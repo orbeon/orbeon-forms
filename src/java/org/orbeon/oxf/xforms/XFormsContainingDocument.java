@@ -18,7 +18,6 @@ import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.orbeon.oxf.cache.Cacheable;
-import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.common.Version;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
@@ -52,7 +51,6 @@ import org.orbeon.oxf.xml.SAXStore;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
-import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.functions.FunctionLibrary;
 import org.orbeon.saxon.om.Item;
 
@@ -154,7 +152,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
     private String focusEffectiveControlId;
     private String helpEffectiveControlId;
     private List<DelayedEvent> delayedEvents;
-    private List<ServerError> serverErrors;
+    private List<XFormsError.ServerError> serverErrors;
 
     // Annotated page template for noscript and full updates mode
     // NOTE: We used to keep this in the static state, but the static state must now not depend on external HTML anymore
@@ -865,38 +863,19 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         }
     }
     
-    public static class ServerError {
-        public final String exceptionClass;
-        public final String message;
-        public final LocationData locationData;
-
-        public ServerError(Throwable t) {
-            final Throwable root = OXFException.getRootThrowable(t);
-            this.exceptionClass = root.getClass().getName();
-            this.message = StringUtils.trimToEmpty(root.getMessage());
-            this.locationData = ValidationException.getRootLocationData(t);
-        }
-        
-        public ServerError(String message) {
-            this.exceptionClass = null;
-            this.message = message;
-            this.locationData = null;
-        }
-    }
-    
-    public void addServerError(ServerError serverError) {
+    public void addServerError(XFormsError.ServerError serverError) {
         final int maxErrors = XFormsProperties.getShowMaxRecoverableErrors(this);
         if (maxErrors > 0) {
             if (serverErrors == null)
-                serverErrors = new ArrayList<ServerError>();
+                serverErrors = new ArrayList<XFormsError.ServerError>();
 
             if (serverErrors.size() < maxErrors)
                 serverErrors.add(serverError);
         }
     }
     
-    public List<ServerError> getServerErrors() {
-        return serverErrors != null ? serverErrors : Collections.<ServerError>emptyList();
+    public List<XFormsError.ServerError> getServerErrors() {
+        return serverErrors != null ? serverErrors : Collections.<XFormsError.ServerError>emptyList();
     }
 
     @Override

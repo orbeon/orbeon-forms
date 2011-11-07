@@ -389,7 +389,7 @@ public class XFormsModelBinds {
         if (stringResult != null) {
             // TODO: Detect if we have already handled this node and handle this error
             final NodeInfo currentNodeInfo = (NodeInfo) bind.nodeset.get(position - 1);
-            DataModel.jSetValueIfChanged(containingDocument, indentedLogger, model, currentNodeInfo, stringResult, null, "default", true);
+            DataModel.jSetValueIfChanged(containingDocument, indentedLogger, model, bind.staticBind.locationData(), currentNodeInfo, stringResult, null, "default", true);
         }
     }
 
@@ -398,7 +398,7 @@ public class XFormsModelBinds {
         if (stringResult != null) {
             // TODO: Detect if we have already handled this node and handle this error
             final NodeInfo currentNodeInfo = (NodeInfo) bind.nodeset.get(position - 1);
-            DataModel.jSetValueIfChanged(containingDocument, indentedLogger, model, currentNodeInfo, stringResult, null, "calculate", true);
+            DataModel.jSetValueIfChanged(containingDocument, indentedLogger, model, bind.staticBind.locationData(), currentNodeInfo, stringResult, null, "calculate", true);
         }
     }
 

@@ -14,12 +14,11 @@
 package org.orbeon.oxf.xforms.model
 
 import org.orbeon.saxon.dom4j.NodeWrapper
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.dom4j._
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.xforms.event.XFormsEventTarget
 import org.orbeon.oxf.xforms._
-import event.events.{XXFormsValueChanged, XXFormsBindingErrorEvent}
+import event.events.XXFormsValueChanged
 import org.w3c.dom.Node.{ELEMENT_NODE, ATTRIBUTE_NODE, TEXT_NODE, DOCUMENT_NODE}
 import org.orbeon.oxf.util.{NetUtils, IndentedLogger}
 import org.orbeon.saxon.value.AtomicValue
@@ -27,6 +26,7 @@ import org.orbeon.saxon.om.{Item, NodeInfo}
 import org.orbeon.oxf.xml.{XMLUtils}
 import org.orbeon.oxf.xml.XMLConstants._
 import XFormsConstants._
+import org.orbeon.oxf.xml.dom4j.{LocationData, Dom4jUtils}
 
 /**
  * Represent access to the data model via the NodeInfo abstraction.
@@ -125,6 +125,7 @@ object DataModel {
             containingDocument: XFormsContainingDocument,
             indentedLogger: IndentedLogger,
             eventTarget: XFormsEventTarget,
+            locationData: LocationData,
             nodeInfo: NodeInfo,
             valueToSet: String,
             dataType: String,
@@ -134,15 +135,9 @@ object DataModel {
         assert(containingDocument ne null)
         assert(indentedLogger ne null)
 
-        val onError =
-            if (containingDocument.isInitializing || containingDocument.getStaticState.isNoscript)
-                exceptionSetValueError
-            else
-                logAddSetValueError
-
         setValueIfChanged(nodeInfo, valueToSet, Option(dataType),
             logAndNotifyValueChange(containingDocument, indentedLogger, source, nodeInfo, _, valueToSet, isCalculate),
-            reason ⇒ onError(containingDocument, eventTarget, reason))
+            reason ⇒ XFormsError.handleNonFatalSetvalueError(containingDocument, eventTarget, locationData, reason))
     }
 
     // Standard success behavior: log and notify
@@ -174,21 +169,6 @@ object DataModel {
                 // Q: Is the code below the right thing to do?
                 containingDocument.getControls.markDirtySinceLastRequest(true)
         }
-
-    private type SetValueError = (XFormsContainingDocument, XFormsEventTarget, Reason) ⇒ Unit
-
-    private val exceptionSetValueError: SetValueError = (_, _, reason) ⇒
-        throw new OXFException(reason.message)
-
-    private val logAddSetValueError: SetValueError = (containingDocument, eventTarget, reason) ⇒ {
-        // Log + add server error
-        val indentedLogger = containingDocument.getIndentedLogger
-        indentedLogger.logWarning("", reason.message)
-        containingDocument.addServerError(new XFormsContainingDocument.ServerError(reason.message))
-
-        // Dispatch xxforms-binding-error
-        containingDocument.dispatchEvent(new XXFormsBindingErrorEvent(containingDocument, eventTarget, reason.message))
-    }
 
     private def setValueForNode(node: Node, newValue: String, dataType: Option[String]) {
         val convertedValue =

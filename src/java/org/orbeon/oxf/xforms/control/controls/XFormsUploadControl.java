@@ -635,7 +635,7 @@ class FileInfo implements ExternalCopyable {
         final Item currentSingleItem = contextStack.getCurrentSingleItem();
         if (currentSingleItem instanceof NodeInfo) {
             DataModel.jSetValueIfChanged(control.getXBLContainer().getContainingDocument(), control.getIndentedLogger(),
-                    control, (NodeInfo) currentSingleItem, value, null, "fileinfo", false);
+                    control, control.getLocationData(), (NodeInfo) currentSingleItem, value, null, "fileinfo", false);
             contextStack.popBinding();
         }
     }

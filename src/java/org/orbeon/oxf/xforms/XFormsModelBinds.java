@@ -387,7 +387,7 @@ public class XFormsModelBinds {
 
         final String stringResult = evaluateXXFormsDefaultBind(bind, position);
         if (stringResult != null) {
-            // TODO: Detect if we have already handled this node and dispatch xforms-binding-exception
+            // TODO: Detect if we have already handled this node and handle this error
             final NodeInfo currentNodeInfo = (NodeInfo) bind.nodeset.get(position - 1);
             DataModel.jSetValueIfChanged(containingDocument, indentedLogger, model, currentNodeInfo, stringResult, null, "default", true);
         }
@@ -396,7 +396,7 @@ public class XFormsModelBinds {
     public void handleCalculateBind(Bind bind, int position) {
         final String stringResult = evaluateCalculateBind(bind, position);
         if (stringResult != null) {
-            // TODO: Detect if we have already handled this node and dispatch xforms-binding-exception
+            // TODO: Detect if we have already handled this node and handle this error
             final NodeInfo currentNodeInfo = (NodeInfo) bind.nodeset.get(position - 1);
             DataModel.jSetValueIfChanged(containingDocument, indentedLogger, model, currentNodeInfo, stringResult, null, "calculate", true);
         }

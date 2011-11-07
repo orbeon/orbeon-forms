@@ -14,9 +14,6 @@
 package org.orbeon.oxf.xforms.function;
 
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.xforms.XFormsModel;
-import org.orbeon.oxf.xforms.event.events.XFormsComputeExceptionEvent;
-import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.om.Item;

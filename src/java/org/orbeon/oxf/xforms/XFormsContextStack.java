@@ -377,7 +377,7 @@ public class XFormsContextStack {
                         isPushModelVariables = false;
                         variableInfo = null;
                     } else if (!(o instanceof XFormsModelBinds.Bind)) {
-                        // The bind attribute did not resolve to a bind: dispatch xforms-binding-exception
+                        // The bind attribute did not resolve to a bind
 
                         // NOTE: We used to dispatch xforms-binding-exception, but we want to be able to recover
                         if (!handleNonFatal)

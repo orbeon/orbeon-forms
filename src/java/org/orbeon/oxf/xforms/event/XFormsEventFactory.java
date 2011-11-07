@@ -35,11 +35,6 @@ public class XFormsEventFactory {
                 return new DOMActivateEvent(containingDocument, targetObject);
             }
         });
-        nameToClassMap.put(XFormsEvents.XFORMS_COMPUTE_EXCEPTION, new Factory() {
-            public XFormsEvent createEvent(XFormsContainingDocument containingDocument, String eventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable, String contextString, Element contextElement, Throwable contextThrowable, Map<String, String> parameters) {
-                return new XFormsComputeExceptionEvent(containingDocument, targetObject, contextString, contextThrowable);
-            }
-        });
         nameToClassMap.put(XFormsEvents.XFORMS_DELETE, new Factory() {
             public XFormsEvent createEvent(XFormsContainingDocument containingDocument, String eventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable, String contextString, Element contextElement, Throwable contextThrowable, Map<String, String> parameters) {
                 return new XFormsDeleteEvent(containingDocument, targetObject);
@@ -63,11 +58,6 @@ public class XFormsEventFactory {
         nameToClassMap.put(XFormsEvents.XFORMS_LINK_EXCEPTION, new Factory() {
             public XFormsEvent createEvent(XFormsContainingDocument containingDocument, String eventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable, String contextString, Element contextElement, Throwable contextThrowable, Map<String, String> parameters) {
                 return new XFormsLinkExceptionEvent(containingDocument, targetObject, contextString, contextElement, contextThrowable);
-            }
-        });
-        nameToClassMap.put(XFormsEvents.XFORMS_BINDING_EXCEPTION, new Factory() {
-            public XFormsEvent createEvent(XFormsContainingDocument containingDocument, String eventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable, String contextString, Element contextElement, Throwable contextThrowable, Map<String, String> parameters) {
-                return new XFormsBindingExceptionEvent(containingDocument, targetObject);
             }
         });
         nameToClassMap.put(XFormsEvents.XFORMS_REFRESH, new Factory() {

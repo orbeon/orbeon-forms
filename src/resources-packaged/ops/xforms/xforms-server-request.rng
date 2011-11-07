@@ -17,8 +17,6 @@
          xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
-    <include href="xforms-server-common.rng"/>
-
     <start>
         <element name="xxforms:event-request">
             <element name="xxforms:uuid">

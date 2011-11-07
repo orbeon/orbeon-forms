@@ -16,8 +16,6 @@
          xmlns:xforms="http://www.w3.org/2002/xforms"
          xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
 
-    <include href="xforms-server-common.rng"/>
-
     <start>
         <element name="xxforms:event-response">
             <optional>

@@ -811,17 +811,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
     }
 
     public void performDefaultAction(XFormsEvent event) {
-
-        // NOTE: This event must be dispatched to elements that support bindings, but at the moment XFormsContextStack
-        // doesn't know how to perform such dispatches so it dispatches to the container. This is of minor consequence
-        // since the event is fatal, but this should be fixed in the future.
-        final String eventName = event.getName();
-        if (XFormsEvents.XFORMS_BINDING_EXCEPTION.equals(eventName)) {
-            // The default action for this event results in the following: Fatal error.
-            final XFormsBindingExceptionEvent bindingExceptionEvent = (XFormsBindingExceptionEvent) event;
-            throw new ValidationException("Binding exception for target: " + event.getTargetObject().getEffectiveId(),
-                    bindingExceptionEvent.getThrowable(), event.getTargetObject().getLocationData());
-        }
+        // NOP at this time
     }
 
     public void performTargetAction(XBLContainer container, XFormsEvent event) {

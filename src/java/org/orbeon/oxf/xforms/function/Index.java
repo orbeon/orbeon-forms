@@ -17,6 +17,7 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.xforms.XFormsModel;
 import org.orbeon.oxf.xforms.event.events.XFormsComputeExceptionEvent;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
+import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.trans.XPathException;
@@ -30,34 +31,19 @@ import org.orbeon.saxon.value.Int64Value;
 public class Index extends XFormsFunction {
 
     public Item evaluateItem(XPathContext xpathContext) throws XPathException {
-
         final String repeatId = argument[0].evaluateAsString(xpathContext).toString();
-
-        // New implementation
         return findIndexForRepeatId(xpathContext, repeatId);
     }
 
     protected Item findIndexForRepeatId(XPathContext xpathContext, String repeatStaticId) {
-
         final int index = getXBLContainer(xpathContext).getRepeatIndex(getSourceEffectiveId(xpathContext), repeatStaticId);
-
         if (index == -1) {
-            // Dispatch exception event
+            // Throw runtime exception
             final String message = "Function index uses repeat id '" + repeatStaticId + "' which is not in scope";
-            final RuntimeException exception = new ValidationException(message, null);
-
-            final XFormsModel currentModel = getContextStack(xpathContext).getCurrentModel();
-            final XBLContainer container = currentModel.getXBLContainer();
-            container.dispatchEvent(
-                    new XFormsComputeExceptionEvent(container.getContainingDocument(), currentModel, message, exception));
-
-            // TODO: stop processing!
-            // How do we do this: throw special exception? Or should throw exception with
-            // XFormsComputeException() and then dispatch the event?
-            throw exception;
+            throw new ValidationException(message, new LocationData(getSystemId(), getLineNumber(), getColumnNumber()));
+        } else {
+            // Return value found
+            return new Int64Value(index);
         }
-
-        // Return value found
-        return new Int64Value(index);
     }
 }

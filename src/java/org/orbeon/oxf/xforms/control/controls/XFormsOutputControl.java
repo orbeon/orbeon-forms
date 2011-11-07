@@ -21,6 +21,7 @@ import org.orbeon.oxf.externalcontext.URLRewriter;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsError;
 import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.analysis.XPathDependencies;
@@ -160,7 +161,7 @@ public class XFormsOutputControl extends XFormsValueControl {
             return Headers.evaluateHeaders(getXBLContainer(), getContextStack(),
                 getEffectiveId(), getElementAnalysis().element());
         } catch (Exception e) {
-            XFormsUtils.handleNonFatalXPathException(containingDocument, e);
+            XFormsError.handleNonFatalXPathError(containingDocument, e);
             return Collections.emptyMap();
         }
     }

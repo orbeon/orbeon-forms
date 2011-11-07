@@ -70,11 +70,10 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
         // TODO: would be nice to do this here, but then we need to make sure this prefix is available to other handlers
 //        formattingPrefix = handlerContext.findFormattingPrefixDeclare();
 
-        final String requestPath;
+        final String requestPath = containingDocument.getRequestPath();
         final String xformsSubmissionPath;
         {
             final ExternalContext.Request request = handlerContext.getExternalContext().getRequest();
-            requestPath = request.getRequestPath();
             if (containingDocument.getDeploymentType() != XFormsConstants.DeploymentType.standalone || request.getContainerType().equals("portlet")) {
                 // Integrated or separate deployment mode or portlet
                 xformsSubmissionPath =  "/xforms-server-submit";
@@ -87,7 +86,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
         // Noscript panel is included before the xhtml:form element, in case the form is hidden through CSS
         if (!handlerContext.isNoScript()) {
             helper.element("", XMLConstants.XINCLUDE_URI, "include", new String[] {
-                    "href", getIncludedResourcePath(requestPath, "noscript-panel.xml"),
+                    "href", getIncludedResourceURL(requestPath, "noscript-panel.xml"),
                     "fixup-xml-base", "false"
             });
         }
@@ -184,15 +183,11 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
             }
 
             // Ajax error panel
-            // XInclude dialog so users can configure it
-            helper.element("", XMLConstants.XINCLUDE_URI, "include", new String[] {
-                    "href", getIncludedResourcePath(requestPath, "error-dialog.xml"),
-                    "fixup-xml-base", "false"
-            });
+            XFormsError.outputAjaxErrorPanel(containingDocument, helper, htmlPrefix);
 
             // Help panel
             helper.element("", XMLConstants.XINCLUDE_URI, "include", new String[] {
-                    "href", getIncludedResourcePath(requestPath, "help-panel.xml"),
+                    "href", getIncludedResourceURL(requestPath, "help-panel.xml"),
                     "fixup-xml-base", "false"
             });
 
@@ -219,6 +214,9 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
             helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[]{
                     "type", "hidden", "name", "$noscript", "value", "true"
             });
+
+            // Noscript error panel
+            XFormsError.outputNoscriptErrorPanel(containingDocument, helper, htmlPrefix);
         }
     }
     
@@ -409,10 +407,14 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
             final String appName = pathElements[0];// it seems that split() does not return first blank match
             final String path = "/apps/" + appName + "/" + fileName;
             if (ResourceManagerWrapper.instance().exists(path)) {
-                return "oxf:" + path;
+                return path;
             }
         }
         // Default
-        return "oxf:/config/" + fileName;
+        return "/config/" + fileName;
+    }
+    
+    public static String getIncludedResourceURL(String requestPath, String fileName) {
+        return "oxf:" + getIncludedResourcePath(requestPath, fileName);
     }
 }

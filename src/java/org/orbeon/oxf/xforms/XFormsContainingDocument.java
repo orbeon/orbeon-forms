@@ -896,7 +896,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
     }
     
     public List<ServerError> getServerErrors() {
-        return serverErrors;
+        return serverErrors != null ? serverErrors : Collections.<ServerError>emptyList();
     }
 
     @Override
@@ -1039,8 +1039,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         } else if (XFormsEvents.XXFORMS_ACTION_ERROR.equals(eventName)) {
             // Handle action error
             final XXFormsActionErrorEvent ev = (XXFormsActionErrorEvent) event;
-            getIndentedLogger(XFormsActions.LOGGING_CATEGORY()).logError("action", "exception while running action", ev.toStringArray());
-            addServerError(new ServerError(ev.throwable()));
+            XFormsError.handleNonFatalXFormsError(getContainingDocument(), "exception while running action", ev.throwable());
         } else {
             super.performDefaultAction(event);
         }

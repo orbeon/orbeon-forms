@@ -7,7 +7,7 @@
             <li><p><a class="xforms-error-panel-close">Close this dialog</a> and try to continue to use this page.</p></li>
             <li><p><a class="xforms-error-panel-reload">Reload this page</a>. Note that you will lose any unsaved changes.</p></li>
             <li>
-                <p>If the above link does not work, try reloading the page yourself. Note that you will lose any unsaved changes:</p>
+                <p>If the above reload link does not work, try reloading the page yourself. Note that you will lose any unsaved changes:</p>
                 <ul>
                     <li>With Internet Explorer: hold down the <code>control</code> key and click the Reload button in your browser toolbar.</li>
                     <li>With Firefox: hold down the <code>shift</code> key and click the Reload button in your browser toolbar.</li>

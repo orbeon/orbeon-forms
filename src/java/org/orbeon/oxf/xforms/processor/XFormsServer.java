@@ -593,9 +593,8 @@ public class XFormsServer extends ProcessorImpl {
 
             // Output errors
             final List<XFormsContainingDocument.ServerError> errors = containingDocument.getServerErrors();
-            if (errors != null && errors.size() > 0) {
+            if (errors.size() > 0)
                 outputErrors(ch, errors);
-            }
 
             ch.endElement();
             xmlReceiver.endPrefixMapping("xxf");

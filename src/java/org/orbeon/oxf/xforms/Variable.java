@@ -16,7 +16,6 @@ package org.orbeon.oxf.xforms;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.analysis.VariableAnalysis;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
@@ -105,7 +104,7 @@ public class Variable {
                         if (handleNonFatal) {
                             // Don't consider this as fatal
                             // Default value is the empty sequence
-                            XFormsUtils.handleNonFatalXPathException(container.getContainingDocument(), e);
+                            XFormsError.handleNonFatalXPathError(container.getContainingDocument(), e);
                             variableValue = EmptySequence.getInstance();
                         } else {
                             throw new OXFException(e);

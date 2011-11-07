@@ -560,9 +560,9 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
             final Throwable t = ((XXFormsXPathErrorEvent) event).throwable();
 
             if (isIgnorableXPathError(t))
-                XFormsUtils.logNonFatalXPathExceptionAsDebug(getContainingDocument(), t);
+                XFormsError.logNonFatalXPathErrorAsDebug(getContainingDocument(), t);
             else
-                XFormsUtils.handleNonFatalXPathException(getContainingDocument(), t);
+                XFormsError.handleNonFatalXPathError(getContainingDocument(), t);
         }
     }
     

@@ -477,7 +477,7 @@ public class XFormsContextStack {
                                         functionContext, null, locationData);
                             } catch (Exception e) {
                                 if (handleNonFatal) {
-                                    XFormsUtils.handleNonFatalXPathException(container.getContainingDocument(), e);
+                                    XFormsError.handleNonFatalXPathError(container.getContainingDocument(), e);
                                     result = XFormsConstants.EMPTY_ITEM_LIST;
                                 } else {
                                     throw e;
@@ -515,7 +515,7 @@ public class XFormsContextStack {
                                             functionContext, null, locationData);
                                 } catch (Exception e) {
                                     if (handleNonFatal) {
-                                        XFormsUtils.handleNonFatalXPathException(container.getContainingDocument(), e);
+                                        XFormsError.handleNonFatalXPathError(container.getContainingDocument(), e);
                                         result = XFormsConstants.EMPTY_ITEM_LIST;
                                     } else {
                                         throw e;

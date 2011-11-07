@@ -423,7 +423,7 @@ public class XFormsUtils {
                                 contextStack.getFunctionContext(sourceEffectiveId), null,
                                 (LocationData) childElement.getData());
                     } catch (Exception e) {
-                        XFormsUtils.handleNonFatalXPathException(container.getContainingDocument(), e);
+                        XFormsError.handleNonFatalXPathError(container.getContainingDocument(), e);
                         tempResult = "";
                     } finally {
                         contextStack.returnFunctionContext();
@@ -1552,28 +1552,5 @@ public class XFormsUtils {
      */
     public static String getElementStaticId(Element element) {
         return element.attributeValue(XFormsConstants.ID_QNAME);
-    }
-    
-    public static void handleNonFatalXPathException(XFormsContainingDocument containingDocument, Throwable t) {
-        // NOTE: For MIPs, this is called as the result of dispatching xforms-xpath-error.
-        if (containingDocument.isInitializing() || containingDocument.getStaticState().isNoscript()) {
-            // The error is non fatal only upon XForms updates
-            throw new OXFException(t);
-        } else {
-            logNonFatalXPathException(containingDocument, t);
-            containingDocument.addServerError(new XFormsContainingDocument.ServerError(t));
-        }
-    }
-
-    public static void logNonFatalXPathException(XFormsContainingDocument containingDocument, Throwable t) {
-        // NOTE: For MIPs, this is called as the result of dispatching xforms-xpath-error.
-        final IndentedLogger indentedLogger = containingDocument.getIndentedLogger();
-        indentedLogger.logWarning("", "exception while evaluating XPath expression", t);
-    }
-
-    public static void logNonFatalXPathExceptionAsDebug(XFormsContainingDocument containingDocument, Throwable t) {
-        // NOTE: For MIPs, this is called as the result of dispatching xforms-xpath-error.
-        final IndentedLogger indentedLogger = containingDocument.getIndentedLogger();
-        indentedLogger.logDebug("", "exception while evaluating XPath expression", t);
     }
 }

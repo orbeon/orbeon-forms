@@ -434,6 +434,9 @@ div.xforms-modal-progress { width: 40px; height: 40px; background-image: url(../
 .xforms-error-panel-reload { cursor: pointer; }
 .xforms-error-panel { width: 500px }
 
+/* In noscript mode, center the panel */
+.xforms-noscript .xforms-error-panel { margin: auto }
+
 .xforms-help-panel { width: 300px; }
 .xforms-help-panel-close { text-align: right; }
 

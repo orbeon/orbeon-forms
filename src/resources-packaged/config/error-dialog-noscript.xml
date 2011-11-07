@@ -1,0 +1,24 @@
+<div xmlns="http://www.w3.org/1999/xhtml"
+     class="xforms-error-panel yui-panel">
+    <div class="hd">Error</div>
+    <div class="bd">
+        <p>A system error occurred. You can do one of the following:</p>
+        <ol>
+            <li><p>Try to continue to use this page.</p></li>
+            <li>
+                <p>Reload this page. Note that you will lose any unsaved changes.</p>
+                <ul>
+                    <li>With Internet Explorer: hold down the <code>control</code> key and click the Reload button in your browser toolbar.</li>
+                    <li>With Firefox: hold down the <code>shift</code> key and click the Reload button in your browser toolbar.</li>
+                    <li>With Safari and Chrome: click the Reload button in your browser toolbar.</li>
+                </ul>
+            </li>
+            <li><p>Return <a href="/">home</a>.</p></li>
+            <li><p>Report this problem to your system administrator.</p></li>
+        </ol>
+        <div class="xforms-error-panel-details-shown">
+            <p>Details:</p>
+            <div class="xforms-error-panel-details"/>
+        </div>
+    </div>
+</div>

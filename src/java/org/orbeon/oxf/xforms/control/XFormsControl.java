@@ -34,6 +34,7 @@ import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
+import org.orbeon.oxf.xforms.event.events.XXFormsBindingErrorEvent;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.oxf.xforms.xbl.XBLBindingsBase;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
@@ -646,6 +647,9 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
             }
         } else if (XFormsEvents.XFORMS_HELP.equals(event.getName())) {
             containingDocument.setClientHelpEffectiveControlId(getEffectiveId());
+        } else if (XFormsEvents.XXFORMS_BINDING_ERROR.equals(event.getName())) {
+            final XXFormsBindingErrorEvent ev = (XXFormsBindingErrorEvent) event;
+            XFormsError.handleNonFatalSetvalueError(containingDocument, ev.locationData(), ev.reason());
         }
     }
 

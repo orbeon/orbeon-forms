@@ -15,9 +15,12 @@ package org.orbeon.oxf.xforms.event.events
 
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.event.{XFormsEvents, XFormsEvent, XFormsEventTarget}
+import org.orbeon.oxf.xml.dom4j.LocationData
+import org.orbeon.oxf.xforms.model.DataModel.Reason
 
 class XXFormsBindingErrorEvent(
-       containingDocument: XFormsContainingDocument,
-       target: XFormsEventTarget,
-       val errorString: String)
+        containingDocument: XFormsContainingDocument,
+        target: XFormsEventTarget,
+        val locationData: LocationData,
+        val reason: Reason)
     extends XFormsEvent(containingDocument, XFormsEvents.XXFORMS_BINDING_ERROR, target, true, true)

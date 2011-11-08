@@ -18,7 +18,7 @@ import org.dom4j._
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.xforms.event.XFormsEventTarget
 import org.orbeon.oxf.xforms._
-import event.events.XXFormsValueChanged
+import event.events.{XXFormsBindingErrorEvent, XXFormsValueChanged}
 import org.w3c.dom.Node.{ELEMENT_NODE, ATTRIBUTE_NODE, TEXT_NODE, DOCUMENT_NODE}
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.saxon.value.AtomicValue
@@ -137,7 +137,7 @@ object DataModel {
 
         setValueIfChanged(nodeInfo, valueToSet,
             logAndNotifyValueChange(containingDocument, indentedLogger, source, nodeInfo, _, valueToSet, isCalculate),
-            reason ⇒ XFormsError.handleNonFatalSetvalueError(containingDocument, eventTarget, locationData, reason))
+            reason ⇒ containingDocument.dispatchEvent(new XXFormsBindingErrorEvent(containingDocument, eventTarget, locationData, reason)))
     }
 
     // Standard success behavior: log and notify

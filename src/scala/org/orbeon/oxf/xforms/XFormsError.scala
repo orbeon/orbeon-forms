@@ -81,7 +81,7 @@ object XFormsError {
         }
     }
 
-    def handleNonFatalSetvalueError(containingDocument: XFormsContainingDocument, eventTarget: XFormsEventTarget, locationData: LocationData, reason: Reason) {
+    def handleNonFatalSetvalueError(containingDocument: XFormsContainingDocument, locationData: LocationData, reason: Reason) {
         if (containingDocument.isInitializing) {
             // The error is non fatal only upon XForms updates
             throw new OXFException(reason.message)
@@ -89,9 +89,6 @@ object XFormsError {
             // Log + add server error
             containingDocument.getIndentedLogger.logWarning("", reason.message)
             containingDocument.addServerError(ServerError(reason.message, Option(locationData)))
-
-            // Dispatch xxforms-binding-error
-            containingDocument.dispatchEvent(new XXFormsBindingErrorEvent(containingDocument, eventTarget, reason.message))
         }
     }
 

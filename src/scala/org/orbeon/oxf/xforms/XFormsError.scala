@@ -34,7 +34,10 @@ import java.util.{List ⇒ JList}
 object XFormsError {
 
     // Represent a non-fatal server XForms error
-    case class ServerError(exceptionClass: Option[String], message: String, private val locationData: Option[LocationData] = None) {
+    case class ServerError(message: String, private val locationData: Option[LocationData], exceptionClass: Option[String] = None) {
+
+        assert(message ne null)
+
         val file = locationData flatMap (l ⇒ Option(l.getSystemID))
         val line = locationData map (_.getLine) filter (_ >= 0)
         val col = locationData map (_.getCol) filter (_ >= 0)
@@ -55,7 +58,7 @@ object XFormsError {
     object ServerError {
         def apply(t: Throwable): ServerError = {
             val root = OXFException.getRootThrowable(t)
-            ServerError(Some(root.getClass.getName), StringUtils.trimToEmpty(root.getMessage), Some(ValidationException.getRootLocationData(t)))
+            ServerError(StringUtils.trimToEmpty(root.getMessage), Option(ValidationException.getRootLocationData(t)), Some(root.getClass.getName))
         }
     }
 
@@ -85,7 +88,7 @@ object XFormsError {
         } else {
             // Log + add server error
             containingDocument.getIndentedLogger.logWarning("", reason.message)
-            containingDocument.addServerError(ServerError(None, reason.message, Some(locationData)))
+            containingDocument.addServerError(ServerError(reason.message, Option(locationData)))
 
             // Dispatch xxforms-binding-error
             containingDocument.dispatchEvent(new XXFormsBindingErrorEvent(containingDocument, eventTarget, reason.message))

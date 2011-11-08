@@ -35,23 +35,21 @@ object XFormsError {
 
     // Represent a non-fatal server XForms error
     case class ServerError(exceptionClass: Option[String], message: String, private val locationData: Option[LocationData] = None) {
-        val file = locationData map (_.getSystemID)
+        val file = locationData flatMap (l ⇒ Option(l.getSystemID))
         val line = locationData map (_.getLine) filter (_ >= 0)
         val col = locationData map (_.getCol) filter (_ >= 0)
 
-        def getDetailsAsArray = Array(
-            "file", file orNull,
-            "line", line map (_.toString) orNull,
-            "col", col map (_.toString) orNull,
-            "exception", exceptionClass orNull
-        )
+        private val attributes = Seq("file", "line", "column", "exception")
+        private val description = Seq("in", "line", "column", "cause")
 
-        // NOTE: The same concatenation logic is in AjaxServer.js
-        def getUserMessage = message +
-            (file           map (" in " + _)     getOrElse "") +
-            (line           map (" line " + _)   getOrElse "") +
-            (col            map (" column " + _) getOrElse "") +
-            (exceptionClass map (" (" + _ + ")") getOrElse "")
+        private def collectSeq(names: Seq[String]) = names zip
+            Seq(file, line, col, exceptionClass) collect
+                {case (k, Some(v)) ⇒ Seq(k, v.toString)} flatten
+
+        def getDetailsAsArray = collectSeq(attributes) toArray
+
+        // NOTE: A similar concatenation logic is in AjaxServer.js
+        def getDetailsAsUserMessage = Seq(message) ++ collectSeq(description) mkString " "
     }
 
     object ServerError {
@@ -117,7 +115,7 @@ object XFormsError {
                 val ul: Seq[NodeInfo] =
                     <ul xmlns="http://www.w3.org/1999/xhtml">{
                         for (error ← errors)
-                            yield <li>{error.getUserMessage}</li>
+                            yield <li>{error.getDetailsAsUserMessage}</li>
                     }</ul>
 
                 insert(into = div, origin = ul)

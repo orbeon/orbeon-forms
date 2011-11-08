@@ -125,15 +125,15 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
      * understood by the UI layer.
      *
      * @param value             the new external value
-     * @param type
+     *
      */
-    public void storeExternalValue(String value, String type) {
+    public void storeExternalValue(String value) {
         // Set value into the instance
 
         final Item boundItem = getBoundItem();
         if (!(boundItem instanceof NodeInfo)) // this should not happen
             throw new OXFException("Control is no longer bound to a node. Cannot set external value.");
-        DataModel.jSetValueIfChanged(containingDocument, getIndentedLogger(), this, getLocationData(), (NodeInfo) boundItem, value, type, "client", false);
+        DataModel.jSetValueIfChanged(containingDocument, getIndentedLogger(), this, getLocationData(), (NodeInfo) boundItem, value, "client", false);
 
         // NOTE: We do *not* call evaluate() here, as that will break the difference engine. doSetValue() above marks
         // the controls as dirty, and they will be evaluated when necessary later.

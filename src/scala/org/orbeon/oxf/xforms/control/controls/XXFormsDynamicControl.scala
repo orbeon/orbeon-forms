@@ -280,7 +280,7 @@ object InstanceMirror {
         case valueChanged: XXFormsValueChanged =>
             findMatchingNode(valueChanged.node, valueChanged.getTargetObject.getId, true) match {
                 case Some(newNode) =>
-                    DataModel.setValueIfChanged(newNode, valueChanged.newValue, None)
+                    DataModel.setValueIfChanged(newNode, valueChanged.newValue)
                 case None => // change not in an instance
                     notifyOtherChange()
             }

@@ -809,7 +809,7 @@ public class NetUtils {
         try {
             // Read from URL and convert to Base64
             is = URLFactory.createURL(value).openStream();
-            final StringBuffer sb = new StringBuffer();
+            final StringBuilder sb = new StringBuilder();
             XMLUtils.inputStreamToBase64Characters(is, new XMLReceiverAdapter() {
                 public void characters(char ch[], int start, int length) {
                     sb.append(ch, start, length);

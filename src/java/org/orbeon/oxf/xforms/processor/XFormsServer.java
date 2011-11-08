@@ -191,7 +191,7 @@ public class XFormsServer extends ProcessorImpl {
                             // Handle uploaded files for noscript if any
                             if (hasFiles) {
                                 eventsIndentedLogger.logDebug("", "handling uploaded files");
-                                XFormsUploadControl.handleUploadedFiles(containingDocument, filesElement, true);
+                                XFormsUploadControl.handleUploadedFiles(containingDocument, filesElement);
                             }
 
                             // Dispatch the events

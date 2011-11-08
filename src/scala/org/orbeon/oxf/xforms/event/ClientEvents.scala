@@ -478,7 +478,7 @@ object ClientEvents {
                             if (checkEventTarget(event)) {
                                 // Store value into instance data through the control
                                 val valueXFormsControl = eventTarget.asInstanceOf[XFormsValueControl]
-                                valueXFormsControl.storeExternalValue(valueChangeWithFocusChangeEvent.getNewValue, null)
+                                valueXFormsControl.storeExternalValue(valueChangeWithFocusChangeEvent.getNewValue)
                             }
 
                             // NOTE: Recalculate and revalidate are done with the automatic deferred updates

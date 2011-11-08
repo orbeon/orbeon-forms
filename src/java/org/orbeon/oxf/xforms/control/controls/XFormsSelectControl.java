@@ -45,10 +45,10 @@ public class XFormsSelectControl extends XFormsSelect1Control {
      * o Itemset values which are not in the list of tokens are removed from the bound control's value.
      *
      * @param value             list of tokens from the UI
-     * @param type              should probably be null
+     *
      */
     @Override
-    public void storeExternalValue(String value, String type) {
+    public void storeExternalValue(String value) {
 
         final String controlValue = getValue();
 
@@ -118,7 +118,7 @@ public class XFormsSelectControl extends XFormsSelect1Control {
         // "newValue" is created so as to ensure that if a value is NOT in the itemset AND we are a closed selection
         // then we do NOT store the value in instance.
         // NOTE: At the moment we don't support open selection here anyway
-        super.storeExternalValue(newValue, type);
+        super.storeExternalValue(newValue);
     }
 
     @Override

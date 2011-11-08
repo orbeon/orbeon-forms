@@ -58,7 +58,7 @@ abstract class DocumentTestBase extends ResourceManagerTestBase {
     def setControlValue(controlId: String, value: String) {
         // This stores the value without testing for readonly
         document.startOutermostActionHandler()
-        getValueControl(controlId).storeExternalValue(value, null)
+        getValueControl(controlId).storeExternalValue(value)
         document.endOutermostActionHandler()
     }
 

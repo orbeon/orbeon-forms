@@ -346,8 +346,6 @@ public class XFormsConstants {
     public static final QName XFORMS_BASE64BINARY_QNAME = new QName("base64Binary", XFORMS_NAMESPACE);
 
     public static final String XFORMS_STRING_EXPLODED_QNAME = XMLUtils.buildExplodedQName(XFORMS_STRING_QNAME);
-    public static final String XFORMS_ANYURI_EXPLODED_QNAME = XMLUtils.buildExplodedQName(XFORMS_ANYURI_QNAME);
-    public static final String XFORMS_BASE64BINARY_EXPLODED_QNAME = XMLUtils.buildExplodedQName(XFORMS_BASE64BINARY_QNAME);
 
     public static final QName XXFORMS_EVENT_MODE_QNAME = new QName("events-mode", XXFORMS_NAMESPACE);
 
@@ -358,20 +356,12 @@ public class XFormsConstants {
     // Use "$$" to minimize chances of conflict with user-defined ids
     public static final String LHHAC_SEPARATOR = "$$";
 
-    public static final String DEFAULT_UPLOAD_TYPE_EXPLODED_QNAME = XMLConstants.XS_ANYURI_EXPLODED_QNAME;
-    public static final QName DEFAULT_UPLOAD_TYPE_QNAME = XMLConstants.XS_ANYURI_QNAME;
-
     public static final String DUMMY_IMAGE_URI = "/ops/images/xforms/spacer.gif";
     public static final String HELP_IMAGE_URI = "/ops/images/xforms/help.png";
     public static final String CALENDAR_IMAGE_URI = "/ops/images/xforms/calendar.png";
 
-    public static final String XSD_EXPLODED_TYPE_PREFIX = "{" + XMLConstants.XSD_URI + "}";
-    public static final String XFORMS_EXPLODED_TYPE_PREFIX = "{" + XFORMS_NAMESPACE_URI + "}";
-
     public static final QName STATIC_STATE_SCRIPTS_QNAME = new QName("scripts");
     public static final QName STATIC_STATE_PROPERTIES_QNAME = new QName("properties");
-
-    public static final String NO_INDEX_ADJUSTMENT = XMLUtils.buildExplodedQName(XXFORMS_NAMESPACE_URI, "no-index-adjustment");
 
     private XFormsConstants() {
         // Disallow construction

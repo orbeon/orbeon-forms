@@ -33,7 +33,6 @@ import org.orbeon.oxf.xforms.itemset.Itemset;
 import org.orbeon.oxf.xforms.itemset.XFormsItemUtils;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.xml.sax.helpers.AttributesImpl;
 import scala.Tuple3;
@@ -230,7 +229,7 @@ public class XFormsSelect1Control extends XFormsValueControl {
     }
 
     @Override
-    public void storeExternalValue(String value, String type) {
+    public void storeExternalValue(String value) {
 
         if (!(this instanceof XFormsSelectControl)) {// kind of a HACK due to the way our class hierarchy is setup
             // Handle xforms:select1-specific logic
@@ -292,11 +291,11 @@ public class XFormsSelect1Control extends XFormsValueControl {
             if (hasSelectedItem) {
                 // Only then do we store the external value. This ensures that if the value is NOT in the itemset AND
                 // we are a closed selection then we do NOT store the value in instance.
-                super.storeExternalValue(value, type);
+                super.storeExternalValue(value);
             }
         } else {
             // Forward to superclass
-            super.storeExternalValue(value, type);
+            super.storeExternalValue(value);
         }
     }
 

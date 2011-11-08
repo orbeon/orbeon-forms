@@ -20,12 +20,9 @@ import org.orbeon.oxf.xforms.event.XFormsEventTarget
 import org.orbeon.oxf.xforms._
 import event.events.XXFormsValueChanged
 import org.w3c.dom.Node.{ELEMENT_NODE, ATTRIBUTE_NODE, TEXT_NODE, DOCUMENT_NODE}
-import org.orbeon.oxf.util.{NetUtils, IndentedLogger}
+import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.saxon.value.AtomicValue
 import org.orbeon.saxon.om.{Item, NodeInfo}
-import org.orbeon.oxf.xml.{XMLUtils}
-import org.orbeon.oxf.xml.XMLConstants._
-import XFormsConstants._
 import org.orbeon.oxf.xml.dom4j.{LocationData, Dom4jUtils}
 
 /**
@@ -65,11 +62,12 @@ object DataModel {
      * @param dataType              type of the value to set (xs:anyURI or xs:base64Binary), null if none
      * @param onSuccess             function called if the value was set
      * @param onError               function called if the value was not set
+     *
+     * Return true if the value was set.
      */
     def setValue(
             nodeInfo: NodeInfo,
             newValue: String,
-            dataType: Option[String],
             onSuccess: () ⇒ Unit = () ⇒ (),
             onError: Reason ⇒ Unit = _ ⇒ ()) = {
 
@@ -80,7 +78,7 @@ object DataModel {
             case nodeWrapper: NodeWrapper ⇒
                 nodeWrapper.getUnderlyingNode match {
                     case node: Node if Dom4jUtils.isSimpleContent(node) ⇒
-                        setValueForNode(node, newValue, dataType)
+                        setValueForNode(node, newValue)
                         onSuccess()
                         true
                     case _ ⇒
@@ -95,11 +93,12 @@ object DataModel {
 
     /**
      * Same as setValue but only attempts to set the value if the new value is different from the old value.
+     *
+     * Return true if the value was changed.
      */
     def setValueIfChanged(
             nodeInfo: NodeInfo,
             newValue: String,
-            dataType: Option[String],
             onSuccess: String ⇒ Unit = _ ⇒ (),
             onError: Reason ⇒ Unit = _ ⇒ ()) = {
         
@@ -111,13 +110,15 @@ object DataModel {
 
         // Do not require RRR / mark the instance dirty if the value hasn't actually changed
         doUpdate &&
-            setValue(nodeInfo, newValue, dataType, () ⇒ onSuccess(oldValue), onError(_))
+            setValue(nodeInfo, newValue, () ⇒ onSuccess(oldValue), onError(_))
     }
 
     /**
      * Same as setValueIfChanged but with default error handling.
      *
      * Used by MIPs and when setting external values on controls.
+     *
+     * Return true if the value was changed.
      *
      * TODO: Move to use setValueIfChanged once callers are all in Scala.
      */
@@ -128,14 +129,13 @@ object DataModel {
             locationData: LocationData,
             nodeInfo: NodeInfo,
             valueToSet: String,
-            dataType: String,
             source: String,
             isCalculate: Boolean) = {
 
         assert(containingDocument ne null)
         assert(indentedLogger ne null)
 
-        setValueIfChanged(nodeInfo, valueToSet, Option(dataType),
+        setValueIfChanged(nodeInfo, valueToSet,
             logAndNotifyValueChange(containingDocument, indentedLogger, source, nodeInfo, _, valueToSet, isCalculate),
             reason ⇒ XFormsError.handleNonFatalSetvalueError(containingDocument, eventTarget, locationData, reason))
     }
@@ -170,64 +170,19 @@ object DataModel {
                 containingDocument.getControls.markDirtySinceLastRequest(true)
         }
 
-    private def setValueForNode(node: Node, newValue: String, dataType: Option[String]) {
-        val convertedValue =
-            dataType match {
-                case Some(dataType) ⇒
-                    val actualNodeType =
-                        Option(InstanceData.getType(node)) map (Dom4jUtils.qNameToExplodedQName(_)) getOrElse
-                            DEFAULT_UPLOAD_TYPE_EXPLODED_QNAME
-
-                    convertUploadTypes(newValue, dataType, actualNodeType)
-                case _ ⇒
-                    newValue
-            }
-
+    private def setValueForNode(node: Node, newValue: String) =
         node match {
             // NOTE: Previously, there was a "first text node rule" which ended up causing problems and was removed.
-            case element: Element ⇒ element.setText(convertedValue)
+            case element: Element ⇒ element.setText(newValue)
             // "Attribute nodes: The string-value of the attribute is replaced with a string corresponding to the new
             // value."
-            case attribute: Attribute ⇒ attribute.setValue(convertedValue)
+            case attribute: Attribute ⇒ attribute.setValue(newValue)
             // "Text nodes: The text node is replaced with a new one corresponding to the new value."
             // NOTE: As of 2011-11-03, this should not happen as the caller tests for isSimpleContent() which excludes text nodes.
-            case text: Text ⇒ text.setText(convertedValue)
+            case text: Text ⇒ text.setText(newValue)
             // "Namespace, processing instruction, comment, and the XPath root node: behavior is undefined."
             case _ ⇒ throw new OXFException("Setting value on node other than element, attribute or text is not supported for node type: " + node.getNodeTypeName)
         }
-    }
-
-    // Binary types supported for upload, images, etc.
-    private val SupportedBinaryTypes =
-        Set(XS_BASE64BINARY_QNAME, XS_ANYURI_QNAME, XFORMS_BASE64BINARY_QNAME, XFORMS_ANYURI_QNAME) map
-            (qName ⇒ XMLUtils.buildExplodedQName(qName) → qName.getName) toMap
-
-    /**
-     * Convert a value used for xforms:upload depending on its type. If the local name of the current type and the new
-     * type are the same, return the value as passed. Otherwise, convert to or from anyURI and base64Binary.
-     *
-     * @param value             value to convert
-     * @param currentType       current type as exploded QName
-     * @param newType           new type as exploded QName
-     * @return converted value, or value passed
-     */
-    def convertUploadTypes(value: String, currentType: String, newType: String) = {
-
-        def getOrThrow(dataType: String) = SupportedBinaryTypes.getOrElse(dataType,
-            throw new UnsupportedOperationException("Unsupported type: " + dataType))
-
-        val currentTypeLocalName = getOrThrow(currentType)
-        val newTypeLocalName = getOrThrow(newType)
-
-        if (currentTypeLocalName == newTypeLocalName)
-            value
-        else if (currentTypeLocalName == "base64Binary")
-            // Convert from xs:base64Binary or xforms:base64Binary to xs:anyURI or xforms:anyURI
-            NetUtils.base64BinaryToAnyURI(value, NetUtils.REQUEST_SCOPE)
-        else
-            // Convert from xs:anyURI or xforms:anyURI to xs:base64Binary or xforms:base64Binary
-            NetUtils.anyURIToBase64Binary(value)
-    }
 
     /**
      * Whether the item is an element node.

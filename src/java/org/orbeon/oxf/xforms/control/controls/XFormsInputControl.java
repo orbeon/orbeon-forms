@@ -126,9 +126,9 @@ public class XFormsInputControl extends XFormsValueControl {
     }
 
     @Override
-    public void storeExternalValue(String value, String type) {
+    public void storeExternalValue(String value) {
         // Store after converting
-        super.storeExternalValue(convertFromExternalValue(value), type);
+        super.storeExternalValue(convertFromExternalValue(value));
 
         // Tricky: mark the external value as dirty if there is a format, as the client will expect an up to date formatted value
         if (format != null) {

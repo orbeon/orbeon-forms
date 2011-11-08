@@ -57,9 +57,9 @@ public class XFormsRangeControl extends XFormsValueControl {
     }
 
     @Override
-    public void storeExternalValue(String value, String type) {
+    public void storeExternalValue(String value) {
         // Store after converting
-        super.storeExternalValue(convertFromExternalValue(value), type);
+        super.storeExternalValue(convertFromExternalValue(value));
     }
 
     private String convertFromExternalValue(String externalValue) {

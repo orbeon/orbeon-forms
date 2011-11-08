@@ -17,7 +17,6 @@ import org.apache.commons.lang.StringUtils;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.Multipart;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.XFormsConstants;
@@ -42,7 +41,6 @@ import org.xml.sax.helpers.AttributesImpl;
 import scala.Option;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URI;
 import java.util.HashSet;
 import java.util.Map;
@@ -101,7 +99,7 @@ public class XFormsUploadControl extends XFormsValueControl {
             Multipart.removeUploadProgress(NetUtils.getExternalContext().getRequest(), this);
 
             final XXFormsUploadDoneEvent uploadDoneEvent = (XXFormsUploadDoneEvent) event;
-            handleUploadedFile(true, uploadDoneEvent.file(), uploadDoneEvent.filename(), uploadDoneEvent.mediatype(), uploadDoneEvent.size(), XMLConstants.XS_ANYURI_EXPLODED_QNAME);
+            handleUploadedFile(uploadDoneEvent.file(), uploadDoneEvent.filename(), uploadDoneEvent.mediatype(), uploadDoneEvent.size());
 
         } else if (XFormsEvents.XXFORMS_UPLOAD_PROGRESS.equals(event.getName())) {
             // NOP: upload progress information will be sent through the diff process
@@ -140,9 +138,8 @@ public class XFormsUploadControl extends XFormsValueControl {
      *
      * @param containingDocument    document
      * @param filesElement          <xxforms:files> element
-     * @param handleTemporaryFiles  whether to set listeners for file deletion
      */
-    public static void handleUploadedFiles(XFormsContainingDocument containingDocument, Element filesElement, boolean handleTemporaryFiles) {
+    public static void handleUploadedFiles(XFormsContainingDocument containingDocument, Element filesElement) {
         if (filesElement != null) {
             for (final Element parameterElement: Dom4jUtils.elements(filesElement)) {
 
@@ -175,17 +172,16 @@ public class XFormsUploadControl extends XFormsValueControl {
                     // No file was selected in the UI
                 } else {
                     // A file was selected in the UI (note that the file may be empty)
-                    final String paramValueType = Dom4jUtils.qNameToExplodedQName(Dom4jUtils.extractAttributeValueQName(valueElement, XMLConstants.XSI_TYPE_QNAME, false));// TODO: should pass true?
-                    uploadControl.handleUploadedFile(handleTemporaryFiles, value, filename, mediatype, size, paramValueType);
+                    uploadControl.handleUploadedFile(value, filename, mediatype, size);
                 }
             }
         }
     }
 
-    private void handleUploadedFile(boolean handleTemporaryFiles, String value, String filename, String mediatype, String size, String paramValueType) {
+    private void handleUploadedFile(String value, String filename, String mediatype, String size) {
         if (!size.equals("0") || !filename.equals("")) {
             // Set value of uploaded file into the instance (will be xs:anyURI or xs:base64Binary)
-            setExternalValue(value, paramValueType, handleTemporaryFiles);
+            doStoreExternalValue(value);
 
             // Handle filename, mediatype and size if necessary
             setFilename(filename);
@@ -222,10 +218,10 @@ public class XFormsUploadControl extends XFormsValueControl {
     }
 
     @Override
-    public void storeExternalValue(String value, String type) {
+    public void storeExternalValue(String value) {
 
         // Set value and handle temporary files
-        setExternalValue(value, type, true);
+        doStoreExternalValue(value);
 
         // If the value is being cleared, also clear the metadata
         if (value.equals("")) {
@@ -235,51 +231,80 @@ public class XFormsUploadControl extends XFormsValueControl {
         }
     }
 
-    private void setExternalValue(String value, String type, boolean handleTemporaryFiles) {
+    private boolean isFileURL(String url) {
+        return NetUtils.urlHasProtocol(url) && url.startsWith("file:");
+    }
 
-        final String oldValue = getValue();
+    private void deleteFileIfPossible(String url) {
+        if (isFileURL(url)) {
+            try {
+                final File file = new File(new URI(url));
+                if (file.exists()) {
+                    final boolean success = file.delete();
 
-        if ((value == null || value.trim().equals("")) && !(oldValue == null || oldValue.trim().equals(""))) {
-            // Consider that file got "deselected" in the UI
-            // Q: Should this event occur during refresh?
-            getXBLContainer().dispatchEvent(new XFormsDeselectEvent(containingDocument, this));
-        }
-
-        final IndentedLogger indentedLogger = getIndentedLogger();
-        try {
-            final String newValue;
-            if (handleTemporaryFiles) {
-                // Try to delete temporary file if old value was temp URI and new value is different
-                if (oldValue != null && NetUtils.urlHasProtocol(oldValue) && !oldValue.equals(value) && oldValue.startsWith("file:")) {
-                    final File file = new File(new URI(oldValue));
-                    if (file.exists()) {
-                        final boolean success = file.delete();
-                        try {
-                            final String message = success ? "deleted temporary file upon upload" : "could not delete temporary file upon upload";
-                            indentedLogger.logDebug("xforms:upload", message, "path", file.getCanonicalPath());
-                        } catch (IOException e) {
-                            // NOP
-                        }
-                    }
+                    final String message = success ? "deleted temporary file upon upload" : "could not delete temporary file upon upload";
+                    getIndentedLogger().logWarning("xforms:upload", message, "path", file.getCanonicalPath());
                 }
-
-                if (XMLConstants.XS_ANYURI_EXPLODED_QNAME.equals(type) && value != null && NetUtils.urlHasProtocol(value)) {
-                    final File newFile = NetUtils.renameAndExpireWithSession(value, indentedLogger.getLogger());
-                    newValue = newFile.toURI().toString();
-                } else {
-                    newValue = value;
-                }
-            } else {
-                newValue = value;
+            } catch (Exception e) {
+                getIndentedLogger().logWarning("xforms:upload", "could not delete temporary file upon upload", "path", url);
             }
+        }
+    }
 
-            // Call the super method
-            super.storeExternalValue(newValue, type);
+    private void doStoreExternalValue(String newValue) {
 
-            // When a value is set, make sure associated file information is cleared, because even though the control might
-            // not be re-evaluated, a submission might attempt to access file name, etc. information for bound upload
-            // controls. A little tricky: can we find a better solution?
-            fileInfo.markDirty();
+        // Clean values
+        newValue = StringUtils.trimToEmpty(newValue);
+        final String oldValue = StringUtils.trimToEmpty(getValue());
+
+        try {
+            // Only process if the new value is different from the old one
+            if (isFileURL(newValue)) {
+                // Setting new file
+
+                final String convertedValue;
+                final boolean isTargetBase64 = XMLConstants.XS_BASE64BINARY_QNAME.equals(getType()) || XFormsConstants.XFORMS_BASE64BINARY_QNAME.equals(getType());
+                if (isTargetBase64) {
+                    // Convert value to Base64 and delete incoming file
+                    convertedValue = NetUtils.anyURIToBase64Binary(newValue);
+                    deleteFileIfPossible(newValue);
+                } else {
+                    // Leave value as is and make file expire with session
+                    final File newFile = NetUtils.renameAndExpireWithSession(newValue, getIndentedLogger().getLogger());
+                    convertedValue = newFile.toURI().toString();
+                }
+
+                // Store the converted value
+                super.storeExternalValue(convertedValue);
+
+                // When a value is set, make sure associated file information is cleared, because even though the control might
+                // not be re-evaluated, a submission might attempt to access file name, etc. information for bound upload
+                // controls. A little tricky: can we find a better solution?
+                fileInfo.markDirty();
+
+            } else if (StringUtils.isEmpty(newValue)) {
+                // Setting blank value
+                if (StringUtils.isNotEmpty(oldValue)) {
+                    // TODO: This should probably take place during refresh instead.
+                    getXBLContainer().dispatchEvent(new XFormsDeselectEvent(containingDocument, this));
+                }
+
+                // Try to delete temporary file associated with old value if any
+                deleteFileIfPossible(oldValue);
+
+                // Store blank value
+                super.storeExternalValue("");
+
+                // When a value is set, make sure associated file information is cleared, because even though the control might
+                // not be re-evaluated, a submission might attempt to access file name, etc. information for bound upload
+                // controls. A little tricky: can we find a better solution?
+                fileInfo.markDirty();
+
+
+            } else {
+                // Only accept file or blank
+                throw new OXFException("Unexpected incoming value for xforms:upload: " + newValue);
+            }
         } catch (Exception e) {
             throw new ValidationException(e, getLocationData());
         }
@@ -635,7 +660,7 @@ class FileInfo implements ExternalCopyable {
         final Item currentSingleItem = contextStack.getCurrentSingleItem();
         if (currentSingleItem instanceof NodeInfo) {
             DataModel.jSetValueIfChanged(control.getXBLContainer().getContainingDocument(), control.getIndentedLogger(),
-                    control, control.getLocationData(), (NodeInfo) currentSingleItem, value, null, "fileinfo", false);
+                    control, control.getLocationData(), (NodeInfo) currentSingleItem, value, "fileinfo", false);
             contextStack.popBinding();
         }
     }

@@ -1716,22 +1716,26 @@ ORBEON.xforms.Controls = {
         }
     },
 
+    getCurrentValueEvent: new YAHOO.util.CustomEvent(null, null, false, YAHOO.util.CustomEvent.FLAT),
     getCurrentValue: function(control) {
-        var formElement = ORBEON.xforms.Controls.getForm(control);
-        if (YAHOO.util.Dom.hasClass(control, "xforms-type-time")) {
+        var event = { control: control };
+        ORBEON.xforms.Controls.getCurrentValueEvent.fire(event);
+        if (! _.isUndefined(event.result)) {
+            return event.result;
+        } else if (YAHOO.util.Dom.hasClass(control, "xforms-type-time")) {
             // Time control
             var timeInputValue = YAHOO.util.Dom.getElementsByClassName("xforms-input-input", null, control)[0].value;
             var timeJSDate = ORBEON.util.DateTime.magicTimeToJSDate(timeInputValue);
             return timeJSDate == null ? timeInputValue : ORBEON.util.DateTime.jsDateToISOTime(timeJSDate);
         } else if (YAHOO.util.Dom.hasClass(control, "xforms-type-date") && YAHOO.util.Dom.hasClass(control, "xforms-input")) {
             // Date control
-			var dateInputValue;
-			if (YAHOO.util.Dom.hasClass(control, "xforms-input-appearance-minimal")) {
-				var imgElement = YAHOO.util.Dom.getElementsByClassName("xforms-input-appearance-minimal", "img", control)[0];
-				dateInputValue = ORBEON.util.Dom.getAttribute(imgElement, "alt");
-			} else {
-				dateInputValue = YAHOO.util.Dom.getElementsByClassName("xforms-input-input", null, control)[0].value;
-			}
+            var dateInputValue;
+            if (YAHOO.util.Dom.hasClass(control, "xforms-input-appearance-minimal")) {
+                var imgElement = YAHOO.util.Dom.getElementsByClassName("xforms-input-appearance-minimal", "img", control)[0];
+                dateInputValue = ORBEON.util.Dom.getAttribute(imgElement, "alt");
+            } else {
+                dateInputValue = YAHOO.util.Dom.getElementsByClassName("xforms-input-input", null, control)[0].value;
+            }
             var dateJSDate = ORBEON.util.DateTime.magicDateToJSDate(dateInputValue);
             return dateJSDate == null ? dateInputValue : ORBEON.util.DateTime.jsDateToISODate(dateJSDate);
         } else if (YAHOO.util.Dom.hasClass(control, "xforms-type-dateTime")) {
@@ -2124,7 +2128,10 @@ ORBEON.xforms.Controls = {
                 }
             }
         }
+        ORBEON.xforms.Controls.lhhaChangeEvent.fire({ control: control, type: lhhaType, message: message });
     },
+
+    lhhaChangeEvent: new YAHOO.util.CustomEvent(null, null, false, YAHOO.util.CustomEvent.FLAT),
 
     getLabelMessage: function(control) {
         if (YAHOO.util.Dom.hasClass(control, "xforms-trigger")

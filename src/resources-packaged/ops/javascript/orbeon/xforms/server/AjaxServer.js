@@ -1161,11 +1161,11 @@
                                             parentElement.replaceChild(newDocumentElement, documentElement);
 
                                             // Remove alert
-                                            var alertElement = ORBEON.xforms.Controls._getControlLHHA(newDocumentElement, "alert");
+                                            var alertElement = ORBEON.xforms.Controls.getControlLHHA(newDocumentElement, "alert");
                                             if (alertElement != null)
                                                 parentElement.removeChild(alertElement);
                                             // Remove hint
-                                            var hintElement = ORBEON.xforms.Controls._getControlLHHA(newDocumentElement, "hint");
+                                            var hintElement = ORBEON.xforms.Controls.getControlLHHA(newDocumentElement, "hint");
                                             if (hintElement != null)
                                                 parentElement.removeChild(hintElement);
                                                 // Update document element information
@@ -1281,7 +1281,7 @@
                                                 return newInputElement;
                                             }
 
-                                            var inputLabelElement = ORBEON.xforms.Controls._getControlLHHA(documentElement, "label");
+                                            var inputLabelElement = ORBEON.xforms.Controls.getControlLHHA(documentElement, "label");
                                             if (newType.type == "string") {
                                                 var newStringInput = createInput("xforms-type-string", 1);
                                                 insertIntoDocument([newStringInput]);

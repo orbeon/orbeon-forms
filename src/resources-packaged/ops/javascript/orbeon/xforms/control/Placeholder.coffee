@@ -13,23 +13,25 @@
 Controls = ORBEON.xforms.Controls
 Event = YAHOO.util.Event
 Events = ORBEON.xforms.Events
+Init = ORBEON.xforms.Init
 YD = YAHOO.util.Dom
 
-# Local state keeping track of the input where the label/hint is a placeholder
-inputWithPlaceholder =
-    label: []
-    hint: []
-
-# All the ids of placeholder inputs
-inputWithPlaceholderIds = () ->
-    result = []
-    result.push id for id in ids for own labelHint, ids of inputWithPlaceholder
-    result
+# Returns true if this control is a placeholder
+isPlaceholderControl = (control) ->
+    if YD.hasClass control, "xforms-input"
+        input = (control.getElementsByTagName "input")[0]
+        placeholder = YD.getAttribute input, "placeholder"
+        placeholder != null
+    else false
 
 # Populate the value with the placeholder (when users aren't editing the field)
 showPlaceholder = (control) ->
     input = (control.getElementsByTagName "input")[0]
-    if input.value == ""
+    if YD.hasClass control, "xforms-placeholder"
+        # Already showing the placeholder, update it
+        input.value = input.placeholder
+    else if input.value == ""
+        # Field is empty, then we can show the placeholder
         YD.addClass control, "xforms-placeholder"
         input.value = input.placeholder
 
@@ -43,7 +45,7 @@ hidePlaceholder = (control) ->
 # On DOM ready, get initial placeholder inputs and populate value with placeholder
 do ->
     Event.onDOMReady ->
-        # Store pointers to list of input with label/hint placeholder
+        # Initial initialization of placeholders
         for own formId, formInfo of orbeonInitData
             controls = formInfo.controls
             continue if not controls?
@@ -51,9 +53,7 @@ do ->
                 continue if not controls[labelHint]?
                 placeholders = controls[labelHint]["{http://orbeon.org/oxf/xml/xforms}placeholder"]
                 continue if not placeholders?
-                inputWithPlaceholder[labelHint] = placeholders
-        # Populate value with placeholder
-        showPlaceholder (YD.get id) for id in ids for own labelHint, ids of inputWithPlaceholder
+                showPlaceholder (YD.get id) for id in placeholders
 
 # Call showPlaceholder/hidePlaceholder when users focus in and out of input
 do ->
@@ -61,7 +61,7 @@ do ->
         Event.addListener document, name, (event) ->
             target = Event.getTarget event
             targetControl = YD.getAncestorByClassName target, "xforms-control"
-            f targetControl if targetControl? and targetControl.id in inputWithPlaceholderIds()
+            f targetControl if targetControl? and isPlaceholderControl targetControl
     addFocusListener "focusin", hidePlaceholder
     addFocusListener "focusout", showPlaceholder
 
@@ -70,23 +70,24 @@ do ->
     addChangeListener = (event, f) ->
         event.subscribe (type, args) ->
             target = args[0].target
-            f(target) if target.id in inputWithPlaceholderIds()
+            f(target) if isPlaceholderControl target
     addChangeListener Events.beforeValueChange, hidePlaceholder
     addChangeListener Events.afterValueChange, showPlaceholder
 
 # When the label/hint changes, set the value of the placeholder
 do ->
     Controls.lhhaChangeEvent.subscribe (event) ->
-        if event.control.id in inputWithPlaceholder[event.type]
-            # Update placeholder attribute
-            input = (event.control.getElementsByTagName "input")[0]
-            input.placeholder = event.message
-            # Update value if showing placeholder
-            input.value = event.message if YD.hasClass event.control, "xforms-placeholder"
+        if isPlaceholderControl event.control
+            labelHint = Controls.getControlLHHA event.control, event.type
+            if not labelHint?
+                # Update placeholder attribute and show it
+                input = (event.control.getElementsByTagName "input")[0]
+                input.placeholder = event.message
+                showPlaceholder event.control
 
 # When getting the value of a placeholder input, if the placeholder is shown, the current value is empty string
 do ->
     Controls.getCurrentValueEvent.subscribe (event) ->
-        if event.control.id in inputWithPlaceholderIds()
+        if isPlaceholderControl event.control
             if YD.hasClass event.control, "xforms-placeholder"
                 event.result = ""

@@ -16,6 +16,10 @@ Events = ORBEON.xforms.Events
 Init = ORBEON.xforms.Init
 YD = YAHOO.util.Dom
 
+browserSupportsPlaceholder = do ->
+    input = document.createElement "input"
+    input.placeholder?
+
 # Returns true if this control is a placeholder
 isPlaceholderControl = (control) ->
     if YD.hasClass control, "xforms-input"
@@ -44,35 +48,38 @@ hidePlaceholder = (control) ->
 
 # On DOM ready, get initial placeholder inputs and populate value with placeholder
 do ->
-    Event.onDOMReady ->
-        # Initial initialization of placeholders
-        for own formId, formInfo of orbeonInitData
-            controls = formInfo.controls
-            continue if not controls?
-            for labelHint in ["label", "hint"]
-                continue if not controls[labelHint]?
-                placeholders = controls[labelHint]["{http://orbeon.org/oxf/xml/xforms}placeholder"]
-                continue if not placeholders?
-                showPlaceholder (YD.get id) for id in placeholders
+    if not browserSupportsPlaceholder
+        Event.onDOMReady ->
+            # Initial initialization of placeholders
+            for own formId, formInfo of orbeonInitData
+                controls = formInfo.controls
+                continue if not controls?
+                for labelHint in ["label", "hint"]
+                    continue if not controls[labelHint]?
+                    placeholders = controls[labelHint]["{http://orbeon.org/oxf/xml/xforms}placeholder"]
+                    continue if not placeholders?
+                    showPlaceholder (YD.get id) for id in placeholders
 
 # Call showPlaceholder/hidePlaceholder when users focus in and out of input
 do ->
-    addFocusListener = (name, f) ->
-        Event.addListener document, name, (event) ->
-            target = Event.getTarget event
-            targetControl = YD.getAncestorByClassName target, "xforms-control"
-            f targetControl if targetControl? and isPlaceholderControl targetControl
-    addFocusListener "focusin", hidePlaceholder
-    addFocusListener "focusout", showPlaceholder
+    if not browserSupportsPlaceholder
+        addFocusListener = (name, f) ->
+            Event.addListener document, name, (event) ->
+                target = Event.getTarget event
+                targetControl = YD.getAncestorByClassName target, "xforms-control"
+                f targetControl if targetControl? and isPlaceholderControl targetControl
+        addFocusListener "focusin", hidePlaceholder
+        addFocusListener "focusout", showPlaceholder
 
 # Call showPlaceholder/hidePlaceholder before/after the XForms engine changes the value
 do ->
-    addChangeListener = (event, f) ->
-        event.subscribe (type, args) ->
-            target = args[0].target
-            f(target) if isPlaceholderControl target
-    addChangeListener Events.beforeValueChange, hidePlaceholder
-    addChangeListener Events.afterValueChange, showPlaceholder
+    if not browserSupportsPlaceholder
+        addChangeListener = (event, f) ->
+            event.subscribe (type, args) ->
+                target = args[0].target
+                f(target) if isPlaceholderControl target
+        addChangeListener Events.beforeValueChange, hidePlaceholder
+        addChangeListener Events.afterValueChange, showPlaceholder
 
 # When the label/hint changes, set the value of the placeholder
 do ->
@@ -83,11 +90,12 @@ do ->
                 # Update placeholder attribute and show it
                 input = (event.control.getElementsByTagName "input")[0]
                 input.placeholder = event.message
-                showPlaceholder event.control
+                showPlaceholder event.control if not browserSupportsPlaceholder
 
 # When getting the value of a placeholder input, if the placeholder is shown, the current value is empty string
 do ->
-    Controls.getCurrentValueEvent.subscribe (event) ->
-        if isPlaceholderControl event.control
-            if YD.hasClass event.control, "xforms-placeholder"
-                event.result = ""
+    if not browserSupportsPlaceholder
+        Controls.getCurrentValueEvent.subscribe (event) ->
+            if isPlaceholderControl event.control
+                if YD.hasClass event.control, "xforms-placeholder"
+                    event.result = ""

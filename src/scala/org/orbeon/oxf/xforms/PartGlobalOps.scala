@@ -37,6 +37,7 @@ trait PartGlobalOps {
     def getAncestorControlForAction(prefixedId: String): Option[String]
     def hasControlByName(controlName: String): Boolean                                              // GRUN
     def hasControlAppearance(controlName: String, appearance: QName): Boolean                       // GRUN
+    def hasInputPlaceholder: Boolean
 
     // Events
     def hasHandlerForEvent(eventName: String): Boolean                                              // GRUN

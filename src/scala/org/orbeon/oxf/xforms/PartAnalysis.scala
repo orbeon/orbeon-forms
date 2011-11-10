@@ -46,7 +46,7 @@ trait PartAnalysis extends PartGlobalOps with PartStaticAnalysisOps with XMLUtil
     def metadata: Metadata
     def getXBLBindings: XBLBindings
 
-    // TODO: These two methods should probalby not be part of this trait
+    // TODO: These two methods should probably not be part of this trait
     def extractXFormsScripts(documentInfo: DocumentWrapper, prefix: String)
     def extractEventHandlers(documentInfo: DocumentInfo, innerScope: XBLBindingsBase.Scope, isControls: Boolean): JList[XFormsEventHandlerImpl]
 

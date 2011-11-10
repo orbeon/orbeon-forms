@@ -2498,6 +2498,7 @@
                 <xh:script src="/ops/javascript/orbeon/xforms/control/RTE-min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/orbeon/xforms/control/Tree-min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/orbeon/xforms/action/Message-min.js" class="xforms-baseline"/>
+                <xh:script src="/ops/javascript/orbeon/xforms/control/Placeholder-min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/yui/button/button-min.js" class="xforms-baseline"/>
                 <xh:script src="/xbl/orbeon/button/button.js" class="xforms-baseline"/>
                 <xh:script src="/ops/yui/element/element.js" class="xforms-baseline"/>

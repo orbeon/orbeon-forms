@@ -79,6 +79,8 @@ class StaticStateGlobalOps(topLevelPart: PartAnalysis) extends PartGlobalOpsImpl
     def hasAttributeControl(prefixedForAttribute: String) = existsInParts(_.hasAttributeControl(prefixedForAttribute))
     def getAttributeControl(prefixedForAttribute: String, attributeName: String) = findInParts(_.getAttributeControl(prefixedForAttribute, attributeName)).orNull
 
+    def hasInputPlaceholder = existsInParts(_.hasInputPlaceholder)
+
     def getGlobals = collectInParts(_.getGlobals) toMap
 
     def getScripts = parts flatMap (_.getScripts) toMap

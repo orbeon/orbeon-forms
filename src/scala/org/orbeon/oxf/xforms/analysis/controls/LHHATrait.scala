@@ -18,8 +18,9 @@ import org.dom4j.QName
 import org.orbeon.oxf.xml.ContentHandlerHelper
 import collection.mutable.LinkedHashMap
 import org.orbeon.oxf.xforms.analysis.SimpleElementAnalysis
+import collection.JavaConverters._
 
-object LHHATrait {
+private object LHHA {
     val LHHAQNames = List(LABEL_QNAME, HELP_QNAME, HINT_QNAME, ALERT_QNAME)
 }
 
@@ -28,16 +29,18 @@ object LHHATrait {
  */
 trait LHHATrait extends SimpleElementAnalysis {
 
+    self =>
+
     // All LHHA, nested or external
     private val lhha = LinkedHashMap.empty[String, LHHAAnalysis]
 
     // Process nested LHHA
     lhha ++= (
         for {
-            qName <- LHHATrait.LHHAQNames
+            qName <- LHHA.LHHAQNames
             lhhaElement <- findNestedLHHAElement(qName)
         } yield
-            lhhaElement.getName -> new LocalLHHAAnalysis(staticStateContext, lhhaElement, LHHATrait.this, None, getChildElementScope(lhhaElement))
+            lhhaElement.getName -> new LocalLHHAAnalysis(staticStateContext, lhhaElement, self, None, getChildElementScope(lhhaElement))
     )
 
     protected def findNestedLHHAElement(qName: QName) = Option(element.element(qName))
@@ -76,4 +79,5 @@ trait LHHATrait extends SimpleElementAnalysis {
     }
 
     private def getAllLHHA = lhha.values
+    def jGetAllLHHA = lhha.values.asJava
 }

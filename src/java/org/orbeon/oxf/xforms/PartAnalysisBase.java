@@ -81,6 +81,12 @@ public abstract class PartAnalysisBase implements PartAnalysis {
     // XXFormsAttributeControl
     private Map<String, Map<String, AttributeControl>> attributeControls;        // Map<String forPrefixedId, Map<String name, AttributeControl control>>
 
+    private boolean _hasInputPlaceholder = false;
+
+    public boolean hasInputPlaceholder() {
+        return _hasInputPlaceholder;
+    }
+
     public PartAnalysisBase(Metadata metadata, XBLBindingsBase.Scope startScope) {
         this.metadata = metadata;
 
@@ -347,6 +353,33 @@ public abstract class PartAnalysisBase implements PartAnalysis {
         // Process deferred external LHHA elements
         for (final ExternalLHHAAnalysis entry : externalLHHA)
             entry.attachToControl();
+
+        // Check whether input controls have "placeholder" label/hint
+        if (controlTypes.get("input") != null) {
+            final Collection<ElementAnalysis> values = controlTypes.get("input").values();
+            if (values != null && values.size() > 0) {
+                for (final ElementAnalysis control : values) {
+                    if (control instanceof LHHATrait) {
+                        final LHHATrait lhhaTrait = (LHHATrait) control;
+
+                        {
+                            final LHHAAnalysis lhhaAnalysis = lhhaTrait.getLHHA("label");
+                            if (lhhaAnalysis != null && lhhaAnalysis.jAppearances().contains(XFormsConstants.XXFORMS_PLACEHOLDER_APPEARANCE_QNAME)) {
+                                _hasInputPlaceholder = true;
+                                break;
+                            }
+                        }
+                        {
+                            final LHHAAnalysis lhhaAnalysis = lhhaTrait.getLHHA("hint");
+                            if (lhhaAnalysis != null && lhhaAnalysis.jAppearances().contains(XFormsConstants.XXFORMS_PLACEHOLDER_APPEARANCE_QNAME)) {
+                                _hasInputPlaceholder = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
         // Index attribute controls
         if (controlTypes.get("attribute") != null) {

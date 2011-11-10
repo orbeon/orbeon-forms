@@ -1,0 +1,89 @@
+<xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml"
+      xmlns:xforms="http://www.w3.org/2002/xforms"
+      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+      xmlns:ev="http://www.w3.org/2001/xml-events"
+      xmlns:xs="http://www.w3.org/2001/XMLSchema"
+      xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+    <xhtml:head>
+        <xhtml:title>Placeholder</xhtml:title>
+        <xforms:model>
+            <xforms:instance>
+                <instance>
+                    <iteration>
+                        <content/>
+                        <placeholder>1</placeholder>
+                    </iteration>
+                </instance>
+            </xforms:instance>
+        </xforms:model>
+
+        <!-- Added by server if placeholders are found in form -->
+        <xhtml:script type="text/javascript" src="/ops/javascript/orbeon/xforms/control/Placeholder.js"/>
+        <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
+        <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
+        <xhtml:script type="text/javascript" src="/ops/yui/event-simulate/event-simulate.js"/>
+        <xhtml:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
+        <xhtml:script type="text/javascript" src="/apps/xforms-sandbox/samples/test-placeholder.js"/>
+        <xhtml:style type="text/css">
+            .add, .remove { margin-bottom: 10px }
+            .iteration { display: inline-block; border: 1px solid #999; padding: 10px }
+            .xforms-repeat-selected-item-1 { background-color: #EEE }
+        </xhtml:style>
+    </xhtml:head>
+    <xhtml:body>
+        <xhtml:div>
+            <xforms:trigger id="add" class="add">
+                <xforms:label>Add</xforms:label>
+                <xforms:insert ev:event="DOMActivate" nodeset="iteration"/>
+            </xforms:trigger>
+            <xforms:trigger id="remove" class="remove">
+                <xforms:label>Remove</xforms:label>
+                <xforms:delete ev:event="DOMActivate" nodeset="iteration[last()]"/>
+            </xforms:trigger>
+        </xhtml:div>
+        <xforms:repeat ref="iteration">
+            <xhtml:div class="iteration">
+                <xforms:trigger id="reset-content">
+                    <xforms:label>Reset content</xforms:label>
+                    <xforms:setvalue ev:event="DOMActivate" ref="content"/>
+                </xforms:trigger>
+                <xforms:trigger id="increment-content">
+                    <xforms:label>Content++</xforms:label>
+                    <xforms:setvalue ev:event="DOMActivate" ref="content" value="if (. castable as xs:integer) then . + 1 else 1"/>
+                </xforms:trigger>
+                <xforms:trigger id="increment-placeholder">
+                    <xforms:label>Placeholder++</xforms:label>
+                    <xforms:setvalue ev:event="DOMActivate" ref="placeholder" value="if (. castable as xs:integer) then . + 1 else 1"/>
+                </xforms:trigger>
+                <xhtml:dl>
+                    <xhtml:dt>Static label placeholder</xhtml:dt>
+                    <xhtml:dd>
+                        <xforms:input ref="content" id="static-label">
+                            <xforms:label appearance="xxforms:placeholder">First name</xforms:label>
+                        </xforms:input>
+                    </xhtml:dd>
+                    <xhtml:dt>Static hint placeholder</xhtml:dt>
+                    <xhtml:dd>
+                        <xforms:input ref="content" id="static-hint">
+                            <xforms:hint appearance="xxforms:placeholder">First name</xforms:hint>
+                        </xforms:input>
+                    </xhtml:dd>
+                    <xhtml:dt>Dynamic label placeholder</xhtml:dt>
+                    <xhtml:dd>
+                        <xforms:input ref="content" id="dynamic-label">
+                            <xforms:label appearance="xxforms:placeholder" ref="../placeholder"/>
+                            <xforms:hint ref="../placeholder"/>
+                        </xforms:input>
+                    </xhtml:dd>
+                    <xhtml:dt>Dynamic hint placeholder</xhtml:dt>
+                    <xhtml:dd>
+                        <xforms:input ref="content" id="dynamic-hint">
+                            <xforms:label ref="../placeholder"/>
+                            <xforms:hint appearance="xxforms:placeholder" ref="../placeholder"/>
+                        </xforms:input>
+                    </xhtml:dd>
+                </xhtml:dl>
+            </xhtml:div>
+        </xforms:repeat>
+    </xhtml:body>
+</xhtml:html>

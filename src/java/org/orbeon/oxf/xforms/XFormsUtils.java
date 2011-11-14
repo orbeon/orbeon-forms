@@ -44,7 +44,6 @@ import org.orbeon.saxon.functions.FunctionLibrary;
 import org.orbeon.saxon.om.*;
 import org.orbeon.saxon.value.*;
 import org.orbeon.saxon.value.StringValue;
-import org.w3c.tidy.Tidy;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
@@ -165,40 +164,6 @@ public class XFormsUtils {
         }
     }
 
-    public static String ensureEncrypted(String encoded) {
-        if (encoded.startsWith("X3") || encoded.startsWith("X4")) {
-            // Data is currently not encrypted, so encrypt it
-            final byte[] decodedValue = XFormsUtils.decodeBytes(encoded, XFormsProperties.getXFormsPassword());
-            return XFormsUtils.encodeBytes(decodedValue, XFormsProperties.isGZIPState(), XFormsProperties.getXFormsPassword());
-        } else {
-            // Data is already encrypted
-            return encoded;
-        }
-    }
-
-    public static org.w3c.dom.Document htmlStringToDocument(String value, LocationData locationData) {
-        // Create and configure Tidy instance
-        final Tidy tidy = new Tidy();
-        tidy.setShowWarnings(false);
-        tidy.setQuiet(true);
-        tidy.setInputEncoding("utf-8");
-        //tidy.setNumEntities(true); // CHECK: what does this do exactly?
-
-        // Parse and output to SAXResult
-        final byte[] valueBytes;
-        try {
-            valueBytes = value.getBytes("utf-8");
-        } catch (UnsupportedEncodingException e) {
-            throw new OXFException(e); // will not happen
-        }
-        try {
-            final InputStream is = new ByteArrayInputStream(valueBytes);
-            return tidy.parseDOM(is, null);
-        } catch (Exception e) {
-            throw new ValidationException("Cannot parse value as text/html for value: '" + value + "'", locationData);
-        }
-    }
-
     private static void htmlStringToResult(String value, LocationData locationData, Result result) {
         try {
             final XMLReader xmlReader = new org.ccil.cowan.tagsoup.Parser();
@@ -252,49 +217,13 @@ public class XFormsUtils {
 //    }
 
     public static void streamHTMLFragment(XMLReceiver xmlReceiver, String value, LocationData locationData, String xhtmlPrefix) {
-        
-        if (value != null && value.trim().length() > 0) { // don't parse blank values
+        if (StringUtils.isNotBlank(value)) { // don't parse blank values
+            final org.w3c.dom.Document htmlDocument = htmlStringToDocumentTagSoup(value, locationData);
 
-//            final boolean useTagSoup = false;
-//
-//            if (useTagSoup) {
-//                try {
-//                    final XMLReader xmlReader = new org.ccil.cowan.tagsoup.Parser();
-//		            final HTMLSchema theSchema = new HTMLSchema();
-//
-//                    xmlReader.setProperty(org.ccil.cowan.tagsoup.Parser.schemaProperty, theSchema);
-//                    xmlReader.setContentHandler(new HTMLBodyContentHandler(contentHandler, xhtmlPrefix));
-//
-//                    final InputSource inputSource = new InputSource();
-//                    inputSource.setCharacterStream(new StringReader(value));
-//
-//                    xmlReader.parse(inputSource);
-//                } catch (SAXException e) {
-//                    throw new OXFException(e);
-//                } catch (IOException e) {
-//                    throw new OXFException(e);
-//                }
-//
-////			r.setFeature(Parser.CDATAElementsFeature, false);
-////			r.setFeature(Parser.namespacesFeature, false);
-////			r.setFeature(Parser.ignoreBogonsFeature, true);
-////			r.setFeature(Parser.bogonsEmptyFeature, false);
-////			r.setFeature(Parser.defaultAttributesFeature, false);
-////			r.setFeature(Parser.translateColonsFeature, true);
-////			r.setFeature(Parser.restartElementsFeature, false);
-////			r.setFeature(Parser.ignorableWhitespaceFeature, true);
-////			r.setProperty(Parser.scannerProperty, new PYXScanner());
-////          r.setProperty(Parser.lexicalHandlerProperty, h);
-//
-//            } else {
-
-                final org.w3c.dom.Document htmlDocument = htmlStringToDocument(value, locationData);
-
-                // Stream fragment to the output
-                if (htmlDocument != null) {
-                    TransformerUtils.sourceToSAX(new DOMSource(htmlDocument), new HTMLBodyXMLReceiver(xmlReceiver, xhtmlPrefix));
-                }
-//            }
+            // Stream fragment to the output
+            if (htmlDocument != null) {
+                TransformerUtils.sourceToSAX(new DOMSource(htmlDocument), new HTMLBodyXMLReceiver(xmlReceiver, xhtmlPrefix));
+            }
         }
     }
 
@@ -1086,6 +1015,18 @@ public class XFormsUtils {
     public static String scriptIdToScriptName(String scriptId) {
         return scriptId.replace('-', '_').replace('$', '_') + "_xforms_function";
     }
+    
+    private static String[] voidElementsNames = {
+        // HTML 5: http://www.w3.org/TR/html5/syntax.html#void-elements
+        "area", "base", "br", "col", "command", "embed", "hr", "img", "input", "keygen", "link", "meta", "param", "source", "track", "wbr",
+        // Legacy
+        "basefont", "frame", "isindex"
+    };
+    private static final Set<String> voidElements = new HashSet<String>(Arrays.asList(voidElementsNames));
+    
+    public static boolean isVoidElement(String elementName) {
+        return voidElements.contains(elementName);
+    }
 
     private static class LHHAElementVisitorListener implements Dom4jUtils.VisitorListener {
         private final XBLContainer container;
@@ -1096,14 +1037,6 @@ public class XFormsUtils {
         private final StringBuilder sb;
         private final Element childElement;
         private final boolean hostLanguageAVTs;
-
-        private static String[] voidElementsNames = {
-            // HTML 5: http://www.w3.org/TR/html5/syntax.html#void-elements
-            "area", "base", "br", "col", "command", "embed", "hr", "img", "input", "keygen", "link", "meta", "param", "source", "track", "wbr",
-            // Legacy
-            "basefont", "frame", "isindex"
-        };
-        private static final Set<String> voidElements = new HashSet<String>(Arrays.asList(voidElementsNames));
 
         // Constructor for "static" case, i.e. when we know the child element cannot have dynamic content
         public LHHAElementVisitorListener(boolean acceptHTML, boolean[] containsHTML, StringBuilder sb, Element childElement) {
@@ -1234,7 +1167,7 @@ public class XFormsUtils {
 
         public void endElement(Element element) {
             final String elementName = element.getName();
-            if ((!lastIsStart || !voidElements.contains(elementName)) && !element.getQName().equals(XFormsConstants.XFORMS_OUTPUT_QNAME)) {
+            if ((!lastIsStart || !isVoidElement(elementName)) && !element.getQName().equals(XFormsConstants.XFORMS_OUTPUT_QNAME)) {
                 // This is a regular element, just serialize the end tag to no namespace
                 // UNLESS the element was just opened. This means we output <br>, not <br></br>, etc.
                 sb.append("</");

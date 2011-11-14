@@ -29,7 +29,6 @@
                 <instance xmlns="">
                     <filter-broken-pi xsi:type="xs:boolean">true</filter-broken-pi>
                     <html/>
-                    <xhtml-jtidy/>
                     <xhtml-tagsoup/>
                 </instance>
             </xforms:instance>
@@ -59,14 +58,10 @@
 
             <xforms:action ev:event="xforms-value-changed">
                 <xxforms:variable name="filtered" select="if (filter-broken-pi = 'true') then replace(html, '&lt;\?[^>]*>', '') else html" as="xs:string"/>
-                <xforms:setvalue ref="xhtml-jtidy" value="saxon:serialize(utils:htmlStringToDocument($filtered, ()), instance('fr-xsl-output-instance'))"/>
                 <xforms:setvalue ref="xhtml-tagsoup" value="saxon:serialize(utils:htmlStringToDocumentTagSoup($filtered, ()), instance('fr-xsl-output-instance'))"/>
             </xforms:action>
         </xforms:group>
 
-        <xforms:textarea ref="xhtml-jtidy">
-            <xforms:label>JTidy</xforms:label>
-        </xforms:textarea>
         <xforms:textarea ref="xhtml-tagsoup">
             <xforms:label>TagSoup</xforms:label>
         </xforms:textarea>

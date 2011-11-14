@@ -2136,7 +2136,7 @@
         <output name="response">
             <controls xmlns:xhtml="http://www.w3.org/1999/xhtml">
                 <xh:label xmlns:xh="http://www.w3.org/1999/xhtml" class="xforms-label" id="xf-1$$l" for="xf-1$xforms-input-1">Foo
-                    <xh:br/>Bar
+                    <xh:br clear="none"/>Bar
                 </xh:label>
                 <xh:span xmlns:xh="http://www.w3.org/1999/xhtml" id="xf-1" class="xforms-control xforms-input">
                     <xh:input id="xf-1$xforms-input-1" type="text" name="xf-1$xforms-input-1" value="" class="xforms-input-input"/>

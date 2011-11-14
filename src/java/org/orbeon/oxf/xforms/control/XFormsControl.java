@@ -677,14 +677,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
         // NOTE: we do our own serialization here, but it's really simple (no namespaces) and probably reasonably efficient
         final ExternalContext.Rewriter rewriter = NetUtils.getExternalContext().getResponse();
         XFormsUtils.streamHTMLFragment(new XHTMLRewrite().getRewriteXMLReceiver(rewriter, new ForwardingXMLReceiver() {
-
-            private final String[] voidElementsNames = {
-                // HTML 5: http://www.w3.org/TR/html5/syntax.html#void-elements
-                "area", "base", "br", "col", "command", "embed", "hr", "img", "input", "keygen", "link", "meta", "param", "source", "track", "wbr",
-                // Legacy
-                "basefont", "frame", "isindex"
-            };
-            private final Set<String> voidElements = new HashSet<String>(Arrays.asList(voidElementsNames));
+            
             private boolean isStartElement;
 
             public void characters(char[] chars, int start, int length) throws SAXException {
@@ -712,7 +705,7 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
             }
 
             public void endElement(String uri, String localname, String qName) throws SAXException {
-                if (!isStartElement || !voidElements.contains(localname)) {
+                if (!isStartElement || !XFormsUtils.isVoidElement(localname)) {
                     // We serialize to HTML: don't close elements that just opened (will cover <br>, <hr>, etc.). Be sure not to drop closing elements of other tags though!
                     sb.append("</");
                     sb.append(localname);

@@ -13,7 +13,10 @@
  */
 package org.orbeon.oxf.processor;
 
-import org.dom4j.*;
+import org.dom4j.Document;
+import org.dom4j.Element;
+import org.dom4j.Node;
+import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
@@ -36,9 +39,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Set;
 
 public class ProcessorUtils {
 
@@ -88,8 +89,7 @@ public class ProcessorUtils {
                 Element originalElement = (Element) ((Element) inputElement).elementIterator().next();
                 if (originalElement == null)
                     throw new OXFException("Input content is mandatory");
-                Element copiedElement = originalElement.createCopy();
-                addNeededNamespaceDeclarations(originalElement, copiedElement, new HashSet<String>());
+                Element copiedElement = Dom4jUtils.copyElementCopyParentNamespaces(originalElement);
                 final String sid = Dom4jUtils.makeSystemId( originalElement );
                 final DOMGenerator domGenerator = new DOMGenerator
                     (copiedElement, "input from pipeline utils", DOMGenerator.ZeroValidity, sid);
@@ -131,8 +131,7 @@ public class ProcessorUtils {
             final Element originalElement = (Element) ((Element) element).elementIterator().next();
             if (originalElement == null)
                 throw new OXFException("Content for element '" + element.getName() + "' is mandatory");
-            final Element copiedElement = originalElement.createCopy();
-            addNeededNamespaceDeclarations(originalElement, copiedElement, new HashSet<String>());
+            Element copiedElement = Dom4jUtils.copyElementCopyParentNamespaces(originalElement);
             result = new NonLazyUserDataDocument();
             result.add(copiedElement);
         } else {
@@ -154,39 +153,6 @@ public class ProcessorUtils {
         final PipelineContext pipelineContext = PipelineContext.get();
         domSerializer.start(pipelineContext);
         return domSerializer.getDocument(pipelineContext);
-    }
-
-    private static void addNeededNamespaceDeclarations(Element originalElement, Element copyElement, Set<String> alreadyDeclaredPrefixes) {
-        Set<String> newAlreadyDeclaredPrefixes = new HashSet<String>(alreadyDeclaredPrefixes);
-
-        // Add namespaces declared on this element
-        for (Object o: copyElement.declaredNamespaces()) {
-            Namespace namespace = (Namespace) o;
-            newAlreadyDeclaredPrefixes.add(namespace.getPrefix());
-        }
-
-        // Add element prefix if needed
-        String elementPrefix = copyElement.getNamespace().getPrefix();
-        if (elementPrefix != null && !newAlreadyDeclaredPrefixes.contains(elementPrefix)) {
-            copyElement.addNamespace(elementPrefix, originalElement.getNamespaceForPrefix(elementPrefix).getURI());
-            newAlreadyDeclaredPrefixes.add(elementPrefix);
-        }
-
-        // Add attribute prefixes if needed
-        for (Object o: copyElement.attributes()) {
-            Attribute attribute = (Attribute) o;
-            String attributePrefix = attribute.getNamespace().getPrefix();
-            if (attributePrefix != null && !newAlreadyDeclaredPrefixes.contains(attribute.getNamespace().getPrefix())) {
-                copyElement.addNamespace(attributePrefix, originalElement.getNamespaceForPrefix(attributePrefix).getURI());
-                newAlreadyDeclaredPrefixes.add(attributePrefix);
-            }
-        }
-
-        // Get needed namespace declarations for children
-        for (Object o: copyElement.elements()) {
-            Element child = (Element) o;
-            addNeededNamespaceDeclarations(originalElement, child, newAlreadyDeclaredPrefixes);
-        }
     }
 
     /**

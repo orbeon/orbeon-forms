@@ -22,6 +22,7 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.util.PipelineUtils;
+import org.orbeon.oxf.xml.Dom4j;
 import org.orbeon.oxf.xml.XMLReceiverAdapter;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
@@ -167,11 +168,9 @@ public class TestScriptProcessor extends ProcessorImpl {
                 final Document actualDocument = executionContext.outputProcessor.readInputAsDOM4J(pipelineContext, outputName);
                 final Document expectedDocument = ProcessorUtils.createDocumentFromEmbeddedOrHref(commandElement, XPathUtils.selectStringValue(commandElement, "@href"));
 
-                final String expectedDataString = Dom4jUtils.domToCompactString(expectedDocument);
-                final String actualDataString = Dom4jUtils.domToCompactString(actualDocument);
-
-                if (!expectedDataString.equals(actualDataString))
-                    throw new OXFException("Assertion failed: output '" + outputName + "' got '" + actualDataString +  " ', but expected '" + expectedDataString + "'.");
+                if (!Dom4j.compareDocumentsIgnoreNamespacesInScopeCollapse(actualDocument, expectedDocument))
+                    throw new OXFException("Assertion failed: output '" + outputName + "' got '" + Dom4jUtils.domToCompactString(actualDocument)
+                        +  " ', but expected '" + Dom4jUtils.domToCompactString(expectedDocument) + "'.");
 
             } else {
                 throw new IllegalArgumentException("Not implemented yet.");

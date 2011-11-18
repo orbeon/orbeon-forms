@@ -318,6 +318,10 @@ public class Dom4jUtils {
             throw new OXFException("Should never happen");
         return builder.toString();
     }
+    
+    private static boolean isTextOrCDATA(Node node) {
+        return (node instanceof Text) || (node instanceof CDATA);
+    }
 
     /**
      * Go over the Node and its children and make sure that there are no two contiguous text nodes so as to ensure that
@@ -325,6 +329,8 @@ public class Dom4jUtils {
      *
      * "As much character data as possible is grouped into each text node: a text node never has an immediately
      * following or preceding sibling that is a text node."
+     *
+     * dom4j Text and CDATA nodes are combined together.
      *
      * @param nodeToNormalize Node hierarchy to normalize
      * @return                the input node, normalized
@@ -339,13 +345,13 @@ public class Dom4jUtils {
                 for (Iterator i = children.iterator(); i.hasNext();) {
                     final Node currentNode = (Node) i.next();
                     if (previousNode != null) {
-                        if (previousNode instanceof Text && currentNode instanceof Text) {
-                            final Text previousNodeText = (Text) previousNode;
+                        if (isTextOrCDATA(previousNode) && isTextOrCDATA(currentNode)) {
+                            final CharacterData previousNodeText = (CharacterData) previousNode;
                             if (sb == null)
                                 sb = new StringBuilder(previousNodeText.getText());
                             sb.append(currentNode.getText());
                             nodesToDetach.add(currentNode);
-                        } else if (previousNode instanceof Text) {
+                        } else if (isTextOrCDATA(previousNode)) {
                             // Update node if needed
                             if (sb != null) {
                                 previousNode.setText(sb.toString());

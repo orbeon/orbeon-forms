@@ -14,10 +14,8 @@
 package org.orbeon.oxf.test;
 
 import org.apache.commons.lang.StringUtils;
-import org.dom4j.Attribute;
 import org.dom4j.Document;
 import org.dom4j.Element;
-import org.dom4j.Namespace;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
@@ -36,6 +34,7 @@ import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.webapp.ProcessorService;
+import org.orbeon.oxf.xml.Dom4j;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
@@ -56,7 +55,6 @@ public class ProcessorTest extends ResourceManagerTestBase {
     private static PipelineContext pipelineContext;
 
     private static final int THREAD_COUNT = 1;
-    private static final int REPEAT_COUNT = 1;
     private static final String TEST_CONFIG = "oxf.test.config";
 
     @Test
@@ -223,8 +221,7 @@ public class ProcessorTest extends ResourceManagerTestBase {
             // Check exception
             if (threads[i].getException() != null) {
                 System.err.println(description);
-                Throwable throwable = OXFException.getRootThrowable(threads[i].getException());
-                throw throwable;
+                throw OXFException.getRootThrowable(threads[i].getException());
             }
 
             // Check if got expected result
@@ -237,55 +234,10 @@ public class ProcessorTest extends ResourceManagerTestBase {
         }
     }
 
-    /**
-     * Remove the element the namespace declaration that are not used
-     * in this element or child elements.
-     */
-    private synchronized void removeUnusedNamespaceDeclarations(Element element) {
-        List<String> usedNamespaces = new ArrayList<String>();
-        getUsedNamespaces(usedNamespaces, element);
-        List declaredNamespaces = element.declaredNamespaces();
-        for (Iterator i = declaredNamespaces.iterator(); i.hasNext();) {
-            Namespace namespace = (Namespace) i.next();
-            if (!usedNamespaces.contains(namespace.getURI())) {
-                i.remove();
-            }
-        }
-        for (Iterator i = element.elements().iterator(); i.hasNext();) {
-            Element child = (Element) i.next();
-            removeUnusedNamespaceDeclarations(child);
-        }
-    }
-
-    /**
-     * Adds to the result list the URI of the namespaces actually used
-     * by elements or attribute in this element or child elements.
-     *
-     * @param result List of String (URI)
-     */
-    private synchronized void getUsedNamespaces(List<String> result, Element element) {
-        if (element != null) {
-            if (!"".equals(element.getNamespaceURI()))
-                result.add(element.getNamespaceURI());
-            for (Iterator i = element.attributes().iterator(); i.hasNext();) {
-                Attribute attribute = (Attribute) i.next();
-                if (!attribute.getNamespaceURI().equals("")) {
-                    result.add(attribute.getNamespaceURI());
-                }
-            }
-            for (Iterator i = element.elements().iterator(); i.hasNext();) {
-                Element child = (Element) i.next();
-                getUsedNamespaces(result, child);
-            }
-        }
-    }
-
     class TestThread extends Thread {
 
         private Throwable exception;
         private boolean expectedEqualsActual = true;
-        private String expectedDataString;
-        private String actualDataString;
 
         private String expectedDataStringFormatted;
         private String actualDataStringFormatted;
@@ -295,54 +247,42 @@ public class ProcessorTest extends ResourceManagerTestBase {
         }
 
         public void run() {
-            int executionCount = 0;
             try {
-                for (; executionCount < REPEAT_COUNT; executionCount++) {
-                    // Create pipeline context
-                    final PipelineContext pipelineContext = StringUtils.isNotEmpty(requestURL) ? createPipelineContextWithExternalContext(requestURL) : createPipelineContextWithExternalContext();
-                    pipelineContext.setAttribute(ProcessorService.JNDI_CONTEXT, jndiContext);
+                // Create pipeline context
+                final PipelineContext pipelineContext = StringUtils.isNotEmpty(requestURL) ? createPipelineContextWithExternalContext(requestURL) : createPipelineContextWithExternalContext();
+                pipelineContext.setAttribute(ProcessorService.JNDI_CONTEXT, jndiContext);
 
-                    processor.reset(pipelineContext);
-                    if (domSerializers.size() == 0) {
-                        // Processor with no output: just run it
-                        processor.start(pipelineContext);
-                    } else {
-                        // Get output and compare to expected result
-                        final Iterator<DOMSerializer> domSerializersIterator = domSerializers.iterator();
-                        final Iterator<Document> expectedNodesIterator = expectedDocuments.iterator();
-                        while (domSerializersIterator.hasNext()) {
+                processor.reset(pipelineContext);
+                if (domSerializers.size() == 0) {
+                    // Processor with no output: just run it
+                    processor.start(pipelineContext);
+                } else {
+                    // Get output and compare to expected result
+                    final Iterator<DOMSerializer> domSerializersIterator = domSerializers.iterator();
+                    final Iterator<Document> expectedNodesIterator = expectedDocuments.iterator();
+                    while (domSerializersIterator.hasNext()) {
 
-                            // Get expected
-                            final DOMSerializer domSerializer = domSerializersIterator.next();
-                            final Document expectedData = expectedNodesIterator.next();
-                            // TODO: we want to remove that (avernet 2004-12-14)
-                            removeUnusedNamespaceDeclarations(expectedData.getRootElement());
+                        // Get expected
+                        final DOMSerializer domSerializer = domSerializersIterator.next();
+                        final Document expectedData = expectedNodesIterator.next();
 
-                            // Run serializer
-                            domSerializer.start(pipelineContext);
+                        // Run serializer
+                        domSerializer.start(pipelineContext);
 
-                            // Get actual data
-                            final Document actualData = domSerializer.getDocument(pipelineContext);
-                            // TODO: we want to remove that (avernet 2004-12-14)
-                            removeUnusedNamespaceDeclarations(actualData.getRootElement());
+                        // Get actual data
+                        final Document actualData = domSerializer.getDocument(pipelineContext);
 
-                            // Compare converting to strings
-                            expectedDataString = Dom4jUtils.domToCompactString(expectedData);
-                            actualDataString = Dom4jUtils.domToCompactString(actualData);
-                            final boolean outputPassed = expectedDataString.equals(actualDataString);
+                        // NOTE: We could make the comparison more configurable, for example to not collapse white space
+                        final boolean outputPassed = Dom4j.compareDocumentsIgnoreNamespacesInScopeCollapse(expectedData, actualData);
 
-                            // Display if test not passed
-                            if (!outputPassed) {
-                                expectedEqualsActual = false;
-                                // Store pretty strings
-                                expectedDataStringFormatted = Dom4jUtils.domToPrettyString(expectedData);
-                                actualDataStringFormatted = Dom4jUtils.domToPrettyString(actualData);
-                                break;
-                            }
-                        }
-                        // Don't bother repeating the test if it failed
-                        if (!expectedEqualsActual)
+                        // Display if test not passed
+                        if (!outputPassed) {
+                            expectedEqualsActual = false;
+                            // Store pretty strings
+                            expectedDataStringFormatted = Dom4jUtils.domToPrettyString(expectedData);
+                            actualDataStringFormatted = Dom4jUtils.domToPrettyString(actualData);
                             break;
+                        }
                     }
                 }
             } catch (Throwable e) {

@@ -1073,7 +1073,7 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="output">Comment 2 - Comment 3 - Comment 4</xxf:control>
+                        <xxf:control id="output">Comment 2  -  Comment 3  -  Comment 4</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1124,8 +1124,10 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="output-readwrite">Comment 1 - Multi-line comment</xxf:control>
-                        <xxf:control id="output-readonly">Comment 1 - Multi-line comment</xxf:control>
+                        <xxf:control id="output-readwrite">Comment 1  -  Multi-line
+         comment</xxf:control>
+                        <xxf:control id="output-readonly">Comment 1  -  Multi-line
+         comment</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1185,8 +1187,10 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="output-readwrite">Comment 1 - Multi-line comment</xxf:control>
-                        <xxf:control id="output-readonly">Comment 1 - Multi-line comment</xxf:control>
+                        <xxf:control id="output-readwrite">Comment 1  -  Multi-line
+         comment</xxf:control>
+                        <xxf:control id="output-readonly">Comment 1  -  Multi-line
+         comment</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1272,8 +1276,8 @@
                             </instance>
                             <instance id="results" model-id="model">
                                 <results>
-                                    <comments>Comment 1 - Comment 2</comments>
-                                    <comments>Comment 1 - Comment 2</comments>
+                                    <comments>Comment 1  -  Comment 2</comments>
+                                    <comments>Comment 1  -  Comment 2</comments>
                                 </results>
                             </instance>
                         </instances>

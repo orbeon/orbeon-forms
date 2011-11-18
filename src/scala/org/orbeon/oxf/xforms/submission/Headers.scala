@@ -70,7 +70,7 @@ object Headers {
                         headerElement.getData.asInstanceOf[LocationData], avtCombine)
                     contextStack.returnFunctionContext()
 
-                    if (!allowedCombineValues(result))
+                    if (! allowedCombineValues(result))
                         throw new OXFException("Invalid value '" + result + "' for attribute combine.")
 
                     result
@@ -80,11 +80,11 @@ object Headers {
                 val existingHeaderValues = headerNameValues.getOrElse(headerName, Array.empty[String])
 
                 // Append/prepend/replace
-                headerNameValues += (headerName -> (combine match {
+                headerNameValues += headerName -> (combine match {
                     case "append" => existingHeaderValues :+ headerValue
                     case "prepend" => headerValue +: existingHeaderValues
                     case _ => Array(headerValue)
-                }))
+                })
             }
 
             // Process all nested <header> elements

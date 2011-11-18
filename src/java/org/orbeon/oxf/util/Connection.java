@@ -731,6 +731,7 @@ public class Connection {
         final PropertySet propertySet = org.orbeon.oxf.properties.Properties.instance().getPropertySet();
         return propertySet.getString(HTTP_FORWARD_HEADERS_PROPERTY, "");
     }
+
     public static String[] getForwardCookies() {
         final PropertySet propertySet = org.orbeon.oxf.properties.Properties.instance().getPropertySet();
         final String stringValue = propertySet.getString(HTTP_FORWARD_COOKIES_PROPERTY, "JSESSIONID JSESSIONIDSSO");

@@ -509,23 +509,15 @@
                                 <!--</xf:group>-->
                             </xf:group>
 
-                            <!-- Inplace editor if the control has a label -->
-                            <!--<xh:div>-->
-                                <!--<xf:group ref=".[exists($control/xf:label/@ref)]" appearance="xxforms:internal" xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps">-->
-                                    <!--<fr:inplace-input xxf:autocomplete="off" class="fb-control-label" ref="$current-resources/*[name() = controlOps:controlName($control-id)]/label">-->
-                                        <!--<xf:hint ref="$fb-resources/enter-label/label"/>-->
-                                    <!--</fr:inplace-input>-->
-                                <!--</xf:group>-->
-                            <!--</xh:div>-->
+                            <!-- Label editor -->
+                            <xf:group ref=".[exists($control/xf:label/@ref)]" appearance="xxforms:internal" xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps">
+                                <xf:input xxf:autocomplete="off" class="fb-control-label" ref="$current-resources/*[name() = controlOps:controlName($control-id)]/label"/>
+                            </xf:group>
 
                             <!-- Inplace editor if the control has a hint -->
-                            <!--<xh:div>-->
-                                <!--<xf:group ref=".[exists($control/xf:hint/@ref)]" appearance="xxforms:internal" xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps">-->
-                                    <!--<fr:inplace-input xxf:autocomplete="off" class="fb-control-hint" ref="$current-resources/*[name() = controlOps:controlName($control-id)]/hint">-->
-                                        <!--<xf:hint ref="$fb-resources/enter-hint/label"/>-->
-                                    <!--</fr:inplace-input>-->
-                                <!--</xf:group>-->
-                            <!--</xh:div>-->
+                            <xf:group ref=".[exists($control/xf:hint/@ref)]" appearance="xxforms:internal" xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps">
+                                <xf:input xxf:autocomplete="off" class="fb-control-hint" ref="$current-resources/*[name() = controlOps:controlName($control-id)]/hint"/>
+                            </xf:group>
 
                             <!--<xf:trigger ref="$control[xf:itemset]" appearance="minimal" class="fb-edit-items" id="fb-edit-items-trigger">-->
                                 <!--<xf:label>-->

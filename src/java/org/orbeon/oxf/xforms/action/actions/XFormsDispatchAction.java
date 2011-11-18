@@ -47,7 +47,7 @@ public class XFormsDispatchAction extends XFormsAction {
             if (newEventTargetIdValue == null)
                 newEventTargetIdValue = actionElement.attributeValue(XFormsConstants.TARGET_QNAME);
             if (newEventTargetIdValue == null)
-                throw new OXFException("Missing mandatory target attribute on xforms:dispatch element.");
+                throw new OXFException("Missing mandatory targetid attribute on xforms:dispatch element.");
 
         final String resolvedNewEventName;
         {

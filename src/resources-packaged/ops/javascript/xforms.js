@@ -1839,8 +1839,13 @@ ORBEON.xforms.Controls = {
      * @param attribute3        Optional
      * @param attribute4        Optional
      */
+    beforeValueChange: new YAHOO.util.CustomEvent(null, null, false, YAHOO.util.CustomEvent.FLAT),
+    valueChange: new YAHOO.util.CustomEvent(null, null, false, YAHOO.util.CustomEvent.FLAT),
+    afterValueChange: new YAHOO.util.CustomEvent(null, null, false, YAHOO.util.CustomEvent.FLAT),
     setCurrentValue: function(control, newControlValue, attribute1, attribute2, attribute3, attribute4) {
-        ORBEON.xforms.Events.beforeValueChange.fire({ target: control });
+        var customEvent = { control: control, newValue: newControlValue };
+        ORBEON.xforms.Controls.beforeValueChange.fire(customEvent);
+        ORBEON.xforms.Controls.valueChange.fire(customEvent);
         var isStaticReadonly = YAHOO.util.Dom.hasClass(control, "xforms-static");
         var formElement = ORBEON.xforms.Controls.getForm(control);
         if (YAHOO.util.Dom.hasClass(control, "xforms-output-appearance-xxforms-download")) {
@@ -1878,36 +1883,42 @@ ORBEON.xforms.Controls = {
             // Triggers don't have a value: don't update them
         } else if (YAHOO.util.Dom.hasClass(control, "xforms-type-time")) {
             // Time control
-            var inputField = control.getElementsByTagName("input")[0];
-            var jsDate = ORBEON.util.DateTime.magicTimeToJSDate(newControlValue);
-            inputField.value = jsDate == null ? newControlValue : ORBEON.util.DateTime.jsDateToFormatDisplayTime(jsDate);
+            if (! YAHOO.util.Dom.hasClass(document.body, "xforms-ios")) {
+                var inputField = control.getElementsByTagName("input")[0];
+                var jsDate = ORBEON.util.DateTime.magicTimeToJSDate(newControlValue);
+                inputField.value = jsDate == null ? newControlValue : ORBEON.util.DateTime.jsDateToFormatDisplayTime(jsDate);
+            }
         } else if (YAHOO.util.Dom.hasClass(control, "xforms-type-date")) {
             // Date control
-            var jsDate = ORBEON.util.DateTime.magicDateToJSDate(newControlValue);
-            var displayDate = jsDate == null ? newControlValue : ORBEON.util.DateTime.jsDateToFormatDisplayDate(jsDate);
-			if (YAHOO.util.Dom.hasClass(control, "xforms-input-appearance-minimal")) {
-				var imgElement = control.getElementsByTagName("img")[0];
-                ORBEON.util.Dom.setAttribute(imgElement, "alt", displayDate);
-			} else {
-                var inputField = control.getElementsByTagName("input")[0];
-                inputField.value = displayDate;
-			}
+            if (! YAHOO.util.Dom.hasClass(document.body, "xforms-ios")) {
+                var jsDate = ORBEON.util.DateTime.magicDateToJSDate(newControlValue);
+                var displayDate = jsDate == null ? newControlValue : ORBEON.util.DateTime.jsDateToFormatDisplayDate(jsDate);
+                if (YAHOO.util.Dom.hasClass(control, "xforms-input-appearance-minimal")) {
+                    var imgElement = control.getElementsByTagName("img")[0];
+                    ORBEON.util.Dom.setAttribute(imgElement, "alt", displayDate);
+                } else {
+                    var inputField = control.getElementsByTagName("input")[0];
+                    inputField.value = displayDate;
+                }
+            }
         } else if (YAHOO.util.Dom.hasClass(control, "xforms-type-dateTime")) {
             // Only update value if different from the one we have. This handle the case where the fields contain invalid
             // values with the T letter in them. E.g. aTb/cTd, aTbTcTd sent to server, which we don't know anymore how
             // to separate into 2 values.
-            if (ORBEON.xforms.Controls.getCurrentValue(control) != newControlValue) {
-                var separatorIndex = newControlValue.indexOf("T");
-                // Populate date field
-                var datePartString = newControlValue.substring(0, separatorIndex);
-                var datePartJSDate = ORBEON.util.DateTime.magicDateToJSDate(datePartString);
-                var inputFieldDate = control.getElementsByTagName("input")[0];
-                inputFieldDate.value = datePartJSDate == null ? datePartString : ORBEON.util.DateTime.jsDateToFormatDisplayDate(datePartJSDate);
-                // Populate time field
-                var timePartString = newControlValue.substring(separatorIndex + 1);
-                var timePartJSDate = ORBEON.util.DateTime.magicTimeToJSDate(timePartString);
-                var inputFieldTime = control.getElementsByTagName("input")[1];
-                inputFieldTime.value = timePartJSDate == null ? timePartString : ORBEON.util.DateTime.jsDateToFormatDisplayTime(timePartJSDate);
+            if (! YAHOO.util.Dom.hasClass(document.body, "xforms-ios")) {
+                if (ORBEON.xforms.Controls.getCurrentValue(control) != newControlValue) {
+                    var separatorIndex = newControlValue.indexOf("T");
+                    // Populate date field
+                    var datePartString = newControlValue.substring(0, separatorIndex);
+                    var datePartJSDate = ORBEON.util.DateTime.magicDateToJSDate(datePartString);
+                    var inputFieldDate = control.getElementsByTagName("input")[0];
+                    inputFieldDate.value = datePartJSDate == null ? datePartString : ORBEON.util.DateTime.jsDateToFormatDisplayDate(datePartJSDate);
+                    // Populate time field
+                    var timePartString = newControlValue.substring(separatorIndex + 1);
+                    var timePartJSDate = ORBEON.util.DateTime.magicTimeToJSDate(timePartString);
+                    var inputFieldTime = control.getElementsByTagName("input")[1];
+                    inputFieldTime.value = timePartJSDate == null ? timePartString : ORBEON.util.DateTime.jsDateToFormatDisplayTime(timePartJSDate);
+                }
             }
         } else if ((YAHOO.util.Dom.hasClass(control, "xforms-input") && !YAHOO.util.Dom.hasClass(control, "xforms-type-boolean"))
                 || YAHOO.util.Dom.hasClass(control, "xforms-secret")) {
@@ -2033,11 +2044,12 @@ ORBEON.xforms.Controls = {
             }
         } else if (typeof(control.value) == "string") {
             // Textarea, password
+            console.log("Setting value to " + newControlValue);
             control.value = newControlValue;
             control.previousValue = newControlValue;
         }
 
-        ORBEON.xforms.Events.afterValueChange.fire({ target: control });
+        ORBEON.xforms.Controls.afterValueChange.fire(customEvent);
     },
 
     _setRadioCheckboxClasses: function(target) {
@@ -3056,13 +3068,16 @@ ORBEON.xforms.Events = {
         }
     },
 
+    blurEvent: new YAHOO.util.CustomEvent(null, null, false, YAHOO.util.CustomEvent.FLAT),
     blur: function(event) {
         if (!ORBEON.xforms.Globals.maskFocusEvents) {
-            var targetControlElement = ORBEON.xforms.Events._findParentXFormsControl(YAHOO.util.Event.getTarget(event));
-            if (targetControlElement != null) {
-                ORBEON.xforms.Controls.updateInvalidVisitedOnNextAjaxResponse(targetControlElement);
+            var target = YAHOO.util.Event.getTarget(event);
+            var control = ORBEON.xforms.Events._findParentXFormsControl(target);
+            if (control != null) {
+                ORBEON.xforms.Events.blurEvent.fire({control: control, target: target});
+                ORBEON.xforms.Controls.updateInvalidVisitedOnNextAjaxResponse(control);
 
-                if (!YAHOO.util.Dom.hasClass(targetControlElement, "xforms-dialog")) {
+                if (!YAHOO.util.Dom.hasClass(control, "xforms-dialog")) {
                     // This is an event for an XForms control which is not a dialog
 
                     // We don't run this for dialogs, as there is not much sense doing this AND this causes issues with
@@ -3070,12 +3085,8 @@ ORBEON.xforms.Events = {
                     // dialog, which prevents detection of value changes in focus() above.
 
                     // Keep track of the id of the last known control which has focus
-                    ORBEON.xforms.Globals.currentFocusControlId = targetControlElement.id;
-                    ORBEON.xforms.Globals.currentFocusControlElement = targetControlElement;
-                }
-
-                if (ORBEON.widgets.YUICalendar.appliesToControl(targetControlElement)) {
-                    ORBEON.widgets.YUICalendar.blur(event, targetControlElement);
+                    ORBEON.xforms.Globals.currentFocusControlId = control.id;
+                    ORBEON.xforms.Globals.currentFocusControlElement = control;
                 }
             }
         }
@@ -3162,16 +3173,16 @@ ORBEON.xforms.Events = {
                     || YAHOO.util.Dom.hasClass(control, "xforms-textarea"));
     },
 
+    keydownEvent: new YAHOO.util.CustomEvent(null, null, false, YAHOO.util.CustomEvent.FLAT),
     keydown: function(event) {
-        var target = ORBEON.xforms.Events._findParentXFormsControl(YAHOO.util.Event.getTarget(event));
-        if (target != null) {
-            if (ORBEON.xforms.Events._isChangingKey(target, event.keyCode)) {
-                ORBEON.xforms.Globals.changedIdsRequest[target.id] =
-                    ORBEON.xforms.Globals.changedIdsRequest[target.id] == null ? 1
-                            : ORBEON.xforms.Globals.changedIdsRequest[target.id] + 1;
-            }
-            if (ORBEON.widgets.YUICalendar.appliesToControl(target)) {
-                ORBEON.widgets.YUICalendar.keydown(event, target);
+        var target = YAHOO.util.Event.getTarget(event);
+        var control = ORBEON.xforms.Events._findParentXFormsControl(target);
+        if (control != null) {
+            ORBEON.xforms.Events.keydownEvent.fire({control: control, target: target});
+            if (ORBEON.xforms.Events._isChangingKey(control, event.keyCode)) {
+                ORBEON.xforms.Globals.changedIdsRequest[control.id] =
+                    ORBEON.xforms.Globals.changedIdsRequest[control.id] == null ? 1
+                            : ORBEON.xforms.Globals.changedIdsRequest[control.id] + 1;
             }
         }
     },
@@ -3349,18 +3360,20 @@ ORBEON.xforms.Events = {
         }
     },
 
+    clickEvent: new YAHOO.util.CustomEvent(null, null, false, YAHOO.util.CustomEvent.FLAT),
     click: function(event) {
         // Stop processing if the mouse button that was clicked is not the left button
         // See: http://www.quirksmode.org/js/events_properties.html#button
         if (event.button != 0 && event.button != 1) return;
-        ORBEON.xforms.Events.clickEvent.fire(event);
         var originalTarget = YAHOO.util.Event.getTarget(event);
+        var target = ORBEON.xforms.Events._findParentXFormsControl(originalTarget);
+        // Listeners might be interested in click events even if they don't target an XForms control
+        ORBEON.xforms.Events.clickEvent.fire({target: originalTarget, control: target});
         if (YAHOO.lang.isObject(originalTarget) && YAHOO.lang.isBoolean(originalTarget.disabled) && originalTarget.disabled) {
             // IE calls the click event handler on clicks on disabled controls, which Firefox doesn't.
             // To make processing more similar on all browsers, we stop going further here if we go a click on a disabled control.
             return;
         }
-        var target = ORBEON.xforms.Events._findParentXFormsControl(originalTarget);
 
         if (target != null && YAHOO.util.Dom.hasClass(target, "xforms-output")) {
             // Click on output
@@ -3408,9 +3421,6 @@ ORBEON.xforms.Events = {
             var event = new ORBEON.xforms.server.AjaxServer.Event(null, target.id, null, ORBEON.xforms.Controls.getCurrentValue(target), "xxforms-value-change-with-focus-change");
             ORBEON.xforms.server.AjaxServer.fireEvents([event], false);
 
-        } else if (target != null && YAHOO.util.Dom.hasClass(originalTarget, "xforms-type-date") ) {
-            // Click on calendar inside input field
-            ORBEON.widgets.YUICalendar.click(event, target);
         } else if (target != null && YAHOO.util.Dom.hasClass(target, "xforms-upload") && YAHOO.util.Dom.hasClass(originalTarget, "xforms-upload-remove")) {
             // Click on remove icon in upload control
             var event = new ORBEON.xforms.server.AjaxServer.Event(null, target.id, null, "", "xxforms-value-change-with-focus-change");
@@ -3836,11 +3846,8 @@ ORBEON.xforms.Events = {
 
     orbeonLoadedEvent: new YAHOO.util.CustomEvent("orbeonLoaded"),
     ajaxResponseProcessedEvent: new YAHOO.util.CustomEvent("ajaxResponseProcessed"),
-    clickEvent: new YAHOO.util.CustomEvent("clickEvent"),
     errorEvent: new YAHOO.util.CustomEvent("errorEvent"),
-    yuiCalendarCreated: new YAHOO.util.CustomEvent("yuiCalendarCreated"),
-    beforeValueChange: new YAHOO.util.CustomEvent("beforeValueChanged"),
-    afterValueChange: new YAHOO.util.CustomEvent("afterValueChanged")
+    yuiCalendarCreated: new YAHOO.util.CustomEvent("yuiCalendarCreated")
 };
 
 (function() {
@@ -4181,6 +4188,10 @@ ORBEON.xforms.Init = {
         // Rationale: When the whole page is generated by Orbeon Forms, the class will be present, but if the class
         // is embedded in an existing page (portlet-like), then the class will most likely not be there.
         YAHOO.util.Dom.addClass(document.body, "yui-skin-sam");
+
+        // Add the xforms-ios class on the body if we are on iOS
+        if (YAHOO.env.ua.webkit && YAHOO.env.ua.mobile)
+            YAHOO.util.Dom.addClass(document.body, "xforms-ios");
 
         // Notify the offline module that the page was loaded
         if (ORBEON.util.Properties.offlineSupport.get())

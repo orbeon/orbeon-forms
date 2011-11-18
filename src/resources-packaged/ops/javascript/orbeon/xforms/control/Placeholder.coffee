@@ -74,12 +74,11 @@ do ->
 # Call showPlaceholder/hidePlaceholder before/after the XForms engine changes the value
 do ->
     if not browserSupportsPlaceholder
-        addChangeListener = (event, f) ->
-            event.subscribe (type, args) ->
-                target = args[0].target
-                f(target) if isPlaceholderControl target
-        addChangeListener Events.beforeValueChange, hidePlaceholder
-        addChangeListener Events.afterValueChange, showPlaceholder
+        addChangeListener = (customEvent, f) ->
+            customEvent.subscribe (event) ->
+                f(event.control) if isPlaceholderControl event.control
+        addChangeListener Controls.beforeValueChange, hidePlaceholder
+        addChangeListener Controls.afterValueChange, showPlaceholder
 
 # When the label/hint changes, set the value of the placeholder
 do ->

@@ -187,6 +187,15 @@ button.xforms-trigger-appearance-xxforms-minimal::-moz-focus-inner, .xforms-trig
     background-repeat: no-repeat;
 }
 
+/* Reset to default platform styling for dates on iOS */
+.xforms-ios .xforms-input input.xforms-type-date {
+    width: initial;
+    padding-right: initial;
+    background-image: initial;
+    background-position: initial;
+    background-repeat: initial;
+}
+
 .xforms-type-date img { vertical-align: middle; padding-left: .2em; }
 .xforms-readonly img.xforms-type-date { display: none; }
 
@@ -196,6 +205,15 @@ button.xforms-trigger-appearance-xxforms-minimal::-moz-focus-inner, .xforms-trig
     background-image: url(../../ops/images/xforms/clock.png);
     background-position: right center;
     background-repeat: no-repeat;
+}
+
+/* Reset to default platform styling for dates on iOS */
+.xforms-ios .xforms-input input.xforms-type-time {
+    width: initial;
+    padding-right: initial;
+    background-image: initial;
+    background-position: initial;
+    background-repeat: initial;
 }
 .xforms-type-dateTime input.xforms-type-date { margin-right: 1em }
 

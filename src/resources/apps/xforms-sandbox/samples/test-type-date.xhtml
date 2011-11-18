@@ -1,0 +1,72 @@
+<xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml"
+      xmlns:xforms="http://www.w3.org/2002/xforms"
+      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+      xmlns:ev="http://www.w3.org/2001/xml-events"
+      xmlns:xs="http://www.w3.org/2001/XMLSchema"
+      xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+    <xhtml:head>
+        <xhtml:title>XForms Hello</xhtml:title>
+        <xforms:model>
+            <xforms:instance>
+                <instance>
+                    <iteration>
+                        <date>2011-12-17</date>
+                        <time>21:42:00</time>
+                        <dateTime>2011-12-17T21:42:00</dateTime>
+                    </iteration>
+                </instance>
+            </xforms:instance>
+            <xforms:bind ref="iteration/date" type="xs:date"/>
+            <xforms:bind ref="iteration/time" type="xs:time"/>
+            <xforms:bind ref="iteration/dateTime" type="xs:dateTime"/>
+        </xforms:model>
+        <xhtml:style type="text/css">
+            .add, .remove { margin-bottom: 10px }
+            .iteration { display: inline-block; border: 1px solid #999; padding: 10px }
+            .xforms-repeat-selected-item-1 { background-color: #EEE }
+            .xforms-label, .xforms-input, .xforms-output { display: block }
+            .xforms-input, .xforms-output { margin: 0 0 .7em 0 }
+        </xhtml:style>
+    </xhtml:head>
+    <xhtml:body>
+        <xhtml:div>
+            <xforms:trigger id="add" class="add">
+                <xforms:label>Add</xforms:label>
+                <xforms:insert ev:event="DOMActivate" nodeset="iteration"/>
+            </xforms:trigger>
+            <xforms:trigger id="remove" class="remove">
+                <xforms:label>Remove</xforms:label>
+                <xforms:delete ev:event="DOMActivate" nodeset="iteration[last()]"/>
+            </xforms:trigger>
+        </xhtml:div>
+        <xforms:repeat ref="iteration">
+            <xhtml:div class="iteration">
+                <xforms:trigger>
+                    <xforms:label>Date/time++</xforms:label>
+                    <xforms:action ev:event="DOMActivate">
+                        <xforms:setvalue ref="date" value="if (. castable as xs:date) then xs:date(.) + xs:dayTimeDuration('P1D') else ."/>
+                        <xforms:setvalue ref="time" value="if (. castable as xs:time) then xs:time(.) + xs:dayTimeDuration('PT1H') else ."/>
+                        <xforms:setvalue ref="dateTime" value="if (. castable as xs:dateTime) then xs:dateTime(.) + xs:dayTimeDuration('P1DT1H') else ."/>
+                    </xforms:action>
+                </xforms:trigger>
+                <xhtml:dl>
+                    <xhtml:dt>Date</xhtml:dt>
+                    <xhtml:dd>
+                        <xforms:input ref="date" id="date-input"/>
+                        <xforms:output value="date" id="date-output"/>
+                    </xhtml:dd>
+                    <xhtml:dt>Time</xhtml:dt>
+                    <xhtml:dd>
+                        <xforms:input ref="time" id="time-input"/>
+                        <xforms:output ref="time" id="time-output"/>
+                    </xhtml:dd>
+                    <xhtml:dt>Date-time</xhtml:dt>
+                    <xhtml:dd>
+                        <xforms:input ref="dateTime" id="dateTime-input"/>
+                        <xforms:output value="dateTime" id="dateTime-output"/>
+                    </xhtml:dd>
+                </xhtml:dl>
+            </xhtml:div>
+        </xforms:repeat>
+    </xhtml:body>
+</xhtml:html>

@@ -126,7 +126,7 @@ public class PipelineProcessor extends ProcessorImpl {
 
                 if (configFromAST == null && !isInputInCache(pipelineContext, INPUT_CONFIG))
                     return null;
-                
+
                 final ProcessorInput bottomInput = getInput(pipelineContext);
                 final Object[] bottomInputValidity = new Object[1];
                 executeChildren(pipelineContext, new Runnable() {
@@ -305,6 +305,9 @@ public class PipelineProcessor extends ProcessorImpl {
                                 }
                                 transformProcessor = processorFactory.createInstance();
                             }
+
+                            // Add transformation to this pipeline/block, so it is appropriately reset if the block runs multiple times
+                            config.addProcessor(transformProcessor);
 
                             // Set info on processor
                             //processor.setId(processorCall.getId()); // what id, if any?

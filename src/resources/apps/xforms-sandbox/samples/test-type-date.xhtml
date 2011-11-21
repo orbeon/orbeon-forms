@@ -9,16 +9,16 @@
         <xforms:model>
             <xforms:instance>
                 <instance>
-                    <iteration>
+                    <iteration typed="true">
                         <date>2011-12-17</date>
                         <time>21:42:00</time>
                         <dateTime>2011-12-17T21:42:00</dateTime>
                     </iteration>
                 </instance>
             </xforms:instance>
-            <xforms:bind ref="iteration/date" type="xs:date"/>
-            <xforms:bind ref="iteration/time" type="xs:time"/>
-            <xforms:bind ref="iteration/dateTime" type="xs:dateTime"/>
+            <xforms:bind ref="iteration[@typed = 'true']/date" type="xs:date"/>
+            <xforms:bind ref="iteration[@typed = 'true']/time" type="xs:time"/>
+            <xforms:bind ref="iteration[@typed = 'true']/dateTime" type="xs:dateTime"/>
         </xforms:model>
         <xhtml:style type="text/css">
             .add, .remove { margin-bottom: 10px }
@@ -47,6 +47,13 @@
                         <xforms:setvalue ref="date" value="if (. castable as xs:date) then xs:date(.) + xs:dayTimeDuration('P1D') else ."/>
                         <xforms:setvalue ref="time" value="if (. castable as xs:time) then xs:time(.) + xs:dayTimeDuration('PT1H') else ."/>
                         <xforms:setvalue ref="dateTime" value="if (. castable as xs:dateTime) then xs:dateTime(.) + xs:dayTimeDuration('P1DT1H') else ."/>
+                    </xforms:action>
+                </xforms:trigger>
+                <xforms:trigger>
+                    <xforms:label>Toggle typed</xforms:label>
+                    <xforms:action ev:event="DOMActivate">
+                        <xforms:setvalue ref="@typed" value="if (. = 'true') then 'false' else 'true'"/>
+                        <xforms:rebuild/>
                     </xforms:action>
                 </xforms:trigger>
                 <xhtml:dl>

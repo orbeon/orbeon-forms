@@ -34,20 +34,19 @@ Event.onDOMReady ->
 
         # On the iPad, use the native date/time picker
         initUnder = (node) ->
-            if node.nodeType == Node.ELEMENT_NODE
-                forDate = ["input.xforms-type-date", DateTime.magicDateToJSDate, "date"]
-                forTime = ["input.xforms-type-time", DateTime.magicTimeToJSDate, "time"]
-                for [cssClass, toJSDate, type] in [forDate, forTime]
-                    for input in node.querySelectorAll cssClass
-                        input.value = DateTime.jsDateToISODate toJSDate input.value
-                        input.type = type
+            forDate = ["input.xforms-type-date", DateTime.magicDateToJSDate, DateTime.jsDateToISODate, "date"]
+            forTime = ["input.xforms-type-time", DateTime.magicTimeToJSDate, DateTime.jsDateToISOTime, "time"]
+            for [cssClass, toJS, toISO, type] in [forDate, forTime]
+                for input in node.querySelectorAll cssClass
+                    input.value = toISO toJS input.value
+                    input.type = type
 
         # On page load, init everything under the document
         initUnder document.body
 
-        # When a new element is added, init everything under that element
-        Init.insertedElementEvent.subscribe (event) ->
-            initUnder event.element
+        # When an input becomes a date, initialize it just like we do when the page is loaded
+        Controls.typeChangedEvent.subscribe (event) ->
+            initUnder event.control if appliesToControl event.control
 
         # Fire change event on blur, as Mobile Safari doesn't fire the change event (http://goo.gl/jnMFj)
         Events.blurEvent.subscribe (event) ->

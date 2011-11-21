@@ -2763,7 +2763,9 @@ ORBEON.xforms.Controls = {
         ORBEON.xforms.Globals.helpTooltipForControl[control.id] = null;
         ORBEON.xforms.Globals.dialogs[control.id] = null;
         ORBEON.xforms.Globals.dialogMinimalLastMouseOut[control.id] = null;
-    }
+    },
+
+    typeChangedEvent: new YAHOO.util.CustomEvent(null, null, false, YAHOO.util.CustomEvent.FLAT)
 };
 
 ORBEON.xforms.FlatNesting = {

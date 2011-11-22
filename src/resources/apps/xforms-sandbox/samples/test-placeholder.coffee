@@ -49,40 +49,34 @@ YAHOO.tool.TestRunner.add new YAHOO.tool.TestCase
     # Initially placeholders must be shown
     testPlaceholderShown: ->
         placeholders = [{placeholder: "First name"}, {placeholder: "First name"}, {placeholder: "1"}, {placeholder: "1"}]
-        Test.runMayCauseXHR this, [
-            => @assertBlockShows 1, placeholders
-            => Test.click "add"
-            => @assertBlockShows 2, placeholders
-            => Test.click "remove"
-        ]
+        Test.runMayCauseXHR this,
+            -> @assertBlockShows 1, placeholders
+            -> Test.click "add"
+            -> @assertBlockShows 2, placeholders
+            -> Test.click "remove"
 
     # Setting the content hides the placeholders
     testContentShown: ->
         content = [{content: "1"}, {content: "1"}, {content: "1"}, {content: "1"}]
-        Test.runMayCauseXHR this, [
-            => Test.click "increment-content·1"
-            => @assertBlockShows 1, content
-            => Test.click "reset-content·1"
-            => Test.click "add"
-            => Test.click "increment-content·2"
-            => @assertBlockShows 2, content
-            => Test.click "remove"
-        ]
+        Test.runMayCauseXHR this,
+            -> Test.click "increment-content·1"
+            -> @assertBlockShows 1, content
+            -> Test.click "reset-content·1"
+            -> Test.click "add"
+            -> Test.click "increment-content·2"
+            -> @assertBlockShows 2, content
+            -> Test.click "remove"
 
     # Setting the focus on a the first name hides the placeholder
     testFocusNoPlaceholder: ->
         focusOnFirst = [{content: ""}, {placeholder: "First name"}, {placeholder: "1"}, {placeholder: "1"}]
-        Test.runMayCauseXHR this, [
-            => (YD.get "static-label$xforms-input-1·1").focus()
-            => @assertBlockShows 1, focusOnFirst
-            => Test.click "add"
-            => (YD.get "static-label$xforms-input-1·2").focus()
-            => @assertBlockShows 2, focusOnFirst
-            => Test.click "remove"
-            => (YD.get "add").focus()
-        ]
-
-
+        Test.runMayCauseXHR this,
+            -> (YD.get "static-label$xforms-input-1·1").focus()
+            -> @assertBlockShows 1, focusOnFirst
+            -> Test.click "add"
+            -> (YD.get "static-label$xforms-input-1·2").focus()
+            -> @assertBlockShows 2, focusOnFirst
+            -> Test.click "remove"
+            -> (YD.get "add").focus()
 
 Test.onOrbeonLoadedRunTest()
-

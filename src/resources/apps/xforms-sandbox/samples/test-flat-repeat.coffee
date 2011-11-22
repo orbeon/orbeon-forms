@@ -25,7 +25,7 @@ YAHOO.tool.TestRunner.add new YAHOO.tool.TestCase
             cat = YD.get ("cat" + XFORMS_SEPARATOR_1 + position)
             not (_.any ["xforms-disabled", "xforms-disabled-subsequent"], (c) -> YD.hasClass cat.parentElement, c)
 
-        Test.runMayCauseXHR this, [
+        Test.runMayCauseXHR this,
             -> Test.click "show"
             -> Assert.isTrue (isCatVisible 1), "Showing the group, the first cat should be there"
             -> Test.click "add"
@@ -34,6 +34,5 @@ YAHOO.tool.TestRunner.add new YAHOO.tool.TestCase
             -> Test.click "show"
             -> Test.click "add"
             -> Assert.isTrue (isCatVisible 3), "The copy of a template with xforms-disabled-subsequent must be visible"
-        ]
 
 Test.onOrbeonLoadedRunTest()

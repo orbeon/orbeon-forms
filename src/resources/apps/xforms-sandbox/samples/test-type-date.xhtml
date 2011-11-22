@@ -20,6 +20,11 @@
             <xforms:bind ref="iteration[@typed = 'true']/time" type="xs:time"/>
             <xforms:bind ref="iteration[@typed = 'true']/dateTime" type="xs:dateTime"/>
         </xforms:model>
+        <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
+        <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
+        <xhtml:script type="text/javascript" src="/ops/yui/event-simulate/event-simulate.js"/>
+        <xhtml:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
+        <xhtml:script type="text/javascript" src="/apps/xforms-sandbox/samples/test-type-date.js"/>
         <xhtml:style type="text/css">
             .add, .remove { margin-bottom: 10px }
             .iteration { display: inline-block; border: 1px solid #999; padding: 10px }
@@ -41,7 +46,15 @@
         </xhtml:div>
         <xforms:repeat ref="iteration">
             <xhtml:div class="iteration">
-                <xforms:trigger>
+                <xforms:trigger id="reset-date-time">
+                    <xforms:label>Reset date/time</xforms:label>
+                    <xforms:action ev:event="DOMActivate">
+                        <xforms:setvalue ref="date">2011-12-17</xforms:setvalue>
+                        <xforms:setvalue ref="time">21:42:00</xforms:setvalue>
+                        <xforms:setvalue ref="dateTime">2011-12-17T21:42:00</xforms:setvalue>
+                    </xforms:action>
+                </xforms:trigger>
+                <xforms:trigger id="increment-date-time">
                     <xforms:label>Date/time++</xforms:label>
                     <xforms:action ev:event="DOMActivate">
                         <xforms:setvalue ref="date" value="if (. castable as xs:date) then xs:date(.) + xs:dayTimeDuration('P1D') else ."/>
@@ -49,7 +62,7 @@
                         <xforms:setvalue ref="dateTime" value="if (. castable as xs:dateTime) then xs:dateTime(.) + xs:dayTimeDuration('P1DT1H') else ."/>
                     </xforms:action>
                 </xforms:trigger>
-                <xforms:trigger>
+                <xforms:trigger id="toggle-typed">
                     <xforms:label>Toggle typed</xforms:label>
                     <xforms:action ev:event="DOMActivate">
                         <xforms:setvalue ref="@typed" value="if (. = 'true') then 'false' else 'true'"/>

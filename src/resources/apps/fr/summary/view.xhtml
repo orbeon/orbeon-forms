@@ -127,18 +127,9 @@
             <!-- Instance to track search results and paging -->
             <xforms:instance id="fr-search-instance">
                 <search xmlns="">
-                    <!-- Application name -->
-                    <app/>
-                    <!-- Form name -->
-                    <form/>
-                    <!-- Free text search query -->
                     <query/>
-                    <!-- Paging -->
                     <page-size>5</page-size>
                     <page-number>1</page-number>
-                    <!-- Sorting -->
-                    <sort-key/>
-                    <!-- Language -->
                     <lang/>
                 </search>
             </xforms:instance>
@@ -212,7 +203,6 @@
             </xforms:instance>
 
             <!-- Extract summary configuration information from the XHTML document -->
-            <!-- TODO: Move back to persistence model? -->
             <xforms:action ev:event="xforms-submit-done" ev:observer="get-source-form-submission">
 
                 <xforms:dispatch name="get-source-form-submission-done" targetid="fr-form-model"/>
@@ -302,7 +292,7 @@
             </xforms:instance>
 
             <!-- This submission doesn't validate as we allow sending incomplete date, time and dateTime -->
-                <xforms:submission id="search-submission"
+            <xforms:submission id="search-submission"
                     ref="instance('fr-search-instance')" validate="false"
                     method="post" resource="/fr/service/persistence/search/{$app}/{$form}"
                     replace="instance" instance="fr-summary-instance">

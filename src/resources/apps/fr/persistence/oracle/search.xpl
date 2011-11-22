@@ -29,15 +29,12 @@
         Search instance, e.g.:
 
         <search>
-            <app>orbeon</app>
-            <form>bookcast</form>
             <query>free text search</query>
             <query name="title" path="details/title" type="xs:string" control="input">title</query>
             <query name="author" path="details/author" type="xs:string" control="input">author</query>
             <query name="language" path="details/language" type="xs:string" control="select1">en</query>
             <page-size>5</page-size>
             <page-number>1</page-number>
-            <sort-key/>
             <lang>en</lang>
         </search>
     -->

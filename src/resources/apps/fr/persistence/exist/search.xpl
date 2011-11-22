@@ -51,7 +51,7 @@
                                                 concat(/*/query[empty(@path)],
                                                        string-join(for $query in /*/query[@path and normalize-space() != '']
                                                          return concat('&amp;path=', encode-for-uri($query/@path), '&amp;value=', $query), ''))
-                                            }&amp;sort-key={/*/sort-key}&amp;lang={/*/lang}" replace="instance">
+                                            }&amp;lang={/*/lang}" replace="instance">
                 <!-- Move resulting <document> element as root element -->
                 <xforms:insert ev:event="xforms-submit-done" if="event('response-status-code') = 200" nodeset="/*" origin="/*/*[1]"/>
                 <!-- Tricky: eXist returns 202 when there is a syntax error in XQuery. But we do consider this an error of course! -->

@@ -38,7 +38,8 @@ Event.onDOMReady ->
             forTime = ["input.xforms-type-time", DateTime.magicTimeToJSDate, DateTime.jsDateToISOTime, "time"]
             for [cssClass, toJS, toISO, type] in [forDate, forTime]
                 for input in node.querySelectorAll cssClass
-                    input.value = toISO toJS input.value
+                    inJS = toJS input.value
+                    input.value = toISO inJS if inJS? # Can be null if ISO date/time can't be parsed
                     input.type = type
 
         # On page load, init everything under the document

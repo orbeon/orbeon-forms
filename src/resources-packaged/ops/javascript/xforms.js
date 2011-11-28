@@ -3191,19 +3191,22 @@ ORBEON.xforms.Events = {
         }
     },
 
+    keypressEvent: new YAHOO.util.CustomEvent(null, null, false, YAHOO.util.CustomEvent.FLAT),
     keypress: function(event) {
-        var target = ORBEON.xforms.Events._findParentXFormsControl(YAHOO.util.Event.getTarget(event));
-        if (target != null) {
+        var target = YAHOO.util.Event.getTarget(event);
+        var control = ORBEON.xforms.Events._findParentXFormsControl(target);
+        if (control != null) {
+            ORBEON.xforms.Events.keypressEvent.fire({control: control, target: target, keyCode: event.keyCode});
             // Input field and auto-complete: trigger DOMActive when when enter is pressed
-            if ((YAHOO.util.Dom.hasClass(target, "xforms-input") && !YAHOO.util.Dom.hasClass(target, "xforms-type-boolean"))
-                    || YAHOO.util.Dom.hasClass(target, "xforms-secret")) {
+            if ((YAHOO.util.Dom.hasClass(control, "xforms-input") && !YAHOO.util.Dom.hasClass(control, "xforms-type-boolean"))
+                    || YAHOO.util.Dom.hasClass(control, "xforms-secret")) {
                 if (event.keyCode == 10 || event.keyCode == 13) {
                     // Prevent default handling of enter, which might be equivalent as a click on some trigger in the form
                     YAHOO.util.Event.preventDefault(event);
                     // Send a value change and DOM activate
                     var events = [
-                        new ORBEON.xforms.server.AjaxServer.Event(null, target.id, null, ORBEON.xforms.Controls.getCurrentValue(target), "xxforms-value-change-with-focus-change"),
-                        new ORBEON.xforms.server.AjaxServer.Event(null, target.id, null, null, "DOMActivate")
+                        new ORBEON.xforms.server.AjaxServer.Event(null, control.id, null, ORBEON.xforms.Controls.getCurrentValue(control), "xxforms-value-change-with-focus-change"),
+                        new ORBEON.xforms.server.AjaxServer.Event(null, control.id, null, null, "DOMActivate")
                     ];
                     ORBEON.xforms.server.AjaxServer.fireEvents(events, false);
                 }

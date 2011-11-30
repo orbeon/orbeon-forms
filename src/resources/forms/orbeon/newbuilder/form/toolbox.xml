@@ -329,9 +329,7 @@
                                                 </xxforms:show>
                                             </xforms:trigger>
                                             <xforms:trigger ref="$trigger" appearance="minimal" id="fb-submission-remove">
-                                                <xforms:label>
-                                                    <xforms:label><xhtml:img src="/apps/fr/style/images/silk/bin.png" alt="{$form-resources/remove/label}" title="{$form-resources/remove/label}"/></xforms:label>
-                                                </xforms:label>
+                                                <xforms:label><xhtml:img src="/apps/fr/style/images/silk/bin.png" alt="{$form-resources/remove/label}" title="{$form-resources/remove/label}"/></xforms:label>
                                                 <xforms:action ev:event="DOMActivate">
                                                     <!-- Ask confirmation -->
                                                     <xxforms:show dialog="fb-confirmation-dialog">
@@ -384,9 +382,7 @@
                                                 </xxforms:show>
                                             </xforms:trigger>
                                             <xforms:trigger ref="$trigger" appearance="minimal" id="fb-database-service-remove">
-                                                <xforms:label>
-                                                    <xforms:label><xhtml:img src="/apps/fr/style/images/silk/bin.png" alt="{$form-resources/remove/label}" title="{$form-resources/remove/label}"/></xforms:label>
-                                                </xforms:label>
+                                                <xforms:label><xhtml:img src="/apps/fr/style/images/silk/bin.png" alt="{$form-resources/remove/label}" title="{$form-resources/remove/label}"/></xforms:label>
                                                 <xforms:action ev:event="DOMActivate">
                                                     <!-- Ask confirmation -->
                                                     <xxforms:show dialog="fb-confirmation-dialog">
@@ -439,9 +435,7 @@
                                                 </xxforms:show>
                                             </xforms:trigger>
                                             <xforms:trigger ref="$trigger" appearance="minimal" id="fb-binding-remove">
-                                                <xforms:label>
-                                                    <xforms:label><xhtml:img src="/apps/fr/style/images/silk/bin.png" alt="{$form-resources/remove/label}" title="{$form-resources/remove/label}"/></xforms:label>
-                                                </xforms:label>
+                                                <xforms:label><xhtml:img src="/apps/fr/style/images/silk/bin.png" alt="{$form-resources/remove/label}" title="{$form-resources/remove/label}"/></xforms:label>
                                                 <xforms:action ev:event="DOMActivate">
                                                     <!-- Ask confirmation -->
                                                     <xxforms:show dialog="fb-confirmation-dialog">

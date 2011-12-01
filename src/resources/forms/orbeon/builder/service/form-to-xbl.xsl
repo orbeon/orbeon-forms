@@ -133,7 +133,7 @@
         <xsl:variable name="section-data" select="$fr-form-instance/*/*[name() = $section-name]" as="element()"/>
 
         <!-- Use section id as component id as section ids are unique -->
-        <xsl:variable name="component-id" select="$section-id" as="xs:string"/>
+        <xsl:variable name="component-id" select="concat(doc('input:parameters')/*/app, '-',  $section-id)" as="xs:string"/>
 
         <!-- Figure out which actions and services are used by the component -->
 

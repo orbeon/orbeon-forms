@@ -26,14 +26,31 @@
     <xforms:label ref="$form-resources/dialog-actions/dialog-title"/>
 
     <xxforms:variable name="instance" select="instance('fb-bindings-editor-instance')"/>
-    <xhtml:div class="fr-grid">
-        <xhtml:div class="fr-grid-content">
-            <xforms:input ref="name" id="fb-binding-name-input" incremental="true">
-                <xforms:label ref="$form-resources/dialog-actions/service-name/label"/>
-                <xforms:hint ref="$form-resources/dialog-actions/service-name/hint"/>
-            </xforms:input>
-            <xforms:group ref="$instance/xforms:action" appearance="xxforms:internal">
-                <xforms:select1 ref="xforms:action[1]/@ev:event">
+
+    <fr:grid columns="2">
+        <xhtml:tr>
+            <xhtml:td>
+                <!-- Action name -->
+                <xforms:input ref="name" id="fb-binding-name-input" incremental="true">
+                    <xforms:label ref="$form-resources/dialog-actions/service-name/label"/>
+                    <xforms:hint ref="$form-resources/dialog-actions/service-name/hint"/>
+                </xforms:input>
+            </xhtml:td>
+            <xhtml:td>
+                <!-- Condition -->
+                <xforms:select1 ref="$instance/xforms:action/xforms:action[1]/@if">
+                    <xforms:label ref="$form-resources/dialog-actions/event-condition/label"/>
+                    <xforms:itemset nodeset="$form-resources/dialog-actions/event-condition/item">
+                        <xforms:label ref="label"/>
+                        <xforms:value ref="value"/>
+                    </xforms:itemset>
+                </xforms:select1>
+            </xhtml:td>
+        </xhtml:tr>
+        <xhtml:tr>
+            <xhtml:td>
+                <!-- React to -->
+                <xforms:select1 ref="$instance/xforms:action/xforms:action[1]/@ev:event">
                     <xforms:label ref="$form-resources/dialog-actions/event-type/label"/>
                     <xforms:hint ref="$form-resources/dialog-actions/event-type/hint"/>
                     <xforms:item>
@@ -45,7 +62,10 @@
                         <xforms:value ref="value"/>
                     </xforms:itemset>
                 </xforms:select1>
-                <xforms:select1 ref="xforms:action[1]/@ev:observer">
+            </xhtml:td>
+            <xhtml:td>
+                <!-- Control -->
+                <xforms:select1 ref="$instance/xforms:action/xforms:action[1]/@ev:observer">`
                     <xforms:label ref="$form-resources/dialog-actions/event-control/label"/>
                     <xforms:item>
                         <xforms:label ref="$form-resources/select/label"/>
@@ -57,7 +77,12 @@
                         <xforms:value value="@id"/>
                     </xforms:itemset>
                 </xforms:select1>
-                <xforms:select1 ref="xforms:action[1]/xforms:send/@submission" id="fb-bindings-submission-select">
+            </xhtml:td>
+        </xhtml:tr>
+        <xhtml:tr>
+            <xhtml:td>
+                <!-- Service to Call -->
+                <xforms:select1 ref="$instance/xforms:action/xforms:action[1]/xforms:send/@submission" id="fb-bindings-submission-select">
                     <xforms:label ref="$form-resources/dialog-actions/service-to-call/label"/>
                     <xforms:hint ref="$form-resources/dialog-actions/service-to-call/hint"/>
                     <xforms:item>
@@ -70,6 +95,16 @@
                         <xforms:value value="@id"/>
                     </xforms:itemset>
                 </xforms:select1>
+            </xhtml:td>
+            <xhtml:td/>
+        </xhtml:tr>
+    </fr:grid>
+
+    <xhtml:div class="fr-grid">
+        <xhtml:div class="fr-grid-content">
+
+            <xforms:group ref="$instance/xforms:action" appearance="xxforms:internal">
+
                 <!-- Set request values -->
                 <xforms:group ref="xforms:action[@ev:event = 'xforms-submit']/xforms:action">
                     <xforms:label ref="$form-resources/dialog-actions/request-parameters/label"/>
@@ -204,31 +239,6 @@
                     </fr:repeat>
                 </xforms:group>
             </xforms:group>
-            <!--<xforms:group ref="$instance/validation">-->
-                <!--<xforms:label>Validate Control</xforms:label>-->
-                <!--<fr:repeat nodeset="validation" id="fb-bindings-validation-repeat" origin="instance('fb-binding-action-template')/validation" columns="2" appearance="xxforms:table">-->
-                    <!--<xhtml:tr>-->
-                        <!--<xhtml:td>-->
-                            <!--<xforms:select1 ref="@control">-->
-                                <!--<xforms:label>Control</xforms:label>-->
-                                <!--<xforms:item>-->
-                                    <!--<xforms:label>[Select...]</xforms:label>-->
-                                    <!--<xforms:value/>-->
-                                <!--</xforms:item>-->
-                                <!--<xforms:itemset nodeset="$body//*[(@ref or @bind) and ends-with(@id, '-control')]">-->
-                                    <!--<xforms:label value="substring-before(@id, '-control')"/>-->
-                                    <!--<xforms:value value="concat('instance(''fb-form-instance'')/*/*[name() = ''', substring-before(@id, '-control'), ''']')"/>-->
-                                <!--</xforms:itemset>-->
-                            <!--</xforms:select1>-->
-                        <!--</xhtml:td>-->
-                        <!--<xhtml:td>-->
-                            <!--<xforms:input ref="@constraint">-->
-                                <!--<xforms:label>Constraint Expression</xforms:label>-->
-                            <!--</xforms:input>-->
-                        <!--</xhtml:td>-->
-                    <!--</xhtml:tr>-->
-                <!--</fr:repeat>-->
-            <!--</xforms:group>-->
         </xhtml:div>
     </xhtml:div>
 
@@ -297,7 +307,12 @@
             <xxforms:variable name="binding-id" select="concat($binding-name, '-binding')"/>
             <xforms:setvalue ref="$instance/name" value="$binding-name"/>
             <xforms:setvalue ref="$instance/initial-name" value="$binding-name"/>
+
             <xforms:insert nodeset="$instance/*" origin="$model/xforms:action[@id = $binding-id]"/>
+
+            <!-- Insert condition on action if missing -->
+            <xxforms:variable name="action1" select="$instance/xforms:action/xforms:action[1]"/>
+            <xforms:insert if="not(exists($action1/@if))" context="$action1" origin="xxforms:attribute('if', 'true()')"/>
         </xforms:action>
     </xforms:action>
 
@@ -328,7 +343,7 @@
                          constraint="(normalize-space() != '' and normalize-space() = ../initial-name)
                                         or not(../xforms:action[1]/@id = $model/xforms:action/@id)"/>
             <xforms:bind nodeset="instance-id" calculate="concat(../name, '-instance')"/>
-            
+
             <xforms:bind nodeset="xforms:action">
                 <!-- Action id -->
                 <xforms:bind nodeset="@id" calculate="concat(../../name, '-binding')"/>
@@ -341,7 +356,7 @@
                     <xforms:bind nodeset="@ev:observer"
                                  required="tokenize(../@ev:event, '\s+') = ('DOMActivate', 'xforms-value-changed', 'xforms-enabled')"
                                  relevant="tokenize(../@ev:event, '\s+') = ('DOMActivate', 'xforms-value-changed', 'xforms-enabled')"
-                                 calculate="if (tokenize(../@ev:event, '\s+') = ('DOMActivate', 'xforms-value-changed', 'xforms-enabled')) then . else ('fr-form-model')"
+                                 calculate="if (tokenize(../@ev:event, '\s+') = ('DOMActivate', 'xforms-value-changed', 'xforms-enabled')) then . else 'fr-form-model'"
                                  readonly="false()"/>
                 </xforms:bind>
                 <!-- xforms-submit -->
@@ -372,7 +387,7 @@
         <xforms:instance id="fb-binding-template" xxforms:readonly="true" xxforms:exclude-result-prefixes="pipeline xhtml xsi xi xxi fr fb saxon xbl exforms">
             <xforms:action id="">
                 <!-- React to event... on control... -->
-                <xforms:action ev:event="" ev:observer="">
+                <xforms:action ev:event="" ev:observer="" if="true()">
                     <!-- Service to call -->
                     <xforms:send submission="SET ME"/>
                 </xforms:action>

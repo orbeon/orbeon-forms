@@ -314,11 +314,13 @@
 
             <xsl:apply-templates select="node()"/>
 
-            <!-- Bind to set the form instance read-only when necessary -->
-            <xforms:bind nodeset="instance('fr-form-instance')" readonly="xxforms:instance('fr-parameters-instance')/mode = ('view', 'pdf', 'email')"/>
-
             <!-- Variable exposing all the user roles -->
             <xxforms:variable name="fr-roles" select="tokenize(xxforms:instance('fr-permissions')/@all-roles, '\s+')" as="xs:string*"/>
+            <!-- Variable exposing the form mode -->
+            <xxforms:variable name="fr-mode" select="xxforms:instance('fr-parameters-instance')/mode"/>
+
+            <!-- Bind to set the form instance read-only when necessary -->
+            <xforms:bind nodeset="instance('fr-form-instance')" readonly="$fr-mode = ('view', 'pdf', 'email')"/>
 
         </xsl:copy>
 

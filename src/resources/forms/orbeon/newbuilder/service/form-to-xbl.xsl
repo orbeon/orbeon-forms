@@ -32,6 +32,44 @@
     <xsl:variable name="component-namespace" as="xs:string"
                   select="string-join(('http://orbeon.org/oxf/xml/form-builder/component', doc('input:parameters')/*/app, doc('input:parameters')/*/form), '/')"/>
 
+    <!-- Global stuff -->
+    <xsl:variable name="fr-form-model" select="/xhtml:html/xhtml:head//xforms:model[@id = 'fr-form-model']" as="element(xforms:model)"/>
+    <xsl:variable name="fr-form-instance" select="$fr-form-model/xforms:instance[@id = 'fr-form-instance']" as="element(xforms:instance)"/>
+    <xsl:variable name="fr-resources-instance" select="$fr-form-model/xforms:instance[@id = 'fr-form-resources']" as="element(xforms:instance)"/>
+
+    <!-- Actions and services -->
+    <!-- NOTE: Actions and services are implemented, for historical reasons, as XForms instances, submissions, and action
+         blocks. This means that we must analyze them to try to make sense of them, and this is a bit fragile. In the
+         future, actions should be described in a more declarative format. See also:
+         http://wiki.orbeon.com/forms/projects/form-runner-builder/improved-actions-and-services-format
+     -->
+    <xsl:variable name="actions" select="$fr-form-model/xforms:action[ends-with(@id, '-binding')]"/>
+    <xsl:variable name="service-instances" select="$fr-form-model/xforms:instance[tokenize(@class, '\s+') = ('fr-service', 'fr-database-service')]"/>
+    <xsl:variable name="service-submissions" select="$fr-form-model/xforms:submission[tokenize(@class, '\s+') = ('fr-service', 'fr-database-service')]"/>
+
+    <!-- Distinct source ids for the given action -->
+    <!-- NOTE: Source can also be a model -->
+    <xsl:function name="fr:action-sources" as="xs:string*">
+        <xsl:param name="action" as="element(xforms:action)"/>
+        <xsl:sequence select="distinct-values($action/xforms:action[1]/@*:observer/tokenize(., '\s+'))"/>
+    </xsl:function>
+
+    <!-- Distinct destination ids for the given action -->
+    <xsl:function name="fr:action-destinations" as="xs:string*">
+        <xsl:param name="action" as="element(xforms:action)"/>
+        <xsl:sequence select="distinct-values($action//(*:variable | *:var)[@name = 'control-name']/(@value, @select)/replace(., '''([^..]*)''', '$1-control'))"/>
+    </xsl:function>
+
+    <!-- Distinct action elements for which the given id is a source or destination or both -->
+    <xsl:function name="fr:action-for-id" as="element(xforms:action)*">
+        <xsl:param name="id" as="xs:string"/>
+        <xsl:sequence select="$actions[$id = distinct-values((fr:action-sources(.), fr:action-destinations(.)))]"/>
+    </xsl:function>
+
+    <xsl:variable name="all-action-sources" select="distinct-values($actions/fr:action-sources(.))"/>
+    <xsl:variable name="all-action-destinations" select="distinct-values($actions/fr:action-destinations(.))"/>
+
+    <!-- Generate XBL container -->
     <xsl:template match="/">
 
         <xbl:xbl>
@@ -53,23 +91,43 @@
         </xbl:xbl>
     </xsl:template>
 
+    <xsl:function name="fr:value-except" as="xs:anyAtomicType*">
+      <xsl:param name="arg1" as="xs:anyAtomicType*"/>
+      <xsl:param name="arg2" as="xs:anyAtomicType*"/>
+      <xsl:sequence select="distinct-values($arg1[not(. = $arg2)])"/>
+    </xsl:function>
+
+    <!-- When copying actions, update references to instance and resources -->
+    <xsl:template match="xforms:setvalue/@ref[starts-with(., 'instance(''fr-form-instance'')/*')] |
+                         xforms:setvalue/@value[starts-with(., 'instance(''fr-form-instance'')/*')]" mode="filter-actions">
+        <xsl:attribute name="{name()}" select="concat('instance(''fr-form-instance'')', substring-after(., 'instance(''fr-form-instance'')/*'))"/>
+    </xsl:template>
+    <xsl:template match="xxforms:variable[@name = 'control-resources']" mode="filter-actions">
+        <xxforms:variable name="control-resources" select="$form-resources/*[name() = $control-name]"/>
+    </xsl:template>
+
+    <!-- When copying actions, update references to xforms-ready and fr-form-model -->
+    <xsl:template match="@*:event[tokenize(., '\s+') = 'xforms-ready']" mode="filter-actions">
+        <xsl:attribute name="{name(.)}" select="(fr:value-except(tokenize(., '\s+'), 'xforms-ready'), 'xforms-model-construct-done')"/>
+    </xsl:template>
+    <xsl:template match="@*:observer[tokenize(., '\s+') = 'fr-form-model']" mode="filter-actions">
+        <xsl:param name="component-id" tunnel="yes"/>
+        <xsl:attribute name="{name(.)}" select="(fr:value-except(tokenize(., '\s+'), 'fr-form-model'), concat($component-id, '-model'))"/>
+    </xsl:template>
+
+    <!-- Generate one component per section -->
     <xsl:template match="/xhtml:html/xhtml:body//fr:section">
 
         <xsl:variable name="fr-section" select="." as="element(fr:section)"/>
 
         <!-- TODO: for now consider any component in the "fr" namespace, but need to do better -->
 
-        <xsl:variable name="fr-form-model" select="/xhtml:html/xhtml:head//xforms:model[@id = 'fr-form-model']" as="element(xforms:model)"/>
-        <xsl:variable name="fr-form-instance" select="$fr-form-model/xforms:instance[@id = 'fr-form-instance']" as="element(xforms:instance)"/>
-        <xsl:variable name="fr-resources-instance" select="$fr-form-model/xforms:instance[@id = 'fr-form-resources']" as="element(xforms:instance)"/>
-
         <!-- Section id -->
         <xsl:variable name="section-id" select="substring-before(@id, '-section')" as="xs:string"/>
 
         <!-- Section bind -->
         <xsl:variable name="section-bind" select="$fr-form-model//xforms:bind[@id = concat($section-id, '-bind')]" as="element(xforms:bind)"/>
-        <xsl:variable name="section-name" select="$section-bind/@nodeset" as="xs:string"/>
-        <xsl:variable name="section-resource" select="$section-bind/@nodeset" as="xs:string"/>
+        <xsl:variable name="section-name" select="$section-bind/((@ref, @nodeset)[1])" as="xs:string"/>
 
         <!-- Section instance data element -->
         <!-- NOTE: could also gather ancestor-or-self::xforms:bind/@nodeset and evaluate expression to be more generic -->
@@ -77,6 +135,19 @@
 
         <!-- Use section id as component id as section ids are unique -->
         <xsl:variable name="component-id" select="$section-id" as="xs:string"/>
+
+        <!-- Figure out which actions and services are used by the component -->
+
+        <!-- Controls under this section which are the source or destination of an action or both -->
+        <xsl:variable name="action-controls" select="$fr-section//*[@id = ($all-action-sources, $all-action-destinations)]"/>
+        <!-- Unique xforms:action elements which use controls under this section -->
+        <xsl:variable name="relevant-actions" select="$actions[@id = distinct-values($action-controls/@id/fr:action-for-id(.)/@id)]"/>
+        <!-- Unique service ids used by relevant actions -->
+        <xsl:variable name="relevant-service-ids" select="distinct-values($relevant-actions/xforms:action[position() = (2, 3)]/@*:observer/replace(., '(.*)-submission$', '$1'))"/>
+        <!-- Unique service instances and submissions used by relevant actions -->
+        <xsl:variable name="relevant-services" select="
+            $service-instances[replace(@id, '(.*)-instance$', '$1') = $relevant-service-ids] |
+            $service-submissions[replace(@id, '(.*)-submission$', '$1') = $relevant-service-ids]"/>
 
         <!-- Create binding for the section/grid as a component -->
         <!-- TODO: Is using class fr-section-component the best way? -->
@@ -149,16 +220,30 @@
                         </resources>
                     </xforms:instance>
 
+                    <!-- Try to match the current form language, or use the first language available if not found -->
+                    <xxforms:variable name="form-resources"
+                                      select="instance('fr-form-resources')/(resource[@xml:lang = xxforms:instance('fr-language-instance')], resource[1])[1]" as="element(resource)"/>
+
                     <!-- This is also at the top-level in components.xsl -->
                     <!-- TODO: would be ideal if read-onliness on outer instance would simply propagate here -->
                     <xforms:bind nodeset="instance('fr-form-instance')" readonly="xxforms:instance('fr-parameters-instance')/mode = ('view', 'pdf', 'email')"/>
 
-                    <!-- Actions -->
-                    <!-- TODO -->
-
                     <!-- Schema: simply copy so that the types are available locally -->
                     <!-- NOTE: Could optimized to check if any of the types are actually used -->
                     <xsl:copy-of select="$fr-form-model/xs:schema"/>
+
+                    <!-- Services and actions -->
+                    <xsl:if test="exists(($relevant-services, $relevant-actions))">
+                        <xforms:instance id="fr-service-request-instance" xxforms:exclude-result-prefixes="#all">
+                            <request/>
+                        </xforms:instance>
+                        <xforms:instance id="fr-service-response-instance" xxforms:exclude-result-prefixes="#all">
+                            <response/>
+                        </xforms:instance>
+                        <xsl:apply-templates select="$relevant-services, $relevant-actions" mode="filter-actions">
+                            <xsl:with-param name="component-id" tunnel="yes" select="$component-id"/>
+                        </xsl:apply-templates>
+                    </xsl:if>
 
                 </xforms:model>
             </xbl:implementation>
@@ -197,10 +282,6 @@
                         <xxforms:variable name="fr-resources" as="element()?">
                             <xxforms:sequence select="$fr-resources" xxbl:scope="outer"/>
                         </xxforms:variable>
-
-                        <!-- Try to match the current form language, or use the first language available if not found -->
-                        <xxforms:variable name="form-resources"
-                                          select="instance('fr-form-resources')/(resource[@xml:lang = xxforms:instance('fr-language-instance')], resource[1])[1]" as="element(resource)"/>
 
                         <xforms:group appearance="xxforms:internal">
                             <!-- Synchronize data with external world upon local value change -->

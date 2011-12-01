@@ -131,8 +131,8 @@
         <xsl:attribute name="{name(.)}" select="(fr:value-except(p:split(), 'xforms-ready'), 'xforms-model-construct-done')"/>
     </xsl:template>
     <xsl:template match="@*:observer[p:split() = 'fr-form-model']" mode="filter-actions">
-        <xsl:param name="component-id" tunnel="yes"/>
-        <xsl:attribute name="{name(.)}" select="(fr:value-except(p:split(), 'fr-form-model'), concat($component-id, '-model'))"/>
+        <xsl:param name="model-id" tunnel="yes"/>
+        <xsl:attribute name="{name(.)}" select="(fr:value-except(p:split(), 'fr-form-model'), $model-id)"/>
     </xsl:template>
 
     <!-- Generate one component per section -->
@@ -150,18 +150,16 @@
         <!-- Section bind -->
         <xsl:variable name="section-bind" select="$fr-form-model//xf:bind[@id = concat($section-name, '-bind')]" as="element(xf:bind)"/>
         <xsl:variable name="section-name" select="$section-bind/((@ref, @nodeset)[1])" as="xs:string"/>
+        <xsl:variable name="model-id"     select="concat($section-name, '-model')" as="xs:string"/>
 
         <!-- Section instance data element -->
         <!-- NOTE: could also gather ancestor-or-self::xf:bind/@ref and evaluate expression to be more generic -->
         <!-- TODO: What do do with custom data model? -->
         <xsl:variable name="section-data" select="$fr-form-instance/*/*[name() = $section-name]" as="element()"/>
 
-        <!-- NOTE: We should make component ids and names unique, as shown in the commented-out code below. The issue is
-             that if we change that, section templates already in use in forms stop working. So we need another
-             solution.See: http://forge.ow2.org/tracker/index.php?func=detail&aid=316287&group_id=168&atid=350207 -->
-        <xsl:variable name="component-id" select="$section-name" as="xs:string"/>
-        <!-- Use section id as component id as section ids are unique -->
-        <!--<xsl:variable name="component-id" select="concat(doc('input:parameters')/*/app, '-',  $section-name)" as="xs:string"/>-->
+        <!-- Binding ids must be unique as the xbl:xbl of the section templates are embedded into the published forms.
+             So make the ids unique. See https://github.com/orbeon/orbeon-forms/issues/142 -->
+        <xsl:variable name="binding-id" select="concat(doc('input:parameters')/*/app, '-',  $section-name)" as="xs:string"/>
 
         <!-- Figure out which actions and services are used by the component -->
 
@@ -184,10 +182,11 @@
             $service-submissions[replace(@id, '(.*)-submission$', '$1') = $relevant-service-ids]"/>
 
         <!-- Create binding for the section/grid as a component -->
-        <!-- TODO: Is using class fr-section-component the best way? -->
+        <!-- NOTE: In component|foo-section, the namespace already contains the app name. So it's not necessary to
+             include the app name in the local name. See https://github.com/orbeon/orbeon-forms/issues/142 -->
         <xbl:binding
-                id="{$component-id}-component"
-                element="component|{$component-id}"
+                id="{$binding-id}-component"
+                element="component|{$section-name}"
                 class="fr-section-component">
 
             <!-- Orbeon Form Builder Component Metadata -->
@@ -216,14 +215,14 @@
                     </xsl:if>
                     <view>
                         <!-- NOTE: Element doesn't have LHHA elements for now -->
-                        <xsl:element name="component:{$component-id}" namespace="{$component-namespace}"/>
+                        <xsl:element name="component:{$section-name}" namespace="{$component-namespace}"/>
                     </view>
                 </templates>
             </metadata>
 
             <!-- XBL implementation -->
             <xbl:implementation>
-                <xf:model id="{$component-id}-model">
+                <xf:model id="{$model-id}">
                     <!-- Copy schema attribute if present -->
                     <xsl:copy-of select="$fr-form-model/@schema"/>
 
@@ -300,7 +299,7 @@
                             <response/>
                         </xf:instance>
                         <xsl:apply-templates select="$relevant-services, $relevant-actions" mode="filter-actions">
-                            <xsl:with-param name="component-id" tunnel="yes" select="$component-id"/>
+                            <xsl:with-param name="model-id" tunnel="yes" select="$model-id"/>
                         </xsl:apply-templates>
                     </xsl:if>
 
@@ -311,7 +310,7 @@
             <xbl:template>
                 <!-- Point to the context of the current element.
                      NOTE: FB doesn't place a @ref. -->
-                <xf:var name="context" id="context" value="xxf:binding-context('{$component-id}-component')"/>
+                <xf:var name="context" id="context" value="xxf:binding-context('{$binding-id}-component')"/>
 
                 <!-- Propagate readonly of containing section -->
                 <xf:var name="readonly" as="xs:boolean" value="exf:readonly($context)">

@@ -24,23 +24,29 @@ import org.orbeon.oxf.xforms.function._
  */
 trait XFormsEnvFunctions extends OrbeonFunctionLibrary {
 
-    Fun("index", classOf[Index], 0, 1, INTEGER, EXACTLY_ONE,
-        Arg(STRING, EXACTLY_ONE)
-    )
+    // Define in early definition of subclass
+    val XFormsEnvFunctionsNS: String
 
-    Fun("property", classOf[Property], 0, 1, STRING, EXACTLY_ONE,
-        Arg(STRING, EXACTLY_ONE)
-    )
+    Namespace(XFormsEnvFunctionsNS) {
 
-    Fun("instance", classOf[Instance], 0, 0, Type.NODE_TYPE, ALLOWS_ZERO_OR_ONE,
-        Arg(STRING, EXACTLY_ONE)
-    )
+        Fun("index", classOf[Index], 0, 1, INTEGER, EXACTLY_ONE,
+            Arg(STRING, EXACTLY_ONE)
+        )
 
-    Fun("current", classOf[Current], 0, 0, Type.ITEM_TYPE, ALLOWS_ZERO_OR_ONE)
+        Fun("property", classOf[Property], 0, 1, STRING, EXACTLY_ONE,
+            Arg(STRING, EXACTLY_ONE)
+        )
 
-    Fun("context", classOf[Context], 0, 0, Type.ITEM_TYPE, ALLOWS_ZERO_OR_ONE)
+        Fun("instance", classOf[Instance], 0, 0, Type.NODE_TYPE, ALLOWS_ZERO_OR_ONE,
+            Arg(STRING, EXACTLY_ONE)
+        )
 
-    Fun("event", classOf[Event], 0, 1, Type.ITEM_TYPE, ALLOWS_ZERO_OR_MORE,
-        Arg(STRING, EXACTLY_ONE)
-    )
+        Fun("current", classOf[Current], 0, 0, Type.ITEM_TYPE, ALLOWS_ZERO_OR_ONE)
+
+        Fun("context", classOf[Context], 0, 0, Type.ITEM_TYPE, ALLOWS_ZERO_OR_ONE)
+
+        Fun("event", classOf[Event], 0, 1, Type.ITEM_TYPE, ALLOWS_ZERO_OR_MORE,
+            Arg(STRING, EXACTLY_ONE)
+        )
+    }
 }

@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms.library
 
 import org.orbeon.oxf.xforms.function.exforms.{EXFormsSort, EXFormsRequired, EXFormsReadonly, EXFormsRelevant}
-import org.orbeon.oxf.xforms.XFormsConstants
 import org.orbeon.saxon.`type`.BuiltInAtomicType._
 import org.orbeon.saxon.expr.StaticProperty._
 import org.orbeon.saxon.`type`.Type
@@ -25,7 +24,10 @@ import org.orbeon.oxf.xml.OrbeonFunctionLibrary
  */
 trait EXFormsFunctions extends OrbeonFunctionLibrary {
 
-    Namespace(XFormsConstants.EXFORMS_NAMESPACE_URI) {
+    // Define in early definition of subclass
+    val EXFormsFunctionsNS: String
+
+    Namespace(EXFormsFunctionsNS) {
         
         // exf:relevant()
         Fun("relevant", classOf[EXFormsRelevant], 0, 0, BOOLEAN, EXACTLY_ONE,

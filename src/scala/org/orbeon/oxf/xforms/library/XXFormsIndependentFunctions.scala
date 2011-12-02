@@ -19,14 +19,16 @@ import org.orbeon.saxon.`type`.Type._
 import org.orbeon.saxon.functions.{Serialize, Evaluate}
 import org.orbeon.oxf.xforms.function.xxforms._
 import org.orbeon.oxf.xml.OrbeonFunctionLibrary
-import org.orbeon.oxf.xforms.XFormsConstants
 
 /*
 * Orbeon extension functions that don't depend on the XForms environment.
 */
 trait XXFormsIndependentFunctions extends OrbeonFunctionLibrary {
-    
-    Namespace(XFormsConstants.XXFORMS_NAMESPACE_URI) {
+
+    // Define in early definition of subclass
+    val XXFormsIndependentFunctionsNS: String
+
+    Namespace(XXFormsIndependentFunctionsNS) {
     
         // xxforms:get-request-path()
         Fun("get-request-path", classOf[XXFormsGetRequestPath], 0, 0, STRING, ALLOWS_ONE)

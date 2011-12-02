@@ -22,21 +22,26 @@ import org.orbeon.oxf.xforms.function.{Random, Hmac, Digest}
  * XForms functions that don't depend on the XForms environment.
  */
 trait XFormsIndependentFunctions extends OrbeonFunctionLibrary {
-    
-    Fun("digest", classOf[Digest], 0, 2, STRING, EXACTLY_ONE,
-        Arg(STRING, EXACTLY_ONE),
-        Arg(STRING, EXACTLY_ONE),
-        Arg(STRING, EXACTLY_ONE)
-    )
 
-    Fun("hmac", classOf[Hmac], 0, 3, STRING, EXACTLY_ONE,
-        Arg(STRING, EXACTLY_ONE),
-        Arg(STRING, EXACTLY_ONE),
-        Arg(STRING, EXACTLY_ONE),
-        Arg(STRING, EXACTLY_ONE)
-    )
+    // Define in early definition of subclass
+    val XFormsIndependentFunctionsNS: String
 
-    Fun("random", classOf[Random], 0, 0, NUMERIC, EXACTLY_ONE,
-        Arg(BOOLEAN, ALLOWS_ZERO_OR_ONE)
-    )
+    Namespace(XFormsIndependentFunctionsNS) {
+        Fun("digest", classOf[Digest], 0, 2, STRING, EXACTLY_ONE,
+            Arg(STRING, EXACTLY_ONE),
+            Arg(STRING, EXACTLY_ONE),
+            Arg(STRING, EXACTLY_ONE)
+        )
+
+        Fun("hmac", classOf[Hmac], 0, 3, STRING, EXACTLY_ONE,
+            Arg(STRING, EXACTLY_ONE),
+            Arg(STRING, EXACTLY_ONE),
+            Arg(STRING, EXACTLY_ONE),
+            Arg(STRING, EXACTLY_ONE)
+        )
+
+        Fun("random", classOf[Random], 0, 0, NUMERIC, EXACTLY_ONE,
+            Arg(BOOLEAN, ALLOWS_ZERO_OR_ONE)
+        )
+    }
 }

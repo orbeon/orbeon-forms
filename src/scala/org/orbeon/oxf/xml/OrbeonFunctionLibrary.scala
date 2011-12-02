@@ -28,14 +28,11 @@ import org.orbeon.saxon.functions.{FunctionLibrary, SystemFunction}
  */
 abstract class OrbeonFunctionLibrary extends FunctionLibrary {
 
-    // Saxon will call back with the FN namespace so we normalize to that
-    protected def mapFunctionNamespace: Map[String, String] = Map(""  → NamespaceConstant.FN)
-
     protected object Namespace {
         private var _currentURI: Option[String] = None
         def currentURI = _currentURI
 
-        def apply(uri: String)(block: => Any): Unit = {
+        def apply(uri: String)(block: ⇒ Any): Unit = {
             _currentURI = Some(uri)
             block
             _currentURI = None
@@ -45,8 +42,6 @@ abstract class OrbeonFunctionLibrary extends FunctionLibrary {
     protected case class Arg(itemType: ItemType, arity: Int, resultIfEmpty: Value = null)
 
     protected object Fun {
-
-        private lazy val namespaceMap = mapFunctionNamespace
         
         def apply(name: String, implementationClass: Class[_], op: Int, min: Int, itemType: ItemType, arity: Int, args: Arg*) {
             val uri = Namespace.currentURI getOrElse NamespaceConstant.FN
@@ -64,7 +59,7 @@ abstract class OrbeonFunctionLibrary extends FunctionLibrary {
             assert(name ne null)
             assert(itemType ne null)
 
-            val functionName = FunctionName(namespaceMap.get(uri) getOrElse uri, name)
+            val functionName = FunctionName(uri, name)
 
             // Create function entry
             val e = new Entry

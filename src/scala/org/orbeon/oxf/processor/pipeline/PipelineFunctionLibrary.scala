@@ -23,7 +23,6 @@ import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.oxf.xml.OrbeonFunctionLibrary
 import org.orbeon.oxf.xforms.library._
 import org.orbeon.oxf.xforms.XFormsUtils
-import org.orbeon.oxf.xforms.XFormsConstants.XXFORMS_NAMESPACE_URI
 
 // For backward compatibility
 object PipelineFunctionLibrary extends PipelineFunctionLibrary
@@ -31,17 +30,21 @@ object PipelineFunctionLibrary extends PipelineFunctionLibrary
 /**
  * Function library for XPath expressions in XPL.
  *
- * TODO:
- *
- * - add `with XFormsIndependentFunctions` and make sure this is imported in p: namespace
- * - make Java-accessible functions below accessible as a Saxon FunctionLibrary in XSLT instead
- * -
+ * TODO: make Java-accessible functions below accessible as a Saxon FunctionLibrary in XSLT instead
  */
-class PipelineFunctionLibrary extends OrbeonFunctionLibrary
+class PipelineFunctionLibrary extends {
+    // Namespace the functions (we wish we had trait constructors!)
+    val XFormsIndependentFunctionsNS = PIPELINE_NAMESPACE_URI
+    val XXFormsIndependentFunctionsNS = PIPELINE_NAMESPACE_URI
+    val XSLTFunctionsNS = PIPELINE_NAMESPACE_URI // or FN?
+}
+    with OrbeonFunctionLibrary
+    with XFormsIndependentFunctions
     with XXFormsIndependentFunctions
     with XSLTFunctions {
 
     // === Functions made accessible to XSLT via Java calls
+
     def decodeXML(encodedXML: String) = XFormsUtils.decodeXML(encodedXML)
     def encodeXML(node: Node) = XFormsUtils.encodeXMLAsDOM(node)
     def newEvaluator(context: NodeInfo) = new XPathEvaluator(context.getConfiguration)
@@ -56,7 +59,4 @@ class PipelineFunctionLibrary extends OrbeonFunctionLibrary
         NetUtils.getExternalContext.getResponse.setTitle(title)
         null
     }
-
-    // Make sure that functions defined as xxforms:* are exposed as p:* instead
-    override def mapFunctionNamespace = super.mapFunctionNamespace ++ Map(XXFORMS_NAMESPACE_URI → PIPELINE_NAMESPACE_URI)
 }

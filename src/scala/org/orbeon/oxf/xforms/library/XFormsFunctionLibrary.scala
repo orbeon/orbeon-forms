@@ -20,11 +20,23 @@ import org.orbeon.saxon.`type`.BuiltInAtomicType._
 import org.orbeon.saxon.expr.StaticProperty._
 import org.orbeon.saxon.value._
 import org.orbeon.saxon.`type`.Type
+import org.orbeon.oxf.xforms.XFormsConstants._
+import org.orbeon.saxon.om.NamespaceConstant
 
 /**
  * Function library for XPath expressions in XForms.
  */
-object XFormsFunctionLibrary extends OrbeonFunctionLibrary
+object XFormsFunctionLibrary extends {
+    // Namespace the functions (we wish we had trait constructors!)
+    val XFormsIndependentFunctionsNS = NamespaceConstant.FN
+    val XFormsEnvFunctionsNS = NamespaceConstant.FN
+    val XFormsFunnyFunctionsNS = NamespaceConstant.FN
+    val XXFormsIndependentFunctionsNS = XXFORMS_NAMESPACE_URI
+    val XXFormsEnvFunctionsNS = XXFORMS_NAMESPACE_URI
+    val EXFormsFunctionsNS = EXFORMS_NAMESPACE_URI
+    val XSLTFunctionsNS = NamespaceConstant.FN
+}
+    with OrbeonFunctionLibrary
     with XFormsIndependentFunctions
     with XFormsEnvFunctions
     with XFormsFunnyFunctions

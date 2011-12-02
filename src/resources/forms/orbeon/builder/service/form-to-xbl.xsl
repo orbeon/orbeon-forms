@@ -132,8 +132,12 @@
         <!-- NOTE: could also gather ancestor-or-self::xforms:bind/@nodeset and evaluate expression to be more generic -->
         <xsl:variable name="section-data" select="$fr-form-instance/*/*[name() = $section-name]" as="element()"/>
 
+        <!-- NOTE: We should make component ids and names unique, as shown in the commented-out code below. The issue is
+             that if we change that, section templates already in use in forms stop working. So we need another
+             solution.See: http://forge.ow2.org/tracker/index.php?func=detail&aid=316287&group_id=168&atid=350207 -->
+        <xsl:variable name="component-id" select="$section-id" as="xs:string"/>
         <!-- Use section id as component id as section ids are unique -->
-        <xsl:variable name="component-id" select="concat(doc('input:parameters')/*/app, '-',  $section-id)" as="xs:string"/>
+        <!--<xsl:variable name="component-id" select="concat(doc('input:parameters')/*/app, '-',  $section-id)" as="xs:string"/>-->
 
         <!-- Figure out which actions and services are used by the component -->
 

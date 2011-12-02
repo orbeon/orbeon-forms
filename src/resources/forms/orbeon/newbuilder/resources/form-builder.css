@@ -319,12 +319,10 @@ a.xforms-help-image .fb-control-help { vertical-align: baseline; }
 .fb-grid-cell-icons img { margin-bottom: 0; padding: 0 }
 .fr-grid .fr-grid-td .fb-grid-cell-icons img { display: inline }
 
-/* Inputs for cell editor */
-.fb-control-label, .fb-control-hint { position: absolute }
-
 .fb-grid-control-icons { position: absolute; right: 0}
 .fb-grid-control-icons img { margin-bottom: 0; padding: 0 }
 .fr-grid .fr-grid-td .fb-grid-control-icons img { display: inline }
+.fb-label-hint-placeholder { color: #bbb }
 
 /* Column icons */
 .fb-grid-column-toolbar-td {
@@ -344,6 +342,15 @@ a.xforms-help-image .fb-control-help { vertical-align: baseline; }
 
 /* Grid content */
 .fr-grid-content { padding: 0 18px; margin: .5em 0 } /* margin: override FR */
+.fr-grid-content .xforms-label:hover, .fr-grid-content .xforms-hint:hover { background-color: #ffffd3 }
+/* Inputs for editing the label and hint to take the whole width of the grid content */
+.fr-grid-content .xforms-label input, .fr-grid-content .xforms-hint input { width: 100% }
+/* Even if the label or hint is empty, we still want space for 1 line to  be reserved. */
+.fr-grid-content .xforms-label, .fr-grid-content .xforms-hint { min-height: 1.321em }
+/* Show disabled hints, which are hints that don't contain any text, as we want them to show since use them as placeholders.
+   Use an id to override the #fr-view .xforms-disabled { display: none } in form-runner-base.css.
+   The position: static overrides the position: absolute; top: -10000px; left: -10000px in xforms.css. */
+#fr-view .fr-grid-content .xforms-hint.xforms-disabled { display: block; position: static }
 
 .fb-use-toolbar-message, .fb-click-message { display: none; font-size: 70%; color: gray; width: 100%; font-style: italic; text-align: center; margin-top: 2em  }
 .fb-selected .fb-use-toolbar-message { display: block }
@@ -446,7 +453,6 @@ html.accordion-menu-js dd.a-m-d-anim {
 
 /* ***** YUI Layout ************************************************************************************************* */
 
-#fb-layout .xforms-disabled { display: none }
 #fr-view { margin-left: 0 }
 .yui-layout-unit-left { background-color: white }
 .yui-layout-unit-top .yui-layout-hd, .yui-layout-unit-bottom .yui-layout-hd, .yui-layout-unit-left .yui-layout-hd  { display: none }

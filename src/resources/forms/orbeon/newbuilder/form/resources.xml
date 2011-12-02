@@ -122,10 +122,10 @@
             <label>Reload Controls</label>
         </reload-components>
         <enter-label>
-            <label>click to enter a label</label>
+            <label>Click to add a label</label>
         </enter-label>
         <enter-hint>
-            <label>click to enter an optional hint</label>
+            <label>Click to add a hint</label>
         </enter-hint>
         <enter-text>
             <label>click to enter text</label>

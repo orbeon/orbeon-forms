@@ -12,8 +12,7 @@
 
 createCustomEvent = () -> new YAHOO.util.CustomEvent null, null, false, YAHOO.util.CustomEvent.FLAT
 
-ORBEON.builder ?= {}
-ORBEON.builder.Events =
+ORBEON.Builder =
     mouseEntersGridTdEvent:     createCustomEvent()
     mouseExitsGridTdEvent:      createCustomEvent()
     startLabelHintEditEvent:    createCustomEvent()
@@ -25,8 +24,8 @@ OD = ORBEON.util.Dom
 AjaxServer = ORBEON.xforms.server.AjaxServer
 Controls = ORBEON.xforms.Controls
 Event = YAHOO.util.Event
-XEvents = ORBEON.xforms.Events
-BEvents = ORBEON.builder.Events
+Events = ORBEON.xforms.Events
+Builder = ORBEON.Builder
 
 Event.onDOMReady () ->
 
@@ -36,11 +35,17 @@ Event.onDOMReady () ->
     cellEditorTriggerGroups = []
     cellEditorTriggers = []
 
+    # Populate above variables
     do ->
         cellEditorsContainer = (YD.getElementsByClassName "fb-cell-editor", null, document)[0]
+        classToCategory = [
+            [['xforms-input'], cellEditorInputs]
+            [['fb-grid-cell-icons', 'fb-grid-control-icons'], cellEditorTriggerGroups]
+        ]
         for child in YD.getChildren cellEditorsContainer
-            type = if YD.hasClass child, "xforms-input" then cellEditorInputs else cellEditorTriggerGroups
-            type.push child
+            for mapping in classToCategory
+                for cssClass in mapping[0]
+                    mapping[1].push child if YD.hasClass child, cssClass
         for group in cellEditorTriggerGroups
             triggersInGroup = YD.getElementsByClassName 'xforms-trigger', null, group
             cellEditorTriggers = cellEditorTriggers.concat triggersInGroup
@@ -65,51 +70,51 @@ Event.onDOMReady () ->
                 if currentMouseOverGridTd?
                     if gridTd isnt currentMouseOverGridTd
                         # From one gridTd to another gridTd
-                        BEvents.mouseExitsGridTdEvent.fire buildGridTdEvent currentMouseOverGridTd
+                        Builder.mouseExitsGridTdEvent.fire buildGridTdEvent currentMouseOverGridTd
                         currentMouseOverGridTd = gridTd
-                        BEvents.mouseEntersGridTdEvent.fire buildGridTdEvent gridTd
+                        Builder.mouseEntersGridTdEvent.fire buildGridTdEvent gridTd
                 else
                     # First time in a gridTd
                     currentMouseOverGridTd = gridTd
-                    BEvents.mouseEntersGridTdEvent.fire buildGridTdEvent gridTd
+                    Builder.mouseEntersGridTdEvent.fire buildGridTdEvent gridTd
             else
                 if currentMouseOverGridTd?
                     # Exiting a gridTd
-                    BEvents.mouseExitsGridTdEvent.fire buildGridTdEvent currentMouseOverGridTd
+                    Builder.mouseExitsGridTdEvent.fire buildGridTdEvent currentMouseOverGridTd
                     currentMouseOverGridTd = null
 
     # Fire event on click on trigger
     do ->
-        XEvents.clickEvent.subscribe ({control}) ->
+        Events.clickEvent.subscribe ({control}) ->
             if control in cellEditorTriggers
-                BEvents.triggerClickEvent.fire {trigger: control}
+                Builder.triggerClickEvent.fire {trigger: control}
 
     # Fire events related to users starting or being done with editing a label/hint
     do ->
         labelHint = null
 
-        XEvents.clickEvent.subscribe ({target}) ->
+        Events.clickEvent.subscribe ({target}) ->
             isLabel = YD.hasClass target, 'xforms-label'
             isHint = YD.hasClass target, 'xforms-hint'
             isInGridTd = (YD.getAncestorByClassName target, "fr-grid-td")?
             if (isLabel or isHint) and isInGridTd
               # Wait for Ajax response before showing editor to make sure the editor is bound to the current control
-              XEvents.runOnNext XEvents.ajaxResponseProcessedEvent, ->
+              Events.runOnNext Events.ajaxResponseProcessedEvent, ->
                   labelHint = target
-                  BEvents.startLabelHintEditEvent.fire {inputs: cellEditorInputs, labelHint}
+                  Builder.startLabelHintEditEvent.fire {inputs: cellEditorInputs, labelHint}
 
         # Update labelHint before we call hide so not to call hide more than once
         fireEndHideLabelHintInput = ->
             currentLabelHint = labelHint
             labelHint = null
-            BEvents.endLabelHintEditEvent.fire {inputs: cellEditorInputs, labelHint: currentLabelHint}
+            Builder.endLabelHintEditEvent.fire {inputs: cellEditorInputs, labelHint: currentLabelHint}
 
         # On enter or escape, restore label/hint to its view mode
-        XEvents.keypressEvent.subscribe ({control, keyCode}) ->
+        Events.keypressEvent.subscribe ({control, keyCode}) ->
             if labelHint? and control.parentNode == labelHint and keyCode == 13
                 fireEndHideLabelHintInput()
         # On blur of input, restore value
-        XEvents.blurEvent.subscribe ({control}) ->
+        Events.blurEvent.subscribe ({control}) ->
             if labelHint?
                 editor = YD.getFirstChild labelHint
                 fireEndHideLabelHintInput() if control == editor

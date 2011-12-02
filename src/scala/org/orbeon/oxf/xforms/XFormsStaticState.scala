@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms
 
-import java.util.Map
 import java.util.Set
 import org.orbeon.saxon.dom4j.DocumentWrapper
 import org.orbeon.oxf.util.{IndentedLogger, XPathCache}

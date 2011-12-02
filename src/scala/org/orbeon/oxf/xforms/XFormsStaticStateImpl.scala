@@ -66,7 +66,7 @@ class XFormsStaticStateImpl(val encodedState: String, val digest: String, val st
 
     // Legacy methods
     def getAllowedExternalEvents: JSet[String] = allowedExternalEvents
-    def getNonDefaultProperties: JMap[String, AnyRef] =  staticStateDocument.nonDefaultProperties
+    def getNonDefaultProperties: Map[String, AnyRef] =  staticStateDocument.nonDefaultProperties
     def getStringProperty(propertyName: String) = getProperty[String](propertyName)
     def getBooleanProperty(propertyName: String) = getProperty[Boolean](propertyName)
     def getIntegerProperty(propertyName: String) = getProperty[Int](propertyName)
@@ -247,7 +247,7 @@ object XFormsStaticStateImpl {
         def getProperty[T](propertyName: String): T =
             nonDefaultProperties.getOrElse(propertyName, {
                 val definition = P.getPropertyDefinition(propertyName)
-                if (definition ne null) definition.getDefaultValue else null
+                Option(definition) map (_.defaultValue) orNull
             }).asInstanceOf[T]
 
         def isCacheDocument = getProperty[Boolean](P.CACHE_DOCUMENT_PROPERTY)

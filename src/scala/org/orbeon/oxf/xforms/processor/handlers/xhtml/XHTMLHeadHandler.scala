@@ -15,7 +15,9 @@
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
     
 import org.orbeon.oxf.xforms._
+import org.orbeon.oxf.xforms.XFormsProperties._
 import control.XFormsControl
+import event.XFormsEvents
 import org.orbeon.oxf.xforms.processor.XFormsFeatures
 import org.orbeon.oxf.xml.ContentHandlerHelper
 import org.orbeon.oxf.xml.XMLConstants
@@ -26,6 +28,8 @@ import scala.collection.JavaConverters._
 import java.util.{List => JList, Map => JMap}
 import org.dom4j.Element
 import collection.mutable.{Buffer, HashMap, LinkedHashSet}
+import state.XFormsStateManager
+import org.orbeon.oxf.util.URLRewriterUtils._
 
 /**
  * Handler for <xhtml:head>. Outputs CSS and JS.
@@ -96,6 +100,86 @@ class XHTMLHeadHandler extends XHTMLHeadHandlerBase {
         outputResources(outputJSElement, XFormsFeatures.getJavaScriptResources,
             containingDocument.getStaticOps.getXBLScripts,
             containingDocument.getStaticOps.baselineResources._1, minimal)
+    }
+
+    override def outputConfigurationProperties(helper: ContentHandlerHelper, xhtmlPrefix: String, versionedResources: Boolean) {
+
+        // Gather all static properties that need to be sent to the client
+        val staticProperties = containingDocument.getStaticState.getNonDefaultProperties filter
+            { case (propertyName, _) ⇒ getPropertyDefinition(propertyName).isPropagateToClient }
+
+        val dynamicProperties = {
+
+            def dynamicProperty(p: ⇒ Boolean, name: String, value: Any) =
+                if (p) Some(name → value) else None
+
+            // Heartbeat delay is dynamic because it depends on session duration
+            def heartbeat = {
+                val propertyDefinition = getPropertyDefinition(SESSION_HEARTBEAT_DELAY_PROPERTY)
+                val heartbeatDelay = XFormsStateManager.getHeartbeatDelay(containingDocument, handlerContext.getExternalContext)
+
+                dynamicProperty(heartbeatDelay != propertyDefinition.defaultValue.asInstanceOf[java.lang.Integer],
+                    SESSION_HEARTBEAT_DELAY_PROPERTY, heartbeatDelay)
+            }
+
+            // Help events are dynamic because they depend on whether the xforms-help event is used
+            // TODO: Need better way to enable/disable xforms-help event support, probably better static analysis of event handlers
+            def help = dynamicProperty(
+                containingDocument.getStaticOps.hasHandlerForEvent(XFormsEvents.XFORMS_HELP, false),
+                HELP_HANDLER_PROPERTY,
+                true)
+
+            // Whether resources are versioned
+            def resourcesVersioned = dynamicProperty(
+                versionedResources != RESOURCES_VERSIONED_DEFAULT,
+                RESOURCES_VERSIONED_PROPERTY,
+                versionedResources
+            )
+
+            // Application version is not an XForms property but we want to expose it on the client
+            def resourcesVersion = dynamicProperty(
+                versionedResources && (getApplicationResourceVersion ne null),
+                RESOURCES_VERSION_NUMBER_PROPERTY,
+                getApplicationResourceVersion
+            )
+
+            // Gather all dynamic properties that are defined
+            Seq(heartbeat, help, resourcesVersioned, resourcesVersion).flatten
+        }
+
+        // combine all static and dynamic properties
+        val clientProperties = staticProperties ++ dynamicProperties
+
+        if (clientProperties nonEmpty) {
+
+            val sb = new StringBuilder
+
+            for ((propertyName, propertyValue) ← clientProperties) {
+                if (sb isEmpty) {
+                    // First iteration
+                    sb append "var opsXFormsProperties = {"
+                    helper.startElement(xhtmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "script", Array[String]("type", "text/javascript"))
+                } else
+                    sb append ','
+
+                sb append '"'
+                sb append propertyName
+                sb append "\":"
+
+                propertyValue match {
+                    case s: String ⇒
+                        sb append '"'
+                        sb append s
+                        sb append '"'
+                    case _ ⇒
+                        sb append propertyValue.toString
+                }
+            }
+
+            sb append "};"
+            helper.text(sb.toString)
+            helper.endElement()
+        }
     }
 }
 

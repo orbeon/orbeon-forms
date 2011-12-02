@@ -131,9 +131,9 @@ public class XFormsProperties {
 
     public static class PropertyDefinition {
 
-        private String name;
-        private Object defaultValue;
-        private boolean isPropagateToClient;
+        public final String name;
+        public final Object defaultValue;
+        public final boolean isPropagateToClient;
 
         public PropertyDefinition(String name, String defaultValue, boolean propagateToClient) {
             this.name = name;
@@ -153,22 +153,10 @@ public class XFormsProperties {
             isPropagateToClient = propagateToClient;
         }
 
-        public String getName() {
-            return name;
-        }
-
-        public Object getDefaultValue() {
-            return defaultValue;
-        }
-
-        public boolean isPropagateToClient() {
-            return isPropagateToClient;
-        }
-
         public Object parseProperty(String value) {
-            if (getDefaultValue() instanceof Integer) {
+            if (defaultValue instanceof Integer) {
                 return new Integer(value);
-            } else if (getDefaultValue() instanceof Boolean) {
+            } else if (defaultValue instanceof Boolean) {
                 return Boolean.valueOf(value);
             } else {
                 return value;
@@ -185,7 +173,7 @@ public class XFormsProperties {
                     final String stringValue = value.toString();
                     if (!(stringValue.equals(XFormsProperties.STATE_HANDLING_SERVER_VALUE)
                             || stringValue.equals(XFormsProperties.STATE_HANDLING_CLIENT_VALUE)))
-                        throw new ValidationException("Invalid xxforms:" + getName()
+                        throw new ValidationException("Invalid xxforms:" + name
                                 + " property value value: " + stringValue, locationData);
                 }
             },
@@ -198,7 +186,7 @@ public class XFormsProperties {
                     final String stringValue = value.toString();
                     if (!(stringValue.equals(XFormsProperties.READONLY_APPEARANCE_STATIC_VALUE)
                             || stringValue.equals(XFormsProperties.READONLY_APPEARANCE_DYNAMIC_VALUE)))
-                        throw new ValidationException("Invalid xxforms:" + getName()
+                        throw new ValidationException("Invalid xxforms:" + name
                                 + " property value value: " + stringValue, locationData);
                 }
             },

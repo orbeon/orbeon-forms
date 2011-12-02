@@ -194,7 +194,7 @@ public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
                 final String propertyName = (String) currentEntry.getKey();
                 final XFormsProperties.PropertyDefinition propertyDefinition = (XFormsProperties.PropertyDefinition) currentEntry.getValue();
 
-                final Object defaultPropertyValue = propertyDefinition.getDefaultValue(); // value can be String, Boolean, Integer
+                final Object defaultPropertyValue = propertyDefinition.defaultValue; // value can be String, Boolean, Integer
                 final Object actualPropertyValue = properties.get(propertyName); // value can be String, Boolean, Integer
                 if (actualPropertyValue == null) {
                     // Property not defined in the document, try to obtain from global properties

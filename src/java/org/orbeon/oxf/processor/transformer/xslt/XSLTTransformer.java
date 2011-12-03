@@ -43,6 +43,7 @@ import org.orbeon.saxon.event.MessageEmitter;
 import org.orbeon.saxon.event.SaxonOutputKeys;
 import org.orbeon.saxon.expr.*;
 import org.orbeon.saxon.functions.FunctionLibrary;
+import org.orbeon.saxon.functions.FunctionLibraryList;
 import org.orbeon.saxon.instruct.TerminationException;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NamePool;
@@ -206,7 +207,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                 try {
                     // Create transformer handler and set output writer for Saxon
                     final StringErrorListener errorListener = new StringErrorListener(logger);
-                    final TransformerHandler transformerHandler = TransformerUtils.getTransformerHandler(templatesInfo.templates, templatesInfo.transformerClass, attributes);
+                    final TransformerHandler transformerHandler = TransformerUtils.getTransformerHandler(templatesInfo.templates, templatesInfo.transformerClass, attributes, createXSLTConfiguration());
 
                     // Set handler for xsl:result-document
                     if (transformerHandler instanceof TransformerHandlerImpl) {
@@ -606,6 +607,20 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                 }
             }
 
+            // Create a Saxon Configuration which adds the Orbeon pipeline function library
+            private Configuration createXSLTConfiguration() {
+                final Configuration newConfiguration = new Configuration();
+                final FunctionLibrary javaFunctionLibrary = newConfiguration.getExtensionBinder("java");
+
+                final FunctionLibraryList functionLibraryList = new FunctionLibraryList();
+                functionLibraryList.addFunctionLibrary(javaFunctionLibrary);
+                functionLibraryList.addFunctionLibrary(org.orbeon.oxf.pipeline.api.FunctionLibrary.instance());
+
+                newConfiguration.setExtensionBinder("java", functionLibraryList);
+
+                return newConfiguration;
+            }
+
             /**
              * Reads the input and creates the JAXP Templates object (wrapped in a Transformer object). While reading
              * the input, figures out the direct dependencies on other files (URIReferences object), and stores these
@@ -645,7 +660,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                         });
                         final TransformerURIResolver uriResolver
                                 = new TransformerURIResolver(XSLTTransformer.this, pipelineContext, INPUT_DATA, XMLUtils.ParserConfiguration.PLAIN);
-                        templatesInfo.templates = TransformerUtils.getTemplates(stylesheetSAXSource, transformerClass, attributes, errorListener, uriResolver);
+                        templatesInfo.templates = TransformerUtils.getTemplates(stylesheetSAXSource, transformerClass, attributes, createXSLTConfiguration(), errorListener, uriResolver);
                         uriResolver.destroy();
                         templatesInfo.transformerClass = transformerClass;
                         templatesInfo.systemId = topStylesheetXMLReceiver.getSystemId();

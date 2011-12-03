@@ -30,7 +30,11 @@ object PipelineFunctionLibrary extends PipelineFunctionLibrary
 /**
  * Function library for XPath expressions in XPL.
  *
- * TODO: make Java-accessible functions below accessible as a Saxon FunctionLibrary in XSLT instead
+ * TODO:
+ *
+ * - add Java-accessible functions below to XXFormsIndependentFunctions
+ * - then remove them from below
+ * - then update XSLT stylesheets to use the p:* functions instead of direct Java calls
  */
 class PipelineFunctionLibrary extends {
     // Namespace the functions (we wish we had trait constructors!)
@@ -45,18 +49,20 @@ class PipelineFunctionLibrary extends {
 
     // === Functions made accessible to XSLT via Java calls
 
+    // Add these to XXFormsIndependentFunctions?
     def decodeXML(encodedXML: String) = XFormsUtils.decodeXML(encodedXML)
     def encodeXML(node: Node) = XFormsUtils.encodeXMLAsDOM(node)
     def newEvaluator(context: NodeInfo) = new XPathEvaluator(context.getConfiguration)
     def isPE = Version.isPE
     def isPortlet = "portlet" == NetUtils.getExternalContext.getRequest.getContainerType
-    def property(name: String) = XXFormsProperty.property(name)
-    def propertiesStartsWith(name: String) = XXFormsPropertiesStartsWith.propertiesStartsWith(name)
-    def rewriteServiceURI(uri: String, absolute: Boolean) = XXFormsRewriteServiceURI.rewriteServiceURI(uri, absolute)
-    def rewriteResourceURI(uri: String, absolute: Boolean) = XXFormsRewriteResourceURI.rewriteResourceURI(uri, absolute)
-
     def setTitle(title: String): String = {
         NetUtils.getExternalContext.getResponse.setTitle(title)
         null
     }
+
+    // These are already available in XXFormsIndependentFunctions
+    def property(name: String) = XXFormsProperty.property(name)
+    def propertiesStartsWith(name: String) = XXFormsPropertiesStartsWith.propertiesStartsWith(name)
+    def rewriteServiceURI(uri: String, absolute: Boolean) = XXFormsRewriteServiceURI.rewriteServiceURI(uri, absolute)
+    def rewriteResourceURI(uri: String, absolute: Boolean) = XXFormsRewriteResourceURI.rewriteResourceURI(uri, absolute)
 }

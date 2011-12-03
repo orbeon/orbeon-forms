@@ -27,6 +27,8 @@ import org.orbeon.oxf.xml.dom4j.LocationDocumentSource;
 import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
 import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.TransformerFactoryImpl;
+import org.orbeon.saxon.functions.FunctionLibrary;
+import org.orbeon.saxon.functions.FunctionLibraryList;
 import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.saxon.tinytree.TinyBuilder;
@@ -79,9 +81,15 @@ public class TransformerUtils {
      * NOTE: Factories are not thread-safe. So we should not store them into transformerFactories
      * for now, or we should make sure there is one factory per thread, or that we synchronize.
      */
-    public static SAXTransformerFactory getFactory(String clazz, Map attributes) {
+    public static SAXTransformerFactory getFactory(String className, Map attributes, Configuration configuration) {
         try {
-            final SAXTransformerFactory factory = (SAXTransformerFactory) getTransformerClass(clazz).newInstance();
+            final SAXTransformerFactory factory; {
+                if (className.equals(TransformerFactoryImpl.class.getName())) {
+                    factory = new TransformerFactoryImpl(configuration);
+                } else {
+                    factory = (SAXTransformerFactory) getTransformerClass(className).newInstance();
+                }
+            }
 
             for (Iterator i = attributes.keySet().iterator(); i.hasNext();) {
                 final String key = (String) i.next();
@@ -130,7 +138,7 @@ public class TransformerUtils {
      * @param systemDoctype         system doctype
      * @param encoding              character encoding
      * @param omitXMLDeclaration    whether XML declaration must be omitted
-     * @param standalone            wether a standalone declartion must be set and to what value
+     * @param standalone            whether a standalone declaration must be set and to what value
      * @param indent                whether the HTML or XML must be indented
      * @param indentAmount          amount of indenting for the markup
      */
@@ -205,13 +213,13 @@ public class TransformerUtils {
         }
     }
 
-    public static TransformerHandler getTransformerHandler(Templates templates, String clazz, Map attributes) throws TransformerConfigurationException {
-        return ((attributes != null) ? getFactory(clazz, attributes) : getFactory(clazz)).newTransformerHandler(templates);
+    public static TransformerHandler getTransformerHandler(Templates templates, String clazz, Map attributes, Configuration configuration) throws TransformerConfigurationException {
+        return ((attributes != null) ? getFactory(clazz, attributes, configuration) : getFactory(clazz)).newTransformerHandler(templates);
     }
 
-    public static Templates getTemplates(Source source, String clazz, Map attributes, ErrorListener errorListener, URIResolver uriResolver)
+    public static Templates getTemplates(Source source, String clazz, Map attributes, Configuration configuration, ErrorListener errorListener, URIResolver uriResolver)
             throws TransformerConfigurationException {
-        final SAXTransformerFactory factory = (attributes != null) ? getFactory(clazz, attributes) : getFactory(clazz);
+        final SAXTransformerFactory factory = (attributes != null) ? getFactory(clazz, attributes, configuration) : getFactory(clazz);
         factory.setErrorListener(errorListener);
         factory.setURIResolver(uriResolver);
 

@@ -105,7 +105,7 @@ Event.onDOMReady () ->
             inputClass = (inputClass for [targetClass, inputClass] in outputInputClassTuples when YD.hasClass labelHint, targetClass)[0]
             editor = (e for e in inputs when YD.hasClass e, inputClass)[0]
             # Added editor as a children of the label
-            labelHint.removeChild labelHint.childNodes[0] while labelHint.childNodes.length > 0
+            labelHint.removeChild labelHint.firstChild while labelHint.firstChild
             labelHint.appendChild editor
             # Show and focus on editor
             editor.style.display = ""

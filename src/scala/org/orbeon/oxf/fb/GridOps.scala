@@ -114,16 +114,21 @@ object GridOps {
     // Insert a row below
     def insertRowBelow(tr: NodeInfo): NodeInfo = {
 
+        // NOTE: This algorithm expands rowspans that span over the current row, but not rowspans that end with the
+        // current row.
         val grid = getContainingGridOrRepeat(tr)
         val rowCells = getRowCells(tr)
-        val newCellCount = rowCells count (! _.missing)
 
-        // Increment rowspans if needed
-        rowCells foreach { cell =>
+        // Number of cells that end at the current row
+        val newCellCount = rowCells count (cell ⇒ cell.rowspan == 1)
+
+        // Increment rowspan of cells that don't end at the current row
+        rowCells foreach { cell ⇒
             if (cell.rowspan > 1)
                 cell.originalRowspan += 1
         }
 
+        // Insert the new row
         val result = insert(into = grid, after = tr, origin = newRow(grid, newCellCount)).head
         debugDumpDocument("insert row below", grid)
         result

@@ -30,7 +30,7 @@ object ContainerOps {
     // Find ancestor sections and grids (including non-repeated grids) from leaf to root
     def findAncestorContainers(descendant: NodeInfo, includeSelf: Boolean = false) =
         if (includeSelf) descendant ancestorOrSelf * else descendant ancestor * filter
-            (e => containerElementNames(localname(e)))
+            (e ⇒ containerElementNames(localname(e)))
 
     // Find ancestor section and grid names from root to leaf
     def findContainerNames(descendant: NodeInfo): Seq[String] =
@@ -40,7 +40,7 @@ object ContainerOps {
     def deleteContainer(container: NodeInfo) = {
 
         def childrenContainers(container: NodeInfo) =
-            container \ * filter (e => containerElementNames(localname(e)))
+            container \ * filter (e ⇒ containerElementNames(localname(e)))
 
         def recurse(container: NodeInfo): Seq[NodeInfo] = {
             // Go depth-first so we delete containers after all their content has been deleted
@@ -63,7 +63,7 @@ object ContainerOps {
                 (_ isSameNodeInfo element)
 
     // Move a container based on a move function (typically up or down)
-    def moveContainer(container: NodeInfo, otherContainer: NodeInfo, move: (NodeInfo, NodeInfo) => NodeInfo) {
+    def moveContainer(container: NodeInfo, otherContainer: NodeInfo, move: (NodeInfo, NodeInfo) ⇒ NodeInfo) {
 
         // Get names before moving the container
         val nameOption = getControlNameOption(container)
@@ -76,19 +76,19 @@ object ContainerOps {
 
         // Try to move based on name of other element
         (nameOption, otherNameOption) match {
-            case (Some(name), Some(otherName)) =>
+            case (Some(name), Some(otherName)) ⇒
 
                 // Move data holder only
                 for {
-                    holder <- findDataHolder(doc, name)
-                    otherHolder <- findDataHolder(doc, otherName)
+                    holder ← findDataHolder(doc, name)
+                    otherHolder ← findDataHolder(doc, otherName)
                 } yield
                     move(holder, otherHolder)
 
                 // Move bind
                 for {
-                    bind <- findBindByName(doc, name)
-                    otherBind <- findBindByName(doc, otherName)
+                    bind ← findBindByName(doc, name)
+                    otherBind ← findBindByName(doc, otherName)
                 } yield
                     move(bind, otherBind)
 
@@ -97,8 +97,8 @@ object ContainerOps {
                 def firstControl(s: Seq[NodeInfo]) =
                     s filter (getControlNameOption(_).isDefined) headOption
 
-                def tryToMoveHolders(siblingName: String, moveOp: (NodeInfo, NodeInfo) => NodeInfo) =
-                    findResourceAndTemplateHolders(doc, name) foreach { holder =>
+                def tryToMoveHolders(siblingName: String, moveOp: (NodeInfo, NodeInfo) ⇒ NodeInfo) =
+                    findResourceAndTemplateHolders(doc, name) foreach { holder ⇒
                         findSiblingsWithName(holder, siblingName).headOption foreach
                             (moveOp(holder, _))
                     }
@@ -106,12 +106,12 @@ object ContainerOps {
                 val movedContainer = findControlById(doc, container \@ "id").get // must get new reference
 
                 (firstControl(movedContainer preceding *), firstControl(movedContainer following *)) match {
-                    case (Some(preceding), _) => tryToMoveHolders(getControlName(preceding), moveElementAfter)
-                    case (_, Some(following)) => tryToMoveHolders(getControlName(following), moveElementBefore)
-                    case _ =>
+                    case (Some(preceding), _) ⇒ tryToMoveHolders(getControlName(preceding), moveElementAfter)
+                    case (_, Some(following)) ⇒ tryToMoveHolders(getControlName(following), moveElementBefore)
+                    case _ ⇒
                 }
 
-            case _ =>
+            case _ ⇒
         }
     }
 }

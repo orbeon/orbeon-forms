@@ -37,14 +37,14 @@ object ControlOps {
 
     // Get the control name based on the control, bind, grid, section or template id
     def controlName(controlOrBindId: String) = controlOrBindId match {
-        case ControlName(name, _) => name
-        case _ => null
+        case ControlName(name, _) ⇒ name
+        case _ ⇒ null
     }
 
     // Find a control by name (less efficient than searching by id)
     def findControlByName(doc: NodeInfo, controlName: String) =
         Stream("control", "grid", "section", "repeat") flatMap // repeat for legacy FB
-            (suffix => findControlById(doc, controlName + '-' + suffix)) headOption
+            (suffix ⇒ findControlById(doc, controlName + '-' + suffix)) headOption
 
     // XForms callers: find a control element by name or null (the empty sequence)
     def findControlByNameOrEmpty(doc: NodeInfo, controlName: String) =
@@ -57,7 +57,7 @@ object ControlOps {
     def findBindByNameOrEmpty(doc: NodeInfo, name: String) = findBindByName(doc, name).orNull
 
     // Find a bind by predicate
-    def findBind(doc: NodeInfo, p: NodeInfo => Boolean) =
+    def findBind(doc: NodeInfo, p: NodeInfo ⇒ Boolean) =
         ((findModelElement(doc) \ "*:bind" filter (hasId(_, "fr-form-binds"))) \\ "*:bind") filter (p(_)) headOption
 
     def isBindForName(bind: NodeInfo, name: String) =
@@ -69,7 +69,7 @@ object ControlOps {
     // Get the control's name based on the control element
     def getControlNameOption(control: NodeInfo) =
         (control \@ "id" headOption) map
-            (id => controlName(id.stringValue))
+            (id ⇒ controlName(id.stringValue))
 
     def hasName(control: NodeInfo) = getControlNameOption(control).isDefined
 
@@ -79,11 +79,11 @@ object ControlOps {
 
     // Find control holder
     def findDataHolder(doc: NodeInfo, controlName: String) =
-        findBindByName(doc, controlName) map { bind =>
+        findBindByName(doc, controlName) map { bind ⇒
             // From bind, infer path by looking at ancestor-or-self binds
             // Assume there is either a @ref or a @nodeset
             val bindRefs = (bind ancestorOrSelf "*:bind" map
-                (b => ((b \@ "nodeset") ++ (b \@ "ref")) head)).reverse.tail
+                (b ⇒ ((b \@ "nodeset") ++ (b \@ "ref")) head)).reverse.tail
 
             val path = bindRefs map ("(" + _.stringValue + ")") mkString "/"
 
@@ -101,9 +101,9 @@ object ControlOps {
     // Find control resource holders with their language
     def findResourceHoldersWithLang(doc: NodeInfo, controlName: String): Seq[(String, NodeInfo)] =
         for {
-            resource <- formResourcesRoot(doc) \ "resource"
+            resource ← formResourcesRoot(doc) \ "resource"
             lang = (resource \@ "*:lang").stringValue
-            holder <- resource \ * filter (name(_) == controlName) headOption
+            holder ← resource \ * filter (name(_) == controlName) headOption
         } yield
             (lang, holder)
 
@@ -115,7 +115,7 @@ object ControlOps {
 
     // Ensure that a tree of bind exists
     def ensureBindsByName(doc: NodeInfo, name: String) =
-        findControlByName(doc, name) foreach { control =>
+        findControlByName(doc, name) foreach { control ⇒
             ensureBinds(doc, findContainerNames(control) :+ name, isCustomInstance)
         }
 
@@ -125,8 +125,8 @@ object ControlOps {
         // Insert bind container if needed
         val model = findModelElement(doc)
         val topLevelBind = model \ "*:bind" filter (hasId(_, "fr-form-binds")) match {
-            case Seq(bind: NodeInfo, _*) => bind
-            case _ => insert(into = model, after = model \ "*:instance" filter (hasId(_, "fr-form-instance")), origin = topLevelBindTemplate).head
+            case Seq(bind: NodeInfo, _*) ⇒ bind
+            case _ ⇒ insert(into = model, after = model \ "*:instance" filter (hasId(_, "fr-form-instance")), origin = topLevelBindTemplate).head
         }
 
         // Insert a bind into one level
@@ -134,8 +134,8 @@ object ControlOps {
             if (names.hasNext) {
                 val bindName = names.next()
                 val bind =  container \ "*:bind" filter (isBindForName(_, bindName)) match {
-                    case Seq(bind: NodeInfo, _*) => bind
-                    case _ =>
+                    case Seq(bind: NodeInfo, _*) ⇒ bind
+                    case _ ⇒
 
                         val newBind: Seq[NodeInfo] =
                             <xforms:bind id={bindId(bindName)}
@@ -164,7 +164,7 @@ object ControlOps {
         val doc = control.getDocumentRoot
 
         // Holders, bind, templates, resources if the control has a name
-        val holders = getControlNameOption(control).toSeq flatMap { controlName =>
+        val holders = getControlNameOption(control).toSeq flatMap { controlName ⇒
             Seq(findDataHolder(doc, controlName),
                 findBindByName(doc, controlName),
                 instanceElement(doc, templateId(controlName)),
@@ -197,17 +197,17 @@ object ControlOps {
 
         // Set xforms:label, xforms:hint, xforms:help and xforms:alert @ref if present
         // FIXME: This code is particularly ugly!
-        controlElement \ * filter (e => Set("label", "help", "hint", "alert")(localname(e))) map
-            (e => (e \@ "ref", localname(e))) filter
-                (_._1 nonEmpty) filter { e =>
+        controlElement \ * filter (e ⇒ Set("label", "help", "hint", "alert")(localname(e))) map
+            (e ⇒ (e \@ "ref", localname(e))) filter
+                (_._1 nonEmpty) filter { e ⇒
                     val ref = e._1.stringValue
                     ref.isEmpty || ref.startsWith("$form-resources")
-                } foreach { e =>
+                } foreach { e ⇒
                     setvalue(e._1, "$form-resources/" + newName + '/' + e._2)
                 }
 
         // Set xforms:itemset/@ref xforms:itemset/@nodeset value if present
-        for (attName <- Seq("ref", "nodeset"))
+        for (attName ← Seq("ref", "nodeset"))
             setvalue(controlElement \ "*:itemset" \@ attName, "$form-resources/" + newName + "/item")
     }
 
@@ -241,17 +241,17 @@ object ControlOps {
             (findControlByName(doc, holderName) flatMap (findTemplateHolder(_, holderName))) flatten
 
     // Find or create a data holder for the given hierarchy of names
-    def ensureDataHolder(root: NodeInfo, holders: Seq[(() => NodeInfo, Option[String])]) = {
+    def ensureDataHolder(root: NodeInfo, holders: Seq[(() ⇒ NodeInfo, Option[String])]) = {
 
-        @tailrec def ensure(parent: NodeInfo, names: Iterator[(() => NodeInfo, Option[String])]): NodeInfo =
+        @tailrec def ensure(parent: NodeInfo, names: Iterator[(() ⇒ NodeInfo, Option[String])]): NodeInfo =
             if (names.hasNext) {
                 val (getHolder, precedingHolderName) = names.next()
                 val holder = getHolder() // not ideal: this might create a NodeInfo just to check the name of the holder
                 parent \ * filter (name(_) == name(holder)) headOption match {
-                    case Some(child) =>
+                    case Some(child) ⇒
                         // Holder already exists
                         ensure(child, names)
-                    case None =>
+                    case None ⇒
                         // Holder doesn't exist, insert it
                         val newChild = insert(into = parent, after = parent \ * filter (name(_) == precedingHolderName.getOrElse("")), origin = holder)
                         ensure(newChild.head, names)
@@ -266,7 +266,7 @@ object ControlOps {
     def insertHolders(controlElement: NodeInfo, dataHolder: NodeInfo, resourceHolder: NodeInfo, precedingControlName: Option[String]) {
         // Create one holder per existing language
         val resourceHolders = (formResourcesRoot(controlElement) \ "resource" \@ "*:lang") map
-            (att => (att.stringValue, resourceHolder))
+            (att ⇒ (att.stringValue, resourceHolder))
 
         insertHolders(controlElement, dataHolder, resourceHolders, precedingControlName)
     }
@@ -282,7 +282,7 @@ object ControlOps {
         val precedingInGrid = preceding intersect (grid descendant "*:td")
 
         val nameInGridOption = precedingInGrid :+ grid flatMap
-            { case td if localname(td) == "td" => td \ *; case other => other } flatMap
+            { case td if localname(td) == "td" ⇒ td \ *; case other ⇒ other } flatMap
                 (getControlNameOption(_).toSeq) headOption
 
         // Return that if found, otherwise find before the current grid
@@ -297,8 +297,8 @@ object ControlOps {
         // with a name (there might not be one).
         val controlsWithName =
             precedingOrSelfContainers flatMap {
-                case grid if getControlNameOption(grid).isEmpty => grid \\ "*:td" \ * filter (hasName(_)) lastOption
-                case other => Some(other)
+                case grid if getControlNameOption(grid).isEmpty ⇒ grid \\ "*:td" \ * filter (hasName(_)) lastOption
+                case other ⇒ Some(other)
             }
 
         // Take the first result
@@ -313,13 +313,13 @@ object ControlOps {
         // Insert hierarchy of data holders
         // We pass a Seq of tuples, one part able to create missing data holders, the other one with optional previous names.
         // In practice, the ancestor holders should already exist.
-        ensureDataHolder(formInstanceRoot(doc), (containerNames map (n => (() => elementInfo(n), None))) :+ (() => dataHolder, precedingControlName))
+        ensureDataHolder(formInstanceRoot(doc), (containerNames map (n ⇒ (() ⇒ elementInfo(n), None))) :+ (() ⇒ dataHolder, precedingControlName))
 
         // Insert resources placeholders for all languages
         if (resourceHolders.nonEmpty) {
             val resourceHoldersMap = resourceHolders.toMap
             for {
-                resource <- formResourcesRoot(doc) \ "resource"
+                resource ← formResourcesRoot(doc) \ "resource"
                 lang = (resource \@ "*:lang").stringValue
                 holder = resourceHoldersMap.get(lang) getOrElse resourceHolders(0)._2
             } yield
@@ -328,11 +328,11 @@ object ControlOps {
 
         // Insert repeat template holder if needed
         for {
-            grid <- findContainingRepeat(controlElement)
-            gridName <- getControlNameOption(grid)
-            root <- templateRoot(doc, gridName)
+            grid ← findContainingRepeat(controlElement)
+            gridName ← getControlNameOption(grid)
+            root ← templateRoot(doc, gridName)
         } yield
-            ensureDataHolder(root, Seq((() => dataHolder, precedingControlName)))
+            ensureDataHolder(root, Seq((() ⇒ dataHolder, precedingControlName)))
     }
 
     // Update a mip for the given control, grid or section id
@@ -342,22 +342,22 @@ object ControlOps {
         require(Model.MIP.withName(mipName) ne null) // withName() will throw NoSuchElementException if not present
         val mipQName = Model.mipNameToAttributeQName(mipName)
 
-        findControlById(doc, controlId) foreach { control =>
+        findControlById(doc, controlId) foreach { control ⇒
 
             // Get or create the bind element
             val bind = ensureBinds(doc, findContainerNames(control) :+ controlName(controlId), isCustomInstance)
 
             // Create/update or remove attribute
             Option(mipValue) map (_.trim) match {
-                case Some(value) if value.length > 0 => ensureAttribute(bind, mipQName, value)
-                case _ => delete(bind \@ mipQName)
+                case Some(value) if value.length > 0 ⇒ ensureAttribute(bind, mipQName, value)
+                case _ ⇒ delete(bind \@ mipQName)
             }
         }
     }
 
     def getMip(doc: NodeInfo, controlId: String, mipName: String) = {
         require(Model.MIP.withName(mipName) ne null) // withName() will throw NoSuchElementException if not present
-        findBindByName(doc, controlName(controlId)) flatMap (bind => attValueOption(bind \@ Model.mipNameToAttributeQName(mipName)))
+        findBindByName(doc, controlName(controlId)) flatMap (bind ⇒ attValueOption(bind \@ Model.mipNameToAttributeQName(mipName)))
     }
 
     // XForms callers: find the value of a MIP or null (the empty sequence)
@@ -367,8 +367,8 @@ object ControlOps {
     // Get all control names by inspecting all elements with an id that converts to a valid name
     def getAllControlNames(doc: NodeInfo) =
         findBodyElement(doc) \\ * flatMap
-            (e => attValueOption(e \@ "id")) flatMap
-                (id => Option(controlName(id)))
+            (e ⇒ attValueOption(e \@ "id")) flatMap
+                (id ⇒ Option(controlName(id)))
 
     // For XForms callers
     def getAllControlNamesXPath(doc: NodeInfo): SequenceIterator = getAllControlNames(doc)
@@ -376,7 +376,7 @@ object ControlOps {
     // Get the control's resource holder
     def getControlResourceOrEmpty(controlId: String, resourceName: String) =
         findCurrentResourceHolder(controlName(controlId)) flatMap
-            (n => n \ resourceName map (_.stringValue) headOption) getOrElse("")
+            (n ⇒ n \ resourceName map (_.stringValue) headOption) getOrElse("")
 
     def getControlHelpOrEmpty(controlId: String) = getControlResourceOrEmpty(controlId, "help")
     def getControlAlertOrEmpty(controlId: String) = getControlResourceOrEmpty(controlId, "alert")
@@ -384,7 +384,7 @@ object ControlOps {
     // Set a control's current resource
     def setControlResource(controlId: String, resourceName: String, value: String) =
         findCurrentResourceHolder(controlName(controlId)) flatMap
-            (n => n \ resourceName headOption) foreach
+            (n ⇒ n \ resourceName headOption) foreach
                 (setvalue(_, value))
 
     def setControlHelp(controlId: String, value: String) = setControlResource(controlId, "help", value)

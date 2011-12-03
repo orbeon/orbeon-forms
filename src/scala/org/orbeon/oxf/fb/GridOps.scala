@@ -55,17 +55,17 @@ object GridOps {
 
     // For the previous row of prepared cells, and a new row of tds, return the new row of prepared cells
     private def newCellsRow(previousRow: Seq[Cell], tds: Seq[NodeInfo]): Seq[Cell] = previousRow match {
-        case Seq() =>
+        case Seq() ⇒
             // First row: start with initial rowspans
-            tds map (td => Cell(td, getRowspan(td), false))
-        case _ =>
+            tds map (td ⇒ Cell(td, getRowspan(td), false))
+        case _ ⇒
             // Subsequent rows
             val tdsIterator = tds.toIterator
             previousRow map {
-                case Cell(_, 1, _) =>
+                case Cell(_, 1, _) ⇒
                     val td = tdsIterator.next()
                     Cell(td, getRowspan(td), false)
-                case Cell(td, rowspan, _) =>
+                case Cell(td, rowspan, _) ⇒
                     Cell(td, rowspan - 1, true)
             }
     }
@@ -93,7 +93,7 @@ object GridOps {
         // Accumulate the result for each row as we go
         val result = Buffer[Seq[Cell]]()
 
-        rows.foldLeft(Seq[Cell]()) { (previousRow, tds) =>
+        rows.foldLeft(Seq[Cell]()) { (previousRow, tds) ⇒
             val newRow = newCellsRow(previousRow, tds)
             result += newRow
             newRow
@@ -105,9 +105,9 @@ object GridOps {
     def getGridSize(grid: NodeInfo) = (grid \ "*:tr")(0) \ "*:td" size
 
     def newTdElement(grid: NodeInfo, id: String, rowspan: Option[Int] = None): NodeInfo = rowspan match {
-        case Some(rowspan) =>
+        case Some(rowspan) ⇒
             <xhtml:td xmlns:xhtml="http://www.w3.org/1999/xhtml" id={id} rowspan={rowspan.toString}/>
-        case _ =>
+        case _ ⇒
             <xhtml:td xmlns:xhtml="http://www.w3.org/1999/xhtml" id={id}/>
     }
 
@@ -137,11 +137,11 @@ object GridOps {
     // Insert a row above
     def insertRowAbove(tr: NodeInfo): NodeInfo =
         tr precedingSibling "*:tr" headOption match {
-            case Some(prevRow) =>
+            case Some(prevRow) ⇒
                 // Do as if this was an insert below the previous row
                 // This makes things simpler as we can reuse insertRowBelow, but maybe another logic could make sense too
                 insertRowBelow(prevRow)
-            case None =>
+            case None ⇒
                 // Insert as first row of the table
                 val grid = getContainingGridOrRepeat(tr)
                 val result = insert(into = grid, before = tr, origin = newRow(grid, getGridSize(grid))).head
@@ -154,7 +154,7 @@ object GridOps {
         val ids = nextIds(grid, "td", size).toIterator
 
         <xhtml:tr xmlns:xhtml="http://www.w3.org/1999/xhtml">{
-            (1 to size) map (_ => <xhtml:td id={tdId("td-" + ids.next())}/>)
+            (1 to size) map (_ ⇒ <xhtml:td id={tdId("td-" + ids.next())}/>)
         }</xhtml:tr>
     }
 
@@ -170,14 +170,14 @@ object GridOps {
 
         // Decrement rowspans if needed
         rowCells.zipWithIndex foreach {
-            case (cell, posx) =>
+            case (cell, posx) ⇒
                 if (cell.originalRowspan > 1) {
                     if (cell.missing) {
                         // This cell is part of a rowspan that starts in a previous row, so decrement
                         cell.originalRowspan -= 1
                     } else if (nextRowCells.isDefined) {
                         // This cell is the start of a rowspan, and we are deleting it, so add a td in the next row
-                        // TODO XXX: issue: as we insert tds, we can't rely on Cell info unless it is updated => 
+                        // TODO XXX: issue: as we insert tds, we can't rely on Cell info unless it is updated ⇒
                     }
                 }
         }
@@ -203,7 +203,7 @@ object GridOps {
 
         val ids = nextIds(grid, "td", allRowCells.size).toIterator
 
-        allRowCells foreach { cells =>
+        allRowCells foreach { cells ⇒
             val cell = cells(pos)
 
             // For now insert same rowspans as previous column, but could also insert full column as an option
@@ -230,7 +230,7 @@ object GridOps {
             val trs = grid \ "*:tr"
             val ids = nextIds(grid, "td", trs.size).toIterator
 
-            trs foreach { tr =>
+            trs foreach { tr ⇒
                 insert(into = tr, origin = newTdElement(grid, tdId("td-" + ids.next())))
             }
 
@@ -247,7 +247,7 @@ object GridOps {
 
         // Delete the concrete td at this column position in each row
 
-        allRowCells map (_(pos)) filterNot (_.missing) foreach { cell =>
+        allRowCells map (_(pos)) filterNot (_.missing) foreach { cell ⇒
             deleteCellContent(cell.td)
             delete(cell.td)
         }
@@ -260,7 +260,7 @@ object GridOps {
         val allRowCells = getAllRowCells(grid)
         val pos = firstRowTd precedingSibling "*:td" size
 
-        allRowCells map (_(pos)) filterNot (_.missing) filter (cell => hasChildren(cell.td)) size
+        allRowCells map (_(pos)) filterNot (_.missing) filter (cell ⇒ hasChildren(cell.td)) size
     }
 
     private def selectedCellId =
@@ -271,19 +271,19 @@ object GridOps {
 
     // Find the currently selected grid td if any
     def findSelectedTd(doc: NodeInfo) = selectedCellId match {
-        case Some(selectedCell) =>
+        case Some(selectedCell) ⇒
             val tdId = selectedCell.stringValue
             findBodyElement(doc) \\ "*:grid" \\ "*:td" filter (_ \@ "id" === tdId) headOption
-        case _ => // legacy FB
+        case _ ⇒ // legacy FB
             legacySelectedCell
     }
 
     // Make the given grid td selected
     def selectTd(newTd: NodeInfo) = selectedCellId match {
-        case Some(selectedCell) =>
+        case Some(selectedCell) ⇒
             // New FB
             setvalue(selectedCell, newTd \@ "id" stringValue)
-        case _ =>
+        case _ ⇒
             // Legacy FB
             val allRowCells = getAllRowCells(getContainingGridOrRepeat(newTd))
             val (posx, posy) = getTdPosition(newTd, allRowCells)
@@ -295,20 +295,20 @@ object GridOps {
     // Try to ensure that there is an empty td after the current location, inserting a new row if possible
     def ensureEmptyTd(doc: NodeInfo): Option[NodeInfo] = {
 
-        findSelectedTd(doc) flatMap { currentTd =>
+        findSelectedTd(doc) flatMap { currentTd ⇒
 
             if (currentTd \ * nonEmpty) {
                 // There is an element in the current td, figure out what to do
 
                 currentTd followingSibling "*:td" match {
-                    case Seq(followingTd, _*) if followingTd \ * isEmpty  =>
+                    case Seq(followingTd, _*) if followingTd \ * isEmpty  ⇒
                         // Next td exists is empty: move to that one
                         selectTd(followingTd)
                         Some(followingTd)   
-                    case Seq(followingTd, _*) =>
+                    case Seq(followingTd, _*) ⇒
                         // Next td exists but is not empty: NOP for now
                         None
-                    case _ =>
+                    case _ ⇒
                         // We are the last cell of the row
                         val nextTr = currentTd.getParent followingSibling "*:tr" take 1
                         val nextTrFirstTd = nextTr \ "*:td" take 1
@@ -330,10 +330,10 @@ object GridOps {
     }
 
     def getMin(doc: NodeInfo, gridName: String) =
-        findControlById(doc, gridId(gridName)) flatMap (grid => attValueOption(grid \@ "min")) map (_.toInt) getOrElse 0
+        findControlById(doc, gridId(gridName)) flatMap (grid ⇒ attValueOption(grid \@ "min")) map (_.toInt) getOrElse 0
 
     def getMax(doc: NodeInfo, gridName: String) =
-        findControlById(doc, gridId(gridName)) flatMap (grid => attValueOption(grid \@ "max")) map (_.toInt)
+        findControlById(doc, gridId(gridName)) flatMap (grid ⇒ attValueOption(grid \@ "max")) map (_.toInt)
 
     // XForms callers: get the grid's max attribute or null (the empty sequence)
     def getMaxOrEmpty(doc: NodeInfo, gridName: String) = getMax(doc, gridName) map (_.toString) orNull
@@ -343,7 +343,7 @@ object GridOps {
         // A missing or invalid value is taken as the default value: 0 for min, unbounded for max. In both cases, we
         // don't set the attribute value. This means that in the end we only set positive integer values.
         def set(name: String, value: Int) =
-            findControlById(doc, gridId(gridName)) foreach { control =>
+            findControlById(doc, gridId(gridName)) foreach { control ⇒
                 if (value > 0)
                     ensureAttribute(control, name, value.toString)
                 else
@@ -357,17 +357,17 @@ object GridOps {
     // Find template holder
     def findTemplateHolder(descendantOrSelf: NodeInfo, controlName: String) =
         for {
-            grid <- findContainingRepeat(descendantOrSelf, true)
-            gridName <- getControlNameOption(grid)
-            root <- templateRoot(descendantOrSelf, gridName)
-            holder <- root descendantOrSelf * filter (name(_) == controlName) headOption
+            grid ← findContainingRepeat(descendantOrSelf, true)
+            gridName ← getControlNameOption(grid)
+            root ← templateRoot(descendantOrSelf, gridName)
+            holder ← root descendantOrSelf * filter (name(_) == controlName) headOption
         } yield
             holder
 
     // Rename a bind
     def renameTemplate(doc: NodeInfo, oldName: String, newName: String) =
         templateRoot(doc, oldName) flatMap(_.parent) foreach
-            (template => ensureAttribute(template, "id", templateId(newName)))
+            (template ⇒ ensureAttribute(template, "id", templateId(newName)))
 
     // Get the x/y position of a td given Cell information
     private def getTdPosition(td: NodeInfo, cells: Seq[Seq[Cell]]) = {
@@ -433,7 +433,7 @@ object GridOps {
         // 1. Annotate all the grid tds of the given document with unique ids, if they don't have them already
 
         // All grid tds with no existing id
-        val gridTds = findBodyElement(doc) \\ "*:grid" \\ "*:td" filterNot (td => exists(td \@ "id"))
+        val gridTds = findBodyElement(doc) \\ "*:grid" \\ "*:td" filterNot (td ⇒ exists(td \@ "id"))
 
         // Get as many fresh ids as there are tds
         val ids = nextIds(doc, "td", gridTds.size).toIterator

@@ -16,6 +16,8 @@ package org.orbeon.oxf.fb
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.XML._
+import org.orbeon.oxf.xml.TransformerUtils
+
 /**
  * Form Builder functions.
  *
@@ -67,7 +69,7 @@ object FormBuilderFunctions {
         val root = doc.getDocumentRoot
 
         // Start with the number of element the given suffix
-        val initialGuess = 1 + (root \\ * flatMap (e => attValueOption(e \@ "id")) filter (_.endsWith(suffix)) size)
+        val initialGuess = 1 + (root \\ * flatMap (e ⇒ attValueOption(e \@ "id")) filter (_.endsWith(suffix)) size)
 
         // Increment from guess, checking both full ids in the whole document as well as element names in the instance
         def findNext(guess: Int) = {
@@ -79,7 +81,7 @@ object FormBuilderFunctions {
         }
 
         // Return count results, each new id feeding the next guess
-        (1 to count - 1 scanLeft(findNext(initialGuess)))((previousId, _) => findNext(previousId + 1))
+        (1 to count - 1 scanLeft(findNext(initialGuess)))((previousId, _) ⇒ findNext(previousId + 1))
     }
 
     // Whether the current form has a custom instance
@@ -91,7 +93,7 @@ object FormBuilderFunctions {
     def makeInstanceExpression(name: String) = "instance('" + name + "')"
 
     def debugDumpDocument(message: String, inDoc: NodeInfo) {
-//        println(message)
-//        println(TransformerUtils.tinyTreeToString(inDoc.getDocumentRoot))
+        println(message)
+        println(TransformerUtils.tinyTreeToString(inDoc.getDocumentRoot))
     }
 }

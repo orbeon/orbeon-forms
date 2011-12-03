@@ -38,7 +38,7 @@ object ToolboxOps {
     def insertNewControl(doc: NodeInfo, binding: NodeInfo) {
 
         ensureEmptyTd(doc) match {
-            case Some(gridTd) =>
+            case Some(gridTd) ⇒
 
                 val newControlId = nextId(doc, "control")
                 val newControlName = "control-" + newControlId
@@ -46,10 +46,10 @@ object ToolboxOps {
                 // Insert control template
                 val newControlElement: NodeInfo =
                     binding \ "*:metadata" \ "*:template" \ * match {
-                        case Seq(template, _*) =>
+                        case Seq(template, _*) ⇒
                             // There is a specific template available
                             insert(into = gridTd, origin = template).head
-                        case _ =>
+                        case _ ⇒
                             // No specific, create simple element with LHHA
 
                             // Try to find the binding QName (for now takes the first CSS rule and assume the form foo|bar)
@@ -70,8 +70,8 @@ object ToolboxOps {
                 // Get control type
                 // TODO: for now assume a literal 'xs:' prefix (should resolve namespace)
                 val controlType = binding \ "*:metadata" \ "*:datatype" match {
-                    case Seq(datatype, _*) => datatype.stringValue
-                    case _ => "xs:string"
+                    case Seq(datatype, _*) ⇒ datatype.stringValue
+                    case _ ⇒ "xs:string"
                 }
 
                 // Data holder may contain file attributes
@@ -81,7 +81,7 @@ object ToolboxOps {
                     else
                         elementInfo(newControlName)
 
-                val lhhaNames = newControlElement \ * filter (e => Set("label", "help", "hint", "alert")(localname(e))) map (localname(_))
+                val lhhaNames = newControlElement \ * filter (e ⇒ Set("label", "help", "hint", "alert")(localname(e))) map (localname(_))
                 val resourceHolder = elementInfo(newControlName, lhhaNames map (elementInfo(_)))
 
                 // Insert data and resource holders
@@ -105,7 +105,7 @@ object ToolboxOps {
 
                 debugDumpDocument("insert new control", doc)
 
-            case _ => // no empty td found/created so NOP
+            case _ ⇒ // no empty td found/created so NOP
         }
     }
 
@@ -113,7 +113,7 @@ object ToolboxOps {
     def insertNewGrid(doc: NodeInfo) {
 
         findSelectedTd(doc) match {
-            case Some(currentTd) =>
+            case Some(currentTd) ⇒
 
                 val containers = findAncestorContainers(currentTd)
 
@@ -144,7 +144,7 @@ object ToolboxOps {
 
                 debugDumpDocument("insert new grid", doc)
 
-            case _ => // NOP
+            case _ ⇒ // NOP
         }
     }
 
@@ -152,7 +152,7 @@ object ToolboxOps {
     def insertNewSection(doc: NodeInfo) {
 
         findSelectedTd(doc) match {
-            case Some(currentTd) => // A td is selected
+            case Some(currentTd) ⇒ // A td is selected
 
                 val containers = findAncestorContainers(currentTd)
 
@@ -166,8 +166,8 @@ object ToolboxOps {
 
                 val (into, after) =
                     greatGrandParentContainerOption match {
-                        case Some(greatGrandParentContainer) => (greatGrandParentContainer, Some(grandParentContainer))
-                        case None => (grandParentContainer, grandParentContainer \ * headOption)
+                        case Some(greatGrandParentContainer) ⇒ (greatGrandParentContainer, Some(grandParentContainer))
+                        case None ⇒ (grandParentContainer, grandParentContainer \ * headOption)
                     }
 
                 val newSectionName = "section-" + nextId(doc, "section")
@@ -214,7 +214,7 @@ object ToolboxOps {
 
                 debugDumpDocument("insert new section", doc)
 
-            case _ => // No td is selected, add top-level section
+            case _ ⇒ // No td is selected, add top-level section
                 // TODO
         }
     }
@@ -223,7 +223,7 @@ object ToolboxOps {
     def insertNewRepeat(doc: NodeInfo) {
 
         findSelectedTd(doc) match {
-            case Some(currentTd) =>
+            case Some(currentTd) ⇒
 
                 val currentTdContainers = findAncestorContainers(currentTd)
 
@@ -239,12 +239,12 @@ object ToolboxOps {
                 // Handle data template
                 val modelElement = findModelElement(doc)
                 modelElement \ "*:instance" filter (hasId(_, templateInstanceId)) headOption match {
-                    case Some(templateInstance) =>
+                    case Some(templateInstance) ⇒
                         // clear existing template instance
                         delete(templateInstance \ *)
                         insert(into = templateInstance , origin = <dummy/>.copy(label = newGridName))
 
-                    case None =>
+                    case None ⇒
                         // Insert template instance if not present
                         val template: NodeInfo = <xforms:instance xmlns:xforms="http://www.w3.org/2002/xforms"
                                                                   xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
@@ -282,7 +282,7 @@ object ToolboxOps {
 
                 debugDumpDocument("insert new repeat", doc)
 
-            case _ => // NOP
+            case _ ⇒ // NOP
         }
     }
 
@@ -291,21 +291,21 @@ object ToolboxOps {
         val name = getControlName(td \ * head)
         val xvc = asNodeInfo(model("fr-form-model").get.getVariable("xcv"))
 
-        findControlByName(td, name) foreach { controlElement =>
+        findControlByName(td, name) foreach { controlElement ⇒
 
             // Create <resource xml:lang="..."> containers
             val resourcesWithLang = findResourceHoldersWithLang(td, name) map {
-                case (lang, holder) => elementInfo("resource", attributeInfo("xml:lang", lang) ++ holder)
+                case (lang, holder) ⇒ elementInfo("resource", attributeInfo("xml:lang", lang) ++ holder)
             }
 
             // Clear and insert each clipboard element
             Map[String, Seq[NodeInfo]](
-                "control"   -> controlElement,
-                "holder"    -> findDataHolder(td, name).toSeq,
-                "resources" -> resourcesWithLang,
-                "bind"      -> findBindByName(td, name).toSeq) foreach {
+                "control"   → controlElement,
+                "holder"    → findDataHolder(td, name).toSeq,
+                "resources" → resourcesWithLang,
+                "bind"      → findBindByName(td, name).toSeq) foreach {
 
-                case (elementName, content) =>
+                case (elementName, content) ⇒
                     delete(xvc \ elementName \ *)
                     insert(into = xvc \ elementName, origin = content)
             }
@@ -320,11 +320,11 @@ object ToolboxOps {
 
     // Paste control from the clipboard
     def pasteFromClipboard(td: NodeInfo) {
-        ensureEmptyTd(td) foreach { gridTd =>
+        ensureEmptyTd(td) foreach { gridTd ⇒
 
             val xvc = asNodeInfo(model("fr-form-model").get.getVariable("xcv"))
 
-            (xvc \ "control" \ * headOption) foreach { control =>
+            (xvc \ "control" \ * headOption) foreach { control ⇒
                 val controlName = {
                     val requestedName = getControlName(control)
 
@@ -353,13 +353,13 @@ object ToolboxOps {
                 insertHolders(
                     newControlElement,
                     xvc \ "holder" \ * head,
-                    xvc \ "resources" \ "resource" map (r => (r \@ "*:lang" stringValue, r \ * head)),
+                    xvc \ "resources" \ "resource" map (r ⇒ (r \@ "*:lang" stringValue, r \ * head)),
                     precedingControlNameInSectionForControl(newControlElement)
                 )
 
                 // Create the bind and copy all attributes and content
                 val bind = ensureBinds(gridTd, findContainerNames(gridTd) :+ controlName, isCustomInstance)
-                (xvc \ "bind" \ * headOption) foreach { xvcBind =>
+                (xvc \ "bind" \ * headOption) foreach { xvcBind ⇒
                     insert(into = bind, origin = (xvcBind \@ @*) ++ (xvcBind \ *))
                 }
             }

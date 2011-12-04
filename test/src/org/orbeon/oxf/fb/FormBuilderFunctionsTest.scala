@@ -306,6 +306,8 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
         }
     }
 
+    // Return a grid with some rowspans. The tree returned is mutable.
+    // Include model and instance, because the code that looks for next ids relies on their presence.
     def gridWithRowspan: NodeInfo = {
         val doc = elemToDocumentInfo(
             <xh:html xmlns:xh="http://www.w3.org/1999/xhtml">

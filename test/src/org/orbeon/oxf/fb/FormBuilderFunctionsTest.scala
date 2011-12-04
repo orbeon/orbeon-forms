@@ -17,7 +17,6 @@ import org.scalatest.junit.AssertionsForJUnit
 import org.junit.Test
 import org.orbeon.oxf.processor.ProcessorUtils
 import org.orbeon.oxf.test.DocumentTestBase
-import org.orbeon.saxon.dom4j.DocumentWrapper
 import org.orbeon.oxf.fb.FormBuilderFunctions._
 import org.orbeon.oxf.fb.GridOps._
 import org.orbeon.oxf.fb.SectionOps._
@@ -37,6 +36,7 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.xml.TransformerUtils
 import collection.JavaConverters._
 import org.orbeon.saxon.om.{SequenceIterator, EmptyIterator, NodeInfo}
+import org.orbeon.saxon.dom4j.{NodeWrapper, DocumentWrapper}
 
 class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit with MockitoSugar {
 
@@ -143,7 +143,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
         actionInterpreter
     }
 
-    def withActionAndDoc(body: NodeInfo => Any) {
+    def withActionAndDoc(body: NodeInfo ⇒ Any) {
         val doc = getNewDoc
         scalaAction(mockActionInterpreter(doc)) {
             initializeGrids(doc)
@@ -152,7 +152,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
     }
 
     @Test def newBinds() {
-        withActionAndDoc { doc =>
+        withActionAndDoc { doc ⇒
             ensureBinds(doc, Seq(section1, control2), false)
 
             assert(findBindByName(doc, control2).get.getDisplayName === "xforms:bind")
@@ -195,7 +195,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
     }
 
     @Test def insertControl() {
-        withActionAndDoc { doc =>
+        withActionAndDoc { doc ⇒
 
             val binding = <binding element="xforms|input" xmlns:xforms="http://www.w3.org/2002/xforms"/>
 
@@ -229,7 +229,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
     }
 
     @Test def insertRepeat() {
-        withActionAndDoc { doc =>
+        withActionAndDoc { doc ⇒
 
             // Insert a new repeated grid after the current grid
             selectFirstTd(doc)
@@ -297,14 +297,35 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
         }
     }
 
-    @Test def rowspans() {
+    def gridWithRowspan: NodeInfo = {
+        val doc = elemToDocumentInfo(
+            <html>
+                <head>
+                    <xforms:model id="fr-form-model" xmlns:xforms="http://www.w3.org/2002/xforms">
+                        <xforms:instance id="fr-form-instance"><form/></xforms:instance>
+                    </xforms:model>
+                </head>
+                <body>
+                    <grid>
+                        <tr><td id="11"/><td id="12" rowspan="2"/><td id="13"/></tr>
+                        <tr><td id="21" rowspan="2"/><td id="23"/></tr>
+                        <tr><td id="32"/><td id="33"/></tr>
+                    </grid>
+                </body>
+            </html>, false)
 
-        val grid: NodeInfo =
-            <grid>
-                <tr><td id="11"/><td id="12" rowspan="2"/><td id="13"/></tr>
-                <tr><td id="21" rowspan="2"/><td id="23"/></tr>
-                <tr><td id="32"/><td id="33"/></tr>
-            </grid>
+        doc \\ "grid" head
+    }
+
+    def compareExpectedCells(grid: NodeInfo, expected: Seq[Seq[Cell]]) {
+        val trs = grid \ "tr"
+        for ((expected, index) ← expected.zipWithIndex)
+            yield assert(getRowCells(trs(index)) === expected)
+    }
+
+    @Test def rowspanGetRowCells() {
+
+        val grid = gridWithRowspan
 
         def td(id: String) = grid \\ * filter (hasId(_, id)) head
 
@@ -314,9 +335,34 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
             Seq(Cell(td("21"), 1, true),  Cell(td("32"), 1, false), Cell(td("33"), 1, false))
         )
 
-        val trs = grid \ "tr"
-        for ((expected, index) <- expected.zipWithIndex)
-            yield assert(getRowCells(trs(index)) === expected)
+        compareExpectedCells(grid, expected)
+    }
+
+    def rewrap(node: NodeInfo) = node match {
+        case nodeWrapper: NodeWrapper ⇒ node.root.asInstanceOf[DocumentWrapper].wrap(nodeWrapper.getUnderlyingNode)
+        case _ ⇒ node
+    }
+
+    @Test def rowspanInsertRowBelow() {
+
+        val grid = gridWithRowspan
+
+        // Insert one row below each existing row
+        for (tr ← grid \ "tr" force)
+            insertRowBelow(rewrap(tr)) // rewrap after mutation (it's dangerous to play with NodeInfo and mutation!)
+
+        def td(id: String) = grid \\ * filter (hasId(_, id)) head
+
+        val expected = Seq(
+            Seq(Cell(td("11"),      1, false), Cell(td("12"),      3, false), Cell(td("13"),      1, false)),
+            Seq(Cell(td("td-1-td"), 1, false), Cell(td("12"),      2, true),  Cell(td("td-2-td"), 1, false)),
+            Seq(Cell(td("21"),      3, false), Cell(td("12"),      1, true),  Cell(td("23"),      1, false)),
+            Seq(Cell(td("21"),      2, true),  Cell(td("td-3-td"), 1, false), Cell(td("td-4-td"), 1, false)),
+            Seq(Cell(td("21"),      1, true),  Cell(td("32"),      1, false), Cell(td("33"),      1, false)),
+            Seq(Cell(td("td-5-td"), 1, false), Cell(td("td-6-td"), 1, false), Cell(td("td-7-td"), 1, false))
+        )
+
+        compareExpectedCells(grid, expected)
     }
 
     @Test def testPrecedingNameForControl() {

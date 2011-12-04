@@ -129,9 +129,9 @@ object GridOps {
         }
 
         // Insert the new row
-        val result = insert(into = grid, after = tr, origin = newRow(grid, newCellCount)).head
+        val result = insert(into = grid, after = tr, origin = newRow(grid, newCellCount)).headOption
         debugDumpDocument("insert row below", grid)
-        result
+        result orNull // bad, but insert() is not always able to return the inserted item at this time
     }
 
     // Insert a row above

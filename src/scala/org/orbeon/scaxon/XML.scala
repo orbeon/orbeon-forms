@@ -279,7 +279,11 @@ object XML {
         nodeInfo.asInstanceOf[NodeWrapper].getUnderlyingNode.asInstanceOf[Element]
 
     def elemToDom4j(e: Elem): Document = Dom4jUtils.readDom4j(e.toString)
-    def elemToDocumentInfo(e: Elem): DocumentInfo = TransformerUtils.stringToTinyTree(XPathCache.getGlobalConfiguration, e.toString, false, false)
+    def elemToDocumentInfo(e: Elem, readonly: Boolean = true): DocumentInfo =
+        if (readonly)
+            TransformerUtils.stringToTinyTree(XPathCache.getGlobalConfiguration, e.toString, false, false)
+        else
+            new DocumentWrapper(Dom4jUtils.readDom4j(e.toString), null, XPathCache.getGlobalConfiguration)
 
     implicit def elemToItem(e: Elem): Item = elemToDocumentInfo(e) \ * head
     implicit def elemToItemSeq(e: Elem): Seq[Item] = elemToDocumentInfo(e) \ *

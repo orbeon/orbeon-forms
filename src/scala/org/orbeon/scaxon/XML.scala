@@ -73,6 +73,9 @@ object XML {
     // Like XPath local-name()
     def localname(nodeInfo: NodeInfo) = nodeInfo.getLocalPart
 
+    // Return a qualified name as a (namespace uri, local name) pair
+    def qname(nodeInfo: NodeInfo) = (nodeInfo.getURI, nodeInfo.getLocalPart)
+
     // Like XPath namespace-uri()
     def namespaceURI(nodeInfo: NodeInfo) = {
         val uri = nodeInfo.getURI
@@ -131,10 +134,14 @@ object XML {
         }
     }
 
-    class NodeQNameTest(nodeKind: Int, name: QName) extends Test {
+    class NodeQNameTest(nodeKind: Int, name: (String, String)) extends Test {
+
+        def this(nodeKind: Int, name: QName) =
+            this(nodeKind, (name.getNamespaceURI, name.getName))
+
         override def test(nodeInfo: NodeInfo) = {
             val pool = nodeInfo.getNamePool
-            new NameTest(nodeKind, name.getNamespaceURI, name.getName, pool)
+            new NameTest(nodeKind, name._1, name._2, pool)
         }
     }
 
@@ -166,10 +173,13 @@ object XML {
     }
 
     // Passing a string as test means to test on the local name of an element
-    implicit def stringToElementLocalNameTest(s: String) = new NodeLocalNameTest(Type.ELEMENT, s)
+    implicit def stringToTest(s: String): Test = new NodeLocalNameTest(Type.ELEMENT, s)
 
     // Passing a QName as test means to test on the qualified name of an element
-    implicit def qNameToElementQNameTest(s: QName) = new NodeQNameTest(Type.ELEMENT, s)
+    implicit def qNameToTest(s: QName): Test = new NodeQNameTest(Type.ELEMENT, s)
+
+    // Qualified name can also be passed as a pair of strings
+    implicit def pairToTest(s: (String, String)): Test = new NodeQNameTest(Type.ELEMENT, s)
 
     // Operations on NodeInfo
     class NodeInfoOps(nodeInfo: NodeInfo) {

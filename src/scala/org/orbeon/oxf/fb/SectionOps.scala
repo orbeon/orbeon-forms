@@ -41,8 +41,11 @@ object SectionOps {
 
     // Move the section left if possible
     def moveSectionLeft(container: NodeInfo) =
-        findAncestorContainers(container).headOption foreach
-            (moveContainer(container, _, moveElementAfter))
+        findAncestorContainers(container) match {
+            case Seq(parent, rest @ _*) if rest.nonEmpty ⇒
+                moveContainer(container, parent, moveElementAfter)
+            case _ ⇒ // NOP
+        }
 
     // TODO: Could also move into fr:tabview/fr:tab?
     def precedingSection(container: NodeInfo) = container precedingSibling "*:section" headOption

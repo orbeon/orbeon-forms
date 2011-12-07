@@ -17,12 +17,25 @@ import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.scaxon.XML._
 import org.orbeon.oxf.fb.ControlOps._
+import org.orbeon.oxf.fr.FormRunner
+import org.orbeon.oxf.xforms.XFormsConstants.XFORMS_NAMESPACE_URI
 
 object ContainerOps {
 
+    val FormBuilderNS = "http://orbeon.org/oxf/xml/form-builder"
+
     // Hardcoded list of FB controls we know can contain others
-    val containerElementNames = Set("section", "grid", "body", "repeat") // TODO: "tab" is special because within "tabview" // repeat for legacy FB
-    val containerElementTest = "*:section" || "*:grid" || "*:body" || "*:repeat"
+    // TODO: "fr:tab" (special because "fr:tabview/fr:tab" are always combined)
+    val ContainerElementQNames = Set(
+        FormRunner.NS → "section",
+        FormBuilderNS → "section",
+        FormRunner.NS → "grid",
+        FormRunner.NS → "body",
+        FormRunner.NS → "repeat",       // for legacy FB
+        XFORMS_NAMESPACE_URI → "repeat" // for legacy FB
+    )
+
+    val ContainerElementTest = ContainerElementQNames map (pairToTest(_)) reduce (_ || _)
 
     // XForms callers: get the name for a section or grid element or null (the empty sequence)
     def getContainerNameOrEmpty(elem: NodeInfo) = getControlNameOption(elem).orNull
@@ -30,7 +43,7 @@ object ContainerOps {
     // Find ancestor sections and grids (including non-repeated grids) from leaf to root
     def findAncestorContainers(descendant: NodeInfo, includeSelf: Boolean = false) =
         if (includeSelf) descendant ancestorOrSelf * else descendant ancestor * filter
-            (e ⇒ containerElementNames(localname(e)))
+            (e ⇒ ContainerElementQNames(qname(e)))
 
     // Find ancestor section and grid names from root to leaf
     def findContainerNames(descendant: NodeInfo): Seq[String] =
@@ -40,7 +53,7 @@ object ContainerOps {
     def deleteContainer(container: NodeInfo) = {
 
         def childrenContainers(container: NodeInfo) =
-            container \ * filter (e ⇒ containerElementNames(localname(e)))
+            container \ * filter (e ⇒ ContainerElementQNames(qname(e)))
 
         def recurse(container: NodeInfo): Seq[NodeInfo] = {
             // Go depth-first so we delete containers after all their content has been deleted

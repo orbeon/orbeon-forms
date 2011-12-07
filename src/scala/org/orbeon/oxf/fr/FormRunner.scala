@@ -27,6 +27,8 @@ import java.util.{Map => JMap}
 
 object FormRunner {
 
+    val NS = "http://orbeon.org/oxf/xml/form-runner"
+
     val propertyPrefix = "oxf.fr.authentication."
 
     val methodPropertyName = propertyPrefix + "method"

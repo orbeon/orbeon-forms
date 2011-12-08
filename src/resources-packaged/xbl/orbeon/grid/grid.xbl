@@ -337,6 +337,8 @@
                                                                 <xsl:variable name="static-col-pos" select="position()"/>
                                                                 <xsl:variable name="control" select="*[1]" as="element()?"/>
                                                                 <xsl:variable name="has-control" select="exists($control)"/>
+                                                                <xsl:variable name="has-itemset" select="exists($control/xf:itemset)"/>
+                                                                <xsl:variable name="has-upload" select="$has-control and tokenize($control/@class, '\s+') = 'fr-attachment'"/>
 
                                                                 <xsl:if test="$is-editable">
                                                                     <!-- Point to this td -->
@@ -356,8 +358,8 @@
                                                                         </xsl:otherwise>
                                                                     </xsl:choose>
                                                                     <xsl:copy-of select="@* except (@class, @xxf:control)"/>
-
-                                                                    <xh:div class="fr-grid-content{if ($is-repeat) then ' yui-dt-liner' else ''}">
+                                                                    <!-- NOTE: Add itemset or upload classes to allow the client to decide whether to place the itemset editor or the upload button -->
+                                                                    <xh:div class="{('fr-grid-content', if ($is-repeat) then 'yui-dt-liner' else (), if ($has-itemset) then 'fb-itemset' else (), if ($has-upload) then 'fb-upload' else ())}">
                                                                         <xsl:choose>
                                                                             <xsl:when test="not($is-editable)">
                                                                                 <xf:group xxbl:scope="outer" appearance="xxf:internal">
@@ -369,20 +371,10 @@
                                                                                 </xf:group>
                                                                             </xsl:when>
                                                                             <xsl:when test="$has-control">
-                                                                                <!-- Use the cell editor -->
                                                                                 <xf:group xxbl:scope="outer" appearance="xxf:internal">
                                                                                     <xsl:copy-of select="node()"/>
                                                                                 </xf:group>
                                                                             </xsl:when>
-                                                                            <xsl:otherwise>
-                                                                                <!-- This is not very useful and takes resources. We could do a lightweight implementation in JavaScript/CSS if needed. -->
-                                                                                <!--<xh:span class="fb-click-message">-->
-                                                                                    <!--<xf:output value="$fb-resources/click-cell/label"/>-->
-                                                                                <!--</xh:span>-->
-                                                                                <!--<xh:span class="fb-use-toolbar-message">-->
-                                                                                    <!--<xf:output value="$fb-resources/insert-control/label"/>-->
-                                                                                <!--</xh:span>-->
-                                                                            </xsl:otherwise>
                                                                         </xsl:choose>
                                                                     </xh:div>
                                                                 </xh:td>

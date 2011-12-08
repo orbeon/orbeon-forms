@@ -299,20 +299,22 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
 
     def gridWithRowspan: NodeInfo = {
         val doc = elemToDocumentInfo(
-            <html>
-                <head>
+            <xh:html xmlns:xh="http://www.w3.org/1999/xhtml">
+                <xh:head>
                     <xforms:model id="fr-form-model" xmlns:xforms="http://www.w3.org/2002/xforms">
                         <xforms:instance id="fr-form-instance"><form/></xforms:instance>
                     </xforms:model>
-                </head>
-                <body>
-                    <grid>
-                        <tr><td id="11"/><td id="12" rowspan="2"/><td id="13"/></tr>
-                        <tr><td id="21" rowspan="2"/><td id="23"/></tr>
-                        <tr><td id="32"/><td id="33"/></tr>
-                    </grid>
-                </body>
-            </html>, false)
+                </xh:head>
+                <xh:body>
+                    <fr:body xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+                        <fr:grid>
+                            <xh:tr><xh:td id="11"/><xh:td id="12" rowspan="2"/><xh:td id="13"/></xh:tr>
+                            <xh:tr><xh:td id="21" rowspan="2"/><xh:td id="23"/></xh:tr>
+                            <xh:tr><xh:td id="32"/><xh:td id="33"/></xh:tr>
+                        </fr:grid>
+                    </fr:body>
+                </xh:body>
+            </xh:html>, false)
 
         doc \\ "grid" head
     }
@@ -365,20 +367,24 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
         compareExpectedCells(grid, expected)
     }
 
+    def sectionWithGridAndControls: NodeInfo =
+        <fr:section xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+                    xmlns:xh="http://www.w3.org/1999/xhtml"
+                    xmlns:xf="http://www.w3.org/2002/xforms">
+            <fr:grid>
+                <xh:tr><xh:td><xf:input id="control-11-control"/></xh:td></xh:tr>
+            </fr:grid>
+            <fr:grid id="grid-2-grid">
+                <xh:tr><xh:td><xf:input id="control-21-control"/></xh:td></xh:tr>
+            </fr:grid>
+            <fr:grid>
+                <xh:tr><xh:td><xf:input id="control-31-control"/></xh:td></xh:tr>
+            </fr:grid>
+        </fr:section>
+
     @Test def testPrecedingNameForControl() {
 
-        val section: NodeInfo =
-            <section>
-                <grid>
-                    <tr><td><input id="control-11-control"/></td></tr>
-                </grid>
-                <grid id="grid-2-grid">
-                    <tr><td><input id="control-21-control"/></td></tr>
-                </grid>
-                <grid>
-                    <tr><td><input id="control-31-control"/></td></tr>
-                </grid>
-            </section>
+        val section = sectionWithGridAndControls
 
         val controls = section \\ "*:td" \ * filter (_ \@ "id" nonEmpty)
 
@@ -390,18 +396,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
 
     @Test def testPrecedingNameForGrid() {
 
-        val section: NodeInfo =
-            <section>
-                <grid>
-                    <tr><td><input id="control-11-control"/></td></tr>
-                </grid>
-                <grid id="grid-2-grid">
-                    <tr><td><input id="control-21-control"/></td></tr>
-                </grid>
-                <grid>
-                    <tr><td><input id="control-31-control"/></td></tr>
-                </grid>
-            </section>
+        val section = sectionWithGridAndControls
 
         val grids = section \\ "*:grid"
 

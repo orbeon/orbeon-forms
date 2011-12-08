@@ -338,7 +338,10 @@
                                                                 <xsl:variable name="control" select="*[1]" as="element()?"/>
                                                                 <xsl:variable name="has-control" select="exists($control)"/>
                                                                 <xsl:variable name="has-itemset" select="exists($control/xf:itemset)"/>
-                                                                <xsl:variable name="has-upload" select="$has-control and tokenize($control/@class, '\s+') = 'fr-attachment'"/>
+                                                                <!-- NOTE: Not all controls with fr-attachment require a separate upload button.
+                                                                     For example, fr:attachment and fr:image-attachment already provide an upload
+                                                                     button. So for now, we have only xforms:output with an image mediatype. -->
+                                                                <xsl:variable name="has-upload" select="exists($control/self::xforms:output[starts-with(@mediatype, 'image/')])"/>
 
                                                                 <xsl:if test="$is-editable">
                                                                     <!-- Point to this td -->

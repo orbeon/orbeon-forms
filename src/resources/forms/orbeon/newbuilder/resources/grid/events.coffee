@@ -20,9 +20,6 @@ ORBEON.Builder =
     triggerClickEvent:          createCustomEvent()
 
 YD = YAHOO.util.Dom
-OD = ORBEON.util.Dom
-AjaxServer = ORBEON.xforms.server.AjaxServer
-Controls = ORBEON.xforms.Controls
 Event = YAHOO.util.Event
 Events = ORBEON.xforms.Events
 Builder = ORBEON.Builder
@@ -55,8 +52,9 @@ Event.onDOMReady () ->
         currentMouseOverGridTd = null
 
         buildGridTdEvent = (gridTd) ->
-            triggers: cellEditorTriggerGroups
-            inputs: cellEditorTriggerGroups
+            triggerGroups: cellEditorTriggerGroups
+            triggers: cellEditorTriggers
+            inputs: cellEditorInputs
             gridTd: gridTd
 
         Event.addListener document, "mouseover", (event) ->

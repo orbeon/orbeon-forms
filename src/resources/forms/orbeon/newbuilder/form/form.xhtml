@@ -30,10 +30,12 @@
         <xh:link rel="stylesheet" type="text/css" href="/ops/yui/assets/skins/sam/layout.css"/>
         <xh:link rel="stylesheet" href="/forms/orbeon/newbuilder/resources/form-builder.css" type="text/css"/>
 
-        <!-- Script for accordion menu -->
+        <xh:script type="text/javascript" src="/ops/jquery/jquery-1.7.1.min.js"/>
         <xh:script type="text/javascript" src="/forms/orbeon/newbuilder/resources/accordion-menu-v2.js"/>
-        <xh:script type="text/javascript" src="/forms/orbeon/newbuilder/resources/form-builder-events.js"/>
-        <xh:script type="text/javascript" src="/forms/orbeon/newbuilder/resources/form-builder.js"/>
+        <xh:script type="text/javascript" src="/forms/orbeon/newbuilder/resources/grid/events.js"/>
+        <xh:script type="text/javascript" src="/forms/orbeon/newbuilder/resources/grid/action-icons.js"/>
+        <xh:script type="text/javascript" src="/forms/orbeon/newbuilder/resources/grid/label-hint.js"/>
+        <xh:script type="text/javascript" src="/forms/orbeon/newbuilder/resources/grid/placeholders.js"/>
         <xh:script type="text/javascript">
             var fbAccordionMenuOptions = {
                 dependent: false,
@@ -382,65 +384,45 @@
                             <xxf:var name="fb-resources" value="xxf:get-variable('fr-resources-model', 'fr-form-resources')"/>
                             <xh:span class="fb-grid-cell-icons">
                                 <!-- Expand cell down -->
-                                <!-- NOTE: Logic for expand now handled on client -->
-                                <!--<xf:group ref="$grid[exists($td/../following-sibling::*:tr[if ($td/@rowspan) then xs:integer($td/@rowspan) else 1])]">-->
-                                <xf:group ref="$grid">
-                                    <xf:trigger appearance="minimal" id="down-trigger">
-                                        <xf:label><xh:img src="/apps/fr/style/images/silk/arrow_down.png" alt="{$fb-resources/expand-icon/label}" title="{$fb-resources/expand-icon/label}"/></xf:label>
+                                <xf:trigger appearance="minimal" id="fb-expand-trigger">
+                                    <xf:label><xh:img src="/apps/fr/style/images/silk/arrow_down.png" alt="{$fb-resources/expand-icon/label}" title="{$fb-resources/expand-icon/label}"/></xf:label>
 
-                                        <!-- TODO: can we move these handlers up so that they are not duplicated? -->
-                                        <xf:action ev:event="DOMActivate">
+                                    <!-- TODO: can we move these handlers up so that they are not duplicated? -->
+                                    <xf:action ev:event="DOMActivate">
 
-                                            <xxf:var name="confirm" value="gridOps:expandCellTouchesControl($td)" xmlns:gridOps="java:org.orbeon.oxf.fb.GridOps"/>
+                                        <xxf:var name="confirm" value="gridOps:expandCellTouchesControl($td)" xmlns:gridOps="java:org.orbeon.oxf.fb.GridOps"/>
 
-                                            <!-- Ask confirmation -->
-                                            <xf:dispatch if="$confirm" name="fr-show" targetid="fb-form-editor$dialog-confirmation">
-                                                <xxf:context name="message" value="$fb-resources/messages/expand-cell"/>
-                                                <xxf:context name="positive-targetid" value="xxf:effective-id('down-trigger')"/>
-                                            </xf:dispatch>
-                                            <xf:action if="not($confirm)">
-                                                <!-- We are automatically confirmed as there is no control to delete -->
-                                                <xf:dispatch name="fr-positive" target="down-trigger"/>
-                                            </xf:action>
+                                        <!-- Ask confirmation -->
+                                        <xf:dispatch if="$confirm" name="fr-show" targetid="fb-form-editor$dialog-confirmation">
+                                            <xxf:context name="message" value="$fb-resources/messages/expand-cell"/>
+                                            <xxf:context name="positive-targetid" value="xxf:effective-id('fb-expand-trigger')"/>
+                                        </xf:dispatch>
+                                        <xf:action if="not($confirm)">
+                                            <!-- We are automatically confirmed as there is no control to delete -->
+                                            <xf:dispatch name="fr-positive" target="fb-expand-trigger"/>
                                         </xf:action>
-                                        <xf:action ev:event="fr-positive" type="xpath" xmlns:gridOps="java:org.orbeon.oxf.fb.GridOps">
-                                            gridOps:expandCell($td)
-                                        </xf:action>
-                                    </xf:trigger>
-                                </xf:group>
+                                    </xf:action>
+                                    <xf:action ev:event="fr-positive" type="xpath" xmlns:gridOps="java:org.orbeon.oxf.fb.GridOps">
+                                        gridOps:expandCell($td)
+                                    </xf:action>
+                                </xf:trigger>
                                 <!-- Shrink -->
-                                <!-- NOTE: Logic to show/hide now handled on client -->
-                                <!--<xf:group ref="$grid[$td/@rowspan and $td/@rowspan > 1]">-->
-                                <xf:group ref="$grid">
-                                    <xf:trigger appearance="minimal">
-                                        <xf:label><xh:img src="/apps/fr/style/images/silk/arrow_up.png" alt="{$fb-resources/shrink-icon/label}" title="{$fb-resources/shrink-icon/label}"/></xf:label>
-                                        <xf:action ev:event="DOMActivate" type="xpath" xmlns:gridOps="java:org.orbeon.oxf.fb.GridOps">
-                                            gridOps:shrinkCell($td)
-                                        </xf:action>
-                                    </xf:trigger>
-                                </xf:group>
+                                <xf:trigger appearance="minimal" id="fb-shrink-trigger">
+                                    <xf:label><xh:img src="/apps/fr/style/images/silk/arrow_up.png" alt="{$fb-resources/shrink-icon/label}" title="{$fb-resources/shrink-icon/label}"/></xf:label>
+                                    <xf:action ev:event="DOMActivate" type="xpath" xmlns:gridOps="java:org.orbeon.oxf.fb.GridOps">
+                                        gridOps:shrinkCell($td)
+                                    </xf:action>
+                                </xf:trigger>
                                 <!-- Delete control -->
-                                <xf:group ref="$grid">
-                                    <xf:trigger appearance="minimal">
-                                        <xf:label><xh:img src="/apps/fr/style/images/silk/bin.png" alt="{$fb-resources/delete-control-icon/label}" title="{$fb-resources/delete-control-icon/label}"/></xf:label>
-                                        <xf:action ev:event="DOMActivate" type="xpath" xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps">
-                                            controlOps:deleteCellContent($td)
-                                        </xf:action>
-                                    </xf:trigger>
-                                </xf:group>
+                                <xf:trigger appearance="minimal" id="fb-delete-trigger">
+                                    <xf:label><xh:img src="/apps/fr/style/images/silk/bin.png" alt="{$fb-resources/delete-control-icon/label}" title="{$fb-resources/delete-control-icon/label}"/></xf:label>
+                                    <xf:action ev:event="DOMActivate" type="xpath" xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps">
+                                        controlOps:deleteCellContent($td)
+                                    </xf:action>
+                                </xf:trigger>
                             </xh:span>
 
-                            <!-- Edit help for any control -->
-                            <!--<xf:trigger appearance="minimal" id="fb-edit-control-help-trigger" class="fb-edit-help-trigger" ref=".[$has-control]">-->
-                                <!--<xf:label><xh:img alt="{$fb-resources/help-icon/label}" title="{$fb-resources/help-icon/label}" src="/ops/images/xforms/help.png"/></xf:label>-->
-                                <!--<xf:dispatch ev:event="DOMActivate" name="fb-show-dialog" target="fb-form-editor$dialog-help">-->
-                                    <!--<xxf:context name="control-id" value="$control/@id"/>-->
-                                <!--</xf:dispatch>-->
-                            <!--</xf:trigger>-->
-
-                            <!-- NOTE: Logic to show/hide now handled on client -->
-                            <!--<xf:group class="fb-grid-control-icons" ref=".[$has-control]">-->
-                            <xf:group class="fb-grid-control-icons" ref=".">
+                            <xf:group class="fb-grid-control-icons">
                                 <!-- Edit details for any control -->
                                 <xf:trigger appearance="minimal" id="fb-edit-details-trigger">
                                     <xf:label><xh:img alt="{$fb-resources/control-details-icon/label}" title="{$fb-resources/control-details-icon/label}" src="/apps/fr/style/images/silk/cog.png"/></xf:label>

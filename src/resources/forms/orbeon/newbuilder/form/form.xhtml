@@ -313,6 +313,19 @@
                         <!--<xxf:show if="$dialogs-closed" ev:observer="#document" ev:event="keypress" xxf:modifiers="Control" xxf:text="e" dialog="fb-source-editor-dialog"/>-->
                         <!--<xf:dispatch if="$dialogs-closed" ev:observer="#document" ev:event="keypress" xxf:modifiers="Control" xxf:text="d" name="DOMActivate" targetid="fb-edit-details-trigger"/>-->
                         <!--<xf:dispatch if="$dialogs-closed" ev:observer="#document" ev:event="keypress" xxf:modifiers="Control" xxf:text="p" name="DOMActivate" targetid="fb-edit-validation-trigger"/>-->
+                        <!-- Move section -->
+                        <xf:action ev:observer="#document" ev:event="keypress" xxf:modifiers="control alt" xxf:text="&#39;" type="xpath" xmlns:sectionOps="java:org.orbeon.oxf.fb.SectionOps">
+                            sectionOps:moveSectionRight($current-td/ancestor::*:section[1])
+                        </xf:action>
+                        <xf:action ev:observer="#document" ev:event="keypress" xxf:modifiers="control alt" xxf:text="&#37;" type="xpath" xmlns:sectionOps="java:org.orbeon.oxf.fb.SectionOps">
+                            sectionOps:moveSectionLeft($current-td/ancestor::*:section[1])
+                        </xf:action>
+                        <xf:action ev:observer="#document" ev:event="keypress" xxf:modifiers="control alt" xxf:text="&#38;" type="xpath" xmlns:sectionOps="java:org.orbeon.oxf.fb.SectionOps">
+                            sectionOps:moveSectionUp($current-td/ancestor::*:section[1])
+                        </xf:action>
+                        <xf:action ev:observer="#document" ev:event="keypress" xxf:modifiers="control alt" xxf:text="&#40;" type="xpath" xmlns:sectionOps="java:org.orbeon.oxf.fb.SectionOps">
+                            sectionOps:moveSectionDown($current-td/ancestor::*:section[1])
+                        </xf:action>
 
                         <!-- Insert controls shortcuts -->
                         <!--<xf:dispatch if="$dialogs-closed" ev:observer="#document" ev:event="keypress" xxf:modifiers="Control" xxf:text="n" name="DOMActivate" targetid="insert-new-section-trigger"/>-->

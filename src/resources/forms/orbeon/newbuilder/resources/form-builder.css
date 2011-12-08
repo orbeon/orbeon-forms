@@ -295,7 +295,11 @@ a.xforms-help-image .fb-control-help { vertical-align: baseline; }
 /* ***** Grid ******************************************************************************************************* */
 .fb-cell-editor { display: none } /* Contains the editing markup that will be moved inside each grid td */
 
-.xbl-fr-grid table.fr-grid.fr-editable { border-collapse: collapse } /* override default in form-runner-base.css */
+.xbl-fr-grid table.fr-grid.fr-editable {
+    border-collapse: collapse;              /* override default in form-runner-base.css */
+    width: 99.9%                            /* attempt to fix missing right border under Chrome */
+}
+
 .fr-grid-td {
     border: 1px solid transparent;
     position: relative;                     /* So FB icons inside the grid td can use absolute positioning relative to the td */

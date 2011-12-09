@@ -89,8 +89,6 @@ h1.fr-form-title {
 
 .fb-toolbox-inside dt { text-align: center } /* Center text in sections title */
 
-.fb-edit-items { text-decoration: none; display: block; clear: both }
-
 #fb-toolbox .xbl-fr-alert-dialog {display: none } /* Because w/ Chrome, a DIV of the dialog remains under the toolbox DIV and causes the toolbox to scroll */
 
 /* ***** Dialogs **************************************************************************************************** */
@@ -318,13 +316,16 @@ a.xforms-help-image .fb-control-help { vertical-align: baseline; }
 .fr-grid.fr-editable .fr-grid-tr .fb-grid-row-icons img { display: none }
 .fr-grid.fr-editable .fr-grid-tr:hover .fb-grid-row-icons img { display: inline }
 
-/* Cell icons */
-.fb-grid-cell-icons { position: absolute; }
+/* Delete, expand, shrink shown to the left of the cell */
+.fb-grid-cell-icons { position: absolute; left: .5em; top: .5em}
 .fb-grid-cell-icons img { margin-bottom: 0; padding: 0 }
 .fr-grid .fr-grid-td .fb-grid-cell-icons img { display: inline }
-
-.fb-grid-control-icons { position: absolute; right: 0}
+/* Control details and validation shown to the top right of the cell */
+.fb-grid-control-icons { position: absolute; right: .5em; top: .5em }
 .fb-grid-control-icons img { margin-bottom: 0; padding: 0 }
+/* Optional link to itemset editor shown to the bottom of the cell */
+/* Position to the left (2.5em) matched left margin of the fr-grid-content */
+.fb-edit-items { text-decoration: none; display: block; clear: both; position: absolute; left: 2.5em; bottom: .5em }
 .fr-grid .fr-grid-td .fb-grid-control-icons img { display: inline }
 .fb-label-hint-placeholder { color: #bbb }
 
@@ -345,7 +346,10 @@ a.xforms-help-image .fb-control-help { vertical-align: baseline; }
 }
 
 /* Grid content */
-.fr-grid-content { padding: 0 18px; margin: .5em 0 } /* margin: override FR */
+/* Margin leaves space for the icons to the left and right of the control */
+.fr-grid-content { margin-left: 2.5em; margin-right: 2.5em }
+/* Margin leaves space for trigger showing the itemset editor */
+.fr-grid-content.fb-itemset { margin-bottom: 2.5em }
 .fr-grid-content .xforms-label:hover, .fr-grid-content .xforms-hint:hover { background-color: #ffffd3 }
 /* Inputs for editing the label and hint to take the whole width of the grid content */
 .fr-grid-content .xforms-label input, .fr-grid-content .xforms-hint input { width: 100% }

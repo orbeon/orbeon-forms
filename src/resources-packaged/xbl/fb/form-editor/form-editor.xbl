@@ -45,15 +45,13 @@
                 <fb:dialog-grid-details        id="dialog-grid-details"       form-ref="$binding" resources-ref="$form-resources" components-ref="instance('fb-components-instance')"/>
                 <fb:dialog-section-details     id="dialog-section-details"    form-ref="$binding" resources-ref="$form-resources" components-ref="instance('fb-components-instance')"/>
                 <fb:dialog-help                id="dialog-help"               form-ref="$binding" resources-ref="$form-resources" components-ref="instance('fb-components-instance')"/>
+                <fb:dialog-itemsets            id="dialog-itemsets"           form-ref="$binding" resources-ref="$form-resources" components-ref="instance('fb-components-instance')"/>
 
                 <fr:alert-dialog id="dialog-confirmation">
                     <fr:label ref="$form-resources/dialog-confirmation/dialog-title"/>
                     <fr:negative-choice/>
                     <fr:positive-choice/>
                 </fr:alert-dialog>
-
-                <!-- Dialog to edit itemsets -->
-                <!--<xi:include href="oxf:/forms/orbeon/newbuilder/form/dialog-itemsets.xml" xxi:omit-xml-base="true"/>-->
 
             </xf:group>
         </xbl:template>

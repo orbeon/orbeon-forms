@@ -27,6 +27,7 @@ relevanceRules =
     'fb-delete-trigger':            isNotEmpty
     'fb-edit-details-trigger':      isNotEmpty
     'fb-edit-validation-trigger':   isNotEmpty
+    'fb-edit-items-trigger':        (gridTd) -> isNotEmpty(gridTd) and $(gridTd).children('.fr-grid-content').hasClass('fb-itemset')
 
 $ ->
 

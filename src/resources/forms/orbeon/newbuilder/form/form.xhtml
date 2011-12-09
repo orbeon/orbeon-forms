@@ -396,6 +396,7 @@
                             <xf:var name="control-id" value="$control/@id"/>
                             <xf:var name="has-control" value="exists($control-id)"/>
                             <xxf:var name="fb-resources" value="xxf:get-variable('fr-resources-model', 'fr-form-resources')"/>
+
                             <xh:span class="fb-grid-cell-icons">
                                 <!-- Expand cell down -->
                                 <xf:trigger appearance="minimal" id="fb-expand-trigger">
@@ -435,8 +436,7 @@
                                     </xf:action>
                                 </xf:trigger>
                             </xh:span>
-
-                            <xf:group class="fb-grid-control-icons">
+                            <xh:span class="fb-grid-control-icons">
                                 <!-- Edit details for any control -->
                                 <xf:trigger appearance="minimal" id="fb-edit-details-trigger">
                                     <xf:label><xh:img alt="{$fb-resources/control-details-icon/label}" title="{$fb-resources/control-details-icon/label}" src="/apps/fr/style/images/silk/cog.png"/></xf:label>
@@ -510,7 +510,7 @@
                                         <!--</xf:action>-->
                                     <!--</xf:trigger>-->
                                 <!--</xf:group>-->
-                            </xf:group>
+                            </xh:span>
 
                             <!-- Label editor -->
                             <xf:group ref=".[exists($control/xf:label/@ref)]" appearance="xxforms:internal" xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps">
@@ -522,15 +522,16 @@
                                 <xf:input xxf:autocomplete="off" class="fb-control-hint" ref="$current-resources/*[name() = controlOps:controlName($control-id)]/hint"/>
                             </xf:group>
 
-                            <!--<xf:trigger ref="$control[xf:itemset]" appearance="minimal" class="fb-edit-items" id="fb-edit-items-trigger">-->
-                                <!--<xf:label>-->
-                                    <!--<xh:img src="/apps/fr/style/images/silk/text_list_bullets.png" alt=""/>-->
-                                    <!--<xh:span><xf:output value="$fb-resources/edit-items/label"/></xh:span>-->
-                                <!--</xf:label>-->
-                                <!--<xf:dispatch ev:event="DOMActivate" name="fb-show-dialog" target="fb-form-editor$dialog-itemset-editor" xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps">-->
-                                    <!--<xxf:context name="fb:resource-id" select="controlOps:controlName($control-id)"/>-->
-                                <!--</xf:dispatch>-->
-                            <!--</xf:trigger>-->
+                            <!-- Itemset editor -->
+                            <xf:trigger appearance="minimal" class="fb-edit-items" id="fb-edit-items-trigger">
+                                <xf:label>
+                                    <xh:img src="/apps/fr/style/images/silk/text_list_bullets.png" alt=""/>
+                                    <xh:span><xf:output value="$fb-resources/edit-items/label"/></xh:span>
+                                </xf:label>
+                                <xf:dispatch ev:event="DOMActivate" name="fb-show-dialog" target="fb-form-editor$dialog-itemset-editor" xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps">
+                                    <xxf:context name="fb:resource-id" select="controlOps:controlName($control-id)"/>
+                                </xf:dispatch>
+                            </xf:trigger>
                             <xf:output id="fb-enter-label" ref="$form-resources/enter-label/label"/>
                             <xf:output id="fb-enter-hint" ref="$form-resources/enter-hint/label"/>
                         </xh:div>

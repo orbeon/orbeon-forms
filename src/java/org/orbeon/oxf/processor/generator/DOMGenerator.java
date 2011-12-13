@@ -191,7 +191,6 @@ public final class DOMGenerator extends ProcessorImpl {
     @Override
     public ProcessorOutput createOutput(final String nm) {
 
-        final Class clazz = getClass();
         final ProcessorOutput ret = new CacheableTransformerOutputImpl(DOMGenerator.this, nm) {
             public void readImpl(final PipelineContext pipelineContext, final XMLReceiver xmlReceiver) {
                 // NOTE: source cannot be an instance var.  Reason is that the XMLReader it

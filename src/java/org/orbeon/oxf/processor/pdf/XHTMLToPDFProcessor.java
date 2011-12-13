@@ -91,14 +91,16 @@ public class XHTMLToPDFProcessor extends HttpBinarySerializer {// TODO: HttpBina
                 public String resolveURI(String uri) {
                     // Our own resolver
 
-                    // When the browser retrieves resources, they are obviously resource URLs, including the use of the
-                    // incoming host and port.
-                    // In this case, things are a bit different, because when deploying with e.g. an Apache front-end,
-                    // requests from this processor should not go through it. So we rewrite as a service URL instead. But in
-                    // addition to that, we must still rewrite the path as a resource, so that versioned resources are
-                    // handled properly.
-                    final String path = servletRewriter.rewriteResourceURL(uri, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT);
-                    return externalContext.rewriteServiceURL(path, ExternalContext.Response.REWRITE_MODE_ABSOLUTE);
+                    // All resources we care about here are resource URLs. The PDF pipeline makes sure that the servlet
+                    // URL rewriter processes the XHTML output to rewrite resource URLs to absolute paths, including
+                    // the servlet context and version number if needed. In addition, CSS resources must either use
+                    // relative paths when pointing to other CSS files or images, or go through the XForms CSS rewriter,
+                    // which also generates absolute paths.
+                    // So all we need to do here is rewrite the resulting path to an absolute URL.
+                    // NOTE: We used to call rewriteResourceURL() here as the PDF pipeline did not do URL rewriting.
+                    // However this caused issues, for example resources like background images referred by CSS files
+                    // could be rewritten twice: once by the XForms resource rewriter, and a second time here.
+                    return externalContext.rewriteServiceURL(uri, ExternalContext.Response.REWRITE_MODE_ABSOLUTE | ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT);
                 }
 
                 // Called by:

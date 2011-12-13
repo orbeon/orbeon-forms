@@ -43,6 +43,16 @@
         <p:output name="data" id="request"/>
     </p:processor>
 
+    <!--
+        Rewrite using servlet strategy. The idea is that even in a portlet environment, URLs produced by the XForms
+        engine and epilogue are entirely expected to be rewritten further down the pipeline. There might be small
+        exceptions, such as URLs in JSON and the like, but JavaScript is not relevant to PDF production so that
+        is not expected to be an issue.  -->
+    <p:processor name="oxf:xhtml-servlet-rewrite">
+        <p:input name="data" href="#xformed-data"/>
+        <p:output name="data" id="rewritten-data"/>
+    </p:processor>
+
     <!-- Prepare XHTML before conversion to PDF -->
     <p:processor name="oxf:xslt">
         <p:input name="config">
@@ -73,24 +83,14 @@
                 </xsl:template>
             </xsl:transform>
         </p:input>
-        <p:input name="data" href="#xformed-data"/>
+        <p:input name="data" href="#rewritten-data"/>
         <p:input name="request" href="#request"/>
         <p:output name="data" id="xhtml-data"/>
     </p:processor>
 
-    <!--
-        Rewrite using servlet strategy. The idea is that even in a portlet environment, URLs produced by the XForms
-        engine and epilogue are entirely expected to be rewritten further down the pipeline. There might be small
-        exceptions, such as URLs in JSON and the like, but JavaScript is not relevant to PDF production so that
-        is not expected to be an issue.  -->
-    <p:processor name="oxf:xhtml-servlet-rewrite">
-        <p:input name="data" href="#xhtml-data"/>
-        <p:output name="data" id="rewritten-data"/>
-    </p:processor>
-
     <!-- Serialize HTML to PDF -->
     <p:processor name="oxf:xhtml-to-pdf">
-        <p:input name="data" href="#rewritten-data"/>
+        <p:input name="data" href="#xhtml-data"/>
         <p:output name="data" ref="data"/>
     </p:processor>
 

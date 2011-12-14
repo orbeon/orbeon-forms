@@ -95,13 +95,13 @@ object ControlOps {
         }
 
     // Find control resource holders
-    def findResourceHolders(doc: NodeInfo, controlName: String): Seq[NodeInfo] =
-        findResourceHoldersWithLang(doc, controlName) map (_._2)
+    def findResourceHolders(controlName: String): Seq[NodeInfo] =
+        findResourceHoldersWithLang(controlName) map (_._2)
 
     // Find control resource holders with their language
-    def findResourceHoldersWithLang(doc: NodeInfo, controlName: String): Seq[(String, NodeInfo)] =
+    def findResourceHoldersWithLang(controlName: String): Seq[(String, NodeInfo)] =
         for {
-            resource ← formResourcesRoot(doc) \ "resource"
+            resource ← formResourcesRoot \ "resource"
             lang = (resource \@ "*:lang").stringValue
             holder ← resource \ * filter (name(_) == controlName) headOption
         } yield
@@ -169,7 +169,7 @@ object ControlOps {
                 findBindByName(doc, controlName),
                 instanceElement(doc, templateId(controlName)),
                 findTemplateHolder(control, controlName)) ++
-                (findResourceHolders(doc, controlName) map (Option(_))) flatten
+                (findResourceHolders(controlName) map (Option(_))) flatten
         }
 
         // Append control element
@@ -233,11 +233,11 @@ object ControlOps {
     // Find all data, resources, and template holders for the given name
     def findHolders(doc: NodeInfo, holderName: String): Seq[NodeInfo] =
         Seq(findDataHolder(doc, holderName)) ++
-            (findResourceHolders(doc, holderName) map (Option(_))) :+
+            (findResourceHolders(holderName) map (Option(_))) :+
             (findControlByName(doc, holderName) flatMap (findTemplateHolder(_, holderName))) flatten
 
     def findResourceAndTemplateHolders(doc: NodeInfo, holderName: String): Seq[NodeInfo] =
-        (findResourceHolders(doc, holderName) map (Option(_))) :+
+        (findResourceHolders(holderName) map (Option(_))) :+
             (findControlByName(doc, holderName) flatMap (findTemplateHolder(_, holderName))) flatten
 
     // Find or create a data holder for the given hierarchy of names
@@ -265,7 +265,7 @@ object ControlOps {
     // Insert data and resource holders for all languages
     def insertHolders(controlElement: NodeInfo, dataHolder: NodeInfo, resourceHolder: NodeInfo, precedingControlName: Option[String]) {
         // Create one holder per existing language
-        val resourceHolders = (formResourcesRoot(controlElement) \ "resource" \@ "*:lang") map
+        val resourceHolders = (formResourcesRoot \ "resource" \@ "*:lang") map
             (att ⇒ (att.stringValue, resourceHolder))
 
         insertHolders(controlElement, dataHolder, resourceHolders, precedingControlName)
@@ -319,7 +319,7 @@ object ControlOps {
         if (resourceHolders.nonEmpty) {
             val resourceHoldersMap = resourceHolders.toMap
             for {
-                resource ← formResourcesRoot(doc) \ "resource"
+                resource ← formResourcesRoot \ "resource"
                 lang = (resource \@ "*:lang").stringValue
                 holder = resourceHoldersMap.get(lang) getOrElse resourceHolders(0)._2
             } yield

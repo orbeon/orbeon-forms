@@ -53,7 +53,7 @@ object FormBuilderFunctions {
 
     // Get the root element of instances
     def formInstanceRoot(doc: NodeInfo) = inlineInstanceRootElement(doc, "fr-form-instance").get
-    def formResourcesRoot(doc: NodeInfo) = inlineInstanceRootElement(doc, "fr-form-resources").get
+    def formResourcesRoot = asNodeInfo(model("fr-form-model").get.getVariable("resources"))
     def templateRoot(doc: NodeInfo, templateName: String) = inlineInstanceRootElement(doc, templateId(templateName))
 
     // Find the next available id for a given token

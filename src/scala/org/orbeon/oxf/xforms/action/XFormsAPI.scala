@@ -181,7 +181,7 @@ object XFormsAPI {
     }
 
     // Return a model
-    // TODO: This searches only to-level models, find a better way
+    // TODO: This searches only top-level models, find a better way
     def model(modelId: String) =
         // NOTE: This search is not very efficient, but this allows mocking in tests, where getObjectByEffectiveId causes issues
         containingDocument.getModels.asScala.find(_.getId == modelId)

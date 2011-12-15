@@ -44,6 +44,7 @@ Event.onDOMReady () ->
                 for cssClass in mapping[0]
                     mapping[1].push child if YD.hasClass child, cssClass
         gs = $(cellEditorTriggerGroups)
+        # NOTE: I'm not happy with the following; see question http://goo.gl/Dn1DI
         cellEditorTriggers = $.merge(gs.find('.xforms-trigger'), gs.filter('.xforms-trigger'))
 
     # Fires events related to mouse entering or existing a grid cell

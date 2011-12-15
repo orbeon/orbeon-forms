@@ -528,8 +528,8 @@
                                     <xh:img src="/apps/fr/style/images/silk/text_list_bullets.png" alt=""/>
                                     <xh:span><xf:output value="$fb-resources/edit-items/label"/></xh:span>
                                 </xf:label>
-                                <xf:dispatch ev:event="DOMActivate" name="fb-show-dialog" target="fb-form-editor$dialog-itemset-editor" xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps">
-                                    <xxf:context name="fb:resource-id" select="controlOps:controlName($control-id)"/>
+                                <xf:dispatch ev:event="DOMActivate" name="fb-show-dialog" targetid="fb-form-editor$dialog-itemsets">
+                                    <xxf:context name="control-id" value="$control/@id"/>
                                 </xf:dispatch>
                             </xf:trigger>
                             <xf:output id="fb-enter-label" ref="$form-resources/enter-label/label"/>

@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.fb
 
+import scala.collection.JavaConverters._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import annotation.tailrec
 import org.orbeon.oxf.fb.FormBuilderFunctions._
@@ -380,6 +381,31 @@ object ControlOps {
 
     def getControlHelpOrEmpty(controlId: String) = getControlResourceOrEmpty(controlId, "help")
     def getControlAlertOrEmpty(controlId: String) = getControlResourceOrEmpty(controlId, "alert")
+
+    // Get the control's <item> for the current language
+    def getControlItems(controlId: String) =
+        findCurrentResourceHolder(controlName(controlId)).toSeq flatMap (n ⇒ n \ "item") asJava
+
+    // Set the control's <item> for the current language and keep other languages in sync
+    def setControlItems(controlId: String, items: NodeInfo): Unit = {
+        val currentLang = (currentResources \@ "*:lang").stringValue
+        val newItems = items \ "item"
+        // Iterate over resources for each language
+        for {(lang, holder) ← findResourceHoldersWithLang(controlName(controlId))} {
+            // Remove items we had and insert the new one
+            val oldItems = holder \ "item"
+            delete(oldItems)
+            insert(into = holder, after = holder \ "*", origin = newItems)
+            // If this is not the current language, copy over labels we used to have
+            if (lang != currentLang)
+                for (newItem ← holder \ "item") {
+                    // If we can find an oldItem corresponding to the newItem, copy over the label
+                    for (oldItem <- oldItems)
+                        if (oldItem \ "value" === (newItem \ "value"))
+                            setvalue(newItem \ "label", oldItem \ "label")
+                }
+        }
+    }
 
     // Set a control's current resource
     def setControlResource(controlId: String, resourceName: String, value: String) =

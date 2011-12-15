@@ -119,6 +119,15 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
             def getAnother = this
             def getProperties = 0
         }
+        val resources = inlineInstanceRootElement(doc, "fr-form-resources").get
+        Mockito when model.getVariable("resources") thenReturn new SequenceIterator {
+            def next() = resources
+            def current() = resources
+            def position() = 0
+            def close() {}
+            def getAnother = this
+            def getProperties = 0
+        }
 
         val xblContainer = mock[XBLContainer]
 
@@ -222,7 +231,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
             assert(hasId(controlBind, bindId("control-2")))
             assert((controlBind precedingSibling * att "id") === bindId("control-1"))
             
-            assert(formResourcesRoot(doc) \ "resource" \ "control-2" nonEmpty)
+            assert(formResourcesRoot \ "resource" \ "control-2" nonEmpty)
 
 //            println(TransformerUtils.tinyTreeToString(doc))
         }
@@ -283,7 +292,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
                 assert(hasId(controlBind, bindId("control-2")))
                 assert(hasId(controlBind.parent.get, bindId("grid-1")))
 
-                assert(formResourcesRoot(doc) \ "resource" \ "control-2" nonEmpty)
+                assert(formResourcesRoot \ "resource" \ "control-2" nonEmpty)
 
                 val templateHolder = templateRoot(doc, "grid-1").get \ "control-2" headOption
                 

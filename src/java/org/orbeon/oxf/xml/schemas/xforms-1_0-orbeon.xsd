@@ -676,6 +676,7 @@
                 <xsd:group ref="xforms:Action"/>
                 <xsd:any namespace="##other" processContents="lax"/>
             </xsd:choice>
+            <xsd:attribute name="type" type="xsd:NMTOKEN" use="optional"/>
             <xsd:attributeGroup ref="xforms:Common.Attributes"/>
             <xsd:attributeGroup ref="xforms:XML.Events"/>
         </xsd:complexType>

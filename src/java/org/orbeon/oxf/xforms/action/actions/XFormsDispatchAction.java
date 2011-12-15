@@ -106,7 +106,7 @@ public class XFormsDispatchAction extends XFormsAction {
 
                 final IndentedLogger indentedLogger = actionInterpreter.getIndentedLogger();
                 if (indentedLogger.isDebugEnabled())
-                    indentedLogger.logDebug("xforms:dispatch", "cannot find target, ignoring action",
+                    indentedLogger.logWarning("xforms:dispatch", "cannot find target, ignoring action",
                             "target id", resolvedNewEventTargetStaticId);
             }
         } else {

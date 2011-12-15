@@ -80,8 +80,8 @@ abstract class DocumentTestBase extends ResourceManagerTestBase {
     implicit def elementToElem(e: Element) = XML.loadString(Dom4jUtils.domToString(e))
 
 //    // TODO: There is probably a better way to write these conversions
-    implicit def scalaElemSeqToDom4jElementSeq(seq: Traversable[Elem]) = seq map (elemToElement(_)) toList
-    implicit def dom4jElementSeqToScalaElemSeq(seq: Traversable[Element]) = seq map (elementToElem(_)) toList
+    implicit def scalaElemSeqToDom4jElementSeq(seq: Traversable[Elem]): Seq[Element] = seq map (elemToElement(_)) toList
+    implicit def dom4jElementSeqToScalaElemSeq(seq: Traversable[Element]): Seq[Elem]  = seq map (elementToElem(_)) toList
 
     protected def getControl(controlId: String) = getObject(controlId).asInstanceOf[XFormsControl]
     protected def getSingleNodeControl(controlId: String) = getObject(controlId).asInstanceOf[XFormsSingleNodeControl]

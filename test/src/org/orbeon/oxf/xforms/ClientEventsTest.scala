@@ -18,13 +18,12 @@ import org.orbeon.oxf.common.Version
 import org.scalatest.junit.AssertionsForJUnit
 import org.junit.{Assume, Test}
 import org.orbeon.oxf.test.DocumentTestBase
+import org.orbeon.oxf.xml.Dom4j
+import org.dom4j.Element
 
 class ClientEventsTest extends DocumentTestBase with AssertionsForJUnit {
 
-    @Test def noscriptEventReordering = {
-
-        // TODO: Disabled for now as XML comparison doesn't work yet (attribute order is changed along the way)
-        Assume.assumeTrue(false)
+    @Test def noscriptEventReordering() {
 
         Assume.assumeTrue(Version.isPE) // only test this feature if we are the PE version
 
@@ -45,16 +44,19 @@ class ClientEventsTest extends DocumentTestBase with AssertionsForJUnit {
                 </xh:body>
             </xh:html>
 
-        val eventElements = List(
+        val events: Seq[Element] = Seq(
             <xxf:event xmlns:xxf="http://orbeon.org/oxf/xml/xforms" name={XFormsEvents.XXFORMS_VALUE_OR_ACTIVATE} source-control-id="trigger"/>,
             <xxf:event xmlns:xxf="http://orbeon.org/oxf/xml/xforms" name={XFormsEvents.XXFORMS_VALUE_OR_ACTIVATE} source-control-id="input">42</xxf:event>)
 
-        val expected = List(
+        val expected: Seq[Element] = Seq(
             <xxf:event xmlns:xxf="http://orbeon.org/oxf/xml/xforms" name={XFormsEvents.XXFORMS_VALUE_OR_ACTIVATE} source-control-id="input">42</xxf:event>,
             <xxf:event xmlns:xxf="http://orbeon.org/oxf/xml/xforms" name={XFormsEvents.XXFORMS_VALUE_OR_ACTIVATE} source-control-id="trigger"/>)
 
-        val result = ClientEvents.reorderNoscriptEvents(eventElements, getDocument)
+        val result = ClientEvents.reorderNoscriptEvents(events, getDocument)
 
-        assert(expected === result)
+        assert(expected.size === result.size)
+        for ((left, right) ← expected zip result)
+        yield
+            assert(Dom4j.compareElementsIgnoreNamespacesInScopeCollapse(left, right))
     }
 }

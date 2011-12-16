@@ -242,6 +242,13 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                     if (! (value == "" && YAHOO.lang.isNumber(element[key])))
                         element[key] = value;
 
+                } else if (name == "style") {
+
+                    // For IE6/7 (but not IE8), using setAttribute with style doesn't work
+                    // So here we set the style as done by jQuery
+                    // https://github.com/jquery/jquery/blob/master/src/attributes.js#L600
+                    element.style.cssText = "" + value;
+
                 } else if (name == "name" && element.tagName.toLowerCase() == "input") {
 
                     // Here we handle a bug in IE6 and IE7 where the browser doesn't support changing the name of form elements.

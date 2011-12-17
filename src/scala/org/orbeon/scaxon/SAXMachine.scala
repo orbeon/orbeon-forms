@@ -68,6 +68,7 @@ trait SAXMachine[S, D] extends FSM[S, SAXMachine.SAXEvent, D] with ContentHandle
         case PI(target: String, data: String) ⇒ out.processingInstruction(target, data)
         case StartPrefixMapping(prefix: String, uri: String) ⇒ out.startPrefixMapping(prefix, uri)
         case EndPrefixMapping(prefix: String) ⇒ out.endPrefixMapping(prefix)
+        case DocumentLocator(locator) ⇒ out.setDocumentLocator(locator)
     }
 
     // Useful SAX events

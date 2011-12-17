@@ -72,26 +72,6 @@ trait PartEventHandlerAnalysis {
         _scripts = LinkedHashMap(controlTypes.get("script").toSeq flatMap (_.values) map (scriptMapping(_)): _*)
     }
 
-    // [NOT USED YET] for xxf:dynamic
-    /*
-    protected def deregisterActionHandler(eventHandlerImpl: EventHandlerImpl ) {
-        for {
-            observerPrefixedId <- eventHandlerImpl.getObserversPrefixedIds
-            eventHandlersForObserver <- eventHandlersMap.get(observerPrefixedId)
-        } yield
-            eventHandlersForObserver -= eventHandlerImpl
-
-        // NOTE: We don't remove from eventNames as we are unable to figure this one out right now
-
-        // Remove keypress events
-        for {
-            eventName <- eventHandlerImpl.eventNames
-            if eventName == XFormsEvents.KEYPRESS
-        } yield
-             keyHandlers -= eventHandlerImpl
-    }
-    */
-
     def getEventHandlers(observerPrefixedId: String) =
         eventHandlersMap.get(observerPrefixedId) map (_.asJava) orNull
 

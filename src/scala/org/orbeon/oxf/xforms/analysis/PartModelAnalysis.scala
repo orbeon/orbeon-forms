@@ -62,26 +62,6 @@ trait PartModelAnalysis {
         null
     }
 
-    /**
-     * Register a model document. Used by this and XBLBindings.
-     *
-     * @param scope             XBL scope
-     * @param modelDocument     model document
-     */
-    def addModel(scope: Scope, modelDocument: Document, eventHandlers: Buffer[EventHandlerImpl]) = {
-
-        val staticStateContext = StaticStateContext(this, -1)
-        val newModel = new Model(staticStateContext, modelDocument.getRootElement, None, None, scope)
-
-        // Index model and instances
-        indexModel(newModel, eventHandlers)
-
-        // Register nested event handlers and actions
-        newModel.buildChildren(build(_, _, _, _, Buffer[ExternalLHHAAnalysis](), eventHandlers), newModel.scope)
-
-        newModel
-    }
-
     protected def indexModel(model: Model,eventHandlers: Buffer[EventHandlerImpl]) {
         val models = modelsByScope.getOrElseUpdate(model.scope, Buffer[Model]())
         models += model
@@ -98,28 +78,4 @@ trait PartModelAnalysis {
                 model ← models
             } yield
                 model.analyzeXPath()
-
-    // [NOT USED YET] for xxf:dynamic
-    /*
-    def removeModel(model: Model) {
-
-        // TODO: Remove scripts
-
-        // Deregister event handlers
-        for (handler ← model.eventHandlers)
-            deregisterActionHandler(handler)
-
-        // Deindex by instance id
-        for (instance ← model.instances.values)
-            modelByInstancePrefixedId -= instance.prefixedId
-
-        // Deindex by model id
-        modelsByPrefixedId -= model.prefixedId
-
-        // Remove from list of models
-        modelsByScope.get(model.scope) foreach  { models ⇒
-            models -= model
-        }
-    }
-    */
 }

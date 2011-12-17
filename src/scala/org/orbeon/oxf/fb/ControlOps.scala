@@ -395,7 +395,7 @@ object ControlOps {
             // Remove items we had and insert the new one
             val oldItems = holder \ "item"
             delete(oldItems)
-            insert(into = holder, after = holder \ "*", origin = newItems)
+            insert(into = holder, after = holder \ *, origin = newItems)
             // If this is not the current language, copy over labels we used to have
             if (lang != currentLang)
                 for (newItem ← holder \ "item") {

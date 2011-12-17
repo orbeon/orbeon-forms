@@ -10,13 +10,14 @@
 #
 # The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 
+Document = ORBEON.xforms.Document
+
 $ ->
     $('#fb-form-editor\\$dialog-itemsets\\$dialog').on 'change', '.fb-itemset-label-input', (event) ->
-        # User changed the label
-        label = $(event.target)
-        # Get corresponding value
-        value = label.closest('td').find('.fb-itemset-value-input')
-
-        if $.trim(value.val()) == ''
-            $.trim(label.val())
-        console.log('change', event)
+        label = $(event.target)                                             # User changed the label
+        value = label.closest('tr').find('.fb-itemset-value-input')[0]      # Get corresponding value
+        if $.trim(Document.getValue(value)) == ''                           # If user didn't already provide a value
+            newValue = $.trim(label.val())                                  # Populate value from label
+            newValue = newValue.replace(new RegExp(' ', 'g'), '-')
+            newValue = newValue.toLowerCase()
+            Document.setValue(value, newValue)

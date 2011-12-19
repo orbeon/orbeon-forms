@@ -20,13 +20,13 @@ import org.orbeon.oxf.xforms.{XFormsConstants, XFormsContainingDocument}
 import org.dom4j.QName
 import org.orbeon.oxf.xforms.xbl.{Scope, XBLBindings}
 
-trait PartXBLAnalysis {
+trait PartXBLAnalysis extends TransientState {
 
     this: PartAnalysisImpl =>
 
     val xblBindings = new XBLBindings(getIndentedLogger, this, metadata, staticStateDocument.xblElements)
-    protected val scopesById = HashMap[String, Scope]()
-    protected val prefixedIdToXBLScopeMap = HashMap[String, Scope]()
+    private val scopesById = HashMap[String, Scope]()
+    private val prefixedIdToXBLScopeMap = HashMap[String, Scope]()
 
     protected def initializeScopes() {
         // Add existing ids to scope map
@@ -94,4 +94,9 @@ trait PartXBLAnalysis {
     def getXBLStyles = xblBindings.allStyles
     def getXBLScripts = xblBindings.allScripts
     def baselineResources = xblBindings.baselineResources
+
+    abstract override def freeTransientState() = {
+        super.freeTransientState()
+        xblBindings.freeTransientState()
+    }
 }

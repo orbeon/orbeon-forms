@@ -13,22 +13,20 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import controls.ExternalLHHAAnalysis
 import scala.collection.JavaConverters._
 import model.Model
 import collection.mutable.{LinkedHashMap, Buffer}
-import org.dom4j.Document
 import org.orbeon.oxf.xforms.event.EventHandlerImpl
 import org.orbeon.oxf.xforms.xbl.Scope
 
 // Part analysis: models and instances information
-trait PartModelAnalysis {
+trait PartModelAnalysis extends TransientState {
 
     this: PartAnalysisImpl =>
 
-    protected val modelsByScope = LinkedHashMap[Scope, Buffer[Model]]()
-    protected val modelsByPrefixedId = LinkedHashMap[String, Model]()
-    protected val modelByInstancePrefixedId = LinkedHashMap[String, Model]()
+    private val modelsByScope = LinkedHashMap[Scope, Buffer[Model]]()
+    private val modelsByPrefixedId = LinkedHashMap[String, Model]()
+    private val modelByInstancePrefixedId = LinkedHashMap[String, Model]()
 
     def getModel(prefixedId: String) =
         modelsByPrefixedId.get(prefixedId).orNull
@@ -78,4 +76,11 @@ trait PartModelAnalysis {
                 model ← models
             } yield
                 model.analyzeXPath()
+
+    abstract override def freeTransientState() = {
+        super.freeTransientState()
+
+        for (model ← modelsByPrefixedId.values)
+            model.freeTransientState()
+    }
 }

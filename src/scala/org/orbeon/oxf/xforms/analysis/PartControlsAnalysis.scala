@@ -21,7 +21,7 @@ import org.orbeon.oxf.xforms.XFormsConstants._
 import collection.mutable.{Buffer, HashMap, HashSet, LinkedHashMap}
 import org.orbeon.oxf.xforms.event.EventHandlerImpl
 
-trait PartControlsAnalysis {
+trait PartControlsAnalysis extends TransientState {
 
     this: PartAnalysisImpl ⇒
 
@@ -29,7 +29,7 @@ trait PartControlsAnalysis {
     // type → Map of prefixedId → ElementAnalysis
     protected val controlTypes = HashMap[String, LinkedHashMap[String, ElementAnalysis]]()
     // type → Set of appearances
-    protected val controlAppearances = HashMap[String, HashSet[QName]]();
+    private val controlAppearances = HashMap[String, HashSet[QName]]();
 
     // Special handling of attributes
     private var attributeControls: Map[String, Map[String, AttributeControl]] = _
@@ -160,4 +160,11 @@ trait PartControlsAnalysis {
             (xblBindings.allGlobals.values map (_.compactShadowTree.getRootElement)) asJava
 
     def hasControls = getTopLevelControlElements.size > 0
+
+    abstract override def freeTransientState() = {
+        super.freeTransientState()
+
+        for (controlAnalysis ← controlAnalysisMap.values)
+            controlAnalysis.freeTransientState()
+    }
 }

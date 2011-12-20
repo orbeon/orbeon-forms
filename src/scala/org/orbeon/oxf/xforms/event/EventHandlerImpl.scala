@@ -110,9 +110,9 @@ class EventHandlerImpl(
         val observersPrefixedIds = prefixedIds(XML_EVENTS_EV_OBSERVER_ATTRIBUTE_QNAME.getName)
         
         // Handle backward compatibility for <dispatch ev:event="…" ev:target="…" name="…" target="…">. In this case,
-        // if the user didn't specify the `targetid` attribute, the meaning of the `target` attribute is the target of
-        // the dispatch action, not XML Events target. In this case to specify the XML Events target, the attribute
-        // must be qualified as `ev:target`.
+        // if the user didn't specify the `targetid` attribute, the meaning of the `target` attribute in no namespace is
+        // the target of the dispatch action, not the incoming XML Events target. In this case to specify the incoming
+        // XML Events target, the attribute must be qualified as `ev:target`.
         val targetsPrefixedIds = 
             if (XFormsActions.isDispatchAction(element.getQName) && (element.attribute(TARGET_QNAME) ne null) && (element.attribute(TARGETID_QNAME) eq null))
                 prefixedIdsByQName(XML_EVENTS_EV_TARGET_ATTRIBUTE_QNAME)

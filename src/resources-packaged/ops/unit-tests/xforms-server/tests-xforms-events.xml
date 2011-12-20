@@ -16,19 +16,22 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
     xmlns:xu="http://www.xmldb.org/xupdate"
     xmlns:oxf="http://www.orbeon.com/oxf/processors"
     xmlns:xi="http://www.w3.org/2001/XInclude"
     xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
     xmlns:xforms="http://www.w3.org/2002/xforms"
     xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xbl="http://www.w3.org/ns/xbl"
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
     <test description="ev:observer and ev:target" name="oxf:pipeline">
         <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+            <p:config>
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
@@ -87,7 +90,7 @@
 
     <test description="ev:event='#all' ev:propagate='stop'" name="oxf:pipeline">
         <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+            <p:config>
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
@@ -165,7 +168,7 @@
 
     <test description="DnD events" name="oxf:pipeline">
         <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+            <p:config>
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
@@ -361,7 +364,7 @@
 
     <test description="Controls nested within non-relevant markup do not get xforms-enabled" name="oxf:pipeline">
         <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xforms="http://www.w3.org/2002/xforms">
+            <p:config xmlns:xforms="http://www.w3.org/2002/xforms">
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
@@ -501,7 +504,7 @@
 
     <test description="Value change event on group" name="oxf:pipeline">
         <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xforms="http://www.w3.org/2002/xforms">
+            <p:config xmlns:xforms="http://www.w3.org/2002/xforms">
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
@@ -578,7 +581,7 @@
 
     <test description="Value change event on switch" name="oxf:pipeline">
         <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xforms="http://www.w3.org/2002/xforms">
+            <p:config xmlns:xforms="http://www.w3.org/2002/xforms">
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
@@ -670,7 +673,7 @@
 
     <test description="Value change event on output" name="oxf:pipeline">
         <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xforms="http://www.w3.org/2002/xforms">
+            <p:config xmlns:xforms="http://www.w3.org/2002/xforms">
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
@@ -751,7 +754,7 @@
 
     <test description="Event listener on xforms:repeat" name="oxf:pipeline">
         <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+            <p:config>
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
@@ -824,7 +827,7 @@
     <!-- NOTE: This test is disabled because as of 2009-10 we can't run the setvalue within an empty context. -->
     <test description="Event listener on xforms:repeat when node-set becomes empty" name="oxf:pipeline" exclude="true">
         <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+            <p:config>
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
@@ -893,7 +896,7 @@
 
     <test description="Support for ev:target='#observer'" name="oxf:pipeline">
         <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+            <p:config>
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
@@ -985,7 +988,7 @@
 
     <test description="Client events reach proper repeat iteration if repeat rows are moved" name="oxf:pipeline">
         <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xforms="http://www.w3.org/2002/xforms">
+            <p:config xmlns:xforms="http://www.w3.org/2002/xforms">
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
@@ -1017,7 +1020,7 @@
                     </p:input>
                     <p:input name="models">
                         <models xmlns:xforms="http://www.w3.org/2002/xforms"
-                            xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+                           
                             xmlns:ev="http://www.w3.org/2001/xml-events">
                             <xforms:model id="model" xxforms:encrypt-item-values="false">
                                 <xforms:instance xmlns="" id="instance">
@@ -1095,7 +1098,7 @@
 
     <test description="Relevance / readonly state of controls is updated upon Ajax request" name="oxf:pipeline">
         <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xforms="http://www.w3.org/2002/xforms">
+            <p:config xmlns:xforms="http://www.w3.org/2002/xforms">
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
@@ -1125,7 +1128,7 @@
                     </p:input>
                     <p:input name="models">
                         <models xmlns:xforms="http://www.w3.org/2002/xforms"
-                            xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+                           
                             xmlns:ev="http://www.w3.org/2001/xml-events">
                             <xforms:model id="model" xxforms:encrypt-item-values="false">
                                 <xforms:instance xmlns="" id="instance">
@@ -1180,7 +1183,7 @@
     <test description="Test of capture, target, and bubbling phases" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:exf="http://www.exforms.org/exf/1-0">
+            <xhtml:html xmlns:exf="http://www.exforms.org/exf/1-0">
                 <xhtml:head>
                     <xforms:model id="model">
                         <xforms:instance id="instance">
@@ -1290,7 +1293,7 @@
 
     <test description="Event listener on #document" name="oxf:pipeline">
         <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+            <p:config>
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
@@ -1348,7 +1351,7 @@
 
     <test description="Event listener on #document resolves index()" name="oxf:pipeline">
         <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+            <p:config>
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
@@ -1414,7 +1417,7 @@
 
     <test description="Top-level event listener implicitly listens on #document" name="oxf:pipeline">
         <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+            <p:config>
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
@@ -1472,7 +1475,7 @@
 
     <test description="keypress event modifiers and text filtering" name="oxf:pipeline">
         <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+            <p:config>
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
@@ -1561,7 +1564,7 @@
 
     <test description="xxforms:show produces client requests to show dialogs" name="oxf:pipeline">
         <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+            <p:config>
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
@@ -1611,7 +1614,7 @@
 
     <test description="xxforms:toggle produces client requests to show case" name="oxf:pipeline">
         <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+            <p:config>
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
@@ -1658,7 +1661,7 @@
     <test description="XForms 1.1 switch enabled: dispatches xforms-enabled/xforms-disabled events" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+            <xhtml:html>
                 <xhtml:head>
                     <xforms:model id="model" xxforms:xforms11-switch="true">
                         <xforms:instance id="instance">
@@ -1740,7 +1743,7 @@
     <test description="XForms 1.1 switch disabled: dispatches xforms-enabled/xforms-disabled events" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+            <xhtml:html>
                 <xhtml:head>
                     <xforms:model id="model" xxforms:xforms11-switch="false">
                         <xforms:instance id="instance">
@@ -1821,7 +1824,7 @@
     <test description="Dialog dispatches xforms-enabled/xforms-disabled events" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+            <xhtml:html>
                 <xhtml:head>
                     <xforms:model id="model" xxforms:xforms11-switch="true">
                         <xforms:instance id="instance">
@@ -1899,7 +1902,7 @@
 
     <test description="Value change event on variable" name="oxf:pipeline">
         <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xforms="http://www.w3.org/2002/xforms">
+            <p:config xmlns:xforms="http://www.w3.org/2002/xforms">
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
@@ -2015,7 +2018,7 @@
     <test description="xforms:setvalue upon xforms-enabled dispatches proper xforms-value-change event" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+            <xhtml:html>
                 <xhtml:head>
                     <xforms:model id="model" xxforms:xforms11-switch="false">
                         <xforms:instance id="instance">
@@ -2088,7 +2091,7 @@
     <test description="xforms:refresh upon xforms-enabled dispatches proper events" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+            <xhtml:html>
                 <xhtml:head>
                     <xforms:model id="model" xxforms:xforms11-switch="false">
                         <xforms:instance id="instance">
@@ -2160,7 +2163,7 @@
     <test description="Destruction events upon iteration removal" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+            <xhtml:html>
                 <xhtml:head>
                     <xforms:model id="model">
                         <xforms:instance id="instance">
@@ -2222,7 +2225,7 @@
     <test description="[ #315922 ] Event handler nested within bound node causes errors" name="oxf:pipeline" only="false">
         <!-- See: http://forge.ow2.org/tracker/index.php?func=detail&aid=315922&group_id=168&atid=350207 -->
         <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+            <p:config>
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
@@ -2282,7 +2285,7 @@
     <test description="Nested event handler with and without ev:observer" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+            <xhtml:html>
                 <xhtml:head>
                     <xforms:model id="model">
                         <xforms:instance id="instance">
@@ -2331,27 +2334,160 @@
             </xxf:event-response>
         </output>
     </test>
+    
+    <test description="Dispatch to ev:target vs. target" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="instance">
+                            <values>
+                                <value/>
+                                <value/>
+                                <value/>
+                                <value/>
+                                <value/>
+                            </values>
+                        </xf:instance>
 
-    <!--
+                        <!-- Dispatch original event to trigger (so we can play with the event target) -->
+                        <xf:dispatch ev:event="xforms-ready" name="foo" targetid="my-trigger"/>
+                        
+                        <!-- Event handler to set a value -->
+                        <xf:setvalue ev:event="setvalue" ref="value[xs:integer(event('index'))]" value="event('value')"/>
 
-    TODO:
+                        <!-- Various ways to handle receiving the "foo" event -->
+                        <!--
+                            Handle backward compatibility for <dispatch ev:event="…" ev:target="…" name="…" target="…">. In this case,
+                            if the user didn't specify the `targetid` attribute, the meaning of the `target` attribute in no namespace is
+                            the target of the dispatch action, not the incoming XML Events target. In this case to specify the incoming
+                            XML Events target, the attribute must be qualified as `ev:target`.
+                        -->
+                        <xf:dispatch ev:event="foo" ev:observer="my-trigger" ev:target="my-trigger" name="setvalue" target="model">
+                            <xxf:context name="value">Use `ev:target` and `target`</xxf:context>
+                            <xxf:context name="index" value="1"/>
+                        </xf:dispatch>
+                        
+                        <xf:dispatch ev:event="foo" ev:observer="my-trigger" name="setvalue" target="model">
+                            <xxf:context name="value">Use only `target`</xxf:context>
+                            <xxf:context name="index" value="2"/>
+                        </xf:dispatch>
+                        
+                        <xf:dispatch ev:event="foo" ev:observer="my-trigger" ev:target="my-trigger" name="setvalue" targetid="model">
+                            <xxf:context name="value">Use `ev:target` and `targetid`</xxf:context>
+                            <xxf:context name="index" value="3"/>
+                        </xf:dispatch>
+                        
+                        <xf:dispatch ev:event="foo" ev:observer="my-trigger" name="setvalue" targetid="model">
+                            <xxf:context name="value">Use only `targetid`</xxf:context>
+                            <xxf:context name="index" value="4"/>
+                        </xf:dispatch>
+                        
+                        <xf:dispatch ev:event="foo" ev:observer="my-trigger" target="my-trigger" name="setvalue" targetid="model">
+                            <xxf:context name="value">Use `target` and `targetid`</xxf:context>
+                            <xxf:context name="index" value="5"/>
+                        </xf:dispatch>
 
-    * xxforms-value-changed
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:group id="my-group">
+                        <xf:trigger id="my-trigger"/>
+                    </xf:group>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <values>
+                                    <value>Use `ev:target` and `target`</value>
+                                    <value>Use only `target`</value>
+                                    <value>Use `ev:target` and `targetid`</value>
+                                    <value>Use only `targetid`</value>
+                                    <value>Use `target` and `targetid`</value>
+                                </values>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+    
+    <test description="XML Events attributes in no namespace" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="instance">
+                            <values>
+                                <value/>
+                                <value/>
+                                <value/>
+                            </values>
+                        </xf:instance>
 
-    TODO: More tests of client events:
+                        <xf:setvalue event="xforms-ready" ref="value[1]">Use of `event`</xf:setvalue>
 
-    # In Noscript mode
-        * events are reordered so that "activation" events come last (client might send them in another order)
-        * special handling of checkboxes blanking takes place
-    # If there are contiguous value change events for a given controls, they are combined (check number of value changes)
-    # If the target is within a repeat, xxforms-repeat-focus is dispatched
-    # For XFormsOutput, DOMFocusIn translates into:
-        * DOMFocusIn
-        * If the output is not readonly, followed by DOMActivate (not sure why)
-    # A value change with focus change translates into:
-        * Setting the external value into the instance
-        * DOMFocusOut
-        * DOMFocusIn
-    -->
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:setvalue event="xforms-ready" observer="model" ref="value[2]">Use of `event` and `observer`</xf:setvalue>
+                    <xf:setvalue event="xforms-ready" observer="model" target="model" ref="value[3]">Use of `event`, `observer`, and `target`</xf:setvalue>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <values xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxi="http://orbeon.org/oxf/xml/xinclude" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xu="http://www.xmldb.org/xupdate" xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:xf="http://www.w3.org/2002/xforms" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                                    <value>Use of `event`</value>
+                                    <value>Use of `event` and `observer`</value>
+                                    <value>Use of `event`, `observer`, and `target`</value>
+                                </values>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+<!--
+
+TODO:
+
+* xxforms-value-changed
+
+TODO: More tests of client events:
+
+# In Noscript mode
+    * events are reordered so that "activation" events come last (client might send them in another order)
+    * special handling of checkboxes blanking takes place
+# If there are contiguous value change events for a given controls, they are combined (check number of value changes)
+# If the target is within a repeat, xxforms-repeat-focus is dispatched
+# For XFormsOutput, DOMFocusIn translates into:
+    * DOMFocusIn
+    * If the output is not readonly, followed by DOMActivate (not sure why)
+# A value change with focus change translates into:
+    * Setting the external value into the instance
+    * DOMFocusOut
+    * DOMFocusIn
+-->
 
 </group>

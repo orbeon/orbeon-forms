@@ -31,11 +31,6 @@ import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.xml.{SAXStore, NamespaceMapping, ContentHandlerHelper, XMLUtils}
 import xbl.Scope
 
-// Provide default implementations so that behavior can be stacked
-abstract class PartAnalysisBase extends TransientState {
-    def freeTransientState() = ()
-}
-
 /**
  * Static analysis of a whole part, including:
  *
@@ -52,8 +47,7 @@ class PartAnalysisImpl(
         val startScope: Scope,
         val metadata: Metadata,
         protected val staticStateDocument: StaticStateDocument)
-    extends PartAnalysisBase
-    with PartAnalysis
+    extends PartAnalysis
     with PartGlobalOpsImpl
     with PartModelAnalysis
     with PartEventHandlerAnalysis

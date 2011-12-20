@@ -95,7 +95,7 @@ trait PartXBLAnalysis extends TransientState {
     def getXBLScripts = xblBindings.allScripts
     def baselineResources = xblBindings.baselineResources
 
-    abstract override def freeTransientState() = {
+    override def freeTransientState() = {
         super.freeTransientState()
         xblBindings.freeTransientState()
     }

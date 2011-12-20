@@ -161,7 +161,7 @@ trait PartControlsAnalysis extends TransientState {
 
     def hasControls = getTopLevelControlElements.size > 0
 
-    abstract override def freeTransientState() = {
+    override def freeTransientState() = {
         super.freeTransientState()
 
         for (controlAnalysis ← controlAnalysisMap.values)

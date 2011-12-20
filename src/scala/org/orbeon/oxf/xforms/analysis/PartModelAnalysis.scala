@@ -77,7 +77,7 @@ trait PartModelAnalysis extends TransientState {
             } yield
                 model.analyzeXPath()
 
-    abstract override def freeTransientState() = {
+    override def freeTransientState() = {
         super.freeTransientState()
 
         for (model ← modelsByPrefixedId.values)

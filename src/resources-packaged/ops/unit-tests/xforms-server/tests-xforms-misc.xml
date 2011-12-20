@@ -21,6 +21,9 @@
     xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
     xmlns:xforms="http://www.w3.org/2002/xforms"
     xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:exf="http://www.exforms.org/exf/1-0"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xbl="http://www.w3.org/ns/xbl"
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
@@ -28,7 +31,7 @@
     <test description="Calculator" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+            <xhtml:html>
                 <xhtml:head>
                     <xforms:model id="main-model">
                         <xforms:instance id="main-instance">
@@ -114,7 +117,7 @@
     <test description="Default instances" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+            <xhtml:html>
                 <xhtml:head>
                     <xforms:model id="main-model">
                         <xforms:instance id="main-instance">
@@ -199,7 +202,7 @@
 
     <test description="Nested refs with multiple models and instances" name="oxf:pipeline">
         <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+            <p:config>
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
@@ -388,7 +391,7 @@
     -->
     <!--<test description="xxforms:format attribute" name="oxf:pipeline">-->
         <!--<input name="config">-->
-            <!--<p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xforms="http://www.w3.org/2002/xforms">-->
+            <!--<p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xforms="http://www.w3.org/2002/xforms">-->
                 <!--<p:param name="response" type="output"/>-->
 <!---->
                 <!--<p:processor name="oxf:pipeline">-->
@@ -418,7 +421,7 @@
         <!--<output name="response">-->
             <!--<xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">-->
                 <!--<xxf:static-state>-->
-                    <!--<static-state xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">-->
+                    <!--<static-state xmlns:xforms="http://www.w3.org/2002/xforms">-->
                         <!--<controls>-->
                             <!--<xforms:input id="id1" ref="date" xxforms:format="format-date(xs:date(.), &apos;[MNn] [D], [Y]&apos;, &apos;en&apos;, (), ())"/>-->
                             <!--<xforms:output id="id2" ref="date" xxforms:format="format-date(xs:date(.), &apos;[D]. [MNn] [Y]&apos;, &apos;de&apos;, (), ())"/>-->
@@ -460,7 +463,7 @@
          an action resets that value to the same value as the original value, then the proper response is sent. -->
     <test description="xforms:setvalue to same initial value" name="oxf:pipeline">
         <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xforms="http://www.w3.org/2002/xforms">
+            <p:config>
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
@@ -472,8 +475,7 @@
                         </xxforms:action>
                     </p:input>
                     <p:input name="controls">
-                        <controls xmlns:xforms="http://www.w3.org/2002/xforms"
-                                  xmlns:ev="http://www.w3.org/2001/xml-events">
+                        <controls>
                             <xforms:input ref="instance('main')" id="id123"/>
                             <xforms:trigger id="id124">
                                 <xforms:setvalue ev:event="DOMActivate" ref="instance('main')" id="id125">existing value</xforms:setvalue>
@@ -481,9 +483,7 @@
                         </controls>
                     </p:input>
                     <p:input name="models">
-                        <models xmlns:xforms="http://www.w3.org/2002/xforms"
-                            xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
-                            xmlns:ev="http://www.w3.org/2001/xml-events">
+                        <models>
                             <xforms:model id="main-model">
                                 <xforms:instance id="main">
                                     <value/>
@@ -524,13 +524,13 @@
 
     <test description="Incorrect evaluation of trigger in refresh processing with multiple models" name="oxf:pipeline">
         <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+            <p:config>
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
                     <p:input name="config" href="wrap-xforms-state.xpl"/>
                     <p:input name="document">
-                        <xhtml:html xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+                        <xhtml:html>
                             <xhtml:head>
                                 <xforms:model id="model1">
 
@@ -595,7 +595,7 @@
     <test description="xforms:setfocus on xforms:group" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:exf="http://www.exforms.org/exf/1-0">
+            <xhtml:html>
                 <xhtml:head>
                     <xforms:model id="model">
                         <xforms:instance id="instance">
@@ -647,7 +647,7 @@
     <test description="xforms:setfocus on xforms:switch" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:exf="http://www.exforms.org/exf/1-0">
+            <xhtml:html>
                 <xhtml:head>
                     <xforms:model id="model">
                         <xforms:instance id="instance">
@@ -721,7 +721,7 @@
     <test description="xforms:setfocus on xforms:repeat" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:exf="http://www.exforms.org/exf/1-0">
+            <xhtml:html>
                 <xhtml:head>
                     <xforms:model id="model">
                         <xforms:instance id="instance">
@@ -779,7 +779,7 @@
     <test description="Label change on xxforms:dialog" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:exf="http://www.exforms.org/exf/1-0">
+            <xhtml:html>
                 <xhtml:head>
                     <xforms:model id="model">
                         <xforms:instance id="instance">
@@ -833,7 +833,7 @@
     <test description="Label change on xxforms:dialog" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+            <xhtml:html>
                 <xhtml:head>
                     <xforms:model id="model">
                         <xforms:instance id="instance">
@@ -897,7 +897,7 @@
     <test description="Comments in XForms document are not propagated" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-init-nohead.xpl"/>
         <input name="document">
-            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+            <xhtml:html>
                 <!-- Comment 1 -->
                 <xhtml:head>
                     <!-- Comment 2 -->
@@ -1036,7 +1036,7 @@
     <test description="Comments in inline instance are preserved" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+            <xhtml:html>
                 <xhtml:head>
                     <xforms:model id="model">
                         <xforms:instance id="instance">
@@ -1083,7 +1083,7 @@
     <test description="Comments in external instances are preserved" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+            <xhtml:html>
                 <xhtml:head>
                     <xforms:model id="model">
                         <xforms:instance id="instance-readwrite" src="oxf:/ops/unit-tests/comments.xml"/>
@@ -1137,7 +1137,7 @@
     <test description="Comments in instance loaded by submission are preserved" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+            <xhtml:html>
                 <xhtml:head>
                     <xforms:model id="model">
                         <xforms:instance id="instance-readwrite"><dummy/></xforms:instance>
@@ -1200,7 +1200,7 @@
     <test description="Instance comments preserved in state deserialization" name="oxf:pipeline">
         <input name="config" href="wrap-server.xpl"/>
         <input name="action">
-            <xxforms:action xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+            <xxforms:action>
                 <xxforms:event name="update" source-control-id="model"/>
             </xxforms:action>
         </input>
@@ -1208,7 +1208,7 @@
             <controls xmlns:xforms="http://www.w3.org/2002/xforms"/>
         </input>
         <input name="models">
-            <models xmlns:xforms="http://www.w3.org/2002/xforms"  xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+            <models>
                 <xforms:model id="model" xxforms:external-events="update">
                     <xforms:instance id="instance-readwrite"><dummy/></xforms:instance>
                     <xforms:instance id="instance-readonly"><dummy/></xforms:instance>
@@ -1293,7 +1293,7 @@
     <test description="Interaction of context and xxforms:iterate" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+            <xhtml:html>
 
                 <xhtml:head>
                     <xforms:model>
@@ -1354,6 +1354,70 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <!-- NOTE: This is NOT full model scoping [1]: we are just making sure that a nested model is accessible with the
+         @model attribute.
+
+         [1] http://wiki.orbeon.com/forms/projects/xforms-model-scoping-rules
+     -->
+    <test description="Scoping of model nested within controls" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html>
+                <xhtml:head>
+                    <xforms:model id="foo-model">
+                        <xforms:instance id="foo-instance">
+                            <value>foo</value>
+                        </xforms:instance>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+                    <!-- Must use default: foo-model -->
+                    <xforms:output id="output-1" value="instance()"/>
+                    <xforms:group model="bar-model">
+                        <xforms:model id="bar-model">
+                            <xforms:instance id="bar-instance">
+                                <value>bar</value>
+                            </xforms:instance>
+                        </xforms:model>
+
+                        <!-- Must use model scoped on group: bar-model -->
+                        <xforms:output id="output-2" value="instance()"/>
+
+                        <!-- Must use model scoped: foo-model -->
+                        <xforms:output id="output-3" model="foo-model" value="instance()"/>
+                        
+                    </xforms:group>
+                    <!-- Must use default: foo-model -->
+                    <xforms:output id="output-4" value="instance()"/>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response>
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="foo-instance" model-id="foo-model">
+                                <value>foo</value>
+                            </instance>
+                            <instance id="bar-instance" model-id="bar-model">
+                                <value>bar</value>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="output-1">foo</xxf:control>
+                        <xxf:control id="output-2">bar</xxf:control>
+                        <xxf:control id="output-3">foo</xxf:control>
+                        <xxf:control id="output-4">foo</xxf:control>
+                    </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
         </output>

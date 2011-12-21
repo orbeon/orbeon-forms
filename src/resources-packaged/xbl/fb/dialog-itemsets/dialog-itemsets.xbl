@@ -78,13 +78,9 @@
                 </xforms:action>
                 <xforms:setvalue ev:event="xxforms-dialog-close" ev:observer="dialog" ref="$local/@relevant">false</xforms:setvalue>    <!-- Become non-relevant on dialog close -->
 
-                <xforms:action ev:event="DOMActivate" ev:target="fb-itemset-label-input fb-itemset-value-input">                        <!-- Add line when users press enter -->
-                    <xforms:message value="'Adding new item'"/>
-                    <xxforms:variable name="index" select="index('fb-itemset-repeat')"/>
+                <xforms:action ev:event="DOMActivate" ev:observer="fb-itemset-label-input fb-itemset-value-input">                      <!-- Add line when users press enter -->
+                    <xxforms:variable name="index" select="index('fb-itemset-repeat-repeat')"/>
                     <xforms:insert context="$local/items" nodeset="item" at="$index" origin="$local/template/item"/>
-                    <!-- NOTE: setindex should not be necessary after insert, but as of 2010-11-01, the repeat's nodeset is
-                         computed from a variable and the nodeset value therefore not reevaluated until the next refresh. -->
-                    <xforms:setindex repeat="fb-itemset-repeat" index="$index + 1"/>
                     <xforms:setfocus control="fb-itemset-label-input"/>
                 </xforms:action>
 

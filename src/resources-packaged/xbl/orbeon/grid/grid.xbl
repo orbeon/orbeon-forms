@@ -371,7 +371,7 @@
                                                                     </xsl:choose>
                                                                     <xsl:copy-of select="@* except (@class, @xxf:control)"/>
                                                                     <!-- NOTE: Add itemset or upload classes to allow the client to decide whether to place the itemset editor or the upload button -->
-                                                                    <xh:div class="{('fr-grid-content', if ($is-repeat) then 'yui-dt-liner' else (), if ($has-itemset) then 'fb-itemset' else (), if ($has-upload) then 'fb-upload' else ())}">
+                                                                    <xh:div class="{('fr-grid-content', if ($has-itemset) then 'fb-itemset' else (), if ($has-upload) then 'fb-upload' else ())}">
                                                                         <xsl:choose>
                                                                             <xsl:when test="not($is-editable)">
                                                                                 <xf:group xxbl:scope="outer" appearance="xxf:internal">

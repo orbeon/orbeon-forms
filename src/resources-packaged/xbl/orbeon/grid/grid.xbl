@@ -33,7 +33,7 @@
 
     <!-- NOTE on namespaces: in editable mode, we might be passed a path with @edit-ref that makes assumptions on NS prefixes,
          such as xhtml:, xforms:, etc. so make sure the basic ones are defined for now. Would be worth improving on this. -->
-    
+
     <xbl:binding id="fr-grid-binding" element="fr|grid">
 
         <xbl:template xxbl:transform="oxf:xslt">
@@ -61,6 +61,7 @@
                         <xsl:variable name="max-occurs" select="if (@maxOccurs) then @maxOccurs else 'unbounded'"/>
                         <xsl:variable name="readonly" select="@readonly = 'true'"/>
                         <xsl:variable name="remove-constraint" select="@remove-constraint"/>
+                        <xsl:variable name="repeat-id" as="xs:string" select="concat(@id, '-repeat')"/>
 
                         <xsl:variable name="repeat-expression" select="if (@nodeset) then @nodeset else if (@ref) then @ref else concat('xxforms:bind(''', @bind, ''')')" as="xs:string"/>
 
@@ -81,6 +82,10 @@
                             </xxf:var>
                             <xxf:var name="repeat-origin">
                                 <xxf:sequence value="{if (@origin) then @origin else '()'}" xxbl:scope="outer"/>
+                            </xxf:var>
+                            <xxf:var name="repeat-index">
+                                <!-- Replace quote by two quotes in the repeat id to avoid possible XPath injection -->
+                                <xxf:sequence value="index('{replace($repeat-id, '''', '''''')}')" xxbl:scope="outer"/>
                             </xxf:var>
                         </xsl:if>
 
@@ -212,7 +217,7 @@
                                                                                context="$repeat-context"
                                                                                ref="$repeat-sequence"
                                                                                origin="$repeat-origin"
-                                                                               at="index('repeat')"/>
+                                                                               at="$repeat-index"/>
                                                                 </xf:trigger>
                                                                 <xf:group ref="$repeat-context[not($can-add)]">
                                                                     <xh:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/plus_16g.png" alt=""/>
@@ -321,7 +326,7 @@
                                                                                     <!-- TODO: i18n of alt/title -->
                                                                                     <xf:label><xh:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/delete_16.png" alt="Remove" title="Remove"/></xf:label>
                                                                                     <!--/apps/fr/style/images/silk/bin.png-->
-                                                                                    <xf:delete ev:event="DOMActivate" ref="$repeat-sequence" at="index('repeat')"/>
+                                                                                    <xf:delete ev:event="DOMActivate" ref="$repeat-sequence" at="$repeat-index"/>
                                                                                 </xf:trigger>
                                                                                 <xf:group ref="$repeat-context[not($can-remove)]">
                                                                                     <xh:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/delete_16g.png" alt=""/>
@@ -398,8 +403,10 @@
                                         <xsl:choose>
                                             <xsl:when test="$is-repeat">
                                                 <!-- Enclose within repeat -->
-                                                <xf:repeat ref="$repeat-sequence" id="repeat">
-                                                    <xsl:copy-of select="$content"/>
+                                                <xf:repeat ref="{$repeat-expression}" id="{$repeat-id}" xxbl:scope="outer">
+                                                    <xf:group appearance="xxforms:internal" xxbl:scope="inner">
+                                                        <xsl:copy-of select="$content"/>
+                                                    </xf:group>
                                                 </xf:repeat>
                                             </xsl:when>
                                             <xsl:otherwise>

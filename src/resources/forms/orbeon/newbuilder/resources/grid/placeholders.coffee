@@ -34,7 +34,7 @@ Event.onDOMReady () ->
     hidePlaceholder = (labelHint) ->
         if YD.hasClass labelHint, 'fb-label-hint-placeholder'
             YD.removeClass labelHint, 'fb-label-hint-placeholder'
-            OD.setStringValue labelHint, ''
+            $(labelHint).contents().filter(-> @nodeType == @TEXT_NODE).detach()
     doOnLabelHint = (gridTd, f) ->
         for labelHintClass in ['xforms-label', 'xforms-hint']
             labelHint = (YD.getElementsByClassName labelHintClass, null, gridTd)[0]

@@ -131,7 +131,7 @@ public class Variable {
         // Make sure the variable is evaluated
         if (!evaluated) {
             evaluated = true;
-            evaluate(sourceEffectiveId, pushOuterContext, handleNonFatal);
+            evaluate(XFormsUtils.getRelatedEffectiveId(sourceEffectiveId, staticVariable.valueStaticId()), pushOuterContext, handleNonFatal);
         }
 
         // Return value and rewrap if necessary

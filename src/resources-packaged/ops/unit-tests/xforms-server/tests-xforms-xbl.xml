@@ -3963,6 +3963,51 @@
             </xxf:event-response>
         </output>
     </test>
+    
+    <test description="[ #316295 ] XBL: var/sequence in different scope does not resolve repeat properly" name="oxf:pipeline">
+        <!-- See: http://forge.ow2.org/tracker/index.php?func=detail&aid=316295&group_id=168&atid=350207 -->
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html>
+                <xhtml:head>
+                    <xforms:model id="model"/>
+                    <xbl:xbl>
+                        <xbl:binding id="fr-gaga" element="fr|gaga">
+                            <xbl:template>
+                                <xforms:group>
+                                    <xxforms:var name="repeat-index" id="my-var">
+                                        <xxforms:sequence value="index('my-repeat')" xxbl:scope="outer" id="my-sequence"/>
+                                    </xxforms:var>
+                                    <xforms:repeat id="my-repeat" xxbl:scope="outer" ref="1"/>
+                                    <xforms:output value="$repeat-index" id="my-output"/>
+                                </xforms:group>
+                            </xbl:template>
+                        </xbl:binding>
+                    </xbl:xbl>
+                </xhtml:head>
+                <xhtml:body>
+                    <fr:gaga id="my-gaga"/>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response>
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances/>
+                        <controls>
+                            <control effective-id="my-gaga$my-repeat" index="1"/>
+                        </controls>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="my-gaga$my-output">1</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
 
     <!--
 

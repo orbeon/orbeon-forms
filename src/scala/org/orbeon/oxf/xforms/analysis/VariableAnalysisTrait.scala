@@ -58,11 +58,11 @@ trait VariableAnalysisTrait extends SimpleElementAnalysis with VariableTrait {
         }
 
     // Scope of xxf:variable OR nested xxf:sequence if present
-    lazy val (hasSequence, valueScope, valueNamespaceMapping) = sequenceAnalysis match {
+    lazy val (hasSequence, valueScope, valueNamespaceMapping, valueStaticId) = sequenceAnalysis match {
         case Some(sequenceAnalysis) ⇒
-            (true, sequenceAnalysis.scope, sequenceAnalysis.namespaceMapping)
+            (true, sequenceAnalysis.scope, sequenceAnalysis.namespaceMapping, sequenceAnalysis.staticId)
         case None ⇒
-            (false, scope, namespaceMapping)
+            (false, scope, namespaceMapping, staticId)
     }
 
     def variableAnalysis = getValueAnalysis

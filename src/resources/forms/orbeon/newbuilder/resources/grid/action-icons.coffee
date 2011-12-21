@@ -20,7 +20,7 @@ YD = YAHOO.util.Dom
 # Rules defining when certain triggers are relevant
 isNotEmpty = (gridTd) -> $(gridTd).children('.fr-grid-content').children().length > 0
 relevanceRules =
-    'fb-expand-trigger':            (gridTd) -> gridTd.rowSpan <= $(gridTd).parent().nextAll('tr').length
+    'fb-expand-trigger':            (gridTd) -> gridTd.rowSpan <= $(gridTd).parent().nextAll('tr:not(.xforms-repeat-delimiter):not(.xforms-repeat-template):not(.xforms-repeat-begin-end):not(.xforms-group-begin-end)').length
     'fb-shrink-trigger':            (gridTd) -> gridTd.rowSpan >= 2
     'fb-delete-trigger':            isNotEmpty
     'fb-edit-details-trigger':      isNotEmpty

@@ -17,8 +17,6 @@ Event = YAHOO.util.Event
 Events = ORBEON.xforms.Events
 YD = YAHOO.util.Dom
 
-# TODO: Deal with moving back the icons after an Ajax request
-
 # Rules defining when certain triggers are relevant
 isNotEmpty = (gridTd) -> $(gridTd).children('.fr-grid-content').children().length > 0
 relevanceRules =

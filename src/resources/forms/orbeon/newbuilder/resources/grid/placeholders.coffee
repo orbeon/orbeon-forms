@@ -35,10 +35,15 @@ Event.onDOMReady () ->
         if YD.hasClass labelHint, 'fb-label-hint-placeholder'
             YD.removeClass labelHint, 'fb-label-hint-placeholder'
             $(labelHint).contents().filter(-> @nodeType == @TEXT_NODE).detach()
-    doOnLabelHint = (gridTd, f) ->
-        for labelHintClass in ['xforms-label', 'xforms-hint']
-            labelHint = (YD.getElementsByClassName labelHintClass, null, gridTd)[0]
-            f labelHint if labelHint? # There could be no label or hint if the cell is empty
+    doOnLabelHint = (gridThTd, f) ->
+        $gridThTd = $(gridThTd)
+        $table = $gridThTd.closest('table')
+        lookIn = [gridThTd]
+        if $gridThTd.is('td') and $table.is('.fr-repeat-single-row')    # Also look for label/hint in the th
+            columnNumber = $gridThTd.prevAll().length + 1
+            gridTh = $table.find('tr.fr-dt-master-row').children()[columnNumber]
+            lookIn.push gridTh
+        $(lookIn).find('.xforms-label, .xforms-hint').each((index, labelHint) -> f labelHint)
 
     # Show placeholder on mouse entering, and remove them on mouse exiting
     Builder.mouseEntersGridTdEvent.subscribe ({gridTd}) ->

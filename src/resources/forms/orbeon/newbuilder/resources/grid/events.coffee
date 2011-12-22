@@ -49,7 +49,7 @@ Event.onDOMReady () ->
 
     # Fires events related to mouse entering or existing a grid cell
     do ->
-        currentMouseOverGridTd = null
+        currentMouseOverGridThTd = null
 
         buildGridTdEvent = (gridTd) ->
             triggerGroups: cellEditorTriggerGroups
@@ -59,27 +59,27 @@ Event.onDOMReady () ->
 
         Event.addListener document, "mouseover", (event) ->
             target = Event.getTarget event
-            gridTd =
+            gridThTd =
                 # Target is the grid td, we're good
-                if YD.hasClass target, "fr-grid-td" then target
+                if $(target).is('.fr-grid-th, .fr-grid-td') then target
                 # Try finding a grid td parent of the target
-                else YD.getAncestorByClassName target, "fr-grid-td"
-            if gridTd?
-                if currentMouseOverGridTd?
-                    if gridTd isnt currentMouseOverGridTd
+                else $(target).closest('.fr-grid-th, .fr-grid-td')[0]
+            if gridThTd
+                if currentMouseOverGridThTd
+                    if gridThTd isnt currentMouseOverGridThTd
                         # From one gridTd to another gridTd
-                        Builder.mouseExitsGridTdEvent.fire buildGridTdEvent currentMouseOverGridTd
-                        currentMouseOverGridTd = gridTd
-                        Builder.mouseEntersGridTdEvent.fire buildGridTdEvent gridTd
+                        Builder.mouseExitsGridTdEvent.fire buildGridTdEvent currentMouseOverGridThTd
+                        currentMouseOverGridThTd = gridThTd
+                        Builder.mouseEntersGridTdEvent.fire buildGridTdEvent gridThTd
                 else
                     # First time in a gridTd
-                    currentMouseOverGridTd = gridTd
-                    Builder.mouseEntersGridTdEvent.fire buildGridTdEvent gridTd
+                    currentMouseOverGridThTd = gridThTd
+                    Builder.mouseEntersGridTdEvent.fire buildGridTdEvent gridThTd
             else
-                if currentMouseOverGridTd?
+                if currentMouseOverGridThTd
                     # Exiting a gridTd
-                    Builder.mouseExitsGridTdEvent.fire buildGridTdEvent currentMouseOverGridTd
-                    currentMouseOverGridTd = null
+                    Builder.mouseExitsGridTdEvent.fire buildGridTdEvent currentMouseOverGridThTd
+                    currentMouseOverGridThTd = null
 
     # Fire event on click on trigger
     do ->

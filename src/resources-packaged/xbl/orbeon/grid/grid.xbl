@@ -231,7 +231,7 @@
                                                     </xf:group>
                                                 </xsl:if>
                                                 <xsl:for-each select="$grid-rows[1]/*:td">
-                                                    <xh:th>
+                                                    <xh:th class="fr-grid-th">
                                                         <xsl:copy-of select="@colspan"/>
                                                         <xh:div class="yui-dt-liner">
                                                             <!-- NOTE: At this time, assume that XPath expressions on LHH

@@ -90,10 +90,14 @@
                         </xsl:if>
 
                         <!-- Use AVTs to set the style on the div depending on the number of columns in first row -->
-                        <xh:div class="{string-join((if ($is-repeat) then 'yui-dt' else ()), ' ')}">
+                        <xh:div class="{if ($is-repeat) then 'yui-dt' else ()}">
                             <xh:div class="yui-dt-hd">
                                 <!-- Grid table -->
-                                <xh:table class="{string-join(('fr-grid', @class, if ($is-repeat) then ('yui-dt-table', 'fr-repeat', 'fr-repeat-table') else 'fr-norepeat', if ($is-editable) then 'fr-editable' else ()), ' ')}">
+                                <xh:table class="{'fr-grid',
+                                                  @class,
+                                                  if ($is-repeat) then ('yui-dt-table', 'fr-repeat', 'fr-repeat-table') else 'fr-norepeat',
+                                                  if ($is-editable) then 'fr-editable' else (),
+                                                  if ($static-row-count le 1) then 'fr-repeat-single-row' else 'fr-repeat-multiple-rows'}">
 
                                     <!-- If editable, add top row to manipulate grid -->
                                     <xsl:if test="$is-editable">
@@ -259,10 +263,10 @@
                                                         <xh:tr>
                                                             <xsl:choose>
                                                                 <xsl:when test="$is-repeat">
-                                                                    <xsl:attribute name="class"><xsl:value-of select="string-join(('fr-grid-tr', @class), ' ')"/> {string-join((if (xxf:repeat-position() mod 2 = 1) then 'yui-dt-even' else 'yui-dt-odd', if (xxf:repeat-position() = 1) then 'yui-dt-first' else ()), ' ')}</xsl:attribute>
+                                                                    <xsl:attribute name="class"><xsl:value-of select="'fr-grid-tr', @class"/> {if (xxf:repeat-position() mod 2 = 1) then 'yui-dt-even' else 'yui-dt-odd', if (xxf:repeat-position() = 1) then 'yui-dt-first' else ()}</xsl:attribute>
                                                                 </xsl:when>
                                                                 <xsl:otherwise>
-                                                                    <xsl:attribute name="class"><xsl:value-of select="string-join(('fr-grid-tr', @class), ' ')"/></xsl:attribute>
+                                                                    <xsl:attribute name="class"><xsl:value-of select="'fr-grid-tr', @class"/></xsl:attribute>
                                                                 </xsl:otherwise>
                                                             </xsl:choose>
                                                             <xsl:copy-of select="@* except @class"/>
@@ -359,10 +363,10 @@
                                                                     <xsl:choose>
                                                                         <xsl:when test="$is-editable">
                                                                             <xsl:attribute name="xxf:control">true</xsl:attribute>
-                                                                            <xsl:attribute name="class"><xsl:value-of select="string-join(('xforms-activable', 'fr-grid-td', @class), ' ')"/>{if (xxf:get-variable('fr-form-model', 'selected-cell') = $td/@id) then ' fb-selected' else ''}</xsl:attribute>
+                                                                            <xsl:attribute name="class"><xsl:value-of select="'xforms-activable', 'fr-grid-td', @class"/>{if (xxf:get-variable('fr-form-model', 'selected-cell') = $td/@id) then ' fb-selected' else ''}</xsl:attribute>
                                                                         </xsl:when>
                                                                         <xsl:otherwise>
-                                                                            <xsl:attribute name="class"><xsl:value-of select="string-join(('fr-grid-td', @class), ' ')"/></xsl:attribute>
+                                                                            <xsl:attribute name="class"><xsl:value-of select="'fr-grid-td', @class"/></xsl:attribute>
                                                                         </xsl:otherwise>
                                                                     </xsl:choose>
                                                                     <xsl:copy-of select="@* except (@class, @xxf:control)"/>
@@ -437,14 +441,14 @@
                 </xsl:template>
 
                 <xsl:template match="*:tr[empty(ancestor::*/local-name()[not(. = ('group', 'grid'))])]">
-                    <xh:tr class="{string-join(('fr-grid-tr', @class), ' ')}">
+                    <xh:tr class="{'fr-grid-tr', @class}">
                         <xsl:copy-of select="@* except @class"/>
                         <xsl:apply-templates select="*"/><!-- don't bother with other nodes -->
                     </xh:tr>
                 </xsl:template>
 
                 <xsl:template match="*:td[empty(ancestor::*/local-name()[not(. = ('group', 'tr', 'grid'))])]">
-                    <xh:td class="{string-join(('fr-grid-td', @class), ' ')}">
+                    <xh:td class="{'fr-grid-td', @class}">
                         <xsl:copy-of select="@* except @class"/>
                         <xh:div class="fr-grid-content">
                             <xsl:apply-templates select="node()"/>

@@ -230,7 +230,7 @@
                     <!-- This is also at the top-level in components.xsl -->
                     <!-- TODO: would be ideal if read-onliness on outer instance would simply propagate here -->
                     <xxforms:variable name="fr-mode" select="xxforms:instance('fr-parameters-instance')/mode"/>
-                    <xforms:bind nodeset="instance('fr-form-instance')" readonly="$mode = ('view', 'pdf', 'email')"/>
+                    <xforms:bind nodeset="instance('fr-form-instance')" readonly="$fr-mode = ('view', 'pdf', 'email')"/>
 
                     <!-- Schema: simply copy so that the types are available locally -->
                     <!-- NOTE: Could optimized to check if any of the types are actually used -->

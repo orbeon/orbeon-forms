@@ -15,9 +15,18 @@ package org.orbeon.oxf.xforms.event.events
 
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.event.{XFormsEventTarget, XFormsEvents, XFormsEvent}
-import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.saxon.om.{SingletonIterator, NodeInfo}
+import org.orbeon.saxon.value.StringValue
 
 class XXFormsValueChanged(containingDocument: XFormsContainingDocument, targetObject: XFormsEventTarget,
                           val node: NodeInfo, val oldValue: String, val newValue: String)
-    extends XFormsEvent(containingDocument, XFormsEvents.XXFORMS_VALUE_CHANGED, targetObject, true, true)
+    extends XFormsEvent(containingDocument, XFormsEvents.XXFORMS_VALUE_CHANGED, targetObject, true, true) {
+
+    override def getAttribute(name: String) = name match {
+        case "node" ⇒ SingletonIterator.makeIterator(node)
+        case "old-value" ⇒ SingletonIterator.makeIterator(StringValue.makeStringValue(oldValue))
+        case "new-value" ⇒ SingletonIterator.makeIterator(StringValue.makeStringValue(newValue))
+        case other ⇒ super.getAttribute(other)
+    }
+}
 

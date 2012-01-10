@@ -30,6 +30,7 @@ class RTE extends Control
     # Initializes the RTE editor for a particular control.
     init: (container) ->
         super container
+
         if Utils.isNewXHTMLLayout()
             # In span mode, get textarea under container and keep current structure
             textarea = @container.getElementsByTagName("textarea")[0]
@@ -119,5 +120,11 @@ class RTE extends Control
 
 Page.registerControlConstructor RTE, (container) ->
     hasClass = (c) -> YD.hasClass container, c
-    (hasClass "xforms-textarea") and (hasClass "xforms-mediatype-text-html")
+    (hasClass "xforms-textarea") and (hasClass "xforms-mediatype-text-html") and not(hasClass "xforms-static")
+
+# When in static mode, we never want to initialize the RTE, or do anything with it, so we let the base class Control handle it
+Page.registerControlConstructor Control, (container) ->
+    hasClass = (c) -> YD.hasClass container, c
+    (hasClass "xforms-textarea") and (hasClass "xforms-mediatype-text-html") and (hasClass "xforms-static")
+
 ORBEON.xforms.control.RTE = RTE

@@ -94,8 +94,8 @@ Event.onDOMReady () ->
         Events.clickEvent.subscribe ({target}) ->
             isLabel = YD.hasClass target, 'xforms-label'
             isHint = YD.hasClass target, 'xforms-hint'
-            isInGridTd = (YD.getAncestorByClassName target, "fr-grid-td")?
-            if (isLabel or isHint) and isInGridTd
+            isInGridThTd = $(target).closest('th, td').is('.fr-grid-th, .fr-grid-td')
+            if (isLabel or isHint) and isInGridThTd
               # Wait for Ajax response before showing editor to make sure the editor is bound to the current control
               Events.runOnNext Events.ajaxResponseProcessedEvent, ->
                   labelHint = target

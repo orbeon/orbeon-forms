@@ -764,7 +764,7 @@
             <messages>
                 <save-success>Документ сохранен успешно!</save-success>
                 <form-validation-error>Документ не сохранен! Пожалуйста, исправьте ошибки в форме и сохраните еще раз.</form-validation-error>
-                <upload-in-progress>[Please retry once the file upload has completed or has been canceled.]</upload-in-progress>
+                <upload-in-progress>Повторите попытку после окончания загрузки файла.</upload-in-progress>
                 <database-error>Нет соединения с базой данных. Свяжитесь с системным администратором.</database-error>
                 <clear-confirm-message>Вы уверены, что хотите очистить все поля? Несохраненные данные будут потеряны.</clear-confirm-message>
                 <submit-dialog-title>Форма отправлена</submit-dialog-title>
@@ -775,11 +775,11 @@
             </messages>
             <labels>
                 <save-document>Сохранить</save-document>
-                <save-as-document>[Save as…]</save-as-document>
+                <save-as-document>Сохр.копию</save-as-document>
                 <publish>Публиковать</publish>
                 <test>Тестировать</test>
                 <save-locally>Сохр.на диск</save-locally>
-                <save-offline>Сохр. офлайн</save-offline>
+                <save-offline>Сохр.офлайн</save-offline>
                 <submit-document>Отправить</submit-document>
                 <workflow-review>Просмотреть</workflow-review>
                 <workflow-edit>Править</workflow-edit>
@@ -812,8 +812,8 @@
                 <expand-all>Развернуть все</expand-all>
                 <show-content>Показать</show-content>
                 <hide-content>Скрыть</hide-content>
-                <captcha-label>[Captcha]</captcha-label>
-                <captcha-help>[The value you entered didn't match the image, please try again]</captcha-help>
+                <captcha-label>Защита от спама</captcha-label>
+                <captcha-help>Введенное значение не совпадает с картинкой. Попробуйте еще раз.</captcha-help>
             </labels>
             <view>
                 <explanation>

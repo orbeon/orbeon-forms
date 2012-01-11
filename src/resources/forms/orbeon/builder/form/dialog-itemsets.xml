@@ -63,9 +63,9 @@
                             <xforms:input ref="value" id="fb-itemset-value-input">
                                 <xforms:label ref="$form-resources/dialog-itemsets/value/label"/>
                                 <!-- Propose default value upon focus -->
-                                <xforms:action ev:event="DOMFocusIn" if="normalize-space() = ''">
-                                    <xforms:setvalue ref="." value="string-join(for $w in tokenize(normalize-space(../label[@xml:lang = $itemset-lang]), '\s+') return lower-case($w), '-')"/>
-                                </xforms:action>
+                                <!-- xforms:action ev:event="DOMFocusIn" if="normalize-space() = ''" -->
+                                    <!-- xforms:setvalue ref="." value="string-join(for $w in tokenize(normalize-space(../label[@xml:lang = $itemset-lang]), '\s+') return lower-case($w), '-')"/ -->
+                                <!-- /xforms:action -->
                             </xforms:input>
                         </xhtml:td>
                     </xhtml:tr>
@@ -163,6 +163,12 @@
 
                     <!-- Delete all xml:lang attributes -->
                     <xforms:delete nodeset="item/label/@xml:lang"/>
+
+                    <!-- Replace spaces to avoid bug with checkboxes not set in UI -->
+                    <xforms:action xxforms:iterate="item">
+                        <xforms:setvalue ref="context()/value" value="if(normalize-space(context()/value) = '') then string-join(for $w in tokenize(normalize-space(context()/label), '\s+') return lower-case($w), '-') else string-join(for $w in tokenize(normalize-space(context()/value), '\s+') return lower-case($w), '-')"/>
+                    </xforms:action>
+
                 </xforms:action>
 
             </xforms:action>

@@ -43,11 +43,11 @@
                             </xxforms:variable>
 
                             <!-- Access to XForms value and change event -->
-                            <xforms:input ref="$rtecontent" id="tinymce-input" class="xbl-fr-tinymce-xforms-input fr-hidden" style="display:none;">
+                            <xforms:textarea ref="$rtecontent" id="tinymce-input" class="xbl-fr-tinymce-xforms-input fr-hidden" style="display:none;">
                                 <xxforms:script id="xf-ch" ev:event="xforms-value-changed xxforms-iteration-moved">YAHOO.xbl.fr.Tinymce.instance(this).serverToClient();</xxforms:script>
                                 <xxforms:script id="xf-ro" ev:event="xforms-readonly">YAHOO.xbl.fr.Tinymce.instance(this).readonly();</xxforms:script>
                                 <xxforms:script id="xf-rw" ev:event="xforms-readwrite">YAHOO.xbl.fr.Tinymce.instance(this).readwrite();</xxforms:script>
-                            </xforms:input>
+                            </xforms:textarea>
                             <xhtml:a f:url-type="resource" sytle="display: none" href="/xbl/orbeon/tinymce/jscripts/tiny_mce.js" class="tinymce-base-url"/>
 		
 		                    <!-- 

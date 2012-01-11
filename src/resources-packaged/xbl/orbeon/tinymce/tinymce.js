@@ -16,7 +16,6 @@ YAHOO.xbl.fr.Tinymce.prototype = {
     myInputClass: 'xbl-fr-tinymce-xforms-input',
     myDivId: null,
     myEditor: null,
-	updateMask: false,
 
 	init: function(){
         // get to id attribute of our xbl's div element
@@ -40,24 +39,24 @@ YAHOO.xbl.fr.Tinymce.prototype = {
         this.myEditor.onInit.add(function(ed) { ed.setContent(xformsValue); });
         this.myEditor.onChange.add(_.bind(this.clientToServer, this));
 		
-		ORBEON.xforms.Events.ajaxResponseProcessedEvent.subscribe(_.bind(function() { this.updateMask = false; }, this));
-
         // render the component
 		this.myEditor.render();
 	},	
 	
 	// Send value in MCE to server
     clientToServer: function() {
-		this.updateMask = true;
     	ORBEON.xforms.Document.setValue(this.xformsInputElement.id, this.myEditor.getContent());
     },
     
 	// Update MCE with server value
     serverToClient: function() {
-		var xformsInputElement = YAHOO.util.Dom.getElementsByClassName(this.myInputClass, null, this.container)[0];
-        var newServerValue = ORBEON.xforms.Document.getValue(xformsInputElement.id);
-		if (! this.updateMask) this.myEditor.setContent(newServerValue);
-		this.visibleInputElement.disabled = YAHOO.util.Dom.hasClass(this.xformsInputElement, "xforms-readonly");		
+        var activeElementOutsideEditor = YAHOO.util.Dom.getAncestorBy(document.activeElement, _.bind(function(e) { return e == this.container; }, this)) == null;
+        if (activeElementOutsideEditor) {
+    		var xformsInputElement = YAHOO.util.Dom.getElementsByClassName(this.myInputClass, null, this.container)[0];
+            var newServerValue = ORBEON.xforms.Document.getValue(xformsInputElement.id);
+    		this.myEditor.setContent(newServerValue);
+    		this.visibleInputElement.disabled = YAHOO.util.Dom.hasClass(this.xformsInputElement, "xforms-readonly");
+        }
     },
 
     readonly: function() {

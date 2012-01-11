@@ -2783,10 +2783,10 @@
                 <label>Язык</label>
             </resources-language>
             <label>
-                <label>Название</label>
+                <label>Видно пользователю</label>
             </label>
             <value>
-                <label>Значение</label>
+                <label>Системное значение</label>
             </value>
         </dialog-itemsets>
         <dialog-http-services>

@@ -708,7 +708,7 @@
                 <summary-title>Общая информация</summary-title>
                 <row-number>№.</row-number>
                 <created>Дата создания</created>
-                <last-modified>Дата последнего изменения</last-modified>
+                <last-modified>Дата изменения</last-modified>
                 <selected>Выбрана</selected>
                 <refresh>Эта операция потребует перезагрузки страницы</refresh>
                 <toc>Оглавление</toc>

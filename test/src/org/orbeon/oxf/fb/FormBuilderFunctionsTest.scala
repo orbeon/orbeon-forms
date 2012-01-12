@@ -65,7 +65,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
 
         assert(name(formInstanceRoot(doc).parent.get) === "xforms:instance")
 
-        assert(findBodyElement(doc).getDisplayName === "xhtml:body")
+        assert(qname(findFRBodyElement(doc)) === (FR → "body"))
     }
 
     @Test def nameAndId() {
@@ -77,7 +77,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
         assert(controlName(bindId(control1)) === control1)
 
         // Find control element
-        assert(findControlByName(doc, control1).get.getDisplayName === "xforms:input")
+        assert(qname(findControlByName(doc, control1).get) === (XF → "input"))
         assert(hasId(findControlByName(doc, control1).get, controlId(control1)))
     }
 
@@ -85,7 +85,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
         val doc = getNewDoc()
 
         // Find bind element
-        assert(findBindByName(doc, control1).get.getDisplayName === "xforms:bind")
+        assert(qname(findBindByName(doc, control1).get) === (XF → "bind"))
         assert(hasId(findBindByName(doc, control1).get, bindId(control1)))
 
         // Check content of value holder
@@ -166,12 +166,12 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
         withActionAndDoc(getNewDoc()) { doc ⇒
             ensureBinds(doc, Seq(section1, control2), false)
 
-            assert(findBindByName(doc, control2).get.getDisplayName === "xforms:bind")
+            assert(qname(findBindByName(doc, control2).get) === (XF → "bind"))
             assert(hasId(findBindByName(doc, control2).get, bindId(control2)))
 
             ensureBinds(doc, Seq(section2, "grid-1", control3), false)
 
-            assert(findBindByName(doc, control3).get.getDisplayName === "xforms:bind")
+            assert(qname(findBindByName(doc, control3).get) === (XF → "bind"))
             assert(hasId(findBindByName(doc, control3).get, bindId(control3)))
         }
     }
@@ -189,7 +189,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
 
         val doc = getNewDoc()
 
-        val firstTd = findBodyElement(doc) \\ "*:grid" \\ "*:td" head
+        val firstTd = findFRBodyElement(doc) \\ "*:grid" \\ "*:td" head
 
         val containers = findAncestorContainers(firstTd)
 
@@ -202,7 +202,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
 
     // Select the first grid td (assume there is one)
     def selectFirstTd(doc: NodeInfo) {
-        selectTd(findBodyElement(doc) \\ "*:grid" \\ "*:td" head)
+        selectTd(findFRBodyElement(doc) \\ "*:grid" \\ "*:td" head)
     }
 
     @Test def insertControl() {

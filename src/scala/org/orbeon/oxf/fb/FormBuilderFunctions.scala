@@ -17,11 +17,19 @@ import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.XML._
 import org.orbeon.oxf.xml.TransformerUtils
+import org.orbeon.oxf.fr.FormRunner
+import org.orbeon.oxf.xforms.XFormsConstants.XFORMS_NAMESPACE_URI
+import org.orbeon.oxf.xml.XMLConstants.XHTML_NAMESPACE_URI
 
 /**
  * Form Builder functions.
  */
 object FormBuilderFunctions {
+
+    val XH = XHTML_NAMESPACE_URI
+    val XF = XFORMS_NAMESPACE_URI
+    val FR = FormRunner.NS
+    val FB = "http://orbeon.org/oxf/xml/form-builder"
 
     // Get an id based on a name
     // NOTE: The idea as of 2011-06-21 is that we support reading indiscriminately the -control, -grid and -section
@@ -36,35 +44,35 @@ object FormBuilderFunctions {
     def tdId(tdName: String) = tdName + "-td"
 
     // Get the body
-    def findBodyElement(doc: NodeInfo) = doc.getDocumentRoot \ * \ "*:body" head
+    def findFRBodyElement(inDoc: NodeInfo) = inDoc.getDocumentRoot \ * \ "*:body" \\ (FR → "body") head
 
     // Get the form model
-    def findModelElement(doc: NodeInfo) = doc.getDocumentRoot \ * \ "*:head" \ "*:model" filter (hasId(_, "fr-form-model")) head
+    def findModelElement(inDoc: NodeInfo) = inDoc.getDocumentRoot \ * \ "*:head" \ "*:model" filter (hasId(_, "fr-form-model")) head
 
     // Find an xforms:instance element
-    def instanceElement(doc: NodeInfo, id: String) =
-        findModelElement(doc) \ "*:instance" filter (hasId(_, id)) headOption
+    def instanceElement(inDoc: NodeInfo, id: String) =
+        findModelElement(inDoc) \ "*:instance" filter (hasId(_, id)) headOption
 
     // Find an inline instance's root element
-    def inlineInstanceRootElement(doc: NodeInfo, id: String) =
-        instanceElement(doc, id).toSeq \ * headOption
+    def inlineInstanceRootElement(inDoc: NodeInfo, id: String) =
+        instanceElement(inDoc, id).toSeq \ * headOption
 
     // Get the root element of instances
-    def formInstanceRoot(doc: NodeInfo) = inlineInstanceRootElement(doc, "fr-form-instance").get
+    def formInstanceRoot(inDoc: NodeInfo) = inlineInstanceRootElement(inDoc, "fr-form-instance").get
     def formResourcesRoot = asNodeInfo(model("fr-form-model").get.getVariable("resources"))
-    def templateRoot(doc: NodeInfo, templateName: String) = inlineInstanceRootElement(doc, templateId(templateName))
+    def templateRoot(inDoc: NodeInfo, templateName: String) = inlineInstanceRootElement(inDoc, templateId(templateName))
 
     // Find the next available id for a given token
-    def nextId(doc: NodeInfo, token: String) = nextIds(doc, token, 1).head
+    def nextId(inDoc: NodeInfo, token: String) = nextIds(inDoc, token, 1).head
 
     // Find a series of next available ids for a given token
-    def nextIds(doc: NodeInfo, token: String, count: Int) = {
+    def nextIds(inDoc: NodeInfo, token: String, count: Int) = {
 
         val prefix = token + "-"
         val suffix = "-" + token
 
-        val instance = formInstanceRoot(doc)
-        val root = doc.getDocumentRoot
+        val instance = formInstanceRoot(inDoc)
+        val root = inDoc.getDocumentRoot
 
         // Start with the number of element the given suffix
         val initialGuess = 1 + (root \\ * flatMap (e ⇒ attValueOption(e \@ "id")) filter (_.endsWith(suffix)) size)

@@ -149,74 +149,76 @@ object ToolboxOps {
     }
 
     // Insert a new section
-    def insertNewSection(doc: NodeInfo) {
+    def insertNewSection(inDoc: NodeInfo) {
 
-        findSelectedTd(doc) match {
-            case Some(currentTd) ⇒ // A td is selected
+        val (into, after) =
+            findSelectedTd(inDoc) match {
+                case Some(currentTd) ⇒ // A td is selected
 
-                val containers = findAncestorContainers(currentTd)
+                    val containers = findAncestorContainers(currentTd)
 
-                // We must always have a parent (grid) and grandparent (possibly fr:body) container
-                assert(containers.size >= 2)
+                    // We must always have a parent (grid) and grandparent (possibly fr:body) container
+                    assert(containers.size >= 2)
 
-                // Idea: section is inserted after current section/tabview, NOT within current section. If there is no
-                // current section/tabview, the section is inserted after the current grid.
-                val grandParentContainer = containers.tail.head // section/tab, body
-                val greatGrandParentContainerOption = containers.tail.tail.headOption
+                    // Idea: section is inserted after current section/tabview, NOT within current section. If there is no
+                    // current section/tabview, the section is inserted after the current grid.
+                    val grandParentContainer = containers.tail.head // section/tab, body
+                    val greatGrandParentContainerOption = containers.tail.tail.headOption
 
-                val (into, after) =
+
                     greatGrandParentContainerOption match {
                         case Some(greatGrandParentContainer) ⇒ (greatGrandParentContainer, Some(grandParentContainer))
                         case None ⇒ (grandParentContainer, grandParentContainer \ * headOption)
                     }
 
-                val newSectionName = "section-" + nextId(doc, "section")
-                val precedingSectionName = after flatMap (getControlNameOption(_))
+                case _ ⇒ // No td is selected, add top-level section
+                    val frBody = findFRBodyElement(inDoc)
+                    (frBody, childrenContainers(frBody) lastOption)
+            }
 
-                val sectionTemplate: NodeInfo =
-                    <fb:section id={sectionId(newSectionName)} bind={bindId(newSectionName)} edit-ref=""
-                                xmlns:xhtml="http://www.w3.org/1999/xhtml"
-                                xmlns:xforms="http://www.w3.org/2002/xforms"
-                                xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-                                xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
-                        <xforms:label ref={"$form-resources/" + newSectionName + "/label"}/>
-                        <xforms:help ref={"$form-resources/" + newSectionName + "/help"}/>
-                        <fr:grid edit-ref="">
-                            <xhtml:tr>
-                                <xhtml:td id={tdId("td-" + nextId(doc, "td"))}/>
-                            </xhtml:tr>
-                        </fr:grid>
-                    </fb:section>
+        val newSectionName = "section-" + nextId(inDoc, "section")
+        val precedingSectionName = after flatMap (getControlNameOption(_))
 
-                val newSectionElement = insert(into = into, after = after.toSeq, origin = sectionTemplate).head
+        val sectionTemplate: NodeInfo =
+            <fb:section id={sectionId(newSectionName)} bind={bindId(newSectionName)} edit-ref=""
+                        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+                        xmlns:xforms="http://www.w3.org/2002/xforms"
+                        xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+                        xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+                <xforms:label ref={"$form-resources/" + newSectionName + "/label"}/>
+                <xforms:help ref={"$form-resources/" + newSectionName + "/help"}/>
+                <fr:grid edit-ref="">
+                    <xhtml:tr>
+                        <xhtml:td id={tdId("td-" + nextId(inDoc, "td"))}/>
+                    </xhtml:tr>
+                </fr:grid>
+            </fb:section>
 
-                // Create and insert holders
-                val resourceHolder = {
+        val newSectionElement = insert(into = into, after = after.toSeq, origin = sectionTemplate).head
 
-                    val findUntitledSectionMessage = {
-                        val fbResources = asNodeInfo(model("fr-resources-model").get.getVariable("fr-form-resources"))
-                        evalOne(fbResources, "template/untitled-section/string()")
-                    }
+        // Create and insert holders
+        val resourceHolder = {
 
-                    val elementContent = Seq(elementInfo("label", findUntitledSectionMessage), elementInfo("help"))
-                    elementInfo(newSectionName, elementContent)
-                }
+            val findUntitledSectionMessage = {
+                val fbResources = asNodeInfo(model("fr-resources-model").get.getVariable("fr-form-resources"))
+                evalOne(fbResources, "template/untitled-section/string()")
+            }
 
-                insertHolders(newSectionElement, elementInfo(newSectionName), resourceHolder, precedingSectionName)
-
-                // Insert the bind element
-                ensureBinds(doc, findContainerNames(newSectionElement) :+ newSectionName, isCustomInstance)
-
-                // Select first grid cell
-                selectTd(newSectionElement \\ "*:td" head)
-
-                // TODO: Open label editor for newly inserted section
-
-                debugDumpDocument("insert new section", doc)
-
-            case _ ⇒ // No td is selected, add top-level section
-                // TODO
+            val elementContent = Seq(elementInfo("label", findUntitledSectionMessage), elementInfo("help"))
+            elementInfo(newSectionName, elementContent)
         }
+
+        insertHolders(newSectionElement, elementInfo(newSectionName), resourceHolder, precedingSectionName)
+
+        // Insert the bind element
+        ensureBinds(inDoc, findContainerNames(newSectionElement) :+ newSectionName, isCustomInstance)
+
+        // Select first grid cell
+        selectTd(newSectionElement \\ "*:td" head)
+
+        // TODO: Open label editor for newly inserted section
+
+        debugDumpDocument("insert new section", inDoc)
     }
 
     // Insert a new repeat

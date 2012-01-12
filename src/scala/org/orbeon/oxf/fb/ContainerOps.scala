@@ -18,22 +18,19 @@ import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.scaxon.XML._
 import org.orbeon.oxf.fb.ControlOps._
 import org.orbeon.oxf.fb.GridOps._
-import org.orbeon.oxf.fr.FormRunner
-import org.orbeon.oxf.xforms.XFormsConstants.XFORMS_NAMESPACE_URI
+import FormBuilderFunctions._
 
 object ContainerOps {
-
-    val FormBuilderNS = "http://orbeon.org/oxf/xml/form-builder"
 
     // Hardcoded list of FB controls we know can contain others
     // TODO: "fr:tab" (special because "fr:tabview/fr:tab" are always combined)
     val ContainerElementQNames = Set(
-        FormRunner.NS → "section",
-        FormBuilderNS → "section",
-        FormRunner.NS → "grid",
-        FormRunner.NS → "body",
-        FormRunner.NS → "repeat",       // for legacy FB
-        XFORMS_NAMESPACE_URI → "repeat" // for legacy FB
+        FR → "section",
+        FB → "section",
+        FR → "grid",
+        FR → "body",
+        FR → "repeat", // for legacy FB
+        XF → "repeat"  // for legacy FB
     )
 
     val ContainerElementTest = ContainerElementQNames map (pairToTest(_)) reduce (_ || _)
@@ -63,14 +60,15 @@ object ContainerOps {
                 None
         }
 
+    // A container's children containers
+    def childrenContainers(container: NodeInfo) =
+        container \ * filter (e ⇒ ContainerElementQNames(qname(e)))
+
     // Delete the entire container and contained controls
     def deleteContainer(container: NodeInfo) = {
 
         // Find the new td to select if we are removing the currently selected td
         val newTdToSelect = findNewTdToSelect(container, container \\ "*:td")
-
-        def childrenContainers(container: NodeInfo) =
-            container \ * filter (e ⇒ ContainerElementQNames(qname(e)))
 
         def recurse(container: NodeInfo): Seq[NodeInfo] = {
             // Go depth-first so we delete containers after all their content has been deleted

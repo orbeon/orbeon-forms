@@ -76,7 +76,7 @@ object ControlOps {
 
     // Find a control (including grids and sections) element by id
     def findControlById(doc: NodeInfo, id: String) =
-        findBodyElement(doc) \\ * filter (hasId(_, id)) headOption
+        findFRBodyElement(doc) \\ * filter (hasId(_, id)) headOption
 
     // Find control holder
     def findDataHolder(doc: NodeInfo, controlName: String) =
@@ -367,7 +367,7 @@ object ControlOps {
 
     // Get all control names by inspecting all elements with an id that converts to a valid name
     def getAllControlNames(doc: NodeInfo) =
-        findBodyElement(doc) \\ * flatMap
+        findFRBodyElement(doc) \\ * flatMap
             (e ⇒ attValueOption(e \@ "id")) flatMap
                 (id ⇒ Option(controlName(id)))
 

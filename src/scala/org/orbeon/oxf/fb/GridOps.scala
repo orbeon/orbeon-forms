@@ -295,10 +295,10 @@ object GridOps {
         Option(asNodeInfo(model("fr-form-model").get.getVariable("current-td")))
 
     // Find the currently selected grid td if any
-    def findSelectedTd(doc: NodeInfo) = selectedCellId match {
+    def findSelectedTd(inDoc: NodeInfo) = selectedCellId match {
         case Some(selectedCell) ⇒
             val tdId = selectedCell.stringValue
-            findBodyElement(doc) \\ "*:grid" \\ "*:td" filter (_ \@ "id" === tdId) headOption
+            findFRBodyElement(inDoc) \\ "*:grid" \\ "*:td" filter (_ \@ "id" === tdId) headOption
         case _ ⇒ // legacy FB
             legacySelectedCell
     }
@@ -461,7 +461,7 @@ object GridOps {
         // 1. Annotate all the grid tds of the given document with unique ids, if they don't have them already
 
         // All grid tds with no existing id
-        val gridTds = findBodyElement(doc) \\ "*:grid" \\ "*:td" filterNot (td ⇒ exists(td \@ "id"))
+        val gridTds = findFRBodyElement(doc) \\ "*:grid" \\ "*:td" filterNot (td ⇒ exists(td \@ "id"))
 
         // Get as many fresh ids as there are tds
         val ids = nextIds(doc, "td", gridTds.size).toIterator
@@ -470,7 +470,7 @@ object GridOps {
         gridTds foreach (ensureAttribute(_, "id", tdId("td-" + ids.next())))
 
         // 2. Select the first td if any
-        findBodyElement(doc) \\ "*:grid" \\ "*:td" take 1 foreach (selectTd(_))
+        findFRBodyElement(doc) \\ "*:grid" \\ "*:td" take 1 foreach (selectTd(_))
     }
 
     def moveRowUp(td: NodeInfo) {

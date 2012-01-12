@@ -165,8 +165,10 @@ object GridOps {
 
         val posy = tr precedingSibling "*:tr" size
         val rowCells = allRowCells(posy)
-//        val nextRow = tr followingSibling "*:tr" headOption
         val nextRowCells = if (allRowCells.size > posy + 1) Some(allRowCells(posy + 1)) else None
+
+        // Find the new td to select if we are removing the currently selected td
+        val newTdToSelect = findNewTdToSelect(tr)
 
         // Decrement rowspans if needed
         rowCells.zipWithIndex foreach {
@@ -187,6 +189,9 @@ object GridOps {
 
         // Delete row and its content
         delete(tr)
+
+        // Adjust selected td if needed
+        newTdToSelect foreach (selectTd(_))
 
         debugDumpDocument("delete row", tr)
     }

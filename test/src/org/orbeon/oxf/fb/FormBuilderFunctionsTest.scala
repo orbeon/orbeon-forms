@@ -35,16 +35,19 @@ import org.orbeon.oxf.xforms.{XFormsStaticState, XFormsModel, XFormsInstance, XF
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.xml.TransformerUtils
 import collection.JavaConverters._
-import org.orbeon.saxon.om.{SequenceIterator, EmptyIterator, NodeInfo}
 import org.orbeon.saxon.dom4j.{NodeWrapper, DocumentWrapper}
+import org.orbeon.saxon.om.{SequenceIterator, EmptyIterator, NodeInfo}
 
 class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit with MockitoSugar {
 
+    val TemplateDoc = "oxf:/forms/orbeon/builder/form/template.xml"
+    val SectionsGridsDoc = "oxf:/org/orbeon/oxf/fb/template-with-sections-grids.xhtml"
+    
     def getDocument(documentURL: String) = ProcessorUtils.createDocumentFromURL(documentURL, null)
 
-    private def getNewDoc = {
+    def getNewDoc(url: String = TemplateDoc) = {
         // Make a copy because the document is cached behind the scene, and we don't want the original to be mutated
-        val template = Dom4jUtils.createDocumentCopyElement(getDocument("oxf:/forms/orbeon/builder/form/template.xml").getRootElement)
+        val template = Dom4jUtils.createDocumentCopyElement(getDocument(url).getRootElement)
         new DocumentWrapper(template, null, XPathCache.getGlobalConfiguration)
     }
 
@@ -55,7 +58,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
     private val section2 = "section-2"
 
     @Test def modelInstanceBodyElements() {
-        val doc = getNewDoc
+        val doc = getNewDoc()
 
         assert(findModelElement(doc).getDisplayName === "xforms:model")
         assert(hasId(findModelElement(doc), "fr-form-model"))
@@ -67,7 +70,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
 
     @Test def nameAndId() {
 
-        val doc = getNewDoc
+        val doc = getNewDoc()
 
         // Basic functions
         assert(controlName(controlId(control1)) === control1)
@@ -79,7 +82,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
     }
 
     @Test def controlElements() {
-        val doc = getNewDoc
+        val doc = getNewDoc()
 
         // Find bind element
         assert(findBindByName(doc, control1).get.getDisplayName === "xforms:bind")
@@ -94,7 +97,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
     }
 
     @Test def sectionName() {
-        val doc = getNewDoc
+        val doc = getNewDoc()
 
         assert(findSectionName(doc, control1).get === section1)
         assert(getControlNameOption(doc \\ "*:section" head).get === section1)
@@ -152,8 +155,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
         actionInterpreter
     }
 
-    def withActionAndDoc(body: NodeInfo ⇒ Any) {
-        val doc = getNewDoc
+    def withActionAndDoc(doc: DocumentWrapper)(body: NodeInfo ⇒ Any) {
         scalaAction(mockActionInterpreter(doc)) {
             initializeGrids(doc)
             body(doc)
@@ -161,7 +163,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
     }
 
     @Test def newBinds() {
-        withActionAndDoc { doc ⇒
+        withActionAndDoc(getNewDoc()) { doc ⇒
             ensureBinds(doc, Seq(section1, control2), false)
 
             assert(findBindByName(doc, control2).get.getDisplayName === "xforms:bind")
@@ -175,7 +177,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
     }
 
     @Test def findNextId() {
-        val doc = getNewDoc
+        val doc = getNewDoc()
 
         assert(nextId(doc, "control") === 2)
         assert(nextId(doc, "section") === 2)
@@ -185,7 +187,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
 
     @Test def containers() {
 
-        val doc = getNewDoc
+        val doc = getNewDoc()
 
         val firstTd = findBodyElement(doc) \\ "*:grid" \\ "*:td" head
 
@@ -204,7 +206,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
     }
 
     @Test def insertControl() {
-        withActionAndDoc { doc ⇒
+        withActionAndDoc(getNewDoc()) { doc ⇒
 
             val binding = <binding element="xforms|input" xmlns:xforms="http://www.w3.org/2002/xforms"/>
 
@@ -238,7 +240,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
     }
 
     @Test def insertRepeat() {
-        withActionAndDoc { doc ⇒
+        withActionAndDoc(getNewDoc()) { doc ⇒
 
             // Insert a new repeated grid after the current grid
             selectFirstTd(doc)
@@ -415,6 +417,85 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
         val actual = grids map (precedingControlNameInSectionForGrid(_, true))
 
         assert(actual === expected)
+    }
+    
+    def getTd(doc:NodeInfo,  id: String) = doc \\ "*:td" find (hasId(_, id)) head
+    
+    @Test def selectedTdAfterDeletedRow() = {
+
+        // A few before/after ids of selected tds
+        val beforeAfter = Seq(
+            "1111" → "1121",    // first td
+            "2222" → "2213",    // middle td
+            "3333" → "3323",    // last td
+            "2111" → "1333"     // first td of grid/section
+        )
+        
+        def deleteRowCheckSelectedTd(beforeTdId: String, afterTdId: String) =
+            withActionAndDoc(getNewDoc(SectionsGridsDoc)) { doc ⇒
+                val td = getTd(doc, beforeTdId)
+
+                selectTd(td)
+                deleteRow(td.parent.get)
+    
+                assert(findSelectedTd(doc) === Some(getTd(doc, afterTdId)))
+            }
+
+        // Test all
+        for ((beforeTdId, afterTdId) ← beforeAfter)
+            deleteRowCheckSelectedTd(beforeTdId, afterTdId)
+    }
+
+    @Test def selectedTdAfterDeletedGrid() = {
+
+        // A few before/after ids of selected tds
+        val beforeAfter = Seq(
+            "1111" → "1211",    // first td
+            "2222" → "2133",    // middle td
+            "3333" → "3233",    // last td
+            "2111" → "1333"     // first td of grid/section
+        )
+
+        def deleteGridCheckSelectedTd(beforeTdId: String, afterTdId: String) =
+            withActionAndDoc(getNewDoc(SectionsGridsDoc)) { doc ⇒
+                val td = getTd(doc, beforeTdId)
+                val grid = getContainingGridOrRepeat(td)
+
+                selectTd(td)
+                deleteGrid(grid)
+
+                assert(findSelectedTd(doc) === Some(getTd(doc, afterTdId)))
+            }
+
+        // Test all
+        for ((beforeTdId, afterTdId) ← beforeAfter)
+            deleteGridCheckSelectedTd(beforeTdId, afterTdId)
+    }
+
+    @Test def selectedTdAfterDeletedSection() = {
+
+        // A few before/after ids of selected tds
+        val beforeAfter = Seq(
+            "1111" → "2111",    // first td
+            "2222" → "1333",    // middle td
+            "3333" → "2333",    // last td
+            "2111" → "1333"     // first td of grid/section
+        )
+
+        def deleteSectionCheckSelectedTd(beforeTdId: String, afterTdId: String) =
+            withActionAndDoc(getNewDoc(SectionsGridsDoc)) { doc ⇒
+                val td = getTd(doc, beforeTdId)
+                val section = findAncestorContainers(getContainingGridOrRepeat(td)) head
+
+                selectTd(td)
+                deleteSection(section)
+
+                assert(findSelectedTd(doc) === Some(getTd(doc, afterTdId)))
+            }
+
+        // Test all
+        for ((beforeTdId, afterTdId) ← beforeAfter)
+            deleteSectionCheckSelectedTd(beforeTdId, afterTdId)
     }
 
 //    @Test def insertHolders() {

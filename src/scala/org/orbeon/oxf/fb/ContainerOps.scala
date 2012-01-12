@@ -17,6 +17,7 @@ import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.scaxon.XML._
 import org.orbeon.oxf.fb.ControlOps._
+import org.orbeon.oxf.fb.GridOps._
 import org.orbeon.oxf.fr.FormRunner
 import org.orbeon.oxf.xforms.XFormsConstants.XFORMS_NAMESPACE_URI
 
@@ -49,8 +50,24 @@ object ContainerOps {
     def findContainerNames(descendant: NodeInfo): Seq[String] =
         findAncestorContainers(descendant).reverse map (getControlNameOption(_)) flatten
 
+    // Find the new td to select if we are removing the currently selected td
+    def findNewTdToSelect(container: NodeInfo) = {
+
+        val containerTds = container \\ "*:td"
+
+        findSelectedTd(container) match {
+            case Some(selectedTd) if containerTds contains selectedTd ⇒
+                precedingTd(containerTds.head) orElse followingTd(containerTds.last)
+            case _ ⇒
+                None
+        }
+    }
+
     // Delete the entire container and contained controls
     def deleteContainer(container: NodeInfo) = {
+
+        // Find the new td to select if we are removing the currently selected td
+        val newTdToSelect = findNewTdToSelect(container)
 
         def childrenContainers(container: NodeInfo) =
             container \ * filter (e ⇒ ContainerElementQNames(qname(e)))
@@ -67,6 +84,9 @@ object ContainerOps {
 
         // Start with top-level container and delete everything that was returned
         recurse(container) foreach (delete(_))
+
+        // Adjust selected td if needed
+        newTdToSelect foreach (selectTd(_))
     }
 
     // Find all siblings of the given element with the given name, excepting the given element
@@ -126,5 +146,20 @@ object ContainerOps {
 
             case _ ⇒
         }
+    }
+    // Return a td's preceding td in the hierarchy of containers
+    def precedingTd(td: NodeInfo) = {
+        val preceding = td preceding "*:td"
+        val precedingInBody = preceding intersect (findAncestorContainers(td).last descendant "*:td")
+
+        precedingInBody headOption
+    }
+
+    // Return a td's following td in the hierarchy of containers
+    def followingTd(td: NodeInfo) = {
+        val following = td following "*:td"
+        val followingInBody = following intersect (findAncestorContainers(td).last descendant "*:td")
+
+        followingInBody headOption
     }
 }

@@ -32,6 +32,7 @@
     <xbl:binding id="fr-databound-select1" element="fr|databound-select1">
         <fb:metadata>
             <fb:display-name lang="en">Data Dropdown</fb:display-name>
+            <fb:display-name lang="ru">Список из веб-сервиса</fb:display-name>
             <fb:icon lang="en">
                 <fb:small-icon>/forms/orbeon/builder/images/dropdown.png</fb:small-icon>
                 <fb:large-icon>/forms/orbeon/builder/images/dropdown.png</fb:large-icon>
@@ -53,8 +54,10 @@
                 <xforms:input ref="@resource">
                     <xforms:label lang="en">Resource URI</xforms:label>
                     <xforms:label lang="fr">URI de la ressource</xforms:label>
+                    <xforms:label lang="ru">URI ресурса</xforms:label>
                     <xforms:hint lang="en">HTTP URI returning data used to populate the dropdown</xforms:hint>
                     <xforms:hint lang="fr">URI HTTP auquel réside le service</xforms:hint>
+                    <xforms:hint lang="ru">HTTP URI сервиса, данными из которого будет заполнен выпадающий список</xforms:hint>
                 </xforms:input>
                 <xforms:input ref="xforms:itemset/@ref">
                     <xforms:label ref="$resources/dialog-actions/items/label"/>

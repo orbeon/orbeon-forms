@@ -419,7 +419,27 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
         assert(actual === expected)
     }
     
-    def getTd(doc:NodeInfo,  id: String) = doc \\ "*:td" find (hasId(_, id)) head
+    def assertSelectedTdAfterDelete(beforeAfter: Seq[(String, String)])(delete: NodeInfo ⇒ Any) {
+
+        // For before/after td ids: create a doc, call the delete function, and assert the resulting selected td
+        def deleteRowCheckSelectedTd(beforeTdId: String, afterTdId: String) =
+            withActionAndDoc(getNewDoc(SectionsGridsDoc)) { doc ⇒
+
+                def getTd(id: String) = doc \\ "*:td" find (hasId(_, id)) head
+
+                val beforeTd = getTd(beforeTdId)
+                selectTd(beforeTd)
+                delete(beforeTd)
+
+                val actualSelectedId = findSelectedTd(doc) map (_ \@ "id" stringValue)
+                
+                assert(actualSelectedId === Some(afterTdId))
+            }
+
+        // Test all
+        for ((beforeTdId, afterTdId) ← beforeAfter)
+            deleteRowCheckSelectedTd(beforeTdId, afterTdId)
+    }
     
     @Test def selectedTdAfterDeletedRow() = {
 
@@ -430,20 +450,25 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
             "3333" → "3323",    // last td
             "2111" → "1333"     // first td of grid/section
         )
+
+        assertSelectedTdAfterDelete(beforeAfter) { td ⇒
+            deleteRow(td.parent.get)
+        }
+    }
+
+    @Test def selectedTdAfterDeletedCol() = {
         
-        def deleteRowCheckSelectedTd(beforeTdId: String, afterTdId: String) =
-            withActionAndDoc(getNewDoc(SectionsGridsDoc)) { doc ⇒
-                val td = getTd(doc, beforeTdId)
+        // A few before/after ids of selected tds
+        val beforeAfter = Seq(
+            "1111" → "1112",    // first td
+            "2222" → "2221",    // middle td
+            "3333" → "3332",    // last td
+            "2111" → "1333"     // first td of grid/section
+        )
 
-                selectTd(td)
-                deleteRow(td.parent.get)
-    
-                assert(findSelectedTd(doc) === Some(getTd(doc, afterTdId)))
-            }
-
-        // Test all
-        for ((beforeTdId, afterTdId) ← beforeAfter)
-            deleteRowCheckSelectedTd(beforeTdId, afterTdId)
+        assertSelectedTdAfterDelete(beforeAfter) { td ⇒
+            deleteCol(getColTds(td) head)
+        }
     }
 
     @Test def selectedTdAfterDeletedGrid() = {
@@ -456,20 +481,9 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
             "2111" → "1333"     // first td of grid/section
         )
 
-        def deleteGridCheckSelectedTd(beforeTdId: String, afterTdId: String) =
-            withActionAndDoc(getNewDoc(SectionsGridsDoc)) { doc ⇒
-                val td = getTd(doc, beforeTdId)
-                val grid = getContainingGridOrRepeat(td)
-
-                selectTd(td)
-                deleteGrid(grid)
-
-                assert(findSelectedTd(doc) === Some(getTd(doc, afterTdId)))
-            }
-
-        // Test all
-        for ((beforeTdId, afterTdId) ← beforeAfter)
-            deleteGridCheckSelectedTd(beforeTdId, afterTdId)
+        assertSelectedTdAfterDelete(beforeAfter) { td ⇒
+            deleteGrid(getContainingGridOrRepeat(td))
+        }
     }
 
     @Test def selectedTdAfterDeletedSection() = {
@@ -482,20 +496,9 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
             "2111" → "1333"     // first td of grid/section
         )
 
-        def deleteSectionCheckSelectedTd(beforeTdId: String, afterTdId: String) =
-            withActionAndDoc(getNewDoc(SectionsGridsDoc)) { doc ⇒
-                val td = getTd(doc, beforeTdId)
-                val section = findAncestorContainers(getContainingGridOrRepeat(td)) head
-
-                selectTd(td)
-                deleteSection(section)
-
-                assert(findSelectedTd(doc) === Some(getTd(doc, afterTdId)))
-            }
-
-        // Test all
-        for ((beforeTdId, afterTdId) ← beforeAfter)
-            deleteSectionCheckSelectedTd(beforeTdId, afterTdId)
+        assertSelectedTdAfterDelete(beforeAfter) { td ⇒
+            deleteSection(findAncestorContainers(getContainingGridOrRepeat(td)) head)
+        }
     }
 
 //    @Test def insertHolders() {

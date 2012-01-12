@@ -167,8 +167,11 @@ object GridOps {
         val rowCells = allRowCells(posy)
         val nextRowCells = if (allRowCells.size > posy + 1) Some(allRowCells(posy + 1)) else None
 
+        // Find all tds to delete
+        val tdsToDelete = tr \\ "*:td"
+
         // Find the new td to select if we are removing the currently selected td
-        val newTdToSelect = findNewTdToSelect(tr)
+        val newTdToSelect = findNewTdToSelect(tr, tdsToDelete)
 
         // Decrement rowspans if needed
         rowCells.zipWithIndex foreach {
@@ -185,7 +188,7 @@ object GridOps {
         }
 
         // Delete all controls in the row
-        tr \ "*:td" foreach (deleteCellContent(_))
+        tdsToDelete foreach (deleteCellContent(_))
 
         // Delete row and its content
         delete(tr)
@@ -243,6 +246,14 @@ object GridOps {
         }
     }
 
+    // Find a column's tds
+    def getColTds(td: NodeInfo) = {
+        val rows = getContainingGridOrRepeat(td) \ "*:tr"
+        val (x, _) = tdCoordinates(td)
+
+        rows map (row ⇒ (row \ "*:td")(x))
+    }
+
     // Insert a column and contained controls
     def deleteCol(firstRowTd: NodeInfo) {
 
@@ -250,12 +261,20 @@ object GridOps {
         val allRowCells = getAllRowCells(grid)
         val pos = firstRowTd precedingSibling "*:td" size
 
-        // Delete the concrete td at this column position in each row
+        // Find all tds to delete
+        val tdsToDelete = allRowCells map (_(pos)) filterNot (_.missing) map (_.td)
 
-        allRowCells map (_(pos)) filterNot (_.missing) foreach { cell ⇒
-            deleteCellContent(cell.td)
-            delete(cell.td)
+        // Find the new td to select if we are removing the currently selected td
+        val newTdToSelect = findNewTdToSelect(firstRowTd, tdsToDelete)
+
+        // Delete the concrete td at this column position in each row
+        tdsToDelete foreach { td ⇒
+            deleteCellContent(td)
+            delete(td)
         }
+
+        // Adjust selected td if needed
+        newTdToSelect foreach (selectTd(_))
 
         debugDumpDocument("delete col", grid)
     }
@@ -263,9 +282,10 @@ object GridOps {
     def controlsInCol(firstRowTd: NodeInfo) = {
         val grid = getContainingGridOrRepeat(firstRowTd)
         val allRowCells = getAllRowCells(grid)
-        val pos = firstRowTd precedingSibling "*:td" size
+        
+        val (x, _) = tdCoordinates(firstRowTd: NodeInfo, allRowCells: Seq[Seq[Cell]])
 
-        allRowCells map (_(pos)) filterNot (_.missing) filter (cell ⇒ hasChildren(cell.td)) size
+        allRowCells map (_(x)) filterNot (_.missing) filter (cell ⇒ hasChildren(cell.td)) size
     }
 
     private def selectedCellId =
@@ -290,11 +310,10 @@ object GridOps {
             setvalue(selectedCell, newTd \@ "id" stringValue)
         case _ ⇒
             // Legacy FB
-            val allRowCells = getAllRowCells(getContainingGridOrRepeat(newTd))
-            val (posx, posy) = getTdPosition(newTd, allRowCells)
+            val (x, y) = tdCoordinates(newTd)
 
-            setindex("fb-section-content-grid-tr-repeat", posy + 1)
-            setindex("fb-section-content-grid-td-repeat", posx + 1)
+            setindex("fb-section-content-grid-tr-repeat", y + 1)
+            setindex("fb-section-content-grid-td-repeat", x + 1)
     }
 
     // Try to ensure that there is an empty td after the current location, inserting a new row if possible
@@ -375,34 +394,38 @@ object GridOps {
             (template ⇒ ensureAttribute(template, "id", templateId(newName)))
 
     // Get the x/y position of a td given Cell information
-    private def getTdPosition(td: NodeInfo, cells: Seq[Seq[Cell]]) = {
+    private def tdCoordinates(td: NodeInfo, cells: Seq[Seq[Cell]]): (Int, Int) = {
 
         // Search rows first, then cols
         // Another solution would be to store the position directly into Cell
 
-        val posy = td.parent.get precedingSibling "*:tr" size
-        val posx = cells(posy) indexWhere (_.td isSameNodeInfo td)
+        val y = td.parent.get precedingSibling "*:tr" size
+        val x = cells(y) indexWhere (_.td == td)
 
-        (posx, posy)
+        (x, y)
     }
+
+    // Get the x/y position of a td given Cell information
+    def tdCoordinates(td: NodeInfo): (Int, Int) =
+        tdCoordinates(td, getAllRowCells(getContainingGridOrRepeat(td)))
 
     // Whether there will be controls to delete if the cell is expanded
     def expandCellTouchesControl(td: NodeInfo): Boolean = {
         val allRowCells = getAllRowCells(getContainingGridOrRepeat(td))
-        val (posx, posy) = getTdPosition(td, allRowCells)
+        val (x, y) = tdCoordinates(td, allRowCells)
 
-        val cell = allRowCells(posy)(posx)
+        val cell = allRowCells(y)(x)
 
-        hasChildren(allRowCells(posy + cell.rowspan)(posx).td)
+        hasChildren(allRowCells(y + cell.rowspan)(x).td)
     }
 
     // Vertically expand the given cell
     def expandCell(td: NodeInfo) {
         val allRowCells  = getAllRowCells(getContainingGridOrRepeat(td))
-        val (posx, posy) = getTdPosition(td, allRowCells)
+        val (x, y) = tdCoordinates(td, allRowCells)
 
-        val cell = allRowCells(posy)(posx)
-        val cellBelow = allRowCells(posy + cell.rowspan)(posx)
+        val cell = allRowCells(y)(x)
+        val cellBelow = allRowCells(y + cell.rowspan)(x)
 
         // Increment rowspan
         cell.originalRowspan += cellBelow.originalRowspan
@@ -417,19 +440,19 @@ object GridOps {
         val grid = getContainingGridOrRepeat(td)
         val allRowCells  = getAllRowCells(grid)
 
-        val (posx, posy) = getTdPosition(td, allRowCells)
+        val (x, y) = tdCoordinates(td, allRowCells)
 
-        val cell = allRowCells(posy)(posx)
+        val cell = allRowCells(y)(x)
 
         // Decrement rowspan attribute
         cell.originalRowspan -= 1
 
         // Insert new td
-        val posyToInsertInto = posy + cell.rowspan - 1
+        val posyToInsertInto = y + cell.rowspan - 1
         val rowBelow = allRowCells(posyToInsertInto)
 
         val trToInsertInto = grid \ "*:tr" apply posyToInsertInto
-        val tdToInsertAfter = rowBelow.slice(0, posx).reverse find (! _.missing) map (_.td) toSeq
+        val tdToInsertAfter = rowBelow.slice(0, x).reverse find (! _.missing) map (_.td) toSeq
         
         insert(into = trToInsertInto, after = tdToInsertAfter, origin = newTdElement(grid, tdId("td-" + nextId(grid, "td"))))
     }

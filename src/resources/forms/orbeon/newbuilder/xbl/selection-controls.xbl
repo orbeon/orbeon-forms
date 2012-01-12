@@ -119,7 +119,7 @@
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Single List Box</display-name>
             <display-name lang="fr">Liste simple</display-name>
-            <display-name lang="ru">Один из списка</display-name>
+            <display-name lang="ru">Один из контейнера</display-name>
             <icon lang="en">
                 <small-icon>/forms/orbeon/newbuilder/images/listbox.png</small-icon>
                 <large-icon>/forms/orbeon/newbuilder/images/listbox.png</large-icon>
@@ -144,7 +144,7 @@
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Multi List Box</display-name>
             <display-name lang="fr">Liste multiple</display-name>
-            <display-name lang="ru">Несколько из списка</display-name>
+            <display-name lang="ru">Несколько из контейнера</display-name>
             <icon lang="en">
                 <small-icon>/forms/orbeon/newbuilder/images/listbox.png</small-icon>
                 <large-icon>/forms/orbeon/newbuilder/images/listbox.png</large-icon>

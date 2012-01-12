@@ -2399,10 +2399,10 @@
             <label>Редактировать код</label>
         </edit-source>
         <custom-xml>
-            <label>Customize XML</label>
+            <label>Редактировать XML</label>
         </custom-xml>
         <permissions>
-            <label>Set permissions</label>
+            <label>Настроить права</label>
         </permissions>
         <reload-components>
             <label>Перезагрузить элементы</label>
@@ -2468,10 +2468,10 @@
             <label>Переместить ниже</label>
         </move-down-icon>
         <move-right-icon>
-            <label>[Move Right]</label>
+            <label>Переместить вправо</label>
         </move-right-icon>
         <move-left-icon>
-            <label>[Move Left]</label>
+            <label>Переместить влево</label>
         </move-left-icon>
         <control-details-icon>
             <label>Настройки элемента</label>
@@ -2778,224 +2778,224 @@
             </upload-pdf>
         </dialog-upload-pdf>
         <dialog-itemsets>
-            <dialog-title>Itemset Editor</dialog-title>
+            <dialog-title>Редактор элементов</dialog-title>
             <resources-language>
-                <label>Resources Language</label>
+                <label>Язык</label>
             </resources-language>
             <label>
-                <label>Label</label>
+                <label>Видно пользователю</label>
             </label>
             <value>
-                <label>Value</label>
+                <label>Системное значение</label>
             </value>
         </dialog-itemsets>
         <dialog-http-services>
-            <dialog-title>HTTP Service Editor</dialog-title>
+            <dialog-title>Редактор HTTP-сервисов</dialog-title>
             <service-name>
-                <label>Service Name</label>
-                <hint>Choose a unique name for this service</hint>
+                <label>Название сервиса</label>
+                <hint>Выберите уникальное название для этого сервиса</hint>
             </service-name>
             <resource>
-                <label>Resource URL</label>
-                <hint>HTTP URL at which the service reside</hint>
+                <label>URL сервиса</label>
+                <hint>Адрес HTTP расположения сервиса</hint>
             </resource>
             <method>
-                <label>Method</label>
+                <label>Метод</label>
             </method>
             <serialization>
-                <label>Serialization</label>
+                <label>Сериализация</label>
             </serialization>
             <soap-submission>
-                <label>SOAP Service</label>
-                <hint>Whether this is a SOAP service</hint>
+                <label>SOAP-сервис</label>
+                <hint>Является ли SOAP-сервисом</hint>
             </soap-submission>
             <soap-action>
                 <label>SOAP Action</label>
-                <hint>Optional SOAPAction header</hint>
+                <hint>Заголовок SOAPAction (не обязательно)</hint>
             </soap-action>
             <http-authentication>
-                <label>HTTP Authentication</label>
-                <hint>HTTP Authentication</hint>
+                <label>Аутентификация HTTP</label>
+                <hint>Аутентификация HTTP</hint>
             </http-authentication>
             <username>
-                <label>Username</label>
+                <label>Логин</label>
             </username>
             <password>
-                <label>Password</label>
+                <label>Пароль</label>
             </password>
             <request-body>
-                <label>Request Body</label>
-                <hint>XML data (can be a SOAP envelope)</hint>
+                <label>Тело запроса</label>
+                <hint>Данные XML (может быть SOAP-обертка)</hint>
             </request-body>
             <response>
-                <label>Response</label>
+                <label>Ответ</label>
             </response>
             <error-type>
-                <label>Error Type</label>
+                <label>Типы ошибок</label>
                 <item>
-                    <label>Submission in progress</label>
+                    <label>Запрос в процессе выполнения</label>
                     <value>submission-in-progress</value>
                 </item>
                 <item>
-                    <label>No data</label>
+                    <label>Нет данных</label>
                     <value>no-data</value>
                 </item>
                 <item>
-                    <label>Validation error</label>
+                    <label>Ошибка проверки</label>
                     <value>validation-error</value>
                 </item>
                 <item>
-                    <label>Resource error</label>
+                    <label>Ошибка ресурса</label>
                     <value>resource-error</value>
                 </item>
                 <item>
-                    <label>Target error</label>
+                    <label>Ошибка целевого элемента</label>
                     <value>target-error</value>
                 </item>
                 <item>
-                    <label>Internal error</label>
+                    <label>Внутренняя ошибка</label>
                     <value>xxforms-internal-error</value>
                 </item>
             </error-type>
             <resource-uri>
-                <label>Resource URL</label>
+                <label>Адрес ресурса</label>
             </resource-uri>
             <status-code>
-                <label>Status Code</label>
+                <label>Статус</label>
             </status-code>
             <headers>
-                <label>Headers</label>
+                <label>Заголовки</label>
             </headers>
             <header-name>
-                <label>Name</label>
+                <label>Название</label>
             </header-name>
             <header-value>
-                <label>Value(s)</label>
+                <label>Значение</label>
             </header-value>
             <response-body>
-                <label>Response Body</label>
+                <label>Тело ответа</label>
             </response-body>
             <save>
-                <label>Save</label>
+                <label>Сохранить</label>
             </save>
             <test>
-                <label>Test</label>
+                <label>Проверить</label>
             </test>
         </dialog-http-services>
         <dialog-database-services>
-            <dialog-title>Database Service Editor</dialog-title>
+            <dialog-title>Редактор сервисов СУБД</dialog-title>
             <service-name>
-                <label>Service Name</label>
-                <hint>Choose a unique name for this service</hint>
+                <label>Название сервиса</label>
+                <hint>Выберите уникальное название для этого сервиса</hint>
             </service-name>
             <datasource>
-                <label>Datasource</label>
-                <hint>JNDI datasource for this service</hint>
+                <label>Источник данных</label>
+                <hint>Источник данных для этого сервиса (JNDI)</hint>
             </datasource>
             <query>
-                <label>SQL Query</label>
-                <hint>SQL query which can contain placeholders for parameters</hint>
+                <label>SQL-запрос</label>
+                <hint>SQL-запрос, может содержать метки для подстановки параметров</hint>
             </query>
             <save>
-                <label>Save</label>
+                <label>Сохранить</label>
             </save>
             <test>
-                <label>Test</label>
+                <label>Проверить</label>
             </test>
         </dialog-database-services>
         <dialog-actions>
-            <dialog-title>Actions Editor</dialog-title>
+            <dialog-title>Редактор действий</dialog-title>
             <service-name>
-                <label>Action Name</label>
-                <hint>Choose a unique name for this action</hint>
+                <label>Название действия</label>
+                <hint>Выберите уникальное название для этого действия</hint>
             </service-name>
             <event-type>
-                <label>React to</label>
-                <hint>Event (on a control or global) to react to</hint>
+                <label>Реагировать на</label>
+                <hint>Событие (отдельного элемента или всей формы), которое вызывает действие.</hint>
                 <!-- Just a value change -->
                 <item>
-                    <label>Value Change</label>
+                    <label>Изменение значения</label>
                     <value>xforms-value-changed</value>
                 </item>
                 <!-- Value change AND the first time the control shows -->
                 <item>
-                    <label>Value Change or Form Load</label>
+                    <label>Изменение значения ИЛИ загрузка формы</label>
                     <value>xforms-value-changed xforms-enabled</value>
                 </item>
                 <!-- Control activation -->
                 <item>
-                    <label>Activation</label>
+                    <label>Активация элемента</label>
                     <value>DOMActivate</value>
                 </item>
                 <!-- Form load -->
                 <item>
-                    <label>Form Load</label>
+                    <label>Загрузка формы</label>
                     <value>xforms-ready</value>
                 </item>
             </event-type>
             <event-condition>
-                <label>[Condition]</label>
+                <label>Условие</label>
                 <item>
-                    <label>[Run always]</label>
+                    <label>Выполнять всегда</label>
                     <value>true()</value>
                 </item>
                 <item>
-                    <label>[Run on creation only]</label>
+                    <label>Только при создании</label>
                     <value>$fr-mode='new'</value>
                 </item>
             </event-condition>
             <event-control>
-                <label>Control</label>
+                <label>Элемент</label>
             </event-control>
             <service-to-call>
-                <label>Service to Call</label>
-                <hint>Service to call when the event happens</hint>
+                <label>Используемый сервис</label>
+                <hint>К какому сервису обращаться при наступлении события</hint>
             </service-to-call>
             <request-parameters>
-                <label>Set Service Request Values</label>
+                <label>Задать параметры вызова HTTP-сервиса</label>
             </request-parameters>
             <source-control>
-                <label>Source Control</label>
+                <label>Элемент-источник</label>
             </source-control>
             <destination-xpath>
-                <label>Destination XPath Expression</label>
+                <label>Выражение XPath для приемника</label>
             </destination-xpath>
             <request-database-parameter>
-                <label>Set Database Service Parameters</label>
+                <label>Задать параметры вызова сервиса СУБД</label>
             </request-database-parameter>
             <parameter-number>
-                <label>Parameter number</label>
+                <label>Номер параметра</label>
             </parameter-number>
             <response-values>
-                <label>Set Response Control Values</label>
+                <label>Задать из ответа значения элементов</label>
             </response-values>
             <destination-control>
-                <label>Destination Control</label>
+                <label>Целевой элемент</label>
             </destination-control>
             <source-xpath>
-                <label>Source XPath expression</label>
+                <label>Выражение XPath для источника</label>
             </source-xpath>
             <response-itemset>
-                <label>Set Response Selection Control Items</label>
+                <label>Заполнить из ответа элементы выбора</label>
             </response-itemset>
             <destination-selection-control>
-                <label>Destination Selection Control</label>
+                <label>Целевой элемент выбора</label>
             </destination-selection-control>
             <itemset>
-                <label>Itemset</label>
-                <hint>XPath expressions to build a new itemset</hint>
+                <label>Набор элементов</label>
+                <hint>Выражение XPath для создания нового набора элементов</hint>
             </itemset>
             <items>
-                <label>Items</label>
-                <hint>XPath expression returning one node for each item</hint>
+                <label>Элементы</label>
+                <hint>Выражение XPath, возвращает один узел для каждого элемента.</hint>
             </items>
             <label>
-                <label>Label</label>
-                <hint>XPath expression relative to an item node</hint>
+                <label>Название</label>
+                <hint>Выражение XPath, возвращает значение.</hint>
             </label>
             <value>
-                <label>Value</label>
-                <hint>XPath expression relative to an item node</hint>
+                <label>Значение</label>
+                <hint>Выражение XPath, возвращает значение.</hint>
             </value>
             <save>
                 <label>Сохранить</label>
@@ -3017,22 +3017,22 @@
             </message>
         </dialog-pe>
         <dialog-custom-xml>
-            <dialog-title>Custom XML</dialog-title>
-            <mode-label>The information entered by users in the form is stored in an XML document:</mode-label>
-            <mode-automatic>Let Form Builder generate the XML for me</mode-automatic>
-            <mode-custom>I will provide a custom XML document</mode-custom>
+            <dialog-title>Редактирование XML</dialog-title>
+            <mode-label>Данные, которые пользователи будут вводить в форму, хранятся в виде XML-документа. Настройка XML:</mode-label>
+            <mode-automatic>XML автоматически генерирует Мастер Форм</mode-automatic>
+            <mode-custom>Задать собственный XML</mode-custom>
         </dialog-custom-xml>
         <dialog-permissions>
-            <dialog-title>Permissions</dialog-title>
-            <role-based-permissions>Enable role-based permissions for this form</role-based-permissions>
-            <role>Role</role>
-            <invalid-role-name>Invalid role name</invalid-role-name>
-            <permissions>Permissions</permissions>
-            <operations>Operations</operations>
-            <anyone>Anyone</anyone>
-            <create>Create</create>
-            <read-update>Read and update</read-update>
-            <delete>Delete</delete>
+            <dialog-title>Настройка прав</dialog-title>
+            <role-based-permissions>Включить для этой формы ролевое управление доступом</role-based-permissions>
+            <role>Роль</role>
+            <invalid-role-name>Некорректное название роли</invalid-role-name>
+            <permissions>Права</permissions>
+            <operations>Действия</operations>
+            <anyone>Любой пользователь</anyone>
+            <create>Заполнять форму</create>
+            <read-update>Просматривать и редактировать</read-update>
+            <delete>Удалять</delete>
         </dialog-permissions>
         <!-- Messages -->
         <messages>
@@ -3051,7 +3051,7 @@
             <metadata-edit-title>Описание формы</metadata-edit-title>
             <new-metadata-output>Задайте название приложения и название формы. (При необходимости их можно будет изменить потом.)</new-metadata-output>
             <edit-metadata-output>Задайте название приложения и название формы или нажмите Отменить чтобы вернуться к мастеру форм:</edit-metadata-output>
-            <save-as-metadata-output>[Enter a new application name and form name to be used for the copy of this form:]</save-as-metadata-output>
+            <save-as-metadata-output>Задайте название приложения и название формы, куда необходимо сохранить данную форму:</save-as-metadata-output>
         </messages>
         <template>
             <untitled-form>Новая форма</untitled-form>

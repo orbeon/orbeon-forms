@@ -446,9 +446,9 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
         // A few before/after ids of selected tds
         val beforeAfter = Seq(
             "1111" → "1121",    // first td
-            "2222" → "2213",    // middle td
+            "2222" → "2231",    // middle td
             "3333" → "3323",    // last td
-            "2111" → "1333"     // first td of grid/section
+            "2111" → "2121"     // first td of grid/section
         )
 
         assertSelectedTdAfterDelete(beforeAfter) { td ⇒
@@ -461,9 +461,9 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
         // A few before/after ids of selected tds
         val beforeAfter = Seq(
             "1111" → "1112",    // first td
-            "2222" → "2221",    // middle td
+            "2222" → "2223",    // middle td
             "3333" → "3332",    // last td
-            "2111" → "1333"     // first td of grid/section
+            "2111" → "2112"     // first td of grid/section
         )
 
         assertSelectedTdAfterDelete(beforeAfter) { td ⇒
@@ -476,9 +476,9 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
         // A few before/after ids of selected tds
         val beforeAfter = Seq(
             "1111" → "1211",    // first td
-            "2222" → "2133",    // middle td
+            "2222" → "2311",    // middle td
             "3333" → "3233",    // last td
-            "2111" → "1333"     // first td of grid/section
+            "2111" → "2211"     // first td of grid/section
         )
 
         assertSelectedTdAfterDelete(beforeAfter) { td ⇒
@@ -491,9 +491,9 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
         // A few before/after ids of selected tds
         val beforeAfter = Seq(
             "1111" → "2111",    // first td
-            "2222" → "1333",    // middle td
+            "2222" → "3111",    // middle td
             "3333" → "2333",    // last td
-            "2111" → "1333"     // first td of grid/section
+            "2111" → "3111"     // first td of grid/section
         )
 
         assertSelectedTdAfterDelete(beforeAfter) { td ⇒

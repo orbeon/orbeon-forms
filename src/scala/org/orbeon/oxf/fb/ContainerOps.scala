@@ -54,8 +54,11 @@ object ContainerOps {
     def findNewTdToSelect(inDoc: NodeInfo, tdsToDelete: Seq[NodeInfo]) =
         findSelectedTd(inDoc) match {
             case Some(selectedTd) if tdsToDelete contains selectedTd ⇒
-                (precedingTds(selectedTd) filterNot (tdsToDelete contains _) headOption) orElse
-                    (followingTd(selectedTd) filterNot (tdsToDelete contains _) headOption)
+                // Prefer trying following before preceding, as things move up and left when deleting
+                // NOTE: Could improve this by favoring things "at same level", e.g. stay in grid if possible, then
+                // stay in section, etc.
+                (followingTd(selectedTd) filterNot (tdsToDelete contains _) headOption) orElse
+                    (precedingTds(selectedTd) filterNot (tdsToDelete contains _) headOption)
             case _ ⇒
                 None
         }

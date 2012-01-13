@@ -56,6 +56,8 @@
 
                         <xsl:variable name="static-row-count" select="count($grid-rows)"/>
                         <xsl:variable name="static-col-count" select="count($grid-rows[1]/*:td)"/>
+                        <!-- Show LHH in header only if repeating over a row group containing only one row -->
+                        <xsl:variable name="lhh-in-header" select="$static-row-count = 1"/>
 
                         <xsl:variable name="min-occurs" select="if (@minOccurs) then @minOccurs else 0"/>
                         <xsl:variable name="max-occurs" select="if (@maxOccurs) then @maxOccurs else 'unbounded'"/>
@@ -235,11 +237,13 @@
                                                         <xsl:if test="$is-editable"><xsl:attribute name="xxf:control">true</xsl:attribute></xsl:if>
                                                         <xsl:copy-of select="@colspan"/>
                                                         <xh:div class="yui-dt-liner">
-                                                            <!-- NOTE: At this time, assume that XPath expressions on LHH
-                                                                 elements are not relative to their enclosing control. -->
-                                                            <xf:group xxbl:scope="outer">
-                                                                <xsl:copy-of select="*[1]/(xf:label | xf:help | xf:hint)"/>
-                                                            </xf:group>
+                                                            <xsl:if test="$lhh-in-header">
+                                                                <!-- NOTE: At this time, assume that XPath expressions on LHH
+                                                                     elements are not relative to their enclosing control. -->
+                                                                <xf:group xxbl:scope="outer">
+                                                                    <xsl:copy-of select="*[1]/(xf:label | xf:help | xf:hint)"/>
+                                                                </xf:group>
+                                                            </xsl:if>
                                                         </xh:div>
                                                     </xh:th>
                                                 </xsl:for-each>

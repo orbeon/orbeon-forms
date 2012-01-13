@@ -264,7 +264,11 @@
                                                         <xh:tr>
                                                             <xsl:choose>
                                                                 <xsl:when test="$is-repeat">
-                                                                    <xsl:attribute name="class"><xsl:value-of select="'fr-grid-tr', @class"/> {if (xxf:repeat-position() mod 2 = 1) then 'yui-dt-even' else 'yui-dt-odd', if (xxf:repeat-position() = 1) then 'yui-dt-first' else ()}</xsl:attribute>
+                                                                    <xsl:attribute name="class">
+                                                                        <xsl:value-of select="'fr-grid-tr', @class"/>
+                                                                        <xsl:text> {if (xxf:repeat-position() mod 2 = 1) then 'yui-dt-even' else 'yui-dt-odd'}</xsl:text>
+                                                                        <xsl:if test="$static-row-pos = 1">{if (xxf:repeat-position() = 1) then ' yui-dt-first' else ()}</xsl:if>
+                                                                    </xsl:attribute>
                                                                 </xsl:when>
                                                                 <xsl:otherwise>
                                                                     <xsl:attribute name="class"><xsl:value-of select="'fr-grid-tr', @class"/></xsl:attribute>

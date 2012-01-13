@@ -48,7 +48,7 @@
                                 <xxforms:script id="xf-ro" ev:event="xforms-readonly">YAHOO.xbl.fr.Tinymce.instance(this).readonly();</xxforms:script>
                                 <xxforms:script id="xf-rw" ev:event="xforms-readwrite">YAHOO.xbl.fr.Tinymce.instance(this).readwrite();</xxforms:script>
                             </xforms:textarea>
-                            <xhtml:a f:url-type="resource" sytle="display: none" href="/xbl/orbeon/tinymce/jscripts/tiny_mce.js" class="tinymce-base-url"/>
+                            <xhtml:a f:url-type="resource" style="display: none" href="/xbl/orbeon/tinymce/jscripts/tiny_mce.js" class="tinymce-base-url"/>
 		
 		                    <!-- 
 		                    	div to be converted into a TinyMCE Editor instance.

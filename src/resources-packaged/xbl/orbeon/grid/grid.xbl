@@ -238,7 +238,7 @@
                                                             <!-- NOTE: At this time, assume that XPath expressions on LHH
                                                                  elements are not relative to their enclosing control. -->
                                                             <xf:group xxbl:scope="outer">
-                                                                <xsl:copy-of select="*[1]/(xf:label | xf:help)"/><!-- | xf:hint -->
+                                                                <xsl:copy-of select="*[1]/(xf:label | xf:help | xf:hint)"/>
                                                             </xf:group>
                                                         </xh:div>
                                                     </xh:th>

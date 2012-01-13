@@ -338,11 +338,11 @@ object GridOps {
                         val nextTrFirstTd = nextTr \ "*:td" take 1
 
                         val newTd =
-                            if (nextTr.isEmpty || (nextTrFirstTd \ *).isEmpty)
+                            if (nextTr.isEmpty || (nextTrFirstTd \ *).nonEmpty)
                                 // The first cell of the next row is occupied, or there is no next row: insert new row
                                 GridOps.insertRowBelow(currentTd.getParent) \ "*:td" head
                             else
-                                // There is a next row, and its first cell is empty, move to that one
+                                // There is a next row, and its first cell is empty: move to that one
                                 nextTrFirstTd.head
 
                         selectTd(newTd)

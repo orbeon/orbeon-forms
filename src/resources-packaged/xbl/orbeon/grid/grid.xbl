@@ -231,7 +231,8 @@
                                                     </xf:group>
                                                 </xsl:if>
                                                 <xsl:for-each select="$grid-rows[1]/*:td">
-                                                    <xh:th class="fr-grid-th">
+                                                    <xh:th class="fr-grid-th{if ($is-editable) then ' xforms-activable' else ''}">
+                                                        <xsl:if test="$is-editable"><xsl:attribute name="xxf:control">true</xsl:attribute></xsl:if>
                                                         <xsl:copy-of select="@colspan"/>
                                                         <xh:div class="yui-dt-liner">
                                                             <!-- NOTE: At this time, assume that XPath expressions on LHH

@@ -52,9 +52,15 @@
                 <xbl:content/>
 
                 <!-- Listen to activations on grid cells -->
-                <xf:action ev:event="DOMActivate" if="tokenize(xxf:control-element(xxf:event('xxf:effective-targetid'))/@class, '\s+') = 'xforms-activable'">
-                    <xf:setvalue xxbl:scope="inner" ref="xxf:get-variable('fr-form-model', 'selected-cell')" value="xxf:event('xxf:targetid')"/>
-                    <!--<xf:message value="xxf:control-element(xxf:event('xxf:targetid'))/@class"/>-->
+                <xf:action ev:event="DOMActivate">
+                    <xxf:var name="control-element" value="xxf:control-element(xxf:event('xxf:effective-targetid'))"/>
+                    <xf:action if="tokenize($control-element/@class, '\s+') = 'xforms-activable'">
+                        <xxf:var name="th-column" value="count($control-element/preceding-sibling::*[@xxforms:element = 'xh:th']) + 1"/>
+                        <xxf:var name="new-selected-cell" value="if ($control-element/@xxforms:element = 'xh:th') then 
+                            ($control-element/following-sibling::xf:repeat//*[@xxforms:element = 'xh:td'])[$th-column]/@id
+                            else $control-element/@id"/>
+                        <xf:setvalue ref="xxf:get-variable('fr-form-model', 'selected-cell')" value="$new-selected-cell"/>
+                    </xf:action>
                 </xf:action>
 
                 <!--<xf:output value="xxf:get-variable('fr-form-model', 'selected-cell')" xxbl:scope="inner">-->

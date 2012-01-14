@@ -490,6 +490,12 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
      */
     public Object resolveObjectById(String sourceEffectiveId, String targetStaticId, Item contextItem) {
 
+        // Handle "absolute ids" of format "/foo/bar.1-2"
+        // NOTE: Experimental, definitive format TBD
+        if (targetStaticId.startsWith("/")) {
+            return containingDocument.getObjectByEffectiveId(XFormsUtils.absoluteIdToEffectiveId(targetStaticId));
+        }
+
         // Make sure the static id passed is actually a static id
         if (!XFormsUtils.isStaticId(targetStaticId))
             throw new OXFException("Target id must be static id: " + targetStaticId);

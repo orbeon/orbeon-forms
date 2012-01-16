@@ -24,6 +24,7 @@
       xmlns:saxon="http://saxon.sf.net/"
       xmlns:xbl="http://www.w3.org/ns/xbl"
       xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary"
+      xmlns:toolboxOps="java:org.orbeon.oxf.fb.ToolboxOps"
 
       xxforms:external-events="show-fb-test-dialog"
       xxforms:noscript-support="false"
@@ -295,9 +296,10 @@
             <new-language/>
             <new-language-trigger/>
 
-            <controls-triggers/>
-            <sections-triggers/>
-            <grids-triggers/>
+            <!-- Toolbox -->
+            <section-trigger/>
+            <grid-trigger/>
+            <control-trigger/>
 
             <!-- Number of open dialogs -->
             <dialogs-open>0</dialogs-open>
@@ -331,13 +333,10 @@
                      <!--value="concat('xxx out ', xxforms:event('xxforms:effective-targetid'))"/>-->
 
     <xforms:bind ref="instance('fb-variables')">
-        <!-- When are toolbar controls triggers enabled -->
-        <xforms:bind ref="controls-triggers"
-                     readonly="$current-td/ancestor::xbl:binding or ($current-td/* and not($current-td/following-sibling::*:td[1][not(*)]
-                                                                        or not($current-td/following-sibling::*:td)
-                                                                            and (not(exists($current-td/../following-sibling::*:tr[1]/*:td[1]/*)))))"/>
-        <!-- When are grids triggers enabled -->
-        <xforms:bind ref="grids-triggers" readonly="$current-td/ancestor::xbl:binding"/>
+        <!-- Make buttons readonly depending on whether items can be inserted -->
+        <xforms:bind ref="section-trigger"  readonly="$current-td/ancestor::xbl:binding or not(toolboxOps:canInsertSection($body))"/>
+        <xforms:bind ref="grid-trigger"     readonly="$current-td/ancestor::xbl:binding or not(toolboxOps:canInsertGrid($body))"/>
+        <xforms:bind ref="control-trigger"  readonly="$current-td/ancestor::xbl:binding or not(toolboxOps:canInsertControl($body))"/>
     </xforms:bind>
 
     <!-- Schema upload dialog -->

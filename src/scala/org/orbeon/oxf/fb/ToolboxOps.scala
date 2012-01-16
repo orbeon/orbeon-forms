@@ -109,72 +109,92 @@ object ToolboxOps {
         }
     }
 
-    // Insert a new grid
-    def insertNewGrid(doc: NodeInfo) {
-
-        findSelectedTd(doc) match {
-            case Some(currentTd) ⇒
+    private def findGridInsertionPoint(inDoc: NodeInfo) =
+        findSelectedTd(inDoc) match {
+            case Some(currentTd) ⇒ // A td is selected
 
                 val containers = findAncestorContainers(currentTd)
 
                 // We must always have a parent (grid) and grandparent (possibly fr:body) container
                 assert(containers.size >= 2)
 
-                val parentContainer = containers.head
+                val parentContainer = containers.headOption
                 val grandParentContainer = containers.tail.head
 
                 // NOTE: At some point we could allow any grid bound and so with a name/id and bind
                 //val newGridName = "grid-" + nextId(doc, "grid")
 
-                // The grid template
-                val gridTemplate: NodeInfo =
-                    <fr:grid edit-ref=""
-                             xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-                             xmlns:xhtml="http://www.w3.org/1999/xhtml">
-                        <xhtml:tr>
-                            <xhtml:td id={tdId("td-" + nextId(doc, "td"))}/>
-                        </xhtml:tr>
-                    </fr:grid>
+                (grandParentContainer, parentContainer, parentContainer)
 
-                // Insert after current level 2 if found, otherwise into level 1
-                val newGrid = insert(into = grandParentContainer, after = parentContainer, origin = gridTemplate)
-
-                // Select first grid cell
-                selectTd(newGrid \\ "*:td" head)
-
-                debugDumpDocument("insert new grid", doc)
-
-            case _ ⇒ // NOP
+            case _ ⇒ // No td is selected, add top-level grid
+                val frBody = findFRBodyElement(inDoc)
+                (frBody, childrenContainers(frBody) lastOption, None)
         }
+
+    private def findSectionInsertionPoint(inDoc: NodeInfo) =
+        findSelectedTd(inDoc) match {
+            case Some(currentTd) ⇒ // A td is selected
+
+                val containers = findAncestorContainers(currentTd)
+
+                // We must always have a parent (grid) and grandparent (possibly fr:body) container
+                assert(containers.size >= 2)
+
+                // Idea: section is inserted after current section/tabview, NOT within current section. If there is no
+                // current section/tabview, the section is inserted after the current grid.
+                val grandParentContainer = containers.tail.head // section/tab, body
+                val greatGrandParentContainerOption = containers.tail.tail.headOption
+
+                greatGrandParentContainerOption match {
+                    case Some(greatGrandParentContainer) ⇒ (greatGrandParentContainer, Some(grandParentContainer))
+                    case None ⇒ (grandParentContainer, grandParentContainer \ * headOption)
+                }
+
+            case _ ⇒ // No td is selected, add top-level section
+                val frBody = findFRBodyElement(inDoc)
+                (frBody, childrenContainers(frBody) lastOption)
+        }
+
+    // Whether a section can be inserted
+    def canInsertSection(inDoc: NodeInfo) =
+        inDoc ne null
+
+    // Whether a grid can be inserted
+    def canInsertGrid(inDoc: NodeInfo) =
+        (inDoc ne null) && findSelectedTd(inDoc).isDefined
+
+    // Whether a control can be inserted
+    def canInsertControl(inDoc: NodeInfo) =
+        (inDoc ne null) && willEnsureEmptyTdSucceed(inDoc)
+
+    // Insert a new grid
+    def insertNewGrid(inDoc: NodeInfo) {
+
+        val (into, after, _) = findGridInsertionPoint(inDoc)
+
+        // The grid template
+        val gridTemplate: NodeInfo =
+            <fr:grid edit-ref=""
+                     xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+                     xmlns:xhtml="http://www.w3.org/1999/xhtml">
+                <xhtml:tr>
+                    <xhtml:td id={tdId("td-" + nextId(inDoc, "td"))}/>
+                </xhtml:tr>
+            </fr:grid>
+
+        // Insert after current level 2 if found, otherwise into level 1
+        val newGrid = insert(into = into, after = after.toSeq, origin = gridTemplate)
+
+        // Select first grid cell
+        selectTd(newGrid \\ "*:td" head)
+
+        debugDumpDocument("insert new grid", inDoc)
     }
 
     // Insert a new section
     def insertNewSection(inDoc: NodeInfo) {
 
-        val (into, after) =
-            findSelectedTd(inDoc) match {
-                case Some(currentTd) ⇒ // A td is selected
-
-                    val containers = findAncestorContainers(currentTd)
-
-                    // We must always have a parent (grid) and grandparent (possibly fr:body) container
-                    assert(containers.size >= 2)
-
-                    // Idea: section is inserted after current section/tabview, NOT within current section. If there is no
-                    // current section/tabview, the section is inserted after the current grid.
-                    val grandParentContainer = containers.tail.head // section/tab, body
-                    val greatGrandParentContainerOption = containers.tail.tail.headOption
-
-
-                    greatGrandParentContainerOption match {
-                        case Some(greatGrandParentContainer) ⇒ (greatGrandParentContainer, Some(grandParentContainer))
-                        case None ⇒ (grandParentContainer, grandParentContainer \ * headOption)
-                    }
-
-                case _ ⇒ // No td is selected, add top-level section
-                    val frBody = findFRBodyElement(inDoc)
-                    (frBody, childrenContainers(frBody) lastOption)
-            }
+        val (into, after) = findSectionInsertionPoint(inDoc)
 
         val newSectionName = "section-" + nextId(inDoc, "section")
         val precedingSectionName = after flatMap (getControlNameOption(_))
@@ -222,70 +242,58 @@ object ToolboxOps {
     }
 
     // Insert a new repeat
-    def insertNewRepeat(doc: NodeInfo) {
+    def insertNewRepeat(inDoc: NodeInfo) {
 
-        findSelectedTd(doc) match {
-            case Some(currentTd) ⇒
+        val (into, after, grid) = findGridInsertionPoint(inDoc)
 
-                val currentTdContainers = findAncestorContainers(currentTd)
+        val newGridName = "grid-" + nextId(inDoc, "grid")
+        val templateInstanceId = templateId(newGridName)
 
-                // We must always have a parent (grid) and grandparent (possibly fr:body) container
-                assert(currentTdContainers.size >= 2)
+        // Handle data template
+        val modelElement = findModelElement(inDoc)
+        modelElement \ "*:instance" filter (hasId(_, templateInstanceId)) headOption match {
+            case Some(templateInstance) ⇒
+                // clear existing template instance
+                delete(templateInstance \ *)
+                insert(into = templateInstance , origin = <dummy/>.copy(label = newGridName))
 
-                val currentTdGrid = currentTdContainers.head // grid
-                val currentTdGrandParentContainer = currentTdContainers.tail.head // section/tab, body
+            case None ⇒
+                // Insert template instance if not present
+                val template: NodeInfo = <xforms:instance xmlns:xforms="http://www.w3.org/2002/xforms"
+                                                          xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+                                                          id={templateInstanceId} xxforms:readonly="true">{<dummy/>.copy(label = newGridName)}</xforms:instance>
 
-                val newGridName = "grid-" + nextId(doc, "grid")
-                val templateInstanceId = templateId(newGridName)
-
-                // Handle data template
-                val modelElement = findModelElement(doc)
-                modelElement \ "*:instance" filter (hasId(_, templateInstanceId)) headOption match {
-                    case Some(templateInstance) ⇒
-                        // clear existing template instance
-                        delete(templateInstance \ *)
-                        insert(into = templateInstance , origin = <dummy/>.copy(label = newGridName))
-
-                    case None ⇒
-                        // Insert template instance if not present
-                        val template: NodeInfo = <xforms:instance xmlns:xforms="http://www.w3.org/2002/xforms"
-                                                                  xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
-                                                                  id={templateInstanceId} xxforms:readonly="true">{<dummy/>.copy(label = newGridName)}</xforms:instance>
-
-                        insert(into = modelElement, after = modelElement \ "*:instance" takeRight 1, origin = template)
-                }
-
-                // The grid template
-                val gridTemplate: NodeInfo =
-                    <fr:grid edit-ref="" id={gridId(newGridName)} repeat="true" bind={bindId(newGridName)} origin={makeInstanceExpression(templateInstanceId)}
-                             xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-                             xmlns:xhtml="http://www.w3.org/1999/xhtml">
-                        <xhtml:tr>
-                            <xhtml:td id={tdId("td-" + nextId(currentTd, "td"))}/>
-                        </xhtml:tr>
-                    </fr:grid>
-
-                // Insert grid
-                val newGridElement = insert(into = currentTdGrandParentContainer, after = currentTdGrid, origin = gridTemplate).head
-
-                // Insert instance holder (but no resource holders)
-                insertHolders(
-                    newGridElement,
-                    elementInfo(newGridName),
-                    Seq(),
-                    precedingControlNameInSectionForGrid(currentTdGrid, true)
-                )
-
-                // Make sure binds are created
-                ensureBinds(doc, findContainerNames(newGridElement) :+ newGridName, isCustomInstance)
-
-                // Select new td
-                selectTd(newGridElement \\ "*:td" head)
-
-                debugDumpDocument("insert new repeat", doc)
-
-            case _ ⇒ // NOP
+                insert(into = modelElement, after = modelElement \ "*:instance" takeRight 1, origin = template)
         }
+
+        // The grid template
+        val gridTemplate: NodeInfo =
+            <fr:grid edit-ref="" id={gridId(newGridName)} repeat="true" bind={bindId(newGridName)} origin={makeInstanceExpression(templateInstanceId)}
+                     xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+                     xmlns:xhtml="http://www.w3.org/1999/xhtml">
+                <xhtml:tr>
+                    <xhtml:td id={tdId("td-" + nextId(inDoc, "td"))}/>
+                </xhtml:tr>
+            </fr:grid>
+
+        // Insert grid
+        val newGridElement = insert(into = into, after = after.toSeq, origin = gridTemplate).head
+
+        // Insert instance holder (but no resource holders)
+        insertHolders(
+            newGridElement,
+            elementInfo(newGridName),
+            Seq(),
+            grid flatMap (precedingControlNameInSectionForGrid(_, true))
+        )
+
+        // Make sure binds are created
+        ensureBinds(inDoc, findContainerNames(newGridElement) :+ newGridName, isCustomInstance)
+
+        // Select new td
+        selectTd(newGridElement \\ "*:td" head)
+
+        debugDumpDocument("insert new repeat", inDoc)
     }
 
     // Copy control to the clipboard

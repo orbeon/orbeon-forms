@@ -26,6 +26,7 @@
          xmlns:oxf="http://www.orbeon.com/oxf/processors"
          xmlns:exf="http://www.exforms.org/exf/1-0"
          xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+         xmlns:gridOps="java:org.orbeon.oxf.fb.GridOps"
 
          xmlns:xhtml="http://www.w3.org/1999/xhtml"
          xmlns:xforms="http://www.w3.org/2002/xforms"
@@ -108,7 +109,8 @@
                                             <xh:tr>
                                                 <!-- Top left corner td -->
                                                 <xh:td class="fb-grid-top-left-td">
-                                                    <xf:trigger appearance="minimal" id="delete-grid-trigger">
+                                                    <!-- Until we implement the new selection system allowing moving stuff around freely, don't allow deleting the last grid in a section -->
+                                                    <xf:trigger appearance="minimal" id="delete-grid-trigger" ref="$grid[not(gridOps:isLastGridInSection(.))]">
                                                         <xf:label><xh:img src="/apps/fr/style/images/silk/bin.png" alt="{{$fb-resources/delete-grid-icon/label}}" title="{{$fb-resources/delete-grid-icon/label}}"/></xf:label>
                                                         <xf:action ev:event="DOMActivate">
 
@@ -124,7 +126,7 @@
                                                             <!-- We are automatically confirmed-->
                                                             <xf:dispatch if="$count = 0" name="fr-positive" target="delete-grid-trigger"/>
                                                         </xf:action>
-                                                        <xf:action ev:event="fr-positive" type="xpath" xmlns:gridOps="java:org.orbeon.oxf.fb.GridOps">
+                                                        <xf:action ev:event="fr-positive" type="xpath">
                                                             gridOps:deleteGrid($grid)
                                                         </xf:action>
                                                     </xf:trigger>
@@ -151,7 +153,7 @@
                                                         <xh:div class="fb-insert-left">
                                                             <xf:trigger appearance="minimal" ref="$grid[$columns lt 4]"><!-- TODO: check max col property -->
                                                                 <xf:label><xh:img src="/apps/fr/style/images/silk/bullet_arrow_left.png" alt="{{$fb-resources/insert-column-left-icon/label}}" title="{{$fb-resources/insert-column-left-icon/label}}"/></xf:label>
-                                                                <xf:action ev:event="DOMActivate" type="xpath" xmlns:gridOps="java:org.orbeon.oxf.fb.GridOps">
+                                                                <xf:action ev:event="DOMActivate" type="xpath">
                                                                     gridOps:insertColLeft($first-row-td)
                                                                 </xf:action>
                                                             </xf:trigger>
@@ -160,7 +162,7 @@
                                                         <xh:div class="fb-insert-right">
                                                             <xf:trigger appearance="minimal" ref="$grid[$columns lt 4]"><!-- TODO: check max col property -->
                                                                 <xf:label><xh:img src="/apps/fr/style/images/silk/bullet_arrow_right.png" alt="{{$fb-resources/insert-column-right-icon/label}}" title="{{$fb-resources/insert-column-right-icon/label}}"/></xf:label>
-                                                                <xf:action ev:event="DOMActivate" type="xpath" xmlns:gridOps="java:org.orbeon.oxf.fb.GridOps">
+                                                                <xf:action ev:event="DOMActivate" type="xpath">
                                                                     gridOps:insertColRight($first-row-td)
                                                                 </xf:action>
                                                             </xf:trigger>
@@ -170,7 +172,7 @@
                                                             <xf:label><xh:img src="/apps/fr/style/images/silk/bin.png" alt="{{$fb-resources/delete-column-icon/label}}" title="{{$fb-resources/delete-column-icon/label}}"/></xf:label>
                                                             <xf:action ev:event="DOMActivate">
 
-                                                                <xxf:var name="count" value="gridOps:controlsInCol($first-row-td)" xmlns:gridOps="java:org.orbeon.oxf.fb.GridOps"/>
+                                                                <xxf:var name="count" value="gridOps:controlsInCol($first-row-td)"/>
 
                                                                 <!-- Ask confirmation -->
                                                                 <xf:dispatch if="$count > 0" name="fr-show" targetid="fb-form-editor$dialog-confirmation">
@@ -182,7 +184,7 @@
                                                                 <!-- We are automatically confirmed-->
                                                                 <xf:dispatch if="$count = 0" name="fr-positive" target="delete-col-{$static-col-pos}-trigger"/>
                                                             </xf:action>
-                                                            <xf:action ev:event="fr-positive" type="xpath" xmlns:gridOps="java:org.orbeon.oxf.fb.GridOps">
+                                                            <xf:action ev:event="fr-positive" type="xpath">
                                                                 gridOps:deleteCol($first-row-td)
                                                             </xf:action>
                                                         </xf:trigger>
@@ -288,7 +290,7 @@
                                                                         <xh:div>
                                                                             <xf:trigger appearance="minimal">
                                                                                 <xf:label><xh:img src="/apps/fr/style/images/silk/bullet_arrow_top.png" alt="{{$fb-resources/insert-row-above-icon/label}}" title="{{$fb-resources/insert-row-above-icon/label}}"/></xf:label>
-                                                                                <xf:action ev:event="DOMActivate" type="xpath" xmlns:gridOps="java:org.orbeon.oxf.fb.GridOps">
+                                                                                <xf:action ev:event="DOMActivate" type="xpath">
                                                                                     gridOps:insertRowAbove($tr)
                                                                                 </xf:action>
                                                                             </xf:trigger>
@@ -310,7 +312,7 @@
                                                                                 <!-- We are automatically confirmed-->
                                                                                 <xf:dispatch if="$count = 0" name="fr-positive" target="delete-row-{$static-row-pos}-trigger"/>
                                                                             </xf:action>
-                                                                            <xf:action ev:event="fr-positive" type="xpath" xmlns:gridOps="java:org.orbeon.oxf.fb.GridOps">
+                                                                            <xf:action ev:event="fr-positive" type="xpath">
                                                                                 gridOps:deleteRow($tr)
                                                                             </xf:action>
                                                                         </xf:trigger>
@@ -318,7 +320,7 @@
                                                                         <xh:div>
                                                                             <xf:trigger appearance="minimal">
                                                                                 <xf:label><xh:img src="/apps/fr/style/images/silk/bullet_arrow_bottom.png" alt="{{$fb-resources/insert-row-below-icon/label}}" title="{{$fb-resources/insert-row-below-icon/label}}"/></xf:label>
-                                                                                <xf:action ev:event="DOMActivate" type="xpath" xmlns:gridOps="java:org.orbeon.oxf.fb.GridOps">
+                                                                                <xf:action ev:event="DOMActivate" type="xpath">
                                                                                     gridOps:insertRowBelow($tr)
                                                                                 </xf:action>
                                                                             </xf:trigger>

@@ -199,6 +199,10 @@ object GridOps {
         debugDumpDocument("delete row", tr)
     }
 
+    // Whether this is the last grid in the section
+    // NOTE: Use this until we implement the new selection system allowing moving stuff around freely
+    def isLastGridInSection(grid: NodeInfo) = childrenGrids(findAncestorContainers(grid).head).size == 1
+
     // Delete the entire grid and contained controls
     def deleteGrid(grid: NodeInfo) = deleteContainer(grid)
 
@@ -316,10 +320,24 @@ object GridOps {
             setindex("fb-section-content-grid-td-repeat", x + 1)
     }
 
-    // Try to ensure that there is an empty td after the current location, inserting a new row if possible
-    def ensureEmptyTd(doc: NodeInfo): Option[NodeInfo] = {
+    // Whether a call to ensureEmptyTd() will succeed
+    def willEnsureEmptyTdSucceed(inDoc: NodeInfo): Boolean =
+        findSelectedTd(inDoc) match {
+            case Some(currentTd) ⇒
+                if (currentTd \ * nonEmpty)
+                    currentTd followingSibling "*:td" match {
+                        case Seq(followingTd, _*) if followingTd \ * nonEmpty  ⇒ false
+                        case _ ⇒ true
+                    }
+                else
+                    true
+            case None ⇒ false
+        }
 
-        findSelectedTd(doc) flatMap { currentTd ⇒
+    // Try to ensure that there is an empty td after the current location, inserting a new row if possible
+    def ensureEmptyTd(inDoc: NodeInfo): Option[NodeInfo] = {
+
+        findSelectedTd(inDoc) flatMap { currentTd ⇒
 
             if (currentTd \ * nonEmpty) {
                 // There is an element in the current td, figure out what to do
@@ -340,7 +358,7 @@ object GridOps {
                         val newTd =
                             if (nextTr.isEmpty || (nextTrFirstTd \ *).nonEmpty)
                                 // The first cell of the next row is occupied, or there is no next row: insert new row
-                                GridOps.insertRowBelow(currentTd.getParent) \ "*:td" head
+                                insertRowBelow(currentTd.getParent) \ "*:td" head
                             else
                                 // There is a next row, and its first cell is empty: move to that one
                                 nextTrFirstTd.head

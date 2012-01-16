@@ -22,15 +22,18 @@ import FormBuilderFunctions._
 
 object ContainerOps {
 
-    // Hardcoded list of FB controls we know can contain others
-    // TODO: "fr:tab" (special because "fr:tabview/fr:tab" are always combined)
-    val ContainerElementQNames = Set(
-        FR → "section",
-        FB → "section",
+    val GridElementQNames = Set(
         FR → "grid",
-        FR → "body",
         FR → "repeat", // for legacy FB
         XF → "repeat"  // for legacy FB
+    )
+
+    // Hardcoded list of FB controls we know can contain others
+    // TODO: "fr:tab" (special because "fr:tabview/fr:tab" are always combined)
+    val ContainerElementQNames = GridElementQNames ++ Set(
+        FR → "body",
+        FR → "section",
+        FB → "section"
     )
 
     val ContainerElementTest = ContainerElementQNames map (pairToTest(_)) reduce (_ || _)
@@ -63,6 +66,10 @@ object ContainerOps {
     // A container's children containers
     def childrenContainers(container: NodeInfo) =
         container \ * filter (e ⇒ ContainerElementQNames(qname(e)))
+
+    // A container's children grids (including repeated grids)
+    def childrenGrids(container: NodeInfo) =
+        container \ * filter (e ⇒ GridElementQNames(qname(e)))
 
     // Delete the entire container and contained controls
     def deleteContainer(container: NodeInfo) = {

@@ -193,7 +193,7 @@ class EventHandlerImpl(
             xpathContext.pushBinding(element, handlerEffectiveId, scope, false)
 
             val actionInterpreter = new XFormsActionInterpreter(container, xpathContext, element, handlerEffectiveId, event, eventObserver)
-            XFormsAPI.scalaAction(actionInterpreter) {
+            XFormsAPI.withScalaAction(actionInterpreter) {
                 actionInterpreter.runAction(self)
             }
         } catch {

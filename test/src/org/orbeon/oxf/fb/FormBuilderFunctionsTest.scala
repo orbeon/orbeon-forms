@@ -156,9 +156,12 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
     }
 
     def withActionAndDoc(doc: DocumentWrapper)(body: NodeInfo ⇒ Any) {
-        scalaAction(mockActionInterpreter(doc)) {
-            initializeGrids(doc)
-            body(doc)
+        val actionInterpreter = mockActionInterpreter(doc)
+        withScalaAction(actionInterpreter) {
+            withContainingDocument(actionInterpreter.containingDocument) {
+                initializeGrids(doc)
+                body(doc)
+            }
         }
     }
 
@@ -498,6 +501,27 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
 
         assertSelectedTdAfterDelete(beforeAfter) { td ⇒
             deleteSection(findAncestorContainers(getContainingGridOrRepeat(td)) head)
+        }
+    }
+
+    @Test def lastGridInSectionAndCanInsert() {
+        withActionAndDoc(getNewDoc(TemplateDoc)) { doc ⇒
+
+            // Initially can insert all
+            assert(canInsertSection(doc) === true)
+            assert(canInsertGrid(doc) === true)
+            assert(canInsertControl(doc) === true)
+
+            // Remove everything (assume top-level section with a single grid inside)
+            childrenContainers(findFRBodyElement(doc)) foreach  { section ⇒
+                assert(isLastGridInSection(childrenGrids(section).head) === true)
+                deleteContainer(section)
+            }
+
+            // After everything is removed we can only insert a section (later: can also insert grid)
+            assert(canInsertSection(doc) === true)
+            assert(canInsertGrid(doc) === false)
+            assert(canInsertControl(doc) === false)
         }
     }
 

@@ -26,15 +26,30 @@ import org.orbeon.oxf.xforms.model.DataModel
 import org.dom4j.QName
 
 import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.xforms.XFormsContainingDocument
 
 object XFormsAPI {
 
-    // Dynamically set action context
-    val actionInterpreter = new DynamicVariable[XFormsActionInterpreter]
+    // Dynamically set context
+    val containingDocumentDyn = new DynamicVariable[XFormsContainingDocument]
+    val actionInterpreterDyn = new DynamicVariable[XFormsActionInterpreter]
 
     // Every block of action must be run within this
-    def scalaAction(interpreter: XFormsActionInterpreter)(body: => Any) {
-        actionInterpreter.withValue(interpreter) {
+    def withScalaAction(interpreter: XFormsActionInterpreter)(body: => Any) {
+        actionInterpreterDyn.withValue(interpreter) {
+            body
+        }
+    }
+
+    // For Java callers
+    def withContainingDocumentJava(containingDocument: XFormsContainingDocument, runnable: Runnable) =
+        withContainingDocument(containingDocument) {
+            runnable.run()
+        }
+
+    // Every block of action must be run within this
+    def withContainingDocument(containingDocument: XFormsContainingDocument)(body: => Any) {
+        containingDocumentDyn.withValue(containingDocument) {
             body
         }
     }
@@ -47,7 +62,7 @@ object XFormsAPI {
 
             def onSuccess(oldValue: String): Unit =
                 for {
-                    action <- actionInterpreter.value
+                    action <- actionInterpreterDyn.value
                     containingDocument = action.containingDocument
                     indentedLogger = action.indentedLogger
                 } yield
@@ -67,7 +82,7 @@ object XFormsAPI {
     // - Some(0)     if the control is non-relevant or doesn't have any iterations
     // - Some(index) otherwise, where index is the control's new index
     def setindex(repeatStaticId: String, index: Int) =
-        actionInterpreter.value map
+        actionInterpreterDyn.value map
             { interpreter => XFormsSetindexAction.executeSetindexAction(interpreter, interpreter.outerActionElement, repeatStaticId, Integer.toString(index)) } collect
                 { case newIndex if newIndex >= 0 => newIndex }
 
@@ -76,7 +91,7 @@ object XFormsAPI {
     def insert[T](into: Seq[NodeInfo], origin: Seq[T], after: Seq[NodeInfo] = null, before: Seq[NodeInfo] = null): Seq[T] = {
 
         if (into.nonEmpty) {
-            val action = actionInterpreter.value
+            val action = actionInterpreterDyn.value
 
             val (positionAttribute, collectionToUpdate) =
                 if (before ne null)
@@ -86,7 +101,7 @@ object XFormsAPI {
                 else
                     ("after", Seq())
 
-            XFormsInsertAction.doInsert(action map(_.containingDocument) orNull, action map (_.indentedLogger) orNull, positionAttribute,
+            XFormsInsertAction.doInsert(action map (_.containingDocument) orNull, action map (_.indentedLogger) orNull, positionAttribute,
                 collectionToUpdate.asJava, into.headOption.orNull, origin.asJava, collectionToUpdate.size, doClone = true, doDispatch = true).asInstanceOf[JList[T]].asScala
         } else
             Seq()
@@ -95,9 +110,9 @@ object XFormsAPI {
     // Delete
     def delete(ref: Seq[NodeInfo]): Seq[NodeInfo] = {
 
-        val action = actionInterpreter.value
+        val action = actionInterpreterDyn.value
 
-        val deleteInfos = XFormsDeleteAction.doDelete(action map(_.containingDocument) orNull, action map (_.indentedLogger) orNull, ref.asJava, -1, doDispatch = true)
+        val deleteInfos = XFormsDeleteAction.doDelete(action map (_.containingDocument) orNull, action map (_.indentedLogger) orNull, ref.asJava, -1, doDispatch = true)
         deleteInfos.asScala map (_.nodeInfo)
     }
 
@@ -155,7 +170,7 @@ object XFormsAPI {
     // Return an instance's root element in the current action context
     def instanceRoot(staticId: String, searchAncestors: Boolean = false): Option[NodeInfo] = {
 
-        assert(actionInterpreter.value.isDefined)
+        assert(actionInterpreterDyn.value.isDefined)
 
         def ancestorXBLContainers = {
             def recurse(container: XBLContainer): List[XBLContainer] = container :: (container.getParentXBLContainer match {
@@ -163,11 +178,11 @@ object XFormsAPI {
                 case _ => Nil
             })
 
-            recurse(actionInterpreter.value.get.container)
+            recurse(actionInterpreterDyn.value.get.container)
         }
 
         val containersToSearch =
-            if (searchAncestors) ancestorXBLContainers else List(actionInterpreter.value.get.container)
+            if (searchAncestors) ancestorXBLContainers else List(actionInterpreterDyn.value.get.container)
 
         containersToSearch map
                 (_.findInstance(staticId)) find
@@ -182,7 +197,7 @@ object XFormsAPI {
         containingDocument.getModels.asScala.find(_.getId == modelId)
 
     // Return the containing document
-    def containingDocument = { assert(actionInterpreter.value.isDefined); actionInterpreter.value.get.containingDocument }
+    def containingDocument = { assert(containingDocumentDyn.value.isDefined); containingDocumentDyn.value.get }
     
     def context[T](xpath: String)(body: => T): T = ???
     def context[T](item: Item)(body: => T): T = ???

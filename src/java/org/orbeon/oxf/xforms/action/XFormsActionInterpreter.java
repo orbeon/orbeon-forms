@@ -456,7 +456,11 @@ public class XFormsActionInterpreter {
             }
             System.arraycopy(additionalParts, 0, parts, containerParts.length, additionalParts.length);
 
-            return xformsControls.getObjectByEffectiveId(resolutionScopeContainer.getFullPrefix() + targetStaticId + XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1 + StringUtils.join(parts, XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_2));
+            return
+                xformsControls.getObjectByEffectiveId(resolutionScopeContainer.getFullPrefix() +
+                targetStaticId +
+                XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1 +
+                StringUtils.join(parts, XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_2));
         }
     }
 

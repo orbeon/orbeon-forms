@@ -359,7 +359,7 @@ a.xforms-help-image .fb-control-help { vertical-align: baseline; }
 /* Show disabled hints, which are hints that don't contain any text, as we want them to show since use them as placeholders.
    Use an id to override the #fr-view .xforms-disabled { display: none } in form-runner-base.css.
    The position: static overrides the position: absolute; top: -10000px; left: -10000px in xforms.css. */
-#fr-view .fr-grid-content .xforms-hint.xforms-disabled { display: block; position: static }
+#fr-view .xbl-fr-grid .xforms-hint.xforms-disabled { display: block; position: static }
 
 .fb-use-toolbar-message, .fb-click-message { display: none; font-size: 70%; color: gray; width: 100%; font-style: italic; text-align: center; margin-top: 2em  }
 .fb-selected .fb-use-toolbar-message { display: block }

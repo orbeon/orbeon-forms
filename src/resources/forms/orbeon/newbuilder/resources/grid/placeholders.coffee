@@ -40,7 +40,7 @@ Event.onDOMReady () ->
         $table = $gridThTd.closest('table')
         lookIn = [gridThTd]
         if $gridThTd.is('td') and $table.is('.fr-repeat-single-row')    # Also look for label/hint in the th
-            columnNumber = $gridThTd.prevAll().length + 1
+            columnNumber = $gridThTd.prevAll().length
             gridTh = $table.find('tr.fr-dt-master-row').children()[columnNumber]
             lookIn.push gridTh
         $(lookIn).find('.xforms-label, .xforms-hint').each((index, labelHint) -> f labelHint)

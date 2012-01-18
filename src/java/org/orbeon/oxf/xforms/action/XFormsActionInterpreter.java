@@ -358,7 +358,7 @@ public class XFormsActionInterpreter {
      *
      * @param actionElement     action element
      * @param attributeValue    raw value to resolve
-     * @return                  resolved attribute value
+     * @return                  resolved attribute value, null if the value is null or if the XPath context item is missing
      */
     public String resolveAVTProvideValue(Element actionElement, String attributeValue) {
 

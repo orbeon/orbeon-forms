@@ -141,7 +141,7 @@ class PartAnalysisImpl(
         val eventHandlers = Buffer[EventHandlerImpl]()
         
         // Create and index root control
-        val rootControlAnalysis = new RootControl(StaticStateContext(this, -1), staticStateDocument.rootControl, startScope)
+        val rootControlAnalysis = new RootControl(StaticStateContext(this, 0), staticStateDocument.rootControl, startScope)
         indexNewControl(rootControlAnalysis, externalLHHA, eventHandlers)
 
         // Gather controls

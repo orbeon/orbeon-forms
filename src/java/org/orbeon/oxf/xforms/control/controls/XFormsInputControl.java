@@ -80,13 +80,13 @@ public class XFormsInputControl extends XFormsValueControl {
 
     @Override
     public Tuple3<String, String, String> getJavaScriptInitialization() {
-        final PlaceHolderInfo placeHolderInfo = getPlaceholderInfo(getXBLContainer().getPartAnalysis(), getElementAnalysis(), this);
+        final PlaceHolderInfo placeHolderInfo = getPlaceholderInfo(getElementAnalysis(), this);
         if (placeHolderInfo != null) {
             // Control name becomes "label" or "hint". This is a special case as even non-external labels and hints can
             // have the placeholder appearance, and those are not really controls.
             return new Tuple3<String, String, String>(
                     placeHolderInfo.isLabelPlaceholder ? "label" : "hint",
-                    Dom4jUtils.qNameToExplodedQName(XFormsConstants.XXFORMS_PLACEHOLDER_APPEARANCE_QNAME),
+                    Dom4jUtils.qNameToExplodedQName(XFormsConstants.XFORMS_MINIMAL_APPEARANCE_QNAME),
                     getEffectiveId());
         } else {
             return null;
@@ -555,27 +555,12 @@ public class XFormsInputControl extends XFormsValueControl {
         }
     }
     
-    public static PlaceHolderInfo getPlaceholderInfo(PartAnalysis partAnalysis, ElementAnalysis elementAnalysis, XFormsControl control) {
+    public static PlaceHolderInfo getPlaceholderInfo(ElementAnalysis elementAnalysis, XFormsControl control) {
         // Handle placeholder
         
-        final boolean isLabelPlaceholder;
-        final boolean isHintPlaceholder;
-                
-        final LHHAAnalysis labelAnalysis = partAnalysis.getLabel(elementAnalysis.prefixedId());
-        if (labelAnalysis != null && labelAnalysis.appearances().contains(XFormsConstants.XXFORMS_PLACEHOLDER_APPEARANCE_QNAME)) {
-            isLabelPlaceholder = true;
-            isHintPlaceholder = false;
-        } else {
-            final LHHAAnalysis hintAnalysis = partAnalysis.getHint(elementAnalysis.prefixedId());
-            if (hintAnalysis != null && hintAnalysis.appearances().contains(XFormsConstants.XXFORMS_PLACEHOLDER_APPEARANCE_QNAME)) {
-                isLabelPlaceholder = false;
-                isHintPlaceholder = true;
-            } else {
-                isLabelPlaceholder = false;
-                isHintPlaceholder = false;
-            }
-        }
-        
+        final boolean isLabelPlaceholder = LHHAAnalysis.hasLHHAPlaceholder(elementAnalysis, "label");
+        final boolean isHintPlaceholder = ! isLabelPlaceholder && LHHAAnalysis.hasLHHAPlaceholder(elementAnalysis, "hint");
+
         if (isLabelPlaceholder || isHintPlaceholder) {
             final String placeholderValue; // null if no placeholder, "" if placeholder and non-concrete control, placeholder value otherwise
             if (control != null && control.isRelevant()) {

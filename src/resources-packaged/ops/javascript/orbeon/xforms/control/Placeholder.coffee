@@ -56,7 +56,7 @@ do ->
                 continue if not controls?
                 for labelHint in ["label", "hint"]
                     continue if not controls[labelHint]?
-                    placeholders = controls[labelHint]["{http://orbeon.org/oxf/xml/xforms}placeholder"]
+                    placeholders = controls[labelHint]["minimal"]
                     continue if not placeholders?
                     showPlaceholder (YD.get id) for id in placeholders
 

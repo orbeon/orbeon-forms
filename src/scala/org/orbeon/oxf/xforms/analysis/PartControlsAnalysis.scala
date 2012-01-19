@@ -72,19 +72,10 @@ trait PartControlsAnalysis extends TransientState {
     }
 
     protected def analyzeCustomControls() {
-        // Check whether input controls have "placeholder" label/hint
+        // Check whether input controls have "placeholder/minimal" label/hint
         _hasInputPlaceholder =
             controlTypes.get("input") match {
-               case Some(map) ⇒
-
-                   val LabelHint = Seq("label", "hint")
-
-                   def hasLabelOrHintPlaceholder(lhhaTrait: LHHATrait) =
-                       LabelHint flatMap (lhhaTrait.getLHHA(_).toSeq) exists
-                           (_.appearances(XXFORMS_PLACEHOLDER_APPEARANCE_QNAME))
-
-                   map.values exists (c ⇒ hasLabelOrHintPlaceholder(c.asInstanceOf[LHHATrait]))
-
+               case Some(map) ⇒ map.values exists (inputControl ⇒ LHHAAnalysis.hasLabelOrHintPlaceholder(inputControl))
                case None ⇒ false
            }
 

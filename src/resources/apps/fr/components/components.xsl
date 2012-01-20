@@ -184,7 +184,7 @@
                       xxforms:noscript="{$is-noscript}"
                       xxforms:noscript-support="{$is-noscript-support}"
                       xxforms:xforms11-switch="false"
-                      xxforms:xpath-analysis="false"
+                      xxforms:xpath-analysis="true"
                       xxforms:xhtml-layout="span">
 
             <!-- Don't enable client events filtering for FB -->

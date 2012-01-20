@@ -85,6 +85,10 @@
                                 <xforms:action ev:event="DOMActivate" context="$body">
                                     <!-- Insert section -->
 
+                                    <!-- Close current section -->
+                                    <xforms:toggle case="case-fb-top-level-section-closed"/>
+                                    <xforms:toggle case="case-button-fb-top-level-section-closed"/>
+
                                     <xxforms:variable name="old-section-index" select="index('fb-top-level-repeat')" as="xs:integer"/>
 
                                     <!-- Insert section template in the UI -->
@@ -134,6 +138,10 @@
                                     <!-- TODO: these ids don't exist anymore; instead, dispatch to fr-inplace-fb-top-level-section-editable-title -->
                                     <!--<xforms:toggle case="fr-inplace-fb-top-level-section-input-open-edit"/>-->
                                     <!--<xforms:setfocus control="fr-inplace-fb-top-level-section-input-open-input"/>-->
+
+                                    <!-- Open new section -->
+                                    <xforms:toggle case="case-fb-top-level-section-open"/>
+                                    <xforms:toggle case="case-button-fb-top-level-section-open"/>
 
                                 </xforms:action>
                             </xforms:trigger>

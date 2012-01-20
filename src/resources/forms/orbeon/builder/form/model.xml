@@ -144,6 +144,9 @@
             <xforms:toggle case="fb-editor-open-case"/>
             <xforms:toggle case="fb-metadata-view-case"/>
         </xforms:action>
+        <!-- Open first section -->
+        <xforms:toggle case="case-fb-top-level-section-open"/>
+        <xforms:toggle case="case-button-fb-top-level-section-open"/>
     </xforms:action>
 
     <!-- Binds on main instance -->
@@ -334,6 +337,9 @@
             <grids-triggers/>
 
             <xml-view/>
+
+            <!-- HACK to help force refresh of section content -->
+            <force>0</force>
         </variables>
     </xforms:instance>
 

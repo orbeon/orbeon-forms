@@ -399,7 +399,7 @@
                                                 <xforms:delete nodeset="."/>
                                             </xforms:action>
 
-                                            <fr:section id="fb-top-level-section" editable="true">
+                                            <fr:section id="fb-top-level-section" editable="true" open="false">
                                                 <xforms:label ref="$section-resource/label"/>
                                                 <xforms:alert ref="$form-resources/section-name/alert"/>
                                                 <xforms:hint ref="$form-resources/section-name/hint"/>
@@ -456,10 +456,15 @@
                                                     </xforms:trigger>
                                                 </fr:buttons>
 
+                                                <!-- HACK: Force refresh when the section opens or close so that section content can update (see xxforms:case() below) -->
+                                                <xforms:setvalue ev:event="xforms-select" ev:target="case-fb-top-level-section-open case-fb-top-level-section-closed" ref="$variables/force" value=". + 1"/>
+
                                                 <!-- Section content -->
 
-                                                <!-- Iterate over known elements OR component elements -->
-                                                <xforms:repeat nodeset="fr:section | fr:repeat | fr:grid | *[resolve-QName(name(), .) = $components-qnames]" id="fb-section-content-repeat" xxforms:dnd="none">
+                                                <!-- Iterate over known elements OR component elements BUT don't iterate if the section is closed -->
+                                                <xforms:repeat nodeset="(fr:section | fr:repeat | fr:grid | *[resolve-QName(name(), .) = $components-qnames])
+                                                                            [xxforms:case('switch-fb-top-level-section') = 'case-fb-top-level-section-open']"
+                                                               id="fb-section-content-repeat" xxforms:dnd="none">
                                                     <xxforms:variable name="section-content-position" select="position()"/>
 
                                                     <!-- Stop propagation of DOMFocusOut as we don't care about listening for visited controls within grids, and handling this takes time -->

@@ -83,7 +83,9 @@
         <xi:include href="oxf:/forms/orbeon/builder/form/model.xml" xxi:omit-xml-base="true"/>
     </xhtml:head>
     <xhtml:body>
-        <xhtml:div id="fb-layout">
+        <!-- Class yui-layout-doc prevents YUI Layout Manager from looking for an element with the class yui-layout-doc,
+             which is slow on Firefox, and from creating an additional div inside the div#fb-layout -->
+        <xhtml:div id="fb-layout" class="yui-layout-doc">
             <xhtml:div id="top1" class="fb-top">
                 <fr:logo/>
                 <fr:title/>

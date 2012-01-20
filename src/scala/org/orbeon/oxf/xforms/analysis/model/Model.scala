@@ -95,7 +95,7 @@ class Model(val staticStateContext: StaticStateContext, element: Element, parent
 
     def jVariablesSeq = variablesSeq.asJava
 
-    val variablesMap: Map[String, VariableTrait] = variablesSeq map (variable => variable.name -> variable) toMap
+    val variablesMap: Map[String, VariableAnalysisTrait] = variablesSeq map (variable => variable.name -> variable) toMap
     val jVariablesMap = variablesMap.asJava
     
     // Submissions

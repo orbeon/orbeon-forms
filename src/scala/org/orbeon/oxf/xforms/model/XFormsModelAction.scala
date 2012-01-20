@@ -16,9 +16,8 @@ package org.orbeon.oxf.xforms.model
 import org.orbeon.oxf.xforms.event.{EventHandlerImpl, XFormsEventHandler}
 import org.orbeon.oxf.xforms.{XFormsUtils, XFormsContainingDocument, XFormsModel}
 
-
 class XFormsModelAction(model: XFormsModel, eventHandler: EventHandlerImpl) extends XFormsEventHandler {
     val getEffectiveId = XFormsUtils.getRelatedEffectiveId(model.getEffectiveId, eventHandler.staticId)
     def getXBLContainer(containingDocument: XFormsContainingDocument) = model.getXBLContainer
-    def getBindingContext(containingDocument: XFormsContainingDocument) = model.getBindingContext(containingDocument)
+    def getBindingContext(containingDocument: XFormsContainingDocument) = model.getDefaultEvaluationContext
 }

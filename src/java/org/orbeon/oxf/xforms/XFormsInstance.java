@@ -541,11 +541,13 @@ public class XFormsInstance implements XFormsEventTarget, XFormsEventObserver {
     }
 
     public XFormsContextStack.BindingContext getBindingContext(XFormsContainingDocument containingDocument) {
-        final XFormsModel model = getModel(containingDocument);
-        final XFormsContextStack.BindingContext modelBindingContext = model.getBindingContext(containingDocument);
-        // TODO: should push root element of this instance, right? But is this used anywhere?
-        //final XFormsContextStack contextStack = model.getContextStack();
-        return modelBindingContext;
+        throw new IllegalStateException();
+
+//        final XFormsModel model = getModel(containingDocument);
+//        final XFormsContextStack.BindingContext modelBindingContext = model.getBindingContext(containingDocument);
+//        // TODO: should push root element of this instance, right? But is this used anywhere?
+//        //final XFormsContextStack contextStack = model.getContextStack();
+//        return modelBindingContext;
     }
 
     // Don't allow any external events

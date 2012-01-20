@@ -108,7 +108,6 @@ public class XFormsModelBinds {
 
     /**
      * Rebuild all binds, computing all bind nodesets (but not computing the MIPs)
-     *
      */
     public void rebuild() {
 
@@ -116,7 +115,7 @@ public class XFormsModelBinds {
             indentedLogger.startHandleOperation("model", "performing rebuild", "model id", model.getEffectiveId());
 
         // Reset everything
-        model.getContextStack().resetBindingContext(model);
+        // NOTE: Assume that model.getContextStack().resetBindingContext(model) was called
         topLevelBinds.clear();
         singleNodeContextBinds.clear();
         iterationsForContextNodeInfo.clear();
@@ -168,7 +167,7 @@ public class XFormsModelBinds {
             {
 
                 // Reset context stack just to re-evaluate the variables
-                model.getContextStack().resetBindingContext(model);
+                model.resetAndEvaluateVariables();
 
                 // 1. Evaluate initial values and calculate before the rest
 
@@ -210,7 +209,7 @@ public class XFormsModelBinds {
     public void applyComputedExpressionBinds() {
 
         // Reset context stack just to re-evaluate the variables as instance values may have changed with @calculate
-        model.getContextStack().resetBindingContext(model);
+        model.resetAndEvaluateVariables();
 
         // Apply
         iterateBinds(new BindRunner() {
@@ -236,7 +235,7 @@ public class XFormsModelBinds {
             // This model may have validation binds
 
             // Reset context stack just to re-evaluate the variables
-            model.getContextStack().resetBindingContext(model);
+            model.resetAndEvaluateVariables();
 
             // 1. Validate based on type and requiredness
             if (staticModel.hasTypeBind() || staticModel.hasRequiredBind())

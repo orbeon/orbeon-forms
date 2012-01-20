@@ -92,7 +92,7 @@ class TextReplacer(submission: XFormsModelSubmission, containingDocument: XForms
         DataModel.setValueIfChanged(destinationNodeInfo, responseBody, handleSetValueSuccess, handleSetValueError)
 
         // Dispatch xforms-submit-done
-        dispatchSubmitDone(connectionResult)
+        submission.sendSubmitDone(connectionResult)
     }
 }
 

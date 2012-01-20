@@ -23,8 +23,6 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.*;
-import org.orbeon.oxf.xforms.action.actions.XFormsMessageAction;
-import org.orbeon.oxf.xforms.analysis.ElementAnalysis;
 import org.orbeon.oxf.xforms.analysis.model.Instance;
 import org.orbeon.oxf.xforms.analysis.model.Model;
 import org.orbeon.oxf.xforms.analysis.model.Submission;
@@ -73,9 +71,9 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
     private final Map<String, XFormsModelSubmission> submissions;
     private final Map<String, XFormsModelAction> actions = new HashMap<String, XFormsModelAction>();
 
-    // Variables
-//    private Map<String, Variable> variables = new LinkedHashMap<String, Variable>();
-//    private Map<String, ValueRepresentation> variableValues = new LinkedHashMap<String, ValueRepresentation>();
+    // Context and variables
+    private XFormsContextStack.BindingContext defaultEvaluationContext;
+    private Map<String, ValueRepresentation> topLevelVariables = new LinkedHashMap<String, ValueRepresentation>();
 
     // Binds
     private final XFormsModelBinds binds;
@@ -152,31 +150,25 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
         // Create context stack
         this.contextStack = new XFormsContextStack(this);
-
-        // Create variables based on static analysis
-//        for (final Map.Entry<String, VariableAnalysisTrait> entry : staticModel.jVariablesMap().entrySet()) {
-//            variables.put(entry.getKey(), new Variable(container, contextStack, entry.getValue().element()));
-//        }
     }
 
-//    public void evaluateVariables(PropertyContext propertyContext, ) {
-//
-//        variableValues.clear();
-//
-//        for (final Variable variable : variables.values()) {
-//            variable.markDirty();
-//            final ValueRepresentation value = variable.getVariableValue(propertyContext, getEffectiveId(), true);
-//            variableValues.put(variable.getVariableName(), value);
-//        }
-//
-//
-//        xxx
-//    }
+    // Evaluate all top-level variables
+    public void resetAndEvaluateVariables() {
+
+        // NOTE: This method is called during RRR and by submission processing. Need to do dependency handling.
+
+        // Reset everything
+        contextStack.resetBindingContext(this);
+        topLevelVariables.clear();
+
+        // Store context and variables
+        defaultEvaluationContext = contextStack.getCurrentBindingContext();
+        topLevelVariables.putAll(contextStack.getCurrentBindingContext().getInScopeVariables());
+    }
 
     // Return the value of the given model variable
     public SequenceIterator getVariable(String variableName) throws XPathException {
-        final Map<String, ValueRepresentation> variables = getBindingContext(containingDocument).getInScopeVariables();
-        return Value.asIterator(variables.get(variableName));
+        return Value.asIterator(topLevelVariables.get(variableName));
     }
 
     public void updateEffectiveId(String effectiveId) {
@@ -950,9 +942,14 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
     public void doRebuild() {
 
+        // Re-evaluate top-level variables if needed
+        if (deferredActionContext.rebuild)
+            resetAndEvaluateVariables();
+
         // Rebuild bind tree only if needed
         final boolean mustRebuild = instances.size() > 0 && binds != null && deferredActionContext.rebuild;
         if (mustRebuild) {
+            // NOTE: contextStack.resetBindingContext(this) called in evaluateVariables()
             binds.rebuild();
 
             // Controls may have @bind or xxforms:bind() references, so we need to mark them as dirty. Will need dependencies for controls to fix this.
@@ -1172,10 +1169,17 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         return null;
     }
 
-    // TODO: This is does not have the same semantic as getBindingContext() on controls, does it?
     public XFormsContextStack.BindingContext getBindingContext(XFormsContainingDocument containingDocument) {
-        contextStack.resetBindingContext(this);
-        return contextStack.getCurrentBindingContext();
+        // Nobody should be calling this at this time
+        throw new IllegalStateException();
+    }
+
+    public XFormsContextStack.BindingContext getDefaultEvaluationContext() {
+        return defaultEvaluationContext;
+    }
+
+    public Map<String, ValueRepresentation> getTopLevelVariables() {
+        return topLevelVariables;
     }
 
     // Don't allow any external events

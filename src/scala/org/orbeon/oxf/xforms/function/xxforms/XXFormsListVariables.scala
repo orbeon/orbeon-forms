@@ -29,10 +29,10 @@ class XXFormsListVariables extends XFormsFunction {
 
         containingDocument.getObjectByEffectiveId(modelEffectiveId) match {
             case model: XFormsModel =>
-                val variables = model.getBindingContext(containingDocument).getInScopeVariables
+                val variables = model.getTopLevelVariables
 
                 if (variables.size() > 0)
-                    new ListIterator(variables.asScala.map(v => StringValue.makeStringValue(v._1)).toList.asJava)
+                    new ListIterator(variables.asScala.map { case (name, _) => StringValue.makeStringValue(name) }.toList.asJava)
                 else
                     EmptyIterator.getInstance
 

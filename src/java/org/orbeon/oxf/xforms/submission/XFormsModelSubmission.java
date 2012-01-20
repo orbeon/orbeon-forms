@@ -24,6 +24,7 @@ import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis;
 import org.orbeon.oxf.xforms.event.*;
+import org.orbeon.oxf.xforms.event.events.XFormsSubmitDoneEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitErrorEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitSerializeEvent;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
@@ -466,7 +467,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
 
                 // NOTE: handleSubmissionResult() catches Throwable and returns a Runnable
                 if (submissionResult != null)// submissionResult is null in case the submission is running asynchronously, AND when ???
-                    submitDoneOrErrorRunnable = handleSubmissionResult(p, p2, submissionResult);
+                    submitDoneOrErrorRunnable = handleSubmissionResult(p, p2, submissionResult, true); // true because function context might have changed
 
             } catch (final Throwable throwable) {
                 /* ***** Handle errors ********************************************************************************** */
@@ -511,7 +512,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
         final SubmissionParameters p = new SubmissionParameters(null);
         final SecondPassParameters p2 = new SecondPassParameters(p);
 
-        final Runnable submitDoneRunnable = handleSubmissionResult(p, p2, submissionResult);
+        final Runnable submitDoneRunnable = handleSubmissionResult(p, p2, submissionResult, false);
 
         // Execute submit done runnable if any
         if (submitDoneRunnable != null) {
@@ -521,7 +522,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
         }
     }
 
-    private Runnable handleSubmissionResult(SubmissionParameters p, SecondPassParameters p2, final SubmissionResult submissionResult) {
+    private Runnable handleSubmissionResult(SubmissionParameters p, SecondPassParameters p2, final SubmissionResult submissionResult, boolean initializeXPathContext) {
 
         assert p != null;
         assert p2 != null;
@@ -533,9 +534,9 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
             if (indentedLogger.isDebugEnabled())
                 indentedLogger.startHandleOperation("", "handling result");
             try {
-                // Get fresh XPath context because function context might have changed
-                // NOTE: It is not ideal that we have to do this!
-                p.initializeXPathContext();
+                // Get fresh XPath context if requested
+                if (initializeXPathContext)
+                    p.initializeXPathContext();
                 // Process the different types of response
                 if (submissionResult.getThrowable() != null) {
                     // Propagate throwable, which might have come from a separate thread
@@ -598,7 +599,23 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
         }
     }
 
+    public Runnable sendSubmitDone(final ConnectionResult connectionResult) {
+        return new Runnable() {
+            public void run() {
+                // After a submission, the context might have changed
+                model.resetAndEvaluateVariables();
+
+                getXBLContainer(containingDocument)
+                    .dispatchEvent(new XFormsSubmitDoneEvent(containingDocument, XFormsModelSubmission.this, connectionResult));
+            }
+        };
+    }
+
     private void sendSubmitError(Throwable throwable, SubmissionResult submissionResult) {
+
+        // After a submission, the context might have changed
+        model.resetAndEvaluateVariables();
+
         // Try to get error event from exception
         XFormsSubmitErrorEvent submitErrorEvent = null;
         if (throwable instanceof XFormsSubmissionException) {
@@ -618,6 +635,10 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
     }
 
     private void sendSubmitError(String resolvedActionOrResource, Throwable throwable) {
+
+        // After a submission, the context might have changed
+        model.resetAndEvaluateVariables();
+
         // Try to get error event from exception
         XFormsSubmitErrorEvent submitErrorEvent = null;
         if (throwable instanceof XFormsSubmissionException) {
@@ -701,10 +722,10 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
     }
 
     public XFormsContextStack.BindingContext getBindingContext(XFormsContainingDocument containingDocument) {
-        model.getBindingContext(containingDocument);
-        final XFormsContextStack contextStack = model.getContextStack();
-        contextStack.pushBinding(getSubmissionElement(), getEffectiveId(), model.getResolutionScope());
-        return contextStack.getCurrentBindingContext();
+        // Nobody should be calling this at this time
+        // NOTE: Unlike for the model, this can make sense. It's just that we would have to decide when to evaluate the
+        // binding, and for now we evaluate the binding when needed during submission processing instead.
+        throw new IllegalStateException();
     }
 
     public class SubmissionParameters {
@@ -753,7 +774,14 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
         final boolean isDeferredSubmissionSecondPassReplaceAll;
 
         public void initializeXPathContext() {
-            final XFormsContextStack.BindingContext bindingContext = getBindingContext(containingDocument);
+
+            final XFormsContextStack.BindingContext bindingContext; {
+                model.resetAndEvaluateVariables();
+                final XFormsContextStack contextStack = model.getContextStack();
+                contextStack.pushBinding(getSubmissionElement(), getEffectiveId(), model.getResolutionScope());
+                bindingContext = contextStack.getCurrentBindingContext();
+            }
+
             final XFormsFunction.Context functionContext = contextStack.getFunctionContext(getEffectiveId());
 
             refNodeInfo = (NodeInfo) bindingContext.getSingleItem();

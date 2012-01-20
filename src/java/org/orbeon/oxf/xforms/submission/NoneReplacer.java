@@ -31,6 +31,6 @@ public class NoneReplacer extends BaseReplacer {
 
     public Runnable replace(ConnectionResult connectionResult, XFormsModelSubmission.SubmissionParameters p, XFormsModelSubmission.SecondPassParameters p2) {
         // Just notify that processing is terminated by dispatching xforms-submit-done
-        return dispatchSubmitDone(connectionResult);
+        return submission.sendSubmitDone(connectionResult);
     }
 }

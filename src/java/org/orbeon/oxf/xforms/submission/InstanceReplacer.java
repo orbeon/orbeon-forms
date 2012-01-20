@@ -231,7 +231,7 @@ public class InstanceReplacer extends BaseReplacer {
             }
 
             // Dispatch xforms-submit-done
-            return dispatchSubmitDone(connectionResult);
+            return submission.sendSubmitDone(connectionResult);
         }
     }
 

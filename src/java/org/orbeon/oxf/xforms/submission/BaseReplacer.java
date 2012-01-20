@@ -32,13 +32,4 @@ public abstract class BaseReplacer implements Replacer {
     protected IndentedLogger getDetailsLogger(final XFormsModelSubmission.SubmissionParameters p, final XFormsModelSubmission.SecondPassParameters p2) {
         return submission.getDetailsLogger(p, p2);
     }
-
-    protected Runnable dispatchSubmitDone(final ConnectionResult connectionResult) {
-        return new Runnable() {
-            public void run() {
-                submission.getXBLContainer(containingDocument)
-                    .dispatchEvent(new XFormsSubmitDoneEvent(containingDocument, submission, connectionResult));
-            }
-        };
-    }
 }

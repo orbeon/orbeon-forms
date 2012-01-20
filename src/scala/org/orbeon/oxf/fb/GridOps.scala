@@ -151,10 +151,10 @@ object GridOps {
 
     private def newRow(grid: NodeInfo, size: Int): NodeInfo = {
         // Get as many fresh ids as there are tds
-        val ids = nextIds(grid, "td", size).toIterator
+        val ids = nextIds(grid, "td", size, false).toIterator
 
         <xhtml:tr xmlns:xhtml="http://www.w3.org/1999/xhtml">{
-            (1 to size) map (_ ⇒ <xhtml:td id={tdId("td-" + ids.next())}/>)
+            (1 to size) map (_ ⇒ <xhtml:td id={ids.next()}/>)
         }</xhtml:tr>
     }
 
@@ -213,14 +213,14 @@ object GridOps {
         val allRowCells = getAllRowCells(grid)
         val pos = firstRowTd precedingSibling "*:td" size
 
-        val ids = nextIds(grid, "td", allRowCells.size).toIterator
+        val ids = nextIds(grid, "td", allRowCells.size, false).toIterator
 
         allRowCells foreach { cells ⇒
             val cell = cells(pos)
 
             // For now insert same rowspans as previous column, but could also insert full column as an option
             if (! cell.missing) {
-                insert(into = cell.td.parent.get, after = cell.td, origin = newTdElement(grid, tdId("td-" + ids.next()), if (cell.rowspan > 1) Some(cell.rowspan) else None))
+                insert(into = cell.td.parent.get, after = cell.td, origin = newTdElement(grid, ids.next(), if (cell.rowspan > 1) Some(cell.rowspan) else None))
             }
         }
 
@@ -240,10 +240,10 @@ object GridOps {
         } else {
             // First column: just insert plain tds as the first row
             val trs = grid \ "*:tr"
-            val ids = nextIds(grid, "td", trs.size).toIterator
+            val ids = nextIds(grid, "td", trs.size, false).toIterator
 
             trs foreach { tr ⇒
-                insert(into = tr, origin = newTdElement(grid, tdId("td-" + ids.next())))
+                insert(into = tr, origin = newTdElement(grid, ids.next()))
             }
 
             debugDumpDocument("insert col left", grid)
@@ -472,7 +472,7 @@ object GridOps {
         val trToInsertInto = grid \ "*:tr" apply posyToInsertInto
         val tdToInsertAfter = rowBelow.slice(0, x).reverse find (! _.missing) map (_.td) toSeq
         
-        insert(into = trToInsertInto, after = tdToInsertAfter, origin = newTdElement(grid, tdId("td-" + nextId(grid, "td"))))
+        insert(into = trToInsertInto, after = tdToInsertAfter, origin = newTdElement(grid, nextId(grid, "td")))
     }
 
     def initializeGrids(doc: NodeInfo) {
@@ -482,10 +482,10 @@ object GridOps {
         val gridTds = findFRBodyElement(doc) \\ "*:grid" \\ "*:td" filterNot (td ⇒ exists(td \@ "id"))
 
         // Get as many fresh ids as there are tds
-        val ids = nextIds(doc, "td", gridTds.size).toIterator
+        val ids = nextIds(doc, "td", gridTds.size, false).toIterator
 
         // Add the missing ids
-        gridTds foreach (ensureAttribute(_, "id", tdId("td-" + ids.next())))
+        gridTds foreach (ensureAttribute(_, "id", ids.next()))
 
         // 2. Select the first td if any
         findFRBodyElement(doc) \\ "*:grid" \\ "*:td" take 1 foreach (selectTd(_))

@@ -40,8 +40,7 @@ object ToolboxOps {
         ensureEmptyTd(doc) match {
             case Some(gridTd) ⇒
 
-                val newControlId = nextId(doc, "control")
-                val newControlName = "control-" + newControlId
+                val newControlName = controlName(nextId(doc, "control"))
 
                 // Insert control template
                 val newControlElement: NodeInfo =
@@ -178,7 +177,7 @@ object ToolboxOps {
                      xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
                      xmlns:xhtml="http://www.w3.org/1999/xhtml">
                 <xhtml:tr>
-                    <xhtml:td id={tdId("td-" + nextId(inDoc, "td"))}/>
+                    <xhtml:td id={nextId(inDoc, "td", false)}/>
                 </xhtml:tr>
             </fr:grid>
 
@@ -196,7 +195,7 @@ object ToolboxOps {
 
         val (into, after) = findSectionInsertionPoint(inDoc)
 
-        val newSectionName = "section-" + nextId(inDoc, "section")
+        val newSectionName = controlName(nextId(inDoc, "section"))
         val precedingSectionName = after flatMap (getControlNameOption(_))
 
         val sectionTemplate: NodeInfo =
@@ -209,7 +208,7 @@ object ToolboxOps {
                 <xforms:help ref={"$form-resources/" + newSectionName + "/help"}/>
                 <fr:grid edit-ref="">
                     <xhtml:tr>
-                        <xhtml:td id={tdId("td-" + nextId(inDoc, "td"))}/>
+                        <xhtml:td id={nextId(inDoc, "td", false)}/>
                     </xhtml:tr>
                 </fr:grid>
             </fb:section>
@@ -246,7 +245,7 @@ object ToolboxOps {
 
         val (into, after, grid) = findGridInsertionPoint(inDoc)
 
-        val newGridName = "grid-" + nextId(inDoc, "grid")
+        val newGridName = controlName(nextId(inDoc, "grid"))
         val templateInstanceId = templateId(newGridName)
 
         // Handle data template
@@ -272,7 +271,7 @@ object ToolboxOps {
                      xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
                      xmlns:xhtml="http://www.w3.org/1999/xhtml">
                 <xhtml:tr>
-                    <xhtml:td id={tdId("td-" + nextId(inDoc, "td"))}/>
+                    <xhtml:td id={nextId(inDoc, "td", false)}/>
                 </xhtml:tr>
             </fr:grid>
 
@@ -335,13 +334,13 @@ object ToolboxOps {
             val xvc = asNodeInfo(model("fr-form-model").get.getVariable("xcv"))
 
             (xvc \ "control" \ * headOption) foreach { control ⇒
-                val controlName = {
+                val name = {
                     val requestedName = getControlName(control)
 
                     // Check if id is already in use
                     if (findControlById(td, controlId(requestedName)).isDefined) {
                         // If so create new id
-                        val newName = "control-" + nextId(td, "control")
+                        val newName = controlName(nextId(td, "control"))
 
                         // Rename everything
                         // TODO: don't rename in place
@@ -368,7 +367,7 @@ object ToolboxOps {
                 )
 
                 // Create the bind and copy all attributes and content
-                val bind = ensureBinds(gridTd, findContainerNames(gridTd) :+ controlName, isCustomInstance)
+                val bind = ensureBinds(gridTd, findContainerNames(gridTd) :+ name, isCustomInstance)
                 (xvc \ "bind" \ * headOption) foreach { xvcBind ⇒
                     insert(into = bind, origin = (xvcBind \@ @*) ++ (xvcBind \ *))
                 }

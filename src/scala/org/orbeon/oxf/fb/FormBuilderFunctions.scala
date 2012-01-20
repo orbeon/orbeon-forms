@@ -41,7 +41,6 @@ object FormBuilderFunctions {
     def gridId(gridName: String) = gridName + "-grid"
     def controlId(controlName: String) = controlName + "-control"
     def templateId(gridName: String) = gridName + "-template"
-    def tdId(tdName: String) = tdName + "-td"
 
     // Get the body
     def findFRBodyElement(inDoc: NodeInfo) = inDoc.getDocumentRoot \ * \ "*:body" \\ (FR → "body") head
@@ -63,31 +62,41 @@ object FormBuilderFunctions {
     def templateRoot(inDoc: NodeInfo, templateName: String) = inlineInstanceRootElement(inDoc, templateId(templateName))
 
     // Find the next available id for a given token
-    def nextId(inDoc: NodeInfo, token: String) = nextIds(inDoc, token, 1).head
+    def nextId(inDoc: NodeInfo, token: String, useInstance: Boolean = true) =
+        nextIds(inDoc, token, 1).head
 
     // Find a series of next available ids for a given token
-    def nextIds(inDoc: NodeInfo, token: String, count: Int) = {
+    // Return ids of the form "foo-123-foo", where "foo" is the token
+    def nextIds(inDoc: NodeInfo, token: String, count: Int, useInstance: Boolean = true) = {
 
         val prefix = token + "-"
         val suffix = "-" + token
 
-        val instance = formInstanceRoot(inDoc)
-        val root = inDoc.getDocumentRoot
+        def findAllIds = {
+            val root = inDoc.getDocumentRoot
 
-        // Start with the number of element the given suffix
-        val initialGuess = 1 + (root \\ * flatMap (e ⇒ attValueOption(e \@ "id")) filter (_.endsWith(suffix)) size)
+            val instanceIds = if (useInstance) formInstanceRoot(root) \\ * map (localname(_) + suffix) else Seq()
+            val elementIds = root \\ * \@ "id" map (_.stringValue) filter (_.endsWith(suffix))
 
-        // Increment from guess, checking both full ids in the whole document as well as element names in the instance
-        def findNext(guess: Int) = {
-            var result = guess
-            while ((root \\ * filter (hasId(_, prefix + result + suffix)) nonEmpty) ||
-                    (instance \\ * filter (name(_) == prefix + result)))
-                result += 1
+            instanceIds ++ elementIds
+        }
+
+        val allIds = collection.mutable.Set() ++ findAllIds
+        var guess = allIds.size + 1
+
+        def nextId = {
+            def buildId(i: Int) = prefix + i + suffix
+
+            while (allIds(buildId(guess)))
+                guess += 1
+
+            val result = buildId(guess)
+            allIds += result
             result
         }
 
-        // Return count results, each new id feeding the next guess
-        (1 to count - 1 scanLeft(findNext(initialGuess)))((previousId, _) ⇒ findNext(previousId + 1))
+        for (_ ← 1 to count)
+            yield nextId
     }
 
     // Whether the current form has a custom instance

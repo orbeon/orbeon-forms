@@ -164,11 +164,12 @@ public class XFormsUtils {
         }
     }
 
+    private static final HTMLSchema TAGSOUP_HTML_SCHEMA = new HTMLSchema();
+
     private static void htmlStringToResult(String value, LocationData locationData, Result result) {
         try {
             final XMLReader xmlReader = new org.ccil.cowan.tagsoup.Parser();
-            final HTMLSchema theSchema = new HTMLSchema();
-            xmlReader.setProperty(org.ccil.cowan.tagsoup.Parser.schemaProperty, theSchema);
+            xmlReader.setProperty(org.ccil.cowan.tagsoup.Parser.schemaProperty, TAGSOUP_HTML_SCHEMA);
             xmlReader.setFeature(org.ccil.cowan.tagsoup.Parser.ignoreBogonsFeature, true);
             final TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
             identity.setResult(result);

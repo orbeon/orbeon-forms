@@ -327,6 +327,14 @@ a.xforms-help-image .fb-control-help { vertical-align: baseline; }
 /* Optional link to itemset editor shown to the bottom of the cell */
 /* Position to the left (2.5em) matched left margin of the fr-grid-content */
 .fb-edit-items { text-decoration: none; display: block; clear: both; position: absolute; left: 2.5em; bottom: .5em }
+/*  Show upload UI at the bottom of the cell and remove file upload indicator */
+.fb-static-upload { position: absolute; left: 2.5em; bottom: .5em }
+/* Simply styling for file select to just show "x" */
+#fr-form-group .fb-static-upload { background-color: none }
+#fr-form-group .fb-static-upload .xforms-upload-info { padding: 0 }
+#fr-form-group .fb-static-upload .xforms-upload-size { padding: 0 }
+#fr-form-group .fb-static-upload .xforms-upload-remove { padding: 0 }
+
 .fr-grid .fr-grid-td .fb-grid-control-icons img { display: inline }
 .fb-label-hint-placeholder { color: #bbb }
 
@@ -351,6 +359,8 @@ a.xforms-help-image .fb-control-help { vertical-align: baseline; }
 .fr-grid-content { margin-left: 2.5em; margin-right: 2.5em }
 /* Margin leaves space for trigger showing the itemset editor */
 .fr-grid-content.fb-itemset { margin-bottom: 2.5em }
+/* Margin leaves space for file upload  */
+.fr-grid-content.fb-upload { margin-bottom: 2.5em }
 .fr-grid-content .xforms-label:hover, .fr-grid-content .xforms-hint:hover { background-color: #ffffd3 }
 /* Inputs for editing the label and hint to take the whole width of the grid content */
 .fr-grid-content .xforms-label input, .fr-grid-content .xforms-hint input { width: 100% }

@@ -22,7 +22,8 @@
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
       xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
       xmlns:saxon="http://saxon.sf.net/"
-      xmlns:xbl="http://www.w3.org/ns/xbl">
+      xmlns:xbl="http://www.w3.org/ns/xbl"
+      xmlns:xformsUtils="java:org.orbeon.oxf.xforms.XFormsUtils">
     <xh:head>
         <xh:title>Orbeon Form Builder</xh:title>
         <!-- CSS -->
@@ -36,6 +37,7 @@
         <xh:script type="text/javascript" src="/forms/orbeon/newbuilder/resources/grid/action-icons.js"/>
         <xh:script type="text/javascript" src="/forms/orbeon/newbuilder/resources/grid/label-hint.js"/>
         <xh:script type="text/javascript" src="/forms/orbeon/newbuilder/resources/grid/placeholders.js"/>
+        <xh:script type="text/javascript" src="/forms/orbeon/newbuilder/resources/grid/static-upload.js"/>
         <xh:script type="text/javascript">
             var fbAccordionMenuOptions = {
                 dependent: false,
@@ -513,11 +515,13 @@
                             </xh:span>
 
                             <!-- Label editor -->
+                            <xf:output id="fb-enter-label" ref="$form-resources/enter-label/label"/>
                             <xf:group ref=".[exists($control/xf:label/@ref)]" appearance="xxforms:internal" xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps">
                                 <xf:input xxf:autocomplete="off" class="fb-control-label" ref="$current-resources/*[name() = controlOps:controlName($control-id)]/label"/>
                             </xf:group>
 
-                            <!-- Inplace editor if the control has a hint -->
+                            <!-- Hint editor -->
+                            <xf:output id="fb-enter-hint" ref="$form-resources/enter-hint/label"/>
                             <xf:group ref=".[exists($control/xf:hint/@ref)]" appearance="xxforms:internal" xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps">
                                 <xf:input xxf:autocomplete="off" class="fb-control-hint" ref="$current-resources/*[name() = controlOps:controlName($control-id)]/hint"/>
                             </xf:group>
@@ -532,8 +536,20 @@
                                     <xxf:context name="control-id" value="$control/@id"/>
                                 </xf:dispatch>
                             </xf:trigger>
-                            <xf:output id="fb-enter-label" ref="$form-resources/enter-label/label"/>
-                            <xf:output id="fb-enter-hint" ref="$form-resources/enter-hint/label"/>
+
+                            <!-- Upload control for static image -->
+                            <!--
+                                The upload is bound to the node bound to the current control. To find it, we use xxf:binding($id) instead of
+                                building an XPath expression to the node, as this wouldn't work when using a custom instance. When the
+                                control is in a repeat, the upload control needs to be bound to the node corresponding to the current
+                                iteration, so we need the control effective id. It is derived from the effective id of the cell and the
+                                static of the control by getRelatedEffectiveId().
+                            -->
+                            <xf:var name="control-effective-id" value="xformsUtils:getRelatedEffectiveId($selected-cell-effective, $control-id)"/>
+                            <xf:var name="bound-node" value="xxf:binding(concat('/', $control-effective-id))"/>
+                            <xf:upload class="fb-static-upload" id="fb-static-upload-empty" ref="$bound-node[. = ''], instance('fb-static-upload')/empty"/>
+                            <xf:upload class="fb-static-upload" id="fb-static-upload-non-empty" ref="$bound-node[. != ''], instance('fb-static-upload')/non-empty"/>
+
                         </xh:div>
 
                         <!-- Display the form being edited -->

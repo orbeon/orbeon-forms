@@ -37,7 +37,7 @@ Event.onDOMReady () ->
         cellEditorsContainer = (YD.getElementsByClassName "fb-cell-editor", null, document)[0]
         classToCategory = [
             [['xforms-input'], cellEditorInputs]
-            [['fb-grid-cell-icons', 'fb-grid-control-icons', 'fb-edit-items'], cellEditorTriggerGroups]
+            [['fb-grid-cell-icons', 'fb-grid-control-icons', 'fb-edit-items', 'fb-static-upload'], cellEditorTriggerGroups]
         ]
         for child in YD.getChildren cellEditorsContainer
             for mapping in classToCategory
@@ -45,7 +45,8 @@ Event.onDOMReady () ->
                     mapping[1].push child if YD.hasClass child, cssClass
         gs = $(cellEditorTriggerGroups)
         # NOTE: I'm not happy with the following; see question http://goo.gl/Dn1DI
-        cellEditorTriggers = $.merge(gs.find('.xforms-trigger'), gs.filter('.xforms-trigger'))
+        triggerSelector = '.xforms-trigger, .xforms-upload'
+        cellEditorTriggers = $.merge(gs.find(triggerSelector), gs.filter(triggerSelector))
 
     # Fires events related to mouse entering or existing a grid cell
     do ->

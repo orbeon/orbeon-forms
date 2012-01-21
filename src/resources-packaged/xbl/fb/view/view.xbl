@@ -33,7 +33,7 @@
 
     <!-- NOTE on namespaces: in editable mode, we might be passed a path with @edit-ref that makes assumptions on NS prefixes,
          such as xhtml:, xforms:, etc. so make sure the basic ones are defined for now. Would be worth improving on this. -->
-    
+
     <xbl:binding id="fb-view-binding" element="fb|view">
         <xbl:template>
             <xf:group appearance="xxf:internal" xxbl:scope="outer">
@@ -56,10 +56,11 @@
                     <xxf:var name="control-element" value="xxf:control-element(xxf:event('xxf:effective-targetid'))"/>
                     <xf:action if="tokenize($control-element/@class, '\s+') = 'xforms-activable'">
                         <xxf:var name="th-column" value="count($control-element/preceding-sibling::*[@xxforms:element = 'xh:th']) + 1"/>
-                        <xxf:var name="new-selected-cell" value="if ($control-element/@xxforms:element = 'xh:th') then 
+                        <xxf:var name="new-selected-cell" value="if ($control-element/@xxforms:element = 'xh:th') then
                             ($control-element/following-sibling::xf:repeat//*[@xxforms:element = 'xh:td'])[$th-column]/@id
                             else $control-element/@id"/>
                         <xf:setvalue ref="xxf:get-variable('fr-form-model', 'selected-cell')" value="$new-selected-cell"/>
+                        <xf:setvalue ref="xxf:get-variable('fr-form-model', 'selected-cell-effective')" value="xxf:event('xxf:effective-targetid')"/>
                     </xf:action>
                 </xf:action>
 

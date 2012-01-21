@@ -246,6 +246,13 @@
         </triggers>
     </xforms:instance>
 
+    <xforms:instance id="fb-static-upload">
+        <static-upload>
+            <empty/>
+            <non-empty>content</non-empty>
+        </static-upload>
+    </xforms:instance>
+
     <xforms:bind nodeset="instance('fb-triggers-instance')">
         <!-- Condition for disabling Save as… button -->
         <!-- HACK: Not sure why, but if we don't put a calculate here (which is useless), then the readonly is not evaluated on recalculate -->
@@ -292,6 +299,8 @@
 
             <!-- Currently selected cell td id -->
             <selected-cell/>
+            <selected-cell-effective/>
+
 
             <new-language/>
             <new-language-trigger/>
@@ -313,6 +322,7 @@
 
     <xxforms:variable name="variables" select="instance('fb-variables')"/>
     <xxforms:variable name="selected-cell" select="$variables/selected-cell"/>
+    <xxforms:variable name="selected-cell-effective" select="$variables/selected-cell-effective"/>
 
     <xforms:setvalue ev:event="xxforms-dialog-open" ev:observer="#document"
                      ref="instance('fb-variables')/dialogs-open" value="xs:integer(.) + 1"/>

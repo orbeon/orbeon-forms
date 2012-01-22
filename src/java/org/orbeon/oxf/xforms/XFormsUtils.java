@@ -1429,6 +1429,15 @@ public class XFormsUtils {
     }
 
     /**
+     * Convert an absolute id to an effective id.
+     */
+    public static String absoluteIdToEffectiveId(String absoluteId) {
+        assert absoluteId.startsWith("/");
+
+        return absoluteId.substring(1).replace('/', '$');
+    }
+
+    /**
      * Return the id of the enclosing HTML <form> element.
      *
      * @param containingDocument    containing document

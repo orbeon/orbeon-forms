@@ -358,7 +358,7 @@ public class XFormsActionInterpreter {
      *
      * @param actionElement     action element
      * @param attributeValue    raw value to resolve
-     * @return                  resolved attribute value
+     * @return                  resolved attribute value, null if the value is null or if the XPath context item is missing
      */
     public String resolveAVTProvideValue(Element actionElement, String attributeValue) {
 
@@ -456,7 +456,11 @@ public class XFormsActionInterpreter {
             }
             System.arraycopy(additionalParts, 0, parts, containerParts.length, additionalParts.length);
 
-            return xformsControls.getObjectByEffectiveId(resolutionScopeContainer.getFullPrefix() + targetStaticId + XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1 + StringUtils.join(parts, XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_2));
+            return
+                xformsControls.getObjectByEffectiveId(resolutionScopeContainer.getFullPrefix() +
+                targetStaticId +
+                XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1 +
+                StringUtils.join(parts, XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_2));
         }
     }
 

@@ -29,6 +29,7 @@ import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.event.events.XXFormsDndEvent;
 import org.orbeon.oxf.xforms.event.events.XXFormsIndexChangedEvent;
 import org.orbeon.oxf.xforms.event.events.XXFormsNodesetChangedEvent;
+import org.orbeon.oxf.xforms.event.events.XXFormsSetindexEvent;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
@@ -758,5 +759,15 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
     @Override
     protected Set<String> getAllowedExternalEvents() {
         return ALLOWED_EXTERNAL_EVENTS;
+    }
+
+    @Override
+    public void performDefaultAction(XFormsEvent event) {
+        if (event instanceof XXFormsSetindexEvent) {
+            // Set the index if we receive this event
+            setIndex(((XXFormsSetindexEvent) event).index());
+        } else {
+            super.performDefaultAction(event);
+        }
     }
 }

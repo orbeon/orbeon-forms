@@ -151,10 +151,10 @@ object GridOps {
 
     private def newRow(grid: NodeInfo, size: Int): NodeInfo = {
         // Get as many fresh ids as there are tds
-        val ids = nextIds(grid, "td", size).toIterator
+        val ids = nextIds(grid, "td", size, false).toIterator
 
         <xhtml:tr xmlns:xhtml="http://www.w3.org/1999/xhtml">{
-            (1 to size) map (_ ⇒ <xhtml:td id={tdId("td-" + ids.next())}/>)
+            (1 to size) map (_ ⇒ <xhtml:td id={ids.next()}/>)
         }</xhtml:tr>
     }
 
@@ -165,8 +165,13 @@ object GridOps {
 
         val posy = tr precedingSibling "*:tr" size
         val rowCells = allRowCells(posy)
-//        val nextRow = tr followingSibling "*:tr" headOption
         val nextRowCells = if (allRowCells.size > posy + 1) Some(allRowCells(posy + 1)) else None
+
+        // Find all tds to delete
+        val tdsToDelete = tr \\ "*:td"
+
+        // Find the new td to select if we are removing the currently selected td
+        val newTdToSelect = findNewTdToSelect(tr, tdsToDelete)
 
         // Decrement rowspans if needed
         rowCells.zipWithIndex foreach {
@@ -183,13 +188,20 @@ object GridOps {
         }
 
         // Delete all controls in the row
-        tr \ "*:td" foreach (deleteCellContent(_))
+        tdsToDelete foreach (deleteCellContent(_))
 
         // Delete row and its content
         delete(tr)
 
+        // Adjust selected td if needed
+        newTdToSelect foreach (selectTd(_))
+
         debugDumpDocument("delete row", tr)
     }
+
+    // Whether this is the last grid in the section
+    // NOTE: Use this until we implement the new selection system allowing moving stuff around freely
+    def isLastGridInSection(grid: NodeInfo) = childrenGrids(findAncestorContainers(grid).head).size == 1
 
     // Delete the entire grid and contained controls
     def deleteGrid(grid: NodeInfo) = deleteContainer(grid)
@@ -201,14 +213,14 @@ object GridOps {
         val allRowCells = getAllRowCells(grid)
         val pos = firstRowTd precedingSibling "*:td" size
 
-        val ids = nextIds(grid, "td", allRowCells.size).toIterator
+        val ids = nextIds(grid, "td", allRowCells.size, false).toIterator
 
         allRowCells foreach { cells ⇒
             val cell = cells(pos)
 
             // For now insert same rowspans as previous column, but could also insert full column as an option
             if (! cell.missing) {
-                insert(into = cell.td.parent.get, after = cell.td, origin = newTdElement(grid, tdId("td-" + ids.next()), if (cell.rowspan > 1) Some(cell.rowspan) else None))
+                insert(into = cell.td.parent.get, after = cell.td, origin = newTdElement(grid, ids.next(), if (cell.rowspan > 1) Some(cell.rowspan) else None))
             }
         }
 
@@ -228,14 +240,22 @@ object GridOps {
         } else {
             // First column: just insert plain tds as the first row
             val trs = grid \ "*:tr"
-            val ids = nextIds(grid, "td", trs.size).toIterator
+            val ids = nextIds(grid, "td", trs.size, false).toIterator
 
             trs foreach { tr ⇒
-                insert(into = tr, origin = newTdElement(grid, tdId("td-" + ids.next())))
+                insert(into = tr, origin = newTdElement(grid, ids.next()))
             }
 
             debugDumpDocument("insert col left", grid)
         }
+    }
+
+    // Find a column's tds
+    def getColTds(td: NodeInfo) = {
+        val rows = getContainingGridOrRepeat(td) \ "*:tr"
+        val (x, _) = tdCoordinates(td)
+
+        rows map (row ⇒ (row \ "*:td")(x))
     }
 
     // Insert a column and contained controls
@@ -245,12 +265,20 @@ object GridOps {
         val allRowCells = getAllRowCells(grid)
         val pos = firstRowTd precedingSibling "*:td" size
 
-        // Delete the concrete td at this column position in each row
+        // Find all tds to delete
+        val tdsToDelete = allRowCells map (_(pos)) filterNot (_.missing) map (_.td)
 
-        allRowCells map (_(pos)) filterNot (_.missing) foreach { cell ⇒
-            deleteCellContent(cell.td)
-            delete(cell.td)
+        // Find the new td to select if we are removing the currently selected td
+        val newTdToSelect = findNewTdToSelect(firstRowTd, tdsToDelete)
+
+        // Delete the concrete td at this column position in each row
+        tdsToDelete foreach { td ⇒
+            deleteCellContent(td)
+            delete(td)
         }
+
+        // Adjust selected td if needed
+        newTdToSelect foreach (selectTd(_))
 
         debugDumpDocument("delete col", grid)
     }
@@ -258,9 +286,10 @@ object GridOps {
     def controlsInCol(firstRowTd: NodeInfo) = {
         val grid = getContainingGridOrRepeat(firstRowTd)
         val allRowCells = getAllRowCells(grid)
-        val pos = firstRowTd precedingSibling "*:td" size
+        
+        val (x, _) = tdCoordinates(firstRowTd: NodeInfo, allRowCells: Seq[Seq[Cell]])
 
-        allRowCells map (_(pos)) filterNot (_.missing) filter (cell ⇒ hasChildren(cell.td)) size
+        allRowCells map (_(x)) filterNot (_.missing) filter (cell ⇒ hasChildren(cell.td)) size
     }
 
     private def selectedCellId =
@@ -270,10 +299,10 @@ object GridOps {
         Option(asNodeInfo(model("fr-form-model").get.getVariable("current-td")))
 
     // Find the currently selected grid td if any
-    def findSelectedTd(doc: NodeInfo) = selectedCellId match {
+    def findSelectedTd(inDoc: NodeInfo) = selectedCellId match {
         case Some(selectedCell) ⇒
             val tdId = selectedCell.stringValue
-            findBodyElement(doc) \\ "*:grid" \\ "*:td" filter (_ \@ "id" === tdId) headOption
+            findFRBodyElement(inDoc) \\ "*:grid" \\ "*:td" filter (_ \@ "id" === tdId) headOption
         case _ ⇒ // legacy FB
             legacySelectedCell
     }
@@ -285,17 +314,30 @@ object GridOps {
             setvalue(selectedCell, newTd \@ "id" stringValue)
         case _ ⇒
             // Legacy FB
-            val allRowCells = getAllRowCells(getContainingGridOrRepeat(newTd))
-            val (posx, posy) = getTdPosition(newTd, allRowCells)
+            val (x, y) = tdCoordinates(newTd)
 
-            setindex("fb-section-content-grid-tr-repeat", posy + 1)
-            setindex("fb-section-content-grid-td-repeat", posx + 1)
+            setindex("fb-section-content-grid-tr-repeat", y + 1)
+            setindex("fb-section-content-grid-td-repeat", x + 1)
     }
 
-    // Try to ensure that there is an empty td after the current location, inserting a new row if possible
-    def ensureEmptyTd(doc: NodeInfo): Option[NodeInfo] = {
+    // Whether a call to ensureEmptyTd() will succeed
+    def willEnsureEmptyTdSucceed(inDoc: NodeInfo): Boolean =
+        findSelectedTd(inDoc) match {
+            case Some(currentTd) ⇒
+                if (currentTd \ * nonEmpty)
+                    currentTd followingSibling "*:td" match {
+                        case Seq(followingTd, _*) if followingTd \ * nonEmpty  ⇒ false
+                        case _ ⇒ true
+                    }
+                else
+                    true
+            case None ⇒ false
+        }
 
-        findSelectedTd(doc) flatMap { currentTd ⇒
+    // Try to ensure that there is an empty td after the current location, inserting a new row if possible
+    def ensureEmptyTd(inDoc: NodeInfo): Option[NodeInfo] = {
+
+        findSelectedTd(inDoc) flatMap { currentTd ⇒
 
             if (currentTd \ * nonEmpty) {
                 // There is an element in the current td, figure out what to do
@@ -314,11 +356,11 @@ object GridOps {
                         val nextTrFirstTd = nextTr \ "*:td" take 1
 
                         val newTd =
-                            if (nextTr.isEmpty || (nextTrFirstTd \ *).isEmpty)
+                            if (nextTr.isEmpty || (nextTrFirstTd \ *).nonEmpty)
                                 // The first cell of the next row is occupied, or there is no next row: insert new row
-                                GridOps.insertRowBelow(currentTd.getParent) \ "*:td" head
+                                insertRowBelow(currentTd.getParent) \ "*:td" head
                             else
-                                // There is a next row, and its first cell is empty, move to that one
+                                // There is a next row, and its first cell is empty: move to that one
                                 nextTrFirstTd.head
 
                         selectTd(newTd)
@@ -370,34 +412,38 @@ object GridOps {
             (template ⇒ ensureAttribute(template, "id", templateId(newName)))
 
     // Get the x/y position of a td given Cell information
-    private def getTdPosition(td: NodeInfo, cells: Seq[Seq[Cell]]) = {
+    private def tdCoordinates(td: NodeInfo, cells: Seq[Seq[Cell]]): (Int, Int) = {
 
         // Search rows first, then cols
         // Another solution would be to store the position directly into Cell
 
-        val posy = td.parent.get precedingSibling "*:tr" size
-        val posx = cells(posy) indexWhere (_.td isSameNodeInfo td)
+        val y = td.parent.get precedingSibling "*:tr" size
+        val x = cells(y) indexWhere (_.td == td)
 
-        (posx, posy)
+        (x, y)
     }
+
+    // Get the x/y position of a td given Cell information
+    def tdCoordinates(td: NodeInfo): (Int, Int) =
+        tdCoordinates(td, getAllRowCells(getContainingGridOrRepeat(td)))
 
     // Whether there will be controls to delete if the cell is expanded
     def expandCellTouchesControl(td: NodeInfo): Boolean = {
         val allRowCells = getAllRowCells(getContainingGridOrRepeat(td))
-        val (posx, posy) = getTdPosition(td, allRowCells)
+        val (x, y) = tdCoordinates(td, allRowCells)
 
-        val cell = allRowCells(posy)(posx)
+        val cell = allRowCells(y)(x)
 
-        hasChildren(allRowCells(posy + cell.rowspan)(posx).td)
+        hasChildren(allRowCells(y + cell.rowspan)(x).td)
     }
 
     // Vertically expand the given cell
     def expandCell(td: NodeInfo) {
         val allRowCells  = getAllRowCells(getContainingGridOrRepeat(td))
-        val (posx, posy) = getTdPosition(td, allRowCells)
+        val (x, y) = tdCoordinates(td, allRowCells)
 
-        val cell = allRowCells(posy)(posx)
-        val cellBelow = allRowCells(posy + cell.rowspan)(posx)
+        val cell = allRowCells(y)(x)
+        val cellBelow = allRowCells(y + cell.rowspan)(x)
 
         // Increment rowspan
         cell.originalRowspan += cellBelow.originalRowspan
@@ -412,37 +458,37 @@ object GridOps {
         val grid = getContainingGridOrRepeat(td)
         val allRowCells  = getAllRowCells(grid)
 
-        val (posx, posy) = getTdPosition(td, allRowCells)
+        val (x, y) = tdCoordinates(td, allRowCells)
 
-        val cell = allRowCells(posy)(posx)
+        val cell = allRowCells(y)(x)
 
         // Decrement rowspan attribute
         cell.originalRowspan -= 1
 
         // Insert new td
-        val posyToInsertInto = posy + cell.rowspan - 1
+        val posyToInsertInto = y + cell.rowspan - 1
         val rowBelow = allRowCells(posyToInsertInto)
 
         val trToInsertInto = grid \ "*:tr" apply posyToInsertInto
-        val tdToInsertAfter = rowBelow.slice(0, posx).reverse find (! _.missing) map (_.td) toSeq
+        val tdToInsertAfter = rowBelow.slice(0, x).reverse find (! _.missing) map (_.td) toSeq
         
-        insert(into = trToInsertInto, after = tdToInsertAfter, origin = newTdElement(grid, tdId("td-" + nextId(grid, "td"))))
+        insert(into = trToInsertInto, after = tdToInsertAfter, origin = newTdElement(grid, nextId(grid, "td")))
     }
 
     def initializeGrids(doc: NodeInfo) {
         // 1. Annotate all the grid tds of the given document with unique ids, if they don't have them already
 
         // All grid tds with no existing id
-        val gridTds = findBodyElement(doc) \\ "*:grid" \\ "*:td" filterNot (td ⇒ exists(td \@ "id"))
+        val gridTds = findFRBodyElement(doc) \\ "*:grid" \\ "*:td" filterNot (td ⇒ exists(td \@ "id"))
 
         // Get as many fresh ids as there are tds
-        val ids = nextIds(doc, "td", gridTds.size).toIterator
+        val ids = nextIds(doc, "td", gridTds.size, false).toIterator
 
         // Add the missing ids
-        gridTds foreach (ensureAttribute(_, "id", tdId("td-" + ids.next())))
+        gridTds foreach (ensureAttribute(_, "id", ids.next()))
 
         // 2. Select the first td if any
-        findBodyElement(doc) \\ "*:grid" \\ "*:td" take 1 foreach (selectTd(_))
+        findFRBodyElement(doc) \\ "*:grid" \\ "*:td" take 1 foreach (selectTd(_))
     }
 
     def moveRowUp(td: NodeInfo) {

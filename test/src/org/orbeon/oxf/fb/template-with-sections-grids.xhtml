@@ -1,0 +1,118 @@
+<!--
+  Copyright (C) 2010 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+    <xh:head>
+        <xh:title>[Give this form a title]</xh:title>
+        <xf:model id="fr-form-model">
+
+            <!-- Main instance -->
+            <xf:instance id="fr-form-instance">
+                <form>
+                    <section-1/>
+                    <section-2/>
+                    <section-3/>
+                </form>
+            </xf:instance>
+
+            <!-- Bindings -->
+            <xf:bind id="fr-form-binds" nodeset="instance('fr-form-instance')">
+                <xf:bind id="section-1-bind" name="section-1" nodeset="section-1"/>
+                <xf:bind id="section-2-bind" name="section-1" nodeset="section-1"/>
+                <xf:bind id="section-3-bind" name="section-1" nodeset="section-1"/>
+            </xf:bind>
+
+            <!-- All form resources -->
+            <!-- Don't make readonly by default in case a service modifies the resources -->
+            <xf:instance id="fr-form-resources" xxf:readonly="false">
+                <resources>
+                    <resource xml:lang="">
+                        <section-1>
+                            <label/>
+                            <help/>
+                        </section-1>
+                        <section-2>
+                            <label/>
+                            <help/>
+                        </section-2>
+                        <section-3>
+                            <label/>
+                            <help/>
+                        </section-3>
+                    </resource>
+                </resources>
+            </xf:instance>
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <fr:view>
+            <xf:label ref="instance('fr-form-metadata')/title"/>
+            <fr:body>
+                <fr:section id="section1-section">
+                    <fr:grid id="grid11-grid">
+                        <xh:tr><xh:td id="1111"/><xh:td id="1112"/><xh:td id="1113"/></xh:tr>
+                        <xh:tr><xh:td id="1121"/><xh:td id="1122"/><xh:td id="1123"/></xh:tr>
+                        <xh:tr><xh:td id="1131"/><xh:td id="1132"/><xh:td id="1133"/></xh:tr>
+                    </fr:grid>
+                    <fr:grid id="grid12-grid">
+                        <xh:tr><xh:td id="1211"/><xh:td id="1212"/><xh:td id="1213"/></xh:tr>
+                        <xh:tr><xh:td id="1221"/><xh:td id="1222"/><xh:td id="1223"/></xh:tr>
+                        <xh:tr><xh:td id="1231"/><xh:td id="1232"/><xh:td id="1233"/></xh:tr>
+                    </fr:grid>
+                    <fr:grid id="grid13-grid">
+                        <xh:tr><xh:td id="1311"/><xh:td id="1312"/><xh:td id="1313"/></xh:tr>
+                        <xh:tr><xh:td id="1321"/><xh:td id="1322"/><xh:td id="1323"/></xh:tr>
+                        <xh:tr><xh:td id="1331"/><xh:td id="1332"/><xh:td id="1333"/></xh:tr>
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="section2-section">
+                    <fr:grid id="grid21-grid">
+                        <xh:tr><xh:td id="2111"/><xh:td id="2112"/><xh:td id="2113"/></xh:tr>
+                        <xh:tr><xh:td id="2121"/><xh:td id="2122"/><xh:td id="2123"/></xh:tr>
+                        <xh:tr><xh:td id="2131"/><xh:td id="2132"/><xh:td id="2133"/></xh:tr>
+                    </fr:grid>
+                    <fr:grid id="grid22-grid">
+                        <xh:tr><xh:td id="2211"/><xh:td id="2212"/><xh:td id="2213"/></xh:tr>
+                        <xh:tr><xh:td id="2221"/><xh:td id="2222"/><xh:td id="2223"/></xh:tr>
+                        <xh:tr><xh:td id="2231"/><xh:td id="2232"/><xh:td id="2233"/></xh:tr>
+                    </fr:grid>
+                    <fr:grid id="grid23-grid">
+                        <xh:tr><xh:td id="2311"/><xh:td id="2312"/><xh:td id="2313"/></xh:tr>
+                        <xh:tr><xh:td id="2321"/><xh:td id="2322"/><xh:td id="2323"/></xh:tr>
+                        <xh:tr><xh:td id="2331"/><xh:td id="2332"/><xh:td id="2333"/></xh:tr>
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="section3-section">
+                    <fr:grid id="grid31-grid">
+                        <xh:tr><xh:td id="3111"/><xh:td id="3112"/><xh:td id="3113"/></xh:tr>
+                        <xh:tr><xh:td id="3121"/><xh:td id="3122"/><xh:td id="3123"/></xh:tr>
+                        <xh:tr><xh:td id="3131"/><xh:td id="3132"/><xh:td id="3133"/></xh:tr>
+                    </fr:grid>
+                    <fr:grid id="grid32-grid">
+                        <xh:tr><xh:td id="3211"/><xh:td id="3212"/><xh:td id="3213"/></xh:tr>
+                        <xh:tr><xh:td id="3221"/><xh:td id="3222"/><xh:td id="3223"/></xh:tr>
+                        <xh:tr><xh:td id="3231"/><xh:td id="3232"/><xh:td id="3233"/></xh:tr>
+                    </fr:grid>
+                    <fr:grid id="grid33-grid">
+                        <xh:tr><xh:td id="3311"/><xh:td id="3312"/><xh:td id="3313"/></xh:tr>
+                        <xh:tr><xh:td id="3321"/><xh:td id="3322"/><xh:td id="3323"/></xh:tr>
+                        <xh:tr><xh:td id="3331"/><xh:td id="3332"/><xh:td id="3333"/></xh:tr>
+                    </fr:grid>
+                </fr:section>
+            </fr:body>
+        </fr:view>
+    </xh:body>
+</xh:html>

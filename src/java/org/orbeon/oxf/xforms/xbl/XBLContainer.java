@@ -490,6 +490,12 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
      */
     public Object resolveObjectById(String sourceEffectiveId, String targetStaticId, Item contextItem) {
 
+        // Handle "absolute ids" of format "/foo/bar.1-2"
+        // NOTE: Experimental, definitive format TBD
+        if (targetStaticId.startsWith("/")) {
+            return containingDocument.getObjectByEffectiveId(XFormsUtils.absoluteIdToEffectiveId(targetStaticId));
+        }
+
         // Make sure the static id passed is actually a static id
         if (!XFormsUtils.isStaticId(targetStaticId))
             throw new OXFException("Target id must be static id: " + targetStaticId);
@@ -849,7 +855,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
         // xforms-enabled/xforms-disabled. This might not be the final design, see also:
         // http://wiki.orbeon.com/forms/projects/xforms-repeat-events
         final XFormsEventTarget targetObject; {
-            if (originalEvent.getTargetObject() instanceof XFormsRepeatControl && ! (originalEvent.getName().equals("xforms-enabled") || originalEvent.getName().equals("xforms-disabled"))) {
+            if (originalEvent.getTargetObject() instanceof XFormsRepeatControl && ! (originalEvent.getName().equals("xforms-enabled") || originalEvent.getName().equals("xforms-disabled") || originalEvent.getName().equals("xxforms-setindex"))) {
                 // Handle special case of repeat being the target: use repeat iteration instead
                 targetObject = ((XFormsRepeatControl) originalEvent.getTargetObject()).getIndexIteration();
                 // If no repeat iteration is found the dispatch is a NOP

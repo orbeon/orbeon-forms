@@ -25,6 +25,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.PageFlowControllerProcessor;
 import org.orbeon.oxf.servlet.OrbeonXFormsFilter;
 import org.orbeon.oxf.util.*;
+import org.orbeon.oxf.xforms.action.XFormsAPI;
 import org.orbeon.oxf.xforms.action.XFormsActions;
 import org.orbeon.oxf.xforms.analysis.XPathDependencies;
 import org.orbeon.oxf.xforms.control.XFormsControl;
@@ -1205,25 +1206,30 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         return (Map) PipelineContext.get().getAttribute(XFormsContainingDocument.XFORMS_DYNAMIC_STATE_RESTORE_CONTROLS);
     }
 
+    // This is called upon the first creation of the XForms engine OR for testing
     private void initialize() {
-        // This is called upon the first creation of the XForms engine or for testing only
 
-        // Create XForms controls and models
-        createControlsAndModels();
+        // Scope the containing document for the XForms API
+        XFormsAPI.withContainingDocumentJava(this, new Runnable() {
+            public void run() {
+                // Create XForms controls and models
+                createControlsAndModels();
 
-        // Group all xforms-model-construct-done and xforms-ready events within a single outermost action handler in
-        // order to optimize events
-        // Perform deferred updates only for xforms-ready
-        startOutermostActionHandler();
-        {
-            // Initialize models
-            initializeModels();
+                // Group all xforms-model-construct-done and xforms-ready events within a single outermost action handler in
+                // order to optimize events
+                // Perform deferred updates only for xforms-ready
+                startOutermostActionHandler();
+                {
+                    // Initialize models
+                    initializeModels();
 
-            // After initialization, some async submissions might be running
-            processCompletedAsynchronousSubmissions(true, true);
-        }
-        // End deferred behavior
-        endOutermostActionHandler();
+                    // After initialization, some async submissions might be running
+                    processCompletedAsynchronousSubmissions(true, true);
+                }
+                // End deferred behavior
+                endOutermostActionHandler();
+            }
+        });
     }
 
     public AsynchronousSubmissionManager getAsynchronousSubmissionManager(boolean create) {

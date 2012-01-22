@@ -44,7 +44,7 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
     public void init(String uri, String localname, String qName, Attributes attributes, Object matched) throws SAXException {
         super.init(uri, localname, qName, attributes, matched);
 
-        this.placeHolderInfo = XFormsInputControl.getPlaceholderInfo(handlerContext.getPartAnalysis(), elementAnalysis, getControl());
+        this.placeHolderInfo = XFormsInputControl.getPlaceholderInfo(elementAnalysis, getControl());
     }
     
     private boolean isDateTime() {

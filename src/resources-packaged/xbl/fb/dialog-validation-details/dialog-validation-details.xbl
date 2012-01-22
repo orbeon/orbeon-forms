@@ -139,19 +139,21 @@
 
                     <!-- Insert bind if needed -->
                     <xforms:action type="xpath">
-                        (: Set built-in type if needed :)
-                        if ($local/builtin-type != '') then
-                            controlOps:updateMip($form, fbf:controlId($local/control-name), 'type',
-                                concat(if ($local/required = 'true' and not($local/builtin-type = ('listItem', 'listItems', 'dayTimeDuration', 'yearMonthDuration', 'email', 'card-number'))) then 'xs:' else 'xforms:', $local/builtin-type)) else (),
-                        (: Set schema type if needed :)
-                        (: TODO: Handle namespace and prefix for namespace :)
-                        if ($local/schema-type != '') then
-                            controlOps:updateMip($form, fbf:controlId($local/control-name), 'type', $local/schema-type) else (),
-                        (: "required" MIP :)
-                        controlOps:updateMip($form, fbf:controlId($local/control-name), 'required', for $v in $local/required/string return if ($v = 'true') then 'true()' else ''),
-                        (: All other MIPs :)
-                        for $mip in ('constraint', 'relevant', 'readonly', 'calculate', 'initial-value') return
-                            controlOps:updateMip($form, fbf:controlId($local/control-name), $mip, $local/*[name() = $mip])
+                        for $control-name in fbf:controlId($local/control-name) return (
+                            (: Set built-in type if needed :)
+                            if ($local/builtin-type != '') then
+                                controlOps:updateMip($form, $control-name, 'type',
+                                    concat(if ($local/required = 'true' and not($local/builtin-type = ('listItem', 'listItems', 'dayTimeDuration', 'yearMonthDuration', 'email', 'card-number'))) then 'xs:' else 'xforms:', $local/builtin-type)) else (),
+                            (: Set schema type if needed :)
+                            (: TODO: Handle namespace and prefix for namespace :)
+                            if ($local/schema-type != '') then
+                                controlOps:updateMip($form, $control-name, 'type', $local/schema-type) else (),
+                            (: "required" MIP :)
+                            controlOps:updateMip($form, $control-name, 'required', for $v in $local/required/string() return if ($v = 'true') then 'true()' else ''),
+                            (: All other MIPs :)
+                            for $mip in ('constraint', 'relevant', 'readonly', 'calculate', 'initial-value') return
+                                controlOps:updateMip($form, $control-name, $mip, $local/*[name() = $mip])
+                        )
                     </xforms:action>
                 </xforms:action>
 

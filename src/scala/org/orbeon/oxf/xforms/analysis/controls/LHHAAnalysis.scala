@@ -21,6 +21,7 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import scala.collection.JavaConversions._
 import org.orbeon.saxon.dom4j.DocumentWrapper
 import xbl.Scope
+import org.orbeon.oxf.xforms.XFormsConstants._
 
 abstract class LHHAAnalysis(staticStateContext: StaticStateContext, element: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], scope: Scope)
         extends SimpleElementAnalysis(staticStateContext, element, parent, preceding, scope) with AppearanceTrait {
@@ -104,10 +105,24 @@ abstract class LHHAAnalysis(staticStateContext: StaticStateContext, element: Ele
 }
 
 object LHHAAnalysis {
+    // Try to figure out if we have a dynamic LHHA element, including nested xforms:output and AVTs.
     private def hasStaticValue(staticStateContext: StaticStateContext, lhhaElement: Element): Boolean = {
-        // Try to figure out if we have a dynamic LHHA element, including nested xforms:output and AVTs.
         XPathCache.evaluateSingle(new DocumentWrapper(lhhaElement.getDocument, null, XPathCache.getGlobalConfiguration).wrap(lhhaElement),
             "not(exists(descendant-or-self::xforms:*[@ref or @nodeset or @bind or @value] | descendant::*[@*[contains(., '{')]]))",
             XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING, null, null, null, null, ElementAnalysis.createLocationData(lhhaElement)).asInstanceOf[Boolean]
     }
+
+    // Whether the control has label OR hint placeholder
+    def hasLabelOrHintPlaceholder(elementAnalysis: ElementAnalysis) =
+        Seq("label", "hint") exists (hasLHHAPlaceholder(elementAnalysis, _))
+
+    // Whether the control has a placeholder for the given LHHA type
+    def hasLHHAPlaceholder(elementAnalysis: ElementAnalysis, lhhaType: String) =
+        elementAnalysis match {
+            case lhhaTrait: LHHATrait ⇒
+                lhhaTrait.getLHHA(lhhaType).toSeq exists
+                    (lhha ⇒ lhha.appearances(XFORMS_MINIMAL_APPEARANCE_QNAME) || lhha.appearances(XXFORMS_PLACEHOLDER_APPEARANCE_QNAME))
+            case _ ⇒
+                false
+        }
 }

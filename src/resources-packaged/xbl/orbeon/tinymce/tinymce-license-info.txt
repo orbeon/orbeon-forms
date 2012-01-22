@@ -1,0 +1,7 @@
+Major parts of TinyMCE are created by Moxiecode Systems AB - http://www.moxiecode.com/
+
+TinyMCE is released under the LGPL (GNU Lesser General Public License).
+For the full text of that license, see: http://tinymce.moxiecode.com/wiki.php/License
+
+Regarding restriction on using TinyMCE in commercial applications, see:
+http://tinymce.moxiecode.com/wiki.php/TinyMCE_FAQ#Are_there_any_restrictions_to_using_TinyMCE_in_my_commercial_application.3F

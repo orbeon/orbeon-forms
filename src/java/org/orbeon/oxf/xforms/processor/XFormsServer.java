@@ -29,6 +29,7 @@ import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.action.XFormsAPI;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl;
 import org.orbeon.oxf.xforms.event.ClientEvents;
@@ -179,31 +180,37 @@ public class XFormsServer extends ProcessorImpl {
                     // most cases should get files here only in noscript mode, but there is a chance in script mode in
                     // a 2-pass submission that some files could make it here as well.
 
-                    final boolean allEvents;
+                    final boolean[] allEvents = new boolean[1];
                     final Set<String> valueChangeControlIds = new HashSet<String>();
                     if (hasEvents || hasFiles) {
-                        final IndentedLogger eventsIndentedLogger = containingDocument.getIndentedLogger(XFormsEvents.LOGGING_CATEGORY);
-                        eventsIndentedLogger.startHandleOperation("", "handling external events and/or uploaded files");
-                        {
-                            // Start external events
-                            containingDocument.beforeExternalEvents(response);
-
-                            // Handle uploaded files for noscript if any
-                            if (hasFiles) {
-                                eventsIndentedLogger.logDebug("", "handling uploaded files");
-                                XFormsUploadControl.handleUploadedFiles(containingDocument, filesElement);
+                        // Scope the containing document for the XForms API
+                        XFormsAPI.withContainingDocumentJava(containingDocument, new Runnable() {
+                            public void run() {
+                                
+                                final IndentedLogger eventsIndentedLogger = containingDocument.getIndentedLogger(XFormsEvents.LOGGING_CATEGORY);
+                                eventsIndentedLogger.startHandleOperation("", "handling external events and/or uploaded files");
+                                {
+                                    // Start external events
+                                    containingDocument.beforeExternalEvents(response);
+        
+                                    // Handle uploaded files for noscript if any
+                                    if (hasFiles) {
+                                        eventsIndentedLogger.logDebug("", "handling uploaded files");
+                                        XFormsUploadControl.handleUploadedFiles(containingDocument, filesElement);
+                                    }
+        
+                                    // Dispatch the events
+                                    allEvents[0] = hasEvents && ClientEvents.processEvents(pipelineContext, containingDocument,
+                                            clientEvents, serverEventsElements, valueChangeControlIds);
+        
+                                    // End external events
+                                    containingDocument.afterExternalEvents();
+                                }
+                                eventsIndentedLogger.endHandleOperation();
                             }
-
-                            // Dispatch the events
-                            allEvents = hasEvents && ClientEvents.processEvents(pipelineContext, containingDocument,
-                                    clientEvents, serverEventsElements, valueChangeControlIds);
-
-                            // End external events
-                            containingDocument.afterExternalEvents();
-                        }
-                        eventsIndentedLogger.endHandleOperation();
+                        });
                     } else {
-                        allEvents = false;
+                        allEvents[0] = false;
                     }
 
                     // Check if there is a submission with replace="all" that needs processing
@@ -256,7 +263,7 @@ public class XFormsServer extends ProcessorImpl {
 
                                 // Prepare and/or output response
                                 outputAjaxResponse(containingDocument, indentedLogger, valueChangeControlIds,
-                                        requestDocument, responseReceiver, allEvents, false);
+                                        requestDocument, responseReceiver, allEvents[0], false);
 
                                 // Store response in to document
                                 containingDocument.rememberLastAjaxResponse(responseStore);

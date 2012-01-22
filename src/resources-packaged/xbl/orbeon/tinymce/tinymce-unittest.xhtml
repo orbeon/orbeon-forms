@@ -1,0 +1,25 @@
+<xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml"
+      xmlns:xforms="http://www.w3.org/2002/xforms"
+      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+      xmlns:ev="http://www.w3.org/2001/xml-events"
+      xmlns:xs="http://www.w3.org/2001/XMLSchema"
+      xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+    <xhtml:head>
+        <xhtml:title>XForms Hello</xhtml:title>
+        <xforms:model>
+            <xforms:instance>
+                <instance/>
+            </xforms:instance>
+        </xforms:model>
+    </xhtml:head>
+    <xhtml:body>
+		TinyMCE:
+		<fr:tinymce ref="." id="unittest-tinymce"/>
+		Output:
+		<xforms:output value="." id="unittest-output"/>
+		<xforms:trigger>
+			<xforms:label>Add length</xforms:label>
+			<xforms:setvalue ev:event="DOMActivate" ref="." value="concat(string-length(.), ' ',.)"/>
+		</xforms:trigger>
+    </xhtml:body>
+</xhtml:html>

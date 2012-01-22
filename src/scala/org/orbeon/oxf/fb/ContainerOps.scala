@@ -17,22 +17,23 @@ import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.scaxon.XML._
 import org.orbeon.oxf.fb.ControlOps._
-import org.orbeon.oxf.fr.FormRunner
-import org.orbeon.oxf.xforms.XFormsConstants.XFORMS_NAMESPACE_URI
+import org.orbeon.oxf.fb.GridOps._
+import FormBuilderFunctions._
 
 object ContainerOps {
 
-    val FormBuilderNS = "http://orbeon.org/oxf/xml/form-builder"
+    val GridElementQNames = Set(
+        FR → "grid",
+        FR → "repeat", // for legacy FB
+        XF → "repeat"  // for legacy FB
+    )
 
     // Hardcoded list of FB controls we know can contain others
     // TODO: "fr:tab" (special because "fr:tabview/fr:tab" are always combined)
-    val ContainerElementQNames = Set(
-        FormRunner.NS → "section",
-        FormBuilderNS → "section",
-        FormRunner.NS → "grid",
-        FormRunner.NS → "body",
-        FormRunner.NS → "repeat",       // for legacy FB
-        XFORMS_NAMESPACE_URI → "repeat" // for legacy FB
+    val ContainerElementQNames = GridElementQNames ++ Set(
+        FR → "body",
+        FR → "section",
+        FB → "section"
     )
 
     val ContainerElementTest = ContainerElementQNames map (pairToTest(_)) reduce (_ || _)
@@ -49,11 +50,32 @@ object ContainerOps {
     def findContainerNames(descendant: NodeInfo): Seq[String] =
         findAncestorContainers(descendant).reverse map (getControlNameOption(_)) flatten
 
+    // Find the new td to select if we are removing the currently selected td
+    def findNewTdToSelect(inDoc: NodeInfo, tdsToDelete: Seq[NodeInfo]) =
+        findSelectedTd(inDoc) match {
+            case Some(selectedTd) if tdsToDelete contains selectedTd ⇒
+                // Prefer trying following before preceding, as things move up and left when deleting
+                // NOTE: Could improve this by favoring things "at same level", e.g. stay in grid if possible, then
+                // stay in section, etc.
+                (followingTd(selectedTd) filterNot (tdsToDelete contains _) headOption) orElse
+                    (precedingTds(selectedTd) filterNot (tdsToDelete contains _) headOption)
+            case _ ⇒
+                None
+        }
+
+    // A container's children containers
+    def childrenContainers(container: NodeInfo) =
+        container \ * filter (e ⇒ ContainerElementQNames(qname(e)))
+
+    // A container's children grids (including repeated grids)
+    def childrenGrids(container: NodeInfo) =
+        container \ * filter (e ⇒ GridElementQNames(qname(e)))
+
     // Delete the entire container and contained controls
     def deleteContainer(container: NodeInfo) = {
 
-        def childrenContainers(container: NodeInfo) =
-            container \ * filter (e ⇒ ContainerElementQNames(qname(e)))
+        // Find the new td to select if we are removing the currently selected td
+        val newTdToSelect = findNewTdToSelect(container, container \\ "*:td")
 
         def recurse(container: NodeInfo): Seq[NodeInfo] = {
             // Go depth-first so we delete containers after all their content has been deleted
@@ -67,6 +89,9 @@ object ContainerOps {
 
         // Start with top-level container and delete everything that was returned
         recurse(container) foreach (delete(_))
+
+        // Adjust selected td if needed
+        newTdToSelect foreach (selectTd(_))
     }
 
     // Find all siblings of the given element with the given name, excepting the given element
@@ -126,5 +151,16 @@ object ContainerOps {
 
             case _ ⇒
         }
+    }
+    // Return a td's preceding tds in the hierarchy of containers
+    def precedingTds(td: NodeInfo) = {
+        val preceding = td preceding "*:td"
+        preceding intersect (findAncestorContainers(td).last descendant "*:td")
+    }
+
+    // Return a td's following tds in the hierarchy of containers
+    def followingTd(td: NodeInfo) = {
+        val following = td following "*:td"
+        following intersect (findAncestorContainers(td).last descendant "*:td")
     }
 }

@@ -24,6 +24,7 @@
       xmlns:saxon="http://saxon.sf.net/"
       xmlns:xbl="http://www.w3.org/ns/xbl"
       xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary"
+      xmlns:toolboxOps="java:org.orbeon.oxf.fb.ToolboxOps"
 
       xxforms:external-events="show-fb-test-dialog"
       xxforms:noscript-support="false"
@@ -245,6 +246,13 @@
         </triggers>
     </xforms:instance>
 
+    <xforms:instance id="fb-static-upload">
+        <static-upload>
+            <empty/>
+            <non-empty>content</non-empty>
+        </static-upload>
+    </xforms:instance>
+
     <xforms:bind nodeset="instance('fb-triggers-instance')">
         <!-- Condition for disabling Save as… button -->
         <!-- HACK: Not sure why, but if we don't put a calculate here (which is useless), then the readonly is not evaluated on recalculate -->
@@ -291,13 +299,16 @@
 
             <!-- Currently selected cell td id -->
             <selected-cell/>
+            <selected-cell-effective/>
+
 
             <new-language/>
             <new-language-trigger/>
 
-            <controls-triggers/>
-            <sections-triggers/>
-            <grids-triggers/>
+            <!-- Toolbox -->
+            <section-trigger/>
+            <grid-trigger/>
+            <control-trigger/>
 
             <!-- Number of open dialogs -->
             <dialogs-open>0</dialogs-open>
@@ -311,6 +322,7 @@
 
     <xxforms:variable name="variables" select="instance('fb-variables')"/>
     <xxforms:variable name="selected-cell" select="$variables/selected-cell"/>
+    <xxforms:variable name="selected-cell-effective" select="$variables/selected-cell-effective"/>
 
     <xforms:setvalue ev:event="xxforms-dialog-open" ev:observer="#document"
                      ref="instance('fb-variables')/dialogs-open" value="xs:integer(.) + 1"/>
@@ -331,13 +343,10 @@
                      <!--value="concat('xxx out ', xxforms:event('xxforms:effective-targetid'))"/>-->
 
     <xforms:bind ref="instance('fb-variables')">
-        <!-- When are toolbar controls triggers enabled -->
-        <xforms:bind ref="controls-triggers"
-                     readonly="$current-td/ancestor::xbl:binding or ($current-td/* and not($current-td/following-sibling::*:td[1][not(*)]
-                                                                        or not($current-td/following-sibling::*:td)
-                                                                            and (not(exists($current-td/../following-sibling::*:tr[1]/*:td[1]/*)))))"/>
-        <!-- When are grids triggers enabled -->
-        <xforms:bind ref="grids-triggers" readonly="$current-td/ancestor::xbl:binding"/>
+        <!-- Make buttons readonly depending on whether items can be inserted -->
+        <xforms:bind ref="section-trigger"  readonly="$current-td/ancestor::xbl:binding or not(toolboxOps:canInsertSection($body))"/>
+        <xforms:bind ref="grid-trigger"     readonly="$current-td/ancestor::xbl:binding or not(toolboxOps:canInsertGrid($body))"/>
+        <xforms:bind ref="control-trigger"  readonly="$current-td/ancestor::xbl:binding or not(toolboxOps:canInsertControl($body))"/>
     </xforms:bind>
 
     <!-- Schema upload dialog -->

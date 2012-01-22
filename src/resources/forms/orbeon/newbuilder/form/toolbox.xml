@@ -76,7 +76,7 @@
                     <xhtml:div class="fb-tools">
                         <!-- Add new section -->
                         <xhtml:div class="fb-tool">
-                            <xforms:trigger id="insert-new-section-trigger">
+                            <xforms:trigger id="insert-new-section-trigger" ref="instance('fb-variables')/section-trigger" >
                                 <xforms:label>
                                     <xhtml:img src="/apps/fr/style/images/silk/layout_add.png" alt=""/>
                                     <xhtml:span><xforms:output value="$form-resources/new-section/label"/></xhtml:span>
@@ -87,31 +87,29 @@
                             </xforms:trigger>
                         </xhtml:div>
                         <!-- Add grids -->
-                        <xforms:group ref="instance('fb-variables')/grids-triggers" appearance="xxforms:internal">
-                            <xhtml:div class="fb-tool">
-                                <xforms:trigger appearance="full" id="insert-new-grid-trigger">
-                                    <xforms:label>
-                                        <xhtml:img src="/apps/fr/style/images/silk/table_add.png" alt=""/>
-                                        <xhtml:span><xforms:output value="$form-resources/new-grid/label"/></xhtml:span>
-                                    </xforms:label>
-                                    <xforms:action ev:event="DOMActivate" type="xpath" xmlns:toolboxOps="java:org.orbeon.oxf.fb.ToolboxOps">
-                                        toolboxOps:insertNewGrid($model)
-                                    </xforms:action>
-                                </xforms:trigger>
-                            </xhtml:div>
-                            <xhtml:div class="fb-tool">
-                                <xforms:trigger appearance="full" id="insert-new-repeat-trigger">
-                                    <xforms:label>
-                                        <xhtml:img src="/apps/fr/style/images/silk/table_add.png" alt=""/>
-                                        <!-- TODO: i18n <xhtml:span><xforms:output value="$form-resources/new-grid/label"/></xhtml:span>-->
-                                        <xhtml:span>New Repeat</xhtml:span>
-                                    </xforms:label>
-                                    <xforms:action ev:event="DOMActivate" type="xpath" xmlns:toolboxOps="java:org.orbeon.oxf.fb.ToolboxOps">
-                                        toolboxOps:insertNewRepeat($model)
-                                    </xforms:action>
-                                </xforms:trigger>
-                            </xhtml:div>
-                        </xforms:group>
+                        <xhtml:div class="fb-tool">
+                            <xforms:trigger appearance="full" id="insert-new-grid-trigger" ref="instance('fb-variables')/grid-trigger" >
+                                <xforms:label>
+                                    <xhtml:img src="/apps/fr/style/images/silk/table_add.png" alt=""/>
+                                    <xhtml:span><xforms:output value="$form-resources/new-grid/label"/></xhtml:span>
+                                </xforms:label>
+                                <xforms:action ev:event="DOMActivate" type="xpath" xmlns:toolboxOps="java:org.orbeon.oxf.fb.ToolboxOps">
+                                    toolboxOps:insertNewGrid($model)
+                                </xforms:action>
+                            </xforms:trigger>
+                        </xhtml:div>
+                        <xhtml:div class="fb-tool">
+                            <xforms:trigger appearance="full" id="insert-new-repeat-trigger" ref="instance('fb-variables')/grid-trigger" >
+                                <xforms:label>
+                                    <xhtml:img src="/apps/fr/style/images/silk/table_add.png" alt=""/>
+                                    <!-- TODO: i18n <xhtml:span><xforms:output value="$form-resources/new-grid/label"/></xhtml:span>-->
+                                    <xhtml:span>New Repeat</xhtml:span>
+                                </xforms:label>
+                                <xforms:action ev:event="DOMActivate" type="xpath" xmlns:toolboxOps="java:org.orbeon.oxf.fb.ToolboxOps">
+                                    toolboxOps:insertNewRepeat($model)
+                                </xforms:action>
+                            </xforms:trigger>
+                        </xhtml:div>
                     </xhtml:div>
                     <!-- Controls and components -->
                     <xforms:repeat nodeset="instance('fb-components-instance')/xbl:xbl[xbl:binding]">
@@ -128,7 +126,7 @@
                                     <xxforms:variable name="is-section-component" value="tokenize($binding/@class, '\s+') = 'fr-section-component'" as="xs:boolean"/>
 
                                     <xhtml:div class="fb-tool">
-                                        <xforms:trigger id="fb-add-component-trigger" ref="instance('fb-variables')/(if ($is-section-component) then sections-triggers else controls-triggers)">
+                                        <xforms:trigger id="fb-add-component-trigger" ref="instance('fb-variables')/(if ($is-section-component) then section-trigger else control-trigger)">
                                             <xforms:label>
                                                 <xhtml:img src="{($binding/fb:metadata/fb:icon/fb:small-icon[@lang = $lang],$binding/fb:metadata/fb:icon/fb:small-icon[1], '/apps/fr/style/images/silk/plugin.png')[1]}" alt="" width="16" height="16"/>
                                                 <xhtml:span><xforms:output value="($binding/fb:metadata/fb:display-name[@lang = $lang], $binding/fb:metadata/fb:display-name[1])[1]"/></xhtml:span>
@@ -172,12 +170,6 @@
                             </xforms:group>
                         </xhtml:div>
                     </xforms:repeat>
-
-                    <!--<xforms:trigger appearance="minimal">-->
-                        <!--<xforms:label>test</xforms:label>-->
-                        <!--<xxforms:invalidate-instances ev:event="DOMActivate"/>-->
-                    <!--</xforms:trigger>-->
-
                 </xhtml:div>
             </xhtml:dd>
             <xhtml:dt id="fb-toolbox-metadata-dt" class="a-m-t"><xforms:output value="$form-resources/metadata/label"/></xhtml:dt>

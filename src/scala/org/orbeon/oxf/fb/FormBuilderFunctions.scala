@@ -17,11 +17,19 @@ import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.XML._
 import org.orbeon.oxf.xml.TransformerUtils
+import org.orbeon.oxf.fr.FormRunner
+import org.orbeon.oxf.xforms.XFormsConstants.XFORMS_NAMESPACE_URI
+import org.orbeon.oxf.xml.XMLConstants.XHTML_NAMESPACE_URI
 
 /**
  * Form Builder functions.
  */
 object FormBuilderFunctions {
+
+    val XH = XHTML_NAMESPACE_URI
+    val XF = XFORMS_NAMESPACE_URI
+    val FR = FormRunner.NS
+    val FB = "http://orbeon.org/oxf/xml/form-builder"
 
     // Get an id based on a name
     // NOTE: The idea as of 2011-06-21 is that we support reading indiscriminately the -control, -grid and -section
@@ -33,53 +41,62 @@ object FormBuilderFunctions {
     def gridId(gridName: String) = gridName + "-grid"
     def controlId(controlName: String) = controlName + "-control"
     def templateId(gridName: String) = gridName + "-template"
-    def tdId(tdName: String) = tdName + "-td"
 
     // Get the body
-    def findBodyElement(doc: NodeInfo) = doc.getDocumentRoot \ * \ "*:body" head
+    def findFRBodyElement(inDoc: NodeInfo) = inDoc.getDocumentRoot \ * \ "*:body" \\ (FR → "body") head
 
     // Get the form model
-    def findModelElement(doc: NodeInfo) = doc.getDocumentRoot \ * \ "*:head" \ "*:model" filter (hasId(_, "fr-form-model")) head
+    def findModelElement(inDoc: NodeInfo) = inDoc.getDocumentRoot \ * \ "*:head" \ "*:model" filter (hasId(_, "fr-form-model")) head
 
     // Find an xforms:instance element
-    def instanceElement(doc: NodeInfo, id: String) =
-        findModelElement(doc) \ "*:instance" filter (hasId(_, id)) headOption
+    def instanceElement(inDoc: NodeInfo, id: String) =
+        findModelElement(inDoc) \ "*:instance" filter (hasId(_, id)) headOption
 
     // Find an inline instance's root element
-    def inlineInstanceRootElement(doc: NodeInfo, id: String) =
-        instanceElement(doc, id).toSeq \ * headOption
+    def inlineInstanceRootElement(inDoc: NodeInfo, id: String) =
+        instanceElement(inDoc, id).toSeq \ * headOption
 
     // Get the root element of instances
-    def formInstanceRoot(doc: NodeInfo) = inlineInstanceRootElement(doc, "fr-form-instance").get
+    def formInstanceRoot(inDoc: NodeInfo) = inlineInstanceRootElement(inDoc, "fr-form-instance").get
     def formResourcesRoot = asNodeInfo(model("fr-form-model").get.getVariable("resources"))
-    def templateRoot(doc: NodeInfo, templateName: String) = inlineInstanceRootElement(doc, templateId(templateName))
+    def templateRoot(inDoc: NodeInfo, templateName: String) = inlineInstanceRootElement(inDoc, templateId(templateName))
 
     // Find the next available id for a given token
-    def nextId(doc: NodeInfo, token: String) = nextIds(doc, token, 1).head
+    def nextId(inDoc: NodeInfo, token: String, useInstance: Boolean = true) =
+        nextIds(inDoc, token, 1).head
 
     // Find a series of next available ids for a given token
-    def nextIds(doc: NodeInfo, token: String, count: Int) = {
+    // Return ids of the form "foo-123-foo", where "foo" is the token
+    def nextIds(inDoc: NodeInfo, token: String, count: Int, useInstance: Boolean = true) = {
 
         val prefix = token + "-"
         val suffix = "-" + token
 
-        val instance = formInstanceRoot(doc)
-        val root = doc.getDocumentRoot
+        def findAllIds = {
+            val root = inDoc.getDocumentRoot
 
-        // Start with the number of element the given suffix
-        val initialGuess = 1 + (root \\ * flatMap (e ⇒ attValueOption(e \@ "id")) filter (_.endsWith(suffix)) size)
+            val instanceIds = if (useInstance) formInstanceRoot(root) \\ * map (localname(_) + suffix) else Seq()
+            val elementIds = root \\ * \@ "id" map (_.stringValue) filter (_.endsWith(suffix))
 
-        // Increment from guess, checking both full ids in the whole document as well as element names in the instance
-        def findNext(guess: Int) = {
-            var result = guess
-            while ((root \\ * filter (hasId(_, prefix + result + suffix)) nonEmpty) ||
-                    (instance \\ * filter (name(_) == prefix + result)))
-                result += 1
+            instanceIds ++ elementIds
+        }
+
+        val allIds = collection.mutable.Set() ++ findAllIds
+        var guess = allIds.size + 1
+
+        def nextId = {
+            def buildId(i: Int) = prefix + i + suffix
+
+            while (allIds(buildId(guess)))
+                guess += 1
+
+            val result = buildId(guess)
+            allIds += result
             result
         }
 
-        // Return count results, each new id feeding the next guess
-        (1 to count - 1 scanLeft(findNext(initialGuess)))((previousId, _) ⇒ findNext(previousId + 1))
+        for (_ ← 1 to count)
+            yield nextId
     }
 
     // Whether the current form has a custom instance

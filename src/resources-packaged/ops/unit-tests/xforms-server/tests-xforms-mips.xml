@@ -1552,5 +1552,52 @@
             </controls>
         </output>
     </test>
+    
+    <test description="Validation information is updated before xforms-ready runs" name="oxf:pipeline">
+        <!-- See: http://forge.ow2.org/tracker/index.php?func=detail&aid=316315&group_id=168&atid=350207 -->
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms" xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="instance">
+                            <instance>
+                                <value valid="true"/>
+                                <result/>
+                            </instance>
+                        </xf:instance>
+
+                        <!-- Validity depends on a value -->
+                        <xf:bind ref="value" constraint="@valid = 'true'"/>
+
+                        <!-- Update value on which validity depends -->
+                        <xf:setvalue ev:event="xforms-model-construct-done" ref="value/@valid">false</xf:setvalue>
+                        <!-- Get latest validity -->
+                        <xf:setvalue ev:event="xforms-ready" ref="result" value="xxf:valid(../value)"/>
+                    </xf:model>
+                </xh:head>
+                <xh:body/>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <instance>
+                                    <value valid="false"/>
+                                    <result>false</result>
+                                </instance>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
 
 </group>

@@ -738,7 +738,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
         return false;
     }
 
-    private void rebuildRecalculateRevalidateIfNeeded() {
+    protected void rebuildRecalculateRevalidateIfNeeded() {
         if (isRelevant()) {
             // Handle this container
             for (final XFormsModel model: models) {
@@ -770,26 +770,6 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
     public void refreshIfNeeded() {
         // Delegate to controls
         containingDocument.getControls().refreshIfNeeded(this);
-    }
-
-    public void rebuildRecalculateIfNeeded() {
-        if (isRelevant()) {
-            // Handle this container
-            for (final XFormsModel model: models) {
-                model.rebuildRecalculateIfNeeded();
-            }
-            // Recurse into children containers
-            if (childrenXBLContainers != null) {
-                // NOTE: childrenContainers might be modified down the line and cause a ConcurrentModificationException
-                // so make a copy here before processing.
-                // TODO: The exact situation is not entirely clear and there might be other places in this class where this
-                // might happen!
-                final Map<String, XBLContainer> tempMap = new LinkedHashMap<String, XBLContainer>(childrenXBLContainers);
-                for (final XBLContainer container: tempMap.values()) {
-                    container.rebuildRecalculateIfNeeded();
-                }
-            }
-        }
     }
 
     public String getId() {

@@ -1271,8 +1271,10 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
     protected void initializeNestedControls() {
         // Call-back from super class models initialization
 
-        // This is important because if controls use binds, those must be up to date
-        rebuildRecalculateIfNeeded();
+        // This is important because if controls use binds, those must be up to date. In addition, MIP values will be up
+        // to date. Finally, upon receiving xforms-ready after initialization, it is better if calculations and
+        // validations are up to date.
+        rebuildRecalculateRevalidateIfNeeded();
 
         // Initialize controls
         xformsControls.initialize();

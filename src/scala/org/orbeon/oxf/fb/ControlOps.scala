@@ -244,30 +244,37 @@ object ControlOps {
     // Find or create a data holder for the given hierarchy of names
     def ensureDataHolder(root: NodeInfo, holders: Seq[(() ⇒ NodeInfo, Option[String])]) = {
 
-        @tailrec def ensure(parent: NodeInfo, names: Iterator[(() ⇒ NodeInfo, Option[String])]): NodeInfo =
+        @tailrec def ensure(parents: Seq[NodeInfo], names: Iterator[(() ⇒ NodeInfo, Option[String])]): Seq[NodeInfo] =
             if (names.hasNext) {
                 val (getHolder, precedingHolderName) = names.next()
                 val holder = getHolder() // not ideal: this might create a NodeInfo just to check the name of the holder
-                parent \ * filter (name(_) == name(holder)) headOption match {
-                    case Some(child) ⇒
-                        // Holder already exists
-                        ensure(child, names)
-                    case None ⇒
-                        // Holder doesn't exist, insert it
-                        val newChild = insert(into = parent, after = parent \ * filter (name(_) == precedingHolderName.getOrElse("")), origin = holder)
-                        ensure(newChild.head, names)
-                }
-            } else
-                parent
 
-        ensure(root, holders.toIterator)
+                val children =
+                    for {
+                        parent ← parents
+                    } yield
+                        parent \ * filter (name(_) == name(holder)) match {
+                            case Seq() ⇒
+                                // No holder exists so insert one
+                                insert(into = parent, after = parent \ * filter (name(_) == precedingHolderName.getOrElse("")), origin = holder)
+                            case existing ⇒
+                                // At least one holder exists (can be more than one for repeats)
+                                existing
+
+                        }
+
+                ensure(children.flatten, names)
+            } else
+                parents
+
+        ensure(Seq(root), holders.toIterator)
     }
 
     // Insert data and resource holders for all languages
     def insertHolders(controlElement: NodeInfo, dataHolder: NodeInfo, resourceHolder: NodeInfo, precedingControlName: Option[String]) {
         // Create one holder per existing language
         val resourceHolders = (formResourcesRoot \ "resource" \@ "*:lang") map
-            (att ⇒ (att.stringValue, resourceHolder))
+            (att ⇒ (att.stringValue → resourceHolder))
 
         insertHolders(controlElement, dataHolder, resourceHolders, precedingControlName)
     }
@@ -400,7 +407,7 @@ object ControlOps {
             if (lang != currentLang)
                 for (newItem ← holder \ "item") {
                     // If we can find an oldItem corresponding to the newItem, copy over the label
-                    for (oldItem <- oldItems)
+                    for (oldItem ← oldItems)
                         if (oldItem \ "value" === (newItem \ "value"))
                             setvalue(newItem \ "label", oldItem \ "label")
                 }

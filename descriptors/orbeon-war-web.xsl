@@ -166,15 +166,21 @@
                 <dispatcher>FORWARD</dispatcher>
             </filter-mapping>
 
-            <xsl:comment>Set context listener</xsl:comment>
+            <xsl:comment>Orbeon context listener</xsl:comment>
             <listener>
                 <listener-class>org.orbeon.oxf.webapp.OrbeonServletContextListenerDelegate</listener-class>
             </listener>
 
             <!-- NOTE: The session listener is used by the XForm state store so must be enabled  -->
-            <xsl:comment>Set session listener</xsl:comment>
+            <xsl:comment>Orbeon session listener</xsl:comment>
             <listener>
                 <listener-class>org.orbeon.oxf.webapp.OrbeonSessionListenerDelegate</listener-class>
+            </listener>
+
+            <!-- NOTE: This also helps with Tomcat shutdown -->
+            <xsl:comment>Ehcache shutdown listener</xsl:comment>
+            <listener>
+                <listener-class>net.sf.ehcache.constructs.web.ShutdownListener</listener-class>
             </listener>
 
             <!--

@@ -11,7 +11,7 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
+(function() {
 
     YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
 
@@ -395,10 +395,5 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
         EOO: {}
     }));
 
-    if (parent && parent.TestManager) {
-        parent.TestManager.load();
-    } else {
-        new YAHOO.tool.TestLogger();
-        YAHOO.tool.TestRunner.run();
-    }
-});
+    // ORBEON.util.Test.onOrbeonLoadedRunTest();
+})();

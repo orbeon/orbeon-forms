@@ -142,8 +142,9 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
                 modelState
         }
 
-    // Used between refresh start and refresh done
+    // Used between refresh/binding update start/done
     private var inRefresh = false
+    private var inBindingUpdate = false
 
     // Keep state related to the view
     private object RefreshState {
@@ -255,11 +256,20 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
         inRefresh = false
     }
 
-    def afterInitialResponse {
+
+    def bindingUpdateStart() {
+        inBindingUpdate = true
+    }
+
+    def bindingUpdateDone() {
+        inBindingUpdate = false
+    }
+
+    def afterInitialResponse() {
         outputLHHAItemsetStats()
     }
 
-    def beforeUpdateResponse {
+    def beforeUpdateResponse() {
         lhhaEvaluationCount = 0
         lhhaOptimizedCount = 0
         lhhaUnknownDependencies = 0
@@ -273,15 +283,15 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
         itemsetHitCount = 0
     }
 
-    def afterUpdateResponse {
+    def afterUpdateResponse() {
         outputLHHAItemsetStats()
     }
 
-    def notifyComputeLHHA: Unit = lhhaEvaluationCount += 1
-    def notifyOptimizeLHHA: Unit = lhhaOptimizedCount += 1
+    def notifyComputeLHHA(): Unit = lhhaEvaluationCount += 1
+    def notifyOptimizeLHHA(): Unit = lhhaOptimizedCount += 1
 
-    def notifyComputeItemset: Unit = itemsetEvaluationCount += 1
-    def notifyOptimizeItemset: Unit = itemsetOptimizedCount += 1
+    def notifyComputeItemset(): Unit = itemsetEvaluationCount += 1
+    def notifyOptimizeItemset(): Unit = itemsetOptimizedCount += 1
 
     private def outputLHHAItemsetStats() {
         if (logger.isDebugEnabled)
@@ -314,7 +324,7 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
 
     def requireBindingUpdate(controlPrefixedId: String): Boolean = {
 
-        assert(inRefresh)
+        assert(inRefresh || inBindingUpdate)
 
         val cached = RefreshState.modifiedBindingCache.get(controlPrefixedId)
         val updateResult: UpdateResult =
@@ -357,7 +367,7 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
 
     def requireValueUpdate(controlPrefixedId: String): Boolean = {
 
-        assert(inRefresh)
+        assert(inRefresh || inBindingUpdate)
 
         val cached = RefreshState.modifiedValueCache.get(controlPrefixedId)
         val (updateResult, valueAnalysis) =
@@ -399,7 +409,7 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
 
     def requireLHHAUpdate(lhhaName: String, controlPrefixedId: String): Boolean = {
 
-        assert(inRefresh) // LHHA is evaluated lazily typically outside of refresh, but LHHA invalidation takes place during refresh
+        assert(inRefresh || inBindingUpdate) // LHHA is evaluated lazily typically outside of refresh, but LHHA invalidation takes place during refresh
 
         RefreshState.modifiedLHHACache.get(controlPrefixedId) match {
             case Some(result) => result // cached
@@ -427,7 +437,7 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
 
     def requireItemsetUpdate(controlPrefixedId: String): Boolean = {
 
-        assert(inRefresh)
+        assert(inRefresh || inBindingUpdate)
 
         RefreshState.modifiedItemsetCache.get(controlPrefixedId) match {
             case Some(result) => result // cached

@@ -57,8 +57,6 @@ import java.util.concurrent.Callable;
  */
 public class XFormsServer extends ProcessorImpl {
 
-    public static final boolean USE_SEPARATE_LOGGERS = false;
-    public static final String LOGGING_CATEGORY = "server";
     private static final Logger logger = LoggerFactory.createLogger(XFormsServer.class);
 
     private static final String INPUT_REQUEST = "request";
@@ -119,7 +117,7 @@ public class XFormsServer extends ProcessorImpl {
         final boolean isIgnoreSequenceNumber = !isAjaxRequest;
 
         // Logger used for heartbeat and request/response
-        final IndentedLogger indentedLogger = XFormsContainingDocument.getIndentedLogger(XFormsServer.getLogger(), XFormsServer.getLogger(), LOGGING_CATEGORY);
+        final IndentedLogger indentedLogger = XFormsContainingDocument.getIndentedLogger(XFormsServer.getLogger(), "server");
 
         final boolean logRequestResponse = XFormsProperties.getDebugLogging().contains("server-body");
         if (logRequestResponse) {

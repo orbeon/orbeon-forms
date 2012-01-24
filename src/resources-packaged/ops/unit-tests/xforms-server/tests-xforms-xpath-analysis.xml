@@ -2251,6 +2251,7 @@
                     </binding>
                 </foo>
                 <model scope="my-foo" prefixed-id="my-foo$model" default-instance-prefixed-id="my-foo$instance" analyzed-binds="true"/>
+                <template scope="my-foo" prefixed-id="my-foo$xf-4" model-prefixed-id="my-foo$model" binding="false" value="false"/>
                 <variable scope="my-foo" prefixed-id="my-foo$iv" model-prefixed-id="my-foo$model" binding="false" value="true" name="internal">
                     <value>
                         <analysis expression="." analyzed="true">
@@ -2512,6 +2513,7 @@
             <request request-uri="/orbeon/doc/home-welcome" query-string="id=12&amp;print=false" method="GET">
                 <model scope="" prefixed-id="model" analyzed-binds="true"/>
                 <foo scope="" prefixed-id="my-foo" model-prefixed-id="model" binding="false" value="false"/>
+                <template scope="my-foo" prefixed-id="my-foo$xf-2" binding="false" value="false"/>
                 <output scope="my-foo" prefixed-id="my-foo$output" binding="false" value="true">
                     <value>
                         <analysis expression="xs:string((current-date())[1])" analyzed="true"/>
@@ -5410,6 +5412,7 @@
                 <model scope="" prefixed-id="model" default-instance-prefixed-id="instance" analyzed-binds="true"/>
                 <foo scope="" prefixed-id="my-foo" model-prefixed-id="model" binding="false" value="false"/>
                 <model scope="my-foo" prefixed-id="my-foo$foo-model" default-instance-prefixed-id="my-foo$foo-instance" analyzed-binds="true"/>
+                <template scope="my-foo" prefixed-id="my-foo$xf-2" model-prefixed-id="my-foo$foo-model" binding="false" value="false"/>
                 <group scope="" prefixed-id="my-foo$foo-group" model-prefixed-id="model" binding="false" value="false"/>
                 <variable scope="" prefixed-id="my-foo$v1" model-prefixed-id="model" binding="false" value="true" name="v1">
                     <value>
@@ -5571,6 +5574,7 @@
                     </value>
                 </variable>
                 <foo scope="" prefixed-id="my-foo" model-prefixed-id="model" binding="false" value="false"/>
+                <template scope="my-foo" prefixed-id="my-foo$xf-3" binding="false" value="false"/>
                 <group scope="my-foo" prefixed-id="my-foo$foo-group" binding="false" value="false">
                     <label>
                         <analysis expression="xs:string(.[1])" analyzed="true">
@@ -5866,6 +5870,7 @@
                 <foo scope="" prefixed-id="foo1" model-prefixed-id="m1" binding="false" value="false"/>
                 <model scope="foo1" prefixed-id="foo1$m1" default-instance-prefixed-id="foo1$m1i1" analyzed-binds="true"/>
                 <model scope="foo1" prefixed-id="foo1$m2" default-instance-prefixed-id="foo1$m2i1" analyzed-binds="true"/>
+                <template scope="foo1" prefixed-id="foo1$xf-3" model-prefixed-id="foo1$m1" binding="false" value="false"/>
                 <output scope="foo1" prefixed-id="foo1$o1" model-prefixed-id="foo1$m1" binding="false" value="true">
                     <value>
                         <analysis expression="xs:string((xxf:instance('m1i1'))[1])" analyzed="true">
@@ -5929,6 +5934,7 @@
                 <bar scope="foo1" prefixed-id="foo1$bar1" model-prefixed-id="foo1$m1" binding="false" value="false"/>
                 <model scope="foo1$bar1" prefixed-id="foo1$bar1$m1" default-instance-prefixed-id="foo1$bar1$m1i1" analyzed-binds="true"/>
                 <model scope="foo1$bar1" prefixed-id="foo1$bar1$m2" default-instance-prefixed-id="foo1$bar1$m2i1" analyzed-binds="true"/>
+                <template scope="foo1$bar1" prefixed-id="foo1$bar1$xf-4" model-prefixed-id="foo1$bar1$m1" binding="false" value="false"/>
                 <output scope="foo1$bar1" prefixed-id="foo1$bar1$o1" model-prefixed-id="foo1$bar1$m1" binding="false" value="true">
                     <value>
                         <analysis expression="xs:string((xxf:instance('m1i1'))[1])" analyzed="true">
@@ -6174,6 +6180,7 @@
                 <bar scope="" prefixed-id="foo1$bar2" model-prefixed-id="m1" binding="false" value="false"/>
                 <model scope="foo1$bar2" prefixed-id="foo1$bar2$m1" default-instance-prefixed-id="foo1$bar2$m1i1" analyzed-binds="true"/>
                 <model scope="foo1$bar2" prefixed-id="foo1$bar2$m2" default-instance-prefixed-id="foo1$bar2$m2i1" analyzed-binds="true"/>
+                <template scope="foo1$bar2" prefixed-id="foo1$bar2$xf-5" model-prefixed-id="foo1$bar2$m1" binding="false" value="false"/>
                 <output scope="foo1$bar2" prefixed-id="foo1$bar2$o1" model-prefixed-id="foo1$bar2$m1" binding="false" value="true">
                     <value>
                         <analysis expression="xs:string((xxf:instance('m1i1'))[1])" analyzed="true">

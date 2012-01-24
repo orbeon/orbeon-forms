@@ -31,7 +31,7 @@ public class XFormsSecretHandler extends XFormsControlLifecyleHandler {
         super(false);
     }
 
-    protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsControl control) throws SAXException {
+    protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String effectiveId, XFormsControl control) throws SAXException {
 
         final XFormsSecretControl secretControl = (XFormsSecretControl) control;
         final ContentHandler contentHandler = handlerContext.getController().getOutput();

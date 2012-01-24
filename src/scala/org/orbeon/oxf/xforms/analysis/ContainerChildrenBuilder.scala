@@ -20,26 +20,11 @@ import org.orbeon.oxf.xforms.XFormsConstants._
 import org.dom4j.Element
 import org.orbeon.oxf.xforms.xbl.Scope
 
-// Recursively call the builder on all children elements
 trait ContainerChildrenBuilder extends ChildrenBuilderTrait {
-
     // For <xf:group>, <xf:switch>, <xf:case>, <xxf:dialog>, consider only nested LHHA elements without @for attribute
-    def findRelevantChildrenElements: Seq[Element] =
+    // Also, by default, the container scope of nested controls is the same as the current element's
+    def findRelevantChildrenElements: Seq[(Element, Scope)] =
         Dom4jUtils.elements(element).asScala filterNot
-            (e ⇒ LHHA.LHHAQNames(e.getQName) && (e.attribute(FOR_QNAME) eq null))
-
-    def buildChildren(build: Builder, containerScope: Scope) {
-
-        var preceding: Option[ElementAnalysis] = None
-
-        for (childElement ← findRelevantChildrenElements)
-            build(this, preceding, childElement, containerScope) match {
-                case newPreceding @ Some(newControl: ChildrenBuilderTrait) ⇒
-                    preceding = newPreceding
-                    newControl.buildChildren(build, containerScope)
-                case newPreceding @ Some(foo) ⇒
-                    preceding = newPreceding
-                case _ ⇒
-            }
-    }
+            (e ⇒ LHHA.LHHAQNames(e.getQName) && (e.attribute(FOR_QNAME) eq null)) map
+                ((_, containerScope))
 }

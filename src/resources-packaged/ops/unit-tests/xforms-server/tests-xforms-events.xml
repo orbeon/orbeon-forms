@@ -24,6 +24,7 @@
     xmlns:xforms="http://www.w3.org/2002/xforms"
     xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:exf="http://www.exforms.org/exf/1-0"
     xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xbl="http://www.w3.org/ns/xbl"
@@ -987,71 +988,56 @@
     </test>
 
     <test description="Client events reach proper repeat iteration if repeat rows are moved" name="oxf:pipeline">
-        <input name="config">
-            <p:config xmlns:xforms="http://www.w3.org/2002/xforms">
-                <p:param name="response" type="output"/>
-
-                <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="wrap-server.xpl"/>
-                    <!--
-                        The two events must end up on controls on the same repeat iteration, even though the first
-                        event causes its iteration to move.
-                     -->
-                    <p:input name="action">
-                        <xxforms:action>
-                            <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="plate·3">777</xxforms:event>
-                            <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="leased·3">leased</xxforms:event>
-                        </xxforms:action>
-                    </p:input>
-                    <p:input name="controls">
-                        <controls xmlns:xforms="http://www.w3.org/2002/xforms"
-                                  xmlns:ev="http://www.w3.org/2001/xml-events"
-                                  xmlns:exf="http://www.exforms.org/exf/1-0">
-                            <xforms:repeat nodeset="(exf:sort(vehicle, 'string(plate-number)', 'text', 'descending'))" id="repeat">
-                                <xforms:input ref="plate-number" id="plate"/>
-                                <xforms:select ref="leased" appearance="full" id="leased">
-                                    <xforms:item>
-                                        <xforms:label/>
-                                        <xforms:value>leased</xforms:value>
-                                    </xforms:item>
-                                </xforms:select>
-                            </xforms:repeat>
-                        </controls>
-                    </p:input>
-                    <p:input name="models">
-                        <models xmlns:xforms="http://www.w3.org/2002/xforms"
-                           
-                            xmlns:ev="http://www.w3.org/2001/xml-events">
-                            <xforms:model id="model" xxforms:encrypt-item-values="false">
-                                <xforms:instance xmlns="" id="instance">
-                                    <vehicles/>
-                                </xforms:instance>
-                            </xforms:model>
-                        </models>
-                    </p:input>
-                    <p:input name="instances">
-                        <instances>
-                            <instance id="instance" model-id="model">
-                                <vehicles>
-                                    <vehicle>
-                                        <plate-number>111</plate-number>
-                                        <leased/>
-                                    </vehicle>
-                                    <vehicle>
-                                        <plate-number>333</plate-number>
-                                        <leased/>
-                                    </vehicle>
-                                    <vehicle>
-                                        <plate-number>666</plate-number>
-                                        <leased/>
-                                    </vehicle>
-                                </vehicles>
-                            </instance>
-                        </instances>
-                    </p:input>
-                    <p:output name="response" ref="response"/>
-                </p:processor>
-            </p:config>
+        <input name="config" href="wrap-server.xpl"/>
+        <!--
+            The two events must end up on controls on the same repeat iteration, even though the first
+            event causes its iteration to move.
+         -->
+        <input name="action">
+            <xxforms:action>
+                <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="plate·3">777</xxforms:event>
+                <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="leased·3">leased</xxforms:event>
+            </xxforms:action>
+        </input>
+        <input name="controls">
+            <controls>
+                <xforms:repeat nodeset="(exf:sort(vehicle, 'string(plate-number)', 'text', 'descending'))" id="repeat">
+                    <xforms:input ref="plate-number" id="plate"/>
+                    <xforms:select ref="leased" appearance="full" id="leased">
+                        <xforms:item>
+                            <xforms:label/>
+                            <xforms:value>leased</xforms:value>
+                        </xforms:item>
+                    </xforms:select>
+                </xforms:repeat>
+            </controls>
+        </input>
+        <input name="models">
+            <models>
+                <xforms:model id="model" xxforms:encrypt-item-values="false">
+                    <xforms:instance xmlns="" id="instance"/>
+                </xforms:model>
+            </models>
+        </input>
+        <input name="instances">
+            <instances>
+                <instance id="instance" model-id="model">
+                    <vehicles>
+                        <vehicle>
+                            <plate-number>111</plate-number>
+                            <leased/>
+                        </vehicle>
+                        <vehicle>
+                            <plate-number>333</plate-number>
+                            <leased/>
+                        </vehicle>
+                        <vehicle>
+                            <plate-number>666</plate-number>
+                            <leased/>
+                        </vehicle>
+                    </vehicles>
+                </instance>
+            </instances>
         </input>
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
@@ -1088,68 +1074,57 @@
                         <xxf:control id="plate·3">333</xxf:control>
                         <xxf:control id="leased·3"/>
                     </xxf:control-values>
+                    <xxf:repeat-indexes>
+                        <xxf:repeat-index id="repeat" old-index="0" new-index="1"/>
+                    </xxf:repeat-indexes>
                 </xxf:action>
             </xxf:event-response>
         </output>
     </test>
 
     <test description="Relevance / readonly state of controls is updated upon Ajax request" name="oxf:pipeline">
-        <input name="config">
-            <p:config xmlns:xforms="http://www.w3.org/2002/xforms">
-                <p:param name="response" type="output"/>
-
-                <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="wrap-server.xpl"/>
-                    <!--
-                        The first event doesn't cause the other controls to block incoming values. So all first three
-                        "good" values must make it into the instance. But value "42" blocks the other controls, so the
-                        "bad" values must be rejected.
-                     -->
-                    <p:input name="action">
-                        <xxforms:action>
-                            <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="input1">888</xxforms:event>
-                            <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="input2">Good value 2</xxforms:event>
-                            <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="input3">Good value 3</xxforms:event>
-                            <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="input1">42</xxforms:event>
-                            <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="input2">Bad value 2</xxforms:event>
-                            <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="input3">Bad value 3</xxforms:event>
-                        </xxforms:action>
-                    </p:input>
-                    <p:input name="controls">
-                        <controls xmlns:xforms="http://www.w3.org/2002/xforms"
-                                  xmlns:ev="http://www.w3.org/2001/xml-events">
-                            <xforms:input id="input1" ref="value1"/>
-                            <xforms:input id="input2" ref="value2"/>
-                            <xforms:input id="input3" ref="value3"/>
-                        </controls>
-                    </p:input>
-                    <p:input name="models">
-                        <models xmlns:xforms="http://www.w3.org/2002/xforms"
-                           
-                            xmlns:ev="http://www.w3.org/2001/xml-events">
-                            <xforms:model id="model" xxforms:encrypt-item-values="false">
-                                <xforms:instance xmlns="" id="instance">
-                                    <form/>
-                                </xforms:instance>
-                                <xforms:bind id="b1" nodeset="value2" relevant="../value1 != '42'"/>
-                                <xforms:bind id="b2" nodeset="value3" readonly="../value1 = '42'"/>
-                            </xforms:model>
-                        </models>
-                    </p:input>
-                    <p:input name="instances">
-                        <instances>
-                            <instance id="instance" model-id="model">
-                                <form>
-                                    <value1/>
-                                    <value2/>
-                                    <value3/>
-                                </form>
-                            </instance>
-                        </instances>
-                    </p:input>
-                    <p:output name="response" ref="response"/>
-                </p:processor>
-            </p:config>
+        <input name="config" href="wrap-server.xpl"/>
+        <!--
+            The first event doesn't cause the other controls to block incoming values. So all first three
+            "good" values must make it into the instance. But value "42" blocks the other controls, so the
+            "bad" values must be rejected.
+         -->
+        <input name="action">
+            <xxforms:action>
+                <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="input1">888</xxforms:event>
+                <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="input2">Good value 2</xxforms:event>
+                <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="input3">Good value 3</xxforms:event>
+                <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="input1">42</xxforms:event>
+                <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="input2">Bad value 2</xxforms:event>
+                <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="input3">Bad value 3</xxforms:event>
+            </xxforms:action>
+        </input>
+        <input name="controls">
+            <controls>
+                <xforms:input id="input1" ref="value1"/>
+                <xforms:input id="input2" ref="value2"/>
+                <xforms:input id="input3" ref="value3"/>
+            </controls>
+        </input>
+        <input name="models">
+            <models>
+                <xforms:model id="model" xxforms:encrypt-item-values="false">
+                    <xforms:instance id="instance"/>
+                    <xforms:bind id="b1" nodeset="value2" relevant="../value1 != '42'"/>
+                    <xforms:bind id="b2" nodeset="value3" readonly="../value1 = '42'"/>
+                </xforms:model>
+            </models>
+        </input>
+        <input name="instances">
+            <instances>
+                <instance id="instance" model-id="model">
+                    <form>
+                        <value1/>
+                        <value2/>
+                        <value3/>
+                    </form>
+                </instance>
+            </instances>
         </input>
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
@@ -1845,7 +1820,7 @@
 
                     <!-- TODO: we cannot dispatch xxforms-dialog-open to my-dialog before it is enabled -->
 
-                    <xforms:insert ev:event="#all"
+                    <xforms:insert ev:event="xforms-enabled xforms-disabled xxforms-dialog-open xxforms-dialog-close"
                                    context="instance('events')" nodeset="*"
                                    origin="xxforms:element('event',
                                             (xxforms:attribute('type', xxforms:event('xxforms:type')),

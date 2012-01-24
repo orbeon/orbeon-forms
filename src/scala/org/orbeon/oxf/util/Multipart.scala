@@ -100,7 +100,7 @@ object Multipart {
 
     def removeUploadProgress(request: ExternalContext.Request, control: XFormsValueControl): Unit =
         request.getSession(false) match {
-            case session: Session => session.getAttributesMap.remove(getProgressSessionKey(control.getContainingDocument.getUUID, control.getEffectiveId))
+            case session: Session => session.getAttributesMap.remove(getProgressSessionKey(control.containingDocument.getUUID, control.getEffectiveId))
             case _ =>
         }
 

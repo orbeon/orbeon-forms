@@ -53,14 +53,14 @@ public class XFormsUploadControl extends XFormsValueControl {
 
     private FileInfo fileInfo;
 
-    public XFormsUploadControl(XBLContainer container, XFormsControl parent, Element element, String name, String id, Map<String, String> state) {
-        super(container, parent, element, name, id);
+    public XFormsUploadControl(XBLContainer container, XFormsControl parent, Element element, String id, Map<String, String> state) {
+        super(container, parent, element, id);
 
         fileInfo = new FileInfo(this, getContextStack(), element);
     }
 
     @Override
-    protected void evaluateImpl() {
+    public void evaluateImpl() {
         super.evaluateImpl();
 
         getState();
@@ -74,7 +74,7 @@ public class XFormsUploadControl extends XFormsValueControl {
     }
 
     @Override
-    protected void markDirtyImpl(XPathDependencies xpathDependencies) {
+    public void markDirtyImpl(XPathDependencies xpathDependencies) {
         super.markDirtyImpl(xpathDependencies);
         fileInfo.markDirty();
     }
@@ -86,16 +86,16 @@ public class XFormsUploadControl extends XFormsValueControl {
 
         if (XFormsEvents.XXFORMS_UPLOAD_START.equals(event.getName())) {
             // Upload started
-            containingDocument.startUpload(getUploadUniqueId());
+            containingDocument().startUpload(getUploadUniqueId());
         } else if (XFormsEvents.XXFORMS_UPLOAD_CANCEL.equals(event.getName())) {
             // Upload canceled
-            containingDocument.endUpload(getUploadUniqueId());
+            containingDocument().endUpload(getUploadUniqueId());
             Multipart.removeUploadProgress(NetUtils.getExternalContext().getRequest(), this);
         } else if (XFormsEvents.XXFORMS_UPLOAD_DONE.equals(event.getName())) {
             // Upload done: process upload to this control
 
             // Notify that the upload has ended
-            containingDocument.endUpload(getUploadUniqueId());
+            containingDocument().endUpload(getUploadUniqueId());
             Multipart.removeUploadProgress(NetUtils.getExternalContext().getRequest(), this);
 
             final XXFormsUploadDoneEvent uploadDoneEvent = (XXFormsUploadDoneEvent) event;
@@ -108,10 +108,10 @@ public class XFormsUploadControl extends XFormsValueControl {
     }
 
     @Override
-    protected void onDestroy() {
+    public void onDestroy() {
         super.onDestroy();
         // Make sure to consider any upload associated with this control as ended
-        containingDocument.endUpload(getUploadUniqueId());
+        containingDocument().endUpload(getUploadUniqueId());
     }
 
     public String getUploadUniqueId() {
@@ -286,7 +286,7 @@ public class XFormsUploadControl extends XFormsValueControl {
                 // Setting blank value
                 if (StringUtils.isNotEmpty(oldValue)) {
                     // TODO: This should probably take place during refresh instead.
-                    getXBLContainer().dispatchEvent(new XFormsDeselectEvent(containingDocument, this));
+                    container().dispatchEvent(new XFormsDeselectEvent(containingDocument(), this));
                 }
 
                 // Try to delete temporary file associated with old value if any
@@ -381,7 +381,7 @@ public class XFormsUploadControl extends XFormsValueControl {
     }
 
     @Override
-    protected boolean addAjaxCustomAttributes(AttributesImpl attributesImpl, boolean isNewRepeatIteration, XFormsControl other) {
+    public boolean addAjaxCustomAttributes(AttributesImpl attributesImpl, boolean isNewRepeatIteration, XFormsControl other) {
 
         final XFormsUploadControl uploadControl1 = (XFormsUploadControl) other;
         final XFormsUploadControl uploadControl2 = this;
@@ -484,7 +484,7 @@ public class XFormsUploadControl extends XFormsValueControl {
     }
 
     @Override
-    protected Set<String> getAllowedExternalEvents() {
+    public Set<String> getAllowedExternalEvents() {
         return ALLOWED_EXTERNAL_EVENTS;
     }
 }
@@ -614,7 +614,7 @@ class FileInfo implements ExternalCopyable {
     private Multipart.UploadProgress getProgress() {
         final Option option
             = Multipart.getUploadProgress(NetUtils.getExternalContext().getRequest(),
-                control.getContainingDocument().getUUID(), control.getEffectiveId());
+                control.containingDocument().getUUID(), control.getEffectiveId());
 
         final Multipart.UploadProgress progress = option.isEmpty() ? null : (Multipart.UploadProgress) option.get();
 
@@ -625,7 +625,7 @@ class FileInfo implements ExternalCopyable {
     }
 
     private String getInfoValue(Element element) {
-        contextStack.setBinding(control);
+        contextStack.setBinding(control.getBindingContext());
         contextStack.pushBinding(element, control.getEffectiveId(), control.getChildElementScope(element));
         final String tempValue = DataModel.getValue(contextStack.getCurrentSingleItem());
         contextStack.popBinding();
@@ -655,11 +655,11 @@ class FileInfo implements ExternalCopyable {
         if (element == null || value == null)
             return;
 
-        contextStack.setBinding(control);
+        contextStack.setBinding(control.getBindingContext());
         contextStack.pushBinding(element, control.getEffectiveId(), control.getChildElementScope(element));
         final Item currentSingleItem = contextStack.getCurrentSingleItem();
         if (currentSingleItem instanceof NodeInfo) {
-            DataModel.jSetValueIfChanged(control.getXBLContainer().getContainingDocument(), control.getIndentedLogger(),
+            DataModel.jSetValueIfChanged(control.container().getContainingDocument(), control.getIndentedLogger(),
                     control, control.getLocationData(), (NodeInfo) currentSingleItem, value, "fileinfo", false);
             contextStack.popBinding();
         }

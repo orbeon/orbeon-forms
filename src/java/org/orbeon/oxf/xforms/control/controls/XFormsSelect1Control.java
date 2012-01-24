@@ -52,47 +52,27 @@ public class XFormsSelect1Control extends XFormsValueControl {
             XFormsConstants.XXFORMS_GROUP_QNAME
     };
 
-    private ControlProperty<Itemset> itemsetProperty = new ControlProperty<Itemset>() {
-        @Override
-        protected void notifyCompute() {
-            containingDocument.getXPathDependencies().notifyComputeItemset();
-        }
+    private XFormsControl.ControlProperty<Itemset> itemsetProperty = new MutableItemsetProperty(this);
 
-        @Override
-        protected void notifyOptimized() {
-            containingDocument.getXPathDependencies().notifyOptimizeItemset();
-        }
-
-        @Override
-        protected Itemset evaluateValue() {
-            return XFormsItemUtils.evaluateItemset(XFormsSelect1Control.this);
-        }
-
-        @Override
-        protected boolean requireUpdate() {
-            return containingDocument.getXPathDependencies().requireItemsetUpdate(getPrefixedId());
-        }
-    };
-
-    public XFormsSelect1Control(XBLContainer container, XFormsControl parent, Element element, String name, String id, Map<String, String> state) {
-        super(container, parent, element, name, id);
+    public XFormsSelect1Control(XBLContainer container, XFormsControl parent, Element element, String id, Map<String, String> state) {
+        super(container, parent, element, id);
     }
 
     @Override
-    protected void onCreate() {
+    public void onCreate() {
         super.onCreate();
         // Evaluate itemsets only if restoring dynamic state
         // NOTE: This doesn't sound like it is the right place to do this, does it?
-        if (containingDocument.isRestoringDynamicState())
+        if (containingDocument().isRestoringDynamicState())
             getItemset();
     }
 
     public SelectionControl getSelectionControl() {
-        return (SelectionControl) super.getElementAnalysis();
+        return (SelectionControl) super.staticControl();
     }
 
     @Override
-    protected QName[] getExtensionAttributes() {
+    public QName[] getExtensionAttributes() {
         if (!(this instanceof XFormsSelectControl) && isFullAppearance())
             return EXTENSION_ATTRIBUTES_SELECT1_APPEARANCE_FULL;
         else
@@ -116,7 +96,7 @@ public class XFormsSelect1Control extends XFormsValueControl {
     }
 
     @Override
-    protected void markDirtyImpl(XPathDependencies xpathDependencies) {
+    public void markDirtyImpl(XPathDependencies xpathDependencies) {
         super.markDirtyImpl(xpathDependencies);
 
         if (itemsetProperty != null)
@@ -171,15 +151,15 @@ public class XFormsSelect1Control extends XFormsValueControl {
             if (isNorefresh()) {
                 // Items are not automatically refreshed and stored globally
                 // NOTE: Store them by prefixed id because the itemset might be different between XBL template instantiations
-                Itemset constantItemset =  containingDocument.getControls().getConstantItems(getPrefixedId());
+                Itemset constantItemset =  containingDocument().getControls().getConstantItems(getPrefixedId());
                 if (constantItemset == null) {
                     constantItemset = XFormsItemUtils.evaluateItemset(XFormsSelect1Control.this);
-                    containingDocument.getControls().setConstantItems(getPrefixedId(), constantItemset);
+                    containingDocument().getControls().setConstantItems(getPrefixedId(), constantItemset);
                 }
                 return constantItemset;
             } else {
                 // Items are stored in the control
-                return itemsetProperty.getValue();
+                return itemsetProperty.value();
             }
         } catch (Exception e) {
             throw ValidationException.wrapException(e, new ExtendedLocationData(getLocationData(), "evaluating itemset", getControlElement()));
@@ -267,9 +247,9 @@ public class XFormsSelect1Control extends XFormsValueControl {
                     // Handle xforms-select / xforms-deselect
                     // TODO: Dispatch to itemset or item once we support doing that
                     if (!itemWasSelected && itemIsSelected) {
-                        selectEvents.add(new XFormsSelectEvent(containingDocument, this, currentItemValue));
+                        selectEvents.add(new XFormsSelectEvent(containingDocument(), this, currentItemValue));
                     } else if (itemWasSelected && !itemIsSelected) {
-                        deselectEvents.add(new XFormsDeselectEvent(containingDocument, this, currentItemValue));
+                        deselectEvents.add(new XFormsDeselectEvent(containingDocument(), this, currentItemValue));
                     }
                 }
             }
@@ -277,14 +257,14 @@ public class XFormsSelect1Control extends XFormsValueControl {
             // Dispatch xforms-deselect events
             if (deselectEvents.size() > 0) {
                 for (XFormsEvent currentEvent: deselectEvents) {
-                    currentEvent.getTargetObject().getXBLContainer(containingDocument).dispatchEvent(currentEvent);
+                    currentEvent.getTargetObject().getXBLContainer(containingDocument()).dispatchEvent(currentEvent);
                 }
             }
             // Select events must be sent after all xforms-deselect events
             final boolean hasSelectedItem = selectEvents.size() > 0;
             if (hasSelectedItem) {
                 for (XFormsEvent currentEvent: selectEvents) {
-                    currentEvent.getTargetObject().getXBLContainer(containingDocument).dispatchEvent(currentEvent);
+                    currentEvent.getTargetObject().getXBLContainer(containingDocument()).dispatchEvent(currentEvent);
                 }
             }
 
@@ -304,8 +284,7 @@ public class XFormsSelect1Control extends XFormsValueControl {
         final XFormsSelect1Control cloned = (XFormsSelect1Control) super.getBackCopy();
 
         // If we have an itemset, make sure the computed value is used as basis for comparison
-        if (itemsetProperty != null)
-            cloned.itemsetProperty = new ConstantControlProperty<Itemset>(itemsetProperty.getValue());
+        cloned.itemsetProperty = new XFormsControl.ImmutableControlProperty<Itemset>(itemsetProperty.value());
 
         return cloned;
     }
@@ -364,7 +343,7 @@ public class XFormsSelect1Control extends XFormsValueControl {
 
         // Output itemset diff
         if (mustSendItemsetUpdate((XFormsSelect1Control) other)) {
-            ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "itemset", new String[]{"id", XFormsUtils.namespaceId(containingDocument, getEffectiveId())});
+            ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "itemset", new String[]{"id", XFormsUtils.namespaceId(containingDocument(), getEffectiveId())});
             {
                 final Itemset itemset = getItemset();
                 if (itemset != null) {

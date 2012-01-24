@@ -64,8 +64,8 @@ public class XFormsOutputControl extends XFormsValueControl {
 
     private boolean urlNorewrite;
 
-    public XFormsOutputControl(XBLContainer container, XFormsControl parent, Element element, String name, String id, Map<String, String> state) {
-        super(container, parent, element, name, id);
+    public XFormsOutputControl(XBLContainer container, XFormsControl parent, Element element, String id, Map<String, String> state) {
+        super(container, parent, element, id);
         this.format = element.attributeValue(new QName("format", XFormsConstants.XXFORMS_NAMESPACE));
         this.mediatypeAttribute = element.attributeValue(XFormsConstants.MEDIATYPE_QNAME);
         this.valueAttribute = element.attributeValue(XFormsConstants.VALUE_QNAME);
@@ -77,7 +77,7 @@ public class XFormsOutputControl extends XFormsValueControl {
     }
 
     @Override
-    protected QName[] getExtensionAttributes() {
+    public QName[] getExtensionAttributes() {
         if (getAppearances().contains(XFormsConstants.XXFORMS_DOWNLOAD_APPEARANCE_QNAME))
             return DOWNLOAD_APPEARANCE_EXTENSION_ATTRIBUTES;
         else
@@ -85,7 +85,7 @@ public class XFormsOutputControl extends XFormsValueControl {
     }
 
     @Override
-    protected void evaluateImpl() {
+    public void evaluateImpl() {
         super.evaluateImpl();
 
         getState();
@@ -95,7 +95,7 @@ public class XFormsOutputControl extends XFormsValueControl {
     }
 
     @Override
-    protected void markDirtyImpl(XPathDependencies xpathDependencies) {
+    public void markDirtyImpl(XPathDependencies xpathDependencies) {
         super.markDirtyImpl(xpathDependencies);
         fileInfo.markDirty();
     }
@@ -105,11 +105,11 @@ public class XFormsOutputControl extends XFormsValueControl {
         final String value;
         if (valueAttribute == null) {
             // Get value from single-node binding
-            final String tempValue = DataModel.getValue(bindingContext.getSingleItem());
+            final String tempValue = DataModel.getValue(bindingContext().getSingleItem());
             value = (tempValue != null) ? tempValue : "";
         } else {
             // Value comes from the XPath expression within the value attribute
-            value = evaluateAsString(valueAttribute, bindingContext.getNodeset(), bindingContext.getPosition());
+            value = evaluateAsString(valueAttribute, bindingContext().getNodeset(), bindingContext().getPosition());
         }
         setValue((value != null) ? value : "");
     }
@@ -156,12 +156,12 @@ public class XFormsOutputControl extends XFormsValueControl {
     }
 
     private Map<String, String[]> evaluateHeaders() {
-        getContextStack().setBinding(this); // evaluateHeaders() requires this (bad, but do this until we can pass BindingContext directly)
+        getContextStack().setBinding(getBindingContext()); // evaluateHeaders() requires this (bad, but do this until we can pass BindingContext directly)
         try {
-            return Headers.evaluateHeaders(getXBLContainer(), getContextStack(),
-                getEffectiveId(), getElementAnalysis().element());
+            return Headers.evaluateHeaders(container(), getContextStack(),
+                getEffectiveId(), staticControl().element());
         } catch (Exception e) {
-            XFormsError.handleNonFatalXPathError(containingDocument, e);
+            XFormsError.handleNonFatalXPathError(containingDocument(), e);
             return Collections.emptyMap();
         }
     }
@@ -174,13 +174,13 @@ public class XFormsOutputControl extends XFormsValueControl {
                 // xs:anyURI type
                 if (!urlNorewrite) {
                     // Resolve xml:base and try to obtain a path which is an absolute path without the context
-                    final URI rebasedURI = XFormsUtils.resolveXMLBase(containingDocument, getControlElement(), internalValue);
+                    final URI rebasedURI = XFormsUtils.resolveXMLBase(containingDocument(), getControlElement(), internalValue);
                     final URLRewriter servletRewriter = new ServletURLRewriter(NetUtils.getExternalContext().getRequest());
                     final String resolvedURI = servletRewriter.rewriteResourceURL(rebasedURI.toString(), ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT);
 
                     final long lastModified = NetUtils.getLastModifiedIfFast(resolvedURI);
                     updatedValue = XFormsResourceServer.proxyURI(getIndentedLogger(), resolvedURI, fileInfo.getFileName(), mediatype, lastModified, evaluateHeaders(),
-                            XFormsProperties.getForwardSubmissionHeaders(containingDocument, true));
+                            XFormsProperties.getForwardSubmissionHeaders(containingDocument(), true));
                 } else {
                     // Otherwise we leave the value as is
                     updatedValue = internalValue;
@@ -190,7 +190,7 @@ public class XFormsOutputControl extends XFormsValueControl {
                 final String uri = NetUtils.base64BinaryToAnyURI(internalValue, NetUtils.SESSION_SCOPE);
                 // Value of -1 for lastModified will cause XFormsResourceServer to set Last-Modified and Expires properly to "now".
                 updatedValue = XFormsResourceServer.proxyURI(getIndentedLogger(), uri, fileInfo.getFileName(), mediatype, -1, evaluateHeaders(),
-                        XFormsProperties.getForwardSubmissionHeaders(containingDocument, true));
+                        XFormsProperties.getForwardSubmissionHeaders(containingDocument(), true));
 
             } else {
                 // Return dummy image
@@ -211,7 +211,7 @@ public class XFormsOutputControl extends XFormsValueControl {
                 // External value is not blank, rewrite as absolute path. Two cases:
                 // o URL is proxied:        /xforms-server/dynamic/27bf...  => [/context]/xforms-server/dynamic/27bf...
                 // o URL is default value:  /ops/images/xforms/spacer.gif   => [/context][/version]/ops/images/xforms/spacer.gif
-                return XFormsUtils.resolveResourceURL(containingDocument, getControlElement(), externalValue, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH);
+                return XFormsUtils.resolveResourceURL(containingDocument(), getControlElement(), externalValue, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH);
             } else {
                 // Empty value, return as is
                 return externalValue;
@@ -229,7 +229,7 @@ public class XFormsOutputControl extends XFormsValueControl {
     public String getNonRelevantEscapedExternalValue() {
         if (mediatypeAttribute != null && mediatypeAttribute.startsWith("image/")) {
             // Return rewritten URL of dummy image URL
-            return XFormsUtils.resolveResourceURL(containingDocument, getControlElement(), XFormsConstants.DUMMY_IMAGE_URI,
+            return XFormsUtils.resolveResourceURL(containingDocument(), getControlElement(), XFormsConstants.DUMMY_IMAGE_URI,
                     ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH);
         } else {
             return super.getNonRelevantEscapedExternalValue();
@@ -303,7 +303,7 @@ public class XFormsOutputControl extends XFormsValueControl {
     }
 
     @Override
-    protected boolean addAjaxCustomAttributes(AttributesImpl attributesImpl, boolean isNewRepeatIteration, XFormsControl other) {
+    public boolean addAjaxCustomAttributes(AttributesImpl attributesImpl, boolean isNewRepeatIteration, XFormsControl other) {
 
         final XFormsOutputControl outputControl1 = (XFormsOutputControl) other;
         final XFormsOutputControl outputControl2 = this;
@@ -339,7 +339,7 @@ public class XFormsOutputControl extends XFormsValueControl {
     }
 
     @Override
-    protected Set<String> getAllowedExternalEvents() {
+    public Set<String> getAllowedExternalEvents() {
         return ALLOWED_EXTERNAL_EVENTS;
     }
 

@@ -63,8 +63,12 @@ abstract class ElementAnalysis(val element: Element, val parent: Option[ElementA
         }
     }
 
+    // Scope of the closest XBL container (related to the prefixed id)
+    // NOTE: Since prefixed id is part of ElementAnalysis, the container scope should be as well/instead.
+    def containerScope: Scope
+
     // Ids
-    val staticId = XFormsUtils.getElementStaticId(element)
+    val staticId = XFormsUtils.getElementId(element)
     val prefixedId = scope.prefixedIdForStaticId(staticId) // NOTE: we could also pass the prefixed id during construction
 
     // Location
@@ -86,23 +90,24 @@ abstract class ElementAnalysis(val element: Element, val parent: Option[ElementA
 
     // XPath analysis
     private var contextAnalysis: Option[XPathAnalysis] = None
-    private var contextAnalyzed = false
+    private var _contextAnalyzed = false
     private var bindingAnalysis: Option[XPathAnalysis] = None
-    private var bindingAnalyzed = false
+    private var _bindingAnalyzed = false
     private var valueAnalysis: Option[XPathAnalysis] = None
-    private var valueAnalyzed = false
+    private var _valueAnalyzed = false
+    def valueAnalyzed = _valueAnalyzed
 
-    final def getContextAnalysis = { assert(contextAnalyzed); contextAnalysis }
-    final def getBindingAnalysis = { assert(bindingAnalyzed); bindingAnalysis }
-    final def getValueAnalysis = { assert(valueAnalyzed); valueAnalysis }
+    final def getContextAnalysis = { assert(_contextAnalyzed); contextAnalysis }
+    final def getBindingAnalysis = { assert(_bindingAnalyzed); bindingAnalysis }
+    final def getValueAnalysis = { assert(_valueAnalyzed); valueAnalysis }
 
     def analyzeXPath() {
         contextAnalysis = computeContextAnalysis
-        contextAnalyzed = true
+        _contextAnalyzed = true
         bindingAnalysis = computeBindingAnalysis
-        bindingAnalyzed = true
+        _bindingAnalyzed = true
         valueAnalysis = computeValueAnalysis
-        valueAnalyzed = true
+        _valueAnalyzed = true
     }
 
     // To implement in subclasses
@@ -140,20 +145,23 @@ abstract class ElementAnalysis(val element: Element, val parent: Option[ElementA
             })
 
         // Control binding and value analysis
-        getBindingAnalysis match {
-            case Some(bindingAnalysis) if hasNodeBinding ⇒ // NOTE: for now there can be a binding analysis even if there is no binding on the control (hack to simplify determining which controls to update)
-                helper.startElement("binding")
-                bindingAnalysis.toXML(helper)
-                helper.endElement()
-            case _ ⇒ // NOP
-        }
-        getValueAnalysis match {
-            case Some(valueAnalysis) ⇒
-                helper.startElement("value")
-                valueAnalysis.toXML(helper)
-                helper.endElement()
-            case _ ⇒ // NOP
-        }
+        if (_bindingAnalyzed)
+            getBindingAnalysis match {
+                case Some(bindingAnalysis) if hasNodeBinding ⇒ // NOTE: for now there can be a binding analysis even if there is no binding on the control (hack to simplify determining which controls to update)
+                    helper.startElement("binding")
+                    bindingAnalysis.toXML(helper)
+                    helper.endElement()
+                case _ ⇒ // NOP
+            }
+
+        if (_valueAnalyzed)
+            getValueAnalysis match {
+                case Some(valueAnalysis) ⇒
+                    helper.startElement("value")
+                    valueAnalysis.toXML(helper)
+                    helper.endElement()
+                case _ ⇒ // NOP
+            }
 
         // Optional content
         content
@@ -162,11 +170,11 @@ abstract class ElementAnalysis(val element: Element, val parent: Option[ElementA
     }
 
     def freeTransientState() {
-        if (contextAnalyzed && getContextAnalysis.isDefined)
+        if (_contextAnalyzed && getContextAnalysis.isDefined)
             getContextAnalysis.get.freeTransientState()
-        if (bindingAnalyzed && getBindingAnalysis.isDefined)
+        if (_bindingAnalyzed && getBindingAnalysis.isDefined)
             getBindingAnalysis.get.freeTransientState()
-        if (valueAnalyzed && getValueAnalysis.isDefined)
+        if (_valueAnalyzed && getValueAnalysis.isDefined)
             getValueAnalysis.get.freeTransientState()
     }
 }

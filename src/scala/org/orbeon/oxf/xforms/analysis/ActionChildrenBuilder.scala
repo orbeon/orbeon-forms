@@ -14,9 +14,12 @@
 package org.orbeon.oxf.xforms.analysis
 
 import org.orbeon.oxf.xforms.action.XFormsActions
+import org.orbeon.oxf.xml.Dom4j
 
-trait ActionChildrenBuilder extends ContainerChildrenBuilder {
+trait ActionChildrenBuilder extends ChildrenBuilderTrait {
     // Only keep children elements that define actions or variables
-    override def findRelevantChildrenElements =
-        super.findRelevantChildrenElements filter (e ⇒ XFormsActions.isAction(e.getQName) || ControlAnalysisFactory.isVariable(e.getQName))
+    def findRelevantChildrenElements =
+        Dom4j.elements(element) filter
+            (e ⇒ XFormsActions.isAction(e.getQName) || ControlAnalysisFactory.isVariable(e.getQName)) map
+                ((_, containerScope))
 }

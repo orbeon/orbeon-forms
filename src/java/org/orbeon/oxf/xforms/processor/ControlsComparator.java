@@ -68,7 +68,7 @@ public class ControlsComparator {
 
     public boolean diff(List<XFormsControl> state1, List<XFormsControl> state2) {
 
-        // Normalize
+        // Normalize (accept null or empty lists)
         if (state1 != null && state1.size() == 0)
             state1 = null;
         if (state2 != null && state2.size() == 0)
@@ -131,8 +131,8 @@ public class ControlsComparator {
                     final XFormsContainerControl containerControl1 = (XFormsContainerControl) control1;
                     final XFormsContainerControl containerControl2 = (XFormsContainerControl) control2;
 
-                    final List<XFormsControl> children1 = (containerControl1 == null) ? null : containerControl1.getChildren();
-                    final List<XFormsControl> children2 = (containerControl2.getChildren() == null) ? Collections.<XFormsControl>emptyList() : containerControl2.getChildren();
+                    final List<XFormsControl> children1 = (containerControl1 == null) ? Collections.<XFormsControl>emptyList() : containerControl1.childrenJava();
+                    final List<XFormsControl> children2 = containerControl2.childrenJava();
 
     //                if (leadingControl instanceof XFormsContainerControl) {
     //                    // Repeat update
@@ -145,7 +145,7 @@ public class ControlsComparator {
     //                }
 
                     // Repeat grouping control
-                    if (control2 instanceof XFormsRepeatControl && children1 != null) {
+                    if (control2 instanceof XFormsRepeatControl && ! children1.isEmpty()) {
 
                         final XFormsRepeatControl repeatControl = (XFormsRepeatControl) control2;
 
@@ -212,7 +212,7 @@ public class ControlsComparator {
                             break foobar;
                         }
 
-                    } else if (control2 instanceof XFormsRepeatControl && children1 == null) {
+                    } else if (control2 instanceof XFormsRepeatControl && children1.isEmpty()) {
 
                         final XFormsRepeatControl repeatControl = (XFormsRepeatControl) control2;
 

@@ -62,7 +62,7 @@ trait LHHATrait extends SimpleElementAnalysis {
         super.toXML(helper, attributes) {
             for (analysis ← getAllLHHA) {
                 helper.startElement(analysis.localName)
-                if (analysis.getValueAnalysis.isDefined)
+                if (analysis.valueAnalyzed)
                     analysis.getValueAnalysis.get.toXML(helper)
                 helper.endElement()
             }

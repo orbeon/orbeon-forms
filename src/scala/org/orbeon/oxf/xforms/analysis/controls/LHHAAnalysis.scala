@@ -38,7 +38,7 @@ abstract class LHHAAnalysis(staticStateContext: StaticStateContext, element: Ele
         if (LHHAAnalysis.hasStaticValue(staticStateContext, element)) {
             // TODO: figure out whether to allow HTML or not (could default to true?)
             val containsHTML = Array(false)
-            (Option(XFormsUtils.getStaticChildElementValue(element, true, containsHTML)), containsHTML(0))
+            (Option(XFormsUtils.getStaticChildElementValue(containerScope.fullPrefix, element, true, containsHTML)), containsHTML(0))
         } else
             (None, false)
 

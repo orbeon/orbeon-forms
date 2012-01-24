@@ -39,8 +39,7 @@ public class XXFormsComponentHandler extends XFormsBaseHandlerXHTML {
         final ElementHandlerController controller = handlerContext.getController();
         final ContentHandler contentHandler = controller.getOutput();
 
-        final String staticId = handlerContext.getId(attributes);
-        final String prefixedId = handlerContext.getIdPrefix() + staticId;
+        final String prefixedId = handlerContext.getPrefixedId(attributes);
         final String effectiveId = handlerContext.getEffectiveId(attributes);
 
         final StaticStateGlobalOps staticGlobalOps = containingDocument.getStaticOps();

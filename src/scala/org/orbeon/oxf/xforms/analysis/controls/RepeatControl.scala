@@ -20,10 +20,13 @@ import org.orbeon.oxf.xforms.xbl.Scope
 import org.orbeon.oxf.xforms.XFormsConstants._
 
 class RepeatControl(staticStateContext: StaticStateContext, element: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], scope: Scope)
-    extends ContainerControl(staticStateContext, element, parent, preceding, scope) {
+    extends ContainerControl(staticStateContext, element, parent, preceding, scope)
+    with ContainerChildrenBuilder {
+
     // TODO: add repeat hierarchy information
     
     val iterationElement = element.element(XFORMS_REPEAT_ITERATION_QNAME)
+    lazy val iteration = children collectFirst { case i: RepeatIterationControl ⇒ i }
 
     require(iterationElement ne null)
 }

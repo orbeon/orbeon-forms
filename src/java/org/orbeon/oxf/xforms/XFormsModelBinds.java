@@ -170,10 +170,6 @@ public class XFormsModelBinds {
             if (indentedLogger.isDebugEnabled())
                 indentedLogger.startHandleOperation("model", "performing bind recalculate", "model id", model.getEffectiveId());
             {
-
-                // Reset context stack just to re-evaluate the variables
-                model.resetAndEvaluateVariables();
-
                 // 1. Evaluate initial values and calculate before the rest
 
                 if (isFirstCalculate || applyInitialValues) {
@@ -228,7 +224,7 @@ public class XFormsModelBinds {
     /**
      * Apply validation binds
      *
-     * @param invalidInstances  will contain a
+     * @param invalidInstances set filled with invalid instances if any
      */
     public void applyValidationBinds(final Set<String> invalidInstances) {
 

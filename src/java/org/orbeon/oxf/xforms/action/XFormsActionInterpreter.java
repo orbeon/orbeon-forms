@@ -153,7 +153,7 @@ public class XFormsActionInterpreter {
                 // We have to restore the context to the in-scope evaluation context, then push @model/@context/@iterate
                 // NOTE: It's not 100% how @context and @xxforms:iterate should interact here. Right now @xxforms:iterate overrides @context,
                 // i.e. @context is evaluated first, and @xxforms:iterate sets a new context for each iteration
-                final XFormsContextStack.BindingContext actionBindingContext = _actionXPathContext.popBinding();
+                final BindingContext actionBindingContext = _actionXPathContext.popBinding();
                 final NamespaceMapping namespaceMapping = _container.getNamespaceMappings(actionElement);
                 {
                     final String contextAttribute = actionElement.attributeValue(XFormsConstants.CONTEXT_QNAME);
@@ -369,7 +369,7 @@ public class XFormsActionInterpreter {
         final String resolvedAVTValue;
         if (XFormsUtils.maybeAVT(attributeValue)) {
             // We have to go through AVT evaluation
-            final XFormsContextStack.BindingContext bindingContext = _actionXPathContext.getCurrentBindingContext();
+            final BindingContext bindingContext = _actionXPathContext.getCurrentBindingContext();
 
             // We don't have an evaluation context so return
             // CHECK: In the future we want to allow an empty evaluation context so do we really want this check?
@@ -447,7 +447,7 @@ public class XFormsActionInterpreter {
             return resolutionScopeContainer.resolveObjectById(getSourceEffectiveId(actionElement), targetStaticId, null);
         } else {
             // Extension: effective id is provided through repeat indexes, modify appropriately and directly reach control
-            final Integer[] containerParts = XFormsUtils.getEffectiveIdSuffixParts(resolutionScopeContainer.getEffectiveId());
+            final int[] containerParts = XFormsUtils.getEffectiveIdSuffixParts(resolutionScopeContainer.getEffectiveId());
             final String[] additionalParts = StringUtils.split(repeatIndexes);
 
             final String[] parts = new String[containerParts.length + additionalParts.length];
@@ -469,8 +469,9 @@ public class XFormsActionInterpreter {
     }
 
     public String getActionStaticId(Element actionElement) {
-        assert actionElement.attributeValue(XFormsConstants.ID_QNAME) != null;
-        return XFormsUtils.getElementStaticId(actionElement);
+        final String staticId = XFormsUtils.getElementId(actionElement);
+        assert staticId != null;
+        return staticId;
     }
 
     public Scope getActionScope(Element actionElement) {
@@ -540,7 +541,7 @@ public class XFormsActionInterpreter {
 
     public boolean isDeferredUpdates(Element actionElement) {
         
-        final XFormsContextStack.BindingContext bindingContext = _actionXPathContext.getCurrentBindingContext();
+        final BindingContext bindingContext = _actionXPathContext.getCurrentBindingContext();
         
         final boolean deferredUpdates;
         if (bindingContext.getSingleItem() != null) {

@@ -65,7 +65,7 @@ public class XXFormsNodesetChangedEvent extends XFormsUIEvent {
         if (list.size() > 0) {
             final List<Item> items = new ArrayList<Item>(list.size());
             for (XFormsRepeatIterationControl i: list)
-                items.add(new Int64Value(i.getIterationIndex()));
+                items.add(new Int64Value(i.iterationIndex()));
             return new ListIterator(items);
         } else {
             return EmptyIterator.getInstance();

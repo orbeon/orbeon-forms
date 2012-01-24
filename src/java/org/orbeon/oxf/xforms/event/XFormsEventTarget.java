@@ -15,7 +15,6 @@ package org.orbeon.oxf.xforms.event;
 
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.XFormsContextStack;
 import org.orbeon.oxf.xforms.xbl.Scope;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -35,7 +34,6 @@ public interface XFormsEventTarget {
     LocationData getLocationData();
 
     XBLContainer getXBLContainer(XFormsContainingDocument containingDocument);
-    XFormsContextStack.BindingContext getBindingContext(XFormsContainingDocument containingDocument);
 
     XFormsEventObserver getParentEventObserver(XBLContainer container);
 

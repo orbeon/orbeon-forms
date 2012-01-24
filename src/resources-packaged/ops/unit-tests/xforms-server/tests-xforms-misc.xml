@@ -428,46 +428,35 @@
     <!-- This test makes sure that in case the value of a control is changed by the client, but then
          an action resets that value to the same value as the original value, then the proper response is sent. -->
     <test description="xforms:setvalue to same initial value" name="oxf:pipeline">
-        <input name="config">
-            <p:config>
-                <p:param name="response" type="output"/>
-
-                <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="wrap-server.xpl"/>
-                    <p:input name="action">
-                        <xxforms:action>
-                            <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="id123">Hello!</xxforms:event>
-                            <xxforms:event name="DOMActivate" source-control-id="id124"/>
-                        </xxforms:action>
-                    </p:input>
-                    <p:input name="controls">
-                        <controls>
-                            <xforms:input ref="instance('main')" id="id123"/>
-                            <xforms:trigger id="id124">
-                                <xforms:label/>
-                                <xforms:setvalue ev:event="DOMActivate" ref="instance('main')" id="id125">existing value</xforms:setvalue>
-                            </xforms:trigger>
-                        </controls>
-                    </p:input>
-                    <p:input name="models">
-                        <models>
-                            <xforms:model id="main-model">
-                                <xforms:instance id="main">
-                                    <value/>
-                                </xforms:instance>
-                            </xforms:model>
-                        </models>
-                    </p:input>
-                    <p:input name="instances">
-                        <instances>
-                            <instance id="main" model-id="main-model">
-                                <value>existing value</value>
-                            </instance>
-                        </instances>
-                    </p:input>
-                    <p:output name="response" ref="response"/>
-                </p:processor>
-            </p:config>
+        <input name="config" href="wrap-server.xpl"/>
+        <input name="action">
+            <xxforms:action>
+                <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="id123">Hello!</xxforms:event>
+                <xxforms:event name="DOMActivate" source-control-id="id124"/>
+            </xxforms:action>
+        </input>
+        <input name="controls">
+            <controls>
+                <xforms:input ref="instance('main')" id="id123"/>
+                <xforms:trigger id="id124">
+                    <xforms:label/>
+                    <xforms:setvalue ev:event="DOMActivate" ref="instance('main')" id="id125">existing value</xforms:setvalue>
+                </xforms:trigger>
+            </controls>
+        </input>
+        <input name="models">
+            <models>
+                <xforms:model id="main-model">
+                    <xforms:instance id="main"/>
+                </xforms:model>
+            </models>
+        </input>
+        <input name="instances">
+            <instances>
+                <instance id="main" model-id="main-model">
+                    <value>existing value</value>
+                </instance>
+            </instances>
         </input>
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
@@ -797,7 +786,7 @@
         </output>
     </test>
 
-    <test description="Label change on xxforms:dialog" name="oxf:pipeline">
+    <test description="xxforms:dialog within repeat" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html>
@@ -1172,19 +1161,14 @@
             </xxforms:action>
         </input>
         <input name="controls">
-            <controls xmlns:xforms="http://www.w3.org/2002/xforms"/>
+            <controls/>
         </input>
         <input name="models">
             <models>
                 <xforms:model id="model" xxforms:external-events="update">
-                    <xforms:instance id="instance-readwrite"><dummy/></xforms:instance>
-                    <xforms:instance id="instance-readonly"><dummy/></xforms:instance>
-                    <xforms:instance id="results">
-                        <results>
-                            <comments/>
-                            <comments/>
-                        </results>
-                    </xforms:instance>
+                    <xforms:instance id="instance-readwrite"/>
+                    <xforms:instance id="instance-readonly"/>
+                    <xforms:instance id="results"/>
 
                     <xforms:submission id="replace-readwrite" ref="instance()" action="echo:" method="post" replace="instance"/>
                     <xforms:submission id="replace-readonly" ref="instance('instance-readonly')" action="echo:" method="post" replace="instance" xxforms:readonly="true"/>
@@ -1391,6 +1375,61 @@
                         <xxf:control id="output-2">bar</xxf:control>
                         <xxf:control id="output-3">foo</xxf:control>
                         <xxf:control id="output-4">foo</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+    
+    <test description="Control becomes relevant and sends label to client" name="oxf:pipeline">
+        <input name="config" href="wrap-server.xpl"/>
+        <input name="action">
+            <xxforms:action>
+                <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="input1">true</xxforms:event>
+            </xxforms:action>
+        </input>
+        <input name="controls">
+            <controls>
+                <xforms:input id="input1" ref="@show"/>
+                <xforms:input id="input2" ref="name">
+                    <xforms:label>Name:</xforms:label>
+                </xforms:input>
+            </controls>
+        </input>
+        <input name="models">
+            <models>
+                <xforms:model id="model">
+                    <xforms:instance id="instance"/>
+                    <xforms:bind id="bind" ref="name" relevant="../@show = 'true'"/>
+                </xforms:model>
+            </models>
+        </input>
+        <input name="instances">
+            <instances>
+                <instance model-id="model" id="instance">
+                    <form show="false">
+                        <name/>
+                    </form>
+                </instance>
+            </instances>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <form xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxi="http://orbeon.org/oxf/xml/xinclude" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:saxon="http://saxon.sf.net/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:xf="http://www.w3.org/2002/xforms" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:exf="http://www.exforms.org/exf/1-0" show="true">
+                                    <name/>
+                                </form>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="input1">true</xxf:control>
+                        <xxf:control id="input2" label="Name:" relevant="true"/>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>

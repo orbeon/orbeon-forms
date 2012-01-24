@@ -34,7 +34,7 @@ public class XFormsGroupFieldsetHandler extends XFormsGroupHandler {
     }
 
     @Override
-    public void handleControlStart(String uri, String localname, String qName, Attributes attributes, String staticId, final String effectiveId, XFormsControl control) throws SAXException {
+    public void handleControlStart(String uri, String localname, String qName, Attributes attributes, final String effectiveId, XFormsControl control) throws SAXException {
 
         final XFormsGroupControl groupControl = (XFormsGroupControl) control;
 
@@ -74,7 +74,7 @@ public class XFormsGroupFieldsetHandler extends XFormsGroupHandler {
     }
 
     @Override
-    public void handleControlEnd(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsControl control) throws SAXException {
+    public void handleControlEnd(String uri, String localname, String qName, Attributes attributes, String effectiveId, XFormsControl control) throws SAXException {
 
         final ElementHandlerController controller = handlerContext.getController();
 

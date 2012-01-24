@@ -14,8 +14,9 @@
 package org.orbeon.oxf.xforms.analysis.controls
 
 import org.dom4j.Element
-import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, StaticStateContext}
 import org.orbeon.oxf.xforms.xbl.Scope
+import org.orbeon.oxf.xforms.analysis.{ContainerChildrenBuilder, ElementAnalysis, StaticStateContext}
 
 class RepeatIterationControl (staticStateContext: StaticStateContext, element: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], scope: Scope)
     extends ContainerControl(staticStateContext, element, parent, preceding, scope)
+    with ContainerChildrenBuilder

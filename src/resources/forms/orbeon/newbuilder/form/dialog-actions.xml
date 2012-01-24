@@ -25,7 +25,8 @@
 
     <xforms:label ref="$form-resources/dialog-actions/dialog-title"/>
 
-    <xxforms:variable name="instance" select="instance('fb-bindings-editor-instance')"/>
+    <xforms:var name="instance" value="instance('fb-bindings-editor-instance')"/>
+    <xforms:var name="body"     value="$body" model="fr-form-model"/>
 
     <fr:grid columns="2">
         <xhtml:tr>

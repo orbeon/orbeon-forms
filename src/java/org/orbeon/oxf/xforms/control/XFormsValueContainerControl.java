@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.control;
 
 import org.dom4j.Element;
 import org.dom4j.QName;
-import org.orbeon.oxf.xforms.XFormsContextStack;
+import org.orbeon.oxf.xforms.BindingContext;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.model.DataModel;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
@@ -34,18 +34,18 @@ public abstract class XFormsValueContainerControl extends XFormsSingleNodeContai
     private String value;
     private String previousValue;
 
-    public XFormsValueContainerControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId) {
-        super(container, parent, element, name, effectiveId);
+    public XFormsValueContainerControl(XBLContainer container, XFormsControl parent, Element element, String effectiveId) {
+        super(container, parent, element, effectiveId);
     }
 
     @Override
-    protected void onCreate() {
+    public void onCreate() {
         super.onCreate();
         readBinding();
     }
 
     @Override
-    protected void onBindingUpdate(XFormsContextStack.BindingContext oldBinding, XFormsContextStack.BindingContext newBinding) {
+    public void onBindingUpdate(BindingContext oldBinding, BindingContext newBinding) {
         super.onBindingUpdate(oldBinding, newBinding);
         readBinding();
     }
@@ -60,7 +60,7 @@ public abstract class XFormsValueContainerControl extends XFormsSingleNodeContai
     }
 
     @Override
-    protected void evaluateImpl() {
+    public void evaluateImpl() {
         super.evaluateImpl();
 
         // Evaluate control values

@@ -57,19 +57,19 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
     private Map<String, String> customMIPs;
     private String customMIPsAsString;
 
-    public XFormsSingleNodeControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId) {
-        super(container, parent, element, name, effectiveId);
+    public XFormsSingleNodeControl(XBLContainer container, XFormsControl parent, Element element, String effectiveId) {
+        super(container, parent, element, effectiveId);
     }
 
     @Override
-    protected void onDestroy() {
+    public void onDestroy() {
         super.onDestroy();
         // Set default MIPs so that diff picks up the right values
         setDefaultMIPs();
     }
 
     @Override
-    protected void onCreate() {
+    public void onCreate() {
         super.onCreate();
 
         readBinding();
@@ -80,15 +80,15 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
     }
 
     @Override
-    protected void onBindingUpdate(XFormsContextStack.BindingContext oldBinding, XFormsContextStack.BindingContext newBinding) {
+    public void onBindingUpdate(BindingContext oldBinding, BindingContext newBinding) {
         super.onBindingUpdate(oldBinding, newBinding);
         readBinding();
     }
 
     private void readBinding() {
         // Set bound item, only considering actual bindings (with @bind, @ref or @nodeset)
-        if (bindingContext.isNewBind())
-            this.boundItem = bindingContext.getSingleItem();
+        if (bindingContext().isNewBind())
+            this.boundItem = bindingContext().getSingleItem();
 
         // Get MIPs
         final Item currentItem = getBoundItem();
@@ -107,7 +107,7 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
                     this.customMIPs = new HashMap<String, String>(tempCustomMIPs);
 
                 // Handle global read-only setting
-                if (XFormsProperties.isReadonly(containingDocument))
+                if (XFormsProperties.isReadonly(containingDocument()))
                     this.readonly = true;
             } else {
                 // Control is not bound to a node (i.e. bound to an atomic value), MIPs get default values
@@ -283,14 +283,14 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
     }
 
     @Override
-    protected boolean computeRelevant() {
+    public boolean computeRelevant() {
 
         // If parent is not relevant then we are not relevant either
         if (!super.computeRelevant())
             return false;
 
-        final Item currentItem = bindingContext.getSingleItem();
-        if (bindingContext.isNewBind()) {
+        final Item currentItem = bindingContext().getSingleItem();
+        if (bindingContext().isNewBind()) {
             // There is a binding
             if (currentItem instanceof NodeInfo) {
                 final NodeInfo currentNodeInfo = (NodeInfo) currentItem;
@@ -351,7 +351,7 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
     }
 
     public boolean hasStaticReadonlyAppearance() {
-        return XFormsProperties.isStaticReadonlyAppearance(containingDocument)
+        return XFormsProperties.isStaticReadonlyAppearance(containingDocument())
                     || XFormsProperties.READONLY_APPEARANCE_STATIC_VALUE.equals(getControlElement().attributeValue(XFormsConstants.XXFORMS_READONLY_APPEARANCE_ATTRIBUTE_QNAME));
     }
 
@@ -362,7 +362,7 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
             // In addition, we don't allow focusing on read-only controls
 
             // Store new focus information for client
-            containingDocument.setClientFocusEffectiveControlId(getEffectiveId());
+            containingDocument().setClientFocusEffectiveControlId(getEffectiveId());
             return true;
         } else {
             return false;
@@ -403,7 +403,7 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
     }
 
     @Override
-    protected boolean addAjaxAttributes(AttributesImpl attributesImpl, boolean isNewlyVisibleSubtree, XFormsControl other) {
+    public boolean addAjaxAttributes(AttributesImpl attributesImpl, boolean isNewlyVisibleSubtree, XFormsControl other) {
 
         final XFormsSingleNodeControl control1 = (XFormsSingleNodeControl) other;
         final XFormsSingleNodeControl control2 = this;

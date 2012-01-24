@@ -44,12 +44,12 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
     private boolean isExternalValueEvaluated;
     private String externalValue;
 
-    protected XFormsValueControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId) {
-        super(container, parent, element, name, effectiveId);
+    protected XFormsValueControl(XBLContainer container, XFormsControl parent, Element element, String effectiveId) {
+        super(container, parent, element, effectiveId);
     }
 
     @Override
-    protected void onCreate() {
+    public void onCreate() {
         super.onCreate();
 
         value = null;
@@ -59,7 +59,7 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
     }
 
     @Override
-    protected void evaluateImpl() {
+    public void evaluateImpl() {
 
         // Evaluate other aspects of the control if necessary
         super.evaluateImpl();
@@ -82,14 +82,12 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
     }
 
     @Override
-    protected void markDirtyImpl(XPathDependencies xpathDependencies) {
+    public void markDirtyImpl(XPathDependencies xpathDependencies) {
         super.markDirtyImpl(xpathDependencies);
 
         // Handle value update
         if (xpathDependencies.requireValueUpdate(getPrefixedId())) {
-
             value = null;
-
             // Always mark the external value dirty if the value is dirty
             markExternalValueDirty();
         }
@@ -136,7 +134,7 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
         final Item boundItem = getBoundItem();
         if (!(boundItem instanceof NodeInfo)) // this should not happen
             throw new OXFException("Control is no longer bound to a node. Cannot set external value.");
-        DataModel.jSetValueIfChanged(containingDocument, getIndentedLogger(), this, getLocationData(), (NodeInfo) boundItem, value, "client", false);
+        DataModel.jSetValueIfChanged(containingDocument(), getIndentedLogger(), this, getLocationData(), (NodeInfo) boundItem, value, "client", false);
 
         // NOTE: We do *not* call evaluate() here, as that will break the difference engine. doSetValue() above marks
         // the controls as dirty, and they will be evaluated when necessary later.
@@ -164,7 +162,7 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
             if (typeName != null) {
 //                final String lang = XFormsUtils.resolveXMLang(getControlElement());// this could be done as part of the static analysis?
 //                format = XFormsProperties.getTypeOutputFormat(containingDocument, typeName, lang);
-                format = XFormsProperties.getTypeOutputFormat(containingDocument, typeName);
+                format = XFormsProperties.getTypeOutputFormat(containingDocument(), typeName);
             }
 
             if (format != null) {
@@ -265,7 +263,7 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
     }
 
     @Override
-    protected Set<String> getAllowedExternalEvents() {
+    public Set<String> getAllowedExternalEvents() {
         return ALLOWED_EXTERNAL_EVENTS;
     }
 }

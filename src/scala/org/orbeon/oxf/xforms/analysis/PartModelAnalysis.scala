@@ -22,7 +22,7 @@ import org.orbeon.oxf.xforms.xbl.Scope
 // Part analysis: models and instances information
 trait PartModelAnalysis extends TransientState {
 
-    this: PartAnalysisImpl =>
+    self: PartAnalysisImpl =>
 
     private[PartModelAnalysis] val modelsByScope = LinkedHashMap[Scope, Buffer[Model]]()
     private[PartModelAnalysis] val modelsByPrefixedId = LinkedHashMap[String, Model]()

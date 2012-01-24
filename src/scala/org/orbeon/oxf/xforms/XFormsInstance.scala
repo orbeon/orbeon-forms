@@ -252,7 +252,7 @@ class XFormsInstance(
 
     private def updateRepeatNodesets(controls: XFormsControls, insertedNodes: JList[Item]) {
         val repeatControlsMap = controls.getCurrentControlTree.getRepeatControls
-        if (repeatControlsMap ne null) {
+        if (! repeatControlsMap.isEmpty) {
             val instanceScope = getXBLContainer(controls.getContainingDocument).getPartAnalysis.getResolutionScopeByPrefixedId(getPrefixedId)
             
             // NOTE: Copy into List as the list of repeat controls may change within updateNodesetForInsertDelete()
@@ -282,9 +282,6 @@ class XFormsInstance(
     def logInstance(indentedLogger: IndentedLogger, message: String) =
         if (indentedLogger.isDebugEnabled)
             indentedLogger.logDebug("", message, "effective model id", modelEffectiveId, "effective instance id", getEffectiveId, "instance", TransformerUtils.tinyTreeToString(getInstanceRootElementInfo))
-
-    def getBindingContext(containingDocument: XFormsContainingDocument) =
-        throw new IllegalStateException
 
     // Don't allow any external events
     def allowExternalEvent(indentedLogger: IndentedLogger, logType: String, eventName: String) = false

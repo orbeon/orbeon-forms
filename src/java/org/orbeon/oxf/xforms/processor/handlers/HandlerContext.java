@@ -52,7 +52,6 @@ public class HandlerContext {
 
     // UA information
     private boolean processedUserAgent;
-    private boolean isRenderingEngineTrident;
     private boolean isRenderingEngineIE6OrEarlier;
 
     // Context information
@@ -60,9 +59,6 @@ public class HandlerContext {
     private Stack<String> componentContextStack;
     private Stack<RepeatContext> repeatContextStack;
     private Stack<Boolean> caseContextStack;
-
-//    private static final int INDEX_INCREMENT = 100;
-//    private int currentTabIndex = 0;
 
     public HandlerContext(ElementHandlerController controller,
                           XFormsContainingDocument containingDocument, ExternalContext externalContext, String topLevelControlEffectiveId) {
@@ -110,14 +106,6 @@ public class HandlerContext {
         return externalContext;
     }
 
-//    public int nextTabIndex() {
-//        // NIY
-////        final Integer[] repeatIndexes = XFormsUtils.getEffectiveIdSuffixParts(getIdPostfix());
-//
-//        currentTabIndex += INDEX_INCREMENT;
-//        return currentTabIndex;
-//    }
-
     final public String[] getDocumentOrder() {
         return documentOrder;
     }
@@ -138,11 +126,6 @@ public class HandlerContext {
         return alertElementName;
     }
 
-//    final public boolean isRenderingEngineTrident() {
-//        processedUserAgentIfNeeded();
-//        return isRenderingEngineTrident;
-//    }
-
     final public boolean isRenderingEngineIE6OrEarlier() {
         processedUserAgentIfNeeded();
         return isRenderingEngineIE6OrEarlier;
@@ -152,7 +135,6 @@ public class HandlerContext {
         if (!processedUserAgent) {
             final ExternalContext.Request request = externalContext.getRequest();
             isRenderingEngineIE6OrEarlier = UserAgent.isRenderingEngineIE6OrEarlier(request);
-            isRenderingEngineTrident = isRenderingEngineIE6OrEarlier || UserAgent.isRenderingEngineTrident(request);
             processedUserAgent = true;
         }
     }
@@ -230,12 +212,14 @@ public class HandlerContext {
         return "p" + i;
     }
 
-    public String getId(Attributes controlElementAttributes) {
-        return controlElementAttributes.getValue("id");
+    public String getPrefixedId(Attributes controlElementAttributes) {
+        final String id = controlElementAttributes.getValue("id");
+        return (id != null) ? getIdPrefix() + id : null;
     }
 
     public String getEffectiveId(Attributes controlElementAttributes) {
-        return getIdPrefix() + controlElementAttributes.getValue("id") + getIdPostfix();
+        final String prefixedId = getPrefixedId(controlElementAttributes);
+        return (prefixedId != null) ? prefixedId + getIdPostfix() : null;
     }
 
     /**
@@ -403,10 +387,10 @@ public class HandlerContext {
         // Get ancestor controls
         final List<XFormsControl> controls = new ArrayList<XFormsControl>();
         {
-            XFormsControl currentControl = control.getParent();
+            XFormsControl currentControl = control.parent();
             while (currentControl != null) {
                 controls.add(currentControl);
-                currentControl = currentControl.getParent();
+                currentControl = currentControl.parent();
             }
             Collections.reverse(controls);
         }
@@ -416,11 +400,11 @@ public class HandlerContext {
             if (currentControl instanceof XFormsRepeatIterationControl) {
                 // Handle repeat
                 final XFormsRepeatIterationControl repeatIterationControl = (XFormsRepeatIterationControl) currentControl;
-                final XFormsRepeatControl repeatControl = (XFormsRepeatControl) repeatIterationControl.getParent();
+                final XFormsRepeatControl repeatControl = repeatIterationControl.repeat();
 
                 final boolean isTopLevelRepeat = countParentRepeats() == 0;
                 final boolean isRepeatSelected = isRepeatSelected() || isTopLevelRepeat;
-                final int currentRepeatIteration = repeatIterationControl.getIterationIndex();
+                final int currentRepeatIteration = repeatIterationControl.iterationIndex();
 
                 pushRepeatContext(false, currentRepeatIteration, isRepeatSelected || currentRepeatIteration == repeatControl.getIndex());
             } else if (currentControl instanceof XFormsComponentControl) {

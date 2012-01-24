@@ -34,7 +34,7 @@ public class XFormsSelectHandler extends XFormsControlLifecyleHandlerXML {
 	}
 	
 	@Override
-	protected void handleControlEnd(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsControl control) throws SAXException {
+	protected void handleControlEnd(String uri, String localname, String qName, Attributes attributes, String effectiveId, XFormsControl control) throws SAXException {
 		final XFormsSelect1Control select1Control = (XFormsSelect1Control) control;
 		final XMLReceiver xmlReceiver = handlerContext.getController().getOutput();
 		
@@ -70,6 +70,6 @@ public class XFormsSelectHandler extends XFormsControlLifecyleHandlerXML {
     		xmlReceiver.endElement(XFormsConstants.XXFORMS_NAMESPACE_URI, "items", XFormsConstants.XXFORMS_PREFIX + ":items");
     	}
         
-        super.handleControlEnd(uri, localname, qName, attributes, staticId, effectiveId, control);
+        super.handleControlEnd(uri, localname, qName, attributes, effectiveId, control);
     }
 }

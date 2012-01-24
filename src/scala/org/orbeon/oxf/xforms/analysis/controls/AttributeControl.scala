@@ -28,6 +28,7 @@ class AttributeControl(staticStateContext: StaticStateContext, element: Element,
 
     val forStaticId = element.attributeValue(XFormsConstants.FOR_QNAME)
     val forPrefixedId = XFormsUtils.getRelatedEffectiveId(prefixedId, forStaticId)
+
     val attributeName = element.attributeValue(XFormsConstants.NAME_QNAME)
     val attributeValue = element.attributeValue(XFormsConstants.VALUE_QNAME)
 

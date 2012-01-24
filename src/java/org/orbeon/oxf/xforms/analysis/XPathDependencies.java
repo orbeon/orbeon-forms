@@ -32,6 +32,9 @@ public interface XPathDependencies {
     void refreshStart();
     void refreshDone();
 
+    void bindingUpdateStart();
+    void bindingUpdateDone();
+
     void afterInitialResponse();
     void beforeUpdateResponse();
     void afterUpdateResponse();

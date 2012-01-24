@@ -70,7 +70,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
         }
     }
 
-    protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsControl control) throws SAXException {
+    protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String effectiveId, XFormsControl control) throws SAXException {
         // Get items, dynamic or static, if possible
         final XFormsSelect1Control xformsSelect1Control = (XFormsSelect1Control) control;
 

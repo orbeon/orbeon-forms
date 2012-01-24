@@ -82,20 +82,16 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         final Logger globalLogger = XFormsServer.getLogger();
         final Set<String> debugConfig = XFormsProperties.getDebugLogging();
 
-        registerLogger(XFormsContainingDocument.logger, globalLogger, debugConfig, XFormsContainingDocument.LOGGING_CATEGORY);
-        registerLogger(XFormsModel.logger, globalLogger, debugConfig, XFormsModel.LOGGING_CATEGORY);
-        registerLogger(XFormsModelSubmission.logger, globalLogger, debugConfig, XFormsModelSubmission.LOGGING_CATEGORY);
-        registerLogger(XFormsControls.logger, globalLogger, debugConfig, XFormsControls.LOGGING_CATEGORY);
-        registerLogger(XFormsEvents.logger, globalLogger, debugConfig, XFormsEvents.LOGGING_CATEGORY);
-        registerLogger(XFormsActions.logger(), globalLogger, debugConfig, XFormsActions.LOGGING_CATEGORY());
+        registerLogger(globalLogger, debugConfig, XFormsContainingDocument.LOGGING_CATEGORY);
+        registerLogger(globalLogger, debugConfig, XFormsModel.LOGGING_CATEGORY);
+        registerLogger(globalLogger, debugConfig, XFormsModelSubmission.LOGGING_CATEGORY);
+        registerLogger(globalLogger, debugConfig, XFormsControls.LOGGING_CATEGORY);
+        registerLogger(globalLogger, debugConfig, XFormsEvents.LOGGING_CATEGORY);
+        registerLogger(globalLogger, debugConfig, XFormsActions.LOGGING_CATEGORY());
     }
 
-    private void registerLogger(Logger localLogger, Logger globalLogger, Set<String> debugConfig, String category) {
-        if (XFormsServer.USE_SEPARATE_LOGGERS) {
-            loggersMap.put(category, new IndentedLogger(localLogger, indentation, category));
-        } else {
-            loggersMap.put(category, new IndentedLogger(globalLogger, globalLogger.isDebugEnabled() && debugConfig.contains(category), indentation, category));
-        }
+    private void registerLogger(Logger globalLogger, Set<String> debugConfig, String category) {
+        loggersMap.put(category, new IndentedLogger(globalLogger, globalLogger.isDebugEnabled() && debugConfig.contains(category), indentation, category));
     }
 
     private String uuid;        // UUID of this document
@@ -1175,31 +1171,17 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
     private static final Map<String, IndentedLogger> STATIC_LOGGERS_MAP = new HashMap<String, IndentedLogger>();
 
     /**
-     * Return a static logger given all the details.
-     *
-     * @param localLogger       local logger, used only if separate loggers are configured
-     * @param globalLogger      global logger, usually XFormsServer.getLogger()
-     * @param category          category
-     * @return                  logger
+     * Return an indented logger for the given category and base logger.
      */
-    public static IndentedLogger getIndentedLogger(Logger localLogger, Logger globalLogger, String category) {
+    public static IndentedLogger getIndentedLogger(Logger logger, String category) {
 
         final IndentedLogger existingIndentedLogger = STATIC_LOGGERS_MAP.get(category);
-        if (existingIndentedLogger != null) {
+        if (existingIndentedLogger != null)
             return existingIndentedLogger;
-        }
 
-        final IndentedLogger indentedLogger;
-        final Logger logger;
-        final boolean isDebugEnabled;
-        if (XFormsServer.USE_SEPARATE_LOGGERS) {
-            logger = localLogger;
-            isDebugEnabled = logger.isDebugEnabled();
-        } else {
-            logger = globalLogger;
-            isDebugEnabled = logger.isDebugEnabled() && XFormsProperties.getDebugLogging().contains(category);
-        }
-        indentedLogger = new IndentedLogger(logger, isDebugEnabled, category);
+        final boolean isDebugEnabled = logger.isDebugEnabled() && XFormsProperties.getDebugLogging().contains(category);
+
+        final IndentedLogger indentedLogger = new IndentedLogger(logger, isDebugEnabled, category);
 
         STATIC_LOGGERS_MAP.put(category, indentedLogger);
 

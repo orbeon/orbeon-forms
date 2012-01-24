@@ -61,10 +61,6 @@ public class XFormsControlLifecyleHandlerXML extends XFormsBaseHandlerXML {
 	protected XFormsControl getControl() {
 		return xFormsControlLifecycleHandlerDelegate.getControl();
 	}
-	
-	protected String getStaticId() {
-		return xFormsControlLifecycleHandlerDelegate.getStaticId();
-	}
 
     @Override
     public void init(String uri, String localname, String qName, Attributes attributes, Object matched) throws SAXException {
@@ -77,7 +73,7 @@ public class XFormsControlLifecyleHandlerXML extends XFormsBaseHandlerXML {
     public final void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {
         if (isMustOutputControl(getControl())) {
 
-            handleControlStart(uri, localname, qName, attributes, getStaticId(), getEffectiveId(), getControl());
+            handleControlStart(uri, localname, qName, attributes, getEffectiveId(), getControl());
             
             // xforms:label
             if (hasLocalLabel())
@@ -100,7 +96,7 @@ public class XFormsControlLifecyleHandlerXML extends XFormsBaseHandlerXML {
     @Override
     public final void end(String uri, String localname, String qName) throws SAXException {
         if (isMustOutputControl(getControl())) {
-        	handleControlEnd(uri, localname, qName, attributes, getStaticId(), getEffectiveId(), getControl());
+        	handleControlEnd(uri, localname, qName, attributes, getEffectiveId(), getControl());
         }
     }
 
@@ -153,7 +149,7 @@ public class XFormsControlLifecyleHandlerXML extends XFormsBaseHandlerXML {
         handleLabelHintHelpAlert(getEffectiveId(), getForEffectiveId(), LHHAC.HELP, getControl(), isTemplate(), !handlerContext.isSpanHTMLLayout());
     }
 
-    protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsControl control) throws SAXException {
+    protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String effectiveId, XFormsControl control) throws SAXException {
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
         
         reusableAttributes.clear();
@@ -169,7 +165,7 @@ public class XFormsControlLifecyleHandlerXML extends XFormsBaseHandlerXML {
 
 	protected void handleExtraAttributesForControlStart(AttributesImpl reusableAttributes, String prefixedId, XFormsControl control) { }
 
-	protected void handleControlEnd(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsControl control) throws SAXException {
+	protected void handleControlEnd(String uri, String localname, String qName, Attributes attributes, String effectiveId, XFormsControl control) throws SAXException {
     	 final ContentHandler contentHandler = handlerContext.getController().getOutput();
     	 
     	 contentHandler.endElement(uri, localname, qName);

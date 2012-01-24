@@ -31,8 +31,8 @@ import java.util.Map;
  * Represents an xforms:submit control.
  */
 public class XFormsSubmitControl extends XFormsTriggerControl {
-    public XFormsSubmitControl(XBLContainer container, XFormsControl parent, Element element, String name, String id, Map<String, String> state) {
-        super(container, parent, element, name, id, state);
+    public XFormsSubmitControl(XBLContainer container, XFormsControl parent, Element element, String id, Map<String, String> state) {
+        super(container, parent, element, id, state);
     }
 
     @Override
@@ -47,14 +47,14 @@ public class XFormsSubmitControl extends XFormsTriggerControl {
 
             // Find submission object and dispatch submit event to it
 
-            final Object object = getXBLContainer().findResolutionScope(XFormsUtils.getPrefixedId(getEffectiveId())).resolveObjectById(getEffectiveId(), submissionId, null);
+            final Object object = container().findResolutionScope(XFormsUtils.getPrefixedId(getEffectiveId())).resolveObjectById(getEffectiveId(), submissionId, null);
             if (object instanceof XFormsModelSubmission) {
                 final XFormsModelSubmission submission = (XFormsModelSubmission) object;
-                submission.getXBLContainer(containingDocument).dispatchEvent(new XFormsSubmitEvent(containingDocument, submission));
+                submission.getXBLContainer(containingDocument()).dispatchEvent(new XFormsSubmitEvent(containingDocument(), submission));
             } else {
                 // "If there is a null search result for the target object and the source object is an XForms action such as
                 // dispatch, send, setfocus, setindex or toggle, then the action is terminated with no effect."
-                final IndentedLogger indentedLogger = containingDocument.getControls().getIndentedLogger();
+                final IndentedLogger indentedLogger = containingDocument().getControls().getIndentedLogger();
                 if (indentedLogger.isDebugEnabled())
                     indentedLogger.logDebug("xforms:submit", "submission does not refer to an existing xforms:submission element, ignoring action",
                             "submission id", submissionId);

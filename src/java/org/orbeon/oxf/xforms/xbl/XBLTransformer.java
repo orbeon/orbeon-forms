@@ -17,6 +17,7 @@ import org.apache.commons.lang.StringUtils;
 import org.dom4j.*;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.event.EventHandlerImpl;
 import org.orbeon.oxf.xml.NamespaceMapping;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
@@ -33,12 +34,18 @@ public class XBLTransformer {
 
     /**
      * Apply an XBL transformation, i.e. apply xbl:content, xbl:attr, etc.
+     *
+     * NOTE: This mutates shadowTreeDocument.
      */
-    public static void transform(final Document shadowTreeDocument, final Element boundElement) {
+    public static Document transform(final Document shadowTreeDocument, final Element boundElement, final boolean excludeNestedHandlers) {
 
         final DocumentWrapper documentWrapper = new DocumentWrapper(boundElement.getDocument(), null, XPathCache.getGlobalConfiguration());
 
         Dom4jUtils.visitSubtree(shadowTreeDocument.getRootElement(), new Dom4jUtils.VisitorListener() {
+
+            boolean isNestedHandler(Element e) {
+                return e.getParent() == boundElement && EventHandlerImpl.isEventHandler(e);
+            }
 
             public void startElement(Element element) {
 
@@ -51,12 +58,14 @@ public class XBLTransformer {
                     final String scopeAttribute = element.attributeValue(XFormsConstants.XXBL_SCOPE_QNAME);
                     final List<Node> contentToInsert;
                     if (includesAttribute == null) {
-                        // All bound node content must be copied over
+                        // All bound node content must be copied over (except nested handlers if requested)
                         final List<Node> elementContent = Dom4jUtils.content(boundElement);
                         final List<Node> clonedContent = new ArrayList<Node>();
                         for (final Node node: elementContent) {
                             if (node instanceof Element) {
-                                clonedContent.add(Dom4jUtils.copyElementCopyParentNamespaces((Element) node));
+                                final Element currentElement = (Element) node;
+                                if (! excludeNestedHandlers || ! isNestedHandler(currentElement))
+                                    clonedContent.add(Dom4jUtils.copyElementCopyParentNamespaces(currentElement));
                             } else if (!(node instanceof Namespace)) {
                                  clonedContent.add(Dom4jUtils.createCopy(node));
                             }
@@ -82,7 +91,8 @@ public class XBLTransformer {
                                 final NodeInfo currentNodeInfo = (NodeInfo) o;
                                 final Element currentElement = (Element) ((NodeWrapper) currentNodeInfo).getUnderlyingNode();
 
-                                contentToInsert.add(Dom4jUtils.copyElementCopyParentNamespaces(currentElement));
+                                if (! excludeNestedHandlers || ! isNestedHandler(currentElement))
+                                    contentToInsert.add(Dom4jUtils.copyElementCopyParentNamespaces(currentElement));
                             }
                         } else {
                             // Clone all the element's children if any
@@ -90,7 +100,8 @@ public class XBLTransformer {
                             contentToInsert = new ArrayList<Node>(element.nodeCount());
                             for (Object o: element.elements()) {
                                 final Element currentElement = (Element) o;
-                                contentToInsert.add(Dom4jUtils.copyElementCopyParentNamespaces(currentElement));
+                                if (! excludeNestedHandlers || ! isNestedHandler(currentElement))
+                                    contentToInsert.add(Dom4jUtils.copyElementCopyParentNamespaces(currentElement));
                             }
                         }
                     }
@@ -286,6 +297,8 @@ public class XBLTransformer {
             public void endElement(Element element) {}
             public void text(Text text) {}
         }, true);
+
+        return shadowTreeDocument;
     }
 
     /**

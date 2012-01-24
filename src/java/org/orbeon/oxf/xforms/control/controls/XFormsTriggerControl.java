@@ -29,17 +29,19 @@ import java.util.Set;
  * TODO: Use inheritance/interface to make this a single-node control that doesn't hold a value.
  */
 public class XFormsTriggerControl extends XFormsSingleNodeControl {
-    public XFormsTriggerControl(XBLContainer container, XFormsControl parent, Element element, String name, String id, Map<String, String> state) {
-        super(container, parent, element, name, id);
+    public XFormsTriggerControl(XBLContainer container, XFormsControl parent, Element element, String id, Map<String, String> state) {
+        super(container, parent, element, id);
+    }
+
+    private static boolean[] TRIGGER_LHHA_HTML_SUPPORT = { true, true, false, true };
+
+    @Override
+    public boolean[] lhhaHTMLSupport() {
+        return TRIGGER_LHHA_HTML_SUPPORT;
     }
 
     @Override
-    protected boolean isSupportHTMLHints() {
-        return false;
-    }
-
-    @Override
-    protected boolean computeRelevant() {
+    public boolean computeRelevant() {
         // NOTE: We used to make the trigger non-relevant if it was static-readonly. But this caused issues:
         //
         // o at the time computeRelevant() is called, MIPs haven't been read yet
@@ -62,7 +64,7 @@ public class XFormsTriggerControl extends XFormsSingleNodeControl {
     }
 
     @Override
-    protected Set<String> getAllowedExternalEvents() {
+    public Set<String> getAllowedExternalEvents() {
         return ALLOWED_EXTERNAL_EVENTS;
     }
 

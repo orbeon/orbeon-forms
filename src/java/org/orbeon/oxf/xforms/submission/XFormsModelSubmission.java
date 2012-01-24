@@ -720,13 +720,6 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
         }
     }
 
-    public XFormsContextStack.BindingContext getBindingContext(XFormsContainingDocument containingDocument) {
-        // Nobody should be calling this at this time
-        // NOTE: Unlike for the model, this can make sense. It's just that we would have to decide when to evaluate the
-        // binding, and for now we evaluate the binding when needed during submission processing instead.
-        throw new IllegalStateException();
-    }
-
     public class SubmissionParameters {
 
         // @replace attribute
@@ -774,7 +767,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
 
         public void initializeXPathContext() {
 
-            final XFormsContextStack.BindingContext bindingContext; {
+            final BindingContext bindingContext; {
                 model.resetAndEvaluateVariables();
                 final XFormsContextStack contextStack = model.getContextStack();
                 contextStack.pushBinding(getSubmissionElement(), getEffectiveId(), model.getResolutionScope());
@@ -784,7 +777,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
             final XFormsFunction.Context functionContext = contextStack.getFunctionContext(getEffectiveId());
 
             refNodeInfo = (NodeInfo) bindingContext.getSingleItem();
-            submissionElementContextItem = bindingContext.getContextItem();
+            submissionElementContextItem = bindingContext.contextItem();
             // NOTE: Current instance may be null if the document submitted is not part of an instance
             refInstance = bindingContext.getInstance();
             xpathContext = new XPathCache.XPathContext(namespaceMapping, bindingContext.getInScopeVariables(), functionLibrary, functionContext, null, getLocationData());

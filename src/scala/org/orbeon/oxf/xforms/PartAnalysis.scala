@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms
 
-import analysis.Metadata
+import analysis.{ElementAnalysis, Metadata}
 import org.orbeon.oxf.xforms.event.EventHandler
 import org.orbeon.oxf.xml.dom4j.LocationData
 import java.util.{List => JList}
@@ -38,6 +38,7 @@ trait PartAnalysis extends PartGlobalOps with PartStaticAnalysisOps with XMLUtil
     def observerHasHandlerForEvent(observerPrefixedId: String, eventName: String): Boolean
 
     def hasControls: Boolean
+    def getTopLevelControls: Seq[ElementAnalysis]
     def getTopLevelControlElements: JList[Element]
 
     def staticState: XFormsStaticState

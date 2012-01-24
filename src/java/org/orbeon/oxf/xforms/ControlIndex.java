@@ -131,7 +131,12 @@ public class ControlIndex {
     }
 
     public Map<String, XFormsControl> getRepeatControls() {
-        return (controlTypes != null) ? controlTypes.get(XFormsConstants.REPEAT_NAME) : null;
+        if (controlTypes == null)
+            return Collections.emptyMap();
+        else {
+            final Map<String, XFormsControl> repeatMap = controlTypes.get(XFormsConstants.REPEAT_NAME);
+            return repeatMap != null ? repeatMap : Collections.<String, XFormsControl>emptyMap();
+        }
     }
 
     public Map<String, XFormsControl> getDialogControls() {

@@ -66,7 +66,7 @@ object XFormsAPI {
                     containingDocument = action.containingDocument
                     indentedLogger = action.indentedLogger
                 } yield
-                    DataModel.logAndNotifyValueChange(containingDocument, indentedLogger, "scala setvalue", nodeInfo, oldValue, value, false)
+                    DataModel.logAndNotifyValueChange(containingDocument, indentedLogger, "scala setvalue", nodeInfo, oldValue, value, isCalculate = false)
 
             DataModel.setValueIfChanged(nodeInfo, value, onSuccess)
 

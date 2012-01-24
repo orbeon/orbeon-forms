@@ -13,57 +13,52 @@
  */
 package org.orbeon.oxf.xforms.control
 
-import org.orbeon.oxf.util.PropertyContext
-import java.util.{List ⇒ JList, ArrayList ⇒ JArrayList}
 import scala.collection.JavaConverters._
+import collection.mutable.{ArrayBuffer, Buffer}
+import org.orbeon.oxf.xforms.analysis.ChildrenBuilderTrait
+import org.orbeon.oxf.xforms.analysis.controls.ContainerControl
+import org.orbeon.oxf.xml.ContentHandlerHelper
+import java.util.{List ⇒ JList}
 
 trait XFormsContainerControl extends XFormsControl {
 
-    private var children: JList[XFormsControl] = _
+    private var _children: Buffer[XFormsControl] = _ // allow null internally
+    private def hasChildren = (_children ne null) && _children.nonEmpty
 
-    private def hasChildren = (children ne null) && children.size > 0
+    // Get all the direct children controls (never null)
+    def children: Seq[XFormsControl] = Option(_children) getOrElse Seq.empty
+    def childrenJava: JList[XFormsControl] = children.asJava
 
-    /**
-     * Add a child control.
-     */
-    def addChild(XFormsControl: XFormsControl) {
-        if (children eq null)
-            children = new JArrayList[XFormsControl]
-        children.add(XFormsControl)
+    override def staticControl = super.staticControl.asInstanceOf[ContainerControl with ChildrenBuilderTrait]
+
+    // Add a child control
+    def addChild(control: XFormsControl) {
+        if (_children eq null)
+            _children = Buffer[XFormsControl]()
+        _children += control
     }
 
-    /**
-     * Get all the direct children controls.
-     */
-    def getChildren = children
+    // Number of direct children control
+    def getSize = children.size
 
-    /**
-     * Number of direct children control.
-     */
-    def getSize = if (children ne null) children.size else 0
-
-    /**
-     * Set all the direct children at once.
-     */
-    protected def setChildren(children: JList[XFormsControl]) {
-        this.children = children
+    // Set all the direct children at once
+    protected def setChildren(children: Buffer[XFormsControl]) = {
+        require(children ne null)
+        this._children = children
     }
 
-    /**
-     * Update this control's effective id and its descendants based on the parent's effective id.
-     */
+    // Remove all children at once
+    protected def clearChildren() =
+        this._children = null
+
+    // Update this control's effective id and its descendants based on the parent's effective id
     override def updateEffectiveId() {
         super.updateEffectiveId()
         
         if (hasChildren)
-            for (currentControl ← children.asScala)
+            for (currentControl ← _children)
                 currentControl.updateEffectiveId()
     }
-
-    /**
-     * Notify container control that all its children have been added.
-     */
-    def childrenAdded() = ()
 
     override def getBackCopy: AnyRef = {
         // Clone this
@@ -71,11 +66,11 @@ trait XFormsContainerControl extends XFormsControl {
 
         // Clone children if any
         if (hasChildren) {
-            cloned.children = new JArrayList[XFormsControl](children.size)
-            for (currentChildControl ← children.asScala) {
+            cloned._children = new ArrayBuffer[XFormsControl](_children.size)
+            for (currentChildControl ← _children) {
                 val currentChildClone = currentChildControl.getBackCopy.asInstanceOf[XFormsControl]
                 currentChildClone.setParent(cloned)
-                cloned.children.add(currentChildClone)
+                cloned._children += currentChildClone
             }
         }
 
@@ -84,7 +79,7 @@ trait XFormsContainerControl extends XFormsControl {
 
     override def iterationRemoved() {
         if (hasChildren)
-            for (currentControl ← children.asScala)
+            for (currentControl ← _children)
                 currentControl.iterationRemoved()
     }
 
@@ -92,41 +87,16 @@ trait XFormsContainerControl extends XFormsControl {
         // "4.3.7 The xforms-focus Event [...] Setting the focus to a group or switch container form control set the
         // focus to the first form control in the container that is able to accept focus"
         if (hasChildren)
-            for (currentControl ← children.asScala)
+            for (currentControl ← _children)
                 if (currentControl.setFocus())
                     return true
 
         false
     }
 
-    override def equalsExternalRecurse(propertyContext: PropertyContext, other: XFormsControl): Boolean = {
-        if ((other eq null) || ! other.isInstanceOf[XFormsNoSingleNodeContainerControl])
-            return false
-
-        if (this eq other)
-            return true
-
-        // Check children sizes
-        val otherContainerControl = other.asInstanceOf[XFormsNoSingleNodeContainerControl]
-        if (otherContainerControl.getSize != getSize)
-            return false
-
-        // Check this here as that might be faster than checking the children
-        if (! super.equalsExternalRecurse(propertyContext, other))
-            return false
-
-        // Check children
-        if (hasChildren) {
-            val otherIterator = otherContainerControl.children.iterator
-            for (control ← children.asScala) {
-                val otherControl = otherIterator.next
-
-                // Depth-first (not sure if better than breadth-first)
-                if (! control.equalsExternalRecurse(propertyContext, otherControl))
-                    return false
-            }
+    override def toXML(helper: ContentHandlerHelper, attributes: List[String])(content: => Unit) {
+        super.toXML(helper, attributes) {
+            children foreach (_.toXML(helper, List.empty)())
         }
-
-        true
     }
 }

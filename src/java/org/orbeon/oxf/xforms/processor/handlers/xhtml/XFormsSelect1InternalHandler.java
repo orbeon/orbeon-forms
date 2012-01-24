@@ -29,7 +29,7 @@ public class XFormsSelect1InternalHandler extends XFormsControlLifecyleHandler {
     }
 
     @Override
-    protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsControl control) {
+    protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String effectiveId, XFormsControl control) {
         // NOP
     }
 }

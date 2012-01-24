@@ -169,7 +169,7 @@ public abstract class XFormsEvent implements Cloneable {
             }
 
             final String effectiveTargetId = targetObject.getEffectiveId();
-            final Integer[] parts = XFormsUtils.getEffectiveIdSuffixParts(effectiveTargetId);
+            final int[] parts = XFormsUtils.getEffectiveIdSuffixParts(effectiveTargetId);
 
             if (parts.length > 0) {
                 final List<StringValue> tokens = new ArrayList<StringValue>(parts.length);

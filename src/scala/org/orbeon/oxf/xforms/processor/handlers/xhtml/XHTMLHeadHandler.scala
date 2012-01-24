@@ -15,8 +15,8 @@
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
     
 import org.orbeon.oxf.xforms._
+import control.{Controls, XFormsControl}
 import org.orbeon.oxf.xforms.XFormsProperties._
-import control.XFormsControl
 import event.XFormsEvents
 import org.orbeon.oxf.xforms.processor.XFormsFeatures
 import org.orbeon.oxf.xml.ContentHandlerHelper
@@ -210,11 +210,9 @@ object XHTMLHeadHandler {
 
         // control name → appearance or mediatype → ids
         val javaScriptControlsAppearancesMap = HashMap[String, HashMap[String, Buffer[String]]]()
-        val xformsControls = containingDocument.getControls
         
-        xformsControls.visitAllControls(new XFormsControls.XFormsControlVisitorAdapter {
+        Controls.visitAllControls(containingDocument, new Controls.XFormsControlVisitorAdapter {
             override def startVisitControl(control: XFormsControl): Boolean = {
-
                 
                 // Don't run JavaScript initialization if the control is static readonly (could change in the
                 // future if some static readonly controls require JS initialization)

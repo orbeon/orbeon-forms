@@ -567,11 +567,10 @@
                                 <xforms:trigger id="doit">
                                     <xforms:label>Try</xforms:label>
                                     <!-- 1. Run actions causing errors -->
+                                    <!-- NOTE: Invalid model ids are now caught statically -->
                                     <xforms:setvalue ev:event="DOMActivate" ref="date[xs:date('error1')]"/>             <!-- XPath error on ref -->
-                                    <xforms:action ev:event="DOMActivate" model="non-existing-model"/>                  <!-- non-existing model -->
                                     <xforms:action ev:event="DOMActivate" bind="non-existing-bind"/>                    <!-- non-existing bind -->
                                     <xforms:dispatch ev:event="DOMActivate"/>                                           <!-- missing mandatory attribute -->
-                                    <xforms:revalidate ev:event="DOMActivate" model="non-existing-model"/>              <!-- non-existing model -->
                                     <xforms:setvalue ev:event="DOMActivate" ref="."/>                                   <!-- setvalue on complex content -->
 
                                     <!-- 2. Show binds and controls to cause other errors -->
@@ -637,10 +636,8 @@
         <output name="response">
             <xxf:errors xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                 <xxf:error line="1" exception="org.orbeon.saxon.trans.XPathException">Invalid date "error1" (Non-numeric year component)</xxf:error>
-                <xxf:error exception="org.orbeon.oxf.common.ValidationException">(pushing XForms control binding): Reference to non-existing model id: non-existing-model null, line -1, column -1: Reference to non-existing model id: non-existing-model</xxf:error>
                 <xxf:error exception="org.orbeon.oxf.common.ValidationException">(pushing XForms control binding): Reference to non-existing bind id: non-existing-bind null, line -1, column -1: Reference to non-existing bind id: non-existing-bind</xxf:error>
                 <xxf:error exception="org.orbeon.oxf.common.OXFException">Missing mandatory name attribute on xforms:dispatch element.</xxf:error>
-                <xxf:error exception="org.orbeon.oxf.common.ValidationException">(pushing XForms control binding): Reference to non-existing model id: non-existing-model null, line -1, column -1: Reference to non-existing model id: non-existing-model</xxf:error>
                 <xxf:error exception="org.orbeon.oxf.common.OXFException">Unable to set value on complex content</xxf:error>
                 <xxf:error line="1" exception="org.orbeon.saxon.trans.XPathException">Invalid date "error5" (Non-numeric year component)</xxf:error>
                 <xxf:error line="1" exception="org.orbeon.saxon.trans.XPathException">Invalid date "error2" (Non-numeric year component)</xxf:error>
@@ -661,7 +658,6 @@
     <!-- Same test as above but with xxforms:ignore-dynamic-mip-xpath-errors="true" -->
     <test description="Ignorable dynamic XPath errors on MIPs" name="oxf:pipeline"
               request="oxf:/ops/unit-tests/xforms-server/ajax-request.xml">
-
             <input name="config">
                 <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                     <p:param name="response" type="output"/>
@@ -693,11 +689,10 @@
                                     <xforms:trigger id="doit">
                                         <xforms:label>Try</xforms:label>
                                         <!-- 1. Run actions causing errors -->
+                                        <!-- NOTE: Invalid model ids are now caught statically -->
                                         <xforms:setvalue ev:event="DOMActivate" ref="date[xs:date('error1')]"/>             <!-- XPath error on ref -->
-                                        <xforms:action ev:event="DOMActivate" model="non-existing-model"/>                  <!-- non-existing model -->
                                         <xforms:action ev:event="DOMActivate" bind="non-existing-bind"/>                    <!-- non-existing bind -->
                                         <xforms:dispatch ev:event="DOMActivate"/>                                           <!-- missing mandatory attribute -->
-                                        <xforms:revalidate ev:event="DOMActivate" model="non-existing-model"/>              <!-- non-existing model -->
                                         <xforms:setvalue ev:event="DOMActivate" ref="."/>                                   <!-- setvalue on complex content -->
 
                                         <!-- 2. Show binds and controls to cause other errors -->
@@ -763,10 +758,8 @@
             <output name="response">
                 <xxf:errors xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                     <xxf:error line="1" exception="org.orbeon.saxon.trans.XPathException">Invalid date "error1" (Non-numeric year component)</xxf:error>
-                    <xxf:error exception="org.orbeon.oxf.common.ValidationException">(pushing XForms control binding): Reference to non-existing model id: non-existing-model null, line -1, column -1: Reference to non-existing model id: non-existing-model</xxf:error>
                     <xxf:error exception="org.orbeon.oxf.common.ValidationException">(pushing XForms control binding): Reference to non-existing bind id: non-existing-bind null, line -1, column -1: Reference to non-existing bind id: non-existing-bind</xxf:error>
                     <xxf:error exception="org.orbeon.oxf.common.OXFException">Missing mandatory name attribute on xforms:dispatch element.</xxf:error>
-                    <xxf:error exception="org.orbeon.oxf.common.ValidationException">(pushing XForms control binding): Reference to non-existing model id: non-existing-model null, line -1, column -1: Reference to non-existing model id: non-existing-model</xxf:error>
                     <xxf:error exception="org.orbeon.oxf.common.OXFException">Unable to set value on complex content</xxf:error>
                     <xxf:error line="1" exception="org.orbeon.saxon.trans.XPathException">Invalid date "error5" (Non-numeric year component)</xxf:error>
                     <xxf:error line="1" exception="org.orbeon.saxon.trans.XPathException">Invalid date "error2" (Non-numeric year component)</xxf:error>

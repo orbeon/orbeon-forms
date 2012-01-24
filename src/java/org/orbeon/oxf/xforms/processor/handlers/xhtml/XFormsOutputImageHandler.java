@@ -29,7 +29,7 @@ import org.xml.sax.helpers.AttributesImpl;
  */
 public class XFormsOutputImageHandler extends XFormsOutputHandler {
     @Override
-    protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsControl control) throws SAXException {
+    protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String effectiveId, XFormsControl control) throws SAXException {
         // Case of image media type with URI
 
         final XFormsOutputControl outputControl = (XFormsOutputControl) control;

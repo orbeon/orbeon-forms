@@ -17,7 +17,6 @@ import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsCaseControl;
 import org.orbeon.oxf.xforms.processor.handlers.OutputInterceptor;
-import org.orbeon.oxf.xforms.processor.handlers.OutputInterceptor.Listener;
 import org.orbeon.oxf.xml.*;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -44,7 +43,7 @@ public class XFormsCaseHandler extends XFormsControlLifecyleHandler {
     }
 
     @Override
-    protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String staticId, final String effectiveId, XFormsControl control) throws SAXException {
+    protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, final String effectiveId, XFormsControl control) throws SAXException {
 
 
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
@@ -119,7 +118,7 @@ public class XFormsCaseHandler extends XFormsControlLifecyleHandler {
     }
 
     @Override
-    protected void handleControlEnd(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsControl control) throws SAXException {
+    protected void handleControlEnd(String uri, String localname, String qName, Attributes attributes, String effectiveId, XFormsControl control) throws SAXException {
 
         handlerContext.popCaseContext();
 

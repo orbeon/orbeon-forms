@@ -68,9 +68,6 @@ import org.xml.sax.SAXException;
  */
 public class XFormsToXHTML extends ProcessorImpl {
 
-    public static final String LOGGING_CATEGORY = "html";
-    private static final Logger logger = LoggerFactory.createLogger(XFormsToXHTML.class);
-
     private static final String INPUT_ANNOTATED_DOCUMENT = "annotated-document";
     private static final String OUTPUT_DOCUMENT = "document";
 
@@ -150,7 +147,7 @@ public class XFormsToXHTML extends ProcessorImpl {
     private void doIt(final PipelineContext pipelineContext, final XMLReceiver xmlReceiver, final URIProcessorOutputImpl processorOutput, String outputName) {
 
         final ExternalContext externalContext = NetUtils.getExternalContext();
-        final IndentedLogger indentedLogger = XFormsContainingDocument.getIndentedLogger(XFormsToXHTML.logger, XFormsServer.getLogger(), LOGGING_CATEGORY);
+        final IndentedLogger indentedLogger = XFormsContainingDocument.getIndentedLogger(XFormsServer.getLogger(), "html");
 
         // ContainingDocument and XFormsState created below
         final XFormsContainingDocument[] containingDocument = new XFormsContainingDocument[1];
@@ -519,7 +516,6 @@ public class XFormsToXHTML extends ProcessorImpl {
     private void testOutputResponseState(final XFormsContainingDocument containingDocument, final IndentedLogger indentedLogger,
                                          final XMLReceiver xmlReceiver) throws SAXException {
         // Output XML response
-
         XFormsServer.outputAjaxResponse(containingDocument, indentedLogger, null, null, xmlReceiver, false, true);
     }
 

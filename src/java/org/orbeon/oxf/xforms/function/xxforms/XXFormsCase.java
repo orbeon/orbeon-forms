@@ -24,7 +24,7 @@ import org.orbeon.saxon.value.StringValue;
 /**
  * Extension xxforms:case($switch-id as xs:string) as xs:string? function.
  */
-public class XXFormsCase  extends XFormsFunction {
+public class XXFormsCase extends XFormsFunction {
 
     public Item evaluateItem(XPathContext xpathContext) throws XPathException {
 

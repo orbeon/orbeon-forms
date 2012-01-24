@@ -32,21 +32,20 @@ public class XFormsCaseHandler extends XFormsControlLifecyleHandlerXML {
 	}
 
 	@Override
-	protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsControl control) throws SAXException {
+	protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String effectiveId, XFormsControl control) throws SAXException {
 		boolean isVisible;
 		isVisible = isCaseVisible(effectiveId);
 
 
-        super.handleControlStart(uri, localname, qName, attributes, staticId, effectiveId, control);
+        super.handleControlStart(uri, localname, qName, attributes, effectiveId, control);
         handlerContext.pushCaseContext(isVisible);
 	}
 
-
 	@Override
-	protected void handleControlEnd(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsControl control) throws SAXException {
+	protected void handleControlEnd(String uri, String localname, String qName, Attributes attributes, String effectiveId, XFormsControl control) throws SAXException {
 		handlerContext.popCaseContext();
 		
-		super.handleControlEnd(uri, localname, qName, attributes, staticId, effectiveId, control);
+		super.handleControlEnd(uri, localname, qName, attributes, effectiveId, control);
 	}
 	
 	protected void handleExtraAttributesForControlStart(AttributesImpl reusableAttributes, String effectiveId, XFormsControl control) { 

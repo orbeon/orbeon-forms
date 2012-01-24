@@ -50,9 +50,7 @@ import java.net.URL;
  */
 public class XFormsURIResolver extends TransformerURIResolver {
 
-    private static final String LOGGING_CATEGORY = "resolver";
-    private static final Logger logger = LoggerFactory.createLogger(XFormsURIResolver.class);
-    private static final IndentedLogger indentedLogger = XFormsContainingDocument.getIndentedLogger(logger, XFormsServer.getLogger(), LOGGING_CATEGORY);
+    private static final IndentedLogger indentedLogger = XFormsContainingDocument.getIndentedLogger(XFormsServer.getLogger(), "resolver");
 
     private URIProcessorOutputImpl processorOutput;
 

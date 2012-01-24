@@ -25,7 +25,7 @@ import org.xml.sax.SAXException;
 public class XFormsOutputTextHandler extends XFormsOutputHandler {
 
     @Override
-    protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsControl control) throws SAXException {
+    protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String effectiveId, XFormsControl control) throws SAXException {
 
         // Just output value for "text" appearance
 //        if (isImageMediatype || isHTMLMediaType) {

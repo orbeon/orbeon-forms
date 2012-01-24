@@ -215,7 +215,6 @@
                                                                 <xf:trigger appearance="minimal" ref="$repeat-context[$can-add]">
                                                                     <!-- TODO: i18n of alt/title -->
                                                                     <xf:label><xh:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/plus_16.png" alt="Add" title="Add"/></xf:label>
-                                                                    <!--/apps/fr/style/images/silk/add.png-->
                                                                     <xf:insert ev:event="DOMActivate"
                                                                                context="$repeat-context"
                                                                                ref="$repeat-sequence"

@@ -151,7 +151,7 @@ class EventHandlerImpl(
                 eventObserver match {
                     case componentControl: XFormsComponentControl ⇒
 
-                        val xblContainer = componentControl.getNestedContainer
+                        val xblContainer = componentControl.nestedContainer
                         xblContainer.getContextStack.resetBindingContext()
                         val stack = new XFormsContextStack(xblContainer, xblContainer.getContextStack.getCurrentBindingContext)
 

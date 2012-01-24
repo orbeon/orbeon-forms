@@ -42,6 +42,8 @@ class SimpleElementAnalysis(
 
     protected def getRootVariables: Map[String, VariableTrait] = Map.empty
 
+    def containerScope = staticStateContext.partAnalysis.getResolutionScopeByPrefix(XFormsUtils.getEffectiveIdPrefix(prefixedId))
+
     /**
      * Find the model associated with the given element, whether explicitly set with @model, or inherited.
      */
@@ -114,7 +116,7 @@ class SimpleElementAnalysis(
     }
 
     def getChildElementScope(childElement: Element) = {
-        val childPrefixedId =  XFormsUtils.getRelatedEffectiveId(prefixedId, XFormsUtils.getElementStaticId(childElement))
+        val childPrefixedId =  XFormsUtils.getRelatedEffectiveId(prefixedId, XFormsUtils.getElementId(childElement))
         staticStateContext.partAnalysis.getResolutionScopeByPrefixedId(childPrefixedId)
     }
 

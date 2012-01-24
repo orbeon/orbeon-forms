@@ -21,6 +21,7 @@
     xmlns:xi="http://www.w3.org/2001/XInclude"
     xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
     xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
     xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xbl="http://www.w3.org/ns/xbl"
@@ -497,57 +498,49 @@
     </test>
 
     <test description="Repeat index change upon focus change" name="oxf:pipeline">
-        <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xforms="http://www.w3.org/2002/xforms">
-                <p:param name="response" type="output"/>
-
-                <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="wrap-server.xpl"/>
-                    <p:input name="action">
-                        <xxforms:action>
-                            <xxforms:event name="DOMFocusIn" source-control-id="id125·3-2"/>
-                        </xxforms:action>
-                    </p:input>
-                    <p:input name="controls">
-                        <controls
-                            xmlns:xforms="http://www.w3.org/2002/xforms"
-                            xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
-                            xmlns:ev="http://www.w3.org/2001/xml-events">
-                            <xforms:repeat nodeset="/form/company/department" id="id123">
-                                <xforms:repeat nodeset="employee" id="id124">
-                                    <xforms:output ref="@first" id="id125"/>
-                                    <xforms:output ref="@last" id="id126"/>
-                                </xforms:repeat>
-                            </xforms:repeat>
-                        </controls>
-                    </p:input>
-                    <p:input name="models" href="aggregate('models', repeat-model.xml)"/>
-                    <p:input name="instances">
-                        <instances>
-                            <instance model-id="main-model" id="main-instance">
-                                <form>
-                                    <company>
-                                        <department>
-                                            <employee first="f11" last="l11"/>
-                                            <employee first="f12" last="l12"/>
-                                        </department>
-                                        <department>
-                                            <employee first="f21" last="l21"/>
-                                        </department>
-                                        <department>
-                                            <employee first="f31" last="l31"/>
-                                            <employee first="f32" last="l32"/>
-                                            <employee first="f33" last="l33"/>
-                                            <employee first="f34" last="l34"/>
-                                        </department>
-                                    </company>
-                                </form>
-                            </instance>
-                        </instances>
-                    </p:input>
-                    <p:output name="response" ref="response"/>
-                </p:processor>
-            </p:config>
+        <input name="config" href="wrap-server.xpl"/>
+        <input name="action">
+            <xxforms:action>
+                <xxforms:event name="DOMFocusIn" source-control-id="id125·3-2"/>
+            </xxforms:action>
+        </input>
+        <input name="controls">
+            <controls>
+                <xforms:repeat nodeset="/form/company/department" id="id123">
+                    <xforms:repeat nodeset="employee" id="id124">
+                        <xforms:output ref="@first" id="id125"/>
+                        <xforms:output ref="@last" id="id126"/>
+                    </xforms:repeat>
+                </xforms:repeat>
+            </controls>
+        </input>
+        <input name="models">
+            <models>
+                <xi:include href="repeat-model.xml" xxi:omit-xml-base="true"/>
+            </models>
+        </input>
+        <input name="instances">
+            <instances>
+                <instance model-id="main-model" id="main-instance">
+                    <form>
+                        <company>
+                            <department>
+                                <employee first="f11" last="l11"/>
+                                <employee first="f12" last="l12"/>
+                            </department>
+                            <department>
+                                <employee first="f21" last="l21"/>
+                            </department>
+                            <department>
+                                <employee first="f31" last="l31"/>
+                                <employee first="f32" last="l32"/>
+                                <employee first="f33" last="l33"/>
+                                <employee first="f34" last="l34"/>
+                            </department>
+                        </company>
+                    </form>
+                </instance>
+            </instances>
         </input>
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
@@ -585,8 +578,8 @@
                 <xxf:action>
                     <xxf:control-values/>
                     <xxf:repeat-indexes>
-                        <xxf:repeat-index id="id123" old-index="1" new-index="3"/>
-                        <xxf:repeat-index id="id124" old-index="1" new-index="2"/>
+                        <xxf:repeat-index id="id123" old-index="0" new-index="3"/>
+                        <xxf:repeat-index id="id124" old-index="0" new-index="2"/>
                     </xxf:repeat-indexes>
                 </xxf:action>
             </xxf:event-response>
@@ -916,8 +909,8 @@
                     <p:input name="document">
                         <xhtml:html>
                             <xhtml:head>
-                                <xhtml:title>UI events upon insert</xhtml:title>
-                                <xforms:model xxforms:server.events.initial-refresh-events="true">
+
+                                <xforms:model xxforms:server.events.initial-refresh-events="true" id="model">
 
                                     <!-- Insert new iteration -->
                                     <xforms:insert ev:event="xforms-ready"
@@ -962,17 +955,17 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <instance id="fruits" model-id="xf-2">
+                            <instance id="fruits" model-id="model">
                                 <fruits>
                                     <orange>bloody</orange>
                                     <pear>yellow</pear>
                                     <apple>green</apple>
                                 </fruits>
                             </instance>
-                            <instance id="fruit-template" model-id="xf-2">
+                            <instance id="fruit-template" model-id="model">
                                 <pear>yellow</pear>
                             </instance>
-                            <instance id="events" model-id="xf-2">
+                            <instance id="events" model-id="model">
                                 <events>
                                     <event type="xforms-enabled" target="my-input" indexes="1"/>
                                     <event type="xforms-enabled" target="my-input" indexes="2"/>
@@ -996,110 +989,68 @@
         </output>
     </test>
 
-    <test description="Repeat iteration relevance" name="oxf:pipeline">
-        <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
-                <p:param name="response" type="output"/>
-
-                <p:processor name="oxf:pipeline">
-                    <p:input name="config" href="wrap-server.xpl"/>
-                    <p:input name="action">
-                        <xxforms:action>
-                            <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="approvalStatus-input·2">bbb</xxforms:event>
-                        </xxforms:action>
-                    </p:input>
-                    <p:input name="controls">
-                        <controls>
-                            <xforms:group ref="authorizations" id="authorization-group">
-                                <xforms:repeat nodeset="authorization" id="authorization-repeat">
-                                    <xforms:input ref="approvalStatus" id="approvalStatus-input"><xforms:label>Approval Status:</xforms:label></xforms:input>
-                                    <xforms:repeat nodeset="conditions/condition" id="condition-repeat">
-                                        <xforms:textarea ref="description" id="description-textarea"><xforms:label>Condition:</xforms:label></xforms:textarea>
-                                    </xforms:repeat>
-                                </xforms:repeat>
-                            </xforms:group>
-                        </controls>
-                    </p:input>
-                    <p:input name="models">
-                        <models>
-                            <xforms:model id="main-model">
-                                <xforms:instance id="main-instance">
-                                    <tea xmlns="">
-                                        <authorizations>
-                                            <authorization>
-                                                <approvalStatus>aaa</approvalStatus>
-                                                <conditions>
-                                                    <condition>
-                                                        <description/>
-                                                        <resolution/>
-                                                    </condition>
-                                                    <condition>
-                                                        <description/>
-                                                        <resolution/>
-                                                    </condition>
-                                                </conditions>
-                                            </authorization>
-                                            <authorization>
-                                                <approvalStatus/>
-                                                <conditions>
-                                                    <condition>
-                                                        <description/>
-                                                        <resolution/>
-                                                    </condition>
-                                                    <condition>
-                                                        <description/>
-                                                        <resolution/>
-                                                    </condition>
-                                                </conditions>
-                                            </authorization>
-                                        </authorizations>
-                                    </tea>
-                                </xforms:instance>
-
-                                <xforms:bind id="bind1" nodeset="authorizations/authorization/conditions" relevant="../approvalStatus ne ''"/>
-
-                            </xforms:model>
-                        </models>
-                    </p:input>
-                    <p:input name="instances">
-                        <instances>
-                            <instance model-id="main-model" id="main-instance">
-                                <tea xmlns="">
-                                    <authorizations>
-                                        <authorization>
-                                            <approvalStatus>aaa</approvalStatus>
-                                            <conditions>
-                                                <condition>
-                                                    <description/>
-                                                    <resolution/>
-                                                </condition>
-                                                <condition>
-                                                    <description/>
-                                                    <resolution/>
-                                                </condition>
-                                            </conditions>
-                                        </authorization>
-                                        <authorization>
-                                            <approvalStatus/>
-                                            <conditions>
-                                                <condition>
-                                                    <description/>
-                                                    <resolution/>
-                                                </condition>
-                                                <condition>
-                                                    <description/>
-                                                    <resolution/>
-                                                </condition>
-                                            </conditions>
-                                        </authorization>
-                                    </authorizations>
-                                </tea>
-                            </instance>
-                        </instances>
-                    </p:input>
-                    <p:output name="response" ref="response"/>
-                </p:processor>
-            </p:config>
+    <test description="Repeat iteration relevance" name="oxf:pipeline" only="false">
+        <input name="config" href="wrap-server.xpl"/>
+        <input name="action">
+            <xxforms:action>
+                <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="approvalStatus-input·2">bbb</xxforms:event>
+            </xxforms:action>
+        </input>
+        <input name="controls">
+            <controls>
+                <xforms:group ref="authorizations" id="authorization-group">
+                    <xforms:repeat nodeset="authorization" id="authorization-repeat">
+                        <xforms:input ref="approvalStatus" id="approvalStatus-input"><xforms:label>Approval Status:</xforms:label></xforms:input>
+                        <xforms:repeat nodeset="conditions/condition" id="condition-repeat">
+                            <xforms:textarea ref="description" id="description-textarea"><xforms:label>Condition:</xforms:label></xforms:textarea>
+                        </xforms:repeat>
+                    </xforms:repeat>
+                </xforms:group>
+            </controls>
+        </input>
+        <input name="models">
+            <models>
+                <xforms:model id="main-model">
+                    <xforms:instance id="main-instance"/>
+                    <xforms:bind id="bind1" nodeset="authorizations/authorization/conditions" relevant="../approvalStatus ne ''"/>
+                </xforms:model>
+            </models>
+        </input>
+        <input name="instances">
+            <instances>
+                <instance model-id="main-model" id="main-instance">
+                    <tea xmlns="">
+                        <authorizations>
+                            <authorization>
+                                <approvalStatus>aaa</approvalStatus>
+                                <conditions>
+                                    <condition>
+                                        <description/>
+                                        <resolution/>
+                                    </condition>
+                                    <condition>
+                                        <description/>
+                                        <resolution/>
+                                    </condition>
+                                </conditions>
+                            </authorization>
+                            <authorization>
+                                <approvalStatus/>
+                                <conditions>
+                                    <condition>
+                                        <description/>
+                                        <resolution/>
+                                    </condition>
+                                    <condition>
+                                        <description/>
+                                        <resolution/>
+                                    </condition>
+                                </conditions>
+                            </authorization>
+                        </authorizations>
+                    </tea>
+                </instance>
+            </instances>
         </input>
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
@@ -1155,7 +1106,8 @@
                         <xxf:control id="description-textarea·2-2" label="Condition:" relevant="true"/>
                     </xxf:control-values>
                     <xxf:repeat-indexes>
-                        <xxf:repeat-index id="authorization-repeat" old-index="1" new-index="2"/>
+                        <xxf:repeat-index id="authorization-repeat" old-index="0" new-index="2"/>
+                        <xxf:repeat-index id="condition-repeat" old-index="0" new-index="1"/>
                     </xxf:repeat-indexes>
                 </xxf:action>
             </xxf:event-response>
@@ -2042,10 +1994,10 @@
         </output>
     </test>
 
-    <test description="xxforms:index() function" name="oxf:pipeline" only="false">
+    <test description="xxforms:index() function" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+            <xhtml:html>
                 <xhtml:head>
                     <xforms:model id="model">
                         <xforms:instance id="instance">
@@ -2981,16 +2933,12 @@
         <!-- See http://forge.ow2.org/tracker/index.php?func=detail&aid=315081&group_id=168&atid=350207 -->
         <input name="config" href="wrap-server.xpl"/>
         <input name="action">
-            <xxforms:action xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+            <xxforms:action>
                 <xxforms:event name="DOMActivate" source-control-id="insert-trigger"/>
             </xxforms:action>
         </input>
         <input name="controls">
-            <controls
-                xmlns:xforms="http://www.w3.org/2002/xforms"
-                xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
-                xmlns:ev="http://www.w3.org/2001/xml-events">
-
+            <controls>
                 <xforms:repeat id="company-repeat" ref="company"/>
 
                 <xforms:trigger id="insert-trigger">
@@ -3002,9 +2950,7 @@
         <input name="models">
             <models>
                 <xforms:model id="model">
-                    <xforms:instance id="instance">
-                        <companies/>
-                    </xforms:instance>
+                    <xforms:instance id="instance"/>
                 </xforms:model>
             </models>
         </input>

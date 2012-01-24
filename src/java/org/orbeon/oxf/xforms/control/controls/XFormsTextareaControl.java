@@ -40,12 +40,12 @@ public class XFormsTextareaControl extends XFormsValueControl {
             XFormsConstants.XXFORMS_ROWS_QNAME
     };
 
-    public XFormsTextareaControl(XBLContainer container, XFormsControl parent, Element element, String name, String id, Map<String, String> state) {
-        super(container, parent, element, name, id);
+    public XFormsTextareaControl(XBLContainer container, XFormsControl parent, Element element, String id, Map<String, String> state) {
+        super(container, parent, element, id);
     }
 
     @Override
-    protected QName[] getExtensionAttributes() {
+    public QName[] getExtensionAttributes() {
         return EXTENSION_ATTRIBUTES;
     }
 
@@ -68,7 +68,7 @@ public class XFormsTextareaControl extends XFormsValueControl {
     @Override
     public void storeExternalValue(String value) {
         if ("text/html".equals(getMediatype())) {
-            final IndentedLogger indentedLogger = containingDocument.getControls().getIndentedLogger();
+            final IndentedLogger indentedLogger = containingDocument().getControls().getIndentedLogger();
             final boolean isDebugEnabled = indentedLogger.isDebugEnabled();
             if (isDebugEnabled)
                 indentedLogger.startHandleOperation("xforms:textarea", "cleaning-up HTML", "value", value);

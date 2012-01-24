@@ -34,8 +34,8 @@ import java.util.*;
  */
 public class XFormsSelectControl extends XFormsSelect1Control {
 
-    public XFormsSelectControl(XBLContainer container, XFormsControl parent, Element element, String name, String id, Map<String, String> state) {
-        super(container, parent, element, name, id, state);
+    public XFormsSelectControl(XBLContainer container, XFormsControl parent, Element element, String id, Map<String, String> state) {
+        super(container, parent, element, id, state);
     }
 
     /**
@@ -84,22 +84,22 @@ public class XFormsSelectControl extends XFormsSelect1Control {
                 // Handle xforms-select / xforms-deselect
                 // TODO: Dispatch to itemset or item once we support doing that
                 if (!itemWasSelected && itemIsSelected) {
-                    selectEvents.add(new XFormsSelectEvent(containingDocument, this, currentItemValue));
+                    selectEvents.add(new XFormsSelectEvent(containingDocument(), this, currentItemValue));
                 } else if (itemWasSelected && !itemIsSelected) {
-                    deselectEvents.add(new XFormsDeselectEvent(containingDocument, this, currentItemValue));
+                    deselectEvents.add(new XFormsDeselectEvent(containingDocument(), this, currentItemValue));
                 }
             }
             // Dispatch xforms-deselect events
             if (deselectEvents.size() > 0) {
                 for (XFormsEvent currentEvent: deselectEvents) {
-                    currentEvent.getTargetObject().getXBLContainer(containingDocument).dispatchEvent(currentEvent);
+                    currentEvent.getTargetObject().getXBLContainer(containingDocument()).dispatchEvent(currentEvent);
                 }
             }
             // Select events must be sent after all xforms-deselect events
             final boolean hasSelectedItem = selectEvents.size() > 0;
             if (hasSelectedItem) {
                 for (XFormsEvent currentEvent: selectEvents) {
-                    currentEvent.getTargetObject().getXBLContainer(containingDocument).dispatchEvent(currentEvent);
+                    currentEvent.getTargetObject().getXBLContainer(containingDocument()).dispatchEvent(currentEvent);
                 }
             }
 
@@ -122,7 +122,7 @@ public class XFormsSelectControl extends XFormsSelect1Control {
     }
 
     @Override
-    protected void markDirtyImpl(XPathDependencies xpathDependencies) {
+    public void markDirtyImpl(XPathDependencies xpathDependencies) {
 
         // Default implementation
         super.markDirtyImpl(xpathDependencies);

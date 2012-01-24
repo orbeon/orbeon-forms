@@ -28,6 +28,8 @@
 
     <xforms:label ref="$form-resources/dialog-add-language/dialog-title"/>
 
+    <xforms:var name="resources" value="$resources" model="fr-form-model"/>
+
     <xhtml:div>
         <xforms:group>
             <xforms:group class="fb-hide-alert">

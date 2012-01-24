@@ -136,13 +136,17 @@ object DataModel {
         assert(containingDocument ne null)
         assert(indentedLogger ne null)
 
-        setValueIfChanged(nodeInfo, valueToSet,
+        setValueIfChanged(
+            nodeInfo,
+            valueToSet,
             logAndNotifyValueChange(containingDocument, indentedLogger, source, nodeInfo, _, valueToSet, isCalculate),
-            reason ⇒ containingDocument.dispatchEvent(new XXFormsBindingErrorEvent(containingDocument, eventTarget, locationData, reason)))
+            reason ⇒ containingDocument.dispatchEvent(new XXFormsBindingErrorEvent(containingDocument, eventTarget, locationData, reason))
+        )
     }
 
     // Standard success behavior: log and notify
-    def logAndNotifyValueChange(containingDocument: XFormsContainingDocument, indentedLogger: IndentedLogger, source: String, nodeInfo: NodeInfo, oldValue: String, newValue: String, isCalculate: Boolean) = {
+    def logAndNotifyValueChange(containingDocument: XFormsContainingDocument, indentedLogger: IndentedLogger, source: String,
+                                nodeInfo: NodeInfo, oldValue: String, newValue: String, isCalculate: Boolean) = {
         logValueChange(indentedLogger, source, oldValue,  newValue, findInstanceEffectiveId(containingDocument, nodeInfo))
         notifyValueChange(containingDocument, nodeInfo, oldValue, newValue, isCalculate)
     }

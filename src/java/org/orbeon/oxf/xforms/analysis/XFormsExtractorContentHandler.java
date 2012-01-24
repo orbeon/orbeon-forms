@@ -58,7 +58,7 @@ import java.util.*;
  * Structure:
  *
  * <static-state xmlns:xxforms="..." system-id="..." is-html="..." ...>
- *   <root id="#document">
+ *   <root>
  *     <!-- E.g. AVT on xhtml:html -->
  *     <xxforms:attribute .../>
  *     <!-- E.g. xforms:output within xhtml:title -->
@@ -98,7 +98,7 @@ public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
     private boolean mustOutputFirstElement = true;
 
     private final boolean isTopLevel;
-    private final AnnotatedTemplate templateUnderContruction;
+    private final AnnotatedTemplate templateUnderConstruction;
     private final Metadata metadata;
     private final boolean ignoreRootElement;
 
@@ -127,12 +127,12 @@ public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
     private int preserveOrLHHALevel;
     private boolean isHTMLDocument; // Whether this is an (X)HTML document
 
-    public XFormsExtractorContentHandler(XMLReceiver xmlReceiver, Metadata metadata, AnnotatedTemplate templateUnderContruction, String baseURI, boolean isTopLevel, boolean ignoreRootElement) {
+    public XFormsExtractorContentHandler(XMLReceiver xmlReceiver, Metadata metadata, AnnotatedTemplate templateUnderConstruction, String baseURI, boolean isTopLevel, boolean ignoreRootElement) {
         super(xmlReceiver);
 
         this.isTopLevel = isTopLevel;
         this.metadata = metadata;
-        this.templateUnderContruction = templateUnderContruction;
+        this.templateUnderConstruction = templateUnderConstruction;
         this.ignoreRootElement = ignoreRootElement;
 
         // Create xml:base stack
@@ -236,7 +236,7 @@ public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
             // - we are in noscript mode and told to store the template statically
             // - OR if there are top-level marks
             final boolean isStoreNoscriptTemplate =
-                templateUnderContruction != null &&
+                templateUnderConstruction != null &&
                 XFormsStaticStateImpl.isNoscriptJava(properties) &&
                 XFormsProperties.NOSCRIPT_TEMPLATE_STATIC_VALUE.equals(XFormsStaticStateImpl.<String>getPropertyJava(properties, XFormsProperties.NOSCRIPT_TEMPLATE));
 
@@ -246,7 +246,7 @@ public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
 
                 // NOTE: At this point, the template has just received endDocument(), so is no longer under under
                 // construction and can be serialized safely.
-                final String templateString = templateUnderContruction.asBase64();
+                final String templateString = templateUnderConstruction.asBase64();
                 super.characters(templateString.toCharArray(), 0, templateString.length());
 
                 super.endElement("", templateName, templateName);
@@ -274,9 +274,10 @@ public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
         final boolean isXXForms = XFormsConstants.XXFORMS_NAMESPACE_URI.equals(uri);
         final boolean isEXForms = XFormsConstants.EXFORMS_NAMESPACE_URI.equals(uri);
         final boolean isXBL = XFormsConstants.XBL_NAMESPACE_URI.equals(uri);
+        final boolean isXXBL = XFormsConstants.XXBL_NAMESPACE_URI.equals(uri); // for xxbl:global
 
         final boolean isExtension = metadata.isXBLBinding(uri, localname);
-        final boolean isXFormsOrExtension = isXForms || isXXForms || isEXForms || isXBL || isExtension;
+        final boolean isXFormsOrExtension = isXForms || isXXForms || isEXForms || isXBL || isXXBL || isExtension;
 
         // Handle outer xml:base and xml:lang
         if (!inPreserve) {

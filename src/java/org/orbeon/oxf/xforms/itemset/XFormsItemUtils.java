@@ -93,22 +93,22 @@ public class XFormsItemUtils {
      */
     public static Itemset evaluateItemset(final XFormsSelect1Control select1Control) {
 
-        final SelectionControl staticControl = (SelectionControl) select1Control.getElementAnalysis();
+        final SelectionControl staticControl = (SelectionControl) select1Control.staticControl();
 
         // Optimize static itemsets
         if (staticControl.hasStaticItemset())
             return staticControl.evaluateStaticItemset();
 
         final boolean isMultiple = staticControl.isMultiple();
-        final XBLContainer container = select1Control.getXBLContainer();
+        final XBLContainer container = select1Control.container();
 
         final Itemset result = new Itemset();
 
         // Set binding on this control, after saving the current context because the context stack must
         // remain unmodified.
         final XFormsContextStack contextStack = container.getContextStack();
-        final XFormsContextStack.BindingContext savedBindingContext = contextStack.getCurrentBindingContext();
-        contextStack.setBinding(select1Control);
+        final BindingContext savedBindingContext = contextStack.getCurrentBindingContext();
+        contextStack.setBinding(select1Control.getBindingContext());
 
         final boolean isEncryptItemValues = select1Control.isEncryptItemValues();
         Dom4jUtils.visitSubtree(select1Control.getControlElement(), new Dom4jUtils.VisitorListener() {
@@ -116,7 +116,7 @@ public class XFormsItemUtils {
             private ItemContainer currentContainer = result;
 
             private String getElementEffectiveId(Element element) {
-                return XFormsUtils.getRelatedEffectiveId(select1Control.getEffectiveId(), element.attributeValue(XFormsConstants.ID_QNAME));
+                return XFormsUtils.getRelatedEffectiveId(select1Control.getEffectiveId(), XFormsUtils.getElementId(element));
             }
 
             public void startElement(Element element) {
@@ -135,7 +135,7 @@ public class XFormsItemUtils {
                     // xforms:itemset
                     contextStack.pushBinding(element, getElementEffectiveId(element), select1Control.getChildElementScope(element));
                     {
-                        final XFormsContextStack.BindingContext currentBindingContext = contextStack.getCurrentBindingContext();
+                        final BindingContext currentBindingContext = contextStack.getCurrentBindingContext();
 
                         //if (model == null || model == currentBindingContext.getModel()) { // it is possible to filter on a particular model
                         final List<org.orbeon.saxon.om.Item> currentNodeSet = currentBindingContext.getNodeset();
@@ -275,7 +275,7 @@ public class XFormsItemUtils {
                     result.put(attributeName, attributeValue);
                 } else {
                     // Possible AVT
-                    final XFormsContextStack.BindingContext currentBindingContext = contextStack.getCurrentBindingContext();
+                    final BindingContext currentBindingContext = contextStack.getCurrentBindingContext();
                     final List<org.orbeon.saxon.om.Item> currentNodeset = currentBindingContext.getNodeset();
                     if (currentNodeset != null && currentNodeset.size() > 0) {
                         String tempResult;

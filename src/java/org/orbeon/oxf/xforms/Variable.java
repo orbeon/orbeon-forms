@@ -20,7 +20,6 @@ import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis;
 import org.orbeon.oxf.xforms.analysis.VariableAnalysis;
 import org.orbeon.oxf.xforms.analysis.VariableAnalysisTrait;
-import org.orbeon.oxf.xforms.analysis.controls.VariableControl;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.oxf.xforms.xbl.Scope;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -90,7 +89,7 @@ public class Variable {
                 contextStack.pushBinding(valueElement, sourceEffectiveId, variableValueScope);
             }
             {
-                final XFormsContextStack.BindingContext bindingContext = contextStack.getCurrentBindingContext();
+                final BindingContext bindingContext = contextStack.getCurrentBindingContext();
                 final List<Item> currentNodeset = bindingContext.getNodeset();
                 if (currentNodeset != null && currentNodeset.size() > 0) {
                     // TODO: in the future, we should allow null context for expressions that do not depend on the context

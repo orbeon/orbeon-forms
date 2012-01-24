@@ -62,9 +62,7 @@ import java.util.*;
 
 public class XFormsUtils {
 
-    private static final String LOGGING_CATEGORY = "utils";
-    private static final Logger logger = LoggerFactory.createLogger(XFormsUtils.class);
-    public static final IndentedLogger indentedLogger = XFormsContainingDocument.getIndentedLogger(logger, XFormsServer.getLogger(), LOGGING_CATEGORY);
+    public static final IndentedLogger indentedLogger = XFormsContainingDocument.getIndentedLogger(XFormsServer.getLogger(), "utils");
 
     private static final int SRC_CONTENT_BUFFER_SIZE = NetUtils.COPY_BUFFER_SIZE / 2;
 
@@ -203,7 +201,7 @@ public class XFormsUtils {
      * @param containsHTML          whether the result actually contains HTML (null allowed)
      * @return                      string containing the result of the evaluation, null if evaluation failed
      */
-    public static String getStaticChildElementValue(final Element childElement, final boolean acceptHTML, final boolean[] containsHTML) {
+    public static String getStaticChildElementValue(final String prefix, final Element childElement, final boolean acceptHTML, final boolean[] containsHTML) {
         // Check that there is a current child element
         if (childElement == null)
             return null;
@@ -223,7 +221,7 @@ public class XFormsUtils {
             // perform a very simple serialization of elements and text to simple (X)HTML, not full-fledged HTML or XML
             // serialization.
 
-            Dom4jUtils.visitSubtree(childElement, new LHHAElementVisitorListener(acceptHTML, containsHTML, sb, childElement));
+            Dom4jUtils.visitSubtree(childElement, new LHHAElementVisitorListener(prefix, acceptHTML, containsHTML, sb, childElement));
             if (acceptHTML && containsHTML != null && !containsHTML[0]) {
                 // We went through the subtree and did not find any HTML
                 // If the caller supports the information, return a non-escaped string so we can optimize output later
@@ -284,7 +282,7 @@ public class XFormsUtils {
         if (containsHTML != null)
             containsHTML[0] = false;
 
-        final XFormsContextStack.BindingContext currentBindingContext = contextStack.getCurrentBindingContext();
+        final BindingContext currentBindingContext = contextStack.getCurrentBindingContext();
 
         // "the order of precedence is: single node binding attributes, linking attributes, inline text."
 
@@ -348,7 +346,7 @@ public class XFormsUtils {
                     return (acceptHTML && containsHTML == null) ? XMLUtils.escapeXMLMinimal(tempResult) : tempResult;
                 } catch (IOException e) {
                     // Dispatch xforms-link-error to model
-                    final XFormsModel currentModel = currentBindingContext.model;
+                    final XFormsModel currentModel = currentBindingContext.model();
                     // NOTE: xforms-link-error is no longer in XForms 1.1 starting 2009-03-10
                     currentModel.getXBLContainer(null).dispatchEvent(new XFormsLinkErrorEvent(container.getContainingDocument(), currentModel, srcAttributeValue, childElement, e));
                     // Exception when dereferencing the linking attribute
@@ -884,6 +882,7 @@ public class XFormsUtils {
     }
 
     private static class LHHAElementVisitorListener implements Dom4jUtils.VisitorListener {
+        private final String prefix;
         private final XBLContainer container;
         private final XFormsContextStack contextStack;
         private final String sourceEffectiveId;
@@ -894,7 +893,8 @@ public class XFormsUtils {
         private final boolean hostLanguageAVTs;
 
         // Constructor for "static" case, i.e. when we know the child element cannot have dynamic content
-        public LHHAElementVisitorListener(boolean acceptHTML, boolean[] containsHTML, StringBuilder sb, Element childElement) {
+        public LHHAElementVisitorListener(String prefix, boolean acceptHTML, boolean[] containsHTML, StringBuilder sb, Element childElement) {
+            this.prefix = prefix;
             this.container = null;
             this.contextStack = null;
             this.sourceEffectiveId = null;
@@ -908,6 +908,7 @@ public class XFormsUtils {
         // Constructor for "dynamic" case, i.e. when we know the child element can have dynamic content
         public LHHAElementVisitorListener(XBLContainer container, XFormsContextStack contextStack,
                                           String sourceEffectiveId, boolean acceptHTML, boolean[] containsHTML, StringBuilder sb, Element childElement) {
+            this.prefix = container.getFullPrefix();
             this.container = container;
             this.contextStack = contextStack;
             this.sourceEffectiveId = sourceEffectiveId;
@@ -924,11 +925,11 @@ public class XFormsUtils {
             if (element.getQName().equals(XFormsConstants.XFORMS_OUTPUT_QNAME)) {
                 // This is an xforms:output nested among other markup
 
-                final XFormsOutputControl outputControl = new XFormsOutputControl(container, null, element, element.getName(), null, null) {
+                final XFormsOutputControl outputControl = new XFormsOutputControl(container, null, element, null, null) {
                     // Override this as super.getContextStack() gets the containingDocument's stack, and here we need whatever is the current stack
                     // Probably need to modify super.getContextStack() at some point to NOT use the containingDocument's stack
                     @Override
-                    protected XFormsContextStack getContextStack() {
+                    public XFormsContextStack getContextStack() {
                         return LHHAElementVisitorListener.this.contextStack;
                     }
 
@@ -999,6 +1000,9 @@ public class XFormsUtils {
                             contextStack.popBinding();
 
                             resolvedValue = attributeControl.getExternalValue();
+                        } else if (currentAttributeName.equals("id")) {
+                            // This is an id, prefix if needed
+                            resolvedValue = prefix + currentAttributeValue;
                         } else {
                             // Simply use control value
                             resolvedValue = currentAttributeValue;
@@ -1212,21 +1216,21 @@ public class XFormsUtils {
      * @param effectiveId   effective id to check
      * @return              array of parts, empty array if no parts, null if effectiveId was null
      */
-    public static Integer[] getEffectiveIdSuffixParts(String effectiveId) {
+    public static int[] getEffectiveIdSuffixParts(String effectiveId) {
         if (effectiveId == null)
             return null;
 
         final int suffixIndex = effectiveId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1);
         if (suffixIndex != -1) {
             final String[] stringResult = StringUtils.split(effectiveId.substring(suffixIndex + 1), XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_2);
-            final Integer[] result = new Integer[stringResult.length];
+            final int[] result = new int[stringResult.length];
             for (int i = 0; i < stringResult.length; i++) {
                 final String currentString = stringResult[i];
-                result[i] = new Integer(currentString);
+                result[i] = Integer.parseInt(currentString);
             }
             return result;
         } else {
-            return new Integer[0];
+            return new int[0];
         }
     }
 
@@ -1348,12 +1352,12 @@ public class XFormsUtils {
     }
 
     /**
-     * Get an element's static id.
+     * Get an element's id.
      *
      * @param element   element to check
-     * @return          static id or null
+     * @return          id or null
      */
-    public static String getElementStaticId(Element element) {
+    public static String getElementId(Element element) {
         return element.attributeValue(XFormsConstants.ID_QNAME);
     }
 }

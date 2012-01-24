@@ -61,12 +61,12 @@ public class XXFormsShowAction extends XFormsAction {
 
                 final XFormsEvent newEvent = new XXFormsDialogOpenEvent(containingDocument, targetDialog, neighborEffectiveId, constrainToViewport);
                 addContextAttributes(actionInterpreter, actionElement, newEvent);
-                targetDialog.getXBLContainer(containingDocument).dispatchEvent(newEvent);
+                targetDialog.container().dispatchEvent(newEvent);
 
                 // Check if form author has set focus while dialog was opening, and if not focus on dialog
                 final String currentFocusEffectiveId = containingDocument.getClientFocusControlEffectiveId();
                 if (currentFocusEffectiveId == null && targetDialog.isVisible())
-                    targetDialog.getXBLContainer().dispatchEvent(new XFormsFocusEvent(containingDocument, targetDialog));
+                    targetDialog.container().dispatchEvent(new XFormsFocusEvent(containingDocument, targetDialog));
 
             } else {
                 final IndentedLogger indentedLogger = actionInterpreter.indentedLogger();

@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.action.actions;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.util.IndentedLogger;
+import org.orbeon.oxf.xforms.BindingContext;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsContextStack;
 import org.orbeon.oxf.xforms.XFormsControls;
@@ -34,7 +35,7 @@ public class XFormsToggleAction extends XFormsAction {
 
         final XFormsContainingDocument containingDocument = actionInterpreter.containingDocument();
         final XFormsContextStack contextStack = actionInterpreter.actionXPathContext();
-        final XFormsContextStack.BindingContext bindingContext = contextStack.getCurrentBindingContext();
+        final BindingContext bindingContext = contextStack.getCurrentBindingContext();
 
         final String caseAttribute = actionElement.attributeValue("case");
         if (caseAttribute == null)
@@ -56,7 +57,7 @@ public class XFormsToggleAction extends XFormsAction {
         final XFormsCaseControl caseControl = (XFormsCaseControl) actionInterpreter.resolveEffectiveControl(actionElement, caseStaticId);
         if (caseControl != null) { // can be null if the switch is not relevant
             // Found control
-            if (caseControl.getParent().isRelevant() && !caseControl.isSelected()) {
+            if (caseControl.parent().isRelevant() && !caseControl.isSelected()) {
                 // This case is in a relevant switch and not currently selected
 
                 // Actually toggle the xforms:case

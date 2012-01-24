@@ -36,13 +36,14 @@ object ControlAnalysisFactory {
     private val lhhaControlFactory: ControlFactory =      (new ExternalLHHAAnalysis(_, _, _, _, _))
 
     // Variable factories indexed by QName
-    // NOTE: We have all these QNames for historical reasons
+    // NOTE: We have all these QNames for historical reasons (XForms 2 is picking <xforms:var>)
     private val variableFactory =
         Seq(XXFORMS_VARIABLE_QNAME, XXFORMS_VAR_QNAME, XFORMS_VARIABLE_QNAME, XFORMS_VAR_QNAME, EXFORMS_VARIABLE_QNAME) map
             (qName ⇒ qName → variableControlFactory) toMap
 
     // Other factories indexed by QName
     private val byQNameFactory = Map[QName, ControlFactory](
+        XBL_TEMPLATE_QNAME            → (new ContainerControl(_, _, _, _, _) with ContainerChildrenBuilder),
         // Core value controls
         XFORMS_INPUT_QNAME            → valueControlFactory,
         XFORMS_SECRET_QNAME           → valueControlFactory,
@@ -67,8 +68,8 @@ object ControlAnalysisFactory {
         // Dynamic control
         XXFORMS_DYNAMIC_QNAME         → (new ContainerControl(_, _, _, _, _)),
         // Repeat control
-        XFORMS_REPEAT_QNAME           → (new RepeatControl(_, _, _, _, _) with ContainerChildrenBuilder),
-        XFORMS_REPEAT_ITERATION_QNAME → (new RepeatIterationControl(_, _, _, _, _) with ContainerChildrenBuilder),
+        XFORMS_REPEAT_QNAME           → (new RepeatControl(_, _, _, _, _)),
+        XFORMS_REPEAT_ITERATION_QNAME → (new RepeatIterationControl(_, _, _, _, _)),
         // LHHA
         LABEL_QNAME                   → lhhaControlFactory,
         HELP_QNAME                    → lhhaControlFactory,
@@ -89,12 +90,15 @@ object ControlAnalysisFactory {
           preceding: Option[ElementAnalysis],
           scope: Scope): Option[ElementAnalysis] = {
 
+        require(controlElement ne null)
+        require(scope ne null)
+
         // Tell whether the current element has an XBL binding
-        def hasXBLBinding(e: Element) = context.partAnalysis.xblBindings.hasBinding(scope.prefixedIdForStaticId(XFormsUtils.getElementStaticId(e)))
+        def hasXBLBinding(e: Element) = context.partAnalysis.xblBindings.hasBinding(scope.prefixedIdForStaticId(XFormsUtils.getElementId(e)))
 
         // Not all factories are simply indexed by QName, so compose those with factories for components and actions
         val componentFactory: PartialFunction[Element, ControlFactory] =
-            { case e if hasXBLBinding(e) ⇒ (new ComponentControl(_, _, _, _, _) with ShadowChildrenBuilder) }
+            { case e if hasXBLBinding(e) ⇒ (new ComponentControl(_, _, _, _, _)) }
 
         val f = controlFactory orElse componentFactory orElse XFormsActions.factory
 

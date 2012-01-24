@@ -66,7 +66,6 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
 
     private Locator documentLocator;
 
-
     private final Metadata metadata;
     private final boolean isGenerateIds;
 
@@ -178,12 +177,13 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
 
             // Create a new id and update the attributes if needed
             attributes = getAttributesGatherNamespaces(qName, attributes, reusableStringArray, idIndex);
+            final String xformsElementId = reusableStringArray[0];
 
             // Handle full update annotation
             if (isXXForms && localname.equals("dynamic")) {
                 // Remember this subtree has a full update
-                final String id = rewriteId(reusableStringArray[0]);
-                metadata.putMark(templateSAXStore.getMark(id));
+
+                putMark(xformsElementId);
                 // Add a class to help the client
                 attributes = XMLUtils.appendToClassAttribute(attributes, "xforms-update-full");
             } else if (templateSAXStore != null && Version.isPE()) {
@@ -191,8 +191,7 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
                 final String xxformsUpdate = attributes.getValue(XFormsConstants.XXFORMS_UPDATE_QNAME.getNamespaceURI(), XFormsConstants.XXFORMS_UPDATE_QNAME.getName());
                 if (XFormsConstants.XFORMS_FULL_UPDATE.equals(xxformsUpdate)) {
                     // Remember this subtree has a full update
-                    final String id = rewriteId(reusableStringArray[0]);
-                    metadata.putMark(templateSAXStore.getMark(id));
+                    putMark(xformsElementId);
                     // Add a class to help the client
                     attributes = XMLUtils.appendToClassAttribute(attributes, "xforms-update-full");
                 }
@@ -213,9 +212,9 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
                 startElement(true, uri, localname, qName, attributes);
                 // Use xforms:repeat-iteration instead of xxforms:iteration so we don't have to deal with a new namespace
                 reusableAttributes.clear();
-                reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, attributes.getValue("id") + "~iteration");
-                getAttributesGatherNamespaces(qName, reusableAttributes, reusableStringArray, 0);
-                startElement(true, uri, localname + "-iteration", qName + "-iteration", reusableAttributes);
+                reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, xformsElementId + "~iteration");
+                final Attributes repeatIterationAttributes = getAttributesGatherNamespaces(qName, reusableAttributes, reusableStringArray, 0);
+                startElement(true, uri, localname + "-iteration", qName + "-iteration", repeatIterationAttributes);
             } else {
                 // Leave element untouched (except for the id attribute)
                 startElement(true, uri, localname, qName, attributes);
@@ -484,20 +483,22 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
         return false;
     }
 
-    final protected void addNamespaces(String id) {
+    final private void addNamespaceMapping(String rawId) {
         final Map<String, String> namespaces = new HashMap<String, String>();
         for (Enumeration e = namespaceSupport.getPrefixes(); e.hasMoreElements();) {
             final String namespacePrefix = (String) e.nextElement();
             if (!namespacePrefix.startsWith("xml") && !namespacePrefix.equals("")) {
                 namespaces.put(namespacePrefix, namespaceSupport.getURI(namespacePrefix));
-                 // Intern namespace strings to save memory; should use NamePool later
-//                namespaces.put(namespacePrefix.intern(), namespaceSupport.getURI(namespacePrefix).intern());
             }
         }
         // Re-add standard "xml" prefix mapping
         // TODO: WHY?
         namespaces.put(XMLConstants.XML_PREFIX, XMLConstants.XML_URI);
-        metadata.addNamespaceMapping(id, namespaces);
+        metadata.addNamespaceMapping(rewriteId(rawId), namespaces);
+    }
+
+    final private void putMark(String rawId) {
+        metadata.putMark(templateSAXStore.getMark(rewriteId(rawId)));
     }
     
     protected String rewriteId(String id) {
@@ -527,42 +528,42 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
     }
 
     private Attributes getAttributesGatherNamespaces(String qNameForDebug, Attributes attributes, String[] newIdAttribute, final int idIndex) {
+        final String rawId;
         if (isGenerateIds) {
             // Process ids
             if (idIndex == -1) {
                 // Create a new "id" attribute, prefixing if needed
                 final AttributesImpl newAttributes = new AttributesImpl(attributes);
-                newIdAttribute[0] = metadata.idGenerator().getNextId();
-                newAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, newIdAttribute[0]);
+                rawId = metadata.idGenerator().getNextId();
+                newAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, rawId);
                 attributes = newAttributes;
             } else {
                 // Keep existing id
-                newIdAttribute[0] = attributes.getValue(idIndex);
+                rawId = attributes.getValue(idIndex);
+
+                // Check for duplicate ids
+                // TODO: create Element to provide more location info?
+                if (metadata.idGenerator().isDuplicate(rawId))
+                    throw new ValidationException("Duplicate id for XForms element: " + rawId,
+                        new ExtendedLocationData(new LocationData(getDocumentLocator()), "analyzing control element", Dom4jUtils.saxToDebugElement(qNameForDebug, attributes), "id", rawId));
             }
-
-            // Check for duplicate ids
-            // TODO: create Element to provide more location info?
-            if (metadata.idGenerator().isDuplicate(newIdAttribute[0]))
-                throw new ValidationException("Duplicate id for XForms element: " + newIdAttribute[0],
-                        new ExtendedLocationData(new LocationData(getDocumentLocator()), "analyzing control element", Dom4jUtils.saxToDebugElement(qNameForDebug, attributes), "id", newIdAttribute[0]));
-
-            // TODO: Make sure we can test on the presence of "$" without breaking ids produced by XBLBindings
-//            else if (newIdAttribute[0].contains("$"))
-//                throw new ValidationException("Id for XForms element cannot contain the \"$\" character: " + newIdAttribute[0],
-//                        new ExtendedLocationData(new LocationData(getDocumentLocator()), "analyzing control element", Dom4jUtils.saxToDebugElement(qName, attributes), "id", newIdAttribute[0]));
 
         } else {
             // Don't create a new id but remember the existing one
-            newIdAttribute[0] = attributes.getValue(idIndex);
+            rawId = attributes.getValue(idIndex);
         }
 
         // Remember that this id was used
-        metadata.idGenerator().add(newIdAttribute[0]);
+        if (rawId != null) {
+            metadata.idGenerator().add(rawId);
 
-        // Gather namespace information if there is an id
-        if (isGenerateIds || idIndex != -1) {
-            addNamespaces(rewriteId(newIdAttribute[0]));
+            // Gather namespace information if there is an id
+            if (isGenerateIds || idIndex != -1) {
+                addNamespaceMapping(rawId);
+            }
         }
+
+        newIdAttribute[0] = rawId;
 
         return attributes;
     }

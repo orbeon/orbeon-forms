@@ -17,6 +17,7 @@ import org.dom4j.QName;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis;
 import org.orbeon.oxf.xforms.analysis.controls.AttributeControl;
+import org.orbeon.oxf.xforms.control.Controls;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
@@ -170,10 +171,9 @@ public abstract class XFormsBaseHandler extends ElementHandler {
     }
     
     protected Attributes handleAVTsAndIDs(Attributes attributes, String[] refIdAttributeNames) {
-		final String staticId = handlerContext.getId(attributes);
-        final String prefixedId = handlerContext.getIdPrefix() + staticId;
+        final String prefixedId = handlerContext.getPrefixedId(attributes);
 
-        if (staticId != null) {
+        if (prefixedId != null) {
             final boolean hasAVT = containingDocument.getStaticOps().hasAttributeControl(prefixedId);
             final String effectiveId = handlerContext.getEffectiveId(attributes);
             boolean found = false;
@@ -194,7 +194,7 @@ public abstract class XFormsBaseHandler extends ElementHandler {
                         final AttributeControl controlAnalysis = containingDocument.getStaticOps().getAttributeControl(prefixedId, attributeQName);
 
                         // Get static id of attribute control associated with this particular attribute
-                        final String attributeControlStaticId = controlAnalysis.element().attributeValue(XFormsConstants.ID_QNAME);
+                        final String attributeControlStaticId = controlAnalysis.staticId();
 
                         // Find concrete control if possible
                         final XXFormsAttributeControl attributeControl;
@@ -244,6 +244,6 @@ public abstract class XFormsBaseHandler extends ElementHandler {
 	}
 
     protected Set<QName> getAppearances() {
-        return XFormsControl.getAppearances(elementAnalysis);
+        return Controls.appearances(elementAnalysis);
     }
 }

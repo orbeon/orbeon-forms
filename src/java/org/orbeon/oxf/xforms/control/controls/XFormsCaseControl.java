@@ -17,7 +17,6 @@ import org.dom4j.Element;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsNoSingleNodeContainerControl;
-import org.orbeon.oxf.xforms.control.XFormsPseudoControl;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 
 import java.util.Map;
@@ -27,10 +26,10 @@ import java.util.Map;
  *
  * NOTE: This doesn't keep the "currently selected flag". Instead, the parent xforms:switch holds this information.
  */
-public class XFormsCaseControl extends XFormsNoSingleNodeContainerControl implements XFormsPseudoControl {
+public class XFormsCaseControl extends XFormsNoSingleNodeContainerControl {
 
-    public XFormsCaseControl(XBLContainer container, XFormsControl parent, Element element, String name, String id, Map<String, String> state) {
-        super(container, parent, element, name, id);
+    public XFormsCaseControl(XBLContainer container, XFormsControl parent, Element element, String effectiveId, Map<String, String> state) {
+        super(container, parent, element, effectiveId);
     }
 
     public static boolean isDefaultSelected(Element element) {
@@ -39,7 +38,7 @@ public class XFormsCaseControl extends XFormsNoSingleNodeContainerControl implem
     }
 
     @Override
-    protected boolean computeRelevant() {
+    public boolean computeRelevant() {
         if (!super.computeRelevant()) {
             // If parent is not relevant then we are not relevant either
             return false;
@@ -72,6 +71,6 @@ public class XFormsCaseControl extends XFormsNoSingleNodeContainerControl implem
     }
 
     private XFormsSwitchControl getSwitch() {
-        return (XFormsSwitchControl) getParent();
+        return (XFormsSwitchControl) parent();
     }
 }

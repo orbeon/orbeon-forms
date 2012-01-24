@@ -31,7 +31,7 @@ import org.orbeon.oxf.xforms.XFormsStaticStateImpl.StaticStateDocument
 import state.AnnotatedTemplate
 import xbl.Scope
 import org.dom4j.{Element, Document}
-import org.orbeon.oxf.util.{NumberUtils, LoggerFactory, XPathCache}
+import org.orbeon.oxf.util.{NumberUtils, XPathCache}
 
 class XFormsStaticStateImpl(
         val encodedState: String,
@@ -45,7 +45,7 @@ class XFormsStaticStateImpl(
     require(encodedState ne null)
     require(digest ne null)
 
-    val getIndentedLogger = XFormsContainingDocument.getIndentedLogger(XFormsStaticStateImpl.logger, XFormsServer.getLogger, XFormsStaticStateImpl.LOGGING_CATEGORY)
+    val getIndentedLogger = XFormsContainingDocument.getIndentedLogger(XFormsServer.getLogger, "analysis")
     val locationData = staticStateDocument.locationData
     val documentWrapper = new DocumentWrapper(Dom4jUtils.createDocument, null, XPathCache.getGlobalConfiguration)
 
@@ -88,9 +88,8 @@ class XFormsStaticStateImpl(
 
 object XFormsStaticStateImpl {
 
-    val LOGGING_CATEGORY = "analysis"
-    val logger = LoggerFactory.createLogger(classOf[XFormsStaticState])
     val DIGEST_LENGTH = 32
+
     val BASIC_NAMESPACE_MAPPING =
         new NamespaceMapping(Map(
             XFORMS_PREFIX → XFORMS_NAMESPACE_URI,
@@ -160,6 +159,7 @@ object XFormsStaticStateImpl {
     }
 
     // Create template and analyzed part for the given XForms document.
+    // Used by xxf:dynamic.
     def createPart(staticState: XFormsStaticState, parent: PartAnalysis, formDocument: Document, startScope: Scope) =
         createFromDocument(formDocument, startScope, (staticStateDocument: Document, digest: String, metadata: Metadata, _) ⇒ {
             val part = new PartAnalysisImpl(staticState, Some(parent), startScope, metadata, new StaticStateDocument(staticStateDocument))
@@ -259,7 +259,7 @@ object XFormsStaticStateImpl {
         def lastId: Int = {
             val idElement = staticStateElement.element(XFormsExtractorContentHandler.LAST_ID_QNAME)
             require(idElement ne null)
-            val lastId = XFormsUtils.getElementStaticId(idElement)
+            val lastId = XFormsUtils.getElementId(idElement)
             require(lastId ne null)
             Integer.parseInt(lastId)
         }

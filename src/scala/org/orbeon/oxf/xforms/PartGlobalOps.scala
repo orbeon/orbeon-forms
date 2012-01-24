@@ -99,7 +99,7 @@ trait PartGlobalOps {
     def getHint(prefixedId: String) = getLHHA(prefixedId, "hint")
     def getAlert(prefixedId: String) = getLHHA(prefixedId, "alert")
 
-    private def getLHHA(prefixedId: String, lhha: String) =
+    def getLHHA(prefixedId: String, lhha: String) =
         getControlAnalysisOption(prefixedId) match {
             case Some(lhhaTrait: LHHATrait) ⇒ lhhaTrait.getLHHA(lhha).orNull
             case _ ⇒ null

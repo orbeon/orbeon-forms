@@ -43,7 +43,7 @@
                      Use the same logic as in resources-model. In the builder, we don't have a resources-model running
                      for the form being edited, so we duplicate this here. -->
                 <xxf:var name="form-resources" value="instance('fr-form-resources')/(resource[@xml:lang = $lang], resource[1])[1]" as="element(resource)?"/>
-                <!-- Scope $fr-resources for Form Builder resources -->
+                <!-- Scope $fr-resources for Form Runner resources -->
                 <xxf:var name="fr-resources" value="xxf:get-variable('fr-resources-model', 'fr-fr-resources')" as="element(resource)?"/>
                 <!-- Scope $fb-resources for Form Builder resources -->
                 <xxf:var name="fb-resources" value="xxf:get-variable('fr-resources-model', 'fr-form-resources')" as="element(resource)?"/>

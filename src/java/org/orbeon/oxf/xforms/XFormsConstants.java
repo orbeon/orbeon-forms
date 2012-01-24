@@ -37,8 +37,10 @@ public class XFormsConstants {
     public static final Set<String> LABEL_HINT_HELP_ALERT_ELEMENT = new HashSet<String>();
 
     public enum LHHA {
-        LABEL, HELP, HINT, ALERT
+        label, help, hint, alert
     }
+
+    public static final int LHHACount = LHHA.values().length;
 
     static {
         // TODO: Keeping this static list is not ideal
@@ -174,6 +176,7 @@ public class XFormsConstants {
     public static final QName XXBL_SCOPE_QNAME = new QName("scope", XXBL_NAMESPACE);
     public static final QName XXBL_CONTAINER_QNAME = new QName("container", XXBL_NAMESPACE);
     public static final QName XXBL_GLOBAL_QNAME = new QName("global", XXBL_NAMESPACE);
+    public static final QName XXBL_MODE_QNAME = new QName("mode", XXBL_NAMESPACE);
 
     public enum XXBLScope { inner, outer }
     public enum DeploymentType { separate, integrated, standalone}
@@ -356,6 +359,7 @@ public class XFormsConstants {
 
     public static final char REPEAT_HIERARCHY_SEPARATOR_1 = 0xB7;
     public static final char REPEAT_HIERARCHY_SEPARATOR_2 = '-';
+    public static final String REPEAT_HIERARCHY_SEPARATOR_2_STRING = "" + REPEAT_HIERARCHY_SEPARATOR_2;
 
     public static final char COMPONENT_SEPARATOR = '$';
     // Use "$$" to minimize chances of conflict with user-defined ids

@@ -23,7 +23,7 @@ import org.orbeon.oxf.xforms.event.EventHandlerImpl
 
 trait PartControlsAnalysis extends TransientState {
 
-    this: PartAnalysisImpl ⇒
+    self: PartAnalysisImpl ⇒
 
     protected val controlAnalysisMap = new LinkedHashMap[String, ElementAnalysis]
     // type → Map of prefixedId → ElementAnalysis
@@ -145,6 +145,9 @@ trait PartControlsAnalysis extends TransientState {
 
             repeatsWithAncestors mkString ","
         } getOrElse ""
+
+
+    def getTopLevelControls = Seq(controlTypes("root").values.head)
 
     def getTopLevelControlElements =
         Seq(controlTypes("root").values.head.element) ++

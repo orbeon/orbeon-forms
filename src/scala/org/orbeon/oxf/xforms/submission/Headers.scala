@@ -48,7 +48,7 @@ object Headers {
                     if (element eq null)
                         throw new OXFException("Missing <" + name.getQualifiedName + "> child element of <header> element")
 
-                    val scope = xblContainer.getPartAnalysis.getResolutionScopeByPrefixedId(xblContainer.getFullPrefix + XFormsUtils.getElementStaticId(element))
+                    val scope = xblContainer.getPartAnalysis.getResolutionScopeByPrefixedId(xblContainer.getFullPrefix + XFormsUtils.getElementId(element))
                     contextStack.pushBinding(element, sourceEffectiveId, scope)
                     val result = XFormsUtils.getElementValue(xblContainer.getContainingDocument, contextStack, sourceEffectiveId, element, false, null)
                     contextStack.popBinding
@@ -88,7 +88,7 @@ object Headers {
 
             // Process all nested <header> elements
             for (headerElement <- headerElements) {
-                val headerScope = xblContainer.getPartAnalysis.getResolutionScopeByPrefixedId(fullPrefix + XFormsUtils.getElementStaticId(headerElement))
+                val headerScope = xblContainer.getPartAnalysis.getResolutionScopeByPrefixedId(xblContainer.getFullPrefix + XFormsUtils.getElementId(headerElement))
                 contextStack.pushBinding(headerElement, sourceEffectiveId, headerScope)
 
                 if (contextStack.getCurrentBindingContext.isNewBind) {

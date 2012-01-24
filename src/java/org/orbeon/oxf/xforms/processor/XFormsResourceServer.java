@@ -39,16 +39,13 @@ import java.util.Map;
  */
 public class XFormsResourceServer extends ProcessorImpl {
 
-    public static final String LOGGING_CATEGORY = "resources";
-    private static final Logger logger = LoggerFactory.createLogger(XFormsResourceServer.class);
-
     public static final String DYNAMIC_RESOURCES_SESSION_KEY = "orbeon.resources.dynamic.";
     public static final String DYNAMIC_RESOURCES_PATH = "/xforms-server/dynamic/";
 
     public XFormsResourceServer() {}
 
     public static IndentedLogger getIndentedLogger() {
-        return XFormsContainingDocument.getIndentedLogger(logger, XFormsServer.getLogger(), LOGGING_CATEGORY);
+        return XFormsContainingDocument.getIndentedLogger(XFormsServer.getLogger(), "resources");
     }
 
     @Override

@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.xbl
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.dom4j.{Document, QName, Element}
 import org.orbeon.oxf.xforms._
+import analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.XFormsConstants._
 import scala.collection.JavaConverters._
 import org.orbeon.oxf.xml.NamespaceMapping
@@ -66,6 +67,16 @@ case class AbstractBinding(
 
             generatedDocument
     }
+
+    // XBL mode
+    val xblMode = ElementAnalysis.attSet(bindingElement, XFormsConstants.XXBL_MODE_QNAME)
+    def modeAllXForms = xblMode("xforms")
+    def modeBinding =   modeAllXForms || xblMode("binding")
+    def modeValue =     modeAllXForms || xblMode("value")
+    def modeHandlers =  modeAllXForms || xblMode("handlers")
+    def modeUIEvents =  modeAllXForms || xblMode("ui-events")
+    def modeLHHA =      modeAllXForms || xblMode("lhha")
+    def modeItemset =   modeAllXForms || xblMode("itemset")
 }
 
 object AbstractBinding {
@@ -74,7 +85,7 @@ object AbstractBinding {
 
         assert(bindingElement ne null)
 
-        val bindingId = Option(XFormsUtils.getElementStaticId(bindingElement))
+        val bindingId = Option(XFormsUtils.getElementId(bindingElement))
 
         val styles =
             for {

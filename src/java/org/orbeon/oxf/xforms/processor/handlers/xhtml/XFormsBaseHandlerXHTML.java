@@ -22,10 +22,7 @@ import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis;
 import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis;
-import org.orbeon.oxf.xforms.control.XFormsControl;
-import org.orbeon.oxf.xforms.control.XFormsControlFactory;
-import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
-import org.orbeon.oxf.xforms.control.XFormsValueControl;
+import org.orbeon.oxf.xforms.control.*;
 import org.orbeon.oxf.xforms.processor.handlers.HandlerContext;
 import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
@@ -201,7 +198,7 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
     }
 
     protected static void appendAppearances(ElementAnalysis elementAnalysis,StringBuilder sb) {
-        for (final QName appearance : XFormsControl.getAppearances(elementAnalysis)) {
+        for (final QName appearance : Controls.appearances(elementAnalysis)) {
             if (sb.length() > 0)
                 sb.append(' ');
             sb.append("xforms-");

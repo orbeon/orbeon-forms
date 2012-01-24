@@ -26,7 +26,12 @@
 
     <xforms:label ref="$form-resources/dialog-validation-details/dialog-title"/>
 
-    <xxforms:variable name="instance" select="instance('fb-validation-editor-instance')"/>
+    <xforms:var name="instance"             value="instance('fb-validation-editor-instance')"/>
+    <xforms:var name="model"                value="$model"                  model="fr-form-model"/>
+    <xforms:var name="body"                 value="$body"                   model="fr-form-model"/>
+    <xforms:var name="current-resources"    value="$current-resources"      model="fr-form-model"/>
+    <xforms:var name="current-control-name" value="$current-control-name"   model="fr-form-model"/>
+
     <xhtml:div>
         <xhtml:div class="fr-grid">
             <xhtml:div class="fr-grid-content">

@@ -54,9 +54,12 @@ class XFormsSetvalueAction extends XFormsAction {
                 // NOTE: XForms 1.1 seems to require dispatching xforms-binding-exception in case the target node cannot be
                 // written to. But because of the way we now handle errors in actions, we throw an exception instead and
                 // action processing is interrupted.
-                DataModel.setValueIfChanged(nodeInfo, valueToSet,
-                    DataModel.logAndNotifyValueChange(containingDocument, indentedLogger, "setvalue", nodeInfo, _, valueToSet, false),
-                    reason => throw new OXFException(reason.message))
+                DataModel.setValueIfChanged(
+                    nodeInfo,
+                    valueToSet,
+                    DataModel.logAndNotifyValueChange(containingDocument, indentedLogger, "setvalue", nodeInfo, _, valueToSet, isCalculate = false),
+                    reason => throw new OXFException(reason.message)
+                )
             case _ ⇒
                 // Node doesn't exist: NOP
                 if (indentedLogger.isDebugEnabled)
@@ -64,4 +67,3 @@ class XFormsSetvalueAction extends XFormsAction {
         }
     }
 }
-

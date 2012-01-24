@@ -15,16 +15,20 @@ package org.orbeon.oxf.xforms.xbl
 
 import collection.mutable.HashMap
 
+/**
+ * Represent an XBL scope, that is a set of ids associated with elements that can see each other.
+ *
+ * Note:
+ *
+ * - within a scope, static ids must be unique
+ * - static ids might have prefixed ids in different containing scopes
+ */
 class Scope(val parent: Scope, val scopeId: String) {
 
     assert((parent ne null) || scopeId == "")
 
-    val fullPrefix = if (scopeId.length == 0) "" else scopeId + '$'
-
     private val idMap = new HashMap[String, String]
-
-    if (parent eq null)
-        idMap += "#document" → "#document"
+    val fullPrefix = if (isTopLevelScope) "" else scopeId + '$'
     
     def isTopLevelScope = scopeId.length == 0
 
@@ -33,6 +37,7 @@ class Scope(val parent: Scope, val scopeId: String) {
 
     def contains(staticId: String) = idMap.contains(staticId)
 
+    // Add a static id → prefixed id mapping
     def += (kv: (String, String)) = kv match {
         case (staticId, prefixedId) ⇒
             // Index static id => prefixed id by scope

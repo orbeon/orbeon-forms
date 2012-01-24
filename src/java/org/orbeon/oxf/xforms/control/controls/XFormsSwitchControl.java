@@ -41,12 +41,12 @@ public class XFormsSwitchControl extends XFormsValueContainerControl {
 
     private transient boolean restoredState;
 
-    public static class XFormsSwitchControlLocal extends XFormsControlLocal {
+    public static class XFormsSwitchControlLocal extends XFormsControl.XFormsControlLocal {
         private String selectedCaseControlId;
     }
 
-    public XFormsSwitchControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId, Map<String, String> state) {
-        super(container, parent, element, name, effectiveId);
+    public XFormsSwitchControl(XBLContainer container, XFormsControl parent, Element element, String effectiveId, Map<String, String> state) {
+        super(container, parent, element, effectiveId);
 
         // Initial local state
         setLocal(new XFormsSwitchControlLocal());
@@ -63,7 +63,7 @@ public class XFormsSwitchControl extends XFormsValueContainerControl {
     }
 
     @Override
-    protected void onCreate() {
+    public void onCreate() {
         super.onCreate();
 
         // Ensure that the initial state is set, either from default value, or for state deserialization.
@@ -76,23 +76,15 @@ public class XFormsSwitchControl extends XFormsValueContainerControl {
         }
     }
 
-    @Override
-    public void childrenAdded() {
-        // TODO: Do this during static analysis and remove childrenAdded() as it's no longer used as of 2011-11
-        if (getSize() == 0) {
-            throw new OXFException("xforms:switch does not contain at least one xforms:case for switch id: " + getEffectiveId());
-        }
-    }
-
     private List<XFormsCaseControl> getChildrenCases() {
-        final List<XFormsControl> children = getChildren();
+        final List<XFormsControl> children = childrenJava();
         final List<XFormsCaseControl> childrenCases;
-        if (children == null || children.size() == 0) {
+        if (children.isEmpty()) {
             childrenCases = Collections.emptyList();
         } else {
             // Filter because XXFormsVariableControl can also be a child
             childrenCases = new ArrayList<XFormsCaseControl>(children.size());
-            for (final XFormsControl child: children) {
+            for (final XFormsControl child : children) {
                 if (child instanceof XFormsCaseControl)
                     childrenCases.add((XFormsCaseControl) child);
             }
@@ -107,7 +99,7 @@ public class XFormsSwitchControl extends XFormsValueContainerControl {
      */
     public void setSelectedCase(XFormsCaseControl caseControlToSelect) {
 
-        if (caseControlToSelect.getParent() != this)
+        if (caseControlToSelect.parent() != this)
             throw new OXFException("xforms:case is not child of current xforms:switch.");
 
         final XFormsSwitchControlLocal localForUpdate = (XFormsSwitchControlLocal) getLocalForUpdate();
@@ -121,22 +113,22 @@ public class XFormsSwitchControl extends XFormsValueContainerControl {
             // performs the following:"
 
             // "1. Dispatching an xforms-deselect event to the currently selected case."
-            previouslySelectedCaseControl.getXBLContainer().dispatchEvent(
-                    new XFormsDeselectEvent(containingDocument, previouslySelectedCaseControl));
+            previouslySelectedCaseControl.container().dispatchEvent(
+                    new XFormsDeselectEvent(containingDocument(), previouslySelectedCaseControl));
 
             if (isXForms11Switch()) {
                 // Partial refresh on the case that is being deselected
                 // Do this after xforms-deselect is dispatched
-                containingDocument.getControls().doPartialRefresh(previouslySelectedCaseControl);
+                containingDocument().getControls().doPartialRefresh(previouslySelectedCaseControl);
 
                 // Partial refresh on the case that is being selected
                 // Do this before xforms-select is dispatched
-                containingDocument.getControls().doPartialRefresh(caseControlToSelect);
+                containingDocument().getControls().doPartialRefresh(caseControlToSelect);
             }
 
             // "2. Dispatching an xforms-select event to the case to be selected."
-            caseControlToSelect.getXBLContainer().dispatchEvent(
-                    new XFormsSelectEvent(containingDocument, caseControlToSelect));
+            caseControlToSelect.container().dispatchEvent(
+                    new XFormsSelectEvent(containingDocument(), caseControlToSelect));
         }
     }
 
@@ -160,22 +152,23 @@ public class XFormsSwitchControl extends XFormsValueContainerControl {
 
     public XFormsCaseControl getSelectedCase() {
         if (isRelevant()) {
-            return (XFormsCaseControl) containingDocument.getControls().getObjectByEffectiveId(getSelectedCaseEffectiveId());
+            return (XFormsCaseControl) containingDocument().getControls().getObjectByEffectiveId(getSelectedCaseEffectiveId());
         } else {
             return null;
         }
     }
 
     private String findDefaultSelectedCaseId() {
+        // TODO: Use ElementAnalysis instead
         final List<Element> caseElements = Dom4jUtils.elements(getControlElement(), XFormsConstants.XFORMS_CASE_QNAME);
         for (final Element caseElement: caseElements) {
             if (XFormsCaseControl.isDefaultSelected(caseElement)) {
                 // Found first case with selected="true"
-                return caseElement.attributeValue(XFormsConstants.ID_QNAME);
+                return XFormsUtils.getElementId(caseElement);
             }
         }
         // Didn't find a case with selected="true" so return first case
-        return caseElements.get(0).attributeValue(XFormsConstants.ID_QNAME);
+        return XFormsUtils.getElementId(caseElements.get(0));
     }
 
     @Override
@@ -250,7 +243,7 @@ public class XFormsSwitchControl extends XFormsValueContainerControl {
                 final String selectedCaseEffectiveId = getSelectedCaseEffectiveId();
                 assert selectedCaseEffectiveId != null;
                 ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "div", new String[]{
-                        "id", XFormsUtils.namespaceId(containingDocument, selectedCaseEffectiveId),
+                        "id", XFormsUtils.namespaceId(containingDocument(), selectedCaseEffectiveId),
                         "visibility", "visible"
                 });
 
@@ -259,7 +252,7 @@ public class XFormsSwitchControl extends XFormsValueContainerControl {
                     final String previousSelectedCaseId = getOtherSelectedCaseEffectiveId(otherSwitchControl);
                     assert previousSelectedCaseId != null;
                     ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "div", new String[]{
-                            "id", XFormsUtils.namespaceId(containingDocument, previousSelectedCaseId),
+                            "id", XFormsUtils.namespaceId(containingDocument(), previousSelectedCaseId),
                             "visibility", "hidden"}
                     );
                 } else {
@@ -270,7 +263,7 @@ public class XFormsSwitchControl extends XFormsValueContainerControl {
                         for (final XFormsCaseControl caseControl: children) {
                             if (!caseControl.getEffectiveId().equals(selectedCaseEffectiveId)) {
                                 ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "div", new String[]{
-                                        "id", XFormsUtils.namespaceId(containingDocument, caseControl.getEffectiveId()),
+                                        "id", XFormsUtils.namespaceId(containingDocument(), caseControl.getEffectiveId()),
                                         "visibility", "hidden"
                                 });
                             }
@@ -296,6 +289,6 @@ public class XFormsSwitchControl extends XFormsValueContainerControl {
         if (localXForms11Switch != null)
             return Boolean.parseBoolean(localXForms11Switch);
         else
-            return XFormsProperties.isXForms11Switch(containingDocument);
+            return XFormsProperties.isXForms11Switch(containingDocument());
     }
 }

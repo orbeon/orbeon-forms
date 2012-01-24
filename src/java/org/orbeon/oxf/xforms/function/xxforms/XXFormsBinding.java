@@ -13,8 +13,10 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms;
 
-import org.orbeon.oxf.xforms.XFormsContextStack;
-import org.orbeon.oxf.xforms.control.*;
+import org.orbeon.oxf.xforms.BindingContext;
+import org.orbeon.oxf.xforms.control.XFormsContainerControl;
+import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.XPathContext;
@@ -46,7 +48,7 @@ public class XXFormsBinding extends XFormsFunction {
             return SingletonIterator.makeIterator(boundItem);
         } else if (object instanceof XFormsContainerControl) {
             final XFormsControl control = (XFormsControl) object;
-            final XFormsContextStack.BindingContext bindingContext = control.getBindingContext();
+            final BindingContext bindingContext = control.getBindingContext();
             if (bindingContext.isNewBind()) {
                 return new ListIterator(bindingContext.getNodeset());
             } else {

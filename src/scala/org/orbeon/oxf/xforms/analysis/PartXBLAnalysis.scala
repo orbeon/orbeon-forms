@@ -16,13 +16,13 @@ package org.orbeon.oxf.xforms.analysis
 import scala.collection.JavaConverters._
 import collection.mutable.HashMap
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.xforms.{XFormsConstants, XFormsContainingDocument}
+import org.orbeon.oxf.xforms.XFormsConstants
 import org.dom4j.QName
 import org.orbeon.oxf.xforms.xbl.{Scope, XBLBindings}
 
 trait PartXBLAnalysis extends TransientState {
 
-    this: PartAnalysisImpl =>
+    self: PartAnalysisImpl =>
 
     val xblBindings = new XBLBindings(getIndentedLogger, this, metadata, staticStateDocument.xblElements)
     private[PartXBLAnalysis] val scopesById = HashMap[String, Scope]()
@@ -31,6 +31,7 @@ trait PartXBLAnalysis extends TransientState {
     protected def initializeScopes() {
         // Add existing ids to scope map
         val prefix = startScope.fullPrefix
+        metadata.idGenerator.add("#document") // top-level is not added to the id generator until now
         for {
             id ← metadata.idGenerator.ids.asScala
             prefixedId = prefix + id
@@ -39,12 +40,8 @@ trait PartXBLAnalysis extends TransientState {
             indexScope(prefixedId, startScope)
         }
 
-        // Add top-level if needed
-        if (startScope.isTopLevelScope)
-            indexScope(XFormsContainingDocument.CONTAINING_DOCUMENT_PSEUDO_ID, startScope)
-
         // Tell top-level static id generator to stop checking for duplicate ids
-        // TODO: not nice, check what this is about
+        // TODO: not nice, check what this is about (seems needed as of 2012-02-29)
         metadata.idGenerator.setCheckDuplicates(false)
 
         registerScope(startScope)

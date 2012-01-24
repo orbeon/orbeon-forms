@@ -24,7 +24,6 @@ import org.xml.sax.SAXException;
 public class XFormsControlLifecycleHandlerDelegate {
 	private final boolean isTemplate;
 
-    private final String staticId;
     private final String prefixedId;
     private final String effectiveId;
 
@@ -45,17 +44,12 @@ public class XFormsControlLifecycleHandlerDelegate {
     public XFormsControl getControl() {
         return xformsControl;
     }
-    
-	public String getStaticId() {
-		return staticId;
-	}
 
 	public XFormsControlLifecycleHandlerDelegate(HandlerContext handlerContext, XFormsContainingDocument containingDocument, Attributes attributes) throws SAXException {
 
         isTemplate = handlerContext.isTemplate();
 
-        staticId = handlerContext.getId(attributes);
-        prefixedId = handlerContext.getIdPrefix() + staticId;
+        prefixedId = handlerContext.getPrefixedId(attributes);
         effectiveId = handlerContext.getEffectiveId(attributes);
 
         xformsControl = handlerContext.isTemplate()

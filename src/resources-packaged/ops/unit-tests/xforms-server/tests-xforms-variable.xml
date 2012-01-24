@@ -16,12 +16,15 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
     xmlns:xu="http://www.xmldb.org/xupdate"
     xmlns:oxf="http://www.orbeon.com/oxf/processors"
     xmlns:xi="http://www.w3.org/2001/XInclude"
     xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
     xmlns:xforms="http://www.w3.org/2002/xforms"
     xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xbl="http://www.w3.org/ns/xbl"
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
@@ -244,10 +247,10 @@
     </test>
 
     <test description="Variable scoping of model and control event handlers" name="oxf:pipeline">
+        <!-- Also see: https://github.com/orbeon/orbeon-forms/issues/45 -->
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-                        xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+            <xhtml:html>
                 <xhtml:head>
                     <xforms:model id="model1">
                         <xforms:instance id="instance1">
@@ -312,7 +315,6 @@
                         <xforms:instance id="result3">
                             <instance>
                                 <lucky/>
-                                <gaga/>
                                 <sum/>
                                 <product/>
                             </instance>
@@ -359,7 +361,8 @@
                                         <xforms:setvalue ref="instance('result3')/lucky" value="$lucky"/>
 
                                         <!-- All action variables must still be visible -->
-                                        <xforms:setvalue ref="instance('result3')/gaga" value="$gaga"/>
+                                        <!-- NOTE: $gaga used to be in scope, but as of 2012-02-23, model variable
+                                             visibility is fixed and so $gaga is not visible by transparence -->
                                         <xforms:setvalue ref="instance('result3')/sum" value="$sum"/>
                                         <xforms:setvalue ref="instance('result3')/product" value="$product"/>
                                     </xforms:action>
@@ -414,7 +417,6 @@
                             <instance id="result3" model-id="model3">
                                 <instance>
                                     <lucky>888</lucky>
-                                    <gaga>7</gaga>
                                     <sum>85</sum>
                                     <product>1806</product>
                                 </instance>
@@ -551,8 +553,7 @@
     <test description="Event handler after variable can access preceding variable value" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-                        xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+            <xhtml:html>
                 <xhtml:head>
                     <xforms:model id="model">
                         <xforms:instance id="instance">
@@ -592,10 +593,10 @@
     </test>
 
     <test description="Model switching and model variables" name="oxf:pipeline">
+        <!-- Also see: https://github.com/orbeon/orbeon-forms/issues/45 -->
         <input name="config" href="wrap-xforms-state.xpl"/>
         <!-- Reuse document used by other tests -->
         <input name="document" href="oxf:/org/orbeon/oxf/xforms/analysis/model-variables.xhtml"/>
-        <!-- FIXME: output2b should be 42. See: http://forge.ow2.org/tracker/index.php?func=detail&aid=315410&group_id=168&atid=350207 -->
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                 <xxf:dynamic-state>
@@ -614,7 +615,7 @@
                     <xxf:control-values>
                         <xxf:control id="output1">42</xxf:control>
                         <xxf:control id="output2a">43</xxf:control>
-                        <xxf:control id="output2b">43</xxf:control>
+                        <xxf:control id="output2b">42</xxf:control>
                         <xxf:control id="output3a">42</xxf:control>
                         <xxf:control id="output3b">42</xxf:control>
                         <xxf:control id="output3c">43</xxf:control>
@@ -628,5 +629,146 @@
             </xxf:event-response>
         </output>
     </test>
+
+    <test description="Model variable re-evaluation when there are no binds" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-state.xpl"/>
+
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="instance">
+                            <instance>
+                                <foo>42</foo>
+                            </instance>
+                        </xf:instance>
+                        <xf:var name="foo" value="foo"/>
+                        <xf:setvalue ev:event="xforms-ready" ref="foo" value="43"/>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:output id="my-output" value="$foo"/>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <instance>
+                                    <foo>43</foo>
+                                </instance>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="my-output">43</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="Correct context after variable bound to other model" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="model1">
+                        <xf:instance id="instance1">
+                            <value1>42</value1>
+                        </xf:instance>
+                    </xf:model>
+                    <xf:model id="model2">
+                        <xf:instance id="instance2">
+                            <value2>43</value2>
+                        </xf:instance>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:var name="v1" value="."/>
+                    <xf:var name="v2" model="model2" value="."/>
+
+                    <xf:output id="o1" value="$v1"/>
+                    <xf:output id="o2" value="$v2"/>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance1" model-id="model1">
+                                <value1>42</value1>
+                            </instance>
+                            <instance id="instance2" model-id="model2">
+                                <value2>43</value2>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="o1">42</xxf:control>
+                        <xxf:control id="o2">43</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+    
+    <!--<test description="xxx " name="oxf:pipeline" only="true">-->
+        <!--<input name="config" href="wrap-xforms-state.xpl"/>-->
+        <!--<input name="document">-->
+            <!--<xhtml:html>-->
+                <!--<xhtml:head>-->
+                    <!--<xforms:model id="model" xxf:xpath-analysis="true"/>-->
+                <!--</xhtml:head>-->
+                <!--<xhtml:body>-->
+                    <!--<xforms:group id="my-group">-->
+                        <!--<xxforms:var name="foo">foo</xxforms:var>-->
+                        <!--<xforms:model id="nested-model"/>-->
+                        <!--<xforms:output id="my-output" value="$foo"/>-->
+                    <!--</xforms:group>-->
+                <!--</xhtml:body>-->
+            <!--</xhtml:html>-->
+        <!--</input>-->
+        <!--<output name="response">-->
+            <!--<xxf:event-response>-->
+                <!--<xxf:dynamic-state>-->
+                    <!--<dynamic-state>-->
+                        <!--<instances>-->
+                            <!--<instance id="instance1" model-id="model1">-->
+                                <!--<instance>42</instance>-->
+                            <!--</instance>-->
+                            <!--<instance id="instance2" model-id="model2">-->
+                                <!--<instance>43</instance>-->
+                            <!--</instance>-->
+                        <!--</instances>-->
+                    <!--</dynamic-state>-->
+                <!--</xxf:dynamic-state>-->
+                <!--<xxf:action>-->
+                    <!--<xxf:control-values>-->
+                        <!--<xxf:control id="output1">42</xxf:control>-->
+                        <!--<xxf:control id="output2a">43</xxf:control>-->
+                        <!--<xxf:control id="output2b">43</xxf:control>-->
+                        <!--<xxf:control id="output3a">42</xxf:control>-->
+                        <!--<xxf:control id="output3b">42</xxf:control>-->
+                        <!--<xxf:control id="output3c">43</xxf:control>-->
+                        <!--<xxf:control id="output4a">42</xxf:control>-->
+                        <!--<xxf:control id="output4b">42</xxf:control>-->
+                        <!--<xxf:control id="output4c">43</xxf:control>-->
+                        <!--<xxf:control id="output5a">42</xxf:control>-->
+                        <!--<xxf:control id="output5b">43</xxf:control>-->
+                    <!--</xxf:control-values>-->
+                <!--</xxf:action>-->
+            <!--</xxf:event-response>-->
+        <!--</output>-->
+    <!--</test>-->
 
 </group>

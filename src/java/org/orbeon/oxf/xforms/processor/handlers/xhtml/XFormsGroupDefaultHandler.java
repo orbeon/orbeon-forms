@@ -54,7 +54,7 @@ public class XFormsGroupDefaultHandler extends XFormsGroupHandler {
         return elementQName;
     }
 
-    public void handleControlStart(String uri, String localname, String qName, Attributes attributes, String staticId, final String effectiveId, XFormsControl control) throws SAXException {
+    public void handleControlStart(String uri, String localname, String qName, Attributes attributes, final String effectiveId, XFormsControl control) throws SAXException {
         if (!handlerContext.isSpanHTMLLayout()) {
             // Open containing element
             final ElementHandlerController controller = handlerContext.getController();
@@ -64,7 +64,7 @@ public class XFormsGroupDefaultHandler extends XFormsGroupHandler {
     }
 
     @Override
-    public void handleControlEnd(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsControl control) throws SAXException {
+    public void handleControlEnd(String uri, String localname, String qName, Attributes attributes, String effectiveId, XFormsControl control) throws SAXException {
         if (!handlerContext.isSpanHTMLLayout()) {
             // Close containing element
             final ElementHandlerController controller = handlerContext.getController();

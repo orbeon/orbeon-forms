@@ -67,7 +67,7 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
         return (XFormsInputControl) super.getControl();
     }
 
-    protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsControl control) throws SAXException {
+    protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String effectiveId, XFormsControl control) throws SAXException {
 
         final XFormsInputControl inputControl = (XFormsInputControl) control;
         final ContentHandler contentHandler = handlerContext.getController().getOutput();

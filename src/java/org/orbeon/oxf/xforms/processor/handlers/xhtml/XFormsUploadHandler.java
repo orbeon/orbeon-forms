@@ -41,7 +41,7 @@ public class XFormsUploadHandler extends XFormsControlLifecyleHandler {
             classes.append(" xforms-upload-state-file");
     }
 
-    protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsControl control) throws SAXException {
+    protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String effectiveId, XFormsControl control) throws SAXException {
 
         final XFormsUploadControl uploadControl = (XFormsUploadControl) control;
         final ContentHandler contentHandler = handlerContext.getController().getOutput();

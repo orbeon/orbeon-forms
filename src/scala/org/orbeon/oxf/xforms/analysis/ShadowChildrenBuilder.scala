@@ -14,20 +14,32 @@
 package org.orbeon.oxf.xforms.analysis
 
 import controls.ComponentControl
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
-import collection.JavaConverters._
-import org.orbeon.oxf.xforms.xbl.Scope
+import org.orbeon.oxf.xml.Dom4j
+import org.orbeon.oxf.xforms.event.EventHandlerImpl
 
 
 trait ShadowChildrenBuilder extends ContainerChildrenBuilder {
 
-    this: ComponentControl ⇒
+    self: ComponentControl ⇒
 
-    // Return all the children of the shadow tree that need to be built
+    // Directly nested handlers (if enabled)
+    private def directlyNestedHandlers =
+        if (binding.abstractBinding.modeHandlers)
+            Dom4j.elements(_element) filter
+                (EventHandlerImpl.isEventHandler(_)) map
+                    (e ⇒ (
+                        _staticStateContext.partAnalysis.xblBindings.annotateSubtreeByElement(
+                            _element,               // bound element
+                            e,                      // handler tree to annotate
+                            containerScope,         // handler's inner scope is the scope of the container in which the current component is
+                            _scope,                 // TODO: actual outer scope! (this works only if the current component is itself in the outer scope)
+                            binding.innerScope),    // handler is within the current component
+                        binding.innerScope
+                    ))
+        else
+            Seq()
+    
+    // Return all the children to consider, including relevant shadow tree elements
     override def findRelevantChildrenElements =
-        binding.handlers ++ binding.models ++ Dom4jUtils.elements(binding.compactShadowTree.getRootElement).asScala
-
-    // Change the scope to the binding's inner scope
-    override def buildChildren(build: Builder, containerScope: Scope) =
-        super.buildChildren(build, binding.innerScope)
+        directlyNestedHandlers ++ (binding.handlers ++ binding.models :+ binding.compactShadowTree.getRootElement map ((_, binding.innerScope)))
 }

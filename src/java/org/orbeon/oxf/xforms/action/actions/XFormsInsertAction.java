@@ -54,7 +54,7 @@ public class XFormsInsertAction extends XFormsAction {
 
         // "2. The Node Set Binding node-set is determined."
         final List<Item> collectionToBeUpdated; {
-            final XFormsContextStack.BindingContext currentBindingContext = contextStack.getCurrentBindingContext();
+            final BindingContext currentBindingContext = contextStack.getCurrentBindingContext();
             collectionToBeUpdated = currentBindingContext.isNewBind() ? currentBindingContext.getNodeset() : XFormsConstants.EMPTY_ITEM_LIST;
         }
         final boolean isEmptyNodesetBinding = collectionToBeUpdated == null || collectionToBeUpdated.size() == 0;

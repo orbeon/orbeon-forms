@@ -46,14 +46,15 @@ trait SelectionControl extends SimpleElementAnalysis with SelectAppearanceTrait 
             staticStateContext.partAnalysis.staticState.getProperty[Boolean](XFormsProperties.ENCRYPT_ITEM_VALUES_PROPERTY)
 
     private var itemsetAnalysis: Option[XPathAnalysis] = None
-    private var itemsetAnalyzed = false
+    private var _itemsetAnalyzed = false
+    def itemsetAnalyzed = _itemsetAnalyzed
 
-    final def getItemsetAnalysis = { assert(itemsetAnalyzed); itemsetAnalysis }
+    final def getItemsetAnalysis = { assert(_itemsetAnalyzed); itemsetAnalysis }
 
     override def analyzeXPath() = {
         super.analyzeXPath()
         itemsetAnalysis = computeItemsetAnalysis()
-        itemsetAnalyzed = true
+        _itemsetAnalyzed = true
     }
 
     def computeItemsetAnalysis() = {
@@ -120,19 +121,20 @@ trait SelectionControl extends SimpleElementAnalysis with SelectAppearanceTrait 
             content
 
             // Itemset details
-            getItemsetAnalysis match {
-                case Some(analysis) ⇒
-                    helper.startElement("itemset")
-                    analysis.toXML(helper)
-                    helper.endElement()
-                case _ ⇒ // NOP
-            }
+            if (itemsetAnalyzed)
+                getItemsetAnalysis match {
+                    case Some(analysis) ⇒
+                        helper.startElement("itemset")
+                        analysis.toXML(helper)
+                        helper.endElement()
+                    case _ ⇒ // NOP
+                }
         }
     }
 
     override def freeTransientState() = {
         super.freeTransientState()
-        if (itemsetAnalyzed && getItemsetAnalysis.isDefined)
+        if (_itemsetAnalyzed && getItemsetAnalysis.isDefined)
             getItemsetAnalysis.get.freeTransientState()
     }
 
@@ -159,12 +161,12 @@ trait SelectionControl extends SimpleElementAnalysis with SelectAppearanceTrait 
                         if (labelElement eq null)
                             throw new ValidationException("xforms:item must contain an xforms:label element.", ElementAnalysis.createLocationData(element))
                         val containsHTML = Array(false)
-                        val label = XFormsUtils.getStaticChildElementValue(labelElement, isFull, containsHTML)
+                        val label = XFormsUtils.getStaticChildElementValue(containerScope.fullPrefix, labelElement, isFull, containsHTML)
 
                         val valueElement = element.element(XFORMS_VALUE_QNAME)
                         if (valueElement eq null)
                             throw new ValidationException("xforms:item must contain an xforms:value element.", ElementAnalysis.createLocationData(element))
-                        val value = XFormsUtils.getStaticChildElementValue(valueElement, false, null)
+                        val value = XFormsUtils.getStaticChildElementValue(containerScope.fullPrefix, valueElement, false, null)
 
                         val attributes = SelectionControlUtil.getAttributes(element)
                         currentContainer.addChildItem(new Item(isMultiple, isEncryptValues, attributes, new Item.Label(label, containsHTML(0)), StringUtils.defaultString(value)))
@@ -177,7 +179,7 @@ trait SelectionControl extends SimpleElementAnalysis with SelectAppearanceTrait 
 
                         val labelElement = element.element(LABEL_QNAME)
                         if (labelElement ne null) {
-                            val label = XFormsUtils.getStaticChildElementValue(labelElement, false, null)
+                            val label = XFormsUtils.getStaticChildElementValue(containerScope.fullPrefix, labelElement, false, null)
 
                             assert(label ne null)
 

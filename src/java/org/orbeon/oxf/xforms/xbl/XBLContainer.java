@@ -73,10 +73,6 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
     private final XBLContainer parentXBLContainer;
     private LinkedHashMap<String, XBLContainer> childrenXBLContainers;  // Map<String, XBLContainer> of static id to container
 
-    // Binding context for this container (may be null for top-level)
-    // This is the binding context of the containing XFormsComponentControl for nested XBL containers
-    private XFormsContextStack.BindingContext bindingContext;
-
     private XFormsContainingDocument containingDocument;
 
     private final XFormsContextStack contextStack;  // for controls under this container
@@ -84,6 +80,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
     private List<XFormsModel> models = new ArrayList<XFormsModel>();
 
     // Containing control if any
+    // NOTE: null if this instanceof XFormsContainingDocument BUT could use a root control instead!
     private final XFormsControl associatedControl;
 
     /**
@@ -145,6 +142,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
     }
 
     public Scope getResolutionScope() {
+        // NOTE: Could maybe use the associated ComponentControl.containerScope instead
         return containingDocument.getStaticOps().getResolutionScopeByPrefix(fullPrefix);
     }
 
@@ -228,19 +226,6 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
      */
     public NamespaceMapping getNamespaceMappings(Element element) {
         return getPartAnalysis().getNamespaceMapping(fullPrefix, element);
-    }
-
-    public void setBindingContext(XFormsContextStack.BindingContext bindingContext) {
-        this.bindingContext = bindingContext;
-        this.contextStack.setParentBindingContext(bindingContext);
-    }
-
-    public XFormsContextStack.BindingContext getBindingContext() {
-        return bindingContext;
-    }
-
-    public XFormsContextStack.BindingContext getBindingContext(XFormsContainingDocument containingDocument) {
-        return getBindingContext();
     }
 
     public XFormsContainingDocument getContainingDocument() {
@@ -439,7 +424,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
             if (o instanceof XFormsRepeatControl) {
                 repeatControl = (XFormsRepeatControl) o;
             } else if (o instanceof XFormsRepeatIterationControl) {
-                repeatControl = (XFormsRepeatControl) ((XFormsRepeatIterationControl) o).getParent();
+                repeatControl = ((XFormsRepeatIterationControl) o).repeat();
             } else {
                 repeatControl = null;
             }
@@ -547,7 +532,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
     public String getFirstControlEffectiveId() {
         final List<XFormsControl> children = getChildrenControls(containingDocument.getControls());
         String sourceControlEffectiveId;
-        if (children != null && children.size() > 0) {
+        if (! children.isEmpty()) {
             // We currently don't have a real notion of a "root" control, so we resolve against the first control if any
             final XFormsControl firstControl = children.get(0);
             sourceControlEffectiveId = firstControl.getEffectiveId();
@@ -558,10 +543,13 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
         return sourceControlEffectiveId;
     }
 
+    public XFormsControl getAssociatedControl() {
+        return associatedControl;
+    }
+
     protected List<XFormsControl> getChildrenControls(XFormsControls controls) {
         // We are a nested container so there must be an associated XFormsComponentControl
-        final XFormsComponentControl componentControl = (XFormsComponentControl) controls.getCurrentControlTree().getControl(effectiveId);
-        return componentControl.getChildren();
+        return ((XFormsComponentControl) associatedControl).childrenJava();
     }
 
     private Object searchContainedModels(String sourceEffectiveId, String targetStaticId, Item contextItem) {

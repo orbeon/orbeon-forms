@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <!--
   Copyright (C) 2010 Orbeon, Inc.
 
@@ -27,6 +26,8 @@
       id="fb-add-language-dialog" appearance="minimal" level="modeless">
 
     <xforms:label ref="$form-resources/dialog-add-language/dialog-title"/>
+
+    <xforms:var name="resources" value="$resources" model="fr-form-model"/>
 
     <xhtml:div>
         <xforms:group>

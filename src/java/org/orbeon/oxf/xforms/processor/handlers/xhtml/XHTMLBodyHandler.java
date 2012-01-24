@@ -226,9 +226,8 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
         
         public ElementAnalysis getElementAnalysis(Attributes attributes, Object handlerContext) {
             final HandlerContext hc = (HandlerContext) handlerContext;
-            final String staticId = hc.getId(attributes);
-            if (staticId != null) {
-                final String prefixedId = hc.getIdPrefix() + staticId;
+            final String prefixedId = hc.getPrefixedId(attributes);
+            if (prefixedId != null) {
                 return hc.getPartAnalysis().getControlAnalysis(prefixedId);
             } else {
                 return null;

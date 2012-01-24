@@ -75,20 +75,15 @@ class PartAnalysisImpl(
      * as the mapping is considered transient and not sharable among pages.
      */
     def getNamespaceMapping(prefix: String, element: Element) = {
-        val id = XFormsUtils.getElementStaticId(element)
-        if (id ne null) {
-            val prefixedId = if (prefix ne null) prefix + id else id
-            val cachedMap = metadata.getNamespaceMapping(prefixedId)
-            if (cachedMap ne null)
-                cachedMap
-            else {
-                // NOTE: We hope to get rid of this case at some point as all mappings should be in the metadata (put an assert)
-                getIndentedLogger.logDebug("", "namespace mappings not cached", "prefix", prefix, "element", Dom4jUtils.elementToDebugString(element))
-                new NamespaceMapping(Dom4jUtils.getNamespaceContextNoDefault(element))
-            }
-        } else {
+        val id = XFormsUtils.getElementId(element)
+
+        require(id ne null)
+
+        val prefixedId = if (prefix ne null) prefix + id else id
+
+        Option(metadata.getNamespaceMapping(prefixedId)) getOrElse {
             // NOTE: We hope to get rid of this case at some point as all mappings should be in the metadata (put an assert)
-            getIndentedLogger.logDebug("", "namespace mappings not available because element doesn't have an id attribute", "prefix", prefix, "element", Dom4jUtils.elementToDebugString(element))
+            getIndentedLogger.logDebug("", "namespace mappings not cached", "prefix", prefix, "element", Dom4jUtils.elementToDebugString(element))
             new NamespaceMapping(Dom4jUtils.getNamespaceContextNoDefault(element))
         }
     }
@@ -97,10 +92,12 @@ class PartAnalysisImpl(
     def build(parent: ElementAnalysis, preceding: Option[ElementAnalysis], controlElement: Element, containerScope: Scope,
               externalLHHA: Buffer[ExternalLHHAAnalysis], eventHandlers: Buffer[EventHandlerImpl]) = {
 
+        assert(containerScope ne null)
+
         val locationData = new ExtendedLocationData(controlElement.getData.asInstanceOf[LocationData], "gathering static control information", controlElement)
 
         // Check for mandatory id
-        val controlStaticId = XFormsUtils.getElementStaticId(controlElement)
+        val controlStaticId = XFormsUtils.getElementId(controlElement)
         if (controlStaticId eq null)
             throw new ValidationException("Missing mandatory id for element: " + controlElement.getQualifiedName, locationData)
 
@@ -145,18 +142,26 @@ class PartAnalysisImpl(
 
         // Gather controls
         val buildGatherLHHAAndHandlers: ChildrenBuilderTrait#Builder = build(_, _, _, _, externalLHHA, eventHandlers)
-        rootControlAnalysis.buildChildren(buildGatherLHHAAndHandlers, startScope)
+        rootControlAnalysis.build(buildGatherLHHAAndHandlers)
 
         // Gather new global XBL controls introduced above
         // Q: should recursively check?
         // NOTE: For now we don't set the `preceding` value. The main impact is no resolution of variables. It might be
         // desirable not to scope them anyway.
-        for {
-            shadowTree ← xblBindings.allGlobals.values
-            globalElement ← Dom4jUtils.elements(shadowTree.compactShadowTree.getRootElement).asScala
-        } yield
-            buildGatherLHHAAndHandlers(rootControlAnalysis, None, globalElement, startScope) collect
-                { case childrenBuilder: ChildrenBuilderTrait ⇒ childrenBuilder.buildChildren(buildGatherLHHAAndHandlers, startScope) }
+        val globalsOptions =
+            for {
+                shadowTree ← xblBindings.allGlobals.values
+                globalElement ← Dom4jUtils.elements(shadowTree.compactShadowTree.getRootElement).asScala
+            } yield
+                buildGatherLHHAAndHandlers(rootControlAnalysis, None, globalElement, startScope) collect {
+                    case childrenBuilder: ChildrenBuilderTrait ⇒
+                        childrenBuilder.build(buildGatherLHHAAndHandlers)
+                        childrenBuilder
+                    case other ⇒ other
+                }
+
+        // Add to the root analysis
+        rootControlAnalysis.addChildren(globalsOptions.flatten.toSeq)
 
         // Index models that were found in the control tree
         controlTypes.get("model") match {
@@ -207,7 +212,7 @@ class PartAnalysisImpl(
             def toXML(helper: ContentHandlerHelper) {
                 for {
                     controlAnalysis ← controlAnalysisMap.values
-                    if !controlAnalysis.isInstanceOf[ExternalLHHAAnalysis]
+                    if ! controlAnalysis.isInstanceOf[ExternalLHHAAnalysis]
                     if controlAnalysis.localName != "root" // for now don't output root as it's not an interesting container and we don't want to modify the unit tests
                 } yield
                     controlAnalysis.toXML(helper, List())()
@@ -215,10 +220,8 @@ class PartAnalysisImpl(
         })
     }
 
-    def dumpAnalysis() {
-        if (staticState.isXPathAnalysis)
-            println(Dom4jUtils.domToPrettyString(XMLUtils.createDocument(this)))
-    }
+    def dumpAnalysis() =
+        println(Dom4jUtils.domToPrettyString(XMLUtils.createDocument(this)))
 }
 
 object PartAnalysisImpl {

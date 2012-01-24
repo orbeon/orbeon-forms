@@ -13,8 +13,7 @@
  */
 package org.orbeon.oxf.xforms.control.controls
 
-import org.orbeon.oxf.xforms.control.{XFormsSingleNodeContainerControl, XFormsControl}
-import org.orbeon.oxf.xforms.XFormsContextStack.BindingContext
+import org.orbeon.oxf.xforms.BindingContext
 import org.w3c.dom.Node.{ELEMENT_NODE, ATTRIBUTE_NODE}
 import org.orbeon.oxf.xforms.xbl.{Scope, XBLContainer}
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
@@ -22,6 +21,7 @@ import org.xml.sax.helpers.AttributesImpl
 import org.orbeon.oxf.xforms._
 import action.actions.{XFormsDeleteAction, XFormsInsertAction}
 import collection.JavaConverters._
+import control.{XFormsSingleNodeContainerControl, XFormsControl}
 import event.events.{XFormsDeleteEvent, XFormsInsertEvent, XXFormsValueChanged}
 import event.{EventListener, XFormsEvent, XFormsEvents}
 import model.DataModel
@@ -35,9 +35,10 @@ import org.orbeon.oxf.util.{IndentedLogger, XPathCache}
 import java.lang.{IllegalStateException, IllegalArgumentException}
 import org.dom4j._
 import org.orbeon.scaxon.XML.evalOne
+import org.orbeon.oxf.common.OXFException
 
-class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, element: Element, name: String, effectiveId: String, state: JMap[String, String])
-    extends XFormsSingleNodeContainerControl(container, parent, element, name, effectiveId) {
+class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, element: Element, effectiveId: String, state: JMap[String, String])
+    extends XFormsSingleNodeContainerControl(container, parent, element, effectiveId) {
 
     implicit def toEventListener(f: XFormsEvent ⇒ Any) = new EventListener {
         def handleEvent(event: XFormsEvent) { f(event) }
@@ -45,40 +46,34 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
 
     class Nested(val container: XBLContainer, val partAnalysis: PartAnalysis, val template: SAXStore, val outerListener: EventListener)
 
-    var nested: Option[Nested] = None
+    private var _nested: Option[Nested] = None
+    def nested = _nested
 
     var previousChangeCount = -1
     var changeCount = 0
 
     var newScripts: Seq[Script] = Seq.empty
 
-    // For Java callers
-    def getNestedContainer = nested map (_.container) orNull
-    def getNestedPartAnalysis = nested map (_.partAnalysis) orNull
-    def getNestedTemplate = nested map (_.template) orNull
-
-    // TODO: we should not override this, but currently due to the way XFormsContextStack works with XBL, even non-relevant
-    // XFormsComponentControl expect the binding to be set.
-    override def setBindingContext(bindingContext: XFormsContextStack.BindingContext) {
-        super.setBindingContext(bindingContext)
-
-        nested foreach { n ⇒
-            n.container.setBindingContext(bindingContext)
-            n.container.getContextStack.resetBindingContext()
-        }
-    }
+    // TODO: This might blow if the control is non-relevant
+    override def bindingContextForChild =
+        _nested map { n ⇒
+            val contextStack = n.container.getContextStack
+            contextStack.setParentBindingContext(getBindingContext)
+            contextStack.resetBindingContext()
+            contextStack.getCurrentBindingContext
+        } orNull
 
     override def onCreate() {
         getBoundElement match {
             case Some(node) ⇒ updateSubTree(node)
             case _ ⇒ // don't create binding (maybe we could for a read-only instance)
-                nested = None
+                _nested = None
         }
     }
 
     override def onDestroy() {
         // TODO: XXX remove child container from parent
-        nested = None
+        _nested = None
         previousChangeCount = 0
         changeCount = 0
     }
@@ -106,10 +101,10 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
                 // TODO: PERF: dispatching destruction events takes a lot of time, what can we do?
                 //tree.dispatchDestructionEventsForRemovedContainer(this, false)
                 tree.deindexSubtree(this, false)
-                getChildren.clear()
+                clearChildren()
             }
 
-            nested foreach { n ⇒
+            _nested foreach { n ⇒
                 // Remove container and associated models
                 n.container.destroy()
                 // Remove part and associated scopes
@@ -123,7 +118,10 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
 
             // Create new part
             val element = node.getUnderlyingNode.asInstanceOf[Element]
-            val (template, partAnalysis) = createPartAnalysis(Dom4jUtils.createDocumentCopyElement(element), getXBLContainer.getPartAnalysis)
+            val (template, partAnalysis) = createPartAnalysis(Dom4jUtils.createDocumentCopyElement(element), container.getPartAnalysis)
+
+            // Update allowed events as depending on the dynamic subtree this can change
+            tree.updateAllowedEvents(containingDocument)
 
             // Save new scripts if any
 //            val newScriptCount = containingDocument.getStaticState.getScripts.size
@@ -132,11 +130,11 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
 
             // Nested container is initialized after binding and before control tree
             // TODO: Support updating models/instances
-            val container = getXBLContainer.createChildContainer(this, partAnalysis)
+            val childContainer = container.createChildContainer(this, partAnalysis)
 
-            container.addAllModels()
-            container.setLocationData(getLocationData)
-            container.initializeModels(Array(
+            childContainer.addAllModels()
+            childContainer.setLocationData(getLocationData)
+            childContainer.initializeModels(Array(
                 XFormsEvents.XFORMS_MODEL_CONSTRUCT,
                 XFormsEvents.XFORMS_MODEL_CONSTRUCT_DONE)
             )
@@ -144,7 +142,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
             // Add listener to the single outer instance
             val docWrapper = new DocumentWrapper(element.getDocument, null, XPathCache.getGlobalConfiguration)
             val outerListener: EventListener = InstanceMirror.mirrorListener(containingDocument, getIndentedLogger,
-                InstanceMirror.toInnerNode(docWrapper, partAnalysis, container), () ⇒ changeCount += 1) _
+                InstanceMirror.toInnerNode(docWrapper, partAnalysis, childContainer), () ⇒ changeCount += 1) _
             for (eventName ← InstanceMirror.mutationEvents)
                 outerInstance.addListener(eventName, outerListener)
 
@@ -155,17 +153,17 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
 
             partAnalysis.getModelsForScope(partAnalysis.startScope).asScala foreach {
                 _.instances.values filter (_.src eq null) foreach { instance ⇒
-                    val innerInstance = container.findInstance(instance.staticId)
+                    val innerInstance = childContainer.findInstance(instance.staticId)
                     for (eventName ← InstanceMirror.mutationEvents)
                         innerInstance.addListener(eventName, innerListener)
                 }
             }
 
             // Remember all that we created
-            nested = Some(new Nested(container, partAnalysis, template, outerListener))
+            _nested = Some(new Nested(childContainer, partAnalysis, template, outerListener))
             
             // Create new control subtree
-            tree.createAndInitializeSubTree(containingDocument, this)
+            tree.createAndInitializeSubTree(childContainer, this, partAnalysis.getTopLevelControls.head)
         }
     }
 
@@ -186,18 +184,20 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
         val cloned = super.getBackCopy.asInstanceOf[XXFormsDynamicControl]
         cloned.previousChangeCount = -1 // unused
         cloned.changeCount = previousChangeCount
-        cloned.nested = None
+        cloned._nested = None
 
         cloned
     }
 
-    override def equalsExternal(other: XFormsControl) =
-        changeCount == other.asInstanceOf[XXFormsDynamicControl].changeCount && newScripts.isEmpty
+    override def equalsExternal(other: XFormsControl) = other match {
+        case other: XXFormsDynamicControl ⇒ changeCount == other.changeCount && newScripts.isEmpty
+        case _ ⇒ false
+    }
 
     override def outputAjaxDiff(ch: ContentHandlerHelper, other: XFormsControl, attributesImpl: AttributesImpl, isNewlyVisibleSubtree: Boolean) {}
 }
 
-// Logic to mirror mutation changes between an outer and an inner instance
+// Logic to mirror mutations between an outer and an inner instance
 object InstanceMirror {
 
     val mutationEvents = Seq(XFormsEvents.XXFORMS_VALUE_CHANGED, XFormsEvents.XFORMS_INSERT, XFormsEvents.XFORMS_DELETE)
@@ -218,7 +218,7 @@ object InstanceMirror {
                 // This is a change to an instance
 
                 // Find instance id
-                val instanceId = instanceWrapper.getUnderlyingNode.asInstanceOf[Element].attributeValue("id")
+                val instanceId = XFormsUtils.getElementId(instanceWrapper.getUnderlyingNode.asInstanceOf[Element])
                 if (instanceId eq null)
                     throw new IllegalArgumentException
 
@@ -280,7 +280,12 @@ object InstanceMirror {
         case valueChanged: XXFormsValueChanged ⇒
             findMatchingNode(valueChanged.node, valueChanged.getTargetObject.getId, true) match {
                 case Some(newNode) ⇒
-                    DataModel.setValueIfChanged(newNode, valueChanged.newValue)
+                    DataModel.setValueIfChanged(
+                        newNode,
+                        valueChanged.newValue,
+                        DataModel.logAndNotifyValueChange(containingDocument, indentedLogger, "mirror", newNode, _, valueChanged.newValue, isCalculate = false),
+                        reason => throw new OXFException(reason.message)
+                    )
                 case None ⇒ // change not in an instance
                     notifyOtherChange()
             }

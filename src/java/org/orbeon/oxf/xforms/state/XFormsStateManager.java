@@ -38,9 +38,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public class XFormsStateManager implements XFormsStateLifecycle {
 
     private static final String LOG_TYPE = "state manager";
-    private static final String LOGGING_CATEGORY = "state";
-    private static final Logger logger = LoggerFactory.createLogger(XFormsStateManager.class);
-    private static final IndentedLogger indentedLogger = XFormsContainingDocument.getIndentedLogger(logger, XFormsServer.getLogger(), LOGGING_CATEGORY);
+    private static final IndentedLogger indentedLogger = XFormsContainingDocument.getIndentedLogger(XFormsServer.getLogger(), "state");
 
     private static final String XFORMS_STATE_MANAGER_UUID_KEY_PREFIX = "oxf.xforms.state.manager.uuid-key.";
     private static final String XFORMS_STATE_MANAGER_LISTENER_STATE_KEY_PREFIX = "oxf.xforms.state.manager.session-listeners-key.";

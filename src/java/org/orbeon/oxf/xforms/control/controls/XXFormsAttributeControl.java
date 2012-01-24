@@ -20,7 +20,6 @@ import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.analysis.controls.AttributeControl;
 import org.orbeon.oxf.xforms.control.XFormsControl;
-import org.orbeon.oxf.xforms.control.XFormsPseudoControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
@@ -31,15 +30,15 @@ import java.util.Map;
 /**
  * Represents an extension xxforms:attribute control.
  */
-public class XXFormsAttributeControl extends XFormsValueControl implements XFormsPseudoControl {
+public class XXFormsAttributeControl extends XFormsValueControl {
 
     private AttributeControl attributeControl;
     private String attributeName;
     private String attributeValue;
     private String forName;
 
-    public XXFormsAttributeControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId, Map<String, String> state) {
-        super(container, parent, element, name, effectiveId);
+    public XXFormsAttributeControl(XBLContainer container, XFormsControl parent, Element element, String effectiveId, Map<String, String> state) {
+        super(container, parent, element, effectiveId);
 
         this.attributeControl = (AttributeControl) container.getPartAnalysis().getControlAnalysis(getPrefixedId());
         this.attributeName = attributeControl.attributeName();
@@ -57,7 +56,7 @@ public class XXFormsAttributeControl extends XFormsValueControl implements XForm
      * @param forName               name of the element the attribute is on
      */
     public XXFormsAttributeControl(XBLContainer container, Element element, String attributeName, String avtExpression, String forName) {
-        super(container, null, element, element.getName(), null);
+        super(container, null, element, null);
         this.attributeControl = null;
         this.attributeName = attributeName;
         this.attributeValue = avtExpression;
@@ -76,17 +75,17 @@ public class XXFormsAttributeControl extends XFormsValueControl implements XForm
         // Rewrite URI attribute if needed
         final String rewrittenValue;
         if ("src".equals(attributeName)) {
-            rewrittenValue = XFormsUtils.resolveResourceURL(containingDocument, getControlElement(), getExternalValue(), ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
+            rewrittenValue = XFormsUtils.resolveResourceURL(containingDocument(), getControlElement(), getExternalValue(), ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
         } else if ("href".equals(attributeName)) {
 
             final String urlType = attributeControl.urlType();
             if ("action".equals(urlType)) {
-                rewrittenValue = XFormsUtils.resolveActionURL(containingDocument, getControlElement(), getExternalValue(), false);
+                rewrittenValue = XFormsUtils.resolveActionURL(containingDocument(), getControlElement(), getExternalValue(), false);
             } else if ("resource".equals(urlType)) {
-                rewrittenValue = XFormsUtils.resolveResourceURL(containingDocument, getControlElement(), getExternalValue(), ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
+                rewrittenValue = XFormsUtils.resolveResourceURL(containingDocument(), getControlElement(), getExternalValue(), ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
             } else {
                 // Default is "render"
-                rewrittenValue = XFormsUtils.resolveRenderURL(containingDocument, getControlElement(), getExternalValue(), false);
+                rewrittenValue = XFormsUtils.resolveRenderURL(containingDocument(), getControlElement(), getExternalValue(), false);
             }
 
         } else {
@@ -131,7 +130,7 @@ public class XXFormsAttributeControl extends XFormsValueControl implements XForm
     public String getNonRelevantEscapedExternalValue() {
         if ("img".equals(forName) && "src".equals(attributeName)) {
             // Return rewritten URL of dummy image URL
-            return XFormsUtils.resolveResourceURL(containingDocument, getControlElement(), XFormsConstants.DUMMY_IMAGE_URI,
+            return XFormsUtils.resolveResourceURL(containingDocument(), getControlElement(), XFormsConstants.DUMMY_IMAGE_URI,
                     ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH);
         } else {
             return super.getNonRelevantEscapedExternalValue();
@@ -165,14 +164,14 @@ public class XXFormsAttributeControl extends XFormsValueControl implements XForm
         boolean doOutputElement = false;
 
         // Control id
-        attributesImpl.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, XFormsUtils.namespaceId(containingDocument, attributeControl2.getEffectiveId()));
+        attributesImpl.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, XFormsUtils.namespaceId(containingDocument(), attributeControl2.getEffectiveId()));
 
         // The client does not store an HTML representation of the xxforms:attribute control, so we
         // have to output these attributes.
         {
             // HTML element id
             final String effectiveFor2 = attributeControl2.getEffectiveForAttribute();
-            doOutputElement |= addOrAppendToAttributeIfNeeded(attributesImpl, "for", XFormsUtils.namespaceId(containingDocument, effectiveFor2), isNewlyVisibleSubtree, false);
+            doOutputElement |= addOrAppendToAttributeIfNeeded(attributesImpl, "for", XFormsUtils.namespaceId(containingDocument(), effectiveFor2), isNewlyVisibleSubtree, false);
         }
 
         {

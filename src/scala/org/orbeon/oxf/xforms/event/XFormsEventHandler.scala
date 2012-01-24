@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.event
 
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xforms.{XFormsContextStack, XFormsContainingDocument}
+import org.orbeon.oxf.xforms.{BindingContext, XFormsContainingDocument}
 
 // Runtime event handler
 trait XFormsEventHandler {
@@ -22,5 +22,5 @@ trait XFormsEventHandler {
     def getEffectiveId: String
 
     def getXBLContainer(containingDocument: XFormsContainingDocument): XBLContainer
-    def getBindingContext(containingDocument: XFormsContainingDocument): XFormsContextStack.BindingContext
+    def getBindingContext(containingDocument: XFormsContainingDocument): BindingContext
 }

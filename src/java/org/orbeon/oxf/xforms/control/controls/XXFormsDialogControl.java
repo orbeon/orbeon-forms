@@ -63,8 +63,8 @@ public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
         }
     }
 
-    public XXFormsDialogControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId, Map<String, String> state) {
-        super(container, parent, element, name, effectiveId);
+    public XXFormsDialogControl(XBLContainer container, XFormsControl parent, Element element, String effectiveId, Map<String, String> state) {
+        super(container, parent, element, effectiveId);
 
         // NOTE: attributes logic duplicated in XXFormsDialogHandler
         this.level = element.attributeValue("level");
@@ -91,7 +91,7 @@ public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
     }
 
     @Override
-    protected boolean computeRelevant() {
+    public boolean computeRelevant() {
         // If parent is not relevant then we are not relevant either
         if (!super.computeRelevant()) {
             return false;
@@ -156,12 +156,13 @@ public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
             localForUpdate.neighborControlId = dialogOpenEvent.getNeighbor();
             localForUpdate.constrainToViewport = dialogOpenEvent.isConstrainToViewport();
 
-            containingDocument.getControls().markDirtySinceLastRequest(false);
+            containingDocument().getControls().markDirtySinceLastRequest(false);
 
             // TODO: Issue here: if the dialog is non-relevant, it can't receive xxforms-dialog-open!
+            // SOLUTION: Make dialog itself relevant (if it can be), but content non-relevant
             if (isXForms11Switch()) {
                 // Partial refresh
-                containingDocument.getControls().doPartialRefresh(this);
+                containingDocument().getControls().doPartialRefresh(this);
             }
 
             // NOTE: Focus handling now done in XXFormsShowAction, because upon xxforms-dialog-open the user can change
@@ -177,11 +178,11 @@ public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
 
             final XXFormsDialogControlLocal localForUpdate = (XXFormsDialogControlLocal) getLocalForUpdate();
             localForUpdate.visible = false;
-            containingDocument.getControls().markDirtySinceLastRequest(false);
+            containingDocument().getControls().markDirtySinceLastRequest(false);
 
             if (isXForms11Switch()) {
                 // Partial refresh
-                containingDocument.getControls().doPartialRefresh(this);
+                containingDocument().getControls().doPartialRefresh(this);
             }
 
         }
@@ -230,7 +231,7 @@ public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
     }
 
     @Override
-    protected Set<String> getAllowedExternalEvents() {
+    public Set<String> getAllowedExternalEvents() {
         return ALLOWED_EXTERNAL_EVENTS;
     }
 
@@ -263,9 +264,9 @@ public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
         // NOTE: At this point, this uses visible/hidden. But we could also handle this with relevant="true|false".
         final String neighbor = getNeighborControlId();
         ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "div", new String[] {
-                "id", XFormsUtils.namespaceId(containingDocument, getEffectiveId()),
+                "id", XFormsUtils.namespaceId(containingDocument(), getEffectiveId()),
                 "visibility", isVisible() ? "visible" : "hidden",
-                (neighbor != null && isVisible()) ? "neighbor" : null, XFormsUtils.namespaceId(containingDocument, neighbor),
+                (neighbor != null && isVisible()) ? "neighbor" : null, XFormsUtils.namespaceId(containingDocument(), neighbor),
                 isVisible() ? "constrain" : null, Boolean.toString(isConstrainToViewport())
         });
     }
@@ -276,6 +277,6 @@ public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
         if (localXForms11Switch != null)
             return Boolean.parseBoolean(localXForms11Switch);
         else
-            return XFormsProperties.isXForms11Switch(containingDocument);
+            return XFormsProperties.isXForms11Switch(containingDocument());
     }
 }

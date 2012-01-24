@@ -33,10 +33,10 @@ public class XFormsRepeatHandler extends XFormsControlLifecyleHandlerXML {
 	}
 	
 	@Override
-    protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String staticId,
+    protected void handleControlStart(String uri, String localname, String qName, Attributes attributes,
                                       final String effectiveId, XFormsControl control) throws SAXException {
 		
-		super.handleControlStart(uri, localname, qName, attributes, staticId, effectiveId, control);
+		super.handleControlStart(uri, localname, qName, attributes, effectiveId, control);
 		
 		final ContentHandler contentHandler = handlerContext.getController().getOutput();
 		

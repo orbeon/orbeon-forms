@@ -50,6 +50,14 @@ public class DumbXPathDependencies implements XPathDependencies {
         // NOP
     }
 
+    public void bindingUpdateStart() {
+        // NOP
+    }
+
+    public void bindingUpdateDone() {
+        // NOP
+    }
+
     public void afterInitialResponse() {
         // NOP
     }

@@ -28,8 +28,7 @@ class XXFormsDynamicHandler extends XFormsBaseHandler(false, false) {
         val controller = handlerContext.getController
         val contentHandler = controller.getOutput
 
-        val staticId = handlerContext.getId(attributes)
-        val prefixedId = handlerContext.getIdPrefix + staticId
+        val prefixedId = handlerContext.getPrefixedId(attributes)
         val effectiveId = handlerContext.getEffectiveId(attributes)
 
         val xhtmlPrefix = handlerContext.findXHTMLPrefix

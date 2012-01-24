@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms;
 
-import org.orbeon.oxf.xforms.XFormsContextStack;
+import org.orbeon.oxf.xforms.BindingContext;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.om.EmptyIterator;
@@ -29,7 +29,7 @@ public class XXFormsComponentContext extends XFormsFunction {
     public SequenceIterator iterate(XPathContext xpathContext) throws XPathException {
 
         // Get container binding context
-        final XFormsContextStack.BindingContext bindingContext = getXBLContainer(xpathContext).getBindingContext();
+        final BindingContext bindingContext = getXBLContainer(xpathContext).getAssociatedControl().getBindingContext();
         if (bindingContext == null)
             return EmptyIterator.getInstance();
 

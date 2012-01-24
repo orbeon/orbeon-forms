@@ -31,7 +31,7 @@ class XFormsRepeatHandler extends XFormsControlLifecyleHandler(true, true) { // 
 
     override def isMustOutputContainerElement = handlerContext.isFullUpdateTopLevelControl(getEffectiveId)
 
-    def handleControlStart(uri: String, localname: String, qName: String, attributes: Attributes, staticId: String, effectiveId: String, control: XFormsControl) {
+    def handleControlStart(uri: String, localname: String, qName: String, attributes: Attributes, effectiveId: String, control: XFormsControl) {
 
         val isTopLevelRepeat = handlerContext.countParentRepeats == 0
         val isRepeatSelected = handlerContext.isRepeatSelected || isTopLevelRepeat
@@ -143,7 +143,7 @@ class XFormsRepeatHandler extends XFormsControlLifecyleHandler(true, true) { // 
 
                 // MIP classes
                 // Q: Could use handleMIPClasses()?
-                val relevant = repeatControl.getChildren.get(i - 1).isRelevant
+                val relevant = repeatControl.children(i - 1).isRelevant
                 if (!relevant)
                     appendClasses(addedClasses, "xforms-disabled")
 

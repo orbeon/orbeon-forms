@@ -1638,8 +1638,7 @@
             </xxforms:action>
         </input>
         <input name="controls">
-            <controls xmlns:xforms="http://www.w3.org/2002/xforms"
-                      xmlns:ev="http://www.w3.org/2001/xml-events">
+            <controls>
                 <xforms:output id="my-output" mediatype="image/*" ref="image"/>
                 <xforms:trigger id="my-trigger">
                     <xforms:label/>
@@ -1648,9 +1647,7 @@
             </controls>
         </input>
         <input name="models">
-            <models xmlns:xforms="http://www.w3.org/2002/xforms"
-                xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
-                xmlns:ev="http://www.w3.org/2001/xml-events">
+            <models>
                 <xforms:model id="model">
                     <xforms:instance id="instance"/>
                     <xforms:bind id="bind1" nodeset="image" relevant="../show = 'true'"/>
@@ -1724,13 +1721,12 @@
     <test description="Ajax: blank img/@src AVT links to default image" name="oxf:pipeline">
         <input name="config" href="wrap-server.xpl"/>
         <input name="action">
-            <xxforms:action xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" >
+            <xxforms:action>
                 <xxforms:event name="DOMActivate" source-control-id="my-trigger"/>
             </xxforms:action>
         </input>
         <input name="controls">
-            <controls xmlns:xforms="http://www.w3.org/2002/xforms"
-                      xmlns:ev="http://www.w3.org/2001/xml-events">
+            <controls>
                 <xxforms:attribute id="my-src-avt" for="my-image" name="src" value="{image}" for-name="img"/>
                 <xforms:trigger id="my-trigger">
                     <xforms:label/>
@@ -1739,9 +1735,7 @@
             </controls>
         </input>
         <input name="models">
-            <models xmlns:xforms="http://www.w3.org/2002/xforms"
-                xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
-                xmlns:ev="http://www.w3.org/2001/xml-events">
+            <models>
                 <xforms:model id="model">
                     <xforms:instance id="instance"/>
                 </xforms:model>
@@ -1781,13 +1775,12 @@
     <test description="Ajax: blanking URL sends notification to client" name="oxf:pipeline">
         <input name="config" href="wrap-server.xpl"/>
         <input name="action">
-            <xxforms:action xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" >
+            <xxforms:action>
                 <xxforms:event name="DOMActivate" source-control-id="my-trigger"/>
             </xxforms:action>
         </input>
         <input name="controls">
-            <controls xmlns:xforms="http://www.w3.org/2002/xforms"
-                      xmlns:ev="http://www.w3.org/2001/xml-events">
+            <controls>
                 <xforms:upload ref="." id="my-upload">
                     <xforms:filename ref="@filename" id="my-filename"/>
                     <xforms:mediatype ref="@mediatype" id="my-mediatype"/>
@@ -1800,9 +1793,7 @@
             </controls>
         </input>
         <input name="models">
-            <models xmlns:xforms="http://www.w3.org/2002/xforms"
-                xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
-                xmlns:ev="http://www.w3.org/2001/xml-events">
+            <models>
                 <xforms:model id="model">
                     <xforms:instance id="instance"/>
                 </xforms:model>

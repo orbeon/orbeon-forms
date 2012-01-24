@@ -27,6 +27,8 @@
 
     <xforms:label ref="$form-resources/dialog-itemsets/dialog-title"/>
 
+    <xforms:var name="resources" value="$resources" model="fr-form-model"/>
+
     <xhtml:div class="fb-dialog-body fb-hide-alert">
 
         <xforms:group class="fb-language-choice fb-hide-alert">

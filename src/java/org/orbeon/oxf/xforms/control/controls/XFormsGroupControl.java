@@ -21,7 +21,6 @@ import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsValueContainerControl;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -41,7 +40,7 @@ public class XFormsGroupControl extends XFormsValueContainerControl {
     };
 
     @Override
-    protected QName[] getExtensionAttributes() {
+    public QName[] getExtensionAttributes() {
         // Extension attributes depend on the name of the element
         final QName elementQName = containerControl.elementQName();
         if (elementQName != null && "td".equals(elementQName.getName()))
@@ -50,8 +49,8 @@ public class XFormsGroupControl extends XFormsValueContainerControl {
             return null;
     }
 
-    public XFormsGroupControl(XBLContainer container, XFormsControl parent, Element element, String name, String id, Map<String, String> state) {
-        super(container, parent, element, name, id);
+    public XFormsGroupControl(XBLContainer container, XFormsControl parent, Element element, String effectiveId, Map<String, String> state) {
+        super(container, parent, element, effectiveId);
 
         // TODO: every control should point to its static analysis
         this.containerControl = (ContainerControl) container.getPartAnalysis().getControlAnalysis(getPrefixedId());
@@ -76,7 +75,7 @@ public class XFormsGroupControl extends XFormsValueContainerControl {
     }
 
     @Override
-    protected Set<String> getAllowedExternalEvents() {
+    public Set<String> getAllowedExternalEvents() {
         return ALLOWED_EXTERNAL_EVENTS;
     }
 }

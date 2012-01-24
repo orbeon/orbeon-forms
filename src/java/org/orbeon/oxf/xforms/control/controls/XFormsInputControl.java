@@ -17,7 +17,6 @@ import org.dom4j.Element;
 import org.dom4j.QName;
 import org.orbeon.oxf.processor.MatchProcessor;
 import org.orbeon.oxf.processor.Perl5MatchProcessor;
-import org.orbeon.oxf.xforms.PartAnalysis;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis;
@@ -51,8 +50,8 @@ public class XFormsInputControl extends XFormsValueControl {
     private final String format;
     private final String unformat;
 
-    public XFormsInputControl(XBLContainer container, XFormsControl parent, Element element, String name, String id, Map<String, String> state) {
-        super(container, parent, element, name, id);
+    public XFormsInputControl(XBLContainer container, XFormsControl parent, Element element, String id, Map<String, String> state) {
+        super(container, parent, element, id);
         if (element != null) { // can be null in some unit tests only
             this.format = element.attributeValue(new QName("format", XFormsConstants.XXFORMS_NAMESPACE));
             this.unformat = element.attributeValue(new QName("unformat", XFormsConstants.XXFORMS_NAMESPACE));
@@ -62,7 +61,7 @@ public class XFormsInputControl extends XFormsValueControl {
     }
 
     @Override
-    protected QName[] getExtensionAttributes() {
+    public QName[] getExtensionAttributes() {
         return EXTENSION_ATTRIBUTES;
     }
 
@@ -80,7 +79,7 @@ public class XFormsInputControl extends XFormsValueControl {
 
     @Override
     public Tuple3<String, String, String> getJavaScriptInitialization() {
-        final PlaceHolderInfo placeHolderInfo = getPlaceholderInfo(getElementAnalysis(), this);
+        final PlaceHolderInfo placeHolderInfo = getPlaceholderInfo(staticControl(), this);
         if (placeHolderInfo != null) {
             // Control name becomes "label" or "hint". This is a special case as even non-external labels and hints can
             // have the placeholder appearance, and those are not really controls.
@@ -134,7 +133,7 @@ public class XFormsInputControl extends XFormsValueControl {
         // Tricky: mark the external value as dirty if there is a format, as the client will expect an up to date formatted value
         if (format != null) {
             markExternalValueDirty();
-            containingDocument.getControls().markDirtySinceLastRequest(false);
+            containingDocument().getControls().markDirtySinceLastRequest(false);
         }
     }
 
@@ -151,7 +150,7 @@ public class XFormsInputControl extends XFormsValueControl {
                 // Anything but "true" is "false"
                 if (!externalValue.equals("true"))
                     externalValue = "false";
-            } else if (containingDocument.getStaticState().isNoscript()) {
+            } else if (containingDocument().getStaticState().isNoscript()) {
                 // Noscript mode: value must be pre-processed on the server (in Ajax mode, ISO value is sent to server if possible)
 
                 if ( "date".equals(typeName)) {
@@ -508,7 +507,7 @@ public class XFormsInputControl extends XFormsValueControl {
             // Format
             final String xpathExpression =
                     "if ($v castable as xs:" + valueType + ") then format-" + valueType + "(xs:" + valueType + "($v), '"
-                            + XFormsProperties.getTypeInputFormat(containingDocument, valueType)
+                            + XFormsProperties.getTypeInputFormat(containingDocument(), valueType)
                             + "', 'en', (), ()) else $v";
 
             return evaluateAsString(boundItem, xpathExpression, FORMAT_NAMESPACE_MAPPING, variables);

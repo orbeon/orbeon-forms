@@ -28,7 +28,7 @@ public class XFormsTriggerMinimalHandler extends XFormsTriggerHandler {
 
     protected static final String ENCLOSING_ELEMENT_NAME = "a";
 
-    protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsControl control) throws SAXException {
+    protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String effectiveId, XFormsControl control) throws SAXException {
 
         final XFormsTriggerControl triggerControl = (XFormsTriggerControl) control;
         final XMLReceiver xmlReceiver = handlerContext.getController().getOutput();
@@ -82,7 +82,7 @@ public class XFormsTriggerMinimalHandler extends XFormsTriggerHandler {
 //                        hrefValue = resource;
 //                    } else if (resource != null) {
 //                        // Computed resource URL
-//                        final XFormsContextStack.BindingContext currentBindingContext = triggerControl.getBindingContext();
+//                        final BindingContext currentBindingContext = triggerControl.getBindingContext();
 //                        if (currentBindingContext != null && currentBindingContext.getSingleNode() != null) {
 //                            final Map prefixToURIMap = triggerControl.getNamespaceMappings();
 //                            final XFormsContextStack contextStack = triggerControl.getContextStack();
@@ -93,7 +93,7 @@ public class XFormsTriggerMinimalHandler extends XFormsTriggerHandler {
 //                        }
 //                    } else {
 //                        // Assume single-node binding
-//                        final XFormsContextStack.BindingContext curBindingContext = triggerControl.getBindingContext();
+//                        final BindingContext curBindingContext = triggerControl.getBindingContext();
 //                        if (curBindingContext != null && curBindingContext.getSingleNode() != null) {
 //                            hrefValue = XFormsInstance.getValueForNodeInfo(curBindingContext.getSingleNode());
 //                        }

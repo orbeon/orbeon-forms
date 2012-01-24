@@ -34,7 +34,7 @@ public class XFormsTextareaHandler extends XFormsControlLifecyleHandler {
         super(false);
     }
 
-    protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsControl control) throws SAXException {
+    protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String effectiveId, XFormsControl control) throws SAXException {
 
         final XFormsTextareaControl textareaControl = (XFormsTextareaControl) control;
         final XMLReceiver xmlReceiver = handlerContext.getController().getOutput();

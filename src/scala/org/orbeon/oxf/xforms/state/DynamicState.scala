@@ -21,9 +21,9 @@ import XFormsProtocols._
 
 import org.orbeon.oxf.util.URLRewriterUtils.PathMatcher
 import collection.mutable.Buffer
-import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.state.DynamicState.Control
 import org.orbeon.oxf.xforms._
+import control.{Controls, XFormsControl}
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.xml.{TransformerUtils, SAXStore}
 
@@ -178,7 +178,7 @@ object DynamicState {
             val result = Buffer[Control]()
 
             // Gather relevant control
-            document.getControls.visitAllControls(new XFormsControls.XFormsControlVisitorAdapter() {
+            Controls.visitAllControls(document, new Controls.XFormsControlVisitorAdapter {
                 override def startVisitControl(control: XFormsControl) = {
                     if (control.isRelevant) { // don't serialize anything for non-relevant controls
                         Option(control.serializeLocal.asScala) filter (_.nonEmpty) foreach {

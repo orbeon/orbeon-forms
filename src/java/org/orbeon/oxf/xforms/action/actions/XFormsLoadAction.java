@@ -17,9 +17,9 @@ import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.xforms.BindingContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.XFormsContextStack;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
@@ -53,7 +53,7 @@ public class XFormsLoadAction extends XFormsAction {
         final boolean isShowProgress = !"false".equals(actionInterpreter.resolveAVT(actionElement, XFormsConstants.XXFORMS_SHOW_PROGRESS_QNAME));
 
         // "If both are present, the action has no effect."
-        final XFormsContextStack.BindingContext bindingContext = actionInterpreter.actionXPathContext().getCurrentBindingContext();
+        final BindingContext bindingContext = actionInterpreter.actionXPathContext().getCurrentBindingContext();
         if (bindingContext.isNewBind() && resourceAttributeValue != null)
             return;
 

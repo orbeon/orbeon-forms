@@ -83,11 +83,6 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandlerXHTM
 	protected XFormsControl getControl() {
 		return xFormsControlLifecycleHandlerDelegate.getControl();
 	}
-	
-	protected String getStaticId() {
-		return xFormsControlLifecycleHandlerDelegate.getStaticId();
-	}
-	
 
 	@Override
     public void init(String uri, String localname, String qName, Attributes attributes, Object matched) throws SAXException {
@@ -134,7 +129,7 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandlerXHTM
 
                 if ("control".equals(current)) {
                     // Handle control
-                    handleControlStart(uri, localname, qName, attributes, getStaticId(), getEffectiveId(), getControl());
+                    handleControlStart(uri, localname, qName, attributes, getEffectiveId(), getControl());
                     // Do the rest in end() below if needed
                     if (i < config.length - 1) {
                         // There remains stuff to process
@@ -174,7 +169,7 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandlerXHTM
                 for (final String current: endConfig) {
                     if ("control".equals(current)) {
                         // Handle control
-                        handleControlEnd(uri, localname, qName, attributes, getStaticId(), getEffectiveId(), getControl());
+                        handleControlEnd(uri, localname, qName, attributes, getEffectiveId(), getControl());
                     } else if ("label".equals(current)) {
                         // xforms:label
                         if (hasLocalLabel())
@@ -267,9 +262,9 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandlerXHTM
     }
 
     // Must be overridden by subclasses
-    protected abstract void handleControlStart(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsControl control) throws SAXException;
+    protected abstract void handleControlStart(String uri, String localname, String qName, Attributes attributes, String effectiveId, XFormsControl control) throws SAXException;
 
-    protected void handleControlEnd(String uri, String localname, String qName, Attributes attributes, String staticId, String effectiveId, XFormsControl control) throws SAXException {
+    protected void handleControlEnd(String uri, String localname, String qName, Attributes attributes, String effectiveId, XFormsControl control) throws SAXException {
         // May be overridden by subclasses
     }
 

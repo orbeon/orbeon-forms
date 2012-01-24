@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xml
 
+import dom4j.Dom4jUtils
 import dom4j.Dom4jUtils._
 import org.dom4j._
 import java.util.{List ⇒ JList, Map ⇒ JMap}
@@ -96,4 +97,7 @@ object Dom4j {
             case _ ⇒
                 false
         }
+
+    // Return an element's directly nested elements
+    def elements(e: Element): Seq[Element] = Dom4jUtils.elements(e).asScala
 }

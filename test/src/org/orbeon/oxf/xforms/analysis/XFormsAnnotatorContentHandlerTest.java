@@ -21,6 +21,7 @@ import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsStaticStateImpl;
+import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xml.XMLConstants;
@@ -90,7 +91,7 @@ public class XFormsAnnotatorContentHandlerTest extends ResourceManagerTestBase {
         assertNotNull(result);
         assertEquals(1, result.size());
         Element resultElement = (Element) ((NodeWrapper) result.get(0)).getUnderlyingNode();
-        assertTrue(resultElement.attributeValue(XFormsConstants.ID_QNAME).trim().length() > 0);
+        assertTrue(XFormsUtils.getElementId(resultElement).trim().length() > 0);
         assertEquals("lang", resultElement.attributeValue(XFormsConstants.NAME_QNAME));
 
         // Check there is an xxforms:attribute for "span" with correct name
@@ -99,7 +100,7 @@ public class XFormsAnnotatorContentHandlerTest extends ResourceManagerTestBase {
         assertNotNull(result);
         assertEquals(1, result.size());
         resultElement = (Element) ((NodeWrapper) result.get(0)).getUnderlyingNode();
-        assertTrue(resultElement.attributeValue(XFormsConstants.ID_QNAME).trim().length() > 0);
+        assertTrue(XFormsUtils.getElementId(resultElement).trim().length() > 0);
         assertEquals("style", resultElement.attributeValue(XFormsConstants.NAME_QNAME));
     }
 }

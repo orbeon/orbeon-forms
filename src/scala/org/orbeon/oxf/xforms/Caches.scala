@@ -17,7 +17,6 @@ package org.orbeon.oxf.xforms;
 import net.sf.ehcache._
 import org.orbeon.oxf.resources.URLFactory
 import processor.XFormsServer
-import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.oxf.common.OXFException
 
 /**
@@ -49,11 +48,8 @@ object Caches {
                 throw new OXFException("Cache configuration not found for " + cacheName + ". Make sure an ehcache.xml file is in place.")
         }
 
-    private val indentedLogger = {
-        val LOGGING_CATEGORY = "caches"
-        val logger = LoggerFactory.createLogger(Caches.getClass)
-        XFormsContainingDocument.getIndentedLogger(logger, XFormsServer.getLogger, LOGGING_CATEGORY)
-    }
+    private val indentedLogger =
+        XFormsContainingDocument.getIndentedLogger(XFormsServer.getLogger, "caches")
 
     private def withMessage[T](t: T, message: String) = { indentedLogger.logDebug("", message); t }
 }

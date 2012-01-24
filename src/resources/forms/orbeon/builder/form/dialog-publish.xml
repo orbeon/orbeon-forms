@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <!--
     Copyright (C) 2008 Orbeon, Inc.
 
@@ -26,6 +25,8 @@
       id="fb-publish-dialog" level="modal" close="true" draggable="true" class="fr-dialog">
 
     <xforms:label ref="$form-resources/dialog-publish/dialog-title"/>
+
+    <xforms:var name="metadata-instance" value="$metadata-instance" model="fr-form-model"/>
 
     <!-- Switch to display initial / success / error cases -->
     <xforms:switch>

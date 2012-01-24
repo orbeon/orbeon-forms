@@ -21,7 +21,7 @@ import org.orbeon.saxon.functions.SystemFunction
 // Rewrite of Saxon addToPathMap in Scala
 trait AddToPathMap {
 
-    this: SystemFunction =>
+    self: SystemFunction =>
 
     override def addToPathMap(pathMap: PathMap, pathMapNodeSet: PathMap.PathMapNodeSet): PathMap.PathMapNodeSet = {
         val dependsOnFocus = (getDependencies & StaticProperty.DEPENDS_ON_FOCUS) != 0

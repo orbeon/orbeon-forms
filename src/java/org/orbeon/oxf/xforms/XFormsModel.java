@@ -73,7 +73,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
     private final Map<String, XFormsModelAction> actions = new HashMap<String, XFormsModelAction>();
 
     // Context and variables
-    private XFormsContextStack.BindingContext defaultEvaluationContext;
+    private BindingContext defaultEvaluationContext;
     private Map<String, ValueRepresentation> topLevelVariables = new LinkedHashMap<String, ValueRepresentation>();
 
     // Binds
@@ -102,28 +102,23 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
         this.indentedLogger = containingDocument.getIndentedLogger(LOGGING_CATEGORY);
 
-        final Element modelElement = staticModel.element();
-
         this.effectiveId = effectiveId;
 
         // Extract list of instances ids
         {
-            // TODO: use staticModel.instances()
-            final List<Element> instanceContainers = Dom4jUtils.elements(modelElement, XFormsConstants.XFORMS_INSTANCE_QNAME);
-            if (instanceContainers.isEmpty()) {
+            final Collection<Instance> staticInstances = staticModel.instancesMap().values();
+            if (staticInstances.isEmpty()) {
                 // No instance in this model
                 instanceIds = Collections.emptyList();
                 instances = Collections.emptyList();
                 instancesMap = Collections.emptyMap();
             } else {
                 // At least one instance in this model
-                instanceIds = new ArrayList<String>(instanceContainers.size());
-                for (Element instanceContainer: instanceContainers) {
-                    final String instanceId = XFormsUtils.getElementStaticId(instanceContainer);
-                    instanceIds.add(instanceId);
-                }
-                instances = Arrays.asList(new XFormsInstance[instanceIds.size()]);
-                instancesMap = new HashMap<String, XFormsInstance>(instanceIds.size());
+                instanceIds = new ArrayList<String>(staticInstances.size());
+                for (final Instance instance : staticInstances)
+                    instanceIds.add(instance.staticId());
+                instances = Arrays.asList(new XFormsInstance[staticInstances.size()]);
+                instancesMap = new HashMap<String, XFormsInstance>(staticInstances.size());
             }
         }
 
@@ -141,7 +136,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
             }
         }
 
-        // Get event handlers
+        // Get all event handlers
         for (final EventHandlerImpl staticEventHandler : staticModel.jEventHandlers())
             actions.put(staticEventHandler.staticId(), new XFormsModelAction(XFormsModel.this, staticEventHandler));
 
@@ -158,13 +153,12 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
         // NOTE: This method is called during RRR and by submission processing. Need to do dependency handling.
 
-        // Reset everything
+        // Reset context to this model, including evaluating the model variables
         contextStack.resetBindingContext(this);
-        topLevelVariables.clear();
 
-        // Store context and variables
+        // Remember context and variables
         defaultEvaluationContext = contextStack.getCurrentBindingContext();
-        topLevelVariables.putAll(contextStack.getCurrentBindingContext().getInScopeVariables());
+        topLevelVariables = contextStack.getCurrentBindingContext().getInScopeVariables(false);
     }
 
     // Return the value of the given model variable
@@ -282,7 +276,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
      * @return  XFormsInstance or null
      */
     public XFormsInstance getDefaultInstance() {
-        return instances.size() > 0 ? instances.get(0) : null;
+        return ! instances.isEmpty() ? instances.get(0) : null;
     }
 
     /**
@@ -599,22 +593,14 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
         {
             // Build initial instance documents
-            final List<Element> instanceContainers = Dom4jUtils.elements(modelElement, XFormsConstants.XFORMS_INSTANCE_QNAME);
-            if (instanceContainers.size() > 0) {
-                // Iterate through all instances
-                int instancePosition = 0;
-                for (final Element containerElement : instanceContainers) {
-                    // Skip processing in case somebody has already set this particular instance
-                    if (instances.get(instancePosition++) != null) {
-                        // NOP
-                    } else {
-                        // Did not get the instance from static state
 
-                        final String instanceStaticId = XFormsUtils.getElementStaticId(containerElement);
-
-                        // Load instance. This might throw an exception event (and therefore a Java exception) in case of fatal problem.
-                        loadInstance(instanceStaticId);
-                    }
+            // Iterate through all instances
+            int instancePosition = 0;
+            for (final Instance instance : staticModel.instancesMap().values()) {
+                // Skip processing in case somebody has already set this particular instance
+                if (instances.get(instancePosition++) == null) {
+                    // Load instance. This might throw an exception event (and therefore a Java exception) in case of fatal problem.
+                    loadInstance(instance.staticId());
                 }
             }
         }
@@ -677,8 +663,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         final Instance instance = staticModel.instancesMap().get(instanceStaticId);
         final Element instanceContainer = instance.element();
 
-        indentedLogger.startHandleOperation("load", "loading instance",
-                "instance id", XFormsUtils.getElementStaticId(instanceContainer));
+        indentedLogger.startHandleOperation("load", "loading instance", "instance id", instance.staticId());
         {
             // Get instance resource URI, can be from @src or @resource
 
@@ -915,26 +900,30 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         // NOP
     }
 
+    private boolean hasInstancesAndBinds() {
+        return ! instances.isEmpty() && binds != null;
+    }
+
     public void doRebuild() {
 
-        // Re-evaluate top-level variables if needed
-        if (deferredActionContext.rebuild)
+        // Rebuild bind tree only if needed
+        if (deferredActionContext.rebuild) {
+            // Re-evaluate top-level variables if needed
             resetAndEvaluateVariables();
 
-        // Rebuild bind tree only if needed
-        final boolean mustRebuild = instances.size() > 0 && binds != null && deferredActionContext.rebuild;
-        if (mustRebuild) {
-            // NOTE: contextStack.resetBindingContext(this) called in evaluateVariables()
-            binds.rebuild();
+            if (hasInstancesAndBinds()) {
+                // NOTE: contextStack.resetBindingContext(this) called in evaluateVariables()
+                binds.rebuild();
 
-            // Controls may have @bind or xxforms:bind() references, so we need to mark them as dirty. Will need dependencies for controls to fix this.
-            // TODO: Handle XPathDependencies
-            getXBLContainer().requireRefresh();
+                // Controls may have @bind or xxforms:bind() references, so we need to mark them as dirty. Will need dependencies for controls to fix this.
+                // TODO: Handle XPathDependencies
+                getXBLContainer().requireRefresh();
+            }
+
+            // "Actions that directly invoke rebuild, recalculate, revalidate, or refresh always
+            // have an immediate effect, and clear the corresponding flag."
+            deferredActionContext.rebuild = false;
         }
-
-        // "Actions that directly invoke rebuild, recalculate, revalidate, or refresh always
-        // have an immediate effect, and clear the corresponding flag."
-        deferredActionContext.rebuild = false;
 
         // Notify dependencies
         containingDocument.getXPathDependencies().rebuildDone(staticModel);
@@ -943,15 +932,23 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
     public void doRecalculate(boolean applyInitialValues) {
 
         // Recalculate only if needed
-        final boolean mustRecalculate = instances.size() > 0 && binds != null && deferredActionContext.recalculate;
-        if (mustRecalculate) {
-            // Apply calculate binds
-            binds.applyCalculateBinds(applyInitialValues);
-        }
+        if (deferredActionContext.recalculate) {
 
-        // "Actions that directly invoke rebuild, recalculate, revalidate, or refresh always
-        // have an immediate effect, and clear the corresponding flag."
-        deferredActionContext.recalculate = false;
+            final boolean hasVariables = ! staticModel.jVariablesSeq().isEmpty();
+
+            // Re-evaluate top-level variables if needed
+            if (hasInstancesAndBinds() || hasVariables)
+                resetAndEvaluateVariables();
+
+            if (hasInstancesAndBinds()) {
+                // Apply calculate binds
+                binds.applyCalculateBinds(applyInitialValues);
+            }
+
+            // "Actions that directly invoke rebuild, recalculate, revalidate, or refresh always
+            // have an immediate effect, and clear the corresponding flag."
+            deferredActionContext.recalculate = false;
+        }
 
         // Notify dependencies
         containingDocument.getXPathDependencies().recalculateDone(staticModel);
@@ -962,67 +959,69 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
         // Validate only if needed, including checking the flags, because if validation state is clean, validation
         // being idempotent, revalidating is not needed.
-        final boolean mustRevalidate = instances.size() > 0 && (mustBindValidate || hasSchema) && deferredActionContext.revalidate;
-        if (mustRevalidate) {
-            if (indentedLogger.isDebugEnabled())
-                indentedLogger.startHandleOperation("validation", "performing revalidate", "model id", getEffectiveId());
+        if (deferredActionContext.revalidate) {
+            final boolean mustRevalidate = ! instances.isEmpty() && (mustBindValidate || hasSchema);
+            if (mustRevalidate) {
+                if (indentedLogger.isDebugEnabled())
+                    indentedLogger.startHandleOperation("validation", "performing revalidate", "model id", getEffectiveId());
 
-            // Clear schema validation state
-            // NOTE: This could possibly be moved to rebuild(), but we must be careful about the presence of a schema
-            for (final XFormsInstance instance: instances) {
-                // Only clear instances that are impacted by xf:bind/(@ref|@nodeset), assuming we were able to figure out the dependencies
-                // The reason is that clearing this state can take quite some time
-                final boolean instanceMightBeSchemaValidated = hasSchema && instance.isSchemaValidation();
-                if (instanceMightBeSchemaValidated) {
-                    DataModel.visitElementJava(instance.getInstanceRootElementInfo(), new DataModel.NodeVisitor() {
-                        public void visit(NodeInfo nodeInfo) {
-                            InstanceData.clearSchemaState(nodeInfo);
-                        }
-                    });
+                // Clear schema validation state
+                // NOTE: This could possibly be moved to rebuild(), but we must be careful about the presence of a schema
+                for (final XFormsInstance instance: instances) {
+                    // Only clear instances that are impacted by xf:bind/(@ref|@nodeset), assuming we were able to figure out the dependencies
+                    // The reason is that clearing this state can take quite some time
+                    final boolean instanceMightBeSchemaValidated = hasSchema && instance.isSchemaValidation();
+                    if (instanceMightBeSchemaValidated) {
+                        DataModel.visitElementJava(instance.getInstanceRootElementInfo(), new DataModel.NodeVisitor() {
+                            public void visit(NodeInfo nodeInfo) {
+                                InstanceData.clearSchemaState(nodeInfo);
+                            }
+                        });
+                    }
                 }
-            }
 
-            // Run validation
-            final Set<String> invalidInstances = new LinkedHashSet<String>();
+                // Run validation
+                final Set<String> invalidInstances = new LinkedHashSet<String>();
 
-            // Validate using schemas if needed
-            if (hasSchema) {
-                // Apply schemas to all instances
-                for (final XFormsInstance instance : instances) {
-                    // Currently we don't support validating read-only instances
-                    if (instance.isSchemaValidation()) {
-                        if (!schemaValidator.validateInstance(instance)) {
-                            // Remember that instance is invalid
-                            invalidInstances.add(instance.getEffectiveId());
+                // Validate using schemas if needed
+                if (hasSchema) {
+                    // Apply schemas to all instances
+                    for (final XFormsInstance instance : instances) {
+                        // Currently we don't support validating read-only instances
+                        if (instance.isSchemaValidation()) {
+                            if (!schemaValidator.validateInstance(instance)) {
+                                // Remember that instance is invalid
+                                invalidInstances.add(instance.getEffectiveId());
+                            }
                         }
                     }
                 }
-            }
 
-            // Validate using binds if needed
-            if (mustBindValidate)
-                binds.applyValidationBinds(invalidInstances);
+                // Validate using binds if needed
+                if (mustBindValidate)
+                    binds.applyValidationBinds(invalidInstances);
 
-            // NOTE: It is possible, with binds and the use of xxforms:instance(), that some instances in
-            // invalidInstances do not belong to this model. Those instances won't get events with the dispatching
-            // algorithm below.
-            // TODO: Must dispatch validity changes, not validity status
-            // TODO: Must dispatch after marking revalidate = false, right?
-            for (final XFormsInstance instance: instances) {
-                if (invalidInstances.contains(instance.getEffectiveId())) {
-                    container.dispatchEvent(new XXFormsInvalidEvent(containingDocument, instance));
-                } else {
-                    container.dispatchEvent(new XXFormsValidEvent(containingDocument, instance));
+                // NOTE: It is possible, with binds and the use of xxforms:instance(), that some instances in
+                // invalidInstances do not belong to this model. Those instances won't get events with the dispatching
+                // algorithm below.
+                // TODO: Must dispatch validity changes, not validity status
+                // TODO: Must dispatch after marking revalidate = false, right?
+                for (final XFormsInstance instance: instances) {
+                    if (invalidInstances.contains(instance.getEffectiveId())) {
+                        container.dispatchEvent(new XXFormsInvalidEvent(containingDocument, instance));
+                    } else {
+                        container.dispatchEvent(new XXFormsValidEvent(containingDocument, instance));
+                    }
                 }
+
+                if (indentedLogger.isDebugEnabled())
+                    indentedLogger.endHandleOperation();
             }
 
-            if (indentedLogger.isDebugEnabled())
-                indentedLogger.endHandleOperation();
+            // "Actions that directly invoke rebuild, recalculate, revalidate, or refresh always
+            // have an immediate effect, and clear the corresponding flag."
+            deferredActionContext.revalidate = false;
         }
-
-        // "Actions that directly invoke rebuild, recalculate, revalidate, or refresh always
-        // have an immediate effect, and clear the corresponding flag."
-        deferredActionContext.revalidate = false;
 
         // Notify dependencies
         containingDocument.getXPathDependencies().revalidateDone(staticModel);
@@ -1139,12 +1138,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         return null;
     }
 
-    public XFormsContextStack.BindingContext getBindingContext(XFormsContainingDocument containingDocument) {
-        // Nobody should be calling this at this time
-        throw new IllegalStateException();
-    }
-
-    public XFormsContextStack.BindingContext getDefaultEvaluationContext() {
+    public BindingContext getDefaultEvaluationContext() {
         return defaultEvaluationContext;
     }
 

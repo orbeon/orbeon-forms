@@ -156,6 +156,7 @@
     <inspection_tool class="PointlessBooleanExpressionJS" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="RedundantCast" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="ReturnFromFinallyBlock" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="ScalaAbstractValueInTrait" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="SimplifiableConditionalExpression" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="SimplifiableIfStatement" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="StaticMethodNamingConvention" enabled="false" level="WARNING" enabled_by_default="false">
@@ -182,6 +183,8 @@
     <inspection_tool class="TrivialConditionalJS" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="TrivialIf" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="TrivialIfJS" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="UnitMethodDefinedLikeFunction" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="UnitMethodDefinedWithEqualsSign" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="UnnecessaryBoxing" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="UnnecessaryLocalVariableJS" enabled="false" level="WARNING" enabled_by_default="false">
       <option name="m_ignoreImmediatelyReturnedVariables" value="false" />
@@ -199,5 +202,7 @@
     </inspection_tool>
     <inspection_tool class="UnusedLabel" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="Use of postfix method call" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="UseOfPostfixMethodCall" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="VariablePatternShadow" enabled="false" level="WARNING" enabled_by_default="false" />
   </profile>
 </component>

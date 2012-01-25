@@ -61,13 +61,13 @@
             <xforms:input ref="city">
                 <xforms:label>City: </xforms:label>
             </xforms:input>
-            <fr:data-bound-select1 ref="state" appearance="minimal" resource="/xforms-sandbox/service/zip-states">
+            <fr:databound-select1 ref="state" appearance="minimal" resource="/xforms-sandbox/service/zip-states">
                 <xforms:label>State: </xforms:label>
                 <xforms:itemset nodeset="/states/state">
                     <xforms:label ref="@name"/>
                     <xforms:value ref="@abbreviation"/>
                 </xforms:itemset>
-            </fr:data-bound-select1>
+            </fr:databound-select1>
             <xforms:input ref="zip">
                 <xforms:label>Zip: </xforms:label>
             </xforms:input>

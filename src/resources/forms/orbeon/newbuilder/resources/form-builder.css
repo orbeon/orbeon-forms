@@ -108,6 +108,7 @@ h1.fr-form-title {
 .fb-itemset-editor-dialog .xbl-fr-link-select1 { margin-bottom: .5em; float: right }
 .fb-itemset-editor-dialog .xbl-fr-link-select1 .xforms-label { display: none }
 .fb-itemset-editor-dialog .yui-dt { clear: both } /* help IE 6/7 */
+.fb-itemset-editor-dialog .xforms-invalid .xforms-input-input { border-color: #DF731B }     /* Show errors also for fields that aren't visited */
 
 /* Submission editor dialog */
 #fb-service-dialog { width: 45em }

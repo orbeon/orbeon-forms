@@ -534,6 +534,7 @@
                                 </xf:label>
                                 <xf:dispatch ev:event="DOMActivate" name="fb-show-dialog" targetid="fb-form-editor$dialog-itemsets">
                                     <xxf:context name="control-id" value="$control/@id"/>
+                                    <xxf:context name="control-type" value="$control/local-name()"/>
                                 </xf:dispatch>
                             </xf:trigger>
 

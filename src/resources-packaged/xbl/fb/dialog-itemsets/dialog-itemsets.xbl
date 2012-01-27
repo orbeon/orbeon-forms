@@ -106,22 +106,24 @@
                 <xxforms:dialog id="dialog" class="fb-itemset-editor-dialog" appearance="full" model="model" level="modal">             <!-- Actual dialog -->
                     <xforms:label ref="$resources/dialog-itemsets/dialog-title"/>
                     <xhtml:div class="fb-dialog-body fb-hide-alert">
-                        <fr:grid repeat="true" ref="$local/items/item" id="fb-itemset-repeat" origin="$local/template/item" columns="2">
-                            <xhtml:tr>
-                                <xhtml:td>
-                                    <xforms:input ref="label" id="fb-itemset-label-input" class="fb-itemset-label-input">
-                                        <xforms:label ref="$resources/dialog-itemsets/label/label"/>
-                                        <xforms:alert/>
-                                    </xforms:input>
-                                </xhtml:td>
-                                <xhtml:td>
-                                    <xforms:input ref="value" id="fb-itemset-value-input" class="fb-itemset-value-input">
-                                        <xforms:label ref="$resources/dialog-itemsets/value/label"/>
-                                        <xforms:alert/>
-                                    </xforms:input>
-                                </xhtml:td>
-                            </xhtml:tr>
-                        </fr:grid>
+                        <xforms:group ref="$local/items">
+                            <fr:grid repeat="true" ref="item" id="fb-itemset-repeat" origin="$local/template/item" columns="2">
+                                <xhtml:tr>
+                                    <xhtml:td>
+                                        <xforms:input ref="label" id="fb-itemset-label-input" class="fb-itemset-label-input">
+                                            <xforms:label ref="$resources/dialog-itemsets/label/label"/>
+                                            <xforms:alert/>
+                                        </xforms:input>
+                                    </xhtml:td>
+                                    <xhtml:td>
+                                        <xforms:input ref="value" id="fb-itemset-value-input" class="fb-itemset-value-input">
+                                            <xforms:label ref="$resources/dialog-itemsets/value/label"/>
+                                            <xforms:alert/>
+                                        </xforms:input>
+                                    </xhtml:td>
+                                </xhtml:tr>
+                            </fr:grid>
+                        </xforms:group>
                         <xhtml:div class="fr-dialog-buttons">
                             <xforms:trigger ref="$local/triggers/(if (xxforms:valid($local, true())) then enabled else disabled)" class="fr-inplace-rename" id="save-trigger">
                                 <xforms:label ref="$resources/apply/label"/>

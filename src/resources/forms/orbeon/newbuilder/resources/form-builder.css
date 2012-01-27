@@ -367,10 +367,13 @@ a.xforms-help-image .fb-control-help { vertical-align: baseline; }
 .fr-grid-content .xforms-label input, .fr-grid-content .xforms-hint input { width: 100% }
 /* Even if the label or hint is empty, we still want space for 1 line to  be reserved. */
 .fr-grid-content .xforms-label, .fr-grid-content .xforms-hint { min-height: 1.321em }
-/* Show disabled hints, which are hints that don't contain any text, as we want them to show since use them as placeholders.
-   Use an id to override the #fr-view .xforms-disabled { display: none } in form-runner-base.css.
-   The position: static overrides the position: absolute; top: -10000px; left: -10000px in xforms.css. */
-#fr-view .xbl-fr-grid .xforms-hint.xforms-disabled { display: block; position: static }
+
+/* Show disabled hints, which are hints that don't contain any text, as we want them to show since use them as placeholders */
+#fr-view                                    /* Use an id to override the #fr-view .xforms-disabled { display: none } in form-runner-base.css */
+    .fr-grid:not(.fr-repeat-single-row)     /* Exception for hint in single-row repeats where we really don't want to show the hint (it shows in the header) */
+    .xforms-hint.xforms-disabled {
+        display: block;
+        position: static }                  /* The position: static overrides the position: absolute; top: -10000px; left: -10000px in xforms.css. */
 
 .fb-use-toolbar-message, .fb-click-message { display: none; font-size: 70%; color: gray; width: 100%; font-style: italic; text-align: center; margin-top: 2em  }
 .fb-selected .fb-use-toolbar-message { display: block }

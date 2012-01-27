@@ -130,6 +130,9 @@ public abstract class XFormsValueControl extends XFormsSingleNodeControl {
     public void storeExternalValue(String value) {
         // Set value into the instance
 
+        // NOTE: Standard value controls should be bound to simple content only. Is there anything we should / can do
+        // about this? See: https://github.com/orbeon/orbeon-forms/issues/13
+
         final Item boundItem = getBoundItem();
         if (!(boundItem instanceof NodeInfo)) // this should not happen
             throw new OXFException("Control is no longer bound to a node. Cannot set external value.");

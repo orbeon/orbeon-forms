@@ -67,10 +67,11 @@
                     <xforms:bind ref="label, value">
                         <xforms:bind ref="." calculate="normalize-space(.)" readonly="false()"/>                                    <!-- Additional spaces are most likely there by error -->
                         <xforms:bind ref="." constraint=". != ''"/>                                                                 <!-- Empty values are not allowed -->
+                        <xforms:bind ref="." constraint="for $ln in local-name() return
+                            not((../../item/*[local-name() = $ln] except .) = .)"/>                                                 <!-- No duplicate label or value are allowed -->
                     </xforms:bind>
                     <xforms:bind ref="value">
                         <xforms:bind ref="." constraint="/instance/control-type = 'select1' or not(contains(., ' '))"/>             <!-- No spaces in values are allowed for xf:select -->
-                        <xforms:bind ref="." constraint="not((../../item/value except .) = .)"/>                                    <!-- No duplicate values are allowed -->
                     </xforms:bind>
                 </xforms:bind>
                 <xforms:bind ref="triggers/disabled" readonly="true()"/>

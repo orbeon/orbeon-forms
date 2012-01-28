@@ -8,8 +8,13 @@
         <xhtml:title>XForms Hello</xhtml:title>
         <xforms:model>
             <xforms:instance>
-                <instance/>
+                <instance>
+                    <html/>
+                    <readonly>false</readonly>
+                    <relevant>true</relevant>
+                </instance>
             </xforms:instance>
+            <xforms:bind ref="html" readonly="../readonly = 'true'" relevant="../relevant= 'true'"/>
         </xforms:model>
         <xhtml:style type="text/css">
             .xbl-fr-tinymce { width: 600px; margin-top: 2em }
@@ -19,16 +24,20 @@
     <xhtml:body>
         <xforms:trigger>
             <xforms:label>Add length</xforms:label>
-            <xforms:setvalue ev:event="DOMActivate" ref="." value="concat(string-length(.), ' ',.)"/>
+            <xforms:setvalue ev:event="DOMActivate" ref="html" value="concat(string-length(.), ' ',.)"/>
         </xforms:trigger>
         <xforms:trigger>
             <xforms:label>Toggle readonly</xforms:label>
-            <xforms:setvalue ev:event="DOMActivate" ref="." value="concat(string-length(.), ' ',.)"/>
+            <xforms:setvalue ev:event="DOMActivate" ref="readonly" value="if (. = 'true') then 'false' else 'true'"/>
         </xforms:trigger>
-		<fr:tinymce ref="." id="unittest-tinymce"/>
+        <xforms:trigger>
+            <xforms:label>Toggle relevant</xforms:label>
+            <xforms:setvalue ev:event="DOMActivate" ref="relevant" value="if (. = 'true') then 'false' else 'true'"/>
+        </xforms:trigger>
+		<fr:tinymce ref="html" id="unittest-tinymce"/>
         <xhtml:fieldset>
             <xhtml:legend>HTML</xhtml:legend>
-    		<xforms:output value="." id="unittest-output"/>
+    		<xforms:output value="html" id="unittest-output"/>
         </xhtml:fieldset>
     </xhtml:body>
 </xhtml:html>

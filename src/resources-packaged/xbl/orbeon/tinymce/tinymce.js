@@ -71,14 +71,8 @@
             }
         },
 
-        readonly: function() {
-            this.visibleInputElement.disabled = true;
-        },
-
-        readwrite: function() {
-            this.visibleInputElement.disabled = false;
-        }
+        readonly:   function() { this.myEditor.getBody().contentEditable = false; },
+        readwrite:  function() { this.myEditor.getBody().contentEditable = true; }
     };
 
 })();
-

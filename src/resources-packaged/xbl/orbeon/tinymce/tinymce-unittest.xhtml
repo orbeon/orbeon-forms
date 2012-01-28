@@ -11,15 +11,24 @@
                 <instance/>
             </xforms:instance>
         </xforms:model>
+        <xhtml:style type="text/css">
+            .xbl-fr-tinymce { width: 600px; margin-top: 2em }
+            .xforms-form fieldset { width: 600px; margin-top: 2em; box-sizing: border-box; border: 1px solid #ccc }
+        </xhtml:style>
     </xhtml:head>
     <xhtml:body>
-		TinyMCE:
+        <xforms:trigger>
+            <xforms:label>Add length</xforms:label>
+            <xforms:setvalue ev:event="DOMActivate" ref="." value="concat(string-length(.), ' ',.)"/>
+        </xforms:trigger>
+        <xforms:trigger>
+            <xforms:label>Toggle readonly</xforms:label>
+            <xforms:setvalue ev:event="DOMActivate" ref="." value="concat(string-length(.), ' ',.)"/>
+        </xforms:trigger>
 		<fr:tinymce ref="." id="unittest-tinymce"/>
-		Output:
-		<xforms:output value="." id="unittest-output"/>
-		<xforms:trigger>
-			<xforms:label>Add length</xforms:label>
-			<xforms:setvalue ev:event="DOMActivate" ref="." value="concat(string-length(.), ' ',.)"/>
-		</xforms:trigger>
+        <xhtml:fieldset>
+            <xhtml:legend>HTML</xhtml:legend>
+    		<xforms:output value="." id="unittest-output"/>
+        </xhtml:fieldset>
     </xhtml:body>
 </xhtml:html>

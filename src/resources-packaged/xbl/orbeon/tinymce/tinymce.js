@@ -26,6 +26,7 @@
         myInputClass: 'xbl-fr-tinymce-xforms-input',
         myDivId: null,
         myEditor: null,
+        tinymceInitialized: false,
 
         init: function(){
             // get to id attribute of our xbl's div element
@@ -46,7 +47,7 @@
             // can't rely on init_instance_callback or oninit because custom config may lacking those options
             this.xformsInputElement = YAHOO.util.Dom.getElementsByClassName(this.myInputClass, null, this.container)[0];
             var xformsValue = ORBEON.xforms.Document.getValue(this.xformsInputElement.id);
-            this.myEditor.onInit.add(function(ed) { ed.setContent(xformsValue); });
+            this.myEditor.onInit.add(_.bind(function(ed) { this.tinymceInitialized = true; ed.setContent(xformsValue); }, this));
             this.myEditor.onChange.add(_.bind(this.clientToServer, this));
 
             // render the component
@@ -60,6 +61,7 @@
 
         // Update MCE with server value
         serverToClient: function() {
+            if (! this.tinymceInitialized) return;                                                                  // Don't update value until TinyMCE is fully initialized
             var mceContainer = YAHOO.util.Dom.getAncestorBy(document.activeElement, _.bind(function(e) {            // Look for ancestor of active element which is part of the MCE
                 return e == this.container || YD.hasClass(e, 'mceListBoxMenu');                                     // TinyMCE creates a div.mceListBoxMenu under the body for menus
             }, this));

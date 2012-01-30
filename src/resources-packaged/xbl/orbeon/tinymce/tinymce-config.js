@@ -3,7 +3,7 @@ YAHOO.xbl.fr.Tinymce.DefaultConfig = {
     language:                               "en",
     theme:		                            "advanced",
     skin:                                   "thebigreason",
-	plugins:                                "spellchecker,style,table,save,iespell,preview,media,searchreplace,print,contextmenu,paste,visualchars,nonbreaking,xhtmlxtras,template",
+	plugins:                                "spellchecker,style,table,save,iespell,preview,media,searchreplace,print,paste,visualchars,nonbreaking,xhtmlxtras,template",
     theme_advanced_buttons1:                "formatselect,bold,italic,|,bullist,numlist,|,outdent,indent,|,undo,redo",
     theme_advanced_buttons2:                "",
     theme_advanced_buttons3:                "",

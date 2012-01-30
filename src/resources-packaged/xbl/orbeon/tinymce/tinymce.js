@@ -28,7 +28,7 @@
         myEditor: null,
         tinymceInitialized: false,
 
-        init: function(){
+        init: function() {
             // get to id attribute of our xbl's div element
             this.visibleInputElement = YAHOO.util.Dom.getElementsByClassName(this.myDivClass, null, this.container)[0];
             this.myDivId = this.visibleInputElement.id;
@@ -42,15 +42,12 @@
             // Create TinyMCE editor instance
             var tinyMceConfig = typeof TINYMCE_CUSTOM_CONFIG !== "undefined" ? TINYMCE_CUSTOM_CONFIG : YAHOO.xbl.fr.Tinymce.DefaultConfig;
             this.myEditor = new tinymce.Editor(this.myDivId, tinyMceConfig);
-
-            // set initial value (add a listener to the init event. because myEditor is may not fully initialized yet!)
-            // can't rely on init_instance_callback or oninit because custom config may lacking those options
             this.xformsInputElement = YAHOO.util.Dom.getElementsByClassName(this.myInputClass, null, this.container)[0];
             var xformsValue = ORBEON.xforms.Document.getValue(this.xformsInputElement.id);
             this.myEditor.onInit.add(_.bind(function(ed) { this.tinymceInitialized = true; ed.setContent(xformsValue); }, this));
             this.myEditor.onChange.add(_.bind(this.clientToServer, this));
 
-            // render the component
+            // Render the component
             this.myEditor.render();
         },
 

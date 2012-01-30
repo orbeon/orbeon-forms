@@ -19,19 +19,14 @@
     ORBEON.xforms.XBL.declareClass(YAHOO.xbl.fr.Tinymce, "xbl-fr-tinymce");
     YAHOO.xbl.fr.Tinymce.prototype = {
 
-        xformsInputElement: null,
         groupElement: null,
         visibleInputElement: null,
-        myDivClass: 'xbl-fr-tinymce-div',
-        myInputClass: 'xbl-fr-tinymce-xforms-input',
-        myDivId: null,
         myEditor: null,
+        textareaId: null,
         tinymceInitialized: false,
 
         init: function() {
-            // get to id attribute of our xbl's div element
-            this.visibleInputElement = YAHOO.util.Dom.getElementsByClassName(this.myDivClass, null, this.container)[0];
-            this.myDivId = this.visibleInputElement.id;
+            this.textareaId = YAHOO.util.Dom.getElementsByClassName('xbl-fr-tinymce-xforms-textarea', null, this.container)[0].id;
 
             // Tell TinyMCE about base URL, which it can't guess in combined resources
             var baseURLa = YAHOO.util.Dom.getElementsByClassName('tinymce-base-url', null, this.container)[0];
@@ -41,10 +36,10 @@
 
             // Create TinyMCE editor instance
             var tinyMceConfig = typeof TINYMCE_CUSTOM_CONFIG !== "undefined" ? TINYMCE_CUSTOM_CONFIG : YAHOO.xbl.fr.Tinymce.DefaultConfig;
-            this.myEditor = new tinymce.Editor(this.myDivId, tinyMceConfig);
-            this.xformsInputElement = YAHOO.util.Dom.getElementsByClassName(this.myInputClass, null, this.container)[0];
-            var xformsValue = ORBEON.xforms.Document.getValue(this.xformsInputElement.id);
-            this.myEditor.onInit.add(_.bind(function(ed) { this.tinymceInitialized = true; ed.setContent(xformsValue); }, this));
+            var tinyMceDivId = YAHOO.util.Dom.getElementsByClassName('xbl-fr-tinymce-div', null, this.container)[0].id;
+            this.myEditor = new tinymce.Editor(tinyMceDivId, tinyMceConfig);
+            var xformsValue = ORBEON.xforms.Document.getValue(this.textareaId);
+            this.onInit(function() { this.myEditor.setContent(xformsValue); this.tinymceInitialized = true; });
             this.myEditor.onChange.add(_.bind(this.clientToServer, this));
 
             // Render the component
@@ -53,7 +48,7 @@
 
         // Send value in MCE to server
         clientToServer: function() {
-            ORBEON.xforms.Document.setValue(this.xformsInputElement.id, this.myEditor.getContent());
+            ORBEON.xforms.Document.setValue(this.textareaId, this.myEditor.getContent());
         },
 
         // Update MCE with server value
@@ -63,15 +58,20 @@
                 return e == this.container || YD.hasClass(e, 'mceListBoxMenu');                                     // TinyMCE creates a div.mceListBoxMenu under the body for menus
             }, this));
             if (mceContainer == null) {                                                                             // Heuristic: if TinyMCE has focus, users might still be editing so don't update
-                var xformsInputElement = YAHOO.util.Dom.getElementsByClassName(this.myInputClass, null, this.container)[0];
-                var newServerValue = ORBEON.xforms.Document.getValue(xformsInputElement.id);
+                var newServerValue = ORBEON.xforms.Document.getValue(this.textareaId);
                 this.myEditor.setContent(newServerValue);
-                this.visibleInputElement.disabled = YAHOO.util.Dom.hasClass(this.xformsInputElement, "xforms-readonly");
             }
         },
 
-        readonly:   function() { this.myEditor.getBody().contentEditable = false; },
-        readwrite:  function() { this.myEditor.getBody().contentEditable = true; }
+        // Runs a function when the TinyMCE is initialized
+        onInit: function(f) {
+            var bound = _.bind(f, this);
+            if (this.tinymceInitialized) bound();
+            else this.myEditor.onInit.add(bound);
+        },
+
+        readonly:   function() { this.onInit(function() { this.myEditor.getBody().contentEditable = false; })},
+        readwrite:  function() { this.onInit(function() { this.myEditor.getBody().contentEditable = true; })}
     };
 
 })();

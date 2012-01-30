@@ -28,7 +28,7 @@
                 <xsl:template match="/*">
 
                 	<!-- Outer group -->
-                    <xforms:group xbl:attr="model context ref bind" class="{{if (. != '' and exf:required()) then 'xforms-required-filled' else ''}}" xxbl:scope="outer">
+                    <xforms:group xbl:attr="model context ref bind" class="xbl-fr-tinymce-container {{if (. != '' and exf:required()) then 'xforms-required-filled' else ''}}" xxbl:scope="outer">
                         <xbl:content includes="xforms|label"/>
 
 						<!-- Inner group -->
@@ -40,7 +40,7 @@
                             </xxforms:variable>
 
                             <!-- Access to XForms value and change event -->
-                            <xforms:textarea ref="$rtecontent" id="tinymce-input" class="xbl-fr-tinymce-xforms-input fr-hidden" style="display:none;">
+                            <xforms:textarea ref="$rtecontent" id="tinymce-input" class="xbl-fr-tinymce-xforms-textarea fr-hidden" style="display:none;">
                                 <!-- Also update TinyMCE on xforms-enable to refresh TinyMCE with latest value in case the value changed while the component was non-relevant -->
                                 <xxforms:script id="xf-ch" ev:event="xforms-value-changed xforms-enabled xxforms-iteration-moved">YAHOO.xbl.fr.Tinymce.instance(this).serverToClient();</xxforms:script>
                                 <xxforms:script id="xf-ro" ev:event="xforms-readonly">YAHOO.xbl.fr.Tinymce.instance(this).readonly();</xxforms:script>

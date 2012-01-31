@@ -27,7 +27,18 @@ isEmptyUpload = (gridTd) ->
     photo = '/apps/fr/style/images/silk/photo.png'
     $(gridTd).find(".xforms-output-output[src $= '#{spacer}'], .xforms-output-output[src $= '#{photo}']").length > 0
 relevanceRules =
-    'fb-expand-trigger':            (gridTd) -> gridTd.rowSpan <= $(gridTd).parent().nextAll('tr:not(.xforms-repeat-delimiter):not(.xforms-repeat-template):not(.xforms-repeat-begin-end):not(.xforms-group-begin-end)').length
+    'fb-expand-trigger':            (gridTd) ->
+                                        noDelimiter = ':not(.xforms-repeat-delimiter):not(.xforms-repeat-template):not(.xforms-repeat-begin-end):not(.xforms-group-begin-end)'
+                                        grid = $(gridTd).closest('.fr-grid')
+                                        if grid.hasClass('fr-norepeat')                                                             # Regular table
+                                            gridTd.rowSpan <= $(gridTd).parent().nextAll('tr' + noDelimiter).length                 #   Based on number of following non-internal rows
+                                        else if grid.hasClass('fr-repeat-multiple-rows')                                            # Repeat with multiple rows in each iteration
+                                            gridTr =$(gridTd).parent()                                                              #   Based on number of following row with the same parity
+                                            oddEvenClass = if gridTr.hasClass('yui-dt-even') then 'yui-dt-even' else 'yui-dt-odd'   #   Rows with a different parity belong to a different iteration
+                                            gridTd.rowSpan <= gridTr.next('.' + oddEvenClass).length
+                                        else if grid.hasClass('fr-repeat-single-row') then false                                    # Repeat with single row: no expension possible
+                                        else false                                                                                  # Catch all, which shouldn't happen
+
     'fb-shrink-trigger':            (gridTd) -> gridTd.rowSpan >= 2
     'fb-delete-trigger':            isNotEmpty
     'fb-edit-details-trigger':      isNotEmpty

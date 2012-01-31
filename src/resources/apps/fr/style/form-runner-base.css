@@ -457,7 +457,11 @@ html body .xforms-form .fr-grid-content .xbl-component .xforms-disabled {
     .fr-grid .fr-grid-content .xforms-trigger button, .fr-grid .fr-grid-content .yui-button .xforms-trigger input { margin-top: 0 } /* except YUI buttons don't appear right with top margin! */
 
 /* Cell widths */
-.fr-grid-td { width: auto; vertical-align: top; overflow: hidden }
+.fr-grid-td {
+    width: auto; vertical-align: top;
+    /*overflow: hidden*/                                    /* Removed as this looks like a hack and combined with the position: relative in FB, which we need for the
+                                                               absolute positioning of the cell editors, this crops overlays, in particular the date picker */
+}
 
 .fr-grid { table-layout: fixed }                            /* All the column must have the same width */
 

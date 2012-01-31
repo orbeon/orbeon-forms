@@ -53,7 +53,7 @@ public class XFormsUploadControl extends XFormsValueControl {
 
     private FileInfo fileInfo;
 
-    public XFormsUploadControl(XBLContainer container, XFormsControl parent, Element element, String name, String id, Map<String, Element> state) {
+    public XFormsUploadControl(XBLContainer container, XFormsControl parent, Element element, String name, String id, Map<String, String> state) {
         super(container, parent, element, name, id);
 
         fileInfo = new FileInfo(this, getContextStack(), element);

@@ -22,7 +22,6 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.*;
-import org.orbeon.oxf.xforms.analysis.ElementAnalysis;
 import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitDoneEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitErrorEvent;
@@ -1229,7 +1228,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
         // Check that there are no validation errors
         // NOTE: If the instance is read-only, it can't have MIPs at the moment, and can't fail validation/requiredness, so we don't go through the process at all.
         final boolean instanceSatisfiesValidRequired
-                = (currentInstance != null && currentInstance.isReadOnly())
+                = (currentInstance != null && currentInstance.readonly())
                 || !resolvedValidate
                 || XFormsSubmissionUtils.isSatisfiesValid(indentedLogger, documentToSubmit, true);
         if (!instanceSatisfiesValidRequired) {

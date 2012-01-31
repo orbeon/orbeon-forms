@@ -38,7 +38,7 @@ import java.util.List;
  *
  * TODO: Handling of system IDs is not optimal in memory as system IDs are unlikely to change much within a document.
  */
-public class SAXStore extends ForwardingXMLReceiver implements Serializable, Externalizable {
+public class SAXStore extends ForwardingXMLReceiver implements Externalizable {
 
     public static final byte START_DOCUMENT = 0x00;
     public static final byte END_DOCUMENT = 0x01;
@@ -678,7 +678,7 @@ public class SAXStore extends ForwardingXMLReceiver implements Serializable, Ext
         out.writeInt(systemIdBufferPosition);
         for (int i = 0; i < systemIdBufferPosition; i++) {
             final String systemId = systemIdBuffer[i];
-            out.writeUTF(systemId == null ? "" : systemId);
+            out.writeObject(systemId == null ? "" : systemId);
         }
 
         out.writeInt(attributeCountBufferPosition);
@@ -687,10 +687,10 @@ public class SAXStore extends ForwardingXMLReceiver implements Serializable, Ext
 
         out.writeInt(stringBuffer.size());
         for (int i = 0; i < stringBuffer.size(); i++)
-            out.writeUTF(stringBuffer.get(i));
+            out.writeObject(stringBuffer.get(i));
 
         out.writeBoolean(hasDocumentLocator);
-        out.writeUTF(publicId == null ? "" : publicId);
+        out.writeObject(publicId == null ? "" : publicId);
 
         out.flush();
     }
@@ -719,7 +719,7 @@ public class SAXStore extends ForwardingXMLReceiver implements Serializable, Ext
         systemIdBufferPosition = in.readInt();
         systemIdBuffer = new String[systemIdBufferPosition];
         for (int i = 0; i < systemIdBufferPosition; i++) {
-            systemIdBuffer[i] = in.readUTF();
+            systemIdBuffer[i] = (String) in.readObject();
             if ("".equals(systemIdBuffer[i]))
                 systemIdBuffer[i] = null;
         }
@@ -734,10 +734,10 @@ public class SAXStore extends ForwardingXMLReceiver implements Serializable, Ext
 
         final int stringBufferSize = in.readInt();
         for (int i = 0; i < stringBufferSize; i++)
-            stringBuffer.add(in.readUTF());
+            stringBuffer.add((String) in.readObject());
 
         hasDocumentLocator = in.readBoolean();
-        publicId = in.readUTF();
+        publicId = (String) in.readObject();
         if ("".equals(publicId))
             publicId = null;
     }

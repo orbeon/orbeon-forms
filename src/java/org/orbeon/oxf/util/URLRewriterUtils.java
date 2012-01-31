@@ -25,6 +25,7 @@ import org.orbeon.oxf.properties.Properties;
 import org.orbeon.oxf.servlet.OrbeonXFormsFilter;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 
+import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collections;
@@ -435,7 +436,7 @@ public class URLRewriterUtils {
          *
          * @return  element containing serialized parameters
          */
-        public Element serialize() {
+        public Element toXML() {
             final Element matcherElement = Dom4jUtils.createElement("matcher");
 
             matcherElement.addAttribute("path", pathInfo);

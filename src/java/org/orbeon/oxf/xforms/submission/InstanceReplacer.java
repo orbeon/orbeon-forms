@@ -146,6 +146,7 @@ public class InstanceReplacer extends BaseReplacer {
                 // Create resulting instance whether entire instance is replaced or not, because this:
                 // 1. Wraps a Document within a DocumentInfo if needed
                 // 2. Performs text nodes adjustments if needed
+                final boolean exposeXPathTypes = XFormsProperties.isExposeXPathTypes(containingDocument);
                 if (!p2.isReadonly) {
                     // Resulting instance must not be read-only
 
@@ -153,9 +154,10 @@ public class InstanceReplacer extends BaseReplacer {
                         detailsLogger.logDebug("", "replacing instance with mutable instance",
                             "instance", updatedInstance.getEffectiveId());
 
-                    newInstance = new XFormsInstance(containingDocument.getStaticState().xpathConfiguration(), updatedInstance.getEffectiveModelId(), updatedInstance.getId(),
-                            (Document) resultingDocument, connectionResult.resourceURI, resultingRequestBodyHash, p2.username, p2.password, p2.domain,
-                            p2.isCache, p2.timeToLive, updatedInstance.getValidation(), p2.isHandleXInclude, XFormsProperties.isExposeXPathTypes(containingDocument));
+                    newInstance = new XFormsInstance(updatedInstance.staticId(), updatedInstance.modelEffectiveId(),
+                            connectionResult.resourceURI, p2.username, p2.password, p2.domain,
+                            p2.isCache, p2.timeToLive, resultingRequestBodyHash, p2.isReadonly, updatedInstance.validation(), p2.isHandleXInclude, exposeXPathTypes,
+                            XFormsInstance.wrapDocument((Document) resultingDocument, exposeXPathTypes), false);
                 } else {
                     // Resulting instance must be read-only
 
@@ -163,9 +165,10 @@ public class InstanceReplacer extends BaseReplacer {
                         detailsLogger.logDebug("", "replacing instance with read-only instance",
                             "instance", updatedInstance.getEffectiveId());
 
-                    newInstance = new ReadonlyXFormsInstance(updatedInstance.getEffectiveModelId(), updatedInstance.getId(),
-                            (DocumentInfo) resultingDocument, connectionResult.resourceURI, resultingRequestBodyHash, p2.username, p2.password, p2.domain,
-                            p2.isCache, p2.timeToLive, updatedInstance.getValidation(), p2.isHandleXInclude, XFormsProperties.isExposeXPathTypes(containingDocument));
+                    newInstance = new XFormsInstance(updatedInstance.staticId(), updatedInstance.modelEffectiveId(),
+                            connectionResult.resourceURI, p2.username, p2.password, p2.domain,
+                            p2.isCache, p2.timeToLive, resultingRequestBodyHash, p2.isReadonly, updatedInstance.validation(), p2.isHandleXInclude, exposeXPathTypes,
+                            (DocumentInfo) resultingDocument, false);
                 }
                 newDocumentRootElement = newInstance.getInstanceRootElementInfo();
             }
@@ -237,8 +240,8 @@ public class InstanceReplacer extends BaseReplacer {
 
     public void setInstance(XFormsInstance instance) {
         final Document instanceDocument = instance.getDocument();
-        this.resultingRequestBodyHash = instance.getRequestBodyHash();
-        this.resultingDocument = (instanceDocument != null) ? instanceDocument : instance.getDocumentInfo();
+        this.resultingRequestBodyHash = instance.requestBodyHash();
+        this.resultingDocument = (instanceDocument != null) ? instanceDocument : instance.documentInfo();
     }
 
     public Object getResultingDocument() {

@@ -34,7 +34,7 @@ public class XFormsComponentControl extends XFormsNoSingleNodeContainerControl {
 
     private XBLContainer nestedContainer;
 
-    public XFormsComponentControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId, Map<String, Element> state) {
+    public XFormsComponentControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId, Map<String, String> state) {
         super(container, parent, element, name, effectiveId);
 
         // Create container and nested models if any

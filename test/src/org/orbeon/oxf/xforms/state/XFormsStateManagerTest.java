@@ -14,8 +14,6 @@
 package org.orbeon.oxf.xforms.state;
 
 import org.apache.commons.lang.StringUtils;
-import org.dom4j.Attribute;
-import org.dom4j.Document;
 import org.junit.Test;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
@@ -90,7 +88,7 @@ public class XFormsStateManagerTest extends ResourceManagerTestBase {
         final XFormsState state = createDocumentGetState();
 
         // This should throw an exception
-        XFormsUtils.decodeXML(state.getStaticState(), "WrongPassword");
+        XFormsUtils.decodeXML(state.staticState(), "WrongPassword");
     }
 
     @Test(expected=OXFException.class)
@@ -98,22 +96,21 @@ public class XFormsStateManagerTest extends ResourceManagerTestBase {
         final XFormsState state = createDocumentGetState();
 
         // This should throw an exception
-        XFormsUtils.decodeXML(state.getDynamicState(), "WrongPassword");
+        XFormsUtils.decodeXML(state.dynamicState().encodeToString(XFormsProperties.isGZIPState(), true), "WrongPassword");
     }
 
     private XFormsState createDocumentGetState() {
         final XFormsStaticState staticState = XFormsStaticStateTest.getStaticState("oxf:/org/orbeon/oxf/xforms/state/client-nocache.xhtml");
         final XFormsContainingDocument document = new XFormsContainingDocument(staticState, null, null, null);
 
-        final String staticStateString = stateManager.getClientEncodedDynamicState(document);
+        final String staticStateString = stateManager.getClientEncodedStaticState(document);
         final String dynamicStateString = stateManager.getClientEncodedDynamicState(document);
 
         // X2 is the prefix saying it's encrypted
         assertTrue(staticStateString.startsWith("X2"));
         assertTrue(dynamicStateString.startsWith("X2"));
 
-
-        return new XFormsState(staticStateString, dynamicStateString);
+        return new XFormsState(staticStateString, DynamicState.apply(document));
     }
 
     private static class State {
@@ -196,11 +193,10 @@ public class XFormsStateManagerTest extends ResourceManagerTestBase {
         final XFormsStaticState staticState = XFormsStaticStateTest.getStaticState("oxf:/org/orbeon/oxf/xforms/state/" + formFile);
 
         // Initialize document and get initial document state
-        final ExternalContext.Session session;
         final String initialDynamicStateString;
         final State state1 = new State();
         {
-            session = NetUtils.getSession(true);
+            NetUtils.getSession(true);
             state1.document = new XFormsContainingDocument(staticState, null, null, null);
 
             state1.uuid = state1.document.getUUID();
@@ -215,7 +211,7 @@ public class XFormsStateManagerTest extends ResourceManagerTestBase {
             state1.document.afterInitialResponse();
             stateManager.afterInitialResponse(state1.document);
 
-            initialDynamicStateString = state1.document.createEncodedDynamicState(XFormsProperties.isGZIPState(), false);
+            initialDynamicStateString = DynamicState.encodeDocumentToString(state1.document, XFormsProperties.isGZIPState(), false);
         }
 
         assertEquals(1, state1.document.getSequence());
@@ -259,7 +255,7 @@ public class XFormsStateManagerTest extends ResourceManagerTestBase {
         assertNull(StringUtils.trimToNull(state4.dynamicStateString));
         // Make sure we found the initial dynamic state
         {
-            assertEquals(stripSequenceNumber(initialDynamicStateString), stripSequenceNumber(state4.document.createEncodedDynamicState(XFormsProperties.isGZIPState(), false)));
+            assertEquals(stripSequenceNumber(initialDynamicStateString), stripSequenceNumber(DynamicState.encodeDocumentToString(state4.document, XFormsProperties.isGZIPState(), false)));
         }
     }
 
@@ -345,17 +341,13 @@ public class XFormsStateManagerTest extends ResourceManagerTestBase {
     }
 
     private String stripSequenceNumber(String serializedState) {
-        final Document state = XFormsUtils.decodeXML(serializedState);
-        final Attribute sequenceNumber = state.getRootElement().attribute("sequence");
-        if (sequenceNumber != null)
-            state.getRootElement().remove(sequenceNumber);
-        return XFormsUtils.encodeXML(state, false);
+        final DynamicState dynamicState = DynamicState.apply(serializedState);
+        final DynamicState newDynamicState = dynamicState.copyUpdateSequence(1);
+
+        return newDynamicState.encodeToString(XFormsProperties.isGZIPState(), false);
     }
 
     private long getSequenceNumber(String serializedState) {
-        final Document state = XFormsUtils.decodeXML(serializedState);
-        final Attribute sequenceNumber = state.getRootElement().attribute("sequence");
-
-        return Long.parseLong(sequenceNumber.getStringValue());
+        return DynamicState.apply(serializedState).sequence();
     }
 }

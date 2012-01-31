@@ -29,7 +29,7 @@ import java.util.Set;
  * TODO: Use inheritance/interface to make this a single-node control that doesn't hold a value.
  */
 public class XFormsTriggerControl extends XFormsSingleNodeControl {
-    public XFormsTriggerControl(XBLContainer container, XFormsControl parent, Element element, String name, String id, Map<String, Element> state) {
+    public XFormsTriggerControl(XBLContainer container, XFormsControl parent, Element element, String name, String id, Map<String, String> state) {
         super(container, parent, element, name, id);
     }
 

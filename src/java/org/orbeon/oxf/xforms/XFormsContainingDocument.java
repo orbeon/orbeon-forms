@@ -40,6 +40,7 @@ import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.processor.XFormsURIResolver;
 import org.orbeon.oxf.xforms.script.ScriptInterpreter;
+import org.orbeon.oxf.xforms.state.DynamicState;
 import org.orbeon.oxf.xforms.state.XFormsState;
 import org.orbeon.oxf.xforms.state.XFormsStateManager;
 import org.orbeon.oxf.xforms.state.XFormsStaticStateCache;
@@ -49,7 +50,6 @@ import org.orbeon.oxf.xforms.submission.XFormsModelSubmission;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.SAXStore;
-import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.saxon.functions.FunctionLibrary;
@@ -191,6 +191,8 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         {
             initializeRequestInformation();
             this.versionedPathMatchers = (List<URLRewriterUtils.PathMatcher>) PipelineContext.get().getAttribute(PageFlowControllerProcessor.PATH_MATCHERS);
+            if (this.versionedPathMatchers == null)
+                this.versionedPathMatchers = Collections.emptyList();
         }
 
         indentedLogger.startHandleOperation("initialization", "creating new ContainingDocument (static state object provided).", "uuid", this.uuid);
@@ -265,7 +267,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
 
         // Create static state object
         {
-            final String staticStateDigest = xformsState.getStaticStateDigest();
+            final String staticStateDigest = xformsState.staticStateDigestJava();
 
             if (staticStateDigest != null) {
                 final XFormsStaticState cachedState = XFormsStaticStateCache.instance().getDocument(staticStateDigest);
@@ -276,7 +278,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
                 } else {
                     // Not found static state in cache, create static state from input
                     indentedLogger.logDebug("", "did not find static state by digest in cache");
-                    this.staticState = XFormsStaticStateImpl.restore(staticStateDigest, xformsState.getStaticState());
+                    this.staticState = XFormsStaticStateImpl.restore(staticStateDigest, xformsState.staticState());
 
                     // Store in cache
                     XFormsStaticStateCache.instance().storeDocument(this.staticState);
@@ -286,7 +288,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
             } else {
                 // Not digest provided, create static state from input
                 indentedLogger.logDebug("", "did not find static state by digest in cache");
-                this.staticState = XFormsStaticStateImpl.restore(null, xformsState.getStaticState());
+                this.staticState = XFormsStaticStateImpl.restore(null, xformsState.staticState());
 
                 assert this.staticState.isClientStateHandling();
             }
@@ -303,9 +305,9 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
             this.xpathDependencies = Version.instance().createUIDependencies(this);
 
             // Restore the containing document's dynamic state
-            final String encodedDynamicState = xformsState.getDynamicState();
+            final DynamicState encodedDynamicState = xformsState.dynamicState();
             try {
-                if (StringUtils.isEmpty(encodedDynamicState)) {
+                if (encodedDynamicState == null) {
                     // Just for tests, we allow the dynamic state to be empty
                     initialize();
                 } else {
@@ -1013,142 +1015,32 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         }
     }
 
-    /**
-     * Create an encoded dynamic state that represents the dynamic state of this XFormsContainingDocument.
-     *
-     * @param compress              whether to compress
-     * @param isForceEncryption     whether to force encryption or not
-     * @return                      encoded dynamic state
-     */
-    public String createEncodedDynamicState(boolean compress, boolean isForceEncryption) {
-        return XFormsUtils.encodeXML(createDynamicStateDocument(), compress,
-            (isForceEncryption || XFormsProperties.isClientStateHandling(this)) ? XFormsProperties.getXFormsPassword() : null, false);
-    }
+    private void restoreDynamicState(DynamicState dynamicState) {
 
-    private Document createDynamicStateDocument() {
+        this.uuid = dynamicState.uuid();
+        this.sequence = dynamicState.sequence();
 
-        final Document dynamicStateDocument;
-        indentedLogger.startHandleOperation("", "encoding state");
-        {
-            dynamicStateDocument = Dom4jUtils.createDocument();
-            final Element dynamicStateElement = dynamicStateDocument.addElement("dynamic-state");
-            // Add UUIDs
-            dynamicStateElement.addAttribute("uuid", uuid);
-            dynamicStateElement.addAttribute("sequence", Long.toString(sequence));
-
-            // Add request information
-            dynamicStateElement.addAttribute("deployment-type", deploymentType.name());
-            dynamicStateElement.addAttribute("request-context-path", requestContextPath);
-            dynamicStateElement.addAttribute("request-path", requestPath);
-            dynamicStateElement.addAttribute("container-type", containerType);
-            dynamicStateElement.addAttribute("container-namespace", containerNamespace);
-
-            // Remember versioned paths
-            if (versionedPathMatchers != null && versionedPathMatchers.size() > 0) {
-                final Element matchersElement = dynamicStateElement.addElement("matchers");
-                for (final URLRewriterUtils.PathMatcher pathMatcher: versionedPathMatchers) {
-                    matchersElement.add(pathMatcher.serialize());
-                }
-            }
-
-            // Add upload information
-            if (pendingUploads != null && pendingUploads.size() > 0)
-                dynamicStateElement.addAttribute("pending-uploads", StringUtils.join(pendingUploads, ' '));
-
-            // Serialize instances
-            {
-                final Element instancesElement = dynamicStateElement.addElement("instances");
-                serializeInstances(instancesElement);
-            }
-
-            // Serialize controls
-            xformsControls.serializeControls(dynamicStateElement);
-
-            // Serialize annotated page template if present
-            if (annotatedTemplate != null) {
-                final Element templateElement = dynamicStateElement.addElement("template");
-                final Document document = TransformerUtils.saxStoreToDom4jDocument(annotatedTemplate);
-                templateElement.add(document.getRootElement().detach());
-            }
-
-            // Serialize last Ajax response if present
-            if (lastAjaxResponse != null) {
-                final Element responseElement = dynamicStateElement.addElement("response");
-                final Document document = TransformerUtils.saxStoreToDom4jDocument(lastAjaxResponse);
-                responseElement.add(document.getRootElement().detach());
-            }
-        }
-        indentedLogger.endHandleOperation();
-
-        // DEBUG
-//        System.out.println("XXX SERIALIZE: " + Dom4jUtils.domToPrettyString(dynamicStateDocument));
-
-        return dynamicStateDocument;
-    }
-
-
-    /**
-     * Restore the document's dynamic state given a serialized version of the dynamic state.
-     *
-     * @param encodedDynamicState   serialized dynamic state
-     */
-    private void restoreDynamicState(String encodedDynamicState) {
-
-        // Get dynamic state document
-        final Element dynamicStateElement = XFormsUtils.decodeXML(encodedDynamicState).getRootElement();
-
-        // DEBUG
-//        System.out.println("XXX RESTORE: " + Dom4jUtils.domToPrettyString(dynamicStateElement.getDocument()));
-
-        // Restore UUIDs
-
-        this.uuid = dynamicStateElement.attributeValue("uuid");
-        this.sequence = Long.parseLong(dynamicStateElement.attributeValue("sequence"));
-
-        indentedLogger.logDebug("initialization", "restoring UUID", "UUID", this.uuid,
-                "sequence", Long.toString(this.sequence));
+        indentedLogger.logDebug("initialization", "restoring UUID", "UUID", this.uuid, "sequence", Long.toString(this.sequence));
 
         // Restore request information
-        if (dynamicStateElement.attribute("deployment-type") != null) {
+        if (dynamicState.decodeDeploymentTypeJava() != null) {
             // Normal case where information below was previously serialized
-            this.deploymentType = XFormsConstants.DeploymentType.valueOf(dynamicStateElement.attributeValue("deployment-type"));
-            this.requestContextPath = dynamicStateElement.attributeValue("request-context-path");
-            this.requestPath = dynamicStateElement.attributeValue("request-path");
-            this.containerType = dynamicStateElement.attributeValue("container-type");
-            this.containerNamespace = dynamicStateElement.attributeValue("container-namespace");
+            this.deploymentType = XFormsConstants.DeploymentType.valueOf(dynamicState.decodeDeploymentTypeJava());
+            this.requestContextPath = dynamicState.decodeRequestContextPathJava();
+            this.requestPath = dynamicState.decodeRequestPathJava();
+            this.containerType = dynamicState.decodeContainerTypeJava();
+            this.containerNamespace = dynamicState.decodeContainerNamespaceJava();
         } else {
             // Use information from the request
             // This is relied upon by oxf:xforms-submission and unit tests and shouldn't be relied on in other cases
             initializeRequestInformation();
         }
 
-        // Restore versioned paths matchers if present
-        {
-            final Element matchersElement = dynamicStateElement.element("matchers");
-            if (matchersElement != null) {
-                final List<Element> matchersElements = Dom4jUtils.elements(matchersElement, "matcher");
-                this.versionedPathMatchers = new ArrayList<URLRewriterUtils.PathMatcher>(matchersElements.size());
-                for (final Element currentMatcherElement: matchersElements) {
-                    this.versionedPathMatchers.add(new URLRewriterUtils.PathMatcher(currentMatcherElement));
-                }
-            }
-        }
-
-        // Restore upload information
-        {
-            final String pendingUploads = dynamicStateElement.attributeValue("pending-uploads");
-            this.pendingUploads = (pendingUploads == null) ? null : new HashSet<String>(Arrays.asList(StringUtils.split(pendingUploads, ' ')));
-        }
-
-        // Restore annotated page template if present
-        {
-            final Element templateElement = dynamicStateElement.element("template");
-            if (templateElement != null) {
-                final Document templateDocument = Dom4jUtils.createDocument();
-                templateDocument.setRootElement((Element) ((Element) templateElement.elements().get(0)).detach());
-                this.annotatedTemplate = TransformerUtils.dom4jToSAXStore(templateDocument);
-            }
-        }
+        // Restore versioned paths matchers
+        this.versionedPathMatchers = dynamicState.decodePathMatchersJava();
+        this.pendingUploads = new HashSet<String>(dynamicState.decodePendingUploadsJava()); // make copy as must be mutable
+        this.annotatedTemplate = dynamicState.decodeAnnotatedTemplateJava();
+        this.lastAjaxResponse = dynamicState.decodeLastAjaxResponseJava();
 
         // TODO: don't use PipelineContext: use other ThreadLocal
         final PipelineContext pipelineContext = PipelineContext.get();
@@ -1156,8 +1048,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         // Restore models state
         {
             // Store instances state in PipelineContext for use down the line
-            final Element instancesElement = dynamicStateElement.element("instances");
-            pipelineContext.setAttribute(XFORMS_DYNAMIC_STATE_RESTORE_INSTANCES, instancesElement);
+            pipelineContext.setAttribute(XFORMS_DYNAMIC_STATE_RESTORE_INSTANCES, dynamicState.decodeInstancesJava());
 
             // Create XForms controls and models
             createControlsAndModels();
@@ -1169,22 +1060,9 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         // Restore controls state
         {
             // Store serialized control state for retrieval later
-            final Map<String, Element> serializedControlStateMap = xformsControls.getSerializedControlStateMap(dynamicStateElement);
-            pipelineContext.setAttribute(XFORMS_DYNAMIC_STATE_RESTORE_CONTROLS, serializedControlStateMap);
-
+            pipelineContext.setAttribute(XFORMS_DYNAMIC_STATE_RESTORE_CONTROLS, dynamicState.decodeControlsJava());
             xformsControls.restoreControls();
-
             pipelineContext.setAttribute(XFORMS_DYNAMIC_STATE_RESTORE_CONTROLS, null);
-        }
-
-        // Restore last Ajax response if present
-        {
-            final Element responseElement = dynamicStateElement.element("response");
-            if (responseElement != null) {
-                final Document responseDocument = Dom4jUtils.createDocument();
-                responseDocument.setRootElement((Element) ((Element) responseElement.elements().get(0)).detach());
-                this.lastAjaxResponse = TransformerUtils.dom4jToSAXStore(responseDocument);
-            }
         }
 
         // Indicate that instance restoration process is over
@@ -1201,9 +1079,9 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         return PipelineContext.get().getAttribute(XFormsContainingDocument.XFORMS_DYNAMIC_STATE_RESTORE_INSTANCES) != null;
     }
 
-    public Map<String, Element> getSerializedControlStatesMap() {
+    public Map<String, Map<String, String>> getSerializedControlStatesMap() {
         // TODO: don't use PipelineContext: use other ThreadLocal
-        return (Map) PipelineContext.get().getAttribute(XFormsContainingDocument.XFORMS_DYNAMIC_STATE_RESTORE_CONTROLS);
+        return (Map<String, Map<String, String>>) PipelineContext.get().getAttribute(XFormsContainingDocument.XFORMS_DYNAMIC_STATE_RESTORE_CONTROLS);
     }
 
     // This is called upon the first creation of the XForms engine OR for testing
@@ -1389,6 +1267,13 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         // we don't want to fail.
         if (pendingUploads != null)
             pendingUploads.remove(uploadId);
+    }
+
+    public Set<String> getPendingUploads() {
+        if (pendingUploads == null)
+            return Collections.emptySet();
+        else
+            return pendingUploads;
     }
 
     /**

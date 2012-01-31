@@ -46,7 +46,6 @@
     <!-- Native XForms Initialization -->
     <p:processor name="oxf:xforms-to-xhtml">
         <p:input name="annotated-document" href="#updated-document"/>
-        <p:input name="namespace"><request><container-namespace/></request></p:input>
         <p:input name="data"><null xsi:nil="true"/></p:input>
         <p:input name="instance"><null xsi:nil="true"/></p:input>
         <p:output name="document" id="xhtml"/>

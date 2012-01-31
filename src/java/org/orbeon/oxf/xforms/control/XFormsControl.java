@@ -916,13 +916,13 @@ public abstract class XFormsControl implements XFormsEventTarget, XFormsEventObs
     }
 
     /**
-     * Serialize this control's information which cannot be reconstructed from instances. The result is null if no
+     * Serialize this control's information which cannot be reconstructed from instances. The result is empty if no
      * serialization is needed, or a map of name/value pairs otherwise.
      *
      * @return  Map<String name, String value>
      */
     public Map<String, String> serializeLocal() {
-        return null;
+        return Collections.emptyMap();
     }
 
     /**

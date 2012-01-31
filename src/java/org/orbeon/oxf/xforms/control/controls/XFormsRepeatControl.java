@@ -64,7 +64,7 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
         return (RepeatControl) super.getElementAnalysis();
     }
 
-    public XFormsRepeatControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId, Map<String, Element> state) {
+    public XFormsRepeatControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId, Map<String, String> state) {
         super(container, parent, element, name, effectiveId);
 
         // Initial local state
@@ -72,13 +72,9 @@ public class XFormsRepeatControl extends XFormsNoSingleNodeContainerControl {
 
         // Restore state if needed
         if (state != null) {
-            final Element stateElement = state.get(effectiveId);
             // NOTE: Don't use setIndex() as we don't want to cause initialLocal != currentLocal
             final XFormsRepeatControlLocal local = (XFormsRepeatControlLocal) getCurrentLocal();
-            if (stateElement != null)
-                local.index = Integer.parseInt(stateElement.attributeValue("index"));
-            else
-                local.index = 0;// special case of unit tests which don't actually include a value
+            local.index = Integer.parseInt(state.get("index"));
 
             // Indicate that deserialized state must be used
             restoredState = true;

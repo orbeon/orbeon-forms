@@ -444,6 +444,7 @@
                         <controls>
                             <xforms:input ref="instance('main')" id="id123"/>
                             <xforms:trigger id="id124">
+                                <xforms:label/>
                                 <xforms:setvalue ev:event="DOMActivate" ref="instance('main')" id="id125">existing value</xforms:setvalue>
                             </xforms:trigger>
                         </controls>
@@ -1185,7 +1186,14 @@
                         </results>
                     </xforms:instance>
 
+                    <xforms:submission id="replace-readwrite" ref="instance()" action="echo:" method="post" replace="instance"/>
+                    <xforms:submission id="replace-readonly" ref="instance('instance-readonly')" action="echo:" method="post" replace="instance" xxforms:readonly="true"/>
+
                     <xforms:action id="action-1" ev:event="update">
+                        <!-- Replace instances so that the dynamic state includes them even though they are inline and readonly -->
+                        <xforms:send submission="replace-readwrite"/>
+                        <xforms:send submission="replace-readonly"/>
+                        <!-- Extract comments -->
                         <xforms:setvalue id="setvalue-1" ref="instance('results')/comments[1]" value="string-join(instance()//comment(), ' - ')"/>
                         <xforms:setvalue id="setvalue-2" ref="instance('results')/comments[2]" value="string-join(instance('instance-readonly')//comment(), ' - ')"/>
                     </xforms:action>
@@ -1195,7 +1203,7 @@
         </input>
         <input name="instances">
             <instances>
-                <instance id="instance-readwrite" model-id="model" replaced="true">
+                <instance id="instance-readwrite" model-id="model">
                     <document>
                         <!-- Comment 1 -->
                         <element/>
@@ -1203,7 +1211,7 @@
                         <element/>
                     </document>
                 </instance>
-                <instance id="instance-readonly" model-id="model" readonly="true" replaced="true">
+                <instance id="instance-readonly" model-id="model">
                     <document>
                         <!-- Comment 1 -->
                         <element/>

@@ -585,8 +585,8 @@
                 <xxf:action>
                     <xxf:control-values/>
                     <xxf:repeat-indexes>
-                        <xxf:repeat-index id="id123" old-index="0" new-index="3"/>
-                        <xxf:repeat-index id="id124" old-index="0" new-index="2"/>
+                        <xxf:repeat-index id="id123" old-index="1" new-index="3"/>
+                        <xxf:repeat-index id="id124" old-index="1" new-index="2"/>
                     </xxf:repeat-indexes>
                 </xxf:action>
             </xxf:event-response>
@@ -887,7 +887,6 @@
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                 <xxf:dynamic-state>
                     <dynamic-state>
-                        <instances/>
                         <controls>
                             <control effective-id="city-repeat" index="1"/>
                         </controls>
@@ -1156,8 +1155,7 @@
                         <xxf:control id="description-textarea·2-2" label="Condition:" relevant="true"/>
                     </xxf:control-values>
                     <xxf:repeat-indexes>
-                        <xxf:repeat-index id="authorization-repeat" old-index="0" new-index="2"/>
-                        <xxf:repeat-index id="condition-repeat" old-index="0" new-index="1"/>
+                        <xxf:repeat-index id="authorization-repeat" old-index="1" new-index="2"/>
                     </xxf:repeat-indexes>
                 </xxf:action>
             </xxf:event-response>
@@ -2996,6 +2994,7 @@
                 <xforms:repeat id="company-repeat" ref="company"/>
 
                 <xforms:trigger id="insert-trigger">
+                    <xforms:label/>
                     <xforms:insert id="insert" ev:event="DOMActivate" context="instance()" origin="xxforms:element('company')"/>
                 </xforms:trigger>
             </controls>

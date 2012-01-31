@@ -191,53 +191,6 @@ public class XFormsControls implements XFormsObjectResolver {
         }
     }
 
-    /**
-     * Serialize controls into the dynamic state. Only the information that cannot be rebuilt from the instances is
-     * serialized.
-     *
-     * @param dynamicStateElement
-     */
-    public void serializeControls(Element dynamicStateElement) {
-        final Element controlsElement = Dom4jUtils.createElement("controls");
-        visitAllControls(new XFormsControls.XFormsControlVisitorAdapter() {
-            public boolean startVisitControl(XFormsControl control) {
-                if (control.isRelevant()) { // don't serialize anything for non-relevant controls
-                    final Map nameValues = control.serializeLocal();
-                    if (nameValues != null) {
-                        final Element controlElement = controlsElement.addElement("control");
-                        controlElement.addAttribute("effective-id", control.getEffectiveId());
-                        for (Object o: nameValues.entrySet()) {
-                            final Map.Entry currentEntry = (Map.Entry) o;
-                            controlElement.addAttribute((String) currentEntry.getKey(), (String) currentEntry.getValue());
-                        }
-                    }
-                }
-                return true;
-            }
-        });
-        // Only add the element if necessary
-        if (controlsElement.hasContent())
-            dynamicStateElement.add(controlsElement);
-    }
-
-    /**
-     * Get serialized control state as a Map. Only the information that cannot be rebuilt from the instances is
-     * deserialized.
-     *
-     * @param   dynamicStateElement
-     * @return  Map<String effectiveId, Element serializedState>
-     */
-    public Map<String, Element> getSerializedControlStateMap(Element dynamicStateElement) {
-        final Map<String, Element> result = new HashMap<String, Element>();
-        final Element controlsElement = dynamicStateElement.element("controls");
-        if (controlsElement != null) {
-            for (Element currentControlElement : Dom4jUtils.elements(controlsElement, "control")) {
-                result.put(currentControlElement.attributeValue("effective-id"), currentControlElement);
-            }
-        }
-        return result;
-    }
-
     public XFormsContainingDocument getContainingDocument() {
         return containingDocument;
     }

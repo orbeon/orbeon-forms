@@ -40,7 +40,7 @@ public class XFormsTextareaControl extends XFormsValueControl {
             XFormsConstants.XXFORMS_ROWS_QNAME
     };
 
-    public XFormsTextareaControl(XBLContainer container, XFormsControl parent, Element element, String name, String id, Map<String, Element> state) {
+    public XFormsTextareaControl(XBLContainer container, XFormsControl parent, Element element, String name, String id, Map<String, String> state) {
         super(container, parent, element, name, id);
     }
 

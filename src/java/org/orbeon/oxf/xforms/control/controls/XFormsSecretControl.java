@@ -34,7 +34,7 @@ public class XFormsSecretControl extends XFormsValueControl {
             XFormsConstants.XXFORMS_AUTOCOMPLETE_QNAME
     };
 
-    public XFormsSecretControl(XBLContainer container, XFormsControl parent, Element element, String name, String id, Map<String, Element> state) {
+    public XFormsSecretControl(XBLContainer container, XFormsControl parent, Element element, String name, String id, Map<String, String> state) {
         super(container, parent, element, name, id);
     }
 

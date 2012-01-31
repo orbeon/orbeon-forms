@@ -74,7 +74,7 @@ public class XFormsSelect1Control extends XFormsValueControl {
         }
     };
 
-    public XFormsSelect1Control(XBLContainer container, XFormsControl parent, Element element, String name, String id, Map<String, Element> state) {
+    public XFormsSelect1Control(XBLContainer container, XFormsControl parent, Element element, String name, String id, Map<String, String> state) {
         super(container, parent, element, name, id);
     }
 

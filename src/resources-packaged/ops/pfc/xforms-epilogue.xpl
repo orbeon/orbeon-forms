@@ -72,7 +72,6 @@
             <!-- Native XForms Initialization -->
             <p:processor name="oxf:xforms-to-xhtml">
                 <p:input name="annotated-document" href="#preprocessed-view"/>
-                <!--<p:input name="annotated-document" href="#widgeted-view" schema-href="oxf:/ops/xforms/schema/orbeon.rng"/>-->
                 <p:input name="data" href="#model-data"/>
                 <p:input name="instance" href="#instance"/>
                 <p:output name="document" id="xhtml-data"/>

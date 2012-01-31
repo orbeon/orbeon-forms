@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.state
 
 import org.orbeon.oxf.pipeline.api.ExternalContext
-import net.sf.ehcache.{Element => EhElement }
+import net.sf.ehcache.{Element ⇒ EhElement }
 import org.orbeon.oxf.xforms._
 
 /**
@@ -37,15 +37,15 @@ object EhcacheStateStore extends XFormsStateStore {
         val staticStateDigest = document.getStaticState.digest
         val dynamicStateKey = getDynamicStateKey(documentUUID, isInitialState)
 
-        def addOrReplaceOne(key: String, value: String) =
+        def addOrReplaceOne(key: String, value: java.io.Serializable) =
             stateCache.put(new EhElement(key, value))
 
-        // Mapping (UUID -> static state key : dynamic state key
+        // Mapping (UUID → static state key : dynamic state key
         addOrReplaceOne(documentUUID, staticStateDigest + ":" + dynamicStateKey)
 
         // Static and dynamic states
         addOrReplaceOne(staticStateDigest, document.getStaticState.encodedState)
-        addOrReplaceOne(dynamicStateKey, document.createEncodedDynamicState(XFormsProperties.isGZIPState, false))
+        addOrReplaceOne(dynamicStateKey, DynamicState(document))
     }
 
     def findState(session: ExternalContext.Session, documentUUID: String, isInitialState: Boolean): XFormsState = {
@@ -54,12 +54,12 @@ object EhcacheStateStore extends XFormsStateStore {
             debug("store size before finding: " + getCurrentSize + " entries.")
 
         def findOne(key: String) = stateCache.get(key) match {
-            case element: EhElement => element.getValue.asInstanceOf[String]
-            case _ => null
+            case element: EhElement ⇒ element.getValue
+            case _ ⇒ null
         }
 
         findOne(documentUUID) match {
-            case keyString: String =>
+            case keyString: String ⇒
                 // Found the keys, split into parts
                 val parts = keyString split ':'
 
@@ -71,12 +71,12 @@ object EhcacheStateStore extends XFormsStateStore {
 
                 // Gather values from cache for both keys and return state only if both are non-null
                 Stream(parts(0), dynamicStateKey) map (findOne(_)) filter (_ ne null) match {
-                    case Stream(staticState, dynamicState) =>
-                        new XFormsState(parts(0), staticState, dynamicState)
-                    case _ => null
+                    case Stream(staticState: String, dynamicState: DynamicState) ⇒
+                        XFormsState(Some(parts(0)), staticState, dynamicState)
+                    case _ ⇒ null
                 }
 
-            case _ => null
+            case _ ⇒ null
         }
     }
 

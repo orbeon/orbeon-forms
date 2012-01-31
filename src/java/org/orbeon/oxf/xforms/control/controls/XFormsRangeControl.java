@@ -32,7 +32,7 @@ public class XFormsRangeControl extends XFormsValueControl {
     private String end;
     private String step;
 
-    public XFormsRangeControl(XBLContainer container, XFormsControl parent, Element element, String name, String id, Map<String, Element> state) {
+    public XFormsRangeControl(XBLContainer container, XFormsControl parent, Element element, String name, String id, Map<String, String> state) {
         super(container, parent, element, name, id);
         this.start = element.attributeValue("start");
         this.end = element.attributeValue("end");

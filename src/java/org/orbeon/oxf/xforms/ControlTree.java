@@ -24,7 +24,6 @@ import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xforms.xbl.Scope;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.saxon.om.Item;
-import scala.Option;
 
 import java.util.*;
 
@@ -659,13 +658,13 @@ public class ControlTree implements ExternalCopyable {
 
         private XFormsControl currentParent;
 
-        private final Map<String, Element> serializedControls;
+        private final Map<String, Map<String, String>> serializedControls;
         private final ControlIndex controlIndex;
 
         private transient int updateCount;
         private transient int iterationCount;
 
-        public CreateControlsListener(ControlIndex controlIndex, XFormsControl rootControl, Map<String, Element> serializedControls) {
+        public CreateControlsListener(ControlIndex controlIndex, XFormsControl rootControl, Map<String, Map<String, String>> serializedControls) {
 
             this.currentParent = rootControl;
 
@@ -678,7 +677,9 @@ public class ControlTree implements ExternalCopyable {
             updateCount++;
 
             // Create XFormsControl with basic information
-            final XFormsControl control = XFormsControlFactory.createXFormsControl(container, currentParent, controlElement, effectiveControlId, serializedControls);
+            
+            final Map<String, String> state = (serializedControls != null) ? serializedControls.get(effectiveControlId) : null;
+            final XFormsControl control = XFormsControlFactory.createXFormsControl(container, currentParent, controlElement, effectiveControlId, state);
 
             // Set current binding for control element
             final XFormsContextStack.BindingContext currentBindingContext = container.getContextStack().getCurrentBindingContext();

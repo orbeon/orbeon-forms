@@ -17,7 +17,6 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.util.ConnectionResult;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.SecureUtils;
-import org.orbeon.oxf.xforms.ReadonlyXFormsInstance;
 import org.orbeon.oxf.xforms.XFormsInstance;
 import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.XFormsServerSharedInstancesCache;
@@ -79,9 +78,9 @@ public class CacheableSubmission extends BaseSubmission {
             // Find and check replacement location
             final XFormsInstance updatedInstance = checkInstanceToUpdate(detailsLogger, p);
 
-            instanceStaticId = updatedInstance.getId();
-            modelEffectiveId = updatedInstance.getEffectiveModelId();
-            validation = updatedInstance.getValidation();
+            instanceStaticId = updatedInstance.staticId();
+            modelEffectiveId = updatedInstance.modelEffectiveId();
+            validation = updatedInstance.validation();
         }
         final boolean isReadonly = p2.isReadonly;
         final boolean handleXInclude = p2.isHandleXInclude;
@@ -129,7 +128,7 @@ public class CacheableSubmission extends BaseSubmission {
                                 detailsLogger, instanceStaticId, modelEffectiveId, absoluteResolvedURLString, requestBodyHash, isReadonly,
                                 handleXInclude, XFormsProperties.isExposeXPathTypes(containingDocument), timeToLive, validation,
                             new XFormsServerSharedInstancesCache.Loader() {
-                                public ReadonlyXFormsInstance load(String instanceStaticId,
+                                public XFormsInstance load(String instanceStaticId,
                                                                    String modelEffectiveId, String instanceSourceURI,
                                                                    boolean handleXInclude, long timeToLive, String validation) {
 
@@ -178,9 +177,9 @@ public class CacheableSubmission extends BaseSubmission {
                                             status[1] = true;
 
                                             // Create new shared instance
-                                            return new ReadonlyXFormsInstance(modelEffectiveId, instanceStaticId, documentInfo, instanceSourceURI,
-                                                    requestBodyHash, updatedP2.username, updatedP2.password, updatedP2.domain, true, timeToLive, validation, handleXInclude,
-                                                    XFormsProperties.isExposeXPathTypes(containingDocument));
+                                            return new XFormsInstance(instanceStaticId, modelEffectiveId, instanceSourceURI,
+                                                    updatedP2.username, updatedP2.password, updatedP2.domain, true, timeToLive, requestBodyHash, p2.isReadonly, validation, handleXInclude,
+                                                    XFormsProperties.isExposeXPathTypes(containingDocument), documentInfo, false);
                                         }
                                     } catch (ThrowableWrapper throwableWrapper) {
                                         // In case we just threw it above, just propagate

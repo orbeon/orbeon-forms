@@ -45,7 +45,7 @@ public class XFormsSwitchControl extends XFormsValueContainerControl {
         private String selectedCaseControlId;
     }
 
-    public XFormsSwitchControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId, Map<String, Element> state) {
+    public XFormsSwitchControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId, Map<String, String> state) {
         super(container, parent, element, name, effectiveId);
 
         // Initial local state
@@ -53,13 +53,9 @@ public class XFormsSwitchControl extends XFormsValueContainerControl {
 
         // Restore state if needed
         if (state != null) {
-            final Element stateElement = state.get(effectiveId);
             // NOTE: Don't use getLocalForUpdate() as we don't want to cause initialLocal != currentLocal
             final XFormsSwitchControlLocal local = (XFormsSwitchControlLocal) getCurrentLocal();
-            if (stateElement != null)
-                local.selectedCaseControlId = stateElement.attributeValue("case-id");
-            else
-                local.selectedCaseControlId = findDefaultSelectedCaseId();// special case of unit tests which don't actually include a value
+            local.selectedCaseControlId = state.get("case-id");
 
             // Indicate that deserialized state must be used
             restoredState = true;

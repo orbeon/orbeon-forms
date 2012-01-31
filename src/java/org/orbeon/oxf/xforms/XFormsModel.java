@@ -308,7 +308,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         // NOTE: We shouldn't even be called if the parent control is not relevant.
         if (container.isRelevant()) {
             for (final XFormsInstance currentInstance: instances) {
-                if (currentInstance.getDocumentInfo().isSameNodeInfo(documentInfo))
+                if (currentInstance.documentInfo().isSameNodeInfo(documentInfo))
                     return currentInstance;
             }
         }
@@ -327,12 +327,15 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         final int instancePosition = instanceIds.indexOf(instanceStaticId);
         final XFormsInstance newInstance;
         {
+            final boolean exposeXPathTypes = XFormsProperties.isExposeXPathTypes(containingDocument);
             if (instanceDocument instanceof Document) {
-                newInstance = new XFormsInstance(containingDocument.getStaticState().xpathConfiguration(), modelEffectiveId, instanceStaticId, (Document) instanceDocument, instanceSourceURI,
-                        null, username, password, domain, cached, timeToLive, validation, handleXInclude, XFormsProperties.isExposeXPathTypes(containingDocument));
+                newInstance = new XFormsInstance(instanceStaticId, modelEffectiveId, instanceSourceURI,
+                        username, password, domain, cached, timeToLive, null, false, validation, handleXInclude, exposeXPathTypes,
+                        XFormsInstance.wrapDocument((Document) instanceDocument, exposeXPathTypes), false);
             } else if (instanceDocument instanceof DocumentInfo) {
-                newInstance = new ReadonlyXFormsInstance(modelEffectiveId, instanceStaticId, (DocumentInfo) instanceDocument, instanceSourceURI,
-                        null, username, password, domain, cached, timeToLive, validation, handleXInclude, XFormsProperties.isExposeXPathTypes(containingDocument));
+                newInstance = new XFormsInstance(instanceStaticId, modelEffectiveId, instanceSourceURI,
+                        username, password, domain, cached, timeToLive, null, true, validation, handleXInclude, exposeXPathTypes,
+                        (DocumentInfo) instanceDocument, false);
             } else {
                 throw new OXFException("Invalid type for instance document: " + instanceDocument.getClass().getName());
             }
@@ -358,7 +361,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         instance.setReplaced(replaced);
 
         // Prepare and set instance
-        final String instanceId = instance.getId();// use static id as instanceIds contains static ids
+        final String instanceId = instance.staticId();// use static id as instanceIds contains static ids
         final int instancePosition = instanceIds.indexOf(instanceId);
 
         instances.set(instancePosition, instance);
@@ -438,52 +441,22 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
     }
 
     /**
-     * Serialize this model's instances.
-     *
-     * @param instancesElement  container element for serialized instances
-     */
-    public void serializeInstances(Element instancesElement) {
-        for (final XFormsInstance currentInstance: instances) {
-
-            // TODO: can we avoid storing the instance in the dynamic state if it has not changed from static state?
-
-            final boolean isReadonlyNonReplacedInline = currentInstance.isReadOnly() && !currentInstance.isReplaced() && currentInstance.getSourceURI() == null;
-            if (!isReadonlyNonReplacedInline) {
-                // Serialize full instance of instance metadata (latter if instance is cached)
-                // If it is readonly, not replaced, and inline, then don't even add information to the dynamic state
-
-                instancesElement.add(currentInstance.createContainerElement(!currentInstance.isCache()));
-
-                indentedLogger.logDebug("serialize", currentInstance.isCache() ? "storing instance metadata to dynamic state" : "storing full instance to dynamic state",
-                    "model effective id", effectiveId, "instance static id", currentInstance.getId());
-
-                // Log instance if needed
-                if (XFormsProperties.getDebugLogging().contains("model-serialized-instance"))
-                    currentInstance.logInstance(indentedLogger, "serialized instance");
-            }
-        }
-    }
-
-    /**
      * Restore all the instances serialized as children of the given container element.
      */
     private void restoreInstances() {
 
         // Find serialized instances from context
-        final Element instancesElement = (Element) PipelineContext.get().getAttribute(XBLContainer.XFORMS_DYNAMIC_STATE_RESTORE_INSTANCES);
+        final List<XFormsInstance> contextInstances = (List<XFormsInstance>) PipelineContext.get().getAttribute(XBLContainer.XFORMS_DYNAMIC_STATE_RESTORE_INSTANCES);
 
         // Get instances from dynamic state first
-        if (instancesElement != null) {
-            for (Element currentInstanceElement: Dom4jUtils.elements(instancesElement)) {
+        if (contextInstances != null) {
+            for (final XFormsInstance instance : contextInstances) {
                 // Check that the instance belongs to this model
-                final String currentModelEffectiveId = currentInstanceElement.attributeValue("model-id");
-                if (effectiveId.equals(currentModelEffectiveId)) {
-                    // Create and set instance document on current model
-                    final XFormsInstance newInstance = new XFormsInstance(containingDocument.getStaticState().xpathConfiguration(), currentInstanceElement);
-                    final boolean isReadonlyHint = XFormsInstance.isReadonlyHint(currentInstanceElement);
+                if (effectiveId.equals(instance.modelEffectiveId())) {
+                    final boolean isReadonlyHint = instance.readonly();
                     // NOTE: Here instance must contain document
-                    setInstanceLoadFromCacheIfNecessary(isReadonlyHint, newInstance, null);
-                    indentedLogger.logDebug("restore", "restoring instance from dynamic state", "model effective id", effectiveId, "instance static id", newInstance.getId());
+                    setInstanceLoadFromCacheIfNecessary(isReadonlyHint, instance, null);
+                    indentedLogger.logDebug("restore", "restoring instance from dynamic state", "model effective id", effectiveId, "instance static id", instance.staticId());
                 }
             }
         }
@@ -662,11 +635,11 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
     }
 
     private void setInstanceLoadFromCacheIfNecessary(boolean readonlyHint, XFormsInstance newInstance, Element locationDataElement) {
-        if (newInstance.getDocumentInfo() == null && newInstance.getSourceURI() != null) {
+        if (newInstance.documentInfo() == null && newInstance.sourceURI() != null) {
             // Instance not initialized yet and must be loaded from URL
 
             // This means that the instance was cached
-            if (!newInstance.isCache())
+            if (!newInstance.cache())
                 throw new ValidationException("Non-initialized instance has to be cacheable for id: " + newInstance.getEffectiveId(),
                         (locationDataElement != null) ? (LocationData) locationDataElement.getData() : getLocationData());
 
@@ -678,15 +651,15 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
             // TODO: must pass method and request body in case of POST/PUT
             final XFormsInstance cachedInstance
                     = XFormsServerSharedInstancesCache.instance().findConvert(indentedLogger,
-                        newInstance.getId(), newInstance.getEffectiveModelId(), newInstance.getSourceURI(), newInstance.getRequestBodyHash(), readonlyHint, false,
-                        XFormsProperties.isExposeXPathTypes(containingDocument), newInstance.getTimeToLive(), newInstance.getValidation(), INSTANCE_LOADER);
+                        newInstance.staticId(), newInstance.modelEffectiveId(), newInstance.sourceURI(), newInstance.requestBodyHash(), readonlyHint, false,
+                        XFormsProperties.isExposeXPathTypes(containingDocument), newInstance.timeToLive(), newInstance.validation(), INSTANCE_LOADER);
 
-            setInstance(cachedInstance, newInstance.isReplaced());
+            setInstance(cachedInstance, newInstance.replaced());
         } else {
             // Instance is initialized, just use it
 
             // This means that the instance was not cached
-            if (newInstance.isCache())
+            if (newInstance.cache())
                 throw new ValidationException("Initialized instance has to be non-cacheable for id: " + newInstance.getEffectiveId(),
                         (locationDataElement != null) ? (LocationData) locationDataElement.getData() : getLocationData());
 
@@ -694,7 +667,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
                 indentedLogger.logDebug("restore", "using initialized instance from state",
                         "id", newInstance.getEffectiveId());
 
-            setInstance(newInstance, newInstance.isReplaced());
+            setInstance(newInstance, newInstance.replaced());
         }
     }
 
@@ -819,7 +792,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
     // TODO: Use XFormsModelSubmission instead of duplicating code here
     private class InstanceLoader implements XFormsServerSharedInstancesCache.Loader {
-        public ReadonlyXFormsInstance load(String instanceStaticId, String modelEffectiveId,
+        public XFormsInstance load(String instanceStaticId, String modelEffectiveId,
                                            String instanceSourceURI, boolean handleXInclude, long timeToLive, String validation) {
             final URL sourceURL;
             try {
@@ -847,8 +820,9 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
                 // TODO: Handle validating?
                 final DocumentInfo documentInfo = TransformerUtils.readTinyTree(containingDocument.getStaticState().xpathConfiguration(),
                         connectionResult.getResponseInputStream(), connectionResult.resourceURI, handleXInclude, true);
-                return new ReadonlyXFormsInstance(effectiveId, instanceStaticId, documentInfo, instanceSourceURI,
-                        null, null, null, null, true, timeToLive, validation, handleXInclude, XFormsProperties.isExposeXPathTypes(containingDocument));
+                return new XFormsInstance(instanceStaticId, effectiveId, instanceSourceURI,
+                        null, null, null, true, timeToLive, null, true, validation, handleXInclude,
+                        XFormsProperties.isExposeXPathTypes(containingDocument), documentInfo, false);
             } catch (Exception e) {
                 throw new OXFException("Got exception while loading instance from URI: " + instanceSourceURI, e);
             } finally {
@@ -1156,11 +1130,6 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
             container.dispatchEvent(new XFormsRevalidateEvent(containingDocument, this));
             containingDocument.endOutermostActionHandler();
         }
-    }
-
-    public void rebuildRecalculateIfNeeded() {
-        doRebuild();
-        doRecalculate(false);
     }
 
     public XFormsEventObserver getParentEventObserver(XBLContainer container) {

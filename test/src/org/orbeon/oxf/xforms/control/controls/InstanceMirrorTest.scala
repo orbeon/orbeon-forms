@@ -81,13 +81,13 @@ class InstanceMirrorTest extends DocumentTestBase with AssertionsForJUnit {
 
         // Attach listeners
         val outerListener = mirrorListener(document, logger,
-            toInnerNode(outerInstance.getDocumentInfo, document.getStaticState.topLevelPart, document), () => nonInstanceChanges += 1) _
+            toInnerNode(outerInstance.documentInfo, document.getStaticState.topLevelPart, document), () => nonInstanceChanges += 1) _
         for (eventName <- mutationEvents)
             outerInstance.addListener(eventName, outerListener)
 
         // Local helpers
         def dispatch(name: String) = document.dispatchEvent(new XFormsCustomEvent(document, name, document.getObjectByEffectiveId("model").asInstanceOf[XFormsEventTarget], true, true))
-        def innerInstanceValue = TransformerUtils.tinyTreeToString(innerInstance.getDocumentInfo)
+        def innerInstanceValue = TransformerUtils.tinyTreeToString(innerInstance.documentInfo)
 
         // Test insert, value change and delete
         Seq(

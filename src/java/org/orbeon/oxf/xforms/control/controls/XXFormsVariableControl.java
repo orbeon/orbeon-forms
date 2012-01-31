@@ -44,7 +44,7 @@ public class XXFormsVariableControl extends XFormsSingleNodeControl {
     // Previous value for refresh
     private ValueRepresentation previousValue;
 
-    public XXFormsVariableControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId, Map<String, Element> state) {
+    public XXFormsVariableControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId, Map<String, String> state) {
         super(container, parent, element, name, effectiveId);
         variable = new Variable((VariableAnalysisTrait) getElementAnalysis(), container.getContextStack());
     }

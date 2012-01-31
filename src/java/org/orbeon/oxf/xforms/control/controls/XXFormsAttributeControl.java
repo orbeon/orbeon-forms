@@ -38,7 +38,7 @@ public class XXFormsAttributeControl extends XFormsValueControl implements XForm
     private String attributeValue;
     private String forName;
 
-    public XXFormsAttributeControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId, Map<String, Element> state) {
+    public XXFormsAttributeControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId, Map<String, String> state) {
         super(container, parent, element, name, effectiveId);
 
         this.attributeControl = (AttributeControl) container.getPartAnalysis().getControlAnalysis(getPrefixedId());

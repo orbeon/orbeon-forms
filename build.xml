@@ -1,5 +1,3 @@
-<?xml version="1.0"?>
-<?xml-stylesheet type="text/xsl" href="ant2html.xsl"?>
 <!--
     Copyright (C) 2004-2009 Orbeon, Inc.
 
@@ -144,6 +142,8 @@
         <include name="ehcache-dependency-slf4j-log4j12-1.6.1.jar"/>
 
         <include name="scala-library-2.9.1.jar"/>
+        <include name="sbinary-2.9.1-0.4.0.jar"/>
+
         <include name="rhino-1.7R2.jar"/>
 
         <include name="flyingsaucer-core-renderer_orbeon_20100512.jar"/>

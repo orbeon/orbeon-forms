@@ -43,7 +43,7 @@ public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
     private String defaultNeighborControlId;
     private boolean initiallyVisible;
 
-    public static class XXFormsDialogControlLocal extends XFormsControlLocal {
+    public static class XXFormsDialogControlLocal extends XFormsControl.XFormsControlLocal {
         private boolean visible;
         private boolean constrainToViewport;
         private String neighborControlId;
@@ -63,7 +63,7 @@ public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
         }
     }
 
-    public XXFormsDialogControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId, Map<String, Element> state) {
+    public XXFormsDialogControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId, Map<String, String> state) {
         super(container, parent, element, name, effectiveId);
 
         // NOTE: attributes logic duplicated in XXFormsDialogHandler
@@ -82,16 +82,11 @@ public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
 
         // Restore state if needed
         if (state != null) {
-            final Element stateElement = state.get(effectiveId);
             // NOTE: Don't use getLocalForUpdate() as we don't want to cause initialLocal != currentLocal
-            if (stateElement != null) {
-                final String visibleString = stateElement.attributeValue("visible");
-                setLocal(new XXFormsDialogControlLocal("true".equals(visibleString),
-                        "true".equals(stateElement.attributeValue("constrain")),
-                        stateElement.attributeValue("neighbor")));
-            } else {
-                // special case of unit tests which don't actually include a value
-            }
+            final String visibleString = state.get("visible");
+            setLocal(new XXFormsDialogControlLocal("true".equals(visibleString),
+                     "true".equals(state.get("constrain")),
+                     state.get("neighbor")));
         }
     }
 
@@ -201,7 +196,8 @@ public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
         result.put("visible", Boolean.toString(local.visible));
         if (local.visible) {
             result.put("constrain", Boolean.toString(local.constrainToViewport));
-            result.put("neighbor", local.neighborControlId);
+            if (local.neighborControlId != null)
+                result.put("neighbor", local.neighborControlId);
         }
 
         return result;

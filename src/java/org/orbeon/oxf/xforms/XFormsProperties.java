@@ -60,6 +60,7 @@ public class XFormsProperties {
     private static final String EXPOSE_XPATH_TYPES_PROPERTY = "expose-xpath-types";
     private static final String AJAX_SHOW_LOADING_ICON_PROPERTY = "ajax.show-loading-icon";
     private static final String AJAX_UPDATE_FULL_THRESHOLD = "ajax.update.full.threshold";
+    private static final String NO_UPDATES = "no-updates";
 
     private static final String TYPE_OUTPUT_FORMAT_PROPERTY_PREFIX = "format.output.";
     private static final String TYPE_INPUT_FORMAT_PROPERTY_PREFIX = "format.input.";
@@ -217,6 +218,7 @@ public class XFormsProperties {
             new PropertyDefinition(FORWARD_SUBMISSION_HEADERS, DEFAULT_FORWARD_SUBMISSION_HEADERS, false),
             new PropertyDefinition(ASYNC_SUBMISSION_POLL_DELAY, 10 * 1000, false), // 10 seconds
             new PropertyDefinition(AJAX_UPDATE_FULL_THRESHOLD, 20, false),
+            new PropertyDefinition(NO_UPDATES, false, false),
             new PropertyDefinition(XFORMS11_SWITCH_PROPERTY, false, false), // false for now, but default should change at some point
             new PropertyDefinition(XPATH_ANALYSIS_PROPERTY, false, false),
             new PropertyDefinition(CACHE_DOCUMENT_PROPERTY, CACHE_DOCUMENT_DEFAULT, false),
@@ -594,6 +596,10 @@ public class XFormsProperties {
 
     public static int getAjaxFullUpdateThreshold(XFormsContainingDocument containingDocument) {
         return getIntegerProperty(containingDocument, AJAX_UPDATE_FULL_THRESHOLD);
+    }
+
+    public static boolean isNoUpdates(XFormsContainingDocument containingDocument) {
+        return getBooleanProperty(containingDocument, NO_UPDATES);
     }
 
     public static boolean isXForms11Switch(XFormsContainingDocument containingDocument) {

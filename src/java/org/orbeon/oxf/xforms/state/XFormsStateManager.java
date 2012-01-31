@@ -72,11 +72,12 @@ public class XFormsStateManager implements XFormsStateLifecycle {
      * @param containingDocument    containing document
      */
     public void afterInitialResponse(XFormsContainingDocument containingDocument) {
+        if (! XFormsProperties.isNoUpdates(containingDocument)) {
+            // Remember this UUID in the session
+            addDocumentToSession(containingDocument.getUUID());
 
-        // Remember this UUID in the session
-        addDocumentToSession(containingDocument.getUUID());
-
-        cacheOrStore(containingDocument, true);
+            cacheOrStore(containingDocument, true);
+        }
     }
 
     /**
@@ -91,8 +92,7 @@ public class XFormsStateManager implements XFormsStateLifecycle {
         }
     }
 
-    // Keep public and static for unit tests and submission processor (called from XSLT)
-    public static void addDocumentToSession(String uuid) {
+    private static void addDocumentToSession(String uuid) {
         final ExternalContext.Session session = NetUtils.getSession(XFormsStateManager.FORCE_SESSION_CREATION);
 
         final Map<String, Object> sessionAttributes = session.getAttributesMap(ExternalContext.Session.APPLICATION_SCOPE);
@@ -487,7 +487,7 @@ public class XFormsStateManager implements XFormsStateLifecycle {
             }
         } else {
             // State comes directly with request
-            xformsState = new XFormsState(parameters.getEncodedClientStaticState(), parameters.getEncodedClientDynamicState());
+            xformsState = new XFormsState(parameters.getEncodedClientStaticState(), DynamicState.apply(parameters.getEncodedClientDynamicState()));
         }
 
         // Create document
@@ -532,7 +532,7 @@ public class XFormsStateManager implements XFormsStateLifecycle {
                 dynamicStateString = null;
             } else {
                 // Return full encoded state
-                dynamicStateString = containingDocument.createEncodedDynamicState(XFormsProperties.isGZIPState(), true);
+                dynamicStateString = DynamicState.encodeDocumentToString(containingDocument, XFormsProperties.isGZIPState(), true);
             }
         }
         return dynamicStateString;

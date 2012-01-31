@@ -633,28 +633,6 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
     }
 
     /**
-     * Serialize all the instances of this container and children containers.
-     *
-     * @param instancesElement  container element
-     */
-    protected void serializeInstances(Element instancesElement) {
-        // Only serialize if we are relevant
-        if (isRelevant()) {
-            // Serialize this container's model's
-            for (final XFormsModel currentModel: models) {
-                currentModel.serializeInstances(instancesElement);
-            }
-
-            // Recurse into children containers
-            if (childrenXBLContainers != null) {
-                for (final XBLContainer currentContainer: childrenXBLContainers.values()) {
-                    currentContainer.serializeInstances(instancesElement);
-                }
-            }
-        }
-    }
-
-    /**
      * Whether this container is relevant, i.e. either is a top-level container OR is within a relevant container control.
      *
      * @return  true iif container is relevant
@@ -1033,12 +1011,11 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
                     }
 
                     // Custom event listeners
-                    // TODO: Would be nice to have all listeners implemented this way
+                    // TODO: Would be nice to have all listeners exposed this way
                     final List<EventListener> customListeners = currentEventObserver.getListeners(originalEvent.getName());
-                    if (customListeners != null) {
+                    if (customListeners != null)
                         for (final EventListener listener : customListeners)
                             listener.handleEvent(retargetedEvent);
-                    }
                 }
             }
 

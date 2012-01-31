@@ -17,7 +17,8 @@
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:xforms="http://www.w3.org/2002/xforms"
     xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
-    xmlns:saxon="http://saxon.sf.net/">
+    xmlns:saxon="http://saxon.sf.net/"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml">
 
     <p:param name="action" type="input"/>
     <p:param name="controls" type="input"/>
@@ -26,78 +27,85 @@
 
     <p:param name="response" type="output"/>
 
-    <!-- Encode -->
+    <!-- Create XHTML+XForms document based on separate models, instances, and controls -->
     <p:processor name="oxf:unsafe-xslt">
         <p:input name="data"><dummy/></p:input>
-        <p:input name="action" href="#action"/>
         <p:input name="controls" href="#controls"/>
         <p:input name="models" href="#models"/>
         <p:input name="instances" href="#instances"/>
         <p:input name="config">
             <xsl:transform version="2.0">
                 <xsl:import href="oxf:/oxf/xslt/utils/copy-modes.xsl"/>
-                <xsl:output method="xml" name="xml"/>
-                <xsl:variable name="uuid" select="uuid:createPseudoUUID()" xmlns:uuid="org.orbeon.oxf.util.UUIDUtils"/>
+                
+                <xsl:variable name="model-ids" select="doc('input:instances')/*/instance/@model-id/string()"/>
+                <xsl:variable name="instance-ids" select="doc('input:instances')/*/instance/@id/string()"/>
+
+                <!-- Create XHTML+XForms document -->
                 <xsl:template match="/">
-                    <xxforms:event-request xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary">
-                        <!-- A bit of a hack: oxf:xforms-server expects this value in the session to enforce session association -->
-                        <xsl:value-of select="manager:addDocumentToSession($uuid)" xmlns:manager="java:org.orbeon.oxf.xforms.state.XFormsStateManager"/>
-                        <xxforms:uuid><xsl:value-of select="$uuid"/></xxforms:uuid>
+
+                    <xhtml:html>
+                        <xhtml:head>
+                            <!-- Models -->
+                            <xsl:apply-templates select="doc('input:models')/*/*"/>
+                        </xhtml:head>
+                        <xhtml:body>
+                            <!-- Controls -->
+                            <xsl:apply-templates select="doc('input:controls')/*/*"/>
+                        </xhtml:body>
+                    </xhtml:html>
+                    
+                </xsl:template>
+
+                <!-- Copy instance content for matching instances -->
+                <xsl:template match="xforms:instance[@id = $instance-ids]">
+                    <xsl:variable name="id" select="@id"/>
+                    <xsl:variable name="model-id" select="parent::xforms:model/@id"/>
+
+                    <xsl:if test="not($model-id = $model-ids)">
+                        <xsl:message terminate="yes">
+                            Incorrect model id <xsl:value-of select="$model-id"/>
+                            for instance id <xsl:value-of select="$id"/>.
+                        </xsl:message>
+                    </xsl:if>
+
+                    <xsl:copy>
+                        <xsl:apply-templates select="@*"/>
+                        <xsl:apply-templates select="doc('input:instances')/*/instance[@id = $id]/node()"/>
+                    </xsl:copy>
+                </xsl:template>
+
+            </xsl:transform>
+        </p:input>
+        <p:output name="data" id="document"/>
+    </p:processor>
+
+    <!-- Run XForms initialization -->
+    <p:processor name="oxf:pipeline">
+        <p:input name="config" href="wrap-xforms-init-nofilter.xpl"/>
+        <p:input name="document" href="#document"/>
+        <p:output name="response" id="xhtml"/>
+    </p:processor>
+
+    <!-- Prepare Ajax request with the given actions -->
+    <p:processor name="oxf:unsafe-xslt">
+        <p:input name="data" href="#xhtml"/>
+        <p:input name="action" href="#action"/>
+        <p:input name="config">
+            <xsl:transform version="2.0">
+                <xsl:import href="oxf:/oxf/xslt/utils/copy-modes.xsl"/>
+
+                <xsl:template match="/">
+                    <xxforms:event-request>
+                        <xxforms:uuid><xsl:value-of select="//xhtml:input[@name = '$uuid']/@value"/></xxforms:uuid>
                         <xxforms:sequence>1</xxforms:sequence>
-                        <xxforms:static-state>
-                            <xsl:variable name="static-state" as="document-node()">
-                                <xsl:document>
-                                    <static-state xmlns="">
-                                        <root id="#document">
-                                            <xsl:copy-of select="doc('input:models')/*/*"/>
-                                            <xsl:apply-templates select="doc('input:controls')/*/*" mode="controls"/>
-                                        </root>
-                                        <properties xxforms:state-handling="client">
-                                            <!-- Add properties on models, as XFormsExtractorContentHandler does -->
-                                            <xsl:for-each select="doc('input:models')/*/*/@xxforms:*">
-                                                <xsl:attribute name="{name()}" select="."/>
-                                            </xsl:for-each>
-                                        </properties>
-                                        <last-id id="1000"/>
-                                    </static-state>
-                                </xsl:document>
-                            </xsl:variable>
-                            <xsl:value-of select="xpl:encodeXML($static-state)"/>
-                        </xxforms:static-state>
-                        <xxforms:dynamic-state>
-                            <xsl:if test="doc('input:instances')/instances/instance">
-                                <xsl:variable name="dynamic-state" as="document-node()">
-                                    <xsl:document>
-                                        <dynamic-state xmlns="" uuid="{$uuid}" sequence="1">
-                                            <instances>
-                                                <xsl:for-each select="doc('input:instances')/instances/instance">
-                                                    <xsl:copy>
-                                                        <xsl:copy-of select="@*"/>
-                                                        <xsl:value-of select="saxon:serialize(*[1], 'xml')"/>
-                                                    </xsl:copy>
-                                                </xsl:for-each>
-                                            </instances>
-                                        </dynamic-state>
-                                    </xsl:document>
-                                </xsl:variable>
-                                <xsl:value-of select="xpl:encodeXML($dynamic-state)"/>
-                            </xsl:if>
-                        </xxforms:dynamic-state>
+                        <xxforms:static-state><xsl:value-of select="//xhtml:input[@name = '$static-state']/@value"/></xxforms:static-state>
+                        <xxforms:dynamic-state><xsl:value-of select="//xhtml:input[@name = '$dynamic-state']/@value"/></xxforms:dynamic-state>
                         <xxforms:action>
                             <xsl:copy-of select="doc('input:action')/*/*"/>
                         </xxforms:action>
                     </xxforms:event-request>
                 </xsl:template>
-                <!-- Add xforms:repeat-iteration element within xforms:repeat -->
-                <xsl:template match="xforms:repeat" mode="controls">
-                    <xsl:copy>
-                        <xsl:copy-of select="@*"/>
-                        <xsl:element name="{name()}-iteration">
-                            <xsl:attribute name="id" select="concat(@id, '~iteration')"/>
-                            <xsl:apply-templates mode="controls"/>
-                        </xsl:element>
-                    </xsl:copy>
-                </xsl:template>
+
             </xsl:transform>
         </p:input>
         <p:output name="data" id="request"/>
@@ -109,7 +117,7 @@
         <p:output name="response" id="encoded-response" schema-href="/ops/xforms/xforms-server-response.rng"/>
     </p:processor>
 
-    <!-- Decode -->
+    <!-- Decode the result -->
     <p:processor name="oxf:unsafe-xslt">
         <p:input name="data" href="#encoded-response"/>
         <p:input name="config" href="wrap-server-decode.xsl"/>

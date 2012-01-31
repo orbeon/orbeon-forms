@@ -20,5 +20,5 @@ import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.event.XFormsEventHandler
 
 
-class XFormsActionControl(container: XBLContainer, parent: XFormsControl, element: Element, name: String, effectiveId: String, state: JMap[String, Element])
+class XFormsActionControl(container: XBLContainer, parent: XFormsControl, element: Element, name: String, effectiveId: String, state: JMap[String, String])
     extends XFormsControl(container, parent, element, name, effectiveId) with XFormsEventHandler

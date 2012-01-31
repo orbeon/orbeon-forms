@@ -71,10 +71,9 @@ public class NetUtils {
         for (SimpleDateFormat dateHeaderFormat: dateHeaderFormats)
             dateHeaderFormat.setTimeZone(gmtZone);
 
-        final String notEqNorAmpChar = "[^=&]";
-        final String token = notEqNorAmpChar+ "+";
-        PATTERN_NO_AMP = Pattern.compile( "(" + token + ")=(" + token + ")(?:&|(?<!&)\\z)" );
-        PATTERN_AMP = Pattern.compile( "(" + token + ")=(" + token + ")(?:&amp;|&|(?<!&amp;|&)\\z)" );
+        final String token = "[^=&]";
+        PATTERN_NO_AMP = Pattern.compile( "(" + token + "+)=(" + token + "*)(?:&|(?<!&)\\z)" );
+        PATTERN_AMP = Pattern.compile( "(" + token + "+)=(" + token + "*)(?:&amp;|&|(?<!&amp;|&)\\z)" );
     }
 
     public static long getDateHeader(String stringValue) throws ParseException {

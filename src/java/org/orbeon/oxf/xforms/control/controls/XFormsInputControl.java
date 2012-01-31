@@ -51,7 +51,7 @@ public class XFormsInputControl extends XFormsValueControl {
     private final String format;
     private final String unformat;
 
-    public XFormsInputControl(XBLContainer container, XFormsControl parent, Element element, String name, String id, Map<String, Element> state) {
+    public XFormsInputControl(XBLContainer container, XFormsControl parent, Element element, String name, String id, Map<String, String> state) {
         super(container, parent, element, name, id);
         if (element != null) { // can be null in some unit tests only
             this.format = element.attributeValue(new QName("format", XFormsConstants.XXFORMS_NAMESPACE));

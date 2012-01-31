@@ -30,149 +30,80 @@
     </p:processor>
 -->
 <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
-    xmlns:oxf="http://www.orbeon.com/oxf/processors"
-    xmlns:ev="http://www.w3.org/2001/xml-events"
-    xmlns:xs="http://www.w3.org/2001/XMLSchema"
-    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-    xmlns:saxon="http://saxon.sf.net/"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
-    xmlns:xforms="http://www.w3.org/2002/xforms"
-    xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary">
+          xmlns:oxf="http://www.orbeon.com/oxf/processors"
+          xmlns:ev="http://www.w3.org/2001/xml-events"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+          xmlns:xforms="http://www.w3.org/2002/xforms"
+          xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+          xmlns:xhtml="http://www.w3.org/1999/xhtml">
 
     <p:param name="submission" type="input"/>
     <p:param name="request" type="input"/>
     <p:param name="response" type="output"/>
 
-    <!-- Encode -->
+    <!-- Create XHTML+XForms document -->
     <p:processor name="oxf:unsafe-xslt">
-        <p:input name="request" href="#request"/>
-        <p:input name="submission" href="#submission"/>
-        <p:input name="data"><dummy/></p:input>
+        <p:input name="data" href="#submission"/>
         <p:input name="config">
-            <xsl:stylesheet version="2.0">
-                <xsl:output name="xml-output" method="xml" version="1.0" encoding="UTF-8" indent="no" omit-xml-declaration="no"/>
-
-                <xsl:variable name="uuid" select="uuid:createPseudoUUID()" xmlns:uuid="org.orbeon.oxf.util.UUIDUtils"/>
-                <xsl:variable name="is-shared-result" select="exists(doc('input:submission')/xforms:submission[@xxforms:shared = 'application' or @xxforms:cache = 'true'])" as="xs:boolean"/>
-                
-                <xsl:variable name="static-state" as="document-node()">
-                    <xsl:document>
-                        <static-state>
-                            <root id="#document">
-                                <xforms:model id="fr-model">
-                                    <xforms:instance id="fr-instance">
-                                        <dummy/>
-                                    </xforms:instance>
-                                    <xsl:if test="$is-shared-result">
-                                        <xforms:instance id="fr-result-instance">
-                                            <dummy/>
-                                        </xforms:instance>
-                                    </xsl:if>
-                                    <xforms:submission id="fr-default-submission" replace="instance">
-                                        <xsl:copy-of select="doc('input:submission')/xforms:submission/@*[local-name() != 'id']"/>
-                                        <xsl:copy-of select="doc('input:submission')/xforms:submission/namespace::*"/>
-                                        <xsl:copy-of select="doc('input:submission')/xforms:submission/*"/>
-                                        <!-- If the result is shared, it's not directly present in the dynamic state, so we copy it to another instance -->
-                                        <xsl:if test="$is-shared-result">
-                                            <xforms:insert ev:event="xforms-submit-done" origin="instance('fr-instance')" nodeset="instance('fr-result-instance')"/>
-                                        </xsl:if>
-                                    </xforms:submission>
-                                </xforms:model>
-                                <xforms:trigger id="fr-trigger">
-                                    <xforms:send id="fr-send" submission="fr-default-submission" ev:event="DOMActivate"/>
-                                </xforms:trigger>
-                            </root>
-                            <properties xxforms:state-handling="client" xxforms:noscript="false" xxforms:forward-submission-headers="{xpl:property('oxf.xforms.forward-submission-headers')}"
-                                        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary"/>
-                            <last-id id="1000"/>
-                        </static-state>
-                    </xsl:document>
-                </xsl:variable>
-                
-                <xsl:variable name="dynamic-state" as="document-node()">
-                    <xsl:document>
-                        <dynamic-state uuid="{$uuid}" sequence="1">
-                            <instances>
-                                <instance id="fr-instance" model-id="fr-model">
-                                    <xsl:value-of select="saxon:serialize(doc('input:request'), 'xml-output')"/>
-                                </instance>
-                                <xsl:if test="$is-shared-result">
-                                    <instance id="fr-result-instance" model-id="fr-model">&lt;dummy/></instance>
-                                </xsl:if>
-                            </instances>
-                        </dynamic-state>
-                    </xsl:document>
-                </xsl:variable>
-
-                <xsl:template match="/*/root/xforms:model/xforms:submission//*[not(exists(@id))]" mode="update-ids">
-                    <xsl:copy>
-                        <xsl:attribute name="id" select="concat('xf-', count(preceding::*) + 1)"/>
-                        <xsl:apply-templates select="@*|node()" mode="#current"/>
-                    </xsl:copy>
-                </xsl:template>
-
-                <xsl:template match="@*|node()" mode="update-ids">
-                    <xsl:copy>
-                        <xsl:apply-templates select="@*|node()" mode="#current"/>
-                    </xsl:copy>
-                </xsl:template>
-                
-                <xsl:template match="/">
-
-                    <!-- Add ids as oxf:xforms-server expects ids on all XForms elements and caller might not have put ids everywhere -->
-                    <xsl:variable name="annotated-static-state" as="document-node()">
-                        <xsl:document>
-                            <xsl:apply-templates select="$static-state" mode="update-ids"/>
-                        </xsl:document>
-                    </xsl:variable>
-
-                    <!-- A bit of a hack: oxf:xforms-server expects this value in the session to enforce session association -->
-                    <xsl:value-of select="manager:addDocumentToSession($uuid)" xmlns:manager="java:org.orbeon.oxf.xforms.state.XFormsStateManager"/>
-
-                    <xxforms:event-request>
-                        <xxforms:uuid><xsl:value-of select="$uuid"/></xxforms:uuid>
-                        <xxforms:sequence>1</xxforms:sequence>
-                        <xxforms:static-state>
-                            <xsl:value-of select="xpl:encodeXML($annotated-static-state)" xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary"/>
-                        </xxforms:static-state>
-                        <xxforms:dynamic-state>
-                            <xsl:value-of select="xpl:encodeXML($dynamic-state)" xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary"/>
-                        </xxforms:dynamic-state>
-                        <xxforms:action>
-                            <xxforms:event name="DOMActivate" source-control-id="fr-trigger"/>
-                        </xxforms:action>
-                    </xxforms:event-request>
-                </xsl:template>
-            </xsl:stylesheet>
+            <xhtml:html xsl:version="2.0">
+                <xhtml:head>
+                    <xforms:model id="fr-model" xxforms:optimize-get-all="false" xxforms:no-updates="true" xxforms:local-submission-forward="false">
+                        <!-- Instance containing the request document, and response document in case of success -->
+                        <xforms:instance id="fr-instance" src="input:data"/>
+                        <xforms:submission id="fr-default-submission" replace="instance">
+                            <xsl:copy-of select="/xforms:submission/(@* except (@id, @replace))"/>
+                            <xsl:copy-of select="/xforms:submission/namespace::*"/>
+                            <xsl:copy-of select="/xforms:submission/*"/>
+                            <!-- Upon completion (successful or not), send the resulting document to the output -->
+                            <xforms:send ev:event="xforms-submit-done xforms-submit-error" submission="fr-send-all-submission"/>
+                        </xforms:submission>
+                        <xforms:submission id="fr-send-all-submission" action="echo:" method="post" replace="all"/>
+                        <xforms:send ev:event="xforms-ready" submission="fr-default-submission"/>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body/>
+            </xhtml:html>
         </p:input>
-        <p:output name="data" id="encoded-request"/>
+        <p:output name="data" id="xhtml-xforms"/>
     </p:processor>
 
-    <!-- Run XForms Server -->
-    <p:processor name="oxf:xforms-server">
-        <p:input name="request" href="#encoded-request" schema-href="/ops/xforms/xforms-server-request.rng"/>
-        <p:output name="response" id="encoded-response" schema-href="/ops/xforms/xforms-server-response.rng"/>
+    <!-- Native XForms Initialization -->
+    <p:processor name="oxf:xforms-to-xhtml">
+        <p:input name="annotated-document" href="#xhtml-xforms"/>
+        <p:input name="data" href="#request"/>
+        <p:input name="instance"><null xsi:nil="true"/></p:input>
+        <p:output name="document" id="binary-document"/>
     </p:processor>
 
-    <!-- Decode -->
-    <p:processor name="oxf:unsafe-xslt">
-        <p:input name="data" href="#encoded-response"/>
-        <p:input name="config">
-            <xsl:stylesheet version="2.0" xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary">
-                <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
-                <xsl:template match="/">
-                    <xsl:variable name="dynamic-state" select="xpl:decodeXML(normalize-space(xxforms:event-response/xxforms:dynamic-state))" as="document-node()"/>
-
-                    <!-- A bit of a hack: oxf:xforms-server expects this value in the session to enforce session association -->
-                    <!-- Remove it here so as to not grow the session each time a submission is called. -->
-                    <xsl:value-of select="manager:removeSessionDocument($dynamic-state/*/@uuid)" xmlns:manager="java:org.orbeon.oxf.xforms.state.XFormsStateManager"/>
-                    
-                    <!-- Copy out the last instance from the dynamic state -->
-                    <xsl:copy-of select="saxon:parse($dynamic-state/dynamic-state/instances/instance[last()])"/>
-                </xsl:template>
-            </xsl:stylesheet>
-        </p:input>
-        <p:output name="data" ref="response"/>
-    </p:processor>
+    <p:choose href="#binary-document">
+        <!--&lt;!&ndash; HACK: we test on the request path to make this work for the toolbox, but really we should handle this in a different way &ndash;&gt;-->
+        <!--<p:when test="if (for $c in /*/@status-code return $c castable as xs:integer and (not((xs:integer($c) ge 200 and xs:integer($c) lt 300) or xs:integer($c) = 304)))-->
+                      <!--then form-runner:sendError(/*/@status-code)-->
+                      <!--else false()">-->
+            <!--&lt;!&ndash; Null document to keep XPL happy. The error has already been sent in the XPath expression above. &ndash;&gt;-->
+            <!--<p:processor name="oxf:identity">-->
+                <!--<p:input name="data"><null xsi:nil="true"/></p:input>-->
+                <!--<p:output name="data" ref="response"/>-->
+            <!--</p:processor>-->
+        <!--</p:when>-->
+        <p:when test="contains(/*/@content-type, 'xml')">
+            <!-- Convert binary document to XML -->
+            <p:processor name="oxf:to-xml-converter">
+                <p:input name="config">
+                    <config><handle-xinclude>false</handle-xinclude></config>
+                </p:input>
+                <p:input name="data" href="#binary-document"/>
+                <p:output name="data" ref="response"/>
+            </p:processor>
+        </p:when>
+        <p:otherwise>
+            <!-- Don't convert document -->
+            <p:processor name="oxf:identity">
+                <p:input name="data" href="#binary-document"/>
+                <p:output name="data" ref="response"/>
+            </p:processor>
+        </p:otherwise>
+    </p:choose>
 
 </p:config>

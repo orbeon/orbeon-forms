@@ -137,7 +137,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
         val instance = mock[XFormsInstance]
         Mockito when instance.getModel(Matchers.any[XFormsContainingDocument]) thenReturn model
         Mockito when instance.getXBLContainer(Matchers.any[XFormsContainingDocument]) thenReturn xblContainer
-        Mockito when instance.getDocumentInfo thenReturn doc
+        Mockito when instance.documentInfo thenReturn doc
 
         val staticState = mock[XFormsStaticState]
         Mockito when staticState.documentWrapper thenReturn doc

@@ -164,7 +164,7 @@ public class XFormsServer extends ProcessorImpl {
                     final boolean isNoscript = containingDocument.getStaticState().isNoscript();
 
                     // Set URL rewriter resource path information based on information in static state
-                    if (containingDocument.getVersionedPathMatchers() != null) {
+                    if (containingDocument.getVersionedPathMatchers() != null && containingDocument.getVersionedPathMatchers().size() > 0) {
                         // Don't override existing matchers if any (e.g. case of oxf:xforms-to-xhtml and oxf:xforms-submission processor running in same pipeline)
                         pipelineContext.setAttribute(PageFlowControllerProcessor.PATH_MATCHERS, containingDocument.getVersionedPathMatchers());
                     }

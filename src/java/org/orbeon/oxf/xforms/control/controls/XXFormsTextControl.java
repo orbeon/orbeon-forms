@@ -31,7 +31,7 @@ public class XXFormsTextControl extends XFormsOutputControl implements XFormsPse
 
     private String forAttribute;
 
-    public XXFormsTextControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId, Map<String, Element> state) {
+    public XXFormsTextControl(XBLContainer container, XFormsControl parent, Element element, String name, String effectiveId, Map<String, String> state) {
         super(container, parent, element, name, effectiveId, state);
 
         // Remember attributes

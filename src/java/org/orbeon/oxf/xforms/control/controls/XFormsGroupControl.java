@@ -50,7 +50,7 @@ public class XFormsGroupControl extends XFormsValueContainerControl {
             return null;
     }
 
-    public XFormsGroupControl(XBLContainer container, XFormsControl parent, Element element, String name, String id, Map<String, Element> state) {
+    public XFormsGroupControl(XBLContainer container, XFormsControl parent, Element element, String name, String id, Map<String, String> state) {
         super(container, parent, element, name, id);
 
         // TODO: every control should point to its static analysis

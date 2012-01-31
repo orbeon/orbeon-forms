@@ -1609,8 +1609,7 @@
 
     <test description="oxf:xforms-submission with actions upon successful result" name="oxf:xforms-submission">
         <input name="submission">
-            <xforms:submission ref="/*" method="get" replace="instance"
-                    resource="oxf:/ops/unit-tests/xforms-server/sample-instance.xml">
+            <xforms:submission method="get" resource="oxf:/ops/unit-tests/xforms-server/sample-instance.xml">
                 <!-- Try some actions -->
                 <xforms:action ev:event="xforms-submit-done">
                     <xforms:insert nodeset="/*" origin="xxforms:element('envelope', /*)"/>
@@ -1632,8 +1631,7 @@
 
     <test description="oxf:xforms-submission with actions upon error result" name="oxf:xforms-submission">
         <input name="submission">
-            <xforms:submission ref="/*" method="get" replace="instance"
-                    resource="oxf:/ops/unit-tests/xforms-server/i-don't-exist.xml">
+            <xforms:submission method="get" resource="oxf:/ops/unit-tests/xforms-server/i-don't-exist.xml">
                 <!-- Try some actions -->
                 <xforms:action ev:event="xforms-submit-done">
                     <xforms:insert nodeset="/*" origin="xxforms:element('success')"/>

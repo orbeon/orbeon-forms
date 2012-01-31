@@ -59,7 +59,7 @@ object XFormsControlFactory {
         CoreControls + XXFORMS_VARIABLE_QNAME + XXFORMS_VAR_QNAME +
         XFORMS_VARIABLE_QNAME + XFORMS_VAR_QNAME + EXFORMS_VARIABLE_QNAME
 
-    private type ControlFactory = (XBLContainer, XFormsControl, Element, String, String, JMap[String, Element]) ⇒ XFormsControl
+    private type ControlFactory = (XBLContainer, XFormsControl, Element, String, String, JMap[String, String]) ⇒ XFormsControl
 
     private val variableFactory: ControlFactory = (new XXFormsVariableControl(_, _, _, _, _, _))
 
@@ -102,7 +102,7 @@ object XFormsControlFactory {
      * @param state                 initial state if needed, or null
      * @return                      control
      */
-    def createXFormsControl(container: XBLContainer, parent: XFormsControl, element: Element, effectiveId: String, state: JMap[String, Element]) = {
+    def createXFormsControl(container: XBLContainer, parent: XFormsControl, element: Element, effectiveId: String, state: JMap[String, String]) = {
 
         def isComponent = container.getContainingDocument.getStaticOps.isComponent(element.getQName)
 

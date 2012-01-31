@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2005 Orbeon, Inc.
+ *  Copyright (C) 2007 Orbeon, Inc.
  *
  *  This program is free software; you can redistribute it and/or modify it under the terms of the
  *  GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -11,15 +11,17 @@
  *
  *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.xforms.event;
-
-import java.util.List;
+package org.orbeon.oxf.xforms.state
 
 /**
- * Represents an event observer. Implemented in particular by controls, xforms:model, xforms:instance, xforms:submission.
+ * Encoded combination of static an dynamic state that fully represents an XForms document's current state.
  */
-public interface XFormsEventObserver extends XFormsEventTarget {
-    void addListener(String eventName, EventListener listener);
-    void removeListener(String eventName, EventListener listener);
-    List<EventListener> getListeners(String eventName);
+case class XFormsState(staticStateDigest: Option[String], staticState: String, dynamicState: DynamicState) {
+
+    def this(staticState: String, dynamicState: DynamicState) =
+        this(None, staticState, dynamicState)
+
+    def staticStateDigestJava = staticStateDigest.orNull
+
+    override def toString = "XFormsState(" + staticState + "," + dynamicState + ")"
 }

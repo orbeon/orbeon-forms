@@ -1642,6 +1642,7 @@
                       xmlns:ev="http://www.w3.org/2001/xml-events">
                 <xforms:output id="my-output" mediatype="image/*" ref="image"/>
                 <xforms:trigger id="my-trigger">
+                    <xforms:label/>
                     <xforms:setvalue ev:event="DOMActivate" ref="show" id="setvalue1">false</xforms:setvalue>
                 </xforms:trigger>
             </controls>
@@ -1732,6 +1733,7 @@
                       xmlns:ev="http://www.w3.org/2001/xml-events">
                 <xxforms:attribute id="my-src-avt" for="my-image" name="src" value="{image}" for-name="img"/>
                 <xforms:trigger id="my-trigger">
+                    <xforms:label/>
                     <xforms:setvalue ev:event="DOMActivate" ref="image" id="setvalue1">    </xforms:setvalue>
                 </xforms:trigger>
             </controls>
@@ -1792,6 +1794,7 @@
                     <xxforms:size ref="@size" id="my-size"/>
                 </xforms:upload>
                 <xforms:trigger id="my-trigger">
+                    <xforms:label/>
                     <xforms:setvalue ev:event="DOMActivate" ref="." id="setvalue1"/>
                 </xforms:trigger>
             </controls>

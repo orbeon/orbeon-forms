@@ -36,7 +36,7 @@ import java.lang.{IllegalStateException, IllegalArgumentException}
 import org.dom4j._
 import org.orbeon.scaxon.XML.evalOne
 
-class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, element: Element, name: String, effectiveId: String, state: JMap[String, Element])
+class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, element: Element, name: String, effectiveId: String, state: JMap[String, String])
     extends XFormsSingleNodeContainerControl(container, parent, element, name, effectiveId) {
 
     implicit def toEventListener(f: XFormsEvent ⇒ Any) = new EventListener {
@@ -241,7 +241,7 @@ object InstanceMirror {
                 if (innerInstance ne null) { // may not be found if instance was just created
                     // Find destination path in instance
                     val namespaces = partAnalysis.getNamespaceMapping(partAnalysis.startScope.fullPrefix, instanceWrapper.getUnderlyingNode.asInstanceOf[Element])
-                    evalOne(innerInstance.getDocumentInfo, innerPath, namespaces) match {
+                    evalOne(innerInstance.documentInfo, innerPath, namespaces) match {
                         case newNode: NodeWrapper ⇒ Some(newNode)
                         case _ ⇒ throw new IllegalStateException
                     }

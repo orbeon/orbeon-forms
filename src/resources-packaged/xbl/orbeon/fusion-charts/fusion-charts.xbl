@@ -23,6 +23,7 @@
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:f="http://orbeon.org/oxf/xml/formatting"
          xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
          xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
@@ -55,6 +56,7 @@
                             <xsl:copy-of select="xxbl:parameter(., 'width')"/>
                             <xsl:copy-of select="xxbl:parameter(., 'height')"/>
                             <xsl:copy-of select="xxbl:parameter(., 'chart-id')"/>
+                            <xhtml:a f:url-type="resource" style="display: none" href="/dummy.js" class="fusion-charts-base-url"/>
                         </xforms:group>
                     </xforms:group>
                 </xsl:template>

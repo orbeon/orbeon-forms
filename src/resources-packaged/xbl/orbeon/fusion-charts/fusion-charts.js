@@ -34,8 +34,11 @@ YAHOO.xbl.fr.FusionCharts.prototype = {
         var chartId = ORBEON.xforms.Document.getValue(chartIdElement.id);
         var heightElement = YAHOO.util.Dom.getElementsByClassName("xbl-fr-fusion-charts-height", null, this.container)[0];
         var height = ORBEON.xforms.Document.getValue(heightElement.id);
-        var resourcesBaseURL = ORBEON.xforms.Globals.resourcesBaseURL[ORBEON.xforms.Controls.getForm(this.container).id];
+
+        var baseURLa = YAHOO.util.Dom.getElementsByClassName('fusion-charts-base-url', null, this.container)[0];
+        var resourcesBaseURL = baseURLa.href.substr(0, baseURLa.href.length - '/dummy.js'.length);
         var pathToSwf = resourcesBaseURL + uriToSwf + "/" + swf + ".swf?registerWithJS=1";
+
         this.createChart = function() {
        		if (chartId == '') chartId = this.container.id + "-fusion";
             var fusionChart = new FusionCharts(pathToSwf, chartId, width, height, "0", "0");

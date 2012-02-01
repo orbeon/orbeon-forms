@@ -61,12 +61,12 @@
         <xhtml:fieldset>
             <xhtml:legend>Column 3D</xhtml:legend>
             <fr:fusion-charts id="column-chart" ref="column-3d/graph" swf="Column3D" width="600" height="400"/>
-            <fr:button>
+            <xforms:trigger>
                 <xforms:label>Show me the future</xforms:label>
                 <xforms:action ev:event="DOMActivate">
                     <xforms:dispatch name="add-month" target="my-model"/>
                 </xforms:action>
-            </fr:button>
+            </xforms:trigger>
         </xhtml:fieldset>
         <xhtml:fieldset>
             <xhtml:legend>Doughnut 3D</xhtml:legend>

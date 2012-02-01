@@ -85,10 +85,6 @@
                                 <xforms:action ev:event="DOMActivate" context="$body">
                                     <!-- Insert section -->
 
-                                    <!-- Close current section -->
-                                    <xforms:toggle case="case-fb-top-level-section-closed"/>
-                                    <xforms:toggle case="case-button-fb-top-level-section-closed"/>
-
                                     <xxforms:variable name="old-section-index" select="index('fb-top-level-repeat')" as="xs:integer"/>
 
                                     <!-- Insert section template in the UI -->

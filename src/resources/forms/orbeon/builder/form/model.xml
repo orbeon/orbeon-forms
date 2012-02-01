@@ -144,9 +144,22 @@
             <xforms:toggle case="fb-editor-open-case"/>
             <xforms:toggle case="fb-metadata-view-case"/>
         </xforms:action>
-        <!-- Open first section -->
-        <xforms:toggle case="case-fb-top-level-section-open"/>
-        <xforms:toggle case="case-button-fb-top-level-section-open"/>
+        <!-- Number of controls within grid cells -->
+        <xxforms:variable name="many-controls" select="count($body//*:td[exists(*)]) ge 50"/>
+        <xforms:action if="$many-controls">
+            <!-- Open first section only -->
+            <xforms:toggle case="case-fb-top-level-section-open"/>
+            <xforms:toggle case="case-button-fb-top-level-section-open"/>
+        </xforms:action>
+        <xforms:action if="not($many-controls)">
+            <!-- Open all top-level sections -->
+            <xforms:action xxforms:iterate="1 to count($body/fr:*)">
+                <xforms:setindex repeat="fb-top-level-repeat" index="." xxforms:deferred-updates="false"/>
+                <xforms:toggle case="case-fb-top-level-section-open" xxforms:deferred-updates="false"/>
+                <xforms:toggle case="case-button-fb-top-level-section-open" xxforms:deferred-updates="false"/>
+            </xforms:action>
+            <xforms:setindex repeat="fb-top-level-repeat" index="1" xxforms:deferred-updates="false"/>
+        </xforms:action>
     </xforms:action>
 
     <!-- Binds on main instance -->

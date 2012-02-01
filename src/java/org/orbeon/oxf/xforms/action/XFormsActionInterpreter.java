@@ -537,4 +537,18 @@ public class XFormsActionInterpreter {
             return resolveEffectiveObject(actionElement, staticOrEffectiveId);
         }
     }
+
+    public boolean isDeferredUpdates(Element actionElement) {
+        
+        final XFormsContextStack.BindingContext bindingContext = _actionXPathContext.getCurrentBindingContext();
+        
+        final boolean deferredUpdates;
+        if (bindingContext.getSingleItem() != null) {
+            deferredUpdates = ! "false".equals(resolveAVT(actionElement, XFormsConstants.XXFORMS_DEFERRED_UPDATES_QNAME));
+        } else {
+            // TODO: Presence of context is not the right way to decide whether to evaluate AVTs or not
+            deferredUpdates = true;
+        }
+        return deferredUpdates;
+    }
 }

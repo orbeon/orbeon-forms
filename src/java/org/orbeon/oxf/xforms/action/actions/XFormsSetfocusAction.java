@@ -48,7 +48,8 @@ public class XFormsSetfocusAction extends XFormsAction {
         }
 
         // "This XForms Action begins by invoking the deferred update behavior."
-        containingDocument.synchronizeAndRefresh();
+        if (actionInterpreter.isDeferredUpdates(actionElement))
+            containingDocument.synchronizeAndRefresh();
 
         // Find control
         final Object controlObject;

@@ -29,7 +29,8 @@ object XFormsSetindexAction {
         val indentedLogger = interpreter.indentedLogger
         
         // "This XForms Action begins by invoking the deferred update behavior."
-        interpreter.containingDocument.synchronizeAndRefresh()
+        if (interpreter.isDeferredUpdates(actionElement))
+            interpreter.containingDocument.synchronizeAndRefresh()
         
         // Find repeat control
         interpreter.resolveEffectiveControl(actionElement, repeatStaticId) match {

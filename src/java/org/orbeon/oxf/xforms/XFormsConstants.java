@@ -333,6 +333,7 @@ public class XFormsConstants {
     public static final QName XXFORMS_CONTEXT_QNAME = new QName("context", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_REPEAT_INDEXES_QNAME = new QName("repeat-indexes", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_DND_QNAME = new QName("dnd", XXFORMS_NAMESPACE);
+    public static final QName XXFORMS_DEFERRED_UPDATES_QNAME = new QName("deferred-updates", XXFORMS_NAMESPACE);
 
     public static final QName XXFORMS_FORMAT_QNAME = new QName("format", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_UNFORMAT_QNAME = new QName("unformat", XXFORMS_NAMESPACE);

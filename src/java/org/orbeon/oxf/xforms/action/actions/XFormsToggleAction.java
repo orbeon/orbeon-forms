@@ -49,7 +49,8 @@ public class XFormsToggleAction extends XFormsAction {
         }
 
         // "This XForms Action begins by invoking the deferred update behavior."
-        containingDocument.synchronizeAndRefresh();
+        if (actionInterpreter.isDeferredUpdates(actionElement))
+            containingDocument.synchronizeAndRefresh();
 
         // Find case control
         final XFormsCaseControl caseControl = (XFormsCaseControl) actionInterpreter.resolveEffectiveControl(actionElement, caseStaticId);

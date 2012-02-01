@@ -39,7 +39,6 @@
                 <xforms:setvalue ref="@relevant" value="'true'"/>       <!-- Should be handled by XBL -->
                 <xforms:setvalue ref="control-name" value="controlOps:controlName(event('control-id'))"/>
                 <xforms:setvalue ref="control-type" value="event('control-type')"/>
-                <xforms:message value="control-type"/>
                 <xforms:refresh/>                                       <!-- The view needs to be relevant before it gets the event for action to run in a proper context -->
                 <xxforms:show dialog="dialog"/>
             </xbl:handler>

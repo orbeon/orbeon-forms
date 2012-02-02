@@ -2067,7 +2067,8 @@ ORBEON.xforms.Controls = {
         var checkboxInputs = target.getElementsByTagName("input");
         for (var checkboxInputIndex = 0; checkboxInputIndex < checkboxInputs.length; checkboxInputIndex++) {
             var checkboxInput = checkboxInputs[checkboxInputIndex];
-            var parentSpan = checkboxInput.parentNode.parentNode;
+            var parentSpan = checkboxInput.parentNode;                                              // Boolean checkboxes are directly inside a span
+            if (parentSpan.tagName.toLowerCase() == 'label') parentSpan = parentSpan.parentNode;    // While xf:select checkboxes have a label in between
             if (checkboxInput.checked) {
                 YAHOO.util.Dom.addClass(parentSpan, "xforms-selected");
                 YAHOO.util.Dom.removeClass(parentSpan, "xforms-deselected");

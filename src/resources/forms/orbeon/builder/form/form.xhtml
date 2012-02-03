@@ -425,24 +425,35 @@
                                                         <xforms:label><xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/arrow_up.png" alt="{$form-resources/move-up-icon/label}" title="{$form-resources/move-up-icon/label}"/></xforms:label>
                                                         <!-- Move section up -->
                                                         <xforms:action ev:event="DOMActivate">
+                                                            <xxforms:variable name="is-open" select="xxforms:case('switch-fb-top-level-section') = 'case-fb-top-level-section-open'"/>
                                                             <xforms:insert nodeset="$top-level-block/preceding-sibling::fr:*[1]" position="before" origin="$top-level-block"/>
                                                             <xforms:delete nodeset="$top-level-block"/>
                                                             <!-- Move instance holder -->
                                                             <xforms:insert origin="$section-holder" nodeset="$section-holder/preceding-sibling::*[1]" position="before"/>
                                                             <xforms:delete nodeset="$section-holder"/>
                                                             <!-- TODO: would be nice to resources as well -->
+                                                            <xforms:action if="$is-open">
+                                                                <xforms:toggle case="case-fb-top-level-section-open" xxforms:repeat-indexes="{index('fb-top-level-repeat')}"/>
+                                                                <xforms:toggle case="case-button-fb-top-level-section-open" xxforms:repeat-indexes="{index('fb-top-level-repeat')}"/>
+                                                        </xforms:action>
                                                         </xforms:action>
                                                     </xforms:trigger>
                                                     <xforms:trigger appearance="minimal" ref=".[$top-level-block/following-sibling::fr:*]">
                                                         <xforms:label><xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/arrow_down.png" alt="{$form-resources/move-down-icon/label}" title="{$form-resources/move-down-icon/label}"/></xforms:label>
                                                         <!-- Move section down -->
                                                         <xforms:action ev:event="DOMActivate">
+                                                            <xxforms:variable name="is-open" select="xxforms:case('switch-fb-top-level-section') = 'case-fb-top-level-section-open'"/>
                                                             <xforms:insert nodeset="$top-level-block/following-sibling::fr:*[1]" position="after" origin="$top-level-block"/>
                                                             <xforms:delete nodeset="$top-level-block"/>
                                                             <!-- Move instance holder -->
                                                             <xforms:insert origin="$section-holder" nodeset="$section-holder/following-sibling::*[1]" position="after"/>
                                                             <xforms:delete nodeset="$section-holder"/>
                                                             <!-- TODO: would be nice to resources as well -->
+                                                            <!-- Make sure the section that moved is in the same open/closed state -->
+                                                            <xforms:action if="$is-open">
+                                                                <xforms:toggle case="case-fb-top-level-section-open" xxforms:repeat-indexes="{index('fb-top-level-repeat')}"/>
+                                                                <xforms:toggle case="case-button-fb-top-level-section-open" xxforms:repeat-indexes="{index('fb-top-level-repeat')}"/>
+                                                            </xforms:action>
                                                         </xforms:action>
                                                     </xforms:trigger>
                                                     <!-- Edit help for section -->

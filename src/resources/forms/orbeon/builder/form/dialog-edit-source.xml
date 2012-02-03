@@ -42,6 +42,9 @@
                     <xforms:insert nodeset="xxforms:instance('fr-form-instance')" origin="saxon:parse(instance('fb-source-editor-instance')/source)"/>
                     <!-- Saxon serialization adds an extra meta element -->
                     <xforms:delete nodeset="xxforms:instance('fr-form-instance')/xhtml:head/meta[@http-equiv = 'Content-Type']"/>
+                    <!-- Adjust sections for large forms -->
+                    <xforms:refresh model="fr-form-model"/>
+                    <xforms:dispatch name="fb-adjust-sections" target="fr-form-model"/>
                 </xforms:action>
             </xforms:trigger>
             <xforms:output value="$form-resources/or/label"/>

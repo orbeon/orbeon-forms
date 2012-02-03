@@ -144,6 +144,11 @@
             <xforms:toggle case="fb-editor-open-case"/>
             <xforms:toggle case="fb-metadata-view-case"/>
         </xforms:action>
+        <!-- Adjust sections for large forms -->
+        <xforms:dispatch name="fb-adjust-sections" target="fr-form-model"/>
+    </xforms:action>
+
+    <xforms:action ev:event="fb-adjust-sections">
         <!-- Number of controls within grid cells -->
         <xxforms:variable name="many-controls" select="count($body//*:td[exists(*)]) ge 50"/>
         <xforms:action if="$many-controls">

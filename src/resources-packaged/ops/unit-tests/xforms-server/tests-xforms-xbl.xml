@@ -649,7 +649,7 @@
                             <xhtml:body>
                                 <!-- XBL -->
                                 <xbl:xbl xmlns:xbl="http://www.w3.org/ns/xbl">
-                                    <xbl:binding id="fr-data-bound-select1" element="fr|foobar">
+                                    <xbl:binding id="fr-databound-select1" element="fr|foobar">
                                         <xbl:template>
                                             <xforms:model id="xbl-model">
                                                 <!-- Check that the namespace for xxforms:* is in scope: this must not cause a Java exception -->

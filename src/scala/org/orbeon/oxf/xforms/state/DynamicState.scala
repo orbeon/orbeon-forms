@@ -97,7 +97,7 @@ case class DynamicState(
             if (isForceEncryption) XFormsProperties.getXFormsPassword else null
         )
 
-    // Encode to an XML representation
+    // Encode to an XML representation (as of 2012-02-05, used only by unit tests)
     def toXML = {
         val document = Dom4jUtils.createDocument
         val rootElement = document.addElement("dynamic-state")

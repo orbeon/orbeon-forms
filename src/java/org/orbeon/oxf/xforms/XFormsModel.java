@@ -119,7 +119,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
                 // At least one instance in this model
                 instanceIds = new ArrayList<String>(instanceContainers.size());
                 for (Element instanceContainer: instanceContainers) {
-                    final String instanceId = XFormsInstance.getInstanceStaticId(instanceContainer);
+                    final String instanceId = XFormsUtils.getElementStaticId(instanceContainer);
                     instanceIds.add(instanceId);
                 }
                 instances = Arrays.asList(new XFormsInstance[instanceIds.size()]);
@@ -610,7 +610,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
                     } else {
                         // Did not get the instance from static state
 
-                        final String instanceStaticId = XFormsInstance.getInstanceStaticId(containerElement);
+                        final String instanceStaticId = XFormsUtils.getElementStaticId(containerElement);
 
                         // Load instance. This might throw an exception event (and therefore a Java exception) in case of fatal problem.
                         loadInstance(instanceStaticId);

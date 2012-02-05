@@ -101,12 +101,10 @@ object XFormsProtocols extends StandardTypes with StandardPrimitives with JavaLo
             write(output, instance.timeToLive)
             write(output, StringUtils.trimToEmpty(instance.requestBodyHash))
 
+            write(output, instance.readonly)
             write(output, StringUtils.trimToEmpty(instance.validation))
             write(output, instance.handleXInclude)
             write(output, instance.exposeXPathTypes)
-
-            write(output, instance.replaced)
-            write(output, instance.readonly)
 
             if (! instance.cache) {
                 val xmlString =
@@ -125,30 +123,17 @@ object XFormsProtocols extends StandardTypes with StandardPrimitives with JavaLo
                 //System.out.println("  size: " + xmlString.length)
                 write(output, xmlString)
             }
+
+            write(output, instance.replaced)
         }
         
         def reads(in: Input) = {
 
-            val staticId = read[String](in)
-            val modelEffectiveId = read[String](in)
+            lazy val cache = read[Boolean](in)
+            lazy val readonly = read[Boolean](in)
+            lazy val exposeXPathTypes = read[Boolean](in)
 
-            val sourceURI = StringUtils.trimToNull(read[String](in))
-            val username = StringUtils.trimToNull(read[String](in))
-            val password = StringUtils.trimToNull(read[String](in))
-            val domain = StringUtils.trimToNull(read[String](in))
-
-            val cache = read[Boolean](in)
-            val timeToLive = read[Long](in)
-            val requestBodyHash = StringUtils.trimToNull(read[String](in))
-
-            val validation = StringUtils.trimToNull(read[String](in))
-            val handleXInclude = read[Boolean](in)
-            val exposeXPathTypes = read[Boolean](in)
-
-            val replaced = read[Boolean](in)
-            val readonly = read[Boolean](in)
-
-            val documentInfo =
+            def documentInfo =
                 if (! cache) {
                     val xmlString = read[String](in)
                     XFormsInstance.createDocumentInfo(xmlString, readonly = readonly, exposeXPathTypes = exposeXPathTypes)
@@ -156,25 +141,25 @@ object XFormsProtocols extends StandardTypes with StandardPrimitives with JavaLo
                     null
 
             new XFormsInstance(
-                staticId,
-                modelEffectiveId,
+                read[String](in),
+                read[String](in),
 
-                sourceURI,
-                username,
-                password,
-                domain,
+                StringUtils.trimToNull(read[String](in)),
+                StringUtils.trimToNull(read[String](in)),
+                StringUtils.trimToNull(read[String](in)),
+                StringUtils.trimToNull(read[String](in)),
 
                 cache,
-                timeToLive,
-                requestBodyHash,
+                read[Long](in),
+                StringUtils.trimToNull(read[String](in)),
 
                 readonly,
-                validation,
-                handleXInclude,
+                StringUtils.trimToNull(read[String](in)),
+                read[Boolean](in),
                 exposeXPathTypes,
                 documentInfo,
 
-                replaced
+                read[Boolean](in)
             )
         }
     }

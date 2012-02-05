@@ -49,7 +49,7 @@ class XFormsInstance(
         val domain: String,     // Option
     
         val cache: Boolean,
-        val timeToLive: Long,
+        val timeToLive: Long,   // Option
         val requestBodyHash: String, // Option
         
         val readonly: Boolean,
@@ -57,7 +57,7 @@ class XFormsInstance(
         val handleXInclude: Boolean,
         val exposeXPathTypes: Boolean,
 
-        val documentInfo: DocumentInfo,
+        val documentInfo: DocumentInfo, // Option
 
         var replaced: Boolean = false)
 
@@ -70,15 +70,12 @@ class XFormsInstance(
         this.modelEffectiveId = modelEffectiveId
 
     // NOTE: `replaced`: Whether the instance was ever replaced. This is useful so that we know whether we can use an
-    // instance from the static state or not: if it was ever replaced, then we can't use instance information from the static state.
+    // instance from the static state or not: if it was ever replaced, then we can't use instance information from the
+    // static state.
     def setReplaced(replaced: Boolean) =
         this.replaced = replaced
 
-    /**
-     * Create a mutable version of this instance with the same instance document.
-     *
-     * @return  mutable XFormsInstance
-     */
+    // Create a mutable version of this instance with the same instance document
     def createMutableInstance =
         new XFormsInstance(
             staticId,
@@ -102,6 +99,7 @@ class XFormsInstance(
             replaced // ???
         )
 
+    // Encode to an XML representation (as of 2012-02-05, used only by unit tests)
     def toXML(serializeDocument: Boolean): Element = {
         val instanceElement = Dom4jUtils.createElement("instance")
 
@@ -141,12 +139,7 @@ class XFormsInstance(
     // Don't serialize if readonly, not replaced, and inline
     def mustSerialize = ! (readonly && ! replaced && (sourceURI eq null))
 
-    /**
-     * Return the model that contains this instance.
-     *
-     * @param containingDocument    XFormsContainingDocument
-     * @return XFormsModel          XFormsModel containing this instance
-     */
+    // Return the model that contains this instance
     def getModel(containingDocument: XFormsContainingDocument) =
         containingDocument.getObjectByEffectiveId(modelEffectiveId).asInstanceOf[XFormsModel]
 
@@ -162,26 +155,18 @@ class XFormsInstance(
     def isStrictValidation = validation == "strict"
     def isSchemaValidation = (isLaxValidation || isStrictValidation) && ! readonly
 
-    /**
-     * Output the instance to the specified ContentHandler
-     *
-     * @param xmlReceiver   receiver to write to
-     */
+    // Output the instance document to the specified ContentHandler
     def write(xmlReceiver: XMLReceiver) =
         TransformerUtils.sourceToSAX(documentInfo, xmlReceiver)
 
-    /**
-     * This prints the instance with extra annotation attributes to System.out. For debug only.
-     */
+    // Print the instance with extra annotation attributes to Console.out. For debug only.
     def debugPrintOut() = {
         val identityTransformerHandler: TransformerXMLReceiver = TransformerUtils.getIdentityTransformerHandler
-        identityTransformerHandler.setResult(new StreamResult(System.out))
+        identityTransformerHandler.setResult(new StreamResult(Console.out))
         write(identityTransformerHandler)
     }
 
-    /**
-     * This allows dumping all the current MIPs applying to this instance.
-     */
+    // Log the current MIP values applied to this instance
     def debugLogMIPs() = {
         val result = Dom4jUtils.createDocument
         getDocument.accept(new VisitorSupport {
@@ -264,7 +249,7 @@ class XFormsInstance(
             case _ ⇒
         }
 
-    private def updateRepeatNodesets(controls: XFormsControls, insertedNodes: JList[Item]) = {
+    private def updateRepeatNodesets(controls: XFormsControls, insertedNodes: JList[Item]) {
         val repeatControlsMap = controls.getCurrentControlTree.getRepeatControls
         if (repeatControlsMap ne null) {
             val instanceScope = getXBLContainer(controls.getContainingDocument).getPartAnalysis.getResolutionScopeByPrefixedId(getPrefixedId)
@@ -283,13 +268,8 @@ class XFormsInstance(
         }
     }
 
-    /**
-     * Return the instance document as a dom4j Document.
-     *
-     * NOTE: Should use getInstanceDocumentInfo() whenever possible.
-     *
-     * @return  instance document
-     */
+    // Return the instance document as a dom4j Document.
+    // NOTE: Should use getInstanceDocumentInfo() whenever possible.
     def getDocument: Document =
         documentInfo match {
             case documentWrapper: DocumentWrapper ⇒
@@ -302,7 +282,7 @@ class XFormsInstance(
         if (indentedLogger.isDebugEnabled)
             indentedLogger.logDebug("", message, "effective model id", modelEffectiveId, "effective instance id", getEffectiveId, "instance", TransformerUtils.tinyTreeToString(getInstanceRootElementInfo))
 
-    def getBindingContext(containingDocument: XFormsContainingDocument): XFormsContextStack.BindingContext =
+    def getBindingContext(containingDocument: XFormsContainingDocument) =
         throw new IllegalStateException
 
     // Don't allow any external events
@@ -310,9 +290,6 @@ class XFormsInstance(
 }
 
 object XFormsInstance {
-
-    def getInstanceStaticId(xformsInstanceElement: Element) =
-        XFormsUtils.getElementStaticId(xformsInstanceElement)
 
     def isReadonlyHint(element: Element) =
         element.attributeValue(XFormsConstants.XXFORMS_READONLY_ATTRIBUTE_QNAME) == "true"

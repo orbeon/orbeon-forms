@@ -16,7 +16,6 @@ package org.orbeon.oxf.xforms;
 import org.apache.commons.collections.map.CompositeMap;
 import org.dom4j.Namespace;
 import org.dom4j.QName;
-import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.XPathCache;
@@ -130,11 +129,11 @@ public class XFormsModelBinds {
                     dependencies.hasAnyValidationBind(staticModel, instance.getPrefixedId());
 
             if (instanceMightBeSchemaValidated || instanceMightHaveMips) {
-                XFormsUtils.iterateInstanceData(instance, new XFormsUtils.InstanceWalker() {
-                    public void walk(NodeInfo nodeInfo) {
+                DataModel.visitElementJava(instance.getInstanceRootElementInfo(), new DataModel.NodeVisitor() {
+                    public void visit(NodeInfo nodeInfo) {
                         InstanceData.clearState(nodeInfo);
                     }
-                }, true);
+                });
             }
         }
 

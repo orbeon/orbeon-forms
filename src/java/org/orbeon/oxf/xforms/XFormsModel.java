@@ -26,10 +26,11 @@ import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.analysis.model.Instance;
 import org.orbeon.oxf.xforms.analysis.model.Model;
 import org.orbeon.oxf.xforms.analysis.model.Submission;
-import org.orbeon.oxf.xforms.event.EventListener;
 import org.orbeon.oxf.xforms.event.*;
+import org.orbeon.oxf.xforms.event.EventListener;
 import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsExtractDocument;
+import org.orbeon.oxf.xforms.model.DataModel;
 import org.orbeon.oxf.xforms.model.XFormsModelAction;
 import org.orbeon.oxf.xforms.submission.BaseSubmission;
 import org.orbeon.oxf.xforms.submission.XFormsModelSubmission;
@@ -973,11 +974,11 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
                 // The reason is that clearing this state can take quite some time
                 final boolean instanceMightBeSchemaValidated = hasSchema && instance.isSchemaValidation();
                 if (instanceMightBeSchemaValidated) {
-                    XFormsUtils.iterateInstanceData(instance, new XFormsUtils.InstanceWalker() {
-                        public void walk(NodeInfo nodeInfo) {
+                    DataModel.visitElementJava(instance.getInstanceRootElementInfo(), new DataModel.NodeVisitor() {
+                        public void visit(NodeInfo nodeInfo) {
                             InstanceData.clearSchemaState(nodeInfo);
                         }
-                    }, true);
+                    });
                 }
             }
 

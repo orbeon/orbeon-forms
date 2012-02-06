@@ -68,39 +68,6 @@ public class XFormsUtils {
 
     private static final int SRC_CONTENT_BUFFER_SIZE = NetUtils.COPY_BUFFER_SIZE / 2;
 
-    /**
-     * Iterate through nodes of the instance document and call the walker on each of them.
-     *
-     * @param instance          instance to iterate
-     * @param instanceWalker    walker to call back
-     * @param allNodes          all the nodes, otherwise only leaf data nodes
-     */
-    public static void iterateInstanceData(XFormsInstance instance, InstanceWalker instanceWalker, boolean allNodes) {
-        iterateInstanceData(instance.getInstanceRootElementInfo(), instanceWalker, allNodes);
-    }
-
-    private static void iterateInstanceData(NodeInfo elementNodeInfo, InstanceWalker instanceWalker, boolean allNodes) {
-
-        final List childrenElements = getChildrenElements(elementNodeInfo);
-
-        // We "walk" an element which contains elements only if allNodes == true
-        if (allNodes || childrenElements.size() == 0)
-            instanceWalker.walk(elementNodeInfo);
-
-        // "walk" current element's attributes
-        for (Object o: getAttributes(elementNodeInfo)) {
-            final NodeInfo attributeNodeInfo = (NodeInfo) o;
-            instanceWalker.walk(attributeNodeInfo);
-        }
-        // "walk" current element's children elements
-        if (childrenElements.size() != 0) {
-            for (Object childrenElement: childrenElements) {
-                final NodeInfo childElement = (NodeInfo) childrenElement;
-                iterateInstanceData(childElement, instanceWalker, allNodes);
-            }
-        }
-    }
-
     public static String encodeXMLAsDOM(org.w3c.dom.Node node) {
         try {
             return encodeXML(TransformerUtils.domToDom4jDocument(node), XFormsProperties.isGZIPState(), XFormsProperties.getXFormsPassword(), false);
@@ -682,10 +649,6 @@ public class XFormsUtils {
         return XPathCache.evaluateAsAvt(xpathContext, contextNode, attributeValue);
     }
 
-    public static interface InstanceWalker {
-        public void walk(NodeInfo nodeInfo);
-    }
-
     /**
      * Resolve a URI string against an element, taking into account ancestor xml:base attributes for
      * the resolution, and using the document's request URL as a base.
@@ -865,39 +828,6 @@ public class XFormsUtils {
     }
 
     /**
-     * Get an element's children elements if any.
-     *
-     * @param nodeInfo  element NodeInfo to look at
-     * @return          elements NodeInfo or empty list
-     */
-    public static List<NodeInfo> getChildrenElements(NodeInfo nodeInfo) {
-        final List<NodeInfo> result = new ArrayList<NodeInfo>();
-        getChildrenElements(result, nodeInfo);
-        return result;
-    }
-
-    /**
-     * Get an element's children elements if any.
-     *
-     * @param result    List to which to add the elements found
-     * @param nodeInfo  element NodeInfo to look at
-     */
-    public static void getChildrenElements(List<NodeInfo> result, NodeInfo nodeInfo) {
-        final AxisIterator i = nodeInfo.iterateAxis(Axis.CHILD);
-        i.next();
-        while (i.current() != null) {
-            final Item current = i.current();
-            if (current instanceof NodeInfo) {
-                final NodeInfo currentNodeInfo = (NodeInfo) current;
-                if (currentNodeInfo.getNodeKind() == org.w3c.dom.Document.ELEMENT_NODE) {
-                    result.add(currentNodeInfo);
-                }
-            }
-            i.next();
-        }
-    }
-
-    /**
      * Return whether the given node has at least one child element.
      *
      * @param nodeInfo  NodeInfo to look at
@@ -917,71 +847,6 @@ public class XFormsUtils {
             i.next();
         }
         return false;
-    }
-
-    /**
-     * Get an element's attributes if any.
-     *
-     * @param nodeInfo  element NodeInfo to look at
-     * @return          attributes or empty list
-     */
-    public static List<Item> getAttributes(NodeInfo nodeInfo) {
-        final List<Item> result = new ArrayList<Item>();
-        getAttributes(result, nodeInfo);
-        return result;
-    }
-
-    /**
-     * Get an element's attributes if any.
-     *
-     * @param result    List to which to add the attributes found
-     * @param nodeInfo  element NodeInfo to look at
-     */
-    public static void getAttributes(List<Item> result, NodeInfo nodeInfo) {
-
-        if (nodeInfo.getNodeKind() != org.w3c.dom.Document.ELEMENT_NODE)
-            throw new OXFException("Invalid node type passed to getAttributes(): " + nodeInfo.getNodeKind());
-
-        final AxisIterator i = nodeInfo.iterateAxis(Axis.ATTRIBUTE);
-        i.next();
-        while (i.current() != null) {
-            final Item current = i.current();
-            if (current instanceof NodeInfo) {
-                final NodeInfo currentNodeInfo = (NodeInfo) current;
-                if (currentNodeInfo.getNodeKind() == org.w3c.dom.Document.ATTRIBUTE_NODE) {
-                    result.add(currentNodeInfo);
-                }
-            }
-            i.next();
-        }
-    }
-
-    /**
-     * Find all attributes and nested nodes of the given nodeset.
-     */
-    public static void getNestedAttributesAndElements(List<Item> result, List nodeset) {
-        // Iterate through all nodes
-        if (nodeset.size() > 0) {
-            for (Object aNodeset: nodeset) {
-                final NodeInfo currentNodeInfo = (NodeInfo) aNodeset;
-
-                if (currentNodeInfo.getNodeKind() == org.w3c.dom.Document.ELEMENT_NODE) {
-                    // Found an element
-
-                    // Add attributes
-                    getAttributes(result, currentNodeInfo);
-
-                    // Find children elements
-                    final List<NodeInfo> childrenElements = getChildrenElements(currentNodeInfo);
-
-                    // Add all children elements
-                    result.addAll(childrenElements);
-
-                    // Recurse into children elements
-                    getNestedAttributesAndElements(result, childrenElements);
-                }
-            }
-        }
     }
 
     /**

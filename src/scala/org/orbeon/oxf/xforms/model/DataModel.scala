@@ -24,6 +24,7 @@ import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.saxon.value.AtomicValue
 import org.orbeon.saxon.om.{Item, NodeInfo}
 import org.orbeon.oxf.xml.dom4j.{LocationData, Dom4jUtils}
+import org.orbeon.saxon.om.Axis
 
 /**
  * Represent access to the data model via the NodeInfo abstraction.
@@ -197,5 +198,53 @@ object DataModel {
     private def isNodeType(item: Item, nodeType: Int) = item match {
         case nodeInfo: NodeInfo if nodeInfo.getNodeKind == nodeType ⇒ true
         case _ ⇒ false
+    }
+
+    // Return the given node's first child element
+    def firstChildElement(node: NodeInfo): NodeInfo = {
+        val iterator = node.iterateAxis(Axis.CHILD)
+        var next = iterator.next()
+        while (next ne null) {
+            next match {
+                case child: NodeInfo if child.getNodeKind == ELEMENT_NODE ⇒ return child
+                case _ ⇒
+            }
+            next = iterator.next()
+        }
+        null
+    }
+
+    // For Java callers
+    trait NodeVisitor { def visit(nodeInfo: NodeInfo) }
+    def visitElementJava(root: NodeInfo, visitor: NodeVisitor) = visitElement(root, visitor.visit)
+
+    // Visit the given element, its attributes, and its children nodes recursively
+    // NOTE: Because this can be a hot spot, this is written more Java-like. Make changes carefully.
+    def visitElement(e: NodeInfo, visit: NodeInfo ⇒ Unit) {
+
+        visit(e)
+
+        locally {
+            val iterator = e.iterateAxis(Axis.ATTRIBUTE)
+            var next = iterator.next()
+            while (next ne null) {
+                // We know that iterateAxis(Axis.ATTRIBUTE) returns only NodeInfo
+                visit(next.asInstanceOf[NodeInfo])
+                next = iterator.next()
+            }
+        }
+
+        locally {
+            val iterator = e.iterateAxis(Axis.CHILD)
+            var next = iterator.next()
+            while (next ne null) {
+                if (next.isInstanceOf[NodeInfo]) {
+                    val node = next.asInstanceOf[NodeInfo]
+                    if (node.getNodeKind == ELEMENT_NODE)
+                        visitElement(node, visit)
+                }
+                next = iterator.next()
+            }
+        }
     }
 }

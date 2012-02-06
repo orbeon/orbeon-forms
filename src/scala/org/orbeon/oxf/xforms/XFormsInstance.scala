@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms
 
+import model.DataModel
 import org.dom4j._
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver
@@ -27,12 +28,11 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.xml.dom4j.LocationData
 import org.orbeon.saxon.dom4j.DocumentWrapper
 import org.orbeon.saxon.dom4j.TypedDocumentWrapper
-import org.orbeon.saxon.om.DocumentInfo
-import org.orbeon.saxon.om.Item
 import javax.xml.transform.stream.StreamResult
 import java.util.{List ⇒ JList}
 import scala.collection.JavaConverters._
 import org.orbeon.oxf.util.{XPathCache, IndentedLogger}
+import org.orbeon.saxon.om.{NodeInfo, Axis, DocumentInfo, Item}
 
 /**
  * Represent an XForms instance.
@@ -150,7 +150,7 @@ class XFormsInstance(
     def getModel(containingDocument: XFormsContainingDocument) =
         containingDocument.getObjectByEffectiveId(modelEffectiveId).asInstanceOf[XFormsModel]
 
-    def getInstanceRootElementInfo = XFormsUtils.getChildrenElements(documentInfo).get(0)
+    def getInstanceRootElementInfo = DataModel.firstChildElement(documentInfo)
 
     def getId = staticId
     def getPrefixedId = XFormsUtils.getPrefixedId(getEffectiveId)

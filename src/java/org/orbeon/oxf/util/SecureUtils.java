@@ -222,7 +222,7 @@ public class SecureUtils {
         // Format result
         final String result;
         if ("base64".equals(encoding)) {
-            result = Base64.encode(digestBytes);
+            result = Base64.encode(digestBytes, true);
         } else if ("hex".equals(encoding)) {
             result = byteArrayToHex(digestBytes);
         } else {
@@ -257,7 +257,7 @@ public class SecureUtils {
     	// Format result
     	final String result;
     	if ("base64".equals(encoding)) {
-    		result = Base64.encode(digestBytes);
+    		result = Base64.encode(digestBytes, true);
     	} else if ("hex".equals(encoding)) {
     		result = byteArrayToHex(digestBytes);
     	} else {

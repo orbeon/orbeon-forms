@@ -28,7 +28,7 @@ package org.orbeon.oxf.util;
  *
  * This implementation does not encode/decode streaming
  * data. You need the data that you will encode/decode
- * already on a byte arrray.
+ * already on a byte array.
  *
  * @author Jeffrey Rodriguez
  * @author Sandy Gao
@@ -80,34 +80,24 @@ public class Base64 {
 
     }
 
-    public static boolean isWhiteSpace(char octect) {
-        return (octect == 0x20 || octect == 0xd || octect == 0xa || octect == 0x9);
+    public static boolean isWhiteSpace(char octet) {
+        return (octet == 0x20 || octet == 0xd || octet == 0xa || octet == 0x9);
     }
 
-    protected static boolean isPad(char octect) {
-        return (octect == PAD);
+    protected static boolean isPad(char octet) {
+        return (octet == PAD);
     }
 
-    protected static boolean isData(char octect) {
-        return (base64Alphabet[octect] != -1);
+    protected static boolean isData(char octet) {
+        return (base64Alphabet[octet] != -1);
     }
 
-    protected static boolean isBase64(char octect) {
-        return (isWhiteSpace(octect) || isPad(octect) || isData(octect));
-    }
-
-    /**
-     * Encodes hex octects into Base64
-     *
-     * @param binaryData Array containing binaryData
-     * @return Encoded Base64 array
-     */
-    public static String encode(byte[] binaryData) {
-        return encode(binaryData, true);
+    protected static boolean isBase64(char octet) {
+        return (isWhiteSpace(octet) || isPad(octet) || isData(octet));
     }
 
     /**
-     * Encodes hex octects into Base64
+     * Encodes hex octets into Base64
      *
      * @param binaryData    array containing binaryData
      * @param useLineBreaks whether to use line breaks between blocks (using "false" is non-standard)
@@ -236,10 +226,10 @@ public class Base64 {
     }
 
     /**
-     * Decodes Base64 data into octects
+     * Decodes Base64 data into octets
      *
      * @param encoded String array containing Base64 data
-     * @return Array containind decoded data.
+     * @return Array containing decoded data.
      */
     public static byte[] decode(String encoded) {
 

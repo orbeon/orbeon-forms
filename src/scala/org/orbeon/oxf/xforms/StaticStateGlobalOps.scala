@@ -20,7 +20,7 @@ import collection.JavaConverters._
 import java.util.{List ⇒ JList, Map ⇒ JMap}
 
 // Global operations on parts including top-level part and descendant parts
-class StaticStateGlobalOps(topLevelPart: PartAnalysis) extends PartGlobalOpsImpl {
+class StaticStateGlobalOps(topLevelPart: PartAnalysis) extends PartGlobalOps {
 
     // Start with top-level part only
     private var parts = topLevelPart :: Nil

@@ -18,9 +18,10 @@ import analysis.ElementAnalysis
 import analysis.model.Instance
 import event.EventHandler
 import org.dom4j.{Element, QName}
-import java.util.{List => JList, Map => JMap}
+import java.util.{List ⇒ JList, Map ⇒ JMap}
 import org.orbeon.oxf.xml.SAXStore
 import xbl.{Scope, XBLBindings, ConcreteBinding}
+import org.apache.commons.lang.StringUtils
 
 trait PartGlobalOps {
 
@@ -65,15 +66,41 @@ trait PartGlobalOps {
     def baselineResources: (collection.Set[String], collection.Set[String])                         // GRUN
 
     // Functions derived from getControlAnalysis
-    def getControlAnalysisOption(prefixedId: String): Option[ElementAnalysis]
-    def getControlElement(prefixedId: String): Element
-    def hasNodeBinding(prefixedId: String): Boolean
-    def getControlPosition(prefixedId: String): Int
-    def getSelect1Analysis(prefixedId: String): SelectionControl
-    def isValueControl(effectiveId: String): Boolean
-    def appendClasses(sb: java.lang.StringBuilder, prefixedId: String)
-    def getLabel(prefixedId: String): LHHAAnalysis
-    def getHelp(prefixedId: String): LHHAAnalysis
-    def getHint(prefixedId: String): LHHAAnalysis
-    def getAlert(prefixedId: String): LHHAAnalysis
+    def getControlAnalysisOption(prefixedId: String) = Option(getControlAnalysis(prefixedId))
+    def getControlElement(prefixedId: String) = getControlAnalysisOption(prefixedId) map (_.element) orNull
+    def hasNodeBinding(prefixedId: String) = getControlAnalysisOption(prefixedId) map (_.hasNodeBinding) getOrElse false
+
+    def getControlPosition(prefixedId: String) = getControlAnalysisOption(prefixedId) match {
+        case Some(viewTrait: ViewTrait) ⇒ viewTrait.index
+        case _ ⇒ -1
+    }
+
+    def getSelect1Analysis(prefixedId: String) = getControlAnalysisOption(prefixedId) match {
+        case Some(selectionControl: SelectionControl) ⇒ selectionControl
+        case _ ⇒ null
+    }
+
+    def isValueControl(effectiveId: String) =
+        getControlAnalysisOption(XFormsUtils.getPrefixedId(effectiveId)) map (_.canHoldValue) getOrElse false
+
+    def appendClasses(sb: java.lang.StringBuilder, prefixedId: String) =
+        getControlAnalysisOption(prefixedId) foreach { controlAnalysis ⇒
+            val controlClasses = controlAnalysis.classes
+            if (StringUtils.isNotEmpty(controlClasses)) {
+                if (sb.length > 0)
+                    sb.append(' ')
+                sb.append(controlClasses)
+            }
+        }
+
+    def getLabel(prefixedId: String) = getLHHA(prefixedId, "label")
+    def getHelp(prefixedId: String) = getLHHA(prefixedId, "help")
+    def getHint(prefixedId: String) = getLHHA(prefixedId, "hint")
+    def getAlert(prefixedId: String) = getLHHA(prefixedId, "alert")
+
+    private def getLHHA(prefixedId: String, lhha: String) =
+        getControlAnalysisOption(prefixedId) match {
+            case Some(lhhaTrait: LHHATrait) ⇒ lhhaTrait.getLHHA(lhha).orNull
+            case _ ⇒ null
+        }
 }

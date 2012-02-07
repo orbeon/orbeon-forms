@@ -48,7 +48,7 @@ class PartAnalysisImpl(
         val metadata: Metadata,
         protected val staticStateDocument: StaticStateDocument)
     extends PartAnalysis
-    with PartGlobalOpsImpl
+    with PartGlobalOps
     with PartModelAnalysis
     with PartEventHandlerAnalysis
     with PartControlsAnalysis

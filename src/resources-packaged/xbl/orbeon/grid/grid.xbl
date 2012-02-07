@@ -131,15 +131,8 @@
                                                     </xf:trigger>
                                                 </xh:td>
                                                 <xsl:if test="$is-repeat">
-                                                    <!-- Grid properties -->
-                                                    <xh:td class="fb-grid-top-left-td">
-                                                        <xf:trigger appearance="minimal" id="grid-details-trigger">
-                                                            <xf:label><xh:img src="/apps/fr/style/images/silk/cog.png" alt="{{$fb-resources/grid-details-icon/label}}" title="{{$fb-resources/grid-details-icon/label}}"/></xf:label>
-                                                            <xf:dispatch ev:event="DOMActivate" name="fb-show-dialog" target="fb-form-editor$dialog-grid-details">
-                                                                <xxf:context name="grid" select="$grid"/>
-                                                            </xf:dispatch>
-                                                        </xf:trigger>
-                                                    </xh:td>
+                                                    <!-- Column for repeat add/remove -->
+                                                    <xh:td class="fb-grid-top-left-td"/>
                                                 </xsl:if>
                                                 <!-- Column icons -->
                                                 <xsl:for-each select="*:tr[1]/*:td">
@@ -198,15 +191,18 @@
                                         <xh:thead class="yui-dt-hd">
                                             <!-- Row with column headers -->
                                             <xh:tr class="fr-dt-master-row">
-                                                <!--<xsl:if test="$has-origin and not($readonly)">-->
-                                                    <!--<xf:group ref="$grid[not(exf:readonly(.))]">-->
-                                                        <!--<xh:div class="yui-dt-liner">-->
-                                                            <!--<xh:td class="fr-repeat-column fr-repeat-column-number"/>-->
-                                                        <!--</xh:div>-->
-                                                    <!--</xf:group>-->
-                                                <!--</xsl:if>-->
                                                 <xsl:if test="$is-editable">
-                                                    <xh:td/>
+                                                    <xh:td class="fb-grid-top-left-td">
+                                                        <xsl:if test="$is-repeat">
+                                                            <!-- Grid properties -->
+                                                            <xf:trigger appearance="minimal" id="grid-details-trigger">
+                                                                <xf:label><xh:img src="/apps/fr/style/images/silk/cog.png" alt="{{$fb-resources/grid-details-icon/label}}" title="{{$fb-resources/grid-details-icon/label}}"/></xf:label>
+                                                                <xf:dispatch ev:event="DOMActivate" name="fb-show-dialog" target="fb-form-editor$dialog-grid-details">
+                                                                    <xxf:context name="grid" select="$grid"/>
+                                                                </xf:dispatch>
+                                                            </xf:trigger>
+                                                        </xsl:if>
+                                                    </xh:td>
                                                 </xsl:if>
                                                 <xsl:if test="not($readonly)">
                                                     <!--<xf:group ref="$grid[not(exf:readonly(.))]">-->

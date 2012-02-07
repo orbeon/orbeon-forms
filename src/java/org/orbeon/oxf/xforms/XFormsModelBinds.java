@@ -69,6 +69,7 @@ public class XFormsModelBinds {
     private XFormsModelSchemaValidator xformsValidator;         // validator for standard XForms schema types
 
     private boolean isFirstCalculate;                           // whether this is the first recalculate for the associated XForms model
+    private boolean isFirstRebuild;                             // whether this is the first rebuild for the associated XForms model
 
     private static final Set<String> BUILTIN_XFORMS_SCHEMA_TYPES = new HashSet<String>();
 
@@ -102,7 +103,7 @@ public class XFormsModelBinds {
         // For the lifecycle of an XForms document, new XFormsModelBinds() may be created multiple times, e.g. if the
         // state is deserialized, but we know that new XFormsModelBinds() will occur only once during document
         // initialization. So the assignation below is ok.
-        this.isFirstCalculate = containingDocument.isInitializing();
+        this.isFirstCalculate = this.isFirstRebuild = containingDocument.isInitializing();
     }
 
     /**
@@ -120,20 +121,23 @@ public class XFormsModelBinds {
         iterationsForContextNodeInfo.clear();
 
         // Clear all instances that might have InstanceData
-        for (final XFormsInstance instance : model.getInstances()) {
-            // Only clear instances that are impacted by xf:bind/(@ref|@nodeset), assuming we were able to figure out the dependencies
-            // The reason is that clearing this state can take quite some time
-            final boolean instanceMightBeSchemaValidated = model.hasSchema() && instance.isSchemaValidation();
-            final boolean instanceMightHaveMips =
-                    dependencies.hasAnyCalculationBind(staticModel, instance.getPrefixedId()) ||
-                    dependencies.hasAnyValidationBind(staticModel, instance.getPrefixedId());
+        // Only need to do this after the first rebuild
+        if (! isFirstRebuild) {
+            for (final XFormsInstance instance : model.getInstances()) {
+                // Only clear instances that are impacted by xf:bind/(@ref|@nodeset), assuming we were able to figure out the dependencies
+                // The reason is that clearing this state can take quite some time
+                final boolean instanceMightBeSchemaValidated = model.hasSchema() && instance.isSchemaValidation();
+                final boolean instanceMightHaveMips =
+                        dependencies.hasAnyCalculationBind(staticModel, instance.getPrefixedId()) ||
+                        dependencies.hasAnyValidationBind(staticModel, instance.getPrefixedId());
 
-            if (instanceMightBeSchemaValidated || instanceMightHaveMips) {
-                DataModel.visitElementJava(instance.getInstanceRootElementInfo(), new DataModel.NodeVisitor() {
-                    public void visit(NodeInfo nodeInfo) {
-                        InstanceData.clearState(nodeInfo);
-                    }
-                });
+                if (instanceMightBeSchemaValidated || instanceMightHaveMips) {
+                    DataModel.visitElementJava(instance.getInstanceRootElementInfo(), new DataModel.NodeVisitor() {
+                        public void visit(NodeInfo nodeInfo) {
+                            InstanceData.clearState(nodeInfo);
+                        }
+                    });
+                }
             }
         }
 
@@ -142,6 +146,8 @@ public class XFormsModelBinds {
         // Even before that, the bind tree could be modified more dynamically as is the case with controls
         for (final Model.Bind staticBind : staticModel.topLevelBindsJava())
             topLevelBinds.add(new Bind(staticBind, true)); // remember as top-level bind
+
+        isFirstRebuild = false;
 
         if (indentedLogger.isDebugEnabled())
             indentedLogger.endHandleOperation();

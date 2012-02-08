@@ -32,7 +32,7 @@ import javax.xml.transform.stream.StreamResult
 import java.util.{List ⇒ JList}
 import scala.collection.JavaConverters._
 import org.orbeon.oxf.util.{XPathCache, IndentedLogger}
-import org.orbeon.saxon.om.{NodeInfo, Axis, DocumentInfo, Item}
+import org.orbeon.saxon.om.{DocumentInfo, Item}
 
 /**
  * Represent an XForms instance.
@@ -127,7 +127,7 @@ class XFormsInstance(
         if (serializeDocument) {
             val instanceString =
                 Option(getDocument) map
-                    (TransformerUtils.dom4jToString(_)) getOrElse
+                    (TransformerUtils.dom4jToString(_, false)) getOrElse
                         TransformerUtils.tinyTreeToString(documentInfo)
 
             instanceElement.addText(instanceString)
@@ -137,6 +137,7 @@ class XFormsInstance(
     }
 
     // Don't serialize if readonly, not replaced, and inline
+    // NOTE: If the instance is cacheable, its metadata gets serialized, but not it's XML document
     def mustSerialize = ! (readonly && ! replaced && (sourceURI eq null))
 
     // Return the model that contains this instance

@@ -1,4 +1,4 @@
-/**
+    /**
  *  Copyright (C) 2012 Orbeon, Inc.
  *
  *  This program is free software; you can redistribute it and/or modify it under the terms of the
@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.state
 import collection.JavaConverters._
 
 import sbinary.Operations._
-import Operations._
+import XFormsOperations._
 import XFormsProtocols._
 
 import org.orbeon.oxf.util.URLRewriterUtils.PathMatcher
@@ -38,20 +38,20 @@ case class DynamicState(
     containerNamespace: Option[String],
     pathMatchers: Seq[Byte],
     pendingUploads: Seq[Byte],
-    annotatedTemplate: Seq[Byte],
+    annotatedTemplate: Option[Seq[Byte]],
     lastAjaxResponse: Seq[Byte],
     instances: Seq[Byte],
     controls: Seq[Byte]
 ) {
-    /* For testing only
-    locally {
+    // For testing only
+    if (false) {
         val bytes = toByteSeq(this)
         println("  size: " + bytes.size)
         println("   versionedPathMatchers: " + pathMatchers.size)
         println("   pendingUploads: " + pendingUploads.size)
         println("   instances: " + instances.size)
         println("   controls: " + controls.size)
-        println("   annotatedTemplate: " + annotatedTemplate.size)
+        println("   annotatedTemplate: " + (annotatedTemplate map (_.size) getOrElse 1))
         println("   lastAjaxResponse: " + lastAjaxResponse.size)
         
         val xxx0 = decodePathMatchersJava.toArray
@@ -64,11 +64,10 @@ case class DynamicState(
         val deserialized = fromByteSeq[DynamicState](bytes)
         assert(this == deserialized)
     }
-    */
 
     def decodePathMatchers = fromByteSeq[List[PathMatcher]](pathMatchers)
     def decodePendingUploads = fromByteSeq[Set[String]](pendingUploads)
-    def decodeAnnotatedTemplate = fromByteSeq[Option[SAXStore]](annotatedTemplate)
+    def decodeAnnotatedTemplate = annotatedTemplate map (AnnotatedTemplate(_))
     def decodeLastAjaxResponse = fromByteSeq[Option[SAXStore]](lastAjaxResponse)
     def decodeInstances = fromByteSeq[List[XFormsInstance]](instances)
     def decodeControls = fromByteSeq[List[Control]](controls) map (c ⇒ (c.effectiveId, c.keyValues))
@@ -149,7 +148,7 @@ case class DynamicState(
         }
 
         // Template and Ajax response
-        Seq(("template", decodeAnnotatedTemplate), ("response", decodeLastAjaxResponse)) collect {
+        Seq(("template", decodeAnnotatedTemplate map (_.saxStore)), ("response", decodeLastAjaxResponse)) collect {
             case (elementName, Some(saxStore)) ⇒
                 val templateElement = rootElement.addElement(elementName)
                 val document = TransformerUtils.saxStoreToDom4jDocument(saxStore)
@@ -170,6 +169,7 @@ object DynamicState {
         // We could serialize everything right away to a Seq[Byte] instead of a DynamicState instance, but in the
         // scenario where the state is put in cache, then retrieved a bit later without having been pushed to external
         // storage, this would be a waste.
+
         DynamicState(
             document.getUUID,
             document.getSequence,
@@ -180,7 +180,7 @@ object DynamicState {
             Option(document.getContainerNamespace),
             toByteSeq(document.getVersionedPathMatchers.asScala.toList),
             toByteSeq(document.getPendingUploads.asScala.toSet),
-            toByteSeq(Option(document.getAnnotatedTemplate)),
+            Option(document.getTemplate) map (_.asByteSeq), // template returns its own serialization
             toByteSeq(Option(document.getLastAjaxResponse)),
             toByteSeq(document.getAllModels.asScala flatMap (_.getInstances.asScala) filter (_.mustSerialize) toList),
             toByteSeq(getControlsToSerialize(document).toList)

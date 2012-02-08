@@ -34,6 +34,7 @@ import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl;
 import org.orbeon.oxf.xforms.event.ClientEvents;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
+import org.orbeon.oxf.xforms.state.AnnotatedTemplate;
 import org.orbeon.oxf.xforms.state.XFormsStateLifecycle;
 import org.orbeon.oxf.xforms.state.XFormsStateManager;
 import org.orbeon.oxf.xforms.submission.SubmissionResult;
@@ -378,14 +379,18 @@ public class XFormsServer extends ProcessorImpl {
             // Still send out a null document to signal that no further processing must take place
             XMLUtils.streamNullDocument(xmlReceiver);
         } else {
-            // Response will be Ajax response or XHTML document
-            final SAXStore xhtmlDocument = containingDocument.getAnnotatedTemplate();
-            if (xhtmlDocument == null)
-                throw new OXFException("Missing XHTML document in static state for noscript mode.");// shouldn't happen!
+            // The template is stored either in the static state or in the dynamic state
+            final AnnotatedTemplate template; {
+                if (containingDocument.getStaticState().template().isDefined())
+                    template = containingDocument.getStaticState().template().get();
+                else
+                    template = containingDocument.getTemplate();
+            }
+            if (template == null)
+                throw new OXFException("Missing template in static and dynamic state for noscript mode.");// shouldn't happen!
 
             indentedLogger.logDebug("response", "handling noscript response for XHTML output");
-            XFormsToXHTML.outputResponseDocument(externalContext, indentedLogger, xhtmlDocument,
-                    containingDocument, xmlReceiver);
+            XFormsToXHTML.outputResponseDocument(externalContext, indentedLogger, template, containingDocument, xmlReceiver);
         }
     }
 

@@ -84,7 +84,7 @@ class XBLBindings(indentedLogger: IndentedLogger, partAnalysis: PartAnalysisImpl
 
     // Inline <xbl:xbl> and automatically-included XBL documents
     private val xblDocuments = (inlineXBL map ((_, 0L))) ++
-        (metadata.getBindingIncludes.asScala map (readXBLResource(_)))
+        (metadata.getBindingIncludesJava.asScala map (readXBLResource(_)))
 
     // Process <xbl:xbl>
     if (xblDocuments.nonEmpty) {
@@ -408,12 +408,8 @@ class XBLBindings(indentedLogger: IndentedLogger, partAnalysis: PartAnalysisImpl
         // Write the document through the annotator
         // TODO: this adds xml:base on root element, must fix
         TransformerUtils.writeDom4j(shadowTreeDocument, new XFormsAnnotatorContentHandler(output, null, metadata) {
-            // Store prefixed id in order to avoid clashes between top-level controls and shadow trees
-            protected override def addNamespaces(id: String) =
-                super.addNamespaces(prefix + id)
-
-            protected override def addMark(id: String, mark: SAXStore#Mark) =
-                super.addMark(prefix + id, mark)
+            // Use prefixed id for marks and namespaces in order to avoid clashes between top-level controls and shadow trees
+            protected override def rewriteId(id: String) = prefix + id
         })
 
         // Return annotated document
@@ -507,7 +503,7 @@ class XBLBindings(indentedLogger: IndentedLogger, partAnalysis: PartAnalysisImpl
         ignoreRootElement: Boolean,
         startScope: XXBLScope,
         baseURI: String)
-    extends XFormsExtractorContentHandler(xmlReceiver, metadata, ignoreRootElement, baseURI) {
+    extends XFormsExtractorContentHandler(xmlReceiver, metadata, null, baseURI, false, ignoreRootElement) {
 
         assert(innerScope ne null)
         assert(outerScope ne null)

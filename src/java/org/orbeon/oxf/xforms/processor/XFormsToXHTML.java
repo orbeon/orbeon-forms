@@ -47,6 +47,7 @@ import org.orbeon.oxf.xforms.processor.handlers.xml.XFormsDefaultControlHandler;
 import org.orbeon.oxf.xforms.processor.handlers.xml.XFormsGroupHandler;
 import org.orbeon.oxf.xforms.processor.handlers.xml.XFormsRepeatHandler;
 import org.orbeon.oxf.xforms.processor.handlers.xml.XFormsSelectHandler;
+import org.orbeon.oxf.xforms.state.AnnotatedTemplate;
 import org.orbeon.oxf.xforms.state.XFormsStateManager;
 import org.orbeon.oxf.xforms.state.XFormsStaticStateCache;
 import org.orbeon.oxf.xml.DeferredXMLReceiverImpl;
@@ -179,7 +180,7 @@ public class XFormsToXHTML extends ProcessorImpl {
                         // NOTE: Create document here so we can do appropriate analysis of caching dependencies
                         final XFormsURIResolver uriResolver = new XFormsURIResolver(XFormsToXHTML.this, processorOutput,
                                 pipelineContext, INPUT_ANNOTATED_DOCUMENT, XMLUtils.ParserConfiguration.PLAIN);
-                        containingDocument[0] = new XFormsContainingDocument(staticState[0], stage2CacheableState.getAnnotatedTemplate(), uriResolver, getResponse(xmlReceiver, externalContext));
+                        containingDocument[0] = new XFormsContainingDocument(staticState[0], stage2CacheableState.template, uriResolver, getResponse(xmlReceiver, externalContext));
 
                         // Gather set caching dependencies
                         gatherInputDependencies(containingDocument[0], indentedLogger, stage1CacheableState);
@@ -204,11 +205,11 @@ public class XFormsToXHTML extends ProcessorImpl {
             if (containingDocument[0] == null) {
                 assert cachedStatus[0];
                 // In this case, we found the static state digest and more in the cache, but we must now create a new XFormsContainingDocument from this information
-                indentedLogger.logDebug("", "annotated document and static state digest obtained from cache", "digest", stage2CacheableState.getStaticStateDigest());
+                indentedLogger.logDebug("", "annotated document and static state digest obtained from cache", "digest", stage2CacheableState.staticStateDigest);
 
                 final XFormsStaticState staticState;
                 {
-                    final XFormsStaticState cachedState = XFormsStaticStateCache.instance().getDocument(stage2CacheableState.getStaticStateDigest());
+                    final XFormsStaticState cachedState = XFormsStaticStateCache.instance().getDocument(stage2CacheableState.staticStateDigest);
                     if (cachedState != null && cachedState.topLevelPart().metadata().checkBindingsIncludes()) {
                         // Found static state in cache
                         indentedLogger.logDebug("", "found up-to-date static state by digest in cache");
@@ -222,8 +223,9 @@ public class XFormsToXHTML extends ProcessorImpl {
                         else
                             indentedLogger.logDebug("", "did not find static state by digest in cache");
 
-                        final StaticStateBits staticStateBits = new StaticStateBits(pipelineContext, indentedLogger,  stage2CacheableState.getStaticStateDigest());
-                        staticState = XFormsStaticStateImpl.create(staticStateBits.staticStateDocument, stage2CacheableState.getStaticStateDigest(), staticStateBits.metadata);
+                        final StaticStateBits staticStateBits = new StaticStateBits(pipelineContext, indentedLogger, stage2CacheableState.staticStateDigest);
+                        staticState = XFormsStaticStateImpl.createFromStaticStateBits(staticStateBits.staticStateDocument, stage2CacheableState.staticStateDigest,
+                                staticStateBits.metadata, staticStateBits.template);
 
                         // Store in cache
                         XFormsStaticStateCache.instance().storeDocument(staticState);
@@ -231,7 +233,7 @@ public class XFormsToXHTML extends ProcessorImpl {
                 }
 
                 final XFormsURIResolver uriResolver = new XFormsURIResolver(XFormsToXHTML.this, processorOutput, pipelineContext, INPUT_ANNOTATED_DOCUMENT, XMLUtils.ParserConfiguration.PLAIN);
-                containingDocument[0] = new XFormsContainingDocument(staticState, stage2CacheableState.getAnnotatedTemplate(), uriResolver, getResponse(xmlReceiver, externalContext));
+                containingDocument[0] = new XFormsContainingDocument(staticState, stage2CacheableState.template, uriResolver, getResponse(xmlReceiver, externalContext));
             } else {
                 assert !cachedStatus[0];
                 indentedLogger.logDebug("", "annotated document and static state digest not obtained from cache.");
@@ -240,7 +242,7 @@ public class XFormsToXHTML extends ProcessorImpl {
             // Output resulting document
             if (outputName.equals("document")) {
                 // Normal case where we output XHTML
-                outputResponseDocument(externalContext, indentedLogger, stage2CacheableState.getAnnotatedTemplate(),
+                outputResponseDocument(externalContext, indentedLogger, stage2CacheableState.template,
                         containingDocument[0], xmlReceiver);
             } else {
                 // Output in test mode
@@ -275,7 +277,8 @@ public class XFormsToXHTML extends ProcessorImpl {
                 else
                     indentedLogger.logDebug("", "did not find static state by digest in cache");
                 
-                staticState[0] = XFormsStaticStateImpl.create(staticStateBits.staticStateDocument, staticStateBits.staticStateDigest, staticStateBits.metadata);
+                staticState[0] = XFormsStaticStateImpl.createFromStaticStateBits(staticStateBits.staticStateDocument, staticStateBits.staticStateDigest,
+                        staticStateBits.metadata, staticStateBits.template);
 
                 // Store in cache
                 XFormsStaticStateCache.instance().storeDocument(staticState[0]);
@@ -283,7 +286,7 @@ public class XFormsToXHTML extends ProcessorImpl {
         }
 
         // Update input dependencies object
-        return new Stage2CacheableState(staticStateBits.annotatedTemplate, staticStateBits.staticStateDigest);
+        return new Stage2CacheableState(staticStateBits.staticStateDigest, staticStateBits.template);
     }
 
     private class StaticStateBits {
@@ -291,9 +294,8 @@ public class XFormsToXHTML extends ProcessorImpl {
         private final boolean isLogStaticStateInput = XFormsProperties.getDebugLogging().contains("html-static-state");
 
         public final Metadata metadata = new Metadata();
-        public final SAXStore annotatedTemplate = new SAXStore();
-
         public final Document staticStateDocument;
+        public final AnnotatedTemplate template;
         public final String staticStateDigest;
 
         public StaticStateBits(PipelineContext pipelineContext, IndentedLogger indentedLogger, String existingStaticStateDigest) {
@@ -327,8 +329,9 @@ public class XFormsToXHTML extends ProcessorImpl {
             // o optionally: digest
             // o optionally: debug output
             //
+            this.template = AnnotatedTemplate.applyJava(new SAXStore());
             readInputAsSAX(pipelineContext, INPUT_ANNOTATED_DOCUMENT,
-                    new XFormsAnnotatorContentHandler(annotatedTemplate, new XFormsExtractorContentHandler(extractorOutput, metadata), metadata));
+                    new XFormsAnnotatorContentHandler(this.template.saxStore(), new XFormsExtractorContentHandler(extractorOutput, metadata, template, ".", true, false), metadata));
 
             this.staticStateDocument = documentResult.getDocument();
             this.staticStateDigest = computeDigest ? NumberUtils.toHexString(digestReceiver.getResult()) : null;
@@ -360,20 +363,12 @@ public class XFormsToXHTML extends ProcessorImpl {
     // What can be cached by the second stage: SAXStore and static state
     private static class Stage2CacheableState extends URIProcessorOutputImpl.URIReferences {
 
-        private final SAXStore annotatedTemplate;
-        private final String staticStateDigest;
+        public final String staticStateDigest;
+        public final AnnotatedTemplate template;
 
-        public Stage2CacheableState(SAXStore annotatedTemplate, String staticStateDigest) {
-            this.annotatedTemplate = annotatedTemplate;
+        public Stage2CacheableState(String staticStateDigest, AnnotatedTemplate template) {
             this.staticStateDigest = staticStateDigest;
-        }
-
-        public SAXStore getAnnotatedTemplate() {
-            return annotatedTemplate;
-        }
-
-        public String getStaticStateDigest() {
-            return staticStateDigest;
+            this.template = template;
         }
     }
 
@@ -429,7 +424,7 @@ public class XFormsToXHTML extends ProcessorImpl {
         // Set caching dependencies for XBL inclusions
         {
             final Metadata metadata = containingDocument.getStaticState().topLevelPart().metadata();
-            final Set<String> includes = metadata.getBindingIncludes();
+            final Set<String> includes = metadata.getBindingIncludesJava();
             for (final String include: includes) {
                 stage1CacheableState.addReference(null, "oxf:" + include, null, null, null, null);
             }
@@ -438,7 +433,7 @@ public class XFormsToXHTML extends ProcessorImpl {
 
     public static void outputResponseDocument(final ExternalContext externalContext,
                                               final IndentedLogger indentedLogger,
-                                              final SAXStore annotatedDocument, final XFormsContainingDocument containingDocument,
+                                              final AnnotatedTemplate template, final XFormsContainingDocument containingDocument,
                                               final XMLReceiver xmlReceiver) throws SAXException, IOException {
 
         final List<XFormsContainingDocument.Load> loads = containingDocument.getLoadsToRun();
@@ -515,7 +510,7 @@ public class XFormsToXHTML extends ProcessorImpl {
             // Set handler context
             controller.setElementHandlerContext(new HandlerContext(controller, containingDocument, externalContext, null));
             // Process the entire input
-            annotatedDocument.replay(new ExceptionWrapperXMLReceiver(controller, "converting XHTML+XForms document to XHTML"));
+            template.saxStore().replay(new ExceptionWrapperXMLReceiver(controller, "converting XHTML+XForms document to XHTML"));
         }
 
         containingDocument.afterInitialResponse();

@@ -20,8 +20,10 @@ import org.orbeon.oxf.properties.Properties;
 import org.orbeon.oxf.properties.PropertySet;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsProperties;
+import org.orbeon.oxf.xforms.XFormsStaticStateImpl;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.action.XFormsActions;
+import org.orbeon.oxf.xforms.state.AnnotatedTemplate;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -76,6 +78,8 @@ import java.util.*;
  *   <properties xxforms:noscript="true" .../>
  *   <!-- Last id used (for id generation in XBL after deserialization) -->
  *   <last-id id="123"/>
+ *   <!-- Template (for full updates, possibly noscript) -->
+*    <template>base64</template>
  * </static-state>
  */
 public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
@@ -94,6 +98,7 @@ public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
     private boolean mustOutputFirstElement = true;
 
     private final boolean isTopLevel;
+    private final AnnotatedTemplate templateUnderContruction;
     private final Metadata metadata;
     private final boolean ignoreRootElement;
 
@@ -122,43 +127,15 @@ public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
     private int preserveOrLHHALevel;
     private boolean isHTMLDocument; // Whether this is an (X)HTML document
 
-    /**
-     * Constructor for top-level document.
-     *
-     * @param xmlReceiver       resulting static state document
-     * @param metadata          metadata
-     */
-    public XFormsExtractorContentHandler(XMLReceiver xmlReceiver, Metadata metadata) {
+    public XFormsExtractorContentHandler(XMLReceiver xmlReceiver, Metadata metadata, AnnotatedTemplate templateUnderContruction, String baseURI, boolean isTopLevel, boolean ignoreRootElement) {
         super(xmlReceiver);
 
-        this.isTopLevel = true;
+        this.isTopLevel = isTopLevel;
         this.metadata = metadata;
-        this.ignoreRootElement = false;
-
-        // Create xml:base stack
-        try {
-            elementStack.push(new XMLElementDetails(null, new URI(null, null, ".", null), null, null, XFormsConstants.XXBLScope.inner));
-        } catch (URISyntaxException e) {
-            throw new ValidationException(e, new LocationData(locator));
-        }
-    }
-
-    /**
-     * Constructor for nested document (XBL templates).
-     *
-     * @param xmlReceiver       resulting static state document
-     * @param metadata          metadata
-     * @param ignoreRootElement whether root element must just be skipped
-     * @param baseURI           base URI
-     */
-    public XFormsExtractorContentHandler(XMLReceiver xmlReceiver, Metadata metadata,
-                                         boolean ignoreRootElement, String baseURI) {
-        super(xmlReceiver);
-
-        this.isTopLevel = false;
-        this.metadata = metadata;
+        this.templateUnderContruction = templateUnderContruction;
         this.ignoreRootElement = ignoreRootElement;
 
+        // Create xml:base stack
         try {
             assert baseURI != null;
             elementStack.push(new XMLElementDetails(null, new URI(null, null, baseURI, null), null, null, XFormsConstants.XXBLScope.inner));
@@ -250,6 +227,30 @@ public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
             final String lastIdName = LAST_ID_QNAME.getName();
             super.startElement("", lastIdName, lastIdName, newAttributes);
             super.endElement("", lastIdName, lastIdName);
+
+            // TODO: It's not good to serialize this right here, since we have a live SAXStore anyway used to create the
+            // static state and since the serialization is only needed if the static state is serialized. In other
+            // words, serialization of the template should be lazy.
+
+            // Remember the template (and marks if any) if:
+            // - we are in noscript mode and told to store the template statically
+            // - OR if there are top-level marks
+            final boolean isStoreNoscriptTemplate =
+                templateUnderContruction != null &&
+                XFormsStaticStateImpl.isNoscriptJava(properties) &&
+                XFormsProperties.NOSCRIPT_TEMPLATE_STATIC_VALUE.equals(XFormsStaticStateImpl.<String>getPropertyJava(properties, XFormsProperties.NOSCRIPT_TEMPLATE));
+
+            if (isStoreNoscriptTemplate || metadata.hasTopLevelMarks()) {
+                final String templateName = "template";
+                super.startElement("", templateName, templateName, new AttributesImpl());
+
+                // NOTE: At this point, the template has just received endDocument(), so is no longer under under
+                // construction and can be serialized safely.
+                final String templateString = templateUnderContruction.asBase64();
+                super.characters(templateString.toCharArray(), 0, templateString.length());
+
+                super.endElement("", templateName, templateName);
+            }
         }
 
         super.endElement("", "static-state", "static-state");

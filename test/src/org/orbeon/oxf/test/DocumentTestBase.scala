@@ -23,6 +23,7 @@ import org.dom4j.{Element, Document => JDocument}
 import xml.{XML, Elem}
 import org.orbeon.oxf.xforms.event.{ClientEvents, XFormsEventTarget}
 import org.orbeon.oxf.xforms.{XFormsStaticStateImpl, XFormsContainingDocument}
+import org.orbeon.oxf.xforms.state.AnnotatedTemplate
 
 abstract class DocumentTestBase extends ResourceManagerTestBase {
 
@@ -42,14 +43,16 @@ abstract class DocumentTestBase extends ResourceManagerTestBase {
 
     def getDocument = document
 
-    def setupDocument(xhtml: JDocument) {
+    def setupDocument(xhtml: JDocument) = {
         ResourceManagerTestBase.staticSetup()
 
-        val staticState = XFormsStaticStateImpl.create(xhtml)
-        this.document = new XFormsContainingDocument(staticState, null, null, null)
+        val (template, staticState) = XFormsStaticStateImpl.createFromDocument(xhtml)
+        this.document = new XFormsContainingDocument(staticState, AnnotatedTemplate(template), null, null)
 
         document.afterInitialResponse()
         document.beforeExternalEvents(null)
+
+        document
     }
 
     def getControlValue(controlId: String) = getValueControl(controlId).getValue

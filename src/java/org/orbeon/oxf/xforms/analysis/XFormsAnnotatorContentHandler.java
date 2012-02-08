@@ -182,7 +182,8 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
             // Handle full update annotation
             if (isXXForms && localname.equals("dynamic")) {
                 // Remember this subtree has a full update
-                addMark(reusableStringArray[0], templateSAXStore.getElementMark());
+                final String id = rewriteId(reusableStringArray[0]);
+                metadata.putMark(templateSAXStore.getMark(id));
                 // Add a class to help the client
                 attributes = XMLUtils.appendToClassAttribute(attributes, "xforms-update-full");
             } else if (templateSAXStore != null && Version.isPE()) {
@@ -190,7 +191,8 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
                 final String xxformsUpdate = attributes.getValue(XFormsConstants.XXFORMS_UPDATE_QNAME.getNamespaceURI(), XFormsConstants.XXFORMS_UPDATE_QNAME.getName());
                 if (XFormsConstants.XFORMS_FULL_UPDATE.equals(xxformsUpdate)) {
                     // Remember this subtree has a full update
-                    addMark(reusableStringArray[0], templateSAXStore.getElementMark());
+                    final String id = rewriteId(reusableStringArray[0]);
+                    metadata.putMark(templateSAXStore.getMark(id));
                     // Add a class to help the client
                     attributes = XMLUtils.appendToClassAttribute(attributes, "xforms-update-full");
                 }
@@ -482,7 +484,7 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
         return false;
     }
 
-    protected void addNamespaces(String id) {
+    final protected void addNamespaces(String id) {
         final Map<String, String> namespaces = new HashMap<String, String>();
         for (Enumeration e = namespaceSupport.getPrefixes(); e.hasMoreElements();) {
             final String namespacePrefix = (String) e.nextElement();
@@ -497,9 +499,9 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
         namespaces.put(XMLConstants.XML_PREFIX, XMLConstants.XML_URI);
         metadata.addNamespaceMapping(id, namespaces);
     }
-
-    protected void addMark(String id, SAXStore.Mark mark) {
-        metadata.marks().put(id, mark);
+    
+    protected String rewriteId(String id) {
+        return id;
     }
 
     private void storeXBLBinding(String elementAttribute) {
@@ -559,7 +561,7 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
 
         // Gather namespace information if there is an id
         if (isGenerateIds || idIndex != -1) {
-            addNamespaces(newIdAttribute[0]);
+            addNamespaces(rewriteId(newIdAttribute[0]));
         }
 
         return attributes;

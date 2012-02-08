@@ -98,7 +98,7 @@ public class XXFormsExtractDocument extends XFormsFunction {
         if (!readonly) {
             instanceDocument = tempDocument;
         } else {
-            instanceDocument = TransformerUtils.dom4jToTinyTree(configuration, tempDocument);
+            instanceDocument = TransformerUtils.dom4jToTinyTree(configuration, tempDocument, false);
         }
 
         return instanceDocument;

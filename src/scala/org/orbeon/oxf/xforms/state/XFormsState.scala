@@ -17,11 +17,5 @@ package org.orbeon.oxf.xforms.state
  * Encoded combination of static an dynamic state that fully represents an XForms document's current state.
  */
 case class XFormsState(staticStateDigest: Option[String], staticState: String, dynamicState: DynamicState) {
-
-    def this(staticState: String, dynamicState: DynamicState) =
-        this(None, staticState, dynamicState)
-
-    def staticStateDigestJava = staticStateDigest.orNull
-
     override def toString = "XFormsState(" + staticState + "," + dynamicState + ")"
 }

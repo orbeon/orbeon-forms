@@ -392,6 +392,6 @@ public class XFormsStaticStateTest extends ResourceManagerTestBase {
      * @return              static state
      */
     public static XFormsStaticState getStaticState(String documentURL) {
-        return XFormsStaticStateImpl.create(ProcessorUtils.createDocumentFromURL(documentURL, null));
+        return XFormsStaticStateImpl.createFromDocument(ProcessorUtils.createDocumentFromURL(documentURL, null))._2();
     }
 }

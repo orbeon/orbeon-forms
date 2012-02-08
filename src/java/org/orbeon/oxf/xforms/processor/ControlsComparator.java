@@ -286,7 +286,7 @@ public class ControlsComparator {
         // o there is xxforms:update="full"
         //
         if (tempCH == null && (isSpanHTMLLayout || control instanceof XXFormsDynamicControl) && control.supportFullAjaxUpdates()) {
-            return containingDocument.getStaticOps().getElementMark(control.getPrefixedId());
+            return containingDocument.getStaticOps().getMark(control.getPrefixedId());
         } else {
             return null;
         }

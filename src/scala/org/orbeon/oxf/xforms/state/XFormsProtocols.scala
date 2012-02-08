@@ -27,7 +27,7 @@ import sbinary._
 import sbinary.Operations._
 import org.dom4j.{Namespace, QName, Document}
 
-object Operations {
+object XFormsOperations {
 
     // NOTE: We use immutable.Seq instead of Array to indicate immutability
 
@@ -111,7 +111,7 @@ object XFormsProtocols extends StandardTypes with StandardPrimitives with JavaLo
                     if (instance.getDocument ne null) {
                         // This is probably more optimal than going through NodeInfo. Furthermore, there may be an issue with
                         // namespaces when using tinyTreeToString(). Bug in the NodeWrapper or dom4j?
-                        val dom4jString = TransformerUtils.dom4jToString(instance.getDocument)
+                        val dom4jString = TransformerUtils.dom4jToString(instance.getDocument, false)
                         //System.out.println("dom4jToString: " + instance.modelEffectiveId + "/" + instance.staticId)
                         dom4jString
                     }

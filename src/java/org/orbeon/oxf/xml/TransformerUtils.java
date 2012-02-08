@@ -18,6 +18,7 @@ import org.dom4j.io.DocumentSource;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
+import org.orbeon.oxf.processor.SAXLoggerProcessor;
 import org.orbeon.oxf.processor.transformer.TransformerURIResolver;
 import org.orbeon.oxf.processor.xinclude.XIncludeProcessor;
 import org.orbeon.oxf.util.StringBuilderWriter;
@@ -264,6 +265,21 @@ public class TransformerUtils {
         return documentResult.getDocument();
     }
 
+    // Transform a SAXStore mark into a dom4j document
+    public static Document saxStoreMarkToDom4jDocument(SAXStore.Mark mark) {
+        final TransformerXMLReceiver identity = getIdentityTransformerHandler();
+        final LocationDocumentResult documentResult = new LocationDocumentResult();
+        identity.setResult(documentResult);
+        try {
+            identity.startDocument();
+            mark.replay(identity);
+            identity.endDocument();
+        } catch (SAXException e) {
+            throw new OXFException(e);
+        }
+        return documentResult.getDocument();
+    }
+
     /**
      * Transform a SAXStore into a TinyTree document
      *
@@ -311,11 +327,11 @@ public class TransformerUtils {
     /**
      * Transform a dom4j Document into a TinyTree.
      */
-    public static DocumentInfo dom4jToTinyTree(Configuration configuration, Document document) {
+    public static DocumentInfo dom4jToTinyTree(Configuration configuration, Document document, boolean location) {
         final TinyBuilder treeBuilder = new TinyBuilder();
         try {
             final Transformer identity = getIdentityTransformer(configuration);
-            identity.transform(new LocationDocumentSource(document), treeBuilder);
+            identity.transform(location ? new LocationDocumentSource(document) : new DocumentSource(document), treeBuilder);
         } catch (TransformerException e) {
             throw new OXFException(e);
         }
@@ -532,12 +548,12 @@ public class TransformerUtils {
     /**
      * Transform a dom4j document to a String.
      */
-    public static String dom4jToString(Document document) {
+    public static String dom4jToString(Document document, boolean location) {
         try {
             final Transformer identity = getXMLIdentityTransformer();
             identity.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
             final StringBuilderWriter writer = new StringBuilderWriter();
-            identity.transform(new LocationDocumentSource(document), new StreamResult(writer));
+            identity.transform(location ? new LocationDocumentSource(document) : new DocumentSource(document), new StreamResult(writer));
             return writer.toString();
         } catch (TransformerException e) {
             throw new OXFException(e);
@@ -571,9 +587,9 @@ public class TransformerUtils {
     /**
      * Transform a dom4j document to a SAXStore.
      */
-    public static SAXStore dom4jToSAXStore(Document document) {
+    public static SAXStore dom4jToSAXStore(Document document, boolean location) {
         final SAXStore saxStore = new SAXStore();
-        sourceToSAX(new LocationDocumentSource(document), saxStore);
+        sourceToSAX(location ? new LocationDocumentSource(document) : new DocumentSource(document), saxStore);
         return saxStore;
     }
 }

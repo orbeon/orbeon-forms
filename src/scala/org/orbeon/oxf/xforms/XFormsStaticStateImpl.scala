@@ -16,26 +16,34 @@ package org.orbeon.oxf.xforms
 import analysis._
 import collection.JavaConversions._
 import collection.JavaConverters._
-import org.dom4j.io.DocumentSource
 import org.orbeon.oxf.xforms.processor.XFormsServer
 import org.orbeon.oxf.xml._
 import dom4j.{LocationDocumentResult, Dom4jUtils, LocationData}
 import org.orbeon.saxon.dom4j.DocumentWrapper
 import org.orbeon.oxf.xml.XMLConstants._
-import java.util.{List ⇒ JList, Set ⇒ JSet}
+import java.util.{List ⇒ JList, Set ⇒ JSet, Map ⇒ JMap}
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.{XFormsProperties ⇒ P}
 import org.orbeon.oxf.common.{OXFException, Version}
 import org.orbeon.oxf.pipeline.api.XMLReceiver
 import org.xml.sax.Attributes
-import org.orbeon.oxf.util.{NumberUtils, LoggerFactory, XPathCache}
 import org.orbeon.oxf.xforms.XFormsStaticStateImpl.StaticStateDocument
+import state.AnnotatedTemplate
 import xbl.Scope
 import org.dom4j.{Element, Document}
+import org.orbeon.oxf.util.{NumberUtils, LoggerFactory, XPathCache}
 
-class XFormsStaticStateImpl(val encodedState: String, val digest: String, val startScope: Scope,
-                            metadata: Metadata, staticStateDocument: StaticStateDocument)
+class XFormsStaticStateImpl(
+        val encodedState: String,
+        val digest: String,
+        val startScope: Scope,
+        metadata: Metadata,
+        val template: Option[AnnotatedTemplate],
+        val staticStateDocument: StaticStateDocument)
     extends XFormsStaticState {
+
+    require(encodedState ne null)
+    require(digest ne null)
 
     val getIndentedLogger = XFormsContainingDocument.getIndentedLogger(XFormsStaticStateImpl.logger, XFormsServer.getLogger, XFormsStaticStateImpl.LOGGING_CATEGORY)
     val locationData = staticStateDocument.locationData
@@ -47,12 +55,16 @@ class XFormsStaticStateImpl(val encodedState: String, val digest: String, val st
     // Analyze top-level part
     topLevelPart.analyze()
 
+    // Delegation to top-level part
+    def dumpAnalysis() = topLevelPart.dumpAnalysis()
+    def toXML(helper: ContentHandlerHelper) = topLevelPart.toXML(helper)
+
     // Properties
     lazy val allowedExternalEvents = getProperty[String](P.EXTERNAL_EVENTS_PROPERTY) match {
         case s: String ⇒ s split """\s+""" toSet
         case _ ⇒ Set.empty[String]
     }
-    lazy val isNoscript = Version.instance.isPEFeatureEnabled(getProperty[Boolean](P.NOSCRIPT_PROPERTY) && getBooleanProperty(P.NOSCRIPT_SUPPORT_PROPERTY), P.NOSCRIPT_PROPERTY)
+    lazy val isNoscript = XFormsStaticStateImpl.isNoscript(staticStateDocument.nonDefaultProperties)
     lazy val isXPathAnalysis = Version.instance.isPEFeatureEnabled(getProperty[Boolean](P.XPATH_ANALYSIS_PROPERTY), P.XPATH_ANALYSIS_PROPERTY)
     lazy val isHTMLDocument = staticStateDocument.isHTMLDocument
 
@@ -60,20 +72,18 @@ class XFormsStaticStateImpl(val encodedState: String, val digest: String, val st
     def isClientStateHandling = staticStateDocument.isClientStateHandling
     def isServerStateHandling = staticStateDocument.isServerStateHandling
 
-    def isKeepAnnotatedTemplate = isNoscript || metadata.hasTopLevelMarks
+    // Whether to keep the annotated template in the document itself (dynamic state)
+    // See: http://wiki.orbeon.com/forms/doc/contributor-guide/xforms-state-handling#TOC-Handling-of-the-HTML-template
+    def isDynamicNoscriptTemplate = isNoscript && ! template.isDefined
 
     def getProperty[T](propertyName: String): T = staticStateDocument.getProperty[T](propertyName)
 
     // Legacy methods
     def getAllowedExternalEvents: JSet[String] = allowedExternalEvents
-    def getNonDefaultProperties: Map[String, AnyRef] =  staticStateDocument.nonDefaultProperties
+    def getNonDefaultProperties: Map[String, AnyRef] = staticStateDocument.nonDefaultProperties
     def getStringProperty(propertyName: String) = getProperty[String](propertyName)
     def getBooleanProperty(propertyName: String) = getProperty[Boolean](propertyName)
     def getIntegerProperty(propertyName: String) = getProperty[Int](propertyName)
-
-    // Delegation to top-level part
-    def dumpAnalysis() = topLevelPart.dumpAnalysis()
-    def toXML(helper: ContentHandlerHelper) = topLevelPart.toXML(helper)
 }
 
 object XFormsStaticStateImpl {
@@ -89,52 +99,75 @@ object XFormsStaticStateImpl {
             XHTML_PREFIX → XMLConstants.XHTML_NAMESPACE_URI
         ))
 
-    /**
-     * Create static state from an encoded version. This is used when restoring a static state from a serialized form.
-     *
-     * @param digest        digest of the static state if known
-     * @param encodedState  encoded static state (digest + serialized XML)
-     */
-    def restore(digest: String, encodedState: String) = {
+    // Create static state from an encoded version. This is used when restoring a static state from a serialized form.
+    // NOTE: `digest` can be None when using client state, if all we have are serialized static and dynamic states.
+    def restore(digest: Option[String], encodedState: String) = {
 
-        // Decode encodedState
-        val staticStateXML = XFormsUtils.decodeXML(encodedState)
+        val staticStateDocument = new StaticStateDocument(XFormsUtils.decodeXML(encodedState))
+
+        // Restore template
+        val template = staticStateDocument.template map (AnnotatedTemplate(_))
+
+        // Restore metadata
+        val metadata = Metadata(staticStateDocument, template)
+
+        new XFormsStaticStateImpl(
+            encodedState,
+            staticStateDocument.getOrComputeDigest(digest),
+            new Scope(null, ""),
+            metadata,
+            template,
+            staticStateDocument
+        )
+    }
+
+    // Create analyzed static state for the given static state document.
+    // Used by XFormsToXHTML.
+    def createFromStaticStateBits(staticStateXML: Document, digest: String, metadata: Metadata, template: AnnotatedTemplate): XFormsStaticStateImpl = {
+        val startScope = new Scope(null, "")
         val staticStateDocument = new StaticStateDocument(staticStateXML)
 
-        // Recompute namespace mappings and ids
-        val metadata = new Metadata(new IdGenerator(staticStateDocument.lastId))
-        TransformerUtils.sourceToSAX(new DocumentSource(staticStateXML), new XFormsAnnotatorContentHandler(metadata))
-
-        new XFormsStaticStateImpl(encodedState, digest, new Scope(null, ""), metadata, staticStateDocument)
+        new XFormsStaticStateImpl(
+            staticStateDocument.asBase64,
+            digest,
+            startScope,
+            metadata,
+            staticStateDocument.template map (_ ⇒ template),    // only keep the template around if needed
+            staticStateDocument
+        )
     }
 
-    /**
-     * Create analyzed static state for the given static state document.
-     */
-    def create(staticStateDocument: Document, digest: String, metadata: Metadata): XFormsStaticStateImpl =
-        create(staticStateDocument, None, digest, metadata, new Scope(null, ""))
-
-    /**
-     * Create analyzed static state for the given XForms document.
-     *
-     * Used by unit tests.
-     */
-    def create(formDocument: Document): XFormsStaticStateImpl = {
+    // Create analyzed static state for the given XForms document.
+    // Used by unit tests.
+    def createFromDocument(formDocument: Document): (SAXStore, XFormsStaticState) = {
+        
         val startScope = new Scope(null, "")
-        create(formDocument, startScope, create(_, None, _, _, startScope))._2
+        
+        def create(staticStateXML: Document, digest: String, metadata: Metadata, template: AnnotatedTemplate): XFormsStaticStateImpl = {
+            val staticStateDocument = new StaticStateDocument(staticStateXML)
+
+            new XFormsStaticStateImpl(
+                staticStateDocument.asBase64,
+                digest,
+                startScope,
+                metadata,
+                staticStateDocument.template map (_ ⇒ template),    // only keep the template around if needed
+                staticStateDocument
+            )
+        }
+        
+        createFromDocument(formDocument, startScope, create)
     }
 
-    /**
-     * Create template and analyzed part for the given XForms document.
-     */
+    // Create template and analyzed part for the given XForms document.
     def createPart(staticState: XFormsStaticState, parent: PartAnalysis, formDocument: Document, startScope: Scope) =
-        create(formDocument, startScope, (staticStateDocument: Document, digest: String, metadata: Metadata) ⇒ {
+        createFromDocument(formDocument, startScope, (staticStateDocument: Document, digest: String, metadata: Metadata, _) ⇒ {
             val part = new PartAnalysisImpl(staticState, Some(parent), startScope, metadata, new StaticStateDocument(staticStateDocument))
             part.analyze()
             part
         })
 
-    private def create[T](formDocument: Document, startScope: Scope, c: (Document, String, Metadata) ⇒ T): (SAXStore, T) = {
+    private def createFromDocument[T](formDocument: Document, startScope: Scope, create: (Document, String, Metadata, AnnotatedTemplate) ⇒ T): (SAXStore, T) = {
         val identity = TransformerUtils.getIdentityTransformerHandler
 
         val documentResult = new LocationDocumentResult
@@ -142,18 +175,17 @@ object XFormsStaticStateImpl {
 
         val metadata = new Metadata
         val digestContentHandler = new XMLUtils.DigestContentHandler("MD5")
-        val annotatedTemplate = new SAXStore
+        val template = new SAXStore
 
         val prefix = startScope.fullPrefix
 
         // Annotator with prefix
-        class Annotator(extractorReceiver: XMLReceiver) extends XFormsAnnotatorContentHandler(annotatedTemplate, extractorReceiver, metadata) {
-            override def addNamespaces(id: String) = super.addNamespaces(prefix + id)
-            override def addMark(id: String, mark: SAXStore#Mark) = super.addMark(prefix + id, mark)
+        class Annotator(extractorReceiver: XMLReceiver) extends XFormsAnnotatorContentHandler(template, extractorReceiver, metadata) {
+            protected override def rewriteId(id: String) = prefix + id
         }
 
         // Extractor with prefix
-        class Extractor(xmlReceiver: XMLReceiver) extends XFormsExtractorContentHandler(xmlReceiver, metadata) {
+        class Extractor(xmlReceiver: XMLReceiver) extends XFormsExtractorContentHandler(xmlReceiver, metadata, AnnotatedTemplate(template), ".", startScope.isTopLevelScope, false) {
             override def startXFormsOrExtension(uri: String, localname: String, qName: String, attributes: Attributes, scope: XFormsConstants.XXBLScope) {
                 val staticId = attributes.getValue("id")
                 if (staticId ne null) {
@@ -171,31 +203,45 @@ object XFormsStaticStateImpl {
         TransformerUtils.writeDom4j(formDocument, new Annotator(new Extractor(new TeeXMLReceiver(identity, digestContentHandler))))
 
         // Get static state document and create static state object
-        val staticStateDocument = documentResult.getDocument
+        val staticStateXML = documentResult.getDocument
         val digest = NumberUtils.toHexString(digestContentHandler.getResult)
 
-        (annotatedTemplate, c(staticStateDocument, digest, metadata))
+        (template, create(staticStateXML, digest, metadata, AnnotatedTemplate(template)))
     }
 
-    def create(staticStateXML: Document, encodedState: Option[String], digest: String, metadata: Metadata, startScope: Scope): XFormsStaticStateImpl = {
-        val staticStateDocument = new StaticStateDocument(staticStateXML)
-        new XFormsStaticStateImpl(staticStateDocument.getEncodedState(encodedState), digest, startScope, metadata, staticStateDocument)
+    def getPropertyJava[T](nonDefaultProperties: JMap[String, AnyRef], propertyName: String) =
+        getProperty[T](nonDefaultProperties.asScala, propertyName)
+    
+    def getProperty[T](nonDefaultProperties: collection.Map[String, AnyRef], propertyName: String): T =
+        nonDefaultProperties.getOrElse(propertyName, {
+            val definition = P.getPropertyDefinition(propertyName)
+            Option(definition) map (_.defaultValue) orNull
+        }).asInstanceOf[T]
+
+    // For Java callers
+    def isNoscriptJava(nonDefaultProperties: JMap[String, AnyRef]) =
+        isNoscript(nonDefaultProperties.asScala)
+
+    // Determine, based on configuration and properties, whether noscript is allowed and enabled
+    def isNoscript(nonDefaultProperties: collection.Map[String, AnyRef]) = {
+        val noscriptRequested =
+            getProperty[Boolean](nonDefaultProperties, P.NOSCRIPT_PROPERTY) &&
+                getProperty[Boolean](nonDefaultProperties, P.NOSCRIPT_SUPPORT_PROPERTY)
+        Version.instance.isPEFeatureEnabled(noscriptRequested, P.NOSCRIPT_PROPERTY)
     }
 
     // Represent the static state XML document resulting from the extractor
     //
-    // NOTES:
-    //
     // - The underlying document produced by the extractor used to be further transformed to extract various documents.
     //   This is no longer the case and the underlying document should be considered immutable (it would be good if it
     //   was in fact immutable).
-    // - The HTML template, when kept (for noscript and when full update marks are present) is stored in the dynamic
-    //   state.
-    class StaticStateDocument(private val staticStateDocument: Document) {
+    // - The template, when kept for full update marks, is stored in the static state document as Base64. In noscript
+    //   mode, it is stored in the dynamic state.
+    class StaticStateDocument(val xmlDocument: Document) {
 
-        private def staticStateElement = staticStateDocument.getRootElement
+        private def staticStateElement = xmlDocument.getRootElement
 
-        require(staticStateDocument ne null)
+        require(xmlDocument ne null)
 
         // Pointers to nested elements
         def rootControl = staticStateElement.element("root")
@@ -218,12 +264,15 @@ object XFormsStaticStateImpl {
             Integer.parseInt(lastId)
         }
 
+        // Optional template as Base64
+        def template = Option(staticStateElement.element("template")) map (_.getText)
+
         // Extract properties
         // NOTE: XFormsExtractorContentHandler takes care of propagating only non-default properties
         val nonDefaultProperties = {
             for {
-                element ← Dom4jUtils.elements(staticStateElement, STATIC_STATE_PROPERTIES_QNAME)
-                attribute ← Dom4jUtils.attributes(element)
+                element ← Dom4jUtils.elements(staticStateElement, STATIC_STATE_PROPERTIES_QNAME).asScala
+                attribute ← Dom4jUtils.attributes(element).asScala
                 propertyName = attribute.getName
                 propertyValue = P.parseProperty(propertyName, attribute.getValue)
             } yield
@@ -232,10 +281,7 @@ object XFormsStaticStateImpl {
 
         // Get a property by name
         def getProperty[T](propertyName: String): T =
-            nonDefaultProperties.getOrElse(propertyName, {
-                val definition = P.getPropertyDefinition(propertyName)
-                Option(definition) map (_.defaultValue) orNull
-            }).asInstanceOf[T]
+            XFormsStaticStateImpl.getProperty[T](nonDefaultProperties, propertyName)
 
         def isCacheDocument = getProperty[Boolean](P.CACHE_DOCUMENT_PROPERTY)
         def isClientStateHandling = getProperty[String](P.STATE_HANDLING_PROPERTY) == P.STATE_HANDLING_CLIENT_VALUE
@@ -243,11 +289,17 @@ object XFormsStaticStateImpl {
         
         val isHTMLDocument  = Option(staticStateElement.attributeValue("is-html")) exists (_ == "true")
         
+        def getOrComputeDigest(digest: Option[String]) =
+            digest getOrElse {
+                val digestContentHandler = new XMLUtils.DigestContentHandler("MD5")
+                TransformerUtils.writeDom4j(xmlDocument, digestContentHandler)
+                NumberUtils.toHexString(digestContentHandler.getResult)
+            }
+        
         // Get the encoded static state
         // If an existing state is passed in, use it, otherwise encode from XML, encrypting if necessary.
         // NOTE: We do compress the result as we think we can afford this for the static state (probably not so for the dynamic state).
-        def getEncodedState(encodedState: Option[String]) =
-            encodedState getOrElse
-                (XFormsUtils.encodeXML(staticStateDocument, true, if (isClientStateHandling) P.getXFormsPassword else null, true))
+        def asBase64 =
+            XFormsUtils.encodeXML(xmlDocument, true, if (isClientStateHandling) P.getXFormsPassword else null, true)
     }
 }

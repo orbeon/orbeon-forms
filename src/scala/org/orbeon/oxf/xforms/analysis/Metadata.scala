@@ -14,16 +14,19 @@
 package org.orbeon.oxf.xforms.analysis
 
 import collection.immutable.TreeMap
-import collection.JavaConversions._
-import org.orbeon.oxf.xml.{NamespaceMapping, SAXStore}
+import collection.JavaConverters._
 import org.orbeon.oxf.xforms.XFormsUtils
 import collection.mutable.{HashSet, HashMap, LinkedHashMap, LinkedHashSet}
 import collection.immutable.Stream._
-import java.util.{Map => JMap, Set => JSet}
+import java.util.{Map ⇒ JMap}
 
 import org.orbeon.oxf.resources.{ResourceNotFoundException, ResourceManagerWrapper}
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.xforms.xbl.XBLBindings
+import org.orbeon.oxf.xforms.state.AnnotatedTemplate
+import org.orbeon.oxf.xml.{TransformerUtils, NamespaceMapping, SAXStore}
+import org.dom4j.io.DocumentSource
+import org.orbeon.oxf.xforms.XFormsStaticStateImpl.StaticStateDocument
 
 /**
  * Container for element metadata gathered during document annotation/extraction:
@@ -32,59 +35,59 @@ import org.orbeon.oxf.xforms.xbl.XBLBindings
  * - namespace mappings
  * - automatic XBL mappings
  * - full update marks
+ *
+ * Split into traits for modularity.
  */
-class Metadata(val idGenerator: IdGenerator) {
-
+class Metadata(val idGenerator: IdGenerator) extends NamespaceMappings with Bindings with Marks {
     def this() { this(new IdGenerator) }
+}
 
-    val marks = new HashMap[String, SAXStore#Mark]
-    val bindingIncludes = new LinkedHashSet[String]
+object Metadata {
+    // Restore a Metadata object from the given StaticStateDocument
+    def apply(staticStateDocument: StaticStateDocument, template: Option[AnnotatedTemplate]): Metadata = {
 
-    private val namespaceMappings = new HashMap[String, NamespaceMapping]
-    private val hashes = new LinkedHashMap[String, NamespaceMapping]
+        // Restore generator with last id
+        val metadata = new Metadata(new IdGenerator(staticStateDocument.lastId))
+
+        // Restore namespace mappings and ids
+        TransformerUtils.sourceToSAX(new DocumentSource(staticStateDocument.xmlDocument), new XFormsAnnotatorContentHandler(metadata))
+
+        // Restore marks if there is a template
+        template foreach { template ⇒
+            for (mark ← template.saxStore.getMarks.asScala)
+                metadata.putMark(mark)
+        }
+
+        metadata
+    }
+}
+
+// Handling of template marks
+trait Marks {
+    private val marks = new HashMap[String, SAXStore#Mark]
+
+    def putMark(mark: SAXStore#Mark) = marks += mark.id → mark
+    def getMark(prefixedId: String) = marks.get(prefixedId).orNull
+
+    private def topLevelMarks = marks collect { case (prefixedId, mark) if XFormsUtils.isTopLevelId(prefixedId) ⇒ mark }
+    def hasTopLevelMarks = topLevelMarks.nonEmpty
+}
+
+// Handling of XBL bindings
+trait Bindings {
     private val xblBindings = new HashMap[String, collection.mutable.Set[String]]
-
     private var lastModified = -1L
 
     private lazy val automaticMappings = {
         val propertySet = Properties.instance.getPropertySet
         for {
-            propertyName <- propertySet.getPropertiesStartsWith(XBLBindings.XBL_MAPPING_PROPERTY_PREFIX)
+            propertyName ← propertySet.getPropertiesStartsWith(XBLBindings.XBL_MAPPING_PROPERTY_PREFIX).asScala
             prefix = propertyName.substring(XBLBindings.XBL_MAPPING_PROPERTY_PREFIX.length)
         } yield
             (propertySet.getString(propertyName), prefix)
     } toMap
 
-    def addNamespaceMapping(prefixedId: String, mapping: JMap[String, String]) {
-        // Sort mappings by prefix
-        val sorted = TreeMap(mapping.toSeq: _*)
-        // Hash key/values
-        val hexHash = NamespaceMapping.hashMapping(sorted)
-
-        // Retrieve or create mapping object
-        val namespaceMapping = hashes.getOrElseUpdate(hexHash, {
-            val newNamespaceMapping = new NamespaceMapping(hexHash, sorted)
-            hashes += (hexHash → newNamespaceMapping)
-            newNamespaceMapping
-        })
-
-        // Remember that id has this mapping
-        namespaceMappings += prefixedId → namespaceMapping
-    }
-
-    def getNamespaceMapping(prefixedId: String) = namespaceMappings.get(prefixedId).orNull
-
-    // NOTE: Top-level id if static id == prefixed id
-    def hasTopLevelMarks = marks.keySet exists (prefixedId => prefixedId == XFormsUtils.getStaticIdFromId(prefixedId))
-
-    def getElementMark(prefixedId: String) = marks.get(prefixedId).orNull
-
-    // E.g. fr:tabview -> oxf:/xbl/orbeon/tabview/tabview.xbl
-    def getAutomaticXBLMappingPath(uri: String, localname: String) =
-        automaticMappings.get(uri) flatMap { prefix =>
-            val path = "/xbl/" + prefix + '/' + localname + '/' + localname + ".xbl"
-            if (ResourceManagerWrapper.instance.exists(path)) Some(path) else None
-        }
+    val bindingIncludes = new LinkedHashSet[String]
 
     def isXBLBindingCheckAutomaticBindings(uri: String, localname: String): Boolean = {
 
@@ -94,11 +97,11 @@ class Metadata(val idGenerator: IdGenerator) {
 
         // If not, check if it exists as automatic binding
         getAutomaticXBLMappingPath(uri, localname) match {
-            case Some(path) =>
+            case Some(path) ⇒
                 storeXBLBinding(uri, localname)
                 bindingIncludes.add(path)
                 true
-            case _ =>
+            case _ ⇒
                 false
         }
     }
@@ -110,19 +113,17 @@ class Metadata(val idGenerator: IdGenerator) {
 
     def isXBLBinding(uri: String, localname: String) =
         xblBindings.get(uri) match {
-            case Some(localnames) => localnames(localname)
-            case None => false
+            case Some(localnames) ⇒ localnames(localname)
+            case None ⇒ false
         }
 
-    def getBindingIncludes: JSet[String] = bindingIncludes
+    def getBindingIncludesJava = bindingIncludes.asJava
 
     def updateBindingsLastModified(lastModified: Long) {
         this.lastModified = math.max(this.lastModified, lastModified)
     }
 
-    /**
-     * Check if the binding includes are up to date.
-     */
+    // Check if the binding includes are up to date.
     def checkBindingsIncludes =
         try {
             // true if all last modification dates are at most equal to our last modification date
@@ -131,15 +132,47 @@ class Metadata(val idGenerator: IdGenerator) {
                     (_ <= this.lastModified)
         } catch {
             // If a resource cannot be found, consider that something has changed
-            case e: ResourceNotFoundException => false
+            case e: ResourceNotFoundException ⇒ false
         }
 
-    def debugReadOut() {
-        System.out.println("Number of different namespace mappings: " + hashes.size)
-        for (entry <- hashes.entrySet) {
-            System.out.println("   hash: " + entry.getKey)
-            for (mapping <- entry.getValue.mapping.entrySet)
-                System.out.println("     hash: " + mapping.getKey + " -> " + mapping.getValue)
+    // E.g. fr:tabview → oxf:/xbl/orbeon/tabview/tabview.xbl
+    def getAutomaticXBLMappingPath(uri: String, localname: String) =
+        automaticMappings.get(uri) flatMap { prefix ⇒
+            val path = "/xbl/" + prefix + '/' + localname + '/' + localname + ".xbl"
+            if (ResourceManagerWrapper.instance.exists(path)) Some(path) else None
+        }
+}
+
+// Handling of namespaces
+trait NamespaceMappings {
+    private val namespaceMappings = new HashMap[String, NamespaceMapping]
+    private val hashes = new LinkedHashMap[String, NamespaceMapping]
+
+    def addNamespaceMapping(prefixedId: String, mapping: JMap[String, String]) {
+        // Sort mappings by prefix
+        val sorted = TreeMap(mapping.asScala.toSeq: _*)
+        // Hash key/values
+        val hexHash = NamespaceMapping.hashMapping(sorted.asJava)
+
+        // Retrieve or create mapping object
+        val namespaceMapping = hashes.getOrElseUpdate(hexHash, {
+            val newNamespaceMapping = new NamespaceMapping(hexHash, sorted.asJava)
+            hashes += (hexHash → newNamespaceMapping)
+            newNamespaceMapping
+        })
+
+        // Remember that id has this mapping
+        namespaceMappings += prefixedId → namespaceMapping
+    }
+
+    def getNamespaceMapping(prefixedId: String) = namespaceMappings.get(prefixedId).orNull
+
+    def debugPrintNamespaces() {
+        println("Number of different namespace mappings: " + hashes.size)
+        for ((key, value) ← hashes) {
+            println("   hash: " + key)
+            for ((prefix, uri) ← value.mapping.asScala)
+                println("     " + prefix + " → " + uri)
         }
     }
 }

@@ -27,6 +27,7 @@ import org.xml.sax.helpers.AttributesImpl;
 import javax.xml.transform.stream.StreamResult;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -81,8 +82,11 @@ public class SAXStore extends ForwardingXMLReceiver implements Externalizable {
     private transient Locator locator; // used only for recording events, MUST be cleared afterwards
 
     private final Mark START_MARK = new Mark();
+    
+    private List<Mark> marks = null;
 
     public class Mark {
+        public final String id;
         public final int eventBufferPosition;
         public final int charBufferPosition;
         public final int intBufferPosition;
@@ -92,6 +96,7 @@ public class SAXStore extends ForwardingXMLReceiver implements Externalizable {
         public final int stringBufferPosition;
 
         private Mark() {
+            id = null;
             this.eventBufferPosition = 0;
             this.charBufferPosition = 0;
             this.intBufferPosition = 0;
@@ -101,7 +106,8 @@ public class SAXStore extends ForwardingXMLReceiver implements Externalizable {
             this.stringBufferPosition = 0;
         }
 
-        private Mark(final SAXStore store) {
+        private Mark(final SAXStore store, final String id) {
+            this.id = id;
             this.eventBufferPosition = store.eventBufferPosition;
             this.charBufferPosition = store.charBufferPosition;
             this.intBufferPosition = store.intBufferPosition;
@@ -109,10 +115,38 @@ public class SAXStore extends ForwardingXMLReceiver implements Externalizable {
             this.systemIdBufferPosition = store.systemIdBufferPosition;
             this.attributeCountBufferPosition = store.attributeCountBufferPosition;
             this.stringBufferPosition = store.stringBuffer.size();
+            
+            rememberMark();
+        }
+        
+        private Mark(final int[] values, final String id) {
+            this.id = id;
+            int i = 0;
+            this.eventBufferPosition = values[i++];
+            this.charBufferPosition = values[i++];
+            this.intBufferPosition = values[i++];
+            this.lineBufferPosition = values[i++];
+            this.systemIdBufferPosition = values[i++];
+            this.attributeCountBufferPosition = values[i++];
+            this.stringBufferPosition = values[i++];
+            
+            rememberMark();
+        }
+        
+        private void rememberMark() {
+            // Keep a reference to marks, so that they can be serialized/deserialized along with the SAXStore 
+            if (marks == null)
+                marks = new ArrayList<Mark>();
+            
+            marks.add(this);
         }
 
         public void replay(XMLReceiver xmlReceiver) throws SAXException {
             SAXStore.this.replay(xmlReceiver, this);
+        }
+        
+        public SAXStore saxStore() {
+            return SAXStore.this;
         }
     }
 
@@ -341,14 +375,21 @@ public class SAXStore extends ForwardingXMLReceiver implements Externalizable {
         }
     }
 
-    public Mark getElementMark() {
-        return new Mark(this);
+    // Create a new mark
+    // NOTE: This must be called *before* the startElement() event that will be the first element associated with the mark.
+    public Mark getMark(String id) {
+        return new Mark(this, id);
+    }
+
+    // Return all the marks created
+    public List<Mark> getMarks() {
+        return marks != null ? marks : Collections.<Mark>emptyList();
     }
 
     /**
-     * This attempts to print the content to System.out. For debug only.
+     * Print to System.out. For debug only.
      */
-    public void readOut() {
+    public void printOut() {
         try {
             final TransformerXMLReceiver th = TransformerUtils.getIdentityTransformerHandler();
             th.setResult(new StreamResult(System.out));
@@ -432,8 +473,6 @@ public class SAXStore extends ForwardingXMLReceiver implements Externalizable {
 
     @Override
     public void ignorableWhitespace(char[] chars, int start, int length) throws SAXException {
-
-//        if (ended) return;
 
         addToEventBuffer(IGN_WHITESPACE);
         addToCharBuffer(chars, start, length);
@@ -653,11 +692,6 @@ public class SAXStore extends ForwardingXMLReceiver implements Externalizable {
         }
     }
 
-//    private int getNewCapacity(int oldCapacity) {
-//
-//    }
-
-
     public void writeExternal(ObjectOutput out) throws IOException {
 
         out.writeInt(eventBufferPosition);
@@ -691,6 +725,22 @@ public class SAXStore extends ForwardingXMLReceiver implements Externalizable {
 
         out.writeBoolean(hasDocumentLocator);
         out.writeObject(publicId == null ? "" : publicId);
+        
+        if (marks == null || marks.isEmpty()) {
+            out.writeInt(0);
+        } else {
+            out.writeInt(marks.size());
+            for (final Mark mark : marks) {
+                out.writeObject(mark.id);
+                out.writeInt(mark.eventBufferPosition);
+                out.writeInt(mark.charBufferPosition);
+                out.writeInt(mark.intBufferPosition);
+                out.writeInt(mark.lineBufferPosition);
+                out.writeInt(mark.systemIdBufferPosition);
+                out.writeInt(mark.attributeCountBufferPosition);
+                out.writeInt(mark.stringBufferPosition);
+            }
+        }
 
         out.flush();
     }
@@ -740,5 +790,16 @@ public class SAXStore extends ForwardingXMLReceiver implements Externalizable {
         publicId = (String) in.readObject();
         if ("".equals(publicId))
             publicId = null;
+        
+        final int marksCount = in.readInt();
+        if (marksCount > 0) {
+            for (int i = 0; i < marksCount; i++) {
+                final String id = (String) in.readObject();
+                int[] values = new int[7];
+                for (int j = 0; j < 7; j++)
+                    values[j] = in.readInt();
+                new Mark(values, id);
+            }
+        }
     }
 }

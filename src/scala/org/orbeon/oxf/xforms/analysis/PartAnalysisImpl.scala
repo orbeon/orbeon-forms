@@ -28,7 +28,7 @@ import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.oxf.xml.dom4j.{ExtendedLocationData, LocationData, Dom4jUtils}
 import collection.mutable.Buffer
 import org.orbeon.oxf.common.ValidationException
-import org.orbeon.oxf.xml.{SAXStore, NamespaceMapping, ContentHandlerHelper, XMLUtils}
+import org.orbeon.oxf.xml.{NamespaceMapping, ContentHandlerHelper, XMLUtils}
 import xbl.Scope
 
 /**
@@ -67,8 +67,7 @@ class PartAnalysisImpl(
 
     def ancestorOrSelf = this #:: ancestors
 
-    def getElementMark(prefixedId: String): SAXStore#Mark =
-        metadata.getElementMark(prefixedId)
+    def getMark(prefixedId: String) = metadata.getMark(prefixedId)
 
     /**
      * Return the namespace mappings for a given element. If the element does not have an id, or if the mapping is not

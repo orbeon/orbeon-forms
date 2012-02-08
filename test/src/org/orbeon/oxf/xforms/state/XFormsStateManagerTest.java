@@ -110,7 +110,7 @@ public class XFormsStateManagerTest extends ResourceManagerTestBase {
         assertTrue(staticStateString.startsWith("X2"));
         assertTrue(dynamicStateString.startsWith("X2"));
 
-        return new XFormsState(staticStateString, DynamicState.apply(document));
+        return new XFormsState(scala.Option.apply(staticState.digest()), staticStateString, DynamicState.apply(document));
     }
 
     private static class State {

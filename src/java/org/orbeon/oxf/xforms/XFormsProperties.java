@@ -33,8 +33,11 @@ public class XFormsProperties {
     public static final String STATE_HANDLING_SERVER_VALUE = "server";
     public static final String STATE_HANDLING_CLIENT_VALUE = "client";
 
-    public static final String NOSCRIPT_PROPERTY = "noscript";
     public static final String NOSCRIPT_SUPPORT_PROPERTY = "noscript-support";
+    public static final String NOSCRIPT_PROPERTY = "noscript";
+    public static final String NOSCRIPT_TEMPLATE = "noscript-template";
+    public static final String NOSCRIPT_TEMPLATE_STATIC_VALUE = "static";
+    public static final String NOSCRIPT_TEMPLATE_DYNAMIC_VALUE = "dynamic";
 
     public static final String READONLY_APPEARANCE_PROPERTY = "readonly-appearance";
     public static final String READONLY_APPEARANCE_STATIC_VALUE = "static";
@@ -178,8 +181,9 @@ public class XFormsProperties {
                                 + " property value value: " + stringValue, locationData);
                 }
             },
-            new PropertyDefinition(NOSCRIPT_PROPERTY, false, false),
             new PropertyDefinition(NOSCRIPT_SUPPORT_PROPERTY, true, false),
+            new PropertyDefinition(NOSCRIPT_PROPERTY, false, false),
+            new PropertyDefinition(NOSCRIPT_TEMPLATE, NOSCRIPT_TEMPLATE_STATIC_VALUE, false),
             new PropertyDefinition(READONLY_PROPERTY, false, false),
             new PropertyDefinition(READONLY_APPEARANCE_PROPERTY, READONLY_APPEARANCE_DYNAMIC_VALUE, false) {
                 @Override
@@ -489,6 +493,10 @@ public class XFormsProperties {
 
     public static boolean isReadonly(XFormsContainingDocument containingDocument) {
         return getBooleanProperty(containingDocument, READONLY_PROPERTY);
+    }
+
+    public static String getNoscriptTemplate(XFormsContainingDocument containingDocument) {
+        return getStringProperty(containingDocument, NOSCRIPT_TEMPLATE);
     }
 
     public static String getReadonlyAppearance(XFormsContainingDocument containingDocument) {

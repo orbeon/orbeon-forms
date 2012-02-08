@@ -487,7 +487,7 @@ public class XFormsStateManager implements XFormsStateLifecycle {
             }
         } else {
             // State comes directly with request
-            xformsState = new XFormsState(parameters.getEncodedClientStaticState(), DynamicState.apply(parameters.getEncodedClientDynamicState()));
+            xformsState = new XFormsState(scala.Option.<String>apply(null), parameters.getEncodedClientStaticState(), DynamicState.apply(parameters.getEncodedClientDynamicState()));
         }
 
         // Create document

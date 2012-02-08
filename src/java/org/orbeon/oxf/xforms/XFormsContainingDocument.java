@@ -40,10 +40,7 @@ import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.processor.XFormsURIResolver;
 import org.orbeon.oxf.xforms.script.ScriptInterpreter;
-import org.orbeon.oxf.xforms.state.DynamicState;
-import org.orbeon.oxf.xforms.state.XFormsState;
-import org.orbeon.oxf.xforms.state.XFormsStateManager;
-import org.orbeon.oxf.xforms.state.XFormsStaticStateCache;
+import org.orbeon.oxf.xforms.state.*;
 import org.orbeon.oxf.xforms.submission.AsynchronousSubmissionManager;
 import org.orbeon.oxf.xforms.submission.SubmissionResult;
 import org.orbeon.oxf.xforms.submission.XFormsModelSubmission;
@@ -155,9 +152,8 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
     private List<DelayedEvent> delayedEvents;
     private List<XFormsError.ServerError> serverErrors;
 
-    // Annotated page template for noscript and full updates mode
-    // NOTE: We used to keep this in the static state, but the static state must now not depend on external HTML anymore
-    private SAXStore annotatedTemplate;
+    // Page template for noscript mode if stored in dynamic state (otherwise stored in static state)
+    private AnnotatedTemplate template;
 
     private final XPathDependencies xpathDependencies;
 
@@ -177,7 +173,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
      * @param uriResolver               optional URIResolver for loading instances during initialization (and possibly more, such as schemas and "GET" submissions upon initialization)
      * @param response                  optional response for handling replace="all" during initialization
      */
-    public XFormsContainingDocument(XFormsStaticState staticState, SAXStore annotatedTemplate,
+    public XFormsContainingDocument(XFormsStaticState staticState, AnnotatedTemplate template,
                                     XFormsURIResolver uriResolver, ExternalContext.Response response) {
         super(CONTAINING_DOCUMENT_PSEUDO_ID, CONTAINING_DOCUMENT_PSEUDO_ID, CONTAINING_DOCUMENT_PSEUDO_ID, "", null, null);
 
@@ -201,12 +197,12 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
             this.staticState = staticState;
             this.staticOps = new StaticStateGlobalOps(staticState.topLevelPart());
 
-            // Remember annotated page template if needed based on static state information
+            // Remember annotated page template if needed
             {
-                this.annotatedTemplate = staticState.isKeepAnnotatedTemplate() ? annotatedTemplate : null;
+                this.template = staticState.isDynamicNoscriptTemplate() ? template : null;
 
-                if (this.annotatedTemplate != null && indentedLogger.isDebugEnabled()) {
-                    indentedLogger.logDebug("", "keeping XHTML tree", "approximate size (bytes)", Long.toString(this.annotatedTemplate.getApproximateSize()));
+                if (this.template != null && indentedLogger.isDebugEnabled()) {
+                    indentedLogger.logDebug("", "keeping XHTML tree", "approximate size (bytes)", Long.toString(this.template.saxStore().getApproximateSize()));
                 }
             }
 
@@ -225,6 +221,32 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
             }
         }
         indentedLogger.endHandleOperation();
+    }
+
+    // This is called upon the first creation of the XForms engine
+    private void initialize() {
+
+        // Scope the containing document for the XForms API
+        XFormsAPI.withContainingDocumentJava(this, new Runnable() {
+            public void run() {
+                // Create XForms controls and models
+                createControlsAndModels();
+
+                // Group all xforms-model-construct-done and xforms-ready events within a single outermost action handler in
+                // order to optimize events
+                // Perform deferred updates only for xforms-ready
+                startOutermostActionHandler();
+                {
+                    // Initialize models
+                    initializeModels();
+
+                    // After initialization, some async submissions might be running
+                    processCompletedAsynchronousSubmissions(true, true);
+                }
+                // End deferred behavior
+                endOutermostActionHandler();
+            }
+        });
     }
 
     private void initializeRequestInformation() {
@@ -265,12 +287,12 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
     public XFormsContainingDocument(XFormsState xformsState) {
         super(CONTAINING_DOCUMENT_PSEUDO_ID, CONTAINING_DOCUMENT_PSEUDO_ID, CONTAINING_DOCUMENT_PSEUDO_ID, "", null, null);
 
-        // Create static state object
+        // 1. Restore the static state
         {
-            final String staticStateDigest = xformsState.staticStateDigestJava();
+            final scala.Option<String> staticStateDigest = xformsState.staticStateDigest();
 
-            if (staticStateDigest != null) {
-                final XFormsStaticState cachedState = XFormsStaticStateCache.instance().getDocument(staticStateDigest);
+            if (staticStateDigest.isDefined()) {
+                final XFormsStaticState cachedState = XFormsStaticStateCache.instance().getDocument(staticStateDigest.get());
                 if (cachedState != null) {
                     // Found static state in cache
                     indentedLogger.logDebug("", "found static state by digest in cache");
@@ -288,37 +310,89 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
             } else {
                 // Not digest provided, create static state from input
                 indentedLogger.logDebug("", "did not find static state by digest in cache");
-                this.staticState = XFormsStaticStateImpl.restore(null, xformsState.staticState());
+                this.staticState = XFormsStaticStateImpl.restore(staticStateDigest, xformsState.staticState());
 
                 assert this.staticState.isClientStateHandling();
             }
 
+            setLocationData(this.staticState.locationData());
             this.staticOps = new StaticStateGlobalOps(staticState.topLevelPart());
+            this.xpathDependencies = Version.instance().createUIDependencies(this);
         }
 
+        // 2. Restore the dynamic state
         indentedLogger.startHandleOperation("initialization", "restoring containing document");
-
-        {
-            // Make sure there is location data
-            setLocationData(this.staticState.locationData());
-
-            this.xpathDependencies = Version.instance().createUIDependencies(this);
-
-            // Restore the containing document's dynamic state
-            final DynamicState encodedDynamicState = xformsState.dynamicState();
-            try {
-                if (encodedDynamicState == null) {
-                    // Just for tests, we allow the dynamic state to be empty
-                    initialize();
-                } else {
-                    // Regular case
-                    restoreDynamicState(encodedDynamicState);
-                }
-            } catch (Exception e) {
-                throw ValidationException.wrapException(e, new ExtendedLocationData(getLocationData(), "re-initializing XForms containing document"));
-            }
+        try {
+            restoreDynamicState(xformsState.dynamicState());
+        } catch (Exception e) {
+            throw ValidationException.wrapException(e, new ExtendedLocationData(getLocationData(), "re-initializing XForms containing document"));
         }
         indentedLogger.endHandleOperation();
+    }
+
+    private void restoreDynamicState(DynamicState dynamicState) {
+
+        this.uuid = dynamicState.uuid();
+        this.sequence = dynamicState.sequence();
+
+        indentedLogger.logDebug("initialization", "restoring UUID", "UUID", this.uuid, "sequence", Long.toString(this.sequence));
+
+        // Restore request information
+        if (dynamicState.decodeDeploymentTypeJava() != null) {
+            // Normal case where information below was previously serialized
+            this.deploymentType = XFormsConstants.DeploymentType.valueOf(dynamicState.decodeDeploymentTypeJava());
+            this.requestContextPath = dynamicState.decodeRequestContextPathJava();
+            this.requestPath = dynamicState.decodeRequestPathJava();
+            this.containerType = dynamicState.decodeContainerTypeJava();
+            this.containerNamespace = dynamicState.decodeContainerNamespaceJava();
+        } else {
+            // Use information from the request
+            // This is relied upon by oxf:xforms-submission and unit tests and shouldn't be relied on in other cases
+            initializeRequestInformation();
+        }
+
+        // Restore other encoded objects
+        this.versionedPathMatchers = dynamicState.decodePathMatchersJava();
+        this.pendingUploads = new HashSet<String>(dynamicState.decodePendingUploadsJava()); // make copy as must be mutable
+        this.template = dynamicState.decodeAnnotatedTemplateJava();
+        this.lastAjaxResponse = dynamicState.decodeLastAjaxResponseJava();
+
+        // TODO: don't use PipelineContext: use other ThreadLocal
+        final PipelineContext pipelineContext = PipelineContext.get();
+
+        // Restore models state
+        {
+            // Store instances state in PipelineContext for use down the line
+            pipelineContext.setAttribute(XFORMS_DYNAMIC_STATE_RESTORE_INSTANCES, dynamicState.decodeInstancesJava());
+
+            // Create XForms controls and models
+            createControlsAndModels();
+
+            // Restore top-level models state, including instances
+            restoreModelsState();
+        }
+
+        // Restore controls state
+        {
+            // Store serialized control state for retrieval later
+            pipelineContext.setAttribute(XFORMS_DYNAMIC_STATE_RESTORE_CONTROLS, dynamicState.decodeControlsJava());
+            xformsControls.restoreControls();
+            pipelineContext.setAttribute(XFORMS_DYNAMIC_STATE_RESTORE_CONTROLS, null);
+        }
+
+        // Indicate that instance restoration process is over
+        pipelineContext.setAttribute(XFORMS_DYNAMIC_STATE_RESTORE_INSTANCES, null);
+    }
+
+    // Whether the containing document is in a phase of restoring the dynamic state.
+    public boolean isRestoringDynamicState() {
+        // TODO: don't use PipelineContext: use other ThreadLocal
+        return PipelineContext.get().getAttribute(XFormsContainingDocument.XFORMS_DYNAMIC_STATE_RESTORE_INSTANCES) != null;
+    }
+
+    public Map<String, Map<String, String>> getSerializedControlStatesMap() {
+        // TODO: don't use PipelineContext: use other ThreadLocal
+        return (Map<String, Map<String, String>>) PipelineContext.get().getAttribute(XFormsContainingDocument.XFORMS_DYNAMIC_STATE_RESTORE_CONTROLS);
     }
 
     public PartAnalysis getPartAnalysis() {
@@ -415,12 +489,10 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
     }
 
     /**
-     * Return the annotated page template if available. Only for noscript mode and full updates.
-     *
-     * @return  SAXStore containing annotated page template or null
+     * Return the page template if available. Only for noscript mode.
      */
-    public SAXStore getAnnotatedTemplate() {
-        return annotatedTemplate;
+    public AnnotatedTemplate getTemplate() {
+        return template;
     }
 
     /**
@@ -1013,101 +1085,6 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         } else {
             super.performDefaultAction(event);
         }
-    }
-
-    private void restoreDynamicState(DynamicState dynamicState) {
-
-        this.uuid = dynamicState.uuid();
-        this.sequence = dynamicState.sequence();
-
-        indentedLogger.logDebug("initialization", "restoring UUID", "UUID", this.uuid, "sequence", Long.toString(this.sequence));
-
-        // Restore request information
-        if (dynamicState.decodeDeploymentTypeJava() != null) {
-            // Normal case where information below was previously serialized
-            this.deploymentType = XFormsConstants.DeploymentType.valueOf(dynamicState.decodeDeploymentTypeJava());
-            this.requestContextPath = dynamicState.decodeRequestContextPathJava();
-            this.requestPath = dynamicState.decodeRequestPathJava();
-            this.containerType = dynamicState.decodeContainerTypeJava();
-            this.containerNamespace = dynamicState.decodeContainerNamespaceJava();
-        } else {
-            // Use information from the request
-            // This is relied upon by oxf:xforms-submission and unit tests and shouldn't be relied on in other cases
-            initializeRequestInformation();
-        }
-
-        // Restore versioned paths matchers
-        this.versionedPathMatchers = dynamicState.decodePathMatchersJava();
-        this.pendingUploads = new HashSet<String>(dynamicState.decodePendingUploadsJava()); // make copy as must be mutable
-        this.annotatedTemplate = dynamicState.decodeAnnotatedTemplateJava();
-        this.lastAjaxResponse = dynamicState.decodeLastAjaxResponseJava();
-
-        // TODO: don't use PipelineContext: use other ThreadLocal
-        final PipelineContext pipelineContext = PipelineContext.get();
-
-        // Restore models state
-        {
-            // Store instances state in PipelineContext for use down the line
-            pipelineContext.setAttribute(XFORMS_DYNAMIC_STATE_RESTORE_INSTANCES, dynamicState.decodeInstancesJava());
-
-            // Create XForms controls and models
-            createControlsAndModels();
-
-            // Restore top-level models state, including instances
-            restoreModelsState();
-        }
-
-        // Restore controls state
-        {
-            // Store serialized control state for retrieval later
-            pipelineContext.setAttribute(XFORMS_DYNAMIC_STATE_RESTORE_CONTROLS, dynamicState.decodeControlsJava());
-            xformsControls.restoreControls();
-            pipelineContext.setAttribute(XFORMS_DYNAMIC_STATE_RESTORE_CONTROLS, null);
-        }
-
-        // Indicate that instance restoration process is over
-        pipelineContext.setAttribute(XFORMS_DYNAMIC_STATE_RESTORE_INSTANCES, null);
-    }
-
-    /**
-     * Whether the containing document is in a phase of restoring the dynamic state.
-     *
-     * @return                  true iif restore is in process
-     */
-    public boolean isRestoringDynamicState() {
-        // TODO: don't use PipelineContext: use other ThreadLocal
-        return PipelineContext.get().getAttribute(XFormsContainingDocument.XFORMS_DYNAMIC_STATE_RESTORE_INSTANCES) != null;
-    }
-
-    public Map<String, Map<String, String>> getSerializedControlStatesMap() {
-        // TODO: don't use PipelineContext: use other ThreadLocal
-        return (Map<String, Map<String, String>>) PipelineContext.get().getAttribute(XFormsContainingDocument.XFORMS_DYNAMIC_STATE_RESTORE_CONTROLS);
-    }
-
-    // This is called upon the first creation of the XForms engine OR for testing
-    private void initialize() {
-
-        // Scope the containing document for the XForms API
-        XFormsAPI.withContainingDocumentJava(this, new Runnable() {
-            public void run() {
-                // Create XForms controls and models
-                createControlsAndModels();
-
-                // Group all xforms-model-construct-done and xforms-ready events within a single outermost action handler in
-                // order to optimize events
-                // Perform deferred updates only for xforms-ready
-                startOutermostActionHandler();
-                {
-                    // Initialize models
-                    initializeModels();
-
-                    // After initialization, some async submissions might be running
-                    processCompletedAsynchronousSubmissions(true, true);
-                }
-                // End deferred behavior
-                endOutermostActionHandler();
-            }
-        });
     }
 
     public AsynchronousSubmissionManager getAsynchronousSubmissionManager(boolean create) {

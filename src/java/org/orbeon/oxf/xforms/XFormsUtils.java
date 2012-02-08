@@ -80,14 +80,14 @@ public class XFormsUtils {
         return encodeXML(documentToEncode, XFormsProperties.isGZIPState(), XFormsProperties.getXFormsPassword(), encodeLocationData);
     }
 
-    public static String encodeXML(Document documentToEncode, boolean compress, String encryptionPassword, boolean encodeLocationData) {
+    public static String encodeXML(Document document, boolean compress, String encryptionPassword, boolean location) {
         //        XFormsServer.logger.debug("XForms - encoding XML.");
 
         // Get SAXStore
         // TODO: This is not optimal since we create a second in-memory representation. Should stream instead.
         final SAXStore saxStore = new SAXStore();
         // NOTE: We don't encode XML comments and use only the ContentHandler interface
-        final Source source = encodeLocationData ? new LocationDocumentSource(documentToEncode) : new DocumentSource(documentToEncode);
+        final Source source = location ? new LocationDocumentSource(document) : new DocumentSource(document);
         TransformerUtils.sourceToSAX(source, saxStore);
 
         // Serialize SAXStore to bytes
@@ -1301,6 +1301,11 @@ public class XFormsUtils {
         assert absoluteId.startsWith("/");
 
         return absoluteId.substring(1).replace('/', '$');
+    }
+
+    public static boolean isTopLevelId(String id) {
+        // NOTE: Top-level id if static id == prefixed id
+        return id.equals(XFormsUtils.getStaticIdFromId(id));
     }
 
     /**

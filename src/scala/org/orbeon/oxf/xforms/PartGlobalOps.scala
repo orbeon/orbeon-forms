@@ -26,44 +26,44 @@ import org.apache.commons.lang.StringUtils
 trait PartGlobalOps {
 
     // Global
-    def getElementMark(prefixedId: String): SAXStore#Mark                                           // GRUN
+    def getMark(prefixedId: String): SAXStore#Mark
 
     // Models
-    def getInstances(modelPrefixedId: String): java.util.Collection[Instance]                       // RUN
+    def getInstances(modelPrefixedId: String): java.util.Collection[Instance]
 
     // Controls
-    def getControlAnalysis(prefixedId: String): ElementAnalysis                                     // SA|GRUN
-    def hasControlByName(controlName: String): Boolean                                              // GRUN
-    def hasControlAppearance(controlName: String, appearance: QName): Boolean                       // GRUN
+    def getControlAnalysis(prefixedId: String): ElementAnalysis
+    def hasControlByName(controlName: String): Boolean
+    def hasControlAppearance(controlName: String, appearance: QName): Boolean
     def hasInputPlaceholder: Boolean
 
     // Events
-    def hasHandlerForEvent(eventName: String): Boolean                                              // GRUN
-    def hasHandlerForEvent(eventName: String, includeAllEvents: Boolean): Boolean                   // GRUN
-    def getKeyHandlers: JList[EventHandler]                                                         // GRUN
+    def hasHandlerForEvent(eventName: String): Boolean
+    def hasHandlerForEvent(eventName: String, includeAllEvents: Boolean): Boolean
+    def getKeyHandlers: JList[EventHandler]
 
     // XBL
-    def isComponent(binding: QName): Boolean                                                        // GRUN
-    def getBinding(prefixedId: String): ConcreteBinding                                             // GRUN
-    def getBindingId(prefixedId: String): String                                                    // GRUN
-    def getBindingQNames: Seq[QName]                                                                // GRUN
-    def getGlobals: collection.Map[QName, XBLBindings#Global]                                       // GRUN
-    def getResolutionScopeByPrefix(prefix: String): Scope                               // GRUN
-    def getResolutionScopeByPrefixedId(prefixedId: String): Scope                       // SA|GRUN
+    def isComponent(binding: QName): Boolean
+    def getBinding(prefixedId: String): ConcreteBinding
+    def getBindingId(prefixedId: String): String
+    def getBindingQNames: Seq[QName]
+    def getGlobals: collection.Map[QName, XBLBindings#Global]
+    def getResolutionScopeByPrefix(prefix: String): Scope
+    def getResolutionScopeByPrefixedId(prefixedId: String): Scope
 
     // Repeats
-    def addMissingRepeatIndexes(repeatIdToIndex: JMap[String, java.lang.Integer])                   // GRUN
-    def getRepeatHierarchyString: String                                                            // GRUN
+    def addMissingRepeatIndexes(repeatIdToIndex: JMap[String, java.lang.Integer])
+    def getRepeatHierarchyString: String
 
     // AVTs
-    def hasAttributeControl(prefixedForAttribute: String): Boolean                                  // GRUN
-    def getAttributeControl(prefixedForAttribute: String, attributeName: String): AttributeControl  // GRUN
+    def hasAttributeControl(prefixedForAttribute: String): Boolean
+    def getAttributeControl(prefixedForAttribute: String, attributeName: String): AttributeControl
 
     // Client-side resources
-    def scripts: collection.Map[String, Script]                                                     // GRUN
-    def getXBLStyles: Seq[Element]                                                                  // GRUN
-    def getXBLScripts: Seq[Element]                                                                 // GRUN
-    def baselineResources: (collection.Set[String], collection.Set[String])                         // GRUN
+    def scripts: collection.Map[String, Script]
+    def getXBLStyles: Seq[Element]
+    def getXBLScripts: Seq[Element]
+    def baselineResources: (collection.Set[String], collection.Set[String])
 
     // Functions derived from getControlAnalysis
     def getControlAnalysisOption(prefixedId: String) = Option(getControlAnalysis(prefixedId))

@@ -78,7 +78,6 @@ public abstract class XHTMLHeadHandlerBase extends XFormsBaseHandlerXHTML {
         outputCSSResources(helper, xhtmlPrefix, isMinimal, attributesImpl);
 
         // Scripts
-        // TODO: Have option to put this at the bottom of the page. See theme-plain.xsl and http://developer.yahoo.com/performance/rules.html#js_bottom -->
         if (!handlerContext.isNoScript() && !XFormsProperties.isReadonly(containingDocument)) {
 
             // Main JavaScript resources

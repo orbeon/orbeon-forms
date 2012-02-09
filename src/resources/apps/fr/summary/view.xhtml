@@ -769,8 +769,8 @@
                                     <xforms:dispatch ev:event="DOMActivate" targetid="fr-form-model" name="fr-summary-create"/>
                                 </xforms:trigger>
                             </xforms:group>
-                            <!-- Print button -->
-                            <xforms:group ref="if (. = 'print') then instance('fr-summary-triggers-instance')/view else ()">
+                            <!-- Print/review button -->
+                            <xforms:group ref="if (. = ('print', 'review')) then instance('fr-summary-triggers-instance')/view else ()">
                                 <xforms:trigger ref=".">
                                     <xforms:label>
                                         <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/eye.png" alt=""/>

@@ -18,26 +18,28 @@ Events = ORBEON.xforms.Events
 YD = YAHOO.util.Dom
 
 # Rules defining when certain triggers are relevant
-isNotEmpty = (gridTd) -> $(gridTd).children('.fr-grid-content').children().length > 0
-isUpload = (gridTd) -> isNotEmpty(gridTd) and $(gridTd).children('.fr-grid-content').hasClass('fb-upload')
-isEmptyUpload = (gridTd) ->
-    # Check for presence of both spacer and photo placeholder, as both indicate an empty image and we are not sure which one will be shown
-    # depending on whether the code replacing the spacer with the photo placeholder already ran or not
-    spacer = '/ops/images/xforms/spacer.gif'
-    photo = '/apps/fr/style/images/silk/photo.png'
-    $(gridTd).find(".xforms-output-output[src $= '#{spacer}'], .xforms-output-output[src $= '#{photo}']").length > 0
-relevanceRules =
+relevanceRules = do ->
+
+    isNotEmpty = (gridTd) -> $(gridTd).children('.fr-grid-content').children().length > 0
+    isUpload = (gridTd) -> isNotEmpty(gridTd) and $(gridTd).children('.fr-grid-content').hasClass('fb-upload')
+    isEmptyUpload = (gridTd) ->
+        # Check for presence of both spacer and photo placeholder, as both indicate an empty image and we are not sure which one will be shown
+        # depending on whether the code replacing the spacer with the photo placeholder already ran or not
+        spacer = '/ops/images/xforms/spacer.gif'
+        photo = '/apps/fr/style/images/silk/photo.png'
+        $(gridTd).find(".xforms-output-output[src $= '#{spacer}'], .xforms-output-output[src $= '#{photo}']").length > 0
+
     'fb-expand-trigger':            (gridTd) ->
                                         noDelimiter = ':not(.xforms-repeat-delimiter):not(.xforms-repeat-template):not(.xforms-repeat-begin-end):not(.xforms-group-begin-end)'
                                         grid = $(gridTd).closest('.fr-grid')
-                                        if grid.hasClass('fr-norepeat')                                                             # Regular table
-                                            gridTd.rowSpan <= $(gridTd).parent().nextAll('tr' + noDelimiter).length                 #   Based on number of following non-internal rows
-                                        else if grid.hasClass('fr-repeat-multiple-rows')                                            # Repeat with multiple rows in each iteration
-                                            gridTr =$(gridTd).parent()                                                              #   Based on number of following row with the same parity
-                                            oddEvenClass = if gridTr.hasClass('yui-dt-even') then 'yui-dt-even' else 'yui-dt-odd'   #   Rows with a different parity belong to a different iteration
+                                        if grid.hasClass('fr-norepeat')                                                                     # Regular table
+                                            gridTd.rowSpan <= $(gridTd).parent().nextAll('tr' + noDelimiter).length                         #   Based on number of following non-internal rows
+                                        else if grid.hasClass('fr-repeat-multiple-rows')                                                    # Repeat with multiple rows in each iteration
+                                            gridTr =$(gridTd).parent()                                                                      #   Based on number of following row with the same parity
+                                            oddEvenClass = if gridTr.hasClass('yui-dt-even') then 'yui-dt-even' else 'yui-dt-odd'           #   Rows with a different parity belong to a different iteration
                                             gridTd.rowSpan <= gridTr.next('.' + oddEvenClass).length
-                                        else if grid.hasClass('fr-repeat-single-row') then false                                    # Repeat with single row: no expension possible
-                                        else false                                                                                  # Catch all, which shouldn't happen
+                                        else if grid.hasClass('fr-repeat-single-row') then false                                            # Repeat with single row: no expension possible
+                                        else false                                                                                          # Catch all, which shouldn't happen
     'fb-shrink-trigger':            (gridTd) -> gridTd.rowSpan >= 2
     'fb-delete-trigger':            isNotEmpty
     'fb-edit-details-trigger':      isNotEmpty
@@ -48,7 +50,7 @@ relevanceRules =
 
 $ ->
 
-    # Save reference to last operation that positioned the
+    # Save reference to last operation that positioned the triggers
     lastPositionTriggers = null
 
     Builder.mouseEntersGridTdEvent.subscribe ({triggers, triggerGroups, gridTd}) ->
@@ -67,9 +69,9 @@ $ ->
         lastPositionTriggers()
 
     Builder.mouseExitsGridTdEvent.subscribe ({triggerGroups}) ->
-      # We're outside of a grid td: hide cell editor controls
-      triggerGroup.style.display = "none" for triggerGroup in triggerGroups
-      lastPositionTriggers = null
+        $(triggerGroups).hide()
+        $('.fb-cell-editor').append(triggerGroups)
+        lastPositionTriggers = null
 
     # Change current cell on click on trigger
     Builder.triggerClickEvent.subscribe ({trigger}) ->

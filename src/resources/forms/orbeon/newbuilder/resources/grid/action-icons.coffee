@@ -38,7 +38,6 @@ relevanceRules =
                                             gridTd.rowSpan <= gridTr.next('.' + oddEvenClass).length
                                         else if grid.hasClass('fr-repeat-single-row') then false                                    # Repeat with single row: no expension possible
                                         else false                                                                                  # Catch all, which shouldn't happen
-
     'fb-shrink-trigger':            (gridTd) -> gridTd.rowSpan >= 2
     'fb-delete-trigger':            isNotEmpty
     'fb-edit-details-trigger':      isNotEmpty

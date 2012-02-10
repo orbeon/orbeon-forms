@@ -360,9 +360,14 @@ a.xforms-help-image .fb-control-help { vertical-align: baseline; }
 .fr-grid-content.fb-itemset { margin-bottom: 2.5em }
 /* Margin leaves space for file upload  */
 .fr-grid-content.fb-upload { margin-bottom: 2.5em }
-.fr-grid-content .xforms-label:hover, .fr-grid-content .xforms-hint:hover { background-color: #ffffd3 }
 /* Inputs for editing the label and hint to take the whole width of the grid content */
 .fr-grid-content .xforms-label input, .fr-grid-content .xforms-hint input { width: 100% }
+
+.fr-view .fr-grid-content .xforms-label:hover,          /* Yellow background to hint that the hint and label can be edited by clicking */
+.fr-view .fr-grid-content .xforms-hint:hover,           /* .fr-grid-content for label/hint in body */
+.fr-view .fr-grid-th .xforms-label:hover,               /* .fr-grid-th for label/hint in thead of a repeat */
+.fr-view .fr-grid-th .xforms-hint:hover
+    { background-color: #ffffd3 }
 
 /* Even if the label or hint is empty, we still want space for 1 line to be reserved. */
 .fr-grid-content .xforms-label, .fr-grid-content .xforms-hint,  /* In regular grid content */
@@ -379,17 +384,18 @@ a.xforms-help-image .fb-control-help { vertical-align: baseline; }
         position: static }                  /* The position: static overrides the position: absolute; top: -10000px; left: -10000px in xforms.css. */
 
 /* Styling of the repeat grid to look the same as it does at runtime */
-.fr-grid.fr-repeat.fr-editable { border: none }                                 /* Remove borders on the table */
-.fr-grid.fr-repeat.fr-editable tbody tr.yui- td:nth-child(2) { border}
-.fr-grid td.fb-grid-repeat-bottom { border-bottom: 1px solid #7f7f7f }
-.fr-grid.fr-repeat td:first-child { border-right: 1px solid #7f7f7f }
-.fr-grid.fr-repeat thead:first-child tr:first-child td {                        /* First line of thead is added by Form Builder */
-    border-right: none; border-left: none; border-bottom: 1px solid #7f7f7f; }  /* No "vertical lines", but add border at the bottom */
-.fr-grid.fr-repeat thead tr:first-child td:first-child { border-bottom: none; } /* Remove borders in the first column */
-.fr-grid.fr-repeat .yui-dt-first td:first-child { border-top: none }
-.fr-grid.fr-repeat tr td:first-child { background-color: white }                /* Remove odd/even background color on the first column */
-.fr-grid.fr-repeat thead.yui-dt-hd th:last-child,
-    .fr-grid.fr-repeat tbody td:last-child { border-right: 1px solid #7f7f7f }  /* Add thicker border to the right of the table */
+/* Everything is scoped to .fr-view so not to impact repeats outside of the form itself, e.g. in the itemset editor  */
+.fr-view .fr-grid.fr-repeat.fr-editable { border: none }                                    /* Remove borders on the table */
+.fr-view .fr-grid.fr-repeat.fr-editable tbody tr.yui- td:nth-child(2) { border}
+.fr-view .fr-grid td.fb-grid-repeat-bottom { border-bottom: 1px solid #7f7f7f }
+.fr-view .fr-grid.fr-repeat td:first-child { border-right: 1px solid #7f7f7f }
+.fr-view .fr-grid.fr-repeat thead:first-child tr:first-child td {                           /* First line of thead is added by Form Builder */
+    border-right: none; border-left: none; border-bottom: 1px solid #7f7f7f; }              /* No "vertical lines", but add border at the bottom */
+.fr-view .fr-grid.fr-repeat thead tr:first-child td:first-child { border-bottom: none; }    /* Remove borders in the first column */
+.fr-view .fr-grid.fr-repeat .yui-dt-first td:first-child { border-top: none }
+.fr-view .fr-grid.fr-repeat tr td:first-child { background-color: white }                   /* Remove odd/even background color on the first column */
+.fr-view .fr-grid.fr-repeat thead.yui-dt-hd th:last-child,
+    .fr-view .fr-grid.fr-repeat tbody td:last-child { border-right: 1px solid #7f7f7f }     /* Add thicker border to the right of the table */
 
 .fb-use-toolbar-message, .fb-click-message { display: none; font-size: 70%; color: gray; width: 100%; font-style: italic; text-align: center; margin-top: 2em  }
 .fb-selected .fb-use-toolbar-message { display: block }

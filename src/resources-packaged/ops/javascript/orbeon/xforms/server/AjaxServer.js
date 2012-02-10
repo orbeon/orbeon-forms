@@ -993,32 +993,42 @@
                                                     + '>' + label + '</option>';
                                         }
 
-                                        // Build new content for the select element
-                                        var sb = new Array();
-                                        for (var topIndex = 0; topIndex < itemsetTree.length; topIndex++) {
-                                            var itemElement = itemsetTree[topIndex];
+                                        // Utility function to generate an item, including its sub-items, and make sure we do not produce nested optgroups
+                                        var sb = new Array(); // avoid concatenation to the same string over and over again
+                                        var inOptgroup = false;
+                                        function generateItem(itemElement) {
                                             var clazz = null;
                                             if (! YAHOO.lang.isUndefined(itemElement.attributes) && ! YAHOO.lang.isUndefined(itemElement.attributes["class"])) {
                                                 // We have a class property
                                                 clazz = itemElement.attributes["class"];
                                             }
-                                            if (! YAHOO.lang.isUndefined(itemElement.children)) {
-                                                // This is an item that contains other elements
+                                            if (YAHOO.lang.isUndefined(itemElement.children)) { // a normal value
+                                                sb[sb.length] =  generateOption(itemElement.label, itemElement.value, clazz, selectedValues);
+                                            }
+                                            else { // containing sub-items
+                                                // the remaining elements: sub-items
+                                                if (inOptgroup) // nested optgroups are not allowed, close the old one
+                                                    sb[sb.length] = '</optgroup>';
+                                                // open optgroup
                                                 sb[sb.length] = '<optgroup label="' + ORBEON.util.String.escapeAttribute(itemElement.label) + '"'
                                                     + (clazz != null ? ' class="' + ORBEON.util.String.escapeAttribute(clazz) + '"' : '')
                                                     + '">';
-                                                // Go through options in this optgroup
+                                                inOptgroup = true;
+                                                // add subitems
                                                 for (var childItemIndex = 0; childItemIndex < itemElement.children.length; childItemIndex++) {
-                                                    var itemElementOption = itemElement.children[childItemIndex];
-                                                    var subItemClazz = ! YAHOO.lang.isUndefined(itemElementOption.attributes) && ! YAHOO.lang.isUndefined(itemElementOption.attributes["class"])
-                                                        ? itemElementOption.attributes["class"] : null;
-                                                    sb[sb.length] = generateOption(itemElementOption.label, itemElementOption.value, subItemClazz, selectedValues);
+                                                    generateItem(itemElement.children[childItemIndex]);
                                                 }
-                                                sb[sb.length] = '</optgroup>';
-                                            } else {
-                                                // This item is directly an option
-                                                sb[sb.length] = generateOption(itemElement.label, itemElement.value, clazz, selectedValues);
+                                                // if necessary, close optgroup
+                                                if (inOptgroup)
+                                                    sb[sb.length] = '</optgroup>';
+                                                inOptgroup = false;
                                             }
+                                        }
+                                        
+
+                                        // Build new content for the select element
+                                        for (var topIndex = 0; topIndex < itemsetTree.length; topIndex++) {
+                                            generateItem(itemsetTree[topIndex]);
                                         }
 
                                         // Set content of select element

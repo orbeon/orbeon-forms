@@ -121,7 +121,7 @@ public class OutputInterceptor extends ForwardingXMLReceiver {
         String newClassAttribute = originalAttributes.getValue("class");
 
         if (addedClasses != null && addedClasses.length() > 0) {
-            if (newClassAttribute == null) {
+            if (newClassAttribute == null || newClassAttribute.length() == 0) {
                 newClassAttribute = addedClasses;
             } else {
                 newClassAttribute += " " + addedClasses;

@@ -39,8 +39,6 @@ class XFormsRepeatHandler extends XFormsControlLifecyleHandler(true, true) { // 
         val isMustGenerateDelimiters = !handlerContext.isNoScript
         val isMustGenerateBeginEndDelimiters = isMustGenerateDelimiters && !handlerContext.isFullUpdateTopLevelControl(effectiveId)
 
-        val currentIteration = handlerContext.getCurrentIteration
-
         val repeatControl = if (handlerContext.isTemplate) null else containingDocument.getObjectByEffectiveId(effectiveId).asInstanceOf[XFormsRepeatControl]
         val isConcreteControl = repeatControl != null
 

@@ -398,10 +398,10 @@ public class URLRewriterUtils {
     }
 
     public static class PathMatcher {
-        public String pathInfo;
-        public QName matcher;
-        public String mimeType;
-        public boolean versioned;
+        public final String pathInfo;
+        public final QName matcher;
+        public final String mimeType;
+        public final boolean versioned;
 
         /**
          * Construct from parameters.

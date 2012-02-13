@@ -43,28 +43,7 @@ case class DynamicState(
     instances: Seq[Byte],
     controls: Seq[Byte]
 ) {
-    // For testing only
-    if (false) {
-        val bytes = toByteSeq(this)
-        println("  size: " + bytes.size)
-        println("   versionedPathMatchers: " + pathMatchers.size)
-        println("   pendingUploads: " + pendingUploads.size)
-        println("   instances: " + instances.size)
-        println("   controls: " + controls.size)
-        println("   annotatedTemplate: " + (annotatedTemplate map (_.size) getOrElse 1))
-        println("   lastAjaxResponse: " + lastAjaxResponse.size)
-        
-        val xxx0 = decodePathMatchersJava.toArray
-        val xxx1 = decodePendingUploadsJava
-        val xxx3 = decodeControlsJava
-        val xxx2 = decodeInstancesJava.toArray
-        val xxx4 = decodeAnnotatedTemplateJava
-        val xxx5 = decodeLastAjaxResponseJava
-
-        val deserialized = fromByteSeq[DynamicState](bytes)
-        assert(this == deserialized)
-    }
-
+    // Decode individual bits
     def decodePathMatchers = fromByteSeq[List[PathMatcher]](pathMatchers)
     def decodePendingUploads = fromByteSeq[Set[String]](pendingUploads)
     def decodeAnnotatedTemplate = annotatedTemplate map (AnnotatedTemplate(_))
@@ -98,6 +77,7 @@ case class DynamicState(
 
     // Encode to an XML representation (as of 2012-02-05, used only by unit tests)
     def toXML = {
+
         val document = Dom4jUtils.createDocument
         val rootElement = document.addElement("dynamic-state")
 
@@ -157,19 +137,73 @@ case class DynamicState(
 
         document
     }
+
+    private def debug() {
+        val bytes = toByteSeq(this)
+        println("  size: " + bytes.size)
+        println("   versionedPathMatchers: " + pathMatchers.size)
+        println("   pendingUploads: " + pendingUploads.size)
+        println("   instances: " + instances.size)
+        println("   controls: " + controls.size)
+        println("   annotatedTemplate: " + (annotatedTemplate map (_.size) getOrElse 1))
+        println("   lastAjaxResponse: " + lastAjaxResponse.size)
+
+        val decodedParts = Array(
+            decodePathMatchersJava.toArray,
+            decodePendingUploadsJava,
+            decodeControlsJava,
+            decodeInstancesJava.toArray,
+            decodeAnnotatedTemplateJava,
+            decodeLastAjaxResponseJava
+        )
+
+        val deserialized = fromByteSeq[DynamicState](bytes)
+        assert(this == deserialized)
+    }
 }
 
 object DynamicState {
 
+    // Minimal representation of a serialized control
+    case class Control(effectiveId: String, keyValues: Map[String, String])
+
     // Create a DynamicState from a document
     def apply(document: XFormsContainingDocument): DynamicState = {
 
-        // Create the dynamic state object. A snapshot of the state is taken, whereby mutable parts of the state, such
-        // as instances, controls, HTML template, Ajax response, are first serialized to Seq[Byte].
-        // We could serialize everything right away to a Seq[Byte] instead of a DynamicState instance, but in the
-        // scenario where the state is put in cache, then retrieved a bit later without having been pushed to external
-        // storage, this would be a waste.
+        // Serialize relevant controls that have data
+        // NOTE: As of 2012-02-02, only repeat, switch and dialogs controls serialize state. The state of all the other
+        // controls is rebuilt from model data. This way we minimize the size of serialized controls. In the future,
+        // more information might be serialized.
+        def controlsToSerialize(document: XFormsContainingDocument): Seq[Control] = {
+            val result = Buffer[Control]()
 
+            // Gather relevant control
+            document.getControls.visitAllControls(new XFormsControls.XFormsControlVisitorAdapter() {
+                override def startVisitControl(control: XFormsControl) = {
+                    if (control.isRelevant) { // don't serialize anything for non-relevant controls
+                        Option(control.serializeLocal.asScala) filter (_.nonEmpty) foreach {
+                            nameValues ⇒ result += Control(control.getEffectiveId, nameValues.toMap)
+                        }
+                    }
+                    true
+                }
+            })
+
+            result
+        }
+
+        // Create the dynamic state object. A snapshot of the state is taken, whereby mutable parts of the state, such
+        // as instances, controls, HTML template, Ajax response, are first serialized to Seq[Byte]. A couple of notes:
+        //
+        // 1. We could serialize everything right away to a Seq[Byte] instead of a DynamicState instance, but in the
+        //    scenario where the state is put in cache, then retrieved a bit later without having been pushed to
+        //    external storage, this would be a waste.
+        //
+        // 2. Along the same lines, content that is already (conceptually) immutable, namely pathMatchers,
+        //    annotatedTemplate, and lastAjaxResponse, could be serialized to bytes lazily.
+        //
+        // 3. In the cases where there is a large number of large instances or templates, parallel serialization might
+        //    be something to experiment with.
         DynamicState(
             document.getUUID,
             document.getSequence,
@@ -183,7 +217,7 @@ object DynamicState {
             Option(document.getTemplate) map (_.asByteSeq), // template returns its own serialization
             toByteSeq(Option(document.getLastAjaxResponse)),
             toByteSeq(document.getAllModels.asScala flatMap (_.getInstances.asScala) filter (_.mustSerialize) toList),
-            toByteSeq(getControlsToSerialize(document).toList)
+            toByteSeq(controlsToSerialize(document).toList)
         )
     }
 
@@ -191,30 +225,6 @@ object DynamicState {
     def apply(encoded: String): DynamicState = {
         val bytes = XFormsUtils.decodeBytes(encoded, XFormsProperties.getXFormsPassword)
         fromByteArray[DynamicState](bytes)
-    }
-
-    // Minimal representation of a serialized control
-    case class Control(effectiveId: String, keyValues: Map[String, String])
-
-    // Serialize relevant controls that have data
-    // NOTE: As of 2012-02-02, only repeat, switch and dialogs controls serialize state. The state of all the other
-    // controls is rebuilt from model data. This way we minimize the size of serialized controls.
-    private def getControlsToSerialize(document: XFormsContainingDocument): Seq[Control] = {
-        val result = Buffer[Control]()
-
-        // Gather relevant control
-        document.getControls.visitAllControls(new XFormsControls.XFormsControlVisitorAdapter() {
-            override def startVisitControl(control: XFormsControl) = {
-                if (control.isRelevant) { // don't serialize anything for non-relevant controls
-                    Option(control.serializeLocal.asScala) filter (_.nonEmpty) foreach {
-                        nameValues ⇒ result += Control(control.getEffectiveId, nameValues.toMap)
-                    }
-                }
-                true
-            }
-        })
-
-        result
     }
 
     // Encode the given document to a string representation

@@ -108,19 +108,17 @@ object XFormsProtocols extends StandardTypes with StandardPrimitives with JavaLo
 
             if (! instance.cache) {
                 val xmlString =
-                    if (instance.getDocument ne null) {
-                        // This is probably more optimal than going through NodeInfo. Furthermore, there may be an issue with
-                        // namespaces when using tinyTreeToString(). Bug in the NodeWrapper or dom4j?
-                        val dom4jString = TransformerUtils.dom4jToString(instance.getDocument, false)
-                        //System.out.println("dom4jToString: " + instance.modelEffectiveId + "/" + instance.staticId)
-                        dom4jString
-                    }
-                    else {
-                        val tinyTreeString = TransformerUtils.tinyTreeToString(instance.documentInfo)
-                        //System.out.println("tinyTreeToString: " + instance.modelEffectiveId + "/" + instance.staticId)
-                        tinyTreeString
-                    }
-                //System.out.println("  size: " + xmlString.length)
+                    if (instance.getDocument ne null)
+                        // LATER: Measure performance of Dom4jUtils.domToString(instance.getDocument)
+                        TransformerUtils.dom4jToString(instance.getDocument, false)
+                    else
+                        TransformerUtils.tinyTreeToString(instance.documentInfo)
+
+                def debug() {
+                    println("Serializing instance: " + instance.modelEffectiveId + "/" + instance.staticId + (if (instance.getDocument ne null) " read-write" else " readonly"))
+                    println("  size: " + xmlString.length)
+                }
+
                 write(output, xmlString)
             }
 

@@ -331,7 +331,7 @@ public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
         }
         
         if (level == 0 && isTopLevel) {
-        	isHTMLDocument = "html".equals(localname) && (uri == null || uri.isEmpty() || XMLConstants.XHTML_NAMESPACE_URI.equals(uri));
+        	isHTMLDocument = "html".equals(localname) && (uri == null || uri.length() == 0 || XMLConstants.XHTML_NAMESPACE_URI.equals(uri));
         }
 
         if (level > 0 || !ignoreRootElement) {

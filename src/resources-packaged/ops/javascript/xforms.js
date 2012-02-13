@@ -1911,6 +1911,26 @@ ORBEON.xforms.Controls = {
                     inputField.value = displayDate;
                 }
             }
+        } else if (YAHOO.util.Dom.hasClass(control, "xforms-upload")) {
+            // Upload
+
+            // Get elements we want to modify from the DOM
+            var fileNameSpan = YAHOO.util.Dom.getElementsByClassName("xforms-upload-filename", null, control)[0];
+            var mediatypeSpan = YAHOO.util.Dom.getElementsByClassName("xforms-upload-mediatype", null, control)[0];
+            var sizeSpan = YAHOO.util.Dom.getElementsByClassName("xforms-upload-size", null, control)[0];
+            // Set values in DOM
+            var upload = ORBEON.xforms.Page.getControl(control);
+            if (attribute1) upload.setState(attribute1);
+            if (attribute2 != null)
+                ORBEON.util.Dom.setStringValue(fileNameSpan, attribute2);
+            if (attribute3 != null)
+                ORBEON.util.Dom.setStringValue(mediatypeSpan, attribute3);
+            if (attribute4 != null) {
+                var displaySize = attribute4 > 1024 * 1024 ? Math.round(attribute4 / (1024 * 1024) * 10) / 10 + " MB"
+                        : attribute4 > 1024 ? Math.round(attribute4 / 1024 * 10) / 10 + " KB"
+                        : attribute4 + " B";
+                ORBEON.util.Dom.setStringValue(sizeSpan, displaySize);
+            }
         } else if (YAHOO.util.Dom.hasClass(control, "xforms-type-dateTime")) {
             // Only update value if different from the one we have. This handle the case where the fields contain invalid
             // values with the T letter in them. E.g. aTb/cTd, aTbTcTd sent to server, which we don't know anymore how
@@ -2032,26 +2052,6 @@ ORBEON.xforms.Controls = {
         } else if (YAHOO.util.Dom.hasClass(control, "xforms-select-appearance-xxforms-tree")
                 || YAHOO.util.Dom.hasClass(control, "xforms-select1-appearance-xxforms-tree")) {
             return ORBEON.xforms.Page.getControl(control).setValue(newControlValue);
-        } else if (YAHOO.util.Dom.hasClass(control, "xforms-upload")) {
-            // Upload
-
-            // Get elements we want to modify from the DOM
-            var fileNameSpan = YAHOO.util.Dom.getElementsByClassName("xforms-upload-filename", null, control)[0];
-            var mediatypeSpan = YAHOO.util.Dom.getElementsByClassName("xforms-upload-mediatype", null, control)[0];
-            var sizeSpan = YAHOO.util.Dom.getElementsByClassName("xforms-upload-size", null, control)[0];
-            // Set values in DOM
-            var upload = ORBEON.xforms.Page.getControl(control);
-            if (attribute1) upload.setState(attribute1);
-            if (attribute2 != null)
-                ORBEON.util.Dom.setStringValue(fileNameSpan, attribute2);
-            if (attribute3 != null)
-                ORBEON.util.Dom.setStringValue(mediatypeSpan, attribute3);
-            if (attribute4 != null) {
-                var displaySize = attribute4 > 1024 * 1024 ? Math.round(attribute4 / (1024 * 1024) * 10) / 10 + " MB"
-                        : attribute4 > 1024 ? Math.round(attribute4 / 1024 * 10) / 10 + " KB"
-                        : attribute4 + " B";
-                ORBEON.util.Dom.setStringValue(sizeSpan, displaySize);
-            }
         } else if (typeof(control.value) == "string") {
             // Textarea, password
             console.log("Setting value to " + newControlValue);

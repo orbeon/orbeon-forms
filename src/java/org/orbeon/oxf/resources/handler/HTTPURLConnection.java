@@ -45,6 +45,8 @@ import org.orbeon.oxf.properties.PropertySet;
 import org.orbeon.oxf.util.Connection;
 import org.orbeon.oxf.util.StringConversions;
 
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -62,6 +64,8 @@ public class HTTPURLConnection extends URLConnection {
     public static String PROXY_HOST_PROPERTY = "oxf.http.proxy.host";
     public static String PROXY_PORT_PROPERTY = "oxf.http.proxy.port";
     public static String SSL_HOSTNAME_VERIFIER = "oxf.http.ssl.hostname-verifier";
+    public static String SSL_KEYSTORE_URI = "oxf.http.ssl.keystore.uri";
+    public static String SSL_KEYSTORE_PASSWORD = "oxf.http.ssl.keystore.password";
     public static String PROXY_SSL_PROPERTY = "oxf.http.proxy.use-ssl";
 	public static String PROXY_USERNAME_PROPERTY = "oxf.http.proxy.username";
 	public static String PROXY_PASSWORD_PROPERTY = "oxf.http.proxy.password";
@@ -87,19 +91,39 @@ public class HTTPURLConnection extends URLConnection {
         paramBean.setStaleCheckingEnabled(propertySet.getBoolean(STALE_CHECKING_ENABLED_PROPERTY, true));
         paramBean.setSocketBufferSize(propertySet.getInteger(SO_TIMEOUT_PROPERTY, 0));
 
+        // Create SSL context, based on a custom key store if specified
+        final SSLContext sslcontext;
+        try {
+            final String keyStoreURI = propertySet.getStringOrURIAsString(SSL_KEYSTORE_URI);
+            final String keyStorePassword = propertySet.getString(SSL_KEYSTORE_PASSWORD);
+            if (keyStoreURI != null) {
+                sslcontext = SSLContext.getInstance("TLS");
+
+                final URL url = new URL(null, keyStoreURI);
+                final InputStream is = url.openStream();
+
+                sslcontext.init(null, new TrustManager[] {KeyStoreTrustManager.apply(is, keyStorePassword)}, null);
+            } else {
+                sslcontext = SSLContext.getDefault();
+            }
+        } catch (Exception e) {
+            throw new OXFException(e);
+        }
+
         // Create SSL hostname verifier
-        String hostnameVerifierProperty = propertySet.getString(SSL_HOSTNAME_VERIFIER, "strict");
-        X509HostnameVerifier hostnameVerifier =
+        final String hostnameVerifierProperty = propertySet.getString(SSL_HOSTNAME_VERIFIER, "strict");
+        final X509HostnameVerifier hostnameVerifier =
                   "browser-compatible".equals(hostnameVerifierProperty) ? SSLSocketFactory.BROWSER_COMPATIBLE_HOSTNAME_VERIFIER
                 : "allow-all".equals(hostnameVerifierProperty) ? SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER
                 : SSLSocketFactory.STRICT_HOSTNAME_VERIFIER;
 
         // Declare schemes (though having to declare common schemes like HTTP and HTTPS seems wasteful)
         final SchemeRegistry schemeRegistry = new SchemeRegistry();
-        schemeRegistry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
-        SSLSocketFactory sslSocketFactory = SSLSocketFactory.getSocketFactory();
-        sslSocketFactory.setHostnameVerifier(hostnameVerifier);
-        schemeRegistry.register(new Scheme("https", sslSocketFactory, 443));
+        schemeRegistry.register(new Scheme("http", 80, PlainSocketFactory.getSocketFactory()));
+
+        final SSLSocketFactory sslSocketFactory = new SSLSocketFactory(sslcontext, hostnameVerifier);
+        schemeRegistry.register(new Scheme("https", 443, sslSocketFactory));
+
         connectionManager = new ThreadSafeClientConnManager(basicHttpParams, schemeRegistry);
 
         // Set proxy if defined in properties

@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.properties;
 
+import org.apache.commons.lang.StringUtils;
 import org.dom4j.Element;
 import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
@@ -252,9 +253,9 @@ public class PropertySet {
             return null;
 
         if (property instanceof String) {
-            return getString(name);
+            return StringUtils.trimToNull(getString(name));
         } else if (property instanceof java.net.URI) {
-            return getURI(name).toString();
+            return StringUtils.trimToNull(getURI(name).toString());
         } else {
             throw new OXFException("Invalid attribute type requested for property '" + name + "': expected "
                     + XMLConstants.XS_STRING_QNAME.getQualifiedName()
@@ -269,17 +270,11 @@ public class PropertySet {
 
     public String getString(String name) {
         String result = (String) getPropertyValue(name, XMLConstants.XS_STRING_QNAME);
-        if (result == null)
-            return null;
-        result = result.trim();
-        return (result.length() == 0) ? null : result;
+        return StringUtils.trimToNull(result);
     }
 
     public Set<String> getNmtokens(String name) {
-        final Set<String> result = (Set<String>) getPropertyValue(name, XMLConstants.XS_NMTOKENS_QNAME);
-        if (result == null)
-            return null;
-        return result;
+        return (Set<String>) getPropertyValue(name, XMLConstants.XS_NMTOKENS_QNAME);
     }
 
     public String getString(String name, String defaultValue) {

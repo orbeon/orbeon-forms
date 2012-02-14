@@ -25,8 +25,8 @@ trait PartXBLAnalysis extends TransientState {
     this: PartAnalysisImpl =>
 
     val xblBindings = new XBLBindings(getIndentedLogger, this, metadata, staticStateDocument.xblElements)
-    private val scopesById = HashMap[String, Scope]()
-    private val prefixedIdToXBLScopeMap = HashMap[String, Scope]()
+    private[PartXBLAnalysis] val scopesById = HashMap[String, Scope]()
+    private[PartXBLAnalysis] val prefixedIdToXBLScopeMap = HashMap[String, Scope]()
 
     protected def initializeScopes() {
         // Add existing ids to scope map

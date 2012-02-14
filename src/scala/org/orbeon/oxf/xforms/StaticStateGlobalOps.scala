@@ -80,7 +80,8 @@ class StaticStateGlobalOps(topLevelPart: PartAnalysis) extends PartGlobalOps {
 
     def getGlobals = collectInParts(_.getGlobals) toMap
 
-    def scripts = parts flatMap (_.scripts) toMap
+    def scripts = collectInParts(_.scripts) toMap
+    def uniqueClientScripts = collectInParts(_.uniqueClientScripts)
     def getXBLStyles = collectInParts(_.getXBLStyles)
     def getXBLScripts = collectInParts(_.getXBLScripts)
 

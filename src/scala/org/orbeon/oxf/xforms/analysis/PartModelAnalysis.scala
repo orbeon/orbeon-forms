@@ -24,9 +24,9 @@ trait PartModelAnalysis extends TransientState {
 
     this: PartAnalysisImpl =>
 
-    private val modelsByScope = LinkedHashMap[Scope, Buffer[Model]]()
-    private val modelsByPrefixedId = LinkedHashMap[String, Model]()
-    private val modelByInstancePrefixedId = LinkedHashMap[String, Model]()
+    private[PartModelAnalysis] val modelsByScope = LinkedHashMap[Scope, Buffer[Model]]()
+    private[PartModelAnalysis] val modelsByPrefixedId = LinkedHashMap[String, Model]()
+    private[PartModelAnalysis] val modelByInstancePrefixedId = LinkedHashMap[String, Model]()
 
     def getModel(prefixedId: String) =
         modelsByPrefixedId.get(prefixedId).orNull

@@ -48,7 +48,7 @@ class XXFormsDynamicHandler extends XFormsBaseHandler(false, false) {
                     if (!containingDocument.isInitializing && control.newScripts.nonEmpty) {
                         val helper = new ContentHandlerHelper(contentHandler)
                         helper.startElement(xhtmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "script", Array("type", "text/javascript"))
-                        XHTMLHeadHandler.outputScripts(helper, control.newScripts)
+                        XHTMLHeadHandler.outputScripts(helper, control.newScripts map (script ⇒ script.clientName → script.body))
                         helper.endElement()
                         control.newScripts = Seq.empty
                     }

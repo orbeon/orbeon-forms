@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.action.actions;
 import org.orbeon.oxf.xforms._
 import action.{DynamicActionContext, XFormsAction}
 import org.orbeon.oxf.common.OXFException
+import script.ServerScript
 
 /**
  * Extension xxforms:script action.
@@ -29,23 +30,26 @@ class XXFormsScriptAction extends XFormsAction {
 
         val mediatype = actionElement.attributeValue(XFormsConstants.TYPE_QNAME)
         mediatype match {
-            case "javascript" | "text/javascript" | "application/javascript" | null =>
+            case "javascript" | "text/javascript" | "application/javascript" | null ⇒
                 // Get prefixed id of the xxforms:script element based on its location
-                val actionPrefixedId = actionInterpreter.getActionPrefixedId(actionElement)
+                val script = {
+                    val partAnalysis = actionInterpreter.actionXPathContext.container.getPartAnalysis
+                    partAnalysis.scripts(actionInterpreter.getActionPrefixedId(actionElement))
+                }
                 val containingDocument = actionInterpreter.containingDocument
 
                 // Run Script on server or client
-                actionElement.attributeValue("runat") match {
-                    case "server" =>
-                        containingDocument.getScriptInterpreter.runScript(actionPrefixedId)
-                    case _ =>
-                        containingDocument.addScriptToRun(actionPrefixedId, actionContext.interpreter.event, actionContext.interpreter.eventObserver)
+                script match {
+                    case serverScript: ServerScript ⇒
+                        containingDocument.getScriptInterpreter.runScript(serverScript)
+                    case clientScript ⇒
+                        containingDocument.addScriptToRun(clientScript, actionContext.interpreter.event, actionContext.interpreter.eventObserver)
                 }
-            case "xpath" | "text/xpath" | "application/xpath" => // "unofficial" type
+            case "xpath" | "text/xpath" | "application/xpath" ⇒ // "unofficial" type
                 // Evaluate XPath expression for its side effects only
                 val bindingContext = actionInterpreter.actionXPathContext.getCurrentBindingContext
                 actionInterpreter.evaluateExpression(actionElement, bindingContext.getNodeset, bindingContext.getPosition, actionElement.getText)
-            case other =>
+            case other ⇒
                 throw new OXFException("Unsupported script type: " + other)
         }
     }

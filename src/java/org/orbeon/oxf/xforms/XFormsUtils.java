@@ -870,16 +870,6 @@ public class XFormsUtils {
 
         return true;
     }
-
-    /**
-     * Create a JavaScript function name based on a script id.
-     *
-     * @param scriptId  id of the script
-     * @return          JavaScript function name
-     */
-    public static String scriptIdToScriptName(String scriptId) {
-        return scriptId.replace('-', '_').replace('$', '_') + "_xforms_function";
-    }
     
     private static String[] voidElementsNames = {
         // HTML 5: http://www.w3.org/TR/html5/syntax.html#void-elements

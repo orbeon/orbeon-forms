@@ -772,22 +772,22 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         }
     }
 
-    public void addScriptToRun(String scriptId, XFormsEvent event, XFormsEventObserver eventObserver) {
+    public void addScriptToRun(org.orbeon.oxf.xforms.Script script, XFormsEvent event, XFormsEventObserver eventObserver) {
 
         if (activeSubmissionFirstPass != null && StringUtils.isBlank(activeSubmissionFirstPass.getResolvedXXFormsTarget())) {
             // Scripts occurring after a submission without a target takes place should not run
             // TODO: Should we allow scripts anyway? Don't we allow value changes updates on the client anyway?
-            indentedLogger.logWarning("", "xxforms:script will be ignored because two-pass submission started", "script id", scriptId);
+            indentedLogger.logWarning("", "xxforms:script will be ignored because two-pass submission started", "script id", script.prefixedId());
             return;
         }
 
         // Warn that scripts won't run in noscript mode (duh)
         if (staticState.isNoscript())
-            indentedLogger.logWarning("noscript", "script won't run in noscript mode", "script id", scriptId);
+            indentedLogger.logWarning("noscript", "script won't run in noscript mode", "script id", script.prefixedId());
 
         if (scriptsToRun == null)
             scriptsToRun = new ArrayList<Script>();
-        scriptsToRun.add(new Script(XFormsUtils.scriptIdToScriptName(scriptId), event, eventObserver));
+        scriptsToRun.add(new Script(script.clientName(), event, eventObserver));
     }
 
     public static class Script {

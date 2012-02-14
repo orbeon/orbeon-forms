@@ -25,7 +25,7 @@ import org.xml.sax.helpers.AttributesImpl
 
 import scala.collection.JavaConversions._
 import scala.collection.JavaConverters._
-import java.util.{List => JList, Map => JMap}
+import java.util.{List ⇒ JList, Map ⇒ JMap}
 import org.dom4j.Element
 import collection.mutable.{Buffer, HashMap, LinkedHashSet}
 import state.XFormsStateManager
@@ -37,9 +37,16 @@ import org.orbeon.oxf.util.URLRewriterUtils._
 class XHTMLHeadHandler extends XHTMLHeadHandlerBase {
 
     // Output an element
-    private def outputElement(helper: ContentHandlerHelper, xhtmlPrefix: String, attributesImpl: AttributesImpl,
-                              getElementDetails: (Option[String], Option[String]) => (String, Array[String]))
-                             (resource: Option[String], cssClass: Option[String], content: Option[String]) {
+    private def outputElement(
+            helper: ContentHandlerHelper,
+            xhtmlPrefix: String,
+            attributesImpl: AttributesImpl,
+            getElementDetails: (Option[String], Option[String]) ⇒ (String, Array[String])
+        )(
+            resource: Option[String],
+            cssClass: Option[String],
+            content: Option[String]
+        ) {
 
         val (elementName, attributes) = getElementDetails(resource, cssClass)
 
@@ -52,35 +59,38 @@ class XHTMLHeadHandler extends XHTMLHeadHandlerBase {
     }
 
     // Output baseline, remaining, and inline resources
-    private def outputResources(outputElement: (Option[String], Option[String], Option[String]) => Unit,
-                                getBuiltin: StaticStateGlobalOps => JList[XFormsFeatures.ResourceConfig],
-                                getXBL: => Seq[Element], xblBaseline: collection.Set[String], minimal: Boolean) {
+    private def outputResources(
+            outputElement: (Option[String], Option[String], Option[String]) ⇒ Unit,
+            getBuiltin: StaticStateGlobalOps ⇒ JList[XFormsFeatures.ResourceConfig],
+            getXBL: ⇒ Seq[Element],
+            xblBaseline: collection.Set[String],
+            minimal: Boolean) {
 
         // For now, actual builtin resources always include the baseline builtin resources
         val builtinBaseline = LinkedHashSet(getBuiltin(null) map (_.getResourcePath(minimal)): _*)
         val allBaseline = builtinBaseline ++ xblBaseline
 
         // Output baseline resources with a CSS class
-        allBaseline foreach (s => outputElement(Some(s), Some("xforms-baseline"), None))
+        allBaseline foreach (s ⇒ outputElement(Some(s), Some("xforms-baseline"), None))
 
         val builtinUsed = LinkedHashSet(getBuiltin(containingDocument.getStaticOps) map (_.getResourcePath(minimal)): _*)
         val xblUsed = LinkedHashSet(XHTMLHeadHandler.xblResourcesToSeq(getXBL): _*)
 
         // Output remaining resources if any, with no CSS class
-        builtinUsed ++ xblUsed -- allBaseline foreach (s => outputElement(Some(s), None, None))
+        builtinUsed ++ xblUsed -- allBaseline foreach (s ⇒ outputElement(Some(s), None, None))
 
         // Output inline XBL resources
         getXBL filter (_.attributeValue(XFormsConstants.SRC_QNAME) eq null) foreach
-            { e => outputElement(None, None, Some(e.getText)) }
+            { e ⇒ outputElement(None, None, Some(e.getText)) }
     }
 
     override def outputCSSResources(helper: ContentHandlerHelper, xhtmlPrefix: String, minimal: Boolean, attributesImpl: AttributesImpl) {
 
         // Function to output either a <link> or <style> element
         def outputCSSElement = outputElement(helper, xhtmlPrefix, attributesImpl,
-            (resource, cssClass) => resource match {
-                case Some(resource) => ("link", Array("rel", "stylesheet", "href", resource, "type", "text/css", "media", "all", "class", cssClass.orNull))
-                case None => ("style", Array("type", "text/css", "media", "all", "class", cssClass.orNull))
+            (resource, cssClass) ⇒ resource match {
+                case Some(resource) ⇒ ("link", Array("rel", "stylesheet", "href", resource, "type", "text/css", "media", "all", "class", cssClass.orNull))
+                case None ⇒ ("style", Array("type", "text/css", "media", "all", "class", cssClass.orNull))
             }) _
 
         // Output all CSS
@@ -94,7 +104,7 @@ class XHTMLHeadHandler extends XHTMLHeadHandlerBase {
 
         // Function to output either a <script> element
         def outputJSElement = outputElement(helper, xhtmlPrefix, attributesImpl,
-            (resource, cssClass) => ("script", Array("type", "text/javascript", "src", resource.orNull, "class", cssClass.orNull))) _
+            (resource, cssClass) ⇒ ("script", Array("type", "text/javascript", "src", resource.orNull, "class", cssClass.orNull))) _
 
         // Output all JS
         outputResources(outputJSElement, XFormsFeatures.getJavaScriptResources,
@@ -187,17 +197,14 @@ object XHTMLHeadHandler {
 
     // All XBL resources use the @src attribute
     def xblResourcesToSeq(elements: Iterable[Element]) =
-        elements flatMap (e => Option(e.attributeValue(XFormsConstants.SRC_QNAME))) toSeq
+        elements flatMap (e ⇒ Option(e.attributeValue(XFormsConstants.SRC_QNAME))) toSeq
 
-    def outputScripts(helper: ContentHandlerHelper, scripts: Iterable[Script]) {
-        for (script <- scripts) {
-            if (script.isClient) {
-                helper.text("\nfunction " + XFormsUtils.scriptIdToScriptName(script.prefixedId) + "(event) {\n")
-                helper.text(script.body)
-                helper.text("}\n")
-            }
+    def outputScripts(helper: ContentHandlerHelper, scripts: Iterable[(String, String)]) =
+        for ((clientName, body) ← scripts) {
+            helper.text("\nfunction " + clientName + "(event) {\n")
+            helper.text(body)
+            helper.text("}\n")
         }
-    }
 
     def gatherJavascriptControls(containingDocument: XFormsContainingDocument): JMap[String, JMap[String, JList[String]]] = {
 
@@ -212,7 +219,7 @@ object XHTMLHeadHandler {
                 // Don't run JavaScript initialization if the control is static readonly (could change in the
                 // future if some static readonly controls require JS initialization)
                 if (! control.isStaticReadonly)
-                    Option(control.getJavaScriptInitialization) foreach { init =>
+                    Option(control.getJavaScriptInitialization) foreach { init ⇒
 
                         val appearanceToId = javaScriptControlsAppearancesMap.getOrElseUpdate(init._1, HashMap[String, Buffer[String]]())
                         val ids = appearanceToId.getOrElseUpdate(init._2, Buffer[String]())

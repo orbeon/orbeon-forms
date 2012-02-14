@@ -32,10 +32,10 @@ trait PartControlsAnalysis extends TransientState {
     private val controlAppearances = HashMap[String, HashSet[QName]]();
 
     // Special handling of attributes
-    private var attributeControls: Map[String, Map[String, AttributeControl]] = _
+    private[PartControlsAnalysis] var attributeControls: Map[String, Map[String, AttributeControl]] = _
 
     // Special handling of input placeholder
-    private var _hasInputPlaceholder = false
+    private[PartControlsAnalysis] var _hasInputPlaceholder = false
     def hasInputPlaceholder = _hasInputPlaceholder
 
     protected def indexNewControl(elementAnalysis: ElementAnalysis, externalLHHA: Buffer[ExternalLHHAAnalysis], eventHandlers: Buffer[EventHandlerImpl]) {

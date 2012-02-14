@@ -60,7 +60,8 @@ trait PartGlobalOps {
     def getAttributeControl(prefixedForAttribute: String, attributeName: String): AttributeControl
 
     // Client-side resources
-    def scripts: collection.Map[String, Script]
+    def scripts: Map[String, Script]
+    def uniqueClientScripts: Seq[(String, String)]
     def getXBLStyles: Seq[Element]
     def getXBLScripts: Seq[Element]
     def baselineResources: (collection.Set[String], collection.Set[String])

@@ -14,8 +14,8 @@
 package org.orbeon.oxf.xforms.script
 
 import org.mozilla.javascript.Context
-import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.control.XFormsValueControl
+import org.orbeon.oxf.xforms.XFormsContainingDocument
 
 class ScriptInterpreter(containingDocument: XFormsContainingDocument) {
 
@@ -47,9 +47,9 @@ class ScriptInterpreter(containingDocument: XFormsContainingDocument) {
         }
     }
 
-    def runScript(scriptId: String): Unit = {
+    def runScript(script: ServerScript): Unit = {
         // 1. Get compiled script
-        val compiledScript = containingDocument.getStaticOps.scripts.get(scriptId).asInstanceOf[ServerScript].compiledScript
+        val compiledScript = script.compiledScript
 
         // 2. Execute script
         val result = {

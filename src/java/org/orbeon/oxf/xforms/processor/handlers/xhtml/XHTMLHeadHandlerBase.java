@@ -120,11 +120,11 @@ public abstract class XHTMLHeadHandlerBase extends XFormsBaseHandlerXHTML {
 
     private void outputScriptDeclarations(ContentHandlerHelper helper, String xhtmlPrefix, String focusElementId, List<XFormsContainingDocument.Message> messagesToRun, List<XXFormsDialogControl> dialogsToOpen) {
 
-        if (containingDocument.getStaticOps().scripts().size() > 0 || focusElementId != null || messagesToRun != null || dialogsToOpen.size() > 0) {
+        if (containingDocument.getStaticOps().uniqueClientScripts().size() > 0 || focusElementId != null || messagesToRun != null || dialogsToOpen.size() > 0) {
             helper.startElement(xhtmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "script", new String[] {
                 "type", "text/javascript"});
 
-            XHTMLHeadHandler.outputScripts(helper, containingDocument.getStaticOps().scripts().values());
+            XHTMLHeadHandler.outputScripts(helper, containingDocument.getStaticOps().uniqueClientScripts());
 
             final List<XFormsContainingDocument.Script> scriptsToRun = containingDocument.getScriptsToRun();
 

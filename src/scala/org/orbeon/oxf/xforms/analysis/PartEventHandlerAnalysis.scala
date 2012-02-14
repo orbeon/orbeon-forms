@@ -15,9 +15,8 @@ package org.orbeon.oxf.xforms.analysis
 
 import scala.collection.JavaConverters._
 import org.orbeon.oxf.xforms.event.{XFormsEvents, EventHandlerImpl, EventHandler}
-import collection.mutable.LinkedHashMap
-import org.orbeon.oxf.xforms.{Script, XFormsConstants}
 import org.orbeon.oxf.xforms.script.ServerScript
+import org.orbeon.oxf.xforms.{Script, XFormsConstants}
 
 // Part analysis: event handlers information
 trait PartEventHandlerAnalysis {
@@ -29,8 +28,10 @@ trait PartEventHandlerAnalysis {
     private var keyHandlers: List[EventHandler] = _
 
     // Scripts
-    private var _scripts: LinkedHashMap[String, Script] = _
-    def scripts = _scripts
+    private[PartEventHandlerAnalysis] var _scriptsByPrefixedId: Map[String, Script] = _
+    def scripts = _scriptsByPrefixedId
+    private[PartEventHandlerAnalysis] var _uniqueClientScripts: Seq[(String, String)] = _
+    def uniqueClientScripts = _uniqueClientScripts
 
     // Register all event handlers
     def registerEventHandlers(eventHandlers: Seq[EventHandlerImpl]) {
@@ -57,19 +58,30 @@ trait PartEventHandlerAnalysis {
         // Gather all keypress handlers
         keyHandlers = (eventHandlers filter (_.eventNames(XFormsEvents.KEYPRESS)) toList)
 
-        // Gather all scripts
-        def scriptMapping(eventHandlerImpl: ElementAnalysis) = {
+        // Gather all scripts in deterministic order
+        def makeScript(eventHandlerImpl: ElementAnalysis) = {
             val element = eventHandlerImpl.element
             val isClient = element.attributeValue("runat") != "server"
-            val newScript = if (isClient) new Script(_, _, _, _) else new ServerScript(_, _, _, _)
-            val script = newScript(eventHandlerImpl.prefixedId, isClient, element.attributeValue("type"), element.getStringValue)
 
-            eventHandlerImpl.prefixedId → script
+            val make = if (isClient) new Script(_, _, _, _) else new ServerScript(_, _, _, _)
+            make(eventHandlerImpl.prefixedId, isClient, element.attributeValue("type"), element.getStringValue)
         }
 
-        // Use LinkedHashMap as we want to output scripts in the HTML in a deterministic order.
-        // Could use List + Map to avoid using a mutable collection?
-        _scripts = LinkedHashMap(controlTypes.get("script").toSeq flatMap (_.values) map (scriptMapping(_)): _*)
+        val scriptMappings = {
+            val scriptHandlers = controlTypes.get("script").toSeq flatMap (_.values)
+            scriptHandlers map (makeScript(_))
+        }
+
+        // Index scripts by prefixed id
+        _scriptsByPrefixedId = scriptMappings map { case script ⇒ script.prefixedId → script } toMap
+
+        // Keep only one script body for a given digest
+        val distinctNames = scriptMappings collect
+            { case script if script.isClient ⇒ script.clientName → script.digest } distinct
+
+        val scriptBodiesByDigest = (scriptMappings map { case script ⇒ script.digest → script.body } toMap)
+
+        _uniqueClientScripts = distinctNames map { case (clientName, digest) ⇒ clientName → scriptBodiesByDigest(digest) } toSeq
     }
 
     def getEventHandlers(observerPrefixedId: String) =

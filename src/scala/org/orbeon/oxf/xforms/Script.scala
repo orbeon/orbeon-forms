@@ -13,4 +13,9 @@
  */
 package org.orbeon.oxf.xforms
 
-class Script(val prefixedId: String, val isClient: Boolean, val scriptType: String, val body: String)
+import org.orbeon.oxf.util.SecureUtils
+
+case class Script(prefixedId: String, isClient: Boolean, scriptType: String, body: String) {
+    val digest = SecureUtils.digestString(body, "SHA1", "hex")
+    val clientName = "xf_" + digest // digest must be JavaScript-safe (e.g. a hex string)
+}

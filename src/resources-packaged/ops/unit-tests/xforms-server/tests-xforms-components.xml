@@ -271,7 +271,7 @@
                         <xxf:attribute id="my-tabview$fr-tabview-select-2" for="my-tabview$fr-tabview-select-2" name="style">display: none</xxf:attribute>
                         <xxf:attribute id="my-tabview$fr-tabview-deselect-2" for="my-tabview$fr-tabview-deselect-2" name="style">display: none</xxf:attribute>
                     </xxf:control-values>
-                    <xxf:script name="my_tabview_xf_en_xforms_function" target-id="my-tabview$fr-tabview-group" observer-id="my-tabview$fr-tabview-group"/>
+                    <xxf:script name="xf_fa3c6018b6aca63d2389f350f65e272530d03568" target-id="my-tabview$fr-tabview-group" observer-id="my-tabview$fr-tabview-group"/>
                 </xxf:action>
             </xxf:event-response>
         </output>
@@ -386,7 +386,7 @@
                         <xxf:attribute id="my-tabview$fr-tabview-select-7" for="my-tabview$fr-tabview-select-7" name="style">display: none</xxf:attribute>
                         <xxf:attribute id="my-tabview$fr-tabview-deselect-7" for="my-tabview$fr-tabview-deselect-7" name="style">display: none</xxf:attribute>
                     </xxf:control-values>
-                    <xxf:script name="my_tabview_xf_en_xforms_function" target-id="my-tabview$fr-tabview-group" observer-id="my-tabview$fr-tabview-group"/>
+                    <xxf:script name="xf_fa3c6018b6aca63d2389f350f65e272530d03568" target-id="my-tabview$fr-tabview-group" observer-id="my-tabview$fr-tabview-group"/>
                 </xxf:action>
             </xxf:event-response>
         </output>
@@ -648,8 +648,8 @@
                         <xxf:attribute id="my-currency$xf-22" for="my-currency$xf-22" name="style">display: none</xxf:attribute>
                         <xxf:control id="my-currency$number-input" class="xbl-fr-number-xforms-input">$ 12.34</xxf:control>
                     </xxf:control-values>
-                    <xxf:script name="my_currency_xf_6_xforms_function" target-id="my-currency$xf-5" observer-id="my-currency$xf-5"/>
-                    <xxf:script name="my_currency_xf_sf_xforms_function" target-id="my-currency" observer-id="my-currency"/>
+                    <xxf:script name="xf_bb240fc3ea943af5cb3019cdb5d43148021201ec" target-id="my-currency$xf-5" observer-id="my-currency$xf-5"/>
+                    <xxf:script name="xf_ee48e71b3ea5811ae186431b61fae15a32a302b5" target-id="my-currency" observer-id="my-currency"/>
                 </xxf:action>
             </xxf:event-response>
         </output>
@@ -732,8 +732,8 @@
                         <xxf:control id="my-autocomplete$value-selected" class="fr-autocomplete-value-selected"/>
                         <xxf:attribute id="my-autocomplete$value-selected" for="my-autocomplete$value-selected" name="style">display: none</xxf:attribute>
                     </xxf:control-values>
-                    <xxf:script name="my_autocomplete_init_xforms_function" target-id="my-autocomplete$component-inner-group" observer-id="my-autocomplete$component-inner-group"/>
-                    <xxf:script name="my_autocomplete_show_suggestions_button_xf_88_xforms_function" target-id="my-autocomplete$show-suggestions-button$trigger" observer-id="my-autocomplete$show-suggestions-button$trigger"/>
+                    <xxf:script name="xf_586bd855f1f823eb047ce1f64fc89bcd15e36a85" target-id="my-autocomplete$component-inner-group" observer-id="my-autocomplete$component-inner-group"/>
+                    <xxf:script name="xf_8ba62560f51cbde692a8536df3e54bb1c2eba121" target-id="my-autocomplete$show-suggestions-button$trigger" observer-id="my-autocomplete$show-suggestions-button$trigger"/>
                     <xxf:setfocus control-id="my-autocomplete$search"/>
                 </xxf:action>
             </xxf:event-response>

@@ -28,12 +28,13 @@ $ ->
     # so we can add a border with CSS which is like the border we have a runtime.
     do () ->
         decorateGridRepeat = () ->
-            visibleTrs = $('.fr-grid.fr-repeat.fr-editable tbody tr:not([class^="xforms"]):not([class^=" xforms"])')    # xforms with space can be removed once bug #25 is fixed
-            visibleTrs.find('td').removeClass('fb-grid-repeat-bottom')                                                  # Reset: remove bottom class
-            visibleTrs.last().find('td').each (tdIndex, td) ->                                                          # Add on tds of the bottom tr, except the 1st which is FB's row management
-                if tdIndex != 0 then $(td).addClass('fb-grid-repeat-bottom')
-            visibleTrs.each (trIndex, tr) -> $(tr).find('td[rowspan]').each (tdIndex, td) ->                            # Add on td with rowspan for delete iteration
-                if trIndex + parseInt($(td).attr('rowspan')) == visibleTrs.length
-                    $(td).addClass('fb-grid-repeat-bottom')
+            $('.fr-grid.fr-repeat.fr-editable').each (tableIndex, table) ->
+                visibleTrs = $(table).find('tbody tr:not([class^="xforms"]):not([class^=" xforms"])')       # xforms with space can be removed once bug #25 is fixed
+                visibleTrs.find('td').removeClass('fb-grid-repeat-bottom')                                  # Reset: remove bottom class
+                visibleTrs.last().find('td').each (tdIndex, td) ->                                          # Add on tds of the bottom tr, except the 1st which is FB's row management
+                    if tdIndex != 0 then $(td).addClass('fb-grid-repeat-bottom')
+                visibleTrs.each (trIndex, tr) -> $(tr).find('td[rowspan]').each (tdIndex, td) ->            # Add on td with rowspan for delete iteration
+                    if trIndex + parseInt($(td).attr('rowspan')) == visibleTrs.length
+                        $(td).addClass('fb-grid-repeat-bottom')
         Events.ajaxResponseProcessedEvent.subscribe decorateGridRepeat
         decorateGridRepeat()

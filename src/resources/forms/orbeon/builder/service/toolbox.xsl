@@ -50,28 +50,6 @@
 
     </xsl:for-each>
 
-    <!-- Obsolete: custom components -->
-    <xsl:variable name="resources" select="xpl:property(string-join(('oxf.fb.components.uri', $app, $form), '.'))" as="xs:string"/>
-    <xsl:if test="$resources">
-        <xbl:xbl>
-            <!-- Add Form Builder metadata -->
-            <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
-                <display-name lang="en">Custom Components</display-name>
-                <display-name lang="fr">Composants</display-name>
-                <display-name lang="ru">Собственные компоненты</display-name>
-                <icon lang="en">
-                    <small-icon>/forms/orbeon/builder/images/input.png</small-icon>
-                    <large-icon>/forms/orbeon/builder/images/input.png</large-icon>
-                </icon>
-            </metadata>
-            <!-- Copy all the scripts and bindings -->
-            <xsl:for-each select="tokenize($resources, '\s+')">
-                <!-- XBL spec says script and binding can be in any order -->
-                <xsl:copy-of select="doc(.)/*/*"/>
-            </xsl:for-each>
-        </xbl:xbl>
-    </xsl:if>
-
     <!-- Global section templates -->
     <xsl:copy-of select="/xbl:xbl"/>
     <!-- Custom section templates (if different from "orbeon" as we don't want to copy components twice) -->

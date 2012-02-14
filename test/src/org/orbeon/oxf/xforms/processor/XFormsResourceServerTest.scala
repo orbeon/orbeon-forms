@@ -22,10 +22,10 @@ class XFormsResourceServerTest extends ResourceManagerTestBase with AssertionsFo
 
     @Test def proxyURI() {
 
-        assert("/xforms-server/dynamic/87c938edbc170d5038192ca5ab9add97" ===
-            XFormsResourceServer.proxyURI(null, "/foo/bar.png", null, null, -1, Collections.emptyMap(), null));
+        assert("/xforms-server/dynamic/cc104a4fe62471ecc02ae13e1233f31275cb68d6" ===
+            XFormsResourceServer.proxyURI(null, "/foo/bar.png", null, null, -1, Collections.emptyMap(), null))
 
-        assert("/xforms-server/dynamic/674c2ff956348155ff60c01c0c0ec2e0" ===
-            XFormsResourceServer.proxyURI(null, "http://example.org/foo/bar.png", null, null, -1, Collections.emptyMap(), null));
+        assert("/xforms-server/dynamic/1dd011d51abc6f3d9003fabd2f5561943d066c73" ===
+            XFormsResourceServer.proxyURI(null, "http://example.org/foo/bar.png", null, null, -1, Collections.emptyMap(), null))
     }
 }

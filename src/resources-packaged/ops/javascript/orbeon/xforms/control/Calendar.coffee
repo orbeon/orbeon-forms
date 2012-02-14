@@ -121,15 +121,6 @@ Event.onDOMReady ->
                     yuiOverlay = new YAHOO.widget.Overlay calendarDiv, {constraintoviewport: true}
                     yuiOverlay.setBody ""
                     yuiOverlay.render()
-                else
-                    # Move calendarDiv inside this date picker for scrolling
-                    control.appendChild calendarDiv
-
-                # Try to make sure the calendar appears in front of a dialog; doesn't work automatically as of 2008-12-10
-                ORBEON.xforms.Globals.lastDialogZIndex += 2
-                YD.setStyle calendarDiv, "z-index", ORBEON.xforms.Globals.lastDialogZIndex
-
-                unless yuiCalendar?
                     # Create YUI calendar
                     hasTwoMonths = Properties.datePickerTwoMonths.get()
                     bd = (YD.getElementsByClassName "bd", null, calendarDiv)[0]
@@ -175,6 +166,13 @@ Event.onDOMReady ->
                                 , 0
 
                     yuiCalendar.selectEvent.subscribe calendarSelectEvent
+                else
+                    # Move calendarDiv inside this date picker for scrolling
+                    control.appendChild calendarDiv
+
+                # Try to make sure the calendar appears in front of a dialog; doesn't work automatically as of 2008-12-10
+                ORBEON.xforms.Globals.lastDialogZIndex += 2
+                YD.setStyle calendarDiv, "z-index", ORBEON.xforms.Globals.lastDialogZIndex
 
                 # Get language from html/@lang
                 lang = ORBEON.util.Dom.getAttribute(document.documentElement, "lang")

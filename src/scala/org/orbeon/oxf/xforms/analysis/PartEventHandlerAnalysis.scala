@@ -81,7 +81,8 @@ trait PartEventHandlerAnalysis {
 
         val scriptBodiesByDigest = (scriptMappings map { case script ⇒ script.digest → script.body } toMap)
 
-        _uniqueClientScripts = distinctNames map { case (clientName, digest) ⇒ clientName → scriptBodiesByDigest(digest) } toSeq
+        _uniqueClientScripts = distinctNames map
+            { case (clientName, digest) ⇒ clientName → scriptBodiesByDigest(digest) } toSeq
     }
 
     def getEventHandlers(observerPrefixedId: String) =

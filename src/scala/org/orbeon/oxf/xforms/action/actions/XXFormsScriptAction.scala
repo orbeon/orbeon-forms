@@ -31,19 +31,18 @@ class XXFormsScriptAction extends XFormsAction {
         val mediatype = actionElement.attributeValue(XFormsConstants.TYPE_QNAME)
         mediatype match {
             case "javascript" | "text/javascript" | "application/javascript" | null ⇒
-                // Get prefixed id of the xxforms:script element based on its location
+                // Get script based on id
                 val script = {
                     val partAnalysis = actionInterpreter.actionXPathContext.container.getPartAnalysis
                     partAnalysis.scripts(actionInterpreter.getActionPrefixedId(actionElement))
                 }
-                val containingDocument = actionInterpreter.containingDocument
 
                 // Run Script on server or client
                 script match {
                     case serverScript: ServerScript ⇒
-                        containingDocument.getScriptInterpreter.runScript(serverScript)
+                        actionInterpreter.containingDocument.getScriptInterpreter.runScript(serverScript)
                     case clientScript ⇒
-                        containingDocument.addScriptToRun(clientScript, actionContext.interpreter.event, actionContext.interpreter.eventObserver)
+                        actionInterpreter.containingDocument.addScriptToRun(clientScript, actionContext.interpreter.event, actionContext.interpreter.eventObserver)
                 }
             case "xpath" | "text/xpath" | "application/xpath" ⇒ // "unofficial" type
                 // Evaluate XPath expression for its side effects only

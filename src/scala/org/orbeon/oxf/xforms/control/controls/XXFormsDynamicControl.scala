@@ -330,7 +330,7 @@ object InstanceMirror {
                     }
                 }
 
-                // Handle removed node dpending on type
+                // Handle removed node depending on type
                 removedNodeInfo.getNodeKind match {
                     case org.w3c.dom.Node.ATTRIBUTE_NODE ⇒
                         // An attribute was removed

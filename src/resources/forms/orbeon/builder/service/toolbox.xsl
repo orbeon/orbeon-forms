@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <!--
     Copyright (C) 2008 Orbeon, Inc.
 
@@ -18,19 +17,19 @@
             xmlns:xs="http://www.w3.org/2001/XMLSchema"
             xmlns:xbl="http://www.w3.org/ns/xbl"
             xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-            xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary">
+            xmlns:p="http://www.orbeon.com/oxf/pipeline">
 
     <xsl:variable name="app" as="xs:string" select="doc('input:parameters')/*/app"/>
     <xsl:variable name="form" as="xs:string" select="doc('input:parameters')/*/form"/>
 
     <!-- Find group names, e.g. "text", "selection", etc. -->
-    <xsl:variable name="property-names" select="xpl:propertiesStartsWith('oxf.fb.toolbox.group')" as="xs:string*" />
+    <xsl:variable name="property-names" select="p:properties-start-with('oxf.fb.toolbox.group')" as="xs:string*" />
     <xsl:variable name="unique-groups" select="distinct-values(for $v in $property-names return tokenize($v, '\.')[5])" as="xs:string*"/>
 
     <!-- Iterate over groups -->
     <xsl:for-each select="$unique-groups">
 
-        <xsl:variable name="resources-property" select="xpl:property(string-join(('oxf.fb.toolbox.group', ., 'uri', $app, $form), '.'))" as="xs:string"/>
+        <xsl:variable name="resources-property" select="p:property(string-join(('oxf.fb.toolbox.group', ., 'uri', $app, $form), '.'))" as="xs:string"/>
         <xsl:variable name="resources" select="for $uri in tokenize($resources-property, '\s+') return doc($uri)" as="document-node()*"/>
 
         <xsl:if test="$resources">

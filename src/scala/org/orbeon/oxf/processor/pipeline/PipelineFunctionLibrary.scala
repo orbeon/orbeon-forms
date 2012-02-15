@@ -53,7 +53,7 @@ class PipelineFunctionLibrary extends {
     // Add these to XXFormsIndependentFunctions?
     def decodeXML(encodedXML: String) = XFormsUtils.decodeXML(encodedXML)
     def encodeXML(node: Node) = XFormsUtils.encodeXMLAsDOM(node)
-    def decodeDynamicStateString(dynamicState: String) = DynamicState.apply(dynamicState).toXML
+    def decodeDynamicStateString(dynamicState: String) = DynamicState.apply(dynamicState).toXML // for unit tests only
     def newEvaluator(context: NodeInfo) = new XPathEvaluator(context.getConfiguration)
     def isPE = Version.isPE
     def isPortlet = "portlet" == NetUtils.getExternalContext.getRequest.getContainerType

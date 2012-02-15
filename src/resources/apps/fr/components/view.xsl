@@ -231,9 +231,37 @@
                 <!-- Hidden field to communicate to the client whether the data is safe -->
                 <xforms:input model="fr-persistence-model" ref="instance('fr-persistence-instance')/data-safe" id="fr-data-safe-input"
                     class="xforms-disabled"/>
+
+                <!-- This is a bit of a HACK for Form Builder only: place non-relevant instances of all toolbox controls
+                     so that xxf:dynamic will have all the JavaScript and CSS resources available on the client.
+                     See: https://github.com/orbeon/orbeon-forms/issues/31 -->
+                <xsl:if test="$is-new-form-builder" xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
+
+                    <xsl:variable name="property-names"
+                                  select="p:properties-start-with('oxf.fb.toolbox.group')" as="xs:string*" />
+                    <xsl:variable name="resources-names"
+                                  select="distinct-values(for $n in $property-names return tokenize(p:property($n), '\s+'))" as="xs:string*"/>
+
+                    <xsl:variable name="resources"
+                                  select="for $uri in $resources-names return doc($uri)" as="document-node()*"/>
+
+                    <xsl:if test="$resources">
+                        <!-- Non-relevant group -->
+                        <xforms:group ref="()">
+                            <xsl:apply-templates select="$resources/*/xbl:binding/fb:metadata/fb:template/*" mode="filter-fb-template"/>
+                        </xforms:group>
+                    </xsl:if>
+                </xsl:if>
             </xhtml:span>
         </xsl:for-each>
 
+    </xsl:template>
+
+    <!-- Remove id elements on Form Builder templates -->
+    <xsl:template match="@id" mode="filter-fb-template"/>
+    <xsl:template match="@bind" mode="filter-fb-template"/>
+    <xsl:template match="@ref[not(normalize-space())]" mode="filter-fb-template">
+        <xsl:attribute name="{name()}" select="'()'"/>
     </xsl:template>
 
     <xsl:template match="fr:title">

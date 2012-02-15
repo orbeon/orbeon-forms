@@ -104,10 +104,6 @@ html body .xforms-form tr.xforms-disabled,
     position: static;
 }
 
-/* For animated toggle of switch/case */
-.xxforms-animate { overflow: hidden }
-
-
 /* ***** Label, hint, help, alert *********************************************************************************** */
 
 .xforms-hint {

@@ -1024,7 +1024,7 @@
                                                 inOptgroup = false;
                                             }
                                         }
-                                        
+
 
                                         // Build new content for the select element
                                         for (var topIndex = 0; topIndex < itemsetTree.length; topIndex++) {
@@ -1664,6 +1664,14 @@
                                                         YAHOO.util.Dom.hasClass(cursor, "xxforms-animate") // only animate if class present
                                                         && !(YAHOO.env.ua.ie != 0 && YAHOO.env.ua.ie <= 7); // simply disable animation for IE 6/7 as they behave badly
                                                 if (doAnimate) {
+
+                                                    function hideOverflowDuringAnim(anim) {
+                                                        cursor.style.overflow = "hidden";
+                                                        anim.onComplete.subscribe(_.bind(function(cursor) {
+                                                            cursor.style.overflow = "";
+                                                        }, this, cursor));
+                                                    }
+
                                                     if (visible) {
                                                         // Figure out what its natural height is
                                                         cursor.style.height = "auto";
@@ -1678,6 +1686,7 @@
                                                         YAHOO.util.Dom.removeClass(cursor, "xforms-case-deselected-subsequent");
 
                                                         var anim = new YAHOO.util.Anim(cursor, { height: {  to: fullHeight } }, .2);
+                                                        hideOverflowDuringAnim(anim);
                                                         anim.onComplete.subscribe(_.bind(function(cursor) {
                                                             // Set back the height to auto when the animation is finished
                                                             // This is also needed because the natural height might have changed during animation
@@ -1686,6 +1695,7 @@
                                                         anim.animate();
                                                     } else {
                                                         var anim = new YAHOO.util.Anim(cursor, { height: { to: 0 } }, 0.2);
+                                                        hideOverflowDuringAnim(anim);
                                                         anim.onComplete.subscribe(_.bind(function(cursor) {
                                                             // Only close case once the animation terminates
                                                             YAHOO.util.Dom.addClass(cursor, "xforms-case-deselected-subsequent");

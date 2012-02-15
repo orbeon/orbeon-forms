@@ -258,9 +258,8 @@
     </xsl:template>
 
     <!-- Remove id elements on Form Builder templates -->
-    <xsl:template match="@id" mode="filter-fb-template"/>
-    <xsl:template match="@bind" mode="filter-fb-template"/>
-    <xsl:template match="@ref[not(normalize-space())]" mode="filter-fb-template">
+    <xsl:template match="@id | @bind" mode="filter-fb-template"/>
+    <xsl:template match="@ref[not(normalize-space())] | @nodeset[not(normalize-space())]" mode="filter-fb-template">
         <xsl:attribute name="{name()}" select="'()'"/>
     </xsl:template>
 

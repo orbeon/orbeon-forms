@@ -20,8 +20,8 @@ YD = YAHOO.util.Dom
 # Rules defining when certain triggers are relevant
 relevanceRules = do ->
 
-    isNotEmpty = (gridTd) -> $(gridTd).children('.fr-grid-content').children().length > 0
-    isUpload = (gridTd) -> isNotEmpty(gridTd) and $(gridTd).children('.fr-grid-content').hasClass('fb-upload')
+    isNotEmpty = (gridTd) -> $(gridTd).find('.fr-grid-content').children().length > 0
+    isUpload = (gridTd) -> isNotEmpty(gridTd) and $(gridTd).find('.fr-grid-content').hasClass('fb-upload')
     isEmptyUpload = (gridTd) ->
         # Check for presence of both spacer and photo placeholder, as both indicate an empty image and we are not sure which one will be shown
         # depending on whether the code replacing the spacer with the photo placeholder already ran or not
@@ -44,7 +44,7 @@ relevanceRules = do ->
     'fb-delete-trigger':            isNotEmpty
     'fb-edit-details-trigger':      isNotEmpty
     'fb-edit-validation-trigger':   isNotEmpty
-    'fb-edit-items-trigger':        (gridTd) -> isNotEmpty(gridTd) and $(gridTd).children('.fr-grid-content').hasClass('fb-itemset')
+    'fb-edit-items-trigger':        (gridTd) -> isNotEmpty(gridTd) and $(gridTd).find('.fr-grid-content').hasClass('fb-itemset')
     'fb-static-upload-empty':       (gridTd) -> isUpload(gridTd) and isEmptyUpload(gridTd)
     'fb-static-upload-non-empty':   (gridTd) -> isUpload(gridTd) and not isEmptyUpload(gridTd)
 
@@ -59,7 +59,11 @@ $ ->
             # Move cell editor controls under this td
             gridTd = YD.get gridTdId
             if gridTd?
-                $(gridTd).children('.fr-grid-content').before(triggerGroups)
+                if $(gridTd).children('.fb-hover').length == 0                          # Create a div.fb-hover inside the td, if there isn't one already
+                    hoverDiv = $('<div>').addClass('fb-hover')
+                    hoverDiv.append(triggerGroups)
+                    hoverDiv.append($(gridTd).children())
+                    $(gridTd).append(hoverDiv)
                 $(triggerGroups).css('display', '')
                 # Show/hide triggers depending on relevance rules
                 for trigger in triggers
@@ -68,9 +72,12 @@ $ ->
                     trigger.style.display = if triggerRelevant then '' else 'none'
         lastPositionTriggers()
 
-    Builder.mouseExitsGridTdEvent.subscribe ({triggerGroups}) ->
+    Builder.mouseExitsGridTdEvent.subscribe ({triggerGroups, gridTd}) ->
         $(triggerGroups).hide()
         $('.fb-cell-editor').append(triggerGroups)
+        fbHover = $(gridTd).children('.fb-hover')
+        $(gridTd).append(fbHover.children())
+        fbHover.remove()
         lastPositionTriggers = null
 
     # Change current cell on click on trigger

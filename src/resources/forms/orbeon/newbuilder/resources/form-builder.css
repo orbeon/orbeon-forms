@@ -300,10 +300,7 @@ a.xforms-help-image .fb-control-help { vertical-align: baseline; }
     width: 99.9%                            /* attempt to fix missing right border under Chrome */
 }
 
-.fr-grid-td {
-    border: 1px solid transparent;
-    position: relative;                     /* So FB icons inside the grid td can use absolute positioning relative to the td */
-}
+.fr-grid-td { border: 1px solid transparent }
 .fr-editable .fr-grid-tr { height: 60px }   /* Enough space to hold row icons so that hovering doesn't cause the row to expand */
 .fr-grid.fr-norepeat:hover .fr-grid-td { border: 1px solid #ccc} /* Only for grid which is not a repeat, e.g. no highlighting in itemset editor */
 
@@ -338,6 +335,7 @@ a.xforms-help-image .fb-control-help { vertical-align: baseline; }
 
 .fr-grid .fr-grid-td .fb-grid-control-icons img { display: inline }
 .fb-label-hint-placeholder { color: #bbb }
+.fr-grid-td .fb-hover { position: relative }        /* So elements shown on hover can be absolutely positioned relative to the cell */
 
 /* Column icons */
 .fr-grid thead .fb-grid-column-toolbar-td {         /* .fr-grid and thead added to take precedence over YUI's text-align: left */

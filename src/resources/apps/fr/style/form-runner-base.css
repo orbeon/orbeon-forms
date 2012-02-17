@@ -250,9 +250,6 @@ button.xforms-trigger, input.xforms-trigger, .xforms-trigger button, .xforms-tri
 
 /* ***** Repeats **************************************************************************************************** */
 
-/* Repeats: all */
-.fr-repeat td { vertical-align: middle }
-
 /* Repeats: shows as sections (can have multiple lines per iteration; repeated field labels) */
 .fr-repeat-sections th { display: none }
 .fr-repeat-sections .xforms-label { margin-top: 0 }

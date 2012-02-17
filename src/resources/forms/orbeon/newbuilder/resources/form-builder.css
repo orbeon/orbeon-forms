@@ -357,11 +357,11 @@ a.xforms-help-image .fb-control-help { vertical-align: baseline; }
 
 /* Grid content */
 /* Margin leaves space for the icons to the left and right of the control */
-.fr-grid-content { margin-left: 2.5em; margin-right: 2.5em }
+.fr-grid-content { padding-left: 2.5em; padding-right: 2.5em }
 /* Margin leaves space for trigger showing the itemset editor */
-.fr-grid-content.fb-itemset { margin-bottom: 2.5em }
+.fr-grid-content.fb-itemset { padding-bottom: 2.5em }
 /* Margin leaves space for file upload  */
-.fr-grid-content.fb-upload { margin-bottom: 2.5em }
+.fr-grid-content.fb-upload { padding-bottom: 2.5em }
 /* Inputs for editing the label and hint to take the whole width of the grid content */
 .fr-grid-content .xforms-label input, .fr-grid-content .xforms-hint input { width: 100% }
 

@@ -48,8 +48,8 @@ class OrbeonProxyPortlet extends GenericPortlet {
     private def getPreference(request: PortletRequest, pref: PreferenceName.Value) =
         request.getPreferences.getValue(pref.toString, getPortletConfig.getInitParameter(pref.toString))
 
-    private val FormRunnerPath = """/fr/([^/]+)/([^/]+)/(new|summary)""".r
-    private val FormRunnerDocumentPath = """/fr/([^/]+)/([^/]+)/(new|edit|view)/([^/]+)""".r
+    private val FormRunnerPath = """/fr/([^/]+)/([^/]+)/(new|summary)(\?(.*))?""".r
+    private val FormRunnerDocumentPath = """/fr/([^/]+)/([^/]+)/(new|edit|view)/([^/?]+)?(\?(.*))?""".r
 
     override def doView(request: RenderRequest, response: RenderResponse) = {
 
@@ -58,18 +58,18 @@ class OrbeonProxyPortlet extends GenericPortlet {
 
         val formRunnerURL = getPreference(request, PreferenceName.FormRunnerURL)
 
-        val (appName, formName, action, documentId) = request.getParameter("orbeon.path") match {
+            val (appName, formName, action, documentId, query) = request.getParameter("orbeon.path") match {
             // Incoming path is Form Runner path without document id
-            case FormRunnerPath(appName, formName, action) ⇒ (appName, formName, filterAction(request, action), None)
+            case FormRunnerPath(appName, formName, action, _, query) ⇒ (appName, formName, filterAction(request, action), None, Option(query))
             // Incoming path is Form Runner path with document id
-            case FormRunnerDocumentPath(appName, formName, action, documentId) ⇒ (appName, formName, filterAction(request, action), Some(documentId))
+            case FormRunnerDocumentPath(appName, formName, action, documentId, _, query) ⇒ (appName, formName, filterAction(request, action), Some(documentId), Option(query))
             // No incoming path, use preferences
-            case null ⇒ (getPreference(request, PreferenceName.AppName), getPreference(request, PreferenceName.FormName), getPreference(request, PreferenceName.Action), None)
+            case null ⇒ (getPreference(request, PreferenceName.AppName), getPreference(request, PreferenceName.FormName), getPreference(request, PreferenceName.Action), None, None)
             // Unsupported path
             case otherPath ⇒ throw new PortletException("Unsupported path: " + otherPath)
         }
 
-        val url = new URL(Util.buildFormRunnerURL(formRunnerURL, appName, formName, action, documentId))
+        val url = new URL(Util.buildFormRunnerURL(formRunnerURL, appName, formName, action, documentId, query))
 
         val connection = url.openConnection.asInstanceOf[HttpURLConnection]
 
@@ -249,8 +249,10 @@ class OrbeonProxyPortlet extends GenericPortlet {
 
     private object Util {
 
-        def buildFormRunnerURL(baseURL: String, app: String, form: String, action: String, documentId: Option[String]) =
-            removeTrailingSlash(baseURL) + "/fr/" + app + "/" + form + "/" + action + (if (documentId.isDefined) "/" + documentId.get else "") + "?orbeon-embeddable"
+        def buildFormRunnerURL(baseURL: String, app: String, form: String, action: String, documentId: Option[String], query: Option[String]) =
+            removeTrailingSlash(baseURL) + "/fr/" + app + "/" + form + "/" + action +
+                (documentId map ("/" + _) getOrElse "") +
+                (query map ("?" + _ + "&") getOrElse "?") + "orbeon-embeddable"
 
         def buildResourceURL(baseURL: String, resourceId: String) =
             removeTrailingSlash(baseURL) + resourceId

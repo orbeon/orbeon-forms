@@ -287,7 +287,7 @@
                             <!-- Synchronize data with external world upon local value change -->
                             <!-- This assumes the element QName match, or the value is not copied -->
                             <xforms:action ev:event="xforms-value-changed">
-                                <xxforms:variable name="source-binding" select="event('xxforms:binding')" as="element()"/>
+                                <xxforms:variable name="source-binding" select="xxforms:event('xxforms:binding')" as="element()"/>
                                 <xforms:setvalue ref="$binding/*[resolve-QName(name(), .) = resolve-QName(name($source-binding), $source-binding)]" value="$source-binding"/>
                             </xforms:action>
 

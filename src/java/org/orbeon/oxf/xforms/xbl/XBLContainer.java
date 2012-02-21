@@ -82,7 +82,6 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
     private final XFormsContextStack contextStack;  // for controls under this container
 
     private List<XFormsModel> models = new ArrayList<XFormsModel>();
-    private Map<String, XFormsModel> modelsMap = new HashMap<String, XFormsModel>();    // Map<String, XFormsModel> of effective model id to model
 
     // Containing control if any
     private final XFormsControl associatedControl;
@@ -173,17 +172,11 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
             parentXBLContainer.addChild(this);
         }
 
-        // Clear map
-        modelsMap.clear();
-
         // Update effective ids of all nested models
         for (final XFormsModel currentModel: models) {
             // E.g. foo$bar$my-model.1-2 => foo$bar$my-model.1-3
             final String newModelEffectiveId = XFormsUtils.getPrefixedId(currentModel.getEffectiveId()) + XFormsUtils.getEffectiveIdSuffixWithSeparator(effectiveId);
             currentModel.updateEffectiveId(newModelEffectiveId);
-
-            // Put in map
-            modelsMap.put(currentModel.getEffectiveId(), currentModel);
         }
     }
 
@@ -331,7 +324,6 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
 
     private void addModel(XFormsModel model) {
         this.models.add(model);
-        this.modelsMap.put(model.getEffectiveId(), model);
     }
 
     protected void initializeModels() {

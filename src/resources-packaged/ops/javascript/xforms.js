@@ -3893,7 +3893,7 @@ ORBEON.xforms.Events = {
                 // Find if this instance is in a full update container
                 /** @type {HTMLElement} */ var fullUpdate = null;
                 OUD.existsAncestorOrSelf(component.container, function(node) {
-                    return YUD.hasClass(node, "xforms-update-full") ? (fullUpdate = node, true) : false;
+                    return YUD.hasClass(node, "xforms-update-full") || YUD.hasClass(node, "xxforms-dynamic-control") ? (fullUpdate = node, true) : false;
                 });
 
                 // This component is inside a full update

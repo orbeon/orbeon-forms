@@ -72,12 +72,11 @@ $ ->
                     trigger.style.display = if triggerRelevant then '' else 'none'
         lastPositionTriggers()
 
+    # We leave the div.fb-hover that was created on mouseEntersGridTdEvent, as removing it would dispatch a blur to the control
+    # See: https://github.com/orbeon/orbeon-forms/issues/44
     Builder.mouseExitsGridTdEvent.subscribe ({triggerGroups, gridTd}) ->
         $(triggerGroups).hide()
         $('.fb-cell-editor').append(triggerGroups)
-        fbHover = $(gridTd).children('.fb-hover')
-        $(gridTd).append(fbHover.children())
-        fbHover.remove()
         lastPositionTriggers = null
 
     # Change current cell on click on trigger

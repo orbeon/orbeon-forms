@@ -348,12 +348,24 @@ object ClientEvents {
      */
     def processEvent(document: XFormsContainingDocument, event: XFormsEvent): Unit = {
 
+        def isValueChange = event.isInstanceOf[XXFormsValueChangeWithFocusChangeEvent]
+
         // Check whether an event can be be dispatched to the given object. This only checks:
         // o the the target is still live
         // o that the target is not a non-relevant or readonly control
         def checkEventTarget(event: XFormsEvent): Boolean = {
             val eventTarget = event.getTargetObject
             val newReference = document.getObjectByEffectiveId(eventTarget.getEffectiveId)
+
+            def warn(condition: String) = {
+                val logger = document.getIndentedLogger
+                if (logger.isDebugEnabled)
+                    logger.logDebug(EVENT_LOG_TYPE, "ignoring invalid client event on " + condition,
+                        "control id", eventTarget.getEffectiveId,
+                        "event name", event.getName)
+                false
+            }
+
             if (eventTarget ne newReference) {
 
                 // Here, we check that the event's target is still a valid object. For example, a couple of events from the
@@ -375,31 +387,27 @@ object ClientEvents {
                 // On the other hand, if the repeat iteration has disappeared, or was removed and recreated, the event is
                 // not dispatched.
 
-                if (document.getIndentedLogger.isDebugEnabled)
-                    document.getIndentedLogger.logDebug(EVENT_LOG_TYPE, "ignoring invalid client event on ghost target", "control id", eventTarget.getEffectiveId, "event name", event.getName)
-
-                false
+                warn("ghost target")
 
             } else eventTarget match {
                 // Controls accept event only if they are relevant
                 case control: XFormsControl if !control.isRelevant =>
-                    if (document.getIndentedLogger.isDebugEnabled)
-                        document.getIndentedLogger.logDebug(EVENT_LOG_TYPE, "ignoring invalid client event on non-relevant control", "control id", eventTarget.getEffectiveId, "event name", event.getName)
-
-                    false
+                    warn("non-relevant control")
 
                 // Output control not subject to readonly condition below
-                case outputControl: XFormsOutputControl => true
+                case control: XFormsOutputControl =>
+                    true
 
                 // Single node controls accept event only if they are not readonly
-                case singleNodeControl: XFormsSingleNodeControl if singleNodeControl.isReadonly =>
+                case control: XFormsSingleNodeControl if control.isReadonly =>
+                    warn("read-only control")
 
-                    if (document.getIndentedLogger.isDebugEnabled)
-                        document.getIndentedLogger.logDebug(EVENT_LOG_TYPE, "ignoring invalid client event on read-only control", "control id", eventTarget.getEffectiveId, "event name", event.getName)
+                // Single node controls accept value change event only if actually bound
+                case control: XFormsSingleNodeControl if (control.getBoundItem eq null) && isValueChange =>
+                    warn("control without single-node binding")
 
-                    false
-
-                case _ => true
+                case _ =>
+                    true
             }
         }
 
@@ -418,28 +426,29 @@ object ClientEvents {
             document.startOutermostActionHandler()
 
             // Check if the value to set will be different from the current value
-            if (eventTarget.isInstanceOf[XFormsValueControl] && event.isInstanceOf[XXFormsValueChangeWithFocusChangeEvent]) {
-                val valueChangeWithFocusChangeEvent = event.asInstanceOf[XXFormsValueChangeWithFocusChangeEvent]
-                if (valueChangeWithFocusChangeEvent.getOtherTargetObject eq null) {
-                    // We only get a value change with this event
-                    val currentExternalValue = (eventTarget.asInstanceOf[XFormsValueControl]).getExternalValue
-                    if (currentExternalValue ne null) {
-                        // We completely ignore the event if the value in the instance is the same. This also saves dispatching xxforms-repeat-focus below.
-                        val isIgnoreValueChangeEvent = currentExternalValue.equals(valueChangeWithFocusChangeEvent.getNewValue)
-                        if (isIgnoreValueChangeEvent) {
-                            indentedLogger.logDebug(EVENT_LOG_TYPE, "ignoring value change event as value is the same", "control id", eventTargetEffectiveId, "event name", eventName, "value", currentExternalValue)
-                            // Ensure deferred event handling
-                            // NOTE: Here this will do nothing, but out of consistency we better have matching startOutermostActionHandler/endOutermostActionHandler
-                            document.endOutermostActionHandler()
-                            return
+            (event, eventTarget) match {
+                case (event: XXFormsValueChangeWithFocusChangeEvent, eventTarget: XFormsValueControl) ⇒
+                    if (event.getOtherTargetObject eq null) {
+                        // We only get a value change with this event
+                        val currentExternalValue = eventTarget.getExternalValue
+                        if (currentExternalValue ne null) {
+                            // We completely ignore the event if the value in the instance is the same. This also saves dispatching xxforms-repeat-focus below.
+                            val isIgnoreValueChangeEvent = currentExternalValue == event.getNewValue
+                            if (isIgnoreValueChangeEvent) {
+                                indentedLogger.logDebug(EVENT_LOG_TYPE, "ignoring value change event as value is the same", "control id", eventTargetEffectiveId, "event name", eventName, "value", currentExternalValue)
+                                // Ensure deferred event handling
+                                // NOTE: Here this will do nothing, but out of consistency we better have matching startOutermostActionHandler/endOutermostActionHandler
+                                document.endOutermostActionHandler()
+                                return
+                            }
+                        } else {
+                            // shouldn't happen really, but just in case let's log this
+                            indentedLogger.logDebug(EVENT_LOG_TYPE, "got null currentExternalValue", "control id", eventTargetEffectiveId, "event name", eventName)
                         }
                     } else {
-                        // shouldn't happen really, but just in case let's log this
-                        indentedLogger.logDebug(EVENT_LOG_TYPE, "got null currentExternalValue", "control id", eventTargetEffectiveId, "event name", eventName)
+                        // There will be a focus event too, so don't ignore the event!
                     }
-                } else {
-                    // There will be a focus event too, so don't ignore the event!
-                }
+                case _ ⇒
             }
 
             // Handle repeat focus. Don't dispatch event on DOMFocusOut however.

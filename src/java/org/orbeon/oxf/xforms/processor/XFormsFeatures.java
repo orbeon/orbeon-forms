@@ -61,6 +61,8 @@ public class XFormsFeatures {
     };
 
     private static final ResourceConfig[] scripts = {
+            // jQuery
+            new ResourceConfig("/ops/jquery/jquery-1.7.1.js", "/ops/jquery/jquery-1.7.1.min.js"),
             // Yahoo UI Library
             new ResourceConfig("/ops/yui/yahoo/yahoo.js", "/ops/yui/yahoo/yahoo-min.js"),
             new ResourceConfig("/ops/yui/event/event.js", "/ops/yui/event/event-min.js"),
@@ -210,7 +212,7 @@ public class XFormsFeatures {
             new ResourceConfig("/ops/yui/stylesheet/stylesheet.js", "/ops/yui/stylesheet/stylesheet-min.js"),
             new ResourceConfig("/ops/javascript/orbeon/util/DeferredPortletLoader.js", "/ops/javascript/orbeon/util/DeferredPortletLoader-min.js")
     };
-    
+
     public static ResourceConfig[] getAsyncPortletLoadScripts() {
         return asyncPortletLoadScripts;
     }

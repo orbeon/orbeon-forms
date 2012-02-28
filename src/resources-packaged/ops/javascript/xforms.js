@@ -4484,20 +4484,9 @@ ORBEON.xforms.Init = {
         }
 
         // Special registration for focus, blur, and change events
-        if (!ORBEON.xforms.Globals.topLevelListenerRegistered) {
-            if (YAHOO.lang.isUndefined(document.addEventListener)) {
-                // For browsers that don't support the capture mode (IE) register listener for the non-standard
-                // focusin and focusout events (which do bubble), and we'll register the listener for change on the
-                // element on focus
-                YAHOO.util.Event.addListener(document, "focusin", ORBEON.xforms.Events.focus);
-                YAHOO.util.Event.addListener(document, "focusout", ORBEON.xforms.Events.blur);
-            } else {
-                // Register event handlers using capture phase for W3C-compliant browsers
-                document.addEventListener("focus", ORBEON.xforms.Events.focus, true);
-                document.addEventListener("blur", ORBEON.xforms.Events.blur, true);
-                document.addEventListener("change", ORBEON.xforms.Events.change, true);
-            }
-        }
+        $(document).on('focusin', ORBEON.xforms.Events.focus);
+        $(document).on('focusout', ORBEON.xforms.Events.blur);
+        $(document).on('change', ORBEON.xforms.Events.change);
 
         // Register events that bubble on document for all browsers
         if (!ORBEON.xforms.Globals.topLevelListenerRegistered) {

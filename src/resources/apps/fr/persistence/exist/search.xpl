@@ -96,21 +96,18 @@
                 </xsl:template>
                 <!-- Dynamically build where clause -->
                 <xsl:template match="where">
-                    <!-- Old fulltext index -->
-                    <!--<xsl:text>($query = '' or text:match-any($resource, $query))</xsl:text>-->
                     <!-- New lucene index -->
-                    <xsl:text>($query = '' or ft:query($resource, $query))</xsl:text>
                     <xsl:for-each select="$instance/query[@path and normalize-space() != '']">
                         <xsl:variable name="position" select="position()" as="xs:integer"/>
                         <!-- NOTE: We should probably use ft:query() below as well -->
                         <xsl:choose>
                             <xsl:when test="@match = 'exact'">
                                 <!-- Exact match -->
-                                and $resource/*/<xsl:value-of select="@path"/>[. = $value[<xsl:value-of select="$position"/>]]
+                                and $d/*/<xsl:value-of select="@path"/>[. = $value[<xsl:value-of select="$position"/>]]
                             </xsl:when>
                             <xsl:otherwise>
                                 <!-- Substring, case-insensitive match -->
-                                and $resource/*/<xsl:value-of select="@path"/>[contains(lower-case(.), lower-case($value[<xsl:value-of select="$position"/>]))]
+                                and $d/*/<xsl:value-of select="@path"/>[contains(lower-case(.), lower-case($value[<xsl:value-of select="$position"/>]))]
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:for-each>
@@ -119,7 +116,7 @@
                 <xsl:template match="details">
                     <xsl:for-each select="$instance/query[@path]">
                         &lt;detail>
-                            {string-join($resource/*/<xsl:value-of select="@path"/>, ', ')}
+                            {string-join($d/*/<xsl:value-of select="@path"/>, ', ')}
                         &lt;/detail>
                     </xsl:for-each>
                 </xsl:template>

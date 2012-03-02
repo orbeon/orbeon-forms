@@ -44,6 +44,7 @@ import org.orbeon.oxf.xforms.state.*;
 import org.orbeon.oxf.xforms.submission.AsynchronousSubmissionManager;
 import org.orbeon.oxf.xforms.submission.SubmissionResult;
 import org.orbeon.oxf.xforms.submission.XFormsModelSubmission;
+import org.orbeon.oxf.xforms.xbl.Scope;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.SAXStore;
@@ -171,7 +172,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
      */
     public XFormsContainingDocument(XFormsStaticState staticState, AnnotatedTemplate template,
                                     XFormsURIResolver uriResolver, ExternalContext.Response response) {
-        super(CONTAINING_DOCUMENT_PSEUDO_ID, CONTAINING_DOCUMENT_PSEUDO_ID, CONTAINING_DOCUMENT_PSEUDO_ID, "", null, null);
+        super(CONTAINING_DOCUMENT_PSEUDO_ID, CONTAINING_DOCUMENT_PSEUDO_ID, CONTAINING_DOCUMENT_PSEUDO_ID, "", null, null, null);
 
         // Remember location data
         setLocationData(staticState.locationData());
@@ -281,7 +282,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
      * @param xformsState       XFormsState containing static and dynamic state
      */
     public XFormsContainingDocument(XFormsState xformsState) {
-        super(CONTAINING_DOCUMENT_PSEUDO_ID, CONTAINING_DOCUMENT_PSEUDO_ID, CONTAINING_DOCUMENT_PSEUDO_ID, "", null, null);
+        super(CONTAINING_DOCUMENT_PSEUDO_ID, CONTAINING_DOCUMENT_PSEUDO_ID, CONTAINING_DOCUMENT_PSEUDO_ID, "", null, null, null);
 
         // 1. Restore the static state
         {
@@ -935,6 +936,11 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
     
     public List<XFormsError.ServerError> getServerErrors() {
         return serverErrors != null ? serverErrors : Collections.<XFormsError.ServerError>emptyList();
+    }
+
+    @Override
+    public Scope getResolutionScope() {
+        return staticState.topLevelPart().startScope();
     }
 
     @Override

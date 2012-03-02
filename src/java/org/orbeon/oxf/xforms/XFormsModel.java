@@ -378,7 +378,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
     }
 
     public Scope getResolutionScope() {
-        return container.getPartAnalysis().getResolutionScopeByPrefixedId(getPrefixedId());
+        return container.getPartAnalysis().scopeForPrefixedId(getPrefixedId());
     }
 
     public LocationData getLocationData() {

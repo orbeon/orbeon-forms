@@ -23,17 +23,17 @@ import xbl.Scope
 // Operations on a part that are used during static analysis
 trait PartStaticAnalysisOps {
 
-    def getNamespaceMapping(prefix: String, element: Element): NamespaceMapping     // SA(to handle XBL resources)|GRUN
+    def getNamespaceMapping(prefix: String, element: Element): NamespaceMapping
 
-    def getModel(prefixedId: String): Model                                         // SA
-    def getDefaultModelForScope(scope: Scope): Model                                // SA
-    def getModelByInstancePrefixedId(prefixedId: String): Model                     // SA
-    def getModelByScopeAndBind(scope: Scope, bindStaticId: String): Model           // SA
-    def findInstancePrefixedId(startScope: Scope, instanceStaticId: String): String // SA
+    def getModel(prefixedId: String): Model
+    def getDefaultModelForScope(scope: Scope): Model
+    def getModelByInstancePrefixedId(prefixedId: String): Model
+    def getModelByScopeAndBind(scope: Scope, bindStaticId: String): Model
+    def findInstancePrefixedId(startScope: Scope, instanceStaticId: String): String
 
-    def getModelsForScope(scope: Scope): JList[Model]                               // SA|RUN
+    def getModelsForScope(scope: Scope): JList[Model]
     
-    def getControlAnalysis(prefixedId: String): ElementAnalysis                     // SA|GRUN
-    def getResolutionScopeByPrefixedId(prefixedId: String): Scope                   // SA|GRUN
-    def searchResolutionScopeByPrefixedId(prefixedId: String): Scope                // SA
+    def getControlAnalysis(prefixedId: String): ElementAnalysis
+    def scopeForPrefixedId(prefixedId: String): Scope
+    def searchResolutionScopeByPrefixedId(prefixedId: String): Scope
 }

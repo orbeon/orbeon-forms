@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.analysis
 import controls.ComponentControl
 import org.orbeon.oxf.xml.Dom4j
 import org.orbeon.oxf.xforms.event.EventHandlerImpl
+import org.orbeon.oxf.xforms.XFormsConstants.XXBLScope
 
 
 trait ShadowChildrenBuilder extends ContainerChildrenBuilder {
@@ -23,23 +24,40 @@ trait ShadowChildrenBuilder extends ContainerChildrenBuilder {
     self: ComponentControl ⇒
 
     // Directly nested handlers (if enabled)
-    private def directlyNestedHandlers =
+    private def directlyNestedHandlers = {
+
+        // HACK: maybe due to a compiler bug, we cannot access self.element, etc.
+        def component = self
+
+        // Inner scope in effect for the component element itself (NOT the shadow tree's scope)
+        def innerScope = containerScope
+
+        // Outer scope in effect for the component element itself
+        def outerScope =
+            if (innerScope.isTopLevelScope)
+                innerScope
+            else
+                component.staticStateContext.partAnalysis.getControlAnalysis(containerScope.fullPrefix.init).scope
+
+        // If enabled, gather elements and annotate them, as they haven't been annotated earlier (because they are
+        // nested within the bound element)
         if (binding.abstractBinding.modeHandlers)
-            Dom4j.elements(_element) filter
+            Dom4j.elements(component.element) filter
                 (EventHandlerImpl.isEventHandler(_)) map
-                    (e ⇒ (
-                        _staticStateContext.partAnalysis.xblBindings.annotateSubtreeByElement(
-                            _element,               // bound element
-                            e,                      // handler tree to annotate
-                            containerScope,         // handler's inner scope is the scope of the container in which the current component is
-                            _scope,                 // TODO: actual outer scope! (this works only if the current component is itself in the outer scope)
-                            binding.innerScope),    // handler is within the current component
-                        binding.innerScope
+                    (handlerElement ⇒
+                        component.staticStateContext.partAnalysis.xblBindings.annotateSubtreeByElement(
+                            component.element,  // bound element
+                            handlerElement,     // handler tree to annotate
+                            innerScope,         // handler's inner scope is the same as the component's
+                            outerScope,         // handler's outer scope is the same as the component's
+                            if (component.scope == innerScope) XXBLScope.inner else XXBLScope.outer,
+                            binding.innerScope  // handler is within the current component (this determines the prefix of ids)
                     ))
         else
             Seq()
+    }
     
     // Return all the children to consider, including relevant shadow tree elements
     override def findRelevantChildrenElements =
-        directlyNestedHandlers ++ (binding.handlers ++ binding.models :+ binding.compactShadowTree.getRootElement map ((_, binding.innerScope)))
+        directlyNestedHandlers ++ binding.handlers ++ binding.models :+ binding.compactShadowTree.getRootElement map ((_, binding.innerScope))
 }

@@ -98,10 +98,10 @@ class XFormsControl(
     def getIndentedLogger = containingDocument.getControls.getIndentedLogger
 
     final def getResolutionScope =
-        container.getPartAnalysis.getResolutionScopeByPrefixedId(prefixedId)
+        container.getPartAnalysis.scopeForPrefixedId(prefixedId)
 
     def getChildElementScope(element: Element) =
-        container.getPartAnalysis.getResolutionScopeByPrefixedId(container.getFullPrefix + XFormsUtils.getElementId(element))
+        container.getPartAnalysis.scopeForPrefixedId(container.getFullPrefix + XFormsUtils.getElementId(element))
 
     // Update this control's effective id based on the parent's effective id
     def updateEffectiveId() {

@@ -50,8 +50,8 @@ class StaticStateGlobalOps(topLevelPart: PartAnalysis) extends PartGlobalOps {
 
     def getInstances(modelPrefixedId: String) = collectInPartsJ(_.getInstances(modelPrefixedId)).asJava
 
-    def getResolutionScopeByPrefix(prefix: String) = findInParts(_.getResolutionScopeByPrefix(prefix)).orNull
-    def getResolutionScopeByPrefixedId(prefixedId: String) = findInParts(_.getResolutionScopeByPrefixedId(prefixedId)).orNull
+    def containingScope(prefixedId: String) = findInParts(_.containingScope(prefixedId)).orNull
+    def scopeForPrefixedId(prefixedId: String) = findInParts(_.scopeForPrefixedId(prefixedId)).orNull
 
     def hasHandlerForEvent(eventName: String) = existsInParts(_.hasHandlerForEvent(eventName))
     def hasHandlerForEvent(eventName: String, includeAllEvents: Boolean) = existsInParts(_.hasHandlerForEvent(eventName, includeAllEvents))

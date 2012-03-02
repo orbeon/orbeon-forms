@@ -475,7 +475,7 @@ public class XFormsActionInterpreter {
     }
 
     public Scope getActionScope(Element actionElement) {
-        return _container.getPartAnalysis().getResolutionScopeByPrefixedId(getActionPrefixedId(actionElement));
+        return _container.getPartAnalysis().scopeForPrefixedId(getActionPrefixedId(actionElement));
     }
 
     private XBLContainer findResolutionScopeContainer(Element actionElement) {

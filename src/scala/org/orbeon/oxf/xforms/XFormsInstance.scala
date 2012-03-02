@@ -253,7 +253,7 @@ class XFormsInstance(
     private def updateRepeatNodesets(controls: XFormsControls, insertedNodes: JList[Item]) {
         val repeatControlsMap = controls.getCurrentControlTree.getRepeatControls
         if (! repeatControlsMap.isEmpty) {
-            val instanceScope = getXBLContainer(controls.getContainingDocument).getPartAnalysis.getResolutionScopeByPrefixedId(getPrefixedId)
+            val instanceScope = getXBLContainer(controls.getContainingDocument).getPartAnalysis.scopeForPrefixedId(getPrefixedId)
             
             // NOTE: Copy into List as the list of repeat controls may change within updateNodesetForInsertDelete()
             val repeatControls = repeatControlsMap.values.asScala.toList

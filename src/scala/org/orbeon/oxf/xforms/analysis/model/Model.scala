@@ -48,7 +48,7 @@ class Model(val staticStateContext: StaticStateContext, element: Element, parent
     val model = Some(this)
 
     // NOTE: Same code is in SimpleElementAnalysis, which is not optimal → maybe think about passing the container scope to constructors
-    def containerScope = staticStateContext.partAnalysis.getResolutionScopeByPrefix(XFormsUtils.getEffectiveIdPrefix(prefixedId))
+    def containerScope = staticStateContext.partAnalysis.containingScope(prefixedId)
 
     override def getChildrenContext = defaultInstancePrefixedId map { defaultInstancePrefixedId ⇒ // instance('defaultInstanceId')
         PathMapXPathAnalysis(staticStateContext.partAnalysis, PathMapXPathAnalysis.buildInstanceString(defaultInstancePrefixedId),

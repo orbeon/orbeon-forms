@@ -203,15 +203,15 @@ class XBLBindings(indentedLogger: IndentedLogger, partAnalysis: PartAnalysisImpl
 
         val newInnerScope = partAnalysis.newScope(containerScope, boundControlPrefixedId)
         // NOTE: Outer scope is not necessarily the container scope!
-        val outerScope = partAnalysis.getResolutionScopeByPrefixedId(boundControlPrefixedId)
+        val outerScope = partAnalysis.scopeForPrefixedId(boundControlPrefixedId)
 
         // Annotate control tree
         val (fullShadowTree, compactShadowTree) =
-            annotateSubtree(boundElement, rawShadowTree, newInnerScope, outerScope, newInnerScope, hasFullUpdate(rawShadowTree), ignoreRoot = true, needCompact = true)
+            annotateSubtree(boundElement, rawShadowTree, newInnerScope, outerScope, XXBLScope.inner, newInnerScope, hasFullUpdate(rawShadowTree), ignoreRoot = true, needCompact = true)
 
         // Annotate event handlers and implementation models
         def annotateByElement(element: Element) =
-            annotateSubtreeByElement(boundElement, element, newInnerScope, outerScope, newInnerScope)
+            annotateSubtreeByElement(boundElement, element, newInnerScope, outerScope, XXBLScope.inner, newInnerScope)
 
         val annotatedHandlers = abstractBinding.handlers map (annotateByElement(_))
         val annotatedModels = abstractBinding.implementations map (annotateByElement(_))
@@ -239,9 +239,9 @@ class XBLBindings(indentedLogger: IndentedLogger, partAnalysis: PartAnalysisImpl
     /**
      * From a raw non-control tree (handlers, models) rooted at an element, produce a full annotated tree.
      */
-    def annotateSubtreeByElement(boundElement: Element, element: Element, innerScope: Scope, outerScope: Scope, containerScope: Scope) =
+    def annotateSubtreeByElement(boundElement: Element, element: Element, innerScope: Scope, outerScope: Scope, startScope: XXBLScope, containerScope: Scope) =
         annotateSubtree(boundElement, Dom4jUtils.createDocumentCopyParentNamespaces(element, false),
-            innerScope, outerScope, containerScope, hasFullUpdate = false, ignoreRoot = false, needCompact = false)._1.getRootElement
+            innerScope, outerScope, startScope, containerScope, hasFullUpdate = false, ignoreRoot = false, needCompact = false)._1.getRootElement
 
     /**
      * From a raw tree produce a full annotated tree and, optionally, a compact tree.
@@ -251,6 +251,7 @@ class XBLBindings(indentedLogger: IndentedLogger, partAnalysis: PartAnalysisImpl
            rawTree: Document,
            innerScope: Scope,
            outerScope: Scope,
+           startScope: XXBLScope,
            containerScope: Scope,
            hasFullUpdate: Boolean,
            ignoreRoot: Boolean,
@@ -276,7 +277,7 @@ class XBLBindings(indentedLogger: IndentedLogger, partAnalysis: PartAnalysisImpl
             // Gather scopes, namespace mappings, and if needed produce compact tree
             TransformerUtils.writeDom4j(
                 fullAnnotatedTree,
-                new ScopeExtractorContentHandler(transformer, innerScope, outerScope, XXBLScope.inner, containerScope.fullPrefix, baseURI, ignoreRoot = false) // XXX TODO TEMP ignoreRoot
+                new ScopeExtractorContentHandler(transformer, innerScope, outerScope, startScope, containerScope.fullPrefix, baseURI, ignoreRoot = false)
             )
     
             // Extractor produces /static-state/root/(xbl:template|xxbl:global), so extract the nested element
@@ -313,8 +314,18 @@ class XBLBindings(indentedLogger: IndentedLogger, partAnalysis: PartAnalysisImpl
                         val topLevelScopeForGlobals = partAnalysis.startScope
         
                         // TODO: in script mode, XHTML elements in template should only be kept during page generation
-                        (annotateSubtree(pseudoBoundElement, globalDocument, topLevelScopeForGlobals, topLevelScopeForGlobals, topLevelScopeForGlobals,
-                            hasFullUpdate = hasFullUpdate(globalDocument), ignoreRoot = true, needCompact = true), Seq())
+                        (annotateSubtree(
+                            pseudoBoundElement,
+                            globalDocument,
+                            topLevelScopeForGlobals,
+                            topLevelScopeForGlobals,
+                            XXBLScope.inner,
+                            topLevelScopeForGlobals,
+                            hasFullUpdate = hasFullUpdate(globalDocument),
+                            ignoreRoot = true,
+                            needCompact = true),
+                         Seq()
+                        )
                     }
 
                 allGlobals += abstractBinding.qNameMatch → Global(globalFullShadowTreeDocument, globalCompactShadowTreeDocument)
@@ -415,7 +426,7 @@ class XBLBindings(indentedLogger: IndentedLogger, partAnalysis: PartAnalysisImpl
         prefix: String,
         baseURI: String,
         ignoreRoot: Boolean)
-    extends XFormsExtractorContentHandler(xmlReceiver, metadata, null, baseURI, false, ignoreRoot) {
+    extends XFormsExtractorContentHandler(xmlReceiver, metadata, null, baseURI, startScope, false, ignoreRoot) {
 
         assert(innerScope ne null)
         assert(outerScope ne null)

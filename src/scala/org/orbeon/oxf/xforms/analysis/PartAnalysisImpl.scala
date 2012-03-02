@@ -110,7 +110,7 @@ class PartAnalysisImpl(
 
         // 2. Create new control if possible
         val elementAnalysis = {
-            val controlScope = getResolutionScopeByPrefixedId(controlPrefixedId)
+            val controlScope = scopeForPrefixedId(controlPrefixedId)
             val staticStateContext = StaticStateContext(partAnalysis, controlAnalysisMap.size + 1)
             ControlAnalysisFactory.create(staticStateContext, controlElement, Some(parent), preceding, controlScope)
         }

@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms.function.xxforms;
 
 import org.dom4j.Element;
-import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.analysis.controls.AttributeControl;
@@ -42,7 +41,7 @@ public class XXFormsLang extends XFormsFunction {
             element = getSourceElement(xpathContext);
         } else {
             // Do a bit more work to find current scope first
-            final Scope scope = container.getPartAnalysis().getResolutionScopeByPrefixedId(XFormsUtils.getPrefixedId(getSourceEffectiveId(xpathContext)));
+            final Scope scope = container.getPartAnalysis().scopeForPrefixedId(XFormsUtils.getPrefixedId(getSourceEffectiveId(xpathContext)));
             final String elementPrefixedId = scope.prefixedIdForStaticId(elementId);
 
             element = container.getPartAnalysis().getControlElement(elementPrefixedId);

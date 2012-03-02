@@ -63,8 +63,18 @@ abstract class ElementAnalysis(val element: Element, val parent: Option[ElementA
         }
     }
 
-    // Scope of the closest XBL container (related to the prefixed id)
-    // NOTE: Since prefixed id is part of ElementAnalysis, the container scope should be as well/instead.
+    // Definition of the various scopes:
+    //
+    // - Container scope: scope defined by the closest ancestor XBL binding. This scope is directly related to the
+    //   prefix of the prefixed id. E.g. <fr:foo id="my-foo"> defines a new scope `my-foo`. All children of `my-foo`,
+    //   including directly nested handlers, models, shadow trees, have the `my-foo` prefix.
+    //
+    // - Inner scope: this is the scope given this control if this control has `xxbl:scope='inner'`. It is usually the
+    //   same as the container scope, except for directly nested handlers.
+    //
+    // - Outer scope: this is the scope given this control if this control has `xxbl:scope='outer'`. It is usually the
+    //   actual scope of the closest ancestor XBL bound element, except for directly nested handlers.
+
     def containerScope: Scope
 
     // Ids

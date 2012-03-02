@@ -83,19 +83,21 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
     // NOTE: null if this instanceof XFormsContainingDocument BUT could use a root control instead!
     private final XFormsControl associatedControl;
 
+    private final Scope innerScope;
+
     /**
      * Create a new container child of the given control
      *
      * @param associatedControl  containing control
      * @return                   new XFormsContainer
      */
-    public XBLContainer createChildContainer(XFormsControl associatedControl) {
-        return new XBLContainer(associatedControl, this);
+    public XBLContainer createChildContainer(XFormsComponentControl associatedControl) {
+        return new XBLContainer(associatedControl, this, associatedControl.staticControl().binding().innerScope());
     }
 
     public XBLContainer createChildContainer(XFormsControl associatedControl, final PartAnalysis partAnalysis) {
 
-        return new XBLContainer(associatedControl, this) {
+        return new XBLContainer(associatedControl, this, partAnalysis.startScope()) {
             @Override
             public PartAnalysis getPartAnalysis() {
                 // Start with specific part
@@ -104,16 +106,17 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
         };
     }
 
-    protected XBLContainer(XFormsControl associatedControl, XBLContainer parentXBLContainer) {
+    protected XBLContainer(XFormsControl associatedControl, XBLContainer parentXBLContainer, Scope innerScope) {
         this(XFormsUtils.getStaticIdFromId(associatedControl.getEffectiveId()),
                 associatedControl.getEffectiveId(),
                 XFormsUtils.getPrefixedId(associatedControl.getEffectiveId()),
                 XFormsUtils.getPrefixedId(associatedControl.getEffectiveId()) + XFormsConstants.COMPONENT_SEPARATOR,
                 parentXBLContainer,
-                associatedControl);
+                associatedControl,
+                innerScope);
     }
 
-    protected XBLContainer(String staticId, String effectiveId, String prefixedId, String fullPrefix, XBLContainer parentXBLContainer, XFormsControl associatedControl) {
+    protected XBLContainer(String staticId, String effectiveId, String prefixedId, String fullPrefix, XBLContainer parentXBLContainer, XFormsControl associatedControl, Scope innerScope) {
 
         this.staticId = staticId;
         this.effectiveId = effectiveId;
@@ -139,11 +142,11 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
         this.contextStack = new XFormsContextStack(this);
 
         this.associatedControl = associatedControl;
+        this.innerScope = innerScope;
     }
 
     public Scope getResolutionScope() {
-        // NOTE: Could maybe use the associated ComponentControl.containerScope instead
-        return containingDocument.getStaticOps().getResolutionScopeByPrefix(fullPrefix);
+        return innerScope;
     }
 
     /**
@@ -249,7 +252,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
      */
     public XBLContainer findResolutionScope(String prefixedId) {
         final String xblScopeIdFullPrefix; {
-            final Scope xblScope = getPartAnalysis().getResolutionScopeByPrefixedId(prefixedId);
+            final Scope xblScope = getPartAnalysis().scopeForPrefixedId(prefixedId);
             if (xblScope == null)
                 throw new IllegalArgumentException("Prefixed id not found in current part: " + prefixedId);
             xblScopeIdFullPrefix = xblScope.fullPrefix();// e.g. "" or "my-tab$my-component" => "" or "my-tab$my-component$"
@@ -436,7 +439,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
         } else {
 
             final String sourcePrefixedId = XFormsUtils.getPrefixedId(sourceEffectiveId);
-            final Scope scope = getPartAnalysis().getResolutionScopeByPrefixedId(sourcePrefixedId);
+            final Scope scope = getPartAnalysis().scopeForPrefixedId(sourcePrefixedId);
             final String repeatPrefixedId = scope.prefixedIdForStaticId(repeatStaticId);
 
             if (containingDocument.getStaticOps().getControlPosition(repeatPrefixedId) >= 0) {

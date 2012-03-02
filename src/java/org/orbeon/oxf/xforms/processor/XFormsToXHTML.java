@@ -19,7 +19,6 @@ import java.util.Set;
 
 import javax.xml.transform.stream.StreamResult;
 
-import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
@@ -328,7 +327,7 @@ public class XFormsToXHTML extends ProcessorImpl {
             //
             this.template = AnnotatedTemplate.applyJava(new SAXStore());
             readInputAsSAX(pipelineContext, INPUT_ANNOTATED_DOCUMENT,
-                    new XFormsAnnotatorContentHandler(this.template.saxStore(), new XFormsExtractorContentHandler(extractorOutput, metadata, template, ".", true, false), metadata));
+                    new XFormsAnnotatorContentHandler(this.template.saxStore(), new XFormsExtractorContentHandler(extractorOutput, metadata, template, ".", XFormsConstants.XXBLScope.inner, true, false), metadata));
 
             this.staticStateDocument = documentResult.getDocument();
             this.staticStateDigest = computeDigest ? NumberUtils.toHexString(digestReceiver.getResult()) : null;

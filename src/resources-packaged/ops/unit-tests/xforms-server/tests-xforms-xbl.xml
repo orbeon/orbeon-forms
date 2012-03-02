@@ -4003,6 +4003,54 @@
         </output>
     </test>
 
+    <test description="Nested bindings and xxbl:mode='handlers'" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:dispatch ev:event="xforms-ready" name="my-event" targetid="my-gaga"/>
+                        <xf:dispatch ev:event="xforms-ready" name="my-event" targetid="my-toto"/>
+                    </xf:model>
+                    <xbl:xbl>
+                        <xbl:binding id="fr-gaga" element="fr|gaga" xxbl:mode="handlers">
+                            <xbl:template>
+                                <xbl:content/>
+                            </xbl:template>
+                        </xbl:binding>
+                        <xbl:binding id="fr-toto" element="fr|toto" xxbl:mode="handlers">
+                            <xbl:template>
+                                <xbl:content/>
+                            </xbl:template>
+                        </xbl:binding>
+                    </xbl:xbl>
+                </xh:head>
+                <xh:body>
+                    <fr:gaga id="my-gaga">
+                        <fr:toto id="my-toto">
+                            <!-- This handler must be visible from the outside and react to the dispatch to my-toto -->
+                            <xf:message id="toto-message" ev:event="my-event">Hello toto!</xf:message>
+                            <xf:output id="toto-output" value="'Toto'"/>
+                        </fr:toto>
+                    </fr:gaga>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state/>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="my-gaga$my-toto$toto-output">Toto</xxf:control>
+                    </xxf:control-values>
+                    <xxf:message level="modal">Hello toto!</xxf:message>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
     <test description="Simple xxbl:mode='binding'" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">

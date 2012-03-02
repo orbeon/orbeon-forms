@@ -48,8 +48,10 @@ trait PartGlobalOps {
     def getBindingId(prefixedId: String): String
     def getBindingQNames: Seq[QName]
     def getGlobals: collection.Map[QName, XBLBindings#Global]
-    def getResolutionScopeByPrefix(prefix: String): Scope
-    def getResolutionScopeByPrefixedId(prefixedId: String): Scope
+
+    // Return the scope associated with the given prefixed id (the scope is directly associated with the prefix of the id)
+    def containingScope(prefixedId: String): Scope
+    def scopeForPrefixedId(prefixedId: String): Scope
 
     // Repeats
     def addMissingRepeatIndexes(repeatIdToIndex: JMap[String, java.lang.Integer])

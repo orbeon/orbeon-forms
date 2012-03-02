@@ -16,9 +16,9 @@ package org.orbeon.oxf.xforms.analysis
 import scala.collection.JavaConverters._
 import collection.mutable.HashMap
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.xforms.XFormsConstants
 import org.dom4j.QName
 import org.orbeon.oxf.xforms.xbl.{Scope, XBLBindings}
+import org.orbeon.oxf.xforms.XFormsUtils
 
 trait PartXBLAnalysis extends TransientState {
 
@@ -64,14 +64,14 @@ trait PartXBLAnalysis extends TransientState {
         prefixedIdToXBLScopeMap += prefixedId → scope
     }
 
-    def getResolutionScopeByPrefix(prefix: String) = {
-        require(prefix.length == 0 || prefix.charAt(prefix.length - 1) == XFormsConstants.COMPONENT_SEPARATOR)
+    def containingScope(prefixedId: String) = {
+        val prefix = XFormsUtils.getEffectiveIdPrefix(prefixedId)
 
-        val scopeId = if (prefix.length == 0) "" else prefix.substring(0, prefix.length - 1)
+        val scopeId = if (prefix.length == 0) "" else prefix.init
         scopesById.get(scopeId).orNull
     }
 
-    def getResolutionScopeByPrefixedId(prefixedId: String) =
+    def scopeForPrefixedId(prefixedId: String) =
         prefixedIdToXBLScopeMap.get(prefixedId) orNull // NOTE: only one caller tests for null: XBLContainer.findResolutionScope
 
     def isComponent(binding: QName) = xblBindings.isComponent(binding)
@@ -84,7 +84,7 @@ trait PartXBLAnalysis extends TransientState {
 
     // Search scope in ancestor or self parts
     def searchResolutionScopeByPrefixedId(prefixedId: String) =
-        ancestorOrSelf map (_.getResolutionScopeByPrefixedId(prefixedId)) filter (_ ne null) head
+        ancestorOrSelf map (_.scopeForPrefixedId(prefixedId)) filter (_ ne null) head
 
     def getGlobals = xblBindings.allGlobals
 

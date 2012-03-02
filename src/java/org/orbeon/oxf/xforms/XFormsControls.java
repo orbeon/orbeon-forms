@@ -262,7 +262,7 @@ public class XFormsControls implements XFormsObjectResolver {
      */
     public Object resolveObjectById(String sourceControlEffectiveId, String targetStaticId, Item contextItem) {
         final String sourcePrefixedId = XFormsUtils.getPrefixedId(sourceControlEffectiveId);
-        final Scope scope = containingDocument.getStaticOps().getResolutionScopeByPrefixedId(sourcePrefixedId);
+        final Scope scope = containingDocument.getStaticOps().scopeForPrefixedId(sourcePrefixedId);
         final String targetPrefixedId = scope.prefixedIdForStaticId(targetStaticId);
         
         final String effectiveControlId = Controls.findEffectiveControlId(containingDocument.getStaticOps(), this, sourceControlEffectiveId, targetPrefixedId);

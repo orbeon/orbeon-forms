@@ -127,7 +127,15 @@ public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
     private int preserveOrLHHALevel;
     private boolean isHTMLDocument; // Whether this is an (X)HTML document
 
-    public XFormsExtractorContentHandler(XMLReceiver xmlReceiver, Metadata metadata, AnnotatedTemplate templateUnderConstruction, String baseURI, boolean isTopLevel, boolean ignoreRootElement) {
+    public XFormsExtractorContentHandler(
+            XMLReceiver xmlReceiver,
+            Metadata metadata,
+            AnnotatedTemplate templateUnderConstruction,
+            String baseURI,
+            XFormsConstants.XXBLScope startScope,
+            boolean isTopLevel,
+            boolean ignoreRootElement) {
+
         super(xmlReceiver);
 
         this.isTopLevel = isTopLevel;
@@ -138,7 +146,7 @@ public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
         // Create xml:base stack
         try {
             assert baseURI != null;
-            elementStack.push(new XMLElementDetails(null, new URI(null, null, baseURI, null), null, null, XFormsConstants.XXBLScope.inner));
+            elementStack.push(new XMLElementDetails(null, new URI(null, null, baseURI, null), null, null, startScope));
         } catch (URISyntaxException e) {
             throw new ValidationException(e, new LocationData(locator));
         }

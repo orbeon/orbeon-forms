@@ -59,11 +59,13 @@ $ ->
             # Move cell editor controls under this td
             gridTd = YD.get gridTdId
             if gridTd?
-                if $(gridTd).children('.fb-hover').length == 0                          # Create a div.fb-hover inside the td, if there isn't one already
+                hoverDiv = $(gridTd).children('.fb-hover')
+                # Create a div.fb-hover inside the td, if there isn't one already
+                if hoverDiv.length == 0
                     hoverDiv = $('<div>').addClass('fb-hover')
-                    hoverDiv.append(triggerGroups)
                     hoverDiv.append($(gridTd).children())
                     $(gridTd).append(hoverDiv)
+                hoverDiv.append(triggerGroups)
                 $(triggerGroups).css('display', '')
                 # Show/hide triggers depending on relevance rules
                 for trigger in triggers

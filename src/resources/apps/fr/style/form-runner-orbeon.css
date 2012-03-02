@@ -165,9 +165,9 @@ h1 .xforms-trigger-appearance-xxforms-minimal, h2 .xforms-trigger-appearance-xxf
     padding: 0
 }
 
-/* Add a star before the label of required fields */
-/* NOTE: This only works in span layout, and at this point we are still using nospan in FR */
-.xforms-required label {
+/* Add a star before the label of required fields, but only in new/edit modes */
+/* NOTE: This only works in span layout (the default in FR since 2011-07-28) */
+.fr-mode-new .xforms-required label, .fr-mode-edit .xforms-required label {
     background-image: url(asterisk.png);
     background-position: 0 2px;             /* Lower the star, so it doesn't "too high" relative to the text of the label */
     background-repeat: no-repeat;

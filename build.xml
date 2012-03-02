@@ -303,7 +303,8 @@
 
         <scalac destdir="${build.classes.dir}"
                 classpathref="class.path"
-                fork="true" encoding="utf-8" jvmargs="-Xmx400m">
+                fork="true" encoding="utf-8" jvmargs="-Xmx400m"
+                addparams="-Xfatal-warnings">
             <src path="${build.dir}/src"/>
             <src path="${java-src.dir}"/>
             <src path="${scala-src.dir}"/>
@@ -327,7 +328,8 @@
 
         <scalac destdir="${build.test-classes.dir}"
                 classpathref="test.class.path"
-                fork="true" encoding="utf-8" jvmargs="-Xmx300m">
+                fork="true" encoding="utf-8" jvmargs="-Xmx300m"
+                addparams="-Xfatal-warnings">
             <src path="${test-src.dir}"/>
         </scalac>
 

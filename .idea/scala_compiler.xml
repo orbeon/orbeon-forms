@@ -3,6 +3,7 @@
   <component name="ScalacSettings">
     <option name="COMPILER_LIBRARY_NAME" value="Scala 2.9.1" />
     <option name="COMPILER_LIBRARY_LEVEL" value="Project" />
+    <option name="FSC_OPTIONS" value="-Xfatal-warnings" />
   </component>
 </project>
 

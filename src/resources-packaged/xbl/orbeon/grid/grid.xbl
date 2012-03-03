@@ -60,8 +60,8 @@
                         <!-- Show LHH in header only if repeating over a row group containing only one row -->
                         <xsl:variable name="lhh-in-header" select="$is-repeat and $static-row-count = 1"/>
 
-                        <xsl:variable name="min-occurs" select="if (@minOccurs) then @minOccurs else 0"/>
-                        <xsl:variable name="max-occurs" select="if (@maxOccurs) then @maxOccurs else 'unbounded'"/>
+                        <xsl:variable name="min-occurs" select="(@min, @minOccurs, 0)[1]"/>
+                        <xsl:variable name="max-occurs" select="(@max, @maxOccurs, 'unbounded')[1]"/>
                         <xsl:variable name="readonly" select="@readonly = 'true'"/>
                         <xsl:variable name="remove-constraint" select="@remove-constraint"/>
                         <xsl:variable name="repeat-id" as="xs:string" select="concat(@id, '-repeat')"/>

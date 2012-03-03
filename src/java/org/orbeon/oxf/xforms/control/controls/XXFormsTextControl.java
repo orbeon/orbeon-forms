@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.control.controls;
 
 import org.dom4j.Element;
 import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.control.AjaxSupport;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
@@ -64,7 +65,7 @@ public class XXFormsTextControl extends XFormsOutputControl {
         {
             // HTML element id
             final String effectiveFor2 = textControl2.getEffectiveForAttribute();
-            doOutputElement |= addOrAppendToAttributeIfNeeded(attributesImpl, "for", effectiveFor2, isNewlyVisibleSubtree, false);
+            doOutputElement |= AjaxSupport.addOrAppendToAttributeIfNeeded(attributesImpl, "for", effectiveFor2, isNewlyVisibleSubtree, false);
         }
 
         // Output element

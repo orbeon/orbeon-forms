@@ -21,7 +21,6 @@ import org.orbeon.oxf.xforms._
 import analysis.controls.{RepeatIterationControl, RepeatControl}
 import analysis.ElementAnalysis
 import control._
-import control.XFormsControl.XFormsControlLocal
 import org.orbeon.oxf.xforms.action.actions.XFormsDeleteAction
 import org.orbeon.oxf.xforms.action.actions.XFormsInsertAction
 import org.orbeon.oxf.xforms.event.XFormsEvent
@@ -605,7 +604,7 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
 
 object XFormsRepeatControl {
 
-    class XFormsRepeatControlLocal extends XFormsControlLocal {
+    class XFormsRepeatControlLocal extends ControlLocalSupport.XFormsControlLocal {
         var index = -1
     }
 

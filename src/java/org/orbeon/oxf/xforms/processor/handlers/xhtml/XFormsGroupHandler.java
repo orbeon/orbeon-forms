@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.processor.handlers.xhtml;
 
 import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xforms.control.LHHASupport;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 
 /**
@@ -27,7 +27,7 @@ public abstract class XFormsGroupHandler extends XFormsControlLifecyleHandler {
     }
 
     protected String getLabelClasses(XFormsSingleNodeControl xformsControl) {
-        final boolean hasLabel = XFormsControl.hasLabel(containingDocument, getPrefixedId());
+        final boolean hasLabel = LHHASupport.hasLabel(containingDocument, getPrefixedId());
         if (hasLabel) {
             final StringBuilder labelClasses = new StringBuilder("xforms-label");
 

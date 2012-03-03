@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.processor.handlers.xhtml;
 
 import org.apache.commons.lang.StringUtils;
+import org.orbeon.oxf.xforms.control.LHHASupport;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsGroupControl;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
@@ -53,7 +54,7 @@ public class XFormsGroupFieldsetHandler extends XFormsGroupHandler {
 
         // Output an xhtml:legend element if and only if there is an xforms:label element. This help with
         // styling in particular.
-        final boolean hasLabel = XFormsControl.hasLabel(containingDocument, getPrefixedId());
+        final boolean hasLabel = LHHASupport.hasLabel(containingDocument, getPrefixedId());
         if (hasLabel) {
 
             // Handle label classes

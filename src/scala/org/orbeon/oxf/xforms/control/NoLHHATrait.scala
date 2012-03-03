@@ -16,9 +16,12 @@ package org.orbeon.oxf.xforms.control
 import org.orbeon.oxf.xforms.XFormsConstants.LHHA
 
 // Mix in this trait to prevent the control from trying to handle LHHA
-trait NoLHHATrait extends XFormsControl {
+trait NoLHHATrait extends ControlLHHASupport {
+
+    self: XFormsControl ⇒
+
     override def markLHHADirty() = ()
     override def updateLHHACopy(copy: XFormsControl) = ()
-    override def getLHHA(lhhaType: LHHA) = XFormsControl.NULL_LHHA
+    override def getLHHA(lhhaType: LHHA) = LHHASupport.NULL_LHHA
     override def compareLHHA(other: XFormsControl) = true
 }

@@ -462,7 +462,7 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
                 final String attributeValue = typeValue2 != null ? typeValue2 : "";
                 // NOTE: No type is considered equivalent to xs:string or xforms:string
                 // TODO: should have more generic code in XForms engine to equate "no type" and "xs:string"
-                added |= addOrAppendToAttributeIfNeeded(attributesImpl, "type", attributeValue, isNewlyVisibleSubtree,
+                added |= AjaxSupport.addOrAppendToAttributeIfNeeded(attributesImpl, "type", attributeValue, isNewlyVisibleSubtree,
                         attributeValue.equals("") || XMLConstants.XS_STRING_EXPLODED_QNAME.equals(attributeValue) || XFormsConstants.XFORMS_STRING_EXPLODED_QNAME.equals(attributeValue));
             }
         }
@@ -557,7 +557,7 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
             }
             // This attribute is a space-separate list of class names prefixed with either '-' or '+'
             if (attributeValue != null)
-                added |= addOrAppendToAttributeIfNeeded(attributesImpl, "class", attributeValue, newlyVisibleSubtree, attributeValue.equals(""));
+                added |= AjaxSupport.addOrAppendToAttributeIfNeeded(attributesImpl, "class", attributeValue, newlyVisibleSubtree, attributeValue.equals(""));
         }
         return added;
     }

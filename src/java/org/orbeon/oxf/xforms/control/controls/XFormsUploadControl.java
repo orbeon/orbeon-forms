@@ -24,6 +24,7 @@ import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsContextStack;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.analysis.XPathDependencies;
+import org.orbeon.oxf.xforms.control.AjaxSupport;
 import org.orbeon.oxf.xforms.control.ExternalCopyable;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
@@ -394,7 +395,7 @@ public class XFormsUploadControl extends XFormsValueControl {
 
             if (!XFormsUtils.compareStrings(stateValue1, stateValue2)) {
                 final String attributeValue = stateValue2 != null ? stateValue2 : "";
-                added |= addAttributeIfNeeded(attributesImpl, "state", attributeValue, isNewRepeatIteration, attributeValue.equals(""));
+                added |= AjaxSupport.addAttributeIfNeeded(attributesImpl, "state", attributeValue, isNewRepeatIteration, attributeValue.equals(""));
             }
         }
         {
@@ -404,7 +405,7 @@ public class XFormsUploadControl extends XFormsValueControl {
 
             if (!XFormsUtils.compareStrings(mediatypeValue1, mediatypeValue2)) {
                 final String attributeValue = mediatypeValue2 != null ? mediatypeValue2 : "";
-                added |= addAttributeIfNeeded(attributesImpl, "mediatype", attributeValue, isNewRepeatIteration, attributeValue.equals(""));
+                added |= AjaxSupport.addAttributeIfNeeded(attributesImpl, "mediatype", attributeValue, isNewRepeatIteration, attributeValue.equals(""));
             }
         }
         {
@@ -414,7 +415,7 @@ public class XFormsUploadControl extends XFormsValueControl {
 
             if (!XFormsUtils.compareStrings(filenameValue1, filenameValue2)) {
                 final String attributeValue = filenameValue2 != null ? filenameValue2 : "";
-                added |= addAttributeIfNeeded(attributesImpl, "filename", attributeValue, isNewRepeatIteration, attributeValue.equals(""));
+                added |= AjaxSupport.addAttributeIfNeeded(attributesImpl, "filename", attributeValue, isNewRepeatIteration, attributeValue.equals(""));
             }
         }
         {
@@ -424,7 +425,7 @@ public class XFormsUploadControl extends XFormsValueControl {
 
             if (!XFormsUtils.compareStrings(sizeValue1, sizeValue2)) {
                 final String attributeValue = sizeValue2 != null ? sizeValue2 : "";
-                added |= addAttributeIfNeeded(attributesImpl, "size", attributeValue, isNewRepeatIteration, attributeValue.equals(""));
+                added |= AjaxSupport.addAttributeIfNeeded(attributesImpl, "size", attributeValue, isNewRepeatIteration, attributeValue.equals(""));
             }
         }
         {
@@ -434,7 +435,7 @@ public class XFormsUploadControl extends XFormsValueControl {
 
             if (!XFormsUtils.compareStrings(value1, value2)) {
                 final String attributeValue = value2 != null ? value2 : "";
-                added |= addAttributeIfNeeded(attributesImpl, "progress-state", attributeValue, isNewRepeatIteration, attributeValue.equals(""));
+                added |= AjaxSupport.addAttributeIfNeeded(attributesImpl, "progress-state", attributeValue, isNewRepeatIteration, attributeValue.equals(""));
             }
         }
         {
@@ -444,7 +445,7 @@ public class XFormsUploadControl extends XFormsValueControl {
 
             if (!XFormsUtils.compareStrings(progressReceivedValue1, progressReceivedValue2)) {
                 final String attributeValue = progressReceivedValue2 != null ? progressReceivedValue2 : "";
-                added |= addAttributeIfNeeded(attributesImpl, "progress-received", attributeValue, isNewRepeatIteration, attributeValue.equals(""));
+                added |= AjaxSupport.addAttributeIfNeeded(attributesImpl, "progress-received", attributeValue, isNewRepeatIteration, attributeValue.equals(""));
             }
         }
         {
@@ -454,7 +455,7 @@ public class XFormsUploadControl extends XFormsValueControl {
 
             if (!XFormsUtils.compareStrings(progressExpectedValue1, progressExpectedValue2)) {
                 final String attributeValue = progressExpectedValue2 != null ? progressExpectedValue2 : "";
-                added |= addAttributeIfNeeded(attributesImpl, "progress-expected", attributeValue, isNewRepeatIteration, attributeValue.equals(""));
+                added |= AjaxSupport.addAttributeIfNeeded(attributesImpl, "progress-expected", attributeValue, isNewRepeatIteration, attributeValue.equals(""));
             }
         }
 

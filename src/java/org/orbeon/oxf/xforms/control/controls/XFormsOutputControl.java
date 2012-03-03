@@ -25,6 +25,7 @@ import org.orbeon.oxf.xforms.XFormsError;
 import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.analysis.XPathDependencies;
+import org.orbeon.oxf.xforms.control.AjaxSupport;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
@@ -315,7 +316,7 @@ public class XFormsOutputControl extends XFormsValueControl {
         boolean added = false;
         if (!((mediatypeValue1 == null && mediatypeValue2 == null) || (mediatypeValue1 != null && mediatypeValue2 != null && mediatypeValue1.equals(mediatypeValue2)))) {
             final String attributeValue = mediatypeValue2 != null ? mediatypeValue2 : "";
-            added |= addAttributeIfNeeded(attributesImpl, "mediatype", attributeValue, isNewRepeatIteration, attributeValue.equals(""));
+            added |= AjaxSupport.addAttributeIfNeeded(attributesImpl, "mediatype", attributeValue, isNewRepeatIteration, attributeValue.equals(""));
         }
 
         return added;

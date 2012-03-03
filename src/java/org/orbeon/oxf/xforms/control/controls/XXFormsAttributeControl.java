@@ -19,6 +19,7 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.analysis.controls.AttributeControl;
+import org.orbeon.oxf.xforms.control.AjaxSupport;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
@@ -171,13 +172,13 @@ public class XXFormsAttributeControl extends XFormsValueControl {
         {
             // HTML element id
             final String effectiveFor2 = attributeControl2.getEffectiveForAttribute();
-            doOutputElement |= addOrAppendToAttributeIfNeeded(attributesImpl, "for", XFormsUtils.namespaceId(containingDocument(), effectiveFor2), isNewlyVisibleSubtree, false);
+            doOutputElement |= AjaxSupport.addOrAppendToAttributeIfNeeded(attributesImpl, "for", XFormsUtils.namespaceId(containingDocument(), effectiveFor2), isNewlyVisibleSubtree, false);
         }
 
         {
             // Attribute name
             final String name2 = attributeControl2.getAttributeName();
-            doOutputElement |= addOrAppendToAttributeIfNeeded(attributesImpl, "name", name2, isNewlyVisibleSubtree, false);
+            doOutputElement |= AjaxSupport.addOrAppendToAttributeIfNeeded(attributesImpl, "name", name2, isNewlyVisibleSubtree, false);
         }
 
         // Output element

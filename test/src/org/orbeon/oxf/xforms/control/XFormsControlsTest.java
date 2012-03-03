@@ -110,7 +110,7 @@ public class XFormsControlsTest extends ResourceManagerTestBase {
             }
         };
 
-        XFormsSingleNodeControl.addAjaxClass(attributes, false, control1, control2);
+        AjaxSupport.addAjaxClass(attributes, false, control1, control2);
         assertEquals("-foo -gaga +toto", attributes.getValue("class"));
     }
 
@@ -125,7 +125,7 @@ public class XFormsControlsTest extends ResourceManagerTestBase {
             }
         };
 
-        XFormsSingleNodeControl.addAjaxClass(attributes, false, null, control2);
+        AjaxSupport.addAjaxClass(attributes, false, null, control2);
         assertEquals("foo bar", attributes.getValue("class"));
     }
 

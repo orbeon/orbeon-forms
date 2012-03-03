@@ -17,6 +17,7 @@ import org.apache.commons.lang.StringUtils;
 import org.orbeon.oxf.xforms.StaticStateGlobalOps;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis;
+import org.orbeon.oxf.xforms.control.LHHASupport;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.processor.handlers.XFormsControlLifecycleHandlerDelegate;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
@@ -113,8 +114,8 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandlerXHTM
             // sections can link back to the control.
             if (handlerContext.isNoScript()) {
                 if (getControl() != null
-                        && (XFormsControl.hasHelp(containingDocument, getPrefixedId())
-                            || XFormsControl.hasAlert(containingDocument, getPrefixedId()))) {
+                        && (LHHASupport.hasHelp(containingDocument, getPrefixedId())
+                            || LHHASupport.hasAlert(containingDocument, getPrefixedId()))) {
                     final String aQName = XMLUtils.buildQName(xhtmlPrefix, "a");
                     reusableAttributes.clear();
                     reusableAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, getControl().getEffectiveId());

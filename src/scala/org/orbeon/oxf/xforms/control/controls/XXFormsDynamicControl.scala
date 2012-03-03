@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms.control.controls
 
-import org.orbeon.oxf.xforms.BindingContext
 import org.w3c.dom.Node.{ELEMENT_NODE, ATTRIBUTE_NODE}
 import org.orbeon.oxf.xforms.xbl.{Scope, XBLContainer}
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils

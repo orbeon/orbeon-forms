@@ -14,8 +14,8 @@
 package org.orbeon.oxf.xforms.processor.handlers.xhtml;
 
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.analysis.controls.TriggerAppearanceTrait;
+import org.orbeon.oxf.xforms.control.LHHASupport;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
@@ -33,7 +33,7 @@ public abstract class XFormsTriggerHandler extends XFormsControlLifecyleHandler 
     }
 
     protected String getTriggerLabel(XFormsSingleNodeControl xformsControl) {
-        final boolean hasLabel = XFormsControl.hasLabel(containingDocument, getPrefixedId());
+        final boolean hasLabel = LHHASupport.hasLabel(containingDocument, getPrefixedId());
         if (xformsControl != null && !hasLabel)// CHECK: really need to check on xformsControl != null?
             throw new ValidationException("Missing label on xforms:trigger element.", xformsControl.getLocationData());
 

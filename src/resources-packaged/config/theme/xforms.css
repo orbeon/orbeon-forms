@@ -394,9 +394,6 @@ a.xforms-readonly, .xforms-trigger-readonly a { color: gray; cursor: default }
     padding: 3px 9px 3px 9px;
     text-shadow: 0 1px #F0F0F0;
     color: #333!important;
-    -moz-box-shadow: 0 1px 0 #f8f8f8;
-    -wekbit-box-shadow: 0 1px 0 #f8f8f8;
-    box-shadow: 0 1px 0 #f8f8f8;
 }
 
 .xforms-trigger button:hover,

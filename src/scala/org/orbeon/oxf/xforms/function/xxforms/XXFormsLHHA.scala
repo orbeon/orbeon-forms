@@ -22,21 +22,21 @@ class XXFormsLHHA extends XFormsFunction {
 
     override def evaluateItem(xpathContext: XPathContext) = {
 
-        def evaluateControlItem(f: XFormsControl => String) = {
+        def evaluateControlItem(f: XFormsControl ⇒ String) = {
             val controlStaticId = argument(0).evaluateAsString(xpathContext).toString
             getXBLContainer(xpathContext).resolveObjectByIdInScope(getSourceEffectiveId(xpathContext), controlStaticId, null) match {
-                case control: XFormsControl if control.isRelevant =>
+                case control: XFormsControl if control.isRelevant ⇒
                     StringValue.makeStringValue(f(control))
-                case _ => null
+                case _ ⇒ null
             }
         }
 
         evaluateControlItem(operation match {
-            case 0 => _.getLabel
-            case 1 => _.getHelp
-            case 2 => _.getHint
-            case 3 => _.getAlert
-            case _ => throw new UnsupportedOperationException
+            case 0 ⇒ _.getLabel
+            case 1 ⇒ _.getHelp
+            case 2 ⇒ _.getHint
+            case 3 ⇒ _.getAlert
+            case _ ⇒ throw new UnsupportedOperationException
         })
     }
 }

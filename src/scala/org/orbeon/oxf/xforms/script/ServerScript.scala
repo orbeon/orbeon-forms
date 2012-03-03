@@ -21,8 +21,8 @@ class ServerScript(prefixedId: String, isClient: Boolean, scriptType: String, bo
     extends Script(prefixedId, isClient, scriptType, body) {
 
     private def getJavaScriptSource = scriptType match {
-        case "text/coffeescript" => CoffeeScriptCompiler.compile(body, prefixedId, 1)// TODO: location information if available
-        case _ => body
+        case "text/coffeescript" ⇒ CoffeeScriptCompiler.compile(body, prefixedId, 1)// TODO: location information if available
+        case _ ⇒ body
     }
 
     lazy val compiledScript = synchronized { // synchronized might or might not be needed

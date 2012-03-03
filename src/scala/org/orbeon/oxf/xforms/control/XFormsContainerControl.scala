@@ -94,7 +94,7 @@ trait XFormsContainerControl extends XFormsControl {
         false
     }
 
-    override def toXML(helper: ContentHandlerHelper, attributes: List[String])(content: => Unit) {
+    override def toXML(helper: ContentHandlerHelper, attributes: List[String])(content: ⇒ Unit) {
         super.toXML(helper, attributes) {
             children foreach (_.toXML(helper, List.empty)())
         }

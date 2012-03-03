@@ -23,7 +23,7 @@ import scala.collection.JavaConversions._
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.xml._
 import org.orbeon.oxf.util.IndentedLogger
-import java.util.{ArrayList, List => JList, Set => JSet}
+import java.util.{ArrayList, List ⇒ JList, Set ⇒ JSet}
 import dom4j.{LocationSAXContentHandler, Dom4jUtils}
 import org.orbeon.oxf.pipeline.api._
 import org.orbeon.oxf.util.Multipart
@@ -77,9 +77,9 @@ object ClientEvents {
         val allClientAndServerEvents: Seq[LocalEvent] =
             globalServerEvents ++
                 (clientEventsAfterNoscript flatMap {
-                    case element if element.attributeValue("name") == XFormsEvents.XXFORMS_SERVER_EVENTS =>
+                    case element if element.attributeValue("name") == XFormsEvents.XXFORMS_SERVER_EVENTS ⇒
                         decodeServerEvents(element) map (LocalEvent(_, true))
-                    case element => List(LocalEvent(element, false))
+                    case element ⇒ List(LocalEvent(element, false))
                 })
 
         var hasAllEvents = false
@@ -90,21 +90,21 @@ object ClientEvents {
             // that we *must* first create all events, then dispatch them, so that references to XFormsTarget are obtained
             // beforehand.
             val filteredEvents: Seq[XFormsEvent] = (allClientAndServerEvents ++ DUMMY_EVENT).sliding(2).toList flatMap {
-                case Seq(a, _) if a.name == XFormsEvents.XXFORMS_ALL_EVENTS_REQUIRED =>
+                case Seq(a, _) if a.name == XFormsEvents.XXFORMS_ALL_EVENTS_REQUIRED ⇒
                     // Just remember we got the "all events" event
                     hasAllEvents = true
                     None
-                case Seq(a, _) if (a.name eq null) && (a.targetEffectiveId eq null) =>
+                case Seq(a, _) if (a.name eq null) && (a.targetEffectiveId eq null) ⇒
                     throw new OXFException("<event> element must either have source-control-id and name attributes, or no attribute.")
-                case Seq(a, _) if a.name != XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE =>
+                case Seq(a, _) if a.name != XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE ⇒
                     // Non-value change event
                     safelyCreateEvent(document, a)
-                case Seq(a, b) if new EventGroupingKey(a) != new EventGroupingKey(b) =>
+                case Seq(a, b) if new EventGroupingKey(a) != new EventGroupingKey(b) ⇒
                     // Only process last value change event received
                     assert(a.name == XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE)
                     valueChangeControlIds += a.targetEffectiveId
                     safelyCreateEvent(document, a)
-                case Seq(a, b) =>
+                case Seq(a, b) ⇒
                     // Nothing to do here: we are compressing value change events
                     assert(a.name == XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE)
                     assert(new EventGroupingKey(a) == new EventGroupingKey(b))
@@ -112,7 +112,7 @@ object ClientEvents {
             }
 
             // Process all filtered events
-            for (event <- filteredEvents)
+            for (event ← filteredEvents)
                 processEvent(document, event)
         }
 
@@ -132,16 +132,16 @@ object ClientEvents {
         // Group events in 3 categories
         def getEventCategory(element: Element) = element match {
             // Special event for noscript mode
-            case element if element.attributeValue("name") == XFormsEvents.XXFORMS_VALUE_OR_ACTIVATE =>
+            case element if element.attributeValue("name") == XFormsEvents.XXFORMS_VALUE_OR_ACTIVATE ⇒
                 val sourceControlId = element.attributeValue("source-control-id")
                 element match {
                     // This is a value event
-                    case element if document.getStaticOps.isValueControl(sourceControlId) => Category.ValueChange
+                    case element if document.getStaticOps.isValueControl(sourceControlId) ⇒ Category.ValueChange
                     // This is most likely a trigger or submit which will translate into a DOMActivate. We will move it
                     // to the end so that value change events are committed to instance data before that.
-                    case _ => Category.Activation
+                    case _ ⇒ Category.Activation
                 }
-            case _ => Category.Other
+            case _ ⇒ Category.Other
         }
 
         // NOTE: map keys are not in predictable order, but map values preserve the order
@@ -167,12 +167,12 @@ object ClientEvents {
             // control, create a new event that will blank its value.
             selectFullControls.keySet -- getValueChangeIds map
                 (selectFullControls.get(_).asInstanceOf[XFormsSelectControl]) filter
-                    (control => control.isRelevant && !control.isReadonly) map
+                    (control ⇒ control.isRelevant && !control.isReadonly) map
                         (createBlankingEvent(_)) toSeq
         }
 
         // Return all events by category in the order we defined the categories
-        Category.values.toSeq flatMap ((groups + (Category.SelectBlank -> blankEvents)).get(_)) flatten
+        Category.values.toSeq flatMap ((groups + (Category.SelectBlank → blankEvents)).get(_)) flatten
     }
 
     private def safelyCreateEvent(document: XFormsContainingDocument, event: LocalEvent): Option[XFormsEvent] = {
@@ -181,8 +181,8 @@ object ClientEvents {
 
         // Get event target
         val eventTarget = document.getObjectByEffectiveId(XFormsUtils.deNamespaceId(document, event.targetEffectiveId)) match {
-            case eventTarget: XFormsEventTarget => eventTarget
-            case _ =>
+            case eventTarget: XFormsEventTarget ⇒ eventTarget
+            case _ ⇒
                 if (indentedLogger.isDebugEnabled)
                     indentedLogger.logDebug(EVENT_LOG_TYPE, "ignoring client event with invalid target id", "target id", event.targetEffectiveId, "event name", event.name)
                 return None
@@ -192,7 +192,7 @@ object ClientEvents {
             // Rewrite event type. This is special handling of xxforms-value-or-activate for noscript mode.
             // NOTE: We do this here, because we need to know the actual type of the target. Could do this statically if
             // the static state kept type information for each control.
-            case XFormsEvents.XXFORMS_VALUE_OR_ACTIVATE =>
+            case XFormsEvents.XXFORMS_VALUE_OR_ACTIVATE ⇒
                 eventTarget match {
                     // Handler produces:
                     //   <button type="submit" name="foobar" value="activate">...
@@ -203,13 +203,13 @@ object ClientEvents {
                     // we must test for any empty content here instead of "!activate".equals(valueString). (Note that
                     // this means that empty labels won't work.) Further, with IE 6, all buttons are present when
                     // using <button>, so we use <input> instead, either with type="submit" or type="image". Bleh.
-                    case triggerControl: XFormsTriggerControl if event.value.isEmpty => return None
+                    case triggerControl: XFormsTriggerControl if event.value.isEmpty ⇒ return None
                     // Triggers get a DOM activation
-                    case triggerControl: XFormsTriggerControl => XFormsEvents.DOM_ACTIVATE
+                    case triggerControl: XFormsTriggerControl ⇒ XFormsEvents.DOM_ACTIVATE
                     // Other controls get a value change
-                    case _ => XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE
+                    case _ ⇒ XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE
                 }
-             case eventName => eventName
+             case eventName ⇒ eventName
         }
 
         // Check whether the external event is allowed on the given target.
@@ -236,23 +236,23 @@ object ClientEvents {
 
         // Get other event target
         val otherEventTarget = event.otherTargetEffectiveId match {
-            case otherTargetEffectiveId: String =>
+            case otherTargetEffectiveId: String ⇒
                 document.getObjectByEffectiveId(XFormsUtils.deNamespaceId(document, otherTargetEffectiveId)) match {
-                    case eventTarget: XFormsEventTarget => eventTarget
-                    case _ =>
+                    case eventTarget: XFormsEventTarget ⇒ eventTarget
+                    case _ ⇒
                         if (indentedLogger.isDebugEnabled)
                             indentedLogger.logDebug(EVENT_LOG_TYPE, "ignoring client event with invalid second target id", "target id", event.otherTargetEffectiveId, "event name", event.name)
                         return None
                 }
-            case _ => null
+            case _ ⇒ null
         }
 
         def gatherParameters(event: LocalEvent) =
             Map((for {
-                    attributeName <- EVENT_PARAMETERS
+                    attributeName ← EVENT_PARAMETERS
                     attributeValue = event.element.attributeValue(attributeName)
                     if attributeValue ne null
-                } yield (attributeName -> attributeValue)): _*)
+                } yield (attributeName → attributeValue)): _*)
 
         // Create event
         Some(XFormsEventFactory.createEvent(document, newEventName, eventTarget, otherEventTarget, true,
@@ -268,7 +268,7 @@ object ClientEvents {
         val eventElement = clientEvents(0)
 
         // Helper to make it easier to output simple Ajax responses
-        def eventResponse(messageType: String, message: String)(block: ContentHandlerHelper => Unit): Boolean = {
+        def eventResponse(messageType: String, message: String)(block: ContentHandlerHelper ⇒ Unit): Boolean = {
             indentedLogger.startHandleOperation(messageType, message)
 
             // Hook-up debug content handler if we must log the response document
@@ -301,7 +301,7 @@ object ClientEvents {
 
         eventElement.attributeValue("name") match {
             // Quick response for heartbeat
-            case XFormsEvents.XXFORMS_SESSION_HEARTBEAT =>
+            case XFormsEvents.XXFORMS_SESSION_HEARTBEAT ⇒
 
                 if (indentedLogger.isDebugEnabled) {
                     if (session != null)
@@ -311,16 +311,16 @@ object ClientEvents {
                 }
 
                 // Output empty Ajax response
-                eventResponse("ajax response", "handling quick heartbeat Ajax response")(helper => ())
+                eventResponse("ajax response", "handling quick heartbeat Ajax response")(helper ⇒ ())
 
             // Quick response for upload progress
-            case XFormsEvents.XXFORMS_UPLOAD_PROGRESS =>
+            case XFormsEvents.XXFORMS_UPLOAD_PROGRESS ⇒
 
                 // Output simple resulting document
-                eventResponse("ajax response", "handling quick upload progress Ajax response") { helper =>
+                eventResponse("ajax response", "handling quick upload progress Ajax response") { helper ⇒
                     val sourceControlId = eventElement.attributeValue("source-control-id")
                     Multipart.getUploadProgress(request, XFormsStateManager.getRequestUUID(requestDocument), sourceControlId) match {
-                        case Some(progress) =>
+                        case Some(progress) ⇒
 
                             helper.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "action")
                             helper.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control-values")
@@ -328,14 +328,14 @@ object ClientEvents {
                                 Array[String]("id", sourceControlId,
                                     "progress-state", progress.state.toString.toLowerCase,
                                     "progress-received", progress.receivedSize.toString,
-                                    "progress-expected", progress.expectedSize match {case Some(long) => long.toString; case _ => null}))
+                                    "progress-expected", progress.expectedSize match {case Some(long) ⇒ long.toString; case _ ⇒ null}))
                             helper.endElement()
                             helper.endElement()
 
-                        case _ =>
+                        case _ ⇒
                     }
                 }
-            case _ => false
+            case _ ⇒ false
         }
     }
 
@@ -391,22 +391,22 @@ object ClientEvents {
 
             } else eventTarget match {
                 // Controls accept event only if they are relevant
-                case control: XFormsControl if !control.isRelevant =>
+                case control: XFormsControl if !control.isRelevant ⇒
                     warn("non-relevant control")
 
                 // Output control not subject to readonly condition below
-                case control: XFormsOutputControl =>
+                case control: XFormsOutputControl ⇒
                     true
 
                 // Single node controls accept event only if they are not readonly
-                case control: XFormsSingleNodeControl if control.isReadonly =>
+                case control: XFormsSingleNodeControl if control.isReadonly ⇒
                     warn("read-only control")
 
                 // Single node controls accept value change event only if actually bound
-                case control: XFormsSingleNodeControl if (control.getBoundItem eq null) && isValueChange =>
+                case control: XFormsSingleNodeControl if (control.getBoundItem eq null) && isValueChange ⇒
                     warn("control without single-node binding")
 
-                case _ =>
+                case _ ⇒
                     true
             }
         }
@@ -460,24 +460,24 @@ object ClientEvents {
             // Interpret event
             eventTarget match {
                 // Special xforms:output case
-                case xformsOutputControl: XFormsOutputControl =>
+                case xformsOutputControl: XFormsOutputControl ⇒
                     event match {
-                        case event: DOMFocusInEvent =>
+                        case event: DOMFocusInEvent ⇒
                             // First, dispatch DOMFocusIn
                             dispatchEventCheckTarget(event)
                             // Then, dispatch DOMActivate unless the control is read-only
                             if (!xformsOutputControl.isReadonly)
                                 dispatchEventCheckTarget(new DOMActivateEvent(document, xformsOutputControl))
-                        case event if !xformsOutputControl.isIgnoredExternalEvent(eventName) =>
+                        case event if !xformsOutputControl.isIgnoredExternalEvent(eventName) ⇒
                             // Dispatch any other event
                             dispatchEventCheckTarget(event)
-                        case _ =>
+                        case _ ⇒
                     }
                 // All other targets
-                case _ =>
+                case _ ⇒
                     event match {
                         // Special case of value change with focus change
-                        case valueChangeWithFocusChangeEvent: XXFormsValueChangeWithFocusChangeEvent =>
+                        case valueChangeWithFocusChangeEvent: XXFormsValueChangeWithFocusChangeEvent ⇒
                             // 4.6.7 Sequence: Value Change
 
                             // TODO: Not sure if this comment makes sense anymore.
@@ -510,7 +510,7 @@ object ClientEvents {
                             // NOTE: Refresh is done with the automatic deferred updates
 
                         // Dispatch any other event
-                        case _ =>
+                        case _ ⇒
                             dispatchEventCheckTarget(event)
                     }
             }

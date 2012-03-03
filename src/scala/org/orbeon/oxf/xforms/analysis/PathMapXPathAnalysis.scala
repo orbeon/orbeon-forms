@@ -20,7 +20,7 @@ import org.orbeon.oxf.xforms.function.xxforms.XXFormsInstance
 import org.orbeon.oxf.util.XPathCache
 import org.orbeon.oxf.xml.{XMLUtils, ContentHandlerHelper, NamespaceMapping}
 import org.orbeon.saxon.om.Axis
-import java.util.{Map => JMap}
+import java.util.{Map ⇒ JMap}
 import org.orbeon.oxf.common.{OXFException, ValidationException}
 import collection.mutable.{LinkedHashSet, Stack}
 import org.orbeon.saxon.trace.ExpressionPresenter
@@ -49,10 +49,10 @@ class PathMapXPathAnalysis(val xpathString: String,
             NegativeAnalysis(XPathAnalysis.combineXPathStrings(xpathString, other.xpathString))
         else
             other match {
-                case other: XPathAnalysis.ConstantXPathAnalysis =>
+                case other: XPathAnalysis.ConstantXPathAnalysis ⇒
                     // Other is constant positive analysis, so just return this
                     this
-                case other: PathMapXPathAnalysis =>
+                case other: PathMapXPathAnalysis ⇒
                     // Both are PathMap analysis so actually combine
                     new PathMapXPathAnalysis(XPathAnalysis.combineXPathStrings(xpathString, other.xpathString),
                         {
@@ -65,7 +65,7 @@ class PathMapXPathAnalysis(val xpathString: String,
                         returnablePaths.combine(other.returnablePaths),
                         dependentModels ++ other.dependentModels,
                         dependentInstances ++ other.dependentInstances)
-                case _ =>
+                case _ ⇒
                     throw new IllegalStateException // should not happen
             }
     }
@@ -77,13 +77,13 @@ class PathMapXPathAnalysis(val xpathString: String,
         def toXML(traversable: Traversable[String], enclosingElementName: String, elementName: String) {
             if (traversable.nonEmpty) {
                 helper.startElement(enclosingElementName)
-                for (value <- traversable)
+                for (value ← traversable)
                     helper.element(elementName, PathMapXPathAnalysis.getDisplayPath(value))
                 helper.endElement()
             }
         }
 
-        def mapSetToSet(mapSet: MapSet[String, String]) = mapSet map (entry => PathMapXPathAnalysis.buildInstanceString(entry._1) + "/" + entry._2)
+        def mapSetToSet(mapSet: MapSet[String, String]) = mapSet map (entry ⇒ PathMapXPathAnalysis.buildInstanceString(entry._1) + "/" + entry._2)
 
         toXML(mapSetToSet(valueDependentPaths), "value-dependent", "path")
         toXML(mapSetToSet(returnablePaths), "returnable", "path")
@@ -117,21 +117,21 @@ object PathMapXPathAnalysis {
             // In-scope variables
             val variablePathMaps: JMap[String, PathMap] =
                 for {
-                    (name, variable) <- inScopeVariables
+                    (name, variable) ← inScopeVariables
                     valueAnalysis = variable.variableAnalysis
                     if valueAnalysis.isDefined && valueAnalysis.get.figuredOutDependencies
                 } yield (name, valueAnalysis match {
                     // Valid PathMap
-                    case Some(analysis: PathMapXPathAnalysis) => analysis.pathmap.get
+                    case Some(analysis: PathMapXPathAnalysis) ⇒ analysis.pathmap.get
                     // Constant string
-                    case _ => stringPathmap
+                    case _ ⇒ stringPathmap
                 })
 
             def dependsOnFocus = (expression.getDependencies & StaticProperty.DEPENDS_ON_FOCUS) != 0
 
             val pathmap: Option[PathMap] =
                 baseAnalysis match {
-                    case Some(baseAnalysis: PathMapXPathAnalysis) if dependsOnFocus =>
+                    case Some(baseAnalysis: PathMapXPathAnalysis) if dependsOnFocus ⇒
                         // Expression depends on the context and has a context which has a pathmap
 
                         // We clone the base analysis and add to an existing PathMap
@@ -145,13 +145,13 @@ object PathMapXPathAnalysis {
                             clonedPathmap.updateFinalNodes(newNodeset)
 
                         Some(clonedPathmap)
-                    case Some(baseAnalysis) if dependsOnFocus =>
+                    case Some(baseAnalysis) if dependsOnFocus ⇒
                         // Expression depends on the context but the context doesn't have a pathmap
                         //
                         // o if context is constant positive, context is a constant string
                         // o if context is constant negative, we can't handle this
                         if (baseAnalysis.figuredOutDependencies) Some(stringPathmap) else None
-                    case _ =>
+                    case _ ⇒
                         // Start with a new PathMap if:
                         // o we are at the top (i.e. does not have a context)
                         // o or the expression does not depend on the focus
@@ -161,7 +161,7 @@ object PathMapXPathAnalysis {
                 }
 
             pathmap match {
-                case Some(pathmap) if !pathmap.isInvalidated =>
+                case Some(pathmap) if !pathmap.isInvalidated ⇒
 
                     // Try to reduce ancestor axis before anything else
                     reduceAncestorAxis(pathmap)
@@ -188,17 +188,17 @@ object PathMapXPathAnalysis {
                             // Start with first expression
                             extractInstancePrefixedId(partAnalysis, scope, expressions.head, defaultInstancePrefixedId) match {
                                 // First expression is instance() expression we can handle
-                                case Right(Some(instancePrefixedId)) =>
+                                case Right(Some(instancePrefixedId)) ⇒
                                     // Continue with rest of expressions
                                     buildPath(expressions.tail) match {
-                                        case Right(path) => Right(Some(InstancePath(instancePrefixedId, path)))
-                                        case Left(reason) => Left(reason)
+                                        case Right(path) ⇒ Right(Some(InstancePath(instancePrefixedId, path)))
+                                        case Left(reason) ⇒ Left(reason)
                                     }
                                 // First expression is instance() but there is no default instance so we don't add the path
                                 // (This can happen because we translate everything to start with instance() even if there is actually no default instance.)
-                                case Right(None) => Right(None)
+                                case Right(None) ⇒ Right(None)
                                 // Unable to handle first expression
-                                case Left(reason) => Left(reason)
+                                case Left(reason) ⇒ Left(reason)
                             }
                         }
 
@@ -206,7 +206,7 @@ object PathMapXPathAnalysis {
 
                             if (node.getArcs.isEmpty || node.isReturnable || node.isAtomized || ancestorAtomized)
                                 createInstancePath(node) match {
-                                    case Right(Some(instancePath)) =>
+                                    case Right(Some(instancePath)) ⇒
                                         // An instance path was created
 
                                         // Remember dependencies for this path
@@ -222,12 +222,12 @@ object PathMapXPathAnalysis {
                                             returnablePaths.put(instancePath.instancePrefixedId, instancePath.path)
                                         if (node.isAtomized)
                                             valueDependentPaths.put(instancePath.instancePrefixedId, instancePath.path)
-                                    case Right(None) => // NOP: don't add the path as this is not considered a dependency
-                                    case Left(_) => return false // we can't deal with this path so stop here
+                                    case Right(None) ⇒ // NOP: don't add the path as this is not considered a dependency
+                                    case Left(_) ⇒ return false // we can't deal with this path so stop here
                                 }
 
                             // Process children nodes if any
-                            for (arc <- node.getArcs) {
+                            for (arc ← node.getArcs) {
                                 stack.push(arc.getStep)
                                 if (!processNode(arc.getTarget, node.isAtomized))
                                     return false // we can't deal with this path so stop here
@@ -238,7 +238,7 @@ object PathMapXPathAnalysis {
                             true
                         }
 
-                        for (root <- pathmap.getPathMapRoots) {
+                        for (root ← pathmap.getPathMapRoots) {
                             stack.push(root.getRootExpression)
                             if (!processNode(root))
                                 return false
@@ -254,13 +254,13 @@ object PathMapXPathAnalysis {
                         // Failure
                         NegativeAnalysis(xpathString)
 
-                case _ =>
+                case _ ⇒
                     // Failure
                     NegativeAnalysis(xpathString)
             }
 
         } catch {
-            case e: Exception =>
+            case e: Exception ⇒
                 throw ValidationException.wrapException(e, new ExtendedLocationData(locationData, "analysing XPath expression",
                         element, "expression", xpathString))
         }
@@ -274,18 +274,18 @@ object PathMapXPathAnalysis {
 
         expression match {
             case instanceExpression: FunctionCall
-                    if instanceExpression.isInstanceOf[Instance] || instanceExpression.isInstanceOf[XXFormsInstance] =>
+                    if instanceExpression.isInstanceOf[Instance] || instanceExpression.isInstanceOf[XXFormsInstance] ⇒
 
                 val hasParameter = instanceExpression.getArguments.nonEmpty
                 if (!hasParameter) {
                     // instance() resolves to default instance for scope
                     defaultInstancePrefixedId match {
-                        case Some(defaultInstancePrefixedId) =>
+                        case Some(defaultInstancePrefixedId) ⇒
                             // Rewrite expression to add/replace its argument with a prefixed instance id
                             instanceExpression.setArguments(Array(new PrefixedIdStringLiteral(defaultInstancePrefixedId)))
 
                             Right(Some(defaultInstancePrefixedId))
-                        case None =>
+                        case None ⇒
                             // Model does not have a default instance
                             // This is successful, but the path must not be added
                             Right(None)
@@ -293,7 +293,7 @@ object PathMapXPathAnalysis {
                 } else {
                     val instanceNameExpression = instanceExpression.getArguments()(0)
                     instanceNameExpression match {
-                        case stringLiteral: StringLiteral =>
+                        case stringLiteral: StringLiteral ⇒
                             val originalInstanceId = stringLiteral.getStringValue
                             val searchAncestors = expression.isInstanceOf[XXFormsInstance]
 
@@ -329,19 +329,19 @@ object PathMapXPathAnalysis {
                                 // This is successful, but the path must not be added
                                 Right(None)
                             }
-                        case _ => Left("Can't handle non-literal instance name")
+                        case _ ⇒ Left("Can't handle non-literal instance name")
                     }
                 }
-            case _ => Left("Can't handle expression not starting with instance()")
+            case _ ⇒ Left("Can't handle expression not starting with instance()")
         }
     }
 
     private def buildPath(expressions: Seq[Expression]): String Either String = {
         val sb = new StringBuilder
-        for (expression <- expressions) expression match {
-            case axisExpression: AxisExpression => axisExpression.getAxis match {
-                case Axis.SELF => // NOP
-                case axis @ (Axis.CHILD | Axis.ATTRIBUTE) =>
+        for (expression ← expressions) expression match {
+            case axisExpression: AxisExpression ⇒ axisExpression.getAxis match {
+                case Axis.SELF ⇒ // NOP
+                case axis @ (Axis.CHILD | Axis.ATTRIBUTE) ⇒
                     // Child or attribute axis
                     if (sb.nonEmpty)
                         sb.append('/')
@@ -352,9 +352,9 @@ object PathMapXPathAnalysis {
                         sb.append(fingerprint)
                     } else
                         return Left("Can't handle path because of unnamed node: *")
-                case axis => return Left("Can't handle path because of unhandled axis: " + Axis.axisName(axis))
+                case axis ⇒ return Left("Can't handle path because of unhandled axis: " + Axis.axisName(axis))
             }
-            case expression: Expression => return Left("Can't handle path because of unhandled expression: " + expression.getClass.getName)
+            case expression: Expression ⇒ return Left("Can't handle path because of unhandled expression: " + expression.getClass.getName)
         }
         Right(sb.toString)
     }
@@ -393,14 +393,14 @@ object PathMapXPathAnalysis {
 
             def ancestorsWithFingerprint(nodeName: Int): Seq[PathMapArc] = {
                 for {
-                    nodeArc <- stack.elems.tail   // go from parent to root
+                    nodeArc ← stack.elems.tail   // go from parent to root
                     e = nodeArc.arc.getStep
                     if e.getAxis == Axis.CHILD && e.getNodeTest.getFingerprint == nodeName
                 } yield nodeArc.arc
             }
 
             // Process children nodes
-            for (arc <- node.getArcs) {
+            for (arc ← node.getArcs) {
 
                 val newNodeArc = new NodeArc(node, arc)
                 val step = arc.getStep
@@ -408,20 +408,20 @@ object PathMapXPathAnalysis {
                 // TODO: handle ANCESTOR_OR_SELF axis
                 if (stack.nonEmpty) // all tests below assume at least a parent
                 step.getAxis match {
-                    case Axis.ANCESTOR if step.getNodeTest.getFingerprint != -1 =>
+                    case Axis.ANCESTOR if step.getNodeTest.getFingerprint != -1 ⇒
                         // Found ancestor::foobar
                         val nodeName = step.getNodeTest.getFingerprint
                         val ancestorArcs = ancestorsWithFingerprint(nodeName)
                         if (ancestorArcs.nonEmpty) {
                             // There can be more than one ancestor with that fingerprint
-                            for (ancestorArc <- ancestorArcs)
+                            for (ancestorArc ← ancestorArcs)
                                 moveArc(newNodeArc, ancestorArc.getTarget)
                             return true
                         } else {
                             // E.g.: /a/b/ancestor::c
                             // TODO
                         }
-                    case Axis.PARENT => // don't test fingerprint as we could handle /a/*/..
+                    case Axis.PARENT ⇒ // don't test fingerprint as we could handle /a/*/..
                         // Parent axis
                             if (stack.size >= 1) {
                             val parentNodeArc = stack.top
@@ -430,7 +430,7 @@ object PathMapXPathAnalysis {
                         } else {
                             // TODO: is this possible?
                         }
-                    case Axis.FOLLOWING_SIBLING | Axis.PRECEDING_SIBLING =>
+                    case Axis.FOLLOWING_SIBLING | Axis.PRECEDING_SIBLING ⇒
                         // Simplify preceding-sibling::foobar / following-sibling::foobar
                         val parentNodeArc = stack.top
                             if (stack.size > 2) {
@@ -446,7 +446,7 @@ object PathMapXPathAnalysis {
                             parentNodeArc.node.createArc(newStep, arc.getTarget)
                             node.removeArc(arc)
                         }
-                    case _ => // NOP
+                    case _ ⇒ // NOP
                 }
 
                 stack.push(newNodeArc)
@@ -459,7 +459,7 @@ object PathMapXPathAnalysis {
             false
         }
 
-        for (root <- pathmap.getPathMapRoots) {
+        for (root ← pathmap.getPathMapRoots) {
             // Apply as long as we find matches
             while (reduceAncestorAxis(root))
                 stack.clear()
@@ -479,7 +479,7 @@ object PathMapXPathAnalysis {
         val pool = XPathCache.getGlobalConfiguration.getNamePool
 
         {
-            for (token <- path split '/') yield {
+            for (token ← path split '/') yield {
                 if (token.startsWith("instance(")) {
                     // instance(...)
                     token
@@ -492,7 +492,7 @@ object PathMapXPathAnalysis {
                             pool.getDisplayName(number.toInt)
                         } catch {
                             // Shouldn't happen, right? But since this is for debugging we output the token.
-                            case e: NumberFormatException => token
+                            case e: NumberFormatException ⇒ token
                         }
                     }
                 }
@@ -511,7 +511,7 @@ object PathMapXPathAnalysis {
         val pool = XPathCache.getGlobalConfiguration.getNamePool
 
         {
-            for (token <- path split '/') yield {
+            for (token ← path split '/') yield {
                 if (token.startsWith("instance(")) {
                     // instance(...)
                     token
@@ -557,9 +557,9 @@ object PathMapXPathAnalysis {
                               unknown-dependencies={targetNode.hasUnknownDependencies.toString}>{step.toString}</step>
 
                     def getArcs(node: PathMapNode): Node =
-                        <arcs>{ Seq(node.getArcs: _*) map (arc => <arc>{ Seq(getStep(arc.getStep, arc.getTarget), getArcs(arc.getTarget)) }</arc>) }</arcs>
+                        <arcs>{ Seq(node.getArcs: _*) map (arc ⇒ <arc>{ Seq(getStep(arc.getStep, arc.getTarget), getArcs(arc.getTarget)) }</arc>) }</arcs>
 
-                    for (root <- pathmap.getPathMapRoots) yield
+                    for (root ← pathmap.getPathMapRoots) yield
                         <root>{ Seq(explainAsXML(root.getRootExpression), getStep(root.getRootExpression, root), getArcs(root)) }</root>
                 }
             </pathmap>
@@ -572,33 +572,33 @@ object PathMapXPathAnalysis {
 //
 //        expression match {
 //
-//            case other =>
+//            case other ⇒
 //                val dependsOnFocus = (other.getDependencies & StaticProperty.DEPENDS_ON_FOCUS) != 0
 //                val attachmentPoint = pathMapNodeSet match {
-//                    case null if dependsOnFocus =>
+//                    case null if dependsOnFocus ⇒
 //                        // Result is new ContextItemExpression
 //                        val contextItemExpression = new ContextItemExpression
 //                        contextItemExpression.setContainer(expression.getContainer)
 //                        new PathMap.PathMapNodeSet(pathMap.makeNewRoot(contextItemExpression))
-//                    case _ =>
+//                    case _ ⇒
 //                        // All other cases
 //                        if (dependsOnFocus) pathMapNodeSet else null
 //                }
 //
 //                val resultNodeSet = new PathMap.PathMapNodeSet
-//                for (child <- other.iterateSubExpressions)
+//                for (child ← other.iterateSubExpressions)
 //                    resultNodeSet.addNodeSet(externalAnalysisExperiment(child.asInstanceOf[Expression], pathMap, attachmentPoint))
 //
 //                // Handle result differently if result type is atomic or not
 //                other.getItemType(other.getExecutable.getConfiguration.getTypeHierarchy) match {
-//                    case atomicType: AtomicType =>
+//                    case atomicType: AtomicType ⇒
 //                        // NOTE: Thought it would be right to call setAtomized(), but it isn't! E.g. count() returns an atomic type,
 //                        // but it doesn't mean the result of its argument expression is atomized. sum() does, but that's handled by
 //                        // the atomization of the argument to sum().
 //        //                resultNodeSet.setAtomized()
 //                        // If expression returns an atomic value then any nodes accessed don't contribute to the result
 //                        null
-//                    case _ => resultNodeSet
+//                    case _ ⇒ resultNodeSet
 //                }
 //        }
 //    }

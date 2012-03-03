@@ -25,14 +25,14 @@ class XXFormsActionErrorEvent(containingDocument: XFormsContainingDocument, targ
     private def rootMessage = OXFException.getRootThrowable(throwable).getMessage
 
     override val attributes = Map(
-        "element" ->    (() => rootLocationData match {
-                            case rootLocationData: ExtendedLocationData => rootLocationData.getElementDebugString
-                            case _ => null
+        "element" →    (() ⇒ rootLocationData match {
+                            case rootLocationData: ExtendedLocationData ⇒ rootLocationData.getElementDebugString
+                            case _ ⇒ null
                         }),
-        "system-id" ->  (() => rootLocationData.getSystemID),
-        "line" ->       (() => rootLocationData.getLine.toString),
-        "column" ->     (() => rootLocationData.getCol.toString),
-        "message" ->    (() => rootMessage),
-        "throwable" ->  (() => OXFException.throwableToString(throwable))
+        "system-id" →  (() ⇒ rootLocationData.getSystemID),
+        "line" →       (() ⇒ rootLocationData.getLine.toString),
+        "column" →     (() ⇒ rootLocationData.getCol.toString),
+        "message" →    (() ⇒ rootMessage),
+        "throwable" →  (() ⇒ OXFException.throwableToString(throwable))
     )
 }

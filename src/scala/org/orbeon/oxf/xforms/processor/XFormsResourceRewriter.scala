@@ -17,7 +17,7 @@ package org.orbeon.oxf.xforms.processor
 import java.io._
 import org.orbeon.oxf.resources.ResourceManagerWrapper
 import org.orbeon.oxf.processor.PageFlowControllerProcessor
-import java.util.{List => JList}
+import java.util.{List ⇒ JList}
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.common.Version
 import scala.collection.JavaConversions._
@@ -60,7 +60,7 @@ object XFormsResourceRewriter {
         // Output Orbeon Forms version
         outputWriter.write("/* This file was produced by " + Version.getVersionString + " */\n")
 
-        for (resource <- resources) {
+        for (resource ← resources) {
             val resourcePath = resource.getResourcePath(isMinimal)
 
             // Read CSS into a string
@@ -83,11 +83,11 @@ object XFormsResourceRewriter {
 
         // Match and rewrite an id within a selector
         val matchId = """#([\w]+)""".r
-        def rewriteSelector(s: String) = matchId.replaceAllIn(s, e => "#" + namespace + e.group(1))
+        def rewriteSelector(s: String) = matchId.replaceAllIn(s, e ⇒ "#" + namespace + e.group(1))
 
         // Match and rewrite a URL within a block
         val matchURL = """url\(("|')?([^"^'^\)]*)("|')?\)""".r
-        def rewriteBlock(s: String) = matchURL.replaceAllIn(s, e => rewriteURL(e.group(2)))
+        def rewriteBlock(s: String) = matchURL.replaceAllIn(s, e ⇒ rewriteURL(e.group(2)))
 
         // Rewrite an individual URL
         def rewriteURL(url: String) =
@@ -96,7 +96,7 @@ object XFormsResourceRewriter {
                 val rewrittenURI = response.rewriteResourceURL(resolvedURI, URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE)
                 "url(" + rewrittenURI + ")"
             } catch {
-                case _ =>
+                case _ ⇒
                     logger.logWarning("resources", "found invalid URI in CSS file", "uri", url)
                     "url(" + url + ")"
             }
@@ -104,7 +104,7 @@ object XFormsResourceRewriter {
         // Find approximately pairs of selectors/blocks and rewrite each part
         // Ids are rewritten only if the namespace is not empty
         val r = """([^\{]*\s*)(\{[^\}]*\})""".r
-        r.replaceAllIn(css, e => (if (namespace.size == 0) e.group(1) else rewriteSelector(e.group(1))) + rewriteBlock(e.group(2)))
+        r.replaceAllIn(css, e ⇒ (if (namespace.size == 0) e.group(1) else rewriteSelector(e.group(1))) + rewriteBlock(e.group(2)))
     }
 
     private def generateJS(logger: IndentedLogger, resources: JList[XFormsFeatures.ResourceConfig], os: OutputStream, isMinimal: Boolean): Unit = {
@@ -113,8 +113,8 @@ object XFormsResourceRewriter {
         outputWriter.write("// This file was produced by " + Version.getVersionString + "\n")
         outputWriter.flush()
 
-        for (resourceConfig <- resources) {
-            ScalaUtils.useAndClose(ResourceManagerWrapper.instance.getContentAsStream(resourceConfig.getResourcePath(isMinimal))) { is =>
+        for (resourceConfig ← resources) {
+            ScalaUtils.useAndClose(ResourceManagerWrapper.instance.getContentAsStream(resourceConfig.getResourcePath(isMinimal))) { is ⇒
                 NetUtils.copyStream(is, os)
             }
             os.write('\n')

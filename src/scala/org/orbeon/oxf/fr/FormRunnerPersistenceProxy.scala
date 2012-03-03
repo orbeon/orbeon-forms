@@ -54,18 +54,18 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
     def proxyRequest(request: Request, response: Response) {
         val incomingPath = request.getRequestPath
         incomingPath match {
-            case FormPath(path, app, form, _) => proxyRequest(request, response, app, form, "form", path)
-            case DataPath(path, app, form, _, _) => proxyRequest(request, response, app, form, "data", path)
-            case DataCollectionPath(path, app, form) => proxyRequest(request, response, app, form, "data", path)
-            case SearchPath(path, app, form) => proxyRequest(request, response, app, form, "data", path)
-            case FormDefinitionPath() => proxyFormDefinition(request, response)
-            case _ => throw new OXFException("Unsupported path: " + incomingPath)
+            case FormPath(path, app, form, _) ⇒ proxyRequest(request, response, app, form, "form", path)
+            case DataPath(path, app, form, _, _) ⇒ proxyRequest(request, response, app, form, "data", path)
+            case DataCollectionPath(path, app, form) ⇒ proxyRequest(request, response, app, form, "data", path)
+            case SearchPath(path, app, form) ⇒ proxyRequest(request, response, app, form, "data", path)
+            case FormDefinitionPath() ⇒ proxyFormDefinition(request, response)
+            case _ ⇒ throw new OXFException("Unsupported path: " + incomingPath)
         }
     }
 
-    private def proxyHeaders(headers: => Traversable[(String, Seq[String])], setHeader: (String, String) => Unit, out: Boolean): Unit =
+    private def proxyHeaders(headers: ⇒ Traversable[(String, Seq[String])], setHeader: (String, String) ⇒ Unit, out: Boolean): Unit =
         for {
-            (name, values) <- headers
+            (name, values) ← headers
             if !Set("transfer-encoding", "connection", "host")(name.toLowerCase)
             if !out || name.toLowerCase != "content-length"
             if values != null && values.nonEmpty
@@ -81,7 +81,7 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
         // Proxy status code
         response.setStatus(connection.getResponseCode)
         // Proxy incoming headers
-        proxyHeaders(connection.getHeaderFields map {case (name, values) => (name, values.toSeq)}, response.setHeader _, out = false)
+        proxyHeaders(connection.getHeaderFields map {case (name, values) ⇒ (name, values.toSeq)}, response.setHeader _, out = false)
         copyStream(connection.getInputStream, response.getOutputStream)
     }
 
@@ -93,12 +93,12 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
         }
 
         def setPersistenceHeaders(connection: HTTPURLConnection) {
-            for ((name, value) <- headers)
+            for ((name, value) ← headers)
                 connection.setRequestProperty(capitalizeHeader(name), value)
         }
 
         def proxyOutgoingHeaders(connection: HTTPURLConnection) =
-            proxyHeaders(request.getHeaderValuesMap map {case (name, values) => (name, values.toSeq)}, connection.setRequestProperty _, out = true)
+            proxyHeaders(request.getHeaderValuesMap map {case (name, values) ⇒ (name, values.toSeq)}, connection.setRequestProperty _, out = true)
 
         if (! Set("GET", "DELETE", "PUT", "POST")(request.getMethod))
             throw new OXFException("Unsupported method: " + request.getMethod)
@@ -120,8 +120,8 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
             // Ask the request generator first, as the body might have been read already
             // Q: Could this be handled automatically in ExternalContext?
             val is = RequestGenerator.getRequestBody(request) match {
-                case bodyURL: String => NetUtils.uriToInputStream(bodyURL)
-                case _ => request.getInputStream
+                case bodyURL: String ⇒ NetUtils.uriToInputStream(bodyURL)
+                case _ ⇒ request.getInputStream
             }
 
             copyStream(is, connection.getOutputStream)
@@ -144,7 +144,7 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
             properties map (propertySet getString _) distinct
         }
 
-        val formElements = providers map (FormRunner getPersistenceURLHeadersFromProvider _) flatMap { case (baseURI, headers) =>
+        val formElements = providers map (FormRunner getPersistenceURLHeadersFromProvider _) flatMap { case (baseURI, headers) ⇒
             // Read all the forms for the current service
             val serviceURI = baseURI + "/form"
             val inputStream = proxyEstablishConnection(request, serviceURI, headers) getInputStream

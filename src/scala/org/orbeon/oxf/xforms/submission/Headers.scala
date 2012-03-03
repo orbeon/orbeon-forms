@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.submission
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, LocationData}
 import org.orbeon.oxf.xforms._
-import java.util.{LinkedHashMap => JLinkedHashMap, Collections => JCollections}
+import java.util.{LinkedHashMap ⇒ JLinkedHashMap, Collections ⇒ JCollections}
 import scala.collection.JavaConversions._
 import org.orbeon.oxf.common.OXFException
 import org.dom4j.{QName, Element}
@@ -79,21 +79,21 @@ object Headers {
                 val existingHeaderValues = headerNameValues.getOrElse(headerName, Array.empty[String])
 
                 // Append/prepend/replace
-                headerNameValues += headerName -> (combine match {
-                    case "append" => existingHeaderValues :+ headerValue
-                    case "prepend" => headerValue +: existingHeaderValues
-                    case _ => Array(headerValue)
+                headerNameValues += headerName → (combine match {
+                    case "append" ⇒ existingHeaderValues :+ headerValue
+                    case "prepend" ⇒ headerValue +: existingHeaderValues
+                    case _ ⇒ Array(headerValue)
                 })
             }
 
             // Process all nested <header> elements
-            for (headerElement <- headerElements) {
+            for (headerElement ← headerElements) {
                 val headerScope = xblContainer.getPartAnalysis.scopeForPrefixedId(xblContainer.getFullPrefix + XFormsUtils.getElementId(headerElement))
                 contextStack.pushBinding(headerElement, sourceEffectiveId, headerScope)
 
                 if (contextStack.getCurrentBindingContext.isNewBind) {
                     // There is a binding so a possible iteration
-                    for (position <- 1 to contextStack.getCurrentNodeset.size) {
+                    for (position ← 1 to contextStack.getCurrentNodeset.size) {
                         contextStack.pushIteration(position)
                         handleHeaderElement(headerElement)
                         contextStack.popBinding()

@@ -29,15 +29,15 @@ class XXFormsContext extends XFormsFunction with MatchSimpleAnalysis {
     override def iterate(xpathContext: XPathContext): SequenceIterator = {
         // Match on context expression
         getContextIdExpression match {
-            case Some(contextIdExpression) =>
+            case Some(contextIdExpression) ⇒
                 // Get context id by evaluating expression
                 val contextStaticId = contextIdExpression.evaluateAsString(xpathContext).toString
                 // Get context item for context id
                 getContextStack(xpathContext).getContextForId(contextStaticId) match {
-                    case null => EmptyIterator.getInstance
-                    case contextItem => SingletonIterator.makeIterator(contextItem)
+                    case null ⇒ EmptyIterator.getInstance
+                    case contextItem ⇒ SingletonIterator.makeIterator(contextItem)
                 }
-            case None =>
+            case None ⇒
                 // No context id expression
                 EmptyIterator.getInstance
         }
@@ -46,17 +46,17 @@ class XXFormsContext extends XFormsFunction with MatchSimpleAnalysis {
     override def addToPathMap(pathMap: PathMap, pathMapNodeSet: PathMap.PathMapNodeSet): PathMap.PathMapNodeSet = {
         // Match on context expression
         getContextIdExpression match {
-            case Some(contextIdExpression: StringLiteral) =>
+            case Some(contextIdExpression: StringLiteral) ⇒
                 // Argument is literal and we have a context to ask
                 pathMap.getPathMapContext match {
-                    case context: SimpleElementAnalysis#SimplePathMapContext =>
+                    case context: SimpleElementAnalysis#SimplePathMapContext ⇒
                         // Get static context id
                         val contextStaticId = contextIdExpression.getStringValue
                         // Handle context
                         matchSimpleAnalysis(pathMap, context.getInScopeContexts.get(contextStaticId))
-                    case _ => throw new OXFException("Can't process PathMap because context is not of expected type.")
+                    case _ ⇒ throw new OXFException("Can't process PathMap because context is not of expected type.")
                 }
-            case _ =>
+            case _ ⇒
                 // Argument is not literal so we can't figure it out
                 pathMap.setInvalidated(true)
                 null

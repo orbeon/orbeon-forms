@@ -45,20 +45,20 @@ object RepeatControl {
 
     // Get the first ancestor repeats across parts
     def getAncestorRepeatAcrossParts(elementAnalysis: ElementAnalysis): Option[RepeatControl] = elementAnalysis match {
-        case simpleElementAnalysis: SimpleElementAnalysis =>
+        case simpleElementAnalysis: SimpleElementAnalysis ⇒
             val currentPart = simpleElementAnalysis.staticStateContext.partAnalysis
             // First search ancestor local to this part, or else try the ancestor repeat associated with the parent part if any
             getAncestorRepeat(simpleElementAnalysis) orElse
                 (currentPart.parent map
                     (_.getControlAnalysis(currentPart.startScope.fullPrefix.init)) // .init removes the trailing '$'
                         flatMap (getAncestorRepeatAcrossParts(_))) // recursively search ancestor parts
-        case _ => throw new IllegalArgumentException
+        case _ ⇒ throw new IllegalArgumentException
     }
 
     // Get all ancestor repeats across parts, from leaf to root
     def getAllAncestorRepeatsAcrossParts(elementAnalysis: ElementAnalysis): List[RepeatControl] =
         getAncestorRepeatAcrossParts(elementAnalysis) match {
-            case Some(ancestor) => ancestor :: getAllAncestorRepeatsAcrossParts(ancestor)
-            case None => Nil
+            case Some(ancestor) ⇒ ancestor :: getAllAncestorRepeatsAcrossParts(ancestor)
+            case None ⇒ Nil
         }
 }

@@ -23,7 +23,7 @@ import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.oxf.util.{NetUtils, XPathCache}
 import org.orbeon.oxf.pipeline.InitUtils
 import org.orbeon.oxf.xforms.function.xxforms.{XXFormsProperty, XXFormsPropertiesStartsWith}
-import java.util.{Map => JMap}
+import java.util.{Map ⇒ JMap}
 
 object FormRunner {
 
@@ -47,11 +47,11 @@ object FormRunner {
     /**
      * Get the username and roles from the request, based on the Form Runner configuration.
      */
-    def getUserRoles(userRoles: UserRoles, getHeader: String => Option[Array[String]]): (Option[String], Option[Array[String]]) = {
+    def getUserRoles(userRoles: UserRoles, getHeader: String ⇒ Option[Array[String]]): (Option[String], Option[Array[String]]) = {
 
         val propertySet = Properties.instance.getPropertySet
         propertySet.getString(methodPropertyName, "container") match {
-            case "container" =>
+            case "container" ⇒
 
                 val rolesString = propertySet.getString(containerRolesPropertyName)
 
@@ -61,37 +61,37 @@ object FormRunner {
 
                 val rolesArray = (
                     for {
-                        role <- rolesString.split(""",|\s+""")
+                        role ← rolesString.split(""",|\s+""")
                         if userRoles.isUserInRole(role)
                     } yield
                         role)
 
                 val roles = rolesArray match {
-                    case Array() => None
-                    case array => Some(array)
+                    case Array() ⇒ None
+                    case array ⇒ Some(array)
                 }
 
                 (username, roles)
 
-            case "header" =>
+            case "header" ⇒
 
                 val headerPropertyName = propertySet.getString(headerRolesPropertyNamePropertyName, "").trim match {
-                    case "" => None
-                    case value => Some(value)
+                    case "" ⇒ None
+                    case value ⇒ Some(value)
                 }
 
-                def headerOption(name: String) = Option(propertySet.getString(name)) flatMap (p => getHeader(p.toLowerCase))
+                def headerOption(name: String) = Option(propertySet.getString(name)) flatMap (p ⇒ getHeader(p.toLowerCase))
 
                 // Headers can be separated by comma or pipe
                 def split1(value: String) = value split """(\s*[,\|]\s*)+"""
                 // Then, if configured, a header can have the form name=value, where name is specified in a property
                 def split2(value: String) = headerPropertyName match {
-                    case Some(propertyName) =>
+                    case Some(propertyName) ⇒
                         value match {
-                            case NameValueMatch(`propertyName`, value) => Seq(value)
-                            case _ => Seq()
+                            case NameValueMatch(`propertyName`, value) ⇒ Seq(value)
+                            case _ ⇒ Seq()
                         }
-                    case _ => Seq(value)
+                    case _ ⇒ Seq(value)
                 }
 
                 val username = headerOption(headerUsernamePropertyName) map (_.head)
@@ -99,18 +99,18 @@ object FormRunner {
 
                 (username, roles)
 
-            case other => throw new OXFException("Unsupported authentication method, check the '" + methodPropertyName + "' property:" + other)
+            case other ⇒ throw new OXFException("Unsupported authentication method, check the '" + methodPropertyName + "' property:" + other)
         }
     }
 
-    def getUserRolesAsHeaders(userRoles: UserRoles, getHeader: String => Option[Array[String]]) = {
+    def getUserRolesAsHeaders(userRoles: UserRoles, getHeader: String ⇒ Option[Array[String]]) = {
 
         val (username, roles) = getUserRoles(userRoles, getHeader)
 
         val result = collection.mutable.Map[String, Array[String]]()
 
-        username foreach (u => result += ("orbeon-username" -> Array(u)))
-        roles foreach (r => result += ("orbeon-roles" -> r))
+        username foreach (u ⇒ result += ("orbeon-username" → Array(u)))
+        roles foreach (r ⇒ result += ("orbeon-roles" → r))
 
         result.toMap
     }
@@ -146,13 +146,13 @@ object FormRunner {
         // Build headers map
         val headers = (
             for {
-                propertyName <- propertySet.getPropertiesStartsWith(propertyPrefix).asScala
+                propertyName ← propertySet.getPropertiesStartsWith(propertyPrefix).asScala
                 lowerSuffix = propertyName.substring(propertyPrefix.length + 1)
                 if lowerSuffix != "uri"
                 headerName = "Orbeon-" + capitalizeHeader(lowerSuffix)
                 headerValue = propertySet.getObject(propertyName).toString
             } yield
-                (headerName -> headerValue)) toMap
+                (headerName → headerValue)) toMap
 
         (findProviderURL, headers)
     }
@@ -165,7 +165,7 @@ object FormRunner {
         val headersXML =
             <headers>{
                 for {
-                    (name, value) <- headers
+                    (name, value) ← headers
                 } yield
                     <header><name>{XMLUtils.escapeXMLMinimal(name)}</name><value>{XMLUtils.escapeXMLMinimal(value)}</value></header>
             }</headers>.toString
@@ -181,15 +181,15 @@ object FormRunner {
     def authorizedOperationsOnForm(metadata: NodeInfo): java.util.List[String] = {
         val request = NetUtils.getExternalContext.getRequest
         (metadata \ "permissions" match {
-            case Seq() => Seq("*")                                                      // No permissions defined for this form, authorize any operation
-            case ps => ( ps \ "permission"
-                    filter (p =>
+            case Seq() ⇒ Seq("*")                                                      // No permissions defined for this form, authorize any operation
+            case ps ⇒ ( ps \ "permission"
+                    filter (p ⇒
                         (p \ * isEmpty) ||                                              // No constraint on the permission, so it is automatically satisfied
-                        (p \ "user-role" forall (r =>                                   // If we have user-role constraints, they must all pass
+                        (p \ "user-role" forall (r ⇒                                   // If we have user-role constraints, they must all pass
                             (r \@ "any-of" stringValue) split "\\s+"                    // Constraint is satisfied if user has at least one of the roles
                             map (_.replace("%20", " "))                                 // Unescape internal spaces as the roles used in Liferay are user-facing labels that can contain space (see also permissions.xbl)
                             exists (request.isUserInRole(_)))))
-                    flatMap (p => (p \@ "operations" stringValue) split "\\s+")         // For the permissions that passed, return the list operations
+                    flatMap (p ⇒ (p \@ "operations" stringValue) split "\\s+")         // For the permissions that passed, return the list operations
                     distinct                                                            // Remove duplicate operations
                 )
         }) asJava
@@ -210,8 +210,8 @@ object FormRunner {
         } else {
             // Result document contains a tree structure of apps and forms
             <apps has-roles="true" all-roles={incomingRoleNames mkString " "}>{
-                appForms map { case (app, forms) =>
-                    <app name={app}>{ forms map { form => <form name={form}/> } }</app>
+                appForms map { case (app, forms) ⇒
+                    <app name={app}>{ forms map { form ⇒ <form name={form}/> } }</app>
                 }
             }</apps>
         }
@@ -227,22 +227,22 @@ object FormRunner {
             // Roles configured
             val allConfiguredRoleNames = configuredRoles map (_.attValue("name")) toSet
             val applicableRoleNames = allConfiguredRoleNames & incomingRoleNames
-            val applicableRoles = configuredRoles filter (e => (applicableRoleNames + "*")(e.attValue("name")))
+            val applicableRoles = configuredRoles filter (e ⇒ (applicableRoleNames + "*")(e.attValue("name")))
             val applicableAppNames = applicableRoles map (_.attValue("app")) toSet
 
             if (applicableAppNames("*")) {
                 // User has access to all apps (and therefore all forms)
-                Map("*" -> Set("*"))
+                Map("*" → Set("*"))
             } else {
                 // User has access to certain apps only
                 (for {
-                    app <- applicableAppNames
+                    app ← applicableAppNames
                     forms = {
                         val applicableFormsForApp = applicableRoles filter (_.attValue("app") == app) map (_.attValue("form")) toSet
 
                         if (applicableFormsForApp("*")) Set("*") else applicableFormsForApp
                     }
-                } yield app -> forms) toMap
+                } yield app → forms) toMap
             }
         }
     }
@@ -256,7 +256,7 @@ object FormRunner {
     // NOTE: This could be done through ExternalContext
     def sendError(code: Int) = InitUtils.sendError(code)
 
-    // Return mappings (formatName -> expression) for all PDF formats in the properties
+    // Return mappings (formatName → expression) for all PDF formats in the properties
     def getPDFFormats = {
 
         def propertiesStartingWith(prefix: String) =
@@ -264,10 +264,10 @@ object FormRunner {
 
         val formatPairs =
             for {
-                formatPropertyName <- propertiesStartingWith("oxf.fr.pdf.format")
-                expression <- Option(XXFormsProperty.property(formatPropertyName)) map (_.getStringValue)
+                formatPropertyName ← propertiesStartingWith("oxf.fr.pdf.format")
+                expression ← Option(XXFormsProperty.property(formatPropertyName)) map (_.getStringValue)
                 formatName = formatPropertyName split '.' last
-            } yield (formatName -> expression)
+            } yield (formatName → expression)
 
         formatPairs.toMap.asJava
     }
@@ -278,8 +278,8 @@ object FormRunner {
 
         val expressionOption =
             for {
-                format <- Option(XXFormsProperty.property(propertyName)) map (_.getStringValue)
-                expression <- Option(pdfFormats.get(format))
+                format ← Option(XXFormsProperty.property(propertyName)) map (_.getStringValue)
+                expression ← Option(pdfFormats.get(format))
             } yield expression
 
         expressionOption.orNull

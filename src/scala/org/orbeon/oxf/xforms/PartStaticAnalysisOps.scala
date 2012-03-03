@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms
 
 import analysis.ElementAnalysis
 import analysis.model.Model
-import java.util.{List => JList}
+import java.util.{List ⇒ JList}
 import org.dom4j.Element
 import org.orbeon.oxf.xml.NamespaceMapping
 import xbl.Scope

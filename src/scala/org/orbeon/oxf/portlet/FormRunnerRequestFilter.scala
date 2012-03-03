@@ -32,8 +32,8 @@ class FormRunnerRequestFilter extends RequestFilter {
         // either userId (a number) or screenName (a string). It seems more reliable to use the API below to obtain the
         // user.
         PortalUtil.getUser(PortalUtil.getHttpServletRequest(portletRequest)) match {
-            case user: User => amendRequest(portletRequest, user)
-            case _ => portletRequest
+            case user: User ⇒ amendRequest(portletRequest, user)
+            case _ ⇒ portletRequest
         }
     }
 
@@ -46,17 +46,17 @@ class FormRunnerRequestFilter extends RequestFilter {
             val liferayUserRolesHeaders =
                 (
                 for {
-                    (name, value) <- Map(
-                        "email" -> user.getEmailAddress,
-                        "full-name" -> user.getFullName,
-                        "roles" -> (user.getRoles map (_.getName) toArray)
+                    (name, value) ← Map(
+                        "email" → user.getEmailAddress,
+                        "full-name" → user.getFullName,
+                        "roles" → (user.getRoles map (_.getName) toArray)
                     )
                     if value != null
                 } yield {
                     // Return header tuple with header name in lowercase and with the "dash" convention
-                    (mkHeaderName(name) -> (value match {
-                        case array: Array[String] => array
-                        case value: String => Array(value)
+                    (mkHeaderName(name) → (value match {
+                        case array: Array[String] ⇒ array
+                        case value: String ⇒ Array(value)
                     }))
                 })
 
@@ -66,8 +66,8 @@ class FormRunnerRequestFilter extends RequestFilter {
             def getCombine(s: String) = {
                 def getCombine1(s: String) = liferayUserRolesHeaders.get(s)
                 def getCombine2(s: String) = portletRequest.getProperties(s).toArray match {
-                    case Array() => None
-                    case array => Some(array)
+                    case Array() ⇒ None
+                    case array ⇒ Some(array)
                 }
 
                 getCombine1(s).orElse(getCombine2(s))
@@ -84,15 +84,15 @@ class FormRunnerRequestFilter extends RequestFilter {
             override def getProperty(name: String) =
                 headers.get(name) map (_.head) getOrElse super.getProperty(name)
             override def getProperties(name: String) =
-                headers.get(name) map (n => asJavaEnumeration(n.iterator)) getOrElse super.getProperties(name)
+                headers.get(name) map (n ⇒ asJavaEnumeration(n.iterator)) getOrElse super.getProperties(name)
         }
 
         portletRequest match {
-            case r: RenderRequest => new RenderRequestWrapper(r) with CustomProperties
-            case r: ActionRequest => new ActionRequestWrapper(r) with CustomProperties
-            case r: ResourceRequest => new ResourceRequestWrapper(r) with CustomProperties
-            case r: EventRequest => new EventRequestWrapper(r) with CustomProperties
-            case r: PortletRequest => new PortletRequestWrapper(r) with CustomProperties
+            case r: RenderRequest ⇒ new RenderRequestWrapper(r) with CustomProperties
+            case r: ActionRequest ⇒ new ActionRequestWrapper(r) with CustomProperties
+            case r: ResourceRequest ⇒ new ResourceRequestWrapper(r) with CustomProperties
+            case r: EventRequest ⇒ new EventRequestWrapper(r) with CustomProperties
+            case r: PortletRequest ⇒ new PortletRequestWrapper(r) with CustomProperties
         }
     }
 }

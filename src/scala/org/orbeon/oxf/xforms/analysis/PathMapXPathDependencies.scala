@@ -21,15 +21,15 @@ import org.orbeon.oxf.xforms._
 import analysis.controls._
 import org.w3c.dom.Node._
 import org.orbeon.oxf.common.OXFException
-import java.util.{Map => JMap}
+import java.util.{Map ⇒ JMap}
 import java.lang.String
 import collection.immutable.Nil
 
 class PathMapXPathDependencies(private val containingDocument: XFormsContainingDocument) extends XPathDependencies {
 
     private val logger = containingDocument.getControls match {
-        case controls: XFormsControls => controls.getIndentedLogger
-        case _ => containingDocument.getIndentedLogger
+        case controls: XFormsControls ⇒ controls.getIndentedLogger
+        case _ ⇒ containingDocument.getIndentedLogger
     }
     
     // Represent the state of a model
@@ -57,7 +57,7 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
                 def processNode(n: NodeInfo) {
                     val path = PathMapXPathDependencies.createFingerprintedPath(n)
 
-                    val instancePath = instancePrefixedId -> path
+                    val instancePath = instancePrefixedId → path
 
                     // Update model and view changesets
                     recalculateChangeset += instancePath
@@ -126,7 +126,7 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
         def outOfDateChangesetForMip(mip: Model#Bind#MIP) = mip.isValidateMIP && !useValidateChangeset || !mip.isValidateMIP && !useCalculateChangeset
 
         // TODO: Scenario that can break this:
-        // recalculate -> value change -> xxf-value-changed -> insert -> calculateClean = false -> recalculateDone -> calculateClean = true
+        // recalculate → value change → xxf-value-changed → insert → calculateClean = false → recalculateDone → calculateClean = true
         // although following rebuild will set calculateClean = false, this is not right and might still lead to issues
     }
 
@@ -135,10 +135,10 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
 
     private def getModelState(modelPrefixedId: String): ModelState =
         modelStates.get(modelPrefixedId) match {
-            case Some(modelState) => modelState
-            case None =>
+            case Some(modelState) ⇒ modelState
+            case None ⇒
                 val modelState = new ModelState(modelPrefixedId)
-                modelStates += modelPrefixedId -> modelState
+                modelStates += modelPrefixedId → modelState
                 modelState
         }
 
@@ -245,7 +245,7 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
                       "MIP XPath optimized", mipXPathOptimizedCount.toString,
                       "Total XPath optimized", (RefreshState.bindingXPathOptimizedCount + RefreshState.valueXPathOptimizedCount + mipXPathOptimizedCount).toString): _*)
 
-        for (modelState <- modelStates.values)
+        for (modelState ← modelStates.values)
             modelState.refreshDone()
 
         RefreshState.refreshDone()
@@ -317,7 +317,7 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
     def setModifiedPathTest(instance: String, namespaces: JMap[String, String], path: String) {
         assert(RefreshState.changeset.isEmpty)
 
-        RefreshState.changeset += instance -> PathMapXPathAnalysis.getInternalPath(namespaces, path)
+        RefreshState.changeset += instance → PathMapXPathAnalysis.getInternalPath(namespaces, path)
     }
 
     private class UpdateResult(val requireUpdate: Boolean, val savedEvaluations: Int)
@@ -329,17 +329,17 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
         val cached = RefreshState.modifiedBindingCache.get(controlPrefixedId)
         val updateResult: UpdateResult =
             cached match {
-                case Some(result) => result
-                case None => {
+                case Some(result) ⇒ result
+                case None ⇒ {
                     val control = containingDocument.getStaticOps.getControlAnalysisOption(controlPrefixedId).get
                     val tempResult = control.getBindingAnalysis match {
-                        case None =>
+                        case None ⇒
                             // Control does not have an XPath binding
                             new UpdateResult(false, 0)
-                        case Some(analysis) if !analysis.figuredOutDependencies =>
+                        case Some(analysis) if !analysis.figuredOutDependencies ⇒
                             // Binding dependencies are unknown
                             new UpdateResult(true, 0)// savedEvaluations is N/A
-                        case Some(analysis) =>
+                        case Some(analysis) ⇒
                             // Binding dependencies are known
                             new UpdateResult(
                                 analysis.intersectsModels(RefreshState.getStructuralChangeModels) || analysis.intersectsBinding(RefreshState.changeset)
@@ -351,7 +351,7 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
                                 Array("prefixed id", controlPrefixedId, "XPath", control.getBindingAnalysis.get.xpathString): _*)
 
                     if (control.isWithinRepeat)
-                        RefreshState.modifiedBindingCache += controlPrefixedId -> tempResult
+                        RefreshState.modifiedBindingCache += controlPrefixedId → tempResult
                     tempResult
                 }
             }
@@ -372,18 +372,18 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
         val cached = RefreshState.modifiedValueCache.get(controlPrefixedId)
         val (updateResult, valueAnalysis) =
             cached match {
-                case Some(result) => (result, if (result.requireUpdate) containingDocument.getStaticOps.getControlAnalysisOption(controlPrefixedId).get.getValueAnalysis else null)
-                case None => {
+                case Some(result) ⇒ (result, if (result.requireUpdate) containingDocument.getStaticOps.getControlAnalysisOption(controlPrefixedId).get.getValueAnalysis else null)
+                case None ⇒ {
                     val control = containingDocument.getStaticOps.getControlAnalysisOption(controlPrefixedId).get
                     val tempValueAnalysis = control.getValueAnalysis
                     val tempUpdateResult = tempValueAnalysis match {
-                        case None =>
+                        case None ⇒
                             // Control does not have a value
                             new UpdateResult(true, 0)//TODO: should be able to return false here; change once markDirty is handled better
-                        case Some(analysis) if !analysis.figuredOutDependencies =>
+                        case Some(analysis) if !analysis.figuredOutDependencies ⇒
                             // Value dependencies are unknown
                             new UpdateResult(true, 0)// savedEvaluations is N/A
-                        case Some(analysis) =>
+                        case Some(analysis) ⇒
                             // Value dependencies are known
                             new UpdateResult(analysis.intersectsModels(RefreshState.getStructuralChangeModels) || analysis.intersectsValue(RefreshState.changeset)
                                 , if (control.value.isDefined) 1 else 0)
@@ -393,7 +393,7 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
                                 Array("prefixed id", controlPrefixedId, "XPath", tempValueAnalysis.get.xpathString): _*)
 
                     if (control.isWithinRepeat)
-                        RefreshState.modifiedValueCache += controlPrefixedId -> tempUpdateResult
+                        RefreshState.modifiedValueCache += controlPrefixedId → tempUpdateResult
                     (tempUpdateResult, tempValueAnalysis)
                 }
             }
@@ -412,24 +412,24 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
         assert(inRefresh || inBindingUpdate) // LHHA is evaluated lazily typically outside of refresh, but LHHA invalidation takes place during refresh
 
         RefreshState.modifiedLHHACache.get(controlPrefixedId) match {
-            case Some(result) => result // cached
-            case None => // not cached
+            case Some(result) ⇒ result // cached
+            case None ⇒ // not cached
                 containingDocument.getStaticOps.getControlAnalysisOption(controlPrefixedId) match {
-                    case Some(control: LHHATrait) => // control found
+                    case Some(control: LHHATrait) ⇒ // control found
                         val result = control.getLHHAValueAnalysis(lhhaName) match {
-                            case Some(analysis) if !analysis.figuredOutDependencies => // dependencies are unknown
+                            case Some(analysis) if !analysis.figuredOutDependencies ⇒ // dependencies are unknown
                                 lhhaUnknownDependencies += 1
                                 true
-                            case Some(analysis) => // dependencies are known
+                            case Some(analysis) ⇒ // dependencies are known
                                 val result = analysis.intersectsModels(RefreshState.getStructuralChangeModels) || analysis.intersectsValue(RefreshState.changeset)
                                 if (result) lhhaHitCount += 1 else lhhaMissCount += 1
                                 result
-                            case None => throw new OXFException("Control " + controlPrefixedId + " doesn't have LHHA " + lhhaName)
+                            case None ⇒ throw new OXFException("Control " + controlPrefixedId + " doesn't have LHHA " + lhhaName)
                         }
                         if (control.isWithinRepeat)
-                            RefreshState.modifiedLHHACache += controlPrefixedId -> result
+                            RefreshState.modifiedLHHACache += controlPrefixedId → result
                         result
-                    case _ => throw new OXFException("Control " + controlPrefixedId + " not found")
+                    case _ ⇒ throw new OXFException("Control " + controlPrefixedId + " not found")
                 }
         }
     }
@@ -440,24 +440,24 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
         assert(inRefresh || inBindingUpdate)
 
         RefreshState.modifiedItemsetCache.get(controlPrefixedId) match {
-            case Some(result) => result // cached
-            case None => // not cached
+            case Some(result) ⇒ result // cached
+            case None ⇒ // not cached
                 containingDocument.getStaticOps.getControlAnalysisOption(controlPrefixedId) match {
-                    case Some(control: SelectionControl) => // control found
+                    case Some(control: SelectionControl) ⇒ // control found
                         val result = control.getItemsetAnalysis match {
-                            case Some(analysis) if !analysis.figuredOutDependencies => // dependencies are unknown
+                            case Some(analysis) if !analysis.figuredOutDependencies ⇒ // dependencies are unknown
                                 itemsetUnknownDependencies += 1
                                 true
-                            case Some(analysis) => // dependencies are known
+                            case Some(analysis) ⇒ // dependencies are known
                                 val result = analysis.intersectsModels(RefreshState.getStructuralChangeModels) || analysis.intersectsValue(RefreshState.changeset)
                                 if (result) itemsetHitCount += 1 else itemsetMissCount += 1
                                 result
-                            case None => throw new IllegalStateException("Itemset not analyzed")
+                            case None ⇒ throw new IllegalStateException("Itemset not analyzed")
                         }
                         if (control.isWithinRepeat)
-                            RefreshState.modifiedItemsetCache += controlPrefixedId -> result
+                            RefreshState.modifiedItemsetCache += controlPrefixedId → result
                         result
-                    case _ => throw new OXFException("Control " + controlPrefixedId + " not found")
+                    case _ ⇒ throw new OXFException("Control " + controlPrefixedId + " not found")
                 }
         }
     }
@@ -481,7 +481,7 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
         // TODO: cache must store by MIP to optimize xf:bind/@ref over multiple nodes
 
         bind.getMIP(mipName) match {
-            case Some(mip) =>
+            case Some(mip) ⇒
 
                 val modelState = getModelState(model.prefixedId)
                 val updateResult =
@@ -495,20 +495,20 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
                         // We don't check whether we need to update the type MIP, since it is constant, but whether we check whether
                         // the value to type check has changed.
                         val valueAnalysis = mip match {
-                            case xpathMIP: bind.XPathMIP => Some(xpathMIP.analysis)
-                            case typeMIP: bind.TypeMIP => bind.getValueAnalysis
-                            case _ => throw new IllegalStateException("Expecting XPath MIP or type MIP")
+                            case xpathMIP: bind.XPathMIP ⇒ Some(xpathMIP.analysis)
+                            case typeMIP: bind.TypeMIP ⇒ bind.getValueAnalysis
+                            case _ ⇒ throw new IllegalStateException("Expecting XPath MIP or type MIP")
                         }
 
                         val tempUpdateResult = valueAnalysis match {
-                            case Some(analysis) if !analysis.figuredOutDependencies =>
+                            case Some(analysis) if !analysis.figuredOutDependencies ⇒
                                 // Value dependencies are unknown
                                 new UpdateResult(true, 0)// savedEvaluations is N/A
-                            case Some(analysis) =>
+                            case Some(analysis) ⇒
                                 // Value dependencies are known
                                 // NOTE: Assume bind/@ref or MIP points to/depends only on the containing model
                                 new UpdateResult(analysis.intersectsValue(if (mip.isValidateMIP) modelState.revalidateChangeset else modelState.recalculateChangeset), 1)
-                            case _ => throw new IllegalStateException("No value analysis found for xf:bind with " + mipName)
+                            case _ ⇒ throw new IllegalStateException("No value analysis found for xf:bind with " + mipName)
                         }
 
                         if (tempUpdateResult.requireUpdate && logger.isDebugEnabled)
@@ -526,7 +526,7 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
 
                 updateResult.requireUpdate
 
-            case None => throw new IllegalArgumentException("No MIP found for name: " + mipName)
+            case None ⇒ throw new IllegalArgumentException("No MIP found for name: " + mipName)
         }
     }
 }
@@ -548,9 +548,9 @@ object PathMapXPathDependencies {
 
         // Fingerprint representation of the element and attribute nodes
         (if (ancestorOrSelf.size > 1) // first is the root element, which we skip as that corresponds to instance('...')
-            ancestorOrSelf.tail map (node => node.getNodeKind match {
-                case ELEMENT_NODE => node.getFingerprint
-                case ATTRIBUTE_NODE => "@" + node.getFingerprint
+            ancestorOrSelf.tail map (node ⇒ node.getNodeKind match {
+                case ELEMENT_NODE ⇒ node.getFingerprint
+                case ATTRIBUTE_NODE ⇒ "@" + node.getFingerprint
             })
         else
             Nil) mkString "/"

@@ -22,7 +22,7 @@ import org.orbeon.saxon.om.EmptyIterator
 import org.orbeon.saxon.om.ListIterator
 import org.orbeon.saxon.om.SingletonIterator
 import org.orbeon.saxon.value.Int64Value
-import java.util.{List => JList}
+import java.util.{List ⇒ JList}
 import collection.JavaConverters._
 
 /**
@@ -39,16 +39,16 @@ class XFormsDeleteEvent(containingDocument: XFormsContainingDocument, targetObje
         this(containingDocument, targetObject, null, -1)
 
     override def getAttribute(name: String) = name match {
-        case "deleted-nodes" =>
+        case "deleted-nodes" ⇒
             // "The instance data node deleted. Note that these nodes are no longer referenced by their parents."
             new ListIterator(deleteInfos.asScala map (_.nodeInfo) asJava)
-        case "delete-location" =>
+        case "delete-location" ⇒
             // "The delete location as defined by the delete action, or NaN if there is no delete location."
             if (deleteIndex < 1)
                 EmptyIterator.getInstance
             else
                 SingletonIterator.makeIterator(new Int64Value(deleteIndex))
-        case other =>
+        case other ⇒
             super.getAttribute(other)
     }
 }

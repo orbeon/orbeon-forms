@@ -19,7 +19,7 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload
 import org.orbeon.oxf.pipeline.api.ExternalContext
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.generator.RequestGenerator
-import java.util.{Map => JMap, HashMap => JHashMap}
+import java.util.{Map ⇒ JMap, HashMap ⇒ JHashMap}
 import ScalaUtils._
 
 import scala.collection.JavaConversions._
@@ -61,11 +61,11 @@ object Multipart {
         pipelineContext.addContextListener(new PipelineContext.ContextListenerAdapter {
             override def contextDestroyed(success: Boolean) =
                 uploadParameterMap.values.flatten foreach
-                    { case value: FileItem => runQuietly(value.delete()); case _ => }
+                    { case value: FileItem ⇒ runQuietly(value.delete()); case _ ⇒ }
         })
 
         // Parse the request and add file information
-        useAndClose(request.getInputStream) { inputStream =>
+        useAndClose(request.getInputStream) { inputStream ⇒
             val requestContext = new RequestContext {
                 def getContentType = request.getContentType
                 def getContentLength = request.getContentLength
@@ -88,11 +88,11 @@ object Multipart {
 
     def getUploadProgress(request: ExternalContext.Request, sessionKey: String): Option[UploadProgress] =
         request.getSession(false) match {
-            case session: Session => session.getAttributesMap.get(sessionKey) match {
-                case progress: UploadProgress => Some(progress)
-                case _ => None
+            case session: Session ⇒ session.getAttributesMap.get(sessionKey) match {
+                case progress: UploadProgress ⇒ Some(progress)
+                case _ ⇒ None
             }
-            case _ => None
+            case _ ⇒ None
         }
 
     def getUploadProgress(request: ExternalContext.Request, uuid: String, fieldName: String): Option[UploadProgress] =
@@ -100,8 +100,8 @@ object Multipart {
 
     def removeUploadProgress(request: ExternalContext.Request, control: XFormsValueControl): Unit =
         request.getSession(false) match {
-            case session: Session => session.getAttributesMap.remove(getProgressSessionKey(control.containingDocument.getUUID, control.getEffectiveId))
-            case _ =>
+            case session: Session ⇒ session.getAttributesMap.remove(getProgressSessionKey(control.containingDocument.getUUID, control.getEffectiveId))
+            case _ ⇒
         }
 
     object UploadState extends Enumeration {
@@ -135,14 +135,14 @@ object Multipart {
         try {
             var progressUUID: String = null
 
-            for (item <- upload.getItemIterator(requestContext)) {
+            for (item ← upload.getItemIterator(requestContext)) {
                 val fileItem = factory.createItem(item.getFieldName, item.getContentType, item.isFormField, item.getName)
 
                 // Make sure openStream is opened otherwise other methods fail later due to NPE
                 val inputStream = item.openStream
 
                 fileItem match {
-                    case headersSupport: FileItemHeadersSupport => headersSupport.setHeaders(item.getHeaders)
+                    case headersSupport: FileItemHeadersSupport ⇒ headersSupport.setHeaders(item.getHeaders)
                 }
 
                 items :+ fileItem
@@ -163,12 +163,12 @@ object Multipart {
 
                         // Get expected size first from part then from request
                         val expectedLength = item.getHeaders match {
-                            case headers: FileItemHeaders if headers.getHeader("content-length") ne null =>
+                            case headers: FileItemHeaders if headers.getHeader("content-length") ne null ⇒
                                 Some(headers.getHeader("content-length").toLong)
-                            case _ =>
+                            case _ ⇒
                                 request.getHeaderValuesMap.get("content-length") match {
-                                    case Array(requestLength: String) => Some(requestLength.toLong)
-                                    case _ => None
+                                    case Array(requestLength: String) ⇒ Some(requestLength.toLong)
+                                    case _ ⇒ None
                                 }
                         }
 
@@ -185,7 +185,7 @@ object Multipart {
 
                         fileItem
                     } else {
-                        // File upload without progress notification -> just copy the stream
+                        // File upload without progress notification → just copy the stream
                         copyStream(item.openStream, fileItem.getOutputStream)
 
                         fileItem
@@ -200,22 +200,22 @@ object Multipart {
                 // o don't remove UploadProgress objects from the session
                 // o instead mark all entries added so far as being in state Interrupted
                 // o free underlying FileItem storage if any as those won't be used
-                for (sessionKey <- sessionKeys)
+                for (sessionKey ← sessionKeys)
                     runQuietly {
                         getUploadProgress(request, sessionKey) match {
-                            case Some(progress) => progress.state = UploadState.Interrupted
-                            case _ =>
+                            case Some(progress) ⇒ progress.state = UploadState.Interrupted
+                            case _ ⇒
                         }
                     }
 
                 // Free underlying storage for all (disk) items gathered so far
-                for (fileItem <- items)
+                for (fileItem ← items)
                     runQuietly(fileItem.delete())
             }
         }
     }
 
-    // Implicit conversion from FileItemIterator -> Iterator
+    // Implicit conversion from FileItemIterator → Iterator
     private implicit def asScalaIterator(i : FileItemIterator): Iterator[FileItemStream] = new Iterator[FileItemStream] {
         def hasNext = i.hasNext
         def next = i.next

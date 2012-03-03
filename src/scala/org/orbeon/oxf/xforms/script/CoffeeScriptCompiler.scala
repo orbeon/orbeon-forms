@@ -17,7 +17,7 @@ import org.mozilla.javascript.Context
 import java.io.InputStreamReader
 
 /**
- * CoffeeScript -> JavaScript compiler.
+ * CoffeeScript → JavaScript compiler.
  */
 object CoffeeScriptCompiler {
 

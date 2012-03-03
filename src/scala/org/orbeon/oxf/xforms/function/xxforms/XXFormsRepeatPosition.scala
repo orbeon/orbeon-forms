@@ -51,8 +51,8 @@ object XXFormsRepeatFunctions {
         } while (currentBindingContext ne null)
 
         repeatId match {
-            case Some(id) => throw new ValidationException("No enclosing xforms:repeat found for repeat id: " + id, initialBindingContext.locationData)
-            case None =>throw new ValidationException("No enclosing xforms:repeat found.", initialBindingContext.locationData)
+            case Some(id) ⇒ throw new ValidationException("No enclosing xforms:repeat found for repeat id: " + id, initialBindingContext.locationData)
+            case None ⇒throw new ValidationException("No enclosing xforms:repeat found.", initialBindingContext.locationData)
         }
     }
 }

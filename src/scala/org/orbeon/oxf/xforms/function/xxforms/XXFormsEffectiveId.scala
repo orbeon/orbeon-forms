@@ -20,15 +20,15 @@ import org.orbeon.oxf.xforms.event.XFormsEventTarget
 
 class XXFormsEffectiveId extends XFormsFunction {
     override def evaluateItem(xpathContext: XPathContext) = argument match {
-        case Array() =>
+        case Array() ⇒
             // If no argument is supplied, return the closest id (source id)
             StringValue.makeStringValue(getSourceEffectiveId(xpathContext))
-        case Array(expr) =>
+        case Array(expr) ⇒
             // Otherwise resolve the static id passed against the source id
             val staticId = expr.evaluateAsString(xpathContext).toString
             Option(getXBLContainer(xpathContext).resolveObjectById(getSourceEffectiveId(xpathContext), staticId, null)) match {
-                case Some(o: XFormsEventTarget) => StringValue.makeStringValue(o.getEffectiveId)
-                case None => null
+                case Some(o: XFormsEventTarget) ⇒ StringValue.makeStringValue(o.getEffectiveId)
+                case None ⇒ null
             }
     }
 }

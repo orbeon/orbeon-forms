@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.event
 
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xml.dom4j.LocationData
-import java.util.{Set => JSet}
+import java.util.{Set ⇒ JSet}
 
 // Static event handler
 trait EventHandler {

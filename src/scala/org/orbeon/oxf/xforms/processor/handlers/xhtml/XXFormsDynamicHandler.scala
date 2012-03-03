@@ -42,7 +42,7 @@ class XXFormsDynamicHandler extends XFormsBaseHandler(false, false) {
 
         if (!handlerContext.isTemplate) {
             containingDocument.getObjectByEffectiveId(effectiveId) match {
-                case control: XXFormsDynamicControl =>
+                case control: XXFormsDynamicControl ⇒
                     // Output new scripts upon update if any
                     if (!containingDocument.isInitializing && control.newScripts.nonEmpty) {
                         val helper = new ContentHandlerHelper(contentHandler)
@@ -52,13 +52,13 @@ class XXFormsDynamicHandler extends XFormsBaseHandler(false, false) {
                         control.newScripts = Seq.empty
                     }
                     // Output new markup
-                    control.nested foreach { nested =>
+                    control.nested foreach { nested ⇒
                         handlerContext.pushPartAnalysis(nested.partAnalysis)
                         processShadowTree(controller, nested.template)
                         handlerContext.popPartAnalysis()
                     }
 
-                case _ =>
+                case _ ⇒
             }
         }
     }

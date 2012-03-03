@@ -58,7 +58,7 @@ class XFormsSetvalueAction extends XFormsAction {
                     nodeInfo,
                     valueToSet,
                     DataModel.logAndNotifyValueChange(containingDocument, indentedLogger, "setvalue", nodeInfo, _, valueToSet, isCalculate = false),
-                    reason => throw new OXFException(reason.message)
+                    reason ⇒ throw new OXFException(reason.message)
                 )
             case _ ⇒
                 // Node doesn't exist: NOP

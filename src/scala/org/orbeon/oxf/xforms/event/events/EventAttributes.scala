@@ -20,16 +20,16 @@ import org.orbeon.oxf.xforms.event.XFormsEvent
 trait EventAttributes extends XFormsEvent {
 
     // Implementing class must specify attributes
-    protected val attributes: Map[String, () => String]
+    protected val attributes: Map[String, () ⇒ String]
 
     private def stringIterator(value: String) = SingletonIterator.makeIterator(StringValue.makeStringValue(value))
 
     override def getAttribute(name: String) = attributes(name) match {
-        case null => super.getAttribute(name)
-        case getvalue => stringIterator(getvalue())
+        case null ⇒ super.getAttribute(name)
+        case getvalue ⇒ stringIterator(getvalue())
     }
 
     def toStringArray =
          attributes.keys.toArray flatMap
-            (name => Array(name, getAttribute(name).next().getStringValue))
+            (name ⇒ Array(name, getAttribute(name).next().getStringValue))
 }

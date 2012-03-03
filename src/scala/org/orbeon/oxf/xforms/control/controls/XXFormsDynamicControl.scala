@@ -283,7 +283,7 @@ object InstanceMirror {
                         newNode,
                         valueChanged.newValue,
                         DataModel.logAndNotifyValueChange(containingDocument, indentedLogger, "mirror", newNode, _, valueChanged.newValue, isCalculate = false),
-                        reason => throw new OXFException(reason.message)
+                        reason ⇒ throw new OXFException(reason.message)
                     )
                 case None ⇒ // change not in an instance
                     notifyOtherChange()

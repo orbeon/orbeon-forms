@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.action
 import actions.{XFormsSetindexAction, XFormsDeleteAction, XFormsInsertAction}
 import collection.JavaConverters._
 import org.orbeon.saxon.om._
-import java.util.{List => JList}
+import java.util.{List ⇒ JList}
 import org.orbeon.scaxon.XML._
 import org.w3c.dom.Node.{ELEMENT_NODE, ATTRIBUTE_NODE}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
@@ -35,7 +35,7 @@ object XFormsAPI {
     val actionInterpreterDyn = new DynamicVariable[XFormsActionInterpreter]
 
     // Every block of action must be run within this
-    def withScalaAction(interpreter: XFormsActionInterpreter)(body: => Any) {
+    def withScalaAction(interpreter: XFormsActionInterpreter)(body: ⇒ Any) {
         actionInterpreterDyn.withValue(interpreter) {
             body
         }
@@ -48,7 +48,7 @@ object XFormsAPI {
         }
 
     // Every block of action must be run within this
-    def withContainingDocument(containingDocument: XFormsContainingDocument)(body: => Any) {
+    def withContainingDocument(containingDocument: XFormsContainingDocument)(body: ⇒ Any) {
         containingDocumentDyn.withValue(containingDocument) {
             body
         }
@@ -62,7 +62,7 @@ object XFormsAPI {
 
             def onSuccess(oldValue: String): Unit =
                 for {
-                    action <- actionInterpreterDyn.value
+                    action ← actionInterpreterDyn.value
                     containingDocument = action.containingDocument
                     indentedLogger = action.indentedLogger
                 } yield
@@ -83,8 +83,8 @@ object XFormsAPI {
     // - Some(index) otherwise, where index is the control's new index
     def setindex(repeatStaticId: String, index: Int) =
         actionInterpreterDyn.value map
-            { interpreter => XFormsSetindexAction.executeSetindexAction(interpreter, interpreter.outerActionElement, repeatStaticId, index) } collect
-                { case newIndex if newIndex >= 0 => newIndex }
+            { interpreter ⇒ XFormsSetindexAction.executeSetindexAction(interpreter, interpreter.outerActionElement, repeatStaticId, index) } collect
+                { case newIndex if newIndex >= 0 ⇒ newIndex }
 
     // Insert
     // @return the inserted nodes
@@ -125,9 +125,9 @@ object XFormsAPI {
 
         if (oldName != newName) {
             val newNodeInfo = nodeInfo.getNodeKind match {
-                case ELEMENT_NODE => elementInfo(newName, (nodeInfo \@ @*) ++ (nodeInfo \ node))
-                case ATTRIBUTE_NODE =>  attributeInfo(newName, attValueOption(nodeInfo).get)
-                case _ => throw new IllegalArgumentException
+                case ELEMENT_NODE ⇒ elementInfo(newName, (nodeInfo \@ @*) ++ (nodeInfo \ node))
+                case ATTRIBUTE_NODE ⇒  attributeInfo(newName, attValueOption(nodeInfo).get)
+                case _ ⇒ throw new IllegalArgumentException
             }
 
             insert(into = nodeInfo.parent.get, after = nodeInfo, origin = newNodeInfo)
@@ -163,8 +163,8 @@ object XFormsAPI {
     // nodes.
     def ensureAttribute(element: NodeInfo, attName: QName, value: String): Unit =
         element \@ attName match {
-            case Seq() => insert(into = element, origin = attributeInfo(attName, value))
-            case Seq(att, _*) => setvalue(att, value)
+            case Seq() ⇒ insert(into = element, origin = attributeInfo(attName, value))
+            case Seq(att, _*) ⇒ setvalue(att, value)
         }
 
     // Return an instance's root element in the current action context
@@ -174,8 +174,8 @@ object XFormsAPI {
 
         def ancestorXBLContainers = {
             def recurse(container: XBLContainer): List[XBLContainer] = container :: (container.getParentXBLContainer match {
-                case parent: XBLContainer => recurse(parent)
-                case _ => Nil
+                case parent: XBLContainer ⇒ recurse(parent)
+                case _ ⇒ Nil
             })
 
             recurse(actionInterpreterDyn.value.get.container)
@@ -199,7 +199,7 @@ object XFormsAPI {
     // Return the containing document
     def containingDocument = { assert(containingDocumentDyn.value.isDefined); containingDocumentDyn.value.get }
     
-    def context[T](xpath: String)(body: => T): T = ???
-    def context[T](item: Item)(body: => T): T = ???
+    def context[T](xpath: String)(body: ⇒ T): T = ???
+    def context[T](item: Item)(body: ⇒ T): T = ???
     def event[T](attributeName: String): Seq[Item] = ???
 }   

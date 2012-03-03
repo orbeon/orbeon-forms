@@ -36,15 +36,15 @@ object Caches {
             val manager = new CacheManager(URLFactory.createURL(ehcachePath))
             withMessage(manager, "initialized cache manager from " + ehcachePath)
         } catch {
-            case _ =>
+            case _ ⇒
                 throw new OXFException("unable to read cache manager configuration from " + ehcachePath)
         }
 
     private def getCache(cacheName: String) =
         cacheManager.getCache(cacheName) match {
-            case cache: Cache =>
+            case cache: Cache ⇒
                 withMessage(cache, "found cache configuration for " + cacheName)
-            case _ =>
+            case _ ⇒
                 throw new OXFException("Cache configuration not found for " + cacheName + ". Make sure an ehcache.xml file is in place.")
         }
 

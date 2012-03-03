@@ -35,8 +35,8 @@ class ExternalLHHAAnalysis(staticStateContext: StaticStateContext, element: Elem
 
         // Try to find associated control
         staticStateContext.partAnalysis.getControlAnalysis(scope.prefixedIdForStaticId(forAttribute)) match {
-            case lhhaControl: LHHATrait => lhhaControl.setExternalLHHA(ExternalLHHAAnalysis.this)
-            case _ => staticStateContext.partAnalysis.getIndentedLogger.logWarning("", "cannot attach exernal LHHA to control",
+            case lhhaControl: LHHATrait ⇒ lhhaControl.setExternalLHHA(ExternalLHHAAnalysis.this)
+            case _ ⇒ staticStateContext.partAnalysis.getIndentedLogger.logWarning("", "cannot attach exernal LHHA to control",
                 Array("type", localName, "element", Dom4jUtils.elementToDebugString(element)): _*)
         }
     }

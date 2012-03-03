@@ -40,8 +40,8 @@ class Scope(val parent: Scope, val scopeId: String) {
     // Add a static id → prefixed id mapping
     def += (kv: (String, String)) = kv match {
         case (staticId, prefixedId) ⇒
-            // Index static id => prefixed id by scope
-            idMap += staticId -> prefixedId
+            // Index static id ⇒ prefixed id by scope
+            idMap += staticId → prefixedId
     }
 
     // Equality is defined purely based on the scope id

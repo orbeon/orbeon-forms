@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.event.events
 
 import org.orbeon.oxf.xforms.XFormsContainingDocument
-import java.util.{Map => JMap}
+import java.util.{Map ⇒ JMap}
 import org.orbeon.oxf.xforms.event._
 
 class XXFormsUploadDoneEvent(containingDocument: XFormsContainingDocument, targetObject: XFormsEventTarget, parameters: JMap[String, String])

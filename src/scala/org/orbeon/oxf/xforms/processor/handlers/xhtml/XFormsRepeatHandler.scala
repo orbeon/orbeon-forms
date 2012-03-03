@@ -21,7 +21,7 @@ import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl
 import org.orbeon.oxf.xml._
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData
 import org.xml.sax.Attributes
-import java.lang.{StringBuilder => JStringBuilder}
+import java.lang.{StringBuilder ⇒ JStringBuilder}
 import org.orbeon.oxf.xforms.processor.handlers.OutputInterceptor
 
 /**
@@ -52,7 +52,7 @@ class XFormsRepeatHandler extends XFormsControlLifecyleHandler(true, true) { // 
         val savedOutput = handlerContext.getController.getOutput
 
         var mustOutputFirstDelimiter = isMustGenerateDelimiters
-        var outputDelimiter: (String, String) => Unit = null // initialized further below
+        var outputDelimiter: (String, String) ⇒ Unit = null // initialized further below
 
         val outputInterceptor = if (!isMustGenerateDelimiters) null else new OutputInterceptor(savedOutput, spanQName, new OutputInterceptor.Listener {
                 def generateFirstDelimiter(outputInterceptor: OutputInterceptor) {
@@ -111,7 +111,7 @@ class XFormsRepeatHandler extends XFormsControlLifecyleHandler(true, true) { // 
                 if (isMustGenerateDelimiters)
                     outputInterceptor.flushCharacters(true, true)
             } catch {
-                case e: Exception =>
+                case e: Exception ⇒
                     throw ValidationException.wrapException(e, new ExtendedLocationData(repeatControl.getLocationData, "unrolling xforms:repeat control", repeatControl.getControlElement))
             }
             handlerContext.popRepeatContext()
@@ -128,7 +128,7 @@ class XFormsRepeatHandler extends XFormsControlLifecyleHandler(true, true) { // 
             val isStaticReadonly = super.isStaticReadonly(repeatControl)
 
             val addedClasses = new StringBuilder(200)
-            for (i <- 1 to repeatControl.getSize) {
+            for (i ← 1 to repeatControl.getSize) {
                 // Delimiter: before repeat entries, except the first one which is output by generateFirstDelimiter()
                 if (isMustGenerateDelimiters && i > 1)
                     outputDelimiter("xforms-repeat-delimiter", null)

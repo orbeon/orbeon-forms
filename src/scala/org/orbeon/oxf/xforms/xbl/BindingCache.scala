@@ -14,10 +14,10 @@
 package org.orbeon.oxf.xforms.xbl
 
 import org.orbeon.oxf.xforms.Caches
-import net.sf.ehcache.{Element => EhElement}
+import net.sf.ehcache.{Element ⇒ EhElement}
 import org.dom4j.QName
 
-// Cache binding path/QName -> AbstractBinding
+// Cache binding path/QName → AbstractBinding
 object BindingCache {
 
     private val cache = Caches.xblCache
@@ -31,7 +31,7 @@ object BindingCache {
 
     def get(path: String, name: QName, lastModified: Long): Option[AbstractBinding] = synchronized {
         val key = cacheKey(path, name)
-        Option(cache.get(key)) flatMap { element =>
+        Option(cache.get(key)) flatMap { element ⇒
             // NOTE: As of Ehcache 2.4.0, the version attribute is entirely handled by the caller. See:
             // http://jira.terracotta.org/jira/browse/EHC-666
             val cacheLastModified = element.getVersion

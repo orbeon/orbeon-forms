@@ -90,9 +90,9 @@ object XML {
     }
 
     // Useful predicates
-    val hasChildren: NodeInfo => Boolean = element => element \ * nonEmpty
-    val hasId: (NodeInfo, String) => Boolean = (element, id) => element \@ "id" === id
-    val exists: (Seq[Item]) => Boolean = (items) => items.nonEmpty
+    val hasChildren: NodeInfo ⇒ Boolean = element ⇒ element \ * nonEmpty
+    val hasId: (NodeInfo, String) ⇒ Boolean = (element, id) ⇒ element \@ "id" === id
+    val exists: (Seq[Item]) ⇒ Boolean = (items) ⇒ items.nonEmpty
 
     // Get the value of the first attribute passed if any
     def attValueOption(atts: Seq[NodeInfo]) = atts.headOption map (_.getStringValue)
@@ -118,7 +118,7 @@ object XML {
             val pool = nodeInfo.getNamePool
 
             // For now just test on the local name
-            // TODO: support for testing on qualified name -> requires namespace context
+            // TODO: support for testing on qualified name → requires namespace context
 //                    val fingerprint = pool.getFingerprint(uri, qName._2)
 //                    val test = new NameTest(nodeKind, fingerprint, pool)
 
@@ -258,8 +258,8 @@ object XML {
         // The string value is not defined on sequences. We take the first value, for convenience, like in XPath 2.0's
         // XPath 1.0 compatibility mode.
         def stringValue = seq match {
-            case Seq() => ""
-            case Seq(nodeInfo, _*) => nodeInfo.getStringValue
+            case Seq() ⇒ ""
+            case Seq(nodeInfo, _*) ⇒ nodeInfo.getStringValue
         }
     }
 

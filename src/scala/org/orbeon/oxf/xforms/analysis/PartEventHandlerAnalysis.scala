@@ -21,7 +21,7 @@ import org.orbeon.oxf.xforms.{Script, XFormsConstants}
 // Part analysis: event handlers information
 trait PartEventHandlerAnalysis {
 
-    self: PartAnalysisImpl =>
+    self: PartAnalysisImpl ⇒
 
     private var eventHandlersMap: Map[String, List[EventHandler]] = _
     private var eventNames: Set[String] = _

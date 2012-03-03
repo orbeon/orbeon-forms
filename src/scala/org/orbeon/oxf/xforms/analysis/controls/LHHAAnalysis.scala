@@ -44,7 +44,7 @@ abstract class LHHAAnalysis(staticStateContext: StaticStateContext, element: Ele
 
     def debugOut(): Unit =
         if (staticValue.isDefined)
-            println("static value for control " + prefixedId + " => " + staticValue.get)
+            println("static value for control " + prefixedId + " ⇒ " + staticValue.get)
 
     // Consider that LHHA don't have context/binding as we delegate implementation in computeValueAnalysis
     override protected def computeContextAnalysis = None
@@ -84,7 +84,7 @@ abstract class LHHAAnalysis(staticStateContext: StaticStateContext, element: Ele
                                 combinedAnalysis = combinedAnalysis combine outputAnalysis.getValueAnalysis.get
                         } else if (hostLanguageAVTs) {
                             val attributes = element.attributes
-                            for (o <- attributes; attributeValue = o.asInstanceOf[Attribute].getValue; if XFormsUtils.maybeAVT(attributeValue)) {
+                            for (o ← attributes; attributeValue = o.asInstanceOf[Attribute].getValue; if XFormsUtils.maybeAVT(attributeValue)) {
                                 // TODO: handle AVTs
                                 combinedAnalysis = NegativeAnalysis(attributeValue) // not supported just yet
                             }

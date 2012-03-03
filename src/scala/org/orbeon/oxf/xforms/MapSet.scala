@@ -26,8 +26,8 @@ class MapSet[A, B] extends Traversable[(A, B)] with Growable[(A, B)] {
 
     def put(a: A, b: B) {
         (map.get(a) match {
-            case Some(set) => set
-            case None =>
+            case Some(set) ⇒ set
+            case None ⇒
                 val newSet = new LinkedHashSet[B]
                 map.put(a, newSet)
                 newSet
@@ -41,7 +41,7 @@ class MapSet[A, B] extends Traversable[(A, B)] with Growable[(A, B)] {
         if (intersection.isEmpty)
             return false
 
-        for (key <- intersection)
+        for (key ← intersection)
             if ((map.get(key).get & other.map.get(key).get).nonEmpty)
                 return true
 
@@ -53,14 +53,14 @@ class MapSet[A, B] extends Traversable[(A, B)] with Growable[(A, B)] {
     // NOTE: should use ++ operator, but harder to implement properly
     def combine(other: MapSet[A, B]): MapSet[A, B] = {
         val result = new MapSet[A, B]
-        this foreach (entry => result.put(entry._1, entry._2))
-        other foreach (entry => result.put(entry._1, entry._2))
+        this foreach (entry ⇒ result.put(entry._1, entry._2))
+        other foreach (entry ⇒ result.put(entry._1, entry._2))
         result
     }
 
     // TraversableLike
     // Iterate over all (A, B) tuples
-    def foreach[U](f: ((A, B)) => U) = map foreach (mapEntry => mapEntry._2 foreach (setEntry => f((mapEntry._1, setEntry))))
+    def foreach[U](f: ((A, B)) ⇒ U) = map foreach (mapEntry ⇒ mapEntry._2 foreach (setEntry ⇒ f((mapEntry._1, setEntry))))
 
     // Growable
     def +=(elem: (A, B)) = {put(elem._1, elem._2); this}

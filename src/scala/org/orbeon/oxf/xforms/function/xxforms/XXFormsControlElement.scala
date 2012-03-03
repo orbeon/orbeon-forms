@@ -22,10 +22,10 @@ class XXFormsControlElement extends XFormsFunction {
 
     override def evaluateItem(xpathContext: XPathContext) =
         Option(if (argument.length == 0) xpathContext.getContextItem else argument(0).evaluateItem(xpathContext)) map
-            (item => resolveOrFindByEffectiveId(xpathContext, item.getStringValue)) flatMap {
-                case control: XFormsControl =>
+            (item ⇒ resolveOrFindByEffectiveId(xpathContext, item.getStringValue)) flatMap {
+                case control: XFormsControl ⇒
                     Some(getContainingDocument(xpathContext).getStaticState.documentWrapper.wrap(control.getControlElement))
-                case _ =>
+                case _ ⇒
                     None
             } orNull
 

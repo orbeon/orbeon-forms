@@ -25,7 +25,7 @@ class DynamicVariable[T] {
             None
     }
 
-    def withValue[S](value: T)(thunk: => S): S = {
+    def withValue[S](value: T)(thunk: ⇒ S): S = {
 
         val oldValue = threadLocal.get
         threadLocal set Some(value)

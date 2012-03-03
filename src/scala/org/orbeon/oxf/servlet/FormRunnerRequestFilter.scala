@@ -16,7 +16,7 @@ package org.orbeon.oxf.servlet
 import collection.JavaConversions._
 import javax.servlet.http.{HttpServletRequestWrapper, HttpServletRequest}
 import org.orbeon.oxf.fr.FormRunner
-import java.util.{Enumeration => JEnumeration}
+import java.util.{Enumeration ⇒ JEnumeration}
 
 /**
  * This filter adds the Orbeon-Username and Orbeon-Roles to the request headers.
@@ -25,8 +25,8 @@ class FormRunnerRequestFilter extends RequestFilter {
     def amendRequest(servletRequest: HttpServletRequest) = {
 
         def getHeader(name: String) = servletRequest.getHeaders(name).asInstanceOf[JEnumeration[String]].toArray match {
-            case Array() => None
-            case array => Some(array)
+            case Array() ⇒ None
+            case array ⇒ Some(array)
         }
 
         val headers = FormRunner.getUserRolesAsHeaders(servletRequest, getHeader)
@@ -37,7 +37,7 @@ class FormRunnerRequestFilter extends RequestFilter {
             override def getHeader(name: String) =
                 headers.get(name) map (_.head) getOrElse super.getHeader(name)
             override def getHeaders(name: String): JEnumeration[_] =
-                headers.get(name) map (n => asJavaEnumeration(n.iterator)) getOrElse super.getHeaders(name)
+                headers.get(name) map (n ⇒ asJavaEnumeration(n.iterator)) getOrElse super.getHeaders(name)
         }
 
         new HttpServletRequestWrapper(servletRequest) with CustomHeaders

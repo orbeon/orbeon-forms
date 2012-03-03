@@ -28,15 +28,15 @@ class XXFormsListVariables extends XFormsFunction {
         val modelEffectiveId = argument(0).evaluateAsString(xpathContext).toString
 
         containingDocument.getObjectByEffectiveId(modelEffectiveId) match {
-            case model: XFormsModel =>
+            case model: XFormsModel ⇒
                 val variables = model.getTopLevelVariables
 
                 if (variables.size() > 0)
-                    new ListIterator(variables.asScala.map { case (name, _) => StringValue.makeStringValue(name) }.toList.asJava)
+                    new ListIterator(variables.asScala.map { case (name, _) ⇒ StringValue.makeStringValue(name) }.toList.asJava)
                 else
                     EmptyIterator.getInstance
 
-            case _ => EmptyIterator.getInstance
+            case _ ⇒ EmptyIterator.getInstance
         }
     }
 }

@@ -22,7 +22,7 @@ import org.orbeon.oxf.xforms.XFormsUtils
 
 trait PartXBLAnalysis extends TransientState {
 
-    self: PartAnalysisImpl =>
+    self: PartAnalysisImpl ⇒
 
     val xblBindings = new XBLBindings(getIndentedLogger, this, metadata, staticStateDocument.xblElements)
     private[PartXBLAnalysis] val scopesById = HashMap[String, Scope]()

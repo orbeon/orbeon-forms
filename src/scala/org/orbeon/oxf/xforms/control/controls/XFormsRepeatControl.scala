@@ -82,7 +82,7 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
         if (! restoredState)
             setIndexInternal(getStartIndex)
         else
-            // NOTE: state deserialized -> state previously serialized -> control was relevant -> onCreate() called
+            // NOTE: state deserialized → state previously serialized → control was relevant → onCreate() called
             restoredState = false
 
         // Reset refresh information

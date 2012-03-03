@@ -28,10 +28,10 @@ class CoffeeScriptTask extends MatchingTask {
 
     override def execute() {
 
-        Seq(fromDir, toDir) find (!_.isDirectory) foreach (s => throw new BuildException(s + " is not a valid directory"))
+        Seq(fromDir, toDir) find (!_.isDirectory) foreach (s ⇒ throw new BuildException(s + " is not a valid directory"))
 
         try {
-            for (fileName <- getDirectoryScanner(fromDir).getIncludedFiles) {
+            for (fileName ← getDirectoryScanner(fromDir).getIncludedFiles) {
 
                 val iFile = new File(fromDir.getAbsolutePath, fileName)
                 val oFile = new File(toDir.getAbsolutePath, fileName.split('.').init :+ "js" mkString ".")
@@ -51,14 +51,14 @@ class CoffeeScriptTask extends MatchingTask {
                     try {
                         copyReader(new StringReader(jsString), new OutputStreamWriter(new FileOutputStream(oFile), Charset.forName("UTF-8")))
                     } catch {
-                        case e =>
+                        case e ⇒
                             runQuietly(oFile.delete()) // remove output file if something happened while producing the file
                             throw e
                     }
                 }
             }
         } catch {
-            case e => throw new BuildException(e);
+            case e ⇒ throw new BuildException(e);
         }
     }
 }

@@ -18,10 +18,10 @@ import org.orbeon.oxf.util.XPathCache
 import org.orbeon.oxf.xforms._
 import analysis._
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
-import scala.collection.JavaConversions._
 import org.orbeon.saxon.dom4j.DocumentWrapper
 import xbl.Scope
 import org.orbeon.oxf.xforms.XFormsConstants._
+import org.orbeon.oxf.xml.Dom4j
 
 abstract class LHHAAnalysis(staticStateContext: StaticStateContext, element: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], scope: Scope)
         extends SimpleElementAnalysis(staticStateContext, element, parent, preceding, scope) with AppearanceTrait {
@@ -83,11 +83,11 @@ abstract class LHHAAnalysis(staticStateContext: StaticStateContext, element: Ele
                             if (outputAnalysis.getValueAnalysis.isDefined)
                                 combinedAnalysis = combinedAnalysis combine outputAnalysis.getValueAnalysis.get
                         } else if (hostLanguageAVTs) {
-                            val attributes = element.attributes
-                            for (o ← attributes; attributeValue = o.asInstanceOf[Attribute].getValue; if XFormsUtils.maybeAVT(attributeValue)) {
-                                // TODO: handle AVTs
-                                combinedAnalysis = NegativeAnalysis(attributeValue) // not supported just yet
-                            }
+                            for {
+                                attribute ← Dom4j.attributes(element)
+                                attributeValue = attribute.getValue
+                                if XFormsUtils.maybeAVT(attributeValue)
+                            } combinedAnalysis = NegativeAnalysis(attributeValue) // not supported just yet
                         }
                     }
 

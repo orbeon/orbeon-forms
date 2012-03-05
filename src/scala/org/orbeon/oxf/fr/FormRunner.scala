@@ -109,8 +109,8 @@ object FormRunner {
 
         val result = collection.mutable.Map[String, Array[String]]()
 
-        username foreach (u ⇒ result += ("orbeon-username" → Array(u)))
-        roles foreach (r ⇒ result += ("orbeon-roles" → r))
+        username foreach (u ⇒ result += "orbeon-username" → Array(u))
+        roles foreach (r ⇒ result += "orbeon-roles" → r)
 
         result.toMap
     }
@@ -152,7 +152,7 @@ object FormRunner {
                 headerName = "Orbeon-" + capitalizeHeader(lowerSuffix)
                 headerValue = propertySet.getObject(propertyName).toString
             } yield
-                (headerName → headerValue)) toMap
+                headerName → headerValue) toMap
 
         (findProviderURL, headers)
     }
@@ -205,16 +205,15 @@ object FormRunner {
 
         val appForms = getFormBuilderPermissions(formRunnerRoles, incomingRoleNames)
 
-        if (appForms.isEmpty) {
+        if (appForms.isEmpty)
             <apps has-roles="false" all-roles=""/>
-        } else {
+        else
             // Result document contains a tree structure of apps and forms
             <apps has-roles="true" all-roles={incomingRoleNames mkString " "}>{
                 appForms map { case (app, forms) ⇒
                     <app name={app}>{ forms map { form ⇒ <form name={form}/> } }</app>
                 }
             }</apps>
-        }
     }
 
     def getFormBuilderPermissions(formRunnerRoles: NodeInfo, incomingRoleNames: Set[String]): Map[String, Set[String]] = {
@@ -242,7 +241,8 @@ object FormRunner {
 
                         if (applicableFormsForApp("*")) Set("*") else applicableFormsForApp
                     }
-                } yield app → forms) toMap
+                } yield
+                    app → forms) toMap
             }
         }
     }
@@ -267,7 +267,8 @@ object FormRunner {
                 formatPropertyName ← propertiesStartingWith("oxf.fr.pdf.format")
                 expression ← Option(XXFormsProperty.property(formatPropertyName)) map (_.getStringValue)
                 formatName = formatPropertyName split '.' last
-            } yield (formatName → expression)
+            } yield
+                formatName → expression
 
         formatPairs.toMap.asJava
     }
@@ -280,7 +281,8 @@ object FormRunner {
             for {
                 format ← Option(XXFormsProperty.property(propertyName)) map (_.getStringValue)
                 expression ← Option(pdfFormats.get(format))
-            } yield expression
+            } yield
+                expression
 
         expressionOption.orNull
     }

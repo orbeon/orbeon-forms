@@ -119,15 +119,16 @@ object ClientEvents {
         hasAllEvents
     }
 
-    def reorderNoscriptEvents(eventElements: Seq[Element], document: XFormsContainingDocument): Seq[Element] = {
+    // Event categories, in the order we will want them
+    sealed trait Category
+    case object Other extends Category
+    case object ValueChange extends Category
+    case object SelectBlank extends Category
+    case object Activation extends Category
 
-        // Event categories, in the order we will want them
-        object Category extends Enumeration {
-            val Other = Value
-            val ValueChange = Value
-            val SelectBlank = Value
-            val Activation = Value
-        }
+    val AllCategories = Seq(Other, ValueChange, SelectBlank, Activation)
+
+    def reorderNoscriptEvents(eventElements: Seq[Element], document: XFormsContainingDocument): Seq[Element] = {
 
         // Group events in 3 categories
         def getEventCategory(element: Element) = element match {
@@ -136,12 +137,12 @@ object ClientEvents {
                 val sourceControlId = element.attributeValue("source-control-id")
                 element match {
                     // This is a value event
-                    case element if document.getStaticOps.isValueControl(sourceControlId) ⇒ Category.ValueChange
+                    case element if document.getStaticOps.isValueControl(sourceControlId) ⇒ ValueChange
                     // This is most likely a trigger or submit which will translate into a DOMActivate. We will move it
                     // to the end so that value change events are committed to instance data before that.
-                    case _ ⇒ Category.Activation
+                    case _ ⇒ Activation
                 }
-            case _ ⇒ Category.Other
+            case _ ⇒ Other
         }
 
         // NOTE: map keys are not in predictable order, but map values preserve the order
@@ -151,7 +152,7 @@ object ClientEvents {
         val blankEvents = {
 
             // Get set of all value change events effective ids
-            def getValueChangeIds = groups.get(Category.ValueChange).flatten map (_.attributeValue("source-control-id")) toSet
+            def getValueChangeIds = groups.get(ValueChange).flatten map (_.attributeValue("source-control-id")) toSet
 
             // Create <xxf:event name="xxforms-value-or-activate" source-control-id="my-effective-id"/>
             def createBlankingEvent(control: XFormsControl) = {
@@ -172,7 +173,7 @@ object ClientEvents {
         }
 
         // Return all events by category in the order we defined the categories
-        Category.values.toSeq flatMap ((groups + (Category.SelectBlank → blankEvents)).get(_)) flatten
+        AllCategories flatMap ((groups + (SelectBlank → blankEvents)).get(_)) flatten
     }
 
     private def safelyCreateEvent(document: XFormsContainingDocument, event: LocalEvent): Option[XFormsEvent] = {

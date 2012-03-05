@@ -25,28 +25,27 @@ import java.io._
  */
 class OrbeonProxyPortlet extends GenericPortlet {
 
-    private object PreferenceName extends Enumeration {
-        val FormRunnerURL = Value("form-runner-url")
-        val AppName = Value("app-name")
-        val FormName = Value("form-name")
-        val Action = Value("action")
-        val ReadOnly = Value("read-only")
-    }
+    sealed trait Preference { val name: String }
+    case object FormRunnerURL extends Preference { val name = "form-runner-url" }
+    case object AppName       extends Preference { val name = "app-name" }
+    case object FormName      extends Preference { val name = "form-name" }
+    case object Action        extends Preference { val name = "action" }
+    case object ReadOnly      extends Preference { val name = "read-only" }
 
 //    private val actions = Set("new", "summary")
 
-    private val preferences = Map(
-        PreferenceName.FormRunnerURL → "Form Runner URL",
-        PreferenceName.AppName → "Form Runner app name",
-        PreferenceName.FormName → "Form Runner form name",
-        PreferenceName.Action → "Form Runner action",
-        PreferenceName.ReadOnly → "Read-Only access"
+    private val PreferenceLabels = Map(
+        FormRunnerURL → "Form Runner URL",
+        AppName       → "Form Runner app name",
+        FormName      → "Form Runner form name",
+        Action        → "Form Runner action",
+        ReadOnly      → "Read-Only access"
     )
 
     // Return the value of the preference if set, otherwise the value of the initialization parameter
     // NOTE: We should be able to use portlet.xml portlet-preferences/preference, but somehow this doesn't work properly
-    private def getPreference(request: PortletRequest, pref: PreferenceName.Value) =
-        request.getPreferences.getValue(pref.toString, getPortletConfig.getInitParameter(pref.toString))
+    private def getPreference(request: PortletRequest, pref: Preference) =
+        request.getPreferences.getValue(pref.name, getPortletConfig.getInitParameter(pref.name))
 
     private val FormRunnerPath = """/fr/([^/]+)/([^/]+)/(new|summary)(\?(.*))?""".r
     private val FormRunnerDocumentPath = """/fr/([^/]+)/([^/]+)/(new|edit|view)/([^/?]+)?(\?(.*))?""".r
@@ -54,9 +53,9 @@ class OrbeonProxyPortlet extends GenericPortlet {
     override def doView(request: RenderRequest, response: RenderResponse) = {
 
         def filterAction(request: RenderRequest, action: String) =
-            if (getPreference(request, PreferenceName.ReadOnly) == "true" && action == "edit") "view" else action 
+            if (getPreference(request, ReadOnly) == "true" && action == "edit") "view" else action
 
-        val formRunnerURL = getPreference(request, PreferenceName.FormRunnerURL)
+        val formRunnerURL = getPreference(request, FormRunnerURL)
 
             val (appName, formName, action, documentId, query) = request.getParameter("orbeon.path") match {
             // Incoming path is Form Runner path without document id
@@ -64,7 +63,7 @@ class OrbeonProxyPortlet extends GenericPortlet {
             // Incoming path is Form Runner path with document id
             case FormRunnerDocumentPath(appName, formName, action, documentId, _, query) ⇒ (appName, formName, filterAction(request, action), Some(documentId), Option(query))
             // No incoming path, use preferences
-            case null ⇒ (getPreference(request, PreferenceName.AppName), getPreference(request, PreferenceName.FormName), getPreference(request, PreferenceName.Action), None, None)
+            case null ⇒ (getPreference(request, AppName), getPreference(request, FormName), getPreference(request, Action), None, None)
             // Unsupported path
             case otherPath ⇒ throw new PortletException("Unsupported path: " + otherPath)
         }
@@ -102,8 +101,8 @@ class OrbeonProxyPortlet extends GenericPortlet {
                 </style>
                 <form action={response.createActionURL.toString} method="post" class="orbeon-pref-form">
                     {
-                        for ((pref, label) ← preferences) yield
-                            <label>{label}: <input name={pref.toString} value={getPreference(request, pref)}/></label>
+                        for ((pref, label) ← PreferenceLabels) yield
+                            <label>{label}: <input name={pref.name} value={getPreference(request, pref)}/></label>
                     }
                     <hr/>
                     <p>
@@ -119,10 +118,10 @@ class OrbeonProxyPortlet extends GenericPortlet {
 
         request.getParameter("save") match {
             case "save" ⇒
-                def setPreference(name: PreferenceName.Value, value: String) = request.getPreferences.setValue(name.toString, value)
+                def setPreference(pref: Preference, value: String) = request.getPreferences.setValue(pref.name, value)
 
-                for ((pref, label) ← preferences)
-                    setPreference(pref, request.getParameter(pref.toString))
+                for ((pref, label) ← PreferenceLabels)
+                    setPreference(pref, request.getParameter(pref.name))
 
                 request.getPreferences.store()
             case _ ⇒
@@ -135,7 +134,7 @@ class OrbeonProxyPortlet extends GenericPortlet {
     override def serveResource(request: ResourceRequest, response: ResourceResponse) = {
 
         val resourceId = request.getResourceID
-        val url = new URL(Util.buildResourceURL(getPreference(request, PreferenceName.FormRunnerURL), resourceId))
+        val url = new URL(Util.buildResourceURL(getPreference(request, FormRunnerURL), resourceId))
 
         request.getMethod match {
             // GET of a resource, typically image, CSS, JavaScript, etc.

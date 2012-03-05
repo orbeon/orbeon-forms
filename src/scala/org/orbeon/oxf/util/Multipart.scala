@@ -104,15 +104,14 @@ object Multipart {
             case _ ⇒
         }
 
-    object UploadState extends Enumeration {
-        val Started = Value
-        val Completed = Value
-        val Interrupted = Value
-    }
+    sealed trait UploadState
+    case object Started extends UploadState
+    case object Completed extends UploadState
+    case object Interrupted extends UploadState
 
     class UploadProgress(val fieldName: String, val expectedSize: Option[Long]) {
         var receivedSize = 0L
-        var state = UploadState.Started
+        var state: UploadState = Started
     }
 
     private def parseRequest(requestContext: RequestContext, factory: DiskFileItemFactory, upload: ServletFileUpload,
@@ -181,7 +180,7 @@ object Multipart {
 
                         // Copy stream and update progress information
                         copyStream(inputStream, fileItem.getOutputStream, uploadProgress.receivedSize += _)
-                        uploadProgress.state = UploadState.Completed
+                        uploadProgress.state = Completed
 
                         fileItem
                     } else {
@@ -203,7 +202,7 @@ object Multipart {
                 for (sessionKey ← sessionKeys)
                     runQuietly {
                         getUploadProgress(request, sessionKey) match {
-                            case Some(progress) ⇒ progress.state = UploadState.Interrupted
+                            case Some(progress) ⇒ progress.state = Interrupted
                             case _ ⇒
                         }
                     }

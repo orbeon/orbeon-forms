@@ -515,7 +515,7 @@ public class XFormsModelBinds {
             // Mark node
             bind.setReadonly(position, readonly);
         } else if (bind.staticBind.getCalculate() != null) {
-            // The bind doesn't have a readonly attribute, but has` a calculate: set readonly to true()
+            // The bind doesn't have a readonly attribute, but has a calculate: set readonly to true()
             bind.setReadonly(position, true);
         }
 //
@@ -706,13 +706,14 @@ public class XFormsModelBinds {
         // See: http://forge.ow2.org/tracker/index.php?func=detail&aid=315821&group_id=168&atid=350207
 
         final boolean typeValidity = InstanceData.getTypeValid(currentNodeInfo); // all type validity has been computed now
-        final boolean constraintValidity;
+        final Boolean constraintValidity;
         if (typeValidity) {
             // Then bother checking @constraint
             if (dependencies.requireModelMIPUpdate(staticModel, bind.staticBind, Model.CONSTRAINT())) {
                 // Re-evaluate and set
                 constraintValidity = evaluateConstraintMIP(bind, position, currentNodeInfo);
-                bind.setConstraintValidity(position, constraintValidity);
+                if (constraintValidity != null)
+                    bind.setConstraintValidity(position, constraintValidity);
             } else
                 // Keep current value
                 constraintValidity = bindNode.isConstraintValidity();
@@ -725,7 +726,7 @@ public class XFormsModelBinds {
         }
 
         // Remember invalid instances
-        if (!constraintValidity) {
+        if (constraintValidity != null && !constraintValidity) {
             final XFormsInstance instanceForNodeInfo = containingDocument.getInstanceForNode(currentNodeInfo);
             invalidInstances.add(instanceForNodeInfo.getEffectiveId());
         }

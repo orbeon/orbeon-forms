@@ -76,7 +76,6 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
     private final IndentedLogger.Indentation indentation = new IndentedLogger.Indentation();
 
     private static final String LOGGING_CATEGORY = "document";
-    private static final Logger logger = LoggerFactory.createLogger(XFormsContainingDocument.class);
 
     private final Map<String, IndentedLogger> loggersMap = new HashMap<String, IndentedLogger>();
     {

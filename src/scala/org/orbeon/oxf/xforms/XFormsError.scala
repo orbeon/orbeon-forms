@@ -14,8 +14,6 @@
 package org.orbeon.oxf.xforms
 
 import action.XFormsAPI._
-import event.events.XXFormsBindingErrorEvent
-import event.XFormsEventTarget
 import model.DataModel.Reason
 import org.orbeon.oxf.resources.ResourceManagerWrapper
 import org.orbeon.scaxon.XML._

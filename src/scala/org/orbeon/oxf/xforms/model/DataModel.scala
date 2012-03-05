@@ -35,8 +35,8 @@ object DataModel {
 
     // Reasons that setting a value on a node can fail
     sealed trait Reason { val message: String }
-    case object  ComplexContentReason extends Reason { override val message = "Unable to set value on complex content" }
-    case object  ReadonlyNodeReason   extends Reason { override val message = "Unable to set value on read-only node" }
+    case object  ComplexContentReason extends Reason { val message = "Unable to set value on complex content" }
+    case object  ReadonlyNodeReason   extends Reason { val message = "Unable to set value on read-only node" }
 
     private val AllowedNodeTypesForGetValue = Set(ELEMENT_NODE, ATTRIBUTE_NODE, TEXT_NODE) map (_.toInt)
 

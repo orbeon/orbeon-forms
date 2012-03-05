@@ -347,8 +347,8 @@ object ControlOps {
     // The bind is created if needed
     def updateMip(doc: NodeInfo, controlId: String, mipName: String, mipValue: String) {
 
-        require(Model.MIP.withName(mipName) ne null) // withName() will throw NoSuchElementException if not present
-        val mipQName = Model.mipNameToAttributeQName(mipName)
+        require(Model.AllMIPNames(mipName))
+        val mipQName = Model.MIPNameToAttributeQName(mipName)
 
         findControlById(doc, controlId) foreach { control ⇒
 
@@ -364,8 +364,8 @@ object ControlOps {
     }
 
     def getMip(doc: NodeInfo, controlId: String, mipName: String) = {
-        require(Model.MIP.withName(mipName) ne null) // withName() will throw NoSuchElementException if not present
-        findBindByName(doc, controlName(controlId)) flatMap (bind ⇒ attValueOption(bind \@ Model.mipNameToAttributeQName(mipName)))
+        require(Model.AllMIPNames(mipName))
+        findBindByName(doc, controlName(controlId)) flatMap (bind ⇒ attValueOption(bind \@ Model.MIPNameToAttributeQName(mipName)))
     }
 
     // XForms callers: find the value of a MIP or null (the empty sequence)

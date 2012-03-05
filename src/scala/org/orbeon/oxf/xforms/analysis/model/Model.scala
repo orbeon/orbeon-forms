@@ -28,6 +28,7 @@ import collection.immutable.List
 import collection.mutable.{LinkedHashSet, LinkedHashMap}
 import xbl.Scope
 import org.orbeon.oxf.xml.{Dom4j, ContentHandlerHelper}
+import Model._
 
 /**
  * Static analysis of an XForms model <xf:model> element.
@@ -170,8 +171,8 @@ class Model(val staticStateContext: StaticStateContext, element: Element, parent
 
         // Represent an individual MIP on an <xf:bind> element
         class MIP(val name: String) {
-            val isCalculateComputedMIP = Model.calculateMIPNames.contains(name)
-            val isValidateMIP = Model.validateMIPNames.contains(name)
+            val isCalculateComputedMIP = CalculateMIPNames.contains(name)
+            val isValidateMIP = ValidateMIPNames.contains(name)
             val isCustomMIP = !isCalculateComputedMIP && !isValidateMIP
         }
 
@@ -184,7 +185,7 @@ class Model(val staticStateContext: StaticStateContext, element: Element, parent
             def analyzeXPath() {
 
                 def booleanOrStringExpression =
-                    if (Model.booleanXPathMIPNames.contains(name)) "xs:boolean((" + expression + ")[1])" else "xs:string((" + expression + ")[1])"
+                    if (BooleanXPathMIPNames.contains(name)) "xs:boolean((" + expression + ")[1])" else "xs:string((" + expression + ")[1])"
 
                 // Analyze and remember if figured out
                 Bind.this.analyzeXPath(getChildrenContext, bindsVariablesSeq, booleanOrStringExpression) match {
@@ -208,19 +209,23 @@ class Model(val staticStateContext: StaticStateContext, element: Element, parent
 
         // Built-in XPath MIPs
         val mipNameToXPathMIP =
-            for ((qName, name) ← Model.qNameToXPathMIPName; attributeValue = element.attributeValue(qName); if attributeValue ne null)
-            yield (name → new XPathMIP(name, attributeValue))
+            for {
+                (qName, mip) ← QNameToXPathMIP
+                attributeValue = element.attributeValue(qName)
+                if attributeValue ne null
+            } yield
+                mip.name → new XPathMIP(mip.name, attributeValue)
 
         // Type MIP is special as it is not an XPath expression
         val typeMIP = element.attributeValue(TYPE_QNAME) match {
-            case value if value ne null ⇒ Some(new TypeMIP(Model.TYPE, value))
+            case value if value ne null ⇒ Some(new TypeMIP(TYPE, value))
             case _ ⇒ None
         }
 
         // Custom MIPs
         val customMIPNameToXPathMIP = Predef.Map((
                 for {
-                    attribute ← Dom4jUtils.attributes(element).asScala // check all the element's attributes
+                    attribute ← Dom4j.attributes(element) // check all the element's attributes
 
                     attributeQName = attribute.getQName
                     attributePrefix = attributeQName.getNamespacePrefix
@@ -232,8 +237,9 @@ class Model(val staticStateContext: StaticStateContext, element: Element, parent
                             attributeURI != XFORMS_NAMESPACE_URI &&
                             (attributeURI != XXFORMS_NAMESPACE_URI || attributeQName == XXFORMS_EVENT_MODE_QNAME)
 
-                    customMIPName = Model.buildCustomMIPName(attribute.getQualifiedName)
-                } yield (customMIPName → new XPathMIP(customMIPName, attribute.getValue))): _*)
+                    customMIPName = buildCustomMIPName(attribute.getQualifiedName)
+                } yield
+                    customMIPName → new XPathMIP(customMIPName, attribute.getValue)): _*)
 
         def customMIPs = customMIPNameToXPathMIP.asJava
 
@@ -244,19 +250,16 @@ class Model(val staticStateContext: StaticStateContext, element: Element, parent
         val children: Seq[Bind] = Dom4jUtils.elements(element, XFORMS_BIND_QNAME).asScala map (new Bind(_, Bind.this, preceding))
         def jChildren = children.asJava
 
-        def getMIP(mipName: String) = if (mipName == Model.TYPE) typeMIP else allMIPNameToXPathMIP.get(mipName)
+        def getMIP(mipName: String) = if (mipName == TYPE) typeMIP else allMIPNameToXPathMIP.get(mipName)
 
         // For Java callers (can return null)
-        def getInitialValue = getMIPExpressionOrNull(Model.INITIAL_VALUE)
-        def getCalculate = getMIPExpressionOrNull(Model.CALCULATE)
-        def getRelevant = getMIPExpressionOrNull(Model.RELEVANT)
-        def getReadonly = getMIPExpressionOrNull(Model.READONLY)
-        def getRequired = getMIPExpressionOrNull(Model.REQUIRED)
-        def getConstraint = getMIPExpressionOrNull(Model.CONSTRAINT)
-        def getType = typeMIP match {
-            case Some(mip) ⇒ mip.datatype
-            case None ⇒ null
-        }
+        def getInitialValue = getMIPExpressionOrNull(InitialValue.name)
+        def getCalculate = getMIPExpressionOrNull(Calculate.name)
+        def getRelevant = getMIPExpressionOrNull(Relevant.name)
+        def getReadonly = getMIPExpressionOrNull(Readonly.name)
+        def getRequired = getMIPExpressionOrNull(Required.name)
+        def getConstraint = getMIPExpressionOrNull(Constraint.name)
+        def getType = typeMIP map (_.datatype) orNull
         def getCustom(mipName: String) = getMIPExpressionOrNull(mipName)
 
         def getMIPExpressionOrNull(mipName: String) = allMIPNameToXPathMIP.get(mipName) match {
@@ -448,58 +451,54 @@ class Model(val staticStateContext: StaticStateContext, element: Element, parent
 object Model {
 
     // MIP enumeration
-    object MIP extends Enumeration {
-        val Relevant = Value("relevant")
-        val Readonly = Value("readonly")
-        val Required = Value("required")
-        val Constraint = Value("constraint")
-        val Calculate = Value("calculate")
-        val InitialValue = Value("initial-value")
-        val Type = Value("type")
-    }
+    sealed trait MIP { val name: String; def qName = QName.get(name) }
 
-    // Constants for Java callers
-    val RELEVANT = MIP.Relevant.toString
-    val READONLY = MIP.Readonly.toString
-    val REQUIRED = MIP.Required.toString
-    val CONSTRAINT = MIP.Constraint.toString
-    val CALCULATE = MIP.Calculate.toString
-    val INITIAL_VALUE = MIP.InitialValue.toString
-    val TYPE = MIP.Type.toString
-
-    // MIP default values
-    val DEFAULT_RELEVANT = true
-    val DEFAULT_READONLY = false
-    val DEFAULT_REQUIRED = false
-    val DEFAULT_VALID = true
+    trait ComputedMIP extends MIP
+    trait ValidateMIP extends MIP
+    trait XPathMIP    extends MIP
+    trait BooleanMIP  extends XPathMIP
+    trait StringMIP   extends XPathMIP
 
     // NOTE: "required" is special: it is evaluated during recalculate, but used during revalidate. In effect both
     // recalculate AND revalidate depend on it. Ideally maybe revalidate would depend on the the *value* of the
     // "required" MIP, not on the XPath of it. See also what we would need for xxf:valid(), etc. functions.
+    case object Relevant     extends MIP with BooleanMIP with ComputedMIP { val name = "relevant" }
+    case object Readonly     extends MIP with BooleanMIP with ComputedMIP { val name = "readonly" }
+    case object Required     extends MIP with BooleanMIP with ComputedMIP with ValidateMIP { val name = "required" }
+    case object Constraint   extends MIP with BooleanMIP with ValidateMIP { val name = "constraint" }
+    case object Calculate    extends MIP with StringMIP  with ComputedMIP { val name = "calculate" }
+    case object InitialValue extends MIP with StringMIP  with ComputedMIP { val name = "initial-value"; override def qName = XXFORMS_DEFAULT_QNAME }
+    case object Type         extends MIP with ValidateMIP { val name = "type" }
 
-    val qNameToXPathComputedMIPName = Map(
-        RELEVANT_QNAME → RELEVANT,
-        READONLY_QNAME → READONLY,
-        REQUIRED_QNAME → REQUIRED,
-        CALCULATE_QNAME → CALCULATE,
-        XXFORMS_DEFAULT_QNAME → INITIAL_VALUE)
+    case class Custom(override val name: String) extends MIP with XPathMIP
 
-    val qNameToXPathValidateMIPName = Map(
-        REQUIRED_QNAME → REQUIRED,
-        CONSTRAINT_QNAME → CONSTRAINT)
+    val AllMIPs = Set(Relevant, Readonly, Required, Constraint, Calculate, InitialValue, Type)
+    val AllMIPNames             = AllMIPs map (_.name)
+    val MIPNameToAttributeQName = AllMIPs map (m ⇒ m.name → m.qName) toMap
 
-    val mipNameToAttributeQName = qNameToXPathComputedMIPName ++ qNameToXPathValidateMIPName + (TYPE_QNAME → TYPE) map {
-        case (key, value) ⇒ (value, key)
-    }
+    val QNameToXPathComputedMIP = AllMIPs collect { case m: XPathMIP with ComputedMIP ⇒ m.qName → m } toMap
+    val QNameToXPathValidateMIP = AllMIPs collect { case m: XPathMIP with ValidateMIP ⇒ m.qName → m } toMap
+    val QNameToXPathMIP         = QNameToXPathComputedMIP ++ QNameToXPathValidateMIP
 
-    private val qNameToValidateMIPName = qNameToXPathValidateMIPName + (TYPE_QNAME → TYPE)
-    val qNameToXPathMIPName = qNameToXPathComputedMIPName ++ qNameToXPathValidateMIPName
-
-    val calculateMIPNames = Set(qNameToXPathComputedMIPName.values.toSeq: _*)
-    val validateMIPNames = Set(qNameToValidateMIPName.values.toSeq: _*)
-
-    val booleanXPathMIPNames = Set(RELEVANT, READONLY, REQUIRED, CONSTRAINT)
-    val stringXPathMIPNames = Set(CALCULATE, INITIAL_VALUE)
+    val CalculateMIPNames       = AllMIPs collect { case m: ComputedMIP ⇒ m.name }
+    val ValidateMIPNames        = AllMIPs collect { case m: ValidateMIP ⇒ m.name }
+    val BooleanXPathMIPNames    = AllMIPs collect { case m: XPathMIP with BooleanMIP ⇒ m.name }
+    val StringXPathMIPNames     = AllMIPs collect { case m: XPathMIP with StringMIP ⇒ m.name }
 
     def buildCustomMIPName(qualifiedName: String) = qualifiedName.replace(':', '-')
+
+    // Constants for Java callers
+    val RELEVANT = Relevant.name
+    val READONLY = Readonly.name
+    val REQUIRED = Required.name
+    val CONSTRAINT = Constraint.name
+    val CALCULATE = Calculate.name
+    val INITIAL_VALUE = InitialValue.name
+    val TYPE = Type.name
+
+    // MIP default values for Java callers
+    val DEFAULT_RELEVANT = true
+    val DEFAULT_READONLY = false
+    val DEFAULT_REQUIRED = false
+    val DEFAULT_VALID = true
 }

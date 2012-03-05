@@ -100,4 +100,7 @@ object Dom4j {
 
     // Return an element's directly nested elements
     def elements(e: Element): Seq[Element] = Dom4jUtils.elements(e).asScala
+
+    // Return an element's attributes
+    def attributes(e: Element): Seq[Attribute] = Dom4jUtils.attributes(e).asScala
 }

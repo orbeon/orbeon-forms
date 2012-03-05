@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms.control
 
-import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xforms._
 import control.Controls.AncestorIterator
 import event.events.{XFormsHelpEvent, XXFormsBindingErrorEvent, XFormsFocusEvent, XXFormsRepeatFocusEvent}
@@ -68,23 +67,9 @@ trait ControlEventSupport {
 
     def performTargetAction(container: XBLContainer, event: XFormsEvent) = ()
 
-    /**
-     * Check whether this concrete control supports receiving the external event specified.
-     *
-     * @param indentedLogger    logger
-     * @param logType           log type
-     * @param eventName         event name to check
-     * @return                  true iif the event is supported
-     */
-    def allowExternalEvent(indentedLogger: IndentedLogger, logType: String, eventName: String) =
-        if (getAllowedExternalEvents.contains(eventName) || ALLOWED_EXTERNAL_EVENTS.contains(eventName))
-            true
-        else {
-            if (indentedLogger.isDebugEnabled)
-                indentedLogger.logDebug(logType, "ignoring invalid client event on control", "control type", getName, "control id", getEffectiveId, "event name", eventName)
-
-            false
-        }
+    // Check whether this concrete control supports receiving the external event specified.
+    def allowExternalEvent(eventName: String) =
+        getAllowedExternalEvents.contains(eventName) || ALLOWED_EXTERNAL_EVENTS.contains(eventName)
 
     def getAllowedExternalEvents = Collections.emptySet[String]
 

@@ -1147,7 +1147,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
     }
 
     // Don't allow any external events
-    public boolean allowExternalEvent(IndentedLogger indentedLogger, String logType, String eventName) {
+    public boolean allowExternalEvent(String eventName) {
         return false;
     }
 

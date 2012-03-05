@@ -22,17 +22,16 @@ import org.orbeon.oxf.xforms.XFormsUtils
 import scala.collection.JavaConversions._
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.xml._
-import org.orbeon.oxf.util.IndentedLogger
 import java.util.{ArrayList, List ⇒ JList, Set ⇒ JSet}
 import dom4j.{LocationSAXContentHandler, Dom4jUtils}
 import org.orbeon.oxf.pipeline.api._
-import org.orbeon.oxf.util.Multipart
 import org.dom4j.{Document, Element}
 import org.orbeon.oxf.xforms.state.XFormsStateManager
+import org.orbeon.oxf.util.{IndentedLogger, Multipart}
+import org.orbeon.oxf.util.Logger._
 
 object ClientEvents {
 
-    private val EVENT_LOG_TYPE = "executeExternalEvent"
     private val EVENT_PARAMETERS = List("dnd-start", "dnd-end", "modifiers", "text", "file", "filename", "content-type", "content-length")
     private val DUMMY_EVENT = List(new LocalEvent(Dom4jUtils.createElement("dummy"), false))
 
@@ -178,14 +177,13 @@ object ClientEvents {
 
     private def safelyCreateEvent(document: XFormsContainingDocument, event: LocalEvent): Option[XFormsEvent] = {
 
-        val indentedLogger = document.getIndentedLogger(XFormsEvents.LOGGING_CATEGORY)
+        implicit val CurrentLogger = document.getIndentedLogger(XFormsEvents.LOGGING_CATEGORY)
 
         // Get event target
         val eventTarget = document.getObjectByEffectiveId(XFormsUtils.deNamespaceId(document, event.targetEffectiveId)) match {
             case eventTarget: XFormsEventTarget ⇒ eventTarget
             case _ ⇒
-                if (indentedLogger.isDebugEnabled)
-                    indentedLogger.logDebug(EVENT_LOG_TYPE, "ignoring client event with invalid target id", "target id", event.targetEffectiveId, "event name", event.name)
+                debug("ignoring client event with invalid target id", Seq("target id", event.targetEffectiveId, "event name", event.name))
                 return None
         }
 
@@ -224,14 +222,18 @@ object ClientEvents {
 
             // This is also a security measure that also ensures that somebody is not able to change values in an instance
             // by hacking external events.
-            isExplicitlyAllowedExternalEvent || eventTarget.allowExternalEvent(indentedLogger, EVENT_LOG_TYPE, event.name)
+            isExplicitlyAllowedExternalEvent || {
+                val explicitlyAllowed = eventTarget.allowExternalEvent(event.name)
+                if (! explicitlyAllowed)
+                    debug("ignoring invalid client event on target", Seq("id", eventTarget.getEffectiveId, "event name", event.name))
+                explicitlyAllowed
+            }
         }
 
         // Check the event is allowed on target
         if (event.trusted) {
             // Event is trusted, don't check if it is allowed
-            if (indentedLogger.isDebugEnabled)
-                indentedLogger.logDebug(EVENT_LOG_TYPE, "processing trusted event", "target id", eventTarget.getEffectiveId, "event name", event.name)
+            debug("processing trusted event", Seq("target id", eventTarget.getEffectiveId, "event name", event.name))
         } else if (!checkAllowedExternalEvents)
             return None // event is not trusted and is not allowed
 
@@ -241,8 +243,7 @@ object ClientEvents {
                 document.getObjectByEffectiveId(XFormsUtils.deNamespaceId(document, otherTargetEffectiveId)) match {
                     case eventTarget: XFormsEventTarget ⇒ eventTarget
                     case _ ⇒
-                        if (indentedLogger.isDebugEnabled)
-                            indentedLogger.logDebug(EVENT_LOG_TYPE, "ignoring client event with invalid second target id", "target id", event.otherTargetEffectiveId, "event name", event.name)
+                        debug("ignoring client event with invalid second target id", Seq("target id", event.otherTargetEffectiveId, "event name", event.name))
                         return None
                 }
             case _ ⇒ null
@@ -270,32 +271,34 @@ object ClientEvents {
 
         // Helper to make it easier to output simple Ajax responses
         def eventResponse(messageType: String, message: String)(block: ContentHandlerHelper ⇒ Unit): Boolean = {
-            indentedLogger.startHandleOperation(messageType, message)
+            implicit val CurrentLogger = indentedLogger
+            withDebug(message) {
+                // Hook-up debug content handler if we must log the response document
+                val (responseReceiver, debugContentHandler) =
+                    if (logRequestResponse) {
+                        val receivers = new ArrayList[XMLReceiver]
+                        receivers.add(xmlReceiver)
+                        val debugContentHandler = new LocationSAXContentHandler
+                        receivers.add(debugContentHandler)
 
-            // Hook-up debug content handler if we must log the response document
-            val (responseReceiver, debugContentHandler) =
-                if (logRequestResponse) {
-                    val receivers = new ArrayList[XMLReceiver]
-                    receivers.add(xmlReceiver)
-                    val debugContentHandler = new LocationSAXContentHandler
-                    receivers.add(debugContentHandler)
+                        (new TeeXMLReceiver(receivers), Some(debugContentHandler))
+                    } else
+                        (xmlReceiver, None)
 
-                    (new TeeXMLReceiver(receivers), debugContentHandler)
-                } else
-                    (xmlReceiver, null)
+                val helper = new ContentHandlerHelper(responseReceiver)
+                helper.startDocument()
+                helper.startPrefixMapping("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI)
+                helper.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "event-response")
 
-            val helper = new ContentHandlerHelper(responseReceiver)
-            helper.startDocument()
-            helper.startPrefixMapping("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI)
-            helper.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "event-response")
+                block(helper)
 
-            block(helper)
+                helper.endElement()
+                helper.endPrefixMapping("xxf")
+                helper.endDocument()
 
-            helper.endElement()
-            helper.endPrefixMapping("xxf")
-            helper.endDocument()
-
-            indentedLogger.endHandleOperation("ajax response", if (debugContentHandler ne null) Dom4jUtils.domToPrettyString(debugContentHandler.getDocument) else null)
+                debugContentHandler foreach
+                    (ch ⇒ debugResults(Seq("ajax response", Dom4jUtils.domToPrettyString(ch.getDocument))))
+            }
 
             true
         }
@@ -359,11 +362,11 @@ object ClientEvents {
             val newReference = document.getObjectByEffectiveId(eventTarget.getEffectiveId)
 
             def warn(condition: String) = {
-                val logger = document.getIndentedLogger
-                if (logger.isDebugEnabled)
-                    logger.logDebug(EVENT_LOG_TYPE, "ignoring invalid client event on " + condition,
-                        "control id", eventTarget.getEffectiveId,
-                        "event name", event.getName)
+                implicit val CurrentLogger = document.getIndentedLogger
+                debug("ignoring invalid client event on " + condition, Seq(
+                    "control id", eventTarget.getEffectiveId,
+                    "event name", event.getName)
+                )
                 false
             }
 
@@ -416,13 +419,12 @@ object ClientEvents {
             if (checkEventTarget(event))
                 document.dispatchEvent(event)
 
-        val indentedLogger = document.getIndentedLogger(XFormsEvents.LOGGING_CATEGORY)
+        implicit val CurrentLogger = document.getIndentedLogger(XFormsEvents.LOGGING_CATEGORY)
         val eventTarget = event.getTargetObject
         val eventTargetEffectiveId = eventTarget.getEffectiveId
         val eventName = event.getName
 
-        indentedLogger.startHandleOperation(EVENT_LOG_TYPE, "handling external event", "target id", eventTargetEffectiveId, "event name", eventName)
-        try {
+        withDebug("handling external event", Seq("target id", eventTargetEffectiveId, "event name", eventName)) {
             // Each event is within its own start/end outermost action handler
             document.startOutermostActionHandler()
 
@@ -436,7 +438,7 @@ object ClientEvents {
                             // We completely ignore the event if the value in the instance is the same. This also saves dispatching xxforms-repeat-focus below.
                             val isIgnoreValueChangeEvent = currentExternalValue == event.getNewValue
                             if (isIgnoreValueChangeEvent) {
-                                indentedLogger.logDebug(EVENT_LOG_TYPE, "ignoring value change event as value is the same", "control id", eventTargetEffectiveId, "event name", eventName, "value", currentExternalValue)
+                                debug("ignoring value change event as value is the same", Seq("control id", eventTargetEffectiveId, "event name", eventName, "value", currentExternalValue))
                                 // Ensure deferred event handling
                                 // NOTE: Here this will do nothing, but out of consistency we better have matching startOutermostActionHandler/endOutermostActionHandler
                                 document.endOutermostActionHandler()
@@ -444,7 +446,7 @@ object ClientEvents {
                             }
                         } else {
                             // shouldn't happen really, but just in case let's log this
-                            indentedLogger.logDebug(EVENT_LOG_TYPE, "got null currentExternalValue", "control id", eventTargetEffectiveId, "event name", eventName)
+                            debug("got null currentExternalValue", Seq("control id", eventTargetEffectiveId, "event name", eventName))
                         }
                     } else {
                         // There will be a focus event too, so don't ignore the event!
@@ -518,8 +520,6 @@ object ClientEvents {
 
             // Each event is within its own start/end outermost action handler
             document.endOutermostActionHandler()
-        } finally {
-            indentedLogger.endHandleOperation()
         }
     }
 }

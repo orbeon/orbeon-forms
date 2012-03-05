@@ -1056,7 +1056,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
         }
     }
 
-    public boolean allowExternalEvent(IndentedLogger indentedLogger, String logType, String eventName) {
+    public boolean allowExternalEvent(String eventName) {
         return false;
     }
 

@@ -284,7 +284,7 @@ class XFormsInstance(
             indentedLogger.logDebug("", message, "effective model id", modelEffectiveId, "effective instance id", getEffectiveId, "instance", TransformerUtils.tinyTreeToString(getInstanceRootElementInfo))
 
     // Don't allow any external events
-    def allowExternalEvent(indentedLogger: IndentedLogger, logType: String, eventName: String) = false
+    def allowExternalEvent(eventName: String) = false
 }
 
 object XFormsInstance {

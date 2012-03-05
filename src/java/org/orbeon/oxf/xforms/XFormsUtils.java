@@ -62,7 +62,7 @@ import java.util.*;
 
 public class XFormsUtils {
 
-    public static final IndentedLogger indentedLogger = XFormsContainingDocument.getIndentedLogger(XFormsServer.getLogger(), "utils");
+    public static final IndentedLogger indentedLogger = Loggers.getIndentedLogger("utils");
 
     private static final int SRC_CONTENT_BUFFER_SIZE = NetUtils.COPY_BUFFER_SIZE / 2;
 

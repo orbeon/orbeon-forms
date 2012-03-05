@@ -35,8 +35,8 @@ object Controls {
         val rootControl = containingDocument.getStaticState.topLevelPart.getTopLevelControls.head
 
         buildTree(controlIndex, containingDocument, bindingContext, None, rootControl, Seq(), Option(state)) foreach { root ⇒
-            val logger = XFormsContainingDocument.getIndentedLogger(XFormsServer.getLogger, "tree")
-            logger.logDebug("new control tree", root.toXMLString)
+            if (XFormsProperties.getDebugLogging.contains("control-tree"))
+                containingDocument.getControls.getIndentedLogger.logDebug("new control tree", root.toXMLString)
         }
     }
 

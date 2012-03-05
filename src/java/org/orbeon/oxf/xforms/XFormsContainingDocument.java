@@ -79,7 +79,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
 
     private final Map<String, IndentedLogger> loggersMap = new HashMap<String, IndentedLogger>();
     {
-        final Logger globalLogger = XFormsServer.getLogger();
+        final Logger globalLogger = XFormsServer.logger;
         final Set<String> debugConfig = XFormsProperties.getDebugLogging();
 
         registerLogger(globalLogger, debugConfig, XFormsContainingDocument.LOGGING_CATEGORY);
@@ -1153,16 +1153,6 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         return (eventStack.size() == 0) ? null : eventStack.peek();
     }
 
-    public static void logWarningStatic(String type, String message, String... parameters) {
-        final Logger globalLogger = XFormsServer.getLogger();
-        IndentedLogger.logWarningStatic(globalLogger, "XForms", type, message, parameters);
-    }
-
-    public static void logErrorStatic(String type, String message, Throwable throwable) {
-        final Logger globalLogger = XFormsServer.getLogger();
-        IndentedLogger.logErrorStatic(globalLogger, "XForms", type, message, throwable);
-    }
-
     /**
      * Return a logger given a category.
      *
@@ -1171,26 +1161,6 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
      */
     public IndentedLogger getIndentedLogger(String loggingCategory) {
         return loggersMap.get(loggingCategory);
-    }
-
-    private static final Map<String, IndentedLogger> STATIC_LOGGERS_MAP = new HashMap<String, IndentedLogger>();
-
-    /**
-     * Return an indented logger for the given category and base logger.
-     */
-    public static IndentedLogger getIndentedLogger(Logger logger, String category) {
-
-        final IndentedLogger existingIndentedLogger = STATIC_LOGGERS_MAP.get(category);
-        if (existingIndentedLogger != null)
-            return existingIndentedLogger;
-
-        final boolean isDebugEnabled = logger.isDebugEnabled() && XFormsProperties.getDebugLogging().contains(category);
-
-        final IndentedLogger indentedLogger = new IndentedLogger(logger, isDebugEnabled, category);
-
-        STATIC_LOGGERS_MAP.put(category, indentedLogger);
-
-        return indentedLogger;
     }
 
     public IndentedLogger getIndentedLogger() {
@@ -1209,7 +1179,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         ALLOWED_EXTERNAL_EVENTS.add(XFormsEvents.XXFORMS_POLL);
     }
 
-    public boolean allowExternalEvent(IndentedLogger indentedLogger, String logType, String eventName) {
+    public boolean allowExternalEvent(String eventName) {
         return ALLOWED_EXTERNAL_EVENTS.contains(eventName);
     }
 

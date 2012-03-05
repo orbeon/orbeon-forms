@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms.event;
 
-import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.xbl.Scope;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
@@ -40,5 +39,5 @@ public interface XFormsEventTarget {
     void performTargetAction(XBLContainer container, XFormsEvent event);
     void performDefaultAction(XFormsEvent event);
 
-    boolean allowExternalEvent(IndentedLogger indentedLogger, String logType, String eventName);
+    boolean allowExternalEvent(String eventName);
 }

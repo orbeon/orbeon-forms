@@ -16,7 +16,6 @@ package org.orbeon.oxf.xforms;
 
 import net.sf.ehcache._
 import org.orbeon.oxf.resources.URLFactory
-import processor.XFormsServer
 import org.orbeon.oxf.common.OXFException
 
 /**
@@ -49,7 +48,7 @@ object Caches {
         }
 
     private val indentedLogger =
-        XFormsContainingDocument.getIndentedLogger(XFormsServer.getLogger, "caches")
+        Loggers.getIndentedLogger("caches")
 
     private def withMessage[T](t: T, message: String) = { indentedLogger.logDebug("", message); t }
 }

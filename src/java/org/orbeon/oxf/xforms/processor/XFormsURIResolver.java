@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms.processor;
 
-import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
@@ -24,8 +23,7 @@ import org.orbeon.oxf.processor.transformer.TransformerURIResolver;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.Connection;
 import org.orbeon.oxf.util.IndentedLogger;
-import org.orbeon.oxf.util.LoggerFactory;
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.Loggers;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLReaderToReceiver;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -50,7 +48,7 @@ import java.net.URL;
  */
 public class XFormsURIResolver extends TransformerURIResolver {
 
-    private static final IndentedLogger indentedLogger = XFormsContainingDocument.getIndentedLogger(XFormsServer.getLogger(), "resolver");
+    private static final IndentedLogger indentedLogger = Loggers.getIndentedLogger("resolver");
 
     private URIProcessorOutputImpl processorOutput;
 

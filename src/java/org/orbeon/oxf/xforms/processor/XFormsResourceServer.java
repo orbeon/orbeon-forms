@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms.processor;
 
 import net.sf.ehcache.Element;
-import org.apache.log4j.Logger;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
@@ -24,7 +23,7 @@ import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.Caches;
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.Loggers;
 import org.orbeon.oxf.xforms.XFormsProperties;
 
 import java.io.*;
@@ -45,7 +44,7 @@ public class XFormsResourceServer extends ProcessorImpl {
     public XFormsResourceServer() {}
 
     public static IndentedLogger getIndentedLogger() {
-        return XFormsContainingDocument.getIndentedLogger(XFormsServer.getLogger(), "resources");
+        return Loggers.getIndentedLogger("resources");
     }
 
     @Override

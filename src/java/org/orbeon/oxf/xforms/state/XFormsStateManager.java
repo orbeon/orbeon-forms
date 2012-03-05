@@ -14,19 +14,17 @@
 package org.orbeon.oxf.xforms.state;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.util.IndentedLogger;
-import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.xforms.Loggers;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsProperties;
-import org.orbeon.oxf.xforms.processor.XFormsServer;
 
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
@@ -38,7 +36,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public class XFormsStateManager implements XFormsStateLifecycle {
 
     private static final String LOG_TYPE = "state manager";
-    private static final IndentedLogger indentedLogger = XFormsContainingDocument.getIndentedLogger(XFormsServer.getLogger(), "state");
+    private static final IndentedLogger indentedLogger = Loggers.getIndentedLogger("state");
 
     private static final String XFORMS_STATE_MANAGER_UUID_KEY_PREFIX = "oxf.xforms.state.manager.uuid-key.";
     private static final String XFORMS_STATE_MANAGER_LISTENER_STATE_KEY_PREFIX = "oxf.xforms.state.manager.session-listeners-key.";

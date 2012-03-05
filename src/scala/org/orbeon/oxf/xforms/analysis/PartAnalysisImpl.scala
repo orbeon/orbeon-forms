@@ -105,7 +105,7 @@ class PartAnalysisImpl(
         val controlPrefixedId = containerScope.fullPrefix + controlStaticId
 
         // 1. If element is not built-in, first check XBL and generate shadow content if needed
-        xblBindings.processElementIfNeeded(getIndentedLogger, controlElement,
+        xblBindings.processElementIfNeeded(controlElement,
             controlPrefixedId, locationData, containerScope, eventHandlers)
 
         // 2. Create new control if possible
@@ -116,7 +116,6 @@ class PartAnalysisImpl(
         }
 
         // Throw if the element is unknown (we could also just warn?)
-//        getIndentedLogger.logWarning("", "Unknown control: " + controlElement.getQualifiedName)
         if (! elementAnalysis.isDefined)
             throw new ValidationException("Unknown control: " + controlElement.getQualifiedName, locationData)
 

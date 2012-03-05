@@ -150,7 +150,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
         val actionInterpreter = mock[XFormsActionInterpreter]
         Mockito when actionInterpreter.containingDocument thenReturn document
         Mockito when actionInterpreter.container thenReturn xblContainer
-        Mockito when actionInterpreter.indentedLogger thenReturn new IndentedLogger(XFormsServer.getLogger, "action")
+        Mockito when actionInterpreter.indentedLogger thenReturn new IndentedLogger(XFormsServer.logger, "action")
 
         actionInterpreter
     }

@@ -20,11 +20,15 @@ import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.oxf.fr.FormRunner
 import org.orbeon.oxf.xforms.XFormsConstants.XFORMS_NAMESPACE_URI
 import org.orbeon.oxf.xml.XMLConstants.XHTML_NAMESPACE_URI
+import org.orbeon.oxf.util.Logger._
+import org.orbeon.oxf.xforms.{XFormsProperties, Loggers}
 
 /**
  * Form Builder functions.
  */
 object FormBuilderFunctions {
+
+    private implicit val Logger = Loggers.getIndentedLogger("form-builder")
 
     val XH = XHTML_NAMESPACE_URI
     val XF = XFORMS_NAMESPACE_URI
@@ -107,8 +111,7 @@ object FormBuilderFunctions {
 
     def makeInstanceExpression(name: String) = "instance('" + name + "')"
 
-    def debugDumpDocument(message: String, inDoc: NodeInfo) {
-        println(message)
-        println(TransformerUtils.tinyTreeToString(inDoc.getDocumentRoot))
-    }
+    def debugDumpDocument(message: String, inDoc: NodeInfo) =
+        if (XFormsProperties.getDebugLogging.contains("form-builder-grid"))
+            debug(message, Seq("doc", TransformerUtils.tinyTreeToString(inDoc.getDocumentRoot)))
 }

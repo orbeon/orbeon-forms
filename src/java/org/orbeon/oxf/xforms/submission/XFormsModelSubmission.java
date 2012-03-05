@@ -1337,19 +1337,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
         ALLOWED_EXTERNAL_EVENTS.add(XFormsEvents.XXFORMS_SUBMIT);
     }
 
-    public boolean allowExternalEvent(IndentedLogger indentedLogger, String logType, String eventName) {
-        if (ALLOWED_EXTERNAL_EVENTS.contains(eventName)) {
-            return true;
-        } else {
-            logIgnoredExternalEvent(indentedLogger, logType, eventName);
-            return false;
-        }
-    }
-
-    protected void logIgnoredExternalEvent(IndentedLogger indentedLogger, String logType, String eventName) {
-        if (indentedLogger.isDebugEnabled()) {
-            indentedLogger.logDebug(logType, "ignoring invalid client event on submission", "submission id", getEffectiveId(), "event name", eventName);
-        }
+    public boolean allowExternalEvent(String eventName) {
+        return ALLOWED_EXTERNAL_EVENTS.contains(eventName);
     }
 
     public void addListener(String eventName, EventListener listener) {

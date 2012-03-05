@@ -19,7 +19,7 @@ import org.orbeon.oxf.xforms.event.XFormsEvents
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import java.util.Map
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
-import org.orbeon.oxf.xforms.{XFormsUtils, BindingContext}
+import org.orbeon.oxf.xforms.{BindingContext}
 
 /**
  * Control that represents a custom components.
@@ -40,8 +40,7 @@ class XFormsComponentControl(container: XBLContainer, parent: XFormsControl, ele
     // Make sure there is location data
     nestedContainer.setLocationData(getLocationData)
 
-    override def staticControl: ComponentControl =
-        super.staticControl.asInstanceOf[ComponentControl]
+    override def staticControl = super.staticControl.asInstanceOf[ComponentControl]
 
     // Only handle binding if we support modeBinding
     override protected def pushBindingImpl(parentContext: BindingContext): BindingContext = {

@@ -16,7 +16,6 @@ package org.orbeon.oxf.xforms
 import analysis._
 import collection.JavaConversions._
 import collection.JavaConverters._
-import org.orbeon.oxf.xforms.processor.XFormsServer
 import org.orbeon.oxf.xml._
 import dom4j.{LocationDocumentResult, Dom4jUtils, LocationData}
 import org.orbeon.saxon.dom4j.DocumentWrapper
@@ -45,7 +44,7 @@ class XFormsStaticStateImpl(
     require(encodedState ne null)
     require(digest ne null)
 
-    val getIndentedLogger = XFormsContainingDocument.getIndentedLogger(XFormsServer.getLogger, "analysis")
+    val getIndentedLogger = Loggers.getIndentedLogger("analysis")
     val locationData = staticStateDocument.locationData
     val documentWrapper = new DocumentWrapper(Dom4jUtils.createDocument, null, XPathCache.getGlobalConfiguration)
 

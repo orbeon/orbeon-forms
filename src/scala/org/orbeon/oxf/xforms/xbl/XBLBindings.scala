@@ -23,8 +23,8 @@ import org.orbeon.oxf.resources.ResourceManagerWrapper
 import scala.collection.JavaConverters._
 
 import XBLBindings._
-import org.orbeon.oxf.util.{ScalaUtils, IndentedLogger}
-import ScalaUtils._
+import org.orbeon.oxf.util.IndentedLogger
+import org.orbeon.oxf.util.ScalaUtils._
 import org.dom4j.{Text, Document, QName, Element}
 import XFormsConstants._
 import org.orbeon.oxf.xml.dom4j.{LocationDocumentResult, Dom4jUtils, LocationData}
@@ -33,6 +33,7 @@ import org.orbeon.oxf.xml.{SAXStore, TransformerUtils, XMLUtils}
 import org.orbeon.oxf.common.{OXFException, Version}
 import org.xml.sax.Attributes
 import collection.mutable.{Buffer, LinkedHashSet, ArrayBuffer, LinkedHashMap}
+import org.orbeon.oxf.util.Logger._
 
 /**
  * All the information statically gathered about XBL bindings.
@@ -48,6 +49,8 @@ import collection.mutable.{Buffer, LinkedHashSet, ArrayBuffer, LinkedHashMap}
  *   o keep a single DOM
  */
 class XBLBindings(indentedLogger: IndentedLogger, partAnalysis: PartAnalysisImpl, var metadata: Metadata, inlineXBL: Seq[Element]) {
+
+    private implicit val Logger = indentedLogger
 
     // For unit test written in Java
     def this(indentedLogger: IndentedLogger, partAnalysis: PartAnalysisImpl, metadata: Metadata) =
@@ -96,13 +99,14 @@ class XBLBindings(indentedLogger: IndentedLogger, partAnalysis: PartAnalysisImpl
                 bindingsForDoc.size
             }
 
-            (bindingCounts, Seq("xbl:xbl count", xblDocuments.size.toString, "xbl:binding count", bindingCounts.sum.toString))
+            debugResults(Seq("xbl:xbl count", xblDocuments.size.toString, "xbl:binding count", bindingCounts.sum.toString))
+
+            bindingCounts
         }
     }
 
     // Create concrete binding if there is an applicable abstract binding
     def processElementIfNeeded(
-            indentedLogger: IndentedLogger,
             controlElement: Element,
             controlPrefixedId: String,
             locationData: LocationData,
@@ -113,11 +117,10 @@ class XBLBindings(indentedLogger: IndentedLogger, partAnalysis: PartAnalysisImpl
 
             // Generate the shadow content for this particular binding
             withProcessAutomaticXBL {
-                generateRawShadowTree(indentedLogger, controlElement, abstractBinding) map {
+                generateRawShadowTree(controlElement, abstractBinding) map {
                     rawShadowTree ⇒
                         val newBinding =
                             createConcreteBinding(
-                                indentedLogger,
                                 controlElement,
                                 controlPrefixedId,
                                 locationData,
@@ -167,10 +170,12 @@ class XBLBindings(indentedLogger: IndentedLogger, partAnalysis: PartAnalysisImpl
                         bindingsForDoc.size
                     }
 
-                (None, Seq(
+                debugResults(Seq(
                     "xbl:xbl count", finalIncludesCount - initialIncludesCount toString,
                     "xbl:binding count", bindingCounts.sum toString,
                     "total xbl:binding count", abstractBindings.size toString))
+
+                None
             }
         }
 
@@ -189,7 +194,6 @@ class XBLBindings(indentedLogger: IndentedLogger, partAnalysis: PartAnalysisImpl
     }
 
     private def createConcreteBinding(
-            indentedLogger: IndentedLogger,
             boundElement: Element,
             boundControlPrefixedId: String,
             locationData: LocationData,
@@ -228,7 +232,7 @@ class XBLBindings(indentedLogger: IndentedLogger, partAnalysis: PartAnalysisImpl
                 compactShadowTree)
 
         // Process globals here as the component is in use
-        processGlobals(abstractBinding, indentedLogger, locationData, eventHandlers)
+        processGlobals(abstractBinding, locationData, eventHandlers)
 
         // Extract xbl:xbl/xbl:script and xbl:binding/xbl:resources/xbl:style
         // TODO: should do this here, in order to include only the scripts and resources actually used
@@ -284,37 +288,27 @@ class XBLBindings(indentedLogger: IndentedLogger, partAnalysis: PartAnalysisImpl
             val compactTreeOption = Option(result) map { result ⇒
                 Dom4jUtils.createDocumentCopyParentNamespaces(result.getDocument.getRootElement.element("root").element(fullAnnotatedTree.getRootElement.getQName), true)
             }
+
+            if (logShadowTrees)
+                debugResults(Seq("full tree", Dom4jUtils.domToString(fullAnnotatedTree), "compact tree", compactTreeOption map (Dom4jUtils.domToString(_)) orNull))
             
             // Result is full annotated tree and, if needed, the compact tree
-            ((fullAnnotatedTree, compactTreeOption.orNull),
-             if (logShadowTrees) Seq("full tree", Dom4jUtils.domToString(fullAnnotatedTree), "compact tree", compactTreeOption map (Dom4jUtils.domToString(_)) orNull) else Seq())
+            (fullAnnotatedTree, compactTreeOption.orNull)
         }
     }
 
-    private def withDebug[T](message: String, parameters: String*)(body: ⇒ (T, Seq[String])): T = {
-        if (indentedLogger.isDebugEnabled)
-            indentedLogger.startHandleOperation("", message, parameters: _*)
-        
-        val (result, logParameters) = body
-        
-        if (indentedLogger.isDebugEnabled)
-            indentedLogger.endHandleOperation(logParameters: _*)
-        
-        result
-    }
-
-    private def processGlobals(abstractBinding: AbstractBinding, indentedLogger: IndentedLogger, locationData: LocationData, eventHandlers: Buffer[EventHandlerImpl]) {
+    private def processGlobals(abstractBinding: AbstractBinding, locationData: LocationData, eventHandlers: Buffer[EventHandlerImpl]) {
         abstractBinding.global match {
             case Some(globalDocument) if ! allGlobals.contains(abstractBinding.qNameMatch) ⇒
 
                 val (globalFullShadowTreeDocument, globalCompactShadowTreeDocument) =
-                    withDebug("generating global XBL shadow content", "binding id", abstractBinding.bindingId.orNull) {
+                    withDebug("generating global XBL shadow content", Seq("binding id", abstractBinding.bindingId.orNull)) {
 
                         val pseudoBoundElement = Dom4jUtils.NULL_DOCUMENT.getRootElement
                         val topLevelScopeForGlobals = partAnalysis.startScope
         
                         // TODO: in script mode, XHTML elements in template should only be kept during page generation
-                        (annotateSubtree(
+                        annotateSubtree(
                             pseudoBoundElement,
                             globalDocument,
                             topLevelScopeForGlobals,
@@ -323,8 +317,7 @@ class XBLBindings(indentedLogger: IndentedLogger, partAnalysis: PartAnalysisImpl
                             topLevelScopeForGlobals,
                             hasFullUpdate = hasFullUpdate(globalDocument),
                             ignoreRoot = true,
-                            needCompact = true),
-                         Seq()
+                            needCompact = true
                         )
                     }
 
@@ -337,16 +330,15 @@ class XBLBindings(indentedLogger: IndentedLogger, partAnalysis: PartAnalysisImpl
     /**
      * Generate raw (non-annotated) shadow content for the given control id and XBL binding.
      *
-     * @param indentedLogger    logger
      * @param boundElement      element to which the binding applies
      * @param abstractBinding  corresponding <xbl:binding>
      * @return Some shadow tree document if there is a template, None otherwise
      */
-    private def generateRawShadowTree(indentedLogger: IndentedLogger, boundElement: Element,
+    private def generateRawShadowTree(boundElement: Element,
                                       abstractBinding: AbstractBinding): Option[Document] = {
         abstractBinding.templateElement map {
             templateElement ⇒
-                withDebug("generating raw XBL shadow content", "binding id", abstractBinding.bindingId.orNull) {
+                withDebug("generating raw XBL shadow content", Seq("binding id", abstractBinding.bindingId.orNull)) {
 
                     // TODO: in script mode, XHTML elements in template should only be kept during page generation
 
@@ -359,7 +351,7 @@ class XBLBindings(indentedLogger: IndentedLogger, partAnalysis: PartAnalysisImpl
                             Dom4jUtils.createDocumentCopyParentNamespaces(templateElement)
 
                     // 2. Apply xbl:attr, xbl:content, xxbl:attr and index xxbl:scope
-                    (XBLTransformer.transform(shadowTreeDocument, boundElement, abstractBinding.modeHandlers), Seq())
+                    XBLTransformer.transform(shadowTreeDocument, boundElement, abstractBinding.modeHandlers)
                 }
         }
     }
@@ -411,12 +403,12 @@ class XBLBindings(indentedLogger: IndentedLogger, partAnalysis: PartAnalysisImpl
     /**
      *
      * @param xmlReceiver           output of transformation
-     * @param prefix                prefix of the ids within the new shadow tree, e.g. "my-stuff$my-foo-bar$"
      * @param innerScope            inner scope
      * @param outerScope            outer scope, i.e. scope of the bound element
-     * @param ignoreRootElement     whether root element must just be skipped
-     * @param baseURI               base URI of new tree
      * @param startScope            scope of root element
+     * @param prefix                prefix of the ids within the new shadow tree, e.g. "my-stuff$my-foo-bar$"
+     * @param baseURI               base URI of new tree
+     * @param ignoreRoot            whether root element must just be skipped
      */
     private class ScopeExtractorContentHandler(
         xmlReceiver: XMLReceiver,

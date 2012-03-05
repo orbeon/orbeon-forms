@@ -100,10 +100,17 @@ public class IndentedLogger {
 
     public void endHandleOperation() {
         if (debugEnabled) {
-            indentation.indentation--;
-            final Operation operation = stack.pop();
-            if (operation != null) {
-                logDebug(operation.type, "end " + operation.message, "time (ms)", Long.toString(operation.getTimeElapsed()));
+            final String[] resultParameters = stack.peek().resultParameters;
+            if (resultParameters != null) {
+                // Case where parameters were set with setDebugResults
+                endHandleOperation(resultParameters);
+            } else {
+                // No parameters
+                indentation.indentation--;
+                final Operation operation = stack.pop();
+                if (operation != null) {
+                    logDebug(operation.type, "end " + operation.message, "time (ms)", Long.toString(operation.getTimeElapsed()));
+                }
             }
         }
     }
@@ -113,7 +120,6 @@ public class IndentedLogger {
             indentation.indentation--;
             final Operation operation = stack.pop();
             if (operation != null) {
-
                 final String[] newParameters = new String[parameters.length + 2];
                 newParameters[0] = "time (ms)";
                 newParameters[1] = Long.toString(operation.getTimeElapsed());
@@ -122,6 +128,10 @@ public class IndentedLogger {
                 logDebug(operation.type, "end " + operation.message, newParameters);
             }
         }
+    }
+
+    public void setDebugResults(String... parameters) {
+        stack.peek().resultParameters = parameters;
     }
 
     private static String getLogIndentSpaces(int level) {
@@ -145,14 +155,6 @@ public class IndentedLogger {
 
     public void logDebug(String type, String message, Throwable throwable) {
         log(Level.DEBUG, indentation.indentation, type, message, "throwable", OXFException.throwableToString(throwable));
-    }
-
-    public static void logWarningStatic(Logger logger, String prefix, String type, String message, String... parameters) {
-        log(logger, Level.WARN, 0, prefix, type, message, parameters);
-    }
-
-    public static void logErrorStatic(Logger logger, String prefix, String type, String message, Throwable throwable) {
-        log(logger, Level.ERROR, 0, prefix, type, message, "throwable", OXFException.throwableToString(throwable));
     }
 
     public void logWarning(String type, String message, String... parameters) {
@@ -238,7 +240,9 @@ public class IndentedLogger {
     private class Operation {
         public String type;
         public String message;
-        public long startTime;
+        public final long startTime;
+
+        public String[] resultParameters;
 
         public Operation() {
             if (isDebugEnabled()) {

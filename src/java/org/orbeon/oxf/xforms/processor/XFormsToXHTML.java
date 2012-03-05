@@ -146,7 +146,7 @@ public class XFormsToXHTML extends ProcessorImpl {
     private void doIt(final PipelineContext pipelineContext, final XMLReceiver xmlReceiver, final URIProcessorOutputImpl processorOutput, String outputName) {
 
         final ExternalContext externalContext = NetUtils.getExternalContext();
-        final IndentedLogger indentedLogger = XFormsContainingDocument.getIndentedLogger(XFormsServer.getLogger(), "html");
+        final IndentedLogger indentedLogger = Loggers.getIndentedLogger("html");
 
         // ContainingDocument and XFormsState created below
         final XFormsContainingDocument[] containingDocument = new XFormsContainingDocument[1];

@@ -57,7 +57,7 @@ import java.util.concurrent.Callable;
  */
 public class XFormsServer extends ProcessorImpl {
 
-    private static final Logger logger = LoggerFactory.createLogger(XFormsServer.class);
+    public static final Logger logger = LoggerFactory.createLogger(XFormsServer.class);
 
     private static final String INPUT_REQUEST = "request";
     //private static final String OUTPUT_RESPONSE = "response"; // optional
@@ -67,10 +67,6 @@ public class XFormsServer extends ProcessorImpl {
         XFORMS_NAMESPACES.put(XFormsConstants.XFORMS_SHORT_PREFIX, XFormsConstants.XFORMS_NAMESPACE_URI);
         XFORMS_NAMESPACES.put(XFormsConstants.XML_EVENTS_PREFIX, XFormsConstants.XML_EVENTS_NAMESPACE_URI);
         XFORMS_NAMESPACES.put(XFormsConstants.XXFORMS_SHORT_PREFIX, XFormsConstants.XXFORMS_NAMESPACE_URI);
-    }
-
-    public static Logger getLogger() {
-        return logger;
     }
 
     public XFormsServer() {
@@ -117,7 +113,7 @@ public class XFormsServer extends ProcessorImpl {
         final boolean isIgnoreSequenceNumber = !isAjaxRequest;
 
         // Logger used for heartbeat and request/response
-        final IndentedLogger indentedLogger = XFormsContainingDocument.getIndentedLogger(XFormsServer.getLogger(), "server");
+        final IndentedLogger indentedLogger = Loggers.getIndentedLogger("server");
 
         final boolean logRequestResponse = XFormsProperties.getDebugLogging().contains("server-body");
         if (logRequestResponse) {

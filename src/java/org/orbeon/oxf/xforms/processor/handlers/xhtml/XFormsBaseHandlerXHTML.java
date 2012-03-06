@@ -198,7 +198,7 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
     }
 
     protected static void appendAppearances(ElementAnalysis elementAnalysis,StringBuilder sb) {
-        for (final QName appearance : Controls.appearances(elementAnalysis)) {
+        for (final QName appearance : XFormsControl.appearances(elementAnalysis)) {
             if (sb.length() > 0)
                 sb.append(' ');
             sb.append("xforms-");

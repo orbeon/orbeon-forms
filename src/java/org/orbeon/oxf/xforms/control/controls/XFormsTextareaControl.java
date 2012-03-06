@@ -51,7 +51,7 @@ public class XFormsTextareaControl extends XFormsValueControl {
 
     @Override
     public Tuple3<String, String, String> getJavaScriptInitialization() {
-        final boolean hasInitialization = "text/html".equals(getMediatype()) || getAppearances().contains(XFormsConstants.XXFORMS_AUTOSIZE_APPEARANCE_QNAME);
+        final boolean hasInitialization = XFormsControl.isHTMLMediatype(this) || getAppearances().contains(XFormsConstants.XXFORMS_AUTOSIZE_APPEARANCE_QNAME);
 
         return hasInitialization ? getCommonJavaScriptInitialization() : null;
     }
@@ -67,7 +67,7 @@ public class XFormsTextareaControl extends XFormsValueControl {
      */
     @Override
     public void storeExternalValue(String value) {
-        if ("text/html".equals(getMediatype())) {
+        if (XFormsControl.isHTMLMediatype(this)) {
             final IndentedLogger indentedLogger = containingDocument().getControls().getIndentedLogger();
             final boolean isDebugEnabled = indentedLogger.isDebugEnabled();
             if (isDebugEnabled)

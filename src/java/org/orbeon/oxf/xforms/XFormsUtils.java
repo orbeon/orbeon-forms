@@ -25,6 +25,7 @@ import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.DebugProcessor;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.*;
+import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl;
 import org.orbeon.oxf.xforms.control.controls.XXFormsAttributeControl;
 import org.orbeon.oxf.xforms.event.events.XFormsLinkErrorEvent;
@@ -948,7 +949,7 @@ public class XFormsUtils {
 
                 if (outputControl.isRelevant()) {
                     if (acceptHTML) {
-                        if ("text/html".equals(outputControl.getMediatype())) {
+                        if (XFormsControl.isHTMLMediatype(outputControl)) {
                             if (containsHTML != null)
                                 containsHTML[0] = true; // this indicates for sure that there is some nested HTML
                             sb.append(outputControl.getExternalValue());
@@ -957,7 +958,7 @@ public class XFormsUtils {
                             sb.append(XMLUtils.escapeXMLMinimal(outputControl.getExternalValue()));
                         }
                     } else {
-                        if ("text/html".equals(outputControl.getMediatype())) {
+                        if (XFormsControl.isHTMLMediatype(outputControl)) {
                             // HTML is not allowed here, better tell the user
                             throw new OXFException("HTML not allowed within element: " + childElement.getName());
                         } else {

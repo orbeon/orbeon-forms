@@ -244,6 +244,6 @@ public abstract class XFormsBaseHandler extends ElementHandler {
 	}
 
     protected Set<QName> getAppearances() {
-        return Controls.appearances(elementAnalysis);
+        return XFormsControl.appearances(elementAnalysis);
     }
 }

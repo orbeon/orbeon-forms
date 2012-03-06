@@ -16,15 +16,12 @@ package org.orbeon.oxf.xforms.control
 import controls._
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms._
-import analysis.controls.AppearanceTrait
 import analysis.ElementAnalysis
-import processor.XFormsServer
 import xbl.XBLContainer
 import org.orbeon.oxf.xforms.BindingContext
 import org.orbeon.saxon.om.Item
 import collection.JavaConverters._
-import org.dom4j.QName
-import java.util.{Collections, Map ⇒ JMap, List ⇒ JList}
+import java.util.{Map ⇒ JMap, List ⇒ JList}
 
 object Controls {
 
@@ -345,12 +342,6 @@ object Controls {
         }
 
         true
-    }
-
-    // Return the set of appearances for the given element, if any
-    def appearances(elementAnalysis: ElementAnalysis) = elementAnalysis match {
-        case appearanceTrait: AppearanceTrait ⇒ appearanceTrait.jAppearances
-        case _ ⇒ Collections.emptySet[QName]
     }
 
     // Iterator over a control's ancestors

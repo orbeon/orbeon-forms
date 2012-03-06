@@ -13,11 +13,11 @@
  */
 package org.orbeon.oxf.xforms.control
 
-import org.dom4j.Element
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.processor.converter.XHTMLRewrite
 import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.xforms._
+import analysis.controls.AppearanceTrait
 import org.orbeon.oxf.xforms.analysis.ChildrenBuilderTrait
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.XPathDependencies
@@ -36,6 +36,7 @@ import scala.collection.Seq
 import scala.collection.JavaConverters._
 import org.orbeon.oxf.xforms.BindingContext
 import java.util.{Collections, LinkedList, List ⇒ JList}
+import org.dom4j.{QName, Element}
 
 /**
  * Represents an XForms control.
@@ -83,15 +84,15 @@ class XFormsControl(
     final def getControlElement = element
 
     // For cloning only!
-    def setParent(parent: XFormsControl) = this.parent = parent
+    final def setParent(parent: XFormsControl) = this.parent = parent
 
     def getContextStack = container.getContextStack
-    def getIndentedLogger = containingDocument.getControls.getIndentedLogger
+    final def getIndentedLogger = containingDocument.getControls.getIndentedLogger
 
     final def getResolutionScope =
         container.getPartAnalysis.scopeForPrefixedId(prefixedId)
 
-    def getChildElementScope(element: Element) =
+    final def getChildElementScope(element: Element) =
         container.getPartAnalysis.scopeForPrefixedId(container.getFullPrefix + XFormsUtils.getElementId(element))
 
     // Update this control's effective id based on the parent's effective id
@@ -113,11 +114,8 @@ class XFormsControl(
     def setEffectiveId(effectiveId: String) =
         this.effectiveId = effectiveId
 
-    def getLocationData =
+    final def getLocationData =
         if (staticControl ne null) staticControl.locationData else if (element ne null) element.getData.asInstanceOf[LocationData] else null
-
-    // TODO: from staticControl
-    private var mediatype: String = null // could become more dynamic in the future
 
     // Semi-dynamic information (depends on the tree of controls, but does not change over time)
     private var childrenActions: JList[XFormsActionControl] = null
@@ -137,16 +135,16 @@ class XFormsControl(
     // bindingContextForChild, bindingContextForFollowing operations work on nested actions too.
     // Possibly we could make *any* control able to have nested content. This would make sense from a class hierarchy
     // perspective.
-    def addChildAction(actionControl: XFormsActionControl) {
+    final def addChildAction(actionControl: XFormsActionControl) {
         if (childrenActions == null)
             childrenActions = new LinkedList[XFormsActionControl]
         childrenActions.add(actionControl)
     }
 
-    def getChildrenActions =
-        if (childrenActions ne null) childrenActions else Collections.emptyList[XFormsActionControl]
+    final def getChildrenActions =
+        Option(childrenActions) getOrElse Collections.emptyList[XFormsActionControl]
 
-    def previousEffectiveIdCommit() = {
+    final def previousEffectiveIdCommit() = {
         val result = previousEffectiveId
         previousEffectiveId = effectiveId
         result
@@ -157,13 +155,13 @@ class XFormsControl(
         previousEffectiveIdCommit()
     }
 
-    def getAppearances = Controls.appearances(staticControl)
+    final def getAppearances = XFormsControl.appearances(staticControl)
     def isStaticReadonly = false
 
-    def getMediatype = {
-        if (mediatype eq null)
-            mediatype = getControlElement.attributeValue(XFormsConstants.MEDIATYPE_QNAME)
-        mediatype
+    // Optional mediatype
+    final def mediatype = staticControl match {
+        case appearanceTrait: AppearanceTrait ⇒ appearanceTrait.mediatype
+        case _ ⇒ None
     }
 
     def getJavaScriptInitialization: (String, String, String) = null
@@ -171,8 +169,8 @@ class XFormsControl(
     def getCommonJavaScriptInitialization = {
         val appearances = getAppearances
         // First appearance only (should probably handle all of them, but historically only one appearance was handled)
-        val appearance = if (appearances.size > 0) Dom4jUtils.qNameToExplodedQName(appearances.iterator.next) else null
-        (getName, Option(appearance) getOrElse getMediatype, getEffectiveId)
+        val firstAppearance = if (! appearances.isEmpty) Some(Dom4jUtils.qNameToExplodedQName(appearances.iterator.next)) else None
+        (getName, firstAppearance orElse mediatype orNull, getEffectiveId)
     }
 
     // Compare this control with another control, as far as the comparison is relevant for the external world.
@@ -380,4 +378,14 @@ object XFormsControl {
 
         def copy = super.clone.asInstanceOf[MutableControlProperty[T]]
     }
+
+    // Return the set of appearances for the given element, if any
+    def appearances(elementAnalysis: ElementAnalysis) = elementAnalysis match {
+        case appearanceTrait: AppearanceTrait ⇒ appearanceTrait.jAppearances
+        case _ ⇒ Collections.emptySet[QName]
+    }
+
+    // Whether the given control has the text/html mediatype
+    private val HTMLMediatype = Some("text/html")
+    def isHTMLMediatype(control: XFormsControl) = control.mediatype == HTMLMediatype
 }

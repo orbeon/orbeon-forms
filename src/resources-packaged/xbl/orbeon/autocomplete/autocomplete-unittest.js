@@ -77,6 +77,11 @@
             document.getElementById("focus-input").getElementsByTagName("input")[0].focus();
         },
 
+        simulateAutocompleteClick: function(staticDynamicResource) {
+            var autocomplete = YAHOO.util.Dom.get(staticDynamicResource + "-autocomplete");
+            autocomplete.getElementsByTagName("button")[0].click();
+        },
+
         /**
          * Checks that the external value is what we expect it to be.
          */
@@ -374,8 +379,7 @@
                 }, function() {
                     ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
                         // Click on the button, which may require something to be done on the server
-                        var autocomplete = YAHOO.util.Dom.get(staticDynamicResource + "-autocomplete");
-                        autocomplete.getElementsByTagName("button")[0].click();
+                        this.simulateAutocompleteClick(staticDynamicResource);
                     }, function() {
                         ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
                             // Click on the second item in the list; the search field is populated right away
@@ -392,8 +396,19 @@
             });
         },
 
+        testKeepPartialValueOnFocusOut: function() {
+            this.runForStaticDynamicResource(function(staticDynamicResource, continuation) {
+                ORBEON.util.Test.runMayCauseXHR(this,
+                    function() { this.simulateTypeInField(staticDynamicResource, "Sw"); },
+                    function() { this.simulateAutocompleteClick(staticDynamicResource); },
+                    function() { this.checkSearchValue(staticDynamicResource, "Sw", "List should show with current value still 'Sw'"); },
+                    function() { continuation.call(this); }
+                );
+            });
+        },
+
         EOO: {}
     }));
 
-    // ORBEON.util.Test.onOrbeonLoadedRunTest();
+    ORBEON.util.Test.onOrbeonLoadedRunTest();
 })();

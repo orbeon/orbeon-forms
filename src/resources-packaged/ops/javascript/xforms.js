@@ -1373,12 +1373,24 @@ var DEFAULT_LOADING_TEXT = "Loading...";
 
             /**
              * Function to be call in every test to start the test when the page is loaded.
+             *
+             * You can pass one optional argument: the name of a test function (say 'testSomething'). If this argument is present, then
+             * only this specific test will be run. This is useful when debugging test, replacing the call to Test.onOrbeonLoadedRunTest()
+             * by a call to Test.onOrbeonLoadedRunTest('testSomething') to only run testSomething().
              */
-            onOrbeonLoadedRunTest: function() {
+            onOrbeonLoadedRunTest: function(onlyFunctionName) {
                 ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
                     if (parent && parent.TestManager) {
                         parent.TestManager.load();
                     } else {
+                        if (! _.isUndefined(onlyFunctionName)) {
+                            _.each(YAHOO.tool.TestRunner.masterSuite.items, function(testCase) {
+                                _.each(_.functions(testCase), function(functionName) {
+                                    if (functionName.indexOf('test') == 0 && functionName != onlyFunctionName)
+                                        delete testCase[functionName];
+                                })
+                            });
+                        }
                         new YAHOO.tool.TestLogger();
                         YAHOO.tool.TestRunner.run();
                     }

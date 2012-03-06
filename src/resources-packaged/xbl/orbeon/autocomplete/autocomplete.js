@@ -120,7 +120,8 @@
 
             var doUpdateSuggestionList =
                 this.suggestionRequested || (
-                // If the user just selected something before which triggered an Ajax query, don't show the suggestion list (why?)
+                // If the user just selected something before which triggered an Ajax query, don't show the suggestion list
+                // as users expect the suggestion list to close after making a selection (clicking or pressing enter)
                 ! this.justMadeSelection
                 // Update the list only of the control has the focus, as updating the list will show the suggestion list
                 // and we only want to show the suggestion list if the user happens to be in that field

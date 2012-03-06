@@ -93,12 +93,14 @@ object ControlAnalysisFactory {
         require(controlElement ne null)
         require(scope ne null)
 
-        // Tell whether the current element has an XBL binding
-        def hasXBLBinding(e: Element) = context.partAnalysis.xblBindings.hasBinding(scope.prefixedIdForStaticId(XFormsUtils.getElementId(e)))
+        // XBL binding if any
+        val binding = Option(context.partAnalysis.xblBindings.getBinding(scope.prefixedIdForStaticId(XFormsUtils.getElementId(controlElement))))
 
         // Not all factories are simply indexed by QName, so compose those with factories for components and actions
-        val componentFactory: PartialFunction[Element, ControlFactory] =
-            { case e if hasXBLBinding(e) ⇒ (new ComponentControl(_, _, _, _, _)) }
+        val componentFactory: PartialFunction[Element, ControlFactory] = {
+            case e if binding.isDefined && binding.get.abstractBinding.modeLHHA ⇒ (new ComponentControl(_, _, _, _, _) with LHHATrait)
+            case e if binding.isDefined ⇒ (new ComponentControl(_, _, _, _, _))
+        }
 
         val f = controlFactory orElse componentFactory orElse XFormsActions.factory
 

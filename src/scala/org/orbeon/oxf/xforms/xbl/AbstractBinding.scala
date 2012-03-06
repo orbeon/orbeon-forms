@@ -18,9 +18,8 @@ import org.dom4j.{Document, QName, Element}
 import org.orbeon.oxf.xforms._
 import analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.XFormsConstants._
-import scala.collection.JavaConverters._
-import org.orbeon.oxf.xml.NamespaceMapping
 import org.orbeon.oxf.common.OXFException
+import org.orbeon.oxf.xml.{Dom4j, NamespaceMapping}
 
 // Holds details of an xbl:xbl/xbl:binding
 case class AbstractBinding(
@@ -89,22 +88,22 @@ object AbstractBinding {
 
         val styles =
             for {
-                resourcesElement ← Dom4jUtils.elements(bindingElement, XBL_RESOURCES_QNAME).asScala
-                styleElement ← Dom4jUtils.elements(resourcesElement, XBL_STYLE_QNAME).asScala
+                resourcesElement ← Dom4j.elements(bindingElement, XBL_RESOURCES_QNAME)
+                styleElement ← Dom4j.elements(resourcesElement, XBL_STYLE_QNAME)
             } yield
                 styleElement
 
         val handlers =
             for {
                 handlersElement ← Option(bindingElement.element(XBL_HANDLERS_QNAME)).toSeq
-                handlerElement ← Dom4jUtils.elements(handlersElement, XBL_HANDLER_QNAME).asScala
+                handlerElement ← Dom4j.elements(handlersElement, XBL_HANDLER_QNAME)
             } yield
                 handlerElement
 
         val implementations =
             for {
                 implementationElement ← Option(bindingElement.element(XBL_IMPLEMENTATION_QNAME)).toSeq
-                modelElement ← Dom4jUtils.elements(implementationElement, XFORMS_MODEL_QNAME).asScala
+                modelElement ← Dom4j.elements(implementationElement, XFORMS_MODEL_QNAME)
             } yield
                 modelElement
 

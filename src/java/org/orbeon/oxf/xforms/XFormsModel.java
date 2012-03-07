@@ -233,7 +233,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
      */
     public Object resolveObjectById(String sourceEffectiveId, String targetStaticId, Item contextItem) {
 
-        if (targetStaticId.indexOf(XFormsConstants.COMPONENT_SEPARATOR) != -1 || targetStaticId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1) != -1)
+        if (XFormsUtils.isEffectiveId(targetStaticId))
             throw new OXFException("Target id must be static id: " + targetStaticId);
 
         // Check this id

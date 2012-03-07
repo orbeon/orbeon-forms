@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.function.xxforms
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xforms.control.XFormsControl
-import org.orbeon.oxf.xforms.XFormsConstants
+import org.orbeon.oxf.xforms.XFormsUtils
 
 class XXFormsControlElement extends XFormsFunction {
 
@@ -30,10 +30,8 @@ class XXFormsControlElement extends XFormsFunction {
             } orNull
 
     def resolveOrFindByEffectiveId(xpathContext: XPathContext, staticOrEffectiveId: String) =
-        if (isEffectiveId(staticOrEffectiveId))
+        if (XFormsUtils.isEffectiveId(staticOrEffectiveId))
             getContainingDocument(xpathContext).getObjectByEffectiveId(staticOrEffectiveId)
         else
             getXBLContainer(xpathContext).resolveObjectByIdInScope(getSourceEffectiveId(xpathContext), staticOrEffectiveId, null)
-
-    def isEffectiveId(id: String) = id.contains(XFormsConstants.COMPONENT_SEPARATOR) || id.contains(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1)
 }

@@ -454,11 +454,10 @@ object ClientEvents {
                 case _ ⇒
             }
 
-            // Handle repeat focus. Don't dispatch event on DOMFocusOut however.
-            if (eventTargetEffectiveId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1) != -1 && !(event.isInstanceOf[DOMFocusOutEvent])) {
-                // The event target is in a repeated structure, so make sure it gets repeat focus
+            // Handle repeat focus if the event target is in a repeat
+            // Don't dispatch event on DOMFocusOut however
+            if (XFormsUtils.hasEffectiveIdSuffix(eventTargetEffectiveId) && ! event.isInstanceOf[DOMFocusOutEvent])
                 dispatchEventCheckTarget(new XXFormsRepeatFocusEvent(document, eventTarget))
-            }
 
             // Interpret event
             eventTarget match {

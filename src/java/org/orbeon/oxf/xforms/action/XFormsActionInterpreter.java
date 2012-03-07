@@ -530,8 +530,7 @@ public class XFormsActionInterpreter {
      * Resolve an object by effective id if the id is not a static id, otherwise try to resolve by static id.
      */
     public Object resolveOrFindByEffectiveId(Element actionElement, String staticOrEffectiveId) {
-        if (staticOrEffectiveId.indexOf(XFormsConstants.COMPONENT_SEPARATOR) != -1
-            || staticOrEffectiveId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1) != -1) {
+        if (XFormsUtils.isEffectiveId(staticOrEffectiveId)) {
             // We allow the use of effective ids so that e.g. a global component such as the error summary can target a specific component
             return _containingDocument.getObjectByEffectiveId(staticOrEffectiveId);
         } else {

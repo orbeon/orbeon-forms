@@ -30,7 +30,6 @@ import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl;
 import org.orbeon.oxf.xforms.control.controls.XXFormsAttributeControl;
 import org.orbeon.oxf.xforms.event.events.XFormsLinkErrorEvent;
 import org.orbeon.oxf.xforms.model.DataModel;
-import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.xbl.Scope;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.*;
@@ -1282,11 +1281,15 @@ public class XFormsUtils {
     /**
      * Check if an id is a static id, i.e. if it does not contain component/hierarchy separators.
      *
-     * @param staticId  static id to check
+     * @param id  static id to check
      * @return          true if the id is a static id
      */
-    public static boolean isStaticId(String staticId) {
-        return staticId.indexOf(XFormsConstants.COMPONENT_SEPARATOR) == -1 && staticId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1) == -1;
+    public static boolean isStaticId(String id) {
+        return id != null && id.indexOf(XFormsConstants.COMPONENT_SEPARATOR) == -1 && ! hasEffectiveIdSuffix(id);
+    }
+
+    public static boolean isEffectiveId(String id) {
+        return id != null && id.indexOf(XFormsConstants.COMPONENT_SEPARATOR) != -1 || hasEffectiveIdSuffix(id);
     }
 
     /**

@@ -16,8 +16,8 @@ package org.orbeon.oxf.xforms.action.actions;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.util.IndentedLogger;
-import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.control.XFormsControl;
@@ -53,8 +53,7 @@ public class XFormsSetfocusAction extends XFormsAction {
 
         // Find control
         final Object controlObject;
-        if (resolvedControlStaticOrEffectiveId.indexOf(XFormsConstants.COMPONENT_SEPARATOR) != -1
-                || resolvedControlStaticOrEffectiveId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1) != -1) {
+        if (XFormsUtils.isEffectiveId(resolvedControlStaticOrEffectiveId)) {
             // We allow the use of effective ids so that e.g. a global component such as the error summary can target a specific component
             controlObject = containingDocument.getObjectByEffectiveId(resolvedControlStaticOrEffectiveId);
         } else {

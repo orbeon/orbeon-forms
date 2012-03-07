@@ -51,8 +51,8 @@
             <xforms:instance id="selected-countries">
                 <selected-countries readonly="false" relevant="true">
                     <static effective-target-id="">ca</static>
-                    <dynamic effective-target-id=""/>
-                    <resource effective-target-id=""/>
+                    <dynamic effective-target-id="" label="Canada">ca</dynamic>
+                    <resource effective-target-id="" label="Canada">ca</resource>
                 </selected-countries>
             </xforms:instance>
             <!-- Constraint on selected country -->
@@ -71,16 +71,6 @@
             <!-- Add other countries for testing to list of all countries -->
             <xforms:insert ev:event="xforms-model-construct-done"
                 nodeset="instance('all-countries')/country" origin="instance('additional-countries')/*"/>
-
-            <xforms:action ev:event="xforms-ready">
-                <!-- NOTE: We don't dispatch fr-set-label to the static-autocomplete since the initial value is already "ca" in the instance -->
-                <xforms:dispatch target="dynamic-autocomplete" name="fr-set-label">
-                    <xxforms:context name="label" select="'Canada'"/>
-                </xforms:dispatch>
-                <xforms:dispatch target="resource-autocomplete" name="fr-set-label">
-                    <xxforms:context name="label" select="'Canada'"/>
-                </xforms:dispatch>
-            </xforms:action>
 
         </xforms:model>
         <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
@@ -106,8 +96,8 @@
         <xhtml:fieldset>
             <xhtml:legend>Static itemset</xhtml:legend>
             <xhtml:div>
-                <xforms:output value="instance('selected-countries')/static" id="static-output">
-                    <xforms:label>Code of selected country: </xforms:label>
+                <xforms:output value="instance('selected-countries')/static" id="static-output-value">
+                    <xforms:label>Code: </xforms:label>
                 </xforms:output>
             </xhtml:div>
             <xhtml:div>
@@ -159,8 +149,11 @@
         <xhtml:fieldset>
             <xhtml:legend>Dynamic itemset, custom</xhtml:legend>
             <xhtml:div>
-                <xforms:output value="instance('selected-countries')/dynamic" id="dynamic-output">
-                    <xforms:label>Code of selected country: </xforms:label>
+                <xforms:output value="instance('selected-countries')/dynamic" id="dynamic-output-value">
+                    <xforms:label>Code: </xforms:label>
+                </xforms:output>
+                <xforms:output value="instance('selected-countries')/dynamic/@label" id="dynamic-output-label">
+                    <xforms:label>Label: </xforms:label>
                 </xforms:output>
             </xhtml:div>
             <xhtml:div>
@@ -192,7 +185,7 @@
             <xhtml:div>
                 <xforms:group ref="instance('selected-countries')/dynamic">
                     <xforms:setvalue ev:event="xforms-invalid" ref="@effective-target-id" value="string-join((xxforms:event('xxforms:target-prefixes'), xxforms:event('xxforms:targetid')), '$')"/>
-                    <fr:autocomplete ref="." id="dynamic-autocomplete"
+                    <fr:autocomplete ref="." id="dynamic-autocomplete" labelref="@label"
                                      dynamic-itemset="true">
                         <!-- React to user searching -->
                         <xforms:action ev:event="fr-search-changed">
@@ -228,8 +221,11 @@
         <xhtml:fieldset>
             <xhtml:legend>Using resource</xhtml:legend>
             <xhtml:div>
-                <xforms:output value="instance('selected-countries')/resource" id="resource-output">
-                    <xforms:label>Code of selected country: </xforms:label>
+                <xforms:output value="instance('selected-countries')/resource" id="resource-output-value">
+                    <xforms:label>Code: </xforms:label>
+                </xforms:output>
+                <xforms:output value="instance('selected-countries')/resource/@label" id="resource-output-label">
+                    <xforms:label>Label: </xforms:label>
                 </xforms:output>
             </xhtml:div>
             <xhtml:div>
@@ -261,7 +257,7 @@
             <xhtml:div>
                 <xforms:group ref="instance('selected-countries')/resource">
                     <xforms:setvalue ev:event="xforms-invalid" ref="@effective-target-id" value="string-join((xxforms:event('xxforms:target-prefixes'), xxforms:event('xxforms:targetid')), '$')"/>
-                    <fr:autocomplete ref="." id="resource-autocomplete" resource="/xforms-controls/services/countries?country-name={$fr-search-value}" max-results-displayed="4">
+                    <fr:autocomplete ref="." labelref="@label" id="resource-autocomplete" resource="/xforms-controls/services/countries?country-name={$fr-search-value}" max-results-displayed="4">
                         <xforms:label>Country code: </xforms:label>
                         <xforms:itemset nodeset="/countries/country">
                             <xforms:label ref="name"/>

@@ -41,18 +41,22 @@
                 <large-icon>/forms/orbeon/builder/images/autocomplete.png</large-icon>
             </icon>
             <datatype>xforms:string</datatype>
-            <fb:template>
-                <fr:autocomplete id="" appearance="minimal" ref="" xmlns="" resource="">
-                    <xforms:label ref=""/>
-                    <xforms:hint ref=""/>
-                    <xforms:help ref=""/>
-                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
-                    <xforms:itemset ref="">
+            <templates>
+                <instance label=""/>
+                <view>
+                    <fr:autocomplete id="" appearance="minimal" ref="" labelref="@label" xmlns="" resource="">
                         <xforms:label ref=""/>
-                        <xforms:value ref=""/>
-                    </xforms:itemset>
-                </fr:autocomplete>
-            </fb:template>
+                        <xforms:hint ref=""/>
+                        <xforms:help ref=""/>
+                        <xforms:alert ref="$fr-resources/detail/labels/alert"/>
+                        <!-- Itemset points to an empty nodeset until users set them in the control details dialog -->
+                        <xforms:itemset ref="()">
+                            <xforms:label ref="()"/>
+                            <xforms:value ref="()"/>
+                        </xforms:itemset>
+                    </fr:autocomplete>
+                </view>
+            </templates>
             <control-details>
                 <xforms:input ref="@resource">
                     <xforms:label lang="en">Resource URI</xforms:label>
@@ -136,6 +140,7 @@
                             <xxforms:variable name="external-value"><xxforms:sequence select="." xxbl:scope="outer"/></xxforms:variable>
                             <xxforms:variable name="local" select="instance('local')"/>
                             <xxforms:variable name="dynamic-itemset-attribute" xbl:attr="xbl:text=dynamic-itemset"/>
+                            <!-- Yes, we want this variable both in inner and outer scope  -->
                             <xxforms:variable name="resource-avt" xbl:attr="xbl:text=resource"/>
                             <xxforms:variable name="resource-avt" xbl:attr="xbl:text=resource" xxbl:scope="outer"/>
                             <!-- Mode is either: static, dynamic, resource -->
@@ -151,6 +156,13 @@
                                     <xxforms:sequence select="xxforms:evaluate-avt($resource-avt)" xxbl:scope="outer"/>
                                 </xxforms:variable>
                             </xsl:if>
+                            <!-- Define variables $has-labelref (xs:boolean) and $external-label (node()) -->
+                            <xxforms:variable name="labelref" xbl:attr="xbl:text=labelref"/>
+                            <xxforms:variable name="has-labelref" select="$dynamic-itemset and $labelref != ''"/>
+                            <!-- HACK: It is unfortunate that we have to dupplicate in XSLT the logic already implement in XForms for $dynamic-itemset  -->
+                            <xsl:if test="exists(@resource) or @dynamic-itemset = 'true'">
+                                <xxforms:variable name="external-label"><xxforms:sequence xbl:attr="select=labelref" xxbl:scope="outer"/></xxforms:variable>
+                            </xsl:if>
 
                             <!-- - - - - - - - - - - - - - - - - - - FUNCTIONS - - - - - - - - - - - - - - - - - - -->
 
@@ -161,6 +173,8 @@
                                 <xforms:setvalue ref="$external-value" value="$value"/>
                                 <!-- If no value is found, clear the search field -->
                                 <xforms:setvalue if="$value = ''" ref="$local/textfield-value"/>
+                                <!-- HACK: We'll be able to move the if on the setvalue once the following is fixed: https://github.com/orbeon/orbeon-forms/issues/57 -->
+                                <xforms:action if="$has-labelref"><xforms:setvalue ref="$external-label" value="$local/textfield-value"/></xforms:action>
                             </xforms:action>
                             <xforms:action ev:event="get-label-from-itemset">
                                 <xxforms:variable name="label" select="event('fr-label')"/>
@@ -183,6 +197,8 @@
                             <!-- Init event -->
                             <xforms:action id="xf-en" ev:event="xforms-enabled" ev:observer="component-inner-group" ev:target="component-inner-group">
                                 <xxforms:script id="init">YAHOO.xbl.fr.Autocomplete.instance(this).init();</xxforms:script>
+                                <!-- On xforms-enabled, if $has-labelref, copy the $external-label to the search field -->
+                                <xforms:setvalue if="$has-labelref" ref="$local/textfield-value" value="$external-label"/>
                             </xforms:action>
                             <!-- For resource mode: when the component is initialized or when resources changes, update our internal itemset -->
                             <xsl:if test="exists(@resource)">
@@ -194,13 +210,12 @@
                                 </xforms:action>
                             </xsl:if>
                             <!-- Forward focus event and keep track of whether we have the focus -->
-                            <xforms:action ev:event="DOMFocusIn" ev:observer="search">
+                            <!-- HACK: We would like the propagation of the DOMFocusIn/DOMFocusOut to be done automatically by the XBL engine -->
+                            <xforms:action ev:event="DOMFocusIn" ev:observer="component-inner-group" ev:target="component-inner-group">
                                 <xforms:dispatch name="DOMFocusIn" target="fr-autocomplete"/>
-                                <xforms:setvalue ref="$local/has-focus">true</xforms:setvalue>
                             </xforms:action>
-                            <xforms:action ev:event="DOMFocusOut" ev:observer="search">
+                            <xforms:action ev:event="DOMFocusOut" ev:observer="component-inner-group" ev:target="component-inner-group">
                                 <xforms:dispatch name="DOMFocusOut" target="fr-autocomplete"/>
-                                <xforms:setvalue ref="$local/has-focus">false</xforms:setvalue>
                                 <xforms:dispatch name="update-external-value" target="component-inner-group"/>
                             </xforms:action>
                             <!-- Selecting a value updates the external value -->

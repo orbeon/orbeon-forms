@@ -207,9 +207,10 @@ object ControlOps {
                     setvalue(e._1, "$form-resources/" + newName + '/' + e._2)
                 }
 
-        // Set xforms:itemset/@ref xforms:itemset/@nodeset value if present
-        for (attName ← Seq("ref", "nodeset"))
-            setvalue(controlElement \ "*:itemset" \@ attName, "$form-resources/" + newName + "/item")
+        // If using a static itemset editor, set xforms:itemset/@ref xforms:itemset/@nodeset value
+        if (hasEditor(controlElement, "static-itemset"))
+            for (attName ← Seq("ref", "nodeset"))
+                setvalue(controlElement \ "*:itemset" \@ attName, "$form-resources/" + newName + "/item")
     }
 
     // Rename a bind
@@ -422,4 +423,35 @@ object ControlOps {
 
     def setControlHelp(controlId: String, value: String) = setControlResource(controlId, "help", value)
     def setControlAlert(controlId: String, value: String) = setControlResource(controlId, "alert", value)
+
+    // From an <xbl:binding>, returns the view template (say <fr:autocomplete>)
+    def viewTemplate(binding: NodeInfo) = {
+        val metadata = binding \ "*:metadata"
+        (((metadata \ "*:template") ++ (metadata \ "*:templates" \ "*:view")) \ *).headOption
+    }
+
+    // From a control element (say <fr:autocomplete>), returns the corresponding <xbl:binding>
+    def binding(controlElement: NodeInfo) = {
+        (asScalaSeq(model("fr-form-model").get.getVariable("component-bindings")) map asNodeInfo filter (b ⇒
+            viewTemplate(b) match {
+                case Some(viewTemplate) ⇒ qname(viewTemplate) == qname(controlElement)
+                case _ ⇒ false
+            }
+        )).headOption
+    }
+
+    // Finds if a control uses a particular type of editor (say "static-itemset")
+    // TODO: make `editor` something other than a string
+    def hasEditor(controlElement: NodeInfo, editor: String) = {
+        (binding(controlElement) filter (b ⇒ {
+            val x = b \ "*:metadata"
+            val y = b \ "*:metadata" \ "*:editors"
+            val z = b \ "*:metadata" \ "*:editors" \@ editor
+            val staticItemsetAttribute = (b \ "*:metadata" \ "*:editors" \@ editor).headOption
+            staticItemsetAttribute match {
+                case Some(a) ⇒ a.stringValue == "true"
+                case _ ⇒ false
+            }
+        })).isDefined
+    }
 }

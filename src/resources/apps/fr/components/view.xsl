@@ -248,7 +248,7 @@
                     <xsl:if test="$resources">
                         <!-- Non-relevant group -->
                         <xforms:group ref="()">
-                            <xsl:apply-templates select="$resources/*/xbl:binding/fb:metadata/fb:template/*" mode="filter-fb-template"/>
+                            <xsl:apply-templates select="$resources/*/xbl:binding/fb:metadata/(fb:template | fb:templates/fb:view)/*" mode="filter-fb-template"/>
                         </xforms:group>
                     </xsl:if>
                 </xsl:if>

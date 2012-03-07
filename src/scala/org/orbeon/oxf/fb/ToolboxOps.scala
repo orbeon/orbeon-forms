@@ -20,6 +20,7 @@ import org.orbeon.oxf.fb.FormBuilderFunctions._
 import org.orbeon.oxf.fb.ControlOps._
 import org.orbeon.oxf.fb.GridOps._
 import org.orbeon.oxf.fb.ContainerOps._
+import org.orbeon.oxf.xml.TransformerUtils
 
 /*
  * Form Builder: toolbox operations.
@@ -44,10 +45,10 @@ object ToolboxOps {
 
                 // Insert control template
                 val newControlElement: NodeInfo =
-                    binding \ "*:metadata" \ "*:template" \ * match {
-                        case Seq(template, _*) ⇒
+                    viewTemplate(binding) match {
+                        case Some(viewTemplate) ⇒
                             // There is a specific template available
-                            insert(into = gridTd, origin = template).head
+                            insert(into = gridTd, origin = viewTemplate).head
                         case _ ⇒
                             // No specific, create simple element with LHHA
 
@@ -74,8 +75,11 @@ object ToolboxOps {
                 }
 
                 // Data holder may contain file attributes
+                val instanceTemplate = binding \ "*:metadata" \ "*:templates" \ "*:instance"
                 val dataHolder =
-                    if (Set("xs:anyURI", "xforms:anyURI")(controlType))
+                    if (! instanceTemplate.isEmpty)
+                        elementInfo(newControlName, (instanceTemplate.head \@ @*) ++ (instanceTemplate \ *))
+                    else if (Set("xs:anyURI", "xforms:anyURI")(controlType))
                         elementInfo(newControlName, Seq("filename", "mediatype", "size") map (attributeInfo(_)))
                     else
                         elementInfo(newControlName)

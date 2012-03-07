@@ -79,16 +79,28 @@
 
         simulateAutocompleteClick: function(staticDynamicResource) {
             var autocomplete = YAHOO.util.Dom.get(staticDynamicResource + "-autocomplete");
-            autocomplete.getElementsByTagName("button")[0].click();
+            var button = autocomplete.getElementsByTagName("button")[0];
+            button.focus();
+            button.click();
         },
 
         /**
-         * Checks that the external value is what we expect it to be.
+         * Checks that the external value and label is what we expect it to be.
          */
-        checkExternalValue: function(staticDynamicResource, expectedValue, message) {
-            var outputValue = ORBEON.xforms.Document.getValue(staticDynamicResource + "-output");
-            YAHOO.util.Assert.areEqual(expectedValue, outputValue, staticDynamicResource +
-                (YAHOO.lang.isUndefined(message) ? "" : " - " + message));
+        checkExternal: function(staticDynamicResource, expectedValue, expectedLabel, message) {
+            var expected = { 'value': expectedValue, 'label': expectedLabel };
+            _.each(_.keys(expected), function(key) {
+                var doAssert =
+                    /* Value for label is optional */
+                    expected[key] != null
+                    /* Don't check label for the static mode, as it isn't supported (and doesn't make sense) */
+                    && !(staticDynamicResource == 'static' && key == 'label');
+                if (doAssert) {
+                    var value = ORBEON.xforms.Document.getValue(staticDynamicResource + "-output-" + key);
+                    YAHOO.util.Assert.areEqual(expected[key], value, staticDynamicResource + " " + key + " " +
+                        (YAHOO.lang.isUndefined(message) ? "" : " - " + message));
+                }
+            });
         },
 
         /**
@@ -126,7 +138,7 @@
                 // Nothing is done in JS, but the fr-set-label we dispatch on xforms-ready will create some Ajax traffic
             }, function() {
                 this.runForStaticDynamicResource(function(staticDynamicResource, continuation) {
-                    this.checkExternalValue(staticDynamicResource, "ca");
+                    this.checkExternal(staticDynamicResource, "ca", "Canada");
                     this.checkSearchValue(staticDynamicResource, "Canada");
                     continuation.call(this);
                 });
@@ -158,7 +170,7 @@
                     this.simulateTypeInField(staticDynamicResource, "Switzerland");
                     this.simulateFocusOut();
                 }, function() {
-                    this.checkExternalValue(staticDynamicResource, "sz");
+                    this.checkExternal(staticDynamicResource, "sz", "Switzerland");
                     continuation.call(this);
                 });
             });
@@ -225,7 +237,7 @@
                             this.simulateClickItem(staticDynamicResource, 0);
                             this.simulateFocusOut();
                         }, function() {
-                            this.checkExternalValue(staticDynamicResource, "us");
+                            this.checkExternal(staticDynamicResource, "us", "United States");
                             ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
                                 this.simulateTypeInField(staticDynamicResource, "United States");
                             }, function() {
@@ -236,7 +248,7 @@
                                 }, function() {
                                     // The value is still 'us', not 'us2', since the XForms code that looks the value up
                                     // in the itemset only knows the label, not the position of the label
-                                    this.checkExternalValue(staticDynamicResource, "us");
+                                    this.checkExternal(staticDynamicResource, "us", "United States");
                                     continuation.call(this);
                                 });
                             });
@@ -259,7 +271,7 @@
                             this.simulateClickItem(staticDynamicResource, 0);
                             this.simulateFocusOut();
                         }, function() {
-                            this.checkExternalValue(staticDynamicResource, "vq", "1st value (vq) selected when clicking on the 1st item in the list");
+                            this.checkExternal(staticDynamicResource, "vq", "Virgin Islands", "1st value (vq) selected when clicking on the 1st item in the list");
                             ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
                                 this.simulateTypeInField(staticDynamicResource, "Virgin");
                             }, function() {
@@ -268,7 +280,7 @@
                                     this.simulateClickItem(staticDynamicResource, 1);
                                     this.simulateFocusOut();
                                 }, function() {
-                                    this.checkExternalValue(staticDynamicResource, "vq2", "2nd value (vq2) selected when clicking on the 2nd item in the list");
+                                    this.checkExternal(staticDynamicResource, "vq2", "Virgin Islands", "2nd value (vq2) selected when clicking on the 2nd item in the list");
                                     this.checkSearchValue(staticDynamicResource, "Virgin  Islands");
                                     continuation.call(this);
                                 });
@@ -324,11 +336,11 @@
                 ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
                     YAHOO.util.UserAction.click(YAHOO.util.Dom.get(staticDynamicResource + "-set-to-canada"));
                 }, function() {
-                    this.checkExternalValue(staticDynamicResource, "ca", "external value is 'ca' because Canada exists in the itemset");
+                    this.checkExternal(staticDynamicResource, "ca", "Canada", "external value is 'ca' because Canada exists in the itemset");
                     ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
                         YAHOO.util.UserAction.click(YAHOO.util.Dom.get(staticDynamicResource + "-set-to-utopia"));
                     }, function() {
-                        this.checkExternalValue(staticDynamicResource, "", "external value is empty string because Utopia does not exist in the itemset");
+                        this.checkExternal(staticDynamicResource, "", "", "external value is empty string because Utopia does not exist in the itemset");
                         continuation.call(this);
                     });
                 });
@@ -388,7 +400,7 @@
                             this.simulateFocusOut();
                         }, function() {
                             // And the external value should now be updated as well
-                            this.checkExternalValue(staticDynamicResource, "al", "External value set based on selected item");
+                            this.checkExternal(staticDynamicResource, "al", "Albania", "External value set based on selected item");
                             continuation.call(this);
                         });
                     });
@@ -402,6 +414,8 @@
                     function() { this.simulateTypeInField(staticDynamicResource, "Sw"); },
                     function() { this.simulateAutocompleteClick(staticDynamicResource); },
                     function() { this.checkSearchValue(staticDynamicResource, "Sw", "List should show with current value still 'Sw'"); },
+                    function() { this.simulateFocusOut(); },
+                    function() { this.checkSearchValue(staticDynamicResource, "", "On focus lost, the search field is reset since 'Sw' isn't an existing label"); },
                     function() { continuation.call(this); }
                 );
             });

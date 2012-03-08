@@ -188,7 +188,7 @@ object Controls {
         val targetIndexBuilder = new StringBuilder
 
         def appendIterationToSuffix(iteration: Int) {
-            if (targetIndexBuilder.length == 0)
+            if (targetIndexBuilder.isEmpty)
                 targetIndexBuilder.append(REPEAT_HIERARCHY_SEPARATOR_1)
             else if (targetIndexBuilder.length != 1)
                 targetIndexBuilder.append(REPEAT_HIERARCHY_SEPARATOR_2)

@@ -333,6 +333,7 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
                             currentControlTree.dispatchDestructionEventsForRemovedContainer(movedOrRemovedIteration, true)
 
                             // Indicate to iteration that it is being removed
+                            // As of 2012-03-07, only used by XFormsComponentControl to destroy the XBL container
                             movedOrRemovedIteration.iterationRemoved()
                             if (isDebugEnabled)
                                 indentedLogger.endHandleOperation()
@@ -366,7 +367,7 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
                         false
 
                 if (! didSetIndex) {
-                    // Delete logic
+                    // Non-insert logic (covers delete and other arbitrary changes to the repeat sequence)
 
                     // Try to point to the same node as before
                     if (oldRepeatIndex > 0 && oldRepeatIndex <= newIndexes.length && newIndexes(oldRepeatIndex - 1) != -1) {
@@ -404,7 +405,7 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
                     }
                 }
 
-                    // Iterate over new nodeset to move or add iterations
+                // Iterate over new nodeset to move or add iterations
                 val newSize = newRepeatNodeset.size
                 val newChildren = new ArrayBuffer[XFormsControl](newSize)
                 val newIterations = new ArrayBuffer[XFormsRepeatIterationControl]

@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.control
 
 import org.orbeon.oxf.xforms._
 import control.Controls.AncestorIterator
-import event.events.{XFormsHelpEvent, XXFormsBindingErrorEvent, XFormsFocusEvent, XXFormsRepeatFocusEvent}
+import event.events._
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatIterationControl
 import org.orbeon.oxf.xforms.event.XFormsEvent
 import org.orbeon.oxf.xforms.event.XFormsEventObserver

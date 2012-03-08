@@ -1,0 +1,1114 @@
+<!--
+  Copyright (C) 2012 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<group description="XForms Focus"
+       xmlns:p="http://www.orbeon.com/oxf/pipeline"
+       xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:xs="http://www.w3.org/2001/XMLSchema"
+       xmlns:xh="http://www.w3.org/1999/xhtml"
+       xmlns:oxf="http://www.orbeon.com/oxf/processors"
+       xmlns:xi="http://www.w3.org/2001/XInclude"
+       xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+       xmlns:xf="http://www.w3.org/2002/xforms"
+       xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+       xmlns:exf="http://www.exforms.org/exf/1-0"
+       xmlns:ev="http://www.w3.org/2001/xml-events"
+       xmlns:xbl="http://www.w3.org/ns/xbl"
+       xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+
+    <test description="xf:setfocus on xf:group with non-relevant child control" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="instance">
+                            <instance xmlns="">
+                                <first-name>Ada</first-name>
+                            </instance>
+                        </xf:instance>
+
+                        <xf:setfocus ev:event="xforms-ready" control="my-group-1"/>
+
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:group id="my-group-1">
+                        <xf:input ref="()" id="my-input-1"/>
+                        <xf:group id="my-group-2">
+                            <xf:input ref="first-name" id="my-input-2"/>
+                        </xf:group>
+                    </xf:group>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response>
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <instance>
+                                    <first-name>Ada</first-name>
+                                </instance>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="my-input-1" relevant="false"/>
+                        <xxf:control id="my-input-2">Ada</xxf:control>
+                    </xxf:control-values>
+                    <xxf:focus control-id="my-input-2"/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="xf:setfocus on xf:switch" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="instance">
+                            <instance xmlns="">
+                                <first-name>Ada</first-name>
+                            </instance>
+                        </xf:instance>
+
+                        <xf:action ev:event="xforms-ready">
+                            <xf:toggle case="my-case-12"/>
+                            <xf:toggle case="my-case-21"/>
+                            <xf:setfocus control="my-switch-1"/>
+                        </xf:action>
+
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:switch id="my-switch-1">
+                        <xf:case id="my-case-11">
+                            <xf:input ref="first-name" id="my-input-11"/>
+                        </xf:case>
+                        <xf:case id="my-case-12">
+                            <xf:switch id="my-switch-2">
+                                <xf:case id="my-case-21">
+                                    <xf:input ref="first-name" id="my-input-21"/>
+                                </xf:case>
+                                <xf:case id="my-case-22">
+                                    <xf:input ref="first-name" id="my-input-22"/>
+                                </xf:case>
+                            </xf:switch>
+                            <xf:input ref="first-name" id="my-input-23"/>
+                        </xf:case>
+                    </xf:switch>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response>
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <instance>
+                                    <first-name>Ada</first-name>
+                                </instance>
+                            </instance>
+                        </instances>
+                        <controls>
+                            <control effective-id="my-switch-1" case-id="my-case-12"/>
+                            <control effective-id="my-switch-2" case-id="my-case-21"/>
+                        </controls>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:div id="my-case-12" visibility="visible"/>
+                        <xxf:div id="my-case-11" visibility="hidden"/>
+                        <xxf:control id="my-input-11">Ada</xxf:control>
+                        <xxf:div id="my-case-21" visibility="visible"/>
+                        <xxf:div id="my-case-22" visibility="hidden"/>
+                        <xxf:control id="my-input-21">Ada</xxf:control>
+                        <xxf:control id="my-input-22">Ada</xxf:control>
+                        <xxf:control id="my-input-23">Ada</xxf:control>
+                    </xxf:control-values>
+                    <xxf:focus control-id="my-input-21"/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="xf:setfocus on xf:repeat" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="instance">
+                            <instance xmlns="">
+                                <first-name>Ada</first-name>
+                                <first-name>Marie</first-name>
+                                <first-name>Clara</first-name>
+                            </instance>
+                        </xf:instance>
+
+                        <xf:action ev:event="xforms-ready">
+                            <xf:setindex repeat="my-repeat" index="2"/>
+                            <xf:setfocus control="my-repeat"/>
+                        </xf:action>
+
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:repeat id="my-repeat" ref="first-name">
+                        <xf:input ref="." id="my-input"/>
+                    </xf:repeat>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response>
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <instance>
+                                    <first-name>Ada</first-name>
+                                    <first-name>Marie</first-name>
+                                    <first-name>Clara</first-name>
+                                </instance>
+                            </instance>
+                        </instances>
+                        <controls>
+                            <control effective-id="my-repeat" index="2"/>
+                        </controls>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="my-input·1">Ada</xxf:control>
+                        <xxf:control id="my-input·2">Marie</xxf:control>
+                        <xxf:control id="my-input·3">Clara</xxf:control>
+                    </xxf:control-values>
+                    <xxf:focus control-id="my-input·2"/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="xf:setfocus moving between containers" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="instance">
+                            <instance xmlns=""/>
+                        </xf:instance>
+
+                        <xf:action ev:event="xforms-ready">
+                            <!-- Within same group -->
+                            <xf:setfocus control="my-input-111"/>
+                            <xf:insert model="events-model" context="." ref="*" origin="xxf:element('separator')"/>
+                            <xf:setfocus control="my-input-112"/>
+                            <xf:insert model="events-model" context="." ref="*" origin="xxf:element('separator')"/>
+                            <!-- Change one group -->
+                            <xf:setfocus control="my-input-121"/>
+                            <xf:insert model="events-model" context="." ref="*" origin="xxf:element('separator')"/>
+                            <!-- Change two groups -->
+                            <xf:setfocus control="my-input-211"/>
+                            <xf:insert model="events-model" context="." ref="*" origin="xxf:element('separator')"/>
+                            <!-- Move up one group -->
+                            <xf:setfocus control="my-input-2"/>
+                        </xf:action>
+
+                    </xf:model>
+                    <xf:model id="events-model">
+                        <!-- TEST: Events to gather -->
+                        <xf:instance id="events-instance">
+                            <events/>
+                        </xf:instance>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+
+                    <!-- Record focus events -->
+                    <xf:insert ev:event="DOMFocusIn DOMFocusOut" model="events-model" context="." ref="*"
+                        origin="xxf:element('event',
+                                (xxf:attribute('type', xxf:event('xxf:type')),
+                                 xxf:attribute('target', xxf:event('xxf:targetid'))))"/>
+
+                    <xf:group id="my-group-1">
+                        <xf:group id="my-group-11">
+                            <xf:input id="my-input-111" ref="."/>
+                            <xf:input id="my-input-112" ref="."/>
+                        </xf:group>
+                        <xf:group id="my-group-12">
+                            <xf:input id="my-input-121" ref="."/>
+                        </xf:group>
+                    </xf:group>
+                    <xf:group id="my-group-2">
+                        <xf:group id="my-group-21">
+                            <xf:input id="my-input-211" ref="."/>
+                        </xf:group>
+                        <xf:input id="my-input-2" ref="."/>
+                    </xf:group>
+
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response>
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <instance/>
+                            </instance>
+                            <instance id="events-instance" model-id="events-model">
+                                <events>
+                                    <event type="DOMFocusIn" target="my-group-1"/>
+                                    <event type="DOMFocusIn" target="my-group-11"/>
+                                    <event type="DOMFocusIn" target="my-input-111"/>
+                                    <separator/>
+                                    <event type="DOMFocusOut" target="my-input-111"/>
+                                    <event type="DOMFocusIn" target="my-input-112"/>
+                                    <separator/>
+                                    <event type="DOMFocusOut" target="my-input-112"/>
+                                    <event type="DOMFocusOut" target="my-group-11"/>
+                                    <event type="DOMFocusIn" target="my-group-12"/>
+                                    <event type="DOMFocusIn" target="my-input-121"/>
+                                    <separator/>
+                                    <event type="DOMFocusOut" target="my-input-121"/>
+                                    <event type="DOMFocusOut" target="my-group-12"/>
+                                    <event type="DOMFocusOut" target="my-group-1"/>
+                                    <event type="DOMFocusIn" target="my-group-2"/>
+                                    <event type="DOMFocusIn" target="my-group-21"/>
+                                    <event type="DOMFocusIn" target="my-input-211"/>
+                                    <separator/>
+                                    <event type="DOMFocusOut" target="my-input-211"/>
+                                    <event type="DOMFocusOut" target="my-group-21"/>
+                                    <event type="DOMFocusIn" target="my-input-2"/>
+                                </events>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values/>
+                    <xxf:focus control-id="my-input-2"/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="xf:setfocus to and from non-relevant and read-only controls" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="instance">
+                            <instance xmlns="">
+                                <value relevant="true" readonly="false"/>
+                                <value relevant="true" readonly="false"/>
+                            </instance>
+                        </xf:instance>
+
+                        <xf:bind ref="value" relevant="@relevant = 'true'" readonly="@readonly = 'true'"/>
+
+                        <xf:action ev:event="xforms-ready">
+                            <!-- Initial control -->
+                            <xf:setfocus control="my-input-111"/>
+                            <xf:insert model="events-model" context="." ref="*" origin="xxf:element('separator')"/>
+                            <!-- Try to focus on non-relevant control (must fail) -->
+                            <xf:setvalue ref="value[2]/@relevant">false</xf:setvalue>
+                            <xf:setfocus control="my-input-211"/>
+                            <xf:insert model="events-model" context="." ref="*" origin="xxf:element('separator')"/>
+                            <!-- Make control relevant again and set focus (must succeed) -->
+                            <xf:setvalue ref="value[2]/@relevant">true</xf:setvalue>
+                            <xf:setfocus control="my-input-211"/>
+                            <xf:insert model="events-model" context="." ref="*" origin="xxf:element('separator')"/>
+                            <!-- Make control non-relevant again (focus must go away) -->
+                            <xf:setvalue ref="value[2]/@relevant">false</xf:setvalue>
+                            <xf:setfocus control="my-input-211"/>
+                            <xf:insert model="events-model" context="." ref="*" origin="xxf:element('separator')"/>
+
+                            <!-- Initial control -->
+                            <xf:setvalue ref="value[2]/@relevant">true</xf:setvalue>
+                            <xf:setfocus control="my-input-111"/>
+                            <xf:insert model="events-model" context="." ref="*" origin="xxf:element('separator')"/>
+                            <!-- Try to focus on readonly control (must fail) -->
+                            <xf:setvalue ref="value[2]/@readonly">true</xf:setvalue>
+                            <xf:setfocus control="my-input-211"/>
+                            <xf:insert model="events-model" context="." ref="*" origin="xxf:element('separator')"/>
+                            <!-- Make control readwrite again and set focus (must succeed) -->
+                            <xf:setvalue ref="value[2]/@readonly">false</xf:setvalue>
+                            <xf:setfocus control="my-input-211"/>
+                            <xf:insert model="events-model" context="." ref="*" origin="xxf:element('separator')"/>
+                            <!-- Make control readonly again (focus must go away) -->
+                            <xf:setvalue ref="value[2]/@readonly">true</xf:setvalue>
+                            <xf:setfocus control="my-input-211"/>
+                        </xf:action>
+
+                    </xf:model>
+                    <xf:model id="events-model">
+                        <!-- TEST: Events to gather -->
+                        <xf:instance id="events-instance">
+                            <events/>
+                        </xf:instance>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+
+                    <!-- Record focus events -->
+                    <xf:insert ev:event="DOMFocusIn DOMFocusOut" model="events-model" context="." ref="*"
+                        origin="xxf:element('event',
+                                (xxf:attribute('type', xxf:event('xxf:type')),
+                                 xxf:attribute('target', xxf:event('xxf:targetid'))))"/>
+
+                    <xf:group id="my-group-1">
+                        <xf:group id="my-group-11">
+                            <xf:input id="my-input-111" ref="value[1]"/>
+                        </xf:group>
+                    </xf:group>
+                    <xf:group id="my-group-2">
+                        <xf:group id="my-group-21">
+                            <xf:input id="my-input-211" ref="value[2]"/>
+                        </xf:group>
+                    </xf:group>
+
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response>
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <instance>
+                                    <value relevant="true" readonly="false"/>
+                                    <value relevant="true" readonly="true"/>
+                                </instance>
+                            </instance>
+                            <instance id="events-instance" model-id="events-model">
+                                <events>
+                                    <event type="DOMFocusIn" target="my-group-1"/>
+                                    <event type="DOMFocusIn" target="my-group-11"/>
+                                    <event type="DOMFocusIn" target="my-input-111"/>
+                                    <separator/>
+                                    <separator/>
+                                    <event type="DOMFocusOut" target="my-input-111"/>
+                                    <event type="DOMFocusOut" target="my-group-11"/>
+                                    <event type="DOMFocusOut" target="my-group-1"/>
+                                    <event type="DOMFocusIn" target="my-group-2"/>
+                                    <event type="DOMFocusIn" target="my-group-21"/>
+                                    <event type="DOMFocusIn" target="my-input-211"/>
+                                    <separator/>
+                                    <event type="DOMFocusOut" target="my-input-211"/>
+                                    <event type="DOMFocusOut" target="my-group-21"/>
+                                    <event type="DOMFocusOut" target="my-group-2"/>
+                                    <separator/>
+                                    <event type="DOMFocusIn" target="my-group-1"/>
+                                    <event type="DOMFocusIn" target="my-group-11"/>
+                                    <event type="DOMFocusIn" target="my-input-111"/>
+                                    <separator/>
+                                    <separator/>
+                                    <event type="DOMFocusOut" target="my-input-111"/>
+                                    <event type="DOMFocusOut" target="my-group-11"/>
+                                    <event type="DOMFocusOut" target="my-group-1"/>
+                                    <event type="DOMFocusIn" target="my-group-2"/>
+                                    <event type="DOMFocusIn" target="my-group-21"/>
+                                    <event type="DOMFocusIn" target="my-input-211"/>
+                                    <separator/>
+                                    <event type="DOMFocusOut" target="my-input-211"/>
+                                    <event type="DOMFocusOut" target="my-group-21"/>
+                                    <event type="DOMFocusOut" target="my-group-2"/>
+                                </events>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="my-input-211" readonly="true"/>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="Focus updates within repeat iterations upon insert/delete" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="instance">
+                            <instance xmlns="">
+                                <value/>
+                                <value/>
+                                <value/>
+                            </instance>
+                        </xf:instance>
+
+                        <xf:action ev:event="xforms-ready">
+                            <!-- Initial control -->
+                            <xf:setfocus control="my-input"/>
+                            <xf:insert model="events-model" context="." ref="*" origin="xxf:element('separator')"/>
+                            <!-- Insert iteration before (focus will move from 2 to 1) -->
+                            <xf:insert ref="value" at="1" position="before"/>
+                            <xf:insert model="events-model" context="." ref="*" origin="xxf:element('separator')"/>
+                            <!-- Delete iteration 1 (focus will move from old 1 to new 1) -->
+                            <xf:delete ref="value[1]"/>
+                            <xf:insert model="events-model" context="." ref="*" origin="xxf:element('separator')"/>
+                        </xf:action>
+
+                    </xf:model>
+                    <xf:model id="events-model">
+                        <!-- TEST: Events to gather -->
+                        <xf:instance id="events-instance">
+                            <events/>
+                        </xf:instance>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+
+                    <!-- Record focus events -->
+                    <xf:insert ev:event="DOMFocusIn DOMFocusOut" model="events-model" context="." ref="*"
+                        origin="xxf:element('event',
+                                (xxf:attribute('type', xxf:event('xxf:type')),
+                                 xxf:attribute('target', xxf:event('xxf:effective-targetid'))))"/>
+
+                    <xf:repeat id="my-repeat" ref="value">
+                        <xf:input id="my-input" ref="."/>
+                    </xf:repeat>
+
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response>
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <instance>
+                                    <value/>
+                                    <value/>
+                                    <value/>
+                                </instance>
+                            </instance>
+                            <instance id="events-instance" model-id="events-model">
+                                <events>
+                                    <event type="DOMFocusIn" target="my-repeat"/>
+                                    <event type="DOMFocusIn" target="my-repeat~iteration·1"/>
+                                    <event type="DOMFocusIn" target="my-input·1"/>
+                                    <separator/>
+                                    <event type="DOMFocusOut" target="my-input·2"/>
+                                    <event type="DOMFocusOut" target="my-repeat~iteration·2"/>
+                                    <event type="DOMFocusIn" target="my-repeat~iteration·1"/>
+                                    <event type="DOMFocusIn" target="my-input·1"/>
+                                    <separator/>
+                                    <event type="DOMFocusOut" target="my-input·1"/>
+                                    <event type="DOMFocusOut" target="my-repeat~iteration·1"/>
+                                    <event type="DOMFocusIn" target="my-repeat~iteration·1"/>
+                                    <event type="DOMFocusIn" target="my-input·1"/>
+                                    <separator/>
+                                </events>
+                            </instance>
+                        </instances>
+                        <controls>
+                            <control effective-id="my-repeat" index="1"/>
+                        </controls>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values/>
+                    <xxf:focus control-id="my-input·1"/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="Update to repeat sequence moves iteration with focus" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="instance">
+                            <instance xmlns="">
+                                <value p="1"/>
+                                <value p="2"/>
+                                <value p="3"/>
+                            </instance>
+                        </xf:instance>
+
+                        <xf:action ev:event="xforms-ready">
+                            <!-- Initial control -->
+                            <xf:setfocus control="my-input"/>
+                            <xf:insert model="events-model" context="." ref="*" origin="xxf:element('separator')"/>
+                            <!-- Move iteration with focus (focus moves with iteration and events are not dispatched) -->
+                            <xf:setvalue ref="value[1]/@p" value="4"/>
+                            <xf:refresh/>
+                            <xf:insert model="events-model" context="." ref="*" origin="xxf:element('separator')"/>
+                            <!-- Move iteration that doesn't have focus (focus moves with iteration and events are not dispatched) -->
+                            <xf:setvalue ref="value[2]/@p" value="5"/>
+                        </xf:action>
+
+                    </xf:model>
+                    <xf:model id="events-model">
+                        <!-- TEST: Events to gather -->
+                        <xf:instance id="events-instance">
+                            <events/>
+                        </xf:instance>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+
+                    <!-- Record focus events -->
+                    <xf:insert ev:event="DOMFocusIn DOMFocusOut" model="events-model" context="." ref="*"
+                        origin="xxf:element('event',
+                                (xxf:attribute('type', xxf:event('xxf:type')),
+                                 xxf:attribute('target', xxf:event('xxf:effective-targetid'))))"/>
+
+                    <xf:repeat id="my-repeat" ref="xxf:sort(value, @p, 'text', 'ascending')">
+                        <xf:input id="my-input" ref="."/>
+                    </xf:repeat>
+
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response>
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <instance>
+                                    <value p="4"/>
+                                    <value p="5"/>
+                                    <value p="3"/>
+                                </instance>
+                            </instance>
+                            <instance id="events-instance" model-id="events-model">
+                                <events>
+                                    <event type="DOMFocusIn" target="my-repeat"/>
+                                    <event type="DOMFocusIn" target="my-repeat~iteration·1"/>
+                                    <event type="DOMFocusIn" target="my-input·1"/>
+                                    <separator/>
+                                    <separator/>
+                                </events>
+                            </instance>
+                        </instances>
+                        <controls>
+                            <control effective-id="my-repeat" index="2"/>
+                        </controls>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values/>
+                    <xxf:focus control-id="my-input·2"/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="Focus moves with xf:setindex" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="instance">
+                            <instance xmlns="">
+                                <outer>
+                                    <inner/>
+                                    <inner/>
+                                </outer>
+                                <outer>
+                                    <inner/>
+                                    <inner/>
+                                    <inner/>
+                                </outer>
+                                <outer/>
+                            </instance>
+                        </xf:instance>
+
+                        <xf:action ev:event="xforms-ready">
+                            <!-- Initial control -->
+                            <xf:setfocus control="my-input"/>
+                            <xf:insert model="events-model" context="." ref="*" origin="xxf:element('separator')"/>
+                            <!-- Move index (index must move to second iteration) -->
+                            <xf:setindex repeat="my-outer-repeat" index="2"/>
+                            <xf:insert model="events-model" context="." ref="*" origin="xxf:element('separator')"/>
+                            <!-- Move index (focus must go away) -->
+                            <xf:setindex repeat="my-outer-repeat" index="3"/>
+                        </xf:action>
+
+                    </xf:model>
+                    <xf:model id="events-model">
+                        <!-- TEST: Events to gather -->
+                        <xf:instance id="events-instance">
+                            <events/>
+                        </xf:instance>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+
+                    <!-- Record focus events -->
+                    <xf:insert ev:event="DOMFocusIn DOMFocusOut" model="events-model" context="." ref="*"
+                        origin="xxf:element('event',
+                                (xxf:attribute('type', xxf:event('xxf:type')),
+                                 xxf:attribute('target', xxf:event('xxf:effective-targetid'))))"/>
+
+                    <xf:repeat id="my-outer-repeat" ref="outer">
+                        <xf:repeat id="my-inner-repeat" ref="inner">
+                            <xf:input id="my-input" ref="."/>
+                        </xf:repeat>
+                    </xf:repeat>
+
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response>
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <instance>
+                                    <outer>
+                                        <inner/>
+                                        <inner/>
+                                    </outer>
+                                    <outer>
+                                        <inner/>
+                                        <inner/>
+                                        <inner/>
+                                    </outer>
+                                    <outer/>
+                                </instance>
+                            </instance>
+                            <instance id="events-instance" model-id="events-model">
+                                <events>
+                                    <event type="DOMFocusIn" target="my-outer-repeat"/>
+                                    <event type="DOMFocusIn" target="my-outer-repeat~iteration·1"/>
+                                    <event type="DOMFocusIn" target="my-inner-repeat·1"/>
+                                    <event type="DOMFocusIn" target="my-inner-repeat~iteration·1-1"/>
+                                    <event type="DOMFocusIn" target="my-input·1-1"/>
+                                    <separator/>
+                                    <event type="DOMFocusOut" target="my-input·1-1"/>
+                                    <event type="DOMFocusOut" target="my-inner-repeat~iteration·1-1"/>
+                                    <event type="DOMFocusOut" target="my-inner-repeat·1"/>
+                                    <event type="DOMFocusOut" target="my-outer-repeat~iteration·1"/>
+                                    <event type="DOMFocusIn" target="my-outer-repeat~iteration·2"/>
+                                    <event type="DOMFocusIn" target="my-inner-repeat·2"/>
+                                    <event type="DOMFocusIn" target="my-inner-repeat~iteration·2-1"/>
+                                    <event type="DOMFocusIn" target="my-input·2-1"/>
+                                    <separator/>
+                                    <event type="DOMFocusOut" target="my-input·2-1"/>
+                                    <event type="DOMFocusOut" target="my-inner-repeat~iteration·2-1"/>
+                                    <event type="DOMFocusOut" target="my-inner-repeat·2"/>
+                                    <event type="DOMFocusOut" target="my-outer-repeat~iteration·2"/>
+                                    <event type="DOMFocusOut" target="my-outer-repeat"/>
+                                </events>
+                            </instance>
+                        </instances>
+                        <controls>
+                            <control effective-id="my-outer-repeat" index="3"/>
+                            <control effective-id="my-inner-repeat·1" index="1"/>
+                            <control effective-id="my-inner-repeat·2" index="1"/>
+                        </controls>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="Focus and switch/case" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="instance">
+                            <instance xmlns="">
+                                <value/>
+                                <value/>
+                                <value/>
+                            </instance>
+                        </xf:instance>
+
+                        <xf:action ev:event="xforms-ready">
+                            <!-- Initial control -->
+                            <xf:setfocus control="my-input-1"/>
+                            <xf:insert model="events-model" context="." ref="*" origin="xxf:element('separator')"/>
+                            <!-- Set focus to hidden control (must fail) -->
+                            <xf:setfocus control="my-input-2"/>
+                            <xf:insert model="events-model" context="." ref="*" origin="xxf:element('separator')"/>
+                            <!-- Toggle case (focus must go away) -->
+                            <xf:toggle case="case-2"/>
+                            <xf:insert model="events-model" context="." ref="*" origin="xxf:element('separator')"/>
+                            <!-- Set focus to hidden control (must fail) -->
+                            <xf:setfocus control="my-input-1"/>
+                            <xf:insert model="events-model" context="." ref="*" origin="xxf:element('separator')"/>
+                            <!-- Set focus to newly visible control (must succeed) -->
+                            <xf:setfocus control="my-input-2"/>
+                            <xf:insert model="events-model" context="." ref="*" origin="xxf:element('separator')"/>
+                            <!-- Toggle 3rd case (focus must go to new control) -->
+                            <xf:toggle case="case-3"/>
+                        </xf:action>
+
+                    </xf:model>
+                    <xf:model id="events-model">
+                        <!-- TEST: Events to gather -->
+                        <xf:instance id="events-instance">
+                            <events/>
+                        </xf:instance>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+
+                    <!-- Record focus events -->
+                    <xf:insert ev:event="DOMFocusIn DOMFocusOut" model="events-model" context="." ref="*"
+                        origin="xxf:element('event',
+                                (xxf:attribute('type', xxf:event('xxf:type')),
+                                 xxf:attribute('target', xxf:event('xxf:effective-targetid'))))"/>
+
+                    <xf:switch id="my-switch">
+                        <xf:case id="case-1">
+                            <xf:input id="my-input-1" ref="value[1]"/>
+                        </xf:case>
+                        <xf:case id="case-2">
+                            <xf:input id="my-input-2" ref="value[2]"/>
+                        </xf:case>
+                        <xf:case id="case-3">
+                            <xf:setfocus ev:event="xforms-select" control="my-input-3"/>
+                            <xf:input id="my-input-3" ref="value[3]"/>
+                        </xf:case>
+                    </xf:switch>
+
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response>
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <instance>
+                                    <value/>
+                                    <value/>
+                                    <value/>
+                                </instance>
+                            </instance>
+                            <instance id="events-instance" model-id="events-model">
+                                <events>
+                                    <event type="DOMFocusIn" target="my-switch"/>
+                                    <event type="DOMFocusIn" target="case-1"/>
+                                    <event type="DOMFocusIn" target="my-input-1"/>
+                                    <separator/>
+                                    <separator/>
+                                    <event type="DOMFocusOut" target="my-input-1"/>
+                                    <event type="DOMFocusOut" target="case-1"/>
+                                    <event type="DOMFocusOut" target="my-switch"/>
+                                    <separator/>
+                                    <separator/>
+                                    <event type="DOMFocusIn" target="my-switch"/>
+                                    <event type="DOMFocusIn" target="case-2"/>
+                                    <event type="DOMFocusIn" target="my-input-2"/>
+                                    <separator/>
+                                    <event type="DOMFocusOut" target="my-input-2"/>
+                                    <event type="DOMFocusOut" target="case-2"/>
+                                    <event type="DOMFocusIn" target="case-3"/>
+                                    <event type="DOMFocusIn" target="my-input-3"/>
+                                </events>
+                            </instance>
+                        </instances>
+                        <controls>
+                            <control effective-id="my-switch" case-id="case-3"/>
+                        </controls>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:div id="case-3" visibility="visible"/>
+                        <xxf:div id="case-1" visibility="hidden"/>
+                        <xxf:div id="case-2" visibility="hidden"/>
+                    </xxf:control-values>
+                    <xxf:focus control-id="my-input-3"/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="Focus and dialog" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="instance">
+                            <instance xmlns="">
+                                <value/>
+                            </instance>
+                        </xf:instance>
+
+                        <xf:action ev:event="xforms-ready">
+                            <!-- Initial control -->
+                            <xf:setfocus control="my-input-1"/>
+                            <xf:insert model="events-model" context="." ref="*" origin="xxf:element('separator')"/>
+                            <!-- Set focus to hidden control (must fail) -->
+                            <xf:setfocus control="my-input-2"/>
+                            <xf:insert model="events-model" context="." ref="*" origin="xxf:element('separator')"/>
+                            <!-- Show dialog (focus must automatically go to first dialog control) -->
+                            <xxf:show dialog="my-dialog-1"/>
+                            <xf:insert model="events-model" context="." ref="*" origin="xxf:element('separator')"/>
+                            <!-- Hide dialog (focus must go away) -->
+                            <xxf:hide dialog="my-dialog-1"/>
+                            <xf:insert model="events-model" context="." ref="*" origin="xxf:element('separator')"/>
+
+                            <!-- Initial control -->
+                            <xf:setfocus control="my-input-1"/>
+                            <xf:insert model="events-model" context="." ref="*" origin="xxf:element('separator')"/>
+                            <!-- Show dialog (focus goes to second dialog control) -->
+                            <xxf:show dialog="my-dialog-2"/>
+                            <xf:insert model="events-model" context="." ref="*" origin="xxf:element('separator')"/>
+                            <!-- Hide dialog (focus goes to initial control) -->
+                            <xxf:hide dialog="my-dialog-2"/>
+
+                        </xf:action>
+
+                    </xf:model>
+                    <xf:model id="events-model">
+                        <!-- TEST: Events to gather -->
+                        <xf:instance id="events-instance">
+                            <events/>
+                        </xf:instance>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+
+                    <!-- Record focus events -->
+                    <xf:insert ev:event="DOMFocusIn DOMFocusOut" model="events-model" context="." ref="*"
+                        origin="xxf:element('event',
+                                (xxf:attribute('type', xxf:event('xxf:type')),
+                                 xxf:attribute('target', xxf:event('xxf:effective-targetid'))))"/>
+
+                    <xf:input id="my-input-1" ref="value"/>
+
+                    <xxf:dialog id="my-dialog-1">
+                        <xf:input id="my-input-2" ref="value"/>
+                    </xxf:dialog>
+
+                    <xxf:dialog id="my-dialog-2">
+                        <!-- Focus to second control upon open -->
+                        <xf:setfocus ev:event="xxforms-dialog-open" control="my-input-4"/>
+                        <!-- Focus to external control upon close -->
+                        <xf:setfocus ev:event="xxforms-dialog-close" control="my-input-1"/>
+
+                        <xf:input id="my-input-3" ref="value"/>
+                        <xf:input id="my-input-4" ref="value"/>
+                    </xxf:dialog>
+
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response>
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <instance>
+                                    <value/>
+                                </instance>
+                            </instance>
+                            <instance id="events-instance" model-id="events-model">
+                                <events>
+                                    <event type="DOMFocusIn" target="my-input-1"/>
+                                    <separator/>
+                                    <separator/>
+                                    <event type="DOMFocusOut" target="my-input-1"/>
+                                    <event type="DOMFocusIn" target="my-dialog-1"/>
+                                    <event type="DOMFocusIn" target="my-input-2"/>
+                                    <separator/>
+                                    <event type="DOMFocusOut" target="my-input-2"/>
+                                    <event type="DOMFocusOut" target="my-dialog-1"/>
+                                    <separator/>
+                                    <event type="DOMFocusIn" target="my-input-1"/>
+                                    <separator/>
+                                    <event type="DOMFocusOut" target="my-input-1"/>
+                                    <event type="DOMFocusIn" target="my-dialog-2"/>
+                                    <event type="DOMFocusIn" target="my-input-4"/>
+                                    <separator/>
+                                    <event type="DOMFocusOut" target="my-input-4"/>
+                                    <event type="DOMFocusOut" target="my-dialog-2"/>
+                                    <event type="DOMFocusIn" target="my-input-1"/>
+                                </events>
+                            </instance>
+                        </instances>
+                        <controls>
+                            <control effective-id="my-dialog-1" visible="false"/>
+                            <control effective-id="my-dialog-2" visible="false"/>
+                        </controls>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:div id="my-dialog-1" visibility="hidden"/>
+                        <xxf:div id="my-dialog-2" visibility="hidden"/>
+                    </xxf:control-values>
+                    <xxf:focus control-id="my-input-1"/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="Focus and XBL" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="instance">
+                            <value/>
+                        </xf:instance>
+
+                        <xf:action ev:event="xforms-ready">
+                            <!-- Initial control -->
+                            <xf:setfocus control="my-input-1"/>
+                            <xf:insert model="events-model" context="." ref="*" origin="xxf:element('separator')"/>
+                            <!-- Focus on gaga -->
+                            <xf:setfocus control="my-gaga"/>
+                            <xf:insert model="events-model" context="." ref="*" origin="xxf:element('separator')"/>
+                            <!-- Move focus within gaga -->
+                            <xf:setfocus control="/my-gaga/gaga-2"/>
+                            <xf:insert model="events-model" context="." ref="*" origin="xxf:element('separator')"/>
+                            <!-- Focus on toto -->
+                            <xf:setfocus control="my-toto"/>
+                            <xf:insert model="events-model" context="." ref="*" origin="xxf:element('separator')"/>
+                            <!-- Move focus within toto -->
+                            <xf:setfocus control="toto-2"/>
+                        </xf:action>
+
+                    </xf:model>
+                    <xf:model id="events-model">
+                        <!-- TEST: Events to gather -->
+                        <xf:instance id="events-instance">
+                            <events/>
+                        </xf:instance>
+                    </xf:model>
+                    <xbl:xbl>
+                        <xbl:binding id="fr-gaga" element="fr|gaga">
+                            <xbl:implementation>
+                                <xf:model id="model">
+                                    <xf:instance id="instance">
+                                        <value/>
+                                    </xf:instance>
+                                    <!-- TEST: Events to gather -->
+                                    <xf:instance id="events-instance">
+                                        <events/>
+                                    </xf:instance>
+                                </xf:model>
+                            </xbl:implementation>
+                            <xbl:template>
+                                <!-- Record focus events -->
+                                <xf:insert ev:event="DOMFocusIn DOMFocusOut" context="instance('events-instance')" ref="*"
+                                    origin="xxf:element('event',
+                                            (xxf:attribute('type', xxf:event('xxf:type')),
+                                             xxf:attribute('target', xxf:event('xxf:effective-targetid'))))"/>
+
+                                <xf:input id="gaga-1" ref="."/>
+                                <xf:input id="gaga-2" ref="."/>
+                            </xbl:template>
+                        </xbl:binding>
+                        <xbl:binding id="fr-toto" element="fr|toto">
+                            <xbl:template>
+                                <xbl:content/>
+                            </xbl:template>
+                        </xbl:binding>
+                    </xbl:xbl>
+                </xh:head>
+                <xh:body>
+
+                    <!-- Record focus events -->
+                    <xf:insert ev:event="DOMFocusIn DOMFocusOut" model="events-model" context="." ref="*"
+                        origin="xxf:element('event',
+                                (xxf:attribute('type', xxf:event('xxf:type')),
+                                 xxf:attribute('target', xxf:event('xxf:effective-targetid'))))"/>
+
+                    <xf:input id="my-input-1" ref="."/>
+
+                    <fr:gaga id="my-gaga"/>
+
+                    <fr:toto id="my-toto">
+                        <xf:input id="toto-1" ref="."/>
+                        <xf:input id="toto-2" ref="."/>
+                    </fr:toto>
+
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response>
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <value/>
+                            </instance>
+                            <instance id="events-instance" model-id="events-model">
+                                <events>
+                                    <event type="DOMFocusIn" target="my-input-1"/>
+                                    <separator/>
+                                    <event type="DOMFocusOut" target="my-input-1"/>
+                                    <event type="DOMFocusIn" target="my-gaga"/>
+                                    <separator/>
+                                    <separator/>
+                                    <event type="DOMFocusOut" target="my-gaga"/>
+                                    <event type="DOMFocusIn" target="my-toto"/>
+                                    <event type="DOMFocusIn" target="my-toto$toto-1"/>
+                                    <separator/>
+                                    <event type="DOMFocusOut" target="my-toto$toto-1"/>
+                                    <event type="DOMFocusIn" target="my-toto$toto-2"/>
+                                </events>
+                            </instance>
+                            <instance id="instance" model-id="my-gaga$model">
+                                <value/>
+                            </instance>
+                            <instance id="events-instance" model-id="my-gaga$model">
+                                <events/>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values/>
+                    <xxf:focus control-id="my-toto$toto-2"/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+</group>

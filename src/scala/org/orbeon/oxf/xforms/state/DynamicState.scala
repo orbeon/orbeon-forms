@@ -37,6 +37,7 @@ case class DynamicState(
     containerType: Option[String],
     containerNamespace: Option[String],
     pathMatchers: Seq[Byte],
+    focusedControl: Option[String],
     pendingUploads: Seq[Byte],
     annotatedTemplate: Option[Seq[Byte]],
     lastAjaxResponse: Seq[Byte],
@@ -58,6 +59,7 @@ case class DynamicState(
     def decodeContainerTypeJava = containerType.orNull
     def decodeContainerNamespaceJava = containerNamespace.orNull
     def decodePathMatchersJava = decodePathMatchers.asJava
+    def decodeFocusedControlJava = focusedControl.orNull
     def decodePendingUploadsJava = decodePendingUploads.asJava
     def decodeAnnotatedTemplateJava = decodeAnnotatedTemplate.orNull
     def decodeLastAjaxResponseJava = decodeLastAjaxResponse.orNull
@@ -150,6 +152,7 @@ case class DynamicState(
 
         val decodedParts = Array(
             decodePathMatchersJava.toArray,
+            decodeFocusedControlJava,
             decodePendingUploadsJava,
             decodeControlsJava,
             decodeInstancesJava.toArray,
@@ -213,6 +216,7 @@ object DynamicState {
             Option(document.getContainerType),
             Option(document.getContainerNamespace),
             toByteSeq(document.getVersionedPathMatchers.asScala.toList),
+            Option(document.getControls.getFocusedControl) map (_.getEffectiveId),
             toByteSeq(document.getPendingUploads.asScala.toSet),
             Option(document.getTemplate) map (_.asByteSeq), // template returns its own serialization
             toByteSeq(Option(document.getLastAjaxResponse)),

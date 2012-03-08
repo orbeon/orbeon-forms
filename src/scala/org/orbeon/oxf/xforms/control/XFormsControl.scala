@@ -228,6 +228,12 @@ class XFormsControl(
         cloned
     }
 
+    // Whether the control can gain focus
+    // NOTE: This is different from supporting `setFocus()`. `setFocus()` can apply to groups, etc. which by themselves
+    // do not directly receive focus. Concretely, only leaf controls are focusable, but not all of them. For example,
+    // an output control is not focusable.
+    def isFocusable = false
+
     /**
      * Set the focus on this control.
      *

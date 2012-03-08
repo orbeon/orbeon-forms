@@ -22,12 +22,11 @@
     var Controls = ORBEON.xforms.Controls;
     var Properties = ORBEON.util.Properties;
 
-    AjaxServer.Event = function(form, targetId, otherId, value, eventName, bubbles, cancelable, ignoreErrors, showProgress, progressMessage, additionalAttribs) {
+    AjaxServer.Event = function(form, targetId, value, eventName, bubbles, cancelable, ignoreErrors, showProgress, progressMessage, additionalAttribs) {
         // If no form is provided, infer the form based on that targetId, if one is provided
         this.form = YAHOO.lang.isObject(form) ? form
             : YAHOO.lang.isString(targetId) ? ORBEON.xforms.Controls.getForm(ORBEON.util.Dom.get(targetId)) : null;
         this.targetId = YAHOO.lang.isUndefined(targetId) ? null: targetId;
-        this.otherId = YAHOO.lang.isUndefined(otherId) ? null: otherId;
         this.value = YAHOO.lang.isUndefined(value) ? null: value;
         this.eventName = YAHOO.lang.isUndefined(eventName) ? null: eventName;
         this.bubbles = YAHOO.lang.isUndefined(bubbles) ? null: bubbles;
@@ -79,7 +78,7 @@
             var valueChangeEvents = [];
             for (var eventIndex = 0; eventIndex < events.length; eventIndex++) {
                 var event = events[eventIndex];
-                if (event.eventName == "xxforms-value-change-with-focus-change") {
+                if (event.eventName == "xxforms-value") {
                     valueChangeEvents.push(event);
                     // Store new value of control
                     ORBEON.xforms.Offline.controlValues[event.targetId] = event.value;
@@ -148,7 +147,7 @@
      */
     AjaxServer.createDelayedServerEvent = function(serverEvents, delay, showProgress, progressMessage, discardable, formID) {
         var timerId = window.setTimeout(function () {
-            var event = new AjaxServer.Event(ORBEON.util.Dom.get(formID), null, null,
+            var event = new AjaxServer.Event(ORBEON.util.Dom.get(formID), null,
                     serverEvents, "xxforms-server-events", null, null, null, showProgress, progressMessage);
             AjaxServer.fireEvents([event]);
         }, delay);
@@ -272,7 +271,7 @@
                         var event = ORBEON.xforms.Globals.eventQueue[eventIndex];
                         // Proceed with this event only if this is not one of the event we filter
                         if (eventsToFilter[event.eventName] == null) {
-                            if (event.eventName == "xxforms-value-change-with-focus-change") {
+                            if (event.eventName == "xxforms-value") {
                                 // Value change is handled specially as values are collapsed
 
                                 if (seenControlValue[event.targetId] == null) {
@@ -464,8 +463,6 @@
                             requestDocumentString.push(' name="' + event.eventName + '"');
                             if (event.targetId != null)
                                 requestDocumentString.push(' source-control-id="' + event.targetId.substring(ORBEON.xforms.Globals.ns[formID].length) + '"');
-                            if (event.otherId != null)
-                                requestDocumentString.push(' other-control-id="' + event.otherId.substring(ORBEON.xforms.Globals.ns[formID].length) + '"');
                             if (event.additionalAttribs != null) {
                                 for(var attribIndex = 0; attribIndex < event.additionalAttribs.length - 1; attribIndex+=2) {
                                     var attribName = event.additionalAttribs[attribIndex]
@@ -1901,10 +1898,18 @@
                             }
 
                             // Set focus to a control
-                            case "setfocus": {
-                                var setfocusElement = actionElement.childNodes[actionIndex];
-                                var controlId = ORBEON.util.Dom.getAttribute(setfocusElement, "control-id");
+                            case "focus": {
+                                var focusElement = actionElement.childNodes[actionIndex];
+                                var controlId = ORBEON.util.Dom.getAttribute(focusElement, "control-id");
                                 ORBEON.xforms.Controls.setFocus(controlId);
+                                break;
+                            }
+
+                            // Remove focus from a control
+                            case "blur": {
+                                var blurElement = actionElement.childNodes[actionIndex];
+                                var controlId = ORBEON.util.Dom.getAttribute(blurElement, "control-id");
+                                // TODO: not supported yet
                                 break;
                             }
 

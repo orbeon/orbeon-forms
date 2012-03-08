@@ -471,13 +471,10 @@ public class XFormsUploadControl extends XFormsValueControl {
 
     private static final Set<String> ALLOWED_EXTERNAL_EVENTS = new HashSet<String>();
     static {
-        ALLOWED_EXTERNAL_EVENTS.add(XFormsEvents.DOM_FOCUS_IN);
-        ALLOWED_EXTERNAL_EVENTS.add(XFormsEvents.DOM_FOCUS_OUT);
+        ALLOWED_EXTERNAL_EVENTS.add(XFormsEvents.XFORMS_FOCUS);
         ALLOWED_EXTERNAL_EVENTS.add(XFormsEvents.XFORMS_HELP);
         ALLOWED_EXTERNAL_EVENTS.add(XFormsEvents.XFORMS_SELECT);
-        ALLOWED_EXTERNAL_EVENTS.add(XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE);
-        // Do we need this?
-//        ALLOWED_EXTERNAL_EVENTS.add(XFormsEvents.XXFORMS_VALUE_OR_ACTIVATE);// for noscript mode
+        ALLOWED_EXTERNAL_EVENTS.add(XFormsEvents.XXFORMS_VALUE);
         // NOTE: xxforms-upload-done is a trusted server event so doesn't need to be listed here
         ALLOWED_EXTERNAL_EVENTS.add(XFormsEvents.XXFORMS_UPLOAD_START);
         ALLOWED_EXTERNAL_EVENTS.add(XFormsEvents.XXFORMS_UPLOAD_CANCEL);
@@ -487,6 +484,11 @@ public class XFormsUploadControl extends XFormsValueControl {
     @Override
     public Set<String> getAllowedExternalEvents() {
         return ALLOWED_EXTERNAL_EVENTS;
+    }
+
+    @Override
+    public boolean isFocusable() {
+        return true;
     }
 }
 

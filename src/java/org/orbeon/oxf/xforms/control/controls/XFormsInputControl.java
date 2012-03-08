@@ -576,4 +576,9 @@ public class XFormsInputControl extends XFormsValueControl {
             return null;
         }
     }
+
+    @Override
+    public boolean isFocusable() {
+        return true;
+    }
 }

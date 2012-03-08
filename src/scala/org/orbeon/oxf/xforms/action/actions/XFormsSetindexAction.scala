@@ -18,7 +18,7 @@ import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl
 import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction, XFormsActionInterpreter}
 import org.orbeon.oxf.xforms.event.events.XXFormsSetindexEvent
-import org.orbeon.oxf.xforms.control.XFormsControl
+import org.orbeon.oxf.xforms.control.{Focus, XFormsControl}
 
 /**
  * 9.3.7 The setindex Element
@@ -42,9 +42,14 @@ object XFormsSetindexAction {
                     indentedLogger.logDebug("xforms:setindex", "setting index upon xforms:setindex",
                         "old index", repeatControl map (_.getIndex.toString) orNull,
                         "new index", index.toString)
-                
+
+                val focusedBefore = interpreter.containingDocument().getControls.getFocusedControl
+
                 // Dispatch to any control so that other custom controls can implement the notion of "setindex"
                 interpreter.container().dispatchEvent(new XXFormsSetindexEvent(interpreter.containingDocument(), control, index))
+
+                // Handle focus changes
+                Focus.updateFocus(focusedBefore)
                 
                 // However at this time return the index only for repeat controls as we don't have a generic way to figure this out yet
                 repeatControl map (_.getIndex) getOrElse -1

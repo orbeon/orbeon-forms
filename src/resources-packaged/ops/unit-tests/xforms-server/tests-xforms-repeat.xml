@@ -501,7 +501,7 @@
         <input name="config" href="wrap-server.xpl"/>
         <input name="action">
             <xxforms:action>
-                <xxforms:event name="DOMFocusIn" source-control-id="id125·3-2"/>
+                <xxforms:event name="xforms-focus" source-control-id="id125·3-2"/>
             </xxforms:action>
         </input>
         <input name="controls">
@@ -993,7 +993,7 @@
         <input name="config" href="wrap-server.xpl"/>
         <input name="action">
             <xxforms:action>
-                <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="approvalStatus-input·2">bbb</xxforms:event>
+                <xxforms:event name="xxforms-value" source-control-id="approvalStatus-input·2">bbb</xxforms:event>
             </xxforms:action>
         </input>
         <input name="controls">

@@ -16,6 +16,6 @@
     <xxforms:uuid>9C5314A6-4AFD-2889-C972-EFDBBB4C30E5</xxforms:uuid>
     <xxforms:sequence>2</xxforms:sequence>
     <xxforms:action>
-        <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="my-input">The external entity should be missing: &foobar;</xxforms:event>
+        <xxforms:event name="xxforms-value" source-control-id="my-input">The external entity should be missing: &foobar;</xxforms:event>
     </xxforms:action>
 </xxforms:event-request>

@@ -357,16 +357,7 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
 
     @Override
     public boolean setFocus() {
-        if (isRelevant() && !isReadonly()) {
-            // "4.3.7 The xforms-focus Event [...] Any form control is able to accept the focus if it is relevant"
-            // In addition, we don't allow focusing on read-only controls
-
-            // Store new focus information for client
-            containingDocument().setClientFocusEffectiveControlId(getEffectiveId());
-            return true;
-        } else {
-            return false;
-        }
+        return Focus.focusWithEvents(this);
     }
 
     @Override

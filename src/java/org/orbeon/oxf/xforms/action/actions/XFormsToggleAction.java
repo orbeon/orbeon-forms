@@ -22,9 +22,11 @@ import org.orbeon.oxf.xforms.XFormsContextStack;
 import org.orbeon.oxf.xforms.XFormsControls;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
+import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsCaseControl;
 import org.orbeon.oxf.xforms.xbl.Scope;
 import org.orbeon.saxon.om.Item;
+import org.orbeon.oxf.xforms.control.Focus;
 
 /**
  * 9.2.3 The toggle Element
@@ -63,7 +65,13 @@ public class XFormsToggleAction extends XFormsAction {
                 // Actually toggle the xforms:case
                 final XFormsControls controls = containingDocument.getControls();
                 controls.markDirtySinceLastRequest(false);// NOTE: xxforms:case() function might still be impacted, so this is not quite right
+
+                final XFormsControl focusedBefore = controls.getFocusedControl();
+
                 caseControl.toggle();// this will dispatch events
+
+                // Handle focus changes
+                Focus.updateFocus(focusedBefore);
             }
         } else {
             // "If there is a null search result for the target object and the source object is an XForms action such as

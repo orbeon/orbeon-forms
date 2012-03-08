@@ -16,123 +16,130 @@ package org.orbeon.oxf.xforms.event
 import events._
 import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.control.controls._
-import org.orbeon.oxf.xforms.XFormsConstants
+import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.XFormsUtils
 import scala.collection.JavaConversions._
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.xml._
-import java.util.{ArrayList, List ⇒ JList, Set ⇒ JSet}
+import java.util.{ArrayList, List ⇒ JList, Set ⇒ JSet, Collections ⇒ JCollections}
 import dom4j.{LocationSAXContentHandler, Dom4jUtils}
 import org.orbeon.oxf.pipeline.api._
 import org.dom4j.{Document, Element}
 import org.orbeon.oxf.xforms.state.XFormsStateManager
 import org.orbeon.oxf.util.{IndentedLogger, Multipart}
 import org.orbeon.oxf.util.Logger._
+import XFormsEvents._
+import collection.JavaConverters._
 
+// Process events sent by the client, including sorting, filtering, and security
 object ClientEvents {
 
-    private val EVENT_PARAMETERS = List("dnd-start", "dnd-end", "modifiers", "text", "file", "filename", "content-type", "content-length")
-    private val DUMMY_EVENT = List(new LocalEvent(Dom4jUtils.createElement("dummy"), false))
+    private val EventParameters = List("dnd-start", "dnd-end", "modifiers", "text", "file", "filename", "content-type", "content-length")
+    private val DummyEvent = List(new LocalEvent(Dom4jUtils.createElement("dummy"), false))
 
     private case class LocalEvent(element: Element, trusted: Boolean) {
         val name = element.attributeValue("name")
         val targetEffectiveId = element.attributeValue("source-control-id")
         val bubbles = element.attributeValue("bubbles") != "false" // default is true
         val cancelable = element.attributeValue("cancelable") != "false" // default is true
-        val otherTargetEffectiveId = element.attributeValue("other-control-id")
         val value = element.getText
     }
 
-    /**
-     * Process a sequence of incoming client events.
-     */
-    def processEvents(pipelineContext: PipelineContext, document: XFormsContainingDocument, clientEvents: JList[Element],
-                      serverEvents: JList[Element], valueChangeControlIds: JSet[String]) = {
+    // Entry point called by the server: process a sequence of incoming client events.
+    def processEvents(
+            document: XFormsContainingDocument,
+            clientEvents: JList[Element],
+            serverEvents: JList[Element]): (Boolean, JSet[String], String) = {
 
-        // Process events for noscript mode if needed
-        val clientEventsAfterNoscript =
-            if (document.getStaticState.isNoscript)
-                reorderNoscriptEvents(clientEvents, document)
-            else
-                clientEvents.toSeq
+        val allClientAndServerEvents = {
 
-        // Decode encrypted server events
-        def decodeServerEvents(element: Element) = {
-            val document = XFormsUtils.decodeXML(element.getStringValue)
-            Dom4jUtils.elements(document.getRootElement, XFormsConstants.XXFORMS_EVENT_QNAME)
-        }
+            // Process events for noscript mode if needed
+            val clientEventsAfterNoscript =
+                if (document.getStaticState.isNoscript)
+                    reorderNoscriptEvents(clientEvents, document)
+                else
+                    clientEvents.toSeq
 
-        // Grouping key for value change events
-        case class EventGroupingKey(name: String, targetId: String, otherTargetId: String) {
-            def this(localEvent: LocalEvent) =
-                this(localEvent.name, localEvent.targetEffectiveId, localEvent.otherTargetEffectiveId)
-        }
+            // Decode encrypted server events
+            def decodeServerEvents(element: Element) = {
+                val document = XFormsUtils.decodeXML(element.getStringValue)
+                Dom4jUtils.elements(document.getRootElement, XXFORMS_EVENT_QNAME)
+            }
 
-        // Decode global server events
-        val globalServerEvents: Seq[LocalEvent] = serverEvents flatMap (decodeServerEvents(_)) map (LocalEvent(_, true))
+            // Decode global server events
+            val globalServerEvents: Seq[LocalEvent] = serverEvents flatMap (decodeServerEvents(_)) map (LocalEvent(_, true))
 
-        // Gather all events including decoding action server events
-        val allClientAndServerEvents: Seq[LocalEvent] =
+            // Gather all events including decoding action server events
             globalServerEvents ++
                 (clientEventsAfterNoscript flatMap {
-                    case element if element.attributeValue("name") == XFormsEvents.XXFORMS_SERVER_EVENTS ⇒
+                    case element if element.attributeValue("name") == XXFORMS_SERVER_EVENTS ⇒
                         decodeServerEvents(element) map (LocalEvent(_, true))
-                    case element ⇒ List(LocalEvent(element, false))
+                    case element ⇒
+                        List(LocalEvent(element, false))
                 })
+        }
 
-        var hasAllEvents = false
+        def combineEvents(events: Seq[LocalEvent]): Seq[XFormsEvent] = {
 
-        if (allClientAndServerEvents.size > 0 ) {
+            // Grouping key for value change events
+            case class EventGroupingKey(name: String, targetId: String) {
+                def this(localEvent: LocalEvent) =
+                    this(localEvent.name, localEvent.targetEffectiveId)
+            }
+
             // Slide over the events so we can filter and compress them
             // NOTE: Don't use Iterator.toSeq as that returns a Stream, which evaluates lazily. This would be great, except
             // that we *must* first create all events, then dispatch them, so that references to XFormsTarget are obtained
             // beforehand.
-            val filteredEvents: Seq[XFormsEvent] = (allClientAndServerEvents ++ DUMMY_EVENT).sliding(2).toList flatMap {
-                case Seq(a, _) if a.name == XFormsEvents.XXFORMS_ALL_EVENTS_REQUIRED ⇒
-                    // Just remember we got the "all events" event
-                    hasAllEvents = true
+            (events ++ DummyEvent).sliding(2).toList flatMap {
+                case Seq(a, _) if a.name == XXFORMS_ALL_EVENTS_REQUIRED ⇒
                     None
                 case Seq(a, _) if (a.name eq null) && (a.targetEffectiveId eq null) ⇒
                     throw new OXFException("<event> element must either have source-control-id and name attributes, or no attribute.")
-                case Seq(a, _) if a.name != XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE ⇒
-                    // Non-value change event
-                    safelyCreateEvent(document, a)
-                case Seq(a, b) if new EventGroupingKey(a) != new EventGroupingKey(b) ⇒
-                    // Only process last value change event received
-                    assert(a.name == XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE)
-                    valueChangeControlIds += a.targetEffectiveId
-                    safelyCreateEvent(document, a)
+                case Seq(a, b) if a.name != XXFORMS_VALUE || new EventGroupingKey(a) != new EventGroupingKey(b) ⇒
+                    // Non-value event or value event that doesn't need compression
+                    safelyCreateAndMapEvent(document, a)
                 case Seq(a, b) ⇒
                     // Nothing to do here: we are compressing value change events
-                    assert(a.name == XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE)
+                    assert(a.name == XXFORMS_VALUE)
                     assert(new EventGroupingKey(a) == new EventGroupingKey(b))
                     None
             }
-
-            // Process all filtered events
-            for (event ← filteredEvents)
-                processEvent(document, event)
         }
 
-        hasAllEvents
+        if (allClientAndServerEvents.nonEmpty) {
+
+            // Combine and process events
+            for (event ← combineEvents(allClientAndServerEvents))
+                processEvent(document, event)
+
+            // Gather some metadata about the events received to help with the response to the client
+            (allClientAndServerEvents exists (_.name == XXFORMS_ALL_EVENTS_REQUIRED),
+             (allClientAndServerEvents collect { case e if e.name == XXFORMS_VALUE ⇒ e.targetEffectiveId } toSet).asJava,
+             allClientAndServerEvents.reverse find (_.name == XFORMS_FOCUS) map (_.targetEffectiveId) orNull)
+
+        } else
+            (false, JCollections.emptySet[String], null)
     }
 
-    // Event categories, in the order we will want them
-    sealed trait Category
-    case object Other extends Category
-    case object ValueChange extends Category
-    case object SelectBlank extends Category
-    case object Activation extends Category
-
-    val AllCategories = Seq(Other, ValueChange, SelectBlank, Activation)
-
+    // NOTE: Leave public for unit tests
     def reorderNoscriptEvents(eventElements: Seq[Element], document: XFormsContainingDocument): Seq[Element] = {
+
+        // Event categories
+        sealed trait Category
+        case object Other extends Category
+        case object ValueChange extends Category
+        case object SelectBlank extends Category
+        case object Activation extends Category
+
+        // All categories in the order we want them
+        val AllCategories = Seq(Other, ValueChange, SelectBlank, Activation)
 
         // Group events in 3 categories
         def getEventCategory(element: Element) = element match {
             // Special event for noscript mode
-            case element if element.attributeValue("name") == XFormsEvents.XXFORMS_VALUE_OR_ACTIVATE ⇒
+            case element if element.attributeValue("name") == XXFORMS_VALUE_OR_ACTIVATE ⇒
                 val sourceControlId = element.attributeValue("source-control-id")
                 element match {
                     // This is a value event
@@ -155,8 +162,8 @@ object ClientEvents {
 
             // Create <xxf:event name="xxforms-value-or-activate" source-control-id="my-effective-id"/>
             def createBlankingEvent(control: XFormsControl) = {
-                val newEventElement = Dom4jUtils.createElement(XFormsConstants.XXFORMS_EVENT_QNAME)
-                newEventElement.addAttribute("name", XFormsEvents.XXFORMS_VALUE_OR_ACTIVATE)
+                val newEventElement = Dom4jUtils.createElement(XXFORMS_EVENT_QNAME)
+                newEventElement.addAttribute("name", XXFORMS_VALUE_OR_ACTIVATE)
                 newEventElement.addAttribute("source-control-id", control.getEffectiveId)
                 newEventElement
             }
@@ -167,7 +174,7 @@ object ClientEvents {
             // control, create a new event that will blank its value.
             selectFullControls.keySet -- getValueChangeIds map
                 (selectFullControls.get(_).asInstanceOf[XFormsSelectControl]) filter
-                    (control ⇒ control.isRelevant && !control.isReadonly) map
+                    (control ⇒ control.isRelevant && ! control.isReadonly) map
                         (createBlankingEvent(_)) toSeq
         }
 
@@ -175,9 +182,9 @@ object ClientEvents {
         AllCategories flatMap ((groups + (SelectBlank → blankEvents)).get(_)) flatten
     }
 
-    private def safelyCreateEvent(document: XFormsContainingDocument, event: LocalEvent): Option[XFormsEvent] = {
+    private def safelyCreateAndMapEvent(document: XFormsContainingDocument, event: LocalEvent): Option[XFormsEvent] = {
 
-        implicit val CurrentLogger = document.getIndentedLogger(XFormsEvents.LOGGING_CATEGORY)
+        implicit val CurrentLogger = document.getIndentedLogger(LOGGING_CATEGORY)
 
         // Get event target
         val eventTarget = document.getObjectByEffectiveId(XFormsUtils.deNamespaceId(document, event.targetEffectiveId)) match {
@@ -187,37 +194,13 @@ object ClientEvents {
                 return None
         }
 
-        val newEventName = event.name match {
-            // Rewrite event type. This is special handling of xxforms-value-or-activate for noscript mode.
-            // NOTE: We do this here, because we need to know the actual type of the target. Could do this statically if
-            // the static state kept type information for each control.
-            case XFormsEvents.XXFORMS_VALUE_OR_ACTIVATE ⇒
-                eventTarget match {
-                    // Handler produces:
-                    //   <button type="submit" name="foobar" value="activate">...
-                    //   <input type="submit" name="foobar" value="Hi There">...
-                    //   <input type="image" name="foobar" value="Hi There" src="...">...
-
-                    // IE 6/7 are terminally broken: they don't send the value back, but the contents of the label. So
-                    // we must test for any empty content here instead of "!activate".equals(valueString). (Note that
-                    // this means that empty labels won't work.) Further, with IE 6, all buttons are present when
-                    // using <button>, so we use <input> instead, either with type="submit" or type="image". Bleh.
-                    case triggerControl: XFormsTriggerControl if event.value.isEmpty ⇒ return None
-                    // Triggers get a DOM activation
-                    case triggerControl: XFormsTriggerControl ⇒ XFormsEvents.DOM_ACTIVATE
-                    // Other controls get a value change
-                    case _ ⇒ XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE
-                }
-             case eventName ⇒ eventName
-        }
-
         // Check whether the external event is allowed on the given target.
         def checkAllowedExternalEvents = {
 
             // Whether an external event name is explicitly allowed by the configuration.
             def isExplicitlyAllowedExternalEvent = {
                 val externalEventsMap = document.getStaticState.getAllowedExternalEvents
-                !XFormsEventFactory.isBuiltInEvent(event.name) && externalEventsMap.contains(event.name)
+                ! XFormsEventFactory.isBuiltInEvent(event.name) && externalEventsMap.contains(event.name)
             }
 
             // This is also a security measure that also ensures that somebody is not able to change values in an instance
@@ -231,39 +214,52 @@ object ClientEvents {
         }
 
         // Check the event is allowed on target
-        if (event.trusted) {
+        if (event.trusted)
             // Event is trusted, don't check if it is allowed
             debug("processing trusted event", Seq("target id", eventTarget.getEffectiveId, "event name", event.name))
-        } else if (!checkAllowedExternalEvents)
+        else if (! checkAllowedExternalEvents)
             return None // event is not trusted and is not allowed
 
-        // Get other event target
-        val otherEventTarget = event.otherTargetEffectiveId match {
-            case otherTargetEffectiveId: String ⇒
-                document.getObjectByEffectiveId(XFormsUtils.deNamespaceId(document, otherTargetEffectiveId)) match {
-                    case eventTarget: XFormsEventTarget ⇒ eventTarget
-                    case _ ⇒
-                        debug("ignoring client event with invalid second target id", Seq("target id", event.otherTargetEffectiveId, "event name", event.name))
-                        return None
+        def mapEventName(event: LocalEvent, eventTarget: XFormsEventTarget) = event.name match {
+            // Rewrite event type. This is special handling of xxforms-value-or-activate for noscript mode.
+            // NOTE: We do this here, because we need to know the actual type of the target. Could do this statically if
+            // the static state kept type information for each control.
+            case XXFORMS_VALUE_OR_ACTIVATE ⇒
+                eventTarget match {
+                    // Handler produces:
+                    //   <button type="submit" name="foobar" value="activate">...
+                    //   <input type="submit" name="foobar" value="Hi There">...
+                    //   <input type="image" name="foobar" value="Hi There" src="...">...
+
+                    // IE 6/7 are terminally broken: they don't send the value back, but the contents of the label. So
+                    // we must test for any empty content here instead of !"activate".equals(valueString). (Note that
+                    // this means that empty labels won't work.) Further, with IE 6, all buttons are present when
+                    // using <button>, so we use <input> instead, either with type="submit" or type="image". Bleh.
+                    case triggerControl: XFormsTriggerControl if event.value.isEmpty ⇒ None
+                    // Triggers get a DOM activation
+                    case triggerControl: XFormsTriggerControl ⇒ Some(DOM_ACTIVATE)
+                    // Other controls get a value change
+                    case _ ⇒ Some(XXFORMS_VALUE)
                 }
-            case _ ⇒ null
+            case eventName ⇒ Some(eventName)
         }
 
-        def gatherParameters(event: LocalEvent) =
-            Map((for {
-                    attributeName ← EVENT_PARAMETERS
-                    attributeValue = event.element.attributeValue(attributeName)
-                    if attributeValue ne null
-                } yield (attributeName → attributeValue)): _*)
-
         // Create event
-        Some(XFormsEventFactory.createEvent(document, newEventName, eventTarget, otherEventTarget, true,
-            event.bubbles, event.cancelable, event.value, gatherParameters(event)))
+        mapEventName(event, eventTarget) map { eventName ⇒
+
+            def gatherParameters(event: LocalEvent) =
+                Map((for {
+                        attributeName ← EventParameters
+                        attributeValue = event.element.attributeValue(attributeName)
+                        if attributeValue ne null
+                    } yield (attributeName → attributeValue)): _*)
+
+            XFormsEventFactory.createEvent(document, eventName, eventTarget, true,
+                event.bubbles, event.cancelable, event.value, gatherParameters(event))
+        }
     }
 
-    /**
-     * Check for and handle events that don't need access to the document but can return an Ajax response rapidly.
-     */
+    // Check for and handle events that don't need access to the document but can return an Ajax response rapidly.
     def doQuickReturnEvents(xmlReceiver: XMLReceiver, request: ExternalContext.Request, requestDocument: Document, indentedLogger: IndentedLogger,
                logRequestResponse: Boolean, clientEvents: JList[Element], session: ExternalContext.Session): Boolean = {
 
@@ -287,8 +283,8 @@ object ClientEvents {
 
                 val helper = new ContentHandlerHelper(responseReceiver)
                 helper.startDocument()
-                helper.startPrefixMapping("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI)
-                helper.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "event-response")
+                helper.startPrefixMapping("xxf", XXFORMS_NAMESPACE_URI)
+                helper.startElement("xxf", XXFORMS_NAMESPACE_URI, "event-response")
 
                 block(helper)
 
@@ -305,7 +301,7 @@ object ClientEvents {
 
         eventElement.attributeValue("name") match {
             // Quick response for heartbeat
-            case XFormsEvents.XXFORMS_SESSION_HEARTBEAT ⇒
+            case XXFORMS_SESSION_HEARTBEAT ⇒
 
                 if (indentedLogger.isDebugEnabled) {
                     if (session != null)
@@ -318,7 +314,7 @@ object ClientEvents {
                 eventResponse("ajax response", "handling quick heartbeat Ajax response")(helper ⇒ ())
 
             // Quick response for upload progress
-            case XFormsEvents.XXFORMS_UPLOAD_PROGRESS ⇒
+            case XXFORMS_UPLOAD_PROGRESS ⇒
 
                 // Output simple resulting document
                 eventResponse("ajax response", "handling quick upload progress Ajax response") { helper ⇒
@@ -326,9 +322,9 @@ object ClientEvents {
                     Multipart.getUploadProgress(request, XFormsStateManager.getRequestUUID(requestDocument), sourceControlId) match {
                         case Some(progress) ⇒
 
-                            helper.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "action")
-                            helper.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control-values")
-                            helper.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control",
+                            helper.startElement("xxf", XXFORMS_NAMESPACE_URI, "action")
+                            helper.startElement("xxf", XXFORMS_NAMESPACE_URI, "control-values")
+                            helper.element("xxf", XXFORMS_NAMESPACE_URI, "control",
                                 Array[String]("id", sourceControlId,
                                     "progress-state", progress.state.toString.toLowerCase,
                                     "progress-received", progress.receivedSize.toString,
@@ -343,16 +339,12 @@ object ClientEvents {
         }
     }
 
-    /**
-     * Process an incoming client event. Preprocessing for Noscript and encrypted events is assumed to have taken place.
-     *
-     * This handles checking for stale controls, relevance, readonly, and special cases like xf:output.
-     *
-     * @param event             event to dispatch
-     */
+    // Process an incoming client event. Preprocessing for noscript and encrypted events is assumed to have taken place.
+    // This handles checking for stale controls, relevance, readonly, and special cases like xf:output.
+    // NOTE: Leave public for unit tests
     def processEvent(document: XFormsContainingDocument, event: XFormsEvent): Unit = {
 
-        def isValueChange = event.isInstanceOf[XXFormsValueChangeWithFocusChangeEvent]
+        def isValueChange = event.isInstanceOf[XXFormsValue]
 
         // Check whether an event can be be dispatched to the given object. This only checks:
         // o the the target is still live
@@ -395,7 +387,7 @@ object ClientEvents {
 
             } else eventTarget match {
                 // Controls accept event only if they are relevant
-                case control: XFormsControl if !control.isRelevant ⇒
+                case control: XFormsControl if ! control.isRelevant ⇒
                     warn("non-relevant control")
 
                 // Output control not subject to readonly condition below
@@ -419,102 +411,63 @@ object ClientEvents {
             if (checkEventTarget(event))
                 document.dispatchEvent(event)
 
-        implicit val CurrentLogger = document.getIndentedLogger(XFormsEvents.LOGGING_CATEGORY)
-        val eventTarget = event.getTargetObject
-        val eventTargetEffectiveId = eventTarget.getEffectiveId
+        implicit val CurrentLogger = document.getIndentedLogger(LOGGING_CATEGORY)
+        val target = event.getTargetObject
+        val targetEffectiveId = target.getEffectiveId
         val eventName = event.getName
 
-        withDebug("handling external event", Seq("target id", eventTargetEffectiveId, "event name", eventName)) {
-            // Each event is within its own start/end outermost action handler
-            document.startOutermostActionHandler()
+        withDebug("handling external event", Seq("target id", targetEffectiveId, "event name", eventName)) {
 
-            // Check if the value to set will be different from the current value
-            (event, eventTarget) match {
-                case (event: XXFormsValueChangeWithFocusChangeEvent, eventTarget: XFormsValueControl) ⇒
-                    if (event.getOtherTargetObject eq null) {
-                        // We only get a value change with this event
-                        val currentExternalValue = eventTarget.getExternalValue
-                        if (currentExternalValue ne null) {
-                            // We completely ignore the event if the value in the instance is the same. This also saves dispatching xxforms-repeat-focus below.
-                            val isIgnoreValueChangeEvent = currentExternalValue == event.getNewValue
-                            if (isIgnoreValueChangeEvent) {
-                                debug("ignoring value change event as value is the same", Seq("control id", eventTargetEffectiveId, "event name", eventName, "value", currentExternalValue))
-                                // Ensure deferred event handling
-                                // NOTE: Here this will do nothing, but out of consistency we better have matching startOutermostActionHandler/endOutermostActionHandler
-                                document.endOutermostActionHandler()
-                                return
-                            }
-                        } else {
-                            // shouldn't happen really, but just in case let's log this
-                            debug("got null currentExternalValue", Seq("control id", eventTargetEffectiveId, "event name", eventName))
-                        }
-                    } else {
-                        // There will be a focus event too, so don't ignore the event!
-                    }
+            // Optimize case where a value change event won't change the control value to actually change
+            (event, target) match {
+                case (valueChange: XXFormsValue, target: XFormsValueControl) if target.getExternalValue == valueChange.getNewValue ⇒
+                    // We completely ignore the event if the value in the instance is the same. This also saves dispatching xxforms-repeat-focus below.
+                    debug("ignoring value change event as value is the same", Seq(
+                        "control id", targetEffectiveId,
+                        "event name", eventName,
+                        "value", target.getExternalValue)
+                    )
+                    return
                 case _ ⇒
             }
 
+            // Each event is within its own start/end outermost action handler
+            document.startOutermostActionHandler()
+
             // Handle repeat focus if the event target is in a repeat
-            // Don't dispatch event on DOMFocusOut however
-            if (XFormsUtils.hasEffectiveIdSuffix(eventTargetEffectiveId) && ! event.isInstanceOf[DOMFocusOutEvent])
-                dispatchEventCheckTarget(new XXFormsRepeatFocusEvent(document, eventTarget))
+            if (XFormsUtils.hasEffectiveIdSuffix(targetEffectiveId))
+                dispatchEventCheckTarget(new XXFormsRepeatFocusEvent(document, target))
 
             // Interpret event
-            eventTarget match {
+            target match {
                 // Special xforms:output case
-                case xformsOutputControl: XFormsOutputControl ⇒
+                case outputControl: XFormsOutputControl ⇒
                     event match {
-                        case event: DOMFocusInEvent ⇒
-                            // First, dispatch DOMFocusIn
+                        case event: XFormsFocusEvent⇒
+                            // First, dispatch xforms-focus
                             dispatchEventCheckTarget(event)
                             // Then, dispatch DOMActivate unless the control is read-only
-                            if (!xformsOutputControl.isReadonly)
-                                dispatchEventCheckTarget(new DOMActivateEvent(document, xformsOutputControl))
-                        case event if !xformsOutputControl.isIgnoredExternalEvent(eventName) ⇒
+                            if (! outputControl.isReadonly)
+                                dispatchEventCheckTarget(new DOMActivateEvent(document, outputControl))
+                        case event if ! outputControl.isIgnoredExternalEvent(eventName) ⇒
                             // Dispatch any other event
                             dispatchEventCheckTarget(event)
                         case _ ⇒
                     }
                 // All other targets
                 case _ ⇒
-                    event match {
-                        // Special case of value change with focus change
-                        case valueChangeWithFocusChangeEvent: XXFormsValueChangeWithFocusChangeEvent ⇒
-                            // 4.6.7 Sequence: Value Change
 
-                            // TODO: Not sure if this comment makes sense anymore.
-                            // What we want to do here is set the value on the initial controls tree, as the value has already been
-                            // changed on the client. This means that this event(s) must be the first to come!
+                    // NOTES:
 
-                            if (checkEventTarget(event)) {
-                                // Store value into instance data through the control
-                                val valueXFormsControl = eventTarget.asInstanceOf[XFormsValueControl]
-                                valueXFormsControl.storeExternalValue(valueChangeWithFocusChangeEvent.getNewValue)
-                            }
+                    // 1. We used to dispatch xforms-focus here, but now we don't anymore: we assume that the client
+                    // provides xforms-focus before value changes as needed. Also, value changes can occur without focus
+                    // changes, in particular when the JavaScript API is used.
 
-                            // NOTE: Recalculate and revalidate are done with the automatic deferred updates
+                    // 2. We also used to handle value controls here, but it makes more sense to do it via events.
 
-                            // Handle focus change DOMFocusOut / DOMFocusIn
-                            if (valueChangeWithFocusChangeEvent.getOtherTargetObject ne null) {
+                    // 3. Recalculate, revalidate and refresh are handled with the automatic deferred updates.
 
-                                // We have a focus change (otherwise, the focus is assumed to remain the same)
-
-                                // Dispatch DOMFocusOut
-                                // NOTE: storeExternalValue() above may cause e.g. xforms-select / xforms-deselect events to be
-                                // dispatched, so we get the control again to have a fresh reference
-
-                                dispatchEventCheckTarget(new DOMFocusOutEvent(document, eventTarget))
-
-                                // Dispatch DOMFocusIn
-                                dispatchEventCheckTarget(new DOMFocusInEvent(document, valueChangeWithFocusChangeEvent.getOtherTargetObject))
-                            }
-
-                            // NOTE: Refresh is done with the automatic deferred updates
-
-                        // Dispatch any other event
-                        case _ ⇒
-                            dispatchEventCheckTarget(event)
-                    }
+                    dispatchEventCheckTarget(event)
             }
 
             // Each event is within its own start/end outermost action handler

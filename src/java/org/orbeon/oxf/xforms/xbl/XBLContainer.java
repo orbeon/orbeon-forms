@@ -21,19 +21,18 @@ import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.analysis.model.Model;
 import org.orbeon.oxf.xforms.control.XFormsComponentControl;
 import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xforms.control.Focus;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatIterationControl;
-import org.orbeon.oxf.xforms.control.controls.XXFormsRootControl;
 import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.EventListener;
-import org.orbeon.oxf.xforms.event.events.XFormsModelDestructEvent;
-import org.orbeon.oxf.xforms.event.events.XFormsUIEvent;
-import org.orbeon.oxf.xforms.event.events.XXFormsValueChangeWithFocusChangeEvent;
+import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xml.NamespaceMapping;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
+import scala.Tuple3;
 
 import java.util.*;
 
@@ -779,9 +778,6 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
      */
     public void dispatchEvent(XFormsEvent originalEvent) {
 
-        // XXFormsValueChangeWithFocusChangeEvent is always transformed into DOMFocusIn/Out
-        assert !(originalEvent instanceof XXFormsValueChangeWithFocusChangeEvent);
-
         final IndentedLogger indentedLogger = containingDocument.getIndentedLogger(XFormsEvents.LOGGING_CATEGORY);
 
         if (indentedLogger.isDebugEnabled()) {
@@ -808,36 +804,13 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
 
         try {
 
-            // Find all event handler containers
-            final List<XFormsEventObserver> boundaries = new ArrayList<XFormsEventObserver>();
-            final Map<String, XFormsEvent> eventsForBoundaries = new LinkedHashMap<String, XFormsEvent>();// Map<String effectiveId, XFormsEvent event>
-            final List<XFormsEventObserver> eventObservers = new ArrayList<XFormsEventObserver>();
-            {
-                XFormsEventObserver eventObserver
-                        = (targetObject instanceof XFormsEventObserver) ? (XFormsEventObserver) targetObject : targetObject.getParentEventObserver(this);
-                while (eventObserver != null) {
-                    if (!((eventObserver instanceof XFormsRepeatControl && targetObject != eventObserver) || eventObserver instanceof XXFormsRootControl)) {
-                        // Repeat is not an observer (repeat iterations are) UNLESS it is the direct target of the event
+            // Find all observers
+            final Tuple3<ArrayList<XFormsEventObserver>, LinkedHashMap<String, XFormsEvent>, ArrayList<XFormsEventObserver>> eventBoundaries
+                    = Focus.findBoundaries(targetObject, originalEvent);
 
-                        if (eventObserver instanceof XFormsComponentControl && targetObject != eventObserver) {
-                            // Either retarget, or stop propagation if the event is trying to go through the component boundary
-                            if (originalEvent instanceof XFormsUIEvent) {
-                                // UI events need to be retargeted
-                                boundaries.add(eventObserver);
-                                eventsForBoundaries.put(eventObserver.getEffectiveId(), null);
-                            } else {
-                                // Stop propagation on model container or component boundary for all non-UI events
-                                break;
-                            }
-                        }
-                        // Add the observer
-                        eventObservers.add(eventObserver);
-                    }
-
-                    // Find parent
-                    eventObserver = eventObserver.getParentEventObserver(this);
-                }
-            }
+            final List<XFormsEventObserver> boundaries = eventBoundaries._1();
+            final Map<String, XFormsEvent> eventsForBoundaries = eventBoundaries._2();
+            final List<XFormsEventObserver> eventObservers = eventBoundaries._3();
 
             boolean propagate = true;
             boolean performDefaultAction = true;

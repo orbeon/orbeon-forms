@@ -55,7 +55,7 @@ Event.onDOMReady ->
             isDateOrTimeInput = true in (YD.hasClass event.control, c for c in dateOrTimeClasses)
             if isDateOrTimeInput
                 value = Controls.getCurrentValue event.control
-                changeEvent = new ORBEON.xforms.server.AjaxServer.Event null, event.control.id, null, value, "xxforms-value-change-with-focus-change"
+                changeEvent = new ORBEON.xforms.server.AjaxServer.Event null, event.control.id, value, "xxforms-value"
                 ORBEON.xforms.server.AjaxServer.fireEvents [changeEvent], false
 
         # For iOS, store the ISO values as the input value
@@ -99,7 +99,7 @@ Event.onDOMReady ->
             inputField.value = DateTime.jsDateToFormatDisplayDate jsDate
             inputField.alt = inputField.value  if YAHOO.util.Dom.hasClass control, "xforms-input-appearance-minimal"
             value = Controls.getCurrentValue control
-            changeEvent = new ORBEON.xforms.server.AjaxServer.Event null, control.id, null, value, "xxforms-value-change-with-focus-change"
+            changeEvent = new ORBEON.xforms.server.AjaxServer.Event null, control.id, value, "xxforms-value"
             ORBEON.xforms.server.AjaxServer.fireEvents [changeEvent], false
             closeCalendar()
 

@@ -260,7 +260,7 @@
                             <xxforms:static-state><xsl:value-of select="//xhtml:input[@name = '$static-state']/@value"/></xxforms:static-state>
                             <xxforms:dynamic-state><xsl:value-of select="//xhtml:input[@name = '$dynamic-state']/@value"/></xxforms:dynamic-state>
                             <xxforms:action>
-                                <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="input1">true</xxforms:event>
+                                <xxforms:event name="xxforms-value" source-control-id="input1">true</xxforms:event>
                             </xxforms:action>
                         </xxforms:event-request>
                     </p:input>
@@ -276,7 +276,7 @@
                             <xxforms:static-state><xsl:value-of select="//xhtml:input[@name = '$static-state']/@value"/></xxforms:static-state>
                             <xxforms:dynamic-state><xsl:value-of select="//xhtml:input[@name = '$dynamic-state']/@value"/></xxforms:dynamic-state>
                             <xxforms:action>
-                                <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="input1">false</xxforms:event>
+                                <xxforms:event name="xxforms-value" source-control-id="input1">false</xxforms:event>
                             </xxforms:action>
                         </xxforms:event-request>
                     </p:input>
@@ -292,7 +292,7 @@
                             <xxforms:static-state><xsl:value-of select="//xhtml:input[@name = '$static-state']/@value"/></xxforms:static-state>
                             <xxforms:dynamic-state><xsl:value-of select="//xhtml:input[@name = '$dynamic-state']/@value"/></xxforms:dynamic-state>
                             <xxforms:action>
-                                <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="input1">true</xxforms:event>
+                                <xxforms:event name="xxforms-value" source-control-id="input1">true</xxforms:event>
                             </xxforms:action>
                         </xxforms:event-request>
                     </p:input>
@@ -465,35 +465,35 @@
                             <xxforms:dynamic-state><xsl:value-of select="//xhtml:input[@name = '$dynamic-state']/@value"/></xxforms:dynamic-state>
 
                             <xxforms:action>
-                                <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="input">1</xxforms:event>
+                                <xxforms:event name="xxforms-value" source-control-id="input">1</xxforms:event>
                                 <xxforms:event name="DOMActivate" source-control-id="trigger1"/>
                                 <xxforms:event name="xxforms-server-events">
                                     <xsl:variable name="server-events" as="document-node()">
                                         <xsl:document>
                                             <xxforms:server-events xmlns="">
-                                                <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="input">2</xxforms:event>
-                                                <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="input">3</xxforms:event>
+                                                <xxforms:event name="xxforms-value" source-control-id="input">2</xxforms:event>
+                                                <xxforms:event name="xxforms-value" source-control-id="input">3</xxforms:event>
                                                 <xxforms:event name="DOMActivate" source-control-id="trigger2"/>
                                             </xxforms:server-events>
                                         </xsl:document>
                                     </xsl:variable>
                                     <xsl:value-of select="xpl:encodeXML($server-events)"/>
                                 </xxforms:event>
-                                <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="input">4</xxforms:event>
+                                <xxforms:event name="xxforms-value" source-control-id="input">4</xxforms:event>
                                 <xxforms:event name="DOMActivate" source-control-id="trigger3"/>
                                 <xxforms:event name="xxforms-server-events">
                                     <xsl:variable name="server-events" as="document-node()">
                                         <xsl:document>
                                             <xxforms:server-events xmlns="">
-                                                <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="input">5</xxforms:event>
-                                                <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="input">6</xxforms:event>
+                                                <xxforms:event name="xxforms-value" source-control-id="input">5</xxforms:event>
+                                                <xxforms:event name="xxforms-value" source-control-id="input">6</xxforms:event>
                                                 <xxforms:event name="DOMActivate" source-control-id="trigger4"/>
                                             </xxforms:server-events>
                                         </xsl:document>
                                     </xsl:variable>
                                     <xsl:value-of select="xpl:encodeXML($server-events)"/>
                                 </xxforms:event>
-                                <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="input">7</xxforms:event>
+                                <xxforms:event name="xxforms-value" source-control-id="input">7</xxforms:event>
                                 <xxforms:event name="DOMActivate" source-control-id="trigger5"/>
                             </xxforms:action>
                         </xxforms:event-request>

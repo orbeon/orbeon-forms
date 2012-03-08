@@ -245,6 +245,8 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
         // Get old nodeset
         val oldRepeatNodeset = getBindingContext.getNodeset
 
+        val focusedBefore = containingDocument.getControls.getFocusedControl
+
         // Set new binding context on the repeat control
         locally {
             // NOTE: here we just reevaluate against the parent; maybe we should reevaluate all the way down
@@ -275,6 +277,9 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
             // This will dispatch xforms-enabled/xforms-disabled/xxforms-nodeset-changed/xxforms-index-changed events if needed
             containingDocument.getControls.getCurrentControlTree.dispatchRefreshEvents(Collections.singletonList(getEffectiveId))
         }
+
+        // Handle focus changes
+        Focus.updateFocus(focusedBefore)
     }
 
     /**

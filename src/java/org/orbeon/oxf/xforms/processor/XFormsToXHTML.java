@@ -515,7 +515,7 @@ public class XFormsToXHTML extends ProcessorImpl {
     private void testOutputResponseState(final XFormsContainingDocument containingDocument, final IndentedLogger indentedLogger,
                                          final XMLReceiver xmlReceiver) throws SAXException {
         // Output XML response
-        XFormsServer.outputAjaxResponse(containingDocument, indentedLogger, null, null, xmlReceiver, false, true);
+        XFormsServer.outputAjaxResponse(containingDocument, indentedLogger, null, null, null, null, xmlReceiver, false, true);
     }
 
     /*

@@ -92,4 +92,9 @@ public class XFormsTextareaControl extends XFormsValueControl {
         }
         super.storeExternalValue(value);
     }
+
+    @Override
+    public boolean isFocusable() {
+        return true;
+    }
 }

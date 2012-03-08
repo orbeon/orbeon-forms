@@ -29,7 +29,7 @@ import org.orbeon.oxf.xforms.analysis.XFormsStaticStateTest;
 import org.orbeon.oxf.xforms.event.ClientEvents;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
-import org.orbeon.oxf.xforms.event.events.XXFormsValueChangeWithFocusChangeEvent;
+import org.orbeon.oxf.xforms.event.events.XXFormsValue;
 
 import java.util.Collections;
 import java.util.List;
@@ -153,7 +153,7 @@ public class XFormsStateManagerTest extends ResourceManagerTestBase {
         final State state2 = doUpdate(isCache, state1, new EventCallback() {
             public List<XFormsEvent> createEvents(XFormsContainingDocument document) {
                 final XFormsEventTarget input = (XFormsEventTarget) document.getObjectByEffectiveId("my-input");
-                return Collections.<XFormsEvent>singletonList(new XXFormsValueChangeWithFocusChangeEvent(document, input, null, "gaga"));
+                return Collections.<XFormsEvent>singletonList(new XXFormsValue(document, input, "gaga"));
             }
         });
 
@@ -220,7 +220,7 @@ public class XFormsStateManagerTest extends ResourceManagerTestBase {
         final State state2 = doUpdate(isCache, state1, new EventCallback() {
             public List<XFormsEvent> createEvents(XFormsContainingDocument document) {
                 final XFormsEventTarget input = (XFormsEventTarget) document.getObjectByEffectiveId("my-input");
-                return Collections.<XFormsEvent>singletonList(new XXFormsValueChangeWithFocusChangeEvent(document, input, null, "gaga"));
+                return Collections.<XFormsEvent>singletonList(new XXFormsValue(document, input, "gaga"));
             }
         });
 

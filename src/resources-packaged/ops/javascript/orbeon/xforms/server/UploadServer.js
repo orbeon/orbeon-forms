@@ -88,7 +88,7 @@
         // Switch the upload to progress state, so users can't change the file and know the upload is in progress
         this.processingEvent.upload.setState("progress");
         // Tell server we're starting uploads
-        AjaxServer.fireEvents([new AjaxServer.Event(null, this.processingEvent.upload.container.id, null, null,
+        AjaxServer.fireEvents([new AjaxServer.Event(null, this.processingEvent.upload.container.id, null,
                 "xxforms-upload-start", null, null, null, false)], false);
         // Disabling fields other than the one we want to upload
         var disabledElements = _.filter(this.processingEvent.form.elements, function(element) {
@@ -125,7 +125,7 @@
             // Keep asking for progress update at regular interval until there is no upload in progress
             if (this.processingEvent != null) {
                 AjaxServer.fireEvents([new AjaxServer.Event(null, this.processingEvent.upload.container.id,
-                        null, null, "xxforms-upload-progress", null, null, null, false)], false);
+                        null, "xxforms-upload-progress", null, null, null, false)], false);
                 this.askForProgressUpdate();
             }
         }, this), Properties.delayBeforeUploadProgressRefresh.get())
@@ -141,7 +141,7 @@
         Connect.abort(UploadServer.yuiConnection);
         this.processingEvent.upload.clear();
         this.processingEvent.upload.setState("empty");
-        AjaxServer.fireEvents([new AjaxServer.Event(null, this.processingEvent.upload.container.id, null, null, "xxforms-upload-cancel")], false);
+        AjaxServer.fireEvents([new AjaxServer.Event(null, this.processingEvent.upload.container.id, null, "xxforms-upload-cancel")], false);
         this.continueWithRemainingEvents();
     };
 

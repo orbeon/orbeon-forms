@@ -13,24 +13,28 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers.xhtml;
 
-import org.apache.commons.collections.map.CompositeMap;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.util.URLRewriterUtils;
-import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.XFormsProperties;
+import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XXFormsDialogControl;
 import org.orbeon.oxf.xforms.event.EventHandler;
-import org.orbeon.oxf.xforms.event.XFormsEvents;
-import org.orbeon.oxf.xforms.state.XFormsStateManager;
-import org.orbeon.oxf.xml.*;
+import org.orbeon.oxf.xml.ContentHandlerHelper;
+import org.orbeon.oxf.xml.ElementHandlerController;
+import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
-import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Handle xhtml:head.
@@ -87,8 +91,10 @@ public abstract class XHTMLHeadHandlerBase extends XFormsBaseHandlerXHTML {
             outputConfigurationProperties(helper, xhtmlPrefix, isVersionedResources);
 
             // User-defined (with xxforms:script) and XForms scripts
-            final String focusElementId = containingDocument.getClientFocusControlEffectiveId();
+            final XFormsControl focusedControl = containingDocument.getControls().getFocusedControl();
+            final String focusElementId = focusedControl != null ? focusedControl.getEffectiveId() : null;
             final List<XFormsContainingDocument.Message> messagesToRun = containingDocument.getMessagesToRun();
+
             final List<XXFormsDialogControl> dialogsToOpen = new ArrayList<XXFormsDialogControl>(); {
                 final Map<String, XFormsControl> dialogsMap = containingDocument.getControls().getCurrentControlTree().getDialogControls();
                 if (dialogsMap != null && dialogsMap.size() > 0) {

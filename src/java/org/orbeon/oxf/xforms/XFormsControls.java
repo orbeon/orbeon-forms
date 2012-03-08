@@ -18,9 +18,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.xforms.analysis.XPathDependencies;
-import org.orbeon.oxf.xforms.control.Controls;
-import org.orbeon.oxf.xforms.control.XFormsContainerControl;
-import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xforms.control.*;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatIterationControl;
 import org.orbeon.oxf.xforms.itemset.Itemset;
@@ -310,10 +308,16 @@ public class XFormsControls implements XFormsObjectResolver {
                 // Notify dependencies
                 xpathDependencies.refreshStart();
 
+                // Focused control before updating bindings
+                final XFormsControl focusedBefore = getFocusedControl();
+
                 // Update control bindings
                 updateControlBindings();
                 // Update control values
                 evaluateControlValues();
+
+                // Handle focus changes
+                Focus.updateFocus(focusedBefore);
 
                 if (currentControlTree.isAllowSendingRefreshEvents()) {
                     // There are potentially event handlers for UI events, so do the whole processing
@@ -420,8 +424,14 @@ public class XFormsControls implements XFormsObjectResolver {
      */
     public void doPartialRefresh(XFormsContainerControl containerControl) {
 
+        // Focused control before updating bindings
+        final XFormsControl focusedBefore = getFocusedControl();
+
         // Update bindings starting at the container control
         updateSubtreeBindings(containerControl);
+
+        // Handle focus changes
+        Focus.updateFocus(focusedBefore);
 
         // Evaluate the controls
         Controls.visitControls(containerControl, true, new Controls.XFormsControlVisitorAdapter() {
@@ -475,5 +485,16 @@ public class XFormsControls implements XFormsObjectResolver {
         });
 
         return eventsToDispatch;
+    }
+
+    // Remember which control owns focus if any
+    private XFormsControl focusedControl = null;
+
+    public XFormsControl getFocusedControl() {
+        return focusedControl;
+    }
+
+    public void setFocusedControl(XFormsControl focusedControl) {
+        this.focusedControl = focusedControl;
     }
 }

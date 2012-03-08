@@ -143,7 +143,6 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
     private List<Message> messagesToRun;
     private List<Load> loadsToRun;
     private List<Script> scriptsToRun;
-    private String focusEffectiveControlId;
     private String helpEffectiveControlId;
     private List<DelayedEvent> delayedEvents;
     private List<XFormsError.ServerError> serverErrors;
@@ -374,6 +373,10 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
             pipelineContext.setAttribute(XFORMS_DYNAMIC_STATE_RESTORE_CONTROLS, dynamicState.decodeControlsJava());
             xformsControls.restoreControls();
             pipelineContext.setAttribute(XFORMS_DYNAMIC_STATE_RESTORE_CONTROLS, null);
+
+            // Once the control tree is rebuilt, restore focus if needed
+            if (dynamicState.decodeFocusedControlJava() != null)
+                xformsControls.setFocusedControl(xformsControls.getInitialControlTree().getControl(dynamicState.decodeFocusedControlJava()));
         }
 
         // Indicate that instance restoration process is over
@@ -569,7 +572,6 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         this.messagesToRun = null;
         this.loadsToRun = null;
         this.scriptsToRun = null;
-        this.focusEffectiveControlId = null;
         this.helpEffectiveControlId = null;
         this.delayedEvents = null;
         
@@ -855,38 +857,6 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
 
         public boolean isShowProgress() {
             return isShowProgress;
-        }
-    }
-
-    /**
-     * Tell the client that focus must be changed to the given effective control id.
-     *
-     * This can be called several times, but only the last control id is remembered.
-     *
-     * @param effectiveControlId
-     */
-    public void setClientFocusEffectiveControlId(String effectiveControlId) {
-        this.focusEffectiveControlId = effectiveControlId;
-    }
-
-    /**
-     * Return the effective control id of the control to set the focus to, or null.
-     */
-    public String getClientFocusControlEffectiveId() {
-
-        if (focusEffectiveControlId == null)
-            return null;
-
-        final XFormsControl xformsControl = (XFormsControl) getObjectByEffectiveId(focusEffectiveControlId);
-        // It doesn't make sense to tell the client to set the focus to an element that is non-relevant or readonly
-        if (xformsControl instanceof XFormsSingleNodeControl) {
-            final XFormsSingleNodeControl xformsSingleNodeControl = (XFormsSingleNodeControl) xformsControl;
-            if (xformsSingleNodeControl.isRelevant() && !xformsSingleNodeControl.isReadonly())
-                return focusEffectiveControlId;
-            else
-                return null;
-        } else {
-            return null;
         }
     }
 

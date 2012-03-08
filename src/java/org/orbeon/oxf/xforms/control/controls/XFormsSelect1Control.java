@@ -357,6 +357,11 @@ public class XFormsSelect1Control extends XFormsValueControl {
     }
 
     @Override
+    public boolean isFocusable() {
+        return !getAppearances().contains(XFormsConstants.XXFORMS_INTERNAL_APPEARANCE_QNAME);
+    }
+
+    @Override
     public boolean setFocus() {
         // Don't accept focus if we have the internal appearance
         return !getAppearances().contains(XFormsConstants.XXFORMS_INTERNAL_APPEARANCE_QNAME) && super.setFocus();

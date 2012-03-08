@@ -16,6 +16,7 @@
        xmlns:xi="http://www.w3.org/2001/XInclude">
 
     <xi:include href="xforms-server/tests-xforms-misc.xml"/>
+    <xi:include href="xforms-server/tests-xforms-focus.xml"/>
     <xi:include href="xforms-server/tests-xforms-mips.xml"/>
     <xi:include href="xforms-server/tests-xforms-submission.xml"/>
     <xi:include href="xforms-server/tests-xforms-xbl.xml"/>

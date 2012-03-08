@@ -593,7 +593,7 @@
                         <xxf:control id="my-date$xf-15" class="xbl-fr-date-pagedate"/>
                         <xxf:attribute id="my-date$xf-15" for="my-date$xf-15" name="style">display: none</xxf:attribute>
                     </xxf:control-values>
-                    <xxf:setfocus control-id="my-date$xf-6"/>
+                    <xxf:focus control-id="my-date$xf-6"/>
                 </xxf:action>
             </xxf:event-response>
         </output>
@@ -706,7 +706,7 @@
                                     <readonly>false</readonly>
                                     <textfield-value/>
                                     <resource/>
-                                    <has-focus>false</has-focus>
+                                    <has-focus>true</has-focus>
                                 </autocomplete>
                             </instance>
                             <instance id="suggestions-instance" model-id="my-autocomplete$autocomplete-model">
@@ -734,7 +734,7 @@
                     </xxf:control-values>
                     <xxf:script name="xf_586bd855f1f823eb047ce1f64fc89bcd15e36a85" target-id="my-autocomplete$component-inner-group" observer-id="my-autocomplete$component-inner-group"/>
                     <xxf:script name="xf_8ba62560f51cbde692a8536df3e54bb1c2eba121" target-id="my-autocomplete$show-suggestions-button$trigger" observer-id="my-autocomplete$show-suggestions-button$trigger"/>
-                    <xxf:setfocus control-id="my-autocomplete$search"/>
+                    <xxf:focus control-id="my-autocomplete$search"/>
                 </xxf:action>
             </xxf:event-response>
         </output>

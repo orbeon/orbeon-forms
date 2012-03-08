@@ -363,9 +363,14 @@
                         </element>
                     </zeroOrMore>
                     <optional>
-                        <element name="xxforms:setfocus">
-                            <attribute name="control-id"/>
-                        </element>
+                        <choice>
+                            <element name="xxforms:focus">
+                                <attribute name="control-id"/>
+                            </element>
+                            <element name="xxforms:blur">
+                                <attribute name="control-id"/>
+                            </element>
+                        </choice>
                     </optional>
                     <optional>
                         <element name="xxforms:help">

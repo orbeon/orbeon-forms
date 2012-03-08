@@ -14,25 +14,23 @@
 package org.orbeon.oxf.xforms.event.events;
 
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.event.*;
+import org.orbeon.oxf.xforms.event.XFormsEvent;
+import org.orbeon.oxf.xforms.event.XFormsEventTarget;
+import org.orbeon.oxf.xforms.event.XFormsEvents;
 
 
 /**
- * Internal xxforms-value-change-with-focus-change event.
+ * Internal xxforms-value event dispatched by the client to indicate a control's value.
+ *
+ * Does not bubble and is not cancelable.
  */
-public class XXFormsValueChangeWithFocusChangeEvent extends XFormsEvent {
+public class XXFormsValue extends XFormsEvent {
 
     private String newValue;
-    private XFormsEventTarget otherTargetObject;
 
-    public XXFormsValueChangeWithFocusChangeEvent(XFormsContainingDocument containingDocument, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, String newValue) {
-        super(containingDocument, XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE, targetObject, false, false);
-        this.otherTargetObject = otherTargetObject;
+    public XXFormsValue(XFormsContainingDocument containingDocument, XFormsEventTarget targetObject, String newValue) {
+        super(containingDocument, XFormsEvents.XXFORMS_VALUE, targetObject, false, false);
         this.newValue = newValue;
-    }
-
-    public XFormsEventTarget getOtherTargetObject() {
-        return otherTargetObject;
     }
 
     public String getNewValue() {

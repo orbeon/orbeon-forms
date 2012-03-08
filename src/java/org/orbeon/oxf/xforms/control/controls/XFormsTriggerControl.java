@@ -56,8 +56,7 @@ public class XFormsTriggerControl extends XFormsSingleNodeControl {
 
     private static final Set<String> ALLOWED_EXTERNAL_EVENTS = new HashSet<String>();
     static {
-        ALLOWED_EXTERNAL_EVENTS.add(XFormsEvents.DOM_FOCUS_IN);
-        ALLOWED_EXTERNAL_EVENTS.add(XFormsEvents.DOM_FOCUS_OUT);
+        ALLOWED_EXTERNAL_EVENTS.add(XFormsEvents.XFORMS_FOCUS);
         ALLOWED_EXTERNAL_EVENTS.add(XFormsEvents.XFORMS_HELP);
         ALLOWED_EXTERNAL_EVENTS.add(XFormsEvents.DOM_ACTIVATE);
         ALLOWED_EXTERNAL_EVENTS.add(XFormsEvents.XXFORMS_VALUE_OR_ACTIVATE);// for noscript mode
@@ -72,5 +71,10 @@ public class XFormsTriggerControl extends XFormsSingleNodeControl {
     public boolean supportAjaxUpdates() {
         // Don't output anything for triggers in static readonly mode
         return ! isStaticReadonly();
+    }
+
+    @Override
+    public boolean isFocusable() {
+        return true;
     }
 }

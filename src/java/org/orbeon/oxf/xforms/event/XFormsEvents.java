@@ -52,7 +52,7 @@ public class XFormsEvents {
     public static final String XXFORMS_VALID = "xxforms-valid";
     public static final String XXFORMS_INVALID = "xxforms-invalid";
 
-    public static final String XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE = "xxforms-value-change-with-focus-change";
+    public static final String XXFORMS_VALUE = "xxforms-value";
     public static final String XXFORMS_VALUE_OR_ACTIVATE = "xxforms-value-or-activate";
 
     public static final String XXFORMS_VALUE_CHANGED = "xxforms-value-changed";

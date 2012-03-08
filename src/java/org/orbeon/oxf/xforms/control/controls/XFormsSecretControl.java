@@ -42,4 +42,9 @@ public class XFormsSecretControl extends XFormsValueControl {
     public QName[] getExtensionAttributes() {
         return EXTENSION_ATTRIBUTES;
     }
+
+    @Override
+    public boolean isFocusable() {
+        return true;
+    }
 }

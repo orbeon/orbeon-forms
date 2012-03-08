@@ -995,13 +995,13 @@
          -->
         <input name="action">
             <xxforms:action>
-                <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="plate·3">777</xxforms:event>
-                <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="leased·3">leased</xxforms:event>
+                <xxforms:event name="xxforms-value" source-control-id="plate·3">777</xxforms:event>
+                <xxforms:event name="xxforms-value" source-control-id="leased·3">leased</xxforms:event>
             </xxforms:action>
         </input>
         <input name="controls">
             <controls>
-                <xforms:repeat nodeset="(exf:sort(vehicle, 'string(plate-number)', 'text', 'descending'))" id="repeat">
+                <xforms:repeat nodeset="exf:sort(vehicle, 'string(plate-number)', 'text', 'descending')" id="repeat">
                     <xforms:input ref="plate-number" id="plate"/>
                     <xforms:select ref="leased" appearance="full" id="leased">
                         <xforms:item>
@@ -1091,12 +1091,12 @@
          -->
         <input name="action">
             <xxforms:action>
-                <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="input1">888</xxforms:event>
-                <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="input2">Good value 2</xxforms:event>
-                <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="input3">Good value 3</xxforms:event>
-                <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="input1">42</xxforms:event>
-                <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="input2">Bad value 2</xxforms:event>
-                <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="input3">Bad value 3</xxforms:event>
+                <xxforms:event name="xxforms-value" source-control-id="input1">888</xxforms:event>
+                <xxforms:event name="xxforms-value" source-control-id="input2">Good value 2</xxforms:event>
+                <xxforms:event name="xxforms-value" source-control-id="input3">Good value 3</xxforms:event>
+                <xxforms:event name="xxforms-value" source-control-id="input1">42</xxforms:event>
+                <xxforms:event name="xxforms-value" source-control-id="input2">Bad value 2</xxforms:event>
+                <xxforms:event name="xxforms-value" source-control-id="input3">Bad value 3</xxforms:event>
             </xxforms:action>
         </input>
         <input name="controls">
@@ -1851,9 +1851,9 @@
                                     <event type="xforms-enabled" target="input1" indexes=""/>
                                     <event type="xforms-enabled" target="input2" indexes=""/>
                                     <event type="xxforms-dialog-open" target="my-dialog" indexes=""/>
-                                    <event type="xxforms-dialog-close" target="my-dialog" indexes=""/>
                                     <event type="xforms-disabled" target="input1" indexes=""/>
                                     <event type="xforms-disabled" target="input2" indexes=""/>
+                                    <event type="xxforms-dialog-close" target="my-dialog" indexes=""/>
                                 </events>
                             </instance>
                         </instances>

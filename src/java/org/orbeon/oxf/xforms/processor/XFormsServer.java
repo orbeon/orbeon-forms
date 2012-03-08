@@ -46,6 +46,7 @@ import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
 import org.xml.sax.SAXException;
+import scala.Tuple3;
 
 import java.io.IOException;
 import java.util.*;
@@ -175,8 +176,9 @@ public class XFormsServer extends ProcessorImpl {
                     // most cases should get files here only in noscript mode, but there is a chance in script mode in
                     // a 2-pass submission that some files could make it here as well.
 
-                    final boolean[] allEvents = new boolean[1];
-                    final Set<String> valueChangeControlIds = new HashSet<String>();
+                    final Tuple3[] eventsFindings = new Tuple3[1];
+
+                    final XFormsControl beforeFocusedControl = containingDocument.getControls().getFocusedControl();
                     if (hasEvents || hasFiles) {
                         // Scope the containing document for the XForms API
                         XFormsAPI.withContainingDocumentJava(containingDocument, new Runnable() {
@@ -195,8 +197,8 @@ public class XFormsServer extends ProcessorImpl {
                                     }
         
                                     // Dispatch the events
-                                    allEvents[0] = hasEvents && ClientEvents.processEvents(pipelineContext, containingDocument,
-                                            clientEvents, serverEventsElements, valueChangeControlIds);
+                                    if (hasEvents)
+                                        eventsFindings[0] = ClientEvents.processEvents(containingDocument, clientEvents, serverEventsElements);
         
                                     // End external events
                                     containingDocument.afterExternalEvents();
@@ -204,8 +206,19 @@ public class XFormsServer extends ProcessorImpl {
                                 eventsIndentedLogger.endHandleOperation();
                             }
                         });
+                    }
+
+                    final boolean allEvents;
+                    final Set<String> valueChangeControlIds;
+                    final String lastFocusControlId;
+                    if (eventsFindings[0] != null) {
+                        allEvents = ((Boolean) eventsFindings[0]._1());
+                        valueChangeControlIds = ((Set<String>) eventsFindings[0]._2());
+                        lastFocusControlId = ((String) eventsFindings[0]._3());
                     } else {
-                        allEvents[0] = false;
+                        allEvents = false;
+                        valueChangeControlIds = Collections.emptySet();
+                        lastFocusControlId = null;
                     }
 
                     // Check if there is a submission with replace="all" that needs processing
@@ -258,7 +271,8 @@ public class XFormsServer extends ProcessorImpl {
 
                                 // Prepare and/or output response
                                 outputAjaxResponse(containingDocument, indentedLogger, valueChangeControlIds,
-                                        requestDocument, responseReceiver, allEvents[0], false);
+                                        lastFocusControlId, beforeFocusedControl,
+                                        requestDocument, responseReceiver, allEvents, false);
 
                                 // Store response in to document
                                 containingDocument.rememberLastAjaxResponse(responseStore);
@@ -394,13 +408,15 @@ public class XFormsServer extends ProcessorImpl {
      * @param containingDocument                containing document
      * @param indentedLogger                    logger
      * @param valueChangeControlIds             control ids for which the client sent a value change
+     * @param lastFocusControlId                id of the last control that received focus from client
+     * @param beforeFocusedControl              control which had the focus before the updates, if any
      * @param requestDocument                   incoming request document (for all events mode)
      * @param xmlReceiver                       handler for the Ajax result
      * @param allEvents                         whether to handle all events
      * @param testOutputAllActions              for testing purposes
      */
     public static void outputAjaxResponse(XFormsContainingDocument containingDocument, IndentedLogger indentedLogger,
-                                          Set<String> valueChangeControlIds,
+                                          Set<String> valueChangeControlIds, String lastFocusControlId, XFormsControl beforeFocusedControl,
                                           Document requestDocument, XMLReceiver xmlReceiver, boolean allEvents,
                                           boolean testOutputAllActions) {
 
@@ -580,9 +596,15 @@ public class XFormsServer extends ProcessorImpl {
 
                 // Output focus instruction
                 {
-                    final String focusControlEffectiveId = containingDocument.getClientFocusControlEffectiveId();
-                    if (focusControlEffectiveId != null) {
-                        outputFocusInfo(ch, containingDocument, focusControlEffectiveId);
+                    final XFormsControl afterFocusedControl = containingDocument.getControls().getFocusedControl();
+                    if (beforeFocusedControl != null && afterFocusedControl == null) {
+                        // Focus removed
+                        outputFocusInfo(ch, containingDocument, false, beforeFocusedControl.getEffectiveId());
+                    } else if (afterFocusedControl != null && ! afterFocusedControl.getEffectiveId().equals(lastFocusControlId)) {
+                        // Focus set or changed
+                        // We don't send a focus update to the client if last xforms-focus sent by the client matches
+                        // the new focus.
+                        outputFocusInfo(ch, containingDocument, true, afterFocusedControl.getEffectiveId());
                     }
                 }
 
@@ -708,8 +730,8 @@ public class XFormsServer extends ProcessorImpl {
         }
     }
 
-    private static void outputFocusInfo(ContentHandlerHelper ch, XFormsContainingDocument containingDocument, String focusControlEffectiveId) {
-        ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "setfocus",
+    private static void outputFocusInfo(ContentHandlerHelper ch, XFormsContainingDocument containingDocument, boolean focus, String focusControlEffectiveId) {
+        ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, focus ? "focus" : "blur",
                 new String[]{"control-id", XFormsUtils.namespaceId(containingDocument, focusControlEffectiveId)});
     }
 

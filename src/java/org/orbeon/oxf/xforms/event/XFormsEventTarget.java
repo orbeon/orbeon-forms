@@ -34,6 +34,8 @@ public interface XFormsEventTarget {
 
     XBLContainer getXBLContainer(XFormsContainingDocument containingDocument);
 
+    // NOTE: Implementing methods now only use the XBLContainer to get to XFormsContainingDocument
+    // TODO: Change this interface to use XFormsContainingDocument
     XFormsEventObserver getParentEventObserver(XBLContainer container);
 
     void performTargetAction(XBLContainer container, XFormsEvent event);

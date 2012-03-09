@@ -797,7 +797,7 @@ public class XFormsUtils {
     }
 
     /**
-     * Return the underlying Node from the given NodeInfo, possibly converting it to a Dom4j Node. Changes to the returned Node may or may not 
+     * Return the underlying Node from the given NodeInfo, possibly converting it to a Dom4j Node. Changes to the returned Node may or may not
      * reflect on the original, depending on its type.
      *
      * @param nodeInfo      NodeInfo to process
@@ -806,7 +806,9 @@ public class XFormsUtils {
     public static Node getNodeFromNodeInfoConvert(NodeInfo nodeInfo) {
         if (nodeInfo instanceof NodeWrapper)
             return (Node) ((NodeWrapper) nodeInfo).getUnderlyingNode();
-        else
+        else if (nodeInfo.getNodeKind() == org.w3c.dom.Document.ATTRIBUTE_NODE) {
+            return Dom4jUtils.createAttribute(new QName(nodeInfo.getLocalPart(), new Namespace(nodeInfo.getPrefix(), nodeInfo.getURI())), nodeInfo.getStringValue());
+        } else
             return TransformerUtils.tinyTreeToDom4j2((nodeInfo.getParent() instanceof DocumentInfo) ? nodeInfo.getParent() : nodeInfo);
     }
 
@@ -868,7 +870,7 @@ public class XFormsUtils {
 
         return true;
     }
-    
+
     private static String[] voidElementsNames = {
         // HTML 5: http://www.w3.org/TR/html5/syntax.html#void-elements
         "area", "base", "br", "col", "command", "embed", "hr", "img", "input", "keygen", "link", "meta", "param", "source", "track", "wbr",
@@ -876,7 +878,7 @@ public class XFormsUtils {
         "basefont", "frame", "isindex"
     };
     private static final Set<String> voidElements = new HashSet<String>(Arrays.asList(voidElementsNames));
-    
+
     public static boolean isVoidElement(String elementName) {
         return voidElements.contains(elementName);
     }

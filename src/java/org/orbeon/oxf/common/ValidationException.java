@@ -145,6 +145,8 @@ public class ValidationException extends OXFException {
 
     public String getMessage() {
         if (locationDataList.size() > 0)
+            // TODO: Shouldn't getMessage() return a string containing all the messages in locationDataList?
+            // TODO: Then, in IndentedLogger, we could skip showing the message and the throwable.getMessage(); the latter would suffice
             return locationDataList.get(0) + ": " + simpleMessage + "\n" + super.getMessage();
         else
             return simpleMessage + ": " + super.getMessage();

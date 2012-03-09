@@ -154,7 +154,7 @@ public class IndentedLogger {
     }
 
     public void logDebug(String type, String message, Throwable throwable) {
-        log(Level.DEBUG, indentation.indentation, type, message, "throwable", OXFException.throwableToString(throwable));
+        log(Level.DEBUG, indentation.indentation, type, message, "message", throwable.getMessage(), "throwable", OXFException.throwableToString(OXFException.getRootThrowable(throwable)));
     }
 
     public void logWarning(String type, String message, String... parameters) {
@@ -170,11 +170,11 @@ public class IndentedLogger {
     }
 
     public void logInfo(String type, String message, Throwable throwable) {
-        log(Level.INFO, indentation.indentation, type, message, "throwable", OXFException.throwableToString(throwable));
+        log(Level.INFO, indentation.indentation, type, message, "message", throwable.getMessage(), "throwable", OXFException.throwableToString(OXFException.getRootThrowable(throwable)));
     }
 
     public void logWarning(String type, String message, Throwable throwable) {
-        log(Level.WARN, indentation.indentation, type, message, "throwable", OXFException.throwableToString(throwable));
+        log(Level.WARN, indentation.indentation, type, message, "message", throwable.getMessage(), "throwable", OXFException.throwableToString(OXFException.getRootThrowable(throwable)));
     }
 
     public void logError(String type, String message, String... parameters) {
@@ -182,7 +182,7 @@ public class IndentedLogger {
     }
 
     public void logError(String type, String message, Throwable throwable) {
-        log(Level.ERROR, indentation.indentation, type, message, "throwable", OXFException.throwableToString(throwable));
+        log(Level.ERROR, indentation.indentation, type, message, "message", throwable.getMessage(), "throwable", OXFException.throwableToString(OXFException.getRootThrowable(throwable)));
     }
 
     private void log(Level level, int indentLevel, String type, String message, String... parameters) {

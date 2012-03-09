@@ -18,6 +18,7 @@ import org.orbeon.saxon.value.StringValue
 import xml.Elem
 import org.orbeon.saxon.om._
 import org.orbeon.oxf.util.XPathCache
+import org.orbeon.oxf.xforms.action.XFormsAPI._
 import collection.JavaConverters._
 import org.orbeon.oxf.xforms.{XFormsStaticStateImpl, XFormsInstance}
 import java.util.Collections
@@ -49,9 +50,9 @@ object XML {
     // Element and attribute creation
     def element(name: QName): Element = Dom4jUtils.createElement(name)
     def elementInfo(qName: QName, content: Seq[Item] = Seq()): NodeInfo = {
-        val newElement = element(qName)
-        content foreach (XXFormsElement.addItem(newElement, _))
-        wrapper.wrap(newElement)
+        val newElement = wrapper.wrap(element(qName))
+        insert(into = Seq(newElement), origin = content)
+        newElement
     }
 
     def attribute(name: QName, value: String = ""): Attribute = Dom4jUtils.createAttribute(name, value)

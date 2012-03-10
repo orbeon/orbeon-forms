@@ -18,7 +18,7 @@ import analysis.ElementAnalysis
 import analysis.model.Instance
 import event.EventHandler
 import org.dom4j.{Element, QName}
-import java.util.{List ⇒ JList, Map ⇒ JMap}
+import java.util.{List ⇒ JList}
 import org.orbeon.oxf.xml.SAXStore
 import xbl.{Scope, XBLBindings, ConcreteBinding}
 import org.apache.commons.lang.StringUtils
@@ -54,7 +54,7 @@ trait PartGlobalOps {
     def scopeForPrefixedId(prefixedId: String): Scope
 
     // Repeats
-    def addMissingRepeatIndexes(repeatIdToIndex: JMap[String, java.lang.Integer])
+    def repeats: Traversable[RepeatControl]
     def getRepeatHierarchyString: String
 
     // AVTs

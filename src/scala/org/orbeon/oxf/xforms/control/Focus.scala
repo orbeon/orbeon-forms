@@ -236,7 +236,7 @@ object Focus {
     private def containersAndSelf(control: XFormsControl) =
         control :: containers(control).init reverse
 
-    // For the given control, return the same control or another one but at the sam
+    // For the given control, return the same control or another one but at the same level of repeats
     private def controlWithCurrentRepeatIndexes(control: XFormsControl): Option[XFormsControl] = {
 
         // TODO: Some code here is duplicated from Controls.findEffectiveControlId

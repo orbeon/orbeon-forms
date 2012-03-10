@@ -21,11 +21,11 @@ import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis;
 import org.orbeon.oxf.xforms.analysis.controls.AppearanceTrait;
+import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.processor.handlers.HandlerContext;
 import org.orbeon.oxf.xforms.processor.handlers.NullContentHandler;
 import org.orbeon.oxf.xforms.processor.handlers.NullHandler;
 import org.orbeon.oxf.xforms.state.XFormsStateManager;
-import org.orbeon.oxf.xforms.xbl.Scope;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.ElementHandlerController;
@@ -154,7 +154,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
             // Store information about the initial index of each repeat
             {
                 final StringBuilder repeatIndexesBuilder = new StringBuilder();
-                final Map<String, Integer> repeatIdToIndex = xformsControls.getCurrentControlTree().getMinimalRepeatIdToIndex(containingDocument.getStaticOps());
+                final Map<String, Integer> repeatIdToIndex = XFormsRepeatControl.getMinimalRepeatIdToIndex(containingDocument, xformsControls.getCurrentControlTree());
                 if (repeatIdToIndex.size() != 0) {
                     for (final Map.Entry<String, Integer> currentEntry: repeatIdToIndex.entrySet()) {
                         final String repeatId = currentEntry.getKey();

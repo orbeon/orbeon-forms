@@ -122,13 +122,7 @@ trait PartControlsAnalysis extends TransientState {
         controlAppearances.get(controlName) map (_(appearance)) getOrElse false
 
     // Repeats
-    def addMissingRepeatIndexes(repeatPrefixedIdToIndex: JMap[String, java.lang.Integer]) {
-        (controlTypes.get("repeat") map (_.keySet) flatten) foreach { prefixedId ⇒
-
-            if (! repeatPrefixedIdToIndex.containsKey(prefixedId))
-                repeatPrefixedIdToIndex.put(prefixedId, 0)
-        }
-    }
+    def repeats = controlTypes.get("repeat") map (_.values map (_.asInstanceOf[RepeatControl])) getOrElse Seq.empty
 
     def getRepeatHierarchyString =
         controlTypes.get("repeat") map { repeats ⇒

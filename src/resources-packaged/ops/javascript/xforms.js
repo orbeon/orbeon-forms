@@ -1212,7 +1212,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
              *
              * @param repeatId      Can be either a pure repeat ID, such as "foobar" or an ID that contains information of its
              *                      position relative to its parents, such as "foobar.1". The former happens when we handle an
-             *                      event such as <xxf:repeat-index id="foobar" old-index="4" new-index="6"/>. In this case
+             *                      event such as <xxf:repeat-index id="foobar" new-index="6"/>. In this case
              *                      "foobar" means the "foobar at 'index' in the current foobar list". The latter happens when we handle
              *                      an event such as <xxf:repeat-iteration id="foobar.1" relevant="false" iteration="10"/>, which
              *                      does not necessarily apply to the current "foobar".

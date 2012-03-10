@@ -17,7 +17,7 @@ import analysis.controls.RepeatControl
 import org.dom4j.QName
 import collection.mutable.LinkedHashSet
 import collection.JavaConverters._
-import java.util.{List ⇒ JList, Map ⇒ JMap}
+import java.util.{List ⇒ JList}
 
 // Global operations on parts including top-level part and descendant parts
 class StaticStateGlobalOps(topLevelPart: PartAnalysis) extends PartGlobalOps {
@@ -48,6 +48,9 @@ class StaticStateGlobalOps(topLevelPart: PartAnalysis) extends PartGlobalOps {
     private def collectInParts[T](get: PartAnalysis ⇒ Traversable[T]) =
         parts flatMap (part ⇒ get(part))
 
+    private def collectInPartsReverse[T](get: PartAnalysis ⇒ Traversable[T]) =
+        parts.reverse flatMap (part ⇒ get(part))
+
     def getInstances(modelPrefixedId: String) = collectInPartsJ(_.getInstances(modelPrefixedId)).asJava
 
     def containingScope(prefixedId: String) = findInParts(_.containingScope(prefixedId)).orNull
@@ -68,9 +71,7 @@ class StaticStateGlobalOps(topLevelPart: PartAnalysis) extends PartGlobalOps {
     def getBindingId(prefixedId: String) = findInParts(_.getBindingId(prefixedId)) orNull
     def getBindingQNames = collectInParts(_.getBindingQNames)
 
-    def addMissingRepeatIndexes(repeatPrefixedIdToIndex: JMap[String, java.lang.Integer]) =
-        parts foreach (_.addMissingRepeatIndexes(repeatPrefixedIdToIndex))
-
+    def repeats = collectInPartsReverse(_.repeats)
     def getRepeatHierarchyString = parts map (_.getRepeatHierarchyString) mkString "," // just concat the repeat strings from all parts
 
     def hasAttributeControl(prefixedForAttribute: String) = existsInParts(_.hasAttributeControl(prefixedForAttribute))

@@ -31,6 +31,7 @@ import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.action.XFormsAPI;
 import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl;
 import org.orbeon.oxf.xforms.event.ClientEvents;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
@@ -533,18 +534,17 @@ public class XFormsServer extends ProcessorImpl {
                 // Output repeat indexes information
                 {
                     // Output index updates
-                    final StaticStateGlobalOps staticGlobalOps = containingDocument.getStaticOps();
                     if (allEvents) {
                         // All events
                         // Reload / back case: diff between current state and initial state as obtained from initial dynamic state
                         final ControlTree currentControlTree = xformsControls.getCurrentControlTree();
                         final ControlTree initialControlTree = initialContainingDocument.getControls().getCurrentControlTree();
-                        diffIndexState(ch, containingDocument, initialControlTree.getInitialMinimalRepeatIdToIndex(staticGlobalOps),
-                                currentControlTree.getMinimalRepeatIdToIndex(staticGlobalOps));
+                        diffIndexState(ch, containingDocument, XFormsRepeatControl.getInitialMinimalRepeatIdToIndex(containingDocument, initialControlTree),
+                                XFormsRepeatControl.getMinimalRepeatIdToIndex(containingDocument, currentControlTree));
                     } else if (!testOutputAllActions && containingDocument.isDirtySinceLastRequest()) {
                         // Only output changes if needed
-                        diffIndexState(ch, containingDocument, xformsControls.getInitialControlTree().getInitialMinimalRepeatIdToIndex(staticGlobalOps),
-                                xformsControls.getCurrentControlTree().getMinimalRepeatIdToIndex(staticGlobalOps));
+                        diffIndexState(ch, containingDocument, xformsControls.getInitialControlTree().getIndexes(),
+                                XFormsRepeatControl.getMinimalRepeatIdToIndex(containingDocument, xformsControls.getCurrentControlTree()));
                     }
                 }
 
@@ -657,7 +657,7 @@ public class XFormsServer extends ProcessorImpl {
                     }
 
                     ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "repeat-index",
-                            new String[] {"id", XFormsUtils.namespaceId(containingDocument, repeatId), "old-index", (oldIndex != null) ? oldIndex.toString() : "0", "new-index", newIndex.toString()});
+                            new String[] {"id", XFormsUtils.namespaceId(containingDocument, repeatId), "new-index", newIndex.toString()});
                 }
             }
             if (found)

@@ -376,7 +376,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
 
             // Once the control tree is rebuilt, restore focus if needed
             if (dynamicState.decodeFocusedControlJava() != null)
-                xformsControls.setFocusedControl(xformsControls.getInitialControlTree().getControl(dynamicState.decodeFocusedControlJava()));
+                xformsControls.setFocusedControl(xformsControls.getCurrentControlTree().getControl(dynamicState.decodeFocusedControlJava()));
         }
 
         // Indicate that instance restoration process is over

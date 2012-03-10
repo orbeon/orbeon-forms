@@ -366,8 +366,12 @@ object Controls {
     }
 
     // Visit all the controls
-    def visitAllControls(containingDocument: XFormsContainingDocument, listener: XFormsControlVisitorListener) =
-        visitSiblings(listener, containingDocument.getControls.getCurrentControlTree.getChildren.asScala)
+    def visitAllControls(containingDocument: XFormsContainingDocument, listener: XFormsControlVisitorListener): Unit =
+        visitAllControls(containingDocument.getControls.getCurrentControlTree, listener)
+
+    // Visit all the controls
+    def visitAllControls(tree: ControlTree, listener: XFormsControlVisitorListener): Unit =
+        visitSiblings(listener, tree.getChildren.asScala)
 
     // Visit all the descendant controls of the given container control
     def visitControls(containerControl: XFormsContainerControl, includeCurrent: Boolean, listener: XFormsControlVisitorListener) {

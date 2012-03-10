@@ -267,9 +267,6 @@
                             <zeroOrMore>
                                 <element name="xxforms:repeat-index">
                                     <attribute name="id"/>
-                                    <attribute name="old-index">
-                                        <data type="nonNegativeInteger"/>
-                                    </attribute>
                                     <attribute name="new-index">
                                         <data type="nonNegativeInteger"/>
                                     </attribute>

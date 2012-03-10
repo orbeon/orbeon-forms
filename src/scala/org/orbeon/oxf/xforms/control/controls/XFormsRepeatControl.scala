@@ -32,12 +32,13 @@ import org.orbeon.oxf.xforms.event.events.XXFormsSetindexEvent
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.saxon.om.Item
 import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.oxf.xforms.XFormsConstants._
 
 import control.controls.XFormsRepeatControl._
 import java.util.{ArrayList, List ⇒ JList, Map ⇒ JMap, Collections}
 import collection.JavaConverters._
 import org.orbeon.oxf.xforms.BindingContext
-import collection.mutable.ArrayBuffer
+import collection.mutable.{ArrayBuffer, LinkedHashMap}
 
 // Represents an xforms:repeat container control.
 class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, element: Element, effectiveId: String, state: JMap[String, String])
@@ -166,7 +167,7 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
             val destinationControl =
             if (dndEnd.length > 1) {
                 // DnD destination is a different repeat control
-                val containingRepeatEffectiveId = getPrefixedId + XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1 + (dndEnd mkString XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_2_STRING)
+                val containingRepeatEffectiveId = getPrefixedId + REPEAT_HIERARCHY_SEPARATOR_1 + (dndEnd mkString REPEAT_HIERARCHY_SEPARATOR_2_STRING)
                 containingDocument.getObjectByEffectiveId(containingRepeatEffectiveId).asInstanceOf[XFormsRepeatControl]
             } else
                 // DnD destination is the current repeat control
@@ -229,7 +230,7 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
     }
 
     def isDnD = {
-        val dndAttribute = getControlElement.attributeValue(XFormsConstants.XXFORMS_DND_QNAME)
+        val dndAttribute = getControlElement.attributeValue(XXFORMS_DND_QNAME)
         dndAttribute != null && dndAttribute != "none"
     }
 
@@ -620,5 +621,36 @@ object XFormsRepeatControl {
         var movedIterationsOldPositions: JList[java.lang.Integer] = null
         var movedIterationsNewPositions: JList[java.lang.Integer] = null
         var oldRepeatIndex: Int = 0
+    }
+
+    def getInitialMinimalRepeatIdToIndex(doc: XFormsContainingDocument, tree: ControlTree) =
+        getIndexes(doc, tree, _.getInitialLocal.asInstanceOf[XFormsRepeatControlLocal].index)
+
+    def getMinimalRepeatIdToIndex(doc: XFormsContainingDocument, tree: ControlTree) =
+        getIndexes(doc, tree, _.getIndex)
+
+    private def getIndexes(doc: XFormsContainingDocument, tree: ControlTree, index: XFormsRepeatControl ⇒ Int) = {
+
+        // Map prefixed ids to indexes
+        // Here we assume that the static repeats come ordered from root to leaf
+        val indexes = new LinkedHashMap[String, java.lang.Integer]
+
+        doc.getStaticOps.repeats foreach { repeat ⇒
+            val suffix = RepeatControl.getAllAncestorRepeatsAcrossParts(repeat).reverse map
+                (ancestor ⇒ indexes(ancestor.prefixedId)) mkString
+                    REPEAT_HIERARCHY_SEPARATOR_2_STRING
+
+            val effectiveId = repeat.prefixedId + (if (suffix.length > 0) REPEAT_HIERARCHY_SEPARATOR_1 + suffix else "")
+
+            indexes += repeat.prefixedId → {
+                tree.getControl(effectiveId) match {
+                    case control: XFormsRepeatControl ⇒
+                        index(control)
+                    case _ ⇒ 0
+                }
+            }
+        }
+
+        indexes.asJava
     }
 }

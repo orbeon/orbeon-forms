@@ -501,7 +501,7 @@
         <input name="config" href="wrap-server.xpl"/>
         <input name="action">
             <xxforms:action>
-                <xxforms:event name="xforms-focus" source-control-id="id125·3-2"/>
+                <xxforms:event name="xforms-help" source-control-id="id125·3-2"/>
             </xxforms:action>
         </input>
         <input name="controls">
@@ -578,8 +578,8 @@
                 <xxf:action>
                     <xxf:control-values/>
                     <xxf:repeat-indexes>
-                        <xxf:repeat-index id="id123" old-index="0" new-index="3"/>
-                        <xxf:repeat-index id="id124" old-index="0" new-index="2"/>
+                        <xxf:repeat-index id="id123" new-index="3"/>
+                        <xxf:repeat-index id="id124" new-index="2"/>
                     </xxf:repeat-indexes>
                     <xxf:help control-id="id125·3-2"/>
                 </xxf:action>
@@ -1107,8 +1107,7 @@
                         <xxf:control id="description-textarea·2-2" label="Condition:" relevant="true"/>
                     </xxf:control-values>
                     <xxf:repeat-indexes>
-                        <xxf:repeat-index id="authorization-repeat" old-index="0" new-index="2"/>
-                        <xxf:repeat-index id="condition-repeat" old-index="0" new-index="1"/>
+                        <xxf:repeat-index id="authorization-repeat" new-index="2"/>
                     </xxf:repeat-indexes>
                 </xxf:action>
             </xxf:event-response>
@@ -2983,7 +2982,7 @@
                         <xxf:copy-repeat-template id="company-repeat" parent-indexes="" start-suffix="1" end-suffix="1"/>
                     </xxf:control-values>
                     <xxf:repeat-indexes>
-                        <xxf:repeat-index id="company-repeat" old-index="0" new-index="1"/>
+                        <xxf:repeat-index id="company-repeat" new-index="1"/>
                     </xxf:repeat-indexes>
                 </xxf:action>
             </xxf:event-response>

@@ -45,6 +45,7 @@ public class ControlTree implements ExternalCopyable {
 
     // Index of controls
     private ControlIndex controlIndex;
+    private Map<String, Integer> indexes = Collections.emptyMap();
 
     private boolean isBindingsDirty;    // whether the bindings must be reevaluated
 
@@ -317,9 +318,14 @@ public class ControlTree implements ExternalCopyable {
             throw new OXFException(e);
         }
 
-        // Clone children if any
-        if (root != null)
+        if (root != null) {
+            // Gather repeat indexes if any
+            // Do this before cloning controls so that initial/current locals are still different
+            cloned.indexes = XFormsRepeatControl.getInitialMinimalRepeatIdToIndex(((XFormsControl) root).containingDocument(), this);
+
+            // Clone children if any
             cloned.root = (XFormsContainerControl) root.getBackCopy();
+        }
 
         // NOTE: The cloned tree does not make use of this so we clear it
         cloned.controlIndex = null;
@@ -327,6 +333,11 @@ public class ControlTree implements ExternalCopyable {
         cloned.isBindingsDirty = false;
 
         return cloned;
+    }
+
+    // Only for initial tree after getBackCopy has been called
+    public Map<String, Integer> getIndexes() {
+        return indexes;
     }
 
     /**
@@ -429,42 +440,6 @@ public class ControlTree implements ExternalCopyable {
 
     public Map<String, XFormsControl> getEffectiveIdsToControls() {
         return controlIndex.getEffectiveIdsToControls();
-    }
-
-    public Map<String, Integer> getInitialMinimalRepeatIdToIndex(StaticStateGlobalOps globalOps) {
-
-        // TODO: for now, get the Map all the time, but should be optimized
-
-        final Map<String, Integer> repeatIdToIndex = new LinkedHashMap<String, Integer>();
-
-        for (final XFormsControl control : getRepeatControls().values()) {
-            if (control.isRelevant()) {
-                final XFormsRepeatControl repeatControl = (XFormsRepeatControl) control;
-                repeatIdToIndex.put(repeatControl.getPrefixedId(), ((XFormsRepeatControl.XFormsRepeatControlLocal) repeatControl.getInitialLocal()).index());
-            }
-        }
-
-        globalOps.addMissingRepeatIndexes(repeatIdToIndex);
-
-        return repeatIdToIndex;
-    }
-
-    public Map<String, Integer> getMinimalRepeatIdToIndex(StaticStateGlobalOps globalOps) {
-
-        // TODO: for now, get the Map all the time, but should be optimized
-
-        final Map<String, Integer> repeatIdToIndex = new LinkedHashMap<String, Integer>();
-
-        for (final XFormsControl control : getRepeatControls().values()) {
-            if (control.isRelevant()) {
-                final XFormsRepeatControl repeatControl = (XFormsRepeatControl) control;
-                repeatIdToIndex.put(repeatControl.getPrefixedId(), repeatControl.getIndex());
-            }
-        }
-
-        globalOps.addMissingRepeatIndexes(repeatIdToIndex);
-
-        return repeatIdToIndex;
     }
 
     public XFormsControl getControl(String effectiveId) {

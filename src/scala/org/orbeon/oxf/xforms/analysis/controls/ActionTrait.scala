@@ -20,5 +20,9 @@ import org.orbeon.oxf.xforms.XFormsConstants._
 trait ActionTrait extends SimpleElementAnalysis {
     val ifCondition = Option(element.attributeValue("if")) orElse Option(element.attributeValue(EXFORMS_IF_ATTRIBUTE_QNAME))
     val whileCondition = Option(element.attributeValue("while")) orElse Option(element.attributeValue(EXFORMS_WHILE_ATTRIBUTE_QNAME))
-    val iterate = Option(element.attributeValue(XXFORMS_ITERATE_ATTRIBUTE_QNAME)) orElse Option(element.attributeValue(EXFORMS_ITERATE_ATTRIBUTE_QNAME))
+    val iterate = Option(element.attributeValue("iterate")) orElse Option(element.attributeValue(XXFORMS_ITERATE_ATTRIBUTE_QNAME)) orElse Option(element.attributeValue(EXFORMS_ITERATE_ATTRIBUTE_QNAME))
+
+    def ifConditionJava = ifCondition.orNull
+    def whileConditionJava = whileCondition.orNull
+    def iterateJava = iterate.orNull
 }

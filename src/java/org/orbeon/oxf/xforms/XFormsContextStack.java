@@ -226,14 +226,6 @@ public class XFormsContextStack {
         return this.head;
     }
 
-    public void restoreBinding(BindingContext bindingContext) {
-        final BindingContext currentBindingContext = this.head;
-        if (currentBindingContext != bindingContext.parent())
-            throw new ValidationException("Inconsistent binding context parent.", currentBindingContext.locationData());
-
-        this.head = bindingContext;
-    }
-
     /**
      * Push an element containing either single-node or nodeset binding attributes.
      *

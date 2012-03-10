@@ -50,9 +50,7 @@ class XFormsActionAction extends XFormsAction {
                     case Some(action) ⇒
                         // Run child action
                         // NOTE: We execute children actions, even if they happen to have ev:observer or ev:target attributes
-                        contextStack.pushBinding(childActionElement, actionInterpreter.getSourceEffectiveId(actionElement), action.scope, false)
                         actionInterpreter.runAction(action)
-                        contextStack.popBinding()
                     case None ⇒
                         throw new IllegalStateException
                 }

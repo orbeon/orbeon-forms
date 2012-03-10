@@ -634,6 +634,7 @@
     XForms Actions
     -->
     <xsd:attributeGroup name="XML.Events">
+        <xsd:attribute name="iterate" type="xsd:string" use="optional"/>
         <xsd:attribute name="if" type="xsd:string" use="optional"/>
         <xsd:attribute name="while" type="xsd:string" use="optional"/>
         <xsd:attribute name="model" type="xsd:NMTOKEN" use="optional"/>

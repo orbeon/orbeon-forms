@@ -21,6 +21,7 @@ import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis;
+import org.orbeon.oxf.xforms.analysis.controls.ActionTrait;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
@@ -105,67 +106,28 @@ public class XFormsActionInterpreter {
     public void runAction(ElementAnalysis actionAnalysis) {
 
         final Element actionElement = actionAnalysis.element();
-        
-        // Check that we understand the action element
-        final QName actionQName = actionElement.getQName();
-        if (!XFormsActions.isAction(actionQName)) {
-            throw new ValidationException("Invalid action: " + actionQName.getQualifiedName(),
-                    new ExtendedLocationData((LocationData) actionElement.getData(), "running XForms action", actionElement,
-                            "action name", actionQName.getQualifiedName()));
-        }
+        final ActionTrait actionTrait = (ActionTrait) actionAnalysis;
 
         try {
 
-            // Extract conditional action (@if / @exf:if)
-            final String ifConditionAttribute;
-            {
-                final String ifAttribute = actionElement.attributeValue("if");
-                if (ifAttribute != null)
-                    ifConditionAttribute = ifAttribute;
-                else
-                    ifConditionAttribute = actionElement.attributeValue(XFormsConstants.EXFORMS_IF_ATTRIBUTE_QNAME);
-            }
+            // Condition (@if / @exf:if) and iteration (@while / @exf:while / @xxforms:iterate / @exf:iterate) properties
+            final String ifConditionAttribute = actionTrait.ifConditionJava();
+            final String whileIterationAttribute = actionTrait.whileConditionJava();
+            final String iterateIterationAttribute = actionTrait.iterateJava();
 
-            // Extract iterated action (@while / @exf:while)
-            final String whileIterationAttribute;
-            {
-                final String whileAttribute = actionElement.attributeValue("while");
-                if (whileAttribute != null)
-                    whileIterationAttribute = whileAttribute;
-                else
-                    whileIterationAttribute = actionElement.attributeValue(XFormsConstants.EXFORMS_WHILE_ATTRIBUTE_QNAME);
-            }
-
-            // Extract iterated action (@xxforms:iterate / @exf:iterate)
-            final String iterateIterationAttribute;
-            {
-                final String xxformsIterateAttribute = actionElement.attributeValue(XFormsConstants.XXFORMS_ITERATE_ATTRIBUTE_QNAME);
-                if (xxformsIterateAttribute != null)
-                    iterateIterationAttribute = xxformsIterateAttribute;
-                else
-                    iterateIterationAttribute = actionElement.attributeValue(XFormsConstants.EXFORMS_ITERATE_ATTRIBUTE_QNAME);
-            }
+            // Push @iterate (if present) within the @model and @context context
+            final NamespaceMapping namespaceMapping = actionAnalysis.namespaceMapping();
+            // TODO: function context
+            _actionXPathContext.pushBinding(iterateIterationAttribute, actionAnalysis.contextJava(), null, actionAnalysis.modelJava(),
+                    null, actionElement, namespaceMapping, getSourceEffectiveId(actionElement), actionAnalysis.scope(), false);
 
             // NOTE: At this point, the context has already been set to the current action element
             if (iterateIterationAttribute != null) {
                 // Gotta iterate
 
-                // We have to restore the context to the in-scope evaluation context, then push @model/@context/@iterate
                 // NOTE: It's not 100% how @context and @xxforms:iterate should interact here. Right now @xxforms:iterate overrides @context,
                 // i.e. @context is evaluated first, and @xxforms:iterate sets a new context for each iteration
-                final BindingContext actionBindingContext = _actionXPathContext.popBinding();
-                final NamespaceMapping namespaceMapping = _container.getNamespaceMappings(actionElement);
                 {
-                    final String contextAttribute = actionElement.attributeValue(XFormsConstants.CONTEXT_QNAME);
-                    final String modelAttribute = actionElement.attributeValue(XFormsConstants.MODEL_QNAME);
-                    // TODO: function context
-                    _actionXPathContext.pushBinding(null, contextAttribute, iterateIterationAttribute, modelAttribute, null, actionElement, namespaceMapping, getSourceEffectiveId(actionElement), actionAnalysis.scope(), false);
-                }
-                {
-                    final String refAttribute = actionElement.attributeValue(XFormsConstants.REF_QNAME);
-                    final String nodesetAttribute = actionElement.attributeValue(XFormsConstants.NODESET_QNAME);
-                    final String bindAttribute = actionElement.attributeValue(XFormsConstants.BIND_QNAME);
-
                     final List<Item> currentNodeset = _actionXPathContext.getCurrentNodeset();
                     final int iterationCount = currentNodeset.size();
                     for (int index = 1; index <= iterationCount; index++) {
@@ -173,32 +135,25 @@ public class XFormsActionInterpreter {
                         // Push iteration
                         _actionXPathContext.pushIteration(index);
 
-                        // Then we also need to push back binding attributes, excluding @context and @model
-                        // TODO: function context
-                        _actionXPathContext.pushBinding(refAttribute, null, nodesetAttribute, null, bindAttribute, actionElement, namespaceMapping, getSourceEffectiveId(actionElement), actionAnalysis.scope(), false);
-
                         final Item overriddenContextNodeInfo = currentNodeset.get(index - 1);
-                        runSingleIteration(actionAnalysis, actionQName,
+                        runSingleIteration(actionAnalysis, actionElement.getQName(),
                                 ifConditionAttribute, whileIterationAttribute, true, overriddenContextNodeInfo);
 
                         // Restore context
                         _actionXPathContext.popBinding();
-                        _actionXPathContext.popBinding();
                     }
-
                 }
-                // Restore context stack
-                _actionXPathContext.popBinding();
-                _actionXPathContext.restoreBinding(actionBindingContext);
             } else {
                 // Do a single iteration run (but this may repeat over the @while condition!)
-
-                runSingleIteration(actionAnalysis, actionQName,
+                runSingleIteration(actionAnalysis, actionElement.getQName(),
                         ifConditionAttribute, whileIterationAttribute, _actionXPathContext.hasOverriddenContext(), _actionXPathContext.getContextItem());
             }
+
+            // Restore
+            _actionXPathContext.popBinding();
         } catch (Exception e) {
             throw ValidationException.wrapException(e, new ExtendedLocationData((LocationData) actionElement.getData(), "running XForms action", actionElement,
-                    "action name", actionQName.getQualifiedName()));
+                    "action name", actionElement.getQName().getQualifiedName()));
         }
     }
 
@@ -223,36 +178,40 @@ public class XFormsActionInterpreter {
 
             // We are executing the action
             if (_indentedLogger.isDebugEnabled()) {
-                if (whileIterationAttribute == null)
-                    _indentedLogger.startHandleOperation("interpreter", "executing", "action name", actionQName.getQualifiedName());
-                else
-                    _indentedLogger.startHandleOperation("interpreter", "executing", "action name", actionQName.getQualifiedName(), "while iteration", Integer.toString(whileIteration));
+                _indentedLogger.startHandleOperation("interpreter", "executing",
+                    "action name", actionQName.getQualifiedName(),
+                    "while iteration", (whileIterationAttribute != null) ? Integer.toString(whileIteration) : null
+                );
             }
 
             // Get action and execute it
             final DynamicActionContext dynamicActionContext =
                     new DynamicActionContext(this, actionAnalysis, hasOverriddenContext ? Option.apply(contextItem) : Option.apply((Item) null));
-            
+
+            // Push binding excluding excluding @context and @model
+            // NOTE: If we repeat, re-evaluate the action binding.
+            // For example:
+            //
+            //   <xforms:delete nodeset="/*/foo[1]" while="/*/foo"/>
+            //
+            // In this case, in the second iteration, xforms:repeat must find an up-to-date nodeset!
+            // TODO: function context
+            _actionXPathContext.pushBinding(actionAnalysis.refJava(), null, null, null, actionAnalysis.bindJava(), actionAnalysis.element(),
+                    actionAnalysis.namespaceMapping(), getSourceEffectiveId(actionAnalysis.element()), actionAnalysis.scope(), false);
+
             XFormsActions.getAction(actionQName).execute(dynamicActionContext);
 
+            _actionXPathContext.popBinding();
+
             if (_indentedLogger.isDebugEnabled()) {
-                if (whileIterationAttribute == null)
-                    _indentedLogger.endHandleOperation("action name", actionQName.getQualifiedName());
-                else
-                    _indentedLogger.endHandleOperation("action name", actionQName.getQualifiedName(), "while iteration", Integer.toString(whileIteration));
+                _indentedLogger.endHandleOperation(
+                    "action name", actionQName.getQualifiedName(),
+                    "while iteration", (whileIterationAttribute != null) ? Integer.toString(whileIteration) : null);
             }
 
             // Stop if there is no iteration
             if (whileIterationAttribute == null)
                 break;
-
-            // If we repeat, we must re-evaluate the action binding.
-            // For example:
-            //   <xforms:delete nodeset="/*/foo[1]" while="/*/foo"/>
-            // In that case, in the second iteration, xforms:repeat must find an up-to-date nodeset
-            // NOTE: There is still the possibility that parent bindings will be out of date. What should be done there?
-            _actionXPathContext.popBinding();
-            _actionXPathContext.pushBinding(actionAnalysis.element(), getSourceEffectiveId(actionAnalysis.element()), actionAnalysis.scope(), false);
 
             whileIteration++;
         }

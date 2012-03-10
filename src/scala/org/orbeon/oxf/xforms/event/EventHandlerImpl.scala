@@ -189,9 +189,6 @@ class EventHandlerImpl(
 
         // Run the action within the context
         try {
-            // Push binding for outermost action
-            xpathContext.pushBinding(element, handlerEffectiveId, scope, false)
-
             val actionInterpreter = new XFormsActionInterpreter(container, xpathContext, element, handlerEffectiveId, event, eventObserver)
             XFormsAPI.withScalaAction(actionInterpreter) {
                 actionInterpreter.runAction(self)

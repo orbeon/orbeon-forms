@@ -20,9 +20,227 @@
     xmlns:xi="http://www.w3.org/2001/XInclude"
     xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
     xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xbl="http://www.w3.org/ns/xbl"
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+    
+    <test description="Interaction of context and xxf:iterate" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html>
+
+                <xh:head>
+                    <xf:model>
+                        <xf:instance id="instance">
+                            <instance>
+                                <nested/>
+                                <one-line/>
+                                <no-insert/>
+                            </instance>
+                        </xf:instance>
+
+                        <xf:action ev:event="xforms-model-construct-done">
+
+                            <!-- Straight forward insert -->
+                            <xf:action xxf:iterate="for $i in (1 to 3) return .">
+                                <xf:insert context="nested" origin="xxf:element('item')"/>
+                            </xf:action>
+
+                            <!-- Does the same thing as the previous, in one line (the iterate doesn't change the context of the insert since it return ".") -->
+                            <xf:insert context="one-line"
+                                    xxf:iterate="for $i in (1 to 3) return ."
+                                    origin="xxf:element('item')"/>
+
+                            <!-- This should not do any insert as the iterate changes the context to a simple type -->
+                            <xf:insert context="no-insert"
+                                    xxf:iterate="for $i in (1 to 3) return 42"
+                                    origin="xxf:element('item')"/>
+
+                        </xf:action>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="xf-1">
+                                <instance>
+                                    <nested>
+                                        <item/>
+                                        <item/>
+                                        <item/>
+                                    </nested>
+                                    <one-line>
+                                        <item/>
+                                        <item/>
+                                        <item/>
+                                    </one-line>
+                                    <no-insert/>
+                                </instance>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+    
+    <test description="xxf:iterate attribute on action and context() function" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <p:param name="response" type="output"/>
+
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="wrap-xforms-state.xpl"/>
+                    <p:input name="document">
+                        <xh:html>
+                            <xh:head>
+                                <xf:model id="main-model">
+                                    <xf:instance id="main-instance">
+                                        <instance xmlns=""/>
+                                    </xf:instance>
+
+                                    <xf:instance id="template-instance" xxf:readonly="true">
+                                        <book xmlns="">
+                                            <title/>
+                                            <author/>
+                                        </book>
+                                    </xf:instance>
+
+                                    <xf:instance id="source-instance" xxf:readonly="true">
+                                        <instance xmlns="">
+                                            <title>Don Quixote de la Mancha</title>
+                                            <author>Miguel de Cervantes Saavedra</author>
+                                            <title>Jacques le fataliste et son maître</title>
+                                            <author>Denis Diderot</author>
+                                            <title>Childhood's End</title>
+                                            <author>Arthur C. Clarke</author>
+                                        </instance>
+                                    </xf:instance>
+
+                                    <!-- Show how you can easily reformat data from one instance to the other -->
+                                    <xf:action ev:event="xforms-ready" xxf:iterate="instance('source-instance')/title">
+                                        <xf:insert context="instance('main-instance')" nodeset="book" origin="instance('template-instance')"/>
+                                        <!-- Make things a bit trickier by changing the context -->
+                                        <xf:action context="context()/following-sibling::author">
+                                            <xf:setvalue ref="instance('main-instance')/book[last()]/title" value="context()/preceding-sibling::title[1]"/>
+                                            <xf:setvalue ref="instance('main-instance')/book[last()]/author" value="context()"/>
+                                        </xf:action>
+                                    </xf:action>
+                                </xf:model>
+                            </xh:head>
+                            <xh:body>
+
+                            </xh:body>
+                        </xh:html>
+                    </p:input>
+                    <p:output name="response" ref="response"/>
+                </p:processor>
+
+            </p:config>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="main-instance" model-id="main-model">
+                                <instance>
+                                    <book>
+                                        <title>Don Quixote de la Mancha</title>
+                                        <author>Miguel de Cervantes Saavedra</author>
+                                    </book>
+                                    <book>
+                                        <title>Jacques le fataliste et son maître</title>
+                                        <author>Denis Diderot</author>
+                                    </book>
+                                    <book>
+                                        <title>Childhood's End</title>
+                                        <author>Arthur C. Clarke</author>
+                                    </book>
+                                </instance>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="xxf:iterate and context() function on strings" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <p:param name="response" type="output"/>
+
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="wrap-xforms-state.xpl"/>
+                    <p:input name="document">
+                        <xh:html>
+                            <xh:head>
+                                <xf:model id="main-model">
+
+                                <xf:instance id="url" xxf:readonly="true">
+                                    <url>http://example.com/?orbeon=foo&amp;forms=bar&amp;version=3.6</url>
+                                </xf:instance>
+
+                                <xf:instance id="name">
+                                    <name/>
+                                </xf:instance>
+
+                                <xf:instance id="element-template" xxf:readonly="true">
+                                    <element name=""/>
+                                </xf:instance>
+
+                                <xf:action ev:event="xforms-ready" xxf:iterate="tokenize(substring-after(instance('url'), '?'), '&amp;')">
+                                    <xf:insert context="instance('name')" origin="instance('element-template')" nodeset="element"/>
+                                    <xf:setvalue ref="instance('name')/element[last()]/@name" value="substring-before(context(), '=')"/>
+                                    <xf:setvalue ref="instance('name')/element[last()]" value="substring-after(context(), '=')"/>
+                                </xf:action>
+                                </xf:model>
+                            </xh:head>
+                            <xh:body>
+
+                            </xh:body>
+                        </xh:html>
+                    </p:input>
+                    <p:output name="response" ref="response"/>
+                </p:processor>
+
+            </p:config>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="name" model-id="main-model">
+                                <name>
+                                    <element name="orbeon">foo</element>
+                                    <element name="forms">bar</element>
+                                    <element name="version">3.6</element>
+                                </name>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
 
     <test description="Simple XPath script" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
@@ -109,6 +327,83 @@
                                     <value>foo</value>
                                     <value>bar</value>
                                     <value/>
+                                </values>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+    
+    <test description="Combine iterate, while and if" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="instance1">
+                            <values>
+                                <value/>
+                                <value/>
+                            </values>
+                        </xf:instance>
+
+                        <xf:instance id="instance2">
+                            <values>
+                                <value/>
+                                <bar/>
+                                <value/>
+                            </values>
+                        </xf:instance>
+
+                        <xf:instance id="instance3">
+                            <values>
+                                <value/>
+                                <foo/>
+                                <value/>
+                            </values>
+                        </xf:instance>
+
+                        <xf:setvalue
+                            ev:event="xforms-model-construct-done"
+                            iterate="for $i in ('instance1', 'instance2', 'instance3') return instance($i)"
+                            if="not(exists(bar))"
+                            while="value = ''"
+                            ref="value[. = '']"
+                            value="count(preceding::value) + 1"/>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response>
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance1" model-id="model">
+                                <values>
+                                    <value>1</value>
+                                    <value>2</value>
+                                </values>
+                            </instance>
+                            <instance id="instance2" model-id="model">
+                                <values>
+                                    <value/>
+                                    <bar/>
+                                    <value/>
+                                </values>
+                            </instance>
+                            <instance id="instance3" model-id="model">
+                                <values>
+                                    <value>1</value>
+                                    <foo/>
+                                    <value>2</value>
                                 </values>
                             </instance>
                         </instances>

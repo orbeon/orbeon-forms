@@ -439,36 +439,22 @@ object ClientEvents {
                 dispatchEventCheckTarget(new XXFormsRepeatFocusEvent(document, target))
 
             // Interpret event
-            target match {
-                // Special xforms:output case
-                case outputControl: XFormsOutputControl ⇒
-                    event match {
-                        case event: XFormsFocusEvent⇒
-                            // First, dispatch xforms-focus
-                            dispatchEventCheckTarget(event)
-                            // Then, dispatch DOMActivate unless the control is read-only
-                            if (! outputControl.isReadonly)
-                                dispatchEventCheckTarget(new DOMActivateEvent(document, outputControl))
-                        case event if ! outputControl.isIgnoredExternalEvent(eventName) ⇒
-                            // Dispatch any other event
-                            dispatchEventCheckTarget(event)
-                        case _ ⇒
-                    }
-                // All other targets
-                case _ ⇒
 
-                    // NOTES:
+            // NOTES:
 
-                    // 1. We used to dispatch xforms-focus here, but now we don't anymore: we assume that the client
-                    // provides xforms-focus before value changes as needed. Also, value changes can occur without focus
-                    // changes, in particular when the JavaScript API is used.
+            // 1. We used to dispatch xforms-focus here, but now we don't anymore: we assume that the client
+            // provides xforms-focus before value changes as needed. Also, value changes can occur without focus
+            // changes, in particular when the JavaScript API is used.
 
-                    // 2. We also used to handle value controls here, but it makes more sense to do it via events.
+            // 2. We also used to handle value controls here, but it makes more sense to do it via events.
 
-                    // 3. Recalculate, revalidate and refresh are handled with the automatic deferred updates.
+            // 3. Recalculate, revalidate and refresh are handled with the automatic deferred updates.
 
-                    dispatchEventCheckTarget(event)
-            }
+            // 4. We used to do special handling for xforms:output: upon click on xforms:output, the client would
+            //    send xforms-focus. We would translate that into DOMActivate. As of 2012-03-09 there doesn't seem to
+            //    be a need for this so we are removing this behavior.
+
+            dispatchEventCheckTarget(event)
 
             // Each event is within its own start/end outermost action handler
             document.endOutermostActionHandler()

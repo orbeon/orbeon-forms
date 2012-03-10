@@ -329,22 +329,13 @@ public class XFormsOutputControl extends XFormsValueControl {
         return cloned;
     }
 
-    private static final Set<String> IGNORED_EXTERNAL_EVENTS = new HashSet<String>();
     private static final Set<String> ALLOWED_EXTERNAL_EVENTS = new HashSet<String>();
     static {
-        IGNORED_EXTERNAL_EVENTS.add(XFormsEvents.XFORMS_FOCUS);
-
-        ALLOWED_EXTERNAL_EVENTS.addAll(IGNORED_EXTERNAL_EVENTS);
         ALLOWED_EXTERNAL_EVENTS.add(XFormsEvents.XFORMS_HELP);
     }
 
     @Override
     public Set<String> getAllowedExternalEvents() {
         return ALLOWED_EXTERNAL_EVENTS;
-    }
-
-    public boolean isIgnoredExternalEvent(String eventName) {
-        // Mmh, this looks like some legacy stuff?
-        return IGNORED_EXTERNAL_EVENTS.contains(eventName);
     }
 }

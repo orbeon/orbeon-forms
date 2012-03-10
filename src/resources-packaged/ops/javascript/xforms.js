@@ -361,6 +361,11 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                 catch (e) { /* NOP */ }
             },
 
+            blur: function(element) {
+                try { element.blur(); }
+                catch (e) { /* NOP */ }
+            },
+
             clearUploadControl: function(uploadElement) {
                 var inputElement = YAHOO.util.Dom.getElementsByClassName("xforms-upload-select", null, uploadElement)[0];
                 var parentElement = inputElement.parentNode;
@@ -2532,6 +2537,46 @@ ORBEON.xforms.Controls = {
             var currentValue = ORBEON.xforms.Controls.getCurrentValue(control);
             ORBEON.xforms.ServerValueStore.set(controlId, currentValue);
         }
+    },
+
+    removeFocus: function(controlId) {
+
+        // If not control has the focus, there is nothing to do
+        if (ORBEON.xforms.Globals.currentFocusControlId == null)
+            return;
+
+
+
+        var control = ORBEON.util.Dom.get(controlId);
+
+        if (YAHOO.util.Dom.hasClass(control, "xforms-select-appearance-full")
+                || YAHOO.util.Dom.hasClass(control, "xforms-select1-appearance-full")
+                || (YAHOO.util.Dom.hasClass(control, "xforms-input") && YAHOO.util.Dom.hasClass(control, "xforms-type-boolean"))) {
+            // Radio button or checkbox
+            var formInputs = ORBEON.util.Dom.getElementsByName(control, "input");
+            if (formInputs.length > 0) {
+                var itemIndex = 0;
+                // Blur all of them (can we know which one has focus if any?)
+                for (; itemIndex < formInputs.length; itemIndex++) {
+                    var formInput = formInputs[itemIndex];
+                    ORBEON.util.Dom.blur(formInput);
+                }
+            }
+        } else if (YAHOO.util.Dom.hasClass(control, "xforms-textarea")
+                && YAHOO.util.Dom.hasClass(control, "xforms-mediatype-text-html")) {
+            // Special case for RTE
+            ORBEON.xforms.Page.getControl(control).removeFocus();
+        } else {
+            // Generic code to find focusable descendant-or-self HTML element and focus on it
+            var htmlControlNames = [ "input", "textarea", "select", "button", "a" ];
+            var htmlControl = ORBEON.util.Dom.getElementByTagName(control, htmlControlNames);
+            // If we found a control set the focus on it
+            if (htmlControl != null) ORBEON.util.Dom.blur(htmlControl);
+        }
+
+        // Mark that no control has the focus
+        ORBEON.xforms.Globals.currentFocusControlId = null;
+        ORBEON.xforms.Globals.currentFocusControlElement = null;
     },
 
     /**

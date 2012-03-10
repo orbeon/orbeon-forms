@@ -1909,7 +1909,7 @@
                             case "blur": {
                                 var blurElement = actionElement.childNodes[actionIndex];
                                 var controlId = ORBEON.util.Dom.getAttribute(blurElement, "control-id");
-                                // TODO: not supported yet
+                                ORBEON.xforms.Controls.removeFocus(controlId);
                                 break;
                             }
 

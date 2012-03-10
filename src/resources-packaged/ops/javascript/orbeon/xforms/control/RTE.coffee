@@ -111,6 +111,8 @@ class RTE extends Control
     setFocus: () ->
         @yuiRTE.focus()
 
+    removeFocus: () -> # no blur on RTE?
+
     # XForms readonly == RTE disabled configuration attribute.
     setReadonly: (isReadonly) ->
         @yuiRTE.set("disabled", isReadonly)

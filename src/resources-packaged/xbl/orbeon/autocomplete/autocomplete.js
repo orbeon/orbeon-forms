@@ -75,8 +75,6 @@
 
             // Listen on user selecting a value
             this.yuiAutoComplete.itemSelectEvent.subscribe(this.itemSelected, this, true);
-            // Listen on user typing in search field
-            YAHOO.util.Event.addListener(this.searchField, "keyup", this.searchFieldKeyUp, this, true);
         },
 
         /**
@@ -87,27 +85,6 @@
             this.justMadeSelection = true;
             Document.setValue(this.searchControl.id, itemLabel);
             this.valueSelectedButton.click();
-        },
-
-        /**
-         * Called when users type in the search field.
-         * If they end up typing something which shows in the suggestion list, set the external value to
-         * to value of that item.
-         */
-        searchFieldKeyUp: function() {
-            var searchFieldValue = this.searchField.value;
-            var select1Element = this.container.getElementsByTagName("select")[0];
-            var options = select1Element.options;
-            var matchingOptionIndex = -1;
-            var itemsCount = options.length / 2;
-            for (var optionIndex = 0; optionIndex < itemsCount; optionIndex++) {
-                var option = options[optionIndex];
-                if (option.value == searchFieldValue) {
-                    // Give up if this is not the first match
-                    if (matchingOptionIndex != -1) return;
-                    matchingOptionIndex = optionIndex;
-                }
-            }
         },
 
         /**

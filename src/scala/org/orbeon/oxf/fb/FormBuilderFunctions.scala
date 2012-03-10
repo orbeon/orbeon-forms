@@ -20,7 +20,7 @@ import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.oxf.fr.FormRunner
 import org.orbeon.oxf.xforms.XFormsConstants.XFORMS_NAMESPACE_URI
 import org.orbeon.oxf.xml.XMLConstants.XHTML_NAMESPACE_URI
-import org.orbeon.oxf.util.Logger._
+import org.orbeon.oxf.util.DebugLogger._
 import org.orbeon.oxf.xforms.{XFormsProperties, Loggers}
 
 /**

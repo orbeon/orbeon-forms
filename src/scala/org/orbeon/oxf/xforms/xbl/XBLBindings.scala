@@ -33,7 +33,7 @@ import org.orbeon.oxf.xml.{SAXStore, TransformerUtils, XMLUtils}
 import org.orbeon.oxf.common.{OXFException, Version}
 import org.xml.sax.Attributes
 import collection.mutable.{Buffer, LinkedHashSet, ArrayBuffer, LinkedHashMap}
-import org.orbeon.oxf.util.Logger._
+import org.orbeon.oxf.util.DebugLogger._
 
 /**
  * All the information statically gathered about XBL bindings.

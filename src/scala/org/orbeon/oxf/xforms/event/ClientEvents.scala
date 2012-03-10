@@ -28,7 +28,7 @@ import org.orbeon.oxf.pipeline.api._
 import org.dom4j.{Document, Element}
 import org.orbeon.oxf.xforms.state.XFormsStateManager
 import org.orbeon.oxf.util.{IndentedLogger, Multipart}
-import org.orbeon.oxf.util.Logger._
+import org.orbeon.oxf.util.DebugLogger._
 import XFormsEvents._
 import collection.JavaConverters._
 

@@ -14,7 +14,7 @@
 package org.orbeon.oxf.util
 
 // More Scala-friendly indented logger API
-object Logger {
+object DebugLogger {
 
     // Simple debug with optional parameters
     def debug(message: ⇒ String, parameters: ⇒ Seq[String] = Seq())(implicit logger: IndentedLogger) =

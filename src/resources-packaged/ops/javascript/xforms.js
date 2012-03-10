@@ -3403,11 +3403,7 @@ ORBEON.xforms.Events = {
             return;
         }
 
-        if (target != null && YAHOO.util.Dom.hasClass(target, "xforms-output")) {
-            // Click on output
-            // Translate this into a focus event
-            ORBEON.xforms.Events.focus(event);
-        } else if (target != null && (YAHOO.util.Dom.hasClass(target, "xforms-trigger") || YAHOO.util.Dom.hasClass(target, "xforms-submit"))) {
+        if (target != null && (YAHOO.util.Dom.hasClass(target, "xforms-trigger") || YAHOO.util.Dom.hasClass(target, "xforms-submit"))) {
             // Click on trigger
             YAHOO.util.Event.preventDefault(event);
             if (YAHOO.util.Dom.hasClass(target, "xxforms-offline-save")) {

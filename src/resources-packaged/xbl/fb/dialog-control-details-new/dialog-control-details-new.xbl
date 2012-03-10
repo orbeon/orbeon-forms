@@ -106,7 +106,6 @@
                 <!-- Bindings specified on control -->
                 <xxforms:variable name="form"><xxforms:sequence select=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=form-ref"/></xxforms:variable>
                 <xxforms:variable name="resources"><xxforms:sequence select=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=resources-ref"/></xxforms:variable>
-                <xxforms:variable name="components"><xxforms:sequence select=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=components-ref"/></xxforms:variable>
 
                 <xxforms:variable name="local" select="instance('local')"/>
                 <xxforms:variable name="form-resources" select="$form/xhtml:head/xforms:model/xforms:instance[@id = 'fr-form-resources']/* treat as element()"/>
@@ -124,15 +123,8 @@
                     <xforms:setvalue ref="$local/classes" value="$control/@class"/>
 
                     <!-- Copy XBL control-details from xbl:binding in local instance -->
-                    <xxforms:variable name="binding" select="xxforms:element('binding')"/>
-                    <xforms:dispatch name="fb-xbl-binding-for-control" target="fb-dialog-control-details">
-                        <xxforms:context name="fb-components" select="$components"/>
-                        <xxforms:context name="fb-control" select="$control"/>
-                        <xxforms:context name="fb-bind" select="$bind"/>
-                        <xxforms:context name="fb-result" select="$binding"/>
-                    </xforms:dispatch>
                     <xforms:delete nodeset="$local/fb:control-details"/>
-                    <xforms:insert nodeset="$local/*" origin="$binding/xbl:binding/fb:metadata/fb:control-details"/>
+                    <xforms:insert nodeset="$local/*" origin="controlOps:bindingOrEmpty($control)/fb:metadata/fb:control-details"/>
 
                     <!-- Process the LHHA of each details control -->
                     <xxforms:variable name="current-language" select="$resources/@xml:lang/string() treat as xs:string"/>

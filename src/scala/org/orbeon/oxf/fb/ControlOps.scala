@@ -439,6 +439,9 @@ object ControlOps {
             }
         )).headOption
     }
+    // Version returning a list, for called from XForms
+    // TODO: Is there a better way, so we don't have to keep defining alternate functions? Maybe define a Option -> List function?
+    def bindingOrEmpty(controlElement: NodeInfo) = binding(controlElement).orNull
 
     // Finds if a control uses a particular type of editor (say "static-itemset")
     // TODO: make `editor` something other than a string

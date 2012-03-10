@@ -581,6 +581,7 @@
                         <xxf:repeat-index id="id123" old-index="0" new-index="3"/>
                         <xxf:repeat-index id="id124" old-index="0" new-index="2"/>
                     </xxf:repeat-indexes>
+                    <xxf:help control-id="id125·3-2"/>
                 </xxf:action>
             </xxf:event-response>
         </output>

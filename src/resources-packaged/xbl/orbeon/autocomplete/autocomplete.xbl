@@ -121,7 +121,6 @@
                                         <readonly>false</readonly>
                                         <textfield-value/>
                                         <resource/>
-                                        <has-focus>false</has-focus>
                                     </autocomplete>
                                 </xforms:instance>
                                 <xforms:bind ref="textfield-value" readonly="../readonly = 'true'"/>

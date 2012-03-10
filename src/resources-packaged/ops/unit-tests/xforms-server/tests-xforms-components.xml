@@ -77,7 +77,7 @@
                         <xxf:control id="my-inplace-input$xf-4" class="fr-component-group" label="Label me!"/>
                         <xxf:div id="my-inplace-input$fr-inplace-view" visibility="visible"/>
                         <xxf:div id="my-inplace-input$fr-inplace-edit" visibility="hidden"/>
-                        <xxf:control id="my-inplace-input$xf-8" class="fr-inplace-hint">[Hint hint!]</xxf:control>
+                        <xxf:control id="my-inplace-input$xf-8" class="fr-inplace-hint xforms-activable">[Hint hint!]</xxf:control>
                         <xxf:control id="my-inplace-input$fr-inplace-input-edit-group" class="fr-inplace-content fr-inplace-edit"/>
                         <xxf:control id="my-inplace-input$xf-15" class="fr-inplace-rename" label="Apply"/>
                         <xxf:control id="my-inplace-input$xf-19" class="fr-inplace-cancel" label="Cancel"/>
@@ -135,7 +135,7 @@
                         <xxf:control id="my-inplace-input$xf-4" class="fr-component-group" label="Label me!" readonly="true"/>
                         <xxf:div id="my-inplace-input$fr-inplace-view" visibility="visible"/>
                         <xxf:div id="my-inplace-input$fr-inplace-edit" visibility="hidden"/>
-                        <xxf:control id="my-inplace-input$xf-8" readonly="true">42</xxf:control>
+                        <xxf:control id="my-inplace-input$xf-8" class="xforms-activable" readonly="true">42</xxf:control>
                         <xxf:control id="my-inplace-input$fr-inplace-input-edit-group" class="fr-inplace-content fr-inplace-edit" relevant="false"/>
                         <xxf:control id="my-inplace-input$fr-inplace-input" relevant="false"/>
                         <xxf:control id="my-inplace-input$xf-15" class="fr-inplace-rename" relevant="false"/>

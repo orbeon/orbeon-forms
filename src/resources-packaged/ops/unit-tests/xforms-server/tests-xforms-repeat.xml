@@ -501,14 +501,14 @@
         <input name="config" href="wrap-server.xpl"/>
         <input name="action">
             <xxforms:action>
-                <xxforms:event name="xforms-help" source-control-id="id125·3-2"/>
+                <xxforms:event name="DOMActivate" source-control-id="id125·3-2"/>
             </xxforms:action>
         </input>
         <input name="controls">
             <controls>
                 <xforms:repeat nodeset="/form/company/department" id="id123">
                     <xforms:repeat nodeset="employee" id="id124">
-                        <xforms:output ref="@first" id="id125"/>
+                        <xforms:output ref="@first" id="id125" class="xforms-activable"/>
                         <xforms:output ref="@last" id="id126"/>
                     </xforms:repeat>
                 </xforms:repeat>
@@ -581,7 +581,6 @@
                         <xxf:repeat-index id="id123" new-index="3"/>
                         <xxf:repeat-index id="id124" new-index="2"/>
                     </xxf:repeat-indexes>
-                    <xxf:help control-id="id125·3-2"/>
                 </xxf:action>
             </xxf:event-response>
         </output>

@@ -88,12 +88,12 @@
                             <!-- View mode -->
                             <xhtml:span class="fr-inplace-content fr-inplace-view">
                                 <!-- NOTE: Output is in outer scope so it can evaluate hint in outer scope -->
-                                <xforms:output ref="." xbl:attr="navindex navindex=tabindex" xxbl:scope="outer">
+                                <xforms:output ref="." xbl:attr="navindex navindex=tabindex" xxbl:scope="outer" class="xforms-activable">
                                     <xsl:if test="xforms:hint">
                                         <!-- Add class so we can distinguish between hint case and value case -->
                                         <xsl:attribute name="class">{for $value in . return
                                                                         if (normalize-space($value) = '' and not(exf:readonly($value)))
-                                                                          then 'fr-inplace-hint' else ''}</xsl:attribute>
+                                                                          then 'fr-inplace-hint xforms-activable' else 'xforms-activable'}</xsl:attribute>
                                     </xsl:if>
                                     <!-- Handle inline hint-->
                                     <xsl:choose>

@@ -332,6 +332,7 @@ public class XFormsOutputControl extends XFormsValueControl {
     private static final Set<String> ALLOWED_EXTERNAL_EVENTS = new HashSet<String>();
     static {
         ALLOWED_EXTERNAL_EVENTS.add(XFormsEvents.XFORMS_HELP);
+        ALLOWED_EXTERNAL_EVENTS.add(XFormsEvents.DOM_ACTIVATE);
     }
 
     @Override

@@ -1026,19 +1026,9 @@
                                     <xf:instance id="instance">
                                         <value/>
                                     </xf:instance>
-                                    <!-- TEST: Events to gather -->
-                                    <xf:instance id="events-instance">
-                                        <events/>
-                                    </xf:instance>
                                 </xf:model>
                             </xbl:implementation>
                             <xbl:template>
-                                <!-- Record focus events -->
-                                <xf:insert ev:event="DOMFocusIn DOMFocusOut" context="instance('events-instance')" ref="*"
-                                    origin="xxf:element('event',
-                                            (xxf:attribute('type', xxf:event('xxf:type')),
-                                             xxf:attribute('target', xxf:event('xxf:effective-targetid'))))"/>
-
                                 <xf:input id="gaga-1" ref="."/>
                                 <xf:input id="gaga-2" ref="."/>
                             </xbl:template>
@@ -1096,9 +1086,6 @@
                             </instance>
                             <instance id="instance" model-id="my-gaga$model">
                                 <value/>
-                            </instance>
-                            <instance id="events-instance" model-id="my-gaga$model">
-                                <events/>
                             </instance>
                         </instances>
                     </dynamic-state>

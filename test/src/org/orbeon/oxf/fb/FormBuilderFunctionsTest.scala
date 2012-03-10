@@ -111,6 +111,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
         Mockito when model.getId thenReturn "fr-form-model"
         Mockito when model.getEffectiveId thenReturn "fr-form-model"
         Mockito when model.getVariable("metadata-instance") thenReturn EmptyIterator.getInstance
+        Mockito when model.getVariable("component-bindings") thenReturn EmptyIterator.getInstance
 
         // Not sure how to make it so that each call to getVariable returns a new, fresh iterator
         val selectedCellElement = elementInfo("selected-cell")

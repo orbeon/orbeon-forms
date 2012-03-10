@@ -154,7 +154,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
             // Store information about the initial index of each repeat
             {
                 final StringBuilder repeatIndexesBuilder = new StringBuilder();
-                final Map<String, Integer> repeatIdToIndex = XFormsRepeatControl.getMinimalRepeatIdToIndex(containingDocument, xformsControls.getCurrentControlTree());
+                final Map<String, Integer> repeatIdToIndex = XFormsRepeatControl.findCurrentIndexes(containingDocument, xformsControls.getCurrentControlTree());
                 if (repeatIdToIndex.size() != 0) {
                     for (final Map.Entry<String, Integer> currentEntry: repeatIdToIndex.entrySet()) {
                         final String repeatId = currentEntry.getKey();

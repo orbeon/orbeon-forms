@@ -623,29 +623,33 @@ object XFormsRepeatControl {
         var oldRepeatIndex: Int = 0
     }
 
-    def getInitialMinimalRepeatIdToIndex(doc: XFormsContainingDocument, tree: ControlTree) =
-        getIndexes(doc, tree, _.getInitialLocal.asInstanceOf[XFormsRepeatControlLocal].index)
+    // Find the initial repeat indexes for the given tree
+    def findInitialIndexes(doc: XFormsContainingDocument, tree: ControlTree) =
+        findIndexes(doc, tree, _.getInitialLocal.asInstanceOf[XFormsRepeatControlLocal].index)
 
-    def getMinimalRepeatIdToIndex(doc: XFormsContainingDocument, tree: ControlTree) =
-        getIndexes(doc, tree, _.getIndex)
+    // Find the current repeat indexes for the given tree
+    def findCurrentIndexes(doc: XFormsContainingDocument, tree: ControlTree) =
+        findIndexes(doc, tree, _.getIndex)
 
-    private def getIndexes(doc: XFormsContainingDocument, tree: ControlTree, index: XFormsRepeatControl ⇒ Int) = {
+    private def findIndexes(doc: XFormsContainingDocument, tree: ControlTree, index: XFormsRepeatControl ⇒ Int) = {
 
         // Map prefixed ids to indexes
-        // Here we assume that the static repeats come ordered from root to leaf
         val indexes = new LinkedHashMap[String, java.lang.Integer]
 
+        // For each static repeats ordered from root to leaf, find the current index if any
         doc.getStaticOps.repeats foreach { repeat ⇒
+
+            // Build the suffix by gathering all the ancestor repeat's indexes
             val suffix = RepeatControl.getAllAncestorRepeatsAcrossParts(repeat).reverse map
                 (ancestor ⇒ indexes(ancestor.prefixedId)) mkString
                     REPEAT_HIERARCHY_SEPARATOR_2_STRING
 
             val effectiveId = repeat.prefixedId + (if (suffix.length > 0) REPEAT_HIERARCHY_SEPARATOR_1 + suffix else "")
 
+            // Add the index to the map (0 if the control is not found)
             indexes += repeat.prefixedId → {
                 tree.getControl(effectiveId) match {
-                    case control: XFormsRepeatControl ⇒
-                        index(control)
+                    case control: XFormsRepeatControl ⇒ index(control)
                     case _ ⇒ 0
                 }
             }

@@ -539,12 +539,12 @@ public class XFormsServer extends ProcessorImpl {
                         // Reload / back case: diff between current state and initial state as obtained from initial dynamic state
                         final ControlTree currentControlTree = xformsControls.getCurrentControlTree();
                         final ControlTree initialControlTree = initialContainingDocument.getControls().getCurrentControlTree();
-                        diffIndexState(ch, containingDocument, XFormsRepeatControl.getInitialMinimalRepeatIdToIndex(containingDocument, initialControlTree),
-                                XFormsRepeatControl.getMinimalRepeatIdToIndex(containingDocument, currentControlTree));
+                        diffIndexState(ch, containingDocument, XFormsRepeatControl.findInitialIndexes(containingDocument, initialControlTree),
+                                XFormsRepeatControl.findCurrentIndexes(containingDocument, currentControlTree));
                     } else if (!testOutputAllActions && containingDocument.isDirtySinceLastRequest()) {
                         // Only output changes if needed
                         diffIndexState(ch, containingDocument, xformsControls.getInitialControlTree().getIndexes(),
-                                XFormsRepeatControl.getMinimalRepeatIdToIndex(containingDocument, xformsControls.getCurrentControlTree()));
+                                XFormsRepeatControl.findCurrentIndexes(containingDocument, xformsControls.getCurrentControlTree()));
                     }
                 }
 

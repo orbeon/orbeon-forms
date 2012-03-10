@@ -210,15 +210,15 @@ public class XFormsServer extends ProcessorImpl {
 
                     final boolean allEvents;
                     final Set<String> valueChangeControlIds;
-                    final String lastFocusControlId;
+                    final String clientFocusControlId;
                     if (eventsFindings[0] != null) {
                         allEvents = ((Boolean) eventsFindings[0]._1());
                         valueChangeControlIds = ((Set<String>) eventsFindings[0]._2());
-                        lastFocusControlId = ((String) eventsFindings[0]._3());
+                        clientFocusControlId = ((String) eventsFindings[0]._3());
                     } else {
                         allEvents = false;
                         valueChangeControlIds = Collections.emptySet();
-                        lastFocusControlId = null;
+                        clientFocusControlId = null;
                     }
 
                     // Check if there is a submission with replace="all" that needs processing
@@ -271,7 +271,7 @@ public class XFormsServer extends ProcessorImpl {
 
                                 // Prepare and/or output response
                                 outputAjaxResponse(containingDocument, indentedLogger, valueChangeControlIds,
-                                        lastFocusControlId, beforeFocusedControl,
+                                        clientFocusControlId, beforeFocusedControl,
                                         requestDocument, responseReceiver, allEvents, false);
 
                                 // Store response in to document
@@ -408,7 +408,7 @@ public class XFormsServer extends ProcessorImpl {
      * @param containingDocument                containing document
      * @param indentedLogger                    logger
      * @param valueChangeControlIds             control ids for which the client sent a value change
-     * @param lastFocusControlId                id of the last control that received focus from client
+     * @param clientFocusControlId              id of the last control that received focus from client
      * @param beforeFocusedControl              control which had the focus before the updates, if any
      * @param requestDocument                   incoming request document (for all events mode)
      * @param xmlReceiver                       handler for the Ajax result
@@ -416,7 +416,7 @@ public class XFormsServer extends ProcessorImpl {
      * @param testOutputAllActions              for testing purposes
      */
     public static void outputAjaxResponse(XFormsContainingDocument containingDocument, IndentedLogger indentedLogger,
-                                          Set<String> valueChangeControlIds, String lastFocusControlId, XFormsControl beforeFocusedControl,
+                                          Set<String> valueChangeControlIds, String clientFocusControlId, XFormsControl beforeFocusedControl,
                                           Document requestDocument, XMLReceiver xmlReceiver, boolean allEvents,
                                           boolean testOutputAllActions) {
 
@@ -600,10 +600,17 @@ public class XFormsServer extends ProcessorImpl {
                     if (beforeFocusedControl != null && afterFocusedControl == null) {
                         // Focus removed
                         outputFocusInfo(ch, containingDocument, false, beforeFocusedControl.getEffectiveId());
-                    } else if (afterFocusedControl != null && ! afterFocusedControl.getEffectiveId().equals(lastFocusControlId)) {
-                        // Focus set or changed
-                        // We don't send a focus update to the client if last xforms-focus sent by the client matches
-                        // the new focus.
+                    } else if (clientFocusControlId == null && afterFocusedControl == beforeFocusedControl) {
+                        // Client didn't send new focus information AND focus hasn't changed on server
+                        // NOP
+                    } else if (afterFocusedControl != null
+                            && afterFocusedControl != beforeFocusedControl
+                            && ! afterFocusedControl.getEffectiveId().equals(clientFocusControlId)) {
+
+                        // There is a focused control, it is not the same as the initially focused control, and the new
+                        // id to send doesn't match the last xforms-focus sent by the client.
+                        // Q: Should we initially retrieve the actual control associated with clientFocusControlId for
+                        // comparison?
                         outputFocusInfo(ch, containingDocument, true, afterFocusedControl.getEffectiveId());
                     }
                 }

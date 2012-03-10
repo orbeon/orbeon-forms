@@ -115,9 +115,17 @@ object ClientEvents {
                 processEvent(document, event)
 
             // Gather some metadata about the events received to help with the response to the client
-            (allClientAndServerEvents exists (_.name == XXFORMS_ALL_EVENTS_REQUIRED),
-             (allClientAndServerEvents collect { case e if e.name == XXFORMS_VALUE ⇒ e.targetEffectiveId } toSet).asJava,
-             allClientAndServerEvents.reverse find (_.name == XFORMS_FOCUS) map (_.targetEffectiveId) orNull)
+
+            // Whether we got a request for all events
+            val gotAllEvents = allClientAndServerEvents exists (_.name == XXFORMS_ALL_EVENTS_REQUIRED)
+
+            // Set of all control ids for which we got value events
+            val valueChangeControlIds = (allClientAndServerEvents collect { case e if e.name == XXFORMS_VALUE ⇒ e.targetEffectiveId } toSet).asJava
+
+            // Last client focus event received
+            val clientFocusControlId = allClientAndServerEvents.reverse find (_.name == XFORMS_FOCUS) map (_.targetEffectiveId) orNull
+
+            (gotAllEvents, valueChangeControlIds, clientFocusControlId)
 
         } else
             (false, JCollections.emptySet[String], null)

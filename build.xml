@@ -35,8 +35,8 @@
     <!-- http://www.scala-lang.org/node/98 -->
     <taskdef resource="scala/tools/ant/antlib.xml">
         <classpath>
-            <pathelement location="${lib.dir}/scala-compiler-2.9.1.jar"/>
-            <pathelement location="${lib.dir}/scala-library-2.9.1.jar"/>
+            <pathelement location="${lib.dir}/scala-compiler-2.9.1-1.jar"/>
+            <pathelement location="${lib.dir}/scala-library-2.9.1-1.jar"/>
         </classpath>
     </taskdef>
 
@@ -141,7 +141,7 @@
         <include name="ehcache-dependency-slf4j-api-1.6.1.jar"/>
         <include name="ehcache-dependency-slf4j-log4j12-1.6.1.jar"/>
 
-        <include name="scala-library-2.9.1.jar"/>
+        <include name="scala-library-2.9.1-1.jar"/>
         <include name="sbinary-2.9.1-0.4.0.jar"/>
 
         <include name="rhino-1.7R2.jar"/>
@@ -623,7 +623,7 @@
                 <pathelement location="lib/rhino-1.7R2.jar"/>
                 <pathelement location="lib/commons-fileupload-1.2.2.jar"/>
                 <pathelement location="lib/log4j-1_2_15.jar"/>
-                <pathelement location="lib/scala-library-2.9.1.jar"/>
+                <pathelement location="lib/scala-library-2.9.1-1.jar"/>
             </classpath>
         </taskdef>
 

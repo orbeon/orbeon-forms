@@ -159,7 +159,7 @@ class XBLBindings(indentedLogger: IndentedLogger, partAnalysis: PartAnalysisImpl
             withDebug("adding XBL bindings") {
 
                 // Get new paths
-                val newPaths = metadata.bindingIncludes.view(initialIncludesCount, finalIncludesCount)
+                val newPaths = metadata.bindingIncludes.slice(initialIncludesCount, finalIncludesCount)
 
                 // Extract and register new bindings
                 val bindingCounts =

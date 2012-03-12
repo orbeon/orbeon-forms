@@ -134,45 +134,29 @@ object AjaxSupport {
 
     def addAjaxClass(attributesImpl: AttributesImpl, newlyVisibleSubtree: Boolean, control1: XFormsControl, control2: XFormsControl): Boolean = {
         var added = false
-        val class1 = Option(control1) map (_.getExtensionAttributeValue(XFormsConstants.CLASS_QNAME)) orNull
-        val class2 = control2.getExtensionAttributeValue(XFormsConstants.CLASS_QNAME)
+        val class1 = Option(control1) flatMap (control ⇒ Option(control.getExtensionAttributeValue(XFormsConstants.CLASS_QNAME)))
+        val class2 = Option(control2.getExtensionAttributeValue(XFormsConstants.CLASS_QNAME))
 
-        if (newlyVisibleSubtree || !XFormsUtils.compareStrings(class1, class2)) {
-            // Custom MIPs changed
+        if (newlyVisibleSubtree || class1 != class2) {
+
             val attributeValue =
-                if (class1 eq null)
+                if (class1.isEmpty)
                     class2
                 else {
-                    val sb = new StringBuilder(100)
-
-                    def tokenize(value: String) = LinkedHashSet(StringUtils.split(value): _*)
+                    def tokenize(value: Option[String]) = value map (v ⇒ LinkedHashSet(StringUtils.split(v): _*)) getOrElse LinkedHashSet()
 
                     val classes1 = tokenize(class1)
                     val classes2 = tokenize(class2)
 
-                    // Classes to remove
-                    for (currentClass ← classes1) {
-                        if (! classes2(currentClass)) {
-                            if (sb.length > 0)
-                                sb.append(' ')
-                            sb.append('-')
-                            sb.append(currentClass)
-                        }
-                    }
-
-                    // Classes to add
-                    for (currentClass ← classes2) {
-                        if (! classes1(currentClass)) {
-                            if (sb.length > 0)
-                                sb.append(' ')
-                            sb.append('+')
-                            sb.append(currentClass)
-                        }
-                    }
-                    sb.toString
+                    // Classes to remove and to add
+                    val toRemove = classes1 -- classes2 map ("-" + _)
+                    val toAdd    = classes2 -- classes1 map ("+" + _)
+                    
+                    Some(toRemove ++ toAdd mkString " ")
                 }
-            if (attributeValue ne null)
+            attributeValue foreach { attributeValue ⇒
                 added |= addOrAppendToAttributeIfNeeded(attributesImpl, "class", attributeValue, newlyVisibleSubtree, attributeValue == "")
+            }
         }
         added
     }

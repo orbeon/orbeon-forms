@@ -447,9 +447,6 @@ object ControlOps {
     // TODO: make `editor` something other than a string
     def hasEditor(controlElement: NodeInfo, editor: String) = {
         (binding(controlElement) filter (b ⇒ {
-            val x = b \ "*:metadata"
-            val y = b \ "*:metadata" \ "*:editors"
-            val z = b \ "*:metadata" \ "*:editors" \@ editor
             val staticItemsetAttribute = (b \ "*:metadata" \ "*:editors" \@ editor).headOption
             staticItemsetAttribute match {
                 case Some(a) ⇒ a.stringValue == "true"

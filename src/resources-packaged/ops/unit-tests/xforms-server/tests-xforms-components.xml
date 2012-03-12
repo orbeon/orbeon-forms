@@ -655,7 +655,7 @@
         </output>
     </test>
 
-    <test description="xforms:setfocus on fr:autocomplete" name="oxf:pipeline" only="false">
+    <test description="xforms:setfocus on fr:autocomplete" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner">

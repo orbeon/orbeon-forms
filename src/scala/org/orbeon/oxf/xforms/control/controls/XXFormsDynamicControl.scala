@@ -125,7 +125,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
             // Save new scripts if any
 //            val newScriptCount = containingDocument.getStaticState.getScripts.size
 //            if (newScriptCount > scriptCount)
-//                newScripts = containingDocument.getStaticState.getScripts.values.view(scriptCount, newScriptCount).toSeq
+//                newScripts = containingDocument.getStaticState.getScripts.values.slice(scriptCount, newScriptCount).toSeq
 
             // Nested container is initialized after binding and before control tree
             // TODO: Support updating models/instances

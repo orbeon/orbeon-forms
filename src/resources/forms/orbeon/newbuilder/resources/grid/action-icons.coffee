@@ -86,7 +86,7 @@ $ ->
         # Send a DOMActivate to the closest xforms-activable ancestor
         activable = YD.getAncestorByClassName trigger, "xforms-activable"
         form = Controls.getForm activable
-        event = new AjaxServer.Event form, activable.id, null, null, "DOMActivate"
+        event = new AjaxServer.Event form, activable.id, null, "DOMActivate"
         AjaxServer.fireEvents [event]
 
     # Reposition triggers after an Ajax request

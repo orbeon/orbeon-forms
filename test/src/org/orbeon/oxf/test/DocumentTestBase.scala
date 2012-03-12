@@ -27,32 +27,33 @@ import org.orbeon.oxf.xforms.state.AnnotatedTemplate
 
 abstract class DocumentTestBase extends ResourceManagerTestBase {
 
-    private var document: XFormsContainingDocument = _
+    private var _document: XFormsContainingDocument = _
+    def document = _document
 
     @After def disposeDocument() {
-        if (document ne null) {
-            document.afterExternalEvents()
-            document.afterUpdateResponse()
+        if (_document ne null) {
+            _document.afterExternalEvents()
+            _document.afterUpdateResponse()
 
-            document = null
+            _document = null
         }
     }
 
     def setupDocument(documentURL: String): Unit =
         setupDocument(ProcessorUtils.createDocumentFromURL(documentURL, null))
 
-    def getDocument = document
+    def getDocument = _document
 
     def setupDocument(xhtml: JDocument) = {
         ResourceManagerTestBase.staticSetup()
 
         val (template, staticState) = XFormsStaticStateImpl.createFromDocument(xhtml)
-        this.document = new XFormsContainingDocument(staticState, AnnotatedTemplate(template), null, null)
+        this._document = new XFormsContainingDocument(staticState, AnnotatedTemplate(template), null, null)
 
-        document.afterInitialResponse()
-        document.beforeExternalEvents(null)
+        _document.afterInitialResponse()
+        _document.beforeExternalEvents(null)
 
-        document
+        _document
     }
 
     def getControlValue(controlId: String) = getValueControl(controlId).getValue
@@ -60,13 +61,13 @@ abstract class DocumentTestBase extends ResourceManagerTestBase {
 
     def setControlValue(controlId: String, value: String) {
         // This stores the value without testing for readonly
-        document.startOutermostActionHandler()
+        _document.startOutermostActionHandler()
         getValueControl(controlId).storeExternalValue(value)
-        document.endOutermostActionHandler()
+        _document.endOutermostActionHandler()
     }
 
     def setControlValueWithEvent(controlId: String, value: String): Unit =
-        ClientEvents.processEvent(document, new XXFormsValue(document, getObject(controlId).asInstanceOf[XFormsEventTarget], value))
+        ClientEvents.processEvent(_document, new XXFormsValue(_document, getObject(controlId).asInstanceOf[XFormsEventTarget], value))
 
     def isRelevant(controlId: String) = getObject(controlId).asInstanceOf[XFormsControl].isRelevant
     def isRequired(controlId: String) = getSingleNodeControl(controlId).isRequired
@@ -89,5 +90,5 @@ abstract class DocumentTestBase extends ResourceManagerTestBase {
     protected def getControl(controlId: String) = getObject(controlId).asInstanceOf[XFormsControl]
     protected def getSingleNodeControl(controlId: String) = getObject(controlId).asInstanceOf[XFormsSingleNodeControl]
     protected def getValueControl(controlId: String) = getObject(controlId).asInstanceOf[XFormsValueControl]
-    protected def getObject(controlId: String) = document.getObjectByEffectiveId(controlId)
+    protected def getObject(controlId: String) = _document.getObjectByEffectiveId(controlId)
 }

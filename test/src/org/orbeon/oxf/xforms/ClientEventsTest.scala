@@ -52,7 +52,7 @@ class ClientEventsTest extends DocumentTestBase with AssertionsForJUnit {
             <xxf:event xmlns:xxf="http://orbeon.org/oxf/xml/xforms" name={XFormsEvents.XXFORMS_VALUE_OR_ACTIVATE} source-control-id="input">42</xxf:event>,
             <xxf:event xmlns:xxf="http://orbeon.org/oxf/xml/xforms" name={XFormsEvents.XXFORMS_VALUE_OR_ACTIVATE} source-control-id="trigger"/>)
 
-        val result = ClientEvents.reorderNoscriptEvents(events, getDocument)
+        val result = ClientEvents.reorderNoscriptEvents(events, document)
 
         assert(expected.size === result.size)
         for ((left, right) ← expected zip result)

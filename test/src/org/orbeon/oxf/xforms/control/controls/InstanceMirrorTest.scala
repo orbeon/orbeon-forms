@@ -71,11 +71,10 @@ class InstanceMirrorTest extends DocumentTestBase with AssertionsForJUnit {
                 <xh:body/>
             </xh:html>
 
-        val document = getDocument
         val logger = document.getIndentedLogger
 
-        val outerInstance = getDocument.findInstance("form-instance")
-        val innerInstance = getDocument.findInstance("my-instance")
+        val outerInstance = document.findInstance("form-instance")
+        val innerInstance = document.findInstance("my-instance")
 
         var nonInstanceChanges = 0
 

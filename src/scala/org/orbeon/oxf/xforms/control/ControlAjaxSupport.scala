@@ -139,7 +139,7 @@ object AjaxSupport {
 
         if (newlyVisibleSubtree || class1 != class2) {
 
-            val attributeValue =
+            val attributeOption =
                 if (class1.isEmpty)
                     class2
                 else {
@@ -154,7 +154,8 @@ object AjaxSupport {
                     
                     Some(toRemove ++ toAdd mkString " ")
                 }
-            attributeValue foreach { attributeValue ⇒
+
+            attributeOption foreach { attributeValue ⇒
                 added |= addOrAppendToAttributeIfNeeded(attributesImpl, "class", attributeValue, newlyVisibleSubtree, attributeValue == "")
             }
         }

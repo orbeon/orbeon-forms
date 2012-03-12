@@ -102,12 +102,11 @@ object ClientEvents {
                 // that we *must* first create all events, then dispatch them, so that references to XFormsTarget are obtained
                 // beforehand.
                 (events ++ DummyEvent).sliding(2).toList flatMap {
-                    case Seq(a, b) if a.name == XXFORMS_VALUE && new EventGroupingKey(a) == new EventGroupingKey(b) ⇒
-                        // The following value event is for the same control so we skipthe current value event
-                        None
                     case Seq(a, b) ⇒
-                        // Create event in any other case
-                        safelyCreateAndMapEvent(doc, a)
+                        if (a.name != XXFORMS_VALUE || new EventGroupingKey(a) != new EventGroupingKey(b))
+                            safelyCreateAndMapEvent(doc, a)
+                        else
+                            None
                 }
             }
 

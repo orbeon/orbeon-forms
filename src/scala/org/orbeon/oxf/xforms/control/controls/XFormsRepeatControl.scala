@@ -633,28 +633,28 @@ object XFormsRepeatControl {
 
     private def findIndexes(doc: XFormsContainingDocument, tree: ControlTree, index: XFormsRepeatControl ⇒ Int) = {
 
-        // Map prefixed ids to indexes
-        val indexes = new LinkedHashMap[String, java.lang.Integer]
+        // Each static repeat in document order
+        val allRepeats = doc.getStaticOps.repeats
 
-        // For each static repeats ordered from root to leaf, find the current index if any
-        doc.getStaticOps.repeats foreach { repeat ⇒
+        // Process each repeat and gather index information into a LinkedHashMap so that the original order is preserved
+        allRepeats.foldLeft(LinkedHashMap[String, java.lang.Integer]()) {
+            (indexes, repeat) ⇒
 
-            // Build the suffix by gathering all the ancestor repeat's indexes
-            val suffix = RepeatControl.getAllAncestorRepeatsAcrossParts(repeat).reverse map
-                (ancestor ⇒ indexes(ancestor.prefixedId)) mkString
-                    REPEAT_HIERARCHY_SEPARATOR_2_STRING
+                // Build the suffix by gathering all the ancestor repeat's indexes
+                val suffix = RepeatControl.getAllAncestorRepeatsAcrossParts(repeat).reverse map
+                    (ancestor ⇒ indexes(ancestor.prefixedId)) mkString
+                        REPEAT_HIERARCHY_SEPARATOR_2_STRING
 
-            val effectiveId = repeat.prefixedId + (if (suffix.length > 0) REPEAT_HIERARCHY_SEPARATOR_1 + suffix else "")
+                // Build the effective id
+                val effectiveId = repeat.prefixedId + (if (suffix.length > 0) REPEAT_HIERARCHY_SEPARATOR_1 + suffix else "")
 
-            // Add the index to the map (0 if the control is not found)
-            indexes += repeat.prefixedId → {
-                tree.getControl(effectiveId) match {
-                    case control: XFormsRepeatControl ⇒ index(control)
-                    case _ ⇒ 0
-                }
-            }
-        }
-
-        indexes.asJava
+                // Add the index to the map (0 if the control is not found)
+                indexes += (repeat.prefixedId → {
+                    tree.getControl(effectiveId) match {
+                        case control: XFormsRepeatControl ⇒ index(control)
+                        case _ ⇒ 0
+                    }
+                })
+        } asJava
     }
 }

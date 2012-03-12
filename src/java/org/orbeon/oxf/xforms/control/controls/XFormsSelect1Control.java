@@ -22,6 +22,7 @@ import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.analysis.XPathDependencies;
 import org.orbeon.oxf.xforms.analysis.controls.SelectionControl;
+import org.orbeon.oxf.xforms.control.FocusableTrait;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
@@ -45,7 +46,7 @@ import java.util.Set;
 /**
  * Represents an xforms:select1 control.
  */
-public class XFormsSelect1Control extends XFormsValueControl {
+public class XFormsSelect1Control extends XFormsValueControl implements FocusableTrait {
 
     // List of attributes to handle as AVTs for select1 with appearance="full"
     private static final QName[] EXTENSION_ATTRIBUTES_SELECT1_APPEARANCE_FULL = {
@@ -354,11 +355,6 @@ public class XFormsSelect1Control extends XFormsValueControl {
             }
             ch.endElement();
         }
-    }
-
-    @Override
-    public boolean isFocusable() {
-        return !getAppearances().contains(XFormsConstants.XXFORMS_INTERNAL_APPEARANCE_QNAME);
     }
 
     @Override

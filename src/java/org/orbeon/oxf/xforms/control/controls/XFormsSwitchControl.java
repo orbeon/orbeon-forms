@@ -203,6 +203,9 @@ public class XFormsSwitchControl extends XFormsValueContainerControl {
 
     @Override
     public boolean setFocus() {
+        if (! isRelevant())
+            return false;
+
         final XFormsCaseControl selectedCase = getSelectedCase();
         return selectedCase != null && selectedCase.setFocus();
     }

@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.control.controls;
 
 import org.dom4j.Element;
+import org.orbeon.oxf.xforms.control.FocusableTrait;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
@@ -28,7 +29,7 @@ import java.util.Set;
  *
  * TODO: Use inheritance/interface to make this a single-node control that doesn't hold a value.
  */
-public class XFormsTriggerControl extends XFormsSingleNodeControl {
+public class XFormsTriggerControl extends XFormsSingleNodeControl implements FocusableTrait {
     public XFormsTriggerControl(XBLContainer container, XFormsControl parent, Element element, String id, Map<String, String> state) {
         super(container, parent, element, id);
     }
@@ -71,10 +72,5 @@ public class XFormsTriggerControl extends XFormsSingleNodeControl {
     public boolean supportAjaxUpdates() {
         // Don't output anything for triggers in static readonly mode
         return ! isStaticReadonly();
-    }
-
-    @Override
-    public boolean isFocusable() {
-        return true;
     }
 }

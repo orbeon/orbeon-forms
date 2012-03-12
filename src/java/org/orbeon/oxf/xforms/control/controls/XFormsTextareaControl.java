@@ -19,6 +19,7 @@ import org.dom4j.QName;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.control.FocusableTrait;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
@@ -31,7 +32,7 @@ import java.util.Map;
 /**
  * Represents an xforms:textarea control.
  */
-public class XFormsTextareaControl extends XFormsValueControl {
+public class XFormsTextareaControl extends XFormsValueControl implements FocusableTrait {
 
     // List of attributes to handle as AVTs
     private static final QName[] EXTENSION_ATTRIBUTES = {
@@ -91,10 +92,5 @@ public class XFormsTextareaControl extends XFormsValueControl {
                 indentedLogger.endHandleOperation("value", value);
         }
         super.storeExternalValue(value);
-    }
-
-    @Override
-    public boolean isFocusable() {
-        return true;
     }
 }

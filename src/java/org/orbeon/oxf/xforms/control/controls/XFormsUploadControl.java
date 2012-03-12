@@ -24,10 +24,7 @@ import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsContextStack;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.analysis.XPathDependencies;
-import org.orbeon.oxf.xforms.control.AjaxSupport;
-import org.orbeon.oxf.xforms.control.ExternalCopyable;
-import org.orbeon.oxf.xforms.control.XFormsControl;
-import org.orbeon.oxf.xforms.control.XFormsValueControl;
+import org.orbeon.oxf.xforms.control.*;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.event.events.XFormsDeselectEvent;
@@ -50,7 +47,7 @@ import java.util.Set;
 /**
  * Represents an xforms:upload control.
  */
-public class XFormsUploadControl extends XFormsValueControl {
+public class XFormsUploadControl extends XFormsValueControl implements FocusableTrait {
 
     private FileInfo fileInfo;
 
@@ -484,11 +481,6 @@ public class XFormsUploadControl extends XFormsValueControl {
     @Override
     public Set<String> getAllowedExternalEvents() {
         return ALLOWED_EXTERNAL_EVENTS;
-    }
-
-    @Override
-    public boolean isFocusable() {
-        return true;
     }
 }
 

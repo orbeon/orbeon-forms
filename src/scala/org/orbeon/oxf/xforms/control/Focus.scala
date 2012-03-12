@@ -214,8 +214,8 @@ object Focus {
 
     // Whether the control is focusable, that is it supports focus, is relevant, not read-only, and is not in a hidden case
     private def isFocusable(control: XFormsControl) = control match {
-        case control: XFormsSingleNodeControl if control.isReadonly ⇒ false
-        case control: XFormsControl if control.isFocusable && control.isRelevant && ! isHidden(control) ⇒ true
+        case focusable: XFormsSingleNodeControl with FocusableTrait if focusable.isReadonly ⇒ false
+        case focusable: FocusableTrait if focusable.isRelevant && ! isHidden(focusable) ⇒ true
         case _ ⇒ false
     }
 

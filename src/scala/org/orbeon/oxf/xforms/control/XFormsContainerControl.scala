@@ -86,7 +86,7 @@ trait XFormsContainerControl extends XFormsControl {
     override def setFocus(): Boolean = {
         // "4.3.7 The xforms-focus Event [...] Setting the focus to a group or switch container form control set the
         // focus to the first form control in the container that is able to accept focus"
-        if (hasChildren)
+        if (isRelevant && hasChildren)
             for (currentControl ← _children)
                 if (currentControl.setFocus())
                     return true

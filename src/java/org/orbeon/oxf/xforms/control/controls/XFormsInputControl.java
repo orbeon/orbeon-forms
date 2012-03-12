@@ -21,6 +21,7 @@ import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis;
 import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis;
+import org.orbeon.oxf.xforms.control.FocusableTrait;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
@@ -36,7 +37,7 @@ import java.util.*;
 /**
  * Represents an xforms:input control.
  */
-public class XFormsInputControl extends XFormsValueControl {
+public class XFormsInputControl extends XFormsValueControl implements FocusableTrait {
 
     // List of attributes to handle as AVTs
     private static final QName[] EXTENSION_ATTRIBUTES = {
@@ -575,10 +576,5 @@ public class XFormsInputControl extends XFormsValueControl {
         } else {
             return null;
         }
-    }
-
-    @Override
-    public boolean isFocusable() {
-        return true;
     }
 }

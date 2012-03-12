@@ -599,7 +599,12 @@ public class XFormsServer extends ProcessorImpl {
                     final XFormsControl afterFocusedControl = containingDocument.getControls().getFocusedControl();
                     if (beforeFocusedControl != null && afterFocusedControl == null) {
                         // Focus removed
-                        outputFocusInfo(ch, containingDocument, false, beforeFocusedControl.getEffectiveId());
+                        
+                        // Notify the client only if the control still exists
+                        final String beforeFocusedControlEffectiveId = beforeFocusedControl.getEffectiveId();
+                        if (containingDocument.getControls().getCurrentControlTree().getControl(beforeFocusedControlEffectiveId) != null)
+                            outputFocusInfo(ch, containingDocument, false, beforeFocusedControlEffectiveId);
+
                     } else if (clientFocusControlId == null && afterFocusedControl == beforeFocusedControl) {
                         // Client didn't send new focus information AND focus hasn't changed on server
                         // NOP

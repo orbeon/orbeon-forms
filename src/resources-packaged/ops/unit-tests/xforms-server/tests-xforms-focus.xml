@@ -151,6 +151,50 @@
         </output>
     </test>
 
+    <test description="xf:setfocus on non-relevant xf:switch" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="instance">
+                            <instance/>
+                        </xf:instance>
+
+                        <xf:bind ref="." relevant="false()"/>
+
+                        <xf:setfocus ev:event="xforms-ready" control="my-switch-1"/>
+
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:switch id="my-switch-1" ref=".">
+                        <xf:case id="my-case-11"/>
+                        <xf:case id="my-case-12"/>
+                    </xf:switch>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <instance/>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="my-switch-1" relevant="false"/>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
     <test description="xf:setfocus on xf:repeat" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">

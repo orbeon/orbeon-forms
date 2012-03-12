@@ -113,5 +113,5 @@ object FormBuilderFunctions {
 
     def debugDumpDocument(message: String, inDoc: NodeInfo) =
         if (XFormsProperties.getDebugLogging.contains("form-builder-grid"))
-            debug(message, Seq("doc", TransformerUtils.tinyTreeToString(inDoc.getDocumentRoot)))
+            debug(message, Seq("doc" → TransformerUtils.tinyTreeToString(inDoc.getDocumentRoot)))
 }

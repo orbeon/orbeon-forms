@@ -17,25 +17,27 @@ package org.orbeon.oxf.util
 object DebugLogger {
 
     // Simple debug with optional parameters
-    def debug(message: ⇒ String, parameters: ⇒ Seq[String] = Seq())(implicit logger: IndentedLogger) =
+    def debug(message: ⇒ String, parameters: ⇒ Seq[(String, String)] = Seq())(implicit logger: IndentedLogger) =
         if (logger.isDebugEnabled)
-            logger.logDebug("", message, parameters: _*)
+            logger.logDebug("", message, flattenTuples(parameters): _*)
 
     // Debug block with optional parameters
-    def withDebug[T](message: ⇒ String, parameters: ⇒ Seq[String] = Seq())(body: ⇒ T)(implicit logger: IndentedLogger): T = {
+    def withDebug[T](message: ⇒ String, parameters: ⇒ Seq[(String, String)] = Seq())(body: ⇒ T)(implicit logger: IndentedLogger): T =
         try {
             if (logger.isDebugEnabled)
-                logger.startHandleOperation("", message, parameters: _*)
+                logger.startHandleOperation("", message, flattenTuples(parameters): _*)
 
             body
         } finally {
             if (logger.isDebugEnabled)
                 logger.endHandleOperation()
         }
-    }
 
     // Call from a result block to set result parameters
-    def debugResults(parameters: ⇒ Seq[String])(implicit logger: IndentedLogger) =
+    def debugResults(parameters: ⇒ Seq[(String, String)])(implicit logger: IndentedLogger) =
         if (logger.isDebugEnabled)
-            logger.setDebugResults(parameters: _*)
+            logger.setDebugResults(flattenTuples(parameters): _*)
+
+    private def flattenTuples(tuples: Seq[(String, String)]) =
+        tuples flatMap { case (n, v) ⇒ Seq(n, v) }
 }

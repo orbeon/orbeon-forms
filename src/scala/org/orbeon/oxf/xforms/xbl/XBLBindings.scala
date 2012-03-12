@@ -99,7 +99,7 @@ class XBLBindings(indentedLogger: IndentedLogger, partAnalysis: PartAnalysisImpl
                 bindingsForDoc.size
             }
 
-            debugResults(Seq("xbl:xbl count", xblDocuments.size.toString, "xbl:binding count", bindingCounts.sum.toString))
+            debugResults(Seq("xbl:xbl count" → xblDocuments.size.toString, "xbl:binding count" → bindingCounts.sum.toString))
 
             bindingCounts
         }
@@ -171,9 +171,9 @@ class XBLBindings(indentedLogger: IndentedLogger, partAnalysis: PartAnalysisImpl
                     }
 
                 debugResults(Seq(
-                    "xbl:xbl count", finalIncludesCount - initialIncludesCount toString,
-                    "xbl:binding count", bindingCounts.sum toString,
-                    "total xbl:binding count", abstractBindings.size toString))
+                    "xbl:xbl count" → (finalIncludesCount - initialIncludesCount).toString,
+                    "xbl:binding count" → bindingCounts.sum.toString,
+                    "total xbl:binding count" → abstractBindings.size.toString))
 
                 None
             }
@@ -290,7 +290,10 @@ class XBLBindings(indentedLogger: IndentedLogger, partAnalysis: PartAnalysisImpl
             }
 
             if (logShadowTrees)
-                debugResults(Seq("full tree", Dom4jUtils.domToString(fullAnnotatedTree), "compact tree", compactTreeOption map (Dom4jUtils.domToString(_)) orNull))
+                debugResults(Seq(
+                    "full tree" → Dom4jUtils.domToString(fullAnnotatedTree),
+                    "compact tree" → (compactTreeOption map (Dom4jUtils.domToString(_)) orNull)
+                ))
             
             // Result is full annotated tree and, if needed, the compact tree
             (fullAnnotatedTree, compactTreeOption.orNull)
@@ -302,7 +305,7 @@ class XBLBindings(indentedLogger: IndentedLogger, partAnalysis: PartAnalysisImpl
             case Some(globalDocument) if ! allGlobals.contains(abstractBinding.qNameMatch) ⇒
 
                 val (globalFullShadowTreeDocument, globalCompactShadowTreeDocument) =
-                    withDebug("generating global XBL shadow content", Seq("binding id", abstractBinding.bindingId.orNull)) {
+                    withDebug("generating global XBL shadow content", Seq("binding id" → abstractBinding.bindingId.orNull)) {
 
                         val pseudoBoundElement = Dom4jUtils.NULL_DOCUMENT.getRootElement
                         val topLevelScopeForGlobals = partAnalysis.startScope
@@ -338,7 +341,7 @@ class XBLBindings(indentedLogger: IndentedLogger, partAnalysis: PartAnalysisImpl
                                       abstractBinding: AbstractBinding): Option[Document] = {
         abstractBinding.templateElement map {
             templateElement ⇒
-                withDebug("generating raw XBL shadow content", Seq("binding id", abstractBinding.bindingId.orNull)) {
+                withDebug("generating raw XBL shadow content", Seq("binding id" → abstractBinding.bindingId.orNull)) {
 
                     // TODO: in script mode, XHTML elements in template should only be kept during page generation
 

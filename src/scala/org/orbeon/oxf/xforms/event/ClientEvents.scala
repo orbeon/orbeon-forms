@@ -215,7 +215,7 @@ object ClientEvents {
         val eventTarget = doc.getObjectByEffectiveId(deNamespaceId(doc, adjustIdForRepeatIteration(doc, event.targetEffectiveId))) match {
             case eventTarget: XFormsEventTarget ⇒ eventTarget
             case _ ⇒
-                debug("ignoring client event with invalid target id", Seq("target id", event.targetEffectiveId, "event name", event.name))
+                debug("ignoring client event with invalid target id", Seq("target id" → event.targetEffectiveId, "event name" → event.name))
                 return None
         }
 
@@ -233,7 +233,7 @@ object ClientEvents {
             isExplicitlyAllowedExternalEvent || {
                 val explicitlyAllowed = eventTarget.allowExternalEvent(event.name)
                 if (! explicitlyAllowed)
-                    debug("ignoring invalid client event on target", Seq("id", eventTarget.getEffectiveId, "event name", event.name))
+                    debug("ignoring invalid client event on target", Seq("id" → eventTarget.getEffectiveId, "event name" → event.name))
                 explicitlyAllowed
             }
         }
@@ -241,7 +241,7 @@ object ClientEvents {
         // Check the event is allowed on target
         if (event.trusted)
             // Event is trusted, don't check if it is allowed
-            debug("processing trusted event", Seq("target id", eventTarget.getEffectiveId, "event name", event.name))
+            debug("processing trusted event", Seq("target id" → eventTarget.getEffectiveId, "event name" → event.name))
         else if (! checkAllowedExternalEvents)
             return None // event is not trusted and is not allowed
 
@@ -324,7 +324,7 @@ object ClientEvents {
                 helper.endDocument()
 
                 debugContentHandler foreach
-                    (ch ⇒ debugResults(Seq("ajax response", Dom4jUtils.domToPrettyString(ch.getDocument))))
+                    (ch ⇒ debugResults(Seq("ajax response" → Dom4jUtils.domToPrettyString(ch.getDocument))))
             }
 
             true
@@ -385,8 +385,8 @@ object ClientEvents {
             def warn(condition: String) = {
                 implicit val CurrentLogger = doc.getIndentedLogger
                 debug("ignoring invalid client event on " + condition, Seq(
-                    "control id", eventTarget.getEffectiveId,
-                    "event name", event.getName)
+                    "control id" → eventTarget.getEffectiveId,
+                    "event name" → event.getName)
                 )
                 false
             }
@@ -445,16 +445,16 @@ object ClientEvents {
         val targetEffectiveId = target.getEffectiveId
         val eventName = event.getName
 
-        withDebug("handling external event", Seq("target id", targetEffectiveId, "event name", eventName)) {
+        withDebug("handling external event", Seq("target id" → targetEffectiveId, "event name" → eventName)) {
 
             // Optimize case where a value change event won't change the control value to actually change
             (event, target) match {
                 case (valueChange: XXFormsValue, target: XFormsValueControl) if target.getExternalValue == valueChange.getNewValue ⇒
                     // We completely ignore the event if the value in the instance is the same. This also saves dispatching xxforms-repeat-focus below.
                     debug("ignoring value change event as value is the same", Seq(
-                        "control id", targetEffectiveId,
-                        "event name", eventName,
-                        "value", target.getExternalValue)
+                        "control id" → targetEffectiveId,
+                        "event name" → eventName,
+                        "value" → target.getExternalValue)
                     )
                     return
                 case _ ⇒

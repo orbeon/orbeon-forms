@@ -18,11 +18,12 @@ import org.orbeon.oxf.xforms.event.events.{DOMFocusOutEvent,DOMFocusInEvent}
 import org.orbeon.oxf.xforms.control.Controls.AncestorIterator
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsContainingDocument
-import org.orbeon.oxf.xforms.event.{XFormsEventTarget, XFormsEventObserver, XFormsEvent}
 import org.orbeon.oxf.xforms.event.events.XFormsUIEvent
 import collection.JavaConverters._
 
 import java.util.{ArrayList ⇒ JArrayList, LinkedHashMap ⇒ JLinkedHashMap}
+import org.orbeon.oxf.xforms.event._
+import org.orbeon.oxf.xforms.event.XFormsEvents.{DOM_FOCUS_OUT, DOM_FOCUS_IN}
 
 // Handle control focus
 object Focus {
@@ -219,13 +220,12 @@ object Focus {
         case _ ⇒ false
     }
 
-    // Dispatch DOMFocusOut to the given control
-    private def focusOut(control: XFormsControl) =
-        control.container.dispatchEvent(new DOMFocusOutEvent(control.containingDocument, control))
+    // Dispatch DOMFocusOut and DOMFocusIn
+    private def focusOut(control: XFormsControl) = dispatch(control, DOM_FOCUS_OUT)
+    private def focusIn(control: XFormsControl)  = dispatch(control, DOM_FOCUS_IN)
 
-    // Dispatch DOMFocusIn to the given control
-    private def focusIn(control: XFormsControl) =
-        control.container.dispatchEvent(new DOMFocusInEvent(control.containingDocument, control))
+    private def dispatch(control: XFormsControl, eventName: String) =
+        control.container.dispatchEvent(XFormsEventFactory.createEvent(control.containingDocument, eventName, control))
 
     // Find all ancestor container controls of the given control from leaf to root
     private def containers(control: XFormsControl) =

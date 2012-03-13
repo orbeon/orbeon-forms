@@ -27,6 +27,10 @@
 
     <xforms:label ref="$form-resources/dialog-section-details/dialog-title"/>
 
+    <xforms:var name="model"         value="$model"         model="fr-form-model"/>
+    <xforms:var name="form-instance" value="$form-instance" model="fr-form-model"/>
+    <xforms:var name="resources"     value="$resources"     model="fr-form-model"/>
+
     <xhtml:div>
         <xhtml:div class="fr-grid">
             <xhtml:div class="fr-grid-content">

@@ -625,28 +625,40 @@ object XFormsRepeatControl {
 
     // Find the initial repeat indexes for the given tree
     def findInitialIndexes(doc: XFormsContainingDocument, tree: ControlTree) =
-        findIndexes(doc, tree, _.getInitialLocal.asInstanceOf[XFormsRepeatControlLocal].index)
+        findIndexes(doc, tree, doc.getStaticOps.repeats, _.getInitialLocal.asInstanceOf[XFormsRepeatControlLocal].index).asJava
 
     // Find the current repeat indexes for the given tree
     def findCurrentIndexes(doc: XFormsContainingDocument, tree: ControlTree) =
-        findIndexes(doc, tree, _.getIndex)
+        findIndexes(doc, tree, doc.getStaticOps.repeats, _.getIndex).asJava
 
-    private def findIndexes(doc: XFormsContainingDocument, tree: ControlTree, index: XFormsRepeatControl ⇒ Int) = {
+    // For the given control, return the matching control that follows repeat indexes
+    // This might be the same as the given control if it is within the repeat indexes chain, or another control if not
+    def findControlFollowIndexes(control: XFormsControl) = {
+        val doc = control.containingDocument
+        val tree = doc.getControls.getCurrentControlTree
+        
+        // All ancestor repeats from root to leaf
+        val ancestorRepeats = RepeatControl.getAllAncestorRepeatsAcrossParts(control.staticControl).reverse
+        
+        // Find just the indexes we need
+        val indexes = findIndexes(doc, tree, ancestorRepeats, _.getIndex)
 
-        // Each static repeat in document order
-        val allRepeats = doc.getStaticOps.repeats
+        // Build a suffix based on the ancestor repeats' current indexes
+        val suffix = suffixForRepeats(indexes, ancestorRepeats)
 
-        // Process each repeat and gather index information into a LinkedHashMap so that the original order is preserved
-        allRepeats.foldLeft(LinkedHashMap[String, java.lang.Integer]()) {
+        Option(tree.getControl(addSuffix(control.prefixedId, suffix)))
+    }
+
+    // Find indexes for the given repeats in the current document
+    private def findIndexes(doc: XFormsContainingDocument, tree: ControlTree, repeats: Seq[RepeatControl], index: XFormsRepeatControl ⇒ Int) =
+        repeats.foldLeft(LinkedHashMap[String, java.lang.Integer]()) {
             (indexes, repeat) ⇒
 
-                // Build the suffix by gathering all the ancestor repeat's indexes
-                val suffix = RepeatControl.getAllAncestorRepeatsAcrossParts(repeat).reverse map
-                    (ancestor ⇒ indexes(ancestor.prefixedId)) mkString
-                        REPEAT_HIERARCHY_SEPARATOR_2_STRING
+                // Build the suffix based on all the ancestor repeats' indexes
+                val suffix = suffixForRepeats(indexes, RepeatControl.getAllAncestorRepeatsAcrossParts(repeat).reverse)
 
                 // Build the effective id
-                val effectiveId = repeat.prefixedId + (if (suffix.length > 0) REPEAT_HIERARCHY_SEPARATOR_1 + suffix else "")
+                val effectiveId = addSuffix(repeat.prefixedId, suffix)
 
                 // Add the index to the map (0 if the control is not found)
                 indexes += (repeat.prefixedId → {
@@ -655,6 +667,11 @@ object XFormsRepeatControl {
                         case _ ⇒ 0
                     }
                 })
-        } asJava
-    }
+        }
+    
+    private def suffixForRepeats(indexes: collection.Map[String, java.lang.Integer], repeats: Seq[RepeatControl]) =
+        repeats map (repeat ⇒ indexes(repeat.prefixedId)) mkString REPEAT_HIERARCHY_SEPARATOR_2_STRING
+    
+    private def addSuffix(prefixedId: String, suffix: String) =
+        prefixedId + (if (suffix.length > 0) REPEAT_HIERARCHY_SEPARATOR_1 + suffix else "")
 }

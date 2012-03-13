@@ -16,7 +16,6 @@ package org.orbeon.oxf.xforms.control
 import controls.{XXFormsRootControl, XFormsRepeatControl, XFormsCaseControl, XXFormsDialogControl}
 import org.orbeon.oxf.xforms.event.events.{DOMFocusOutEvent,DOMFocusInEvent}
 import org.orbeon.oxf.xforms.control.Controls.AncestorIterator
-import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.event.events.XFormsUIEvent
 import collection.JavaConverters._
@@ -88,7 +87,7 @@ object Focus {
                 // focus accordingly.
 
                 // Obtain a new reference to the control via the index, following repeats
-                val newReferenceWithRepeats = controlWithCurrentRepeatIndexes(focusedBefore)
+                val newReferenceWithRepeats = XFormsRepeatControl.findControlFollowIndexes(focusedBefore)
 
                 newReferenceWithRepeats match {
                     case None ⇒
@@ -235,35 +234,4 @@ object Focus {
     // Ancestor controls and control from root to leaf excepting the root control
     private def containersAndSelf(control: XFormsControl) =
         control :: containers(control).init reverse
-
-    // For the given control, return the same control or another one but at the same level of repeats
-    private def controlWithCurrentRepeatIndexes(control: XFormsControl): Option[XFormsControl] = {
-
-        // TODO: Some code here is duplicated from Controls.findEffectiveControlId
-        val targetIndexBuilder = new StringBuilder
-
-        def appendIterationToSuffix(iteration: Int) {
-            if (targetIndexBuilder.isEmpty)
-                targetIndexBuilder.append(REPEAT_HIERARCHY_SEPARATOR_1)
-            else if (targetIndexBuilder.length != 1)
-                targetIndexBuilder.append(REPEAT_HIERARCHY_SEPARATOR_2)
-
-            targetIndexBuilder.append(iteration.toString)
-        }
-
-        val ancestorRepeats = control.containingDocument.getStaticOps.getAncestorRepeats(control.prefixedId).reverse
-        val tree = control.containingDocument.getControls.getCurrentControlTree
-
-        // Follow repeat indexes towards target
-        for (repeatPrefixedId ← ancestorRepeats) {
-            val repeatControl = tree.getControl(repeatPrefixedId + targetIndexBuilder.toString).asInstanceOf[XFormsRepeatControl]
-            // Control might not exist
-            if (repeatControl eq null)
-                return None
-            // Update iteration suffix
-            appendIterationToSuffix(repeatControl.getIndex)
-        }
-
-        Option(tree.getControl(control.prefixedId + targetIndexBuilder.toString))
-    }
 }

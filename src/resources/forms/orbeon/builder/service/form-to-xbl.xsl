@@ -23,7 +23,8 @@
         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
         xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:xbl="http://www.w3.org/ns/xbl"
-        xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+        xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+        xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
 
     <xsl:import href="oxf:/oxf/xslt/utils/copy-modes.xsl"/>
 
@@ -290,13 +291,13 @@
                         <xforms:group appearance="xxforms:internal">
                             <!-- Synchronize data with external world upon local value change -->
                             <!-- This assumes the element QName match, or the value is not copied -->
-                            <xforms:action ev:event="xforms-value-changed">
+                            <xforms:action ev:event="xforms-value-changed" if="exists($binding/*) and exists(xxforms:event('xxforms:binding'))">
                                 <xxforms:variable name="source-binding" select="xxforms:event('xxforms:binding')" as="element()"/>
                                 <xforms:setvalue ref="$binding/*[resolve-QName(name(), .) = resolve-QName(name($source-binding), $source-binding)]" value="$source-binding"/>
                             </xforms:action>
 
                             <!-- Copy grids within section -->
-                            <xsl:copy-of select="$fr-section/fr:grid"/>
+                            <xsl:copy-of select="$fr-section/(fr:grid | fb:grid)"/>
 
                         </xforms:group>
                     </xforms:group>

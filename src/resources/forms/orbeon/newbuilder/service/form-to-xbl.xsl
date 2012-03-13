@@ -133,8 +133,12 @@
         <!-- NOTE: could also gather ancestor-or-self::xforms:bind/@nodeset and evaluate expression to be more generic -->
         <xsl:variable name="section-data" select="$fr-form-instance/*/*[name() = $section-name]" as="element()"/>
 
-        <!-- Use section id as component id as section ids are unique -->
+        <!-- NOTE: We should make component ids and names unique, as shown in the commented-out code below. The issue is
+             that if we change that, section templates already in use in forms stop working. So we need another
+             solution.See: http://forge.ow2.org/tracker/index.php?func=detail&aid=316287&group_id=168&atid=350207 -->
         <xsl:variable name="component-id" select="$section-id" as="xs:string"/>
+        <!-- Use section id as component id as section ids are unique -->
+        <!--<xsl:variable name="component-id" select="concat(doc('input:parameters')/*/app, '-',  $section-id)" as="xs:string"/>-->
 
         <!-- Figure out which actions and services are used by the component -->
 
@@ -226,7 +230,8 @@
 
                     <!-- This is also at the top-level in components.xsl -->
                     <!-- TODO: would be ideal if read-onliness on outer instance would simply propagate here -->
-                    <xforms:bind nodeset="instance('fr-form-instance')" readonly="xxforms:instance('fr-parameters-instance')/mode = ('view', 'pdf', 'email')"/>
+                    <xxforms:variable name="fr-mode" select="xxforms:instance('fr-parameters-instance')/mode"/>
+                    <xforms:bind nodeset="instance('fr-form-instance')" readonly="$fr-mode = ('view', 'pdf', 'email')"/>
 
                     <!-- Schema: simply copy so that the types are available locally -->
                     <!-- NOTE: Could optimized to check if any of the types are actually used -->
@@ -286,7 +291,7 @@
                         <xforms:group appearance="xxforms:internal">
                             <!-- Synchronize data with external world upon local value change -->
                             <!-- This assumes the element QName match, or the value is not copied -->
-                            <xforms:action ev:event="xforms-value-changed">
+                            <xforms:action ev:event="xforms-value-changed" if="exists($binding/*) and exists(xxforms:event('xxforms:binding'))">
                                 <xxforms:variable name="source-binding" select="xxforms:event('xxforms:binding')" as="element()"/>
                                 <xforms:setvalue ref="$binding/*[resolve-QName(name(), .) = resolve-QName(name($source-binding), $source-binding)]" value="$source-binding"/>
                             </xforms:action>

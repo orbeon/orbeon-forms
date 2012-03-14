@@ -24,7 +24,8 @@
         xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:xbl="http://www.w3.org/ns/xbl"
         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
-        xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
+        xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+        xmlns:exf="http://www.exforms.org/exf/1-0">
 
     <xsl:import href="oxf:/oxf/xslt/utils/copy-modes.xsl"/>
 
@@ -228,10 +229,12 @@
                     <xxforms:variable name="form-resources"
                                       select="instance('fr-form-resources')/(resource[@xml:lang = xxforms:instance('fr-language-instance')], resource[1])[1]" as="element(resource)"/>
 
+                    <!-- Keep track of whether fields should be readonly because the node we're bound to is readonly -->
+                    <xforms:instance id="readonly"><readonly/></xforms:instance>
+
                     <!-- This is also at the top-level in components.xsl -->
-                    <!-- TODO: would be ideal if read-onliness on outer instance would simply propagate here -->
                     <xxforms:variable name="fr-mode" select="xxforms:instance('fr-parameters-instance')/mode"/>
-                    <xforms:bind nodeset="instance('fr-form-instance')" readonly="$fr-mode = ('view', 'pdf', 'email')"/>
+                    <xforms:bind nodeset="instance('fr-form-instance')" readonly="$fr-mode = ('view', 'pdf', 'email') or instance('readonly') = 'true'"/>
 
                     <!-- Schema: simply copy so that the types are available locally -->
                     <!-- NOTE: Could optimized to check if any of the types are actually used -->
@@ -255,7 +258,7 @@
 
             <!-- XBL template -->
             <xbl:template>
-                
+
                 <xforms:group appearance="xxforms:internal" xxbl:scope="outer">
 
                     <!-- Inner group -->
@@ -264,7 +267,7 @@
                         <xxforms:variable id="binding" name="binding" as="node()?">
                             <xxforms:sequence select="." xxbl:scope="outer"/>
                         </xxforms:variable>
-                        
+
                         <xforms:action ev:event="xforms-enabled xforms-value-changed" ev:observer="binding">
                             <!-- Section becomes visible OR binding changes -->
                             <xforms:action>
@@ -282,6 +285,11 @@
                                 </xforms:action>
                             </xforms:action>
                         </xforms:action>
+
+                        <!-- Propagate readonly -->
+                        <xxforms:variable name="readonly" as="xs:boolean" select="exf:readonly($binding)">
+                            <xforms:setvalue ev:event="xforms-enabled xforms-value-changed" ref="instance('readonly')" value="exf:readonly($binding)"/>
+                        </xxforms:variable>
 
                         <!-- Expose internally a variable pointing to Form Runner resources -->
                         <xxforms:variable name="fr-resources" as="element()?">

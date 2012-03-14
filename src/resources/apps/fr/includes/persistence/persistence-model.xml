@@ -1,5 +1,5 @@
 <!--
-  Copyright (C) 2011 Orbeon, Inc.
+  Copyright (C) 2012 Orbeon, Inc.
 
   This program is free software; you can redistribute it and/or modify it under the terms of the
   GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -31,6 +31,7 @@
     <xxforms:variable name="app" value="$parameters/app" as="xs:string"/>
     <xxforms:variable name="form" value="$parameters/form" as="xs:string"/>
     <xxforms:variable name="document" select="$parameters/document"/>
+    <xxforms:variable name="mode" select="$parameters/mode"/>
 
     <!-- Model initialization when we have a specific app and form -->
     <!-- TODO: Should not do this on summary page, for example -->
@@ -54,7 +55,7 @@
             <xforms:insert nodeset="instance('fr-source-form-instance')" origin="$source-form"/>
         </xforms:action>
         <xforms:action if="not(exists($source-form))">
-            <!--  Try submission -->
+            <!-- Try submission -->
             <xforms:message level="xxforms:log-debug">Could not get source form from request. Trying submission instead.</xforms:message>
             <xforms:send submission="get-source-form-submission"/>
         </xforms:action>
@@ -76,68 +77,78 @@
         <!-- Send an "Unauthorized" error if the user is unauthorized -->
         <xforms:action if="$unauthorized-access" type="xpath">form-runner:sendError(401)</xforms:action>
 
-        <!-- Whether a document id is provided -->
-        <xxforms:variable name="is-document-id-provided" select="$document != ''" as="xs:boolean"/>
-        <xforms:action if="$is-document-id-provided">
-            <!-- A document id is provided -->
-            <xxforms:variable name="form-data" select="xxforms:get-request-attribute('fr-form-data')" as="document-node()?"/>
-            <xforms:action if="$form-data">
-                <!-- An id is provided, but the form data is also available in the request, so we use that first -->
-                <xforms:message level="xxforms:log-debug">Loading document by id from request: <xforms:output value="$document"/></xforms:message>
-                <xforms:insert nodeset="xxforms:instance('fr-form-instance')" origin="$form-data"/>
+        <xforms:action if="$mode != 'summary'">
+
+            <xxforms:variable name="is-new-id" select="normalize-space($document) = ''"/>
+            <xxforms:variable name="is-xml-submit" select="exists(xxforms:get-request-attribute('fr-form-data'))"/>
+            <xxforms:variable name="is-submit" select="$is-xml-submit or exists(xxforms:get-request-parameter('fr-form-data'))"/>
+
+            <!-- Create random document id if none is provided. This is the default for 'new', but a missing id is also
+                 allowed for 'edit', 'view', etc., when data is posted to the page. -->
+            <xforms:setvalue if="$is-new-id" ref="$document" value="digest(string(random(true)), 'MD5', 'hex')"/>
+
+            <!-- Case of 'new' mode where we load the initial data via a service -->
+            <xxforms:variable name="new-from-service" select="$mode = 'new' and xxforms:property(string-join(('oxf.fr.detail.new.service.enable', $app, $form), '.'))"/>
+            <xforms:action if="$new-from-service">
+                <xforms:message level="xxforms:log-debug">Loading new document from service</xforms:message>
+                <xforms:send submission="fr-get-instance-from-service"/>
+            </xforms:action>
+
+            <!-- Check the data submitted to the page.
+
+                 - 'new' mode:  check if we accept submitted data based on a property
+                 - 'edit' mode: check based on a property, but let plain XML POSTs pass as that's used internally to switch modes
+                 - other modes: accept XML POSTs
+
+                 In the future, we should enforce other cases by making sure that the data comes from Form Runner itself. -->
+            <xxforms:variable name="pass-submit-check"
+                              select="$mode = 'new' and xxforms:property(string-join(('oxf.fr.detail.new.accept-post', $app, $form), '.'))
+                                   or $mode = 'edit' and ($is-xml-submit or xxforms:property(string-join(('oxf.fr.detail.edit.accept-post', $app, $form), '.')))
+                                   or not($mode = ('new', 'edit')) and $is-xml-submit"/>
+
+            <!-- Case of data submitted to the page -->
+            <xforms:action if="$is-submit and $pass-submit-check">
+
+                <!-- Do we have data posted to this form as a parameter? -->
+                <xforms:action if="not($is-xml-submit)">
+                    <xxforms:variable name="form-data" select="xxforms:get-request-parameter('fr-form-data')"/>
+                    <xforms:action if="$form-data">
+                        <xforms:message level="xxforms:log-debug">Loading document submitted to the page as parameter</xforms:message>
+                        <xxforms:variable name="xml-data" select="saxon:parse(saxon:base64Binary-to-string(xs:base64Binary($form-data), 'UTF-8'))"/>
+                        <xforms:insert nodeset="xxforms:instance('fr-form-instance')" origin="$xml-data"/>
+                    </xforms:action>
+                </xforms:action>
+
+                <!-- Do we have data posted to this form as XML? -->
+                <xforms:action if="$is-xml-submit">
+                    <xforms:message level="xxforms:log-debug">Loading document submitted to the page as XML</xforms:message>
+                    <xxforms:variable name="form-data" select="xxforms:get-request-attribute('fr-form-data')" as="document-node()?"/>
+                    <xforms:insert nodeset="xxforms:instance('fr-form-instance')" origin="$form-data"/>
+                </xforms:action>
+
                 <!-- Set initial data as dirty, because this is the case typically of switching between script/noscript
                      mode, and we can't really know if the data is clean or dirty but would like to enable the save button -->
-                <xforms:setvalue if="not($parameters/mode = ('test', 'view', 'pdf', 'email'))"
-                                 ref="instance('fr-persistence-instance')/initial-data-status">dirty</xforms:setvalue>
+                <xforms:setvalue if="$mode = 'edit'" ref="instance('fr-persistence-instance')/initial-data-status">dirty</xforms:setvalue>
             </xforms:action>
-            <xforms:action if="not($form-data)">
-                <!-- Load document with that id from persistence layer -->
-                <xforms:message level="xxforms:log-debug">Loading document by id from submission: <xforms:output value="$document"/></xforms:message>
-                <xforms:send submission="fr-get-document-submission"/>
+
+            <!-- In 'new' mode only, after an external document has been set, recalculate defaults (and rebuild so the refs
+                 in the binds are updated). -->
+            <xforms:action if="$new-from-service or ($mode = 'new' and $is-submit)">
                 <!-- After we get the document from the persistence layer, recalculate defaults (and rebuild so the refs in the binds are updated) -->
+                <xforms:message level="xxforms:log-debug">Updating initial values for externally-loaded new document</xforms:message>
                 <xforms:rebuild model="fr-form-model"/>
                 <xforms:recalculate xxforms:defaults="true" model="fr-form-model"/>
             </xforms:action>
-        </xforms:action>
-        <xforms:action if="not($is-document-id-provided)">
-            <!-- No document id is provided -->
-            <!-- Are we in new/edit mode -->
-            <xxforms:variable name="is-new-document" select="$parameters/mode = ('new', 'edit')" as="xs:boolean"/>
-            <xforms:action if="$is-new-document">
-                <!-- Create random document id -->
-                <xforms:setvalue ref="$document" value="digest(string(random(true())), 'MD5', 'hex')"/>
 
-                <xxforms:var name="switch"
-                             value="if (xxforms:property(string-join(('oxf.fr.detail.new.service.enable', $app, $form), '.'))) then 'try-service'
-                                    else if (xxforms:property(string-join(('oxf.fr.detail.new.accept-post', $app, $form), '.'))) then 'try-post'
-                                    else 'other'"/>
-
-                <!-- Do we call a service to initialize the instance? -->
-                <xforms:action if="$switch = 'try-service'">
-                    <xforms:message level="xxforms:log-debug">Loading document from service</xforms:message>
-                    <xforms:send submission="fr-get-instance-from-service"/>
-                </xforms:action>
-                <!-- Do we accept data posted to this page? -->
-                <xforms:action if="$switch = 'try-post'">
-                    <xxforms:variable name="mediatype" select="xxforms:get-request-header('Content-Type')" as="xs:string?"/>
-                    <xxforms:variable name="is-xml-mediatype" select="starts-with($mediatype, 'application/xml') or starts-with($mediatype, 'text/xml')" as="xs:boolean"/>
-                    <!-- Do we have data posted to this form as XML? -->
-                    <xforms:action if="$is-xml-mediatype">
-                        <xforms:message level="xxforms:log-debug">Loading document submitted to the page as XML</xforms:message>
-                        <xxforms:variable name="form-data" select="xxforms:get-request-attribute('fr-form-data')" as="document-node()?"/>
-                        <xforms:insert nodeset="xxforms:instance('fr-form-instance')" origin="$form-data"/>
-                    </xforms:action>
-                    <!-- Do we have data posted to this form as a parameter? -->
-                    <xforms:action if="not($is-xml-mediatype)">
-                        <xxforms:variable name="form-data" select="xxforms:get-request-parameter('fr-form-data')"/>
-                        <xforms:action if="$form-data">
-                            <xforms:message level="xxforms:log-debug">Loading document submitted to the page as parameter</xforms:message>
-                            <xxforms:variable name="xml-data" select="saxon:parse(saxon:base64Binary-to-string(xs:base64Binary($form-data), 'UTF-8'))"/>
-                            <xforms:insert nodeset="xxforms:instance('fr-form-instance')" origin="$xml-data"/>
-                        </xforms:action>
-                    </xforms:action>
-                </xforms:action>
+            <!-- Case of modes other than new where the data to be edited or viewed is loaded from the persistence layer -->
+            <xforms:action if="$mode != 'new' and not($is-new-id) and not($is-submit)">
+                <!-- Load document with the provided id from persistence layer -->
+                <xforms:message level="xxforms:log-debug">Loading document by id from persistence layer: <xforms:output value="$document"/></xforms:message>
+                <xforms:send submission="fr-get-document-submission"/>
             </xforms:action>
+
+            <!-- Otherwise, don't stay here if the constraints are not satisfied -->
+            <xforms:load if="($is-submit and not($pass-submit-check)) or ($mode != 'new' and $is-new-id and not($is-submit))" resource="/fr/unauthorized"/>
         </xforms:action>
 
         <!-- Notify that the data is ready -->
@@ -731,7 +742,7 @@
     <xforms:action ev:observer="fr-form-instance" ev:event="xforms-insert xforms-delete xxforms-value-changed">
         <!-- Mark status as dirty if data changes -->
         <!-- In test and view modes, we don't want the status to be marked as dirty, so that the browser's alert dialog doesn't show -->
-        <xforms:setvalue if="not($parameters/mode = ('test', 'view', 'pdf', 'email'))" ref="instance('fr-persistence-instance')/data-status">dirty</xforms:setvalue>
+        <xforms:setvalue if="not($mode = ('test', 'view', 'pdf', 'email'))" ref="instance('fr-persistence-instance')/data-status">dirty</xforms:setvalue>
     </xforms:action>
 
     <!-- Clear message upon DOMFocusIn on #fr-form-group -->

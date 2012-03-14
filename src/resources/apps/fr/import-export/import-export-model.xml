@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <!--
   Copyright (C) 2009 Orbeon, Inc.
 
@@ -12,20 +11,21 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xforms:model id="fr-import-export-model"
-              xmlns:xs="http://www.w3.org/2001/XMLSchema"
-              xmlns:xforms="http://www.w3.org/2002/xforms"
-              xmlns:ev="http://www.w3.org/2001/xml-events"
-              xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
-              xmlns:xi="http://www.w3.org/2001/XInclude"
-              xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
-              xmlns:f="http://orbeon.org/oxf/xml/formatting"
-              xmlns:exist="http://exist.sourceforge.net/NS/exist"
-              xmlns:xhtml="http://www.w3.org/1999/xhtml">
+<xforms:model
+        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns:xforms="http://www.w3.org/2002/xforms"
+        xmlns:ev="http://www.w3.org/2001/xml-events"
+        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+        xmlns:xi="http://www.w3.org/2001/XInclude"
+        xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+        xmlns:f="http://orbeon.org/oxf/xml/formatting"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+
+        id="fr-import-export-model">
 
     <xxforms:variable name="parameters" select="xxforms:instance('fr-parameters-instance')"/>
 
-    <!-- Contains the UUID returned after the Word document has been produced from us to be able to retrieve that document -->
+    <!-- Contains the UUID returned after the document has been produced from us to be able to retrieve that document -->
     <xforms:instance id="fr-uuid">
         <uuid/>
     </xforms:instance>

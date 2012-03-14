@@ -1,4 +1,4 @@
-<xxforms:dialog id="fr-download-save-dialog" level="modal" close="true" draggable="false" class="fr-dialog"
+<xxforms:dialog
         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
         xmlns:xs="http://www.w3.org/2001/XMLSchema"
         xmlns:xforms="http://www.w3.org/2002/xforms"
@@ -8,13 +8,24 @@
         xmlns:xi="http://www.w3.org/2001/XInclude"
         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
         xmlns:ev="http://www.w3.org/2001/xml-events"
-        xmlns:saxon="http://saxon.sf.net/">
+        xmlns:saxon="http://saxon.sf.net/"
+
+        id="fr-download-save-dialog" level="modal" close="true" draggable="false" class="fr-dialog">
+
     <xforms:label ref="$fr-resources/import-export/dialog-title"/>
+
+    <!-- Dialog body -->
     <xforms:output mediatype="text/html" value="saxon:serialize($fr-resources/import-export/dialog-body/*, 'xml')"/>
+
+    <!-- Buttons -->
     <xhtml:div class="fr-dialog-buttons">
-        <xforms:output mediatype="text/html" value="concat('&lt;a href=&quot;../../service/import-export/serve?uuid=',
-            xxforms:instance('fr-uuid'), '&amp;filename=',
-            encode-for-uri(concat(xxforms:instance('fr-save-locally-file-name'), '.html')),
-            '&quot; target=&quot;_blank&quot;&gt;', $fr-resources/import-export/link,'&lt;a&gt;')"/>
+        <!-- Use link as button to work around pop-up blockers -->
+        <xhtml:a href="/fr/service/import-export/serve?uuid={
+                           xxforms:instance('fr-uuid')
+                       }&amp;filename={
+                           encode-for-uri(concat(xxforms:instance('fr-save-locally-file-name'), '.html'))}"
+                 target="_blank">
+            <xforms:output value="$fr-resources/import-export/link"/>
+        </xhtml:a>
     </xhtml:div>
 </xxforms:dialog>

@@ -1,17 +1,8 @@
-<?xml version="1.0" encoding="windows-1252"?>
 <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
         xmlns:saxon="http://saxon.sf.net/"
-        xmlns:wx="http://schemas.microsoft.com/office/word/2003/auxHint"
-        xmlns:w="http://schemas.microsoft.com/office/word/2003/wordml"
-        xmlns:w10="urn:schemas-microsoft-com:office:word"
-        xmlns:v="urn:schemas-microsoft-com:vml"
-        xmlns:o="urn:schemas-microsoft-com:office:office"
         xmlns:oxf="http://www.orbeon.com/oxf/processors"
-        xmlns:xs="http://www.w3.org/2001/XMLSchema"
-        xmlns:xdb="http://orbeon.org/oxf/xml/xmldb"
-        xmlns:snapshot="ccm.job.snapshot.Snapshot"
-        xmlns:f="http://www.orbeon.com/oxf/function">
+        xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
     <p:param name="form-instance" type="input"/>
     <p:param name="parameters" type="input"/>
@@ -52,11 +43,11 @@
                                     <p>
                                         <xsl:value-of select="$resource/detail/messages/saved-locally-open"/>
                                     </p>
-                            <!-- Form we produce -->
-                                    <form name="form1" method="post" action="{$context}/fr/{$app}/{$form}/new" id="form">
-                                <input type="hidden" name="fr-form-data" value="{saxon:string-to-base64Binary(saxon:serialize(/*, 'xml'), 'UTF8')}"/>
-                                <input type="submit" value="Open"/>
-                            </form>
+                                    <!-- Form we produce -->
+                                    <form name="form1" method="post" action="{$context}/fr/{$app}/{$form}/edit" id="form">
+                                        <input type="hidden" name="fr-form-data" value="{saxon:string-to-base64Binary(saxon:serialize(/*, 'xml'), 'UTF8')}"/>
+                                        <input type="submit" value="Open"/>
+                                    </form>
                                 </div>
                             </div>
                         </body>

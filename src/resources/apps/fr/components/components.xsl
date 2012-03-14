@@ -63,8 +63,8 @@
     <xsl:variable name="hide-top" select="xpl:property(string-join(('oxf.fr.detail.hide-top', $app, $form), '.'))" as="xs:boolean?"/>
     <xsl:variable name="hide-buttons-bar" select="xpl:property(string-join(('oxf.fr.detail.hide-buttons-bar', $app, $form), '.'))" as="xs:boolean?"/>
     <xsl:variable name="css-uri" select="tokenize(normalize-space(xpl:property(string-join(('oxf.fr.css.uri', $app, $form), '.'))), '\s+')" as="xs:string*"/>
-    <xsl:variable name="buttons" select="tokenize(xpl:property(string-join(('oxf.fr.detail.buttons', $app, $form), '.')), '\s+')" as="xs:string*"/>
-    <xsl:variable name="view-buttons" select="tokenize(xpl:property(string-join(('oxf.fr.detail.buttons.view', $app, $form), '.')), '\s+')" as="xs:string*"/>
+    <xsl:variable name="buttons-property" select="if ($mode = 'view') then 'oxf.fr.detail.buttons.view' else 'oxf.fr.detail.buttons'"/>
+    <xsl:variable name="buttons" select="tokenize(xpl:property(string-join(($buttons-property, $app, $form), '.')), '\s+')" as="xs:string*"/>
     <xsl:variable name="has-alfresco" select="xpl:property(string-join(('oxf.fr.detail.send.alfresco', $app, $form), '.'))" as="xs:boolean?"/>
     <xsl:variable name="is-show-explanation" select="xpl:property(string-join(('oxf.fr.detail.view.show-explanation', $app, $form), '.')) = true()" as="xs:boolean"/>
     <xsl:variable name="is-inline-hints" select="not(xpl:property(string-join(('oxf.fr.detail.hints.inline', $app, $form), '.')) = false())" as="xs:boolean"/>

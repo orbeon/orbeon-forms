@@ -610,19 +610,6 @@
                         </xhtml:div>
                     </xhtml:div>
                 </xsl:when>
-                <!-- In view mode  -->
-                <xsl:when test="$mode = ('view')">
-                    <!-- List of buttons we include based on property -->
-                    <xsl:variable name="default-buttons" as="element(fr:buttons)">
-                        <fr:buttons>
-                            <xsl:for-each select="$view-buttons">
-                                <xsl:element name="fr:{.}-button"/>
-                                <xsl:text>X</xsl:text>
-                            </xsl:for-each>
-                        </fr:buttons>
-                    </xsl:variable>
-                    <xsl:apply-templates select="$default-buttons/*"/>
-                </xsl:when>
                 <!-- In PDF mode, don't include anything -->
                 <xsl:when test="$mode = ('pdf')"/>
                 <!-- Use default buttons -->

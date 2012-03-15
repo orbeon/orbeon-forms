@@ -157,23 +157,25 @@
             </view>
         </detail>
         <import-export>
-            <dialog-title>Save</dialog-title>
+            <dialog-title>Save Locally</dialog-title>
             <dialog-body>
                 <div>
                     <p>
-                        To save the data you entered; click on the link below and save the document on your machine.
+                        Click on the Save button below to save your form data on your computer as an HTML file.
                     </p>
                     <p>
-                        To reopen the information you entered, double click on the file you saved on your machine and
-                        the tool will automatically retrieve the information entered preciously.
+                        To reopen your form data:
                     </p>
+                    <ul>
+                        <li>Open the HTML file in your browser (by clicking on the file, or dropping it on your browser window).</li>
+                        <li>Click the Open button that will be displayed to confirm.</li>
+                    </ul>
                     <p>
-                        <b>Note:</b> No data is kept on the server and if you delete the file you saved your data will
+                        <b>WARNING:</b> No data is kept on the server and if you delete the file you saved your data will
                         be lost.
                     </p>
                 </div>
             </dialog-body>
-            <link>Save</link>
         </import-export>
         <home>
             <title>Forms Home</title>
@@ -280,8 +282,8 @@
                 <save-as-document>Enregistrer sous…</save-as-document>
                 <publish>Publier…</publish>
                 <test>Tester</test>
-                <save-locally>Enregistrement Local</save-locally>
-                <save-offline>Enregistrement Hors-ligne</save-offline>
+                <save-locally>Enreg. Local</save-locally>
+                <save-offline>Enreg. Hors-ligne</save-offline>
                 <submit-document>Envoyer</submit-document>
                 <workflow-review>Valider</workflow-review>
                 <workflow-send>Envoyer</workflow-send>
@@ -324,24 +326,26 @@
             </view>
         </detail>
         <import-export>
-            <dialog-title>[Save]</dialog-title>
+            <dialog-title>Sauvegarder Localement</dialog-title>
             <dialog-body>
                 <div>
-                    <!-- TODO: i18n -->
                     <p>
-                        [To save the data you entered; click on the link below and save the document on your machine.
+                        Cliquez sur le bouton Enregistrer ci-dessous pour sauvegarder les données de votre formulaire
+                        dans un fichier HTML.
                     </p>
                     <p>
-                        To reopen the information you entered, double click on the file you saved on your machine and
-                        the tool will automatically retrieve the information entered preciously.
+                        Pour rouvrir les données :
                     </p>
+                    <ul>
+                        <li>Ouvrir le fichier HTML dans votre navigateur (en cliquant sur le fichier, ou en le déposant sur une fenêtre du navigateur).</li>
+                        <li>Cliquez le bouton Open qui s'affichera pour confirmer.</li>
+                    </ul>
                     <p>
-                        <b>Note:</b> No data is kept on the server and if you delete the file you saved your data will
-                        be lost.]
+                        <b>ATTENTION:</b> Les données ne seront pas conservées sur le serveur, et si vous supprimez le
+                        fichier sur disque celles-ci seront perdues.
                     </p>
                 </div>
             </dialog-body>
-            <link>Save</link>
         </import-export>
     </resource>
     <resource xml:lang="es">
@@ -505,7 +509,6 @@
                     </p>
                 </div>
             </dialog-body>
-            <link>Guardar</link>
         </import-export>
     </resource>
     <resource xml:lang="no">
@@ -673,7 +676,6 @@
                     </p>
                 </div>
             </dialog-body>
-            <link>Lagre</link>
         </import-export>
 
     </resource>
@@ -836,7 +838,6 @@
                     </p>
                 </div>
             </dialog-body>
-            <link>Сохранить</link>
         </import-export>
     </resource>
 </resources>

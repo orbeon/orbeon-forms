@@ -297,7 +297,6 @@ button.xforms-trigger, input.xforms-trigger, .xforms-trigger button, .xforms-tri
 .fr-dialog .hd { background-color: #666699 }
 .fr-dialog .bd { margin: 0 .5em .5em .5em }
 .fr-dialog-icon { float: left; margin-right: 2em; margin-left: 1em; padding-bottom: 1em }
-.fr-dialog-message { margin-top: .5em; padding-top: 0.5em }
 .fr-dialog-buttons { text-align: right; padding-right: .5em; padding-top: .5em; padding-bottom: .5em; margin-top: .5em; border-top: 2px solid #DDDDEE; clear: both }
 
 #fr-submission-result-dialog { width: 800px }

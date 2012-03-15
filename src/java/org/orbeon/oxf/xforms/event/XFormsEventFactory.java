@@ -293,14 +293,17 @@ public class XFormsEventFactory {
         });
     }
 
+    // For internal events
     public static XFormsEvent createEvent(XFormsContainingDocument containingDocument, String newEventName, XFormsEventTarget targetObject) {
         return createEvent(containingDocument, newEventName, targetObject, false, true, true, null, null, null, null);
     }
 
+    // For xforms:dispatch
     public static XFormsEvent createEvent(XFormsContainingDocument containingDocument, String newEventName, XFormsEventTarget targetObject, boolean bubbles, boolean cancelable) {
         return createEvent(containingDocument, newEventName, targetObject, true, bubbles, cancelable, null, null, null, null);
     }
 
+    // For client events
     public static XFormsEvent createEvent(XFormsContainingDocument containingDocument, String eventName, XFormsEventTarget targetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable,
                                            String contextString, Map<String, String> parameters) {
 

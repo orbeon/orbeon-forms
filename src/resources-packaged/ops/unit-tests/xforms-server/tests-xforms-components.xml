@@ -718,7 +718,7 @@
                     <xxf:control-values>
                         <xxf:control id="my-autocomplete$xf-5" class="fr-autocomplete-container"/>
                         <xxf:control id="my-autocomplete$search" class="fr-autocomplete-search"/>
-                        <xxf:control id="my-autocomplete$show-suggestions-button$container" class="yui-button yui-push-button fr-autocomplete-show-suggestions-button"/>
+                        <xxf:attribute id="my-autocomplete$show-suggestions-button$xf-90" for="my-autocomplete$show-suggestions-button$container" name="class">yui-button yui-push-button fr-autocomplete-show-suggestions-button</xxf:attribute>
                         <xxf:control id="my-autocomplete$itemset" class="fr-autocomplete-dynamic-itemset">true</xxf:control>
                         <xxf:attribute id="my-autocomplete$itemset" for="my-autocomplete$itemset" name="style">display: none</xxf:attribute>
                         <xxf:control id="my-autocomplete$xf-70" class="xbl-fr-autocomplete-max-results-displayed"/>

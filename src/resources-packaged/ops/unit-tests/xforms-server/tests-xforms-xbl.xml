@@ -3395,7 +3395,7 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:control id="my-group" relevant="false"/>
-                        <xxf:control id="my-button$container" relevant="false"/>
+                        <xxf:attribute id="my-button$xf-6" for="my-button$container" name="class"/>
                         <xxf:control id="my-button$trigger" relevant="false"/>
                     </xxf:control-values>
                 </xxf:action>

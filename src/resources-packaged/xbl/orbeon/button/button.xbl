@@ -27,10 +27,12 @@
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
 
          script-type="application/xhtml+xml">
+
     <xbl:script type="text/javascript" src="/ops/yui/element/element-min.js"/>
     <xbl:script type="text/javascript" src="/ops/yui/button/button-min.js"/>
     <xbl:script type="text/javascript" src="/xbl/orbeon/button/button.js"/>
-    <xbl:binding id="fr-button" element="fr|button">
+
+    <xbl:binding id="fr-button" element="fr|button" xxbl:mode="binding handlers">
         <xbl:resources>
             <xbl:style src="/ops/yui/button/assets/skins/sam/button.css"/>
             <xbl:style>
@@ -56,10 +58,9 @@
         </xbl:resources>
         <xbl:template xxbl:transform="oxf:unsafe-xslt">
             <xforms:group appearance="xxforms:internal" xsl:version="2.0">
-                <xxforms:variable name="binding" as="node()?"><xxforms:sequence select="." xxbl:scope="outer" xbl:attr="model context ref bind"/></xxforms:variable>
                 <xxforms:variable name="class-avt" xxbl:scope="outer" xbl:attr="xbl:text=class"/>
                 <xxforms:variable name="class"><xxforms:sequence select="xxforms:evaluate-avt($class-avt)" xxbl:scope="outer"/></xxforms:variable>
-                <xforms:group ref="$binding" class="yui-button yui-push-button{{if ($class = '') then '' else concat(' ', $class)}}" id="container">
+                <xhtml:span class="yui-button yui-push-button{{if ($class = '') then '' else concat(' ', $class)}}" id="container">
                     <xhtml:span class="first-child">
                         <xsl:variable name="tabindex" select="/fr:button/@tabindex"/>
                         <xsl:if test="/fr:button/@tabindex">
@@ -70,7 +71,7 @@
                         <!-- Bind trigger so it can handle read-only -->
                         <xforms:trigger xbl:attr="xxforms:modal" id="trigger">
                             <xsl:if test="exists(/fr:button/(@ref, @bind))">
-                                <xsl:attribute name="ref">$binding</xsl:attribute>
+                                <xsl:attribute name="ref">xxforms:binding('fr-button')</xsl:attribute>
                             </xsl:if>
                             <xbl:content includes="xforms|label, xforms|help, xforms|hint"/>
                             <xxforms:script ev:event="xforms-enabled xxforms-iteration-moved" ev:target="#observer">YAHOO.xbl.fr.Button.instance(this).enabled();</xxforms:script>
@@ -78,7 +79,7 @@
                             <xxforms:script ev:event="xforms-readwrite" ev:target="#observer">YAHOO.xbl.fr.Button.instance(this).readwrite();</xxforms:script>
                         </xforms:trigger>
                     </xhtml:span>
-                </xforms:group>
+                </xhtml:span>
             </xforms:group>
         </xbl:template>
     </xbl:binding>

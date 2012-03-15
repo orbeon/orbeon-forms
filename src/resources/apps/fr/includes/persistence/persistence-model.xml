@@ -148,7 +148,7 @@
             </xforms:action>
 
             <!-- Otherwise, don't stay here if the constraints are not satisfied -->
-            <xforms:load if="($is-submit and not($pass-submit-check)) or ($mode != 'new' and $is-new-id and not($is-submit))" resource="/fr/unauthorized"/>
+            <xforms:load if="($is-submit and not($pass-submit-check)) or (not($mode = ('new', 'test')) and $is-new-id and not($is-submit))" resource="/fr/unauthorized"/>
         </xforms:action>
 
         <!-- Notify that the data is ready -->

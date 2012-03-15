@@ -740,9 +740,8 @@
 
     <!-- React to instance mutation events -->
     <xforms:action ev:observer="fr-form-instance" ev:event="xforms-insert xforms-delete xxforms-value-changed">
-        <!-- Mark status as dirty if data changes -->
-        <!-- In test and view modes, we don't want the status to be marked as dirty, so that the browser's alert dialog doesn't show -->
-        <xforms:setvalue if="not($mode = ('test', 'view', 'pdf', 'email'))" ref="instance('fr-persistence-instance')/data-status">dirty</xforms:setvalue>
+        <!-- In 'new' and 'edit' modes only, mark status as dirty if data changes -->
+        <xforms:setvalue if="$mode = ('new', 'edit')" ref="instance('fr-persistence-instance')/data-status">dirty</xforms:setvalue>
     </xforms:action>
 
     <!-- Clear message upon DOMFocusIn on #fr-form-group -->

@@ -222,7 +222,6 @@
                             <p:processor name="oxf:identity">
                                 <p:input name="data">
                                     <config>
-                                        <version>4.01</version>
                                         <encoding>utf-8</encoding>
                                         <indent>true</indent>
                                         <indent-amount>0</indent-amount>

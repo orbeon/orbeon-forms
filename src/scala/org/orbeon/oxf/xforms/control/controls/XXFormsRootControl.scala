@@ -32,10 +32,6 @@ class XXFormsRootControl(container: XBLContainer, parent: XFormsControl, element
             containingDocument.getControls.getCurrentControlTree.setRoot(this)
     }
 
-    // Root control is always relevant
-    // TODO: Not sure if overriding this is still needed
-    override def wasRelevantCommit() = true
-
-    // TODO: Should we support refresh events? Simply enabling below doesn't seem to work for enabled/disabled.
+    // FIXME: Support refresh events? Simply enabling below doesn't seem to work for enabled/disabled.
     //override def supportsRefreshEvents = true
 }

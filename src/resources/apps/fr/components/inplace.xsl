@@ -45,7 +45,7 @@
                     <!-- View mode -->
                     <xhtml:span class="fr-inplace-view">
                         <xhtml:span class="fr-inplace-content">
-                            <xforms:output>
+                            <xforms:output class="xforms-activable">
                                 <xsl:if test="@tabindex | @navindex">
                                     <xsl:attribute name="navindex" select="(@navindex, @tabindex)[1]"/>
                                 </xsl:if>
@@ -98,7 +98,7 @@
             <xforms:case id="fr-inplace-{@id}-view">
                 <xhtml:div class="fr-inplace-view">
                     <xhtml:span class="fr-inplace-content">
-                        <xforms:output>
+                        <xforms:output class="xforms-activable">
                             <!-- Handle inline hint-->
                             <xsl:call-template name="fr-handle-inplace-hint"/>
                             <!-- Place @ref/@bind and alert in order to obtain validity MIP -->

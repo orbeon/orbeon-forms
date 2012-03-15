@@ -1,0 +1,58 @@
+<!--
+  Copyright (C) 2012 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl xmlns:xhtml="http://www.w3.org/1999/xhtml"
+         xmlns:xforms="http://www.w3.org/2002/xforms"
+         xmlns:ev="http://www.w3.org/2001/xml-events"
+         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:xbl="http://www.w3.org/ns/xbl"
+         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+         xmlns:f="http://orbeon.org/oxf/xml/formatting">
+
+    <xbl:binding id="fr-href-button" element="fr|href-button" xxbl:mode="binding handlers" xxbl:container="span">
+        <xbl:template>
+            <xforms:group>
+                <!-- Create the link so that the URL gets rewritten -->
+                <xhtml:a style="display:none" class="fr-href-button-anchor" target="_blank"
+                         xbl:attr="href" f:url-type="resource" xxbl:scope="outer"/>
+
+                <!-- In script mode, intercept client-side click and open window directly -->
+                <xxforms:script ev:event="xforms-enabled" ev:target="#observer">
+                    var button = ORBEON.util.Dom.getElementsByName(this, "button")[0];
+                    YAHOO.util.Event.addListener(button, "click", function(_dummy, group) {
+                        var a = YAHOO.util.Dom.getElementsByClassName("fr-href-button-anchor", null, group)[0];
+                        window.open(a.href, a.target)
+                    }, this);
+                </xxforms:script>
+
+                <!-- FIXME: remove listener -->
+                <xxforms:script ev:event="xforms-disabled" ev:target="#observer"/>
+                
+                <!-- Only load directly in noscript mode -->
+                <xforms:load
+                        ev:event="DOMActivate"
+                        if="property('xxforms:noscript')"
+                        xbl:attr="resource=href"
+                        xxforms:show-progress="false"
+                        f:url-type="resource"/>
+                
+                <!-- Trigger and its content -->
+                <!-- TODO: Should also support case where we don't want a binding, right? -->
+                <xforms:trigger xxbl:scope="outer" ref=".">
+                    <xbl:content/>
+                </xforms:trigger>
+            </xforms:group>
+        </xbl:template>
+    </xbl:binding>
+</xbl:xbl>

@@ -84,7 +84,7 @@
         <xforms:setvalue ev:event="xforms-submit-done xforms-submit-error" ref="xxforms:instance('fr-persistence-instance')/data-safe-override"/>
     </xforms:submission>
 
-    <!-- Open PDF for the current form data -->
+    <!-- Open PDF for the current form data (dispatch from XPL) -->
     <xforms:action ev:event="fr-open-pdf">
         <xforms:send submission="fr-pdf-submission"/>
     </xforms:action>

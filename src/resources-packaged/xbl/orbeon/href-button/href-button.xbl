@@ -16,28 +16,25 @@
          xmlns:ev="http://www.w3.org/2001/xml-events"
          xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:oxf="http://www.orbeon.com/oxf/processors"
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
-         xmlns:f="http://orbeon.org/oxf/xml/formatting">
+         xmlns:f="http://orbeon.org/oxf/xml/formatting"
+         xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+
+    <xbl:script type="text/javascript" src="/xbl/orbeon/href-button/href-button.js"/>
 
     <xbl:binding id="fr-href-button" element="fr|href-button" xxbl:mode="binding handlers" xxbl:container="span">
-        <xbl:template>
-            <xforms:group>
+        <xbl:template xxbl:transform="oxf:xslt">
+            <xforms:group xsl:version="2.0">
                 <!-- Create the link so that the URL gets rewritten -->
                 <xhtml:a style="display:none" class="fr-href-button-anchor" target="_blank"
                          xbl:attr="href" f:url-type="resource" xxbl:scope="outer"/>
 
                 <!-- In script mode, intercept client-side click and open window directly -->
-                <xxforms:script ev:event="xforms-enabled" ev:target="#observer">
-                    var button = ORBEON.util.Dom.getElementsByName(this, "button")[0];
-                    YAHOO.util.Event.addListener(button, "click", function(_dummy, group) {
-                        var a = YAHOO.util.Dom.getElementsByClassName("fr-href-button-anchor", null, group)[0];
-                        window.open(a.href, a.target)
-                    }, this);
-                </xxforms:script>
-
-                <!-- FIXME: remove listener -->
-                <xxforms:script ev:event="xforms-disabled" ev:target="#observer"/>
+                <xxforms:script
+                    ev:event="xforms-enabled xxforms-iteration-moved"
+                    ev:target="#observer">YAHOO.xbl.fr.HrefButton.instance(this);</xxforms:script>
                 
                 <!-- Only load directly in noscript mode -->
                 <xforms:load
@@ -48,8 +45,12 @@
                         f:url-type="resource"/>
                 
                 <!-- Trigger and its content -->
-                <!-- TODO: Should also support case where we don't want a binding, right? -->
-                <xforms:trigger xxbl:scope="outer" ref=".">
+                <xforms:trigger>
+                    <!-- Handle optional binding -->
+                    <!-- See also RFE: https://github.com/orbeon/orbeon-forms/issues/72 -->
+                    <xsl:if test="exists(/fr:href-button/(@ref, @bind))">
+                        <xsl:attribute name="ref">xxforms:binding('fr-href-button')</xsl:attribute>
+                    </xsl:if>
                     <xbl:content/>
                 </xforms:trigger>
             </xforms:group>

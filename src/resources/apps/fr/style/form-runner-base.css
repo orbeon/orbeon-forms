@@ -214,7 +214,7 @@ button.xforms-trigger, input.xforms-trigger, .xforms-trigger button, .xforms-tri
 /* Explanation message if present */
 .fr-explanation { padding: 10px }
 
-/* Buttons */
+/* Button bar */
 
 .fr-buttons {
     float: right;

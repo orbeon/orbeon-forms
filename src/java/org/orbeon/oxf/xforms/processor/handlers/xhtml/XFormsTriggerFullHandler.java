@@ -13,7 +13,9 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers.xhtml;
 
+import org.dom4j.QName;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
+import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsControls;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.XFormsControl;
@@ -22,6 +24,8 @@ import org.orbeon.oxf.xml.*;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
+
+import java.util.Set;
 
 /**
  * Default full appearance (button).
@@ -132,5 +136,18 @@ public class XFormsTriggerFullHandler extends XFormsTriggerHandler {
             }
         }
         xmlReceiver.endElement(XMLConstants.XHTML_NAMESPACE_URI, elementName, spanQName);
+    }
+
+    @Override
+    protected void addCustomClasses(StringBuilder classes, XFormsControl control) {
+        // When the appearance is not minimal, put a class for the full appearance, so we can style the full trigger
+        // properly without banging our head on walls due to poor CSS support in IE.
+        // We don't add xforms-trigger-appearance-full to all controls as it is usually not needed and would add more
+        // markup.
+        final Set<QName> appearances = XFormsControl.appearances(elementAnalysis);
+        if (! (appearances.contains(XFormsConstants.XXFORMS_MINIMAL_APPEARANCE_QNAME) || appearances.contains(XFormsConstants.XFORMS_MINIMAL_APPEARANCE_QNAME)))
+            classes.append(" xforms-trigger-appearance-full");
+
+        super.addCustomClasses(classes, control);
     }
 }

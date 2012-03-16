@@ -296,8 +296,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
             public ElementAnalysis match(Attributes attributes, Object handlerContext) {
                 final ElementAnalysis elementAnalysis = getElementAnalysis(attributes, handlerContext);
                 return elementAnalysis != null && !containingDocument.getStaticState().isNoscript()             // in noscript mode, use the full appearance
-                        && (hasAppearance(elementAnalysis, XFormsConstants.XFORMS_MINIMAL_APPEARANCE_QNAME)     // minimal appearance
-                            || hasAppearance(elementAnalysis, XFormsConstants.XXFORMS_LINK_APPEARANCE_QNAME))   // legacy appearance
+                        && (hasAppearance(elementAnalysis, XFormsConstants.XFORMS_MINIMAL_APPEARANCE_QNAME))    // minimal appearance
                        ? elementAnalysis : null;
             }
         };

@@ -303,7 +303,6 @@ public class XFormsConstants {
     public static final QName XXFORMS_MENU_APPEARANCE_QNAME = new QName("menu", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_AUTOCOMPLETE_APPEARANCE_QNAME = new QName("autocomplete", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_AUTOSIZE_APPEARANCE_QNAME = new QName("autosize", XXFORMS_NAMESPACE);
-    public static final QName XXFORMS_LINK_APPEARANCE_QNAME = new QName("link", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_FIELDSET_APPEARANCE_QNAME = new QName("fieldset", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_INTERNAL_APPEARANCE_QNAME = new QName("internal", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_TEXT_APPEARANCE_QNAME = new QName("text", XXFORMS_NAMESPACE);

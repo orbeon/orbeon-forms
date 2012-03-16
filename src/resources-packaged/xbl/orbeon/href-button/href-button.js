@@ -21,7 +21,7 @@
     YAHOO.xbl.fr.HrefButton.prototype = {
 
         /**
-         *
+         * Attach a click listener to the button. The listener opens a window based on information from the anchor.
          */
         init: function() {
             var container = this.container;

@@ -36,6 +36,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dom4j.Attribute;
 import org.dom4j.Element;
+import org.dom4j.Node;
 import org.dom4j.QName;
 import org.orbeon.oxf.cache.Cache;
 import org.orbeon.oxf.cache.CacheKey;
@@ -364,19 +365,9 @@ public class XFormsModelSchemaValidator {
             } else {
                 return false;
             }
-        } else if (datatypeRef.types != null && datatypeRef.types.length > 0) {
-            // This element is valid and has at least one assigned datatype
-
+        } else {
             // Attempt to set datatype name
-            final Datatype datatype = datatypeRef.types[0];
-            if (datatype instanceof XSDatatype) {
-                final XSDatatype xsDatatype = (XSDatatype) datatype;
-                final String dataTypeURI = xsDatatype.getNamespaceUri();
-                final String dataTypeName = xsDatatype.getName();
-
-                if (dataTypeName != null && !dataTypeName.equals(""))
-                    InstanceData.setSchemaType(element, QName.get(dataTypeName, "", dataTypeURI));
-            }
+            setDataType(datatypeRef, element);
         }
 
         // Handle id errors
@@ -402,6 +393,23 @@ public class XFormsModelSchemaValidator {
         } else {
             // This element is valid
             return true;
+        }
+    }
+
+    private void setDataType(DatatypeRef datatypeRef, Node node) {
+        if (datatypeRef.types != null && datatypeRef.types.length > 0) {
+            // This element is valid and has at least one assigned datatype
+
+            // Attempt to set datatype name
+            final Datatype datatype = datatypeRef.types[0];
+            if (datatype instanceof XSDatatype) {
+                final XSDatatype xsDatatype = (XSDatatype) datatype;
+                final String dataTypeURI = xsDatatype.getNamespaceUri();
+                final String dataTypeName = xsDatatype.getName();
+
+                if (dataTypeName != null && !dataTypeName.equals(""))
+                    InstanceData.setSchemaType(node, QName.get(dataTypeName, "", dataTypeURI));
+            }
         }
     }
 
@@ -545,9 +553,10 @@ public class XFormsModelSchemaValidator {
                 final String qName = startTagInfo.attributes.getQName(i);
                 final String value = startTagInfo.attributes.getValue(i);
 
+                final Attribute attribute = element.attribute(i);
+
                 if (!acceptor.onAttribute2(uri, name, qName, value, startTagInfo.context, null, attributeDatatypeRef)) {
                     if (isReportErrors) {
-                        final Attribute attribute = element.attribute(i);
                         acceptor.onAttribute2(uri, name, qName, value, startTagInfo.context, stringRef, null);
                         addSchemaError(attribute, stringRef.str);
                         isElementChildrenValid = false;
@@ -555,7 +564,10 @@ public class XFormsModelSchemaValidator {
                         return false;
                     }
                 }
-                final Attribute attribute = element.attribute(i);
+
+                // Attempt to set datatype name
+                setDataType(attributeDatatypeRef, attribute);
+
                 if (icc != null && isReportErrors) {
                     icc.feedAttribute(acceptor, attribute, attributeDatatypeRef.types);
                     isElementChildrenValid &= handleIDErrors(icc);

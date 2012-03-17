@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms.processor.handlers.xhtml;
 
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.xforms.analysis.controls.TriggerAppearanceTrait;
 import org.orbeon.oxf.xforms.control.LHHASupport;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
@@ -60,14 +59,6 @@ public abstract class XFormsTriggerHandler extends XFormsControlLifecyleHandler 
     @Override
     protected void handleAlert() throws SAXException {
         // Triggers don't need an alert (in theory, they could have one)
-    }
-
-    @Override
-    protected void addCustomClasses(StringBuilder classes, XFormsControl control) {
-        // Set modal class
-        // TODO: xf:trigger/@xxforms:modal; do this in static state?
-        if (((TriggerAppearanceTrait) elementAnalysis).isModal())
-            classes.append(" xforms-trigger-appearance-modal");
     }
 
     @Override

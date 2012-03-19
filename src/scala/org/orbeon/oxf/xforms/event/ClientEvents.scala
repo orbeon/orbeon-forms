@@ -89,25 +89,28 @@ object ClientEvents {
                 case _ ⇒ true
             }
 
-            def combineValueEvents(events: Seq[LocalEvent]): Seq[XFormsEvent] = {
+            def combineValueEvents(events: Seq[LocalEvent]): Seq[XFormsEvent] = events match {
+                case Seq() ⇒ Seq()
+                case Seq(localEvent) ⇒ safelyCreateAndMapEvent(doc, localEvent).toList
+                case _ ⇒
 
-                // Grouping key for value change events
-                case class EventGroupingKey(name: String, targetId: String) {
-                    def this(localEvent: LocalEvent) =
-                        this(localEvent.name, localEvent.targetEffectiveId)
-                }
+                    // Grouping key for value change events
+                    case class EventGroupingKey(name: String, targetId: String) {
+                        def this(localEvent: LocalEvent) =
+                            this(localEvent.name, localEvent.targetEffectiveId)
+                    }
 
-                // Slide over the events so we can filter and compress them
-                // NOTE: Don't use Iterator.toSeq as that returns a Stream, which evaluates lazily. This would be great, except
-                // that we *must* first create all events, then dispatch them, so that references to XFormsTarget are obtained
-                // beforehand.
-                (events ++ DummyEvent).sliding(2).toList flatMap {
-                    case Seq(a, b) ⇒
-                        if (a.name != XXFORMS_VALUE || new EventGroupingKey(a) != new EventGroupingKey(b))
-                            safelyCreateAndMapEvent(doc, a)
-                        else
-                            None
-                }
+                    // Slide over the events so we can filter and compress them
+                    // NOTE: Don't use Iterator.toSeq as that returns a Stream, which evaluates lazily. This would be great, except
+                    // that we *must* first create all events, then dispatch them, so that references to XFormsTarget are obtained
+                    // beforehand.
+                    (events ++ DummyEvent).sliding(2).toList flatMap {
+                        case Seq(a, b) ⇒
+                            if (a.name != XXFORMS_VALUE || new EventGroupingKey(a) != new EventGroupingKey(b))
+                                safelyCreateAndMapEvent(doc, a)
+                            else
+                                None
+                    }
             }
 
             // Combine and process events

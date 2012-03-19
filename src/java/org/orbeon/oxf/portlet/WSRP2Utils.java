@@ -90,10 +90,9 @@ public class WSRP2Utils {
     private static final Pattern PATTERN_AMP;
 
     static {
-        final String notEqNorAmpChar = "[^=&]";
-        final String token = notEqNorAmpChar+ "+";
-        PATTERN_NO_AMP = Pattern.compile( "(" + token + ")=(" + token + ")(?:&|(?<!&)\\z)" );
-        PATTERN_AMP = Pattern.compile( "(" + token + ")=(" + token + ")(?:&amp;|&|(?<!&amp;|&)\\z)" );
+        final String token = "[^=&]+";
+        PATTERN_NO_AMP = Pattern.compile( "(" + token + ")=(" + token + ")?(?:&|(?<!&)\\z)" );
+        PATTERN_AMP = Pattern.compile( "(" + token + ")=(" + token + ")?(?:&amp;|&|(?<!&amp;|&)\\z)" );
     }
 
     public static String escapeXMLMinimal(String str) {
@@ -116,7 +115,9 @@ public class WSRP2Utils {
                     // Group 0 is the whole match, e.g. a=b, while group 1 is the first group
                     // denoted (with parens) in the expression. Hence we start with group 1.
                     String name = URLDecoder.decode(matcher.group(1), STANDARD_PARAMETER_ENCODING);
-                    final String value = URLDecoder.decode(matcher.group(2), STANDARD_PARAMETER_ENCODING);
+                    String group2 = matcher.group(2);
+
+                    final String value = group2 != null ? URLDecoder.decode(group2, STANDARD_PARAMETER_ENCODING) : "";
 
                     // Handle the case where the source contains &amp;amp; because of double escaping which does occur in
                     // full Ajax updates!

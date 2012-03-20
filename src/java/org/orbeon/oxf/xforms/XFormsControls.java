@@ -312,12 +312,9 @@ public class XFormsControls implements XFormsObjectResolver {
                 final XFormsControl focusedBefore = getFocusedControl();
 
                 // Update control bindings
-                updateControlBindings();
+                final Controls.BindingUpdater updater = updateControlBindings();
                 // Update control values
                 evaluateControlValues();
-
-                // Handle focus changes
-                Focus.updateFocus(focusedBefore);
 
                 if (currentControlTree.isAllowSendingRefreshEvents()) {
                     // There are potentially event handlers for UI events, so do the whole processing
@@ -340,6 +337,9 @@ public class XFormsControls implements XFormsObjectResolver {
                     // effect, and clear the corresponding flag."
                     refreshDone();
                 }
+
+                // Handle focus changes
+                Focus.updateFocusWithEvents(focusedBefore, updater.partialFocusRepeat());
             }
             indentedLogger.endHandleOperation();
         }
@@ -350,16 +350,16 @@ public class XFormsControls implements XFormsObjectResolver {
      *
      * @return                  true iif bindings were updated
      */
-    private boolean updateControlBindings() {
+    private Controls.BindingUpdater updateControlBindings() {
 
         if (!initialized) {
-            return false;
+            return null;
         } else {
             // This is the regular case
 
             // Don't do anything if bindings are clean
             if (!currentControlTree.isBindingsDirty())
-                return false;
+                return null;
 
             // Clone if needed
             cloneInitialStateIfNeeded();
@@ -369,7 +369,7 @@ public class XFormsControls implements XFormsObjectResolver {
             final Controls.BindingUpdater updater = Controls.updateBindings(containingDocument);
             indentedLogger.endHandleOperation(
                 "controls visited", Integer.toString(updater.visitedCount()),
-                "bindings evaluated", Integer.toString(updater.updateCount()),
+                "bindings evaluated", Integer.toString(updater.updatedCount()),
                 "bindings optimized", Integer.toString(updater.optimizedCount())
                 );
 
@@ -377,7 +377,7 @@ public class XFormsControls implements XFormsObjectResolver {
             initialControlTree.markBindingsClean();
             currentControlTree.markBindingsClean();
 
-            return true;
+            return updater;
         }
     }
 
@@ -428,10 +428,7 @@ public class XFormsControls implements XFormsObjectResolver {
         final XFormsControl focusedBefore = getFocusedControl();
 
         // Update bindings starting at the container control
-        updateSubtreeBindings(containerControl);
-
-        // Handle focus changes
-        Focus.updateFocus(focusedBefore);
+        final Controls.BindingUpdater updater = updateSubtreeBindings(containerControl);
 
         // Evaluate the controls
         Controls.visitControls(containerControl, true, new Controls.XFormsControlVisitorAdapter() {
@@ -451,6 +448,9 @@ public class XFormsControls implements XFormsObjectResolver {
             // Dispatch events
             currentControlTree.dispatchRefreshEvents(eventsToDispatch);
         }
+
+        // Handle focus changes
+        Focus.updateFocusWithEvents(focusedBefore, updater.partialFocusRepeat());
     }
 
     /**
@@ -458,7 +458,7 @@ public class XFormsControls implements XFormsObjectResolver {
      *
      * @param containerControl  container control
      */
-    private void updateSubtreeBindings(XFormsContainerControl containerControl) {
+    private Controls.BindingUpdater updateSubtreeBindings(XFormsContainerControl containerControl) {
         // Clone if needed
         cloneInitialStateIfNeeded();
 
@@ -466,9 +466,11 @@ public class XFormsControls implements XFormsObjectResolver {
         final Controls.BindingUpdater updater = Controls.updateBindings(containerControl);
         indentedLogger.endHandleOperation(
             "controls visited", Integer.toString(updater.visitedCount()),
-            "bindings evaluated", Integer.toString(updater.updateCount()),
+            "bindings evaluated", Integer.toString(updater.updatedCount()),
             "bindings optimized", Integer.toString(updater.optimizedCount())
         );
+        
+        return updater;
     }
 
     private List<String> gatherControlsForRefresh(XFormsContainerControl containerControl) {
@@ -496,5 +498,9 @@ public class XFormsControls implements XFormsObjectResolver {
 
     public void setFocusedControl(XFormsControl focusedControl) {
         this.focusedControl = focusedControl;
+    }
+
+    public void clearFocusedControl() {
+        this.focusedControl = null;
     }
 }

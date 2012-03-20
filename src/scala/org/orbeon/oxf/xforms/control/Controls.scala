@@ -241,18 +241,26 @@ object Controls {
 
     class BindingUpdater(val containingDocument: XFormsContainingDocument, val startBindingContext: BindingContext) extends XFormsControlVisitorListener {
 
-        var newIterationsIds = Set.empty[String]
+        private var newIterationsIds = Set.empty[String]
 
         // Start with initial context
-        var bindingContext = startBindingContext
-        val xpathDependencies = containingDocument.getXPathDependencies
+        private var bindingContext = startBindingContext
+        private val xpathDependencies = containingDocument.getXPathDependencies
 
-        var level = 0
-        var newlyRelevantLevel = -1
+        private var level = 0
+        private var newlyRelevantLevel = -1
 
-        var visitedCount = 0
-        var updateCount = 0
-        var optimizedCount = 0
+        private var _visitedCount = 0
+        def visitedCount = _visitedCount
+        
+        private var _updatedCount = 0
+        def updatedCount = _updatedCount
+        
+        private var _optimizedCount = 0
+        def optimizedCount = _optimizedCount
+        
+        var _partialFocusRepeatOption: Option[XFormsRepeatControl] = None
+        def partialFocusRepeat = _partialFocusRepeatOption
 
         def startVisitControl(control: XFormsControl): Boolean = {
 
@@ -261,7 +269,7 @@ object Controls {
                 return false
 
             level += 1
-            visitedCount += 1
+            _visitedCount += 1
 
             // Value of relevance before messing with the binding
             val wasRelevant = control.isRelevant
@@ -283,21 +291,25 @@ object Controls {
                         // Update iterations
                         val oldRepeatSeq = control.getBindingContext.getNodeset
                         control.evaluateBinding(bindingContext, update = true)
-                        val newIterations = repeatControl.updateIterations(oldRepeatSeq, null, isInsertDelete = false)
+                        val (newIterations, partialFocusRepeatOption) = repeatControl.updateIterations(oldRepeatSeq, null, isInsertDelete = false)
+
+                        // Remember partial focus out of repeat if needed
+                        if (this._partialFocusRepeatOption.isEmpty && partialFocusRepeatOption.isDefined)
+                            this._partialFocusRepeatOption = partialFocusRepeatOption
 
                         // Remember newly created iterations so we don't recurse into them in startRepeatIteration()
                         // o It is not needed to recurse into them because their bindings are up to date since they have just been created
                         // o However they have not yet been evaluated. They will be evaluated at the same time the other controls are evaluated
                         // NOTE: don't call ControlTree.initializeRepeatIterationTree() here because refresh evaluates controls and dispatches events
-                        newIterationsIds = newIterations map (_.getEffectiveId) toSet
+                        this.newIterationsIds = newIterations map (_.getEffectiveId) toSet
                     case control ⇒
                         // Simply set new binding
                         control.evaluateBinding(bindingContext, update = true)
                 }
-                updateCount += 1
+                _updatedCount += 1
             } else {
                 control.refreshBinding(bindingContext)
-                optimizedCount += 1
+                _optimizedCount += 1
             }
 
             // Update context for children controls

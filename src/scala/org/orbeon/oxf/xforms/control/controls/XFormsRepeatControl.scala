@@ -248,8 +248,6 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
         // Get old nodeset
         val oldRepeatNodeset = getBindingContext.getNodeset
 
-        val focusedBefore = containingDocument.getControls.getFocusedControl
-
         // Set new binding context on the repeat control
         locally {
             // NOTE: here we just reevaluate against the parent; maybe we should reevaluate all the way down
@@ -270,7 +268,9 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
         if (! Controls.compareNodesets(oldRepeatNodeset, getBindingContext.getNodeset)) {
             // Update iterationsInitialStateIfNeeded()
 
-            val newIterations = updateIterations(oldRepeatNodeset, insertedNodeInfos, isInsertDelete = true)
+            val focusedBefore = containingDocument.getControls.getFocusedControl
+
+            val (newIterations, partialFocusRepeatOption) = updateIterations(oldRepeatNodeset, insertedNodeInfos, isInsertDelete = true)
 
             // Evaluate all controls and then dispatches creation events
             val currentControlTree = containingDocument.getControls.getCurrentControlTree
@@ -279,10 +279,10 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
 
             // This will dispatch xforms-enabled/xforms-disabled/xxforms-nodeset-changed/xxforms-index-changed events if needed
             containingDocument.getControls.getCurrentControlTree.dispatchRefreshEvents(Collections.singletonList(getEffectiveId))
-        }
 
-        // Handle focus changes
-        Focus.updateFocus(focusedBefore)
+            // Handle focus changes
+            Focus.updateFocusWithEvents(focusedBefore, partialFocusRepeatOption)
+        }
     }
 
     /**
@@ -296,7 +296,8 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
      * @param insertedItems         items just inserted by xforms:insert if any, or null
      * @return                      new iterations if any, or an empty list
      */
-    def updateIterations(oldRepeatItems: JList[Item], insertedItems: JList[Item], isInsertDelete: Boolean): Seq[XFormsRepeatIterationControl] = {
+    def updateIterations(oldRepeatItems: JList[Item], insertedItems: JList[Item], isInsertDelete: Boolean):
+            (Seq[XFormsRepeatIterationControl], Option[XFormsRepeatControl]) = {
 
         // NOTE: The following assumes the nodesets have changed
 
@@ -314,8 +315,11 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
         val oldRepeatIndex = getIndex// 1-based
         var updated = false
 
-        val (newIterations, movedIterationsOldPositions, movedIterationsNewPositions) =
+        val (newIterations, movedIterationsOldPositions, movedIterationsNewPositions, partialFocusRepeatOption) =
             if (! newRepeatNodeset.isEmpty) {
+
+                // This may be set to this repeat or to a nested repeat if focus was within a removed iteration
+                var partialFocusRepeatOption: Option[XFormsRepeatControl] = None
 
                 // For each new node, what its old index was, -1 if it was not there
                 val oldIndexes = findNodeIndexes(newRepeatNodeset, oldRepeatItems)
@@ -334,6 +338,15 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
                         val movedOrRemovedIteration = oldChildren(i)
                         if (isRemoved) {
                             withDebug("removing iteration", Seq("id" → getEffectiveId, "index" → (i + 1).toString)) {
+
+                                // If focused control is in removed iteration, remember this repeat and partially remove
+                                // focus before deindexing the iteration. The idea here is that we don't want to dispatch
+                                // events to controls that have been removed from the index. So we dispatch all the
+                                // possible focus out events here.
+                                if (partialFocusRepeatOption.isEmpty && Focus.isFocusInContainer(movedOrRemovedIteration)) {
+                                    partialFocusRepeatOption = Some(XFormsRepeatControl.this)
+                                    Focus.removeFocusPartially(containingDocument, boundary = partialFocusRepeatOption)
+                                }
         
                                 // Dispatch destruction events
                                 currentControlTree.dispatchDestructionEventsForRemovedContainer(movedOrRemovedIteration, true)
@@ -434,6 +447,16 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
 
                         val existingIteration = oldChildren(currentOldIndex)
                         val newIterationOldIndex = existingIteration.iterationIndex
+
+                        def updateBindingsIfNeeded() {
+                            // NOTE: We used to only update the binding on the iteration itself
+                            if (isInsertDelete) {
+                                val updater = Controls.updateBindings(existingIteration)
+                                if (partialFocusRepeatOption.isEmpty && updater.partialFocusRepeat.isDefined)
+                                    partialFocusRepeatOption = updater.partialFocusRepeat
+                            }
+                        }
+
                         if (newIterationOldIndex != repeatIndex) {
                             // Iteration index changed
                             debug("moving iteration", Seq("id" → getEffectiveId, "old index" → newIterationOldIndex.toString, "new index" → repeatIndex.toString))
@@ -442,9 +465,7 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
                             existingIteration.setIterationIndex(repeatIndex)
 
                             // Update iteration bindings
-                            // NOTE: We used to only update the binding on the iteration itself
-                            if (isInsertDelete)
-                                Controls.updateBindings(existingIteration)
+                            updateBindingsIfNeeded()
 
                             // Index iteration
                             currentControlTree.indexSubtree(existingIteration, true)
@@ -457,9 +478,7 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
                             // Iteration index stayed the same
 
                             // Update iteration bindings
-                            // NOTE: We used to only update the binding on the iteration itself
-                            if (isInsertDelete)
-                                Controls.updateBindings(existingIteration)
+                            updateBindingsIfNeeded()
                         }
 
                         // Add existing iteration
@@ -470,9 +489,13 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
                 // Set the new children iterations
                 setChildren(newChildren)
 
-                (newIterations, movedIterationsOldPositions, movedIterationsNewPositions)
+                (newIterations, movedIterationsOldPositions, movedIterationsNewPositions, partialFocusRepeatOption)
             } else {
                 // New repeat nodeset is now empty
+
+                // If focused control is in removed iterations, remove focus first
+                if (Focus.isFocusInContainer(XFormsRepeatControl.this))
+                    Focus.removeFocus(containingDocument)
 
                 // Remove control information for iterations that disappear
                 for (removedIteration ← children) {
@@ -492,7 +515,7 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
                 clearChildren()
                 setIndexInternal(0)
 
-                (Seq.empty, Collections.emptyList[java.lang.Integer], Collections.emptyList[java.lang.Integer])
+                (Seq.empty, Collections.emptyList[java.lang.Integer], Collections.emptyList[java.lang.Integer], None)
             }
 
         if (updated || oldRepeatIndex != getIndex) {
@@ -509,7 +532,7 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
         else
             refreshInfo = null
 
-        newIterations
+        (newIterations, partialFocusRepeatOption)
     }
 
     def dispatchRefreshEvents() {

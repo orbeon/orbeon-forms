@@ -24,6 +24,7 @@ import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsCaseControl;
+import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.xbl.Scope;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.oxf.xforms.control.Focus;
@@ -71,7 +72,7 @@ public class XFormsToggleAction extends XFormsAction {
                 caseControl.toggle();// this will dispatch events
 
                 // Handle focus changes
-                Focus.updateFocus(focusedBefore);
+                Focus.updateFocusWithEvents(focusedBefore, scala.Option.<XFormsRepeatControl>apply(null));
             }
         } else {
             // "If there is a null search result for the target object and the source object is an XForms action such as

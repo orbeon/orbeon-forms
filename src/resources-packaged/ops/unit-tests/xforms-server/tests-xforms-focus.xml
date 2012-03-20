@@ -1142,4 +1142,67 @@
         </output>
     </test>
 
+    <test description="Focus and event handler within removed iteration" name="oxf:pipeline">
+        <!-- See: https://github.com/orbeon/orbeon-forms/issues/62 -->
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="instance">
+                            <instance xmlns="">
+                                <first-name focus="false">Ada</first-name>
+                                <first-name focus="false">Marie</first-name>
+                                <first-name focus="false">Clara</first-name>
+                            </instance>
+                        </xf:instance>
+
+                        <xf:action ev:event="xforms-ready">
+                            <!-- Focus on last iteration -->
+                            <xf:setindex repeat="my-repeat" index="3"/>
+                            <xf:setfocus control="my-repeat"/>
+                            <!-- Make sure to delete the last iteration, which has focus -->
+                            <xf:delete ref="first-name[3]"/>
+                        </xf:action>
+
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:repeat id="my-repeat" ref="first-name">
+                        <xf:setvalue ev:event="DOMFocusOut" ev:target="my-input" ref="@focus">false</xf:setvalue>
+                        <xf:setvalue ev:event="DOMFocusIn"  ev:target="my-input" ref="@focus">true</xf:setvalue>
+
+                        <xf:input ref="." id="my-input"/>
+                    </xf:repeat>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <instance>
+                                    <first-name focus="false">Ada</first-name>
+                                    <first-name focus="true">Marie</first-name>
+                                </instance>
+                            </instance>
+                        </instances>
+                        <controls>
+                            <control effective-id="my-repeat" index="2"/>
+                        </controls>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="my-input·1">Ada</xxf:control>
+                        <xxf:control id="my-input·2">Marie</xxf:control>
+                    </xxf:control-values>
+                    <xxf:focus control-id="my-input·2"/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 </group>

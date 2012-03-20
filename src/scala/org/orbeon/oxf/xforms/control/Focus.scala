@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.control
 
-import controls.{XXFormsRootControl, XFormsRepeatControl, XFormsCaseControl, XXFormsDialogControl}
+import controls._
 import org.orbeon.oxf.xforms.event.events.{DOMFocusOutEvent,DOMFocusInEvent}
 import org.orbeon.oxf.xforms.control.Controls.AncestorIterator
 import org.orbeon.oxf.xforms.XFormsContainingDocument
@@ -28,7 +28,7 @@ import org.orbeon.oxf.xforms.event.XFormsEvents.{DOM_FOCUS_OUT, DOM_FOCUS_IN}
 object Focus {
 
     // Focus on the given control and dispatch appropriate focus events
-    def focusWithEvents(control: XFormsControl ): Boolean = {
+    def focusWithEvents(control: XFormsControl): Boolean = {
 
         // Continue only if control is focusable
         if (! isFocusable(control))
@@ -47,8 +47,8 @@ object Focus {
         doc.getControls.setFocusedControl(control)
 
         // Ancestor-or-self chains from root to leaf
-        val previousChain = previousOption.toList flatMap (containersAndSelf(_))
-        val currentChain = containersAndSelf(control)
+        val previousChain = previousOption.toList flatMap (containersAndSelf(_).reverse)
+        val currentChain = containersAndSelf(control).reverse
 
         // Number of common ancestor containers, if any
         val commonPrefix = previousChain zip currentChain prefixLength
@@ -66,7 +66,33 @@ object Focus {
     }
 
     // Updated focus based on a previously focused control
-    def updateFocus(focusedBefore: XFormsControl ) =
+    def updateFocusWithEvents(focusedBefore: XFormsControl, repeat: Option[XFormsRepeatControl] = None) = repeat match {
+        case Some(repeat) ⇒
+            // Update the focus based on a previously focused control for which focus out events up to a repeat have
+            // already been dispatched when a repeat iteration has been removed
+
+            val doc = focusedBefore.containingDocument
+
+            // Do as if focus hadn't been removed yet, as updateFocus expects it
+            doc.getControls.setFocusedControl(focusedBefore)
+
+            // Called if the focus is fully removed
+            // Focus out events have been dispatched up to the iteration already, so just dispatch from the repeat to the root
+            def removeFocus() =
+                containersAndSelf(repeat) foreach (focusOut(_))
+
+            // Called if the focus is changing to a new control
+            // This will dispatch focus events from the new repeat iteration to the control
+            def focus(control: XFormsControl) =
+                setFocusPartially(control, Some(repeat))
+
+            updateFocus(focusedBefore, removeFocus _, focus)
+        case None ⇒
+            updateFocus(focusedBefore, () ⇒ removeFocus(focusedBefore.containingDocument), focusWithEvents(_))
+    }
+
+    // Updated focus based on a previously focused control
+    private def updateFocus(focusedBefore: XFormsControl, onRemoveFocus: () ⇒ Any, onFocus: XFormsControl ⇒ Any) =
         if (focusedBefore ne null) {
             // There was a control with focus before
 
@@ -93,29 +119,34 @@ object Focus {
                     case None ⇒
                         // Cannot find a reference to the control anymore
                         // Control might be a ghost that has been removed from the tree (iteration removed)
-                        removeFocus(doc)
+                        onRemoveFocus()
 
                     case Some(newReference) if ! isFocusable(newReference) ⇒
                         // New reference exists, but is not focusable
-                        removeFocus(doc)
+                        onRemoveFocus()
 
                     case Some(newReference) if newReference ne focusedBefore ⇒
                         // Control exists and is focusable, and is not the same as the original control
 
                         // This covers the case where repeat indexes have been updated
                         // Here we move the focus to the new control
-                        focusWithEvents(newReference)
+                        onFocus(newReference)
 
                     case _ ⇒
                         // Control exists, is focusable, and is the same as before, so we do nothing!
                 }
             } else {
-                // Either there is no focus now, or the focus is different. Either way, the change must have been done
-                // via xforms-focus, which means that events have already been dispatched. So here we do nothing.
+                // The focus is different or has been removed
+                //
+                // - if different, the change must have been done via xforms-focus
+                // - if removed, the change might have been done in XFormsRepeatControl upon removing an iteration
+                //
+                // Either way events must have already been dispatched, so here we do nothing.
             }
         } else {
-            // Whether there was focus before or not, or whether there is focus now or not the change must have been
-            // done via xforms-focus, which means that events have already been dispatched. So here we do nothing.
+            // There was no focus before. If there is focus now, the change must have been done via xforms-focus, which
+            // means that events have already been dispatched. If there is no focus now, nothing has changed. So here we
+            // do nothing.
         }
 
     // Whether focus is currently within the given container
@@ -125,20 +156,54 @@ object Focus {
             case _ ⇒ false
         }
 
-    // Completely remove the focus
-    def removeFocus(doc: XFormsContainingDocument) {
+    private def isNotBoundary(control: XFormsControl, boundary: Option[XFormsContainerControl]) =
+        boundary.isEmpty || (control ne boundary.get)
+    
+    // Partially remove the focus until the given boundary if any
+    // The boundary is used by XFormsRepeatControl when an iteration is removed if the focus is within that iteration
+    def removeFocusPartially(doc: XFormsContainingDocument, boundary: Option[XFormsContainerControl]) {
 
-        // Dispatch DOMFocusOut events to the given focusable control and to all its container ancestors
-        def dispatchFocusOutUponNonRelevance(control: XFormsControl) =
-            (containersAndSelf(control) reverse) foreach (focusOut(_))
+        // Dispatch DOMFocusOut events to the given control and to its container ancestors
+        def dispatchFocusOuts(control: XFormsControl) =
+            (containersAndSelf(control) takeWhile (isNotBoundary(_, boundary))) foreach (focusOut(_))
 
-        // Read previous control
-        Option(doc.getControls.getFocusedControl) foreach { focusedBefore ⇒
-            // Forget focus
-            doc.getControls.setFocusedControl(null)
-            // Dispatch focus out events to the control and its ancestors
-            dispatchFocusOutUponNonRelevance(focusedBefore)
+        // Dispatch focus out events if needed
+        Option(doc.getControls.getFocusedControl) foreach { focused ⇒
+            doc.getControls.clearFocusedControl()
+            dispatchFocusOuts(focused)
         }
+    }
+
+    // Partially set the focus to the control, dispatching events from the given boundary if any
+    def setFocusPartially(control: XFormsControl, boundary: Option[XFormsContainerControl]) {
+        val doc = control.containingDocument
+
+        // Remember first that the new control has focus
+        doc.getControls.setFocusedControl(control)
+
+        // Dispatch DOMFocusOut events to the given control and to its container ancestors
+        def dispatchFocusIns(control: XFormsControl) =
+            (containersAndSelf(control) takeWhile (isNotBoundary(_, boundary)) reverse) foreach (focusIn(_))
+
+        // Dispatch focus in events
+        dispatchFocusIns(control)
+    }
+
+    // Remove the focus entirely and dispatch the appropriate events
+    def removeFocus(doc: XFormsContainingDocument) =
+        removeFocusPartially(doc, boundary = None)
+    
+    // Whether focus is currently in the given container
+    def isFocusInContainer(container: XFormsContainerControl) = {
+        val doc = container.containingDocument
+        
+        // Focused control if any
+        val previousOption = Option(doc.getControls.getFocusedControl)
+        
+        // True iif the currently focused control is a descendant of the container
+        previousOption map
+            (focused ⇒ containers(focused) exists (_ eq container)) getOrElse
+                false
     }
 
     // Find boundaries for event dispatch
@@ -231,7 +296,7 @@ object Focus {
         new AncestorIterator(control.parent) collect
             { case container: XFormsContainerControl ⇒ container } toList
 
-    // Ancestor controls and control from root to leaf excepting the root control
+    // Ancestor controls and control from leaf to root excepting the root control
     private def containersAndSelf(control: XFormsControl) =
-        control :: containers(control).init reverse
+        control :: containers(control).init
 }

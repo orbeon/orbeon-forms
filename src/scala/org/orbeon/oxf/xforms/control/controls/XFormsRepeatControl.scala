@@ -33,6 +33,8 @@ import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.saxon.om.Item
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.oxf.xforms.XFormsConstants._
+import org.orbeon.oxf.util.DebugLogger
+import DebugLogger._
 
 import control.controls.XFormsRepeatControl._
 import java.util.{ArrayList, List ⇒ JList, Map ⇒ JMap, Collections}
@@ -307,8 +309,7 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
 
         val currentControlTree = controls.getCurrentControlTree
 
-        val indentedLogger = controls.getIndentedLogger
-        val isDebugEnabled = indentedLogger.isDebugEnabled
+        implicit val indentedLogger = controls.getIndentedLogger
 
         val oldRepeatIndex = getIndex// 1-based
         var updated = false
@@ -332,18 +333,15 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
                         val isRemoved = currentNewIndex == -1
                         val movedOrRemovedIteration = oldChildren(i)
                         if (isRemoved) {
-                            if (isDebugEnabled)
-                                indentedLogger.startHandleOperation("xforms:repeat", "removing iteration", "id", getEffectiveId, "index", Integer.toString(i + 1))
-
-                            // Dispatch destruction events
-                            currentControlTree.dispatchDestructionEventsForRemovedContainer(movedOrRemovedIteration, true)
-
-                            // Indicate to iteration that it is being removed
-                            // As of 2012-03-07, only used by XFormsComponentControl to destroy the XBL container
-                            movedOrRemovedIteration.iterationRemoved()
-                            if (isDebugEnabled)
-                                indentedLogger.endHandleOperation()
-
+                            withDebug("removing iteration", Seq("id" → getEffectiveId, "index" → (i + 1).toString)) {
+        
+                                // Dispatch destruction events
+                                currentControlTree.dispatchDestructionEventsForRemovedContainer(movedOrRemovedIteration, true)
+        
+                                // Indicate to iteration that it is being removed
+                                // As of 2012-03-07, only used by XFormsComponentControl to destroy the XBL container
+                                movedOrRemovedIteration.iterationRemoved()
+                            }
                         }
 
                         // Deindex old iteration
@@ -362,9 +360,9 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
                         // First, try to point to the last inserted node if found
                         findNodeIndexes(insertedItems, newRepeatNodeset).reverse find (_ != -1) map { index ⇒
                             val newRepeatIndex = index + 1
-                            if (isDebugEnabled)
-                                indentedLogger.logDebug("xforms:repeat", "setting index to new node", "id", getEffectiveId, "new index", newRepeatIndex.toString)
-
+                            
+                            debug("setting index to new node", Seq("id" → getEffectiveId, "new index" → newRepeatIndex.toString))
+                            
                             setIndexInternal(newRepeatIndex)
                             true
                         } getOrElse
@@ -380,9 +378,8 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
                         // The index was pointing to a node which is still there, so just move the index
                         val newRepeatIndex = newIndexes(oldRepeatIndex - 1) + 1
                         if (newRepeatIndex != oldRepeatIndex) {
-                            if (isDebugEnabled)
-                                indentedLogger.logDebug("xforms:repeat", "adjusting index for existing node", "id", getEffectiveId,
-                                    "old index", oldRepeatIndex.toString, "new index", newRepeatIndex.toString)
+                            
+                            debug("adjusting index for existing node", Seq("id" → getEffectiveId, "old index" → oldRepeatIndex.toString, "new index" → newRepeatIndex.toString))
 
                             setIndexInternal(newRepeatIndex)
                         }
@@ -393,9 +390,7 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
                             // the collection is smaller than the index, the index is changed to the new size of the
                             // collection."
 
-                            if (isDebugEnabled)
-                                indentedLogger.logDebug("xforms:repeat", "setting index to the size of the new nodeset",
-                                    "id", getEffectiveId, "new index", newRepeatNodeset.size.toString)
+                            debug("setting index to the size of the new nodeset", Seq("id" → getEffectiveId, "new index" → newRepeatNodeset.size.toString))
 
                             setIndexInternal(newRepeatNodeset.size)
                         } else {
@@ -406,8 +401,7 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
                     } else {
                         // Old index was out of bounds?
                         setIndexInternal(getStartIndex)
-                        if (isDebugEnabled)
-                            indentedLogger.logDebug("xforms:repeat", "resetting index", "id", getEffectiveId, "new index", getIndex.toString)
+                        debug("resetting index", Seq("id" → getEffectiveId, "new index" → getIndex.toString))
                     }
                 }
 
@@ -422,20 +416,19 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
                     val currentOldIndex = oldIndexes(repeatIndex - 1)
                     if (currentOldIndex == -1) {
                         // This new node was not in the old nodeset so create a new one
-                        if (isDebugEnabled)
-                            indentedLogger.startHandleOperation("xforms:repeat", "creating new iteration", "id", getEffectiveId, "index", repeatIndex.toString)
-
-                        // Create repeat iteration
-                        val newIteration = controls.createRepeatIterationTree(this, repeatIndex)
-                        updated = true
-
-                        newIterations += newIteration
-
-                        if (isDebugEnabled)
-                            indentedLogger.endHandleOperation()
 
                         // Add new iteration
-                        newChildren += newIteration
+                        newChildren +=
+                            withDebug("creating new iteration", Seq("id" → getEffectiveId, "index" → repeatIndex.toString)) {
+
+                                // Create repeat iteration
+                                val newIteration = controls.createRepeatIterationTree(this, repeatIndex)
+                                updated = true
+
+                                newIterations += newIteration
+
+                                newIteration
+                            }
                     } else {
                         // This new node was in the old nodeset so keep it
 
@@ -443,9 +436,7 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
                         val newIterationOldIndex = existingIteration.iterationIndex
                         if (newIterationOldIndex != repeatIndex) {
                             // Iteration index changed
-                            if (isDebugEnabled)
-                                indentedLogger.logDebug("xforms:repeat", "moving iteration", "id", getEffectiveId,
-                                    "old index", newIterationOldIndex.toString, "new index", repeatIndex.toString)
+                            debug("moving iteration", Seq("id" → getEffectiveId, "old index" → newIterationOldIndex.toString, "new index" → repeatIndex.toString))
 
                             // Set new index
                             existingIteration.setIterationIndex(repeatIndex)
@@ -486,23 +477,17 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
                 // Remove control information for iterations that disappear
                 for (removedIteration ← children) {
 
-                    if (isDebugEnabled)
-                        indentedLogger.startHandleOperation("xforms:repeat", "removing iteration", "id", getEffectiveId,
-                            "index", removedIteration.iterationIndex.toString)
-
-                    // Dispatch destruction events and deindex old iteration
-                    currentControlTree.dispatchDestructionEventsForRemovedContainer(removedIteration, true)
-                    currentControlTree.deindexSubtree(removedIteration, true)
-
-                    if (isDebugEnabled)
-                        indentedLogger.endHandleOperation()
+                    withDebug("removing iteration", Seq("id" → getEffectiveId, "index" → removedIteration.iterationIndex.toString)) {
+                        // Dispatch destruction events and deindex old iteration
+                        currentControlTree.dispatchDestructionEventsForRemovedContainer(removedIteration, true)
+                        currentControlTree.deindexSubtree(removedIteration, true)
+                    }
 
                     updated = true
                 }
 
-                if (isDebugEnabled)
-                    if (getIndex != 0)
-                        indentedLogger.logDebug("xforms:repeat", "setting index to 0", "id", getEffectiveId)
+                if (getIndex != 0)
+                    debug("setting index to 0", Seq("id" → getEffectiveId))
 
                 clearChildren()
                 setIndexInternal(0)

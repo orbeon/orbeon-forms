@@ -105,8 +105,8 @@ object FormBuilderFunctions {
 
     // Whether the current form has a custom instance
     def isCustomInstance = {
-        val metadataInstance = asNodeInfo(model("fr-form-model").get.getVariable("metadata-instance"))
-        (metadataInstance ne null) && metadataInstance \ "form-instance-mode" === "custom"
+        val metadataInstance = model("fr-form-model").get.getVariable("is-custom-instance")
+        (metadataInstance ne null) && effectiveBooleanValue(metadataInstance)
     }
 
     def makeInstanceExpression(name: String) = "instance('" + name + "')"

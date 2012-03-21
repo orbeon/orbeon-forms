@@ -36,7 +36,10 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.xml.TransformerUtils
 import collection.JavaConverters._
 import org.orbeon.saxon.dom4j.{NodeWrapper, DocumentWrapper}
-import org.orbeon.saxon.om.{SequenceIterator, EmptyIterator, NodeInfo}
+import org.orbeon.saxon.value.BooleanValue
+import org.mockito.stubbing.Answer
+import org.mockito.invocation.InvocationOnMock
+import org.orbeon.saxon.om._
 
 class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit with MockitoSugar {
 
@@ -82,18 +85,19 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
     }
 
     @Test def controlElements() {
-        val doc = getNewDoc()
+        withActionAndDoc(getNewDoc()) { doc ⇒
 
-        // Find bind element
-        assert(qname(findBindByName(doc, control1).get) === (XF → "bind"))
-        assert(hasId(findBindByName(doc, control1).get, bindId(control1)))
+            // Find bind element
+            assert(qname(findBindByName(doc, control1).get) === (XF → "bind"))
+            assert(hasId(findBindByName(doc, control1).get, bindId(control1)))
 
-        // Check content of value holder
-        assert(findDataHolder(doc, control1).isDefined)
-        assert(findDataHolder(doc, control1).get.getStringValue === "")
+            // Check content of value holder
+            assert(findDataHolder(doc, control1).isDefined)
+            assert(findDataHolder(doc, control1).get.getStringValue === "")
 
-        // TODO
-        // controlResourceHolders
+            // TODO
+            // controlResourceHolders
+        }
     }
 
     @Test def sectionName() {
@@ -103,77 +107,14 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
         assert(getControlNameOption(doc \\ "*:section" head).get === section1)
     }
 
-    private def mockActionInterpreter(doc: DocumentWrapper) = {
-
-        // This mocks just what's needed so that the tests won't choke
-
-        val model = mock[XFormsModel]
-        Mockito when model.getId thenReturn "fr-form-model"
-        Mockito when model.getEffectiveId thenReturn "fr-form-model"
-        Mockito when model.getVariable("metadata-instance") thenReturn EmptyIterator.getInstance
-        Mockito when model.getVariable("component-bindings") thenReturn EmptyIterator.getInstance
-
-        // Not sure how to make it so that each call to getVariable returns a new, fresh iterator
-        val selectedCellElement = elementInfo("selected-cell")
-        Mockito when model.getVariable("selected-cell") thenReturn new SequenceIterator {
-            def next() = selectedCellElement
-            def current() = selectedCellElement
-            def position() = 0
-            def close() {}
-            def getAnother = this
-            def getProperties = 0
-        }
-        val resources = inlineInstanceRootElement(doc, "fr-form-resources").get
-        Mockito when model.getVariable("resources") thenReturn new SequenceIterator {
-            def next() = resources
-            def current() = resources
-            def position() = 0
-            def close() {}
-            def getAnother = this
-            def getProperties = 0
-        }
-
-        val xblContainer = mock[XBLContainer]
-
-        val instance = mock[XFormsInstance]
-        Mockito when instance.getModel(Matchers.any[XFormsContainingDocument]) thenReturn model
-        Mockito when instance.getXBLContainer(Matchers.any[XFormsContainingDocument]) thenReturn xblContainer
-        Mockito when instance.documentInfo thenReturn doc
-
-        val staticState = mock[XFormsStaticState]
-        Mockito when staticState.documentWrapper thenReturn doc
-
-        val document = mock[XFormsContainingDocument]
-        Mockito when document.getStaticState thenReturn staticState
-        Mockito when document.getInstanceForNode(Matchers.any[NodeInfo]) thenReturn instance
-        Mockito when document.getModels thenReturn Seq(model).asJava
-
-        val actionInterpreter = mock[XFormsActionInterpreter]
-        Mockito when actionInterpreter.containingDocument thenReturn document
-        Mockito when actionInterpreter.container thenReturn xblContainer
-        Mockito when actionInterpreter.indentedLogger thenReturn new IndentedLogger(XFormsServer.logger, "action")
-
-        actionInterpreter
-    }
-
-    def withActionAndDoc(doc: DocumentWrapper)(body: NodeInfo ⇒ Any) {
-        val actionInterpreter = mockActionInterpreter(doc)
-        withScalaAction(actionInterpreter) {
-            withContainingDocument(actionInterpreter.containingDocument) {
-                initializeGrids(doc)
-                body(doc)
-            }
-        }
-    }
-
     @Test def newBinds() {
         withActionAndDoc(getNewDoc()) { doc ⇒
-            ensureBinds(doc, Seq(section1, control2), false)
+            ensureBinds(doc, Seq(section1, control2))
 
             assert(qname(findBindByName(doc, control2).get) === (XF → "bind"))
             assert(hasId(findBindByName(doc, control2).get, bindId(control2)))
 
-            ensureBinds(doc, Seq(section2, "grid-1", control3), false)
+            ensureBinds(doc, Seq(section2, "grid-1", control3))
 
             assert(qname(findBindByName(doc, control3).get) === (XF → "bind"))
             assert(hasId(findBindByName(doc, control3).get, bindId(control3)))
@@ -209,104 +150,121 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
         selectTd(findFRBodyElement(doc) \\ "*:grid" \\ "*:td" head)
     }
 
-    @Test def insertControl() {
-        withActionAndDoc(getNewDoc()) { doc ⇒
+    @Test def insertControl(): Unit = insertControl(isCustomInstance = false)
+    @Test def insertControlCustomXML(): Unit = insertControl(isCustomInstance = true)
+
+    private def insertControl(isCustomInstance: Boolean) {
+        withActionAndDoc(getNewDoc(), isCustomInstance) { doc ⇒
 
             val binding = <binding element="xforms|input" xmlns:xforms="http://www.w3.org/2002/xforms"/>
 
             // Insert a new control into the next empty td
             selectFirstTd(doc)
-            insertNewControl(doc, binding)
+            val newControlNameOption = insertNewControl(doc, binding)
+            
+            // Check the control's name
+            assert(newControlNameOption === Some("control-3"))
+            val newControlName = newControlNameOption.get
 
             // Test result
-            assert(hasId(findControlByName(doc, "control-3").get, controlId("control-3")))
+            assert(hasId(findControlByName(doc, newControlName).get, controlId(newControlName)))
 
             val newlySelectedTd = findSelectedTd(doc)
             assert(newlySelectedTd.isDefined)
-            assert(newlySelectedTd.get \ * \@ "id" === controlId("control-3"))
+            assert(newlySelectedTd.get \ * \@ "id" === controlId(newControlName))
 
             val containerNames = findContainerNames(newlySelectedTd.get)
             assert(containerNames == Seq("section-1"))
 
             // NOTE: We should maybe just compare the XML for holders, binds, and resources
-            val dataHolder = findDataHolder(doc, "control-3")
-            assert(dataHolder.isDefined)
-            assert(name(dataHolder.get precedingSibling * head) === "control-1")
+            val dataHolder = assertDataHolder(doc, newControlName, isCustomInstance)
+            if (! isCustomInstance)
+                assert(name(dataHolder.get precedingSibling * head) === "control-1")
 
-            val controlBind = findBindByName(doc, "control-3").get
-            assert(hasId(controlBind, bindId("control-3")))
+            val controlBind = findBindByName(doc, newControlName).get
+            assert(hasId(controlBind, bindId(newControlName)))
             assert((controlBind precedingSibling * att "id") === bindId("control-1"))
             
-            assert(formResourcesRoot \ "resource" \ "control-3" nonEmpty)
-
-//            println(TransformerUtils.tinyTreeToString(doc))
+            assert(formResourcesRoot \ "resource" \ newControlName nonEmpty)
         }
     }
 
-    @Test def insertRepeat() {
-        withActionAndDoc(getNewDoc()) { doc ⇒
+    @Test def insertRepeat(): Unit = insertRepeat(false)
+    @Test def insertRepeatCustomXML(): Unit = insertRepeat(true)
+
+    private def insertRepeat(isCustomInstance: Boolean) {
+        withActionAndDoc(getNewDoc(), isCustomInstance) { doc ⇒
 
             // Insert a new repeated grid after the current grid
             selectFirstTd(doc)
-            insertNewRepeat(doc)
+            val newRepeatNameOption = insertNewRepeat(doc)
+            
+            assert(newRepeatNameOption === Some("grid-3"))
+            val newRepeatName = newRepeatNameOption.get
 
-            def assertNewRepeat() {
+            locally {
 
                 val newlySelectedTd = findSelectedTd(doc)
                 assert(newlySelectedTd.isDefined)
-                assert((newlySelectedTd flatMap (_.parent) flatMap (_.parent) get) \@ "id" === gridId("grid-3"))
+                assert((newlySelectedTd flatMap (_.parent) flatMap (_.parent) get) \@ "id" === gridId(newRepeatName))
 
                 val containerNames = findContainerNames(newlySelectedTd.get)
-                assert(containerNames === Seq("section-1", "grid-3"))
+                assert(containerNames === Seq("section-1", newRepeatName))
 
                 // NOTE: We should maybe just compare the XML for holders, binds, and resources
-                val dataHolder = findDataHolder(doc, containerNames.last)
-                assert(dataHolder.isDefined)
-                assert(name(dataHolder.get precedingSibling * head) === "control-1")
+                val dataHolder = assertDataHolder(doc, containerNames.last, isCustomInstance)
+                if (! isCustomInstance)
+                    assert(name(dataHolder.get precedingSibling * head) === "control-1")
 
-                val controlBind = findBindByName(doc, "grid-3").get
-                assert(hasId(controlBind, bindId("grid-3")))
+                val controlBind = findBindByName(doc, newRepeatName).get
+                assert(hasId(controlBind, bindId(newRepeatName)))
                 assert((controlBind precedingSibling * att "id") === bindId("control-1"))
 
                 assert(findModelElement(doc) \ "*:instance" filter(hasId(_, "grid-3-template")) nonEmpty)
             }
-            assertNewRepeat()
 
             // Insert a new control
             val binding = <binding element="xforms|input" xmlns:xforms="http://www.w3.org/2002/xforms"/>
-            insertNewControl(doc, binding)
+            val newControlNameOption = insertNewControl(doc, binding)
+            
+            assert(newControlNameOption === Some(if (isCustomInstance) "control-3" else "control-4"))
+            val newControlName = newControlNameOption.get
 
             // Test result
-            def assertNewControl() {
+            locally {
 
                 val newlySelectedTd = findSelectedTd(doc)
                 assert(newlySelectedTd.isDefined)
-                assert(newlySelectedTd.get \ * \@ "id" === controlId("control-4"))
+                assert(newlySelectedTd.get \ * \@ "id" === controlId(newControlName))
 
                 val containerNames = findContainerNames(newlySelectedTd.get)
-                assert(containerNames === Seq("section-1", "grid-3"))
+                assert(containerNames === Seq("section-1", newRepeatName))
 
-                assert(hasId(findControlByName(doc, "control-4").get, controlId("control-4")))
+                assert(hasId(findControlByName(doc, newControlName).get, controlId(newControlName)))
 
                 // NOTE: We should maybe just compare the XML for holders, binds, and resources
-                val dataHolder = findDataHolder(doc, "control-4")
-                assert(dataHolder.isDefined)
-                assert(dataHolder.get precedingSibling * isEmpty)
-                assert(name(dataHolder.get.parent.get) === "grid-3")
+                val dataHolder = assertDataHolder(doc, newControlName, isCustomInstance)
+                if (! isCustomInstance) {
+                    assert(dataHolder.get precedingSibling * isEmpty)
+                    assert(name(dataHolder.get.parent.get) === newRepeatName)
+                }
 
-                val controlBind = findBindByName(doc, "control-4").get
-                assert(hasId(controlBind, bindId("control-4")))
-                assert(hasId(controlBind.parent.get, bindId("grid-3")))
+                val controlBind = findBindByName(doc, newControlName).get
+                assert(hasId(controlBind, bindId(newControlName)))
+                assert(hasId(controlBind.parent.get, bindId(newRepeatName)))
 
-                assert(formResourcesRoot \ "resource" \ "control-4" nonEmpty)
+                assert(formResourcesRoot \ "resource" \ newControlName nonEmpty)
 
-                val templateHolder = templateRoot(doc, "grid-3").get \ "control-4" headOption
-                
-                assert(templateHolder.isDefined)
-                assert(templateHolder.get precedingSibling * isEmpty)
-                assert(name(templateHolder.get.parent.get) === "grid-3")
+                val templateHolder = templateRoot(doc, newRepeatName).get \ newControlName headOption
+
+                if (! isCustomInstance) {
+                    assert(templateHolder.isDefined)
+                    assert(templateHolder.get precedingSibling * isEmpty)
+                    assert(name(templateHolder.get.parent.get) === newRepeatName)
+                } else {
+                    assert(templateHolder.isEmpty)
+                }
             }
-            assertNewControl()
 
             println(TransformerUtils.tinyTreeToString(doc))
         }
@@ -549,4 +507,78 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
 //    @Test def renameBind() {
 //
 //    }
+
+    private def assertDataHolder(doc: DocumentWrapper, holderName: String, isCustomInstance: Boolean) = {
+        val dataHolder = findDataHolder(doc, holderName)
+        if (isCustomInstance)
+            assert(dataHolder.isEmpty)
+        else
+            assert(dataHolder.isDefined)
+        dataHolder
+    }
+
+    private def withActionAndDoc(doc: DocumentWrapper, isCustomInstance: Boolean = false)(body: DocumentWrapper ⇒ Any) {
+        val actionInterpreter = mockActionInterpreter(doc, isCustomInstance)
+        withScalaAction(actionInterpreter) {
+            withContainingDocument(actionInterpreter.containingDocument) {
+                initializeGrids(doc)
+                body(doc)
+            }
+        }
+    }
+
+    private def mockActionInterpreter(doc: DocumentWrapper, isCustomInstance: Boolean) = {
+
+        // This mocks just what's needed so that the tests won't choke
+
+        // Main model
+        val model = mock[XFormsModel]
+        Mockito when model.getId thenReturn "fr-form-model"
+        Mockito when model.getEffectiveId thenReturn "fr-form-model"
+
+        // Mock useful model variables
+        val variables = Map(
+            "component-bindings" → None,
+            "selected-cell"      → Some(elementInfo("selected-cell")),
+            "resources"          → inlineInstanceRootElement(doc, "fr-form-resources"),
+            "metadata-instance"  → inlineInstanceRootElement(doc, "fr-form-metadata"),
+            "is-custom-instance" → Some(BooleanValue.get(isCustomInstance))
+        )
+
+        Mockito when model.getVariable(Matchers.anyString) thenAnswer new Answer[SequenceIterator] {
+            // Use answer because each invocation returns a fresh result
+            def answer(invocation: InvocationOnMock) = {
+                val name = invocation.getArguments.apply(0).asInstanceOf[String]
+
+                variables.get(name) map {
+                    case Some(item) ⇒ SingletonIterator.makeIterator(item)
+                    case None ⇒ EmptyIterator.getInstance
+                } getOrElse
+                    EmptyIterator.getInstance
+            }
+        }
+
+        // Everything else
+        val xblContainer = mock[XBLContainer]
+
+        val instance = mock[XFormsInstance]
+        Mockito when instance.getModel(Matchers.any[XFormsContainingDocument]) thenReturn model
+        Mockito when instance.getXBLContainer(Matchers.any[XFormsContainingDocument]) thenReturn xblContainer
+        Mockito when instance.documentInfo thenReturn doc
+
+        val staticState = mock[XFormsStaticState]
+        Mockito when staticState.documentWrapper thenReturn doc
+
+        val document = mock[XFormsContainingDocument]
+        Mockito when document.getStaticState thenReturn staticState
+        Mockito when document.getInstanceForNode(Matchers.any[NodeInfo]) thenReturn instance
+        Mockito when document.getModels thenReturn Seq(model).asJava
+
+        val actionInterpreter = mock[XFormsActionInterpreter]
+        Mockito when actionInterpreter.containingDocument thenReturn document
+        Mockito when actionInterpreter.container thenReturn xblContainer
+        Mockito when actionInterpreter.indentedLogger thenReturn new IndentedLogger(XFormsServer.logger, "action")
+
+        actionInterpreter
+    }
 }

@@ -49,6 +49,8 @@
     <xxforms:variable name="component-bindings" select="instance('fb-components-instance')//xbl:binding" as="element(xbl:binding)*"/>
     <xxforms:variable name="components-qnames" select="for $t in $component-bindings//fb:template/*[1] return resolve-QName(name($t), $t)" as="xs:QName*"/>
 
+    <xxforms:variable name="is-custom-instance" select="$metadata-instance/form-instance-mode = 'custom'" as="xs:boolean"/>
+
     <!-- TODO: Probably remove once all usages are gone -->
     <xxforms:variable name="current-td" select="$body//*:grid//*:td[@id = instance('fb-variables')/selected-cell]" as="element()?"/>
 
@@ -161,7 +163,8 @@
     <!-- De-annotate data before saving -->
     <xforms:action ev:event="fr-data-save-prepare">
         <!-- Use XSLT to transform the form -->
-        <xforms:insert ref="instance('fr-form-instance')" origin="xxforms:call-xpl('oxf:/forms/orbeon/newbuilder/form/deannotate.xpl', 'data', instance('fb-form-instance'), 'data')"/>
+        <xforms:insert ref="instance('fr-form-instance')"
+                       origin="xxforms:call-xpl('oxf:/forms/orbeon/newbuilder/form/deannotate.xpl', 'data', instance('fb-form-instance'), 'data')"/>
     </xforms:action>
 
     <xforms:action ev:event="xforms-ready">

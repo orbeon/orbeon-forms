@@ -20,7 +20,6 @@ import org.orbeon.oxf.fb.FormBuilderFunctions._
 import org.orbeon.oxf.fb.ControlOps._
 import org.orbeon.oxf.fb.GridOps._
 import org.orbeon.oxf.fb.ContainerOps._
-import org.orbeon.oxf.xml.TransformerUtils
 
 /*
  * Form Builder: toolbox operations.
@@ -36,7 +35,7 @@ object ToolboxOps {
         </template>
 
     // Insert a new control in a cell
-    def insertNewControl(doc: NodeInfo, binding: NodeInfo) {
+    def insertNewControl(doc: NodeInfo, binding: NodeInfo) = {
 
         ensureEmptyTd(doc) match {
             case Some(gridTd) ⇒
@@ -96,7 +95,7 @@ object ToolboxOps {
                 )
 
                 // Insert the bind element
-                val bind = ensureBinds(doc, findContainerNames(gridTd) :+ newControlName, isCustomInstance)
+                val bind = ensureBinds(doc, findContainerNames(gridTd) :+ newControlName)
 
                 // Make sure there is a @bind instead of a @ref on the control
                 delete(newControlElement \@ "ref")
@@ -108,7 +107,11 @@ object ToolboxOps {
 
                 debugDumpDocument("insert new control", doc)
 
-            case _ ⇒ // no empty td found/created so NOP
+                Some(newControlName)
+
+            case _ ⇒
+                // no empty td found/created so NOP
+                None
         }
     }
 
@@ -234,7 +237,7 @@ object ToolboxOps {
         insertHolders(newSectionElement, elementInfo(newSectionName), resourceHolder, precedingSectionName)
 
         // Insert the bind element
-        ensureBinds(inDoc, findContainerNames(newSectionElement) :+ newSectionName, isCustomInstance)
+        ensureBinds(inDoc, findContainerNames(newSectionElement) :+ newSectionName)
 
         // Select first grid cell
         selectTd(newSectionElement \\ "*:td" head)
@@ -245,7 +248,7 @@ object ToolboxOps {
     }
 
     // Insert a new repeat
-    def insertNewRepeat(inDoc: NodeInfo) {
+    def insertNewRepeat(inDoc: NodeInfo) = {
 
         val (into, after, grid) = findGridInsertionPoint(inDoc)
 
@@ -256,7 +259,7 @@ object ToolboxOps {
         val modelElement = findModelElement(inDoc)
         modelElement \ "*:instance" filter (hasId(_, templateInstanceId)) headOption match {
             case Some(templateInstance) ⇒
-                // clear existing template instance
+                // clear existing template instance content
                 delete(templateInstance \ *)
                 insert(into = templateInstance , origin = <dummy/>.copy(label = newGridName))
 
@@ -291,12 +294,14 @@ object ToolboxOps {
         )
 
         // Make sure binds are created
-        ensureBinds(inDoc, findContainerNames(newGridElement) :+ newGridName, isCustomInstance)
+        ensureBinds(inDoc, findContainerNames(newGridElement) :+ newGridName)
 
         // Select new td
         selectTd(newGridElement \\ "*:td" head)
 
         debugDumpDocument("insert new repeat", inDoc)
+
+        Some(newGridName)
     }
 
     // Copy control to the clipboard
@@ -371,7 +376,7 @@ object ToolboxOps {
                 )
 
                 // Create the bind and copy all attributes and content
-                val bind = ensureBinds(gridTd, findContainerNames(gridTd) :+ name, isCustomInstance)
+                val bind = ensureBinds(gridTd, findContainerNames(gridTd) :+ name)
                 (xvc \ "bind" \ * headOption) foreach { xvcBind ⇒
                     insert(into = bind, origin = (xvcBind \@ @*) ++ (xvcBind \ *))
                 }

@@ -24,7 +24,6 @@ import org.orbeon.oxf.xforms.{XFormsStaticStateImpl, XFormsInstance}
 import java.util.Collections
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.xml.{TransformerUtils, NamespaceMapping}
-import org.orbeon.oxf.xforms.function.xxforms.XXFormsElement
 import org.orbeon.saxon.dom4j.{DocumentWrapper, NodeWrapper}
 import org.dom4j.{Document, Attribute, QName, Element}
 import org.orbeon.saxon.pattern._
@@ -46,6 +45,10 @@ object XML {
     // Runtime conversion to NodeInfo (can fail!)
     def asNodeInfo(item: Item) = item.asInstanceOf[NodeInfo]
     def asNodeInfoSeq(item: Item) = item.asInstanceOf[NodeInfo]
+
+    // Effective boolean value of the iterator
+    def effectiveBooleanValue(iterator: SequenceIterator) =
+        ExpressionTool.effectiveBooleanValue(iterator)
 
     // Element and attribute creation
     def element(name: QName): Element = Dom4jUtils.createElement(name)
@@ -282,7 +285,7 @@ object XML {
         items.headOption map (_.getStringValue)
 
     implicit def itemSeqToBoolean(items: Seq[Item]): Boolean =
-        ExpressionTool.effectiveBooleanValue(new ListIterator(items.asJava))
+        effectiveBooleanValue(new ListIterator(items.asJava))
 
     implicit def itemSeqToFirstItem(items: Seq[Item]): Item = items.headOption.orNull // TODO: don't return null
 

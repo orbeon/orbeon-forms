@@ -79,21 +79,25 @@ object ControlOps {
         findFRBodyElement(doc) \\ * filter (hasId(_, id)) headOption
 
     // Find control holder
+    // Don't return anything if isCustomInstance is true
     def findDataHolder(doc: NodeInfo, controlName: String) =
-        findBindByName(doc, controlName) map { bind ⇒
-            // From bind, infer path by looking at ancestor-or-self binds
-            // Assume there is either a @ref or a @nodeset
-            val bindRefs = (bind ancestorOrSelf "*:bind" map
-                (b ⇒ ((b \@ "nodeset") ++ (b \@ "ref")) head)).reverse.tail
+        if (! isCustomInstance)
+            findBindByName(doc, controlName) map { bind ⇒
+                // From bind, infer path by looking at ancestor-or-self binds
+                // Assume there is either a @ref or a @nodeset
+                val bindRefs = (bind ancestorOrSelf "*:bind" map
+                    (b ⇒ ((b \@ "nodeset") ++ (b \@ "ref")) head)).reverse.tail
 
-            val path = bindRefs map ("(" + _.stringValue + ")") mkString "/"
+                val path = bindRefs map ("(" + _.stringValue + ")") mkString "/"
 
-            // Assume that namespaces in scope on leaf bind apply to ancestor binds (in theory mappings could be overridden along the way!)
-            val namespaces = new NamespaceMapping(Dom4jUtils.getNamespaceContextNoDefault(bind))
+                // Assume that namespaces in scope on leaf bind apply to ancestor binds (in theory mappings could be overridden along the way!)
+                val namespaces = new NamespaceMapping(Dom4jUtils.getNamespaceContextNoDefault(bind))
 
-            // Evaluate path from instance root element
-            evalOne(formInstanceRoot(doc), path, namespaces).asInstanceOf[NodeInfo]
-        }
+                // Evaluate path from instance root element
+                evalOne(formInstanceRoot(doc), path, namespaces).asInstanceOf[NodeInfo]
+            }
+        else
+            None
 
     // Find control resource holders
     def findResourceHolders(controlName: String): Seq[NodeInfo] =
@@ -117,11 +121,11 @@ object ControlOps {
     // Ensure that a tree of bind exists
     def ensureBindsByName(doc: NodeInfo, name: String) =
         findControlByName(doc, name) foreach { control ⇒
-            ensureBinds(doc, findContainerNames(control) :+ name, isCustomInstance)
+            ensureBinds(doc, findContainerNames(control) :+ name)
         }
 
     // Ensure that a tree of bind exists
-    def ensureBinds(doc: NodeInfo, names: Seq[String], isCustomInstance: Boolean): NodeInfo = {
+    def ensureBinds(doc: NodeInfo, names: Seq[String]): NodeInfo = {
 
         // Insert bind container if needed
         val model = findModelElement(doc)
@@ -227,7 +231,6 @@ object ControlOps {
             (renameBindByElement(_, newName))
 
     // Rename holders with the given name
-    // TODO: don't rename data holders if (isCustomInstance)
     def findRenameHolders(doc: NodeInfo, oldName: String, newName: String) =
         findHolders(doc, oldName) foreach
             (rename(_, oldName, newName))
@@ -243,7 +246,7 @@ object ControlOps {
             (findControlByName(doc, holderName) flatMap (findTemplateHolder(_, holderName))) flatten
 
     // Find or create a data holder for the given hierarchy of names
-    def ensureDataHolder(root: NodeInfo, holders: Seq[(() ⇒ NodeInfo, Option[String])]) = {
+    private def ensureDataHolder(root: NodeInfo, holders: Seq[(() ⇒ NodeInfo, Option[String])]) = {
 
         @tailrec def ensure(parents: Seq[NodeInfo], names: Iterator[(() ⇒ NodeInfo, Option[String])]): Seq[NodeInfo] =
             if (names.hasNext) {
@@ -322,7 +325,8 @@ object ControlOps {
         // Insert hierarchy of data holders
         // We pass a Seq of tuples, one part able to create missing data holders, the other one with optional previous names.
         // In practice, the ancestor holders should already exist.
-        ensureDataHolder(formInstanceRoot(doc), (containerNames map (n ⇒ (() ⇒ elementInfo(n), None))) :+ (() ⇒ dataHolder, precedingControlName))
+        if (! isCustomInstance)
+            ensureDataHolder(formInstanceRoot(doc), (containerNames map (n ⇒ (() ⇒ elementInfo(n), None))) :+ (() ⇒ dataHolder, precedingControlName))
 
         // Insert resources placeholders for all languages
         if (resourceHolders.nonEmpty) {
@@ -336,12 +340,13 @@ object ControlOps {
         }
 
         // Insert repeat template holder if needed
-        for {
-            grid ← findContainingRepeat(controlElement)
-            gridName ← getControlNameOption(grid)
-            root ← templateRoot(doc, gridName)
-        } yield
-            ensureDataHolder(root, Seq((() ⇒ dataHolder, precedingControlName)))
+        if (! isCustomInstance)
+            for {
+                grid ← findContainingRepeat(controlElement)
+                gridName ← getControlNameOption(grid)
+                root ← templateRoot(doc, gridName)
+            } yield
+                ensureDataHolder(root, Seq((() ⇒ dataHolder, precedingControlName)))
     }
 
     // Update a mip for the given control, grid or section id
@@ -354,7 +359,7 @@ object ControlOps {
         findControlById(doc, controlId) foreach { control ⇒
 
             // Get or create the bind element
-            val bind = ensureBinds(doc, findContainerNames(control) :+ controlName(controlId), isCustomInstance)
+            val bind = ensureBinds(doc, findContainerNames(control) :+ controlName(controlId))
 
             // Create/update or remove attribute
             Option(mipValue) map (_.trim) match {
@@ -399,7 +404,7 @@ object ControlOps {
         val currentLang = (currentResources \@ "*:lang").stringValue
         val newItems = items \ "item"
         // Iterate over resources for each language
-        for {(lang, holder) ← findResourceHoldersWithLang(controlName(controlId))} {
+        for ((lang, holder) ← findResourceHoldersWithLang(controlName(controlId))) {
             // Remove items we had and insert the new one
             val oldItems = holder \ "item"
             delete(oldItems)

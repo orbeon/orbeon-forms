@@ -65,7 +65,7 @@ object Focus {
         true
     }
 
-    // Updated focus based on a previously focused control
+    // Update focus based on a previously focused control
     def updateFocusWithEvents(focusedBefore: XFormsControl, repeat: Option[XFormsRepeatControl] = None) = repeat match {
         case Some(repeat) ⇒
             // Update the focus based on a previously focused control for which focus out events up to a repeat have
@@ -91,7 +91,7 @@ object Focus {
             updateFocus(focusedBefore, () ⇒ removeFocus(focusedBefore.containingDocument), focusWithEvents(_))
     }
 
-    // Updated focus based on a previously focused control
+    // Update focus based on a previously focused control
     private def updateFocus(focusedBefore: XFormsControl, onRemoveFocus: () ⇒ Any, onFocus: XFormsControl ⇒ Any) =
         if (focusedBefore ne null) {
             // There was a control with focus before

@@ -192,19 +192,6 @@ object Focus {
     // Remove the focus entirely and dispatch the appropriate events
     def removeFocus(doc: XFormsContainingDocument) =
         removeFocusPartially(doc, boundary = None)
-    
-    // Whether focus is currently in the given container
-    def isFocusInContainer(container: XFormsContainerControl) = {
-        val doc = container.containingDocument
-        
-        // Focused control if any
-        val previousOption = Option(doc.getControls.getFocusedControl)
-        
-        // True iif the currently focused control is a descendant of the container
-        previousOption map
-            (focused ⇒ containers(focused) exists (_ eq container)) getOrElse
-                false
-    }
 
     // Find boundaries for event dispatch
     // Put here temporarily as this deals with focus events, but must be moved to some better place when possible
@@ -260,7 +247,7 @@ object Focus {
     }
 
     // Iterator over a control's ancestors
-    class ObserverIterator(start: XFormsEventObserver, doc: XFormsContainingDocument) extends Iterator[XFormsEventObserver] {
+    private class ObserverIterator(start: XFormsEventObserver, doc: XFormsContainingDocument) extends Iterator[XFormsEventObserver] {
         private var _next = start
         def hasNext = _next ne null
         def next() = {

@@ -235,7 +235,12 @@ public class XFormsInsertAction extends XFormsAction {
                         // This is an extension: support sequences containing other items
 
                         // Convert the result to a text node
-                        final String stringValue = currentObject.toString(); // we get String, Long, etc.
+                        final String stringValue;
+                        if (currentObject instanceof Item)
+                            stringValue = ((Item) currentObject).getStringValue();
+                        else
+                            stringValue = currentObject.toString();
+
                         final Text textNode = Dom4jUtils.createText(stringValue);
 
                         sourceNodes.add(null); // there is no source node for this cloned node, it's a source item

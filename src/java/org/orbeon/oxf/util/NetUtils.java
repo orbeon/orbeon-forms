@@ -977,7 +977,7 @@ public class NetUtils {
      */
     public static ExternalContext.Session getSession(boolean create) {
         final ExternalContext externalContext = NetUtils.getExternalContext();
-        return (externalContext != null) ? NetUtils.getExternalContext().getSession(create) : null;
+        return (externalContext != null) ? externalContext.getSession(create) : null;
     }
 
     public static File renameAndExpireWithSession(String existingFileURI, final Logger logger) {

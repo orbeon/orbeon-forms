@@ -621,13 +621,8 @@ public class PipelineProcessor extends ProcessorImpl {
                         });
 
         // Reset processors
-        executeChildren(context, new Runnable() {
-            public void run() {
-                for (final Processor processor : config.getProcessors()) {
-                    processor.reset(context);
-                }
-            }
-        });
+        state.childProcessors = config.getProcessors();
+        resetChildProcessors(context);
 
         // Save inputs in state for InternalTopOutput
         state.pipelineInputs = getConnectedInputs();
@@ -651,8 +646,24 @@ public class PipelineProcessor extends ProcessorImpl {
         }
     }
 
+    private void resetChildProcessors(final PipelineContext context) {
+        if (hasState(context)) {
+            final State state = (State) getState(context);
+            if (state.childProcessors != null) {
+                executeChildren(context, new Runnable() {
+                    public void run() {
+                        for (final Processor processor : state.childProcessors) {
+                            processor.reset(context);
+                        }
+                    }
+                });
+            }
+        }
+    }
+
     @Override
     public void reset(final PipelineContext context) {
+        resetChildProcessors(context);
         setState(context, new State());
     }
 
@@ -660,6 +671,7 @@ public class PipelineProcessor extends ProcessorImpl {
         public Map<String, ProcessorInput> nameToBottomInputMap = new HashMap<String, ProcessorInput>();
         public boolean started = false;
         public Map<String, List<ProcessorInput>> pipelineInputs = new HashMap<String, List<ProcessorInput>>();
+        public List<Processor> childProcessors;
     }
 
     private void addSelfAsParent(PipelineContext pipelineContext) {

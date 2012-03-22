@@ -39,6 +39,7 @@ import org.orbeon.saxon.tinytree.TinyBuilder;
 import org.w3c.dom.Document;
 
 import javax.xml.transform.dom.DOMResult;
+import java.lang.ref.WeakReference;
 import java.util.*;
 
 /**
@@ -423,7 +424,7 @@ public abstract class ProcessorImpl implements Processor {
      */
     public ProcessorKey getProcessorKey(PipelineContext context) {
         final Stack<ProcessorImpl> parents = (Stack<ProcessorImpl>) context.getAttribute(PARENT_PROCESSORS);
-        return new ProcessorKey(parents);
+        return new ProcessorKey(parents, this);
     }
 
     public void start(PipelineContext pipelineContext) {
@@ -574,18 +575,21 @@ public abstract class ProcessorImpl implements Processor {
         }
     }
 
-    public class ProcessorKey {
+    public static class ProcessorKey {
 
         private int hash = 0;
-        private List<ProcessorImpl> processors;
+        private List<WeakReference<ProcessorImpl>> processors;
 
-        public ProcessorKey(Stack<ProcessorImpl> parents) {
-            processors = (parents == null ? new ArrayList<ProcessorImpl>() : new ArrayList<ProcessorImpl>(parents));
-            processors.add(ProcessorImpl.this);
+        public ProcessorKey(Stack<ProcessorImpl> parents, ProcessorImpl child) {
+            processors = new ArrayList<WeakReference<ProcessorImpl>>();
+            if (parents != null)
+                for (ProcessorImpl parent: parents)
+                    processors.add(new WeakReference(parent));
+            processors.add(new WeakReference(child));
             // NOTE: Use get() which appears to be faster (profiling) than using an iterator in such a bottleneck
             for (int i = 0; i < processors.size(); i++) {
-                Object processor = processors.get(i);
-                hash += processor.hashCode() * 31;
+                WeakReference<ProcessorImpl> processor = processors.get(i);
+                hash += processor.get().hashCode() * 31;
             }
         }
 
@@ -593,21 +597,19 @@ public abstract class ProcessorImpl implements Processor {
             return hash;
         }
 
-        private List<ProcessorImpl> getProcessors() {
-            return processors;
-        }
-
         public boolean equals(Object other) {
             if (!(other instanceof ProcessorKey))
                 return false;
 
-            final List<ProcessorImpl> otherProcessors = ((ProcessorKey) other).getProcessors();
+            final List<WeakReference<ProcessorImpl>> otherProcessors = ((ProcessorKey) other).processors;
             int processorsSize = processors.size();
             if (processorsSize != otherProcessors.size())
                 return false;
             // NOTE: Use get() which appears to be faster (profiling) than using an iterator in such a bottleneck
             for (int i = 0; i < processorsSize; i++) {
-                if (processors.get(i) != otherProcessors.get(i))
+                ProcessorImpl p1 = processors.get(i).get();
+                ProcessorImpl p2 = otherProcessors.get(i).get();
+                if (p1 == null || p2 == null || p1 != p2)
                     return false;
             }
             return true;
@@ -615,15 +617,19 @@ public abstract class ProcessorImpl implements Processor {
 
         public String toString() {
             StringBuilder result = null;
-            for (Processor processor: processors) {
+            for (WeakReference<ProcessorImpl> processor: processors) {
                 if (result == null) {
                     result = new StringBuilder(hash + ": [");
                 } else {
                     result.append(", ");
                 }
-                result.append(Integer.toString(processor.hashCode()));
-                result.append(": ");
-                result.append(processor.getClass().getName());
+                if (processor == null) {
+                    result.append("Garbage collected processor");
+                } else {
+                    result.append(Integer.toString(processor.get().hashCode()));
+                    result.append(": ");
+                    result.append(processor.get().getClass().getName());
+                }
             }
             result.append("]");
             return result.toString();

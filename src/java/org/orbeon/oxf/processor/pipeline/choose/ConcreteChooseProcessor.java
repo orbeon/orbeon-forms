@@ -40,7 +40,7 @@ public class ConcreteChooseProcessor extends ProcessorImpl {
     private LocationData locationData;
     private List branchConditions;
     private List<NamespaceMapping> branchNamespaces;
-    private List branchProcessors;
+    private List<Processor> branchProcessors;
     private Set outputsById;
     private Set outputsByParamRef;
     private List<Map<String, ProcessorInput>> branchInputs = new ArrayList<Map<String, ProcessorInput>>();  // List [Map: (String inputName) -> (ProcessorInput)]
@@ -60,7 +60,7 @@ public class ConcreteChooseProcessor extends ProcessorImpl {
      *                          pipeline outputs
      */
     public ConcreteChooseProcessor(String id, LocationData locationData,
-                                   List branchConditions, List<NamespaceMapping> branchNamespaces, List branchProcessors,
+                                   List branchConditions, List<NamespaceMapping> branchNamespaces, List<Processor> branchProcessors,
                                    Set inputs, Set outputsById, Set outputsByParamRef) {
         setId(id);
         this.locationData = locationData;
@@ -254,6 +254,8 @@ public class ConcreteChooseProcessor extends ProcessorImpl {
     @Override
     public void reset(PipelineContext context) {
         setState(context, new State());
+        for (final Processor processor : branchProcessors)
+            processor.reset(context);
     }
 
     private static class State {

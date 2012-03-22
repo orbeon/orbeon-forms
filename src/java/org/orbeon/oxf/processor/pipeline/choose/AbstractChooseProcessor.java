@@ -151,7 +151,7 @@ public class AbstractChooseProcessor extends ProcessorImpl implements AbstractPr
         }
 
         // For each branch, create a new pipeline processor
-        final List branchProcessors = new ArrayList();
+        final List<Processor> branchProcessors = new ArrayList();
         final List branchConditions = new ArrayList();
         final List<NamespaceMapping> branchNamespaces = new ArrayList<NamespaceMapping>();
 

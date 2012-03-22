@@ -587,7 +587,7 @@ public class URLGenerator extends ProcessorImpl {
                         final Long validity;
                         if (handler == null) {
                             // Dependency
-                            
+
                             // Create handler right here
                             handler = OXFHandler.PROTOCOL.equals(url.getProtocol())
                                 ? new OXFResourceHandler(new Config(url)) // Should use full config so that headers are forwarded?
@@ -604,7 +604,7 @@ public class URLGenerator extends ProcessorImpl {
                             }
                         } else {
                             // Main handler
-                            
+
                             // Try to see what we have in cache
                             final CacheEntry cacheEntry;
                             if (config.isEnableConditionalGET()) {
@@ -617,7 +617,7 @@ public class URLGenerator extends ProcessorImpl {
                             } else {
                                 cacheEntry = null;
                             }
-                            
+
                             if (cacheEntry != null) {
                                 // Found some entry in cache for the key
                                 final long lastModified = findLastModified(cacheEntry.validity);
@@ -625,10 +625,10 @@ public class URLGenerator extends ProcessorImpl {
                                 validity = handler.getConditional(lastModified);
                                 if (handler.getConnectionStatusCode() == 304) {
                                     // The server responded that the resource hasn't changed
-                                    
+
                                     // Update the entry in cache
                                     ObjectCache.instance().add(cacheEntry.key, lastModified, cacheEntry.cacheable);
-                                    
+
                                     // Remember the document for the rest of this request
                                     state.setDocument((SAXStore) cacheEntry.cacheable);
                                 }
@@ -638,7 +638,7 @@ public class URLGenerator extends ProcessorImpl {
                         }
                         state.setLastModified(urlString, validity);
                         return validity;
-                        
+
                     } catch (Exception e) {
                         // If the file no longer exists, for example, we don't want to throw, just to invalidate
                         // An exception will be thrown if necessary when the document is actually read
@@ -846,7 +846,7 @@ public class URLGenerator extends ProcessorImpl {
             connectionResult = null;
             inputStream = null;
         }
-        
+
         private void openConnection() throws IOException {
             openConnection(null);
         }
@@ -855,7 +855,7 @@ public class URLGenerator extends ProcessorImpl {
             if (connectionResult == null) {
                 final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
                 // TODO: pass logging callback
-                
+
                 final Map<String, String[]> newHeaders;
                 if (lastModified != null) {
                     // A conditional GET is requested
@@ -867,7 +867,7 @@ public class URLGenerator extends ProcessorImpl {
                     // Regular GET
                     newHeaders = config.getHeaderNameValues();
                 }
-                
+
                 connectionResult = new Connection().open(externalContext, indentedLogger, false, Connection.Method.GET.name(),
                         config.getURL(), null, null, null, null, null, newHeaders, config.getForwardHeaders());
                 inputStream = connectionResult.getResponseInputStream(); // empty stream if conditional GET succeeded
@@ -957,7 +957,7 @@ public class URLGenerator extends ProcessorImpl {
     // o followed by a call to read()
     //
     // In order to avoid dereferencing the URL twice, the handler is stored in the state so it can be accessed by read().
-    private class URLGeneratorState {
+    private static class URLGeneratorState {
 
         private ResourceHandler mainResourceHandler;
         private Map<String, Object> map;

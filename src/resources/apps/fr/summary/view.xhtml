@@ -270,6 +270,8 @@
 
                         <xforms:setvalue ref="$query/@type" value="if ($bind/@type) then $bind/@type else 'xs:string'"/>
                     </xforms:action>
+                    <!-- If control has labelref attribute, like the autocomplete, use value from labelref -->
+                    <xforms:setvalue if="exists($control/@labelref)" ref="$query/@path" value="concat(., '/', $control/@labelref)"/>
 
                     <!-- Compute label information -->
                     <xxforms:variable name="label" select="$control/xforms:label" as="xs:element(xforms:label)*"/>

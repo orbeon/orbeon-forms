@@ -44,7 +44,7 @@
             <templates>
                 <instance label=""/>
                 <view>
-                    <fr:autocomplete id="" appearance="minimal" ref="" labelref="@label" xmlns="" resource="">
+                    <fr:autocomplete id="" appearance="minimal" labelref="@label" xmlns="" resource="">
                         <xforms:label ref=""/>
                         <xforms:hint ref=""/>
                         <xforms:help ref=""/>

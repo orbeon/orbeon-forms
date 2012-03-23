@@ -16,10 +16,11 @@
           xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
           xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
           xmlns:xhtml="http://www.w3.org/1999/xhtml"
+          xmlns:xforms="http://www.w3.org/2002/xforms"
           xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
 
     <p:param type="input" name="data"/>
-    <p:param type="output" name="data"/>
+    <p:param type="output" name="data" debug="xxx"/>
 
     <p:processor name="oxf:xslt">
         <p:input name="data" href="#data"/>
@@ -45,6 +46,14 @@
                     <xsl:copy>
                         <xsl:attribute name="edit-ref"/>
                         <xsl:apply-templates select="@* | node()"/>
+                    </xsl:copy>
+                </xsl:template>
+
+                <!-- Convert @relevant to @fb:relevant -->
+                <xsl:template match="xforms:bind[@relevant]">
+                    <xsl:copy>
+                        <xsl:attribute name="fb:relevant" select="@relevant"/>
+                        <xsl:apply-templates select="(@* | node()) except @relevant"/>
                     </xsl:copy>
                 </xsl:template>
 

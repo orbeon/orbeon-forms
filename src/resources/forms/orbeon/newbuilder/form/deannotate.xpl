@@ -16,6 +16,7 @@
           xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
           xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
           xmlns:xhtml="http://www.w3.org/1999/xhtml"
+          xmlns:xforms="http://www.w3.org/2002/xforms"
           xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
 
     <p:param type="input" name="data"/>
@@ -32,6 +33,14 @@
                     <xsl:element name="fr:{local-name()}">
                         <xsl:apply-templates select="@* except @edit-ref | node()"/>
                     </xsl:element>
+                </xsl:template>
+
+                <!-- Convert @fb:relevant to @relevant -->
+                <xsl:template match="xforms:bind[@fb:relevant]">
+                    <xsl:copy>
+                        <xsl:attribute name="relevant" select="@fb:relevant"/>
+                        <xsl:apply-templates select="(@* | node()) except @fb:relevant"/>
+                    </xsl:copy>
                 </xsl:template>
 
                 <!-- Remove automatic td ids -->

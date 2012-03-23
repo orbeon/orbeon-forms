@@ -462,7 +462,8 @@ public class XFormsModelBinds {
         if (customMips != null && customMips.size() > 0) {
             for (final String propertyName: customMips.keySet()) {
                 final String stringResult = evaluateCustomMIP(bind, propertyName, position, currentVariables);
-                bind.setCustom(position, propertyName, stringResult);
+                if (stringResult != null)
+                    bind.setCustom(position, propertyName, stringResult);
             }
         }
     }

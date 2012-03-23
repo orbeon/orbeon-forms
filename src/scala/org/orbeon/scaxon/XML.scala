@@ -46,6 +46,12 @@ object XML {
     def asNodeInfo(item: Item) = item.asInstanceOf[NodeInfo]
     def asNodeInfoSeq(item: Item) = item.asInstanceOf[NodeInfo]
 
+    // Convert a ns → name tuple to a QName, including separating prefix/local if needed
+    def toQName(qName: (String, String)) = {
+        val prefixLocal = parseQName(qName._2)
+        QName.get(prefixLocal._2, prefixLocal._1, qName._1)
+    }
+
     // Effective boolean value of the iterator
     def effectiveBooleanValue(iterator: SequenceIterator) =
         ExpressionTool.effectiveBooleanValue(iterator)
@@ -198,9 +204,12 @@ object XML {
         // Return an element's attributes
         def \@(attName: String): Seq[NodeInfo] = \@(new NodeLocalNameTest(Type.ATTRIBUTE, attName))
         def \@(attName: QName): Seq[NodeInfo] = \@(new NodeQNameTest(Type.ATTRIBUTE, attName))
+        def \@(attName: (String, String)): Seq[NodeInfo] = \@(new NodeQNameTest(Type.ATTRIBUTE, attName))
         def \@(test: Test): Seq[NodeInfo] = find(Axis.ATTRIBUTE, test)
 
         def \\@(attName: String): Seq[NodeInfo] = \\@(new NodeLocalNameTest(Axis.ATTRIBUTE, attName))
+        def \\@(attName: QName): Seq[NodeInfo] = \\@(new NodeQNameTest(Type.ATTRIBUTE, attName))
+        def \\@(attName: (String, String)): Seq[NodeInfo] = \\@(new NodeQNameTest(Type.ATTRIBUTE, attName))
         def \\@(test: Test): Seq[NodeInfo] = find(Axis.DESCENDANT, test)
 
         def root = nodeInfo.getDocumentRoot
@@ -249,9 +258,16 @@ object XML {
         // Semantic is the same as XPath: at least one value must match
         def ===(s: String) = seq exists (_ === s)
 
-        def \@(attName: String): Seq[NodeInfo] = seq flatMap (_ \@ attName)
         def \(test: Test): Seq[NodeInfo] = seq flatMap (_ \ test)
         def \\(test: Test): Seq[NodeInfo] = seq flatMap (_ \\ test)
+
+        def \@(attName: String): Seq[NodeInfo] = seq flatMap (_ \@ attName)
+        def \@(attName: QName): Seq[NodeInfo] = seq flatMap (_ \@ attName)
+        def \@(attName: (String, String)): Seq[NodeInfo] = seq flatMap (_ \@ attName)
+
+        def \\@(attName: String): Seq[NodeInfo] = seq flatMap (_ \\@ attName)
+        def \\@(attName: QName): Seq[NodeInfo] = seq flatMap (_ \\@ attName)
+        def \\@(attName: (String, String)): Seq[NodeInfo] = seq flatMap (_ \\@ attName)
 
         def att(attName: String) = \@(attName)
         def child(test: Test) = \(test)

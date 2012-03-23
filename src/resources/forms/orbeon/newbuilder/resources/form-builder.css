@@ -411,6 +411,10 @@ td.fb-selected:hover .fb-click-message { display: none }
 
 .fr-buttons-placeholder .xforms-output { color: gray }
 
+/* Make pseudo-non-relevant content gray */
+.fb-relevant-false { color: #CCC !important }
+.fb-relevant-false input, .fb-relevant-false textarea, .fb-relevant-false select, .fb-relevant-false button { color: #CCC !important }
+
 /* ***** Accordion Menu ********************************************************************************************* */
 
 dl.accordion-menu { margin: 0; padding: 0; width: 100% }

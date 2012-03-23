@@ -32,6 +32,8 @@ object ControlOps {
 
     private val ControlName = """(.+)-(control|bind|grid|section|template|repeat)""".r // repeat for legacy FB
 
+    private val FBRelevantQName = toQName(FB → ("fb:" + Model.Relevant.name))
+
     private val topLevelBindTemplate: NodeInfo =
             <xforms:bind id="fr-form-binds" nodeset="instance('fr-form-instance')"
                          xmlns:xforms="http://www.w3.org/2002/xforms"/>
@@ -354,7 +356,7 @@ object ControlOps {
     def updateMip(doc: NodeInfo, controlId: String, mipName: String, mipValue: String) {
 
         require(Model.AllMIPNames(mipName))
-        val mipQName = Model.MIPNameToAttributeQName(mipName)
+        val mipQName = mipQNameConvertRelevant(mipName)
 
         findControlById(doc, controlId) foreach { control ⇒
 
@@ -369,10 +371,19 @@ object ControlOps {
         }
     }
 
+    // Get the value of a MIP attribute if present
     def getMip(doc: NodeInfo, controlId: String, mipName: String) = {
         require(Model.AllMIPNames(mipName))
-        findBindByName(doc, controlName(controlId)) flatMap (bind ⇒ attValueOption(bind \@ Model.MIPNameToAttributeQName(mipName)))
+        val mipQName = mipQNameConvertRelevant(mipName)
+
+        findBindByName(doc, controlName(controlId)) flatMap (bind ⇒ attValueOption(bind \@ mipQName))
     }
+
+    private def mipQNameConvertRelevant(mipName: String) =
+        if (mipName == Model.Relevant.name)
+            FBRelevantQName
+        else
+            Model.MIPNameToAttributeQName(mipName)
 
     // XForms callers: find the value of a MIP or null (the empty sequence)
     def getMipOrEmpty(doc: NodeInfo, controlId: String, mipName: String) =

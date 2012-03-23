@@ -335,7 +335,8 @@ a.xforms-help-image .fb-control-help { vertical-align: baseline; }
 
 .fr-grid .fr-grid-td .fb-grid-control-icons img { display: inline }
 .fb-label-hint-placeholder { color: #bbb }
-.fr-grid-td .fb-hover { position: relative }        /* So elements shown on hover can be absolutely positioned relative to the cell */
+.fr-grid-td .fb-hover { position: relative }        /* So elements shown on hover can be absolutely positioned relative to the cell
+                                                       Necessary as Firefox doesn't support position: relative on table cells (http://goo.gl/Atzi2) */
 
 /* Column icons */
 .fr-grid thead .fb-grid-column-toolbar-td {         /* .fr-grid and thead added to take precedence over YUI's text-align: left */

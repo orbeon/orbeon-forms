@@ -39,7 +39,12 @@
             var tinyMceDivId = YAHOO.util.Dom.getElementsByClassName('xbl-fr-tinymce-div', null, this.container)[0].id;
             this.myEditor = new tinymce.Editor(tinyMceDivId, tinyMceConfig);
             var xformsValue = ORBEON.xforms.Document.getValue(this.textareaId);
-            this.onInit(function() { this.myEditor.setContent(xformsValue); this.tinymceInitialized = true; });
+            this.onInit(_.bind(function() {
+                this.myEditor.setContent(xformsValue);
+                // On click inside the iframe, propagate the click outside, so code listening on click on an ancestor gets called
+                $(this.container).find('iframe').contents().on('click', _.bind(function() { this.container.click(); }, this));
+                this.tinymceInitialized = true;
+            }, this));
             this.myEditor.onChange.add(_.bind(this.clientToServer, this));
 
             // Render the component

@@ -53,18 +53,24 @@ $ ->
     # Save reference to last operation that positioned the triggers
     lastPositionTriggers = null
 
+    # Create a div.fb-hover inside the td, if there isn't one already
+    # We do this because Firefox doesn't support position: relative on table cells (http://goo.gl/Atzi2)
+    createHoverDiv = (gridTd) ->
+        hoverDiv = $(gridTd).children('.fb-hover')
+        # Create a div.fb-hover inside the td, if there isn't one already
+        if hoverDiv.length == 0
+            hoverDiv = $('<div>').addClass('fb-hover')
+            hoverDiv.append($(gridTd).children())
+            $(gridTd).append(hoverDiv)
+        hoverDiv
+
     Builder.mouseEntersGridTdEvent.subscribe ({triggers, triggerGroups, gridTd}) ->
         gridTdId = gridTd.id
         lastPositionTriggers = ->
             # Move cell editor controls under this td
             gridTd = YD.get gridTdId
             if gridTd?
-                hoverDiv = $(gridTd).children('.fb-hover')
-                # Create a div.fb-hover inside the td, if there isn't one already
-                if hoverDiv.length == 0
-                    hoverDiv = $('<div>').addClass('fb-hover')
-                    hoverDiv.append($(gridTd).children())
-                    $(gridTd).append(hoverDiv)
+                hoverDiv = createHoverDiv gridTd
                 hoverDiv.append(triggerGroups)
                 $(triggerGroups).css('display', '')
                 # Show/hide triggers depending on relevance rules
@@ -73,6 +79,14 @@ $ ->
                     triggerRelevant = if rule? then rule gridTd else true
                     trigger.style.display = if triggerRelevant then '' else 'none'
         lastPositionTriggers()
+
+    # Normally, we add the div.fb-hover when the mouse first enters the td.fr-grid-td, but for the TinyMCE, if we do
+    # this after the TinyMCE is initialized, the TinyMCE looses its state as we need to wrap the TinyMCE iframe,
+    # which require us to detach the TinyMCE iframe from the DOM. So here we preempltively add the td.fr-grid-td around
+    # the TinyMCE just before it is initialized.
+    tinyMCE.onAddEditor.add (sender, editor) ->
+        gridTd = $(document.getElementById(editor.id)).closest('td.fr-grid-td')
+        createHoverDiv gridTd
 
     # We leave the div.fb-hover that was created on mouseEntersGridTdEvent, as removing it would dispatch a blur to the control
     # See: https://github.com/orbeon/orbeon-forms/issues/44

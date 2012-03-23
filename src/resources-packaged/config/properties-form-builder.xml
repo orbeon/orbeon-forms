@@ -19,6 +19,7 @@
 
     <!-- Toolbox -->
     <property as="xs:string"  name="oxf.fb.toolbox.group.text.uri.*.*"               value="oxf:/forms/orbeon/builder/xbl/text-controls.xbl
+                                                                                            oxf:/xbl/orbeon/tinymce/tinymce.xbl
                                                                                             oxf:/xbl/orbeon/inplace-input/inplace-input.xbl"/>
     <property as="xs:string"  name="oxf.fb.toolbox.group.typed.uri.*.*"              value="oxf:/forms/orbeon/builder/xbl/typed-controls.xbl
                                                                                             oxf:/xbl/orbeon/image-attachment/image-attachment.xbl

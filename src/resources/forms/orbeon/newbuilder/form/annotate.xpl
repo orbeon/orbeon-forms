@@ -20,7 +20,7 @@
           xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
 
     <p:param type="input" name="data"/>
-    <p:param type="output" name="data" debug="xxx"/>
+    <p:param type="output" name="data"/>
 
     <p:processor name="oxf:xslt">
         <p:input name="data" href="#data"/>

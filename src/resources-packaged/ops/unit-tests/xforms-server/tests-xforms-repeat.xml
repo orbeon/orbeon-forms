@@ -2512,9 +2512,9 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:control id="my-position·1">1</xxf:control>
-                        <xxf:control id="my-value·1">2</xxf:control>
+                        <xxf:control id="my-value·1" readonly="true">2</xxf:control>
                         <xxf:control id="my-position·2">2</xxf:control>
-                        <xxf:control id="my-value·2">1</xxf:control>
+                        <xxf:control id="my-value·2" readonly="true">1</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>

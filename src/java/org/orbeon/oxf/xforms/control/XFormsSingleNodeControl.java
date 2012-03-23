@@ -110,13 +110,18 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
                 if (XFormsProperties.isReadonly(containingDocument()))
                     this.readonly = true;
             } else {
-                // Control is not bound to a node (i.e. bound to an atomic value), MIPs get default values
-                setDefaultMIPs();
+                // Control is not bound to a node (i.e. bound to an atomic value)
+                setAtomicValueMIPs();
             }
         } else {
             // Control is not bound to a node because it doesn't have a binding (group, trigger, dialog, etc. without @ref)
             setDefaultMIPs();
         }
+    }
+
+    private void setAtomicValueMIPs() {
+        setDefaultMIPs();
+        this.readonly = true;
     }
 
     private void setDefaultMIPs() {

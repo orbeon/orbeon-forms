@@ -1512,7 +1512,7 @@
                     </xforms:model>
                 </xhtml:head>
                 <xhtml:body>
-                    <xforms:output id="output" ref="xxforms:evaluate-avt('{record[@code = ''c'']}')"/>
+                    <xforms:output id="output" value="xxforms:evaluate-avt('{record[@code = ''c'']}')"/>
                 </xhtml:body>
             </xhtml:html>
         </input>

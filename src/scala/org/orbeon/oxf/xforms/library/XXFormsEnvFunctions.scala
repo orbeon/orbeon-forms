@@ -113,7 +113,12 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
         )
     
         // xxforms:binding
-        Fun("binding", classOf[XXFormsBinding], 0, 1, Type.NODE_TYPE, ALLOWS_ZERO_OR_MORE,
+        Fun("binding", classOf[XXFormsBinding], 0, 1, Type.ITEM_TYPE, ALLOWS_ZERO_OR_MORE,
+            Arg(STRING, EXACTLY_ONE)
+        )
+
+        // xxforms:binding-context
+        Fun("binding-context", classOf[XXFormsBindingContext], 0, 1, Type.ITEM_TYPE, ALLOWS_ZERO_OR_MORE,
             Arg(STRING, EXACTLY_ONE)
         )
     

@@ -4213,6 +4213,67 @@
         </output>
     </test>
 
+    <test description="xxf:binding(), xxf:binding-context() and xxf:component-context()" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="instance">
+                            <values xmlns="">
+                                <foo/>
+                                <bar/>
+                            </values>
+                        </xf:instance>
+                    </xf:model>
+                    <xbl:xbl>
+                        <xbl:binding id="fr-gaga" element="fr|gaga" xxbl:mode="binding">
+                            <xbl:template>
+                                <xf:output id="binding" value="string-join(for $i in xxf:binding('fr-gaga') return if ($i instance of node()) then name($i) else xs:string($i), ' ')"/>
+                                <xf:output id="binding-context" value="string-join(for $i in xxf:binding-context('fr-gaga') return if ($i instance of node()) then name($i) else xs:string($i), ' ')"/>
+                                <xf:output id="component-context" value="string-join(for $i in xxf:component-context() return if ($i instance of node()) then name($i) else xs:string($i), ' ')"/>
+                            </xbl:template>
+                        </xbl:binding>
+                    </xbl:xbl>
+                </xh:head>
+                <xh:body>
+                    <fr:gaga id="gaga1" ref="foo"/>
+                    <fr:gaga id="gaga2" ref="*"/>
+                    <fr:gaga id="gaga3" ref="1 to 10"/>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <values>
+                                    <foo/>
+                                    <bar/>
+                                </values>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="gaga1$binding">foo</xxf:control>
+                        <xxf:control id="gaga1$binding-context">values</xxf:control>
+                        <xxf:control id="gaga1$component-context">values</xxf:control>
+                        <xxf:control id="gaga2$binding">foo bar</xxf:control>
+                        <xxf:control id="gaga2$binding-context">values</xxf:control>
+                        <xxf:control id="gaga2$component-context">values</xxf:control>
+                        <xxf:control id="gaga3$binding">1 2 3 4 5 6 7 8 9 10</xxf:control>
+                        <xxf:control id="gaga3$binding-context">values</xxf:control>
+                        <xxf:control id="gaga3$component-context">values</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
     <!--
 
     TODO: more XBL ids tests:

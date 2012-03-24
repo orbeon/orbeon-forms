@@ -1,14 +1,14 @@
 <!--
     Copyright (C) 2004 Orbeon, Inc.
-  
+
     This program is free software; you can redistribute it and/or modify it under the terms of the
     GNU Lesser General Public License as published by the Free Software Foundation; either version
     2.1 of the License, or (at your option) any later version.
-  
+
     This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
     without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
     See the GNU Lesser General Public License for more details.
-  
+
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
@@ -32,7 +32,7 @@
         </p:input>
         <p:output name="data" id="input-parsed"/>
     </p:processor>
-    
+
     <!-- Execute XPath expresssion-->
     <p:processor name="oxf:xslt">
         <p:input name="data" href="#input-parsed"/>
@@ -41,7 +41,7 @@
             <xsl:stylesheet version="2.0">
                 <xsl:template match="/">
                     <root>
-                        <xsl:copy-of select="saxon:evaluate(string(doc('input:xpath')))"/>
+                        <xsl:copy-of select="saxon:eval(saxon:expression(string(doc('input:xpath')), /*))"/>
                     </root>
                 </xsl:template>
             </xsl:stylesheet>

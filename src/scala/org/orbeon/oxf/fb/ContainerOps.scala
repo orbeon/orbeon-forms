@@ -163,4 +163,8 @@ object ContainerOps {
         val following = td following "*:td"
         following intersect (findAncestorContainers(td).last descendant "*:td")
     }
+
+    // Return all the container controls in the view
+    def getAllContainerControls(inDoc: NodeInfo) =
+        getAllControls(inDoc) filter (e ⇒ ContainerElementQNames(qname(e)))
 }

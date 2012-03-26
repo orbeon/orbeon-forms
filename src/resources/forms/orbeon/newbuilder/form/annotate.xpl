@@ -22,19 +22,44 @@
     <p:param type="input" name="data"/>
     <p:param type="output" name="data"/>
 
-    <p:processor name="oxf:xslt">
+    <p:processor name="oxf:unsafe-xslt">
         <p:input name="data" href="#data"/>
         <p:input name="config">
-            <xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+            <xsl:stylesheet version="2.0"
+                            xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                            xmlns:dataModel="java:org.orbeon.oxf.fb.DataModel">
 
                 <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
 
+                <!-- Duplicated from model.xml, but we have to right now as the form hasn't been loaded yet at this point -->
+                <xsl:variable name="is-custom-instance"
+                              select="/*/xhtml:head/xforms:model[@id = 'fr-form-model']/xforms:instance[@id = 'fr-form-metadata']/*/form-instance-mode = 'custom'"/>
+
+                <!-- Modify binds to point to a readonly node if the binding is empty -->
+                <xsl:template match="/*/xhtml:head/xforms:model[@id = 'fr-form-model']/xforms:instance[@id = 'fr-form-instance']">
+                    <xsl:next-match/>
+                    <xforms:instance id="fb-readonly" xxforms:readonly="true"><readonly/></xforms:instance>
+                </xsl:template>
+                <xsl:template match="xforms:bind/@ref[$is-custom-instance] | xforms:bind/@nodeset[$is-custom-instance]">
+                    <xsl:attribute name="{name()}" select="dataModel:annotatedBindRef(.)"/>
+                </xsl:template>
+
+                <!-- Temporarily mark read-only instances as read-write -->
+                <xsl:template match="xforms:instance[@xxforms:readonly = 'true']">
+                    <xsl:copy>
+                        <xsl:attribute name="fb:readonly" select="'true'"/><!-- so we remember to set the value back -->
+                        <xsl:apply-templates select="@* except @xxforms:readonly | node()"/>
+                    </xsl:copy>
+                </xsl:template>
+
+                <!-- fr:view -> fb:view -->
                 <xsl:template match="xhtml:body//fr:view">
                     <xsl:element name="fb:{local-name()}">
                         <xsl:apply-templates select="@* | node()"/>
                     </xsl:element>
                 </xsl:template>
 
+                <!-- Add @edit-ref -->
                 <xsl:template match="xhtml:body//fr:section">
                     <xsl:element name="fb:{local-name()}">
                         <xsl:attribute name="edit-ref"/>

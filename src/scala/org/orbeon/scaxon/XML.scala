@@ -242,10 +242,10 @@ object XML {
 
         def stringValue = nodeInfo.getStringValue
 
-        private def find(axisNumber: Byte, test: Test) = {
+        private def find(axisNumber: Byte, test: Test): Seq[NodeInfo] = {
             // We know the result contains only NodeInfo, but ouch, this is a cast!
             val iterator = asScalaIterator(nodeInfo.iterateAxis(axisNumber, test.test(nodeInfo))).asInstanceOf[Iterator[NodeInfo]]
-            // Be lazy: a good idea?
+            // Be lazy: a good idea or not?
             iterator.toStream
         }
     }

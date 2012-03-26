@@ -60,7 +60,6 @@
 
     <!-- Set edit mode -->
     <xforms:bind ref="instance('fb-form-instance')//@edit-ref" calculate="concat('xxforms:instance(''fb-form-instance'')/root()', ../saxon:path())"/>
-    <xforms:bind ref="instance('fb-form-instance')//xforms:instance/@xxforms:readonly" calculate="'false'"/>
 
     <!-- Annotate form data passed and store it into fb-form-instance -->
     <xforms:action ev:event="fr-annotate-data">

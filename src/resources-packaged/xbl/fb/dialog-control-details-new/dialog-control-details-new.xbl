@@ -26,7 +26,8 @@
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
 
-         xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps">
+         xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps"
+         xmlns:dataModel="java:org.orbeon.oxf.fb.DataModel">
 
     <xbl:binding id="fb-dialog-control-details-new" element="fb|dialog-control-details-new">
         <xbl:handlers>
@@ -78,7 +79,7 @@
                         <control-name/>             <!-- Possibly new name set by users -->
                         <control-xpath/>            <!-- XPath expression to node might be editable if using custom XML -->
                         <classes/>                  <!-- fr-summary, fr-search... -->
-                        <is-custom-mode/>
+                        <is-custom-instance/>
                         <save-trigger/>             <!-- Contains 'enabled' if all the fields are valid -->
                         <control-names/>            <!-- All used control names in the form, to check that new name doesn't conflict with existing id -->
                         <control-details/>          <!-- Sub-elements contain additional properties for this control -->
@@ -95,7 +96,7 @@
                              calculate="normalize-space()"
                              readonly="false()"
                              constraint=". = ../original-control-name or not(. = tokenize(../control-names, '\s+'))"/>
-                <xforms:bind nodeset="control-xpath" relevant="../is-custom-mode = 'true'" type="xxforms:xpath2" required="../is-custom-mode = 'true'"/>
+                <xforms:bind nodeset="control-xpath" relevant="../is-custom-instance = 'true'" type="xxforms:xpath2" required="../is-custom-instance = 'true'"/>
                 <xforms:bind nodeset="save-trigger" readonly=". = 'disabled'"/>
 
             </xforms:model>
@@ -111,13 +112,12 @@
                 <xxforms:variable name="form-resources" select="$form/xhtml:head/xforms:model/xforms:instance[@id = 'fr-form-resources']/* treat as element()"/>
                 <xxforms:variable name="metadata" select="$form/xhtml:head/xforms:model/xforms:instance[@id = 'fr-form-metadata']/metadata treat as element()"/>
                 <xxforms:variable name="body" select="$form/xhtml:body treat as element()"/>
-                <xxforms:variable name="is-custom-mode" select="$metadata/form-instance-mode = 'custom'"/>
+                <xxforms:variable name="is-custom-instance" select="$metadata/form-instance-mode = 'custom'"/>
 
                 <!-- Show dialog -->
                 <xforms:action ev:event="xxforms-dialog-open" ev:observer="dialog">
-                    <xxforms:variable name="bind" select="controlOps:findBindByNameOrEmpty($form, $local/control-name) treat as element()"/>
-                    <xforms:setvalue ref="$local/control-xpath" value="$bind/((@ref, @nodeset)[1]) treat as attribute()"/>
-                    <xforms:setvalue ref="$local/is-custom-mode" value="$is-custom-mode"/>
+                    <xforms:setvalue ref="$local/control-xpath" value="dataModel:getBindRefOrEmpty($form, $local/control-name)"/>
+                    <xforms:setvalue ref="$local/is-custom-instance" value="$is-custom-instance"/>
                     <xforms:setvalue ref="$local/control-names" value="string-join(controlOps:getAllControlNamesXPath($body), ' ')"/>
                     <xxforms:variable name="control" select="$form//*[@id = concat($local/control-name, '-control')] treat as element()"/>
                     <xforms:setvalue ref="$local/classes" value="$control/@class"/>
@@ -163,11 +163,13 @@
                     <!-- Find reference to control -->
                     <xxforms:variable name="control" select="controlOps:findControlByNameOrEmpty($form, $old-name)"/>
                     <!-- Rename if needed -->
-                    <xforms:action if="$old-name != $new-name" type="xpath" xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps">
+                    <xforms:action if="$old-name != $new-name" type="xpath">
                         controlOps:findRenameControl($form, $old-name, $new-name)
                     </xforms:action>
                     <!-- Update XPath on bind -->
-                    <xforms:setvalue if="$is-custom-mode" ref="controlOps:findBindByNameOrEmpty($form, $new-name)/((@ref, @nodeset)[1]) treat as attribute()" value="$local/control-xpath"/>
+                    <xforms:action if="$is-custom-instance" type="xpath">
+                        dataModel:setBindRef($form, $new-name, $local/control-xpath)
+                    </xforms:action>
                     <!-- Set proper classes -->
                     <xxforms:variable name="classes" select="tokenize($local/classes, '\s+')"/>
                     <xforms:delete if="count($classes) = 0" nodeset="$control/@class"/>

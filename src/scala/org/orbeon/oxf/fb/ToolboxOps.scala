@@ -266,8 +266,8 @@ object ToolboxOps {
             case None ⇒
                 // Insert template instance if not present
                 val template: NodeInfo = <xforms:instance xmlns:xforms="http://www.w3.org/2002/xforms"
-                                                          xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
-                                                          id={templateInstanceId} xxforms:readonly="true">{<dummy/>.copy(label = newGridName)}</xforms:instance>
+                                                          xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+                                                          id={templateInstanceId} fb:readonly="true">{<dummy/>.copy(label = newGridName)}</xforms:instance>
 
                 insert(into = modelElement, after = modelElement \ "*:instance" takeRight 1, origin = template)
         }

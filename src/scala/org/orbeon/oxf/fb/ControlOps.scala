@@ -21,6 +21,7 @@ import org.orbeon.scaxon.XML._
 import org.orbeon.oxf.xforms.analysis.model.Model
 import org.orbeon.oxf.fb.GridOps._
 import org.orbeon.oxf.fb.ContainerOps._
+import org.orbeon.oxf.fb.DataModel._
 import org.orbeon.oxf.xml.NamespaceMapping
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.saxon.om.{SequenceIterator, NodeInfo}
@@ -39,12 +40,15 @@ object ControlOps {
     private val topLevelBindTemplate: NodeInfo =
             <xforms:bind id="fr-form-binds" nodeset="instance('fr-form-instance')"
                          xmlns:xforms="http://www.w3.org/2002/xforms"/>
-
+    
     // Get the control name based on the control, bind, grid, section or template id
     def controlName(controlOrBindId: String) = controlOrBindId match {
         case ControlName(name, _) ⇒ name
         case _ ⇒ null
     }
+
+    // Whether the given id is for a control (given its reserved suffix)
+    def isIdForControl(controlOrBindId: String) = controlName(controlOrBindId) ne null
 
     // Find a control by name (less efficient than searching by id)
     def findControlByName(doc: NodeInfo, controlName: String) =
@@ -66,7 +70,7 @@ object ControlOps {
         ((findModelElement(doc) \ "*:bind" filter (hasId(_, "fr-form-binds"))) \\ "*:bind") filter (p(_)) headOption
 
     def isBindForName(bind: NodeInfo, name: String) =
-        hasId(bind, bindId(name)) || (bind \@ "ref" ++ bind \@ "nodeset" stringValue) == name // also check ref/nodeset in case id is not present
+        hasId(bind, bindId(name)) || bindRefOrNodeset(bind).toSeq.stringValue == name // also check ref/nodeset in case id is not present
 
     // Get the control's name based on the control element
     def getControlName(control: NodeInfo) = getControlNameOption(control).get
@@ -82,15 +86,17 @@ object ControlOps {
     def findControlById(doc: NodeInfo, id: String) =
         findFRBodyElement(doc) \\ * filter (hasId(_, id)) headOption
 
+    // Return a bind's nodeset or ref attribute if present
+    def bindRefOrNodeset(bind: NodeInfo) = (bind \@ "ref") ++ (bind \@ "nodeset") headOption
+
     // Find control holder
     // Don't return anything if isCustomInstance is true
     def findDataHolder(doc: NodeInfo, controlName: String) =
         if (! isCustomInstance)
             findBindByName(doc, controlName) map { bind ⇒
                 // From bind, infer path by looking at ancestor-or-self binds
-                // Assume there is either a @ref or a @nodeset
-                val bindRefs = (bind ancestorOrSelf "*:bind" map
-                    (b ⇒ ((b \@ "nodeset") ++ (b \@ "ref")) head)).reverse.tail
+                val bindRefs = (bind ancestorOrSelf "*:bind" flatMap
+                    (bindRefOrNodeset(_))).reverse.tail
 
                 val path = bindRefs map ("(" + _.stringValue + ")") mkString "/"
 
@@ -128,14 +134,18 @@ object ControlOps {
             ensureBinds(doc, findContainerNames(control) :+ name)
         }
 
+    // Find the top-level bind (marked with "fr-form-binds") if any
+    def findTopLevelBind(inDoc: NodeInfo) =
+        findModelElement(inDoc) \ "*:bind" collectFirst { case bind if hasId(bind, "fr-form-binds") ⇒ bind }
+
     // Ensure that a tree of bind exists
-    def ensureBinds(doc: NodeInfo, names: Seq[String]): NodeInfo = {
+    def ensureBinds(inDoc: NodeInfo, names: Seq[String]): NodeInfo = {
 
         // Insert bind container if needed
-        val model = findModelElement(doc)
-        val topLevelBind = model \ "*:bind" filter (hasId(_, "fr-form-binds")) match {
-            case Seq(bind: NodeInfo, _*) ⇒ bind
-            case _ ⇒ insert(into = model, after = model \ "*:instance" filter (hasId(_, "fr-form-instance")), origin = topLevelBindTemplate).head
+        val model = findModelElement(inDoc)
+        val topLevelBind = findTopLevelBind(inDoc) match {
+            case Some(bind) ⇒ bind
+            case None ⇒ insert(into = model, after = model \ "*:instance" filter (hasId(_, "fr-form-instance")), origin = topLevelBindTemplate).head
         }
 
         // Insert a bind into one level
@@ -148,7 +158,7 @@ object ControlOps {
 
                         val newBind: Seq[NodeInfo] =
                             <xforms:bind id={bindId(bindName)}
-                                         nodeset={if (isCustomInstance) "()" else bindName}
+                                         nodeset={annotatedBindRefIfNeeded(bindName)}
                                          name={bindName}
                                          xmlns:xforms="http://www.w3.org/2002/xforms"/>
 
@@ -160,7 +170,7 @@ object ControlOps {
         }
 
         // Start with top-level
-        ensureBind(topLevelBind.asInstanceOf[NodeInfo], names.toIterator)
+        ensureBind(topLevelBind, names.toIterator)
     }
 
     // Delete the controls in the given grid cell, if any
@@ -389,13 +399,18 @@ object ControlOps {
         getMip(doc, controlId, mipName).orNull
 
     // Get all control names by inspecting all elements with an id that converts to a valid name
-    def getAllControlNames(doc: NodeInfo) =
-        findFRBodyElement(doc) \\ * flatMap
+    def getAllControlNames(inDoc: NodeInfo) =
+        findFRBodyElement(inDoc) \\ * flatMap
             (e ⇒ attValueOption(e \@ "id")) flatMap
                 (id ⇒ Option(controlName(id)))
 
     // For XForms callers
-    def getAllControlNamesXPath(doc: NodeInfo): SequenceIterator = getAllControlNames(doc)
+    def getAllControlNamesXPath(inDoc: NodeInfo): SequenceIterator = getAllControlNames(inDoc)
+
+    // Return all the controls in the view
+    def getAllControls(inDoc: NodeInfo) =
+        findFRBodyElement(inDoc) \\ * filter
+            (e ⇒ isIdForControl(e attValue "id"))
 
     // Get the control's resource holder
     def getControlResourceOrEmpty(controlId: String, resourceName: String) =

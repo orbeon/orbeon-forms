@@ -22,25 +22,39 @@
     <p:param type="input" name="data"/>
     <p:param type="output" name="data"/>
 
-    <p:processor name="oxf:xslt">
+    <p:processor name="oxf:unsafe-xslt">
         <p:input name="data" href="#data"/>
         <p:input name="config">
-            <xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+            <xsl:stylesheet version="2.0"
+                            xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                            xmlns:dataModel="java:org.orbeon.oxf.fb.DataModel">
 
                 <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
 
+                <xsl:variable name="is-custom-instance"
+                              select="/*/xhtml:head/xforms:model[@id = 'fr-form-model']/xforms:instance[@id = 'fr-form-metadata']/*/form-instance-mode = 'custom'"/>
+
+                <!-- Remove temporary fb-readonly instance -->
+                <xsl:template match="xforms:instance[@id = 'fb-readonly']"/>
+
+                <!-- Restore read-only instances -->
+                <xsl:template match="xforms:instance[@fb:readonly = 'true']">
+                    <xsl:copy>
+                        <xsl:attribute name="xxforms:readonly" select="'true'"/>
+                        <xsl:apply-templates select="@* except @fb:readonly | node()"/>
+                    </xsl:copy>
+                </xsl:template>
+
+                <!-- Remove @edit-ref -->
                 <xsl:template match="xhtml:body//fb:view | xhtml:body//fb:section | xhtml:body//fr:grid">
                     <xsl:element name="fr:{local-name()}">
                         <xsl:apply-templates select="@* except @edit-ref | node()"/>
                     </xsl:element>
                 </xsl:template>
 
-                <!-- Convert @fb:relevant to @relevant -->
-                <xsl:template match="xforms:bind[@fb:relevant]">
-                    <xsl:copy>
-                        <xsl:attribute name="relevant" select="@fb:relevant"/>
-                        <xsl:apply-templates select="(@* | node()) except @fb:relevant"/>
-                    </xsl:copy>
+                <!-- Restore binds pointing to fb-readonly -->
+                <xsl:template match="xforms:bind/@ref[$is-custom-instance] | xforms:bind/@nodeset[$is-custom-instance]">
+                    <xsl:attribute name="{name()}" select="dataModel:deAnnotatedBindRef(.)"/>
                 </xsl:template>
 
                 <!-- Convert MIP names -->

@@ -103,12 +103,6 @@ object FormBuilderFunctions {
             yield nextId
     }
 
-    // Whether the current form has a custom instance
-    def isCustomInstance = {
-        val metadataInstance = model("fr-form-model").get.getVariable("is-custom-instance")
-        (metadataInstance ne null) && effectiveBooleanValue(metadataInstance)
-    }
-
     def makeInstanceExpression(name: String) = "instance('" + name + "')"
 
     def debugDumpDocument(message: String, inDoc: NodeInfo) =

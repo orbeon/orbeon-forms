@@ -325,7 +325,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
         val grid = gridWithRowspan
 
         // Insert one row below each existing row
-        for (tr ← grid \ "tr" force)
+        for (tr ← grid \ "tr" toList)
             insertRowBelow(rewrap(tr)) // rewrap after mutation (it's dangerous to play with NodeInfo and mutation!)
 
         def td(id: String) = grid \\ * filter (hasId(_, id)) head

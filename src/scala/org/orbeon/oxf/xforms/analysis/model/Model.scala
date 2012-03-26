@@ -472,7 +472,8 @@ object Model {
 
     case class Custom(override val name: String) extends MIP with XPathMIP
 
-    val AllMIPs = Set(Relevant, Readonly, Required, Constraint, Calculate, InitialValue, Type)
+    val AllMIPs                 = Set[MIP](Relevant, Readonly, Required, Constraint, Calculate, InitialValue, Type)
+    val AllMIPsByName           = AllMIPs map (mip ⇒ mip.name → mip) toMap
     val AllMIPNames             = AllMIPs map (_.name)
     val MIPNameToAttributeQName = AllMIPs map (m ⇒ m.name → m.qName) toMap
 

@@ -308,13 +308,6 @@ a.xforms-trigger span { vertical-align: middle }
 
 a.xforms-readonly, .xforms-trigger-readonly a { color: gray; cursor: default }
 
-/* Highlight of invalid input/textarea */
-/*
-.xforms-invalid .xforms-input-input, textarea.xforms-invalid,
-    .xforms-required-empty .xforms-input-input, textarea.xforms-required-empty
-        { border-color: orange }
-*/
-
 #orbeon-calendar-div .yui-calendar .calheader {
     padding-top: .3em;
 }

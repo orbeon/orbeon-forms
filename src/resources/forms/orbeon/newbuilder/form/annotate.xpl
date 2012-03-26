@@ -49,12 +49,9 @@
                     </xsl:copy>
                 </xsl:template>
 
-                <!-- Convert @relevant to @fb:relevant -->
-                <xsl:template match="xforms:bind[@relevant]">
-                    <xsl:copy>
-                        <xsl:attribute name="fb:relevant" select="@relevant"/>
-                        <xsl:apply-templates select="(@* | node()) except @relevant"/>
-                    </xsl:copy>
+                <!-- Convert MIP names -->
+                <xsl:template match="xforms:bind/@relevant | xforms:bind/@readonly | xforms:bind/@required | xforms:bind/@constraint | xforms:bind/@calculate | xforms:bind/@xxforms:default">
+                    <xsl:attribute name="fb:{local-name()}" select="."/>
                 </xsl:template>
 
                 <!-- Saxon serialization adds an extra meta element, make sure to remove it -->

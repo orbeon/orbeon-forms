@@ -24,6 +24,7 @@ import org.orbeon.oxf.fb.ContainerOps._
 import org.orbeon.oxf.xml.NamespaceMapping
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.saxon.om.{SequenceIterator, NodeInfo}
+import Model._
 
 /*
  * Form Builder: operations on controls.
@@ -32,7 +33,8 @@ object ControlOps {
 
     private val ControlName = """(.+)-(control|bind|grid|section|template|repeat)""".r // repeat for legacy FB
 
-    private val FBRelevantQName = toQName(FB → ("fb:" + Model.Relevant.name))
+    private val MIPsToRewrite = AllMIPs - Type
+    private val RewrittenMIPs = MIPsToRewrite map (mip ⇒ mip.name → toQName(FB → ("fb:" + mip.name))) toMap
 
     private val topLevelBindTemplate: NodeInfo =
             <xforms:bind id="fr-form-binds" nodeset="instance('fr-form-instance')"
@@ -356,7 +358,7 @@ object ControlOps {
     def updateMip(doc: NodeInfo, controlId: String, mipName: String, mipValue: String) {
 
         require(Model.AllMIPNames(mipName))
-        val mipQName = mipQNameConvertRelevant(mipName)
+        val mipQName = convertMIP(mipName)
 
         findControlById(doc, controlId) foreach { control ⇒
 
@@ -374,16 +376,13 @@ object ControlOps {
     // Get the value of a MIP attribute if present
     def getMip(doc: NodeInfo, controlId: String, mipName: String) = {
         require(Model.AllMIPNames(mipName))
-        val mipQName = mipQNameConvertRelevant(mipName)
+        val mipQName = convertMIP(mipName)
 
         findBindByName(doc, controlName(controlId)) flatMap (bind ⇒ attValueOption(bind \@ mipQName))
     }
 
-    private def mipQNameConvertRelevant(mipName: String) =
-        if (mipName == Model.Relevant.name)
-            FBRelevantQName
-        else
-            Model.MIPNameToAttributeQName(mipName)
+    private def convertMIP(mipName: String) =
+        RewrittenMIPs.get(mipName) orElse (AllMIPsByName.get(mipName) map (_.qName)) getOrElse (throw new IllegalArgumentException)
 
     // XForms callers: find the value of a MIP or null (the empty sequence)
     def getMipOrEmpty(doc: NodeInfo, controlId: String, mipName: String) =

@@ -43,6 +43,14 @@
                     </xsl:copy>
                 </xsl:template>
 
+                <!-- Convert MIP names -->
+                <xsl:template match="xforms:bind/@fb:relevant | xforms:bind/@fb:readonly | xforms:bind/@fb:required | xforms:bind/@fb:constraint | xforms:bind/@fb:calculate">
+                    <xsl:attribute name="{local-name()}" select="."/>
+                </xsl:template>
+                <xsl:template match="xforms:bind/@fb:default">
+                    <xsl:attribute name="xxforms:{local-name()}" select="."/>
+                </xsl:template>
+
                 <!-- Remove automatic td ids -->
                 <xsl:template match="xhtml:body//fr:grid//*:td/@id[ends-with(., '-td')]"/>
 

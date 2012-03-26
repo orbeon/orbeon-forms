@@ -108,9 +108,11 @@
                                     <!-- Editable section title -->
                                     <xsl:variable name="input" as="element(fr:inplace-input)">
                                         <fr:inplace-input ref="{xforms:label/@ref}" xxbl:scope="outer">
-                                            <xsl:apply-templates select="xforms:hint | xforms:alert"/>
+                                            <!-- Hint and alert -->
+                                            <xforms:hint class="fr-hidden" ref="$fb-resources/section-name/hint"/>
+                                            <xforms:alert class="fr-hidden" ref="$fb-resources/section-name/alert"/>
                                             <!-- Put a hidden label for the error summary -->
-                                            <xforms:label class="fr-hidden" ref="$fb-resources/components/labels/section-name"/>
+                                            <xforms:label class="fr-hidden" ref="$fb-resources/section-name/label"/>
                                         </fr:inplace-input>
                                     </xsl:variable>
                                     <xsl:apply-templates select="$input"/>

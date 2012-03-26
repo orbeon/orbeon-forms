@@ -42,6 +42,7 @@
         </logo>
         <!-- Sections -->
         <section-name>
+            <label>Section Name</label>
             <hint>click to enter a section title</hint>
             <alert>The section title is required in all languages</alert>
         </section-name>
@@ -825,6 +826,7 @@
         </logo>
         <!-- Sections -->
         <section-name>
+            <label>Nom de la section</label>
             <hint>cliquer pour entrer un titre de section</hint>
             <alert>Le title de section est requis dans toutes les langues</alert>
         </section-name>
@@ -1605,6 +1607,7 @@
         </logo>
         <!-- Sections -->
         <section-name>
+            <label>[Section Name]</label>
             <hint>klikk for å legge inn en seksjonstittel</hint>
             <alert>Seksjonstittel er påkrevd for alle språk</alert>
         </section-name>
@@ -2384,6 +2387,7 @@
         </logo>
         <!-- Sections -->
         <section-name>
+            <label>[Section Name]</label>
             <hint>Нажмите чтобы ввести заголовок раздела</hint>
             <alert>Заголовок необходимо ввести на всех языках формы</alert>
         </section-name>

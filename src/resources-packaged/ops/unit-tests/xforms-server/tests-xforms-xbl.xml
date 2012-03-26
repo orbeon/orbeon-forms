@@ -4240,6 +4240,7 @@
                     <fr:gaga id="gaga1" ref="foo"/>
                     <fr:gaga id="gaga2" ref="*"/>
                     <fr:gaga id="gaga3" ref="1 to 10"/>
+                    <fr:gaga id="gaga4"/>
                 </xh:body>
             </xh:html>
         </input>
@@ -4268,6 +4269,8 @@
                         <xxf:control id="gaga3$binding">1 2 3 4 5 6 7 8 9 10</xxf:control>
                         <xxf:control id="gaga3$binding-context">values</xxf:control>
                         <xxf:control id="gaga3$component-context">values</xxf:control>
+                        <xxf:control id="gaga4$binding-context">values</xxf:control>
+                        <xxf:control id="gaga4$component-context">values</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>

@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms.xbl
 
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
-import org.orbeon.oxf.xforms._
 import org.dom4j.{Element, Document}
 
 case class ConcreteBinding(
@@ -28,8 +27,5 @@ case class ConcreteBinding(
 ) {
     require(abstractBinding.bindingId.isDefined, "missing id on XBL binding for " + Dom4jUtils.elementToDebugString(abstractBinding.bindingElement))
 
-    val bindingId = abstractBinding.bindingId.get
-    val containerElementName =          // "div" by default
-        Option(abstractBinding.bindingElement.attributeValue(XFormsConstants.XXBL_CONTAINER_QNAME)) getOrElse
-            "div"
+    def bindingId = abstractBinding.bindingId.get
 }

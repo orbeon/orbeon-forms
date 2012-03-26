@@ -35,6 +35,10 @@ case class AbstractBinding(
 ) {
     def templateElement = Option(bindingElement.element(XBL_TEMPLATE_QNAME))
 
+    val containerElementName =          // "div" by default
+        Option(bindingElement.attributeValue(XFormsConstants.XXBL_CONTAINER_QNAME)) getOrElse
+            "div"
+
     private def transformQNameOption = templateElement flatMap
         (e ⇒ Option(Dom4jUtils.extractAttributeValueQName(e, XXBL_TRANSFORM_QNAME)))
 

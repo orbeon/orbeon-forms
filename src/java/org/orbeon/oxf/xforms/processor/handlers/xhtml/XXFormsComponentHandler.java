@@ -46,7 +46,7 @@ public class XXFormsComponentHandler extends XFormsBaseHandlerXHTML {
 
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
 
-        this.elementName = staticGlobalOps.getBinding(prefixedId).containerElementName();
+        this.elementName = staticGlobalOps.getBinding(prefixedId).abstractBinding().containerElementName();
         this.elementQName = XMLUtils.buildQName(xhtmlPrefix, elementName);
 
         // Produce class of the form xbl-foo-bar

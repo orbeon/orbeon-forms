@@ -2393,7 +2393,7 @@ ORBEON.xforms.Controls = {
         } else if (YAHOO.util.Dom.hasClass(control, "xforms-upload")) {
             // Upload control
             ORBEON.xforms.Controls.setDisabledOnFormElement(
-                    ORBEON.util.Dom.getChildElementByClass(control, "xforms-upload-select"), isReadonly);
+                    YAHOO.util.Dom.getElementsByClassName("xforms-upload-select", null, control)[0], isReadonly);
         } else if (YAHOO.util.Dom.hasClass(control, "xforms-textarea")) {
             // Textarea
             var textarea = ORBEON.util.Utils.isNewXHTMLLayout()

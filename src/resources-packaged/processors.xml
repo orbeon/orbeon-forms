@@ -764,6 +764,10 @@
         <class name="org.orbeon.oxf.processor.InstanceToParametersProcessor"/>
     </processor>
 
+    <processor name="oxf:tag-soup">
+        <class name="org.orbeon.oxf.processor.TagSoupProcessor"/>
+    </processor>
+
     <!-- Form Runner / Form Builder processors -->
     <processor name="fr:persistence-proxy">
         <class name="org.orbeon.oxf.fr.FormRunnerPersistenceProxy"/>

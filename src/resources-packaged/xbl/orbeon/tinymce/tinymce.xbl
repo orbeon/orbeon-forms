@@ -52,7 +52,7 @@
         <xbl:template>
             <xxforms:variable name="server-value" select="xxforms:binding('fr-tinymce')"/>
             <xxforms:variable name="client-value" select="client-value"/>
-            <xforms:group ref="$server-value" appearance="xxforms:internal">
+            <xforms:group ref="$server-value">
                 <xbl:content/>
 
                 <!-- XForms control the JavaScript writes to -->

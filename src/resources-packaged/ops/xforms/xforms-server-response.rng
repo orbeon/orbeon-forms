@@ -382,7 +382,7 @@
                                 <optional><attribute name="exception"/></optional>
                                 <optional><attribute name="file"/></optional>
                                 <optional><attribute name="line"/></optional>
-                                <optional><attribute name="col"/></optional>
+                                <optional><attribute name="column"/></optional>
                                 <data type="string"/>
                             </element>
                         </zeroOrMore>

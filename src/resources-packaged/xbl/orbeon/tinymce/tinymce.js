@@ -22,11 +22,13 @@
         groupElement: null,
         visibleInputElement: null,
         myEditor: null,
-        textareaId: null,
+        clientValueTextareaId: null,
+        serverValueOutputId: null,
         tinymceInitialized: false,
 
         init: function() {
-            this.textareaId = YAHOO.util.Dom.getElementsByClassName('xbl-fr-tinymce-xforms-textarea', null, this.container)[0].id;
+            this.clientValueTextareaId = YAHOO.util.Dom.getElementsByClassName('xbl-fr-tinymce-xforms-client-value', null, this.container)[0].id;
+            this.serverValueOutputId = YAHOO.util.Dom.getElementsByClassName('xbl-fr-tinymce-xforms-server-value', null, this.container)[0].id;
 
             // Tell TinyMCE about base URL, which it can't guess in combined resources
             var baseURLa = YAHOO.util.Dom.getElementsByClassName('tinymce-base-url', null, this.container)[0];
@@ -38,7 +40,7 @@
             var tinyMceConfig = typeof TINYMCE_CUSTOM_CONFIG !== "undefined" ? TINYMCE_CUSTOM_CONFIG : YAHOO.xbl.fr.Tinymce.DefaultConfig;
             var tinyMceDivId = YAHOO.util.Dom.getElementsByClassName('xbl-fr-tinymce-div', null, this.container)[0].id;
             this.myEditor = new tinymce.Editor(tinyMceDivId, tinyMceConfig);
-            var xformsValue = ORBEON.xforms.Document.getValue(this.textareaId);
+            var xformsValue = ORBEON.xforms.Document.getValue(this.serverValueOutputId);
             this.onInit(_.bind(function() {
                 this.myEditor.setContent(xformsValue);
                 // On click inside the iframe, propagate the click outside, so code listening on click on an ancestor gets called
@@ -53,7 +55,7 @@
 
         // Send value in MCE to server
         clientToServer: function() {
-            ORBEON.xforms.Document.setValue(this.textareaId, this.myEditor.getContent());
+            ORBEON.xforms.Document.setValue(this.clientValueTextareaId, this.myEditor.getContent());
         },
 
         // Update MCE with server value
@@ -63,7 +65,7 @@
                 return e == this.container || YD.hasClass(e, 'mceListBoxMenu');                                     // TinyMCE creates a div.mceListBoxMenu under the body for menus
             }, this));
             if (mceContainer == null) {                                                                             // Heuristic: if TinyMCE has focus, users might still be editing so don't update
-                var newServerValue = ORBEON.xforms.Document.getValue(this.textareaId);
+                var newServerValue = ORBEON.xforms.Document.getValue(this.serverValueOutputId);
                 this.myEditor.setContent(newServerValue);
             }
         },

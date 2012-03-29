@@ -290,9 +290,8 @@
         </path>
     </target>
 
-    <!-- Compile source -->
-    <target name="classes" depends="classpath" unless="skip.compilation">
-
+    <!-- Perform string replacement in Version.java to set version and edition  -->
+    <target name="set-version" depends="init">
         <mkdir dir="${build.dir}/src"/>
         <copy todir="${build.dir}/src" file="${java-src.dir}/org/orbeon/oxf/common/Version.java" overwrite="true">
             <filterset>
@@ -300,6 +299,16 @@
                 <filter token="EDITION" value="${edition}"/>
             </filterset>
         </copy>
+    </target>
+
+    <!-- A task we use only from IntelliJ before running tests that sets the version in place in Version.java.
+         The task is executed automatically by IntelliJ, which saves us from having to edit that file by hand. -->
+    <target name="intellij-set-version" depends="set-version">
+        <copy file="${build.dir}/src/Version.java" tofile="${java-src.dir}/org/orbeon/oxf/common/Version.java" overwrite="true"/>
+    </target>
+
+    <!-- Compile source -->
+    <target name="classes" depends="set-version, classpath" unless="skip.compilation">
 
         <scalac destdir="${build.classes.dir}"
                 classpathref="class.path"

@@ -45,7 +45,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
 
     val TemplateDoc = "oxf:/forms/orbeon/builder/form/template.xml"
     val SectionsGridsDoc = "oxf:/org/orbeon/oxf/fb/template-with-sections-grids.xhtml"
-    
+
     def getDocument(documentURL: String) = ProcessorUtils.createDocumentFromURL(documentURL, null)
 
     def getNewDoc(url: String = TemplateDoc) = {
@@ -161,7 +161,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
             // Insert a new control into the next empty td
             selectFirstTd(doc)
             val newControlNameOption = insertNewControl(doc, binding)
-            
+
             // Check the control's name
             assert(newControlNameOption === Some("control-3"))
             val newControlName = newControlNameOption.get
@@ -184,7 +184,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
             val controlBind = findBindByName(doc, newControlName).get
             assert(hasId(controlBind, bindId(newControlName)))
             assert((controlBind precedingSibling * att "id") === bindId("control-1"))
-            
+
             assert(formResourcesRoot \ "resource" \ newControlName nonEmpty)
         }
     }
@@ -198,7 +198,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
             // Insert a new repeated grid after the current grid
             selectFirstTd(doc)
             val newRepeatNameOption = insertNewRepeat(doc)
-            
+
             assert(newRepeatNameOption === Some("grid-3"))
             val newRepeatName = newRepeatNameOption.get
 
@@ -226,7 +226,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
             // Insert a new control
             val binding = <binding element="xforms|input" xmlns:xforms="http://www.w3.org/2002/xforms"/>
             val newControlNameOption = insertNewControl(doc, binding)
-            
+
             assert(newControlNameOption === Some(if (isCustomInstance) "control-3" else "control-4"))
             val newControlName = newControlNameOption.get
 
@@ -265,8 +265,6 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
                     assert(templateHolder.isEmpty)
                 }
             }
-
-            println(TransformerUtils.tinyTreeToString(doc))
         }
     }
 
@@ -380,7 +378,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
 
         assert(actual === expected)
     }
-    
+
     def assertSelectedTdAfterDelete(beforeAfter: Seq[(String, String)])(delete: NodeInfo ⇒ Any) {
 
         // For before/after td ids: create a doc, call the delete function, and assert the resulting selected td
@@ -394,7 +392,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
                 delete(beforeTd)
 
                 val actualSelectedId = findSelectedTd(doc) map (_ \@ "id" stringValue)
-                
+
                 assert(actualSelectedId === Some(afterTdId))
             }
 
@@ -402,7 +400,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
         for ((beforeTdId, afterTdId) ← beforeAfter)
             deleteRowCheckSelectedTd(beforeTdId, afterTdId)
     }
-    
+
     @Test def selectedTdAfterDeletedRow() = {
 
         // A few before/after ids of selected tds
@@ -419,7 +417,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
     }
 
     @Test def selectedTdAfterDeletedCol() = {
-        
+
         // A few before/after ids of selected tds
         val beforeAfter = Seq(
             "1111" → "1112",    // first td

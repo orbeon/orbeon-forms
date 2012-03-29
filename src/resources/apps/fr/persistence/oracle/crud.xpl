@@ -477,7 +477,7 @@
                             </p:processor>
                             <p:processor name="oxf:sql">
                                 <p:input name="data"><dummy/></p:input>
-                                <p:input name="config" href="#create-sql" debug="create-sql"/>
+                                <p:input name="config" href="#create-sql"/>
                             </p:processor>
                         </p:when>
                     </p:choose>

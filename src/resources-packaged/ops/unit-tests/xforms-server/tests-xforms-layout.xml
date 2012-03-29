@@ -2621,7 +2621,8 @@
         </output>
     </test>
 
-    <test description="#90: Noscript: empty TOC items appear for non-visible sections (noscript mode)" name="oxf:pipeline">
+    <!-- NOTE: Excluded test for CE version -->
+    <test description="#90: Noscript: empty TOC items appear for non-visible sections (noscript mode)" name="oxf:pipeline" exclude="true">
         <!-- See: https://github.com/orbeon/orbeon-forms/issues/90 -->
         <input name="config" href="wrap-xforms-init-allcontrols.xpl"/>
         <input name="document">

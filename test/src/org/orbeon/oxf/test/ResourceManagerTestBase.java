@@ -22,6 +22,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorUtils;
 import org.orbeon.oxf.processor.test.TestExternalContext;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
+import org.orbeon.oxf.util.LoggerFactory;
 
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -37,6 +38,9 @@ public abstract class ResourceManagerTestBase {
     @BeforeClass
     public static void staticSetup() throws Exception {
         if (!staticSetupDone) {
+
+            // Avoid Log4j warning telling us no appender could be found
+            LoggerFactory.initBasicLogger();
 
             // Setup resource manager
             final Map props = new HashMap();
@@ -66,7 +70,7 @@ public abstract class ResourceManagerTestBase {
         if (pipelineContext != null)
             pipelineContext.destroy(true);
     }
- 
+
     protected PipelineContext createPipelineContextWithExternalContext() {
         return createPipelineContextWithExternalContext("oxf:/org/orbeon/oxf/default-request.xml");
     }

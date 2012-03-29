@@ -71,7 +71,7 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
 
         final XFormsInputControl inputControl = (XFormsInputControl) control;
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
-        final boolean isConcreteControl = inputControl != null && inputControl.isRelevant();
+        final boolean isConcreteControl = ! isNonRelevant(inputControl);
 
         if (isBoolean()) {
             // Produce a boolean output

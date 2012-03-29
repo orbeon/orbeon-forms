@@ -89,7 +89,7 @@ public class XFormsGroupSeparatorHandler extends XFormsGroupHandler {
 
             // Set control classes
             outputInterceptor.setAddedClasses(elementClasses);
-        } else if (isHTMLDisabled(control)) {
+        } else if (isNonRelevant(control)) {
             // In noscript, if the group not visible, set output to a black hole
             controller.setOutput(new DeferredXMLReceiverAdapter());
         }
@@ -114,7 +114,7 @@ public class XFormsGroupSeparatorHandler extends XFormsGroupHandler {
                         outputInterceptor.getDelimiterPrefix(), outputInterceptor.getDelimiterLocalName(), "xforms-group-begin-end",
                         "group-end-" + XFormsUtils.namespaceId(containingDocument, effectiveId));
             }
-        } else if (isHTMLDisabled(control)) {
+        } else if (isNonRelevant(control)) {
             // In noscript, group was not visible, restore output
             controller.setOutput(currentSavedOutput);
         }

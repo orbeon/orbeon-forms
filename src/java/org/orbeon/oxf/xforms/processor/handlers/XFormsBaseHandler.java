@@ -105,6 +105,10 @@ public abstract class XFormsBaseHandler extends ElementHandler {
             && ((XFormsSingleNodeControl) control).isReadonly()
             && !XFormsProperties.isStaticReadonlyAppearance(containingDocument);
     }
+    
+    public boolean isNonRelevant(XFormsControl control) {
+        return control == null || ! control.isRelevant();
+    }
 
     protected boolean isEmpty(XFormsControl control) {
         return control instanceof XFormsValueControl && XFormsModelBinds.isEmptyValue(((XFormsValueControl) control).getValue());

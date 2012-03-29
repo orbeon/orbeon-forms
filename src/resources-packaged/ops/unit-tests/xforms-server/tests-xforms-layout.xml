@@ -2577,4 +2577,87 @@
         </output>
     </test>
 
+    <test description="#90: Noscript: empty TOC items appear for non-visible sections (script mode)" name="oxf:pipeline">
+        <!-- See: https://github.com/orbeon/orbeon-forms/issues/90 -->
+        <input name="config" href="wrap-xforms-init-allcontrols.xpl"/>
+        <input name="document">
+            <xhtml:html>
+                <xhtml:head>
+                    <xforms:model id="model" xxforms:xhtml-layout="span" xxforms:noscript="false">
+                        <xforms:instance id="instance">
+                            <instance/>
+                        </xforms:instance>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:group id="group1">
+                        <xhtml:ul>
+                            <xhtml:li>Cat</xhtml:li>
+                            <xforms:group ref="()" id="group2">
+                                <xhtml:li>Dog</xhtml:li>
+                            </xforms:group>
+                            <xforms:group ref="." id="group3">
+                                <xhtml:li>Fish</xhtml:li>
+                            </xforms:group>
+                        </xhtml:ul>
+                    </xforms:group>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <controls>
+                <xhtml:span id="group1" class="xforms-group">
+                    <xhtml:ul>
+                        <xhtml:li>Cat</xhtml:li>
+                        <xhtml:li id="group-begin-group2" class="xforms-group-begin-end xforms-disabled"/>
+                        <xhtml:li class="xforms-disabled">Dog</xhtml:li>
+                        <xhtml:li id="group-end-group2" class="xforms-group-begin-end"/>
+                        <xhtml:li id="group-begin-group3" class="xforms-group-begin-end"/>
+                        <xhtml:li>Fish</xhtml:li>
+                        <xhtml:li id="group-end-group3" class="xforms-group-begin-end"/>
+                    </xhtml:ul>
+                </xhtml:span>
+            </controls>
+        </output>
+    </test>
+
+    <test description="#90: Noscript: empty TOC items appear for non-visible sections (noscript mode)" name="oxf:pipeline">
+        <!-- See: https://github.com/orbeon/orbeon-forms/issues/90 -->
+        <input name="config" href="wrap-xforms-init-allcontrols.xpl"/>
+        <input name="document">
+            <xhtml:html>
+                <xhtml:head>
+                    <xforms:model id="model" xxforms:xhtml-layout="span" xxforms:noscript="true">
+                        <xforms:instance id="instance">
+                            <instance/>
+                        </xforms:instance>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:group id="group1">
+                        <xhtml:ul>
+                            <xhtml:li>Cat</xhtml:li>
+                            <xforms:group ref="()" id="group2">
+                                <xhtml:li>Dog</xhtml:li>
+                            </xforms:group>
+                            <xforms:group ref="." id="group3">
+                                <xhtml:li>Fish</xhtml:li>
+                            </xforms:group>
+                        </xhtml:ul>
+                    </xforms:group>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <controls>
+                <xhtml:span id="group1" class="xforms-group">
+                    <xhtml:ul>
+                        <xhtml:li>Cat</xhtml:li>
+                        <xhtml:li>Fish</xhtml:li>
+                    </xhtml:ul>
+                </xhtml:span>
+            </controls>
+        </output>
+    </test>
+
 </group>

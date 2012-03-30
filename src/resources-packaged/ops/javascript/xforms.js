@@ -3550,7 +3550,7 @@ ORBEON.xforms.Events = {
                 // we can avoid a round trip and show the help right away
                 ORBEON.xforms.Controls.showHelp(control);
             }
-        } else {
+        } else if (target == null) {
             // Click on something that is not an XForms element, but which might still be in an repeat iteration,
             // in which case we want to let the server know about where in the iteration the click was.
 

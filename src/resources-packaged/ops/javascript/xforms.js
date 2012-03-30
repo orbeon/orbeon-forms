@@ -3086,7 +3086,8 @@ ORBEON.xforms.Events = {
                 // Store initial value of control if we don't have a server value already, and if this is is not a list
                 // Initial value for lists is set up initialization, as when we receive the focus event the new value is already set.
                 if (ORBEON.xforms.ServerValueStore.get(targetControlElement.id) == null
-                        && ! YAHOO.util.Dom.hasClass(targetControlElement, "xforms-select-appearance-compact")) {
+                        && ! YAHOO.util.Dom.hasClass(targetControlElement, "xforms-select-appearance-compact")
+                        && ! YAHOO.util.Dom.hasClass(targetControlElement, "xforms-select1-appearance-compact")) {
                     var controlCurrentValue = ORBEON.xforms.Controls.getCurrentValue(targetControlElement);
                     ORBEON.xforms.ServerValueStore.set(targetControlElement.id, controlCurrentValue);
                 }

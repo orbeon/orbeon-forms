@@ -192,7 +192,7 @@
                     </fr:repeat>
                 </xforms:group>
                 <!-- Only show this section if there are selection controls -->
-                <xxforms:variable name="controls-with-itemset" select="$body//*[(@ref or @bind) and ends-with(@id, '-control') and exists(xforms:itemset)]" as="element()*"/>
+                <xforms:var name="controls-with-itemset" value="$body//*[(@ref or @bind) and ends-with(@id, '-control') and exists(xforms:itemset)]" as="element()*"/>
                 <xforms:group ref="xforms:action[@ev:event = 'xforms-submit-done' and exists($controls-with-itemset)]">
                     <xforms:label ref="$form-resources/dialog-actions/response-itemset/label"/>
                     <fr:repeat nodeset="xforms:action[@class = 'fr-itemset-action']" id="fb-bindings-itemset-repeat" origin="instance('fb-binding-action-template')/xforms:action[@class = 'fr-itemset-action']" columns="2" appearance="xxforms:table">
@@ -268,7 +268,7 @@
                 <xforms:action ev:event="DOMActivate">
 
                     <!-- Delete existing binding if any -->
-                    <xxforms:variable name="binding-id" select="$instance/xforms:action[1]/@id"/>
+                    <xforms:var name="binding-id" value="$instance/xforms:action[1]/@id"/>
                     <xforms:delete nodeset="$model/xforms:action[@id = $binding-id]"/>
 
                     <!-- Insert new binding -->
@@ -291,8 +291,8 @@
 
     <!-- Initialize dialog -->
     <xforms:action ev:event="xxforms-dialog-open">
-        <xxforms:variable name="instance" select="instance('fb-bindings-editor-instance')"/>
-        <xxforms:variable name="binding-name" select="event('binding-name')"/>
+        <xforms:var name="instance" value="instance('fb-bindings-editor-instance')"/>
+        <xforms:var name="binding-name" value="event('binding-name')"/>
 
         <!-- Clear working values -->
         <xforms:setvalue ref="$instance/name"/>
@@ -305,14 +305,14 @@
         </xforms:action>
         <!-- Otherwise copy binding -->
         <xforms:action if="$binding-name">
-            <xxforms:variable name="binding-id" select="concat($binding-name, '-binding')"/>
+            <xforms:var name="binding-id" value="concat($binding-name, '-binding')"/>
             <xforms:setvalue ref="$instance/name" value="$binding-name"/>
             <xforms:setvalue ref="$instance/initial-name" value="$binding-name"/>
 
             <xforms:insert nodeset="$instance/*" origin="$model/xforms:action[@id = $binding-id]"/>
 
             <!-- Insert condition on action if missing -->
-            <xxforms:variable name="action1" select="$instance/xforms:action/xforms:action[1]"/>
+            <xforms:var name="action1" value="$instance/xforms:action/xforms:action[1]"/>
             <xforms:insert if="not(exists($action1/@if))" context="$action1" origin="xxforms:attribute('if', 'true()')"/>
         </xforms:action>
     </xforms:action>
@@ -320,10 +320,10 @@
     <!-- Model for the bindings editor -->
     <xforms:model id="fb-bindings-model">
 
-        <xxforms:variable name="fb-lang" select="xxforms:instance('fb-language-instance')"/>
-        <xxforms:variable name="model" select="xxforms:instance('fb-form-instance')/xhtml:head/xforms:model[@id = 'fr-form-model']"/>
-        <xxforms:variable name="resources" select="$model/xforms:instance[@id = 'fr-form-resources']/*"/>
-        <xxforms:variable name="current-resources" select="$resources/resource[@xml:lang = $fb-lang]"/>
+        <xforms:var name="fb-lang" value="xxforms:instance('fb-language-instance')"/>
+        <xforms:var name="model" value="xxforms:instance('fb-form-instance')/xhtml:head/xforms:model[@id = 'fr-form-model']"/>
+        <xforms:var name="resources" value="$model/xforms:instance[@id = 'fr-form-resources']/*"/>
+        <xforms:var name="current-resources" value="$resources/resource[@xml:lang = $fb-lang]"/>
 
         <xforms:instance id="fb-bindings-editor-instance">
             <bindings-editor>
@@ -395,7 +395,7 @@
                 <!-- Request actions -->
                 <xforms:action ev:event="xforms-submit" ev:observer="SET ME">
                     <!-- Get reference to initial request -->
-                    <xxforms:variable name="request-instance-name" select="SET ME" as="xs:string"/>
+                    <xforms:var name="request-instance-name" value="SET ME" as="xs:string"/>
                     <!-- Copy over to read-write request instance -->
                     <xforms:insert nodeset="instance('fr-service-request-instance')" origin="saxon:parse(instance($request-instance-name))"/>
                     <!--<xforms:insert nodeset="instance('fr-service-request-instance')" origin="instance($request-instance-name)"/>-->
@@ -417,16 +417,16 @@
                 <!-- Set service value -->
                 <xforms:action class="fr-set-service-value-action">
                     <!-- Parameters -->
-                    <xxforms:variable name="control-name" select="" as="xs:string"/>
-                    <xxforms:variable name="path" select="" as="xs:string"/>
+                    <xforms:var name="control-name" value="" as="xs:string"/>
+                    <xforms:var name="path" value="" as="xs:string"/>
                     <!-- Set value -->
                     <xforms:setvalue ref="$path" value="instance('fb-form-instance')/*/*[name() = $control-name]"/>
                 </xforms:action>
                 <!-- Set database service value -->
                 <xforms:action class="fr-set-database-service-value-action" xmlns:sql="http://orbeon.org/oxf/xml/sql">
                     <!-- Parameters -->
-                    <xxforms:variable name="control-name" select="" as="xs:string"/>
-                    <xxforms:variable name="parameter" select="" as="xs:integer"/>
+                    <xforms:var name="control-name" value="" as="xs:string"/>
+                    <xforms:var name="parameter" value="" as="xs:integer"/>
                     <!-- Set value and escape single quotes -->
                     <xforms:setvalue ref="/sql:config/sql:query/sql:param[xs:integer($parameter)]/@select"
                                      value="concat('''', replace(instance('fb-form-instance')/*/*[name() = $control-name], '''', ''''''), '''')"/>
@@ -434,22 +434,22 @@
                 <!-- Set control value -->
                 <xforms:action class="fr-set-control-value-action">
                     <!-- Parameters -->
-                    <xxforms:variable name="control-name" select="" as="xs:string"/>
-                    <xxforms:variable name="control-value" select="" as="xs:string"/>
+                    <xforms:var name="control-name" value="" as="xs:string"/>
+                    <xforms:var name="control-value" value="" as="xs:string"/>
                     <!-- Set value -->
                     <xforms:setvalue ref="instance('fb-form-instance')/*/*[name() = $control-name]" value="$control-value"/>
                 </xforms:action>
                 <!-- Set control itemset -->
                 <xforms:action class="fr-itemset-action">
                     <!-- Parameters -->
-                    <xxforms:variable name="control-name" select="" as="xs:string"/>
-                    <xxforms:variable name="response-items" select="" as="node()*"/>
+                    <xforms:var name="control-name" value="" as="xs:string"/>
+                    <xforms:var name="response-items" value="" as="node()*"/>
                     <!-- Set itemset -->
-                    <xxforms:variable name="control-resources" model="fr-resources-model" select="$fr-form-resources/*[name() = $control-name]"/>
+                    <xforms:var name="control-resources" model="fr-resources-model" value="$fr-form-resources/*[name() = $control-name]"/>
                     <xforms:delete nodeset="$control-resources/item"/>
                     <xforms:action xxforms:iterate="$response-items">
-                        <xxforms:variable name="item-label" select="" as="xs:string"/>
-                        <xxforms:variable name="item-value" select="" as="xs:string"/>
+                        <xforms:var name="item-label" value="" as="xs:string"/>
+                        <xforms:var name="item-value" value="" as="xs:string"/>
                         <xforms:insert nodeset="$control-resources/*"
                                        origin="xxforms:element('item', (xxforms:element('label', xs:string($item-label)), xxforms:element('value', xs:string($item-value))))"/>
                     </xforms:action>

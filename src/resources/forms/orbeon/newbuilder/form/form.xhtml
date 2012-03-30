@@ -238,10 +238,10 @@
                                         <!-- Ask confirmation -->
                                         <xxf:show dialog="fb-confirmation-dialog">
                                             <xxf:context name="fr:message"
-                                                             select="concat($form-resources/messages/delete-resources, ' ''',
+                                                             value="concat($form-resources/messages/delete-resources, ' ''',
                                                                          xxf:instance('fr-languages-instance')/language[@code = $fb-lang]/(if (@native-name != @english-name) then concat(@native-name, ' (', @english-name, ')') else @native-name),
                                                                          '''?')"/>
-                                            <xxf:context name="fr:confirmation-target" select="'fb-language-remove'"/>
+                                            <xxf:context name="fr:confirmation-target" value="'fb-language-remove'"/>
                                         </xxf:show>
                                     </xf:action>
                                     <xf:action ev:event="fb-confirmation-yes">

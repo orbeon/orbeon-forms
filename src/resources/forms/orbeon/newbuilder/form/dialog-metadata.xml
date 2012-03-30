@@ -24,8 +24,8 @@
       id="fb-editor-metadata-dialog" close="false">
 
     <!-- Are we editing the metadata for a new or existing form? Consider new if either value is blank. -->
-    <xxforms:variable name="is-new-form" select="(xxforms:bind('application-name-bind'), xxforms:bind('form-name-bind')) = ''"/>
-    <xxforms:variable name="is-save-as" select="instance('fb-metadata-instance')/mode = 'save-as'"/>
+    <xforms:var name="is-new-form" value="(xxforms:bind('application-name-bind'), xxforms:bind('form-name-bind')) = ''"/>
+    <xforms:var name="is-save-as" value="instance('fb-metadata-instance')/mode = 'save-as'"/>
 
     <!-- HACK: Copy expression as we can't use the variable $is-save-as above -->
     <xforms:label value="if (instance('fb-metadata-instance')/mode = 'save-as')
@@ -60,7 +60,7 @@
                 <!-- Application name -->
 
                 <!-- Use an input if app name is a wildcard -->
-                <xxforms:variable name="is-input" select="xxforms:instance('fr-permissions')/app[@name = '*']" as="xs:boolean"/>
+                <xforms:var name="is-input" value="xxforms:instance('fr-permissions')/app[@name = '*']" as="xs:boolean"/>
                 <xforms:group ref=".[$is-input]">
                     <xforms:input ref="application-name" id="fb-application-name-input" tabindex="1" xxforms:autocomplete="off">
                         <xforms:label ref="$form-resources/application-name/label"/>
@@ -118,7 +118,7 @@
                     <xforms:setvalue ref="xxforms:instance('fr-parameters-instance')/document" value="digest(string(random(true())), 'MD5', 'hex')"/>
                     <!-- Actually save -->
                     <xforms:dispatch name="fr-save-action" target="fr-persistence-model">
-                        <xxforms:context name="fr:check-data-valid" select="true()"/>
+                        <xxforms:context name="fr:check-data-valid" value="true()"/>
                     </xforms:dispatch>
                     <!-- Change URL to have new document id -->
                     <xxforms:script>

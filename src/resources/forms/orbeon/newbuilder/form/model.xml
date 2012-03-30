@@ -34,25 +34,25 @@
       id="fr-form-model">
 
     <!-- Variable pointing to the current language -->
-    <xxforms:variable name="fb-lang" select="instance('fb-language-instance')"/>
-    <xxforms:variable name="form-resources" model="fr-resources-model" select="$fr-form-resources" as="element(resource)?"/>
+    <xforms:var name="fb-lang" value="instance('fb-language-instance')"/>
+    <xforms:var name="form-resources" model="fr-resources-model" value="$fr-form-resources" as="element(resource)?"/>
 
-    <xxforms:variable name="is-pe" select="xpl:isPE()" as="xs:boolean"/>
+    <xforms:var name="is-pe" value="xpl:isPE()" as="xs:boolean"/>
 
     <!-- Other variables -->
-    <xxforms:variable name="model" select="xhtml:head/xforms:model[@id = 'fr-form-model']"/>
-    <xxforms:variable name="metadata-instance" select="$model/xforms:instance[@id = 'fr-form-metadata']/*"/>
-    <xxforms:variable name="resources" select="$model/xforms:instance[@id = 'fr-form-resources']/*"/>
-    <xxforms:variable name="current-resources" select="($resources/resource[@xml:lang = $fb-lang])[1]"/>
-    <xxforms:variable name="body" select="xhtml:body/*:view/*:body"/>
+    <xforms:var name="model" value="xhtml:head/xforms:model[@id = 'fr-form-model']"/>
+    <xforms:var name="metadata-instance" value="$model/xforms:instance[@id = 'fr-form-metadata']/*"/>
+    <xforms:var name="resources" value="$model/xforms:instance[@id = 'fr-form-resources']/*"/>
+    <xforms:var name="current-resources" value="($resources/resource[@xml:lang = $fb-lang])[1]"/>
+    <xforms:var name="body" value="xhtml:body/*:view/*:body"/>
 
-    <xxforms:variable name="component-bindings" select="instance('fb-components-instance')//xbl:binding" as="element(xbl:binding)*"/>
-    <xxforms:variable name="components-qnames" select="for $t in $component-bindings//fb:template/*[1] return resolve-QName(name($t), $t)" as="xs:QName*"/>
+    <xforms:var name="component-bindings" value="instance('fb-components-instance')//xbl:binding" as="element(xbl:binding)*"/>
+    <xforms:var name="components-qnames" value="for $t in $component-bindings//fb:template/*[1] return resolve-QName(name($t), $t)" as="xs:QName*"/>
 
-    <xxforms:variable name="is-custom-instance" select="$metadata-instance/form-instance-mode = 'custom'" as="xs:boolean"/>
+    <xforms:var name="is-custom-instance" value="$metadata-instance/form-instance-mode = 'custom'" as="xs:boolean"/>
 
     <!-- TODO: Probably remove once all usages are gone -->
-    <xxforms:variable name="current-td" select="$body//*:grid//*:td[@id = instance('fb-variables')/selected-cell]" as="element()?"/>
+    <xforms:var name="current-td" value="$body//*:grid//*:td[@id = instance('fb-variables')/selected-cell]" as="element()?"/>
 
     <!-- Main instance -->
     <xforms:instance id="fb-form-instance"><dummy/></xforms:instance>
@@ -94,7 +94,7 @@
     <!-- Run the rest of the initialization. Do this in separate action so that model variables are up to date. -->
     <xforms:action ev:event="fr-data-ready">
         <!-- Check permissions if there are roles -->
-        <xxforms:variable name="has-roles" select="not(xxforms:instance('fr-roles-instance')/has-roles = 'false')" as="xs:boolean"/>
+        <xforms:var name="has-roles" value="not(xxforms:instance('fr-roles-instance')/has-roles = 'false')" as="xs:boolean"/>
         <xforms:action if="$has-roles">
             <xforms:action if="xxforms:instance('fr-parameters-instance')/mode = 'new'">
                 <!-- New form: set default value for app and form if needed -->
@@ -106,8 +106,8 @@
             </xforms:action>
             <xforms:action if="not(xxforms:instance('fr-parameters-instance')/mode = 'new')">
                 <!-- E.g. we are reading an existing doc: IF there are roles and roles don't match THEN send redirection -->
-                <xxforms:variable name="app" select="xxforms:bind('application-name-bind')" as="xs:string"/>
-                <xxforms:variable name="form" select="xxforms:bind('form-name-bind')" as="xs:string"/>
+                <xforms:var name="app" value="xxforms:bind('application-name-bind')" as="xs:string"/>
+                <xforms:var name="form" value="xxforms:bind('form-name-bind')" as="xs:string"/>
                 <!-- See similar logic in FR -->
                 <xforms:load if="not(exists(xxforms:instance('fr-permissions')/app[@name = '*'])
                                     or exists(xxforms:instance('fr-permissions')/app[@name = $app]/form[@name = ('*', $form)]))"
@@ -117,15 +117,15 @@
 
         <!-- Handle user agent -->
 
-        <xxforms:variable name="user-agent" select="xxforms:get-request-header('user-agent')"/>
+        <xforms:var name="user-agent" value="xxforms:get-request-header('user-agent')"/>
         <xforms:setvalue ref="instance('fb-user-agent-instance')/value" value="$user-agent"/>
         <!-- IE detection -->
-        <xxforms:variable name="is-ie" select="contains(lower-case($user-agent), 'msie') and not(contains(lower-case($user-agent), 'opera'))"/>
+        <xforms:var name="is-ie" value="contains(lower-case($user-agent), 'msie') and not(contains(lower-case($user-agent), 'opera'))"/>
         <xforms:setvalue ref="instance('fb-user-agent-instance')/is-ie" value="$is-ie"/>
         <!-- Try to find IE version -->
         <xforms:action if="$is-ie">
-            <xxforms:variable name="msie" select="(for $t in tokenize(lower-case($user-agent), '[;\(\)]') return normalize-space($t))[starts-with(., 'msie')][1]"/>
-            <xxforms:variable name="ie-version" select="xs:integer(substring-before(normalize-space(substring-after($msie, 'msie')), '.'))"/>
+            <xforms:var name="msie" value="(for $t in tokenize(lower-case($user-agent), '[;\(\)]') return normalize-space($t))[starts-with(., 'msie')][1]"/>
+            <xforms:var name="ie-version" value="xs:integer(substring-before(normalize-space(substring-after($msie, 'msie')), '.'))"/>
             <xforms:setvalue ref="instance('fb-user-agent-instance')/ie-version" value="$ie-version"/>
             <xforms:setvalue ref="instance('fb-user-agent-instance')/is-supported-ie" value="$ie-version gt 6"/>
         </xforms:action>
@@ -168,7 +168,7 @@
 
     <xforms:action ev:event="xforms-ready">
         <!-- Show editor case if mode is not new -->
-        <xxforms:variable name="is-new" select="xxforms:instance('fr-parameters-instance')/mode = 'new'" as="xs:boolean"/>
+        <xforms:var name="is-new" value="xxforms:instance('fr-parameters-instance')/mode = 'new'" as="xs:boolean"/>
         <xforms:action if="$is-new">
             <xforms:setvalue ref="instance('fb-metadata-instance')/mode" value="'edit'"/>
             <xxforms:show dialog="fb-editor-metadata-dialog"/>
@@ -322,9 +322,9 @@
         <xforms:bind ref="new-language-trigger" readonly="normalize-space(../new-language) = ''"/>
     </xforms:bind>
 
-    <xxforms:variable name="variables" select="instance('fb-variables')"/>
-    <xxforms:variable name="selected-cell" select="$variables/selected-cell"/>
-    <xxforms:variable name="selected-cell-effective" select="$variables/selected-cell-effective"/>
+    <xforms:var name="variables" value="instance('fb-variables')"/>
+    <xforms:var name="selected-cell" value="$variables/selected-cell"/>
+    <xforms:var name="selected-cell-effective" value="$variables/selected-cell-effective"/>
 
     <xforms:setvalue ev:event="xxforms-dialog-open" ev:observer="#document"
                      ref="instance('fb-variables')/dialogs-open" value="xs:integer(.) + 1"/>
@@ -432,7 +432,7 @@
             <paste-trigger/>
         </xcv>
     </xforms:instance>
-    <xxforms:variable name="xcv" select="instance('fb-xcv-instance')"/>
+    <xforms:var name="xcv" value="instance('fb-xcv-instance')"/>
 
     <xforms:bind ref="$xcv">
         <xforms:bind ref="cut-trigger" readonly="not(exists($current-td/*))"/>

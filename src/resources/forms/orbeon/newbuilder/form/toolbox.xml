@@ -24,7 +24,7 @@
 
       id="fb-toolbox">
 
-    <xxforms:variable name="lang" value="xxforms:instance('fr-language-instance')"/>
+    <xforms:var name="lang" value="xxforms:instance('fr-language-instance')"/>
 
     <xhtml:div class="fb-toolbox-inside">
 
@@ -120,10 +120,10 @@
 
                                 <xforms:repeat nodeset="xbl:binding" id="fb-components-template-repeat">
 
-                                    <xxforms:variable name="binding" value="." as="element(xbl:binding)"/>
+                                    <xforms:var name="binding" value="." as="element(xbl:binding)"/>
 
                                     <!-- Whether the component is a section component or not -->
-                                    <xxforms:variable name="is-section-component" value="tokenize($binding/@class, '\s+') = 'fr-section-component'" as="xs:boolean"/>
+                                    <xforms:var name="is-section-component" value="tokenize($binding/@class, '\s+') = 'fr-section-component'" as="xs:boolean"/>
 
                                     <xhtml:div class="fb-tool">
                                         <xforms:trigger id="fb-add-component-trigger" ref="instance('fb-variables')/(if ($is-section-component) then section-trigger else control-trigger)">
@@ -296,7 +296,7 @@
                 </xhtml:div>
             </xhtml:dd>
             <!-- To facilitate marking buttons read-only -->
-            <xxforms:variable name="trigger" value="instance('fb-metadata-instance')/toolbox/services-actions" as="element()"/>
+            <xforms:var name="trigger" value="instance('fb-metadata-instance')/toolbox/services-actions" as="element()"/>
             <xforms:group>
                 <xhtml:dt class="a-m-t"><xforms:output value="$form-resources/services-actions/label"/></xhtml:dt>
                 <xhtml:dd class="a-m-d">
@@ -309,9 +309,9 @@
                                 <!-- Repeat over existing services -->
                                 <xhtml:ul>
                                     <xforms:repeat nodeset="$model/xforms:submission[ends-with(@id, '-submission') and tokenize(@class, '\s+') = 'fr-service']">
-                                        <xxforms:variable name="current-submission" value="."/>
+                                        <xforms:var name="current-submission" value="."/>
                                         <xhtml:li>
-                                            <xxforms:variable name="submission-name" value="substring-before(@id, '-submission')"/>
+                                            <xforms:var name="submission-name" value="substring-before(@id, '-submission')"/>
                                             <xforms:trigger ref="$trigger" appearance="minimal">
                                                 <xforms:label>
                                                     <xhtml:img src="/apps/fr/style/edit.gif" alt="{$form-resources/edit/label}" title="{$form-resources/edit/label}"/>
@@ -362,9 +362,9 @@
                                 <!-- Repeat over existing services -->
                                 <xhtml:ul>
                                     <xforms:repeat nodeset="$model/xforms:submission[ends-with(@id, '-submission') and tokenize(@class, '\s+') = 'fr-database-service']">
-                                        <xxforms:variable name="current-submission" value="."/>
+                                        <xforms:var name="current-submission" value="."/>
                                         <xhtml:li>
-                                            <xxforms:variable name="submission-name" value="substring-before(@id, '-submission')"/>
+                                            <xforms:var name="submission-name" value="substring-before(@id, '-submission')"/>
                                             <xforms:trigger ref="$trigger" appearance="minimal">
                                                 <xforms:label>
                                                     <xhtml:img src="/apps/fr/style/edit.gif" alt="{$form-resources/edit/label}" title="{$form-resources/edit/label}"/>
@@ -415,9 +415,9 @@
                                 <!-- Repeat over existing bindings -->
                                 <xhtml:ul>
                                     <xforms:repeat nodeset="$model/xforms:action[ends-with(@id, '-binding')]">
-                                        <xxforms:variable name="current-action" value="."/>
+                                        <xforms:var name="current-action" value="."/>
                                         <xhtml:li>
-                                            <xxforms:variable name="binding-name" value="substring-before(@id, '-binding')"/>
+                                            <xforms:var name="binding-name" value="substring-before(@id, '-binding')"/>
                                             <xforms:trigger ref="$trigger" appearance="minimal">
                                                 <xforms:label>
                                                     <xhtml:img src="/apps/fr/style/edit.gif" alt="{$form-resources/edit/label}" title="{$form-resources/edit/label}"/>

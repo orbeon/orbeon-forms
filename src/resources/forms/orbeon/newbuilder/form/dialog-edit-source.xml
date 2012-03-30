@@ -60,7 +60,7 @@
     <!-- Model for the source editor -->
     <xforms:model id="fb-source-editor-model">
 
-        <xxforms:variable name="model" select="xxforms:instance('fb-form-instance')/xhtml:head/xforms:model[@id = 'fr-form-model']"/>
+        <xforms:var name="model" value="xxforms:instance('fb-form-instance')/xhtml:head/xforms:model[@id = 'fr-form-model']"/>
 
         <xforms:instance id="fb-source-editor-instance">
             <source-editor>

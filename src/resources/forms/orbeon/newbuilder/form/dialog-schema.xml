@@ -26,14 +26,14 @@
 
     <xforms:label ref="$form-resources/dialog-upload-schema/dialog-title"/>
     
-    <xxforms:variable name="instance" select="instance('fb-schema-upload-instance')"/>
+    <xforms:var name="instance" value="instance('fb-schema-upload-instance')"/>
     <xhtml:div>
         <xforms:group>
 
             <!-- Schema information -->
-            <xxforms:variable name="schema-element" select="($instance/schema/xs:schema, $model/xs:schema)[1]" as="element()?"/>
-            <xxforms:variable name="is-existing-schema" select="exists($model/xs:schema)" as="xs:boolean"/>
-            <xxforms:variable name="is-new-schema" select="exists($instance/schema/xs:schema)" as="xs:boolean"/>
+            <xforms:var name="schema-element" value="($instance/schema/xs:schema, $model/xs:schema)[1]" as="element()?"/>
+            <xforms:var name="is-existing-schema" value="exists($model/xs:schema)" as="xs:boolean"/>
+            <xforms:var name="is-new-schema" value="exists($instance/schema/xs:schema)" as="xs:boolean"/>
 
             <xforms:group ref="$schema-element" class="fb-hide-alert">
                 <xforms:label class="fb-dialog-h2" value="$form-resources/dialog-upload-schema/messages/(if ($is-new-schema) then new-schema-information else existing-schema-information)"/>
@@ -94,7 +94,7 @@
                             <!-- Read the schema and store it -->
                             <!-- TODO: support catching dynamic XPath error in case doc() fails -->
                             <xforms:insert context="schema" origin="doc(../schema-uri)"/>
-                            <xxforms:variable name="schema-element" select="schema/*"/>
+                            <xforms:var name="schema-element" value="schema/*"/>
                             <xforms:action if="$schema-element/self::xs:schema">
                                 <!-- We got something that looks like a schema -->
 

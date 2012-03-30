@@ -37,7 +37,7 @@
                     <xforms:label ref="$form-resources/apply/label"/>
                     <!-- Close and save upon DOMActivate -->
                     <xforms:dispatch ev:event="DOMActivate" name="xxforms-dialog-close" target="fb-edit-help-dialog">
-                        <xxforms:context name="fb:save" select="true()"/>
+                        <xxforms:context name="fb:save" value="true()"/>
                     </xforms:dispatch>
                 </xforms:trigger>
                 <xforms:output value="$form-resources/or/label"/>
@@ -45,7 +45,7 @@
                     <xforms:label ref="$form-resources/cancel/label"/>
                     <!-- Close and cancel upon DOMActivate -->
                     <xforms:dispatch ev:event="DOMActivate" name="xxforms-dialog-close" target="fb-edit-help-dialog">
-                        <xxforms:context name="fb:save" select="false()"/>
+                        <xxforms:context name="fb:save" value="false()"/>
                     </xforms:dispatch>
                 </xforms:trigger>
             </xhtml:div>
@@ -54,11 +54,11 @@
 
     <!-- Copy help value when the dialog opens -->
     <xforms:action ev:event="xforms-help" ev:observer="fb-dynamic" ev:defaultAction="cancel">
-        <xxforms:variable name="target-id" select="xxf:event('xxf:targetid')"/>
-        <xxforms:variable name="id-without-section-control-suffix" select="replace($target-id, '(.*)-[^-]+', '$1')"/>
-        <xxforms:variable name="section-resource" select="$current-resources/*[name() = $id-without-section-control-suffix]" as="element()"/>
-        <xxforms:variable name="help-resource" select="$section-resource/help" as="element()"/>
-        <xxforms:variable name="instance" select="instance('fb-edit-help-instance')" as="element()"/>
+        <xforms:var name="target-id" value="xxf:event('xxf:targetid')"/>
+        <xforms:var name="id-without-section-control-suffix" value="replace($target-id, '(.*)-[^-]+', '$1')"/>
+        <xforms:var name="section-resource" value="$current-resources/*[name() = $id-without-section-control-suffix]" as="element()"/>
+        <xforms:var name="help-resource" value="$section-resource/help" as="element()"/>
+        <xforms:var name="instance" value="instance('fb-edit-help-instance')" as="element()"/>
         <xforms:setvalue ref="$instance/result-path" value="$help-resource/saxon:path()"/>
         <xforms:setvalue ref="$instance/help-text" value="$help-resource"/>
         <xxforms:show dialog="fb-edit-help-dialog"/>
@@ -66,7 +66,7 @@
 
     <!-- Save data upon close -->
     <xforms:action ev:event="xxforms-dialog-close" if="event('fb:save')">
-        <xxforms:variable name="instance" select="instance('fb-edit-help-instance')" as="element()"/>
+        <xforms:var name="instance" value="instance('fb-edit-help-instance')" as="element()"/>
         <xforms:setvalue ref="$current-resources/root()/saxon:evaluate($instance/result-path)" value="$instance/help-text"/>
     </xforms:action>
 

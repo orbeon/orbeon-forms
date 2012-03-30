@@ -387,7 +387,6 @@ a.xforms-help-image .fb-control-help { vertical-align: baseline; }
 /* Styling of the repeat grid to look the same as it does at runtime */
 /* Everything is scoped to .fr-view so not to impact repeats outside of the form itself, e.g. in the itemset editor  */
 .fr-view .fr-grid.fr-repeat.fr-editable { border: none }                                    /* Remove borders on the table */
-.fr-view .fr-grid.fr-repeat.fr-editable tbody tr.yui- td:nth-child(2) { border}
 .fr-view .fr-grid td.fb-grid-repeat-bottom { border-bottom: 1px solid #7f7f7f }
 .fr-view .fr-grid.fr-repeat td:first-child { border-right: 1px solid #7f7f7f }
 .fr-view .fr-grid.fr-repeat thead:first-child tr:first-child td {                           /* First line of thead is added by Form Builder */

@@ -222,7 +222,7 @@ button.xforms-trigger-appearance-xxforms-minimal::-moz-focus-inner, .xforms-trig
     color: #bbb;
 }
 
-.xforms-form .xforms-textarea, .xforms-textarea textarea {
+.xforms-form .xforms-textarea, .xforms-form .xforms-textarea textarea {
     -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
     font-family: Arial,Helvetica,Geneva,sans-serif;
     -webkit-overflow-scrolling: touch; /* Only supported by iOS 5, but should be good too if it becomes supported in the future by browsers on OS X */

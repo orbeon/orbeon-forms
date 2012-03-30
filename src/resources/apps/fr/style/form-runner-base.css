@@ -461,6 +461,14 @@ html body .xforms-form .fr-grid-content .xbl-component .xforms-disabled {
 
 .fr-grid { table-layout: fixed }                            /* All the column must have the same width */
 
+/**
+ * The YUI datatable.css has rules that apply to tables inside the cells of the datatable, which is undesirable,
+ * for instance: .yui-skin-sam .yui-dt td { border-right: 1px solid }
+ * This impacts, for instance, a TinyMCE used inside a repeat (the repeat uses classes from datatable.css).
+ * Without this rule (notice the right border): http://twitpic.com/93du9c. With this rule: http://twitpic.com/93du2a.
+ */
+.yui-dt table.yui-dt-table > * > tr > td td { border: initial }
+
 #doc4 .fr-grid .fr-grid-td .fr-grid-content img.xforms-input-input { *width: auto } /* Undo effect of previous rule for image in minimal date picker */
 
 #doc  .fr-grid-td .fr-grid-content .xforms-input input.xforms-type-date,

@@ -53,7 +53,7 @@
                     <!-- Root element -->
                     <xf:group appearance="xxf:internal">
 
-                        <xsl:variable name="is-repeat" select="@repeat = 'true' or @minOccurs or @maxOccurs"/>
+                        <xsl:variable name="is-repeat" select="@repeat = 'true' or exists(@minOccurs | @maxOccurs | @min | @max)"/>
                         <xsl:variable name="grid-rows" select="(*:body, self::*)[1]/*:tr"/>
 
                         <xsl:variable name="static-row-count" select="count($grid-rows)"/>

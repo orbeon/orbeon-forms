@@ -43,7 +43,7 @@
     <!-- JUnit tasks -->
     <taskdef name="junit" classname="org.apache.tools.ant.taskdefs.optional.junit.JUnitTask">
         <classpath>
-            <pathelement location="${lib.dir}/junit-4.8.2.jar"/>
+            <pathelement location="${lib.dir}/junit-4.11-SNAPSHOT.jar"/>
             <pathelement location="${lib.dir}/ant-junit-1.7.1.jar"/>
         </classpath>
     </taskdef>

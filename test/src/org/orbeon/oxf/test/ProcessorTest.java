@@ -104,7 +104,7 @@ public class ProcessorTest extends ResourceManagerTestBase {
         }
     }
 
-    @Parameterized.Parameters
+    @Parameterized.Parameters(name="{0}")
     public static Collection<Object[]> data() {
 
         String currentTestError = null;

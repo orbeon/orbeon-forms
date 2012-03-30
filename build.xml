@@ -757,6 +757,9 @@
             <sysproperty key="oxf.test.config" value="oxf:/ops/unit-tests/tests.xml"/>
         	<sysproperty key="java.io.tmpdir" value="${test.tmp.dir}"/>
 
+            <!-- Some code uses the default time zone, which might different on different system, so we need to set it explicitely -->
+        	<sysproperty key="user.timezone" value="America/Los_Angeles"/>
+
             <classpath>
                 <path refid="test.class.path"/>
                 <pathelement location="${build.test-classes.dir}"/>

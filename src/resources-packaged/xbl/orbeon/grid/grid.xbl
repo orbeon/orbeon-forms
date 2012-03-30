@@ -93,6 +93,8 @@
                             </xxf:var>
                         </xsl:if>
 
+                        <xxf:var name="max-columns" value="xxforms:property('oxf.fb.grid.max-columns')"/>
+
                         <!-- Use AVTs to set the style on the div depending on the number of columns in first row -->
                         <xh:div class="{if ($is-repeat) then 'yui-dt' else ()}">
                             <xh:div class="yui-dt-hd">
@@ -144,7 +146,7 @@
                                                     <xh:td class="fb-grid-column-toolbar-td">
                                                         <!-- Insert column to the left -->
                                                         <xh:div class="fb-insert-left">
-                                                            <xf:trigger appearance="minimal" ref="$grid[$columns lt 4]"><!-- TODO: check max col property -->
+                                                            <xf:trigger appearance="minimal" ref="$grid[$columns lt $max-columns]">
                                                                 <xf:label><xh:img src="/apps/fr/style/images/silk/bullet_arrow_left.png" alt="{{$fb-resources/insert-column-left-icon/label}}" title="{{$fb-resources/insert-column-left-icon/label}}"/></xf:label>
                                                                 <xf:action ev:event="DOMActivate" type="xpath">
                                                                     gridOps:insertColLeft($first-row-td)
@@ -153,7 +155,7 @@
                                                         </xh:div>
                                                         <!-- Insert column to the right -->
                                                         <xh:div class="fb-insert-right">
-                                                            <xf:trigger appearance="minimal" ref="$grid[$columns lt 4]"><!-- TODO: check max col property -->
+                                                            <xf:trigger appearance="minimal" ref="$grid[$columns lt $max-columns]">
                                                                 <xf:label><xh:img src="/apps/fr/style/images/silk/bullet_arrow_right.png" alt="{{$fb-resources/insert-column-right-icon/label}}" title="{{$fb-resources/insert-column-right-icon/label}}"/></xf:label>
                                                                 <xf:action ev:event="DOMActivate" type="xpath">
                                                                     gridOps:insertColRight($first-row-td)

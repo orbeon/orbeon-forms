@@ -234,7 +234,7 @@
                 </xsd:choice>
             </xsd:sequence>
             <xsd:attributeGroup ref="xforms:Common.Attributes"/>
-            <!-- XForms 1.2 deprecates @nodeset -->
+            <!-- XForms 2.0 deprecates @nodeset -->
             <xsd:attribute name="ref" type="xforms:XPathExpression" use="optional"/>
             <xsd:attribute name="nodeset" type="xforms:XPathExpression" use="optional"/>
             <xsd:attribute name="name" type="xsd:QName" use="optional"/>
@@ -378,6 +378,7 @@
             <xsd:attribute name="ref" type="xforms:XPathExpression" use="optional"/>
             <xsd:attribute name="nodeset" type="xforms:XPathExpression" use="optional"/>
             <xsd:attribute name="model" type="xsd:NMTOKEN" use="optional"/>
+            <xsd:attribute name="combine" type="xsd:NMTOKEN" use="optional"/>
         </xsd:complexType>
     </xsd:element>
     <xsd:element name="name">
@@ -513,6 +514,19 @@
             <xsd:attributeGroup ref="xforms:UI.Common.Attrs"/>
             <xsd:attribute name="mediatype" type="xsd:string" use="optional"/>
             <xsd:attribute name="incremental" type="xsd:boolean" use="optional" default="false"/>
+            <xsd:anyAttribute namespace="##other" processContents="lax"/>
+        </xsd:complexType>
+    </xsd:element>
+    <xsd:element name="var">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:group ref="xforms:Action"/>
+            </xsd:sequence>
+            <xsd:attributeGroup ref="xforms:Common.Attributes"/>
+            <xsd:attributeGroup ref="xforms:Single.Node.Binding.Attributes"/>
+            <xsd:attribute name="name" type="xsd:QName" use="required"/>
+            <xsd:attribute name="value" type="xforms:XPathExpression" use="optional"/>
+            <xsd:attribute name="as" type="xsd:string" use="optional"/>
             <xsd:anyAttribute namespace="##other" processContents="lax"/>
         </xsd:complexType>
     </xsd:element>
@@ -667,6 +681,7 @@
                 <xsd:element ref="xforms:setindex"/>
                 <xsd:element ref="xforms:toggle"/>
                 <xsd:element ref="xforms:message"/>
+                <xsd:element ref="xforms:var"/>
                 <xsd:any namespace="##other" processContents="lax"/>
             </xsd:choice>
         </xsd:sequence>
@@ -880,6 +895,7 @@
                         <xsd:element ref="xforms:group"/>
                         <xsd:element ref="xforms:switch"/>
                         <xsd:element ref="xforms:repeat"/>
+                        <xsd:element ref="xforms:var"/>
                         <xsd:any namespace="##other" processContents="lax"/>
                         <!-- containing document language to add additional allowed content here -->
                     </xsd:choice>
@@ -905,6 +921,7 @@
                         <xsd:element ref="xforms:switch"/>
                         <xsd:element ref="xforms:repeat"/>
                         <xsd:element ref="xforms:model"/>
+                        <xsd:element ref="xforms:var"/>
                         <!-- containing document language to add additional allowed content here -->
                     </xsd:choice>
                 </xsd:sequence>
@@ -936,6 +953,7 @@
                         <xsd:element ref="xforms:group"/>
                         <xsd:element ref="xforms:switch"/>
                         <xsd:element ref="xforms:repeat"/>
+                        <xsd:element ref="xforms:var"/>
                         <xsd:any namespace="##other" processContents="lax"/>
                         <!-- containing document language to add additional allowed content here -->
                     </xsd:choice>

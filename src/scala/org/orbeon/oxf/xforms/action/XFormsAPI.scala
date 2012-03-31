@@ -88,21 +88,27 @@ object XFormsAPI {
 
     // Insert
     // @return the inserted nodes
-    def insert[T](into: Seq[NodeInfo], origin: Seq[T], after: Seq[NodeInfo] = null, before: Seq[NodeInfo] = null): Seq[T] = {
+    def insert[T](origin: Seq[T], into: Seq[NodeInfo] = Seq(), after: Seq[NodeInfo] = Seq(), before: Seq[NodeInfo] = Seq()): Seq[T] = {
 
-        if (into.nonEmpty) {
+        if (origin.nonEmpty && (into.nonEmpty || after.nonEmpty || before.nonEmpty)) {
             val action = actionInterpreterDyn.value
 
             val (positionAttribute, collectionToUpdate) =
-                if (before ne null)
+                if (before.nonEmpty)
                     ("before", before)
-                else if (after ne null)
-                    ("after", after)
                 else
-                    ("after", Seq())
+                    ("after", after)
 
-            XFormsInsertAction.doInsert(action map (_.containingDocument) orNull, action map (_.indentedLogger) orNull, positionAttribute,
-                collectionToUpdate.asJava, into.headOption.orNull, origin.asJava, collectionToUpdate.size, doClone = true, doDispatch = true).asInstanceOf[JList[T]].asScala
+            XFormsInsertAction.doInsert(
+                action map (_.containingDocument) orNull,
+                action map (_.indentedLogger) orNull,
+                positionAttribute,
+                collectionToUpdate.asJava,
+                into.headOption.orNull,
+                origin.asJava,
+                collectionToUpdate.size,
+                doClone = true,
+                doDispatch = true).asInstanceOf[JList[T]].asScala
         } else
             Seq()
     }

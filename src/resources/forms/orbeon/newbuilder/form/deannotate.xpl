@@ -12,12 +12,7 @@
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
 <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
-          xmlns:oxf="http://www.orbeon.com/oxf/processors"
-          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-          xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-          xmlns:xhtml="http://www.w3.org/1999/xhtml"
-          xmlns:xforms="http://www.w3.org/2002/xforms"
-          xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+          xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
     <p:param type="input" name="data"/>
     <p:param type="output" name="data"/>
@@ -27,6 +22,12 @@
         <p:input name="config">
             <xsl:stylesheet version="2.0"
                             xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                            xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+                            xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+                            xmlns:xhtml="http://www.w3.org/1999/xhtml"
+                            xmlns:xforms="http://www.w3.org/2002/xforms"
+                            xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+                            xmlns:xbl="http://www.w3.org/ns/xbl"
                             xmlns:dataModel="java:org.orbeon.oxf.fb.DataModel">
 
                 <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
@@ -67,6 +68,9 @@
 
                 <!-- Remove automatic td ids -->
                 <xsl:template match="xhtml:body//fr:grid//*:td/@id[ends-with(., '-td')]"/>
+
+                <!-- Remove xbl:xbl containing section templates bindings -->
+                <xsl:template match="xbl:xbl[xbl:binding[tokenize(@class, '\s+') = 'fr-section-component']]"/>
 
             </xsl:stylesheet>
         </p:input>

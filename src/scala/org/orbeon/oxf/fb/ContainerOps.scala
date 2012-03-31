@@ -167,4 +167,19 @@ object ContainerOps {
     // Return all the container controls in the view
     def getAllContainerControls(inDoc: NodeInfo) =
         getAllControls(inDoc) filter (e ⇒ ContainerElementQNames(qname(e)))
+
+    // Whether it is possible to move an item into the given container
+    // Currently: must be a section without section template content
+    // Later: fr:tab (maybe fr:tabview), wizard
+    def canMoveInto(container: NodeInfo) =
+        isSection(container) && ! (container \ * exists (isSectionTemplateContent(_)))
+
+    def isGrid(container: NodeInfo) =
+        container self (FR → "grid")
+
+    def isSection(container: NodeInfo) =
+        (container self (FR → "section")) || (container self (FB → "section"))
+
+    def isSectionTemplateContent(container: NodeInfo) =
+        (container.parent exists (isSection(_))) && container.getNamespaceURI == Component
 }

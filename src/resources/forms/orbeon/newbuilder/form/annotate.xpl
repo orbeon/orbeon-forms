@@ -12,14 +12,10 @@
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
 <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
-          xmlns:oxf="http://www.orbeon.com/oxf/processors"
-          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-          xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-          xmlns:xhtml="http://www.w3.org/1999/xhtml"
-          xmlns:xforms="http://www.w3.org/2002/xforms"
-          xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+          xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
     <p:param type="input" name="data"/>
+    <p:param type="input" name="bindings"/>
     <p:param type="output" name="data"/>
 
     <p:processor name="oxf:unsafe-xslt">
@@ -27,6 +23,11 @@
         <p:input name="config">
             <xsl:stylesheet version="2.0"
                             xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                            xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+                            xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+                            xmlns:xhtml="http://www.w3.org/1999/xhtml"
+                            xmlns:xforms="http://www.w3.org/2002/xforms"
+                            xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
                             xmlns:dataModel="java:org.orbeon.oxf.fb.DataModel">
 
                 <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
@@ -84,7 +85,16 @@
 
             </xsl:stylesheet>
         </p:input>
+        <p:output name="data" id="annotated"/>
+    </p:processor>
+
+    <!-- Make sure XBL bindings for section templates are present -->
+    <p:processor name="oxf:pipeline">
+        <p:input name="config" href="add-template-bindings.xpl"/>
+        <p:input name="data" href="#annotated"/>
+        <p:input name="bindings" href="#bindings"/>
         <p:output name="data" ref="data"/>
     </p:processor>
+
 
 </p:config>

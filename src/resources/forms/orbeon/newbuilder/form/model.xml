@@ -46,9 +46,6 @@
     <xforms:var name="current-resources" value="($resources/resource[@xml:lang = $fb-lang])[1]"/>
     <xforms:var name="body" value="xhtml:body/*:view/*:body"/>
 
-    <xforms:var name="component-bindings" value="instance('fb-components-instance')//xbl:binding" as="element(xbl:binding)*"/>
-    <xforms:var name="components-qnames" value="for $t in $component-bindings//fb:template/*[1] return resolve-QName(name($t), $t)" as="xs:QName*"/>
-
     <xforms:var name="is-custom-instance" value="$metadata-instance/form-instance-mode = 'custom'" as="xs:boolean"/>
 
     <!-- TODO: Probably remove once all usages are gone -->
@@ -66,13 +63,16 @@
         <!-- First store into a temporary document so that multiple inserts won't cause repeat processing until we are done -->
         <xxforms:var name="temp" value="xxforms:create-document()"/>
         <xforms:insert context="$temp"
-                       origin="xxforms:call-xpl('oxf:/forms/orbeon/newbuilder/form/annotate.xpl', 'data', event('data'), 'data')"/>
+                       origin="xxforms:call-xpl('oxf:/forms/orbeon/newbuilder/form/annotate.xpl',
+                                                ('data', 'bindings'),
+                                                (event('data'), instance('fb-components-instance')),
+                                                'data')"/>
 
         <xforms:action type="xpath" xmlns:gridOps="java:org.orbeon.oxf.fb.GridOps">
             gridOps:initializeGrids($temp)
         </xforms:action>
 
-        <xforms:message level="xxforms:log-info" value="saxon:serialize($temp, 'xml')"/>
+        <!--<xforms:message level="xxforms:log-info" value="saxon:serialize($temp, 'xml')"/>-->
 
         <xforms:insert ref="instance('fb-form-instance')" origin="$temp"/>
     </xforms:action>
@@ -80,10 +80,17 @@
     <!-- Copy initial data with annotations -->
     <xforms:action ev:event="fr-data-ready">
 
-        <!-- Annotate -->
-        <xforms:dispatch targetid="fr-form-model" name="fr-annotate-data">
-            <xxforms:context name="data" value="instance('fr-form-instance')"/>
-        </xforms:dispatch>
+        <!-- Load toolbox if mode is not new. This also annotates the form when loading is done. -->
+        <xforms:send if="not(xxforms:instance('fr-parameters-instance')/mode = 'new')" submission="fb-load-toolbox">
+            <xxforms:context
+                name="app"
+                value="instance('fr-form-instance')/
+                           xhtml:head/
+                               xforms:model[@id = 'fr-form-model']/
+                                   xforms:instance[@id = 'fr-form-metadata']/
+                                       */
+                                           application-name"/>
+        </xforms:send>
 
         <!-- RRR so that all binds are up to date for the rest of the initialization -->
         <xforms:rebuild/>
@@ -130,38 +137,34 @@
             <xforms:setvalue ref="instance('fb-user-agent-instance')/is-supported-ie" value="$ie-version gt 6"/>
         </xforms:action>
 
-        <!--  I18n -->
-
         <!-- Set current language: for new forms, use current FR language;
              for existing form, use language based on first resources available in loaded form -->
-        <xforms:setvalue ref="$fb-lang" value="if (xxforms:instance('fr-parameters-instance')/mode = 'new')
-                then xxforms:instance('fr-language-instance')
-                else $resources/resource[1]/@xml:lang"/>
-        <!-- For new forms -->
+        <xforms:setvalue
+            ref="$fb-lang"
+            value="if (xxforms:instance('fr-parameters-instance')/mode = 'new')
+                   then xxforms:instance('fr-language-instance')
+                   else $resources/resource[1]/@xml:lang"/>
+
+        <!-- Changing the language can affect binds -->
+        <xforms:rebuild/>
+        <xforms:recalculate/>
+        <xforms:revalidate/>
+
         <xforms:action if="xxforms:instance('fr-parameters-instance')/mode = 'new'">
             <!-- Set language in all @xml:lang  -->
-            <xforms:action xxforms:iterate="instance('fb-form-instance')//@xml:lang">
-                <xforms:setvalue ref="." value="$fb-lang"/>
-            </xforms:action>
+            <xforms:setvalue
+                iterate="instance('fb-form-instance')//@xml:lang"
+                ref="."
+                value="$fb-lang"/>
             <!-- Set initial form and first section titles -->
             <xforms:setvalue ref="$metadata-instance/title" value="$form-resources/template/untitled-form"/>
             <xforms:setvalue ref="$resources/resource/section-1/label" value="$form-resources/template/untitled-section"/>
-        </xforms:action>
-
-        <!-- Tasks when mode is not new -->
-        <xforms:action if="not(xxforms:instance('fr-parameters-instance')/mode = 'new')">
-            <!-- Load components right away, because we already have app/form names -->
-            <xforms:send submission="fb-load-components"/>
-            <!-- HACK: Store valid values so we don't see error message -->
-            <xforms:setvalue ref="instance('fb-metadata-instance')/application-name">dummy</xforms:setvalue>
-            <xforms:setvalue ref="instance('fb-metadata-instance')/form-name">dummy</xforms:setvalue>
         </xforms:action>
 
     </xforms:action>
 
     <!-- De-annotate data before saving -->
     <xforms:action ev:event="fr-data-save-prepare">
-        <!-- Use XSLT to transform the form -->
         <xforms:insert ref="instance('fr-form-instance')"
                        origin="xxforms:call-xpl('oxf:/forms/orbeon/newbuilder/form/deannotate.xpl', 'data', instance('fb-form-instance'), 'data')"/>
     </xforms:action>
@@ -284,11 +287,20 @@
     </xforms:instance>
 
     <!-- Submission to test the form -->
-    <xforms:submission id="fb-test-form-submission"
-            ref="instance('fr-form-instance')" method="post" replace="all"
-            resource="/fr/orbeon/newbuilder/test" xxforms:target="fb-test-iframe" xxforms:show-progress="false">
+    <!-- NOTE: Submit form to testing service with section templates XBL included -->
+    <xforms:submission
+            id="fb-test-form-submission"
+            ref="xxforms:call-xpl('oxf:/forms/orbeon/newbuilder/form/add-template-bindings.xpl',
+                                  ('data', 'bindings'),
+                                  (xxforms:instance('fr-form-instance'), xxforms:instance('fb-components-instance')),
+                                  'data')"
+            method="post"
+            replace="all"
+            resource="/fr/orbeon/newbuilder/test"
+            xxforms:target="fb-test-iframe"
+            xxforms:show-progress="false">
 
-        <!-- Prepare form to test -->
+        <!-- Make sure de-annotated form is up to date first -->
         <xforms:dispatch ev:event="xforms-submit" targetid="fr-form-model" name="fr-data-save-prepare"/>
     </xforms:submission>
 
@@ -371,10 +383,18 @@
 
     <!-- Submission to load the components library -->
     <!-- NOTE: We only pass the app name, not the form name -->
-    <xforms:submission id="fb-load-components" serialization="none"
-                       method="get" resource="/fr/service/custom/orbeon/newbuilder/toolbox?application={xxforms:bind('application-name-bind')}"
+    <xforms:submission id="fb-load-toolbox" serialization="none"
+                       method="get" resource="/fr/service/custom/orbeon/newbuilder/toolbox?application={event('app')}"
                        replace="instance" instance="fb-components-instance"
-                       xxforms:readonly="true" xxforms:cache="true"/>
+                       xxforms:readonly="true" xxforms:cache="true">>
+
+        <!-- Annotate form when the toolbox is loaded. This is needed to ensure the XBL for section templates is updated.
+             NOTE: The data in fr-form-instance must be up to date! -->
+        <xforms:dispatch ev:event="xforms-submit-done" targetid="fr-form-model" name="fr-annotate-data">
+            <xxforms:context name="data" value="instance('fr-form-instance')"/>
+        </xforms:dispatch>
+
+    </xforms:submission>
 
     <xforms:instance id="fb-components-instance">
         <!-- This contains the components available for the currently edited form -->

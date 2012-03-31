@@ -67,8 +67,13 @@
                                 <xhtml:img src="/apps/fr/style/images/silk/arrow_refresh_small.png" alt="{$form-resources/reload-components/label}" title="{$form-resources/reload-components/label}"/>
                             </xforms:label>
                             <xforms:action ev:event="DOMActivate">
+                                <!-- De-annotate the form, as it will be re-annotated once the toolbox is loaded -->
+                                <xforms:dispatch name="fr-data-save-prepare" target="fr-form-model"/>
+                                <!-- Invalidate and reload the toolbox -->
                                 <xforms:dispatch name="xxforms-instance-invalidate" target="fb-components-instance"/>
-                                <xforms:send submission="fb-load-components"/>
+                                <xforms:send submission="fb-load-toolbox">
+                                    <xxforms:context name="app" value="xxforms:bind('application-name-bind')"/>
+                                </xforms:send>
                             </xforms:action>
                         </xforms:trigger>
                     </xhtml:div>
@@ -82,7 +87,7 @@
                                     <xhtml:span><xforms:output value="$form-resources/new-section/label"/></xhtml:span>
                                 </xforms:label>
                                 <xforms:action ev:event="DOMActivate" type="xpath" xmlns:toolboxOps="java:org.orbeon.oxf.fb.ToolboxOps">
-                                    toolboxOps:insertNewSection($model)
+                                    toolboxOps:insertNewSection($model, true())
                                 </xforms:action>
                             </xforms:trigger>
                         </xhtml:div>
@@ -131,36 +136,9 @@
                                                 <xhtml:img src="{($binding/fb:metadata/fb:icon/fb:small-icon[@lang = $lang],$binding/fb:metadata/fb:icon/fb:small-icon[1], '/apps/fr/style/images/silk/plugin.png')[1]}" alt="" width="16" height="16"/>
                                                 <xhtml:span><xforms:output value="($binding/fb:metadata/fb:display-name[@lang = $lang], $binding/fb:metadata/fb:display-name[1])[1]"/></xhtml:span>
                                             </xforms:label>
-                                            <!-- TODO: move to Scala -->
-                                            <!--<xforms:action ev:event="DOMActivate" if="$is-section-component">-->
-                                                <!--&lt;!&ndash; Insert a new section component &ndash;&gt;-->
-
-                                                <!--<xxforms:variable name="current-section" value="$body/*[index('fb-top-level-repeat')]" as="element()"/>-->
-
-                                                <!--&lt;!&ndash; Is the current section empty (i.e. no children non-XForms elements, or an empty grid)? &ndash;&gt;-->
-                                                <!--<xxforms:variable name="is-current-section-empty" as="xs:boolean"-->
-                                                                  <!--value="not(exists($current-section/*[namespace-uri() != 'http://www.w3.org/2002/xforms']))-->
-                                                                          <!--or exists($current-section/(fr:grid | fb:grid)) and not(exists($current-section/(fr:grid | fb:grid)//*:td/*))"/>-->
-
-                                                <!--&lt;!&ndash;<xforms:message>&ndash;&gt;-->
-                                                    <!--&lt;!&ndash;xxx <xforms:output value="$is-current-section-empty"/> xxx&ndash;&gt;-->
-                                                <!--&lt;!&ndash;</xforms:message>&ndash;&gt;-->
-
-                                                <!--<xforms:action if="not($is-current-section-empty)">-->
-                                                    <!--&lt;!&ndash; Insert new section &ndash;&gt;-->
-                                                    <!--<xforms:dispatch name="DOMActivate" target="insert-new-section-trigger"/>-->
-                                                <!--</xforms:action>-->
-
-                                                <!--&lt;!&ndash; Point to insert section &ndash;&gt;-->
-                                                <!--<xxforms:variable name="insert-section" value="$body/*[index('fb-top-level-repeat')]" as="element()"/>-->
-
-                                                <!--&lt;!&ndash; Remove existing fr:* if any &ndash;&gt;-->
-                                                <!--<xforms:delete nodeset="$insert-section/fr:*"/>-->
-
-                                                <!--&lt;!&ndash; Insert reference to component &ndash;&gt;-->
-                                                <!--<xforms:insert context="$insert-section" nodeset="*" origin="$binding/fb:metadata/fb:template/*[1]"/>-->
-
-                                            <!--</xforms:action>-->
+                                            <xforms:action type="xpath" ev:event="DOMActivate" if="$is-section-component" xmlns:toolboxOps="java:org.orbeon.oxf.fb.ToolboxOps">
+                                                toolboxOps:insertNewSectionTemplate($model, $binding)
+                                            </xforms:action>
                                             <xforms:action type="xpath" ev:event="DOMActivate" if="not($is-section-component)" xmlns:toolboxOps="java:org.orbeon.oxf.fb.ToolboxOps">
                                                 toolboxOps:insertNewControl($model, $binding)
                                             </xforms:action>

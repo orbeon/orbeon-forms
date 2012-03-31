@@ -26,29 +26,23 @@ object SectionOps {
 
     // Move the section up if possible
     def moveSectionUp(container: NodeInfo) =
-        container.precedingElement foreach
-            (moveContainer(container, _, moveElementBefore))
+        if (canMoveUp(container))
+            moveContainer(container, container precedingSibling ContainerElementTest head, moveElementBefore)
 
     // Move the section down if possible
     def moveSectionDown(container: NodeInfo) =
-        container.followingElement foreach
-            (moveContainer(container, _, moveElementAfter))
+        if (canMoveDown(container))
+            moveContainer(container, container followingSibling ContainerElementTest head, moveElementAfter)
 
     // Move the section right if possible
     def moveSectionRight(container: NodeInfo) =
-        precedingSection(container) foreach
-            (moveContainer(container, _, moveElementIntoAsLast))
+        if (canMoveRight(container))
+            moveContainer(container, precedingSection(container).get, moveElementIntoAsLast)
 
     // Move the section left if possible
     def moveSectionLeft(container: NodeInfo) =
-        findAncestorContainers(container) match {
-            case Seq(parent, rest @ _*) if rest.nonEmpty ⇒
-                moveContainer(container, parent, moveElementAfter)
-            case _ ⇒ // NOP
-        }
-
-    // TODO: Could also move into fr:tabview/fr:tab?
-    def precedingSection(container: NodeInfo) = container precedingSibling "*:section" headOption
+        if (canMoveLeft(container))
+            moveContainer(container, findAncestorContainers(container).head, moveElementAfter)
 
     // Find the section name given a descendant node
     def findSectionName(descendant: NodeInfo): String  =
@@ -57,4 +51,23 @@ object SectionOps {
     // Find the section name for a given control name
     def findSectionName(doc: NodeInfo, controlName: String): Option[String] =
         findControlByName(doc, controlName) map (findSectionName(_))
+
+    // Whether the given container can be moved up
+    def canMoveUp(container: NodeInfo) =
+        container precedingSibling ContainerElementTest nonEmpty
+
+    // Whether the given container can be moved down
+    def canMoveDown(container: NodeInfo) =
+        container followingSibling ContainerElementTest nonEmpty
+
+    // Whether the given container can be moved to the right
+    def canMoveRight(container: NodeInfo) =
+        precedingSection(container) exists (canMoveInto(_))
+
+    // Whether the given container can be moved to the left
+    def canMoveLeft(container: NodeInfo) =
+        findAncestorContainers(container).size >= 2
+
+    private def precedingSection(container: NodeInfo) =
+        container precedingSibling "*:section" headOption
 }

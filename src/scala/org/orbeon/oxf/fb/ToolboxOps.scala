@@ -197,8 +197,8 @@ object ToolboxOps {
         debugDumpDocument("insert new grid", inDoc)
     }
 
-    // Insert a new section
-    def insertNewSection(inDoc: NodeInfo) {
+    // Insert a new section with optionally a nested grid
+    def insertNewSection(inDoc: NodeInfo, withGrid: Boolean) = {
 
         val (into, after) = findSectionInsertionPoint(inDoc)
 
@@ -212,13 +212,14 @@ object ToolboxOps {
                         xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
                         xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
                 <xforms:label ref={"$form-resources/" + newSectionName + "/label"}/>
-                <xforms:help ref={"$form-resources/" + newSectionName + "/help"}/>
-                <fr:grid edit-ref="">
-                    <xhtml:tr>
-                        <xhtml:td id={nextId(inDoc, "td", false)}/>
-                    </xhtml:tr>
-                </fr:grid>
-            </fb:section>
+                <xforms:help ref={"$form-resources/" + newSectionName + "/help"}/>{
+                if (withGrid)
+                    <fr:grid edit-ref="">
+                        <xhtml:tr>
+                            <xhtml:td id={nextId(inDoc, "td", false)}/>
+                        </xhtml:tr>
+                    </fr:grid>
+            }</fb:section>
 
         val newSectionElement = insert(into = into, after = after.toSeq, origin = sectionTemplate).head
 
@@ -240,11 +241,14 @@ object ToolboxOps {
         ensureBinds(inDoc, findContainerNames(newSectionElement) :+ newSectionName)
 
         // Select first grid cell
-        selectTd(newSectionElement \\ "*:td" head)
+        if (withGrid)
+            selectTd(newSectionElement \\ "*:td" head)
 
         // TODO: Open label editor for newly inserted section
 
         debugDumpDocument("insert new section", inDoc)
+
+        Some(newSectionElement)
     }
 
     // Insert a new repeat
@@ -303,6 +307,30 @@ object ToolboxOps {
 
         Some(newGridName)
     }
+
+    // Insert a new section template
+    def insertNewSectionTemplate(inDoc: NodeInfo, binding: NodeInfo) =
+        // Insert new section first
+        insertNewSection(inDoc, withGrid = false) foreach { section ⇒
+
+            // Remove grid which was automatically inserted
+            delete(section \ (FR → "grid"))
+
+            val selector = binding \@ "element" stringValue
+
+            val model = findModelElement(inDoc)
+            val xbl = model followingSibling (XBL → "xbl")
+            val existingBindings = xbl child (XBL → "binding")
+
+            // Insert binding into form if needed
+            if (! (existingBindings \@ "element" === selector))
+                insert(after = Seq(model) ++ xbl, origin = binding.parent.toSeq)
+
+            // Insert template into section
+            val template = binding child (FB → "metadata") child (FB → "template") child *
+
+            insert(into = section, after = section \ *, origin = template)
+        }
 
     // Copy control to the clipboard
     def copyToClipboard(td: NodeInfo) {

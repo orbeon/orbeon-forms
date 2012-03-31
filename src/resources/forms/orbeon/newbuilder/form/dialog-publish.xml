@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <!--
     Copyright (C) 2008 Orbeon, Inc.
 
@@ -175,26 +174,13 @@
             <xforms:action ev:event="xforms-submit">
                 <!-- Copy de-annotated form locally -->
                 <xforms:dispatch targetid="fr-form-model" name="fr-data-save-prepare"/>
-                <xforms:insert ref="instance('fr-form-to-publish-instance')" origin="xxforms:instance('fr-form-instance')"/>
-                <!-- Embed only XBL for section templates that are in use -->
-                <!-- NOTE: We used to embed all XBL components here. This is not desirable in most cases so we don't do it anymore. -->
-                <xforms:var name="available-section-xbl" as="element(xbl:xbl)*"
-                                  value="xxforms:instance('fb-components-instance')/xbl:xbl[xbl:binding[tokenize(@class, '\s+') = 'fr-section-component']]"/>
 
-                <xforms:var name="possible-section-element-qnames" as="xs:Qname*"
-                                  value="for $e in $body/*:section/* return QName(namespace-uri($e), name($e))"/>
-
-                <xforms:var name="xbl-to-insert" as="document-node()" value="xxforms:create-document()"/>
-
-                <xforms:insert context="$xbl-to-insert"
-                               origin="$available-section-xbl[xbl:binding[tokenize(@class, '\s+') = 'fr-section-component'
-                                            and resolve-QName(translate(@element, '|', ':'), .) = $possible-section-element-qnames]]"/>
-
-                <!-- Keep only bindings in use -->
-                <xforms:delete ref="$xbl-to-insert/xbl:xbl/xbl:binding[not(tokenize(@class, '\s+') = 'fr-section-component')
-                                        or not(resolve-QName(translate(@element, '|', ':'), .) = $possible-section-element-qnames)]"/>
-
-                <xforms:insert ref="instance('fr-form-to-publish-instance')/xhtml:head/*" origin="$xbl-to-insert"/>
+                <!-- Make sure XBL bindings for section templates are present -->
+                <xforms:insert ref="instance('fr-form-to-publish-instance')"
+                               origin="xxforms:call-xpl('oxf:/forms/orbeon/newbuilder/form/add-template-bindings.xpl',
+                                                        ('data', 'bindings'),
+                                                        (xxforms:instance('fr-form-instance'), xxforms:instance('fb-components-instance')),
+                                                        'data')"/>
 
             </xforms:action>
 

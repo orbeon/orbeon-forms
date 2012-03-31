@@ -53,8 +53,14 @@
     <xxforms:hide ev:event="DOMActivate" dialog="fb-source-editor-dialog"/>
     <!-- Serialize XML when the dialog opens -->
     <xforms:action ev:event="xxforms-dialog-open">
-        <xforms:setvalue ref="source"
-                         value="saxon:serialize(xxforms:call-xpl('oxf:/forms/orbeon/newbuilder/form/deannotate.xpl', 'data', xxforms:instance('fb-form-instance'), 'data'), xxforms:instance('fr-xsl-output-instance'))"/>
+        <xforms:setvalue
+            ref="source"
+            value="saxon:serialize(xxforms:call-xpl(
+                                      'oxf:/forms/orbeon/newbuilder/form/deannotate.xpl',
+                                      'data',
+                                      xxforms:instance('fb-form-instance'),
+                                      'data'),
+                                   xxforms:instance('fr-xsl-output-instance'))"/>
     </xforms:action>
 
     <!-- Model for the source editor -->

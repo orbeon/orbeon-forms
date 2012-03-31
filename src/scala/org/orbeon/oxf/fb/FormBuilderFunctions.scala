@@ -18,7 +18,7 @@ import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.XML._
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.oxf.fr.FormRunner
-import org.orbeon.oxf.xforms.XFormsConstants.XFORMS_NAMESPACE_URI
+import org.orbeon.oxf.xforms.XFormsConstants.{XFORMS_NAMESPACE_URI, XBL_NAMESPACE_URI}
 import org.orbeon.oxf.xml.XMLConstants.XHTML_NAMESPACE_URI
 import org.orbeon.oxf.util.DebugLogger._
 import org.orbeon.oxf.xforms.{XFormsProperties, Loggers}
@@ -32,8 +32,10 @@ object FormBuilderFunctions {
 
     val XH = XHTML_NAMESPACE_URI
     val XF = XFORMS_NAMESPACE_URI
+    val XBL = XBL_NAMESPACE_URI
     val FR = FormRunner.NS
     val FB = "http://orbeon.org/oxf/xml/form-builder"
+    val Component = "http://orbeon.org/oxf/xml/form-builder/component/orbeon/library"
 
     // Get an id based on a name
     // NOTE: The idea as of 2011-06-21 is that we support reading indiscriminately the -control, -grid and -section

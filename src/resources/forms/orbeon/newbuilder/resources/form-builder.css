@@ -302,14 +302,14 @@ a.xforms-help-image .fb-control-help { vertical-align: baseline; }
 
 .fr-grid-td { border: 1px solid transparent }
 .fr-editable .fr-grid-tr { height: 60px }   /* Enough space to hold row icons so that hovering doesn't cause the row to expand */
-.fr-grid.fr-norepeat:hover .fr-grid-td { border: 1px solid #ccc} /* Only for grid which is not a repeat, e.g. no highlighting in itemset editor */
+.fr-grid.fr-editable.fr-norepeat:hover .fr-grid-td { border: 1px solid #ccc} /* Only for grid which is not a repeat, e.g. no highlighting in itemset editor */
 
 .fb-grid-cell-icons, .fb-grid-control-icons, .fb-grid-row-icons { display: block; width: 16px; min-height: 4em; height: auto !important; height: 4em; text-align: center }/* IE HACK for min-height */
 
 /* Grid icons and hovering */
 .fb-grid-top-left-td { text-align: center; width: 24px }
 .fr-grid .fb-grid-top-left-td img { display: none }
-.fr-grid:hover .fb-grid-top-left-td img { display: inline }
+.fr-grid.fr-editable:hover .fb-grid-top-left-td img { display: inline }
 
 /* Row icons and hovering */
 .fr-grid.fr-editable .fr-grid-tr .fb-grid-row-icons img { display: none }
@@ -364,10 +364,10 @@ a.xforms-help-image .fb-control-help { vertical-align: baseline; }
 /* Inputs for editing the label and hint to take the whole width of the grid content */
 .fr-grid-content .xforms-label input, .fr-grid-content .xforms-hint input { width: 100% }
 
-.fr-view .fr-grid-content .xforms-label:hover,          /* Yellow background to hint that the hint and label can be edited by clicking */
-.fr-view .fr-grid-content .xforms-hint:hover,           /* .fr-grid-content for label/hint in body */
-.fr-view .fr-grid-th .xforms-label:hover,               /* .fr-grid-th for label/hint in thead of a repeat */
-.fr-view .fr-grid-th .xforms-hint:hover
+.fr-view .fr-grid.fr-editable .fr-grid-content .xforms-label:hover,          /* Yellow background to hint that the hint and label can be edited by clicking */
+.fr-view .fr-grid.fr-editable .fr-grid-content .xforms-hint:hover,           /* .fr-grid-content for label/hint in body */
+.fr-view .fr-grid.fr-editable .fr-grid-th .xforms-label:hover,               /* .fr-grid-th for label/hint in thead of a repeat */
+.fr-view .fr-grid.fr-editable .fr-grid-th .xforms-hint:hover
     { background-color: #ffffd3 }
 
 /* Even if the label or hint is empty, we still want space for 1 line to be reserved. */

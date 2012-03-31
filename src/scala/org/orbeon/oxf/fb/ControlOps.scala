@@ -38,8 +38,8 @@ object ControlOps {
     private val RewrittenMIPs = MIPsToRewrite map (mip ⇒ mip.name → toQName(FB → ("fb:" + mip.name))) toMap
 
     private val topLevelBindTemplate: NodeInfo =
-            <xforms:bind id="fr-form-binds" nodeset="instance('fr-form-instance')"
-                         xmlns:xforms="http://www.w3.org/2002/xforms"/>
+        <xforms:bind id="fr-form-binds" ref="instance('fr-form-instance')"
+                     xmlns:xforms="http://www.w3.org/2002/xforms"/>
     
     // Get the control name based on the control, bind, grid, section or template id
     def controlName(controlOrBindId: String) = controlOrBindId match {
@@ -86,7 +86,7 @@ object ControlOps {
     def findControlById(doc: NodeInfo, id: String) =
         findFRBodyElement(doc) \\ * filter (hasId(_, id)) headOption
 
-    // Return a bind's nodeset or ref attribute if present
+    // Return a bind ref or nodeset attribute if present
     def bindRefOrNodeset(bind: NodeInfo) = (bind \@ "ref") ++ (bind \@ "nodeset") headOption
 
     // Find control holder
@@ -158,7 +158,7 @@ object ControlOps {
 
                         val newBind: Seq[NodeInfo] =
                             <xforms:bind id={bindId(bindName)}
-                                         nodeset={annotatedBindRefIfNeeded(bindName)}
+                                         ref={annotatedBindRefIfNeeded(bindName)}
                                          name={bindName}
                                          xmlns:xforms="http://www.w3.org/2002/xforms"/>
 

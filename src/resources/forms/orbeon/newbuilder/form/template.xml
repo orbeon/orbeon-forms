@@ -39,9 +39,9 @@
             </xforms:instance>
 
             <!-- Bindings -->
-            <xforms:bind id="fr-form-binds" nodeset="instance('fr-form-instance')">
-                <xforms:bind id="section-1-bind" name="section-1" nodeset="section-1">
-                    <xforms:bind id="control-1-bind" name="control-1" nodeset="control-1"/>
+            <xforms:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xforms:bind id="section-1-bind" name="section-1" ref="section-1">
+                    <xforms:bind id="control-1-bind" name="control-1" ref="control-1"/>
                 </xforms:bind>
             </xforms:bind>
 

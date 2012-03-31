@@ -359,22 +359,6 @@ button.xforms-trigger, input.xforms-trigger, .xforms-trigger button, .xforms-tri
     zoom: 1;                    /* For the overflow: hidden to have an effect on IE6 */
 }
 
-/* Style controls or component groups */
-.fr-grid-content .xforms-control, .fr-grid-content .fr-component-group {
-    display: block;     /* So control is not displayed next to the help icon but on a new line */
-    clear: both;
-}
-
-/* Restore defaults for controls within component */
-/* NOTE: A downside of this approach is that this can breaks CSS that sets display: none in the components, by overriding it with a stronger rule. */
-.fr-grid-content .xbl-component .xforms-control { display: inline; clear: none }
-html body .xforms-form .fr-grid-content .xbl-component .xforms-disabled-subsequent { display: none }
-html body .xforms-form .fr-grid-content .xbl-component .xforms-disabled {
-    top: -10000px; /* this so that no space is visible on the page */
-    left: -10000px; /* this so that no space is visible on the page */
-    position: absolute;
-}
-
 .fr-grid .fr-inplace-edit .xforms-input input { width: 100% }
 
 /* Styling common to all HTML form controls */

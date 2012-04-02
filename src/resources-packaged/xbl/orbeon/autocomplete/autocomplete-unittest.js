@@ -129,6 +129,12 @@
             YAHOO.util.Assert.areEqual(actualCount, expectedCount, staticDynamicResource + " suggestions shows");
         },
 
+        checkSuggestionOpen: function(staticDynamicResource, isOpen, message) {
+            var autocomplete = document.getElementById(staticDynamicResource + "-autocomplete");
+            YAHOO.util.Assert.areEqual(isOpen, $(autocomplete).find('.yui-ac-content').css('display') == 'block',
+                    staticDynamicResource + ". " + message);
+        },
+
         /**
          * This test needs to be first, as we test that setting the label to Canada on xforms-ready by dispatching
          * the fr-set-label event, we indeed get the value 'ca' in the node bound to the control.
@@ -408,6 +414,12 @@
             });
         },
 
+        /**
+         * On focus out, if the label users typed isn't found in the itemset, we reset the autocomplete. However, we
+         * don't want to reset it if just the text field looses the focus and the button gains it, which happens
+         * when users start typing and click on the button. We also test that suggestion list is closed after this
+         * (see https://github.com/orbeon/orbeon-forms/issues/101).
+         */
         testKeepPartialValueOnFocusOut: function() {
             this.runForStaticDynamicResource(function(staticDynamicResource, continuation) {
                 ORBEON.util.Test.runMayCauseXHR(this,
@@ -416,6 +428,7 @@
                     function() { this.checkSearchValue(staticDynamicResource, "Sw", "List should show with current value still 'Sw'"); },
                     function() { this.simulateFocusOut(); },
                     function() { this.checkSearchValue(staticDynamicResource, "", "On focus lost, the search field is reset since 'Sw' isn't an existing label"); },
+                    function() { this.checkSuggestionOpen(staticDynamicResource, false, 'List should be closed after focus out'); },
                     function() { continuation.call(this); }
                 );
             });

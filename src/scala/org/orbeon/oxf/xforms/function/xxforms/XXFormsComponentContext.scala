@@ -24,4 +24,6 @@ class XXFormsComponentContext extends XFormsFunction {
             (componentControl ⇒ Option(componentControl.getBindingContext.parent)) map
                 (contextBinding ⇒ new ListIterator(contextBinding.nodeset)) getOrElse
                     EmptyIterator.getInstance
+
+    // TODO: PathMap
 }

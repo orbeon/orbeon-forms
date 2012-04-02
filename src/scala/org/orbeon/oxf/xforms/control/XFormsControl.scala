@@ -37,6 +37,7 @@ import scala.collection.JavaConverters._
 import org.orbeon.oxf.xforms.BindingContext
 import java.util.{Collections, LinkedList, List ⇒ JList}
 import org.dom4j.{QName, Element}
+import org.orbeon.saxon.om.Item
 
 /**
  * Represents an XForms control.
@@ -248,6 +249,27 @@ object XFormsControl {
 
     def controlSupportsRefreshEvents(control: XFormsControl) =
         (control ne null) && control.supportsRefreshEvents
+
+    // Find a control's binding, either single-item or item-sequence binding
+    // TODO: Instead of pattern matching, add `binding` method to all controls
+    def controlBinding(control: XFormsControl): Seq[Item] = control match {
+        case control: XFormsSingleNodeControl ⇒
+            // Single-node (single-item) binding
+            Option(control.getBoundItem).toList
+        case control: XFormsNoSingleNodeContainerControl ⇒
+            // Node-set (item-sequence) binding
+            Option(control.bindingContext) filter (_.isNewBind) map (_.nodeset.asScala) getOrElse Seq()
+        case _ ⇒
+            Seq()
+    }
+
+    // Find a control's binding context
+    // TODO: Instead of pattern matching, add `bindingContext` method to all controls
+    def controlBindingContext(control: XFormsControl): Seq[Item] =
+        Option(control.bindingContext) flatMap
+            (binding ⇒ Option(binding.parent)) map
+                (binding ⇒ binding.nodeset.asScala) getOrElse
+                    Seq()
 
     // Rewrite an HTML value which may contain URLs, for example in @src or @href attributes. Also deals with closing element tags.
     def getEscapedHTMLValue(locationData: LocationData, rawValue: String): String = {

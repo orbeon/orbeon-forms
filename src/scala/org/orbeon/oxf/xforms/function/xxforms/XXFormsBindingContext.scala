@@ -13,31 +13,25 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms
 
-import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om._
+import org.orbeon.oxf.xforms.function.FunctionHelpers
+import scala.collection.JavaConverters._
 import org.orbeon.oxf.xforms.control.XFormsControl
 
-class XXFormsBindingContext extends XFormsFunction {
+class XXFormsBindingContext extends FunctionHelpers {
 
-    override def iterate(xpathContext: XPathContext) = {
+    override def iterate(xpathContext: XPathContext): SequenceIterator = {
 
         // Get id
         val staticIdOption = argument.lift(0) map (_.evaluateAsString(xpathContext).toString)
 
-        staticIdOption flatMap {
-            staticId ⇒
-                // Find object
-                getXBLContainer(xpathContext).resolveObjectByIdInScope(getSourceEffectiveId(xpathContext), staticId, null) match {
-                    case control: XFormsControl ⇒
-                        // Any control has a binding context
-                        Option(control.getBindingContext) flatMap
-                            (binding ⇒ Option(binding.parent)) map
-                                (binding ⇒ new ListIterator(binding.nodeset))
-                    case _ ⇒
-                        None
-                }
-        } getOrElse
-            EmptyIterator.getInstance
+        // Resolve control and get its binding context
+        staticIdOption flatMap
+            (resolveControl(xpathContext, _)) map
+                (control ⇒ new ListIterator(XFormsControl.controlBindingContext(control).asJava)) getOrElse
+                    EmptyIterator.getInstance
     }
+
+    // TODO: PathMap
 }

@@ -44,6 +44,7 @@
                         <name>Virgin  Islands</name>
                         <us-code>vq2</us-code>
                     </country>
+                    <dummy/>
                 </additional-countries>
             </xforms:instance>
 
@@ -269,10 +270,8 @@
             </xhtml:div>
         </xhtml:fieldset>
 
-        <!-- Invisible label we use to trigger focus out events -->
-        <xforms:input id="focus-input" style="height: 1px; width: 1px; overflow: hidden; display: block">
-            <xforms:label/>
-        </xforms:input>
+        <!-- Invisible input we use to trigger focus out events -->
+        <xforms:input id="focus-input" style="height: 1px; width: 1px; overflow: hidden; display: block" ref="dummy"/>
 
     </xhtml:body>
 </xhtml:html>

@@ -225,9 +225,6 @@ public class XFormsServer extends ProcessorImpl {
                     // Check if there is a submission with replace="all" that needs processing
                     replaceAllCallable = containingDocument.getReplaceAllCallable();
 
-                    // TODO: UI-DEPENDENCIES TEMP
-    //                containingDocument.getStaticState().dumpAnalysis();
-
                     // Notify the state manager that we will send the response
                     XFormsStateManager.instance().beforeUpdateResponse(containingDocument, isIgnoreSequenceNumber);
 
@@ -597,26 +594,21 @@ public class XFormsServer extends ProcessorImpl {
                 // Output focus instruction
                 {
                     final XFormsControl afterFocusedControl = containingDocument.getControls().getFocusedControl();
-                    if (beforeFocusedControl != null && afterFocusedControl == null) {
-                        // Focus removed
-                        
-                        // Notify the client only if the control still exists
-                        final String beforeFocusedControlEffectiveId = beforeFocusedControl.getEffectiveId();
-                        if (containingDocument.getControls().getCurrentControlTree().getControl(beforeFocusedControlEffectiveId) != null)
-                            outputFocusInfo(ch, containingDocument, false, beforeFocusedControlEffectiveId);
 
-                    } else if (clientFocusControlId == null && afterFocusedControl == beforeFocusedControl) {
-                        // Client didn't send new focus information AND focus hasn't changed on server
-                        // NOP
-                    } else if (afterFocusedControl != null
-                            && afterFocusedControl != beforeFocusedControl
-                            && ! afterFocusedControl.getEffectiveId().equals(clientFocusControlId)) {
+                    // The focus as known by the client, as far as we know: either the focus sent by the client in the
+                    // current request, or the focus information we kept since the previous request.
+                    final String beforeFocusEffectiveId = clientFocusControlId != null ? clientFocusControlId : beforeFocusedControl != null ? beforeFocusedControl.getEffectiveId() : null;
+                    final String afterFocusEffectiveId = afterFocusedControl != null ? afterFocusedControl.getEffectiveId() : null;
 
-                        // There is a focused control, it is not the same as the initially focused control, and the new
-                        // id to send doesn't match the last xforms-focus sent by the client.
-                        // Q: Should we initially retrieve the actual control associated with clientFocusControlId for
-                        // comparison?
-                        outputFocusInfo(ch, containingDocument, true, afterFocusedControl.getEffectiveId());
+                    if (beforeFocusEffectiveId != null && afterFocusEffectiveId == null) {
+                        // Focus removed: notify the client only if the control still exists
+                        if (containingDocument.getControls().getCurrentControlTree().getControl(beforeFocusEffectiveId) != null)
+                            outputFocusInfo(ch, containingDocument, false, beforeFocusEffectiveId);
+
+                    } else if (afterFocusEffectiveId != null && ! afterFocusEffectiveId.equals(beforeFocusEffectiveId)) {
+
+                        // There is a focused control and it is different from the focus as known by the client
+                        outputFocusInfo(ch, containingDocument, true, afterFocusEffectiveId);
                     }
                 }
 

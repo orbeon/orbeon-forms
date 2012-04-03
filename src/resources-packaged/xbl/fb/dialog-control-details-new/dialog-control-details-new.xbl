@@ -112,14 +112,14 @@
                 <xxforms:variable name="form-resources" select="$form/xhtml:head/xforms:model/xforms:instance[@id = 'fr-form-resources']/* treat as element()"/>
                 <xxforms:variable name="metadata" select="$form/xhtml:head/xforms:model/xforms:instance[@id = 'fr-form-metadata']/metadata treat as element()"/>
                 <xxforms:variable name="body" select="$form/xhtml:body treat as element()"/>
-                <xxforms:variable name="is-custom-instance" select="$metadata/form-instance-mode = 'custom'"/>
+                <xxforms:variable name="is-custom-instance" select="dataModel:isCustomInstance()"/>
 
                 <!-- Show dialog -->
                 <xforms:action ev:event="xxforms-dialog-open" ev:observer="dialog">
                     <xforms:setvalue ref="$local/control-xpath" value="dataModel:getBindRefOrEmpty($form, $local/control-name)"/>
                     <xforms:setvalue ref="$local/is-custom-instance" value="$is-custom-instance"/>
                     <xforms:setvalue ref="$local/control-names" value="string-join(controlOps:getAllControlNamesXPath($body), ' ')"/>
-                    <xxforms:variable name="control" select="$form//*[@id = concat($local/control-name, '-control')] treat as element()"/>
+                    <xxforms:variable name="control" select="controlOps:findControlByNameOrEmpty($form, $local/control-name)"/>
                     <xforms:setvalue ref="$local/classes" value="$control/@class"/>
 
                     <!-- Copy XBL control-details from xbl:binding in local instance -->

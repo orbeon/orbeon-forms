@@ -42,7 +42,7 @@ public abstract class XFormsBaseHandlerXML extends XFormsBaseHandler {
     public void handleMIPAttributes(AttributesImpl newAttributes, String controlPrefixedId, XFormsControl control) {
 
         // Output MIP classes only having a binding
-        final boolean hasBinding = containingDocument.getStaticOps().hasNodeBinding(controlPrefixedId);
+        final boolean hasBinding = containingDocument.getStaticOps().hasBinding(controlPrefixedId);
         if (hasBinding) {
             if (control != null) {
                 // Output standard MIP classes

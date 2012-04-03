@@ -96,7 +96,7 @@ abstract class ElementAnalysis(val element: Element, val parent: Option[ElementA
     def bindJava = bind.orNull
 
     // Other
-    val hasNodeBinding = ref.isDefined || bind.isDefined
+    def hasBinding = ref.isDefined || bind.isDefined
     val bindingXPathEvaluations = (if (context.isDefined) 1 else 0) + (if (ref.isDefined) 1 else 0)// 0, 1, or 2: number of XPath evaluations used to resolve the binding if no optimization is taking place
     val canHoldValue = false // by default
 
@@ -134,7 +134,7 @@ abstract class ElementAnalysis(val element: Element, val parent: Option[ElementA
      * Return the context within which children elements or values evaluate. This is the element binding if any, or the
      * element context if there is no binding.
      */
-    def getChildrenContext: Option[XPathAnalysis] = if (hasNodeBinding) getBindingAnalysis else getContextAnalysis
+    def getChildrenContext: Option[XPathAnalysis] = if (hasBinding) getBindingAnalysis else getContextAnalysis
 
     val closestAncestorInScope = ElementAnalysis.getClosestAncestorInScope(self, scope)
 
@@ -152,7 +152,7 @@ abstract class ElementAnalysis(val element: Element, val parent: Option[ElementA
                         "scope", scope.scopeId,
                         "prefixed-id", prefixedId,
                         "model-prefixed-id", getModelPrefixedId.orNull,
-                        "binding", hasNodeBinding.toString,
+                        "binding", hasBinding.toString,
                         "value", canHoldValue.toString,
                         "name", element.attributeValue("name") // e.g. variables
                     )
@@ -162,7 +162,7 @@ abstract class ElementAnalysis(val element: Element, val parent: Option[ElementA
         // Control binding and value analysis
         if (_bindingAnalyzed)
             getBindingAnalysis match {
-                case Some(bindingAnalysis) if hasNodeBinding ⇒ // NOTE: for now there can be a binding analysis even if there is no binding on the control (hack to simplify determining which controls to update)
+                case Some(bindingAnalysis) if hasBinding ⇒ // NOTE: for now there can be a binding analysis even if there is no binding on the control (hack to simplify determining which controls to update)
                     helper.startElement("binding")
                     bindingAnalysis.toXML(helper)
                     helper.endElement()

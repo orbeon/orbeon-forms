@@ -9,6 +9,9 @@ class ComponentControl(staticStateContext: StaticStateContext, element: Element,
 
     val binding = staticStateContext.partAnalysis.xblBindings.getBinding(prefixedId)
 
+    // Only support binding if the control defines it has a binding
+    override def hasBinding = binding.abstractBinding.modeBinding && super.hasBinding
+
     // If control does not have an XPath binding, return one anyway so that controls w/o their own binding also get updated.
     override protected def computeBindingAnalysis =
         if (binding.abstractBinding.modeBinding) super.computeBindingAnalysis else getContextAnalysis

@@ -56,7 +56,7 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
     public void handleMIPClasses(StringBuilder sb, String controlPrefixedId, XFormsControl control) {
 
         // Output MIP classes only having a binding
-        final boolean hasBinding = containingDocument.getStaticOps().hasNodeBinding(controlPrefixedId);
+        final boolean hasBinding = containingDocument.getStaticOps().hasBinding(controlPrefixedId);
         if (hasBinding) {
             if (control != null) {
                 // The case of a concrete control

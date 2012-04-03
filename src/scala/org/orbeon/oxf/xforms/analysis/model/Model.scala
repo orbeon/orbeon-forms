@@ -284,7 +284,7 @@ class Model(val staticStateContext: StaticStateContext, element: Element, parent
 
         // Compute value analysis if we have a type bound, otherwise don't bother
         override protected def computeValueAnalysis: Option[XPathAnalysis] = typeMIP match {
-            case Some(_) if hasNodeBinding ⇒ Some(analyzeXPath(getChildrenContext, "xs:string(.[1])"))
+            case Some(_) if hasBinding ⇒ Some(analyzeXPath(getChildrenContext, "xs:string(.[1])"))
             case _ ⇒ None
         }
 

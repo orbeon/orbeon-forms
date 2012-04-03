@@ -71,7 +71,7 @@ trait PartGlobalOps {
     // Functions derived from getControlAnalysis
     def getControlAnalysisOption(prefixedId: String) = Option(getControlAnalysis(prefixedId))
     def getControlElement(prefixedId: String) = getControlAnalysisOption(prefixedId) map (_.element) orNull
-    def hasNodeBinding(prefixedId: String) = getControlAnalysisOption(prefixedId) map (_.hasNodeBinding) getOrElse false
+    def hasBinding(prefixedId: String) = getControlAnalysisOption(prefixedId) map (_.hasBinding) getOrElse false
 
     def getControlPosition(prefixedId: String) = getControlAnalysisOption(prefixedId) match {
         case Some(viewTrait: ViewTrait) ⇒ viewTrait.index

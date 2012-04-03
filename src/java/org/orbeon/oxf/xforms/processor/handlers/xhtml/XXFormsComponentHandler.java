@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml;
 
 import org.dom4j.Document;
 import org.orbeon.oxf.xforms.StaticStateGlobalOps;
+import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xml.*;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
@@ -50,10 +51,14 @@ public class XXFormsComponentHandler extends XFormsBaseHandlerXHTML {
         this.elementQName = XMLUtils.buildQName(xhtmlPrefix, elementName);
 
         // Produce class of the form xbl-foo-bar
-        final String classes = "xbl-component xbl-" + qName.replace(':', '-');
+        final StringBuilder classes = new StringBuilder("xbl-component xbl-" + qName.replace(':', '-'));
+
+        // Add MIP classes
+        final XFormsControl control = handlerContext.isTemplate() ? null : (XFormsControl) containingDocument.getObjectByEffectiveId(effectiveId);
+        handleMIPClasses(classes, prefixedId, control);
 
         // Start xhtml:span element
-        contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, elementName, elementQName, getAttributes(attributes, classes, effectiveId));
+        contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, elementName, elementQName, getAttributes(attributes, classes.toString(), effectiveId));
 
         // Push context
         handlerContext.pushComponentContext(prefixedId);

@@ -2232,24 +2232,7 @@
                         </value>
                     </variable>
                 </model>
-                <foo scope="" prefixed-id="my-foo" model-prefixed-id="model" binding="true" value="false">
-                    <binding>
-                        <analysis expression="instance('instance')" analyzed="true">
-                            <returnable>
-                                <path>instance('instance')</path>
-                            </returnable>
-                            <dependent-models>
-                                <model>model</model>
-                            </dependent-models>
-                            <dependent-instances>
-                                <instance>instance</instance>
-                            </dependent-instances>
-                            <returnable-instances>
-                                <instance>instance</instance>
-                            </returnable-instances>
-                        </analysis>
-                    </binding>
-                </foo>
+                <foo scope="" prefixed-id="my-foo" model-prefixed-id="model" binding="false" value="false"/>
                 <model scope="my-foo" prefixed-id="my-foo$model" default-instance-prefixed-id="my-foo$instance" analyzed-binds="true"/>
                 <template scope="my-foo" prefixed-id="my-foo$xf-4" model-prefixed-id="my-foo$model" binding="false" value="false"/>
                 <variable scope="my-foo" prefixed-id="my-foo$iv" model-prefixed-id="my-foo$model" binding="false" value="true" name="internal">

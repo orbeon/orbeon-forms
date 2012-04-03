@@ -310,6 +310,7 @@
                             </instance>
                             <instance id="events" model-id="main-model">
                                 <events>
+                                    <event type="xforms-enabled" target="fr-dropdown-date" indexes="2"/>
                                     <event type="xforms-enabled" target="xf-25" indexes="2"/>
                                     <event type="xforms-enabled" target="component-inner-group" indexes="2"/>
                                     <event type="xforms-enabled" target="result-variable" indexes="2"/>
@@ -949,6 +950,8 @@
                             <instance id="events" model-id="model">
                                 <events>
                                     <event type="xforms-enabled" target="external-group" phase="target" original-target="external-group" indexes="" original-indexes=""/>
+                                    <event type="xforms-enabled" target="my-foobar" phase="capture" original-target="my-foobar" indexes="" original-indexes=""/>
+                                    <event type="xforms-enabled" target="my-foobar" phase="bubbling" original-target="my-foobar" indexes="" original-indexes=""/>
                                     <event type="xforms-enabled" target="my-foobar" phase="capture" original-target="internal-group" indexes="" original-indexes=""/>
                                     <event type="DOMActivate" target="my-foobar" phase="capture" original-target="internal-trigger-1" indexes="" original-indexes=""/>
                                     <event type="fr:my-event" target="my-foobar" phase="capture" original-target="my-foobar" indexes="" original-indexes=""/>
@@ -1513,6 +1516,7 @@
                             </instance>
                             <instance id="events" model-id="my-bar-1$model">
                                 <events>
+                                    <event type="xforms-enabled" target="my-bar-1" phase="target" original-target="my-bar-1" indexes="" original-indexes=""/>
                                     <event type="xforms-enabled" target="my-bar-1" phase="bubbling" original-target="bar-group" indexes="" original-indexes=""/>
                                     <event type="xforms-enabled" target="my-bar-1" phase="bubbling" original-target="input1" indexes="" original-indexes=""/>
                                     <event type="xforms-enabled" target="my-bar-1" phase="bubbling" original-target="input2" indexes="" original-indexes=""/>
@@ -1529,6 +1533,7 @@
                             </instance>
                             <instance id="events" model-id="my-bar-2$model">
                                 <events>
+                                    <event type="xforms-enabled" target="my-bar-2" phase="target" original-target="my-bar-2" indexes="" original-indexes=""/>
                                     <event type="xforms-enabled" target="my-bar-2" phase="bubbling" original-target="bar-group" indexes="" original-indexes=""/>
                                     <event type="xforms-enabled" target="my-bar-2" phase="bubbling" original-target="input1" indexes="" original-indexes=""/>
                                     <event type="xforms-enabled" target="my-bar-2" phase="bubbling" original-target="input2" indexes="" original-indexes=""/>
@@ -1788,11 +1793,20 @@
                             <instance id="events" model-id="model">
                                 <events>
                                     <event observer="main-group" type="xforms-enabled" target="main-group" phase="target" original-target="main-group" indexes=""/>
+                                    <event observer="fr-level1-binding" type="xforms-enabled" target="level1-component" phase="target" original-target="level1-component" indexes=""/>
+                                    <event observer="main-group" type="xforms-enabled" target="level1-component" phase="bubbling" original-target="level1-component" indexes=""/>
                                     <event observer="fr-level1-binding" type="xforms-enabled" target="level1-component" phase="bubbling" original-target="level1-repeat" indexes=""/>
                                     <event observer="main-group" type="xforms-enabled" target="level1-component" phase="bubbling" original-target="level1-repeat" indexes=""/>
+                                    <event observer="fr-level2-binding" type="xforms-enabled" target="level2-component" phase="target" original-target="level2-component" indexes="1"/>
+                                    <event observer="fr-level1-binding" type="xforms-enabled" target="level1-component" phase="bubbling" original-target="level2-component" indexes="1"/>
+                                    <event observer="main-group" type="xforms-enabled" target="level1-component" phase="bubbling" original-target="level2-component" indexes="1"/>
                                     <event observer="fr-level2-binding" type="xforms-enabled" target="level2-component" phase="bubbling" original-target="level2-repeat" indexes="1"/>
                                     <event observer="fr-level1-binding" type="xforms-enabled" target="level1-component" phase="bubbling" original-target="level2-repeat" indexes="1"/>
                                     <event observer="main-group" type="xforms-enabled" target="level1-component" phase="bubbling" original-target="level2-repeat" indexes="1"/>
+                                    <event observer="fr-level3-binding" type="xforms-enabled" target="level3-component" phase="target" original-target="level3-component" indexes="1 1"/>
+                                    <event observer="fr-level2-binding" type="xforms-enabled" target="level2-component" phase="bubbling" original-target="level3-component" indexes="1 1"/>
+                                    <event observer="fr-level1-binding" type="xforms-enabled" target="level1-component" phase="bubbling" original-target="level3-component" indexes="1 1"/>
+                                    <event observer="main-group" type="xforms-enabled" target="level1-component" phase="bubbling" original-target="level3-component" indexes="1 1"/>
                                     <event observer="fr-level3-binding" type="xforms-enabled" target="level3-component" phase="bubbling" original-target="level3-repeat" indexes="1 1"/>
                                     <event observer="fr-level2-binding" type="xforms-enabled" target="level2-component" phase="bubbling" original-target="level3-repeat" indexes="1 1"/>
                                     <event observer="fr-level1-binding" type="xforms-enabled" target="level1-component" phase="bubbling" original-target="level3-repeat" indexes="1 1"/>
@@ -2286,8 +2300,12 @@
                             </instance>
                             <instance id="events" model-id="model">
                                 <events>
+                                    <event type="xforms-enabled" target="my-foo"/>
+                                    <event type="my-event-1" target="model"/>
                                     <event type="xforms-enabled" target="my-foo-input"/>
                                     <event type="my-event-1" target="model"/>
+                                    <event type="xforms-enabled" target="my-foo-2"/>
+                                    <event type="my-event-2" target="model"/>
                                     <event type="xforms-enabled" target="my-foo-input-2"/>
                                     <event type="my-event-2" target="model"/>
                                 </events>
@@ -3395,6 +3413,7 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:control id="my-group" relevant="false"/>
+                        <xxf:control id="my-button" relevant="false"/>
                         <xxf:attribute id="my-button$xf-6" for="my-button$container" name="class"/>
                         <xxf:control id="my-button$trigger" relevant="false"/>
                     </xxf:control-values>
@@ -3508,6 +3527,7 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:control id="my-group1" relevant="false"/>
+                        <xxf:control id="my-foo2" relevant="false"/>
                         <xxf:control id="my-foo2$my-output" relevant="false"/>
                     </xxf:control-values>
                     <xxf:message level="modal">instance, my-foo1$my-xbl-instance</xxf:message>
@@ -4263,10 +4283,11 @@
                         <xxf:control id="gaga1$binding">foo</xxf:control>
                         <xxf:control id="gaga1$binding-context">values</xxf:control>
                         <xxf:control id="gaga1$component-context">values</xxf:control>
-                        <xxf:control id="gaga2$binding">foo bar</xxf:control>
+                        <xxf:control id="gaga2$binding">foo</xxf:control>
                         <xxf:control id="gaga2$binding-context">values</xxf:control>
                         <xxf:control id="gaga2$component-context">values</xxf:control>
-                        <xxf:control id="gaga3$binding">1 2 3 4 5 6 7 8 9 10</xxf:control>
+                        <xxf:control id="gaga3" readonly="true"/>
+                        <xxf:control id="gaga3$binding">1</xxf:control>
                         <xxf:control id="gaga3$binding-context">values</xxf:control>
                         <xxf:control id="gaga3$component-context">values</xxf:control>
                         <xxf:control id="gaga4$binding-context">values</xxf:control>

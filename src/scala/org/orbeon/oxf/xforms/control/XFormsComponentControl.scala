@@ -31,7 +31,7 @@ import org.orbeon.oxf.xforms.{BindingContext}
  * o event dispatching
  */
 class XFormsComponentControl(container: XBLContainer, parent: XFormsControl, element: Element, effectiveId: String, state: Map[String, String])
-        extends XFormsNoSingleNodeContainerControl(container, parent, element, effectiveId) {
+        extends XFormsSingleNodeContainerControl(container, parent, element, effectiveId) {
 
     val nestedContainer = container.createChildContainer(this)
 

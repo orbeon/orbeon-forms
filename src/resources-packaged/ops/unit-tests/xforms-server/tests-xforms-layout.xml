@@ -24,6 +24,7 @@
     xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
     <test description="New layout for xforms:input" name="oxf:pipeline">
@@ -2656,6 +2657,69 @@
                         <xhtml:li>Cat</xhtml:li>
                         <xhtml:li>Fish</xhtml:li>
                     </xhtml:ul>
+                </xhtml:span>
+            </controls>
+        </output>
+    </test>
+
+    <test description="XBL controls with and without bindings" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-init-allcontrols.xpl"/>
+        <input name="document">
+            <xhtml:html>
+                <xhtml:head>
+                    <xforms:model id="model" xxforms:xhtml-layout="span">
+                        <xforms:instance id="instance">
+                            <instance>
+                                <default/>
+                                <relevant/>
+                                <readonly/>
+                            </instance>
+                        </xforms:instance>
+                        <xforms:bind ref="relevant" relevant="false()"/>
+                        <xforms:bind ref="readonly" readonly="true()"/>
+                    </xforms:model>
+                    <xbl:xbl>
+                        <xbl:binding id="fr-gaga" element="fr|gaga" xxbl:mode="binding" xxbl:container="span">
+                            <xbl:template/>
+                        </xbl:binding>
+                        <xbl:binding id="fr-toto" element="fr|toto" xxbl:container="span">
+                            <xbl:template/>
+                        </xbl:binding>
+                    </xbl:xbl>
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:group id="my-group">
+                        <xforms:repeat id="my-repeat" ref=".">
+                            <fr:gaga id="gaga-1" ref="default"/>
+                            <fr:toto id="toto-1" ref="default"/>
+                            <fr:gaga id="gaga-2" ref="relevant"/>
+                            <fr:toto id="toto-2" ref="relevant"/>
+                            <fr:gaga id="gaga-3" ref="readonly"/>
+                            <fr:toto id="toto-3" ref="readonly"/>
+                        </xforms:repeat>
+                    </xforms:group>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <controls>
+                <xhtml:span id="my-group" class="xforms-group">
+                    <xhtml:span id="repeat-begin-my-repeat" class="xforms-repeat-begin-end"/>
+                    <xhtml:span class="xforms-repeat-delimiter"/>
+                    <xhtml:span id="gaga-1·1" class="xbl-component xbl-fr-gaga xforms-repeat-selected-item-1"/>
+                    <xhtml:span id="toto-1·1" class="xbl-component xbl-fr-toto xforms-repeat-selected-item-1"/>
+                    <xhtml:span id="gaga-2·1" class="xbl-component xbl-fr-gaga xforms-disabled xforms-repeat-selected-item-1"/>
+                    <xhtml:span id="toto-2·1" class="xbl-component xbl-fr-toto xforms-repeat-selected-item-1"/>
+                    <xhtml:span id="gaga-3·1" class="xbl-component xbl-fr-gaga xforms-readonly xforms-repeat-selected-item-1"/>
+                    <xhtml:span id="toto-3·1" class="xbl-component xbl-fr-toto xforms-repeat-selected-item-1"/>
+                    <xhtml:span class="xforms-repeat-delimiter"/>
+                    <xhtml:span id="gaga-1" class="xbl-component xbl-fr-gaga xforms-repeat-template"/>
+                    <xhtml:span id="toto-1" class="xbl-component xbl-fr-toto xforms-repeat-template"/>
+                    <xhtml:span id="gaga-2" class="xbl-component xbl-fr-gaga xforms-repeat-template"/>
+                    <xhtml:span id="toto-2" class="xbl-component xbl-fr-toto xforms-repeat-template"/>
+                    <xhtml:span id="gaga-3" class="xbl-component xbl-fr-gaga xforms-repeat-template"/>
+                    <xhtml:span id="toto-3" class="xbl-component xbl-fr-toto xforms-repeat-template"/>
+                    <xhtml:span id="repeat-end-my-repeat" class="xforms-repeat-begin-end"/>
                 </xhtml:span>
             </controls>
         </output>

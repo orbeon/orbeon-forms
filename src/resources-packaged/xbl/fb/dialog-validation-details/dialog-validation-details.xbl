@@ -33,7 +33,7 @@
         <xbl:handlers>
             <!-- Handler to open dialog -->
             <xbl:handler event="fb-show-dialog" phase="target" defaultAction="cancel">
-                <xforms:setvalue xxforms:iterate="*[not(*)]" ref="."/> <!-- Clear all local values -->
+                <xforms:setvalue iterate="*[not(*)]" ref="."/> <!-- Clear all local values -->
                 <xforms:setvalue ref="@relevant" value="'true'"/>
                 <xforms:setvalue ref="control-name" value="controlOps:controlName(event('control-id'))"/>
                 <xforms:refresh/> <!-- The view needs to be relevant before it gets the event for action to run in a proper context -->

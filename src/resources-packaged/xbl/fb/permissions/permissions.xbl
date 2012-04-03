@@ -88,7 +88,7 @@
                     <xforms:action if="$has-permissions">
                         <!-- Add permissions attached to a role -->
                         <xxforms:variable name="roles" select="('', distinct-values($metadata/permissions/permission/user-role/@any-of/tokenize(., '\s')))"/>
-                        <xforms:action xxforms:iterate="$roles">
+                        <xforms:action iterate="$roles">
                             <!-- Current role -->
                             <xxforms:variable name="role" select="."/>
                             <!-- Permissions for the current role -->
@@ -114,15 +114,15 @@
                     <xforms:action if="$ui/has-permissions = 'true'">
                         <xforms:insert context="$metadata" ref="*" origin="xxforms:element('permissions')"/>
                         <!-- In UI replace "read-update" by "read update" -->
-                        <xforms:setvalue xxforms:iterate="$ui/permissions/permission/operations" ref="." value="replace(., 'read-update', 'read update')"/>
+                        <xforms:setvalue iterate="$ui/permissions/permission/operations" ref="." value="replace(., 'read-update', 'read update')"/>
                         <!-- In UI replace space in role by %20 -->
-                        <xforms:setvalue xxforms:iterate="$ui/permissions/permission/role" ref="." value="replace(normalize-space(.), ' ', '%20')"/>
+                        <xforms:setvalue iterate="$ui/permissions/permission/role" ref="." value="replace(normalize-space(.), ' ', '%20')"/>
                         <!-- Add "anyone" permission -->
                         <xxforms:variable name="anyone-operations" select="$ui/permissions/permission[1]/operations"/>
                         <xforms:insert if="$anyone-operations != ''" context="$metadata/permissions" origin="xxforms:element('permission', xxforms:attribute('operations', $anyone-operations))"/>
                         <!-- For each permission, get the roles that can access it, and store in metadata as a separate permission element -->
                         <xxforms:variable name="permissions" select="$ui/permissions/permission[position() > 1]"/>
-                        <xforms:action xxforms:iterate="distinct-values($permissions/operations/tokenize(., '\s'))">
+                        <xforms:action iterate="distinct-values($permissions/operations/tokenize(., '\s'))">
                             <xxforms:variable name="operation" select="."/>
                             <xxforms:variable name="roles" select="string-join(saxon:sort($permissions[tokenize(operations, '\s') = $operation]/role), ' ')"/>
                             <xforms:insert context="$metadata/permissions" ref="*" origin="xxforms:element('permission', (
@@ -133,7 +133,7 @@
                         <xxforms:variable name="any-ofs" select="distinct-values($metadata/permissions/permission/user-role/@any-of)"/>
                         <xxforms:variable name="operations" select="for $ao in $any-ofs return string-join($metadata/permissions/permission[user-role/@any-of = $ao]/@operations, ' ')"/>
                         <xforms:delete ref="$metadata/permissions/permission[user-role]"/>
-                        <xforms:action xxforms:iterate="1 to count($any-ofs)">
+                        <xforms:action iterate="1 to count($any-ofs)">
                             <xxforms:variable name="i" select="position()"/>
                             <xforms:insert context="$metadata/permissions" ref="*" origin="xxforms:element('permission', (
                                 xxforms:attribute('operations', saxon:item-at($operations, $i)),

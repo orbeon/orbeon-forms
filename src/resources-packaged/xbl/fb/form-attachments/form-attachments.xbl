@@ -64,7 +64,7 @@
 
                     <!-- Process the LHHR of each details control -->
                     <xxforms:variable name="current-language" select="$resources/@xml:lang/string() treat as xs:string"/>
-                    <xforms:action xxforms:iterate="$local/fb:control-details/*/(xforms:label, xforms:hint, xforms:help, xforms:alert)">
+                    <xforms:action iterate="$local/fb:control-details/*/(xforms:label, xforms:hint, xforms:help, xforms:alert)">
                         <xxforms:variable name="lhhr" select="."/>
                         <!-- If it has a lang attribute, only keep if matches the current language -->
                         <xforms:delete if="exists($lhhr/@lang) and $lhhr/@lang != $current-language" nodeset="$lhhr"/>
@@ -78,7 +78,7 @@
 
                     <!-- Create elements for additional properties, populating their initial value from the control -->
                     <xforms:delete nodeset="$local/control-details/*"/>
-                    <xforms:action xxforms:iterate="$local/fb:control-details/*">
+                    <xforms:action iterate="$local/fb:control-details/*">
                         <xxforms:variable name="position" select="position()"/>
                         <xxforms:variable name="xforms-control" select="."/>
                         <xforms:insert context="$local/control-details" nodeset="*" origin="xxforms:element('control-detail', string($control/saxon:evaluate($xforms-control/@ref)))"/>
@@ -122,7 +122,7 @@
                     <xforms:delete if="count($classes) = 0" nodeset="$control/@class"/>
                     <xforms:insert if="count($classes) > 0" context="$control" origin="xxforms:attribute('class', $local/classes)"/>
                     <!-- Update custom XBL properties -->
-                    <xforms:action xxforms:iterate="$local/fb:control-details/*">
+                    <xforms:action iterate="$local/fb:control-details/*">
                         <xxforms:variable name="position" select="position()"/>
                         <xxforms:variable name="bound-node" select="$local/control-details/*[$position]"/>
                         <xxforms:variable name="xforms-control" select="."/>

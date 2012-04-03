@@ -110,7 +110,7 @@ public class XFormsActionInterpreter {
 
         try {
 
-            // Condition (@if / @exf:if) and iteration (@while / @exf:while / @xxforms:iterate / @exf:iterate) properties
+            // Condition
             final String ifConditionAttribute = actionTrait.ifConditionJava();
             final String whileIterationAttribute = actionTrait.whileConditionJava();
             final String iterateIterationAttribute = actionTrait.iterateJava();
@@ -125,8 +125,8 @@ public class XFormsActionInterpreter {
             if (iterateIterationAttribute != null) {
                 // Gotta iterate
 
-                // NOTE: It's not 100% how @context and @xxforms:iterate should interact here. Right now @xxforms:iterate overrides @context,
-                // i.e. @context is evaluated first, and @xxforms:iterate sets a new context for each iteration
+                // NOTE: It's not 100% how @context and @iterate should interact here. Right now @iterate overrides @context,
+                // i.e. @context is evaluated first, and @iterate sets a new context for each iteration
                 {
                     final List<Item> currentNodeset = _actionXPathContext.getCurrentNodeset();
                     final int iterationCount = currentNodeset.size();

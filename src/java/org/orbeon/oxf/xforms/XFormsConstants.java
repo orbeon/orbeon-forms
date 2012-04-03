@@ -189,6 +189,9 @@ public class XFormsConstants {
     public static final QName EXFORMS_VARIABLE_QNAME = new QName("variable", EXFORMS_NAMESPACE);
     public static final QName XXFORMS_SEQUENCE_QNAME = new QName("sequence", XXFORMS_NAMESPACE);
 
+    public static final QName IF_ATTRIBUTE_QNAME = new QName("if");
+    public static final QName WHILE_ATTRIBUTE_QNAME = new QName("while");
+    public static final QName ITERATE_ATTRIBUTE_QNAME = new QName("iterate");
     public static final QName XXFORMS_ITERATE_ATTRIBUTE_QNAME = new QName("iterate", XXFORMS_NAMESPACE);
 
     public static final String XML_EVENTS_PREFIX = "ev";

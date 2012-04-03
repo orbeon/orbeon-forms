@@ -218,7 +218,7 @@
                 <xforms:insert context="instance('fr-configuration-instance')" nodeset="*" origin="$summary-elements"/>
 
                 <!-- Create elements holding structured search data -->
-                <xforms:action xxforms:iterate="$summary-elements">
+                <xforms:action iterate="$summary-elements">
                     <xxforms:variable name="control" select="." as="element()"/>
 
                     <!-- Insert empty template -->
@@ -360,7 +360,7 @@
                                                 <xforms:trigger appearance="minimal">
                                                     <xforms:label ref="$fr-resources/summary/search/show-options"/>
                                                     <xforms:action ev:event="DOMActivate">
-                                                        <xforms:setvalue xxforms:iterate="instance('fr-search-instance')/query" ref="."/>
+                                                        <xforms:setvalue iterate="instance('fr-search-instance')/query" ref="."/>
                                                         <xforms:toggle case="search-options"/>
                                                         <xforms:setfocus control="search-options"/>
                                                     </xforms:action>
@@ -497,7 +497,7 @@
                                         <xforms:trigger appearance="minimal">
                                             <xforms:label ref="$fr-resources/summary/search/close-options"/>
                                             <xforms:action ev:event="DOMActivate">
-                                                <xforms:setvalue xxforms:iterate="instance('fr-search-instance')/query" ref="."/>
+                                                <xforms:setvalue iterate="instance('fr-search-instance')/query" ref="."/>
                                                 <xforms:toggle case="search-free"/>
                                                 <xforms:setfocus control="search-free"/>
                                             </xforms:action>
@@ -842,7 +842,7 @@
                     <fr:positive-choice>
                         <xforms:action ev:event="DOMActivate">
                             <!-- Parse the selected rows -->
-                            <xforms:action xxforms:iterate="tokenize(instance('fr-selection-instance'), '\s+')">
+                            <xforms:action iterate="tokenize(instance('fr-selection-instance'), '\s+')">
                                 <xxforms:variable name="document-name" select="." as="xs:string"/>
                                 <xforms:dispatch name="fr-delete-data" targetid="fr-persistence-model">
                                     <xxforms:context name="document-id" select="$document-name"/>

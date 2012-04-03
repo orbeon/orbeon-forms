@@ -447,7 +447,7 @@
                     <!-- Set itemset -->
                     <xxforms:variable name="control-resources" model="fr-resources-model" select="$fr-form-resources/*[name() = $control-name]"/>
                     <xforms:delete nodeset="$control-resources/item"/>
-                    <xforms:action xxforms:iterate="$response-items">
+                    <xforms:action iterate="$response-items">
                         <xxforms:variable name="item-label" select="" as="xs:string"/>
                         <xxforms:variable name="item-value" select="" as="xs:string"/>
                         <xforms:insert nodeset="$control-resources/*"

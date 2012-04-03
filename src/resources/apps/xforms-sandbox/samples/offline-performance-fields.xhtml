@@ -30,7 +30,7 @@
                 </ui>
             </xforms:instance>
             <xforms:action ev:event="xforms-model-construct-done">
-                <xforms:insert xxforms:iterate="for $i in (1 to 300) return ." context="/ui/fields" origin="xxforms:element('field')"/>
+                <xforms:insert iterate="for $i in (1 to 300) return ." context="/ui/fields" origin="xxforms:element('field')"/>
             </xforms:action>
             <xforms:action ev:event="xxforms-offline">
                 <xforms:setvalue ref="instance('ui')/offline">true</xforms:setvalue>

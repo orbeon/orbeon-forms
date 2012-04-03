@@ -39,7 +39,7 @@
 
         <!-- Initialize parameters to pass to "new" service -->
         <xxforms:variable name="pass-request-parameters" select="xxforms:property(string-join(('oxf.fr.detail.new.service.passing-request-parameters', $app, $form), '.'))"/>
-        <xforms:action xxforms:iterate="tokenize($pass-request-parameters, '\s+')">
+        <xforms:action iterate="tokenize($pass-request-parameters, '\s+')">
             <xxforms:variable name="parameter-name" select="."/>
             <xxforms:variable name="parameter-value" select="xxforms:get-request-parameter($parameter-name)"/>
             <xforms:insert context="instance('fr-service-parameters')" origin="xxforms:element($parameter-name, $parameter-value)"/>
@@ -316,7 +316,7 @@
                 <xforms:setvalue ref="instance('fr-persistence-instance')/error"/>
 
                 <!-- Iterate over attachment controls while there is no submission error -->
-                <xforms:action xxforms:iterate="(1 to count($attachment-binds))">
+                <xforms:action iterate="(1 to count($attachment-binds))">
 
                     <xforms:action if="instance('fr-persistence-instance')/is-error = 'false'">
                         <xxforms:variable name="bind" as="element(xforms:bind)"
@@ -342,7 +342,7 @@
                             <!--xxx Holders content: <xforms:output value="string-join($holders, ' - ')"/> xxx-->
                         <!--</xforms:message>-->
 
-                        <xforms:action xxforms:iterate="$holders">
+                        <xforms:action iterate="$holders">
                             <xxforms:variable name="holder" select="." as="node()"/>
                             <!-- Found attachment URI location -->
                             <xxforms:variable name="uri" select="normalize-space($holder)" as="xs:string"/>

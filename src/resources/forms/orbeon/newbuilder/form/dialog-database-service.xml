@@ -57,7 +57,7 @@
                 <!-- Test submission -->
                 <xforms:action ev:event="DOMActivate">
                     <!-- Clear response -->
-                    <xforms:setvalue xxforms:iterate="response/*[not(*)]" ref="."/>
+                    <xforms:setvalue iterate="response/*[not(*)]" ref="."/>
                     <xforms:delete nodeset="response/headers/header"/>
 
                     <!-- Toggle back response submission -->
@@ -148,7 +148,7 @@
         <xforms:var name="submission-name" value="event('submission-name')"/>
 
         <!-- Clear instance entirely -->
-        <xforms:setvalue xxforms:iterate="$instance//*[not(*)]" ref="."/>
+        <xforms:setvalue iterate="$instance//*[not(*)]" ref="."/>
         <xforms:setvalue ref="$instance/datasource" value="instance('fb-database-query-template')/sql:datasource"/>
         <xforms:setvalue ref="$instance/query" value="instance('fb-database-query-template')/sql:query"/>
 

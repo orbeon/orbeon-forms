@@ -118,7 +118,7 @@
                                     </xforms:action>
 
                                     <!-- Insert resources placeholders for all languages -->
-                                    <xforms:action xxforms:iterate="$resources/resource">
+                                    <xforms:action iterate="$resources/resource">
                                         <xforms:insert context="." nodeset="*"
                                                        origin="xxforms:element($new-section-name)"/>
                                         <xforms:insert context="*[last()]" origin="instance('fb-resource-template')/(label | help)"/>

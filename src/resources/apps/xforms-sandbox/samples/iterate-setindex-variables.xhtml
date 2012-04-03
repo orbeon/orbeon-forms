@@ -27,7 +27,7 @@
                 </items>
             </xforms:instance>
 
-            <xforms:action ev:event="xforms-ready" xxforms:iterate="item">
+            <xforms:action ev:event="xforms-ready" iterate="item">
                 <xforms:setindex repeat="items-repeat" index="position()"/>
                 <xforms:dispatch name="my-event" target="my-count"/>
             </xforms:action>

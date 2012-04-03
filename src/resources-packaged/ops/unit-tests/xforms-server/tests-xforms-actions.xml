@@ -12,20 +12,20 @@
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
 <group description="XForms Actions" xmlns:p="http://www.orbeon.com/oxf/pipeline"
-    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:xs="http://www.w3.org/2001/XMLSchema"
-    xmlns:xh="http://www.w3.org/1999/xhtml"
-    xmlns:oxf="http://www.orbeon.com/oxf/processors"
-    xmlns:xi="http://www.w3.org/2001/XInclude"
-    xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
-    xmlns:xf="http://www.w3.org/2002/xforms"
-    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
-    xmlns:ev="http://www.w3.org/2001/xml-events"
-    xmlns:xbl="http://www.w3.org/ns/xbl"
-    xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+       xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:xs="http://www.w3.org/2001/XMLSchema"
+       xmlns:xh="http://www.w3.org/1999/xhtml"
+       xmlns:oxf="http://www.orbeon.com/oxf/processors"
+       xmlns:xi="http://www.w3.org/2001/XInclude"
+       xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+       xmlns:xf="http://www.w3.org/2002/xforms"
+       xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+       xmlns:ev="http://www.w3.org/2001/xml-events"
+       xmlns:xbl="http://www.w3.org/ns/xbl"
+       xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
     
-    <test description="Interaction of context and xxf:iterate" name="oxf:pipeline">
+    <test description="Interaction of context and iterate" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xh:html>
@@ -43,18 +43,18 @@
                         <xf:action ev:event="xforms-model-construct-done">
 
                             <!-- Straight forward insert -->
-                            <xf:action xxf:iterate="for $i in (1 to 3) return .">
+                            <xf:action iterate="for $i in (1 to 3) return .">
                                 <xf:insert context="nested" origin="xxf:element('item')"/>
                             </xf:action>
 
                             <!-- Does the same thing as the previous, in one line (the iterate doesn't change the context of the insert since it return ".") -->
                             <xf:insert context="one-line"
-                                    xxf:iterate="for $i in (1 to 3) return ."
+                                    iterate="for $i in (1 to 3) return ."
                                     origin="xxf:element('item')"/>
 
                             <!-- This should not do any insert as the iterate changes the context to a simple type -->
                             <xf:insert context="no-insert"
-                                    xxf:iterate="for $i in (1 to 3) return 42"
+                                    iterate="for $i in (1 to 3) return 42"
                                     origin="xxf:element('item')"/>
 
                         </xf:action>
@@ -94,7 +94,7 @@
         </output>
     </test>
     
-    <test description="xxf:iterate attribute on action and context() function" name="oxf:pipeline">
+    <test description="iterate attribute on action and context() function" name="oxf:pipeline">
         <input name="config">
             <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                 <p:param name="response" type="output"/>
@@ -128,7 +128,7 @@
                                     </xf:instance>
 
                                     <!-- Show how you can easily reformat data from one instance to the other -->
-                                    <xf:action ev:event="xforms-ready" xxf:iterate="instance('source-instance')/title">
+                                    <xf:action ev:event="xforms-ready" iterate="instance('source-instance')/title">
                                         <xf:insert context="instance('main-instance')" nodeset="book" origin="instance('template-instance')"/>
                                         <!-- Make things a bit trickier by changing the context -->
                                         <xf:action context="context()/following-sibling::author">
@@ -179,7 +179,7 @@
         </output>
     </test>
 
-    <test description="xxf:iterate and context() function on strings" name="oxf:pipeline">
+    <test description="iterate and context() function on strings" name="oxf:pipeline">
         <input name="config">
             <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                 <p:param name="response" type="output"/>
@@ -203,7 +203,7 @@
                                     <element name=""/>
                                 </xf:instance>
 
-                                <xf:action ev:event="xforms-ready" xxf:iterate="tokenize(substring-after(instance('url'), '?'), '&amp;')">
+                                <xf:action ev:event="xforms-ready" iterate="tokenize(substring-after(instance('url'), '?'), '&amp;')">
                                     <xf:insert context="instance('name')" origin="instance('element-template')" nodeset="element"/>
                                     <xf:setvalue ref="instance('name')/element[last()]/@name" value="substring-before(context(), '=')"/>
                                     <xf:setvalue ref="instance('name')/element[last()]" value="substring-after(context(), '=')"/>
@@ -404,6 +404,56 @@
                                     <value>1</value>
                                     <foo/>
                                     <value>2</value>
+                                </values>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="Backward-compatibility for xxforms:iterate and exforms:iterate" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="instance">
+                            <values>
+                                <iterate/>
+                                <xxforms-iterate/>
+                                <exforms-iterate/>
+                            </values>
+                        </xf:instance>
+
+                        <xf:action ev:event="xforms-model-construct-done" iterate="1 to 3">
+                            <xf:setvalue ref="instance()/iterate" value="concat(., ' ', context())"/>
+                        </xf:action>
+                        <xf:action ev:event="xforms-model-construct-done" xxf:iterate="1 to 3">
+                            <xf:setvalue ref="instance()/xxforms-iterate" value="concat(., ' ', context())"/>
+                        </xf:action>
+                        <xf:action ev:event="xforms-model-construct-done" exf:iterate="1 to 3" xmlns:exf="http://www.exforms.org/exf/1-0">
+                            <xf:setvalue ref="instance()/exforms-iterate" value="concat(., ' ', context())"/>
+                        </xf:action>
+
+                    </xf:model>
+                </xh:head>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response>
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <values>
+                                    <iterate>1 2 3</iterate>
+                                    <xxforms-iterate>1 2 3</xxforms-iterate>
+                                    <exforms-iterate>1 2 3</exforms-iterate>
                                 </values>
                             </instance>
                         </instances>

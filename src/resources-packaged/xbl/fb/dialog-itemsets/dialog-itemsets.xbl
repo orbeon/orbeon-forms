@@ -34,7 +34,7 @@
         <xbl:handlers>
             <!-- Handler to open dialog -->
             <xbl:handler event="fb-show-dialog" phase="target" defaultAction="cancel">
-                <xforms:setvalue xxforms:iterate="*[not(*)]" ref="."/>  <!-- Clear local values -->
+                <xforms:setvalue iterate="*[not(*)]" ref="."/>  <!-- Clear local values -->
                 <xforms:delete ref="items/item"/>                       <!-- Clear local items -->
                 <xforms:setvalue ref="@relevant" value="'true'"/>       <!-- Should be handled by XBL -->
                 <xforms:setvalue ref="control-name" value="controlOps:controlName(event('control-id'))"/>

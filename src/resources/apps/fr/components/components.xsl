@@ -232,8 +232,8 @@
             <xsl:variable name="section-ids-sequence" select="concat('(', string-join(for $s in $section-ids return concat('''', $s, ''''), ','), ')')" as="xs:string*"/>
 
             <!-- Collapse or expand all sections -->
-            <xforms:dispatch ev:event="fr-collapse-all" xxforms:iterate="{$section-ids-sequence}" name="fr-collapse" targetid="{{.}}"/>
-            <xforms:dispatch ev:event="fr-expand-all"   xxforms:iterate="{$section-ids-sequence}" name="fr-expand"   targetid="{{.}}"/>
+            <xforms:dispatch ev:event="fr-collapse-all" iterate="{$section-ids-sequence}" name="fr-collapse" targetid="{{.}}"/>
+            <xforms:dispatch ev:event="fr-expand-all"   iterate="{$section-ids-sequence}" name="fr-expand"   targetid="{{.}}"/>
         </xforms:model>
         <!-- This model handles global error summary information -->
         <xforms:model id="fr-error-summary-model">

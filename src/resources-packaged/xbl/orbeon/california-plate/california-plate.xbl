@@ -78,7 +78,7 @@
                             <!-- Convert to codepoints with a max length of 7 and pad with spaces -->
                             <xxforms:variable name="codepoints" select="subsequence(string-to-codepoints(concat($result, '       ')), 1, 7)" as="xs:integer*"/>
                             <!-- Set values for current elements -->
-                            <xforms:action xxforms:iterate="$codepoints">
+                            <xforms:action iterate="$codepoints">
                                 <xxforms:variable name="p" select="position()" as="xs:integer"/>
                                 <xxforms:variable name="c" select="." as="xs:integer"/>
                                 <xforms:setvalue ref="instance()/c[$p]" value="codepoints-to-string($c)"/>

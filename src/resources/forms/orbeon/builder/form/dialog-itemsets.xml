@@ -126,7 +126,7 @@
 
         <!-- Prepare insert template -->
         <xforms:delete context="instance('fb-item-template')" nodeset="*"/>
-        <xforms:action xxforms:iterate="$resources/resource">
+        <xforms:action iterate="$resources/resource">
             <xxforms:variable name="current-lang" select="@xml:lang"/>
             <xforms:insert context="instance('fb-item-template')" nodeset="label" origin="xxforms:element('label')"/>
             <xforms:insert context="instance('fb-item-template')/label[last()]" origin="$current-lang"/>
@@ -149,7 +149,7 @@
         <xforms:action if="event('fb:save')">
             <!-- Copy back the items to all languages -->
             <xxforms:variable name="resource-id" select="itemset-resource-id" as="xs:string"/>
-            <xforms:action xxforms:iterate="$resources/resource">
+            <xforms:action iterate="$resources/resource">
                 <xxforms:variable name="current-lang" select="@xml:lang" as="xs:string"/>
                 <xxforms:variable name="current-resource" select="*[name() = $resource-id][1]" as="element()"/>
 

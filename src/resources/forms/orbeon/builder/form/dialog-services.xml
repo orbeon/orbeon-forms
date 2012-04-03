@@ -191,7 +191,7 @@
                 <!-- Test submission -->
                 <xforms:action ev:event="DOMActivate">
                     <!-- Clear response -->
-                    <xforms:setvalue xxforms:iterate="$instance/response/*[not(*)]" ref="."/>
+                    <xforms:setvalue iterate="$instance/response/*[not(*)]" ref="."/>
                     <xforms:delete nodeset="$instance/response/headers/header"/>
 
                     <!-- Toggle back response submission -->
@@ -296,7 +296,7 @@
         <xxforms:variable name="submission-name" select="event('submission-name')"/>
 
         <!-- Clear instance entirely -->
-        <xforms:setvalue xxforms:iterate="$instance//*[not(*)]" ref="."/>
+        <xforms:setvalue iterate="$instance//*[not(*)]" ref="."/>
 
         <xforms:setvalue ref="$instance/request/is-soap">false</xforms:setvalue>
         <xforms:setvalue ref="$instance/request/is-auth">false</xforms:setvalue>

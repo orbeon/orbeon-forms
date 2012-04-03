@@ -78,7 +78,7 @@
                 <item label="New item" value="new-item"/>
             </xforms:instance>
             <xforms:action ev:event="xforms-model-construct-done">
-                <xforms:action xxforms:iterate="instance('encyclopedia-instance')//item">
+                <xforms:action iterate="instance('encyclopedia-instance')//item">
                     <!--  | instance('books-instance')//item -->
                     <xforms:insert context="." origin="xxforms:attribute('color', if (starts-with(context()/@value, 's')) then 'red' else 'green')"/>
                 </xforms:action>
@@ -109,7 +109,7 @@
             <xforms:trigger appearance="minimal">
                 <xforms:label>Put in red starting with C</xforms:label>
                 <xforms:action ev:event="DOMActivate">
-                    <xforms:action xxforms:iterate="instance('encyclopedia-instance')//item">
+                    <xforms:action iterate="instance('encyclopedia-instance')//item">
                         <!--  | instance('books-instance')//item -->
                         <xforms:insert context="." origin="xxforms:attribute('color', if (starts-with(context()/@value, 'c')) then 'red' else 'green')"/>
                     </xforms:action>

@@ -395,7 +395,7 @@ Inserting error information into error list:
                                 <xforms:delete nodeset="$affected-errors"/>
 
                                 <!-- Re-insert affected errors -->
-                                <xforms:action xxforms:iterate="$affected-errors">
+                                <xforms:action iterate="$affected-errors">
                                     <xxforms:variable name="error" select="." as="element(error)"/>
                                     <xxforms:variable name="current-indexes" select="tokenize($error/@indexes, '\s+')" as="xs:string*"/>
                                     <xxforms:variable name="from-position" select="$current-indexes[$prefix-size]" as="xs:string"/>

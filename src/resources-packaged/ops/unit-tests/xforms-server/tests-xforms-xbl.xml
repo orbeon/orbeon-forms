@@ -177,15 +177,15 @@
 
                                                 <!-- Initialize itemsets upon initialization -->
                                                 <xforms:action ev:event="xforms-model-construct-done">
-                                                    <xforms:action xxforms:iterate="(2007 to 2009)">
+                                                    <xforms:action iterate="(2007 to 2009)">
                                                         <xxforms:variable name="year" select="." as="xs:string"/>
                                                         <xforms:insert context="instance('years-itemset')" origin="xxforms:element('year', $year)"/>
                                                     </xforms:action>
-                                                    <xforms:action xxforms:iterate="(1 to 3)">
+                                                    <xforms:action iterate="(1 to 3)">
                                                         <xxforms:variable name="month" select="." as="xs:string"/>
                                                         <xforms:insert context="instance('months-itemset')" nodeset="*" origin="xxforms:element('month', $month)"/>
                                                     </xforms:action>
-                                                    <xforms:action xxforms:iterate="(1 to 3)">
+                                                    <xforms:action iterate="(1 to 3)">
                                                         <xxforms:variable name="day" select="." as="xs:string"/>
                                                         <xforms:insert context="instance('days-itemset')" nodeset="*" origin="xxforms:element('day', $day)"/>
                                                     </xforms:action>

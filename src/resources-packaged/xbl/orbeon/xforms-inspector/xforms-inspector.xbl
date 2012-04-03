@@ -32,7 +32,7 @@
                     <!-- Add newline if we already have content shown -->
                     <xforms:setvalue ref="$shown-output" value="concat(., if (. = '') then '' else '&#x0a;')"/>
 
-                    <xforms:action xxforms:iterate="event('fr-messages')">
+                    <xforms:action iterate="event('fr-messages')">
                         <xxforms:variable name="position" select="position()"/>
                         <xxforms:variable name="current" select="."/>
                         <xxforms:variable name="is-xml" select="$current instance of element()"/>
@@ -55,12 +55,12 @@
             <xforms:model id="inspector-model">
                 <xforms:action ev:event="xforms-enabled" ev:observer="inspector-group" ev:target="inspector-group">
                     <!-- Initialize itemset -->
-                    <xforms:action xxforms:iterate="xxforms:list-models()">
+                    <xforms:action iterate="xxforms:list-models()">
                         <xxforms:variable name="current-model-id" select="." as="xs:string"/>
                         <xforms:action context="instance('inspector-itemset')">
                             <xforms:insert context="." nodeset="model" origin="xxforms:element('model', xxforms:attribute('id', $current-model-id))"/>
                         </xforms:action>
-                        <xforms:action xxforms:iterate="xxforms:list-instances($current-model-id)">
+                        <xforms:action iterate="xxforms:list-instances($current-model-id)">
                             <xxforms:variable name="current-instance-id" select="." as="xs:string"/>
                             <xforms:action context="instance('inspector-itemset')/model[last()]">
                                 <xforms:insert context="." nodeset="instance" origin="xxforms:element('instance', xxforms:attribute('id', $current-instance-id))"/>

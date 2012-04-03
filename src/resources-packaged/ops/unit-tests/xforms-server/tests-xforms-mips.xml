@@ -251,7 +251,7 @@
 
                         <!-- Result for "a" might change in the future if instead the xs:boolean() logic is used -->
 
-                        <xforms:action ev:event="xforms-ready" xxforms:iterate="*">
+                        <xforms:action ev:event="xforms-ready" iterate="*">
                             <xxforms:variable name="current" select="."/>
                             <xforms:insert context="instance('result')" nodeset="*" origin="xxforms:element(name($current), xxforms:valid($current))"/>
                         </xforms:action>
@@ -343,7 +343,7 @@
                                         <result/>
                                     </xforms:instance>
 
-                                    <xforms:action ev:event="xforms-ready" xxforms:iterate="*/*">
+                                    <xforms:action ev:event="xforms-ready" iterate="*/*">
                                         <xxforms:variable name="current" select="."/>
                                         <xforms:insert context="instance('result')" nodeset="*" origin="xxforms:element(name($current), xxforms:valid($current))"/>
                                     </xforms:action>
@@ -679,7 +679,7 @@
 
                                     <xforms:action ev:event="xforms-ready">
 
-                                        <xforms:action xxforms:iterate="*">
+                                        <xforms:action iterate="*">
                                             <xforms:setvalue ref="@nodetype" value="xxforms:type(context())"/>
                                         </xforms:action>
 

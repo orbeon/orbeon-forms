@@ -90,15 +90,15 @@
 
                 <!-- Initialize itemsets upon initialization -->
                 <xf:action ev:event="xforms-model-construct-done">
-                    <xf:action xxf:iterate="(1970 to year-from-date(current-date()))">
+                    <xf:action iterate="(1970 to year-from-date(current-date()))">
                         <xxf:variable name="year" select="." as="xs:string"/>
                         <xf:insert context="instance('years-itemset')" origin="xxf:element('year', $year)"/>
                     </xf:action>
-                    <xf:action xxf:iterate="(1 to 12)">
+                    <xf:action iterate="(1 to 12)">
                         <xxf:variable name="month" select="." as="xs:string"/>
                         <xf:insert context="instance('months-itemset')" nodeset="*" origin="xxf:element('month', $month)"/>
                     </xf:action>
-                    <xf:action xxf:iterate="(1 to 31)">
+                    <xf:action iterate="(1 to 31)">
                         <xxf:variable name="day" select="." as="xs:string"/>
                         <xf:insert context="instance('days-itemset')" nodeset="*" origin="xxf:element('day', $day)"/>
                     </xf:action>
@@ -132,7 +132,7 @@
                                 <xf:setvalue ref="instance('date-instance')/day"/>
                             </xf:action>
                             <xf:action if="not($binding castable as xs:date) and count(tokenize($binding, '-')) ge 3">
-                                <xf:action xxf:iterate="tokenize($binding, '-')">
+                                <xf:action iterate="tokenize($binding, '-')">
                                     <xxf:variable name="position" select="position()" as="xs:integer"/>
                                     <xf:setvalue ref="instance('date-instance')/*[$position]"
                                                      value="if (context() castable as xs:integer) then xs:integer(context()) else ''"/>

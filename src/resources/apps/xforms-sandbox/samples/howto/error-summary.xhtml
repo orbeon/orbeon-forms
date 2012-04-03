@@ -31,7 +31,7 @@
                     <type>Mobile</type>
                 </phone>
             </xforms:instance>
-            <xforms:action ev:event="xforms-model-construct-done" xxforms:iterate="for $i in (1 to 3) return .">
+            <xforms:action ev:event="xforms-model-construct-done" iterate="for $i in (1 to 3) return .">
                 <xforms:insert context="instance('user-info')" nodeset="phone" origin="instance('phone-template')"/>
             </xforms:action>
 

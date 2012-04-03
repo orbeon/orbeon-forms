@@ -1298,7 +1298,7 @@
                                         <!-- Save current index -->
                                         <xxforms:variable name="initial-index" select="index('my-repeat')"/>
                                         <!-- Iterate through all values -->
-                                        <xforms:action xxforms:iterate="value">
+                                        <xforms:action iterate="value">
                                             <!-- Set index and dispatch event -->
                                             <xforms:setindex repeat="my-repeat" index="count(preceding-sibling::*) + 1"/>
                                             <xforms:dispatch name="my-event" targetid="my-input"/>

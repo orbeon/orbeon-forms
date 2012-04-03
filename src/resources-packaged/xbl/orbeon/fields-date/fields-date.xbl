@@ -115,7 +115,7 @@
                                 <xf:setvalue ref="instance('date-instance')/day"/>
                             </xf:action>
                             <xf:action if="not($binding castable as xs:date) and count(tokenize($binding, '-')) ge 3">
-                                <xf:action xxf:iterate="tokenize($binding, '-')">
+                                <xf:action iterate="tokenize($binding, '-')">
                                     <xxf:variable name="position" select="position()" as="xs:integer"/>
                                     <xf:setvalue ref="instance('date-instance')/*[$position]"
                                                      value="if (context() castable as xs:integer) then xs:integer(context()) else ''"/>

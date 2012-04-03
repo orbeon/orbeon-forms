@@ -383,7 +383,7 @@
 
                                                 <!-- Delete holder elements and resources for controls in section -->
                                                 <xxforms:variable name="control-names" select="*/*:tr/*:td/*/@id/substring-before(., '-control')" as="xs:string*"/>
-                                                <xforms:action xxforms:iterate="$control-names">
+                                                <xforms:action iterate="$control-names">
                                                     <xforms:delete nodeset="$form-instance/*[name() = $section-name]/*[name() = context()]"/>
                                                     <xforms:delete nodeset="$resources/resource/*[name() = context()]"/>
                                                 </xforms:action>
@@ -542,7 +542,7 @@
                                                                                 <xforms:action ev:event="fb-confirmation-yes">
                                                                                     <!-- Context is on current grid -->
 
-                                                                                    <xforms:action xxforms:iterate="$grid/*:tr/*:td">
+                                                                                    <xforms:action iterate="$grid/*:tr/*:td">
                                                                                         <!-- Delete cell content -->
                                                                                         <xforms:action type="xpath" xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps">
                                                                                             controlOps:deleteCellContent(.)
@@ -577,7 +577,7 @@
                                                                                                                                   return $r/c[$column-number][. != 'x']
                                                                                                                         return $grid/*:tr[count($c/../preceding-sibling::r) + 1]/*:td[count($c/preceding-sibling::c[. != 'x']) + 1]"/>
 
-                                                                                            <xforms:action xxforms:iterate="$insert-tds">
+                                                                                            <xforms:action iterate="$insert-tds">
                                                                                                 <!-- TODO: should insert fr:td instead? -->
                                                                                                 <xforms:insert nodeset="." origin="xxforms:element('xhtml:td', context()/@rowspan)" position="before"/>
                                                                                             </xforms:action>
@@ -603,7 +603,7 @@
                                                                                                                                   return $r/c[$column-number][. != 'x']
                                                                                                                         return $grid/*:tr[count($c/../preceding-sibling::r) + 1]/*:td[count($c/preceding-sibling::c[. != 'x']) + 1]"/>
 
-                                                                                            <xforms:action xxforms:iterate="$insert-tds">
+                                                                                            <xforms:action iterate="$insert-tds">
                                                                                                 <!-- TODO: should insert fr:td instead? -->
                                                                                                 <xforms:insert nodeset="." origin="xxforms:element('xhtml:td', context()/@rowspan)" position="after"/>
                                                                                             </xforms:action>
@@ -650,7 +650,7 @@
                                                                                                                     return $grid/*:tr[count($c/../preceding-sibling::r) + 1]/*:td[count($c/preceding-sibling::c[. != 'x']) + 1]"/>
 
                                                                                         <!-- Iterate over rows and in each delete the appropriate column -->
-                                                                                        <xforms:action xxforms:iterate="$delete-tds">
+                                                                                        <xforms:action iterate="$delete-tds">
                                                                                             <!-- Delete control -->
                                                                                             <xforms:action type="xpath" xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps">
                                                                                                 controlOps:deleteCellContent(.)
@@ -684,7 +684,7 @@
                                                                                                     </xforms:dispatch>
 
                                                                                                     <!-- Adjust rowspans -->
-                                                                                                    <xforms:action xxforms:iterate="instance('fb-span-grid-instance')/r[$tr-position]/c[. = 'x']">
+                                                                                                    <xforms:action iterate="instance('fb-span-grid-instance')/r[$tr-position]/c[. = 'x']">
                                                                                                         <!-- This current cell in the row to delete is impacted by a rowspan -->
                                                                                                         <xxforms:variable name="x" select="count(preceding-sibling::c) + 1"/>
 
@@ -741,7 +741,7 @@
                                                                                             </xforms:dispatch>
 
                                                                                             <!-- Adjust rowspans -->
-                                                                                            <xforms:action xxforms:iterate="instance('fb-span-grid-instance')/r[$tr-position]/c[. = 'x']">
+                                                                                            <xforms:action iterate="instance('fb-span-grid-instance')/r[$tr-position]/c[. = 'x']">
                                                                                                 <!-- This current cell in the row to delete is impacted by a rowspan -->
                                                                                                 <xxforms:variable name="x" select="count(preceding-sibling::c) + 1"/>
 
@@ -757,7 +757,7 @@
                                                                                             </xforms:action>
 
                                                                                             <!-- Delete holder elements and resources -->
-                                                                                            <xforms:action xxforms:iterate="$tr/*:td">
+                                                                                            <xforms:action iterate="$tr/*:td">
                                                                                                 <!-- Delete control -->
                                                                                                 <xforms:action type="xpath" xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps">
                                                                                                     controlOps:deleteCellContent(.)
@@ -780,7 +780,7 @@
                                                                                                 </xforms:dispatch>
 
                                                                                                 <!-- Adjust rowspans -->
-                                                                                                <xforms:action xxforms:iterate="instance('fb-span-grid-instance')/r[$tr-position + 1]/c[. = 'x']">
+                                                                                                <xforms:action iterate="instance('fb-span-grid-instance')/r[$tr-position + 1]/c[. = 'x']">
                                                                                                     <!-- This current cell in the row to delete is impacted by a rowspan -->
                                                                                                     <xxforms:variable name="x" select="count(preceding-sibling::c) + 1"/>
 

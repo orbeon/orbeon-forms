@@ -75,7 +75,7 @@
             </xforms:instance>
 
             <!-- Clear before submitting -->
-            <xforms:setvalue ev:event="xforms-submit" xxforms:iterate="instance('instance-response')/*" ref="."/>
+            <xforms:setvalue ev:event="xforms-submit" iterate="instance('instance-response')/*" ref="."/>
 
             <!-- Fill-out response info -->
             <xforms:action ev:event="xforms-submit-done xforms-submit-error" context="instance('instance-response')">
@@ -172,7 +172,7 @@
             <xforms:label>Test order of responses</xforms:label>
             <xforms:action ev:event="DOMActivate">
                 <!-- Clear values -->
-                <xforms:setvalue xxforms:iterate="instance('instance-delays')/*" ref="."/>
+                <xforms:setvalue iterate="instance('instance-delays')/*" ref="."/>
                 <!-- Send submission in reverse order of expected responses -->
                 <xforms:send submission="replace-delay">
                     <xxforms:context name="my-delay" select="5"/>

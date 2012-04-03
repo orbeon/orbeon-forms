@@ -82,7 +82,7 @@
                             <!-- Any button click closes the dialog and clears the local data -->
                             <xforms:action ev:event="DOMActivate">
                                 <xxforms:hide dialog="dialog"/>
-                                <xforms:setvalue xxforms:iterate="*" ref="."/>
+                                <xforms:setvalue iterate="*" ref="."/>
                             </xforms:action>
 
                             <xhtml:div class="xbl-fr-alert-dialog-message">

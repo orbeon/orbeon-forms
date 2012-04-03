@@ -38,7 +38,7 @@
             <xforms:submission id="get-forms" method="get" resource="/fr/service/persistence/form" replace="instance" instance="fr-forms"/>
             <xforms:action ev:event="xforms-model-construct-done">
                 <xforms:send submission="get-forms"/>
-                <xforms:action xxforms:iterate="instance('fr-forms')/form">
+                <xforms:action iterate="instance('fr-forms')/form">
                     <xforms:insert context="." origin="xxforms:attribute('operations', string-join(form-runner:authorizedOperationsOnForm(.), ' '))"/>
                 </xforms:action>
             </xforms:action>

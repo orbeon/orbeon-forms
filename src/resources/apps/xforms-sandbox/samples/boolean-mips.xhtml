@@ -55,7 +55,7 @@
                 <result/>
             </xforms:instance>
 
-            <xforms:action ev:event="xforms-ready" xxforms:iterate="*">
+            <xforms:action ev:event="xforms-ready" iterate="*">
                 <xxforms:variable name="current" select="."/>
                 <xforms:insert context="instance('result')" nodeset="*" origin="xxforms:element(name($current), xxforms:valid($current))"/>
             </xforms:action>

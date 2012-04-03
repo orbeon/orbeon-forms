@@ -261,7 +261,7 @@
         <xxforms:variable name="current-bind" select="$model//xforms:bind[@id = $current-bind-id]"/>
 
         <!-- Clear all local values as below setvalues won't clear all values if the  @value attribute returns () -->
-        <xforms:setvalue xxforms:iterate="$instance/*[not(*)]" ref="."/>
+        <xforms:setvalue iterate="$instance/*[not(*)]" ref="."/>
 
         <!-- Copy alert -->
         <xforms:setvalue ref="$instance/alert" value="$current-control-resource/alert"/>

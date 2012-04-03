@@ -53,7 +53,7 @@
 
             <xforms:bind nodeset="line/text" readonly="@readonly = 'true'" relevant="@relevant = 'true'"/>
 
-            <xforms:action ev:event="xforms-model-construct-done" xxforms:iterate="text">
+            <xforms:action ev:event="xforms-model-construct-done" iterate="text">
                 <xforms:setvalue ref="." value="normalize-space(.)"/>
             </xforms:action>
         </xforms:model>

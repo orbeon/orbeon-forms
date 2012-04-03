@@ -39,7 +39,7 @@
                     <!-- Insert external validation results when done -->
                     <xforms:insert nodeset="." origin="instance('validation-result')/v:data/*"/>
                     <!-- Add note that certain errors are revalidated until upon revalidation -->
-                    <xforms:setvalue xxforms:iterate="//@v:alert" ref="." value="concat(., ' (save again to revalidate)')"/>
+                    <xforms:setvalue iterate="//@v:alert" ref="." value="concat(., ' (save again to revalidate)')"/>
                     <!-- Show all errors on form -->
                     <xforms:dispatch name="fr-visit-all" targetid="error-summary-incremental"/>
                     <xforms:dispatch name="fr-visit-all" targetid="error-summary"/>

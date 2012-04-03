@@ -69,7 +69,7 @@
                     </xf:action>
 
                     <!-- Iterate over all rows -->
-                    <xf:action xxf:iterate="instance()/row[position() gt 1]">
+                    <xf:action iterate="instance()/row[position() gt 1]">
                         <xxf:var name="p" value="position()"/>
 
                         <!-- Check at each iteration whether to stop -->
@@ -82,7 +82,7 @@
                                 <xf:insert context="$new" origin="instance('fr-empty-data')"/>
 
                                 <!-- Fill data -->
-                                <xf:action xxf:iterate="c">
+                                <xf:action iterate="c">
                                     <xxf:var name="p" value="position()"/>
                                     <xxf:var name="v" value="xs:string(.)"/>
                                     <xxf:var name="raw-header" value="normalize-space($headers[$p])"/>

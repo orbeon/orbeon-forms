@@ -72,7 +72,7 @@
                 </ui>
             </xforms:instance>
             <xforms:bind nodeset="instance('ui')/edited-planet/planet/description" required="true()"/>
-            <xforms:action ev:event="xforms-model-construct-done" xxforms:iterate="instance('planets')/planet/description">
+            <xforms:action ev:event="xforms-model-construct-done" iterate="instance('planets')/planet/description">
                 <xforms:setvalue ref="." value="normalize-space(.)"/>
             </xforms:action>
         </xforms:model>

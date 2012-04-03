@@ -35,7 +35,7 @@
         <xbl:handlers>
             <!-- Handler to open dialog -->
             <xbl:handler event="fb-show-dialog" phase="target" defaultAction="cancel">
-                <xf:setvalue xxf:iterate="*[not(*)]" ref="."/> <!-- Clear all local values -->
+                <xf:setvalue iterate="*[not(*)]" ref="."/> <!-- Clear all local values -->
                 <xf:setvalue ref="@relevant" value="'true'"/>
 
                 <xf:setvalue ref="original-section-name" value="containerOps:getContainerNameOrEmpty(event('section'))"/>

@@ -32,7 +32,7 @@
         <xbl:handlers>
             <!-- Handler to open dialog -->
             <xbl:handler event="fb-show-dialog" phase="target" defaultAction="cancel">
-                <xf:setvalue xxf:iterate="*[not(*)]" ref="."/> <!-- Clear all local values -->
+                <xf:setvalue iterate="*[not(*)]" ref="."/> <!-- Clear all local values -->
                 <xf:setvalue ref="@relevant" value="'true'"/>
 
                 <xf:setvalue ref="control-id" value="event('control-id')"/>

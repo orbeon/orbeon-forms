@@ -555,7 +555,7 @@ public class XFormsContextStack {
     }
 
     /**
-     * Push an iteration of the current node-set. Used for example by xforms:repeat, xforms:bind, xxforms:iterate.
+     * Push an iteration of the current node-set. Used for example by xforms:repeat, xforms:bind, iterate.
      *
      * @param currentPosition   1-based iteration index
      */

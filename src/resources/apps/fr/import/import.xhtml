@@ -83,8 +83,8 @@
                            action="/fr/service/{$app}/{$form}/validate" replace="instance" instance="fr-validation-result">
                 <!-- Reset stats -->
                 <xf:action ev:event="xforms-submit" context="instance('fr-batch-stats')">
-                    <xf:setvalue xxf:iterate="total, processed, succeeded" ref="." value="0"/>
-                    <xf:setvalue xxf:iterate="progress, start-time, eta" ref="."/>
+                    <xf:setvalue iterate="total, processed, succeeded" ref="." value="0"/>
+                    <xf:setvalue iterate="progress, start-time, eta" ref="."/>
                 </xf:action>
 
                 <!-- Flag indicating we are validating -->
@@ -100,8 +100,8 @@
                            action="/fr/service/{$app}/{$form}/import" replace="instance" instance="fr-import-result">
                 <!-- Reset stats -->
                 <xf:action ev:event="xforms-submit" context="instance('fr-batch-stats')">
-                    <xf:setvalue xxf:iterate="total, processed, succeeded" ref="." value="0"/>
-                    <xf:setvalue xxf:iterate="progress, start-time, eta" ref="."/>
+                    <xf:setvalue iterate="total, processed, succeeded" ref="." value="0"/>
+                    <xf:setvalue iterate="progress, start-time, eta" ref="."/>
                 </xf:action>
 
                 <!-- Import start/end flag -->
@@ -346,8 +346,8 @@
                                             <xf:action ev:event="DOMActivate">
                                                 <!-- Clear stats -->
                                                 <xf:action context="instance('fr-batch-stats')">
-                                                    <xf:setvalue xxf:iterate="total, processed, succeeded" ref="." value="0"/>
-                                                    <xf:setvalue xxf:iterate="progress, start-time, eta" ref="."/>
+                                                    <xf:setvalue iterate="total, processed, succeeded" ref="." value="0"/>
+                                                    <xf:setvalue iterate="progress, start-time, eta" ref="."/>
                                                 </xf:action>
                                                 <!-- Reload page (xf:reset would help instead!) -->
                                                 <xf:load resource="import"/>
@@ -479,8 +479,8 @@
                                                 <xf:action ev:event="DOMActivate">
                                                     <!-- Clear stats -->
                                                     <xf:action context="instance('fr-batch-stats')">
-                                                        <xf:setvalue xxf:iterate="total, processed, succeeded" ref="." value="0"/>
-                                                        <xf:setvalue xxf:iterate="progress, start-time, eta" ref="."/>
+                                                        <xf:setvalue iterate="total, processed, succeeded" ref="." value="0"/>
+                                                        <xf:setvalue iterate="progress, start-time, eta" ref="."/>
                                                     </xf:action>
                                                     <!-- Reload page (xf:reset would help instead!) -->
                                                     <xf:load resource="import"/>

@@ -31,6 +31,7 @@ import java.util.*;
 public class SimpleExternalContext implements ExternalContext {
 
     private static final Logger logger = LoggerFactory.createLogger(SimpleExternalContext.class);
+    protected Map<String, Object> applicationAttributesMap = new HashMap<String, Object>();
 
     protected class Request implements ExternalContext.Request {
 
@@ -392,7 +393,7 @@ public class SimpleExternalContext implements ExternalContext {
     }
 
     public Map<String, Object> getAttributesMap() {
-        return Collections.emptyMap();
+        return applicationAttributesMap;
     }
 
     public Map<String, String> getInitAttributesMap() {

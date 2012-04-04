@@ -311,7 +311,7 @@ button.xforms-trigger, input.xforms-trigger, .xforms-trigger button, .xforms-tri
     /* Padding is designed to make the <a> box around the section open/close images a square */
     padding: 0 7px 0 7px;
 }
-/*.fr-section-container .fr-section-open-close:hover { background-color: #FFFFDD; border: 1px solid #FFFF88 }*/
+
 .fr-section-container .fr-section-content {
     display: block;
     margin-left: 22px;

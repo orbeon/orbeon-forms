@@ -422,7 +422,7 @@ public class TestExternalContext implements ExternalContext  {
         public void sendRedirect(String pathInfo, Map parameters, boolean isServerSide, boolean isExitPortal) throws IOException {
         }
 
-        public void setCaching(long lastModified, boolean revalidate, boolean allowOverride) {
+        public void setPageCaching(long lastModified) {
         }
 
         public void setResourceCaching(long lastModified, long expires) {

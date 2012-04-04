@@ -451,7 +451,7 @@ public class Portlet2ExternalContext extends PortletWebAppExternalContext implem
             throw new OXFException("Error while processing request: " + code);
         }
 
-        public void setCaching(long lastModified, boolean revalidate, boolean allowOverride) {
+        public void setPageCaching(long lastModified) {
             // NIY / FIXME
         }
 

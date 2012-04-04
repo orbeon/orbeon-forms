@@ -95,7 +95,7 @@ public abstract class HttpSerializerBase extends CachedSerializer {
                     final long lastModified = findInputLastModified(pipelineContext, dataInput, false);
 
                     // Set caching headers and force revalidation
-                    response.setCaching(lastModified, true, true);
+                    response.setPageCaching(lastModified);
 
                     // Check if we are processing a forward. If so, we cannot tell the client that the content has not been modified.
                     final boolean isForward = URLRewriterUtils.isForwarded(externalContext.getRequest());

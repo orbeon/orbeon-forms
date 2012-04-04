@@ -44,7 +44,6 @@ public class ProcessorService {
 
     // Other properties
     public static final String HTTP_FORCE_LAST_MODIFIED_PROPERTY = "oxf.http.force-last-modified";
-    public static final String HTTP_FORCE_MUST_REVALIDATE_PROPERTY = "oxf.http.force-must-revalidate";
 
     public static final String HTTP_ACCEPT_METHODS_PROPERTY = "oxf.http.accept-methods";
 

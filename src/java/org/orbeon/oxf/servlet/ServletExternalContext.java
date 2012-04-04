@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.servlet;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.externalcontext.*;
@@ -41,8 +42,13 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
     public static Logger logger = LoggerFactory.createLogger(ServletExternalContext.class);
 
     public static final String DEFAULT_HEADER_ENCODING = "utf-8";
-    public static final String DEFAULT_FORM_CHARSET_DEFAULT = "utf-8";
+    public static final String DEFAULT_FORM_CHARSET_DEFAULT  = "utf-8";
     public static final String DEFAULT_FORM_CHARSET_PROPERTY = "oxf.servlet.default-form-charset";
+
+    public static final String HTTP_PAGE_CACHE_HEADERS_DEFAULT      = "Cache-Control: private, max-age=0; Pragma:";
+    public static final String HTTP_PAGE_CACHE_HEADERS_PROPERTY     = "oxf.http.page.cache-headers";
+    public static final String HTTP_RESOURCE_CACHE_HEADERS_DEFAULT  = "Cache-Control: public; Pragma:";
+    public static final String HTTP_RESOURCE_CACHE_HEADERS_PROPERTY = "oxf.http.resource.cache-headers";
 
     public static final String SESSION_LISTENERS = "oxf.servlet.session-listeners";
     public static final String APPLICATION_LISTENERS = "oxf.servlet.application-listeners";
@@ -61,11 +67,46 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
     }
 
     private static String defaultFormCharset;
+    private static Map<String, String> pageCacheHeaders;
+    private static Map<String, String> resourceCacheHeaders;
+
     public static String getDefaultFormCharset() {
-        if (defaultFormCharset == null) {
+        if (defaultFormCharset == null)
             defaultFormCharset = Properties.instance().getPropertySet().getString(DEFAULT_FORM_CHARSET_PROPERTY, DEFAULT_FORM_CHARSET_DEFAULT);
-        }
         return defaultFormCharset;
+    }
+
+    private static Map<String, String> decodeCacheString(String name, String defaultValue) {
+
+        final Map<String, String> result = new LinkedHashMap<String, String>();
+
+        final String value = Properties.instance().getPropertySet().getString(name, defaultValue);
+
+        for (final String header : StringUtils.split(value, ';')) {
+            final String[] parts = StringUtils.split(header, ':');
+            if (parts.length == 2) {
+                result.put(parts[0].trim(), parts[1].trim());
+            }
+        }
+
+        return result;
+    }
+
+    private static void setResponseHeaders(HttpServletResponse nativeResponse, Map<String, String> headers) {
+        for (final Map.Entry<String, String> entry : headers.entrySet())
+            nativeResponse.setHeader(entry.getKey(), entry.getValue());
+    }
+
+    private static Map<String, String> getPageCacheHeaders() {
+        if (pageCacheHeaders == null)
+            pageCacheHeaders = decodeCacheString(HTTP_PAGE_CACHE_HEADERS_PROPERTY, HTTP_PAGE_CACHE_HEADERS_DEFAULT);
+        return pageCacheHeaders;
+    }
+
+    private static Map<String, String> getResourceCacheHeaders() {
+        if (resourceCacheHeaders == null)
+            resourceCacheHeaders = decodeCacheString(HTTP_RESOURCE_CACHE_HEADERS_PROPERTY, HTTP_RESOURCE_CACHE_HEADERS_DEFAULT);
+        return resourceCacheHeaders;
     }
 
     private class Request implements ExternalContext.Request {
@@ -439,26 +480,19 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
             return nativeResponse.getCharacterEncoding();
         }
 
-        public void setCaching(long lastModified, boolean revalidate, boolean allowOverride) {
-
-            // NOTE: Only revalidate = true and allowOverride = true OR revalidate = false and allowOverride = false
-            // are supported. Make sure this code is checked before allowing other configurations.
-            if (revalidate != allowOverride)
-                throw new OXFException("Unsupported flags: revalidate = " + revalidate + ", allowOverride = " + allowOverride);
+        public void setPageCaching(long lastModified) {
 
             // Check a special mode to make all pages appear static, unless the user is logged in (HACK)
-            if (allowOverride) {
-                Date forceLastModified = Properties.instance().getPropertySet().getDateTime(ProcessorService.HTTP_FORCE_LAST_MODIFIED_PROPERTY);
+            {
+                final Date forceLastModified = Properties.instance().getPropertySet().getDateTime(ProcessorService.HTTP_FORCE_LAST_MODIFIED_PROPERTY);
                 if (forceLastModified != null) {
                     // The properties tell that we should override
                     if (request.getRemoteUser() == null) {
                         // If the user is not logged in, just used the specified properties
                         lastModified = forceLastModified.getTime();
-                        revalidate = Properties.instance().getPropertySet().getBoolean(ProcessorService.HTTP_FORCE_MUST_REVALIDATE_PROPERTY, false);
                     } else {
                         // If the user is logged in, make sure the correct lastModified is used
                         lastModified = 0;
-                        revalidate = true;
                     }
                 }
             }
@@ -470,36 +504,9 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
             // Set last-modified
             nativeResponse.setDateHeader("Last-Modified", lastModified);
 
-            if (revalidate) {
-                // Make sure the client does not load from cache
-                nativeResponse.setDateHeader("Expires", now);
-
-                // Here we used to set Cache-Control to public, however this caused a rare and hard to reproduce issue
-                // where IE 7 (and maybe other versions of IE, but not Firefox), over-aggressively cached pages
-                // generated by Orbeon Forms. As a result, user A could log a page, logout from the application; later,
-                // user B logs into the application with the same browser, navigates to the page, and gets the version
-                // generated earlier for user A, which was cached by the browser (no request being set by IE to the
-                // server).
-                //
-                // Setting Cache-Control to no-cache solves the problem, but in that case IE doesn't reset the value
-                // of form fields when navigating back to a page, which breaks the mechanism we have to restore the form
-                // upon hitting back in the browser. Setting Cache-Control to private, max-age=0 solves the caching
-                // issue and doesn't prevent IE from restoring form fields upon hitting back. This is also what Google
-                // does on their home page (as of 2010-12-02).
-                nativeResponse.setHeader("Cache-Control", "private, max-age=0");
-
-            } else {
-                // Regular expiration strategy. We use the HTTP spec heuristic to calculate the "Expires" header value
-                // (10% of the difference between the current time and the last modified time)
-                nativeResponse.setDateHeader("Expires", now + (now - lastModified) / 10);
-                nativeResponse.setHeader("Cache-Control", "public");
-            }
-
-            /*
-             * HACK: Tomcat adds "Pragma", "Expires" and "Cache-Control" headers when resources are constrained,
-             * disabling caching if they are not set. We must re-set them to allow caching.
-             */
-            nativeResponse.setHeader("Pragma", "");
+            // Make sure the client does not load from cache without revalidation
+            nativeResponse.setDateHeader("Expires", now);
+            setResponseHeaders(nativeResponse, getPageCacheHeaders());
         }
 
         public void setResourceCaching(long lastModified, long expires) {
@@ -519,13 +526,7 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
             nativeResponse.setDateHeader("Last-Modified", lastModified);
             nativeResponse.setDateHeader("Expires", expires);
 
-            nativeResponse.setHeader("Cache-Control", "public");
-
-            /*
-             * HACK: Tomcat adds "Pragma", "Expires" and "Cache-Control" headers when resources are constrained,
-             * disabling caching if they are not set. We must re-set them to allow caching.
-             */
-            nativeResponse.setHeader("Pragma", "");
+            setResponseHeaders(nativeResponse, getResourceCacheHeaders());
         }
 
         public boolean checkIfModifiedSince(long lastModified, boolean allowOverride) {

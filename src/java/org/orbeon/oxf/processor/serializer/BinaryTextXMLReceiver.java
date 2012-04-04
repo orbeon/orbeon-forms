@@ -141,7 +141,7 @@ public class BinaryTextXMLReceiver extends XMLReceiverAdapter {
             if (StringUtils.isNotBlank(validityAttribute)) {
                 // Override caching settings which may have taken place before
                 if (response != null)
-                    response.setCaching(ISODateUtils.parseRFC1123Date(validityAttribute), true, true);
+                    response.setPageCaching(ISODateUtils.parseRFC1123Date(validityAttribute));
             }
 
             // Set filename if available

@@ -112,7 +112,7 @@ public interface ExternalContext extends WebAppExternalContext {
 
         void sendRedirect(String pathInfo, Map<String, String[]> parameters, boolean isServerSide, boolean isExitPortal) throws IOException;
 
-        void setCaching(long lastModified, boolean revalidate, boolean allowOverride);
+        void setPageCaching(long lastModified);
 
         /**
          * Set expiration headers for resources.

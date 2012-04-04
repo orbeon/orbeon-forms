@@ -212,7 +212,7 @@ public class ImageServer extends ProcessorImpl {
                 boolean updateCache = useCache && cacheInvalid;
 
                 // Set Last-Modified, required for caching and conditional get
-                imageResponse.setCaching(lastModified, false, false);
+                imageResponse.setResourceCaching(lastModified, 0);
 
                 // Check If-Modified-Since and don't return content if condition is met
                 if ((imageConfig.transformCount == 0 || !mustProcess) && !imageResponse.checkIfModifiedSince(lastModified, false)) {
@@ -331,8 +331,8 @@ public class ImageServer extends ProcessorImpl {
                 response.setStatus(status);
             }
 
-            public void setCaching(long lastModified, boolean revalidate, boolean allowOverride) {
-                response.setCaching(lastModified, revalidate, allowOverride);
+            public void setResourceCaching(long lastModified, long expires) {
+                response.setResourceCaching(lastModified, expires);
             }
 
             public OutputStream getOutputStream() throws IOException {
@@ -373,7 +373,7 @@ public class ImageServer extends ProcessorImpl {
                         return contentHandlerOutputStream;
                     }
 
-                    public void setCaching(long lastModified, boolean revalidate, boolean allowOverride) {
+                    public void setResourceCaching(long lastModified, long expires) {
                         // NOP
                     }
 
@@ -455,7 +455,7 @@ public class ImageServer extends ProcessorImpl {
 
     private static interface ImageResponse {
         public void setStatus(int status);
-        public void setCaching(long lastModified, boolean revalidate, boolean allowOverride);
+        public void setResourceCaching(long lastModified, long expires);
         public boolean checkIfModifiedSince(long lastModified, boolean allowOverride);
         public void setContentType(String contentType);
         public OutputStream getOutputStream() throws IOException;

@@ -80,7 +80,7 @@ public class XFormsResourceServer extends ProcessorImpl {
                     // This is some work though. Might have to proxy conditional GET as well. So for now we don't
                     // handle conditional GET and produce a non-now last modified only in a few cases.
                     
-                    response.setCaching(resource.lastModified, false, false);
+                    response.setResourceCaching(resource.lastModified, 0);
 
                     if (resource.size > 0)
                         response.setContentLength((int) resource.size);// NOTE: Why does this API (and Servlet counterpart) take an int?

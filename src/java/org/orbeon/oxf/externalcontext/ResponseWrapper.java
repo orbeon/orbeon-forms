@@ -83,8 +83,8 @@ public class ResponseWrapper implements ExternalContext.Response {
         _response.sendRedirect(pathInfo, parameters, isServerSide, isExitPortal);
     }
 
-    public void setCaching(long lastModified, boolean revalidate, boolean allowOverride) {
-        _response.setCaching(lastModified, revalidate, allowOverride);
+    public void setPageCaching(long lastModified) {
+        _response.setPageCaching(lastModified);
     }
 
     public void setResourceCaching(long lastModified, long expires) {

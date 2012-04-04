@@ -251,7 +251,7 @@ public class SimpleExternalContext implements ExternalContext {
             return "utf-8";
         }
 
-        public void setCaching(long lastModified, boolean revalidate, boolean allowOverride) {
+        public void setPageCaching(long lastModified) {
         }
 
         public void setResourceCaching(long lastModified, long expires) {

@@ -217,6 +217,6 @@ object Multipart {
     // Implicit conversion from FileItemIterator → Iterator
     private implicit def asScalaIterator(i : FileItemIterator): Iterator[FileItemStream] = new Iterator[FileItemStream] {
         def hasNext = i.hasNext
-        def next = i.next
+        def next() = i.next()
     }
 }

@@ -192,7 +192,6 @@ h1 .xforms-trigger-appearance-xxforms-minimal input, h2 .xforms-trigger-appearan
     padding: .5em;
 }
 .fr-separator {
-    /*background-color: #004B92;*/
     background-color: #004B92;
 }
 .fr-top .fr-form-title, .fr-top .fr-form-description {
@@ -203,8 +202,7 @@ h1 .xforms-trigger-appearance-xxforms-minimal input, h2 .xforms-trigger-appearan
 }
 
 .fr-top .fr-form-description {
-    font-size: smaller;
-    font-style: italic;
+    font-size: 8pt;
 }
 
 /* Table of contents */

@@ -246,15 +246,15 @@ h1.fr-form-title {
 .fr-footer div { height: 1em }
 
 .fb-title-control .xforms-label { display: none }
-.fb-title-control .fr-inplace-content .xforms-output { color: white; font-size: 197% }
-.fb-title-control:hover .fr-inplace-content .xforms-output { color: #004B92 }
-.fb-title-control .fr-inplace-content .xforms-input input { color: #004B92; font-size: 197% }
+.fb-title-control .fr-inplace-content .xforms-output { color: white; font-size: 20pt }
+.fb-title-control .fr-inplace-content .xforms-output:hover { color: #004B92 }
+.fb-title-control .fr-inplace-content .xforms-input input { font-size: 20pt }
 .fb-title-control .fr-inplace-buttons .xforms-trigger-appearance-minimal { color: white }
 
 .fb-description-control .xforms-label { display: none }
-.fb-description-control .fr-inplace-content .xforms-output { color: white }
-.fb-description-control:hover .fr-inplace-content .xforms-output { color: #004B92 }
-.fb-description-control .fr-inplace-content .xforms-textarea { color: #6E6E6E; text-align: right }
+.fb-description-control .fr-inplace-content .xforms-output { color: white; font-size: 8pt  }
+.fb-description-control .fr-inplace-content .xforms-output:hover { color: #004B92 }
+.fb-description-control .fr-inplace-content .xforms-textarea { color: #6E6E6E; font-size: 8pt  }
 
 /* Highlighting of top-level blocks (sections, ...) */
 .fb-top-level-content { padding-left: .5em; margin-bottom: .5em; border-left: 0 solid transparent }

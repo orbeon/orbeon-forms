@@ -173,18 +173,14 @@ button.xforms-trigger, input.xforms-trigger, .xforms-trigger button, .xforms-tri
 
 .fr-top .fr-logo img { margin-right: 1em }
 .fr-top .fr-form-title {
-    float: left;
     margin: 0;
     padding: 0;
-    /*white-space: nowrap;*/
     -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
 }
 
 .fr-top .fr-form-description {
-    float: right;
-    text-align: right;
     margin: 0;
-    padding: .5em;
+    padding: .3em;
     -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
 }
 

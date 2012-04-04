@@ -465,7 +465,7 @@
                                 requestDocumentString.push(' source-control-id="' + event.targetId.substring(ORBEON.xforms.Globals.ns[formID].length) + '"');
                             if (event.additionalAttribs != null) {
                                 for(var attribIndex = 0; attribIndex < event.additionalAttribs.length - 1; attribIndex+=2) {
-                                    var attribName = event.additionalAttribs[attribIndex]
+                                    var attribName = event.additionalAttribs[attribIndex];
                                     var escapedAttribValue = event.additionalAttribs[attribIndex+1].replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/&/g, "&amp;");
                                     requestDocumentString.push(' '+ attribName +'="' + escapedAttribValue + '"');
                                 }
@@ -477,6 +477,7 @@
                                     event.value = event.value.replace(XFORMS_REGEXP_AMPERSAND, "&amp;");
                                     event.value = event.value.replace(XFORMS_REGEXP_OPEN_ANGLE, "&lt;");
                                     event.value = event.value.replace(XFORMS_REGEXP_CLOSE_ANGLE, "&gt;");
+                                    event.value = event.value.replace(XFORMS_REGEXP_INVALID_XML_CHAR, "");
                                 }
                                 requestDocumentString.push(event.value);
                             }

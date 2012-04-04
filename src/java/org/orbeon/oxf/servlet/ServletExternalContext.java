@@ -111,12 +111,9 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
 
     private class Request implements ExternalContext.Request {
 
-        private String namespace = null;
-
         private String contextPath;
 
         private Map<String, Object> attributesMap;
-        private Map<String, String> headerMap;
         private Map<String, String[]> headerValuesMap;
         private Map<String, Object[]> parameterMap;
 

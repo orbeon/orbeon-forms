@@ -38,22 +38,22 @@
                                xxforms:readonly="true" xxforms:cache="true"/>
             <xforms:action ev:event="xforms-ready">
                 <xforms:send submission="fb-load-components"/>
-                <xxforms:variable name="binding" select="xxforms:element('binding')"/>
+                <xforms:var name="binding" value="xxforms:element('binding')"/>
                 <!-- Get binding for xforms:input -->
                 <xforms:dispatch name="fb-xbl-binding-for-control" target="dialog-control-details">
-                    <xxforms:context name="fb-components" select="instance('fb-components-instance')"/>
-                    <xxforms:context name="fb-control" select="instance('instance')/xforms:input"/>
-                    <xxforms:context name="fb-bind" select="instance('instance')/xforms:bind[@type = 'xforms:string']"/>
-                    <xxforms:context name="fb-result" select="$binding"/>
+                    <xxforms:context name="fb-components" value="instance('fb-components-instance')"/>
+                    <xxforms:context name="fb-control" value="instance('instance')/xforms:input"/>
+                    <xxforms:context name="fb-bind" value="instance('instance')/xforms:bind[@type = 'xforms:string']"/>
+                    <xxforms:context name="fb-result" value="$binding"/>
                 </xforms:dispatch>
                 <xforms:insert nodeset="*" origin="$binding"/>
                 <xforms:delete nodeset="$binding/*"/>
                 <!-- Getting binding for databound-select1 -->
                 <xforms:dispatch name="fb-xbl-binding-for-control" target="dialog-control-details">
-                    <xxforms:context name="fb-components" select="instance('fb-components-instance')"/>
-                    <xxforms:context name="fb-control" select="instance('instance')/fr:databound-select1"/>
-                    <xxforms:context name="fb-bind" select="instance('instance')/xforms:bind[@type = 'xforms:string']"/>
-                    <xxforms:context name="fb-result" select="$binding"/>
+                    <xxforms:context name="fb-components" value="instance('fb-components-instance')"/>
+                    <xxforms:context name="fb-control" value="instance('instance')/fr:databound-select1"/>
+                    <xxforms:context name="fb-bind" value="instance('instance')/xforms:bind[@type = 'xforms:string']"/>
+                    <xxforms:context name="fb-result" value="$binding"/>
                 </xforms:dispatch>
                 <xforms:insert nodeset="*" origin="$binding"/>
                 <xforms:delete nodeset="$binding/*"/>

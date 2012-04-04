@@ -38,25 +38,25 @@
         <xbl:template>
             <xf:group appearance="xxf:internal" xxbl:scope="outer">
                 <!-- Scope $lang which is the language of the form being edited -->
-                <xxf:var name="lang" value="xxf:get-variable('fr-form-model', 'fb-lang')" as="element()"/>
+                <xf:var name="lang" value="xxf:get-variable('fr-form-model', 'fb-lang')" as="element()"/>
                 <!-- Scope $form-resources: resources of the form being edited.
                      Use the same logic as in resources-model. In the builder, we don't have a resources-model running
                      for the form being edited, so we duplicate this here. -->
-                <xxf:var name="form-resources" value="instance('fr-form-resources')/(resource[@xml:lang = $lang], resource[1])[1]" as="element(resource)?"/>
+                <xf:var name="form-resources" value="instance('fr-form-resources')/(resource[@xml:lang = $lang], resource[1])[1]" as="element(resource)?"/>
                 <!-- Scope $fr-resources for Form Runner resources -->
-                <xxf:var name="fr-resources" value="xxf:get-variable('fr-resources-model', 'fr-fr-resources')" as="element(resource)?"/>
+                <xf:var name="fr-resources" value="xxf:get-variable('fr-resources-model', 'fr-fr-resources')" as="element(resource)?"/>
                 <!-- Scope $fb-resources for Form Builder resources -->
-                <xxf:var name="fb-resources" value="xxf:get-variable('fr-resources-model', 'fr-form-resources')" as="element(resource)?"/>
+                <xf:var name="fb-resources" value="xxf:get-variable('fr-resources-model', 'fr-form-resources')" as="element(resource)?"/>
 
                 <!-- Apply all the content -->
                 <xbl:content/>
 
                 <!-- Listen to activations on grid cells -->
                 <xf:action ev:event="DOMActivate">
-                    <xxf:var name="control-element" value="xxf:control-element(xxf:event('xxf:effective-targetid'))"/>
+                    <xf:var name="control-element" value="xxf:control-element(xxf:event('xxf:effective-targetid'))"/>
                     <xf:action if="tokenize($control-element/@class, '\s+') = 'xforms-activable'">
-                        <xxf:var name="th-column" value="count($control-element/preceding-sibling::*[@xxforms:element = 'xh:th']) + 1"/>
-                        <xxf:var name="new-selected-cell" value="if ($control-element/@xxforms:element = 'xh:th') then
+                        <xf:var name="th-column" value="count($control-element/preceding-sibling::*[@xxforms:element = 'xh:th']) + 1"/>
+                        <xf:var name="new-selected-cell" value="if ($control-element/@xxforms:element = 'xh:th') then
                             ($control-element/following-sibling::xf:repeat//*[@xxforms:element = 'xh:td'])[$th-column]/@id
                             else $control-element/@id"/>
                         <xf:setvalue ref="xxf:get-variable('fr-form-model', 'selected-cell')" value="$new-selected-cell"/>

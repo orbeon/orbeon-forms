@@ -80,9 +80,9 @@
             <xforms:group id="container" ref=".[@relevant = 'true']" appearance="xxforms:internal">
 
                 <!-- Bindings specified on control -->
-                <xxforms:var name="form"><xxforms:sequence value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=form-ref"/></xxforms:var>
-                <xxforms:var name="resources"><xxforms:sequence value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=resources-ref"/></xxforms:var>
-                <xxforms:var name="local" value="instance('local')"/>
+                <xforms:var name="form"><xxforms:sequence value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=form-ref"/></xforms:var>
+                <xforms:var name="resources"><xxforms:sequence value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=resources-ref"/></xforms:var>
+                <xforms:var name="local" value="instance('local')"/>
 
                 <xforms:action ev:event="xxforms-dialog-open" ev:observer="dialog">
                     <xforms:insert context="$local/items" origin="controlOps:getControlItems(fbf:controlId($local/control-name))"/>     <!-- Get items in the current language -->
@@ -97,7 +97,7 @@
                 <xforms:setvalue ev:event="xxforms-dialog-close" ev:observer="dialog" ref="$local/@relevant">false</xforms:setvalue>    <!-- Become non-relevant on dialog close -->
 
                 <xforms:action ev:event="DOMActivate" ev:observer="fb-itemset-label-input fb-itemset-value-input">                      <!-- Add line when users press enter -->
-                    <xxforms:variable name="index" select="index('fb-itemset-repeat-repeat')"/>
+                    <xforms:var name="index" value="index('fb-itemset-repeat-repeat')"/>
                     <xforms:insert context="$local/items" nodeset="item" at="$index" origin="$local/template/item"/>
                     <xforms:setfocus control="fb-itemset-label-input"/>
                 </xforms:action>

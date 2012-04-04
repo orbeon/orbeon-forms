@@ -37,7 +37,7 @@
                 <!-- Don't let any event go out from within this group -->
                 <xf:action ev:event="#all" ev:propagate="stop"/>
 
-                <xxf:var name="binding" value="."/>
+                <xf:var name="binding" value="."/>
 
                 <!-- Dialogs -->
                 <fb:dialog-control-details-new id="dialog-control-details"    form-ref="$binding" resources-ref="$form-resources"/>

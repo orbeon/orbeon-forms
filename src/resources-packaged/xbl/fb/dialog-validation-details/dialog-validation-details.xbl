@@ -78,15 +78,15 @@
             <xforms:group id="container" ref=".[@relevant = 'true']" appearance="xxforms:internal">
 
                 <!-- Bindings specified on control -->
-                <xxforms:variable name="form"><xxforms:sequence value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=form-ref"/></xxforms:variable>
-                <xxforms:variable name="resources"><xxforms:sequence value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=resources-ref"/></xxforms:variable>
-                <xxforms:variable name="components"><xxforms:sequence value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=components-ref"/></xxforms:variable>
+                <xforms:var name="form"><xxforms:sequence value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=form-ref"/></xforms:var>
+                <xforms:var name="resources"><xxforms:sequence value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=resources-ref"/></xforms:var>
+                <xforms:var name="components"><xxforms:sequence value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=components-ref"/></xforms:var>
                 
-                <xxforms:variable name="local" value="instance('local')"/>
-                <xxforms:variable name="form-resources" value="$form/xhtml:head/xforms:model/xforms:instance[@id = 'fr-form-resources']/* treat as element()"/>
+                <xforms:var name="local" value="instance('local')"/>
+                <xforms:var name="form-resources" value="$form/xhtml:head/xforms:model/xforms:instance[@id = 'fr-form-resources']/* treat as element()"/>
 
-                <xxforms:variable name="current-language" value="$resources/@xml:lang/string() treat as xs:string"/>
-                <xxforms:variable name="current-resources" value="$form-resources/resource[@xml:lang = $current-language]"/>
+                <xforms:var name="current-language" value="$resources/@xml:lang/string() treat as xs:string"/>
+                <xforms:var name="current-resources" value="$form-resources/resource[@xml:lang = $current-language]"/>
 
                 <!-- When the dialog opens, get type information from the form -->
                 <xforms:action ev:event="xxforms-dialog-open" ev:observer="dialog">
@@ -96,7 +96,7 @@
                     <!-- Read bind information -->
 
                     <!-- Set type information if there is a type specified -->
-                    <xxforms:variable name="type-bind" value="controlOps:getMipOrEmpty($form, fbf:controlId($local/control-name), 'type')"/>
+                    <xforms:var name="type-bind" value="controlOps:getMipOrEmpty($form, fbf:controlId($local/control-name), 'type')"/>
 
                     <xforms:setvalue if="empty($type-bind)" ref="$local/builtin-type">string</xforms:setvalue>
                     <xforms:setvalue ref="$local/schema-type"/>
@@ -105,7 +105,7 @@
                     <!-- TODO: more in Scala here -->
                     <xforms:action if="exists($type-bind)">
                         <!-- TODO: must not use hardcoded prefixes for xs: and xforms: -->
-                        <xxforms:variable name="is-builtin-type" value="starts-with($type-bind, 'xs:') or starts-with($type-bind, 'xforms:')"/>
+                        <xforms:var name="is-builtin-type" value="starts-with($type-bind, 'xs:') or starts-with($type-bind, 'xforms:')"/>
                         <xforms:setvalue if="$is-builtin-type" ref="$local/builtin-type" value="substring-after($type-bind, ':')"/>
                         <!-- TODO: Handle namespace and prefix for namespace -->
                         <xforms:setvalue if="not($is-builtin-type)"
@@ -126,7 +126,7 @@
                 <!-- NOTE: We used to have not(event('fb:save') = false()), but we prefer explicit now because we may get
                      an extra xxforms-dialog-close event sent by the client, in which case we don't want to do the processing -->
                 <xforms:action ev:event="xxforms-dialog-close" if="event('fb:save') and $local/save-trigger = 'enabled'" ev:observer="dialog">
-                    <xxforms:variable name="current-control" value="if ($local/control-name != '') then controlOps:findControlByNameOrEmpty($form, $local/control-name) else ()"/>
+                    <xforms:var name="current-control" value="if ($local/control-name != '') then controlOps:findControlByNameOrEmpty($form, $local/control-name) else ()"/>
 
                     <!-- Copy back the alert -->
                     <xforms:action type="xpath">
@@ -167,13 +167,13 @@
                         <xhtml:div class="fr-grid">
                             <xhtml:div class="fr-grid-content">
 
-                                <xxforms:variable name="model" value="$form/xhtml:head/xforms:model[@id = 'fr-form-model'] treat as element()"/>
+                                <xforms:var name="model" value="$form/xhtml:head/xforms:model[@id = 'fr-form-model'] treat as element()"/>
 
-                                <xxforms:variable name="schema" value="$model/xs:schema[1]" as="element(xs:schema)?"/>
-                                <xxforms:variable name="schema-namespace" value="$schema/@targetNamespace" as="xs:string?"/>
-                                <xxforms:variable name="schema-prefixes" value="if (exists($schema)) then in-scope-prefixes($schema) else ()" as="xs:string*"/>
-                                <xxforms:variable name="schema-namespaces" value="if (exists($schema)) then for $p in in-scope-prefixes($schema) return namespace-uri-for-prefix($p, $schema) else ()" as="xs:string*"/>
-                                <xxforms:variable name="schema-prefix" value="if (exists($schema) and exists($schema-namespace)) then $schema-prefixes[index-of($schema-namespaces, $schema-namespace)[1]] else ()" as="xs:string?"/>
+                                <xforms:var name="schema" value="$model/xs:schema[1]" as="element(xs:schema)?"/>
+                                <xforms:var name="schema-namespace" value="$schema/@targetNamespace" as="xs:string?"/>
+                                <xforms:var name="schema-prefixes" value="if (exists($schema)) then in-scope-prefixes($schema) else ()" as="xs:string*"/>
+                                <xforms:var name="schema-namespaces" value="if (exists($schema)) then for $p in in-scope-prefixes($schema) return namespace-uri-for-prefix($p, $schema) else ()" as="xs:string*"/>
+                                <xforms:var name="schema-prefix" value="if (exists($schema) and exists($schema-namespace)) then $schema-prefixes[index-of($schema-namespaces, $schema-namespace)[1]] else ()" as="xs:string?"/>
 
                                 <xforms:group appearance="xxforms:fieldset">
                                     <xforms:label ref="$resources/dialog-validation-details/types/label"/>

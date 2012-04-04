@@ -83,12 +83,12 @@
             <xf:group id="container" ref=".[@relevant = 'true']" appearance="xxf:internal">
 
                 <!-- Bindings specified on control -->
-                <xxf:var name="form"><xxf:sequence value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=form-ref"/></xxf:var>
-                <xxf:var name="resources"><xxf:sequence value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=resources-ref"/></xxf:var>
-                <xxf:var name="components"><xxf:sequence value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=components-ref"/></xxf:var>
+                <xf:var name="form"><xxf:sequence value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=form-ref"/></xf:var>
+                <xf:var name="resources"><xxf:sequence value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=resources-ref"/></xf:var>
+                <xf:var name="components"><xxf:sequence value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=components-ref"/></xf:var>
 
-                <xxf:var name="local" value="instance('local')"/>
-                <xxf:var name="body" value="$form/xh:body treat as element()"/>
+                <xf:var name="local" value="instance('local')"/>
+                <xf:var name="body" value="$form/xh:body treat as element()"/>
 
                 <!-- Show dialog -->
                 <xf:action ev:event="xxforms-dialog-open" ev:observer="dialog">
@@ -106,8 +106,8 @@
                 <!-- Save data upon close -->
                 <xf:action ev:event="DOMActivate" ev:observer="dialog" if="event('xxf:targetid') != 'cancel-trigger' and $local/save-trigger = 'enabled'">
             
-                    <xxf:var name="old-name" value="$local/original-section-name/string()"/>
-                    <xxf:var name="new-name" value="$local/section-name/string()"/>
+                    <xf:var name="old-name" value="$local/original-section-name/string()"/>
+                    <xf:var name="new-name" value="$local/section-name/string()"/>
                                 
                     <xf:action type="xpath">
                         controlOps:findRenameControl($form, $old-name, $new-name),

@@ -61,10 +61,10 @@
                         <xf:group appearance="xxf:internal" xxbl:scope="inner">
 
                             <!-- Point to the design-time source -->
-                            <xxf:var name="section" value="{$edit-ref}"/>
+                            <xf:var name="section" value="{$edit-ref}"/>
 
                             <!-- Form Builder resources -->
-                            <xxf:var name="fb-resources" value="xxf:get-variable('fr-resources-model', 'fr-form-resources')"/>
+                            <xf:var name="fb-resources" value="xxf:get-variable('fr-resources-model', 'fr-form-resources')"/>
 
                             <!-- Section title area: open/close button, title, icons-->
                             <xsl:element name="{if ($ancestor-sections = 0) then 'xhtml:h2' else 'xhtml:h3'}">
@@ -93,7 +93,7 @@
 
                                     <!-- Handle DOMActivate event to open/close the switches -->
                                     <xforms:action ev:event="DOMActivate" ev:target="section button-open button-close">
-                                        <xxforms:variable name="expand" select="xxforms:case('switch') = 'case-closed'" as="xs:boolean"/>
+                                        <xforms:var name="expand" value="xxforms:case('switch') = 'case-closed'" as="xs:boolean"/>
                                         <xforms:action if="$expand">
                                             <!-- Expand -->
                                             <xforms:toggle case="case-open"/>
@@ -139,7 +139,7 @@
                                             <xforms:label><xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/cog.png" alt="{{$fb-resources/section-details-icon/label}}" title="{{$fb-resources/section-details-icon/label}}"/></xforms:label>
                                             <!-- Show section details dialog -->
                                             <xf:dispatch ev:event="DOMActivate" name="fb-show-dialog" target="fb-form-editor$dialog-section-details">
-                                                <xxf:context name="section" select="$section"/>
+                                                <xxf:context name="section" value="$section"/>
                                             </xf:dispatch>
                                         </xforms:trigger>
                                         <!-- Move up -->

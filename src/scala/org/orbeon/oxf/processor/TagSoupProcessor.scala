@@ -32,18 +32,18 @@ class TagSoupProcessor extends ProcessorImpl {
 
                 // Read input as binary document in byte array
                 val inputValue = {
-                    val writer = new StringWriter()
+                    val writer = new StringWriter
                     readInputAsSAX(pipelineContext, ProcessorImpl.INPUT_DATA, new TextXMLReceiver(writer))
                     writer.getBuffer.toString
                 }
 
                 // Create TagSoup reader
-                val tagSoupReader = new org.ccil.cowan.tagsoup.Parser()
+                val tagSoupReader = new org.ccil.cowan.tagsoup.Parser
                 tagSoupReader.setProperty(org.ccil.cowan.tagsoup.Parser.schemaProperty, TAGSOUP_HTML_SCHEMA)
                 tagSoupReader.setFeature(org.ccil.cowan.tagsoup.Parser.ignoreBogonsFeature, true)
 
                 // Connect to input
-                val inputSource = new InputSource()
+                val inputSource = new InputSource
                 inputSource.setCharacterStream(new StringReader(inputValue))
                 // Connect to output
                 tagSoupReader.setContentHandler(xmlReceiver)

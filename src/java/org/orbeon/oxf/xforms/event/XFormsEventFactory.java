@@ -286,9 +286,9 @@ public class XFormsEventFactory {
                 return new XXFormsInvalidEvent(containingDocument, targetObject);
             }
         });
-        nameToClassMap.put(XFormsEvents.XXFORMS_REPEAT_FOCUS, new Factory() {
+        nameToClassMap.put(XFormsEvents.XXFORMS_REPEAT_ACTIVATE, new Factory() {
             public XFormsEvent createEvent(XFormsContainingDocument containingDocument, String eventName, XFormsEventTarget targetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable, String contextString, Element contextElement, Throwable contextThrowable, Map<String, String> parameters) {
-                return new XXFormsRepeatFocusEvent(containingDocument, targetObject);
+                return new XXFormsRepeatActivateEvent(containingDocument, targetObject);
             }
         });
     }

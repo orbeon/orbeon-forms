@@ -452,7 +452,7 @@ object ClientEvents {
             // Optimize case where a value change event won't change the control value to actually change
             (event, target) match {
                 case (valueChange: XXFormsValue, target: XFormsValueControl) if target.getExternalValue == valueChange.getNewValue ⇒
-                    // We completely ignore the event if the value in the instance is the same. This also saves dispatching xxforms-repeat-focus below.
+                    // We completely ignore the event if the value in the instance is the same. This also saves dispatching xxforms-repeat-activate below.
                     debug("ignoring value change event as value is the same", Seq(
                         "control id" → targetEffectiveId,
                         "event name" → eventName,
@@ -479,9 +479,9 @@ object ClientEvents {
             // Each event is within its own start/end outermost action handler
             doc.startOutermostActionHandler()
 
-            // Handle repeat focus if the event target is in a repeat
+            // Handle repeat iteration if the event target is in a repeat
             if (hasEffectiveIdSuffix(targetEffectiveId))
-                dispatchEventCheckTarget(new XXFormsRepeatFocusEvent(doc, target))
+                dispatchEventCheckTarget(new XXFormsRepeatActivateEvent(doc, target))
 
             // Interpret event
             dispatchEventCheckTarget(event)

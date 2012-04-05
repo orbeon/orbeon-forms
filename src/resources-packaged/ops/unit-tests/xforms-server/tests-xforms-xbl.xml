@@ -1206,7 +1206,7 @@
                                         <xforms:insert nodeset="instance('instance')/record" at="1"/>
                                         <xforms:refresh/>
                                         <!-- Dispatch repeat focus to change the index back to 1 -->
-                                        <xforms:dispatch name="xxforms-repeat-focus" target="my-output" xxforms:repeat-indexes="1"/>
+                                        <xforms:dispatch name="xxforms-repeat-activate" target="my-output" xxforms:repeat-indexes="1"/>
                                     </xforms:action>
 
                                 </xforms:model>
@@ -1235,7 +1235,7 @@
                                                 </xforms:action>
                                                 <xforms:action ev:event="xforms-enabled" ev:observer="bar-group" ev:target="bar-group">
                                                     <!-- Dispatch repeat focus to change the index back to 2 -->
-                                                    <xforms:dispatch name="xxforms-repeat-focus" target="my-output-bar" xxforms:repeat-indexes="2"/>
+                                                    <xforms:dispatch name="xxforms-repeat-activate" target="my-output-bar" xxforms:repeat-indexes="2"/>
                                                 </xforms:action>
                                             </xforms:model>
                                             <xforms:group id="bar-group" model="model" appearance="xxforms:internal">

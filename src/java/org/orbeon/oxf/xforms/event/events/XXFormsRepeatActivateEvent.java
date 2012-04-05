@@ -19,10 +19,10 @@ import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 
 /**
- * Extension xxforms-repeat-focus event.
+ * Internal xxforms-repeat-activate event.
  */
-public class XXFormsRepeatFocusEvent extends XFormsEvent {
-    public XXFormsRepeatFocusEvent(XFormsContainingDocument containingDocument, XFormsEventTarget targetObject) {
-        super(containingDocument, XFormsEvents.XXFORMS_REPEAT_FOCUS, targetObject, false, false);
+public class XXFormsRepeatActivateEvent extends XFormsEvent {
+    public XXFormsRepeatActivateEvent(XFormsContainingDocument containingDocument, XFormsEventTarget targetObject) {
+        super(containingDocument, XFormsEvents.XXFORMS_REPEAT_ACTIVATE, targetObject, false, false);
     }
 }

@@ -65,7 +65,7 @@ class XFormsRepeatIterationControl(container: XBLContainer, parent: XFormsContro
     override def isStaticReadonly = false
     override def getType = null
 
-    override val getAllowedExternalEvents = Set(XFormsEvents.XFORMS_FOCUS).asJava
+    override val getAllowedExternalEvents = Set(XFormsEvents.XXFORMS_REPEAT_ACTIVATE).asJava
     override def supportFullAjaxUpdates = false
 
     // Update this control's effective id and its descendants based on the parent's effective id.

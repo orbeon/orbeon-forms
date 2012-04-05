@@ -31,7 +31,7 @@ trait ControlEventSupport {
     self: XFormsControl ⇒
 
     def performDefaultAction(event: XFormsEvent): Unit = event match {
-        case ev @ (_: XXFormsRepeatFocusEvent | _: XFormsFocusEvent) ⇒
+        case ev @ (_: XXFormsRepeatActivateEvent | _: XFormsFocusEvent) ⇒
             // Try to update xforms:repeat indexes based on this
 
             // Find current path through ancestor xforms:repeat elements, if any

@@ -3552,7 +3552,7 @@ ORBEON.xforms.Events = {
                 // we can avoid a round trip and show the help right away
                 ORBEON.xforms.Controls.showHelp(control);
             }
-        } else if (target == null) {
+        } else {
             // Click on something that is not an XForms element, but which might still be in an repeat iteration,
             // in which case we want to let the server know about where in the iteration the click was.
 
@@ -3580,7 +3580,7 @@ ORBEON.xforms.Events = {
                             var targetId = sibling.id.substring("repeat-begin-".length);
                             targetId += targetId.indexOf(XFORMS_SEPARATOR_1) == -1 ? XFORMS_SEPARATOR_1 : XFORMS_SEPARATOR_2;
                             targetId += delimiterCount;
-                            var event = new ORBEON.xforms.server.AjaxServer.Event(form, targetId, null, "xforms-focus");
+                            var event = new ORBEON.xforms.server.AjaxServer.Event(form, targetId, null, "xxforms-repeat-activate");
                             ORBEON.xforms.server.AjaxServer.fireEvents([event]);
                             foundRepeatBegin = true;
                             break;

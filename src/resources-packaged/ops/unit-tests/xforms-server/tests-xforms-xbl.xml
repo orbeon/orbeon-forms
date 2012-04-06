@@ -865,7 +865,7 @@
                                 </xforms:model>
 
                                 <xbl:xbl>
-                                    <xbl:binding id="foobar-component" element="fr|foobar" xxbl:mode="handlers">
+                                    <xbl:binding id="foobar-component" element="fr|foobar">
                                         <xbl:template>
                                             <!-- Local model -->
                                             <xforms:model id="internal-model">
@@ -2255,7 +2255,7 @@
 
                     </xforms:model>
                     <xbl:xbl>
-                        <xbl:binding id="fr-foo" element="fr|foo" xxbl:mode="handlers">
+                        <xbl:binding id="fr-foo" element="fr|foo">
                             <xbl:template>
                                 <xbl:content includes="* > *"/>
                             </xbl:template>
@@ -2909,7 +2909,7 @@
                         <xforms:dispatch ev:event="xforms-ready" name="my-event" targetid="my-foo"/>
                     </xforms:model>
                     <xbl:xbl>
-                        <xbl:binding id="fr-foo" element="fr|foo" xxbl:mode="handlers">
+                        <xbl:binding id="fr-foo" element="fr|foo">
                             <xbl:template>
                                 <xbl:content/>
                                 <xhtml:div/>
@@ -4012,12 +4012,12 @@
                         <xf:dispatch ev:event="xforms-ready" name="my-event" targetid="my-toto"/>
                     </xf:model>
                     <xbl:xbl>
-                        <xbl:binding id="fr-gaga" element="fr|gaga" xxbl:mode="handlers">
+                        <xbl:binding id="fr-gaga" element="fr|gaga">
                             <xbl:template>
                                 <xbl:content/>
                             </xbl:template>
                         </xbl:binding>
-                        <xbl:binding id="fr-toto" element="fr|toto">
+                        <xbl:binding id="fr-toto" element="fr|toto" xxbl:mode="nohandlers">
                             <xbl:template>
                                 <xbl:content/>
                             </xbl:template>
@@ -4062,12 +4062,12 @@
                         <xf:dispatch ev:event="xforms-ready" name="my-event" targetid="my-toto"/>
                     </xf:model>
                     <xbl:xbl>
-                        <xbl:binding id="fr-gaga" element="fr|gaga" xxbl:mode="handlers">
+                        <xbl:binding id="fr-gaga" element="fr|gaga">
                             <xbl:template>
                                 <xbl:content/>
                             </xbl:template>
                         </xbl:binding>
-                        <xbl:binding id="fr-toto" element="fr|toto" xxbl:mode="handlers">
+                        <xbl:binding id="fr-toto" element="fr|toto">
                             <xbl:template>
                                 <xbl:content/>
                             </xbl:template>

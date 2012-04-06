@@ -33,7 +33,7 @@
             <xforms:instance id="fr-form-instance">
                 <form>
                     <section-1>
-                        <control-1>Value of control-1</control-1>
+                        <control-1/>
                     </section-1>
                 </form>
             </xforms:instance>
@@ -67,7 +67,7 @@
 
             <!-- All form resources -->
             <!-- Don't make readonly by default in case a service modifies the resources -->
-            <xforms:instance id="fr-form-resources" xxforms:readonly="false">
+            <xforms:instance id="fr-form-resources" xxforms:readonly="true">
                 <resources>
                     <resource xml:lang="">
                         <section-1>

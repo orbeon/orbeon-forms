@@ -64,6 +64,9 @@ object FormBuilderFunctions {
 
     // Get the root element of instances
     def formInstanceRoot(inDoc: NodeInfo) = inlineInstanceRootElement(inDoc, "fr-form-instance").get
+    def metadataInstanceRoot(inDoc: NodeInfo) = inlineInstanceRootElement(inDoc, "fr-form-metadata").get
+    def resourcesInstanceRoot(inDoc: NodeInfo) = inlineInstanceRootElement(inDoc, "fr-form-resources").get
+
     def formResourcesRoot = asNodeInfo(model("fr-form-model").get.getVariable("resources"))
     def templateRoot(inDoc: NodeInfo, templateName: String) = inlineInstanceRootElement(inDoc, templateId(templateName))
 

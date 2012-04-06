@@ -24,6 +24,7 @@
       xmlns:saxon="http://saxon.sf.net/"
       xmlns:xbl="http://www.w3.org/ns/xbl"
       xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary"
+      xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderFunctions"
       xmlns:toolboxOps="java:org.orbeon.oxf.fb.ToolboxOps"
 
       xxforms:external-events="show-fb-test-dialog"
@@ -40,12 +41,14 @@
     <xforms:var name="is-pe" value="xpl:isPE()" as="xs:boolean"/>
 
     <!-- Other variables -->
+    <!-- TODO: don't duplicate logic with what's in FormBuilderFunctions -->
     <xforms:var name="model" value="xhtml:head/xforms:model[@id = 'fr-form-model']"/>
     <xforms:var name="metadata-instance" value="$model/xforms:instance[@id = 'fr-form-metadata']/*"/>
     <xforms:var name="resources" value="$model/xforms:instance[@id = 'fr-form-resources']/*"/>
     <xforms:var name="current-resources" value="($resources/resource[@xml:lang = $fb-lang])[1]"/>
     <xforms:var name="body" value="xhtml:body/*:view/*:body"/>
 
+    <xforms:var name="component-bindings" value="instance('fb-components-instance')//xbl:binding" as="element(xbl:binding)*"/>
     <xforms:var name="is-custom-instance" value="$metadata-instance/form-instance-mode = 'custom'" as="xs:boolean"/>
 
     <!-- TODO: Probably remove once all usages are gone -->
@@ -152,14 +155,23 @@
 
         <xforms:action if="xxforms:instance('fr-parameters-instance')/mode = 'new'">
             <!-- Set language in all @xml:lang  -->
+            <xforms:var name="template" value="instance('fr-form-instance')"/>
             <xforms:setvalue
-                iterate="instance('fb-form-instance')//@xml:lang"
+                iterate="$template//@xml:lang"
                 ref="."
                 value="$fb-lang"/>
             <!-- Set initial form and first section titles -->
-            <xforms:setvalue ref="$metadata-instance/title" value="$form-resources/template/untitled-form"/>
-            <xforms:setvalue ref="$resources/resource/section-1/label" value="$form-resources/template/untitled-section"/>
+            <xforms:setvalue
+                ref="fbf:metadataInstanceRoot($template)/title"
+                value="$form-resources/template/untitled-form"/>
+            <xforms:setvalue
+                ref="fbf:resourcesInstanceRoot($template)/resource/section-1/label"
+                value="$form-resources/template/untitled-section"/>
         </xforms:action>
+
+        <xforms:rebuild/>
+        <xforms:recalculate/>
+        <xforms:revalidate/>
 
     </xforms:action>
 
@@ -201,19 +213,6 @@
                 <xforms:bind ref="xforms:instance[@id = 'fr-form-attachments']/*">
                     <xforms:bind id="css-attachment-bind" ref="css" type="xs:anyURI"/>
                     <xforms:bind id="pdf-attachment-bind" ref="pdf" type="xs:anyURI"/>
-                </xforms:bind>
-                <!-- Form instance -->
-                <xforms:bind ref="xforms:instance[@id = 'fb-form-instance']/*">
-
-                    <!-- Handle date / time types. Note we make them optional with xforms:* so we can save the form -->
-                    <xforms:bind ref="*/*[name() = $model/xforms:bind/xforms:bind/xforms:bind[substring-after(@type, ':') = 'date']/@ref]" type="xforms:date"/>
-                    <xforms:bind ref="*/*[name() = $model/xforms:bind/xforms:bind/xforms:bind[substring-after(@type, ':') = 'time']/@ref]" type="xforms:time"/>
-                    <xforms:bind ref="*/*[name() = $model/xforms:bind/xforms:bind/xforms:bind[substring-after(@type, ':') = 'dateTime']/@ref]" type="xforms:dateTime"/>
-                    <!-- Handle "boolean" type -->
-                    <!--<xforms:bind ref="*/*[name() = $model/xforms:bind/xforms:bind/xforms:bind[substring-after(@type, ':') = 'boolean']/@ref]" type="xs:boolean"/>-->
-
-                    <!-- Handle local attachments -->
-                    <xforms:bind ref="*/*[@filename and @mediatype and @size]" type="xs:anyURI" class="fr-attachment"/>
                 </xforms:bind>
                 <!-- Resources -->
                 <xforms:bind ref="xforms:instance[@id = 'fr-form-resources']/*">

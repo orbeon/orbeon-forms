@@ -21,6 +21,7 @@
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
       xmlns:saxon="http://saxon.sf.net/"
       xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+      xmlns:toolboxOps="java:org.orbeon.oxf.fb.ToolboxOps"
 
       id="fb-toolbox">
 
@@ -41,7 +42,7 @@
                             <xforms:label>
                                 <xhtml:img src="/apps/fr/style/images/silk/cut.png" alt="{$form-resources/cut/label}" title="{$form-resources/cut/label}"/>
                             </xforms:label>
-                            <xforms:action ev:event="DOMActivate" type="xpath" xmlns:toolboxOps="java:org.orbeon.oxf.fb.ToolboxOps">
+                            <xforms:action ev:event="DOMActivate" type="xpath">
                                 toolboxOps:cutToClipboard($current-td)
                             </xforms:action>
                         </xforms:trigger>
@@ -49,7 +50,7 @@
                             <xforms:label>
                                 <xhtml:img src="/forms/orbeon/newbuilder/images/copy.gif" alt="{$form-resources/copy/label}" title="{$form-resources/copy/label}"/>
                             </xforms:label>
-                            <xforms:action ev:event="DOMActivate" type="xpath" xmlns:toolboxOps="java:org.orbeon.oxf.fb.ToolboxOps">
+                            <xforms:action ev:event="DOMActivate" type="xpath">
                                 toolboxOps:copyToClipboard($current-td)
                             </xforms:action>
                         </xforms:trigger>
@@ -57,7 +58,7 @@
                             <xforms:label>
                                 <xhtml:img src="/apps/fr/style/images/silk/paste_plain.png" alt="{$form-resources/paste/label}" title="{$form-resources/paste/label}"/>
                             </xforms:label>
-                            <xforms:action ev:event="DOMActivate" type="xpath" xmlns:toolboxOps="java:org.orbeon.oxf.fb.ToolboxOps">
+                            <xforms:action ev:event="DOMActivate" type="xpath">
                                 toolboxOps:pasteFromClipboard($current-td)
                             </xforms:action>
                         </xforms:trigger>
@@ -86,7 +87,7 @@
                                     <xhtml:img src="/apps/fr/style/images/silk/layout_add.png" alt=""/>
                                     <xhtml:span><xforms:output value="$form-resources/new-section/label"/></xhtml:span>
                                 </xforms:label>
-                                <xforms:action ev:event="DOMActivate" type="xpath" xmlns:toolboxOps="java:org.orbeon.oxf.fb.ToolboxOps">
+                                <xforms:action ev:event="DOMActivate" type="xpath">
                                     toolboxOps:insertNewSection($model, true())
                                 </xforms:action>
                             </xforms:trigger>
@@ -98,7 +99,7 @@
                                     <xhtml:img src="/apps/fr/style/images/silk/table_add.png" alt=""/>
                                     <xhtml:span><xforms:output value="$form-resources/new-grid/label"/></xhtml:span>
                                 </xforms:label>
-                                <xforms:action ev:event="DOMActivate" type="xpath" xmlns:toolboxOps="java:org.orbeon.oxf.fb.ToolboxOps">
+                                <xforms:action ev:event="DOMActivate" type="xpath">
                                     toolboxOps:insertNewGrid($model)
                                 </xforms:action>
                             </xforms:trigger>
@@ -110,7 +111,7 @@
                                     <!-- TODO: i18n <xhtml:span><xforms:output value="$form-resources/new-grid/label"/></xhtml:span>-->
                                     <xhtml:span>New Repeat</xhtml:span>
                                 </xforms:label>
-                                <xforms:action ev:event="DOMActivate" type="xpath" xmlns:toolboxOps="java:org.orbeon.oxf.fb.ToolboxOps">
+                                <xforms:action ev:event="DOMActivate" type="xpath">
                                     toolboxOps:insertNewRepeat($model)
                                 </xforms:action>
                             </xforms:trigger>
@@ -136,10 +137,10 @@
                                                 <xhtml:img src="{($binding/fb:metadata/fb:icon/fb:small-icon[@lang = $lang],$binding/fb:metadata/fb:icon/fb:small-icon[1], '/apps/fr/style/images/silk/plugin.png')[1]}" alt="" width="16" height="16"/>
                                                 <xhtml:span><xforms:output value="($binding/fb:metadata/fb:display-name[@lang = $lang], $binding/fb:metadata/fb:display-name[1])[1]"/></xhtml:span>
                                             </xforms:label>
-                                            <xforms:action type="xpath" ev:event="DOMActivate" if="$is-section-component" xmlns:toolboxOps="java:org.orbeon.oxf.fb.ToolboxOps">
+                                            <xforms:action type="xpath" ev:event="DOMActivate" if="$is-section-component">
                                                 toolboxOps:insertNewSectionTemplate($model, $binding)
                                             </xforms:action>
-                                            <xforms:action type="xpath" ev:event="DOMActivate" if="not($is-section-component)" xmlns:toolboxOps="java:org.orbeon.oxf.fb.ToolboxOps">
+                                            <xforms:action type="xpath" ev:event="DOMActivate" if="not($is-section-component)">
                                                 toolboxOps:insertNewControl($model, $binding)
                                             </xforms:action>
 -                                        </xforms:trigger>

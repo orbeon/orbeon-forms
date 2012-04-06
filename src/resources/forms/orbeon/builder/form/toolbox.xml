@@ -161,14 +161,14 @@
                                 <xhtml:div>
                                     <!-- Application name -->
                                     <xforms:output id="application-name-control" bind="application-name-bind"
-                                                   class="fr-summary fr-search fr-static" incremental="true">
+                                                   class="fr-summary fr-search fr-static">
                                         <xforms:label ref="$form-resources/application-name/label"/>
                                         <xforms:alert ref="$form-resources/application-name/alert"/>
                                     </xforms:output>
                                 </xhtml:div>
                                 <xhtml:div>
                                     <xforms:output id="form-name-control" bind="form-name-bind"
-                                                   class="fr-summary fr-search fr-static" incremental="true">
+                                                   class="fr-summary fr-search fr-static">
                                         <xforms:label ref="$form-resources/form-name/label"/>
                                         <xforms:alert ref="$form-resources/form-name/alert"/>
                                     </xforms:output>

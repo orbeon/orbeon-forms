@@ -67,7 +67,7 @@
                         <xsl:variable name="remove-constraint" select="@remove-constraint"/>
                         <xsl:variable name="repeat-id" as="xs:string" select="concat(@id, '-repeat')"/>
 
-                        <xsl:variable name="repeat-expression" select="if (@nodeset) then @nodeset else if (@ref) then @ref else concat('xxforms:bind(''', @bind, ''')')" as="xs:string"/>
+                        <xsl:variable name="repeat-expression" select="if (@ref) then @ref else if (@nodeset) then @nodeset else concat('xxforms:bind(''', @bind, ''')')" as="xs:string"/>
 
                         <xsl:if test="$is-editable">
                             <!-- Point to the design-time source -->

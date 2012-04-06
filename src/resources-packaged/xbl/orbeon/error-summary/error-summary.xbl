@@ -485,7 +485,7 @@ Inserting error information into error list:
 
                                     <!-- Display global errors -->
                                     <xsl:for-each select="$fr-errors">
-                                        <xforms:repeat ref="{@nodeset}" xxbl:scope="outer" xmlns:v="http://www.example.com/validation">
+                                        <xforms:repeat ref="{@ref, @nodeset}" xxbl:scope="outer" xmlns:v="http://www.example.com/validation">
                                             <xsl:copy-of select="ancestor-or-self::*/namespace::*"/>
                                             <xhtml:li>
                                                 <!-- Clickable / linkable label -->

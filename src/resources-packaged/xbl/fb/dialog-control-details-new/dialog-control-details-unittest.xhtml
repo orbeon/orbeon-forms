@@ -46,8 +46,8 @@
                     <xxforms:context name="fb-bind" value="instance('instance')/xforms:bind[@type = 'xforms:string']"/>
                     <xxforms:context name="fb-result" value="$binding"/>
                 </xforms:dispatch>
-                <xforms:insert nodeset="*" origin="$binding"/>
-                <xforms:delete nodeset="$binding/*"/>
+                <xforms:insert ref="*" origin="$binding"/>
+                <xforms:delete ref="$binding/*"/>
                 <!-- Getting binding for databound-select1 -->
                 <xforms:dispatch name="fb-xbl-binding-for-control" target="dialog-control-details">
                     <xxforms:context name="fb-components" value="instance('fb-components-instance')"/>
@@ -55,8 +55,8 @@
                     <xxforms:context name="fb-bind" value="instance('instance')/xforms:bind[@type = 'xforms:string']"/>
                     <xxforms:context name="fb-result" value="$binding"/>
                 </xforms:dispatch>
-                <xforms:insert nodeset="*" origin="$binding"/>
-                <xforms:delete nodeset="$binding/*"/>
+                <xforms:insert ref="*" origin="$binding"/>
+                <xforms:delete ref="$binding/*"/>
             </xforms:action>
         </xforms:model>
     </xhtml:head>

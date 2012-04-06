@@ -63,7 +63,7 @@
             </xforms:input>
             <fr:databound-select1 ref="state" appearance="minimal" resource="/xforms-sandbox/service/zip-states">
                 <xforms:label>State: </xforms:label>
-                <xforms:itemset nodeset="/states/state">
+                <xforms:itemset ref="/states/state">
                     <xforms:label ref="@name"/>
                     <xforms:value ref="@abbreviation"/>
                 </xforms:itemset>

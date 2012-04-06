@@ -98,7 +98,7 @@
 
                 <xforms:action ev:event="DOMActivate" ev:observer="fb-itemset-label-input fb-itemset-value-input">                      <!-- Add line when users press enter -->
                     <xforms:var name="index" value="index('fb-itemset-repeat-repeat')"/>
-                    <xforms:insert context="$local/items" nodeset="item" at="$index" origin="$local/template/item"/>
+                    <xforms:insert context="$local/items" ref="item" at="$index" origin="$local/template/item"/>
                     <xforms:setfocus control="fb-itemset-label-input"/>
                 </xforms:action>
 

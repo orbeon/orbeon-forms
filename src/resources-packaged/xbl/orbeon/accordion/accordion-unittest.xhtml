@@ -161,13 +161,13 @@
                 <xhtml:li>
                     <xforms:trigger appearance="minimal" id="add-state">
                         <xforms:label>Add state</xforms:label>
-                        <xforms:insert ev:event="DOMActivate" context="instance('instance')/states" nodeset="state" at="last()" position="after" origin="instance('new-state')"/>
+                        <xforms:insert ev:event="DOMActivate" context="instance('instance')/states" ref="state" at="last()" position="after" origin="instance('new-state')"/>
                     </xforms:trigger>
                 </xhtml:li>
                 <xhtml:li>
                     <xforms:trigger appearance="minimal" id="remove-state">
                         <xforms:label>Remove state</xforms:label>
-                        <xforms:delete ev:event="DOMActivate" nodeset="instance('instance')/states/state[last()]"/>
+                        <xforms:delete ev:event="DOMActivate" ref="instance('instance')/states/state[last()]"/>
                     </xforms:trigger>
                 </xhtml:li>
             </xhtml:ol>
@@ -211,7 +211,7 @@
                         </xhtml:tr>
                     </xhtml:thead>
                     <xhtml:tbody>
-                        <xhtml:tr repeat-nodeset="states/state">
+                        <xhtml:tr repeat-ref="states/state">
                             <xhtml:td>
                                 <xforms:output ref="abbreviation"/>
                             </xhtml:td>
@@ -225,7 +225,7 @@
                     </xhtml:tbody>
                 </fr:datatable>
             </fr:case>
-            <xforms:repeat nodeset="states/state">
+            <xforms:repeat ref="states/state">
                 <fr:case id="my-case-repeat" selected="true">
                     <fr:label value="name"/>
                     <xhtml:ul>

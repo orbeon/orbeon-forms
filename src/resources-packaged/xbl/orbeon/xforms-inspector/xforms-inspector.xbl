@@ -58,16 +58,16 @@
                     <xforms:action iterate="xxforms:list-models()">
                         <xxforms:variable name="current-model-id" select="." as="xs:string"/>
                         <xforms:action context="instance('inspector-itemset')">
-                            <xforms:insert context="." nodeset="model" origin="xxforms:element('model', xxforms:attribute('id', $current-model-id))"/>
+                            <xforms:insert context="." ref="model" origin="xxforms:element('model', xxforms:attribute('id', $current-model-id))"/>
                         </xforms:action>
                         <xforms:action iterate="xxforms:list-instances($current-model-id)">
                             <xxforms:variable name="current-instance-id" select="." as="xs:string"/>
                             <xforms:action context="instance('inspector-itemset')/model[last()]">
-                                <xforms:insert context="." nodeset="instance" origin="xxforms:element('instance', xxforms:attribute('id', $current-instance-id))"/>
+                                <xforms:insert context="." ref="instance" origin="xxforms:element('instance', xxforms:attribute('id', $current-instance-id))"/>
                             </xforms:action>
                         </xforms:action>
                     </xforms:action>
-                    <xforms:delete context="instance('inspector-itemset')" nodeset="model[starts-with(@id, 'orbeon-')]"/>
+                    <xforms:delete context="instance('inspector-itemset')" ref="model[starts-with(@id, 'orbeon-')]"/>
                     <xforms:setvalue ref="instance('inspector-instance')/current-model" value="instance('inspector-itemset')/model[1]/@id"/>
                     <xforms:setvalue ref="instance('inspector-instance')/current-instance"
                                      value="instance('inspector-itemset')/model[1]/instance[1]/@id"/>
@@ -92,7 +92,7 @@
                 </xforms:instance>
 
                 <xxforms:variable name="xml-indent" select="instance('inspector-instance')/xsl:output"/>
-                <xforms:bind nodeset="instance('inspector-instance')">
+                <xforms:bind ref="instance('inspector-instance')">
                     <xforms:bind ref="current-instance" readonly="false()" calculate="if (. = '') then instance('inspector-itemset') /model[@id = instance('inspector-instance')/current-model]/instance[1]/@id else ."/>
                     <xforms:bind ref="xpath" readonly="../function != 'evaluate-xpath'"/>
                     <xforms:bind ref="input" readonly="../function != 'view-console'"/>
@@ -148,7 +148,7 @@
                         <xforms:group ref=".[count($models) gt 1]" class="fr-xforms-inspector-model">
                             <xforms:select1 ref="instance('inspector-instance')/current-model" appearance="compact">
                                 <xforms:label>Model: </xforms:label>
-                                <xforms:itemset nodeset="$models">
+                                <xforms:itemset ref="$models">
                                     <xforms:label ref="@id"/>
                                     <xforms:value ref="@id"/>
                                 </xforms:itemset>
@@ -166,7 +166,7 @@
                         <xforms:group ref=".[count(instance('inspector-itemset')/model[@id = instance('inspector-instance')/current-model]/instance) gt 1]" class="fr-xforms-inspector-instance">
                             <xforms:select1 ref="instance('inspector-instance')/current-instance" appearance="compact">
                                 <xforms:label>Instance: </xforms:label>
-                                <xforms:itemset nodeset="instance('inspector-itemset')/model[@id = instance('inspector-instance')/current-model]/instance">
+                                <xforms:itemset ref="instance('inspector-itemset')/model[@id = instance('inspector-instance')/current-model]/instance">
                                     <xforms:label ref="@id"/>
                                     <xforms:value ref="@id"/>
                                 </xforms:itemset>
@@ -185,7 +185,7 @@
                     <xforms:group ref="instance('inspector-instance')/xpath" appearance="xxforms:internal">
                         <!-- XPath expression and trigger -->
                         <xforms:action ev:event="DOMActivate">
-                            <xforms:delete nodeset="instance('inspector-instance')/xpath-output/node()"/>
+                            <xforms:delete ref="instance('inspector-instance')/xpath-output/node()"/>
                             <xforms:insert if="instance('inspector-instance')/xpath != ''"
                                     context="instance('inspector-instance')/xpath-output"
                                     origin="xxforms:instance(instance('inspector-instance')/current-instance, true())/

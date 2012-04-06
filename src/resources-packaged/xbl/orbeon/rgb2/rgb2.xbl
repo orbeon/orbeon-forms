@@ -58,7 +58,7 @@
                         <b>0</b>
                     </values>
                 </xforms:instance>
-                <xforms:bind nodeset="r | g | b" type="xs:integer"/>
+                <xforms:bind ref="r | g | b" type="xs:integer"/>
             </xforms:model>
         </xbl:implementation>
         <xbl:template>

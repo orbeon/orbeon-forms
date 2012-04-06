@@ -122,7 +122,7 @@
                                             <xforms:label/>
                                             <xforms:value/>
                                         </xforms:item>
-                                        <xforms:itemset nodeset="$form-resources/dialog-http-services/error-type/item">
+                                        <xforms:itemset ref="$form-resources/dialog-http-services/error-type/item">
                                             <xforms:label ref="label"/>
                                             <xforms:value ref="value"/>
                                         </xforms:itemset>
@@ -147,7 +147,7 @@
                                     <fr:grid columns="1">
                                         <xhtml:tr>
                                             <xhtml:td>
-                                                <fr:repeat nodeset="response/headers/header" id="fb-response-headers-repeat"
+                                                <fr:repeat ref="response/headers/header" id="fb-response-headers-repeat"
                                                            columns="2" appearance="xxforms:table" readonly="true">
                                                     <fr:body>
                                                         <xhtml:tr>
@@ -192,7 +192,7 @@
                 <xforms:action ev:event="DOMActivate">
                     <!-- Clear response -->
                     <xforms:setvalue iterate="$instance/response/*[not(*)]" ref="."/>
-                    <xforms:delete nodeset="$instance/response/headers/header"/>
+                    <xforms:delete ref="$instance/response/headers/header"/>
 
                     <!-- Toggle back response submission -->
                     <xforms:toggle case="fb-service-dialog-none"/>
@@ -207,7 +207,7 @@
                     <xforms:action context="$instance/response">
                         <xforms:setvalue ref="resource-uri" value="event('resource-uri')"/>
                         <xforms:setvalue ref="status-code" value="event('response-status-code')"/>
-                        <xforms:delete nodeset="headers/header"/>
+                        <xforms:delete ref="headers/header"/>
                         <xforms:insert context="headers" origin="event('response-headers')"/>
                         <!-- Handle response body -->
                         <xforms:var name="error-body" value="event('response-body')"/>
@@ -236,7 +236,7 @@
 
                     <!-- Insert new submission if needed -->
                     <xforms:action if="not(exists($model/xforms:submission[@id = $submission-id]))">
-                        <xforms:insert context="$model" nodeset="xforms:instance | xforms:submission" origin="instance('fb-submission-template')"/>
+                        <xforms:insert context="$model" ref="xforms:instance | xforms:submission" origin="instance('fb-submission-template')"/>
                         <xforms:setvalue ref="$model/xforms:submission[last()]/@id" value="$submission-id"/>
                     </xforms:action>
 
@@ -257,20 +257,20 @@
                             <xforms:insert context="." origin="(xxforms:attribute('xxforms:username', $request/username), xxforms:attribute('xxforms:password', $request/password))"/>
                         </xforms:action>
                         <xforms:action if="not($request/is-auth = 'true')">
-                            <xforms:delete context="." nodeset="@xxforms:username"/>
-                            <xforms:delete context="." nodeset="@xxforms:password"/>
+                            <xforms:delete context="." ref="@xxforms:username"/>
+                            <xforms:delete context="." ref="@xxforms:password"/>
                         </xforms:action>
                     </xforms:action>
 
                     <!-- Insert new instance just before submission if needed -->
                     <xforms:action if="not(exists($model/xforms:instance[@id = $instance-id]))">
-                        <xforms:insert nodeset="$submission" position="before" origin="instance('fb-instance-template')"/>
+                        <xforms:insert ref="$submission" position="before" origin="instance('fb-instance-template')"/>
                         <xforms:setvalue ref="$submission/preceding-sibling::xforms:instance[1]/@id" value="$instance-id"/>
                     </xforms:action>
 
                     <!-- Set instance document -->
                     <xforms:action context="$model/xforms:instance[@id = $instance-id]">
-                        <!--<xforms:delete context="." nodeset="node()"/>-->
+                        <!--<xforms:delete context="." ref="node()"/>-->
                         <!--<xforms:insert context="." origin="saxon:parse($request/body)"/>-->
                         <xforms:setvalue ref="*" value="$request/body"/>
                     </xforms:action>
@@ -303,7 +303,7 @@
         <xforms:setvalue ref="$instance/request/method" value="instance('fb-submission-template')/@method"/>
         <xforms:setvalue ref="$instance/request/serialization" value="instance('fb-submission-template')/@serialization"/>
         <!--<xforms:setvalue ref="$instance/request/replace" value="instance('fb-submission-template')/@replace"/>-->
-        <xforms:delete nodeset="$instance/response/headers/header"/>
+        <xforms:delete ref="$instance/response/headers/header"/>
 
         <!-- Toggle back response submission -->
         <xforms:toggle case="fb-service-dialog-none"/>
@@ -378,24 +378,24 @@
         <xforms:setvalue ev:event="xxforms-invalid" ev:observer="fb-submission-editor-instance" ref="save-test-trigger">disabled</xforms:setvalue>
         <xforms:setvalue ev:event="xxforms-valid" ev:observer="fb-submission-editor-instance" ref="save-test-trigger">enabled</xforms:setvalue>
 
-        <xforms:bind nodeset="instance('fb-submission-editor-instance')">
-            <xforms:bind nodeset="id" type="xs:NCName" required="true()"
+        <xforms:bind ref="instance('fb-submission-editor-instance')">
+            <xforms:bind ref="id" type="xs:NCName" required="true()"
                          constraint="(normalize-space() != '' and normalize-space() = ../initial-id)
                                         or not(../submission-id = $model/xforms:submission/@id
                                             or ../instance-id = $model/xforms:instance/@id)"/>
-            <xforms:bind nodeset="submission-id" calculate="concat(../id, '-submission')"/>
-            <xforms:bind nodeset="instance-id" calculate="concat(../id, '-instance')"/>
-            <xforms:bind nodeset="request/resource" type="xs:anyURI" required="true()"/>
-            <xforms:bind nodeset="request/(is-soap, is-auth)" type="xs:boolean"/>
-            <!--<xforms:bind nodeset="request/soap-action"/>-->
+            <xforms:bind ref="submission-id" calculate="concat(../id, '-submission')"/>
+            <xforms:bind ref="instance-id" calculate="concat(../id, '-instance')"/>
+            <xforms:bind ref="request/resource" type="xs:anyURI" required="true()"/>
+            <xforms:bind ref="request/(is-soap, is-auth)" type="xs:boolean"/>
+            <!--<xforms:bind ref="request/soap-action"/>-->
             <!-- Compute mediatype based on SOAP or serialization -->
-            <xforms:bind nodeset="request/mediatype"
+            <xforms:bind ref="request/mediatype"
                          calculate="if (../is-soap = 'true')
                                     then string-join(('application/soap+xml', if (normalize-space(../soap-action) != '') then concat('action=', normalize-space(../soap-action)) else ()), '; ')
                                     else ../serialization"/>
-            <xforms:bind nodeset="request/body" type="xxforms:xml" required="true()"/>
-            <xforms:bind nodeset="response/error-type" readonly="true()"/>
-            <xforms:bind nodeset="save-test-trigger" readonly=". = 'disabled'"/>
+            <xforms:bind ref="request/body" type="xxforms:xml" required="true()"/>
+            <xforms:bind ref="response/error-type" readonly="true()"/>
+            <xforms:bind ref="save-test-trigger" readonly=". = 'disabled'"/>
         </xforms:bind>
 
         <!-- Template for inserting a submission -->

@@ -86,7 +86,7 @@
                 <!-- What do when doing a refresh -->
                 <xforms:submission id="get-itemset" method="get" resource="{instance('resource')}" replace="instance" serialization="none">
                     <xforms:action ev:event="xforms-submit-error">
-                        <xforms:insert nodeset="instance('itemset')" origin="xxforms:element('dummy')"/>
+                        <xforms:insert ref="instance('itemset')" origin="xxforms:element('dummy')"/>
                     </xforms:action>
                 </xforms:submission>
             </xforms:model>
@@ -112,9 +112,9 @@
                         <!-- Update itemset based on resource -->
                         <xforms:send submission="get-itemset"/>
                         <!-- Get sequence of values in the new itemset -->
-                        <xxforms:variable name="nodeset"><xsl:value-of select="/*/xforms:itemset/(@nodeset, @ref)"/></xxforms:variable>
+                        <xxforms:variable name="ref"><xsl:value-of select="/*/xforms:itemset/(@ref, @nodeset)[1]"/></xxforms:variable>
                         <xxforms:variable name="value"><xsl:value-of select="/*/xforms:itemset/xforms:value/(@value | @ref)"/></xxforms:variable>
-                        <xxforms:variable name="new-values" select="instance('itemset')/saxon:evaluate($nodeset)/saxon:evaluate($value)"/>
+                        <xxforms:variable name="new-values" select="instance('itemset')/saxon:evaluate($ref)/saxon:evaluate($value)"/>
                         <!-- If the current value is not in the new itemset, set it to blank -->
                         <xforms:setvalue if="not($binding = ($new-values, ''))" ref="$binding"/>
                     </xforms:action>

@@ -48,7 +48,7 @@
                     <text readonly="false">helloo helloo worlrd</text>
                 </instance>
             </xforms:instance>
-            <xforms:bind nodeset="text" readonly="@readonly = 'true'"/>
+            <xforms:bind ref="text" readonly="@readonly = 'true'"/>
         </xforms:model>
         <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
         <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
@@ -70,15 +70,15 @@
     <xhtml:body>
         <fr:button id="add-line">
             <xforms:label>Add line</xforms:label>
-            <xforms:insert nodeset="text" ev:event="DOMActivate"/>
+            <xforms:insert ref="text" ev:event="DOMActivate"/>
         </fr:button>
-        <xforms:repeat nodeset="text" id="spell-checker-repeat">
+        <xforms:repeat ref="text" id="spell-checker-repeat">
             <xhtml:div class="block">
                 <xforms:textarea ref="." id="textarea"/>
                 <fr:spell-checker ref="." id="spell-checker"/>
                 <fr:button id="remove-line">
                     <xforms:label>Remove line</xforms:label>
-                    <xforms:delete ev:event="DOMActivate" nodeset="."/>
+                    <xforms:delete ev:event="DOMActivate" ref="."/>
                 </fr:button>
                 <fr:button id="toggle-readonly">
                     <xforms:label>Toggle readonly</xforms:label>

@@ -47,7 +47,7 @@
                      <xforms:hint ref=""/>
                      <xforms:help ref=""/>
                      <xforms:alert ref=""/>
-                     <xforms:itemset nodeset="">
+                     <xforms:itemset ref="">
                         <xforms:label ref="label"/>
                         <xforms:value ref="value"/>
                     </xforms:itemset>
@@ -93,7 +93,7 @@
                          a problem when using screen readers (JAWS), as the screen readers don't know how to read
                          that element. -->
                     <xhtml:ul tabindex="-1">
-                        <xforms:repeat nodeset="{/*/xforms:itemset/@nodeset}">
+                        <xforms:repeat ref="{/*/xforms:itemset/@nodeset}">
                             <xxforms:variable name="position" select="position()" as="xs:integer"/>
                             <xxforms:variable name="label" select="{/*/xforms:itemset/xforms:label/(@ref | @value)}" as="xs:string"/>
                             <xxforms:variable name="value" select="{/*/xforms:itemset/xforms:value/(@ref | @value)}" as="xs:string"/>

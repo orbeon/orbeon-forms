@@ -51,7 +51,7 @@
                 </instance>
             </xforms:instance>
 
-            <xforms:bind nodeset="line/text" readonly="@readonly = 'true'" relevant="@relevant = 'true'"/>
+            <xforms:bind ref="line/text" readonly="@readonly = 'true'" relevant="@relevant = 'true'"/>
 
             <xforms:action ev:event="xforms-model-construct-done" iterate="text">
                 <xforms:setvalue ref="." value="normalize-space(.)"/>
@@ -86,7 +86,7 @@
     </xhtml:head>
     <xhtml:body>
 
-        <xforms:repeat nodeset="line" id="line-repeat">
+        <xforms:repeat ref="line" id="line-repeat">
             <xhtml:div class="line">
                 <xforms:textarea ref="text" id="excerpt">
                     <xforms:label>Excerpt</xforms:label>
@@ -110,7 +110,7 @@
             <fr:button id="add">
                 <xforms:label>Add</xforms:label>
                 <xforms:action ev:event="DOMActivate">
-                    <xforms:insert nodeset="line" origin="xxforms:element('line',
+                    <xforms:insert ref="line" origin="xxforms:element('line',
                         xxforms:element('text', (
                             xxforms:attribute('readonly', 'false'),
                             xxforms:attribute('relevant', 'true')

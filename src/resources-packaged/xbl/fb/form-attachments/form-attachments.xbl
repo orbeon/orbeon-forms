@@ -44,7 +44,7 @@
                 <!-- Show dialog -->
                 <xforms:action ev:event="xxforms-dialog-open" ev:observer="dialog">
                     <xforms:var name="bind" value="$binds//xforms:bind[@id = $bind-id] treat as element()"/>
-                    <xforms:setvalue ref="$local/control-xpath" value="$bind/@nodeset treat as attribute()"/>
+                    <xforms:setvalue ref="$local/control-xpath" value="$bind/(@ref, @nodeset)[1] treat as attribute()"/>
                     <xforms:setvalue ref="$local/is-custom-mode" value="$is-custom-mode"/>
                     <xforms:setvalue ref="$local/section-ids" value="string-join($body//fr:section/@id, ' ')"/>
                     <xforms:setvalue ref="$local/control-ids" value="string-join($body//*/@id[ends-with(., '-control')], ' ')"/>
@@ -59,29 +59,29 @@
                         <xxforms:context name="fb-bind" value="$bind"/>
                         <xxforms:context name="fb-result" value="$binding"/>
                     </xforms:dispatch>
-                    <xforms:delete nodeset="$local/fb:control-details"/>
-                    <xforms:insert nodeset="$local/*" origin="$binding/xbl:binding/fb:metadata/fb:control-details"/>
+                    <xforms:delete ref="$local/fb:control-details"/>
+                    <xforms:insert ref="$local/*" origin="$binding/xbl:binding/fb:metadata/fb:control-details"/>
 
                     <!-- Process the LHHR of each details control -->
                     <xforms:var name="current-language" value="$resources/@xml:lang/string() treat as xs:string"/>
                     <xforms:action iterate="$local/fb:control-details/*/(xforms:label, xforms:hint, xforms:help, xforms:alert)">
                         <xforms:var name="lhhr" value="."/>
                         <!-- If it has a lang attribute, only keep if matches the current language -->
-                        <xforms:delete if="exists($lhhr/@lang) and $lhhr/@lang != $current-language" nodeset="$lhhr"/>
+                        <xforms:delete if="exists($lhhr/@lang) and $lhhr/@lang != $current-language" ref="$lhhr"/>
                         <!-- If it has a ref="$resources/...", evaluate it -->
                         <xforms:action if="starts-with($lhhr/@ref, '$resources/')">
                             <xforms:var name="resource-path" value="substring-after($lhhr/@ref, '$resources/')"/>
                             <xforms:setvalue ref="$lhhr" value="$resources/saxon:evaluate($resource-path)"/>
-                            <xforms:delete nodeset="$lhhr/@ref"/>
+                            <xforms:delete ref="$lhhr/@ref"/>
                         </xforms:action>
                     </xforms:action>
 
                     <!-- Create elements for additional properties, populating their initial value from the control -->
-                    <xforms:delete nodeset="$local/control-details/*"/>
+                    <xforms:delete ref="$local/control-details/*"/>
                     <xforms:action iterate="$local/fb:control-details/*">
                         <xforms:var name="position" value="position()"/>
                         <xforms:var name="xforms-control" value="."/>
-                        <xforms:insert context="$local/control-details" nodeset="*" origin="xxforms:element('control-detail', string($control/saxon:evaluate($xforms-control/@ref)))"/>
+                        <xforms:insert context="$local/control-details" ref="*" origin="xxforms:element('control-detail', string($control/saxon:evaluate($xforms-control/@ref)))"/>
                     </xforms:action>
                 </xforms:action>
 
@@ -116,10 +116,10 @@
                         </xforms:dispatch>
                     </xforms:action>
                     <!-- Update XPath on bind -->
-                    <xforms:setvalue if="$is-custom-mode" ref="$binds//xforms:bind[@id = $bind-id]/@nodeset treat as attribute()" value="$local/control-xpath"/>
+                    <xforms:setvalue if="$is-custom-mode" ref="$binds//xforms:bind[@id = $bind-id]/(@ref, @nodeset)[1] treat as attribute()" value="$local/control-xpath"/>
                     <!-- Set proper classes -->
                     <xforms:var name="classes" value="tokenize($local/classes, '\s+')"/>
-                    <xforms:delete if="count($classes) = 0" nodeset="$control/@class"/>
+                    <xforms:delete if="count($classes) = 0" ref="$control/@class"/>
                     <xforms:insert if="count($classes) > 0" context="$control" origin="xxforms:attribute('class', $local/classes)"/>
                     <!-- Update custom XBL properties -->
                     <xforms:action iterate="$local/fb:control-details/*">
@@ -160,7 +160,7 @@
                                 <!-- Classes -->
                                 <xforms:select ref="$local/classes" appearance="full">
                                     <xforms:label ref="$resources/dialog-control-details/classes/label"/>
-                                    <xforms:itemset nodeset="$resources/dialog-control-details/classes/item" xxforms:refresh-items="false">
+                                    <xforms:itemset ref="$resources/dialog-control-details/classes/item" xxforms:refresh-items="false">
                                         <xforms:label ref="label"/>
                                         <xforms:value ref="value"/>
                                     </xforms:itemset>

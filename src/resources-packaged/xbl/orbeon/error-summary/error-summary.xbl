@@ -99,12 +99,12 @@
             </xbl:handler>
             <xbl:handler event="fr-update" phase="target">`
                 <!-- Update errors in non-incremental mode -->
-                <xforms:delete nodeset="instance('fr-snapshot-instance')/*"/>
+                <xforms:delete ref="instance('fr-snapshot-instance')/*"/>
                 <xforms:insert context="instance('fr-snapshot-instance')" origin="instance('fr-errors-instance')/*"/>
             </xbl:handler>
             <xbl:handler event="fr-clear" phase="target">`
                 <!-- Clear all errors in non-incremental mode -->
-                <xforms:delete nodeset="instance('fr-snapshot-instance')/*"/>
+                <xforms:delete ref="instance('fr-snapshot-instance')/*"/>
             </xbl:handler>
         </xbl:handlers>
         <xbl:implementation>
@@ -112,7 +112,7 @@
 
                 <!-- Reset everything upon initialization -->
                 <xforms:action ev:event="xforms-model-construct-done">
-                    <xforms:delete nodeset="instance('fr-errors-instance')/*"/>
+                    <xforms:delete ref="instance('fr-errors-instance')/*"/>
                     <xforms:setvalue ref="instance('fr-visited-instance')"/>
                     <xforms:setvalue ref="instance('fr-visited-instance')/@all">false</xforms:setvalue>
                 </xforms:action>
@@ -162,11 +162,11 @@
                               if (instance('fr-visited-instance')/@all = 'true' or tokenize(instance('fr-visited-instance'), '\s+') = $e/@full-id)
                                 then $e else ()"/>
 
-                <xforms:bind nodeset="instance('fr-state-instance')">
+                <xforms:bind ref="instance('fr-state-instance')">
                     <!-- Current number of errors -->
-                    <xforms:bind nodeset="errors-count" calculate="count(instance('fr-errors-instance')/error)"/>
+                    <xforms:bind ref="errors-count" calculate="count(instance('fr-errors-instance')/error)"/>
                     <!-- Current number of visible errors -->
-                    <xforms:bind nodeset="visible-errors-count" calculate="count($visible-errors)"/>
+                    <xforms:bind ref="visible-errors-count" calculate="count($visible-errors)"/>
                 </xforms:bind>
 
                 <!-- Reusable method to insert an error in the right place in the summary -->
@@ -212,7 +212,7 @@ Inserting error information into error list:
                                         return format-number($v, '000000'), '-')])"/>
 
                     <!-- Now that we have found the position, simply insert -->
-                    <xforms:insert context="." nodeset="error[$insert-position]" origin="instance('fr-error-template')"/>
+                    <xforms:insert context="." ref="error[$insert-position]" origin="instance('fr-error-template')"/>
                     <!-- Set all the attributes -->
                     <xforms:action context="error[$insert-position + 1]">
                         <xforms:setvalue ref="@id" value="$prefixed-id"/>
@@ -335,7 +335,7 @@ Inserting error information into error list:
                                         <xforms:setvalue ref="instance('fr-state-instance')/valid">true</xforms:setvalue>
                                     </xforms:action>
                                     <!-- Remove error -->
-                                    <xforms:delete nodeset="$current-error"/>
+                                    <xforms:delete ref="$current-error"/>
                                 </xforms:action>
                             </xforms:action>
                         </xforms:action>
@@ -392,7 +392,7 @@ Inserting error information into error list:
                                 <xforms:setvalue ref="instance('fr-visited-instance')" value="string-join($updated-visited, ' ')"/>
 
                                 <!-- Remove affected errors from instance -->
-                                <xforms:delete nodeset="$affected-errors"/>
+                                <xforms:delete ref="$affected-errors"/>
 
                                 <!-- Re-insert affected errors -->
                                 <xforms:action iterate="$affected-errors">
@@ -459,7 +459,7 @@ Inserting error information into error list:
                         <xsl:variable name="fr-errors" select="/*/fr:errors" as="element(fr:errors)*"/>
                         <xsl:if test="exists($fr-errors)">
                             <xxforms:variable name="global-errors" xxbl:scope="inner">
-                                <xxforms:sequence select="({string-join($fr-errors/@nodeset, ',')})" xxbl:scope="outer">
+                                <xxforms:sequence select="({string-join($fr-errors/@ref, ',')})" xxbl:scope="outer">
                                     <xsl:copy-of select="$fr-errors/ancestor-or-self::*/namespace::*"/>
                                 </xxforms:sequence>
                             </xxforms:variable>
@@ -485,7 +485,7 @@ Inserting error information into error list:
 
                                     <!-- Display global errors -->
                                     <xsl:for-each select="$fr-errors">
-                                        <xforms:repeat nodeset="{@nodeset}" xxbl:scope="outer" xmlns:v="http://www.example.com/validation">
+                                        <xforms:repeat ref="{@nodeset}" xxbl:scope="outer" xmlns:v="http://www.example.com/validation">
                                             <xsl:copy-of select="ancestor-or-self::*/namespace::*"/>
                                             <xhtml:li>
                                                 <!-- Clickable / linkable label -->
@@ -506,7 +506,7 @@ Inserting error information into error list:
                                     </xsl:for-each>
 
                                     <!-- Display control errors -->
-                                    <xforms:repeat nodeset="$visible-errors" id="er">
+                                    <xforms:repeat ref="$visible-errors" id="er">
                                         <xhtml:li>
                                             <!-- Clickable / linkable label -->
                                             <xxforms:variable name="error" as="element(error)" select="."/>

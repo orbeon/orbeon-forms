@@ -41,9 +41,9 @@
                     <large>12345678901234567890123</large>
                 </instance>
             </xforms:instance>
-            <xforms:bind nodeset="double" readonly="false()" calculate="for $value in ../value return if ($value castable as xs:decimal) then ../value * 2 else ''"/>
-            <xforms:bind nodeset="readonly" readonly="@is-readonly = 'true'"/>
-            <xforms:bind nodeset="required-empty | required-filled" required="true()"/>
+            <xforms:bind ref="double" readonly="false()" calculate="for $value in ../value return if ($value castable as xs:decimal) then ../value * 2 else ''"/>
+            <xforms:bind ref="readonly" readonly="@is-readonly = 'true'"/>
+            <xforms:bind ref="required-empty | required-filled" required="true()"/>
         </xforms:model>
         <xhtml:style type="text/css">
             .xbl-fr-currency .xforms-label { display: inline-block; width: 10em; }
@@ -144,7 +144,7 @@
             </fr:currency>
         </xhtml:div>
         <xhtml:div>
-            <xforms:repeat nodeset="repeat[@show = 'true']" id="repeat">
+            <xforms:repeat ref="repeat[@show = 'true']" id="repeat">
                 <fr:currency ref="." id="in-repeat">
                     <xforms:label>In repeat</xforms:label>
                 </fr:currency>

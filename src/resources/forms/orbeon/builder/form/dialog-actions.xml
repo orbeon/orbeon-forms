@@ -41,7 +41,7 @@
                 <!-- Condition -->
                 <xforms:select1 ref="$instance/xforms:action/xforms:action[1]/@if">
                     <xforms:label ref="$form-resources/dialog-actions/event-condition/label"/>
-                    <xforms:itemset nodeset="$form-resources/dialog-actions/event-condition/item">
+                    <xforms:itemset ref="$form-resources/dialog-actions/event-condition/item">
                         <xforms:label ref="label"/>
                         <xforms:value ref="value"/>
                     </xforms:itemset>
@@ -58,7 +58,7 @@
                         <xforms:label ref="$form-resources/select/label"/>
                         <xforms:value/>
                     </xforms:item>
-                    <xforms:itemset nodeset="$form-resources/dialog-actions/event-type/item">
+                    <xforms:itemset ref="$form-resources/dialog-actions/event-type/item">
                         <xforms:label ref="label"/>
                         <xforms:value ref="value"/>
                     </xforms:itemset>
@@ -72,7 +72,7 @@
                         <xforms:label ref="$form-resources/select/label"/>
                         <xforms:value/>
                     </xforms:item>
-                    <xforms:itemset nodeset="$body//(*[@ref or @bind or self::xforms:trigger or self::fr:button])[ends-with(@id, '-control')]">
+                    <xforms:itemset ref="$body//(*[@ref or @bind or self::xforms:trigger or self::fr:button])[ends-with(@id, '-control')]">
                         <!-- Try to build a reasonably user-friendly label -->
                         <xforms:label value="for $id in substring-before(@id, '-control') return concat($current-resources/*[name() = $id]/label, ' (', $id, ')')"/>
                         <xforms:value value="@id"/>
@@ -91,7 +91,7 @@
                         <xforms:value/>
                     </xforms:item>
                     <!-- Show submissions that are NOT yet used by a service. This is a current limitation. -->
-                    <xforms:itemset nodeset="$model/xforms:submission[ends-with(@id, '-submission') and not(@id = ../xforms:action[ends-with(@id, '-binding') and @id != concat($instance/initial-name, '-binding')]/xforms:action[1]/xforms:send/@submission)]">
+                    <xforms:itemset ref="$model/xforms:submission[ends-with(@id, '-submission') and not(@id = ../xforms:action[ends-with(@id, '-binding') and @id != concat($instance/initial-name, '-binding')]/xforms:action[1]/xforms:send/@submission)]">
                         <xforms:label value="substring-before(@id, '-submission')"/>
                         <xforms:value value="@id"/>
                     </xforms:itemset>
@@ -109,7 +109,7 @@
                 <!-- Set request values -->
                 <xforms:group ref="xforms:action[@ev:event = 'xforms-submit']/xforms:action">
                     <xforms:label ref="$form-resources/dialog-actions/request-parameters/label"/>
-                    <fr:repeat nodeset="xforms:action[@class = 'fr-set-service-value-action']" id="fb-actions-setvalue-repeat" origin="instance('fb-binding-action-template')/xforms:action[@class = 'fr-set-service-value-action']" columns="2" appearance="xxforms:table">
+                    <fr:repeat ref="xforms:action[@class = 'fr-set-service-value-action']" id="fb-actions-setvalue-repeat" origin="instance('fb-binding-action-template')/xforms:action[@class = 'fr-set-service-value-action']" columns="2" appearance="xxforms:table">
                         <fr:body>
                             <xhtml:tr>
                                 <xhtml:td>
@@ -119,7 +119,7 @@
                                             <xforms:label ref="$form-resources/select/label"/>
                                             <xforms:value/>
                                         </xforms:item>
-                                        <xforms:itemset nodeset="$body//*[(@ref or @bind) and ends-with(@id, '-control')]">
+                                        <xforms:itemset ref="$body//*[(@ref or @bind) and ends-with(@id, '-control')]">
                                             <!-- Try to build a reasonably user-friendly label -->
                                             <xforms:label value="for $id in substring-before(@id, '-control') return concat($current-resources/*[name() = $id]/label, ' (', $id, ')')"/>
                                             <xforms:value value="concat('''', substring-before(@id, '-control'), '''')"/>
@@ -137,7 +137,7 @@
                 </xforms:group>
                 <xforms:group ref="xforms:action[@ev:event = 'xforms-submit']/xforms:action">
                     <xforms:label ref="$form-resources/dialog-actions/request-database-parameter/label"/>
-                    <fr:repeat nodeset="xforms:action[@class = 'fr-set-database-service-value-action']" id="fb-actions-database-setvalue-repeat" origin="instance('fb-binding-action-template')/xforms:action[@class = 'fr-set-database-service-value-action']" columns="2" appearance="xxforms:table">
+                    <fr:repeat ref="xforms:action[@class = 'fr-set-database-service-value-action']" id="fb-actions-database-setvalue-repeat" origin="instance('fb-binding-action-template')/xforms:action[@class = 'fr-set-database-service-value-action']" columns="2" appearance="xxforms:table">
                         <fr:body>
                             <xhtml:tr>
                                 <xhtml:td>
@@ -147,7 +147,7 @@
                                             <xforms:label ref="$form-resources/select/label"/>
                                             <xforms:value/>
                                         </xforms:item>
-                                        <xforms:itemset nodeset="$body//*[(@ref or @bind) and ends-with(@id, '-control')]">
+                                        <xforms:itemset ref="$body//*[(@ref or @bind) and ends-with(@id, '-control')]">
                                             <!-- Try to build a reasonably user-friendly label -->
                                             <xforms:label value="for $id in substring-before(@id, '-control') return concat($current-resources/*[name() = $id]/label, ' (', $id, ')')"/>
                                             <xforms:value value="concat('''', substring-before(@id, '-control'), '''')"/>
@@ -166,7 +166,7 @@
                 <!-- Set control values -->
                 <xforms:group ref="xforms:action[@ev:event = 'xforms-submit-done']">
                     <xforms:label ref="$form-resources/dialog-actions/response-values/label"/>
-                    <fr:repeat nodeset="xforms:action[@class = 'fr-set-control-value-action']" id="fb-bindings-setvalue-repeat" origin="instance('fb-binding-action-template')/xforms:action[@class = 'fr-set-control-value-action']" columns="2" appearance="xxforms:table">
+                    <fr:repeat ref="xforms:action[@class = 'fr-set-control-value-action']" id="fb-bindings-setvalue-repeat" origin="instance('fb-binding-action-template')/xforms:action[@class = 'fr-set-control-value-action']" columns="2" appearance="xxforms:table">
                         <fr:body>
                             <xhtml:tr>
                                 <xhtml:td>
@@ -176,7 +176,7 @@
                                             <xforms:label ref="$form-resources/select/label"/>
                                             <xforms:value/>
                                         </xforms:item>
-                                        <xforms:itemset nodeset="$body//*[(@ref or @bind) and ends-with(@id, '-control')]">
+                                        <xforms:itemset ref="$body//*[(@ref or @bind) and ends-with(@id, '-control')]">
                                             <xforms:label value="substring-before(@id, '-control')"/>
                                             <xforms:value value="concat('''', substring-before(@id, '-control'), '''')"/>
                                         </xforms:itemset>
@@ -195,7 +195,7 @@
                 <xforms:var name="controls-with-itemset" value="$body//*[(@ref or @bind) and ends-with(@id, '-control') and exists(xforms:itemset)]" as="element()*"/>
                 <xforms:group ref="xforms:action[@ev:event = 'xforms-submit-done' and exists($controls-with-itemset)]">
                     <xforms:label ref="$form-resources/dialog-actions/response-itemset/label"/>
-                    <fr:repeat nodeset="xforms:action[@class = 'fr-itemset-action']" id="fb-bindings-itemset-repeat" origin="instance('fb-binding-action-template')/xforms:action[@class = 'fr-itemset-action']" columns="2" appearance="xxforms:table">
+                    <fr:repeat ref="xforms:action[@class = 'fr-itemset-action']" id="fb-bindings-itemset-repeat" origin="instance('fb-binding-action-template')/xforms:action[@class = 'fr-itemset-action']" columns="2" appearance="xxforms:table">
                         <fr:body>
                             <xhtml:tr>
                                 <xhtml:td>
@@ -207,7 +207,7 @@
                                             <xforms:label ref="$form-resources/select/label"/>
                                             <xforms:value/>
                                         </xforms:item>
-                                        <xforms:itemset nodeset="$controls-with-itemset">
+                                        <xforms:itemset ref="$controls-with-itemset">
                                             <!-- Try to build a reasonably user-friendly label -->
                                             <xforms:label value="for $id in substring-before(@id, '-control') return concat($current-resources/*[name() = $id]/label, ' (', $id, ')')"/>
                                             <xforms:value value="concat('''', substring-before(@id, '-control'), '''')"/>
@@ -269,10 +269,10 @@
 
                     <!-- Delete existing binding if any -->
                     <xforms:var name="binding-id" value="$instance/xforms:action[1]/@id"/>
-                    <xforms:delete nodeset="$model/xforms:action[@id = $binding-id]"/>
+                    <xforms:delete ref="$model/xforms:action[@id = $binding-id]"/>
 
                     <!-- Insert new binding -->
-                    <xforms:insert context="$model" nodeset="*" origin="$instance/xforms:action[1]"/>
+                    <xforms:insert context="$model" ref="*" origin="$instance/xforms:action[1]"/>
 
                     <!-- Hide dialog -->
                     <xxforms:hide dialog="fb-action-dialog"/>
@@ -297,11 +297,11 @@
         <!-- Clear working values -->
         <xforms:setvalue ref="$instance/name"/>
         <xforms:setvalue ref="$instance/initial-name"/>
-        <xforms:delete nodeset="$instance/xforms:action"/>
+        <xforms:delete ref="$instance/xforms:action"/>
 
         <!-- Empty binding if no binding id passed -->
         <xforms:action if="not($binding-name)">
-            <xforms:insert nodeset="$instance/*" origin="instance('fb-binding-template')"/>
+            <xforms:insert ref="$instance/*" origin="instance('fb-binding-template')"/>
         </xforms:action>
         <!-- Otherwise copy binding -->
         <xforms:action if="$binding-name">
@@ -309,7 +309,7 @@
             <xforms:setvalue ref="$instance/name" value="$binding-name"/>
             <xforms:setvalue ref="$instance/initial-name" value="$binding-name"/>
 
-            <xforms:insert nodeset="$instance/*" origin="$model/xforms:action[@id = $binding-id]"/>
+            <xforms:insert ref="$instance/*" origin="$model/xforms:action[@id = $binding-id]"/>
 
             <!-- Insert condition on action if missing -->
             <xforms:var name="action1" value="$instance/xforms:action/xforms:action[1]"/>
@@ -339,49 +339,49 @@
         <xforms:setvalue ev:event="xxforms-invalid" ev:observer="fb-bindings-editor-instance" ref="save-test-trigger">disabled</xforms:setvalue>
         <xforms:setvalue ev:event="xxforms-valid" ev:observer="fb-bindings-editor-instance" ref="save-test-trigger">enabled</xforms:setvalue>
 
-        <xforms:bind nodeset="instance('fb-bindings-editor-instance')">
-            <xforms:bind nodeset="name" type="xs:NCName" required="true()"
+        <xforms:bind ref="instance('fb-bindings-editor-instance')">
+            <xforms:bind ref="name" type="xs:NCName" required="true()"
                          constraint="(normalize-space() != '' and normalize-space() = ../initial-name)
                                         or not(../xforms:action[1]/@id = $model/xforms:action/@id)"/>
-            <xforms:bind nodeset="instance-id" calculate="concat(../name, '-instance')"/>
+            <xforms:bind ref="instance-id" calculate="concat(../name, '-instance')"/>
 
-            <xforms:bind nodeset="xforms:action">
+            <xforms:bind ref="xforms:action">
                 <!-- Action id -->
-                <xforms:bind nodeset="@id" calculate="concat(../../name, '-binding')"/>
+                <xforms:bind ref="@id" calculate="concat(../../name, '-binding')"/>
                 <!-- Action that triggers the submission -->
-                <xforms:bind nodeset="xforms:action[1]">
+                <xforms:bind ref="xforms:action[1]">
                     <!-- Event triggering the action -->
-                    <xforms:bind nodeset="@ev:event" required="true()"/>
-                    <xforms:bind name="submission-bind" nodeset="xforms:send/@submission" required="true()"/>
+                    <xforms:bind ref="@ev:event" required="true()"/>
+                    <xforms:bind name="submission-bind" ref="xforms:send/@submission" required="true()"/>
                     <!-- The observer for the event triggering the action is either a control, or the model -->
-                    <xforms:bind nodeset="@ev:observer"
+                    <xforms:bind ref="@ev:observer"
                                  required="tokenize(../@ev:event, '\s+') = ('DOMActivate', 'xforms-value-changed', 'xforms-enabled')"
                                  relevant="tokenize(../@ev:event, '\s+') = ('DOMActivate', 'xforms-value-changed', 'xforms-enabled')"
                                  calculate="if (tokenize(../@ev:event, '\s+') = ('DOMActivate', 'xforms-value-changed', 'xforms-enabled')) then . else 'fr-form-model'"
                                  readonly="false()"/>
                 </xforms:bind>
                 <!-- xforms-submit -->
-                <xforms:bind nodeset="xforms:action[@ev:event = 'xforms-submit']">
-                    <xforms:bind nodeset="@ev:observer" calculate="$submission-bind"/>
-                    <xforms:bind nodeset="xxforms:variable[@name = 'request-instance-name']/@select"
+                <xforms:bind ref="xforms:action[@ev:event = 'xforms-submit']">
+                    <xforms:bind ref="@ev:observer" calculate="$submission-bind"/>
+                    <xforms:bind ref="xxforms:variable[@name = 'request-instance-name']/@select"
                                  calculate="concat('''', substring-before($submission-bind, '-submission'), '-instance''')"/>
-                    <!--<xforms:bind nodeset="xforms:setvalue/@ref | xforms:setvalue/@value" required="true()"/>-->
+                    <!--<xforms:bind ref="xforms:setvalue/@ref | xforms:setvalue/@value" required="true()"/>-->
                     <!-- TODO: more validation -->
                 </xforms:bind>
                 <!-- xforms-submit-done -->
-                <xforms:bind nodeset="xforms:action[@ev:event = 'xforms-submit-done']">
-                    <xforms:bind nodeset="@ev:observer" calculate="$submission-bind"/>
+                <xforms:bind ref="xforms:action[@ev:event = 'xforms-submit-done']">
+                    <xforms:bind ref="@ev:observer" calculate="$submission-bind"/>
                     <!-- Setvalue actions -->
-                    <xforms:bind nodeset="xforms:action[@class = 'fr-set-control-value-action']">
-                        <xforms:bind nodeset="xxforms:variable/@select" required="true()"/>
+                    <xforms:bind ref="xforms:action[@class = 'fr-set-control-value-action']">
+                        <xforms:bind ref="xxforms:variable/@select" required="true()"/>
                     </xforms:bind>
                     <!-- Itemset actions -->
-                    <xforms:bind nodeset="xforms:action[@class = 'fr-itemset-action']">
-                        <xforms:bind nodeset=".//xxforms:variable/@select" required="true()"/>
+                    <xforms:bind ref="xforms:action[@class = 'fr-itemset-action']">
+                        <xforms:bind ref=".//xxforms:variable/@select" required="true()"/>
                     </xforms:bind>
                 </xforms:bind>
             </xforms:bind>
-            <xforms:bind nodeset="save-test-trigger" readonly=". = 'disabled'"/>
+            <xforms:bind ref="save-test-trigger" readonly=". = 'disabled'"/>
         </xforms:bind>
 
         <!-- Template for a given binding -->
@@ -397,8 +397,8 @@
                     <!-- Get reference to initial request -->
                     <xforms:var name="request-instance-name" value="SET ME" as="xs:string"/>
                     <!-- Copy over to read-write request instance -->
-                    <xforms:insert nodeset="instance('fr-service-request-instance')" origin="saxon:parse(instance($request-instance-name))"/>
-                    <!--<xforms:insert nodeset="instance('fr-service-request-instance')" origin="instance($request-instance-name)"/>-->
+                    <xforms:insert ref="instance('fr-service-request-instance')" origin="saxon:parse(instance($request-instance-name))"/>
+                    <!--<xforms:insert ref="instance('fr-service-request-instance')" origin="instance($request-instance-name)"/>-->
                     <!-- Set values if needed -->
                     <xforms:action context="instance('fr-service-request-instance')">
                         <!-- Setvalue actions will be here -->
@@ -446,11 +446,11 @@
                     <xforms:var name="response-items" value="" as="node()*"/>
                     <!-- Set itemset -->
                     <xforms:var name="control-resources" model="fr-resources-model" value="$fr-form-resources/*[name() = $control-name]"/>
-                    <xforms:delete nodeset="$control-resources/item"/>
+                    <xforms:delete ref="$control-resources/item"/>
                     <xforms:action iterate="$response-items">
                         <xforms:var name="item-label" value="" as="xs:string"/>
                         <xforms:var name="item-value" value="" as="xs:string"/>
-                        <xforms:insert nodeset="$control-resources/*"
+                        <xforms:insert ref="$control-resources/*"
                                        origin="xxforms:element('item', (xxforms:element('label', xs:string($item-label)), xxforms:element('value', xs:string($item-value))))"/>
                     </xforms:action>
                 </xforms:action>

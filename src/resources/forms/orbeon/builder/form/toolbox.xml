@@ -118,13 +118,13 @@
                         </xhtml:div>
                     </xhtml:div>
                     <!-- Controls and components -->
-                    <xforms:repeat nodeset="instance('fb-components-instance')/xbl:xbl[xbl:binding]">
+                    <xforms:repeat ref="instance('fb-components-instance')/xbl:xbl[xbl:binding]">
                         <xhtml:div class="fb-tools">
                             <xforms:group>
                                 <!-- Display localized name -->
                                 <xforms:label ref="(fb:metadata/fb:display-name[@lang = $lang], fb:metadata/fb:display-name[1])"/>
 
-                                <xforms:repeat nodeset="xbl:binding" id="fb-components-template-repeat">
+                                <xforms:repeat ref="xbl:binding" id="fb-components-template-repeat">
 
                                     <xforms:var name="binding" value="." as="element(xbl:binding)"/>
 
@@ -287,7 +287,7 @@
                                 <xforms:label ref="$form-resources/http-services/label"/>
                                 <!-- Repeat over existing services -->
                                 <xhtml:ul>
-                                    <xforms:repeat nodeset="$model/xforms:submission[ends-with(@id, '-submission') and tokenize(@class, '\s+') = 'fr-service']">
+                                    <xforms:repeat ref="$model/xforms:submission[ends-with(@id, '-submission') and tokenize(@class, '\s+') = 'fr-service']">
                                         <xforms:var name="current-submission" value="."/>
                                         <xhtml:li>
                                             <xforms:var name="submission-name" value="substring-before(@id, '-submission')"/>
@@ -313,8 +313,8 @@
                                                 </xforms:action>
                                                 <xforms:action ev:event="fb-confirmation-yes">
                                                     <!-- Delete stuff -->
-                                                    <xforms:delete nodeset="$current-submission"/>
-                                                    <xforms:delete nodeset="$model/xforms:instance[@id = concat($submission-name, '-instance')]"/>
+                                                    <xforms:delete ref="$current-submission"/>
+                                                    <xforms:delete ref="$model/xforms:instance[@id = concat($submission-name, '-instance')]"/>
                                                 </xforms:action>
                                             </xforms:trigger>
                                             <xforms:output value="$submission-name"/>
@@ -340,7 +340,7 @@
                                 <xforms:label ref="$form-resources/database-services/label"/>
                                 <!-- Repeat over existing services -->
                                 <xhtml:ul>
-                                    <xforms:repeat nodeset="$model/xforms:submission[ends-with(@id, '-submission') and tokenize(@class, '\s+') = 'fr-database-service']">
+                                    <xforms:repeat ref="$model/xforms:submission[ends-with(@id, '-submission') and tokenize(@class, '\s+') = 'fr-database-service']">
                                         <xforms:var name="current-submission" value="."/>
                                         <xhtml:li>
                                             <xforms:var name="submission-name" value="substring-before(@id, '-submission')"/>
@@ -366,8 +366,8 @@
                                                 </xforms:action>
                                                 <xforms:action ev:event="fb-confirmation-yes">
                                                     <!-- Delete stuff -->
-                                                    <xforms:delete nodeset="$current-submission"/>
-                                                    <xforms:delete nodeset="$model/xforms:instance[@id = concat($submission-name, '-instance')]"/>
+                                                    <xforms:delete ref="$current-submission"/>
+                                                    <xforms:delete ref="$model/xforms:instance[@id = concat($submission-name, '-instance')]"/>
                                                 </xforms:action>
                                             </xforms:trigger>
                                             <xforms:output value="$submission-name"/>
@@ -393,7 +393,7 @@
                                 <xforms:label ref="$form-resources/actions/label"/>
                                 <!-- Repeat over existing bindings -->
                                 <xhtml:ul>
-                                    <xforms:repeat nodeset="$model/xforms:action[ends-with(@id, '-binding')]">
+                                    <xforms:repeat ref="$model/xforms:action[ends-with(@id, '-binding')]">
                                         <xforms:var name="current-action" value="."/>
                                         <xhtml:li>
                                             <xforms:var name="binding-name" value="substring-before(@id, '-binding')"/>
@@ -419,7 +419,7 @@
                                                 </xforms:action>
                                                 <xforms:action ev:event="fb-confirmation-yes">
                                                     <!-- Delete stuff -->
-                                                    <xforms:delete nodeset="$current-action"/>
+                                                    <xforms:delete ref="$current-action"/>
                                                 </xforms:action>
                                             </xforms:trigger>
                                             <xforms:output value="$binding-name"/>

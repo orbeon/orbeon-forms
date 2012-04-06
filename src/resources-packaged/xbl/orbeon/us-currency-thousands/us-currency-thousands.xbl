@@ -61,9 +61,9 @@
                 <xforms:instance id="currency-instance">
                     <value/>
                 </xforms:instance>
-                <xforms:bind nodeset="." constraint="substring-after(., '$') castable as xs:decimal"/>
+                <xforms:bind ref="." constraint="substring-after(., '$') castable as xs:decimal"/>
                 <!-- FR HACK: Make instance read-only when the form must be read-only -->
-                <xforms:bind nodeset="." readonly="xxforms:instance('fr-parameters-instance')/mode = ('view', 'pdf', 'email')"/>
+                <xforms:bind ref="." readonly="xxforms:instance('fr-parameters-instance')/mode = ('view', 'pdf', 'email')"/>
             </xforms:model>
         </xbl:implementation>
         <xbl:template>

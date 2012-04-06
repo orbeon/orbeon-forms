@@ -129,7 +129,7 @@
                                 <!-- What do when doing a refresh -->
                                 <xforms:submission id="get-itemset" method="get" resource="{{instance('local')/resource}}" replace="instance"
                                                    instance="suggestions-instance" serialization="none">
-                                    <xforms:insert ev:event="xforms-submit-error" nodeset="instance('suggestions-instance')" origin="xxforms:element('dummy')"/>
+                                    <xforms:insert ev:event="xforms-submit-error" ref="instance('suggestions-instance')" origin="xxforms:element('dummy')"/>
                                 </xforms:submission>
                             </xforms:model>
 

@@ -91,7 +91,7 @@
                             <xhtml:tr>
                                 <xhtml:td>
                                     <xhtml:span class="fr-plate-span">
-                                        <xforms:repeat nodeset="instance()/c[normalize-space(.) != '']">
+                                        <xforms:repeat ref="instance()/c[normalize-space(.) != '']">
                                             <xhtml:img src="/xbl/orbeon/california-plate/images/_{if (string-to-codepoints(upper-case(.)) = string-to-codepoints('ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789')) then upper-case(.) else '_'}_small.gif"/>
                                         </xforms:repeat>
                                     </xhtml:span>

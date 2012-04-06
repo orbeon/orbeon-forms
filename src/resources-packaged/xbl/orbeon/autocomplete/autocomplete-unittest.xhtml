@@ -57,7 +57,7 @@
                 </selected-countries>
             </xforms:instance>
             <!-- Constraint on selected country -->
-            <xforms:bind nodeset="instance('selected-countries')/*" constraint="starts-with(., 's')" readonly="../@readonly = 'true'" relevant="../@relevant = 'true'"/>
+            <xforms:bind ref="instance('selected-countries')/*" constraint="starts-with(., 's')" readonly="../@readonly = 'true'" relevant="../@relevant = 'true'"/>
 
             <xforms:instance id="configuration">
                 <configuration>
@@ -71,7 +71,7 @@
 
             <!-- Add other countries for testing to list of all countries -->
             <xforms:insert ev:event="xforms-model-construct-done"
-                nodeset="instance('all-countries')/country" origin="instance('additional-countries')/*"/>
+                ref="instance('all-countries')/country" origin="instance('additional-countries')/*"/>
 
         </xforms:model>
         <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
@@ -137,7 +137,7 @@
                     <fr:autocomplete ref="." id="static-autocomplete"
                                      dynamic-itemset="false" max-results-displayed="4" tabindex="1">
                         <xforms:label>Country code: </xforms:label>
-                        <xforms:itemset nodeset="instance('all-countries')/country">
+                        <xforms:itemset ref="instance('all-countries')/country">
                             <xforms:label ref="name"/>
                             <xforms:value ref="us-code"/>
                         </xforms:itemset>
@@ -197,18 +197,18 @@
                                 <xxforms:variable name="make-suggestion" select="string-length() >= 2"/>
                                 <xforms:setvalue ref="instance('search-dynamic')/country-name" value="$search-value"/>
                                 <xforms:send submission="update-countries"/>
-                                <xforms:insert context="instance('searched-countries')" nodeset="country"
+                                <xforms:insert context="instance('searched-countries')" ref="country"
                                     origin="instance('additional-countries')/country[starts-with(name, $search-value)]"
                                     at="last()" position="after"/>
                             </xforms:action>
                             <xforms:action if="not($make-suggestion)">
                                 <!-- Delete itemset -->
-                                <xforms:delete nodeset="instance('searched-countries')/country"/>
+                                <xforms:delete ref="instance('searched-countries')/country"/>
                             </xforms:action>
                         </xforms:action>
 
                         <xforms:label>Country code: </xforms:label>
-                        <xforms:itemset nodeset="instance('searched-countries')/country">
+                        <xforms:itemset ref="instance('searched-countries')/country">
                             <xforms:label ref="name"/>
                             <xforms:value ref="us-code"/>
                         </xforms:itemset>
@@ -260,7 +260,7 @@
                     <xforms:setvalue ev:event="xforms-invalid" ref="@effective-target-id" value="string-join((xxforms:event('xxforms:target-prefixes'), xxforms:event('xxforms:targetid')), '$')"/>
                     <fr:autocomplete ref="." labelref="@label" id="resource-autocomplete" resource="/xforms-controls/services/countries?country-name={$fr-search-value}" max-results-displayed="4">
                         <xforms:label>Country code: </xforms:label>
-                        <xforms:itemset nodeset="/countries/country">
+                        <xforms:itemset ref="/countries/country">
                             <xforms:label ref="name"/>
                             <xforms:value ref="us-code"/>
                         </xforms:itemset>

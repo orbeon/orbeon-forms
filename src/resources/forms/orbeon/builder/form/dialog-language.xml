@@ -43,7 +43,7 @@
                             </xforms:item>
                             <!-- All the languages except the languages already selected -->
                             <xforms:itemset model="fr-resources-model"
-                                            nodeset="instance('fr-languages-instance')/language[not(@exclude = 'true') and not(@code = $resources/resource/@xml:lang)]">
+                                            ref="instance('fr-languages-instance')/language[not(@exclude = 'true') and not(@code = $resources/resource/@xml:lang)]">
                                 <xforms:label value="if (@native-name != @english-name) then concat(@native-name, ' (', @english-name, ')') else @native-name"/>
                                 <xforms:value ref="@code"/>
                             </xforms:itemset>
@@ -57,12 +57,12 @@
                     <xforms:action ev:event="DOMActivate">
                         <!-- Copy first resources into new resources and set new language -->
                         <xforms:action context="$resources">
-                            <xforms:insert context="." nodeset="resource" origin="resource[1]"/>
+                            <xforms:insert context="." ref="resource" origin="resource[1]"/>
                             <xforms:setvalue ref="resource[last()]/@xml:lang" value="$variables/new-language"/>
                         </xforms:action>
                         <!-- Copy form metadata and set new language -->
                         <xforms:action context="$metadata-instance">
-                            <xforms:insert context="." nodeset="title | description" origin="title[1] | description[1]"/>
+                            <xforms:insert context="." ref="title | description" origin="title[1] | description[1]"/>
                             <xforms:setvalue ref="title[last()]/@xml:lang" value="$variables/new-language"/>
                             <xforms:setvalue ref="description[last()]/@xml:lang" value="$variables/new-language"/>
                         </xforms:action>

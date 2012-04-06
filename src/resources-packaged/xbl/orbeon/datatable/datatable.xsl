@@ -216,7 +216,7 @@
     -->
 
     <xsl:template match="/fr:datatable/xhtml:tbody/xhtml:tr[@repeat-nodeset]" mode="pass2">
-        <xforms:repeat nodeset="{@repeat-nodeset}">
+        <xforms:repeat ref="{@repeat-nodeset}">
             <xsl:copy-of select="@id"/>
             <xsl:copy>
                 <xsl:copy-of select="@*[name() != 'repeat-nodeset']|node()"/>
@@ -236,7 +236,7 @@
 
     <xsl:template match="/fr:datatable/xhtml:tbody/xforms:repeat/xhtml:tr/td[@repeat-nodeset]|/fr:datatable/xhtml:thead/xhtml:tr/th[@repeat-nodeset]"
         mode="pass3">
-        <xforms:repeat nodeset="{@repeat-nodeset}">
+        <xforms:repeat ref="{@repeat-nodeset}">
             <xsl:copy>
                 <xsl:copy-of select="@*[name() != 'repeat-nodeset']|node()"/>
             </xsl:copy>
@@ -363,19 +363,19 @@
                         </xsl:for-each>
                     </columns>
                 </xforms:instance>
-                <xforms:bind nodeset="column/@nbColumns" calculate="1"/>
-                <xforms:bind nodeset="columnSet/@nbColumns" calculate="count(../column)"/>
-                <xforms:bind nodeset="//@index" calculate="count(../preceding::column) + 1"/>
-                <xforms:bind nodeset="//column/@currentSortOrder"
+                <xforms:bind ref="column/@nbColumns" calculate="1"/>
+                <xforms:bind ref="columnSet/@nbColumns" calculate="count(../column)"/>
+                <xforms:bind ref="//@index" calculate="count(../preceding::column) + 1"/>
+                <xforms:bind ref="//column/@currentSortOrder"
                     calculate="if (/*/@default='true' and ../@fr:sorted) then ../@fr:sorted else if (../@index = /*/@currentSortColumn) then . else 'none'"/>
-                <xforms:bind nodeset="//column/@nextSortOrder" calculate="if (../@currentSortOrder = 'ascending') then 'descending' else 'ascending'"/>
+                <xforms:bind ref="//column/@nextSortOrder" calculate="if (../@currentSortOrder = 'ascending') then 'descending' else 'ascending'"/>
                 <xxforms:variable name="repeatNodeset">
                     <xsl:value-of select="$repeatNodeset"/>
                 </xxforms:variable>
-                <xforms:bind nodeset="//column/@pathToFirstNode"
+                <xforms:bind ref="//column/@pathToFirstNode"
                     calculate="concat('xxforms:component-context()/(', $repeatNodeset, ')[1]/(', ../@sortKey, ')')"/>
-                <xforms:bind nodeset="//column[@fr:sortType]/@type" calculate="../@fr:sortType"/>
-                <!--<xforms:bind nodeset="//column[not(@fr:sortType)]/@type"
+                <xforms:bind ref="//column[@fr:sortType]/@type" calculate="../@fr:sortType"/>
+                <!--<xforms:bind ref="//column[not(@fr:sortType)]/@type"
                     calculate="for $value in xxforms:evaluate(../@pathToFirstNode)
                         return if ($value instance of node())
                         then if (xxforms:type($value) = ({$numberTypesEnumeration}))
@@ -400,9 +400,9 @@
                         </xxforms:variable>
                         <xxforms:variable name="nbPages"
                             select="ceiling($nbRows div {$rowsPerPage}) cast as xs:integer"/>
-                        <xforms:bind nodeset="instance('page')">
-                            <xforms:bind nodeset="@nbPages" calculate="$nbPages"/>
-                            <!-\-<xforms:bind nodeset="."
+                        <xforms:bind ref="instance('page')">
+                            <xforms:bind ref="@nbPages" calculate="$nbPages"/>
+                            <!-\-<xforms:bind ref="."
                                calculate="if (. cast as xs:integer > $nbPages) then $nbPages else ."
                                />-\->
                         </xforms:bind>
@@ -472,7 +472,7 @@
                                 <xforms:output value="name()"/>
                             </xhtml:p>
                             <xhtml:ul>
-                                <xforms:repeat nodeset="@*">
+                                <xforms:repeat ref="@*">
                                     <xhtml:li>
                                         <xforms:output ref=".">
                                             <xforms:label>
@@ -483,13 +483,13 @@
                                 </xforms:repeat>
                             </xhtml:ul>
                         </xhtml:div>
-                        <xforms:repeat nodeset="*|//column">
+                        <xforms:repeat ref="*|//column">
                             <xhtml:div id="debug-column">
                                 <xhtml:p>
                                     <xforms:output value="name()"/>
                                 </xhtml:p>
                                 <xhtml:ul>
-                                    <xforms:repeat nodeset="@*">
+                                    <xforms:repeat ref="@*">
                                         <xhtml:li>
                                             <xforms:output ref=".">
                                                 <xforms:label>
@@ -814,7 +814,7 @@
                 <xforms:action ev:event="xforms-enabled" xxbl:scope="inner">
                     <xsl:choose>
                         <xsl:when test="$is-internally-sorted">
-                            <xforms:insert context="$columnSet" nodeset="column"
+                            <xforms:insert context="$columnSet" ref="column"
                                 origin="xxforms:element('column', (
                             xxforms:attribute('position', $position),
                             xxforms:attribute('nbColumns', 1),
@@ -832,7 +832,7 @@
                             "/>
                         </xsl:when>
                         <xsl:otherwise>
-                            <xforms:insert context="$columnSet" nodeset="column"
+                            <xforms:insert context="$columnSet" ref="column"
                                 origin="xxforms:element('column', (
                                 xxforms:attribute('position', $position),
                                 xxforms:attribute('nbColumns', 1),
@@ -882,10 +882,10 @@
             <xsl:apply-templates select="@*[name() != 'class']" mode="dynamic"/>
             <xforms:group ref=".">
                 <xforms:action ev:event="xforms-enabled xforms-value-changed" xxbl:scope="inner">
-                    <!--<xforms:delete nodeset="$columnSet/column[@position = $position]"/>-->
+                    <!--<xforms:delete ref="$columnSet/column[@position = $position]"/>-->
                     <xsl:choose>
                         <xsl:when test="$is-internally-sorted">
-                            <xforms:insert context="$columnSet" nodeset="column"
+                            <xforms:insert context="$columnSet" ref="column"
                                 origin="xxforms:element('column', (
                                 xxforms:attribute('position', $position),
                                 xxforms:attribute('nbColumns', 1),
@@ -903,7 +903,7 @@
                                 "/>
                         </xsl:when>
                         <xsl:otherwise>
-                            <xforms:insert context="$columnSet" nodeset="column"
+                            <xforms:insert context="$columnSet" ref="column"
                                 origin="xxforms:element('column', (
                                 xxforms:attribute('position', $position),
                                 xxforms:attribute('nbColumns', 1),
@@ -1007,7 +1007,7 @@
             </xsl:otherwise>
         </xsl:choose>
 
-        <xforms:repeat nodeset="$fr-dt-rewritten-paginated-nodeset">
+        <xforms:repeat ref="$fr-dt-rewritten-paginated-nodeset">
             <xsl:apply-templates select="@*[not(name()='nodeset')]" mode="dynamic"/>
 
             <xforms:action ev:event="xxforms-nodeset-changed xforms-enabled xforms-disabled" ev:target="#observer">
@@ -1301,7 +1301,7 @@
                     </xforms:group>
 
                     <xhtml:span class="yui-pg-pages">
-                        <xforms:repeat nodeset="$pages" id="{$prefix}-pages">
+                        <xforms:repeat ref="$pages" id="{$prefix}-pages">
                             <xsl:choose>
                                 <xsl:when test="$maxNbPagesToDisplay &lt; 0">
                                     <xxforms:variable name="display">page</xxforms:variable>

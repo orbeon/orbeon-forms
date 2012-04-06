@@ -93,7 +93,7 @@
                             </xhtml:tr>
                         </xhtml:thead>
                         <xhtml:tbody>
-                            <xforms:repeat nodeset="line[string-length(.) &lt; 20]">
+                            <xforms:repeat ref="line[string-length(.) &lt; 20]">
                                 <xhtml:tr>
                                     <xhtml:td>
                                         <span style="display:none">
@@ -113,7 +113,7 @@
                 <fr:label>Check that every table in an xforms:repeat gets updated</fr:label>
                 <xhtml:div>
                     <xhtml:p>When embedded in an xforms:repeat, each datatable should properly be updated when its nodeset changes.</xhtml:p>
-                    <xforms:repeat nodeset="instance('lorem')/line[position() = (1, 2)]">
+                    <xforms:repeat ref="instance('lorem')/line[position() = (1, 2)]">
                         <fr:datatable id="repeat-refresh-table" scrollable="both" width="500px" height="200px">
                             <xhtml:thead>
                                 <xhtml:tr>
@@ -122,7 +122,7 @@
                                 </xhtml:tr>
                             </xhtml:thead>
                             <xhtml:tbody>
-                                <xforms:repeat nodeset="instance('lorem')/line[string-length(.) &lt; xxforms:instance('controls')/maxLength]">
+                                <xforms:repeat ref="instance('lorem')/line[string-length(.) &lt; xxforms:instance('controls')/maxLength]">
                                     <xhtml:tr>
                                         <xhtml:td>
                                             <xforms:output value="position()"/>
@@ -152,7 +152,7 @@
                                 </xhtml:tr>
                             </xhtml:thead>
                             <xhtml:tbody>
-                                <xforms:repeat nodeset="line[position &lt; 3]">
+                                <xforms:repeat ref="line[position &lt; 3]">
                                     <xhtml:tr>
                                         <xhtml:td>
                                             <xforms:output value="if (position=0) then 'one' else if (position=1) then 'two' else 'three'"/>
@@ -180,7 +180,7 @@
                                 </xhtml:tr>
                             </xhtml:thead>
                             <xhtml:tbody>
-                                <xforms:repeat nodeset="line[length &lt; 50]">
+                                <xforms:repeat ref="line[length &lt; 50]">
                                     <xhtml:tr>
                                         <xhtml:td>
                                             <xforms:output value="text"/>
@@ -208,7 +208,7 @@
                                 </xhtml:tr>
                             </xhtml:thead>
                             <xhtml:tbody>
-                                <xforms:repeat nodeset="line[length > 40 and length &lt; 50]">
+                                <xforms:repeat ref="line[length > 40 and length &lt; 50]">
                                     <xhtml:tr>
                                         <xhtml:td>
                                             <xforms:output value="text"/>
@@ -247,7 +247,7 @@
                                 </xhtml:tr>
                             </xhtml:thead>
                             <xhtml:tbody>
-                                <xforms:repeat nodeset="line[string-length() &lt; 30]">
+                                <xforms:repeat ref="line[string-length() &lt; 30]">
                                     <xhtml:tr>
                                         <xhtml:td>
                                             <xforms:output value="."/>
@@ -273,7 +273,7 @@
                                 </xhtml:tr>
                             </xhtml:thead>
                             <xhtml:tbody>
-                                <xforms:repeat nodeset="line[string-length() &lt; xxforms:instance('controls')/maxLength cast as xs:integer]">
+                                <xforms:repeat ref="line[string-length() &lt; xxforms:instance('controls')/maxLength cast as xs:integer]">
                                     <xhtml:tr>
                                         <xhtml:td>
                                             <xforms:output value="."/>
@@ -292,7 +292,7 @@
                     <xhtml:p>Bug <xhtml:a href="http://forge.ow2.org/tracker/index.php?func=detail&amp;aid=314415&amp;group_id=168&amp;atid=350207"
                             >314415</xhtml:a>.</xhtml:p>
                     <xforms:group ref="instance('lorem')[instance('controls')/show = 'true']">
-                        <xforms:repeat nodeset="line[position() = (1, 2)]">
+                        <xforms:repeat ref="line[position() = (1, 2)]">
                             <fr:datatable id="_314415-table" scrollable="both" width="500px" height="200px">
                                 <xhtml:thead>
                                     <xhtml:tr>
@@ -300,7 +300,7 @@
                                     </xhtml:tr>
                                 </xhtml:thead>
                                 <xhtml:tbody>
-                                    <xforms:repeat nodeset="instance('lorem')/line[string-length(.) > 100]">
+                                    <xforms:repeat ref="instance('lorem')/line[string-length(.) > 100]">
                                         <xhtml:tr>
                                             <xhtml:td>
                                                 <xforms:output value="."/>
@@ -327,7 +327,7 @@
                                 </xhtml:tr>
                             </xhtml:thead>
                             <xhtml:tbody>
-                                <xforms:repeat nodeset="line[length &lt; xxforms:instance('controls')/maxLength cast as xs:integer]">
+                                <xforms:repeat ref="line[length &lt; xxforms:instance('controls')/maxLength cast as xs:integer]">
                                     <xhtml:tr>
                                         <xhtml:td>
                                             <xforms:output value="position"/>
@@ -355,7 +355,7 @@
                             </xhtml:tr>
                         </xhtml:thead>
                         <xhtml:tbody>
-                            <xforms:repeat nodeset="line[string-length(.) > 100]">
+                            <xforms:repeat ref="line[string-length(.) > 100]">
                                 <xhtml:tr>
                                     <xhtml:td>
                                         <xforms:output value="position()"/>
@@ -382,7 +382,7 @@
                             </xhtml:tr>
                         </xhtml:thead>
                         <xhtml:tbody>
-                            <xforms:repeat nodeset="line[string-length(.) &lt; 20]">
+                            <xforms:repeat ref="line[string-length(.) &lt; 20]">
                                 <xhtml:tr>
                                     <xhtml:td>
                                         <xforms:output value="position()"/>
@@ -409,7 +409,7 @@
                             </xhtml:tr>
                         </xhtml:thead>
                         <xhtml:tbody>
-                            <xforms:repeat nodeset="line[false()]">
+                            <xforms:repeat ref="line[false()]">
                                 <xhtml:tr>
                                     <xhtml:td>
                                         <xforms:output value="position()"/>
@@ -435,7 +435,7 @@
                             </xhtml:tr>
                         </xhtml:thead>
                         <xhtml:tbody>
-                            <xforms:repeat nodeset="line[string-length(.) &lt; 20]">
+                            <xforms:repeat ref="line[string-length(.) &lt; 20]">
                                 <xhtml:tr>
                                     <xhtml:td>
                                         <xforms:output value="position()"/>
@@ -461,7 +461,7 @@
                             </xhtml:tr>
                         </xhtml:thead>
                         <xhtml:tbody>
-                            <xforms:repeat nodeset="line[string-length(.) &lt; 20]">
+                            <xforms:repeat ref="line[string-length(.) &lt; 20]">
                                 <xhtml:tr>
                                     <xhtml:td>
                                         <xforms:output value="position()"/>
@@ -488,7 +488,7 @@
                             </xhtml:tr>
                         </xhtml:thead>
                         <xhtml:tbody>
-                            <xforms:repeat nodeset="line[string-length(.) &lt; 20]">
+                            <xforms:repeat ref="line[string-length(.) &lt; 20]">
                                 <xhtml:tr>
                                     <xhtml:td>
                                         <xforms:output value="position()"/>
@@ -514,7 +514,7 @@
                             </xhtml:tr>
                         </xhtml:thead>
                         <xhtml:tbody>
-                            <xforms:repeat nodeset="line[string-length(.) &lt; 20]">
+                            <xforms:repeat ref="line[string-length(.) &lt; 20]">
                                 <xhtml:tr>
                                     <xhtml:td>
                                         <xforms:output value="."/>
@@ -537,7 +537,7 @@
                             </xhtml:tr>
                         </xhtml:thead>
                         <xhtml:tbody>
-                            <xforms:repeat nodeset="line[string-length(.) &lt; 20]">
+                            <xforms:repeat ref="line[string-length(.) &lt; 20]">
                                 <xhtml:tr>
                                     <xhtml:td>
                                         <xforms:output value="."/>
@@ -561,7 +561,7 @@
                             </xhtml:tr>
                         </xhtml:thead>
                         <xhtml:tbody>
-                            <xforms:repeat nodeset="line[string-length(.) &lt; 20]">
+                            <xforms:repeat ref="line[string-length(.) &lt; 20]">
                                 <xhtml:tr>
                                     <xhtml:td>
                                         <xforms:output value="."/>
@@ -584,7 +584,7 @@
                             </xhtml:tr>
                         </xhtml:thead>
                         <xhtml:tbody>
-                            <xforms:repeat nodeset="line[string-length(.) &lt; 20]">
+                            <xforms:repeat ref="line[string-length(.) &lt; 20]">
                                 <xhtml:tr>
                                     <xhtml:td>
                                         <xforms:output value="position()"/>
@@ -614,7 +614,7 @@
                             </xhtml:tr>
                         </xhtml:thead>
                         <xhtml:tbody>
-                            <xforms:repeat nodeset="line">
+                            <xforms:repeat ref="line">
                                 <xhtml:tr>
                                     <xhtml:td>
                                         <xforms:output value="."/>
@@ -635,7 +635,7 @@
                             <xxforms:variable name="column" select="('position', 'text', 'length', 'nb-words')[event('fr-column')]"/>
                             <xxforms:variable name="type" select="('number', 'text', 'number', 'number')[event('fr-column')]"/>
                             <xxforms:variable name="sorted" select="exf:sort(instance('detailed-lorem')/line, $column, $type, instance('controls')/sortOrder)"/>
-                            <xforms:delete nodeset="instance('detailed-lorem')/line"/>
+                            <xforms:delete ref="instance('detailed-lorem')/line"/>
                             <xforms:insert context="instance('detailed-lorem')" origin="$sorted"/>
                         </xforms:action>
                         <xhtml:thead>
@@ -647,7 +647,7 @@
                             </xhtml:tr>
                         </xhtml:thead>
                         <xhtml:tbody>
-                            <xforms:repeat nodeset="line">
+                            <xforms:repeat ref="line">
                                 <xhtml:tr>
                                     <xhtml:td><xforms:output value="position"/></xhtml:td>
                                     <xhtml:td><xforms:output value="text"/></xhtml:td>

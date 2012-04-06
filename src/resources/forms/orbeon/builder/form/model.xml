@@ -257,10 +257,10 @@
         </static-upload>
     </xforms:instance>
 
-    <xforms:bind nodeset="instance('fb-triggers-instance')">
+    <xforms:bind ref="instance('fb-triggers-instance')">
         <!-- Condition for disabling Save as… button -->
         <!-- HACK: Not sure why, but if we don't put a calculate here (which is useless), then the readonly is not evaluated on recalculate -->
-        <xforms:bind nodeset="save-as" readonly="xxforms:instance('fr-parameters-instance')/mode != 'edit'" calculate="xxforms:instance('fr-parameters-instance')/mode"/>
+        <xforms:bind ref="save-as" readonly="xxforms:instance('fr-parameters-instance')/mode != 'edit'" calculate="xxforms:instance('fr-parameters-instance')/mode"/>
     </xforms:bind>
 
     <!-- HACK: Bind has inter-model dependency -->

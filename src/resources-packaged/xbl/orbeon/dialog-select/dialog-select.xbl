@@ -44,7 +44,7 @@
                      <xforms:hint ref=""/>
                      <xforms:help ref=""/>
                      <xforms:alert ref=""/>
-                     <xforms:itemset nodeset="">
+                     <xforms:itemset ref="">
                         <xforms:label ref="label"/>
                         <xforms:value ref="value"/>
                     </xforms:itemset>
@@ -84,8 +84,8 @@
                             <callback-id/>
                         </instance>
                     </xforms:instance>
-                    <xforms:bind nodeset="add-trigger" readonly="normalize-space(../available) = ''"/>
-                    <xforms:bind nodeset="remove-trigger" readonly="normalize-space(../selected) = ''"/>
+                    <xforms:bind ref="add-trigger" readonly="normalize-space(../available) = ''"/>
+                    <xforms:bind ref="remove-trigger" readonly="normalize-space(../selected) = ''"/>
                     <xforms:instance id="resources" src="oxf:/xbl/orbeon/dialog-select/dialog-select-resources.xml"
                                      xxforms:readonly="true" xxforms:cache="true"/>
                 </xforms:model>
@@ -116,7 +116,7 @@
                             <!-- List of available items -->
                             <xforms:select ref="available" id="available-list">
                                 <xforms:label value="$resources/available"/>
-                                <xforms:itemset nodeset="$items[value = $available-values]">
+                                <xforms:itemset ref="$items[value = $available-values]">
                                     <xforms:label ref="label"/>
                                     <xforms:value ref="value"/>
                                 </xforms:itemset>
@@ -161,7 +161,7 @@
                             <!-- List of selected items -->
                             <xforms:select ref="selected">
                                 <xforms:label value="$resources/selected"/>
-                                <xforms:itemset nodeset="$items[value = $selected-values]">
+                                <xforms:itemset ref="$items[value = $selected-values]">
                                     <xforms:label ref="label"/>
                                     <xforms:value ref="value"/>
                                 </xforms:itemset>
@@ -224,7 +224,7 @@
                     </xforms:dispatch>
                 </xforms:action>
                 <xforms:select ref="instance()/selected" appearance="full">
-                    <xforms:itemset nodeset="instance()/items/item">
+                    <xforms:itemset ref="instance()/items/item">
                         <xforms:label ref="label"/>
                         <xforms:value ref="value"/>
                     </xforms:itemset>

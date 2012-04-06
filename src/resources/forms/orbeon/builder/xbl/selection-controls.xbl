@@ -57,7 +57,7 @@
                         <xforms:label>[Select...]</xforms:label>
                         <xforms:value/>
                     </xforms:item>
-                    <xforms:itemset nodeset="">
+                    <xforms:itemset ref="">
                         <xforms:label ref="label"/>
                         <xforms:value ref="value"/>
                     </xforms:itemset>
@@ -83,7 +83,7 @@
                     <xforms:hint ref=""/>
                     <xforms:help ref=""/>
                     <xforms:alert ref="$fr-resources/detail/labels/alert"/>
-                    <xforms:itemset nodeset="">
+                    <xforms:itemset ref="">
                         <xforms:label ref="label"/>
                         <xforms:value ref="value"/>
                     </xforms:itemset>
@@ -109,7 +109,7 @@
                     <xforms:hint ref=""/>
                     <xforms:help ref=""/>
                     <xforms:alert ref="$fr-resources/detail/labels/alert"/>
-                    <xforms:itemset nodeset="">
+                    <xforms:itemset ref="">
                         <xforms:label ref="label"/>
                         <xforms:value ref="value"/>
                     </xforms:itemset>
@@ -135,7 +135,7 @@
                     <xforms:hint ref=""/>
                     <xforms:help ref=""/>
                     <xforms:alert ref="$fr-resources/detail/labels/alert"/>
-                    <xforms:itemset nodeset="">
+                    <xforms:itemset ref="">
                         <xforms:label ref="label"/>
                         <xforms:value ref="value"/>
                     </xforms:itemset>
@@ -161,7 +161,7 @@
                     <xforms:hint ref=""/>
                     <xforms:help ref=""/>
                     <xforms:alert ref="$fr-resources/detail/labels/alert"/>
-                    <xforms:itemset nodeset="">
+                    <xforms:itemset ref="">
                         <xforms:label ref="label"/>
                         <xforms:value ref="value"/>
                     </xforms:itemset>
@@ -187,7 +187,7 @@
                     <xforms:hint ref=""/>
                     <xforms:help ref=""/>
                     <xforms:alert ref="$fr-resources/detail/labels/alert"/>
-                    <xforms:itemset nodeset="">
+                    <xforms:itemset ref="">
                         <xforms:label ref="label"/>
                         <xforms:value ref="value"/>
                     </xforms:itemset>
@@ -213,7 +213,7 @@
                     <xforms:hint ref=""/>
                     <xforms:help ref=""/>
                     <xforms:alert ref="$fr-resources/detail/labels/alert"/>
-                    <xforms:itemset nodeset="">
+                    <xforms:itemset ref="">
                         <xforms:label ref="label"/>
                         <xforms:value ref="value"/>
                     </xforms:itemset>

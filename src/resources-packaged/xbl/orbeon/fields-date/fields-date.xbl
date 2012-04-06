@@ -84,9 +84,9 @@
                     </date>
                 </xf:instance>
                 <!-- Set the validity on the whole instance -->
-                <xf:bind nodeset="." constraint="is-valid = 'true'"/>
+                <xf:bind ref="." constraint="is-valid = 'true'"/>
                 <!-- Make instance read-only when the form must be read-only -->
-                <xf:bind nodeset="." readonly="is-readonly = 'true'"/>
+                <xf:bind ref="." readonly="is-readonly = 'true'"/>
             </xf:model>
         </xbl:implementation>
         <xbl:template>

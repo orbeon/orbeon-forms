@@ -107,7 +107,7 @@
 
                     <!-- Repeat over status -->
                     <xhtml:div class="statuses">
-                        <xforms:repeat nodeset="instance('twitter-user-timeline-instance')/status">
+                        <xforms:repeat ref="instance('twitter-user-timeline-instance')/status">
                             <!-- DIV around one status -->
                             <xhtml:div class="status">
                                 <!-- User info -->

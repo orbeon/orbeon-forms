@@ -73,7 +73,7 @@
                 </xf:instance>
 
                 <!-- Make instance read-only when the form must be read-only -->
-                <xf:bind nodeset="." readonly="is-readonly = 'true'"/>
+                <xf:bind ref="." readonly="is-readonly = 'true'"/>
 
                 <!-- TODO: would need global instances! -->
                 <xf:instance id="years-itemset">
@@ -96,11 +96,11 @@
                     </xf:action>
                     <xf:action iterate="(1 to 12)">
                         <xxf:variable name="month" select="." as="xs:string"/>
-                        <xf:insert context="instance('months-itemset')" nodeset="*" origin="xxf:element('month', $month)"/>
+                        <xf:insert context="instance('months-itemset')" ref="*" origin="xxf:element('month', $month)"/>
                     </xf:action>
                     <xf:action iterate="(1 to 31)">
                         <xxf:variable name="day" select="." as="xs:string"/>
-                        <xf:insert context="instance('days-itemset')" nodeset="*" origin="xxf:element('day', $day)"/>
+                        <xf:insert context="instance('days-itemset')" ref="*" origin="xxf:element('day', $day)"/>
                     </xf:action>
                 </xf:action>
             </xf:model>
@@ -152,33 +152,33 @@
                             <!-- NOTE: navindex is copied to first field, but need one for second field too! -->
                             <xf:select1 ref="year" xbl:attr="navindex navindex=tabindex">
                                 <!--<xf:label>Year</xf:label>-->
-                                <xf:itemset nodeset=".[not(context() = instance('years-itemset')/year)]">
+                                <xf:itemset ref=".[not(context() = instance('years-itemset')/year)]">
                                     <xf:label>Year</xf:label>
                                     <xf:value/>
                                 </xf:itemset>
-                                <xf:itemset nodeset="instance('years-itemset')/year">
+                                <xf:itemset ref="instance('years-itemset')/year">
                                     <xf:label ref="."/>
                                     <xf:value ref="."/>
                                 </xf:itemset>
                             </xf:select1>
                             <xf:select1 ref="month">
                                 <!--<xf:label>Month</xf:label>-->
-                                <xf:itemset nodeset=".[not(context() = instance('months-itemset')/month)]">
+                                <xf:itemset ref=".[not(context() = instance('months-itemset')/month)]">
                                     <xf:label>Month</xf:label>
                                     <xf:value/>
                                 </xf:itemset>
-                                <xf:itemset nodeset="instance('months-itemset')/month">
+                                <xf:itemset ref="instance('months-itemset')/month">
                                     <xf:label ref="."/>
                                     <xf:value ref="."/>
                                 </xf:itemset>
                             </xf:select1>
                             <xf:select1 ref="day">
                                 <!--<xf:label>Day</xf:label>-->
-                                <xf:itemset nodeset=".[not(context() = instance('days-itemset')/day)]">
+                                <xf:itemset ref=".[not(context() = instance('days-itemset')/day)]">
                                     <xf:label>Day</xf:label>
                                     <xf:value/>
                                 </xf:itemset>
-                                <xf:itemset nodeset="instance('days-itemset')/day">
+                                <xf:itemset ref="instance('days-itemset')/day">
                                     <xf:label ref="."/>
                                     <xf:value ref="."/>
                                 </xf:itemset>

@@ -34,8 +34,8 @@
                     </component-init>
                 </instance>
             </xforms:instance>
-            <xforms:bind nodeset="button" relevant="../relevant = 'true'" readonly="../readonly = 'true'"/>
-            <xforms:bind nodeset="component-init/button" readonly="true()"/>
+            <xforms:bind ref="button" relevant="../relevant = 'true'" readonly="../readonly = 'true'"/>
+            <xforms:bind ref="component-init/button" readonly="true()"/>
         </xforms:model>
         <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
         <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
@@ -81,9 +81,9 @@
             <xforms:group xxforms:update="full">
                 <fr:button id="init-add">
                     <xforms:label>Add</xforms:label>
-                    <xforms:insert ev:event="DOMActivate" nodeset="component-init/button" position="before" at="1"/>
+                    <xforms:insert ev:event="DOMActivate" ref="component-init/button" position="before" at="1"/>
                 </fr:button>
-                <xforms:repeat nodeset="component-init/button">
+                <xforms:repeat ref="component-init/button">
                     <fr:button ref="." id="init-in-repeat">
                         <xforms:label>In repeat</xforms:label>
                     </fr:button>

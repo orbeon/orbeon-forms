@@ -58,7 +58,7 @@
                 <xforms:action ev:event="DOMActivate">
                     <!-- Clear response -->
                     <xforms:setvalue iterate="response/*[not(*)]" ref="."/>
-                    <xforms:delete nodeset="response/headers/header"/>
+                    <xforms:delete ref="response/headers/header"/>
 
                     <!-- Toggle back response submission -->
                     <xforms:toggle case="fb-service-dialog-none"/>
@@ -73,7 +73,7 @@
                     <xforms:action context="response">
                         <xforms:setvalue ref="resource-uri" value="event('resource-uri')"/>
                         <xforms:setvalue ref="status-code" value="event('response-status-code')"/>
-                        <xforms:delete nodeset="headers/header"/>
+                        <xforms:delete ref="headers/header"/>
                         <xforms:insert context="headers" origin="event('response-headers')"/>
                         <!-- Handle response body -->
                         <xforms:var name="error-body" value="event('response-body')"/>
@@ -103,14 +103,14 @@
 
                     <!-- Insert new submission if needed -->
                     <xforms:action if="not(exists($model/xforms:submission[@id = $submission-id]))">
-                        <xforms:insert context="$model" nodeset="xforms:instance | xforms:submission" origin="instance('fb-database-submission-template')"/>
+                        <xforms:insert context="$model" ref="xforms:instance | xforms:submission" origin="instance('fb-database-submission-template')"/>
                         <xforms:setvalue ref="$model/xforms:submission[last()]/@id" value="$submission-id"/>
                     </xforms:action>
                     <xforms:var name="submission" value="$model/xforms:submission[@id = $submission-id]"/>
 
                     <!-- Insert new instance just before submission if needed -->
                     <xforms:action if="not(exists($model/xforms:instance[@id = $instance-id]))">
-                        <xforms:insert nodeset="$submission" position="before" origin="instance('fb-database-instance-template')"/>
+                        <xforms:insert ref="$submission" position="before" origin="instance('fb-database-instance-template')"/>
                         <xforms:setvalue ref="$submission/preceding-sibling::xforms:instance[1]/@id" value="$instance-id"/>
                     </xforms:action>
 
@@ -121,8 +121,8 @@
                         <!-- Set datasource -->
                         <xforms:setvalue ref="$sql-query/sql:datasource" value="$instance/datasource"/>
                         <!-- Set query -->
-                        <xforms:delete nodeset="$sql-query/sql:query"/>
-                        <xforms:insert context="$sql-query" nodeset="*" origin="saxon:parse($instance/query-xml)/*"/>
+                        <xforms:delete ref="$sql-query/sql:query"/>
+                        <xforms:insert context="$sql-query" ref="*" origin="saxon:parse($instance/query-xml)/*"/>
                         <!-- Set request instance -->
                         <xforms:setvalue ref="." value="saxon:serialize($sql-query, xxforms:instance('fr-xsl-output-instance'))"/>
                     </xforms:action>
@@ -193,22 +193,22 @@
         <xforms:setvalue ev:event="xxforms-invalid" ev:observer="fb-database-service-instance" ref="save-test-trigger">disabled</xforms:setvalue>
         <xforms:setvalue ev:event="xxforms-valid" ev:observer="fb-database-service-instance" ref="save-test-trigger">enabled</xforms:setvalue>
 
-        <xforms:bind nodeset="instance('fb-database-service-instance')">
+        <xforms:bind ref="instance('fb-database-service-instance')">
             <!-- Make sure that the name is not already in use  -->
-            <xforms:bind nodeset="name" type="xs:NCName"
+            <xforms:bind ref="name" type="xs:NCName"
                          constraint="(normalize-space() != '' and normalize-space() = ../initial-name)
                                         or not(../submission-id = $model/xforms:submission/@id
                                             or ../instance-id = $model/xforms:instance/@id)"/>
-            <xforms:bind nodeset="submission-id" calculate="concat(../name, '-submission')"/>
-            <xforms:bind nodeset="instance-id" calculate="concat(../name, '-instance')"/>
+            <xforms:bind ref="submission-id" calculate="concat(../name, '-submission')"/>
+            <xforms:bind ref="instance-id" calculate="concat(../name, '-instance')"/>
             <!-- TODO: type of datasource. What's the format? jdbc/foobar? a/b/c? use regexp -->
-            <xforms:bind nodeset="datasource" type="xs:string" required="true()"/>
+            <xforms:bind ref="datasource" type="xs:string" required="true()"/>
             <!-- Check that the resulting XML document is well-formed -->
-            <xforms:bind nodeset="query-xml" type="xxforms:xml"
+            <xforms:bind ref="query-xml" type="xxforms:xml"
                          calculate="concat('&lt;sql:query xmlns:sql=''http://orbeon.org/oxf/xml/sql''>', ../query, '&lt;/sql:query>')"/>
-            <xforms:bind nodeset="query" constraint="xxforms:valid(../query-xml)"/>
+            <xforms:bind ref="query" constraint="xxforms:valid(../query-xml)"/>
 
-            <xforms:bind nodeset="save-test-trigger" readonly=". = 'disabled'"/>
+            <xforms:bind ref="save-test-trigger" readonly=". = 'disabled'"/>
         </xforms:bind>
 
         <!-- Template for the submission -->

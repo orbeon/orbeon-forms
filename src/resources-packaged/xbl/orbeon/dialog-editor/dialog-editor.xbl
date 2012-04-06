@@ -45,7 +45,7 @@
                             <callback-id/>
                         </instance>
                     </xforms:instance>
-                    <xforms:bind nodeset="text" readonly="../readonly = 'true'"/>
+                    <xforms:bind ref="text" readonly="../readonly = 'true'"/>
                 </xforms:model>
                 <!-- The button telling to show the dialog -->
                 <xforms:action ev:event="fr-edit">

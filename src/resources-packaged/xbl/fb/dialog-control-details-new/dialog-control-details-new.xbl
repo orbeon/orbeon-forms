@@ -91,13 +91,13 @@
                 <xforms:setvalue ev:observer="local" ref="save-trigger" ev:event="xxforms-valid">enabled</xforms:setvalue>
 
                 <!-- NOTE: We use normalize-space() to make sure there is no leading/trailing space -->
-                <xforms:bind nodeset="control-name"
+                <xforms:bind ref="control-name"
                              type="xs:NCName"
                              calculate="normalize-space()"
                              readonly="false()"
                              constraint=". = ../original-control-name or not(. = tokenize(../control-names, '\s+'))"/>
-                <xforms:bind nodeset="control-xpath" relevant="../is-custom-instance = 'true'" type="xxforms:xpath2" required="../is-custom-instance = 'true'"/>
-                <xforms:bind nodeset="save-trigger" readonly=". = 'disabled'"/>
+                <xforms:bind ref="control-xpath" relevant="../is-custom-instance = 'true'" type="xxforms:xpath2" required="../is-custom-instance = 'true'"/>
+                <xforms:bind ref="save-trigger" readonly=". = 'disabled'"/>
 
             </xforms:model>
         </xbl:implementation>
@@ -123,29 +123,29 @@
                     <xforms:setvalue ref="$local/classes" value="$control/@class"/>
 
                     <!-- Copy XBL control-details from xbl:binding in local instance -->
-                    <xforms:delete nodeset="$local/fb:control-details"/>
-                    <xforms:insert nodeset="$local/*" origin="controlOps:bindingOrEmpty($control)/fb:metadata/fb:control-details"/>
+                    <xforms:delete ref="$local/fb:control-details"/>
+                    <xforms:insert ref="$local/*" origin="controlOps:bindingOrEmpty($control)/fb:metadata/fb:control-details"/>
 
                     <!-- Process the LHHA of each details control -->
                     <xforms:var name="current-language" value="$resources/@xml:lang/string() treat as xs:string"/>
                     <xforms:action iterate="$local/fb:control-details/*/(xforms:label, xforms:hint, xforms:help, xforms:alert)">
                         <xforms:var name="lhhr" value="."/>
                         <!-- If it has a lang attribute, only keep if matches the current language -->
-                        <xforms:delete if="exists($lhhr/@lang) and $lhhr/@lang != $current-language" nodeset="$lhhr"/>
+                        <xforms:delete if="exists($lhhr/@lang) and $lhhr/@lang != $current-language" ref="$lhhr"/>
                         <!-- If it has a ref="$resources/...", evaluate it -->
                         <xforms:action if="starts-with($lhhr/@ref, '$resources/')">
                             <xforms:var name="resource-path" value="substring-after($lhhr/@ref, '$resources/')"/>
                             <xforms:setvalue ref="$lhhr" value="$resources/saxon:evaluate($resource-path)"/>
-                            <xforms:delete nodeset="$lhhr/@ref"/>
+                            <xforms:delete ref="$lhhr/@ref"/>
                         </xforms:action>
                     </xforms:action>
 
                     <!-- Create elements for additional properties, populating their initial value from the control -->
-                    <xforms:delete nodeset="$local/control-details/*"/>
+                    <xforms:delete ref="$local/control-details/*"/>
                     <xforms:action iterate="$local/fb:control-details/*">
                         <xforms:var name="position" value="position()"/>
                         <xforms:var name="xforms-control" value="."/>
-                        <xforms:insert context="$local/control-details" nodeset="*" origin="xxforms:element('control-detail', string($control/saxon:evaluate($xforms-control/@ref)))"/>
+                        <xforms:insert context="$local/control-details" ref="*" origin="xxforms:element('control-detail', string($control/saxon:evaluate($xforms-control/@ref)))"/>
                     </xforms:action>
                 </xforms:action>
 
@@ -172,7 +172,7 @@
                     </xforms:action>
                     <!-- Set proper classes -->
                     <xforms:var name="classes" value="tokenize($local/classes, '\s+')"/>
-                    <xforms:delete if="count($classes) = 0" nodeset="$control/@class"/>
+                    <xforms:delete if="count($classes) = 0" ref="$control/@class"/>
                     <xforms:insert if="count($classes) > 0" context="$control" origin="xxforms:attribute('class', $local/classes)"/>
                     <!-- Update custom XBL properties -->
                     <xforms:action iterate="$local/fb:control-details/*">
@@ -214,7 +214,7 @@
                                 <!-- Classes -->
                                 <xforms:select ref="$local/classes" appearance="full">
                                     <xforms:label ref="$resources/dialog-control-details/classes/label"/>
-                                    <xforms:itemset nodeset="$resources/dialog-control-details/classes/item" xxforms:refresh-items="false">
+                                    <xforms:itemset ref="$resources/dialog-control-details/classes/item" xxforms:refresh-items="false">
                                         <xforms:label ref="label"/>
                                         <xforms:value ref="value"/>
                                     </xforms:itemset>

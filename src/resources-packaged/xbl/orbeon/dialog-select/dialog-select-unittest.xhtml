@@ -59,7 +59,7 @@
         <xhtml:div>
             <fr:dialog-select ref="double-multiple" id="double-multiple" separator=", " appearance="double-list">
                 <xforms:label>Double multiple</xforms:label>
-                <xforms:itemset nodeset="instance('items')/item">
+                <xforms:itemset ref="instance('items')/item">
                     <xforms:label ref="@label"/>
                     <xforms:value ref="@value"/>
                 </xforms:itemset>
@@ -69,7 +69,7 @@
         <xhtml:div>
             <fr:dialog-select1 ref="double-one" id="double-one" separator=", " appearance="double-list">
                 <xforms:label>Double one</xforms:label>
-                <xforms:itemset nodeset="instance('items')/item">
+                <xforms:itemset ref="instance('items')/item">
                     <xforms:label ref="@label"/>
                     <xforms:value ref="@value"/>
                 </xforms:itemset>
@@ -79,7 +79,7 @@
         <xhtml:div>
             <fr:dialog-select ref="single-multiple" id="single-multiple" separator=", " appearance="single-list">
                 <xforms:label>Single multiple</xforms:label>
-                <xforms:itemset nodeset="instance('items')/item">
+                <xforms:itemset ref="instance('items')/item">
                     <xforms:label ref="@label"/>
                     <xforms:value ref="@value"/>
                 </xforms:itemset>
@@ -90,7 +90,7 @@
             <fr:dialog-select1 ref="single-one" id="single-one" separator=", " appearance="single-list">
                 <!--<xforms:label>Single one</xforms:label>-->
                 <xforms:label ref="$label"/>
-                <xforms:itemset nodeset="instance('items')/item">
+                <xforms:itemset ref="instance('items')/item">
                     <xforms:label ref="@label"/>
                     <xforms:value ref="@value"/>
                 </xforms:itemset>

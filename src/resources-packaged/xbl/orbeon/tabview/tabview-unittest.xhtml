@@ -32,9 +32,9 @@
                     <tab relevant="true" readonly="true" mip=""/>
                 </instance>
             </xforms:instance>
-            <xforms:bind nodeset="tab">
-                <xforms:bind nodeset="@mip" relevant="../@relevant = 'true'" readonly="../@readonly = 'true'"/>
-                <xforms:bind nodeset="@relevant | @readonly" type="xs:boolean"/>
+            <xforms:bind ref="tab">
+                <xforms:bind ref="@mip" relevant="../@relevant = 'true'" readonly="../@readonly = 'true'"/>
+                <xforms:bind ref="@relevant | @readonly" type="xs:boolean"/>
             </xforms:bind>
             <xforms:submission id="sleep-5-seconds" method="post"
                 action="/xforms-sandbox/service/sleep-5-seconds" serialization="none" replace="none"/>
@@ -46,7 +46,7 @@
     <xhtml:body>
         <xhtml:fieldset>
             <xhtml:legend>Set values in instance to define which tabs are relevant</xhtml:legend>
-            <xforms:repeat nodeset="tab" id="mips-repeat">
+            <xforms:repeat ref="tab" id="mips-repeat">
                 <xhtml:div>
                     <xforms:output value="position()" id="index">
                         <xforms:label>Tab </xforms:label>
@@ -63,7 +63,7 @@
 
         <xhtml:fieldset>
             <xhtml:legend>Switch to a tab by dispatching an event</xhtml:legend>
-            <xforms:repeat nodeset="tab" id="toggle-repeat">
+            <xforms:repeat ref="tab" id="toggle-repeat">
                 <xxforms:variable name="position" select="position()"/>
                 <fr:button id="toggle">
                     <xforms:label>Toggle tab <xforms:output value="$position"/></xforms:label>

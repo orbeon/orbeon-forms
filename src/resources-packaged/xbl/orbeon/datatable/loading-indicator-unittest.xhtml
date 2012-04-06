@@ -92,7 +92,7 @@
                     <fr:datatable id="table-noscroll"
                         loading="xxforms:instance('controls')/loading = 'true'">
                         <xhtml:tbody>
-                            <xforms:repeat nodeset="instance('detailed-lorem')/line[length > 100]">
+                            <xforms:repeat ref="instance('detailed-lorem')/line[length > 100]">
                                 <xhtml:tr>
                                     <xhtml:td>
                                         <xforms:output value="position">
@@ -129,7 +129,7 @@
                     <fr:datatable id="table-scrollH" scrollable="horizontal" width="400px"
                         loading="xxforms:instance('controls')/loading = 'true'">
                         <xhtml:tbody>
-                            <xforms:repeat nodeset="instance('detailed-lorem')/line[length > 100]">
+                            <xforms:repeat ref="instance('detailed-lorem')/line[length > 100]">
                                 <xhtml:tr>
                                     <xhtml:td>
                                         <xforms:output value="position">
@@ -166,7 +166,7 @@
                     <fr:datatable id="table-scrollH-thin" scrollable="horizontal" width="600px"
                         loading="xxforms:instance('controls')/loading = 'true'">
                         <xhtml:tbody>
-                            <xforms:repeat nodeset="instance('detailed-lorem')/line[length > 100]">
+                            <xforms:repeat ref="instance('detailed-lorem')/line[length > 100]">
                                 <xhtml:tr>
                                     <xhtml:td>
                                         <xforms:output value="position">
@@ -192,7 +192,7 @@
                     <fr:datatable id="table-scrollV" scrollable="vertical" height="200px"
                         loading="xxforms:instance('controls')/loading = 'true'">
                         <xhtml:tbody>
-                            <xforms:repeat nodeset="instance('detailed-lorem')/line[length > 60]">
+                            <xforms:repeat ref="instance('detailed-lorem')/line[length > 60]">
                                 <xhtml:tr>
                                     <xhtml:td>
                                         <xforms:output value="position">
@@ -228,7 +228,7 @@
                     <fr:datatable id="table-scrollVH" scrollable="both" height="200px" width="600px"
                         loading="xxforms:instance('controls')/loading = 'true'">
                         <xhtml:tbody>
-                            <xforms:repeat nodeset="instance('detailed-lorem')/line[length > 60]">
+                            <xforms:repeat ref="instance('detailed-lorem')/line[length > 60]">
                                 <xhtml:tr>
                                     <xhtml:td>
                                         <xforms:output value="position">
@@ -264,7 +264,7 @@
                     <fr:datatable id="table-noscroll-dyn"
                         loading="xxforms:instance('controls')/loading = 'true'" dynamic="true">
                         <xhtml:tbody>
-                            <xforms:repeat nodeset="instance('detailed-lorem')/line[length > 100]">
+                            <xforms:repeat ref="instance('detailed-lorem')/line[length > 100]">
                                 <xhtml:tr>
                                     <xhtml:td>
                                         <xforms:output value="position">
@@ -304,7 +304,7 @@
                             loading="xxforms:instance('controls')/loading = 'true'">
                             <xhtml:thead>
                                 <xhtml:tr>
-                                    <xforms:repeat nodeset="line[1]/*">
+                                    <xforms:repeat ref="line[1]/*">
                                         <xhtml:th>
                                             <xforms:output value="name()"/>
                                         </xhtml:th>
@@ -312,9 +312,9 @@
                                 </xhtml:tr>
                             </xhtml:thead>
                             <xhtml:tbody>
-                                <xforms:repeat nodeset="line[length &lt; 20]">
+                                <xforms:repeat ref="line[length &lt; 20]">
                                     <xhtml:tr>
-                                        <xforms:repeat nodeset="*">
+                                        <xforms:repeat ref="*">
                                             <xhtml:td>
                                                 <xforms:output value="."/>
                                             </xhtml:td>
@@ -335,7 +335,7 @@
                             loading="xxforms:instance('controls')/loading = 'true'">
                             <xhtml:thead>
                                 <xhtml:tr>
-                                    <xforms:repeat nodeset="line[1]/*">
+                                    <xforms:repeat ref="line[1]/*">
                                         <xhtml:th>
                                             <xforms:output value="name()"/>
                                         </xhtml:th>
@@ -344,9 +344,9 @@
                                 </xhtml:tr>
                             </xhtml:thead>
                             <xhtml:tbody>
-                                <xforms:repeat nodeset="line[length> 100]">
+                                <xforms:repeat ref="line[length> 100]">
                                     <xhtml:tr>
-                                        <xforms:repeat nodeset="*">
+                                        <xforms:repeat ref="*">
                                             <xhtml:td>
                                                 <xforms:output value="."/>
                                             </xhtml:td>
@@ -370,7 +370,7 @@
                             loading="xxforms:instance('controls')/loading = 'true'">
                             <xhtml:thead>
                                 <xhtml:tr>
-                                    <xforms:repeat nodeset="line[1]/*">
+                                    <xforms:repeat ref="line[1]/*">
                                         <xhtml:th>
                                             <xforms:output value="name()"/>
                                         </xhtml:th>
@@ -379,10 +379,10 @@
                                 </xhtml:tr>
                             </xhtml:thead>
                             <xhtml:tbody>
-                                <xforms:repeat nodeset="line[length > 60]">
+                                <xforms:repeat ref="line[length > 60]">
                                     <xhtml:tr>
 
-                                        <xforms:repeat nodeset="*">
+                                        <xforms:repeat ref="*">
                                             <xhtml:td>
                                                 <xforms:output value="."/>
                                             </xhtml:td>
@@ -408,7 +408,7 @@
                             width="600px" loading="xxforms:instance('controls')/loading = 'true'">
                             <xhtml:thead>
                                 <xhtml:tr>
-                                    <xforms:repeat nodeset="line[1]/*">
+                                    <xforms:repeat ref="line[1]/*">
                                         <xhtml:th>
                                             <xforms:output value="name()"/>
                                         </xhtml:th>
@@ -417,9 +417,9 @@
                                 </xhtml:tr>
                             </xhtml:thead>
                             <xhtml:tbody>
-                                <xforms:repeat nodeset="line[length > 60]">
+                                <xforms:repeat ref="line[length > 60]">
                                     <xhtml:tr>
-                                        <xforms:repeat nodeset="*">
+                                        <xforms:repeat ref="*">
                                             <xhtml:td>
                                                 <xforms:output value="."/>
                                             </xhtml:td>

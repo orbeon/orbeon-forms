@@ -83,16 +83,16 @@
                             <xxforms:variable name="offset-after-current-c" select="$current-c/@o + $current-c/@l"/>
                             <!-- If this is the first <c>, consider inserting a <t> before -->
                             <xforms:action if="$position = 1">
-                                <xforms:insert if="$current-c/@o > 0" nodeset="." position="before" origin="xxforms:element('t', (xxforms:attribute('o', '0'), xxforms:attribute('l', $current-c/@o)))"/>
+                                <xforms:insert if="$current-c/@o > 0" ref="." position="before" origin="xxforms:element('t', (xxforms:attribute('o', '0'), xxforms:attribute('l', $current-c/@o)))"/>
                             </xforms:action>
                             <!-- If we are between two <c>, consider inserting a <t> in between -->
                             <xforms:action if="exists($following-c)">
-                                <xforms:insert if="$following-c/@o > $offset-after-current-c" nodeset="." position="after" origin="xxforms:element('t', (xxforms:attribute('o', $offset-after-current-c), xxforms:attribute('l', $following-c/@o - $offset-after-current-c)))"/>
+                                <xforms:insert if="$following-c/@o > $offset-after-current-c" ref="." position="after" origin="xxforms:element('t', (xxforms:attribute('o', $offset-after-current-c), xxforms:attribute('l', $following-c/@o - $offset-after-current-c)))"/>
                             </xforms:action>
                             <!-- If this is the last <c>, consider insert a <t> after -->
                             <xforms:action if="empty($following-c)">
                                 <xxforms:variable name="text-length" select="string-length(instance('fr-spell-checker-request')/text)"/>
-                                <xforms:insert if="$text-length > $offset-after-current-c" nodeset="." position="after" origin="xxforms:element('t', (xxforms:attribute('o', $offset-after-current-c), xxforms:attribute('l', $text-length - $offset-after-current-c)))"/>
+                                <xforms:insert if="$text-length > $offset-after-current-c" ref="." position="after" origin="xxforms:element('t', (xxforms:attribute('o', $offset-after-current-c), xxforms:attribute('l', $text-length - $offset-after-current-c)))"/>
                             </xforms:action>
                         </xforms:action>
                         <!-- Populate the original value of the words -->

@@ -75,9 +75,9 @@
             </source-editor>
         </xforms:instance>
 
-        <xforms:bind nodeset="instance('fb-source-editor-instance')">
-            <xforms:bind nodeset="source" type="xxforms:xml"/>
-            <xforms:bind nodeset="save-trigger" readonly=". = 'disabled'"/>
+        <xforms:bind ref="instance('fb-source-editor-instance')">
+            <xforms:bind ref="source" type="xxforms:xml"/>
+            <xforms:bind ref="save-trigger" readonly=". = 'disabled'"/>
         </xforms:bind>
 
         <!-- Enable/disable trigger -->

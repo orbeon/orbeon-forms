@@ -68,9 +68,9 @@
                 <xforms:setvalue ev:event="xxforms-invalid" ev:observer="local" ref="save-trigger">disabled</xforms:setvalue>
                 <xforms:setvalue ev:event="xxforms-valid" ev:observer="local" ref="save-trigger">enabled</xforms:setvalue>
                 
-                <xforms:bind nodeset="required" readonly="../schema-type != ''"/>
-                <xforms:bind nodeset="relevant | readonly | constraint | initial-value | calculate" type="xxforms:xpath2" required="false()"/>
-                <xforms:bind nodeset="save-trigger" readonly=". = 'disabled'"/>
+                <xforms:bind ref="required" readonly="../schema-type != ''"/>
+                <xforms:bind ref="relevant | readonly | constraint | initial-value | calculate" type="xxforms:xpath2" required="false()"/>
+                <xforms:bind ref="save-trigger" readonly=". = 'disabled'"/>
 
             </xforms:model>
         </xbl:implementation>
@@ -182,7 +182,7 @@
                                     <xforms:select1 ref="$local/builtin-type">
                                         <xforms:label ref="$resources/dialog-validation-details/builtin-type/label"/>
                                         <xforms:hint ref="$resources/dialog-validation-details/builtin-type/hint"/>
-                                        <xforms:itemset nodeset="$resources/dialog-validation-details/builtin-type/choices//(choices | type)" xxforms:refresh-items="false">
+                                        <xforms:itemset ref="$resources/dialog-validation-details/builtin-type/choices//(choices | type)" xxforms:refresh-items="false">
                                             <xforms:label value="if (self::choices) then label else if (normalize-space(@label)) then concat(@label, ' (', ., ')') else ."/>
                                             <xforms:value ref="if (self::choices) then () else if (value) then value else ."/>
                                         </xforms:itemset>
@@ -201,7 +201,7 @@
                                             <xforms:value/>
                                         </xforms:item>
                                         <!-- NOTE: Mark itemset as mutable as the schema may be updated -->
-                                        <xforms:itemset nodeset="$schema/xs:simpleType" xxforms:refresh-items="true">
+                                        <xforms:itemset ref="$schema/xs:simpleType" xxforms:refresh-items="true">
                                             <xforms:label value="string-join(($schema-prefix, @name), ':')"/>
                                             <xforms:value value="string-join(($schema-prefix, @name), ':')"/>
                                         </xforms:itemset>
@@ -211,7 +211,7 @@
                                     <xforms:select1 ref="required" appearance="full">
                                         <xforms:label ref="$resources/dialog-validation-details/required/label"/>
                                         <xforms:hint ref="$resources/dialog-validation-details/required/hint"/>
-                                        <xforms:itemset nodeset="$resources/dialog-validation-details/required//item" xxforms:refresh-items="false">
+                                        <xforms:itemset ref="$resources/dialog-validation-details/required//item" xxforms:refresh-items="false">
                                             <xforms:label ref="label"/>
                                             <xforms:value ref="value"/>
                                         </xforms:itemset>

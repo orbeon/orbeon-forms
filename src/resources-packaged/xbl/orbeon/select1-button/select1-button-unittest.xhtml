@@ -69,7 +69,7 @@
 
         <!-- Control we are testing -->
         <fr:select1-button ref="state">
-            <xforms:itemset nodeset="instance('states')/state">
+            <xforms:itemset ref="instance('states')/state">
                 <xforms:label ref="@name"/>
                 <xforms:value ref="@abbreviation"/>
             </xforms:itemset>

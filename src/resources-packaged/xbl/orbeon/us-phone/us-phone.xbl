@@ -64,11 +64,11 @@
                     </number>
                 </xf:instance>
                 <!-- Ensure the area code is on 3 digits -->
-                <xf:bind nodeset="area" type="xs:integer" constraint="for $i in xs:integer(.) return $i ge 100 and $i le 999"/>
+                <xf:bind ref="area" type="xs:integer" constraint="for $i in xs:integer(.) return $i ge 100 and $i le 999"/>
                 <!-- Ensure the local number contains only digits and spaces -->
-                <xf:bind nodeset="local" constraint="matches(normalize-space(), '^[0-9\s]*$') and string-length(translate(normalize-space(), ' ', '')) = 7"/>
+                <xf:bind ref="local" constraint="matches(normalize-space(), '^[0-9\s]*$') and string-length(translate(normalize-space(), ' ', '')) = 7"/>
                 <!-- Make instance read-only when the form must be read-only -->
-                <xf:bind nodeset="." readonly="is-readonly = 'true'"/>
+                <xf:bind ref="." readonly="is-readonly = 'true'"/>
             </xf:model>
         </xbl:implementation>
         <xbl:template>

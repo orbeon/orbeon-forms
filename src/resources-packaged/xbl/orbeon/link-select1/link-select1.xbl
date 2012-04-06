@@ -46,7 +46,7 @@
                      <xforms:hint ref=""/>
                      <xforms:help ref=""/>
                      <xforms:alert ref=""/>
-                     <xforms:itemset nodeset="">
+                     <xforms:itemset ref="">
                         <xforms:label ref="label"/>
                         <xforms:value ref="value"/>
                     </xforms:itemset>

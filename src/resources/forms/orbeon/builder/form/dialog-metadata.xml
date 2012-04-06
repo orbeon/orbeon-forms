@@ -72,7 +72,7 @@
                 <xforms:group ref=".[not($is-input)]">
                     <xforms:select1 ref="application-name">
                         <xforms:label ref="$form-resources/application-name/label"/>
-                        <xforms:itemset model="fr-roles-model" nodeset="instance('fr-permissions')/app">
+                        <xforms:itemset model="fr-roles-model" ref="instance('fr-permissions')/app">
                             <xforms:label ref="@name"/>
                             <xforms:value ref="@name"/>
                         </xforms:itemset>

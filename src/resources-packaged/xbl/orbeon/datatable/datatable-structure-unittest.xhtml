@@ -65,7 +65,7 @@
                             </xhtml:tr>
                         </xhtml:thead>
                         <xhtml:tbody>
-                            <xforms:repeat nodeset="line[string-length(.) &lt; 20]">
+                            <xforms:repeat ref="line[string-length(.) &lt; 20]">
                                 <xhtml:tr>
                                     <xhtml:td>
                                         <xforms:output value="position()"/>
@@ -92,7 +92,7 @@
                             </xhtml:tr>
                         </xhtml:thead>
                         <xhtml:tbody>
-                            <xhtml:tr repeat-nodeset="line[string-length(.) &lt; 20]">
+                            <xhtml:tr repeat-ref="line[string-length(.) &lt; 20]">
                                 <xhtml:td>
                                     <xforms:output value="position()"/>
                                 </xhtml:td>
@@ -111,7 +111,7 @@
                     <xhtml:p>This datatable ommits its table header which is derived from the body</xhtml:p>
                     <fr:datatable id="table-no-header">
                         <xhtml:tbody>
-                            <xforms:repeat nodeset="line[string-length(.) &lt; 20]">
+                            <xforms:repeat ref="line[string-length(.) &lt; 20]">
                                 <xhtml:tr>
                                     <xhtml:td>
                                         <xforms:output value="position()">
@@ -136,7 +136,7 @@
                     <xhtml:p>This datatable ommits its table header which is derived from the body and uses the tr/@repeat-nodeset shortcut</xhtml:p>
                     <fr:datatable id="table-no-header-tr-repeat-nodeset">
                         <xhtml:tbody>
-                            <xhtml:tr repeat-nodeset="line[string-length(.) &lt; 20]">
+                            <xhtml:tr repeat-ref="line[string-length(.) &lt; 20]">
                                 <xhtml:td>
                                     <xforms:output value="position()">
                                         <xforms:label>Position</xforms:label>
@@ -169,7 +169,7 @@
                             </xhtml:tr>
                         </xhtml:thead>
                         <xhtml:tbody>
-                            <xforms:repeat nodeset="line[string-length(.) &lt; 20]">
+                            <xforms:repeat ref="line[string-length(.) &lt; 20]">
                                 <xhtml:tr>
                                     <xhtml:td>
                                         <xforms:output value="position()"/>

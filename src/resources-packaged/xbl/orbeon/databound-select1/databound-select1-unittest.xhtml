@@ -38,7 +38,7 @@
         <xhtml:p>
             <fr:databound-select1 ref="state" appearance="minimal" resource="/xforms-sandbox/service/zip-states">
                 <xforms:label>State: </xforms:label>
-                <xforms:itemset nodeset="/states/state">
+                <xforms:itemset ref="/states/state">
                     <xforms:label ref="@name"/>
                     <xforms:value ref="@abbreviation"/>
                 </xforms:itemset>
@@ -46,7 +46,7 @@
             <fr:databound-select1 ref="city" appearance="minimal"
                                    resource="/xforms-sandbox/service/zip-cities?state-abbreviation={state}">
                 <xforms:label>City: </xforms:label>
-                <xforms:itemset nodeset="/cities/city">
+                <xforms:itemset ref="/cities/city">
                     <xforms:label ref="@name"/>
                     <xforms:value ref="@name"/>
                 </xforms:itemset>
@@ -54,7 +54,7 @@
             <fr:databound-select1 ref="zip" appearance="minimal"
                                    resource="/xforms-sandbox/service/zip-zips?state-abbreviation={state}&amp;city={city}">
                 <xforms:label>Zip: </xforms:label>
-                <xforms:itemset nodeset="/zips/zip">
+                <xforms:itemset ref="/zips/zip">
                     <xforms:label ref="@code"/>
                     <xforms:value ref="@code"/>
                 </xforms:itemset>

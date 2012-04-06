@@ -131,7 +131,7 @@
         <xsl:variable name="section-name" select="$section-bind/((@ref, @nodeset)[1])" as="xs:string"/>
 
         <!-- Section instance data element -->
-        <!-- NOTE: could also gather ancestor-or-self::xforms:bind/@nodeset and evaluate expression to be more generic -->
+        <!-- NOTE: could also gather ancestor-or-self::xforms:bind/@ref and evaluate expression to be more generic -->
         <xsl:variable name="section-data" select="$fr-form-instance/*/*[name() = $section-name]" as="element()"/>
 
         <!-- NOTE: We should make component ids and names unique, as shown in the commented-out code below. The issue is
@@ -234,7 +234,7 @@
 
                     <!-- This is also at the top-level in components.xsl -->
                     <xforms:var name="fr-mode" value="xxforms:instance('fr-parameters-instance')/mode"/>
-                    <xforms:bind nodeset="instance('fr-form-instance')" readonly="$fr-mode = ('view', 'pdf', 'email') or instance('readonly') = 'true'"/>
+                    <xforms:bind ref="instance('fr-form-instance')" readonly="$fr-mode = ('view', 'pdf', 'email') or instance('readonly') = 'true'"/>
 
                     <!-- Schema: simply copy so that the types are available locally -->
                     <!-- NOTE: Could optimized to check if any of the types are actually used -->
@@ -274,7 +274,7 @@
                                 <xforms:action if="$binding/*">
                                     <!-- There are already some nodes, copy them in. This handles the case where existing
                                          external data must be loaded in, for example when editing a form. -->
-                                    <xforms:delete nodeset="instance()/*"/>
+                                    <xforms:delete ref="instance()/*"/>
                                     <xforms:insert context="instance()" origin="$binding/*"/>
                                 </xforms:action>
                                 <xforms:action if="not($binding/*)">

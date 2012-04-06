@@ -40,7 +40,7 @@
                 <xf:var name="binding" value="."/>
 
                 <!-- Dialogs -->
-                <fb:dialog-control-details-new id="dialog-control-details"    form-ref="$binding" resources-ref="$form-resources"/>
+                <fb:dialog-control-details     id="dialog-control-details"    form-ref="$binding" resources-ref="$form-resources"/>
                 <fb:dialog-validation-details  id="dialog-validation-details" form-ref="$binding" resources-ref="$form-resources" components-ref="instance('fb-components-instance')"/>
                 <fb:dialog-grid-details        id="dialog-grid-details"       form-ref="$binding" resources-ref="$form-resources" components-ref="instance('fb-components-instance')"/>
                 <fb:dialog-section-details     id="dialog-section-details"    form-ref="$binding" resources-ref="$form-resources" components-ref="instance('fb-components-instance')"/>

@@ -25,16 +25,18 @@
          xmlns:oxf="http://www.orbeon.com/oxf/processors"
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+
          xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps"
-         script-type="application/xhtml+xml">
+         xmlns:dataModel="java:org.orbeon.oxf.fb.DataModel">
+
     <xbl:binding id="fb-dialog-control-details" element="fb|dialog-control-details">
         <xbl:handlers>
+            <!-- Handler to open dialog -->
             <xbl:handler event="fb-show-dialog" phase="target" defaultAction="cancel">
                 <xforms:setvalue iterate="*[not(*)]" ref="."/> <!-- Clear all local values -->
-                <xforms:setvalue ref="relevant" value="'true'"/>
-                <xforms:setvalue ref="original-control-name" value="event('fb-control-name')"/>
-                <xforms:setvalue ref="control-name" value="event('fb-control-name')"/>
-                <xforms:setvalue ref="instance-holder" value="event('fb-instance-holder')/saxon:path()"/>
+                <xforms:setvalue ref="@relevant" value="'true'"/>
+                <xforms:setvalue ref="original-control-name" value="controlOps:controlName(event('control-id'))"/>
+                <xforms:setvalue ref="control-name" value="../original-control-name"/>
                 <xforms:refresh/> <!-- The view needs to be relevant before it gets the event for action to run in a proper context -->
                 <xxforms:show dialog="dialog"/>
             </xbl:handler>
@@ -72,17 +74,14 @@
         <xbl:implementation>
             <xforms:model id="model">
                 <xforms:instance id="local">
-                    <local>
-                        <relevant/>                 <!-- Set to true when dialog is visible (should be automatically done by dialog) -->
+                    <local relevant=""><!-- TODO: Relevance must be handled automatically by the XForms engine! -->
                         <original-control-name/>    <!-- So we can find back the control when saving if users change the name -->
                         <control-name/>             <!-- Possibly new name set by users -->
                         <control-xpath/>            <!-- XPath expression to node might be editable if using custom XML -->
                         <classes/>                  <!-- fr-summary, fr-search... -->
-                        <instance-holder/>          <!-- XPath expression to element in the instance to which this control is bound -->
-                        <is-custom-mode/>
+                        <is-custom-instance/>
                         <save-trigger/>             <!-- Contains 'enabled' if all the fields are valid -->
-                        <section-ids/>              <!-- All the section ids in the form -->
-                        <control-ids/>              <!--     and control ids, to check that new name doesn't conflict with existing id -->
+                        <control-names/>            <!-- All used control names in the form, to check that new name doesn't conflict with existing id -->
                         <control-details/>          <!-- Sub-elements contain additional properties for this control -->
                     </local>
                 </xforms:instance>
@@ -96,48 +95,38 @@
                              type="xs:NCName"
                              calculate="normalize-space()"
                              readonly="false()"
-                             constraint=". = ../original-control-name or (not(concat(., '-section') = tokenize(../section-ids, ' ')) and not(concat(., '-control') = tokenize(../control-ids, ' ')))"/>
-                <xforms:bind ref="control-xpath" relevant="../is-custom-mode = 'true'" type="xxforms:xpath2" required="../is-custom-mode = 'true'"/>
+                             constraint=". = ../original-control-name or not(. = tokenize(../control-names, '\s+'))"/>
+                <xforms:bind ref="control-xpath" relevant="../is-custom-instance = 'true'" type="xxforms:xpath2" required="../is-custom-instance = 'true'"/>
                 <xforms:bind ref="save-trigger" readonly=". = 'disabled'"/>
 
             </xforms:model>
         </xbl:implementation>
         <xbl:template>
-            <xforms:group id="container" ref=".[relevant = 'true']" appearance="xxforms:internal">
+            <xforms:group id="container" ref=".[@relevant = 'true']" appearance="xxforms:internal">
 
+                <!-- Bindings specified on control -->
                 <xforms:var name="form"><xxforms:sequence value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=form-ref"/></xforms:var>
                 <xforms:var name="resources"><xxforms:sequence value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=resources-ref"/></xforms:var>
-                <xforms:var name="components"><xxforms:sequence value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=components-ref"/></xforms:var>
+
                 <xforms:var name="local" value="instance('local')"/>
                 <xforms:var name="form-resources" value="$form/xhtml:head/xforms:model/xforms:instance[@id = 'fr-form-resources']/* treat as element()"/>
-                <xforms:var name="binds" value="$form/xhtml:head/xforms:model/xforms:bind[@id = 'fr-form-binds'] treat as element()"/> <!-- All the binds -->
-                <xforms:var name="bind-id" value="concat($local/control-name, '-bind')"/> <!-- Id of bind for current control -->
                 <xforms:var name="metadata" value="$form/xhtml:head/xforms:model/xforms:instance[@id = 'fr-form-metadata']/metadata treat as element()"/>
-                <xforms:var name="body" value="$form/xhtml:body/fr:view/fr:body treat as element()"/>
-                <xforms:var name="is-custom-mode" value="$metadata/form-instance-mode = 'custom'"/>
+                <xforms:var name="body" value="$form/xhtml:body treat as element()"/>
+                <xforms:var name="is-custom-instance" value="dataModel:isCustomInstance()"/>
 
                 <!-- Show dialog -->
                 <xforms:action ev:event="xxforms-dialog-open" ev:observer="dialog">
-                    <xforms:var name="bind" value="$binds//xforms:bind[@id = $bind-id] treat as element()"/>
-                    <xforms:setvalue ref="$local/control-xpath" value="$bind/(@ref, @nodeset)[1] treat as attribute()"/>
-                    <xforms:setvalue ref="$local/is-custom-mode" value="$is-custom-mode"/>
-                    <xforms:setvalue ref="$local/section-ids" value="string-join($body//fr:section/@id, ' ')"/>
-                    <xforms:setvalue ref="$local/control-ids" value="string-join($body//*/@id[ends-with(., '-control')], ' ')"/>
-                    <xforms:var name="control" value="$form//*[@id = concat($local/control-name, '-control')] treat as element()"/>
+                    <xforms:setvalue ref="$local/control-xpath" value="dataModel:getBindRefOrEmpty($form, $local/control-name)"/>
+                    <xforms:setvalue ref="$local/is-custom-instance" value="$is-custom-instance"/>
+                    <xforms:setvalue ref="$local/control-names" value="string-join(controlOps:getAllControlNamesXPath($body), ' ')"/>
+                    <xforms:var name="control" value="controlOps:findControlByNameOrEmpty($form, $local/control-name)"/>
                     <xforms:setvalue ref="$local/classes" value="$control/@class"/>
 
                     <!-- Copy XBL control-details from xbl:binding in local instance -->
-                    <xforms:var name="binding" value="xxforms:element('binding')"/>
-                    <xforms:dispatch name="fb-xbl-binding-for-control" target="fb-dialog-control-details">
-                        <xxforms:context name="fb-components" value="$components"/>
-                        <xxforms:context name="fb-control" value="$control"/>
-                        <xxforms:context name="fb-bind" value="$bind"/>
-                        <xxforms:context name="fb-result" value="$binding"/>
-                    </xforms:dispatch>
                     <xforms:delete ref="$local/fb:control-details"/>
-                    <xforms:insert ref="$local/*" origin="$binding/xbl:binding/fb:metadata/fb:control-details"/>
+                    <xforms:insert ref="$local/*" origin="controlOps:bindingOrEmpty($control)/fb:metadata/fb:control-details"/>
 
-                    <!-- Process the LHHR of each details control -->
+                    <!-- Process the LHHA of each details control -->
                     <xforms:var name="current-language" value="$resources/@xml:lang/string() treat as xs:string"/>
                     <xforms:action iterate="$local/fb:control-details/*/(xforms:label, xforms:hint, xforms:help, xforms:alert)">
                         <xforms:var name="lhhr" value="."/>
@@ -167,17 +156,20 @@
 
                 <!-- Save data upon close -->
                 <xforms:action ev:event="DOMActivate" ev:observer="dialog" if="event('xxforms:targetid') != 'cancel-trigger' and $local/save-trigger = 'enabled'">
-                    <xforms:var name="instance-holder" value="$form/root()/saxon:evaluate($local/instance-holder)"/>
-                    <xforms:var name="old-name" value="name($instance-holder)"/>
+
+                    <xforms:var name="old-name" value="$local/original-control-name/string()"/>
                     <xforms:var name="new-name" value="$local/control-name/string()"/>
+
                     <!-- Find reference to control -->
-                    <xforms:var name="control" value="$body//*[@id = concat($old-name, '-control')]"/>
+                    <xforms:var name="control" value="controlOps:findControlByNameOrEmpty($form, $old-name)"/>
                     <!-- Rename if needed -->
                     <xforms:action if="$old-name != $new-name" type="xpath">
                         controlOps:findRenameControl($form, $old-name, $new-name)
                     </xforms:action>
                     <!-- Update XPath on bind -->
-                    <xforms:setvalue if="$is-custom-mode" ref="controlOps:findBindByNameOrEmpty($form, $new-name)/((@ref, @nodeset)[1]) treat as attribute()" value="$local/control-xpath"/>
+                    <xforms:action if="$is-custom-instance" type="xpath">
+                        dataModel:setBindRef($form, $new-name, $local/control-xpath)
+                    </xforms:action>
                     <!-- Set proper classes -->
                     <xforms:var name="classes" value="tokenize($local/classes, '\s+')"/>
                     <xforms:delete if="count($classes) = 0" ref="$control/@class"/>
@@ -193,8 +185,9 @@
                 </xforms:action>
 
                 <!-- Make ourselves non-relevant when the dialog closes -->
-                <xforms:setvalue ev:event="xxforms-dialog-close" ev:observer="dialog" ref="$local/relevant">false</xforms:setvalue>
+                <xforms:setvalue ev:event="xxforms-dialog-close" ev:observer="dialog" ref="$local/@relevant">false</xforms:setvalue>
 
+                <!-- Actual dialog -->
                 <xxforms:dialog id="dialog" appearance="full" level="modal">
                     <xforms:label ref="$resources/dialog-control-details/dialog-title"/>
                     <xhtml:div>

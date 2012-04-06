@@ -313,9 +313,6 @@ object ToolboxOps {
         // Insert new section first
         insertNewSection(inDoc, withGrid = false) foreach { section ⇒
 
-            // Remove grid which was automatically inserted
-            delete(section \ (FR → "grid"))
-
             val selector = binding \@ "element" stringValue
 
             val model = findModelElement(inDoc)

@@ -76,7 +76,7 @@
                         <xforms:delete nodeset="headers/header"/>
                         <xforms:insert context="headers" origin="event('response-headers')"/>
                         <!-- Handle response body -->
-                        <xxforms:variable name="error-body" select="event('response-body')"/>
+                        <xforms:var name="error-body" value="event('response-body')"/>
                         <xforms:setvalue if="$error-body" ref="content" value="if ($error-body castable as xs:string)
                             then $error-body else saxon:serialize($error-body, xxforms:instance('fr-xsl-output-instance'))"/>
                     </xforms:action>
@@ -96,17 +96,17 @@
                 </xforms:label>
                 <!-- Save changes to form -->
                 <xforms:action ev:event="DOMActivate" xmlns:sql="http://orbeon.org/oxf/xml/sql">
-                    <xxforms:variable name="instance" select="instance('fb-database-service-instance')"/>
+                    <xforms:var name="instance" value="instance('fb-database-service-instance')"/>
                     <!-- Actual id of the submission and instance -->
-                    <xxforms:variable name="submission-id" select="$instance/submission-id"/>
-                    <xxforms:variable name="instance-id" select="$instance/instance-id"/>
+                    <xforms:var name="submission-id" value="$instance/submission-id"/>
+                    <xforms:var name="instance-id" value="$instance/instance-id"/>
 
                     <!-- Insert new submission if needed -->
                     <xforms:action if="not(exists($model/xforms:submission[@id = $submission-id]))">
                         <xforms:insert context="$model" nodeset="xforms:instance | xforms:submission" origin="instance('fb-database-submission-template')"/>
                         <xforms:setvalue ref="$model/xforms:submission[last()]/@id" value="$submission-id"/>
                     </xforms:action>
-                    <xxforms:variable name="submission" select="$model/xforms:submission[@id = $submission-id]"/>
+                    <xforms:var name="submission" value="$model/xforms:submission[@id = $submission-id]"/>
 
                     <!-- Insert new instance just before submission if needed -->
                     <xforms:action if="not(exists($model/xforms:instance[@id = $instance-id]))">
@@ -117,7 +117,7 @@
                     <!-- Set instance content -->
                     <xforms:action context="$model/xforms:instance[@id = $instance-id]/*">
                         <!-- Get query template -->
-                        <xxforms:variable name="sql-query" select="xxforms:extract-document(instance('fb-database-query-template'), '#all')/*" as="element()"/>
+                        <xforms:var name="sql-query" value="xxforms:extract-document(instance('fb-database-query-template'), '#all')/*" as="element()"/>
                         <!-- Set datasource -->
                         <xforms:setvalue ref="$sql-query/sql:datasource" value="$instance/datasource"/>
                         <!-- Set query -->
@@ -144,8 +144,8 @@
 
     <!-- Initialize dialog -->
     <xforms:action ev:event="xxforms-dialog-open" xmlns:sql="http://orbeon.org/oxf/xml/sql">
-        <xxforms:variable name="instance" select="instance('fb-database-service-instance')"/>
-        <xxforms:variable name="submission-name" select="event('submission-name')"/>
+        <xforms:var name="instance" value="instance('fb-database-service-instance')"/>
+        <xforms:var name="submission-name" value="event('submission-name')"/>
 
         <!-- Clear instance entirely -->
         <xforms:setvalue iterate="$instance//*[not(*)]" ref="."/>
@@ -156,12 +156,12 @@
         <xforms:action if="$submission-name">
             <xforms:setvalue ref="$instance/name" value="$submission-name"/>
             <xforms:setvalue ref="$instance/initial-name" value="$submission-name"/>
-            <xxforms:variable name="submission" select="$model/xforms:submission[@id = concat($submission-name, '-submission')]"/>
+            <xforms:var name="submission" value="$model/xforms:submission[@id = concat($submission-name, '-submission')]"/>
             <!-- Get query -->
-            <xxforms:variable name="query-instance" select="$model/xforms:instance[@id = concat($submission-name, '-instance')]"/>
+            <xforms:var name="query-instance" value="$model/xforms:instance[@id = concat($submission-name, '-instance')]"/>
             <xforms:action if="normalize-space($query-instance/*) != ''">
                 <!-- Assume there is a serialized query -->
-                <xxforms:variable name="sql-query" select="saxon:parse($query-instance/*)/*" as="element()"/>
+                <xforms:var name="sql-query" value="saxon:parse($query-instance/*)/*" as="element()"/>
                 <!-- Restore datasource -->
                 <xforms:setvalue ref="$instance/datasource" value="$sql-query/sql:datasource"/>
                 <!-- Serialize sql:query and remove containing element -->
@@ -173,7 +173,7 @@
     <!-- Model for the submission editor -->
     <xforms:model id="fb-database-service-model">
 
-        <xxforms:variable name="model" select="xxforms:instance('fr-form-instance')/xhtml:head/xforms:model[@id = 'fr-form-model']"/>
+        <xforms:var name="model" value="xxforms:instance('fb-form-instance')/xhtml:head/xforms:model[@id = 'fr-form-model']"/>
 
         <xforms:instance id="fb-database-service-instance">
             <submission>

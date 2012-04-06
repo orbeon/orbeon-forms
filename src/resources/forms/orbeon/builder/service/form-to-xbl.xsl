@@ -104,7 +104,7 @@
         <xsl:attribute name="{name()}" select="concat('instance(''fr-form-instance'')', substring-after(., 'instance(''fr-form-instance'')/*'))"/>
     </xsl:template>
     <xsl:template match="xxforms:variable[@name = 'control-resources']" mode="filter-actions">
-        <xxforms:variable name="control-resources" select="$form-resources/*[name() = $control-name]"/>
+        <xforms:var name="control-resources" value="$form-resources/*[name() = $control-name]"/>
     </xsl:template>
 
     <!-- When copying actions, update references to xforms-ready and fr-form-model -->
@@ -226,14 +226,14 @@
                     </xforms:instance>
 
                     <!-- Try to match the current form language, or use the first language available if not found -->
-                    <xxforms:variable name="form-resources"
-                                      select="instance('fr-form-resources')/(resource[@xml:lang = xxforms:instance('fr-language-instance')], resource[1])[1]" as="element(resource)"/>
+                    <xforms:var name="form-resources"
+                                value="instance('fr-form-resources')/(resource[@xml:lang = xxforms:instance('fr-language-instance')], resource[1])[1]" as="element(resource)"/>
 
                     <!-- Keep track of whether fields should be readonly because the node we're bound to is readonly -->
                     <xforms:instance id="readonly"><readonly/></xforms:instance>
 
                     <!-- This is also at the top-level in components.xsl -->
-                    <xxforms:variable name="fr-mode" select="xxforms:instance('fr-parameters-instance')/mode"/>
+                    <xforms:var name="fr-mode" value="xxforms:instance('fr-parameters-instance')/mode"/>
                     <xforms:bind nodeset="instance('fr-form-instance')" readonly="$fr-mode = ('view', 'pdf', 'email') or instance('readonly') = 'true'"/>
 
                     <!-- Schema: simply copy so that the types are available locally -->
@@ -264,9 +264,9 @@
                     <!-- Inner group -->
                     <xforms:group appearance="xxforms:internal" xxbl:scope="inner">
                         <!-- Variable pointing to external node -->
-                        <xxforms:variable id="binding" name="binding" as="node()?">
+                        <xforms:var id="binding" name="binding" as="node()?">
                             <xxforms:sequence select="." xxbl:scope="outer"/>
-                        </xxforms:variable>
+                        </xforms:var>
 
                         <xforms:action ev:event="xforms-enabled xforms-value-changed" ev:observer="binding">
                             <!-- Section becomes visible OR binding changes -->
@@ -287,20 +287,20 @@
                         </xforms:action>
 
                         <!-- Propagate readonly -->
-                        <xxforms:variable name="readonly" as="xs:boolean" select="exf:readonly($binding)">
+                        <xforms:var name="readonly" as="xs:boolean" value="exf:readonly($binding)">
                             <xforms:setvalue ev:event="xforms-enabled xforms-value-changed" ref="instance('readonly')" value="exf:readonly($binding)"/>
-                        </xxforms:variable>
+                        </xforms:var>
 
                         <!-- Expose internally a variable pointing to Form Runner resources -->
-                        <xxforms:variable name="fr-resources" as="element()?">
+                        <xforms:var name="fr-resources" as="element()?">
                             <xxforms:sequence select="$fr-resources" xxbl:scope="outer"/>
-                        </xxforms:variable>
+                        </xforms:var>
 
                         <xforms:group appearance="xxforms:internal">
                             <!-- Synchronize data with external world upon local value change -->
                             <!-- This assumes the element QName match, or the value is not copied -->
                             <xforms:action ev:event="xforms-value-changed" if="exists($binding/*) and exists(xxforms:event('xxforms:binding'))">
-                                <xxforms:variable name="source-binding" select="xxforms:event('xxforms:binding')" as="element()"/>
+                                <xforms:var name="source-binding" value="xxforms:event('xxforms:binding')" as="element()"/>
                                 <xforms:setvalue ref="$binding/*[resolve-QName(name(), .) = resolve-QName(name($source-binding), $source-binding)]" value="$source-binding"/>
                             </xforms:action>
 

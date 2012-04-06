@@ -24,8 +24,8 @@
             <display-name lang="fr">Zone texte HTML</display-name>
             <display-name lang="ru">Текст в формате HTML</display-name>
             <icon lang="en">
-                <small-icon>/forms/orbeon/newbuilder/images/html.png</small-icon>
-                <large-icon>/forms/orbeon/newbuilder/images/html.png</large-icon>
+                <small-icon>/forms/orbeon/builder/images/html.png</small-icon>
+                <large-icon>/forms/orbeon/builder/images/html.png</large-icon>
             </icon>
             <datatype>xs:string</datatype>
             <template>

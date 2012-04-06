@@ -138,9 +138,7 @@
 
     <!-- Configuration of built-in forms -->
     <property as="xs:boolean" name="oxf.fr.detail.captcha.orbeon.builder"                       value="false"/>
-    <property as="xs:boolean" name="oxf.fr.detail.captcha.orbeon.newbuilder"                    value="false"/>
     <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.builder.form"            value="resource"/>
-    <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.newbuilder.form"         value="resource"/>
     <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.bookshelf.form"          value="resource"/>
     <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.controls.form"           value="resource"/>
     <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.contact.form"            value="exist"/>         <!-- Be specific, as user might have changed the default persistence layer -->

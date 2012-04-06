@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <!--
   Copyright (C) 2010 Orbeon, Inc.
 
@@ -43,6 +42,7 @@
         </logo>
         <!-- Sections -->
         <section-name>
+            <label>Section Name</label>
             <hint>click to enter a section title</hint>
             <alert>The section title is required in all languages</alert>
         </section-name>
@@ -123,10 +123,10 @@
             <label>Reload Controls</label>
         </reload-components>
         <enter-label>
-            <label>click to enter a label</label>
+            <label>Click to add a label</label>
         </enter-label>
         <enter-hint>
-            <label>click to enter an optional hint</label>
+            <label>Click to add a hint</label>
         </enter-hint>
         <enter-text>
             <label>click to enter text</label>
@@ -176,6 +176,9 @@
         <section-details-icon>
             <label>Section Details</label>
         </section-details-icon>
+        <grid-details-icon>
+            <label>Grid Details</label>
+        </grid-details-icon>
         <move-up-icon>
             <label>Move Up</label>
         </move-up-icon>
@@ -285,6 +288,34 @@
                 <hint>Boolean XPath expression</hint>
             </readonly>
         </dialog-section-details>
+        <dialog-grid-details>
+            <dialog-title>Edit Grid Details</dialog-title>
+            <grid-name>
+                <label>Grid Name</label>
+                <alert>Name is already in use or incorrect</alert>
+                <hint>E.g.: "first-name"</hint>
+            </grid-name>
+            <visibility>
+                <label>Visibility</label>
+                <alert>Incorrect XPath expression</alert>
+                <hint>Boolean XPath expression</hint>
+            </visibility>
+            <readonly>
+                <label>Read-Only</label>
+                <alert>Incorrect XPath expression</alert>
+                <hint>Boolean XPath expression</hint>
+            </readonly>
+            <min>
+                <label>Minimum Number of Repetitions</label>
+                <alert>Incorrect value</alert>
+                <hint>Non-negative number</hint>
+            </min>
+            <max>
+                <label>Maximum Number of Repetitions</label>
+                <alert>Incorrect value</alert>
+                <hint>Positive number</hint>
+            </max>
+        </dialog-grid-details>
         <dialog-validation-details>
             <dialog-title>Edit Validation Properties</dialog-title>
             <types>
@@ -400,11 +431,11 @@
                 <alert>Incorrect XPath expression</alert>
                 <hint>Boolean XPath expression</hint>
             </readonly>
-            <default>
+            <initial-value>
                 <label>Initial Value</label>
                 <alert>Incorrect XPath expression</alert>
                 <hint>XPath expression</hint>
-            </default>
+            </initial-value>
             <calculate>
                 <label>Calculated Value</label>
                 <alert>Incorrect XPath expression</alert>
@@ -653,17 +684,6 @@
                     <value>xforms-ready</value>
                 </item>
             </event-type>
-            <event-condition>
-                <label>Condition</label>
-                <item>
-                    <label>Run always</label>
-                    <value>true()</value>
-                </item>
-                <item>
-                    <label>Run on creation only</label>
-                    <value>$fr-mode='new'</value>
-                </item>
-            </event-condition>
             <event-control>
                 <label>Control</label>
             </event-control>
@@ -746,7 +766,6 @@
             <dialog-title>Permissions</dialog-title>
             <role-based-permissions>Enable role-based permissions for this form</role-based-permissions>
             <role>Role</role>
-            <invalid-role-name>Invalid role name</invalid-role-name>
             <permissions>Permissions</permissions>
             <operations>Operations</operations>
             <anyone>Anyone</anyone>
@@ -807,6 +826,7 @@
         </logo>
         <!-- Sections -->
         <section-name>
+            <label>Nom de la section</label>
             <hint>cliquer pour entrer un titre de section</hint>
             <alert>Le title de section est requis dans toutes les langues</alert>
         </section-name>
@@ -940,6 +960,9 @@
         <section-details-icon>
             <label>Détails de la section</label>
         </section-details-icon>
+        <grid-details-icon>
+            <label>Détails de la grille</label>
+        </grid-details-icon>
         <move-up-icon>
             <label>Déplacer vers le haut</label>
         </move-up-icon>
@@ -1031,7 +1054,7 @@
             <control-name>
                 <label>Nom de la section</label>
                 <alert>Le nom est déjà utilisé ou incorrect</alert>
-                <hint>E.g.: "address"</hint>
+                <hint>Par ex.: "addresse"</hint>
             </control-name>
             <visibility>
                 <label>Visibilité</label>
@@ -1044,6 +1067,34 @@
                 <hint>Expression XPath booléenne</hint>
             </readonly>
         </dialog-section-details>
+        <dialog-grid-details>
+            <dialog-title>Détails de la grille</dialog-title>
+            <grid-name>
+                <label>Nom de la grille</label>
+                <alert>Le nom est déjà utilisé ou incorrect</alert>
+                <hint>Par ex.: "addresse"</hint>
+            </grid-name>
+            <visibility>
+                <label>Visibilité</label>
+                <alert>Expression XPath incorrecte</alert>
+                <hint>Expression XPath booléenne</hint>
+            </visibility>
+            <readonly>
+                <label>Lecture seule</label>
+                <alert>Expression XPath incorrecte</alert>
+                <hint>Expression XPath booléenne</hint>
+            </readonly>
+            <min>
+                <label>Nombre minimum de répétitions</label>
+                <alert>Valeur incorrecte</alert>
+                <hint>Nombre non-négatif</hint>
+            </min>
+            <max>
+                <label>Nombre minimum de répétitions</label>
+                <alert>Valeur incorrecte</alert>
+                <hint>Nombre positif</hint>
+            </max>
+        </dialog-grid-details>
         <dialog-validation-details>
             <dialog-title>Propriétés de validation</dialog-title>
             <types>
@@ -1159,11 +1210,11 @@
                 <alert>Expression XPath incorrecte</alert>
                 <hint>Expression XPath booléenne</hint>
             </readonly>
-            <default>
+            <initial-value>
                 <label>Valeur initiale</label>
                 <alert>Expression XPath incorrecte</alert>
                 <hint>Expression XPath</hint>
-            </default>
+            </initial-value>
             <calculate>
                 <label>Valeur calculée</label>
                 <alert>Expression XPath incorrecte</alert>
@@ -1412,17 +1463,6 @@
                     <value>xforms-ready</value>
                 </item>
             </event-type>
-            <event-condition>
-                <label>Condition</label>
-                <item>
-                    <label>Toujours</label>
-                    <value>true()</value>
-                </item>
-                <item>
-                    <label>Création seulement</label>
-                    <value>$fr-mode='new'</value>
-                </item>
-            </event-condition>
             <event-control>
                 <label>Contrôle</label>
             </event-control>
@@ -1505,7 +1545,6 @@
             <dialog-title>Permissions</dialog-title>
             <role-based-permissions>Activer les permissions basées sur les rôles pour ce formulaire</role-based-permissions>
             <role>Rôle</role>
-            <invalid-role-name>Nom de rôle invalide</invalid-role-name>
             <permissions>Permissions</permissions>
             <operations>Opérations</operations>
             <anyone>Toute personne</anyone>
@@ -1568,6 +1607,7 @@
         </logo>
         <!-- Sections -->
         <section-name>
+            <label>[Section Name]</label>
             <hint>klikk for å legge inn en seksjonstittel</hint>
             <alert>Seksjonstittel er påkrevd for alle språk</alert>
         </section-name>
@@ -1701,6 +1741,9 @@
         <section-details-icon>
             <label>Seksjonsdetaljer</label>
         </section-details-icon>
+        <grid-details-icon>
+            <label>[Grid Details]</label>
+        </grid-details-icon>
         <move-up-icon>
             <label>Flytt opp</label>
         </move-up-icon>
@@ -1805,6 +1848,34 @@
                 <hint>Boolsk XPath-uttrykk</hint>
             </readonly>
         </dialog-section-details>
+        <dialog-grid-details>
+            <dialog-title>[Edit Grid Details]</dialog-title>
+            <grid-name>
+                <label>[Grid Name]</label>
+                <alert>[Name is already in use or incorrect]</alert>
+                <hint>[E.g.: "first-name"]</hint>
+            </grid-name>
+            <visibility>
+                <label>Synlighet</label>
+                <alert>Galt XPath-uttrykk</alert>
+                <hint>Boolsk XPath-uttrykk</hint>
+            </visibility>
+            <readonly>
+                <label>Skrivebeskyttet</label>
+                <alert>Galt XPath-uttrykk</alert>
+                <hint>Boolsk XPath-uttrykk</hint>
+            </readonly>
+            <min>
+                <label>[Minimum Number of Repetitions]</label>
+                <alert>[Incorrect value]</alert>
+                <hint>[Non-negative number]</hint>
+            </min>
+            <max>
+                <label>[Maximum Number of Repetitions]</label>
+                <alert>[Incorrect value]</alert>
+                <hint>[Positive number]</hint>
+            </max>
+        </dialog-grid-details>
         <dialog-validation-details>
             <dialog-title>Rediger elementegenskaper</dialog-title>
             <types>
@@ -1920,11 +1991,11 @@
                 <alert>Galt XPath-uttrykk</alert>
                 <hint>Boolsk XPath-uttrykk</hint>
             </readonly>
-            <default>
+            <initial-value>
                 <label>Forhåndsutfylt verdi</label>
                 <alert>Galt XPath-uttrykk</alert>
                 <hint>XPath-uttrykk</hint>
-            </default>
+            </initial-value>
             <calculate>
                 <label>Utregnet verdi</label>
                 <alert>Galt XPath-uttrykk</alert>
@@ -2173,17 +2244,6 @@
                     <value>xforms-ready</value>
                 </item>
             </event-type>
-            <event-condition>
-                <label>[Condition]</label>
-                <item>
-                    <label>[Run always]</label>
-                    <value>true()</value>
-                </item>
-                <item>
-                    <label>[Run on creation only]</label>
-                    <value>$fr-mode='new'</value>
-                </item>
-            </event-condition>
             <event-control>
                 <label>Kontroll</label>
             </event-control>
@@ -2266,7 +2326,6 @@
             <dialog-title>Permissions</dialog-title>
             <role-based-permissions>Enable role-based permissions for this form</role-based-permissions>
             <role>Role</role>
-            <invalid-role-name>Invalid role name</invalid-role-name>
             <permissions>Permissions</permissions>
             <operations>Operations</operations>
             <anyone>Anyone</anyone>
@@ -2328,6 +2387,7 @@
         </logo>
         <!-- Sections -->
         <section-name>
+            <label>[Section Name]</label>
             <hint>Нажмите чтобы ввести заголовок раздела</hint>
             <alert>Заголовок необходимо ввести на всех языках формы</alert>
         </section-name>
@@ -2461,6 +2521,9 @@
         <section-details-icon>
             <label>Настройки раздела</label>
         </section-details-icon>
+        <grid-details-icon>
+            <label>Настройки сетки</label>
+        </grid-details-icon>
         <move-up-icon>
             <label>Переместить выше</label>
         </move-up-icon>
@@ -2565,6 +2628,34 @@
                 <hint>Булево выражение XPath</hint>
             </readonly>
         </dialog-section-details>
+        <dialog-grid-details>
+            <dialog-title>Редактировать настройки сетки</dialog-title>
+            <grid-name>
+                <label>Название сетки</label>
+                <alert>Имя уже используется или некорректно</alert>
+                <hint>Например: "first-name"</hint>
+            </grid-name>
+            <visibility>
+                <label>Настройки видимости</label>
+                <alert>Некорректное выражение XPath</alert>
+                <hint>Булево выражение XPath</hint>
+            </visibility>
+            <readonly>
+                <label>Только для чтения</label>
+                <alert>Некорректное выражение XPath</alert>
+                <hint>Булево выражение XPath</hint>
+            </readonly>
+            <min>
+                <label>Минимальное количество повторений</label>
+                <alert>Некорректное значение</alert>
+                <hint>Неотрицательное число</hint>
+            </min>
+            <max>
+                <label>Максимальное количество повторений</label>
+                <alert>Некорректное значение</alert>
+                <hint>Положительное число</hint>
+            </max>
+        </dialog-grid-details>
         <dialog-validation-details>
             <dialog-title>Настройки автоматической проверки</dialog-title>
             <types>
@@ -2680,11 +2771,11 @@
                 <alert>Некорректное выражение XPath</alert>
                 <hint>Булево выражение XPath</hint>
             </readonly>
-            <default>
+            <initial-value>
                 <label>Начальное значение</label>
                 <alert>Некорректное выражение XPath</alert>
                 <hint>Булево выражение XPath</hint>
-            </default>
+            </initial-value>
             <calculate>
                 <label>Вычисляемое значение</label>
                 <alert>Некорректное выражение XPath</alert>
@@ -2933,17 +3024,6 @@
                     <value>xforms-ready</value>
                 </item>
             </event-type>
-            <event-condition>
-                <label>Условие</label>
-                <item>
-                    <label>Выполнять всегда</label>
-                    <value>true()</value>
-                </item>
-                <item>
-                    <label>Только при создании</label>
-                    <value>$fr-mode='new'</value>
-                </item>
-            </event-condition>
             <event-control>
                 <label>Элемент</label>
             </event-control>
@@ -3026,7 +3106,6 @@
             <dialog-title>Настройка прав</dialog-title>
             <role-based-permissions>Включить для этой формы ролевое управление доступом</role-based-permissions>
             <role>Роль</role>
-            <invalid-role-name>Некорректное название роли</invalid-role-name>
             <permissions>Права</permissions>
             <operations>Действия</operations>
             <anyone>Любой пользователь</anyone>

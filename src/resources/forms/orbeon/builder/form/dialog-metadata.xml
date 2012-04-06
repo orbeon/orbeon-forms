@@ -24,8 +24,8 @@
       id="fb-editor-metadata-dialog" close="false">
 
     <!-- Are we editing the metadata for a new or existing form? Consider new if either value is blank. -->
-    <xxforms:variable name="is-new-form" select="(xxforms:bind('application-name-bind'), xxforms:bind('form-name-bind')) = ''"/>
-    <xxforms:variable name="is-save-as" select="instance('fb-metadata-instance')/mode = 'save-as'"/>
+    <xforms:var name="is-new-form" value="(xxforms:bind('application-name-bind'), xxforms:bind('form-name-bind')) = ''"/>
+    <xforms:var name="is-save-as" value="instance('fb-metadata-instance')/mode = 'save-as'"/>
 
     <!-- HACK: Copy expression as we can't use the variable $is-save-as above -->
     <xforms:label value="if (instance('fb-metadata-instance')/mode = 'save-as')
@@ -60,7 +60,7 @@
                 <!-- Application name -->
 
                 <!-- Use an input if app name is a wildcard -->
-                <xxforms:variable name="is-input" select="xxforms:instance('fr-permissions')/app[@name = '*']" as="xs:boolean"/>
+                <xforms:var name="is-input" value="xxforms:instance('fr-permissions')/app[@name = '*']" as="xs:boolean"/>
                 <xforms:group ref=".[$is-input]">
                     <xforms:input ref="application-name" id="fb-application-name-input" tabindex="1" xxforms:autocomplete="off">
                         <xforms:label ref="$form-resources/application-name/label"/>
@@ -110,17 +110,17 @@
                 <!-- Copy data to main instance -->
                 <xforms:setvalue ref="xxforms:bind('application-name-bind')" value="instance('fb-metadata-instance')/application-name"/>
                 <xforms:setvalue ref="xxforms:bind('form-name-bind')" value="instance('fb-metadata-instance')/form-name"/>
-                <!-- Update providers -->
-                <xforms:dispatch name="fr-update-persistence-provider" target="fr-persistence-model"/>
                 <!-- Refresh components -->
-                <xforms:send submission="fb-load-components"/>
+                <xforms:send submission="fb-load-toolbox">
+                    <xxforms:context name="app" value="instance('fb-metadata-instance')/application-name"/>
+                </xforms:send>
                 <!-- Additional handling for save as -->
                 <xforms:action if="$is-save-as">
                     <!-- Create new document id -->
                     <xforms:setvalue ref="xxforms:instance('fr-parameters-instance')/document" value="digest(string(random(true())), 'MD5', 'hex')"/>
                     <!-- Actually save -->
                     <xforms:dispatch name="fr-save-action" target="fr-persistence-model">
-                        <xxforms:context name="fr:check-data-valid" select="true()"/>
+                        <xxforms:context name="fr:check-data-valid" value="true()"/>
                     </xforms:dispatch>
                     <!-- Change URL to have new document id -->
                     <xxforms:script>
@@ -136,16 +136,12 @@
                     var layout = YAHOO.widget.Layout.getLayoutById("fb-layout");
                     layout.set('height', YAHOO.util.Dom.getViewportHeight());
                     layout.set('width', YAHOO.util.Dom.getViewportWidth());
-                    <!-- This seems necessary w/ IE 7 -->
-                    YAHOO.util.Dom.setStyle("left1", "display", "block");
-                    YAHOO.util.Dom.setStyle("center1", "display", "block");
-                    layout.resize();
                 </xxforms:script>
             </xforms:action>
 
             <!-- Stop value change propagation so changes in this section of the form don't cause data
                  to become dirty in fr-persistence-model -->
-            <xforms:action ev:event="xforms-value-changed" ev:propagate="stop"/>
+            <xforms:action ev:event="#all" ev:propagate="stop"/>
         </xforms:group>
     </xhtml:div>
 </xxforms:dialog>

@@ -235,7 +235,7 @@
                 <!-- This is a bit of a HACK for Form Builder only: place non-relevant instances of all toolbox controls
                      so that xxf:dynamic will have all the JavaScript and CSS resources available on the client.
                      See: https://github.com/orbeon/orbeon-forms/issues/31 -->
-                <xsl:if test="$is-new-form-builder" xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
+                <xsl:if test="$is-form-builder" xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
 
                     <xsl:variable name="property-names"
                                   select="p:properties-start-with('oxf.fb.toolbox.group')" as="xs:string*" />

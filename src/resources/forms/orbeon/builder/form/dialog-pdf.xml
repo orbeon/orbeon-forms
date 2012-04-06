@@ -28,7 +28,7 @@
 
     <xforms:label ref="$form-resources/dialog-upload-pdf/dialog-title"/>
 
-    <xxforms:variable name="attachments-instance" select="$model/xforms:instance[@id = 'fr-form-attachments']/*"/>
+    <xforms:var name="attachments-instance" value="$model/xforms:instance[@id = 'fr-form-attachments']/*"/>
     <xhtml:div>
         <xhtml:div class="fr-dialog-message">
 

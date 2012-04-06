@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   Copyright (C) 2010 Orbeon, Inc.
 
@@ -71,7 +72,7 @@
                         <!-- Force RRR when the value changes. The value change doesn't cause a rebuild, therefore the binds don't update. -->
                         <xforms:rebuild model="fr-form-model"/>
                         <xforms:recalculate model="fr-form-model"/>
-                        <xforms:revalidate model="fr-form-model"/>
+                        <xforms:revalidate model="fr-form-model"/> 
                     </xforms:action>
                 </xforms:trigger>
                 <xforms:output value="$form-resources/or/label"/>

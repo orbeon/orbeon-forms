@@ -38,7 +38,7 @@
             <xxforms:variable name="form" as="xs:string" select="xxforms:instance('fr-parameters-instance')/form"/>
 
             <!-- NOTE: This test is duplicated in other places -->
-            <xxforms:variable name="is-form-builder" select="$app = 'orbeon' and $form = ('builder', 'newbuilder')"/>
+            <xxforms:variable name="is-form-builder" select="$app = 'orbeon' and $form = 'builder'"/>
 
             <xxforms:variable name="has-roles" select="xxforms:instance('fr-permissions')/@has-roles = 'true'" as="xs:boolean"/>
             <xxforms:variable name="app-query" select="if ($is-form-builder and $has-roles) then instance('fr-search-instance')/query[contains(@path, 'application-name') and @search-field = 'true'] else ()" as="element(query)?"/>
@@ -315,7 +315,7 @@
     </head>
     <body>
         <!-- Whether this is the summary page for the form builder -->
-        <xxforms:variable name="is-form-builder" select="$app = 'orbeon' and $form = ('builder', 'newbuilder')"/>
+        <xxforms:variable name="is-form-builder" select="$app = 'orbeon' and $form = 'builder'"/>
         <fr:view>
             <xforms:label>Orbeon Form Runner</xforms:label>
             <fr:body>

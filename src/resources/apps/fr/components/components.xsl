@@ -30,7 +30,6 @@
     <!-- Import components -->
     <xsl:import href="view.xsl"/>
     <xsl:import href="buttons.xsl"/>
-    <xsl:import href="inplace.xsl"/><!-- just for inplace textarea for now -->
     <xsl:import href="section.xsl"/><!-- pass global section properties to fr:section -->
     <xsl:import href="repeat.xsl"/> <!-- convert legacy fr:repeat to fr:grid -->
 

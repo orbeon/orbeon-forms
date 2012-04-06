@@ -684,8 +684,8 @@
 
     <!-- Add a default xforms:alert for those fields which don't have one. Only do this within grids and dialogs. -->
     <xsl:template
-        match="xhtml:body//fr:grid//xforms:*[local-name() = ('input', 'textarea', 'select', 'select1', 'upload') and not(xforms:alert) and not(@appearance = 'fr:in-place')]
-                       | xhtml:body//xxforms:dialog//xforms:*[local-name() = ('input', 'textarea', 'select', 'select1', 'upload') and not(xforms:alert) and not(@appearance = 'fr:in-place')]">
+        match="xhtml:body//fr:grid//xforms:*[local-name() = ('input', 'textarea', 'select', 'select1', 'upload') and not(xforms:alert)]
+                       | xhtml:body//xxforms:dialog//xforms:*[local-name() = ('input', 'textarea', 'select', 'select1', 'upload') and not(xforms:alert)]">
         <xsl:copy>
             <xsl:apply-templates select="@* | node()"/>
             <xforms:alert ref="$fr-resources/detail/labels/alert"/>

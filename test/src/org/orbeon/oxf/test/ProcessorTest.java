@@ -22,6 +22,7 @@ import org.junit.rules.TestName;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.common.Version;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.DOMSerializer;
 import org.orbeon.oxf.processor.Processor;
@@ -130,7 +131,9 @@ public class ProcessorTest extends ResourceManagerTestBase {
             for (; i.hasNext();) {
                 final Element testNode = (Element) i.next();
                 final Element groupNode = testNode.getParent();
-                if (testNode.attributeValue("ignore") != null)
+                if ("true".equals(testNode.attributeValue("ignore"))
+                    || ("pe".equalsIgnoreCase(testNode.attributeValue("edition")) && ! Version.isPE())
+                    || ("ce".equalsIgnoreCase(testNode.attributeValue("edition")) && Version.isPE()))
                     continue;
                 String description = testNode.attributeValue("description", "");
                 if (groupNode.getName().equals("group")) {

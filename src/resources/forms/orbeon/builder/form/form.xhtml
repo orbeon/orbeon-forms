@@ -185,7 +185,7 @@
             <!-- Initially hide to prevent expensive relayout upon load -->
             <xh:div id="center1" style="display: none">
 
-                <fr:view width="974px">
+                <fr:view>
                     <xf:label>Orbeon Form Builder</xf:label>
                     <fr:header>
                         <!-- Image -->
@@ -556,13 +556,15 @@
                                         versions of the upload when user mouse over other cells.
                             -->
                             <xf:var name="control-effective-id" value="xformsUtils:getRelatedEffectiveId($selected-cell-effective, $control-id)"/>
-                            <xf:var name="bound-node" value="xxf:binding(concat('/', $control-effective-id))"/>
-                            <xf:upload class="fb-static-upload" id="fb-static-upload-empty" ref="$bound-node[. = ''], instance('fb-static-upload')/empty"/>
-                            <xf:upload class="fb-static-upload" id="fb-static-upload-non-empty" ref="$bound-node[. != ''], instance('fb-static-upload')/non-empty"/>
+                            <xf:var name="bound-item" value="xxf:binding(concat('/', $control-effective-id))"/>
+                            <xf:upload class="fb-static-upload" id="fb-static-upload-empty" ref="$bound-item[string(.) = ''], instance('fb-static-upload')/empty"/>
+                            <xf:upload class="fb-static-upload" id="fb-static-upload-non-empty" ref="$bound-item[string(.) != ''], instance('fb-static-upload')/non-empty"/>
                         </xh:div>
 
-                        <!-- Display the form being edited -->
                         <xf:group id="fb-details-group">
+                            <!-- Don't leak events -->
+                            <xf:action ev:event="#all" ev:propagate="stop"/>
+                            <!-- Display the form being edited -->
                             <xxf:dynamic id="fb-dynamic" ref="instance('fb-form-instance')"/>
                         </xf:group>
 

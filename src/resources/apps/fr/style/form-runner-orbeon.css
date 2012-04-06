@@ -188,6 +188,7 @@ h1 .xforms-trigger-appearance-xxforms-minimal input, h2 .xforms-trigger-appearan
 /* Metadata */
 .fr-top {
     background: url("../../../ops/yui/assets/skins/sam/sprite.png") repeat-x scroll left -1400px;
+    background-color: #004B92;
     padding: .5em;
 }
 .fr-separator {

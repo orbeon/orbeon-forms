@@ -186,9 +186,9 @@ h1.fr-form-title {
 /* ***** In-Place Editing ******************************************************************************************* */
 
 /* Title and description */
-.fb-title-control, .fb-description-control { width: 49% }
 .fb-title-control .xbl-fr-inplace-input, .fb-description-control .xbl-fr-inplace-input { display: block }
 .fb-title-control input, .fb-description-control input { width: 100% }
+.fb-title-control .fr-inplace-cancel a, .fb-description-control .fr-inplace-cancel a { color: white }
 
 /* In-place editing for regular fields */
 .fr-inplace-buttons { display: block; margin-top: .3em; margin-bottom: .5em }

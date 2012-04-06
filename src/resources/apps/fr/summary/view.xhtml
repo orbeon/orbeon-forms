@@ -32,18 +32,18 @@
         <!-- Summary page XForms model -->
         <xforms:model id="fr-form-model" xxforms:xpath-analysis="true">
 
-            <xxforms:variable name="parameters" select="xxforms:instance('fr-parameters-instance')"/>
+            <xforms:var name="parameters" value="xxforms:instance('fr-parameters-instance')"/>
 
-            <xxforms:variable name="app" as="xs:string" select="xxforms:instance('fr-parameters-instance')/app"/>
-            <xxforms:variable name="form" as="xs:string" select="xxforms:instance('fr-parameters-instance')/form"/>
+            <xforms:var name="app" as="xs:string" value="xxforms:instance('fr-parameters-instance')/app"/>
+            <xforms:var name="form" as="xs:string" value="xxforms:instance('fr-parameters-instance')/form"/>
 
             <!-- NOTE: This test is duplicated in other places -->
-            <xxforms:variable name="is-form-builder" select="$app = 'orbeon' and $form = 'builder'"/>
+            <xforms:var name="is-form-builder" value="$app = 'orbeon' and $form = 'builder'"/>
 
-            <xxforms:variable name="has-roles" select="xxforms:instance('fr-permissions')/@has-roles = 'true'" as="xs:boolean"/>
-            <xxforms:variable name="app-query" select="if ($is-form-builder and $has-roles) then instance('fr-search-instance')/query[contains(@path, 'application-name') and @search-field = 'true'] else ()" as="element(query)?"/>
-            <xxforms:variable name="form-query" select="if ($app-query) then instance('fr-search-instance')/query[contains(@path, 'form-name') and @search-field = 'true'] else ()" as="element(query)?"/>
-            <xxforms:variable name="initial-app-value" select="if ($app-query) then xxforms:instance('fr-permissions')/app[1][not(@name = '*')]/@name else ()" as="xs:string?"/>
+            <xforms:var name="has-roles" value="xxforms:instance('fr-permissions')/@has-roles = 'true'" as="xs:boolean"/>
+            <xforms:var name="app-query" value="if ($is-form-builder and $has-roles) then instance('fr-search-instance')/query[contains(@path, 'application-name') and @search-field = 'true'] else ()" as="element(query)?"/>
+            <xforms:var name="form-query" value="if ($app-query) then instance('fr-search-instance')/query[contains(@path, 'form-name') and @search-field = 'true'] else ()" as="element(query)?"/>
+            <xforms:var name="initial-app-value" value="if ($app-query) then xxforms:instance('fr-permissions')/app[1][not(@name = '*')]/@name else ()" as="xs:string?"/>
 
             <!-- Model initialization -->
             <xforms:action ev:event="xforms-model-construct-done">
@@ -54,21 +54,21 @@
             <!-- Model initialization after we got the source form -->
             <xforms:action ev:event="get-source-form-submission-done">
                 <!-- Store resources from configuration instance -->
-                <xxforms:variable name="resources-instance" as="element(xforms:instance)"
-                                  select="xxforms:instance('fr-source-form-instance')/xhtml:head/xforms:model/xforms:instance[@id = 'fr-form-resources']"/>
+                <xforms:var name="resources-instance" as="element(xforms:instance)"
+                            value="xxforms:instance('fr-source-form-instance')/xhtml:head/xforms:model/xforms:instance[@id = 'fr-form-resources']"/>
                 <xforms:action if="not($resources-instance/@src)">
                     <!-- Copy inline instance -->
-                    <xforms:insert nodeset="instance('fr-form-resources')" origin="$resources-instance/*"/>
+                    <xforms:insert ref="instance('fr-form-resources')" origin="$resources-instance/*"/>
                 </xforms:action>
                 <xforms:action if="$resources-instance/@src">
                     <!-- Dereference @src -->
-                    <xforms:insert nodeset="instance('fr-form-resources')" origin="doc($resources-instance/@src)"/>
+                    <xforms:insert ref="instance('fr-form-resources')" origin="doc($resources-instance/@src)"/>
                 </xforms:action>
                 <!-- Update to current language -->
                 <xforms:dispatch name="fr-update-language" targetid="fr-resources-model"/>
 
                 <!-- Set page size -->
-                <xxforms:variable name="page-size" select="instance('fr-search-instance')/page-size" as="element(page-size)"/>
+                <xforms:var name="page-size" value="instance('fr-search-instance')/page-size" as="element(page-size)"/>
                 <xforms:setvalue ref="$page-size" model="fr-persistence-model"
                                  value="xxforms:property(string-join(('oxf.fr.summary.page-size', $app, $form), '.'))"/>
             </xforms:action>
@@ -105,16 +105,16 @@
                 </triggers>
             </xforms:instance>
 
-            <xxforms:variable name="operations" select="tokenize(xxforms:instance('fr-authorized-operations'), '\s')"/>
-            <xforms:bind nodeset="instance('fr-summary-triggers-instance')">
+            <xforms:var name="operations" value="tokenize(xxforms:instance('fr-authorized-operations'), '\s')"/>
+            <xforms:bind ref="instance('fr-summary-triggers-instance')">
                 <!-- Operations on entries are disabled if no entry is selected -->
-                <xforms:bind nodeset="new" relevant="$operations = ('*', 'create')"/>
-                <xforms:bind nodeset="view | pdf" readonly="not(property('xxforms:noscript')) and count(tokenize(instance('fr-selection-instance'), '\s+')) != 1" relevant="$operations = ('*', 'read')"/>
-                <xforms:bind nodeset="delete" readonly="not(property('xxforms:noscript')) and count(tokenize(instance('fr-selection-instance'), '\s+')) = 0" relevant="$operations = ('*', 'delete')"/>
-                <xforms:bind nodeset="import" relevant="$operations = ('*', 'create')"/>
+                <xforms:bind ref="new" relevant="$operations = ('*', 'create')"/>
+                <xforms:bind ref="view | pdf" readonly="not(property('xxforms:noscript')) and count(tokenize(instance('fr-selection-instance'), '\s+')) != 1" relevant="$operations = ('*', 'read')"/>
+                <xforms:bind ref="delete" readonly="not(property('xxforms:noscript')) and count(tokenize(instance('fr-selection-instance'), '\s+')) = 0" relevant="$operations = ('*', 'delete')"/>
+                <xforms:bind ref="import" relevant="$operations = ('*', 'create')"/>
             </xforms:bind>
 
-            <xxforms:variable name="parameters" select="xxforms:instance('fr-parameters-instance')"/>
+            <xforms:var name="parameters" value="xxforms:instance('fr-parameters-instance')"/>
 
             <xforms:action ev:event="fr-summary-create">
                 <xforms:load resource="/fr/{$app}/{$form}/new{if (property('xxforms:noscript')) then '?fr-noscript=true' else ''}"/>
@@ -138,27 +138,27 @@
                 </search>
             </xforms:instance>
 
-            <xforms:bind nodeset="instance('fr-search-instance')">
+            <xforms:bind ref="instance('fr-search-instance')">
                 <!-- Don't send this to the server -->
-                <xforms:bind nodeset="query/(@search-field | @summary-field)" relevant=". = 'true'"/>
+                <xforms:bind ref="query/(@search-field | @summary-field)" relevant=". = 'true'"/>
                 <!-- Set types so the search fields display the proper controls -->
-                <xforms:bind nodeset="query[ends-with(@type, ':date')]" type="xforms:date"/>
-                <xforms:bind nodeset="query[ends-with(@type, ':time')]" type="xforms:time"/>
-                <xforms:bind nodeset="query[ends-with(@type, ':dateTime')]" type="xforms:dateTime"/>
+                <xforms:bind ref="query[ends-with(@type, ':date')]" type="xforms:date"/>
+                <xforms:bind ref="query[ends-with(@type, ':time')]" type="xforms:time"/>
+                <xforms:bind ref="query[ends-with(@type, ':dateTime')]" type="xforms:dateTime"/>
 
                 <!-- Set default value for app and form if needed -->
                 <!-- Do this declaratively so we don't depend on order of execution of submissions -->
-                <xforms:bind nodeset="$app-query" readonly="false()"
+                <xforms:bind ref="$app-query" readonly="false()"
                              calculate="if (normalize-space() = '' and $initial-app-value) then $initial-app-value else ."/>
                 <!-- Adjust value for form if there is an app constraint and a form constraint -->
-                <xforms:bind nodeset="$form-query" readonly="false()"
+                <xforms:bind ref="$form-query" readonly="false()"
                              calculate="(for $a in xxforms:instance('fr-permissions')/app[@name = $app-query]
                                              return for $current in . return if ($a/form[@name = ($current, '*')]) then .
                                                  else $a/form[1]/@name, .)[1]"/>
                 <!-- Force exact query match if there is an app constraint -->
-                <xforms:bind nodeset="$app-query/@match" readonly="false()" calculate="if ($initial-app-value) then 'exact' else ."/>
+                <xforms:bind ref="$app-query/@match" readonly="false()" calculate="if ($initial-app-value) then 'exact' else ."/>
                 <!-- Force exact query match if there is a form constraint -->
-                <xforms:bind nodeset="$form-query/@match" readonly="false()" calculate="if (xxforms:instance('fr-permissions')/app[@name = $app-query]/form[1][not(@name = '*')]) then 'exact' else ."/>
+                <xforms:bind ref="$form-query/@match" readonly="false()" calculate="if (xxforms:instance('fr-permissions')/app[@name = $app-query]/form[1][not(@name = '*')]) then 'exact' else ."/>
 
             </xforms:bind>
 
@@ -182,16 +182,16 @@
             </xforms:instance>
 
             <!-- Calculations for page navigation -->
-            <xforms:bind nodeset="instance('fr-paging-instance')">
-                <xforms:bind nodeset="total" calculate="(instance('fr-summary-instance')/@total, 0)[1]"/>
-                <xforms:bind nodeset="search-total" calculate="(instance('fr-summary-instance')/@search-total, 0)[1]"/>
-                <xforms:bind nodeset="page-size" calculate="instance('fr-search-instance')/page-size"/>
-                <xforms:bind nodeset="page-number" calculate="instance('fr-search-instance')/page-number"/>
-                <xforms:bind nodeset="page-count" calculate="(../search-total + ../page-size - 1) idiv ../page-size"/>
-                <xforms:bind nodeset="from" calculate="if (../search-total = 0) then 0 else (../page-number - 1) * ../page-size + 1"/>
-                <xforms:bind nodeset="to" calculate="min((../page-number * ../page-size, ../search-total))"/>
-                <xforms:bind nodeset="prev-trigger" readonly="../search-total = 0 or xs:integer(../page-number) le 1"/>
-                <xforms:bind nodeset="next-trigger" readonly="../search-total = 0 or xs:integer(../search-total) le xs:integer(../to)"/>
+            <xforms:bind ref="instance('fr-paging-instance')">
+                <xforms:bind ref="total" calculate="(instance('fr-summary-instance')/@total, 0)[1]"/>
+                <xforms:bind ref="search-total" calculate="(instance('fr-summary-instance')/@search-total, 0)[1]"/>
+                <xforms:bind ref="page-size" calculate="instance('fr-search-instance')/page-size"/>
+                <xforms:bind ref="page-number" calculate="instance('fr-search-instance')/page-number"/>
+                <xforms:bind ref="page-count" calculate="(../search-total + ../page-size - 1) idiv ../page-size"/>
+                <xforms:bind ref="from" calculate="if (../search-total = 0) then 0 else (../page-number - 1) * ../page-size + 1"/>
+                <xforms:bind ref="to" calculate="min((../page-number * ../page-size, ../search-total))"/>
+                <xforms:bind ref="prev-trigger" readonly="../search-total = 0 or xs:integer(../page-number) le 1"/>
+                <xforms:bind ref="next-trigger" readonly="../search-total = 0 or xs:integer(../search-total) le xs:integer(../to)"/>
             </xforms:bind>
 
             <xforms:instance id="fr-summary-headers-instance">
@@ -211,19 +211,19 @@
 
                 <xforms:dispatch name="get-source-form-submission-done" targetid="fr-form-model"/>
 
-                <xxforms:variable name="summary-elements" as="element()*"
-                                  select="xxforms:instance('fr-source-form-instance')/xhtml:body//*[(@ref or @bind) and @class and tokenize(@class, '\s+') = ('fr-summary', 'fr-search')]"/>
+                <xforms:var name="summary-elements" as="element()*"
+                            value="xxforms:instance('fr-source-form-instance')/xhtml:body//*[(@ref or @bind) and @class and tokenize(@class, '\s+') = ('fr-summary', 'fr-search')]"/>
 
                 <!-- Extract fields which must appear in the summary -->
-                <xforms:insert context="instance('fr-configuration-instance')" nodeset="*" origin="$summary-elements"/>
+                <xforms:insert context="instance('fr-configuration-instance')" ref="*" origin="$summary-elements"/>
 
                 <!-- Create elements holding structured search data -->
                 <xforms:action iterate="$summary-elements">
-                    <xxforms:variable name="control" select="." as="element()"/>
+                    <xforms:var name="control" value="." as="element()"/>
 
                     <!-- Insert empty template -->
-                    <xforms:insert context="instance('fr-search-instance')" nodeset="query" origin="instance('fr-search-template')"/>
-                    <xxforms:variable name="query" select="instance('fr-search-instance')/query[last()]"/>
+                    <xforms:insert context="instance('fr-search-instance')" ref="query" origin="instance('fr-search-template')"/>
+                    <xforms:var name="query" value="instance('fr-search-instance')/query[last()]"/>
 
                     <!-- Add control information to template -->
                     <xforms:setvalue ref="$query/@control" value="$control/local-name()"/>
@@ -233,14 +233,14 @@
                     <xforms:setvalue ref="$query/@summary-field" value="tokenize($control/@class, '\s+') = ('fr-summary')"/>
 
                     <!-- All the control's "ancestor" @ref, @context or @bind -->
-                    <xxforms:variable name="all-ancestors" select="$control/ancestor-or-self::*/(@ref | @context | @bind)" as="attribute()*"/>
+                    <xforms:var name="all-ancestors" value="$control/ancestor-or-self::*/(@ref | @context | @bind)" as="attribute()*"/>
                     <!-- First control @bind ancestor and its own ancestors with @ref, @context or @bind  -->
-                    <xxforms:variable name="bind-ancestors" select="reverse($all-ancestors)[name() = 'bind'][1]/ancestor-or-self::*/(@ref | @context | @bind)" as="attribute()*"/>
+                    <xforms:var name="bind-ancestors" value="reverse($all-ancestors)[name() = 'bind'][1]/ancestor-or-self::*/(@ref | @context | @bind)" as="attribute()*"/>
 
                     <!-- All control's ancestors based on a path (@ref or @context) up to the first @bind if any -->
-                    <xxforms:variable name="path-ancestors" select="reverse($all-ancestors except $bind-ancestors)" as="attribute()*"/>
+                    <xforms:var name="path-ancestors" value="reverse($all-ancestors except $bind-ancestors)" as="attribute()*"/>
                     <!-- First ancestor @bind if any -->
-                    <xxforms:variable name="bind-ancestor" select="reverse($bind-ancestors)[1]" as="attribute()?"/>
+                    <xforms:var name="bind-ancestor" value="reverse($bind-ancestors)[1]" as="attribute()?"/>
 
                     <!-- Add meta-information to template -->
                     <!-- First, try paths -->
@@ -250,12 +250,12 @@
                     </xforms:action>
                     <!-- Then, try binds -->
                     <xforms:action if="exists($bind-ancestor)">
-                        <xxforms:variable name="bind" select="xxforms:instance('fr-source-form-instance')/xhtml:head/xforms:model//xforms:bind[@id = $bind-ancestor]"/>
+                        <xforms:var name="bind" value="xxforms:instance('fr-source-form-instance')/xhtml:head/xforms:model//xforms:bind[@id = $bind-ancestor]"/>
 
                         <!-- Set control name if not already done with @ref -->
                         <xforms:setvalue if="empty($path-ancestors)" ref="$query/@name" value="substring-before($bind-ancestor, '-bind')"/>
                         <!-- Prepend path from binds -->
-                        <xforms:setvalue ref="$query/@path" value="string-join((($bind/ancestor-or-self::xforms:bind/(@nodeset | @ref))[position() gt 1], if (normalize-space()) then . else ()), '/')"/>
+                        <xforms:setvalue ref="$query/@path" value="string-join((($bind/ancestor-or-self::xforms:bind/(@ref | @nodeset))[position() gt 1], if (normalize-space()) then . else ()), '/')"/>
 
                         <!--<xforms:message level="xxforms:log-info">XXX Bind: <xforms:output value="saxon:serialize($bind, 'xml')"/></xforms:message>-->
                         <!--<xforms:message level="xxforms:log-info">XXX Path: <xforms:output value="$query/@path"/></xforms:message>-->
@@ -266,7 +266,7 @@
                              through serialization/parsing so all the namespaces are copied into the document. -->
                         <xforms:insert context="$query" origin="saxon:parse(saxon:serialize($bind, 'xml'))"/>
                         <xforms:insert context="$query" origin="$query/xforms:bind/namespace::*[local-name() != '']"/>
-                        <xforms:delete nodeset="$query/xforms:bind"/>
+                        <xforms:delete ref="$query/xforms:bind"/>
 
                         <xforms:setvalue ref="$query/@type" value="if ($bind/@type) then $bind/@type else 'xs:string'"/>
                     </xforms:action>
@@ -274,8 +274,8 @@
                     <xforms:setvalue if="exists($control/@labelref)" ref="$query/@path" value="concat(., '/', $control/@labelref)"/>
 
                     <!-- Compute label information -->
-                    <xxforms:variable name="label" select="$control/xforms:label" as="xs:element(xforms:label)*"/>
-                    <xxforms:variable name="form-resources" model="fr-resources-model" select="$fr-form-resources" as="element(resource)?"/>
+                    <xforms:var name="label" value="$control/xforms:label" as="xs:element(xforms:label)*"/>
+                    <xforms:var name="form-resources" model="fr-resources-model" value="$fr-form-resources" as="element(resource)?"/>
                     <xforms:setvalue ref="$query/@label"
                                      value="if ($label/@ref or $label/@bind) then $form-resources/*[local-name() = $query/@name]/label else $label"/>
                 </xforms:action>
@@ -315,7 +315,7 @@
     </head>
     <body>
         <!-- Whether this is the summary page for the form builder -->
-        <xxforms:variable name="is-form-builder" select="$app = 'orbeon' and $form = 'builder'"/>
+        <xforms:var name="is-form-builder" value="$app = 'orbeon' and $form = 'builder'"/>
         <fr:view>
             <xforms:label>Orbeon Form Runner</xforms:label>
             <fr:body>
@@ -379,9 +379,9 @@
                                         <div class="fr-summary-search-item">
                                             <!-- Application -->
                                             <xforms:group ref="$app-query">
-                                                <xxforms:variable name="label" select="@label" as="xs:string"/>
+                                                <xforms:var name="label" value="@label" as="xs:string"/>
                                                 <!-- Use an input if app name is a wildcard -->
-                                                <xxforms:variable name="is-input" select="xxforms:instance('fr-permissions')/app[@name = '*']" as="xs:boolean"/>
+                                                <xforms:var name="is-input" value="xxforms:instance('fr-permissions')/app[@name = '*']" as="xs:boolean"/>
                                                 <xforms:input ref=".[$is-input]">
                                                     <xforms:label>
                                                         <xforms:output value="$label"/>
@@ -391,7 +391,7 @@
                                                     <xforms:label>
                                                         <xforms:output value="$label"/>
                                                     </xforms:label>
-                                                    <xforms:itemset model="fr-roles-model" nodeset="instance('fr-permissions')/app">
+                                                    <xforms:itemset model="fr-roles-model" ref="instance('fr-permissions')/app">
                                                         <xforms:label ref="@name"/>
                                                         <xforms:value ref="@name"/>
                                                     </xforms:itemset>
@@ -413,10 +413,10 @@
                                         <div class="fr-summary-search-item">
                                             <!-- Form -->
                                             <xforms:group ref="$form-query">
-                                                <xxforms:variable name="label" select="@label" as="xs:string"/>
-                                                <xxforms:variable name="current-app" select="xxforms:instance('fr-permissions')/app[@name = $app-query]"/>
+                                                <xforms:var name="label" value="@label" as="xs:string"/>
+                                                <xforms:var name="current-app" value="xxforms:instance('fr-permissions')/app[@name = $app-query]"/>
                                                 <!-- Use an input if app name or form name is a wildcard -->
-                                                <xxforms:variable name="is-input" select="xxforms:instance('fr-permissions')/app/@name = '*' or $current-app/form[@name = '*']" as="xs:boolean"/>
+                                                <xforms:var name="is-input" value="xxforms:instance('fr-permissions')/app/@name = '*' or $current-app/form[@name = '*']" as="xs:boolean"/>
                                                 <xforms:input ref=".[$is-input]">
                                                     <xforms:label>
                                                         <xforms:output value="$label"/>
@@ -426,7 +426,7 @@
                                                     <xforms:label>
                                                         <xforms:output value="$label"/>
                                                     </xforms:label>
-                                                    <xforms:itemset nodeset="$current-app/form">
+                                                    <xforms:itemset ref="$current-app/form">
                                                         <xforms:label ref="@name"/>
                                                         <xforms:value ref="@name"/>
                                                     </xforms:itemset>
@@ -445,10 +445,10 @@
                                         </div>
                                     </xforms:group>
                                     <!-- Structured search over query terms that have search-field set to 'true' -->
-                                    <xforms:repeat nodeset="instance('fr-search-instance')/query[@path and @search-field = 'true']" id="search-repeat">
-                                        <xxforms:variable name="control-name" select="@name"/>
+                                    <xforms:repeat ref="instance('fr-search-instance')/query[@path and @search-field = 'true']" id="search-repeat">
+                                        <xforms:var name="control-name" value="@name"/>
                                         <div class="fr-summary-search-item">
-                                            <xxforms:variable name="label" select="@label"/>
+                                            <xforms:var name="label" value="@label"/>
 
                                             <xforms:group ref=".[not($is-form-builder and $has-roles and (contains(@path, 'application-name') or contains(@path, 'form-name')))]">
                                                 <!-- Regular search field (exclude app/form name if we are Form Builder and we have roles) -->
@@ -475,7 +475,7 @@
                                                         <xforms:value/>
                                                     </xforms:item>
                                                     <xforms:itemset model="fr-persistence-model"
-                                                                    nodeset="$form-resources/*[local-name() = $control-name]/item"
+                                                                    ref="$form-resources/*[local-name() = $control-name]/item"
                                                                     xxforms:refresh-items="false">
                                                         <xforms:label ref="label"/>
                                                         <xforms:value ref="value"/>
@@ -523,8 +523,8 @@
                             <xforms:output value="$fr-resources/summary/search/returned-2"/>
                         </xforms:group>
 
-                        <xxforms:variable name="show-created" select="xxforms:property(string-join(('oxf.fr.summary.show-created', $app, $form), '.'))"/>
-                        <xxforms:variable name="show-last-modified" select="xxforms:property(string-join(('oxf.fr.summary.show-last-modified', $app, $form), '.'))"/>
+                        <xforms:var name="show-created" value="xxforms:property(string-join(('oxf.fr.summary.show-created', $app, $form), '.'))"/>
+                        <xforms:var name="show-last-modified" value="xxforms:property(string-join(('oxf.fr.summary.show-last-modified', $app, $form), '.'))"/>
 
                         <div class="fr-summary-table-div">
                             <fr:datatable scrollable="horizontal" width="940px">
@@ -535,18 +535,18 @@
                                         <th fr:sortable="false" class="fr-summary-repeat-column-number" fr:resizeable="true">
                                             <xforms:output value="$fr-resources/summary/titles/row-number"/>
                                         </th>
-                                        <xforms:repeat nodeset="if ($show-created) then . else ()">
+                                        <xforms:repeat ref="if ($show-created) then . else ()">
                                             <th fr:sortable="false" fr:resizeable="true">
                                                 <xforms:output value="$fr-resources/summary/titles/created"/>
                                             </th>
                                         </xforms:repeat>
-                                        <xforms:repeat nodeset="if ($show-last-modified) then . else ()">
+                                        <xforms:repeat ref="if ($show-last-modified) then . else ()">
                                             <th fr:sortable="false" fr:resizeable="true">
                                                 <xforms:output value="$fr-resources/summary/titles/last-modified"/>
                                             </th>
                                         </xforms:repeat>
                                         <!-- Iterate through specially marked controls and derive resource id then resource -->
-                                        <xforms:repeat nodeset="instance('fr-configuration-instance')/*[tokenize(@class, '\s+') = 'fr-summary']" id="fr-summary-repeat-column-number">
+                                        <xforms:repeat ref="instance('fr-configuration-instance')/*[tokenize(@class, '\s+') = 'fr-summary']" id="fr-summary-repeat-column-number">
                                             <th fr:sortable="false" fr:resizeable="true">
                                                 <!-- Output showing as the header of the column -->
                                                 <xforms:output value="
@@ -569,17 +569,17 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <xforms:repeat nodeset="document" id="documents-repeat">
+                                    <xforms:repeat ref="document" id="documents-repeat">
                                         <!-- 1-based position in the current page -->
-                                        <xxforms:variable name="position" select="position()" as="xs:integer"/>
+                                        <xforms:var name="position" value="position()" as="xs:integer"/>
                                         <!-- 1-based position in the entire result set -->
-                                        <xxforms:variable name="document-number" select="instance('fr-paging-instance')/from + $position - 1" as="xs:integer"/>
+                                        <xforms:var name="document-number" value="instance('fr-paging-instance')/from + $position - 1" as="xs:integer"/>
 
                                         <!-- Document name and href for edition -->
-                                        <xxforms:variable name="document-name" select="@name" as="xs:string"/>
-                                        <xxforms:variable name="operations" select="tokenize(xxforms:instance('fr-authorized-operations'), '\s')"/>
-                                        <xxforms:variable name="edit-view" select="if ($operations = ('*', 'update')) then 'edit' else if ($operations = 'read') then 'view' else ''"/>
-                                        <xxforms:variable name="document-href" select="concat('/fr/', $app, '/', $form, '/', $edit-view, '/',
+                                        <xforms:var name="document-name" value="@name" as="xs:string"/>
+                                        <xforms:var name="operations" value="tokenize(xxforms:instance('fr-authorized-operations'), '\s')"/>
+                                        <xforms:var name="edit-view" value="if ($operations = ('*', 'update')) then 'edit' else if ($operations = 'read') then 'view' else ''"/>
+                                        <xforms:var name="document-href" value="concat('/fr/', $app, '/', $form, '/', $edit-view, '/',
                                                 $document-name, if (property('xxforms:noscript')) then '?fr-noscript=true' else '')"/>
                                         <tr class="{if (tokenize(instance('fr-selection-instance'), '\s+') = $document-name) then 'fr-summary-row-selected' else 'fr-summary-row-not-selected'}">
                                             <td class="fr-summary-repeat-selection-checkbox">
@@ -600,8 +600,8 @@
                                                     <xforms:output value="$document-number"/>
                                                 </xforms:group>
                                             </td>
-                                            <xforms:repeat nodeset="if ($show-created) then @created else ()">
-                                                <xxforms:variable name="created" select="if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), $fr-resources/summary/formats/save-datetime, xxforms:instance('fr-language-instance'), (), ()) else ."/>
+                                            <xforms:repeat ref="if ($show-created) then @created else ()">
+                                                <xforms:var name="created" value="if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), $fr-resources/summary/formats/save-datetime, xxforms:instance('fr-language-instance'), (), ()) else ."/>
                                                 <td>
                                                     <xforms:group ref=".[$edit-view != '']">
                                                         <xhtml:a href="{$document-href}" target="_blank">
@@ -613,8 +613,8 @@
                                                     </xforms:group>
                                                 </td>
                                             </xforms:repeat>
-                                            <xforms:repeat nodeset="if ($show-last-modified) then @last-modified else ()">
-                                                <xxforms:variable name="last-modified" select="if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), $fr-resources/summary/formats/save-datetime, xxforms:instance('fr-language-instance'), (), ()) else ."/>
+                                            <xforms:repeat ref="if ($show-last-modified) then @last-modified else ()">
+                                                <xforms:var name="last-modified" value="if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), $fr-resources/summary/formats/save-datetime, xxforms:instance('fr-language-instance'), (), ()) else ."/>
                                                 <td>
                                                     <xforms:group ref=".[$edit-view != '']">
                                                         <xhtml:a href="{$document-href}" target="_blank">
@@ -627,11 +627,11 @@
                                                 </td>
                                             </xforms:repeat>
                                             <!-- One column for each detail -->
-                                            <xxforms:variable name="positions" select="instance('fr-search-instance')/query[@name and @summary-field = 'true']/(count(preceding-sibling::query[@name]) + 1)"/>
-                                            <xforms:repeat nodeset="details/detail[position() = $positions]" id="document-details-repeat">
+                                            <xforms:var name="positions" value="instance('fr-search-instance')/query[@name and @summary-field = 'true']/(count(preceding-sibling::query[@name]) + 1)"/>
+                                            <xforms:repeat ref="details/detail[position() = $positions]" id="document-details-repeat">
                                                 <td>
                                                     <!-- NOTE: Doing everything in a single big output XPath expression has the benefit of producing much less markup -->
-                                                    <xxforms:variable name="detail" select="
+                                                    <xforms:var name="detail" value="
                                                         for $detail-position in position() return
                                                             for $query in instance('fr-search-instance')/query[$detail-position + 1] return
                                                                 for $control in $query/@control return
@@ -843,9 +843,9 @@
                         <xforms:action ev:event="DOMActivate">
                             <!-- Parse the selected rows -->
                             <xforms:action iterate="tokenize(instance('fr-selection-instance'), '\s+')">
-                                <xxforms:variable name="document-name" select="." as="xs:string"/>
+                                <xforms:var name="document-name" value="." as="xs:string"/>
                                 <xforms:dispatch name="fr-delete-data" targetid="fr-persistence-model">
-                                    <xxforms:context name="document-id" select="$document-name"/>
+                                    <xxforms:context name="document-id" value="$document-name"/>
                                 </xforms:dispatch>
                             </xforms:action>
                             <!-- Reset search selection and navigation -->

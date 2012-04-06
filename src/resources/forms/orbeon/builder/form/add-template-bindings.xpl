@@ -14,8 +14,8 @@
 <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
           xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
-    <p:param type="input" name="data" debug="xxxdata"/>
-    <p:param type="input" name="bindings" debug="xxxbindings"/>
+    <p:param type="input" name="data"/>
+    <p:param type="input" name="bindings"/>
     <p:param type="output" name="data"/>
 
     <p:processor name="oxf:unsafe-xslt">

@@ -32,8 +32,20 @@
 
                 <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
 
+                <xsl:variable name="metadata"
+                              select="/*/xhtml:head/xforms:model[@id = 'fr-form-model']/xforms:instance[@id = 'fr-form-metadata']/*"/>
+
                 <xsl:variable name="is-custom-instance"
-                              select="/*/xhtml:head/xforms:model[@id = 'fr-form-model']/xforms:instance[@id = 'fr-form-metadata']/*/form-instance-mode = 'custom'"/>
+                              select="$metadata/form-instance-mode = 'custom'"/>
+
+                <!-- HTML title -->
+                <xsl:template match="xhtml:head/xhtml:title">
+                    <xsl:copy>
+                        <xsl:copy-of select="@*"/>
+                        <!-- Use the first title found -->
+                        <xsl:value-of select="$metadata/title[1]"/>
+                    </xsl:copy>
+                </xsl:template>
 
                 <!-- Remove temporary fb-readonly instance -->
                 <xsl:template match="xforms:instance[@id = 'fb-readonly']"/>

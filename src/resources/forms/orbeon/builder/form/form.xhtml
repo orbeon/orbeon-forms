@@ -164,12 +164,10 @@
                                 <xh:span><xf:output value="$fr-resources/detail/labels/save-as-document"/></xh:span>
                             </xf:label>
                             <xf:action ev:event="DOMActivate">
-                                <!-- Reset the app/form name -->
-                                <xf:setvalue ref="instance('fb-metadata-instance')/application-name"/>
-                                <xf:setvalue ref="instance('fb-metadata-instance')/form-name"/>
-                                <!-- Show and focus -->
-                                <xf:setvalue ref="instance('fb-metadata-instance')/mode" value="'save-as'"/>
-                                <xxf:show dialog="fb-editor-metadata-dialog"/>
+                                <!-- Open the dialog in "save-as" mode -->
+                                <xf:dispatch name="fb-show-dialog" targetid="fb-form-editor$dialog-form-settings">
+                                    <xxf:context name="mode" value="'save-as'"/>
+                                </xf:dispatch>
                             </xf:action>
                         </xf:trigger>
                     </xh:div>
@@ -188,7 +186,7 @@
                 <fr:view>
                     <xf:label>Orbeon Form Builder</xf:label>
                     <fr:header>
-                        <!-- Image -->
+                        <!-- Logo -->
                         <xf:group id="fb-logo-group" class="fr-logo">
                             <xf:label ref="$form-resources/logo/label" class="fr-hidden"/>
                             <fr:image-attachment bind="logo-bind" class="fr-attachment">
@@ -201,9 +199,59 @@
                             </fr:image-attachment>
                         </xf:group>
 
+                        <!-- Form settings -->
+                        <xf:trigger appearance="minimal" id="fb-form-settings-trigger">
+                            <xf:label><xh:img src="/apps/fr/style/images/silk/cog.png" alt="" title="{$form-resources/dialog-add-language/add-language/label}"/></xf:label>
+                            <xf:action ev:event="DOMActivate">
+                                <!-- Open the dialog in "edit" mode -->
+                                <xf:dispatch name="fb-show-dialog" targetid="fb-form-editor$dialog-form-settings">
+                                    <xxf:context name="app" value="xxf:bind('application-name-bind')"/>
+                                    <xxf:context name="form" value="xxf:bind('form-name-bind')"/>
+                                    <xxf:context name="mode" value="'edit'"/>
+                                </xf:dispatch>
+                            </xf:action>
+                        </xf:trigger>
+                        <xh:div class="fr-hidden">
+                            <!-- Application name and form name for the summary page -->
+                            <xf:output id="application-name-control" bind="application-name-bind" class="fr-summary fr-search fr-static"/>
+                            <xf:output id="form-name-control" bind="form-name-bind" class="fr-summary fr-search fr-static"/>
+                        </xh:div>
+
+                        <!-- Add/remove language -->
+                        <xf:group class="fb-language-triggers" ref=".[xpl:isPE()]" xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary">
+                            <xf:trigger appearance="minimal">
+                                <xf:label><xh:img src="/apps/fr/style/images/silk/add.png" alt="" title="{$form-resources/dialog-add-language/add-language/label}"/></xf:label>
+                                <xxf:show ev:event="DOMActivate" dialog="fb-add-language-dialog" neighbor="fb-resources-language-select"/>
+                            </xf:trigger>
+                            <xf:trigger appearance="minimal" id="fb-language-remove" ref=".[count($resources/resource) gt 1]">
+                                <xf:label><xh:img src="/apps/fr/style/images/silk/delete.png" alt="" title="{$form-resources/dialog-add-language/remove-language/label}"/></xf:label>
+                                <xf:action ev:event="DOMActivate">
+                                    <!-- Ask confirmation -->
+                                    <xxf:show dialog="fb-confirmation-dialog">
+                                        <xxf:context name="fr:message"
+                                                         value="concat($form-resources/messages/delete-resources, ' ''',
+                                                                     xxf:instance('fr-languages-instance')/language[@code = $fb-lang]/(if (@native-name != @english-name) then concat(@native-name, ' (', @english-name, ')') else @native-name),
+                                                                     '''?')"/>
+                                        <xxf:context name="fr:confirmation-target" value="'fb-language-remove'"/>
+                                    </xxf:show>
+                                </xf:action>
+                                <xf:action ev:event="fb-confirmation-yes">
+                                    <!-- Delete resources for this language -->
+                                    <xf:delete ref="$resources/resource[@xml:lang = $fb-lang]"/>
+                                    <xf:delete ref="$metadata-instance/title[@xml:lang = $fb-lang]"/>
+                                    <xf:delete ref="$metadata-instance/description[@xml:lang = $fb-lang]"/>
+                                    <xf:setvalue ref="$fb-lang" value="$resources/resource[1]/@xml:lang"/>
+
+                                    <!-- Force RRR when the value changes. The value change doesn't cause a rebuild, therefore the binds don't update. -->
+                                    <xf:rebuild model="fr-form-model"/>
+                                    <xf:recalculate model="fr-form-model"/>
+                                    <xf:revalidate model="fr-form-model"/>
+                                </xf:action>
+                            </xf:trigger>
+                        </xf:group>
+
                         <!-- Language selector -->
                         <xh:div class="fr-language-choice">
-                            <!-- Represent as links -->
                             <fr:link-select1 id="fb-resources-language-select" ref="$fb-lang">
                                 <xf:itemset ref="$resources/resource">
                                     <xf:label value="xxf:instance('fr-languages-instance')/language[@code = context()/@xml:lang]/@native-name"/>
@@ -219,68 +267,20 @@
                                 </xf:action>
 
                             </fr:link-select1>
-
-                            <!-- Add/remove language -->
-                            <xf:group class="fb-language-triggers" ref=".[xpl:isPE()]" xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary">
-                                <xf:trigger appearance="minimal">
-                                    <xf:label>
-                                        <xh:img src="/apps/fr/style/images/silk/add.png" alt="" title="{$form-resources/dialog-add-language/add-language/label}"/>
-                                        <!--<xh:span><xf:output value="$form-resources/add/label"/></xh:span>-->
-                                    </xf:label>
-                                    <xxf:show ev:event="DOMActivate" dialog="fb-add-language-dialog" neighbor="fb-resources-language-select"/>
-                                </xf:trigger>
-                                <xf:trigger appearance="minimal" id="fb-language-remove" ref=".[count($resources/resource) gt 1]">
-                                    <xf:label>
-                                        <xh:img src="/apps/fr/style/images/silk/delete.png" alt="" title="{$form-resources/dialog-add-language/remove-language/label}"/>
-                                        <!--<xh:span><xf:output value="$form-resources/remove/label"/></xh:span>-->
-                                    </xf:label>
-                                    <xf:action ev:event="DOMActivate">
-                                        <!-- Ask confirmation -->
-                                        <xxf:show dialog="fb-confirmation-dialog">
-                                            <xxf:context name="fr:message"
-                                                             value="concat($form-resources/messages/delete-resources, ' ''',
-                                                                         xxf:instance('fr-languages-instance')/language[@code = $fb-lang]/(if (@native-name != @english-name) then concat(@native-name, ' (', @english-name, ')') else @native-name),
-                                                                         '''?')"/>
-                                            <xxf:context name="fr:confirmation-target" value="'fb-language-remove'"/>
-                                        </xxf:show>
-                                    </xf:action>
-                                    <xf:action ev:event="fb-confirmation-yes">
-                                        <!-- Delete resources for this language -->
-                                        <xf:delete ref="$resources/resource[@xml:lang = $fb-lang]"/>
-                                        <xf:delete ref="$metadata-instance/title[@xml:lang = $fb-lang]"/>
-                                        <xf:delete ref="$metadata-instance/description[@xml:lang = $fb-lang]"/>
-                                        <xf:setvalue ref="$fb-lang" value="$resources/resource[1]/@xml:lang"/>
-
-                                        <!-- Force RRR when the value changes. The value change doesn't cause a rebuild, therefore the binds don't update. -->
-                                        <xf:rebuild model="fr-form-model"/>
-                                        <xf:recalculate model="fr-form-model"/>
-                                        <xf:revalidate model="fr-form-model"/>
-                                    </xf:action>
-                                </xf:trigger>
-                            </xf:group>
-
                         </xh:div>
 
                     </fr:header>
                     <fr:top>
-                        <!-- Section about form metadata -->
-                        <!-- TODO: we use this group to detect focus, value changed, select, and focus events, keep this until better solution is in -->
-                        <xf:group id="fb-metadata-group">
-                            <xh:div class="fb-title-control fr-form-title">
-                                <fr:inplace-input id="title-control" bind="title-bind" class="fr-summary fr-search">
-                                    <xf:label ref="$form-resources/title/label"/>
-                                    <xf:hint ref="$form-resources/title/hint"/>
-                                    <xf:alert ref="$form-resources/title/alert"/>
-                                </fr:inplace-input>
-                            </xh:div>
-
-                            <xh:div class="fb-description-control fr-form-description">
-                                <fr:inplace-input id="description-control" bind="description-bind" class="fr-summary fr-search">
-                                    <xf:label ref="$form-resources/description/label"/>
-                                    <xf:hint ref="$form-resources/description/hint"/>
-                                </fr:inplace-input>
-                            </xh:div>
-                        </xf:group>
+                        <!-- Form title and description -->
+                        <fr:inplace-input id="title-control" bind="title-bind" class="fr-summary fr-search fb-title-control fr-form-title">
+                            <xf:label ref="$form-resources/title/label"/>
+                            <xf:hint ref="$form-resources/title/hint"/>
+                            <xf:alert ref="$form-resources/title/alert"/>
+                        </fr:inplace-input>
+                        <fr:inplace-input id="description-control" bind="description-bind" class="fr-summary fr-search fb-description-control fr-form-description">
+                            <xf:label ref="$form-resources/description/label"/>
+                            <xf:hint ref="$form-resources/description/hint"/>
+                        </fr:inplace-input>
                         <xh:div class="fr-clear"/>
                     </fr:top>
                     <fr:bottom>
@@ -517,13 +517,13 @@
 
                             <!-- Label editor -->
                             <xf:output id="fb-enter-label" ref="$form-resources/enter-label/label"/>
-                            <xf:group ref=".[exists($control/xf:label/@ref)]" appearance="xxforms:internal" xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps">
+                            <xf:group ref=".[exists($control/xf:label/@ref)]" appearance="xxf:internal" xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps">
                                 <xf:input xxf:autocomplete="off" class="fb-control-label" ref="$current-resources/*[name() = controlOps:controlName($control-id)]/label"/>
                             </xf:group>
 
                             <!-- Hint editor -->
                             <xf:output id="fb-enter-hint" ref="$form-resources/enter-hint/label"/>
-                            <xf:group ref=".[exists($control/xf:hint/@ref)]" appearance="xxforms:internal" xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps">
+                            <xf:group ref=".[exists($control/xf:hint/@ref)]" appearance="xxf:internal" xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps">
                                 <xf:input xxf:autocomplete="off" class="fb-control-hint" ref="$current-resources/*[name() = controlOps:controlName($control-id)]/hint"/>
                             </xf:group>
 
@@ -575,11 +575,9 @@
             </xh:div>
         </xh:div>
         <fr:dialogs>
-            <xi:include href="oxf:/forms/orbeon/builder/form/dialog-metadata.xml" xxi:omit-xml-base="true"/>
             <xi:include href="oxf:/forms/orbeon/builder/form/dialog-edit-source.xml" xxi:omit-xml-base="true"/>
             <xi:include href="oxf:/forms/orbeon/builder/form/dialog-language.xml" xxi:omit-xml-base="true"/>
             <xi:include href="oxf:/forms/orbeon/builder/form/dialog-pdf.xml" xxi:omit-xml-base="true"/>
-            <xi:include href="oxf:/forms/orbeon/builder/form/dialog-help.xml" xxi:omit-xml-base="true"/>
             <xi:include href="oxf:/forms/orbeon/builder/form/dialog-publish.xml" xxi:omit-xml-base="true"/>
             <xi:include href="oxf:/forms/orbeon/builder/form/dialog-schema.xml" xxi:omit-xml-base="true"/>
             <xi:include href="oxf:/forms/orbeon/builder/form/dialog-services.xml" xxi:omit-xml-base="true"/>

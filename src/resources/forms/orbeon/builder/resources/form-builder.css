@@ -25,14 +25,6 @@ html { overflow: hidden }
 .fb-xforms-disabled { display: none }
 .fb-hide-alert .xforms-alert { display: none }
 
-/* This is like the form runner's help image */
-/*a.fb-edit-help-trigger img {*/
-    /*vertical-align: -0.2em;*/
-    /*display: inline;*/
-    /*margin: 0 .5em 0 -1px;*//* move icon to the left a bit to align it better */
-    /*padding: 0;*/
-/*}*/
-
 /* This is for the form builder title at the top */
 h1.fr-form-title {
     clear: none;
@@ -72,11 +64,6 @@ h1.fr-form-title {
 #fb-toolbox .fb-xvc { text-align: center }
 #fb-toolbox .fb-xvc .xforms-trigger { margin-right: .5em }
 
-/* Language choice */
-#fb-toolbox .fb-language-choice { text-align: left }
-#fb-toolbox .fb-language-choice .xforms-select1 { width: 100% }
-#fb-toolbox .fb-language-choice .xforms-label { display: block; margin-bottom: 3px }
-
 /* Services and actions */
 #fb-toolbox ul { margin: 0; overflow: auto }
 #fb-toolbox li { list-style-type: none; white-space: nowrap; font-size: 11px }
@@ -94,13 +81,14 @@ h1.fr-form-title {
 /* ***** Dialogs **************************************************************************************************** */
 
 /* Metadata editor dialog */
-#fb-editor-metadata-dialog { width: 30em; }
-#fb-editor-metadata-dialog img { float: left; margin: 1em 2em 0 1em; }
-#fb-editor-metadata-dialog .xforms-label { display: block; }
-#fb-editor-metadata-dialog .xforms-hint { width: 25em; margin-bottom: 1em; }
-#fb-editor-metadata-dialog .xforms-alert { width: 25em; }
-#fb-editor-metadata-dialog .fb-editor-metadata-dialog-fields { float: left; width: 20em }
-#fb-editor-metadata-dialog .fb-editor-metadata-dialog-buttons { margin-top: 1em; }
+.fb-dialog-form-settings { width: 30em; }
+.fb-dialog-form-settings img { float: left; margin: 1em 2em 0 1em; }
+.fb-dialog-form-settings .xforms-label { display: block; }
+.fb-dialog-form-settings .xforms-hint { width: 25em; margin-bottom: 1em; }
+.fb-dialog-form-settings .xforms-alert { width: 25em; }
+.fb-dialog-form-settings .fb-editor-metadata-dialog-fields { float: left; width: 20em }
+.fb-dialog-form-settings .fb-editor-metadata-dialog-buttons { margin-top: 1em; }
+
 /* Itemset editor dialog */
 /* Using a class instead of an id since the id is simply 'dialog' as it is declared in a component */
 .fb-itemset-editor-dialog { width: 35em }
@@ -183,12 +171,33 @@ h1.fr-form-title {
 /* NOTE: This should not be needed because alert dialog should not use label for message content */
 .xbl-fr-alert-dialog-message .xforms-label { font-weight: normal }
 
-/* ***** In-Place Editing ******************************************************************************************* */
+/* ***** Header ***************************************************************************************************** */
+
+.fr-header #fb-form-settings-trigger { display: inline-block; float: right; margin-left: .5em }
+.fr-header .fb-language-triggers  { display: inline-block; float: right; margin-left: 1em }
+
+/* ***** Top ******************************************************************************************************** */
 
 /* Title and description */
-.fb-title-control .xbl-fr-inplace-input, .fb-description-control .xbl-fr-inplace-input { display: block }
-.fb-title-control input, .fb-description-control input { width: 100% }
-.fb-title-control .fr-inplace-cancel a, .fb-description-control .fr-inplace-cancel a { color: white }
+.fr-top .xbl-fr-inplace-input .xforms-label { display: none }
+.fr-top .xbl-fr-inplace-input .fr-inplace-cancel a { color: white }
+.fr-top .xbl-fr-inplace-input .fr-inplace-content .xforms-output { color: white }
+.fr-top .xbl-fr-inplace-input .fr-inplace-content .xforms-output:hover { color: #004B92 }
+.fr-top .xbl-fr-inplace-input .fr-inplace-content .xforms-input input { color: #6E6E6E }
+.fr-top .xbl-fr-inplace-input .fr-inplace-buttons .xforms-trigger-appearance-minimal { color: white }
+
+.fr-top .xbl-fr-inplace-input .fb-title-control .xforms-output { font-size: 20pt }
+.fr-top .xbl-fr-inplace-input .fb-title-control .xforms-input input { font-size: 20pt }
+
+.fr-top .xbl-fr-inplace-input .fb-description-control .xforms-output { font-size: 8pt }
+.fr-top .xbl-fr-inplace-input .fb-description-control .xforms-input input { font-size: 8pt  }
+
+/* ***** Footer ***************************************************************************************************** */
+
+/* Give height to footer so it shows up even if empty */
+.fr-footer div { height: 1em }
+
+/* ***** In-Place Editing ******************************************************************************************* */
 
 /* In-place editing for regular fields */
 .fr-inplace-buttons { display: block; margin-top: .3em; margin-bottom: .5em }
@@ -209,9 +218,8 @@ h1.fr-form-title {
 #fb-details-group .fb-top-level-content:hover .fr-section-title .fr-inplace-content .xforms-output:hover { background-color: #FFFF88; color: #004B92 }
 
 /* In-place editing for metadata section */
-#fb-metadata-group .fr-inplace-input .xforms-input input { width: 100% }
-#fb-metadata-group .fr-inplace-textarea textarea.xforms-textarea { width: 100% }
-
+.fr-top .xbl-fr-inplace-input { display: block }
+.fr-top .xbl-fr-inplace-input .xforms-input input { width: 100% }
 
 /* In-place editing for section titles */
 .fr-section-title .fr-inplace-content .xforms-output { color: #004B92 }
@@ -241,20 +249,6 @@ h1.fr-form-title {
 #fb-details-group .fr-section-title .xforms-alert-active { font-size: 10px }
 
 /* ***** Misc ******************************************************************************************************* */
-
-/* Give height to footer so it shows up even if empty */
-.fr-footer div { height: 1em }
-
-.fb-title-control .xforms-label { display: none }
-.fb-title-control .fr-inplace-content .xforms-output { color: white; font-size: 20pt }
-.fb-title-control .fr-inplace-content .xforms-output:hover { color: #004B92 }
-.fb-title-control .fr-inplace-content .xforms-input input { font-size: 20pt }
-.fb-title-control .fr-inplace-buttons .xforms-trigger-appearance-minimal { color: white }
-
-.fb-description-control .xforms-label { display: none }
-.fb-description-control .fr-inplace-content .xforms-output { color: white; font-size: 8pt  }
-.fb-description-control .fr-inplace-content .xforms-output:hover { color: #004B92 }
-.fb-description-control .fr-inplace-content .xforms-textarea { color: #6E6E6E; font-size: 8pt  }
 
 /* Highlighting of top-level blocks (sections, ...) */
 .fb-top-level-content { padding-left: .5em; margin-bottom: .5em; border-left: 0 solid transparent }

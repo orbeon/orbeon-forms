@@ -58,9 +58,6 @@
     <xforms:instance id="fb-form-instance"><dummy/></xforms:instance>
     <xforms:instance id="fr-form-instance" src="oxf:/forms/orbeon/builder/form/template.xml"/>
 
-    <!-- Set edit mode -->
-    <xforms:bind ref="instance('fb-form-instance')//@edit-ref" calculate="concat('xxforms:instance(''fb-form-instance'')/root()', ../saxon:path())"/>
-
     <!-- Annotate form data passed and store it into fb-form-instance -->
     <xforms:action ev:event="fr-annotate-data">
         <!-- First store into a temporary document so that multiple inserts won't cause repeat processing until we are done -->
@@ -80,11 +77,11 @@
         <xforms:insert ref="instance('fb-form-instance')" origin="$temp"/>
     </xforms:action>
 
-    <!-- Copy initial data with annotations -->
-    <xforms:action ev:event="fr-data-ready">
+    <!-- Mode != "new": annotate loaded data and copy it to fb-form-instance -->
+    <xforms:action ev:event="fr-data-ready" if="not(xxforms:instance('fr-parameters-instance')/mode = 'new')">
 
-        <!-- Load toolbox if mode is not new. This also annotates the form when loading is done. -->
-        <xforms:send if="not(xxforms:instance('fr-parameters-instance')/mode = 'new')" submission="fb-load-toolbox">
+        <!-- Load toolbox if mode is not new. This also annotates the form when loading is done via fr-annotate-data. -->
+        <xforms:send submission="fb-load-toolbox">
             <xxforms:context
                 name="app"
                 value="instance('fr-form-instance')/
@@ -99,10 +96,48 @@
         <xforms:rebuild/>
         <xforms:recalculate/>
         <xforms:revalidate/>
+
+    </xforms:action>
+
+    <!-- Mode = "new": just annotate template -->
+    <xforms:action ev:event="fr-data-ready" if="xxforms:instance('fr-parameters-instance')/mode = 'new'">
+
+        <!-- Point to template -->
+        <xforms:var name="template" value="instance('fr-form-instance')"/>
+
+        <!-- Set language in all @xml:lang on template -->
+        <xforms:setvalue
+            iterate="$template//@xml:lang"
+            ref="."
+            value="xxforms:instance('fr-language-instance')"/>
+
+        <!-- Set initial form and first section titles on template -->
+        <xforms:setvalue
+            ref="fbf:metadataInstanceRoot($template)/title"
+            value="$form-resources/template/untitled-form"/>
+        <xforms:setvalue
+            ref="fbf:resourcesInstanceRoot($template)/resource/section-1/label"
+            value="$form-resources/template/untitled-section"/>
+
+        <!-- Annotate data -->
+        <xforms:dispatch targetid="fr-form-model" name="fr-annotate-data">
+            <xxforms:context name="data" value="$template"/>
+        </xforms:dispatch>
+
+        <!-- RRR so that all binds are up to date for the rest of the initialization -->
+        <xforms:rebuild/>
+        <xforms:recalculate/>
+        <xforms:revalidate/>
     </xforms:action>
 
     <!-- Run the rest of the initialization. Do this in separate action so that model variables are up to date. -->
     <xforms:action ev:event="fr-data-ready">
+
+        <!-- Set current language: use language based on first resources available in loaded form -->
+        <xforms:setvalue
+            ref="$fb-lang"
+            value="$resources/resource[1]/@xml:lang"/>
+
         <!-- Check permissions if there are roles -->
         <xforms:var name="has-roles" value="not(xxforms:instance('fr-roles-instance')/has-roles = 'false')" as="xs:boolean"/>
         <xforms:action if="$has-roles">
@@ -111,6 +146,7 @@
                 <!-- NOTE: we use xxforms:bind() instead of @bind because @bind doesn't seem to work properly (incorrect context?) -->
                 <xforms:action context="xxforms:instance('fr-permissions')/app[1]" if="not(@name = '*')">
                     <xforms:setvalue ref="xxforms:bind('application-name-bind')" value="context()/@name"/>
+                    <!-- XXXXXXX -->
                     <xforms:setvalue ref="instance('fb-metadata-instance')/application-name" value="context()/@name"/>
                 </xforms:action>
             </xforms:action>
@@ -137,36 +173,7 @@
             <xforms:var name="msie" value="(for $t in tokenize(lower-case($user-agent), '[;\(\)]') return normalize-space($t))[starts-with(., 'msie')][1]"/>
             <xforms:var name="ie-version" value="xs:integer(substring-before(normalize-space(substring-after($msie, 'msie')), '.'))"/>
             <xforms:setvalue ref="instance('fb-user-agent-instance')/ie-version" value="$ie-version"/>
-            <xforms:setvalue ref="instance('fb-user-agent-instance')/is-supported-ie" value="$ie-version gt 6"/>
-        </xforms:action>
-
-        <!-- Set current language: for new forms, use current FR language;
-             for existing form, use language based on first resources available in loaded form -->
-        <xforms:setvalue
-            ref="$fb-lang"
-            value="if (xxforms:instance('fr-parameters-instance')/mode = 'new')
-                   then xxforms:instance('fr-language-instance')
-                   else $resources/resource[1]/@xml:lang"/>
-
-        <!-- Changing the language can affect binds -->
-        <xforms:rebuild/>
-        <xforms:recalculate/>
-        <xforms:revalidate/>
-
-        <xforms:action if="xxforms:instance('fr-parameters-instance')/mode = 'new'">
-            <!-- Set language in all @xml:lang  -->
-            <xforms:var name="template" value="instance('fr-form-instance')"/>
-            <xforms:setvalue
-                iterate="$template//@xml:lang"
-                ref="."
-                value="$fb-lang"/>
-            <!-- Set initial form and first section titles -->
-            <xforms:setvalue
-                ref="fbf:metadataInstanceRoot($template)/title"
-                value="$form-resources/template/untitled-form"/>
-            <xforms:setvalue
-                ref="fbf:resourcesInstanceRoot($template)/resource/section-1/label"
-                value="$form-resources/template/untitled-section"/>
+            <xforms:setvalue ref="instance('fb-user-agent-instance')/is-supported-ie" value="$ie-version gt 7"/>
         </xforms:action>
 
         <xforms:rebuild/>
@@ -181,53 +188,72 @@
                        origin="xxforms:call-xpl('oxf:/forms/orbeon/builder/form/deannotate.xpl', 'data', instance('fb-form-instance'), 'data')"/>
     </xforms:action>
 
+    <!-- Form is ready -->
     <xforms:action ev:event="xforms-ready">
-        <!-- Show editor case if mode is not new -->
+        <!-- Open form settings if mode is "new" -->
         <xforms:var name="is-new" value="xxforms:instance('fr-parameters-instance')/mode = 'new'" as="xs:boolean"/>
-        <xforms:action if="$is-new">
-            <xforms:setvalue ref="instance('fb-metadata-instance')/mode" value="'edit'"/>
-            <xxforms:show dialog="fb-editor-metadata-dialog"/>
-        </xforms:action>
-        <xforms:action if="not($is-new)">
-            <xforms:toggle case="fb-editor-open-case"/>
-            <xforms:toggle case="fb-metadata-view-case"/>
-        </xforms:action>
+        <xforms:dispatch if="$is-new" ev:event="DOMActivate" name="fb-show-dialog" targetid="fb-form-editor$dialog-form-settings">
+            <xxforms:context name="mode" value="'new'"/>
+        </xforms:dispatch>
     </xforms:action>
 
-    <!-- Binds on main instance -->
-    <xforms:bind ref=".">
+    <!-- Annotated form instance -->
+    <xforms:bind ref="instance('fb-form-instance')">
         <xforms:bind ref="xhtml:head">
             <xforms:bind ref="xforms:model[@id = 'fr-form-model']">
                 <!-- Form metadata (also used by Form Runner) -->
                 <xforms:bind ref="xforms:instance[@id = 'fr-form-metadata']/*">
-                    <xforms:bind id="application-name-bind" ref="application-name" required="true()" type="xs:NCName" readonly="false()"/>
-                    <xforms:bind id="form-name-bind" ref="form-name" required="true()" type="xs:NCName" readonly="false()"/>
-                    <!-- The constraint checks that all the titles are non-empty, not only the one currently visible -->
-                    <xforms:bind id="title-bind" ref="title[@xml:lang = $fb-lang]" required="true()"
-                                 constraint="not((for $t in ../title return normalize-space($t) = '') = true())"/>
+                    <xforms:bind id="application-name-bind" ref="application-name"/>
+                    <xforms:bind id="form-name-bind" ref="form-name"/>
+                    <xforms:bind id="title-bind" ref="title[@xml:lang = $fb-lang]"/>
                     <xforms:bind id="description-bind" ref="description[@xml:lang = $fb-lang]"/>
-                    <xforms:bind id="logo-bind" ref="logo" type="xs:anyURI"/>
+                    <xforms:bind id="logo-bind" ref="logo"/>
+                </xforms:bind>
+                <!-- Resources -->
+                <xforms:bind ref="xforms:instance[@id = 'fr-form-resources']/*">
+                    <!-- Handle mandatory sections titles -->
+                    <!-- The constraint checks that all the titles are non-empty, not only the one currently visible -->
+                    <xforms:bind ref="resource/*[name() = $body//*:section/@id/substring-before(., '-section')]/label"
+                                 required="true()"
+                                 constraint="not((for $t in for $n in name(..) return ../../../resource/*[name() = $n]/label return normalize-space($t) = '') = true())"/>
+                </xforms:bind>
+            </xforms:bind>
+        </xforms:bind>
+        <!-- Keep all @edit-ref attributes pointing to the right spot -->
+        <xforms:bind ref=".//@edit-ref" calculate="concat('xxforms:instance(''fb-form-instance'')/root()', ../saxon:path())"/>
+    </xforms:bind>
+
+    <!-- Standard Form Runner instance -->
+    <xforms:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+        <xforms:bind ref="xhtml:head">
+            <xforms:bind ref="xforms:model[@id = 'fr-form-model']">
+                <!-- Form metadata (also used by Form Runner) -->
+                <xforms:bind ref="xforms:instance[@id = 'fr-form-metadata']/*">
+                    <xforms:bind ref="application-name"
+                                 required="true()"
+                                 type="xs:NCName"/>
+                    <xforms:bind ref="form-name"
+                                 required="true()"
+                                 type="xs:NCName"/>
+                    <!-- The constraint checks that all the titles are non-empty, not only the one currently visible -->
                     <!-- TODO: somehow mark current title as "required" if title in other languages are missing -->
+                    <xforms:bind ref="title[@xml:lang = $fb-lang]"
+                                 required="true()"
+                                 constraint="not((for $t in ../title return normalize-space($t) = '') = true())"/>
+                    <xforms:bind ref="description[@xml:lang = $fb-lang]"/>
+                    <xforms:bind ref="logo"
+                                 type="xs:anyURI"/>
                 </xforms:bind>
                 <!-- Global attachments (also used by Form Runner) -->
                 <xforms:bind ref="xforms:instance[@id = 'fr-form-attachments']/*">
                     <xforms:bind id="css-attachment-bind" ref="css" type="xs:anyURI"/>
                     <xforms:bind id="pdf-attachment-bind" ref="pdf" type="xs:anyURI"/>
                 </xforms:bind>
-                <!-- Resources -->
-                <xforms:bind ref="xforms:instance[@id = 'fr-form-resources']/*">
-                    <!-- Handle mandatory sections titles -->
-                    <!-- The constraint checks that all the titles are non-empty, not only the one currently visible -->
-                    <xforms:bind ref="resource/*[name() = $body//*:section/@id/substring-before(., '-section')]/label" required="true()"
-                                 constraint="not((for $t in for $n in name(..) return ../../../resource/*[name() = $n]/label return normalize-space($t) = '') = true())"/>
-                </xforms:bind>
             </xforms:bind>
-            <!-- Set HTML title with the first title found -->
-            <xforms:bind ref="xhtml:title" calculate="$metadata-instance/title[1]"/>
         </xforms:bind>
     </xforms:bind>
 
-    <!-- Metadata -->
+    <!-- Metadata for Form Builder itself -->
     <xforms:instance id="fr-form-metadata" xxforms:readonly="true">
         <metadata>
             <application-name>orbeon</application-name>
@@ -403,8 +429,6 @@
     <!-- Instance for metadata editor -->
     <xforms:instance id="fb-metadata-instance">
         <metadata>
-            <application-name/>
-            <form-name/>
             <next-trigger/>
             <mode/> <!-- edit | save-as -->
             <toolbox>
@@ -412,7 +436,6 @@
                 <css/>
                 <pdf/>
                 <edit-source/>
-                <view-source/>
                 <custom-xml/>
                 <permissions/>
                 <services-actions/>
@@ -425,10 +448,6 @@
     <xforms:setvalue ev:event="xxforms-valid" ev:observer="fb-metadata-instance" ref="instance('fb-metadata-instance')/next-trigger">enabled</xforms:setvalue>
 
     <xforms:bind ref="instance('fb-metadata-instance')">
-        <!-- App/form name -->
-        <!-- NOTE: use normalize-space() = . because type validation seems to allow leading and trailing spaces -->
-        <xforms:bind ref="application-name" required="true()" type="xs:NCName" constraint="normalize-space() = ."/>
-        <xforms:bind ref="form-name" required="true()" type="xs:NCName" constraint="normalize-space() = ."/>
         <!-- Triggers -->
         <xforms:bind ref="next-trigger" readonly=". = 'disabled'"/>
         <xforms:bind ref="toolbox/schema" relevant="xxforms:property('oxf.fb.menu.schema')"/>

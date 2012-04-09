@@ -22,10 +22,10 @@ import org.orbeon.oxf.xforms.analysis.model.Model
 import org.orbeon.oxf.fb.GridOps._
 import org.orbeon.oxf.fb.ContainerOps._
 import org.orbeon.oxf.fb.DataModel._
-import org.orbeon.oxf.xml.NamespaceMapping
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.saxon.om.{SequenceIterator, NodeInfo}
 import Model._
+import org.orbeon.oxf.xml.{XMLConstants, NamespaceMapping}
 
 /*
  * Form Builder: operations on controls.
@@ -483,5 +483,43 @@ object ControlOps {
                 case _ ⇒ false
             }
         })).isDefined
+    }
+
+    // Get a node's "appearance" attribute as an Option[String]
+    def appearanceOption(e: NodeInfo) =
+        e \@ "appearance" map (_.stringValue) headOption
+
+    // Given a control (e.g. xforms:input) and its xforms:bind, find the corresponding xbl:binding elements
+    def findBindingsForControl(components: NodeInfo, control: NodeInfo, bind: NodeInfo) = {
+
+        val stringQName = XMLConstants.XS_STRING_QNAME
+
+        // Get QName from the bind, using xs:string if no type is found
+        val controlTypeQName =
+            bind \@ "type" headOption match {
+                case Some(tpe) ⇒ resolveQName(bind, tpe.stringValue)
+                case None ⇒ stringQName
+            }
+
+        // Support both xs:foo and xforms:foo as they are considered to be equivalent when looking up the metadata. So
+        // here we ignore the namespace URI to achieve this (could be more restrictive if needed).
+        val controlTypeLocalname = controlTypeQName.getName
+        val controlQName = qname(control)
+        val controlAppearanceOption = appearanceOption(control)
+
+        // Get matching xbl:bindings
+        components \ (XBL → "xbl") \ (XBL → "binding") filter { binding ⇒
+
+            val metadata = binding \ (FB → "metadata")
+            val template = (metadata \ (FB → "template") \ * headOption)
+            val typeLocalname = (metadata \ (FB → "datatype") map (e ⇒ resolveQName(e, e.stringValue).getName) headOption)
+
+            // Control name and template name must match
+            (template exists (qname(_) == controlQName)) &&
+            // Appearance must match
+            (template exists (appearanceOption(_) == controlAppearanceOption)) &&
+            // Type local names must match if present
+            (typeLocalname.isEmpty || (typeLocalname exists (_ == controlTypeLocalname)))
+        } asJava
     }
 }

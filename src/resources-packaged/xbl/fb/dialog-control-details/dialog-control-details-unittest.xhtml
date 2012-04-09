@@ -19,7 +19,9 @@
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-    xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
+    xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+
+    xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps">
 
     <xhtml:head>
         <xhtml:title>Control Details Dialog</xhtml:title>
@@ -38,25 +40,19 @@
                                xxforms:readonly="true" xxforms:cache="true"/>
             <xforms:action ev:event="xforms-ready">
                 <xforms:send submission="fb-load-components"/>
-                <xforms:var name="binding" value="xxforms:element('binding')"/>
                 <!-- Get binding for xforms:input -->
-                <xforms:dispatch name="fb-xbl-binding-for-control" target="dialog-control-details">
-                    <xxforms:context name="fb-components" value="instance('fb-components-instance')"/>
-                    <xxforms:context name="fb-control" value="instance('instance')/xforms:input"/>
-                    <xxforms:context name="fb-bind" value="instance('instance')/xforms:bind[@type = 'xforms:string']"/>
-                    <xxforms:context name="fb-result" value="$binding"/>
-                </xforms:dispatch>
-                <xforms:insert ref="*" origin="$binding"/>
-                <xforms:delete ref="$binding/*"/>
+                <xforms:insert ref="*"
+                               origin="controlOps:findBindingsForControl(
+                                           instance('fb-components-instance'),
+                                           instance('instance')/xforms:input,
+                                           instance('instance')/xforms:bind[@type = 'xforms:string'])"/>
+
                 <!-- Getting binding for databound-select1 -->
-                <xforms:dispatch name="fb-xbl-binding-for-control" target="dialog-control-details">
-                    <xxforms:context name="fb-components" value="instance('fb-components-instance')"/>
-                    <xxforms:context name="fb-control" value="instance('instance')/fr:databound-select1"/>
-                    <xxforms:context name="fb-bind" value="instance('instance')/xforms:bind[@type = 'xforms:string']"/>
-                    <xxforms:context name="fb-result" value="$binding"/>
-                </xforms:dispatch>
-                <xforms:insert ref="*" origin="$binding"/>
-                <xforms:delete ref="$binding/*"/>
+                <xforms:insert ref="*"
+                               origin="controlOps:findBindingsForControl(
+                                           instance('fb-components-instance'),
+                                           instance('instance')/instance('instance')/fr:databound-select1,
+                                           instance('instance')/xforms:bind[@type = 'xforms:string'])"/>
             </xforms:action>
         </xforms:model>
     </xhtml:head>

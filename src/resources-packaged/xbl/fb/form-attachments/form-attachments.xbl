@@ -25,7 +25,9 @@
          xmlns:oxf="http://www.orbeon.com/oxf/processors"
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
-         script-type="application/xhtml+xml">
+
+         xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps">
+
     <xbl:binding id="fb-dialog-control-details" element="fb|dialog-control-details">
         <xbl:template>
             <xforms:group id="container" ref=".[relevant = 'true']" appearance="xxforms:internal">
@@ -52,15 +54,8 @@
                     <xforms:setvalue ref="$local/classes" value="$control/@class"/>
 
                     <!-- Copy XBL control-details from xbl:binding in local instance -->
-                    <xforms:var name="binding" value="xxforms:element('binding')"/>
-                    <xforms:dispatch name="fb-xbl-binding-for-control" target="fb-dialog-control-details">
-                        <xxforms:context name="fb-components" value="$components"/>
-                        <xxforms:context name="fb-control" value="$control"/>
-                        <xxforms:context name="fb-bind" value="$bind"/>
-                        <xxforms:context name="fb-result" value="$binding"/>
-                    </xforms:dispatch>
-                    <xforms:delete ref="$local/fb:control-details"/>
-                    <xforms:insert ref="$local/*" origin="$binding/xbl:binding/fb:metadata/fb:control-details"/>
+                    <xforms:insert ref="$local/*"
+                                   origin="controlOps:findBindingsForControl($components, $control, $bind)/fb:metadata/fb:control-details"/>
 
                     <!-- Process the LHHR of each details control -->
                     <xforms:var name="current-language" value="$resources/@xml:lang/string() treat as xs:string"/>

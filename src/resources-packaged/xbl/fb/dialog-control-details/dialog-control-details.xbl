@@ -40,36 +40,6 @@
                 <xforms:refresh/> <!-- The view needs to be relevant before it gets the event for action to run in a proper context -->
                 <xxforms:show dialog="dialog"/>
             </xbl:handler>
-            <!-- Given a control (e.g. xforms:input) and its xforms:bind, bind the corresponding xbl:binding -->
-            <xbl:handler event="fb-xbl-binding-for-control" phase="target" defaultAction="cancel">
-                <xforms:var name="components" value="event('fb-components') treat as element(components)"/>
-                <xforms:var name="control" value="event('fb-control') treat as element()"/>
-                <xforms:var name="bind" value="event('fb-bind') treat as element(xforms:bind)"/>
-                <xforms:var name="result" value="event('fb-result') treat as element()"/>
-
-                <!-- Get QName from the bind, using xs:string if no type is found -->
-                <xforms:var name="string-qname" value="QName('http://www.w3.org/2001/XMLSchema', 'xs:string')"/>
-                <xforms:var name="bind-qname" value="if (empty($bind/@type)) then $string-qname else $bind/resolve-QName(@type, .)"/>
-                <!-- If the bind uses the Schema namespace, add the XForms namespace, and vice versa, as they are considered to be equivalent when looking up the metadata -->
-                <xforms:var name="normalized-bind-qname" value="
-                    if (namespace-uri-from-QName($bind-qname) = 'http://www.w3.org/2002/xforms')
-                        then ($bind-qname, QName('http://www.w3.org/2001/XMLSchema', concat('xs:', local-name-from-QName($bind-qname))))
-                    else if (namespace-uri-from-QName($bind-qname) = 'http://www.w3.org/2001/XMLSchema')
-                        then ($bind-qname, QName('http://www.w3.org/2002/xforms', concat('xforms:', local-name-from-QName($bind-qname))))
-                    else $bind-qname"/>
-                <!-- Get matching xbl:bindings -->
-                <xforms:var name="control-qname" value="$control/resolve-QName(name(), .)"/>
-                <xforms:var name="control-appearance" value="$control/@appearance"/>
-                <xforms:var name="matching-bindings" value="$components/xbl:xbl/xbl:binding[
-                        (: Control name and template name must match :)
-                        fb:metadata/fb:template/*/resolve-QName(name(), .) = $control-qname
-                        (: Appearance must match :)
-                        and (empty($control/@appearance) or fb:metadata/fb:template/*/@appearance = $control/@appearance)
-                        (: Type must match :)
-                        and (empty(fb:metadata/fb:datatype) or fb:metadata/fb:datatype/resolve-QName(., .) = $normalized-bind-qname)
-                    ]"/>
-                <xforms:insert context="$result" origin="$matching-bindings"/>
-            </xbl:handler>
         </xbl:handlers>
         <xbl:implementation>
             <xforms:model id="model">

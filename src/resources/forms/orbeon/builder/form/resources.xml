@@ -59,9 +59,6 @@
         <controls>
             <label>Controls</label>
         </controls>
-        <metadata>
-            <label>Metadata</label>
-        </metadata>
         <i18n>
             <label>Internationalization</label>
         </i18n>
@@ -238,6 +235,10 @@
         <select>
             <label>[Select...]</label>
         </select>
+        <dialog-form-settings>
+            <label>Form Settings</label>
+            <open><label>Form settings</label></open>
+        </dialog-form-settings>
         <dialog-control-details>
             <dialog-title>Edit Control Details</dialog-title>
             <control-name>
@@ -843,9 +844,6 @@
         <controls>
             <label>Contrôles</label>
         </controls>
-        <metadata>
-            <label>Métadonnées</label>
-        </metadata>
         <i18n>
             <label>Internationalisation</label>
         </i18n>
@@ -1022,6 +1020,10 @@
         <select>
             <label>[Sélectionner...]</label>
         </select>
+        <dialog-form-settings>
+            <label>Paramètres du formulaire</label>
+            <open><label>Paramètres du formulaire</label></open>
+        </dialog-form-settings>
         <dialog-control-details>
             <dialog-title>Détails du contrôle</dialog-title>
             <control-name>
@@ -1624,9 +1626,6 @@
         <controls>
             <label>Skjemaelementer</label>
         </controls>
-        <metadata>
-            <label>Metadata</label>
-        </metadata>
         <i18n>
             <label>Internasjonalisering</label>
         </i18n>
@@ -1803,6 +1802,10 @@
         <select>
             <label>- Velg -</label>
         </select>
+        <dialog-form-settings>
+            <label>[Form Settings]</label>
+            <open><label>[Form settings]</label></open>
+        </dialog-form-settings>
         <dialog-control-details>
             <dialog-title>Rediger elementdetaljer</dialog-title>
             <control-name>
@@ -2404,9 +2407,6 @@
         <controls>
             <label>Элементы</label>
         </controls>
-        <metadata>
-            <label>Метаданные</label>
-        </metadata>
         <i18n>
             <label>Перевод</label>
         </i18n>
@@ -2583,6 +2583,10 @@
         <select>
             <label>[Выберите...]</label>
         </select>
+        <dialog-form-settings>
+            <label>[Form Settings]</label>
+            <open><label>[Form Settings]</label></open>
+        </dialog-form-settings>
         <dialog-control-details>
             <dialog-title>Настройки элемента</dialog-title>
             <control-name>

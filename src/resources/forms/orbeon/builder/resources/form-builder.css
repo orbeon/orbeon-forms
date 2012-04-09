@@ -87,7 +87,6 @@ h1.fr-form-title {
 .fb-dialog-form-settings .xforms-hint { width: 25em; margin-bottom: 1em; }
 .fb-dialog-form-settings .xforms-alert { width: 25em; }
 .fb-dialog-form-settings .fb-editor-metadata-dialog-fields { float: left; width: 20em }
-.fb-dialog-form-settings .fb-editor-metadata-dialog-buttons { margin-top: 1em; }
 
 /* Itemset editor dialog */
 /* Using a class instead of an id since the id is simply 'dialog' as it is declared in a component */

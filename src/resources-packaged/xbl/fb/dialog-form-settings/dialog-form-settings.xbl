@@ -122,22 +122,19 @@
                             <xf:alert ref="$resources/form-name/alert"/>
                         </xf:input>
                     </xh:div>
-                    <xh:div class="fr-separator"/>
-                    <xh:div class="fb-editor-metadata-dialog-buttons">
-                        <xh:div class="fr-buttons">
-                            <xf:trigger id="fb-metadata-continue-trigger" tabindex="3">
-                                <xf:label value="$resources/continue/label"/>
-                            </xf:trigger>
-                            <xf:trigger tabindex="4">
-                                <xf:label value="$resources/cancel/label"/>
-                                <!-- Hide this dialog or go to the summary page -->
-                                <xf:action ev:event="DOMActivate">
-                                    <xf:load if="$is-new-form" resource="/fr/orbeon/builder/summary"/>
-                                    <xxf:hide if="not($is-new-form)" dialog="dialog"/>
-                                </xf:action>
-                            </xf:trigger>
-                        </xh:div>
-                        <xh:div class="fr-clear"/>
+                    <xh:div class="fr-dialog-buttons">
+                        <xf:trigger id="fb-metadata-continue-trigger" tabindex="3">
+                            <xf:label value="$resources/(if ($is-new-form) then continue else apply)/label"/>
+                        </xf:trigger>
+                        <xf:output value="$resources/or/label"/>
+                        <xf:trigger appearance="minimal" class="fr-inplace-cancel" tabindex="4">
+                            <xf:label value="$resources/cancel/label"/>
+                            <!-- Hide this dialog or go to the summary page -->
+                            <xf:action ev:event="DOMActivate">
+                                <xf:load if="$is-new-form" resource="/fr/orbeon/builder/summary"/>
+                                <xxf:hide if="not($is-new-form)" dialog="dialog"/>
+                            </xf:action>
+                        </xf:trigger>
                     </xh:div>
 
                     <!-- Event handler for 2 field and button -->

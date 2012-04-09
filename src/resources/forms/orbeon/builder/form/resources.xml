@@ -215,7 +215,7 @@
         </edit>
         <!-- Dialogs -->
         <continue>
-            <label>Continue →</label>
+            <label>Continue</label>
         </continue>
         <apply>
             <label>Apply</label>
@@ -1000,7 +1000,7 @@
         </edit>
         <!-- Dialogs -->
         <continue>
-            <label>Continuer →</label>
+            <label>Continuer</label>
         </continue>
         <apply>
             <label>Appliquer</label>
@@ -1782,7 +1782,7 @@
         </edit>
         <!-- Dialogs -->
         <continue>
-            <label>Fortsett?</label>
+            <label>Fortsett</label>
         </continue>
         <apply>
             <label>Bruk</label>
@@ -2563,7 +2563,7 @@
         </edit>
         <!-- Dialogs -->
         <continue>
-            <label>Далее →</label>
+            <label>Далее</label>
         </continue>
         <apply>
             <label>Применить</label>

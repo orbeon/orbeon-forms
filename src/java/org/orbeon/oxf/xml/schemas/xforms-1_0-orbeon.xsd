@@ -758,7 +758,7 @@
         <xsd:complexType>
             <xsd:attributeGroup ref="xforms:Common.Attributes"/>
             <xsd:attributeGroup ref="xforms:Single.Node.Binding.Attributes"/>
-            <xsd:attribute name="resource" type="xsd:anyURI"/>
+            <xsd:attribute name="resource" type="xsd:string"/>
             <xsd:attribute name="show" use="optional">
                 <xsd:simpleType>
                     <xsd:restriction base="xsd:string">

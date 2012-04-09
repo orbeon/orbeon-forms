@@ -25,7 +25,7 @@
 
       id="fb-edit-help-dialog" appearance="full" model="fb-edit-help-model" level="modal">
 
-    <xforms:label ref="$form-resources/dialog-help/dialog-title"/>
+    <xforms:label ref="$form-resources/dialog-help/label"/>
 
     <xhtml:div>
         <xforms:group class="fb-hide-alert">

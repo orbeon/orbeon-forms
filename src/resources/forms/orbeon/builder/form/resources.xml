@@ -240,7 +240,7 @@
             <open><label>Form settings</label></open>
         </dialog-form-settings>
         <dialog-control-details>
-            <dialog-title>Edit Control Details</dialog-title>
+            <label>Edit Control Details</label>
             <control-name>
                 <label>Control Name</label>
                 <alert>Name is already in use or incorrect</alert>
@@ -272,7 +272,7 @@
             </classes>
         </dialog-control-details>
         <dialog-section-details>
-            <dialog-title>Edit Section Details</dialog-title>
+            <label>Edit Section Details</label>
             <control-name>
                 <label>Section Name</label>
                 <alert>Name is already in use or incorrect</alert>
@@ -290,7 +290,7 @@
             </readonly>
         </dialog-section-details>
         <dialog-grid-details>
-            <dialog-title>Edit Grid Details</dialog-title>
+            <label>Edit Grid Details</label>
             <grid-name>
                 <label>Grid Name</label>
                 <alert>Name is already in use or incorrect</alert>
@@ -318,7 +318,7 @@
             </max>
         </dialog-grid-details>
         <dialog-validation-details>
-            <dialog-title>Edit Validation Properties</dialog-title>
+            <label>Edit Validation Properties</label>
             <types>
                 <label>Data Type</label>
             </types>
@@ -448,16 +448,16 @@
             </alert>
         </dialog-validation-details>
         <dialog-confirmation>
-            <dialog-title>Confirm</dialog-title>
+            <label>Confirm</label>
         </dialog-confirmation>
         <dialog-help>
-            <dialog-title>Edit Help</dialog-title>
+            <label>Edit Help</label>
             <help-message>
                 <label>Help Message</label>
             </help-message>
         </dialog-help>
         <dialog-publish>
-            <dialog-title>Publish Form</dialog-title>
+            <label>Publish Form</label>
             <publish>
                 <label>Publish</label>
             </publish>
@@ -470,7 +470,7 @@
             </messages>
         </dialog-publish>
         <dialog-add-language>
-            <dialog-title>Add Language</dialog-title>
+            <label>Add Language</label>
             <new-language>
                 <label>Add the following language:</label>
             </new-language>
@@ -482,7 +482,7 @@
             </remove-language>
         </dialog-add-language>
         <dialog-upload-schema>
-            <dialog-title>XML Schema Upload</dialog-title>
+            <label>XML Schema Upload</label>
             <schema-type>
                 <label>Available Schema Types</label>
                 <hint>This lists the simple types available in the uploaded schema</hint>
@@ -515,22 +515,22 @@
             </messages>
         </dialog-upload-schema>
         <dialog-edit-source>
-            <dialog-title>Edit Source</dialog-title>
+            <label>Edit Source</label>
             <source>
                 <alert>Please make sure the content is well-formed XML</alert>
             </source>
         </dialog-edit-source>
         <dialog-view-source>
-            <dialog-title>View Source</dialog-title>
+            <label>View Source</label>
         </dialog-view-source>
         <dialog-upload-pdf>
-            <dialog-title>Upload PDF</dialog-title>
+            <label>Upload PDF</label>
             <upload-pdf>
                 <label>PDF File</label>
             </upload-pdf>
         </dialog-upload-pdf>
         <dialog-itemsets>
-            <dialog-title>Itemset Editor</dialog-title>
+            <label>Itemset Editor</label>
             <resources-language>
                 <label>Resources Language</label>
             </resources-language>
@@ -542,7 +542,7 @@
             </value>
         </dialog-itemsets>
         <dialog-http-services>
-            <dialog-title>HTTP Service Editor</dialog-title>
+            <label>HTTP Service Editor</label>
             <service-name>
                 <label>Service Name</label>
                 <hint>Choose a unique name for this service</hint>
@@ -635,7 +635,7 @@
             </test>
         </dialog-http-services>
         <dialog-database-services>
-            <dialog-title>Database Service Editor</dialog-title>
+            <label>Database Service Editor</label>
             <service-name>
                 <label>Service Name</label>
                 <hint>Choose a unique name for this service</hint>
@@ -656,7 +656,7 @@
             </test>
         </dialog-database-services>
         <dialog-actions>
-            <dialog-title>Actions Editor</dialog-title>
+            <label>Actions Editor</label>
             <service-name>
                 <label>Action Name</label>
                 <hint>Choose a unique name for this action</hint>
@@ -746,10 +746,10 @@
             </test>
         </dialog-actions>
         <dialog-test>
-            <dialog-title>Form Preview</dialog-title>
+            <label>Form Preview</label>
         </dialog-test>
         <dialog-pe>
-            <dialog-title>Orbeon Forms PE Feature</dialog-title>
+            <label>Orbeon Forms PE Feature</label>
             <message>
                 <div>
                     <p>This feature is only available in Orbeon Forms PE.</p>
@@ -758,13 +758,13 @@
             </message>
         </dialog-pe>
         <dialog-custom-xml>
-            <dialog-title>Custom XML</dialog-title>
+            <label>Custom XML</label>
             <mode-label>The information entered by users in the form is stored in an XML document:</mode-label>
             <mode-automatic>Let Form Builder generate the XML for me</mode-automatic>
             <mode-custom>I will provide a custom XML document</mode-custom>
         </dialog-custom-xml>
         <dialog-permissions>
-            <dialog-title>Permissions</dialog-title>
+            <label>Permissions</label>
             <role-based-permissions>Enable role-based permissions for this form</role-based-permissions>
             <role>Role</role>
             <permissions>Permissions</permissions>
@@ -1025,7 +1025,7 @@
             <open><label>Paramètres du formulaire</label></open>
         </dialog-form-settings>
         <dialog-control-details>
-            <dialog-title>Détails du contrôle</dialog-title>
+            <label>Détails du contrôle</label>
             <control-name>
                 <label>Nom du contrôle</label>
                 <alert>Le nom est déjà utilisé ou incorrect</alert>
@@ -1052,7 +1052,7 @@
             </classes>
         </dialog-control-details>
         <dialog-section-details>
-            <dialog-title>Détails de la section</dialog-title>
+            <label>Détails de la section</label>
             <control-name>
                 <label>Nom de la section</label>
                 <alert>Le nom est déjà utilisé ou incorrect</alert>
@@ -1070,7 +1070,7 @@
             </readonly>
         </dialog-section-details>
         <dialog-grid-details>
-            <dialog-title>Détails de la grille</dialog-title>
+            <label>Détails de la grille</label>
             <grid-name>
                 <label>Nom de la grille</label>
                 <alert>Le nom est déjà utilisé ou incorrect</alert>
@@ -1098,7 +1098,7 @@
             </max>
         </dialog-grid-details>
         <dialog-validation-details>
-            <dialog-title>Propriétés de validation</dialog-title>
+            <label>Propriétés de validation</label>
             <types>
                 <label>Type de donnée</label>
             </types>
@@ -1228,16 +1228,16 @@
             </alert>
         </dialog-validation-details>
         <dialog-confirmation>
-            <dialog-title>Confirmation</dialog-title>
+            <label>Confirmation</label>
         </dialog-confirmation>
         <dialog-help>
-            <dialog-title>Edition de l'aide</dialog-title>
+            <label>Edition de l'aide</label>
             <help-message>
                 <label>Message d'aide</label>
             </help-message>
         </dialog-help>
         <dialog-publish>
-            <dialog-title>Publier le formulaire</dialog-title>
+            <label>Publier le formulaire</label>
             <publish>
                 <label>Publier</label>
             </publish>
@@ -1250,7 +1250,7 @@
             </messages>
         </dialog-publish>
         <dialog-add-language>
-            <dialog-title>Ajouter une langue</dialog-title>
+            <label>Ajouter une langue</label>
             <new-language>
                 <label>Ajouter la langue suivante :</label>
             </new-language>
@@ -1262,7 +1262,7 @@
             </remove-language>
         </dialog-add-language>
         <dialog-upload-schema>
-            <dialog-title>Insertion de schéma XML</dialog-title>
+            <label>Insertion de schéma XML</label>
             <schema-type>
                 <label>Types disponibles</label>
                 <hint>Liste les types simples disponibles dans le schéma</hint>
@@ -1295,22 +1295,22 @@
             </messages>
         </dialog-upload-schema>
         <dialog-edit-source>
-            <dialog-title>Edition du code source</dialog-title>
+            <label>Edition du code source</label>
             <source>
                 <alert>Veuillez vous assûrer que le contenu soit du XML bien formé</alert>
             </source>
         </dialog-edit-source>
         <dialog-view-source>
-            <dialog-title>Visualisation du code source</dialog-title>
+            <label>Visualisation du code source</label>
         </dialog-view-source>
         <dialog-upload-pdf>
-            <dialog-title>Insertion de fichier PDF</dialog-title>
+            <label>Insertion de fichier PDF</label>
             <upload-pdf>
                 <label>Fichier PDF</label>
             </upload-pdf>
         </dialog-upload-pdf>
         <dialog-itemsets>
-            <dialog-title>Editeur de listes de choix</dialog-title>
+            <label>Editeur de listes de choix</label>
             <resources-language>
                 <label>Langue des ressources</label>
             </resources-language>
@@ -1322,7 +1322,7 @@
             </value>
         </dialog-itemsets>
         <dialog-http-services>
-            <dialog-title>Editeur de services HTTP</dialog-title>
+            <label>Editeur de services HTTP</label>
             <service-name>
                 <label>Nom du service</label>
                 <hint>Choisisez un nom de service unique</hint>
@@ -1415,7 +1415,7 @@
             </test>
         </dialog-http-services>
         <dialog-database-services>
-            <dialog-title>Editeur de services base de données</dialog-title>
+            <label>Editeur de services base de données</label>
             <service-name>
                 <label>Nom du service</label>
                 <hint>Choisisez un nom de service unique</hint>
@@ -1436,7 +1436,7 @@
             </test>
         </dialog-database-services>
         <dialog-actions>
-            <dialog-title>Editeur d'actions</dialog-title>
+            <label>Editeur d'actions</label>
             <service-name>
                 <label>Nom de l'action</label>
                 <hint>Choisisez un nom d'action unique</hint>
@@ -1526,10 +1526,10 @@
             </test>
         </dialog-actions>
         <dialog-test>
-            <dialog-title>Prévisualisation du formulaire</dialog-title>
+            <label>Prévisualisation du formulaire</label>
         </dialog-test>
         <dialog-pe>
-            <dialog-title>Fonction Orbeon Forms PE</dialog-title>
+            <label>Fonction Orbeon Forms PE</label>
             <message>
                 <div>
                     <p>Cette fonction n'est disponible que dans Orbeon Forms PE.</p>
@@ -1538,13 +1538,13 @@
             </message>
         </dialog-pe>
         <dialog-custom-xml>
-            <dialog-title>XML spécifique</dialog-title>
+            <label>XML spécifique</label>
             <mode-label>Les informations saisies par les utilisateurs dans le formulaire sont stockées dans un document XML:</mode-label>
             <mode-automatic>Laissez Form Builder génèrer le code XML</mode-automatic>
             <mode-custom>Je vais fournir un document XML spécifique</mode-custom>
         </dialog-custom-xml>
         <dialog-permissions>
-            <dialog-title>Permissions</dialog-title>
+            <label>Permissions</label>
             <role-based-permissions>Activer les permissions basées sur les rôles pour ce formulaire</role-based-permissions>
             <role>Rôle</role>
             <permissions>Permissions</permissions>
@@ -1807,7 +1807,7 @@
             <open><label>[Form settings]</label></open>
         </dialog-form-settings>
         <dialog-control-details>
-            <dialog-title>Rediger elementdetaljer</dialog-title>
+            <label>Rediger elementdetaljer</label>
             <control-name>
                 <label>Elementnavn</label>
                 <alert>Navnet er galt eller allerede i bruk.</alert>
@@ -1834,7 +1834,7 @@
             </classes>
         </dialog-control-details>
         <dialog-section-details>
-            <dialog-title>Rediger seksjonsdetaljer</dialog-title>
+            <label>Rediger seksjonsdetaljer</label>
             <control-name>
                 <label>Seksjonsnavn</label>
                 <alert>Navnet er galt eller allerede i bruk.</alert>
@@ -1852,7 +1852,7 @@
             </readonly>
         </dialog-section-details>
         <dialog-grid-details>
-            <dialog-title>[Edit Grid Details]</dialog-title>
+            <label>[Edit Grid Details]</label>
             <grid-name>
                 <label>[Grid Name]</label>
                 <alert>[Name is already in use or incorrect]</alert>
@@ -1880,7 +1880,7 @@
             </max>
         </dialog-grid-details>
         <dialog-validation-details>
-            <dialog-title>Rediger elementegenskaper</dialog-title>
+            <label>Rediger elementegenskaper</label>
             <types>
                 <label>Datatype</label>
             </types>
@@ -2010,16 +2010,16 @@
             </alert>
         </dialog-validation-details>
         <dialog-confirmation>
-            <dialog-title>Bekreft</dialog-title>
+            <label>Bekreft</label>
         </dialog-confirmation>
         <dialog-help>
-            <dialog-title>Rediger hjelpetekst</dialog-title>
+            <label>Rediger hjelpetekst</label>
             <help-message>
                 <label>Hjelpetekst</label>
             </help-message>
         </dialog-help>
         <dialog-publish>
-            <dialog-title>Publiser skjema</dialog-title>
+            <label>Publiser skjema</label>
             <publish>
                 <label>Publiser</label>
             </publish>
@@ -2032,7 +2032,7 @@
             </messages>
         </dialog-publish>
         <dialog-add-language>
-            <dialog-title>Legg til språk</dialog-title>
+            <label>Legg til språk</label>
             <new-language>
                 <label>Legg til det følgende språket:</label>
             </new-language>
@@ -2044,7 +2044,7 @@
             </remove-language>
         </dialog-add-language>
         <dialog-upload-schema>
-            <dialog-title>XML-skjemaopplasting</dialog-title>
+            <label>XML-skjemaopplasting</label>
             <schema-type>
                 <label>Tilgjengelige skjematyper</label>
                 <hint>Denne lister de simple typene som er tilgjengelige i det opplastede skjemaet</hint>
@@ -2077,22 +2077,22 @@
             </messages>
         </dialog-upload-schema>
         <dialog-edit-source>
-            <dialog-title>Rediger kildekode</dialog-title>
+            <label>Rediger kildekode</label>
             <source>
                 <alert>Vennligst sørg for at innholdet er velformet XML</alert>
             </source>
         </dialog-edit-source>
         <dialog-view-source>
-            <dialog-title>Vis kildekode</dialog-title>
+            <label>Vis kildekode</label>
         </dialog-view-source>
         <dialog-upload-pdf>
-            <dialog-title>Last opp PDF</dialog-title>
+            <label>Last opp PDF</label>
             <upload-pdf>
                 <label>PDF-fil</label>
             </upload-pdf>
         </dialog-upload-pdf>
         <dialog-itemsets>
-            <dialog-title>Itemset Editor</dialog-title>
+            <label>Itemset Editor</label>
             <resources-language>
                 <label>Resources Language</label>
             </resources-language>
@@ -2104,7 +2104,7 @@
             </value>
         </dialog-itemsets>
         <dialog-http-services>
-            <dialog-title>HTTP-tjenesteredigering</dialog-title>
+            <label>HTTP-tjenesteredigering</label>
             <service-name>
                 <label>Tjenestenavn</label>
                 <hint>Velg et entydig navn for denne tjenesten</hint>
@@ -2197,7 +2197,7 @@
             </test>
         </dialog-http-services>
         <dialog-database-services>
-            <dialog-title>Databasetjenesteredigering</dialog-title>
+            <label>Databasetjenesteredigering</label>
             <service-name>
                 <label>Tjenestenavn</label>
                 <hint>Velg et entydig navn for denne tjenesten</hint>
@@ -2218,7 +2218,7 @@
             </test>
         </dialog-database-services>
         <dialog-actions>
-            <dialog-title>Actionredigering</dialog-title>
+            <label>Actionredigering</label>
             <service-name>
                 <label>Action-navn</label>
                 <hint>Velg et entydig navn for denne actionen</hint>
@@ -2308,10 +2308,10 @@
             </test>
         </dialog-actions>
         <dialog-test>
-            <dialog-title>Skjemaforhåndsvisning</dialog-title>
+            <label>Skjemaforhåndsvisning</label>
         </dialog-test>
         <dialog-pe>
-            <dialog-title>Orbeon Forms PE-funksjonalitet</dialog-title>
+            <label>Orbeon Forms PE-funksjonalitet</label>
             <message>
                 <div>
                     <p>Denne funksjonaliteten er bare tilgjengelig i Orbeon Forms PE.</p>
@@ -2320,13 +2320,13 @@
             </message>
         </dialog-pe>
         <dialog-custom-xml>
-            <dialog-title>Custom XML</dialog-title>
+            <label>Custom XML</label>
             <mode-label>The information entered by users in the form is stored in an XML document:</mode-label>
             <mode-automatic>Let Form Builder generate the XML for me</mode-automatic>
             <mode-custom>I will provide a custom XML document</mode-custom>
         </dialog-custom-xml>
         <dialog-permissions>
-            <dialog-title>Permissions</dialog-title>
+            <label>Permissions</label>
             <role-based-permissions>Enable role-based permissions for this form</role-based-permissions>
             <role>Role</role>
             <permissions>Permissions</permissions>
@@ -2588,7 +2588,7 @@
             <open><label>[Form Settings]</label></open>
         </dialog-form-settings>
         <dialog-control-details>
-            <dialog-title>Настройки элемента</dialog-title>
+            <label>Настройки элемента</label>
             <control-name>
                 <label>Название элемента</label>
                 <alert>Название уже используется или некорректно</alert>
@@ -2615,7 +2615,7 @@
             </classes>
         </dialog-control-details>
         <dialog-section-details>
-            <dialog-title>Настройки раздела</dialog-title>
+            <label>Настройки раздела</label>
             <control-name>
                 <label>Название раздела</label>
                 <alert>Название уже используется или некорректно</alert>
@@ -2633,7 +2633,7 @@
             </readonly>
         </dialog-section-details>
         <dialog-grid-details>
-            <dialog-title>Редактировать настройки сетки</dialog-title>
+            <label>Редактировать настройки сетки</label>
             <grid-name>
                 <label>Название сетки</label>
                 <alert>Имя уже используется или некорректно</alert>
@@ -2661,7 +2661,7 @@
             </max>
         </dialog-grid-details>
         <dialog-validation-details>
-            <dialog-title>Настройки автоматической проверки</dialog-title>
+            <label>Настройки автоматической проверки</label>
             <types>
                 <label>Тип данных</label>
             </types>
@@ -2791,16 +2791,16 @@
             </alert>
         </dialog-validation-details>
         <dialog-confirmation>
-            <dialog-title>Подтвердить</dialog-title>
+            <label>Подтвердить</label>
         </dialog-confirmation>
         <dialog-help>
-            <dialog-title>Редактировать справку</dialog-title>
+            <label>Редактировать справку</label>
             <help-message>
                 <label>Сообщение справки</label>
             </help-message>
         </dialog-help>
         <dialog-publish>
-            <dialog-title>Публикация формы</dialog-title>
+            <label>Публикация формы</label>
             <publish>
                 <label>Опубликовать</label>
             </publish>
@@ -2813,7 +2813,7 @@
             </messages>
         </dialog-publish>
         <dialog-add-language>
-            <dialog-title>Добавить язык</dialog-title>
+            <label>Добавить язык</label>
             <new-language>
                 <label>Добавить следующий язык:</label>
             </new-language>
@@ -2825,7 +2825,7 @@
             </remove-language>
         </dialog-add-language>
         <dialog-upload-schema>
-            <dialog-title>Загрузка схемы XML</dialog-title>
+            <label>Загрузка схемы XML</label>
             <schema-type>
                 <label>Доступные типы схемы</label>
                 <hint>Список простых типов, доступных в загруженной схеме</hint>
@@ -2858,22 +2858,22 @@
             </messages>
         </dialog-upload-schema>
         <dialog-edit-source>
-            <dialog-title>Редактировать код</dialog-title>
+            <label>Редактировать код</label>
             <source>
                 <alert>Пожалуйста, убедитесь в корректности XML</alert>
             </source>
         </dialog-edit-source>
         <dialog-view-source>
-            <dialog-title>Просмотреть код</dialog-title>
+            <label>Просмотреть код</label>
         </dialog-view-source>
         <dialog-upload-pdf>
-            <dialog-title>Загрузка PDF</dialog-title>
+            <label>Загрузка PDF</label>
             <upload-pdf>
                 <label>Файл PDF</label>
             </upload-pdf>
         </dialog-upload-pdf>
         <dialog-itemsets>
-            <dialog-title>Редактор элементов</dialog-title>
+            <label>Редактор элементов</label>
             <resources-language>
                 <label>Язык</label>
             </resources-language>
@@ -2885,7 +2885,7 @@
             </value>
         </dialog-itemsets>
         <dialog-http-services>
-            <dialog-title>Редактор HTTP-сервисов</dialog-title>
+            <label>Редактор HTTP-сервисов</label>
             <service-name>
                 <label>Название сервиса</label>
                 <hint>Выберите уникальное название для этого сервиса</hint>
@@ -2978,7 +2978,7 @@
             </test>
         </dialog-http-services>
         <dialog-database-services>
-            <dialog-title>Редактор сервисов СУБД</dialog-title>
+            <label>Редактор сервисов СУБД</label>
             <service-name>
                 <label>Название сервиса</label>
                 <hint>Выберите уникальное название для этого сервиса</hint>
@@ -2999,7 +2999,7 @@
             </test>
         </dialog-database-services>
         <dialog-actions>
-            <dialog-title>Редактор действий</dialog-title>
+            <label>Редактор действий</label>
             <service-name>
                 <label>Название действия</label>
                 <hint>Выберите уникальное название для этого действия</hint>
@@ -3089,10 +3089,10 @@
             </test>
         </dialog-actions>
         <dialog-test>
-            <dialog-title>Предварительный просмотр формы</dialog-title>
+            <label>Предварительный просмотр формы</label>
         </dialog-test>
         <dialog-pe>
-            <dialog-title>Возможность Orbeon Forms PE</dialog-title>
+            <label>Возможность Orbeon Forms PE</label>
             <message>
                 <div>
                     <p>Эта возможность доступна только в Orbeon Forms PE.</p>
@@ -3101,13 +3101,13 @@
             </message>
         </dialog-pe>
         <dialog-custom-xml>
-            <dialog-title>Редактирование XML</dialog-title>
+            <label>Редактирование XML</label>
             <mode-label>Данные, которые пользователи будут вводить в форму, хранятся в виде XML-документа. Настройка XML:</mode-label>
             <mode-automatic>XML автоматически генерирует Мастер Форм</mode-automatic>
             <mode-custom>Задать собственный XML</mode-custom>
         </dialog-custom-xml>
         <dialog-permissions>
-            <dialog-title>Настройка прав</dialog-title>
+            <label>Настройка прав</label>
             <role-based-permissions>Включить для этой формы ролевое управление доступом</role-based-permissions>
             <role>Роль</role>
             <permissions>Права</permissions>

@@ -24,7 +24,7 @@
 
       id="fb-schema-upload-dialog" level="modal" class="fr-dialog">
 
-    <xforms:label ref="$form-resources/dialog-upload-schema/dialog-title"/>
+    <xforms:label ref="$form-resources/dialog-upload-schema/label"/>
     
     <xforms:var name="instance" value="instance('fb-schema-upload-instance')"/>
     <xhtml:div>

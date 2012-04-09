@@ -83,7 +83,7 @@
                 <fb:dialog-itemsets            id="dialog-itemsets"           form-ref="$binding" resources-ref="$form-resources" components-ref="instance('fb-components-instance')"/>
 
                 <fr:alert-dialog id="dialog-confirmation">
-                    <fr:label ref="$form-resources/dialog-confirmation/dialog-title"/>
+                    <fr:label ref="$form-resources/dialog-confirmation/label"/>
                     <fr:negative-choice/>
                     <fr:positive-choice/>
                 </fr:alert-dialog>

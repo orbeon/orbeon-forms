@@ -89,7 +89,7 @@
 
                 <!-- Actual dialog -->
                 <xxf:dialog id="dialog" appearance="full" level="modal">
-                    <xf:label ref="$resources/dialog-help/dialog-title"/>
+                    <xf:label ref="$resources/dialog-help/label"/>
 
                     <xh:div>
                         <xh:div class="fr-grid">

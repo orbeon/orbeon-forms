@@ -103,7 +103,7 @@
                 </xforms:action>
 
                 <xxforms:dialog id="dialog" class="fb-itemset-editor-dialog" appearance="full" model="model" level="modal">             <!-- Actual dialog -->
-                    <xforms:label ref="$resources/dialog-itemsets/dialog-title"/>
+                    <xforms:label ref="$resources/dialog-itemsets/label"/>
                     <xhtml:div class="fb-dialog-body fb-hide-alert">
                         <xforms:group ref="$local/items">
                             <fr:grid repeat="true" ref="item" id="fb-itemset-repeat" origin="$local/template/item" columns="2">

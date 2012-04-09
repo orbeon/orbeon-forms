@@ -24,7 +24,7 @@
 
       id="fb-service-dialog" level="modal" close="true" draggable="true" class="fr-dialog" model="fb-service-model">
 
-    <xforms:label ref="$form-resources/dialog-http-services/dialog-title"/>
+    <xforms:label ref="$form-resources/dialog-http-services/label"/>
 
     <xforms:var name="instance" value="instance('fb-submission-editor-instance')"/>
     <xhtml:div class="fr-grid">

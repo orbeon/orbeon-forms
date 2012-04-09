@@ -24,7 +24,7 @@
 
       id="fb-publish-dialog" level="modal" close="true" draggable="true" class="fr-dialog">
 
-    <xforms:label ref="$form-resources/dialog-publish/dialog-title"/>
+    <xforms:label ref="$form-resources/dialog-publish/label"/>
 
     <!-- Switch to display initial / success / error cases -->
     <xforms:switch>

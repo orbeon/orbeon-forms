@@ -144,7 +144,7 @@
 
                 <!-- Actual dialog -->
                 <xxf:dialog id="dialog" appearance="full" level="modal">
-                    <xf:label ref="$resources/dialog-grid-details/dialog-title"/>
+                    <xf:label ref="$resources/dialog-grid-details/label"/>
                     <xh:div>
                         <xh:div class="fr-grid">
                             <xh:div class="fr-grid-content">

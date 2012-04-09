@@ -104,7 +104,7 @@
                 </xforms:action>
 
                 <xxforms:dialog id="dialog" class="fb-custom-xml-dialog">
-                    <xforms:label ref="$resources/dialog-custom-xml/dialog-title"/>
+                    <xforms:label ref="$resources/dialog-custom-xml/label"/>
                     <!-- Choose mode -->
                     <xforms:select1 appearance="full" ref="$ui/mode" id="mode-select1">
                         <xforms:label ref="$resources/dialog-custom-xml/mode-label"/>

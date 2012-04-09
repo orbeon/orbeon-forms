@@ -161,7 +161,7 @@
                 <xforms:setvalue ev:event="xxforms-dialog-close" ev:observer="dialog" ref="$local/@relevant">false</xforms:setvalue>
 
                 <xxforms:dialog id="dialog" level="modal">
-                    <xforms:label ref="$resources/dialog-validation-details/dialog-title"/>
+                    <xforms:label ref="$resources/dialog-validation-details/label"/>
 
                     <xhtml:div>
                         <xhtml:div class="fr-grid">

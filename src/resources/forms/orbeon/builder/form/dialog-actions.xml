@@ -23,7 +23,7 @@
 
       id="fb-action-dialog" level="modal" close="true" draggable="true" class="fr-dialog" model="fb-bindings-model">
 
-    <xforms:label ref="$form-resources/dialog-actions/dialog-title"/>
+    <xforms:label ref="$form-resources/dialog-actions/label"/>
 
     <xforms:var name="instance" value="instance('fb-bindings-editor-instance')"/>
     <xforms:var name="body"     value="$body" model="fr-form-model"/>

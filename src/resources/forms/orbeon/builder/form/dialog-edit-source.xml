@@ -25,7 +25,7 @@
 
       id="fb-source-editor-dialog" level="modal" close="true" draggable="true" class="fr-dialog" model="fb-source-editor-model">
 
-    <xforms:label ref="$form-resources/dialog-edit-source/dialog-title"/>
+    <xforms:label ref="$form-resources/dialog-edit-source/label"/>
 
     <xhtml:div class="fb-xml-dialog-view">
         <fr:code-mirror ref="source">

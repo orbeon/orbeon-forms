@@ -148,7 +148,7 @@
                 </xforms:action>
 
                 <xxforms:dialog id="dialog" class="fb-permissions-dialog">
-                    <xforms:label ref="$resources/dialog-permissions/dialog-title"/>
+                    <xforms:label ref="$resources/dialog-permissions/label"/>
                     <!-- Choose mode -->
                     <xforms:select ref="$ui/has-permissions" appearance="full">
                         <xforms:item>

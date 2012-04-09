@@ -26,7 +26,7 @@
 
       id="fb-pdf-upload-dialog" level="modal" close="true" draggable="true" class="fr-dialog">
 
-    <xforms:label ref="$form-resources/dialog-upload-pdf/dialog-title"/>
+    <xforms:label ref="$form-resources/dialog-upload-pdf/label"/>
 
     <xforms:var name="attachments-instance" value="$model/xforms:instance[@id = 'fr-form-attachments']/*"/>
     <xhtml:div>

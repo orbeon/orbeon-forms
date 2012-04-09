@@ -25,7 +25,7 @@
       id="fb-test-dialog" level="modal" close="true" draggable="false" class="fr-dialog fb-test-dialog"
       style="width: 400px; height: 600px">
 
-    <xforms:label ref="$form-resources/dialog-test/dialog-title"/>
+    <xforms:label ref="$form-resources/dialog-test/label"/>
 
     <xhtml:iframe id="fb-test-iframe" name="fb-test-iframe" class="fb-test-iframe" src="about:blank"></xhtml:iframe>
     <xforms:trigger>

@@ -24,7 +24,7 @@
 
       id="fb-confirmation-dialog" level="modal" close="false" draggable="true" model="fb-confirmation-model">
     
-    <xforms:label ref="$form-resources/dialog-confirmation/dialog-title"/>
+    <xforms:label ref="$form-resources/dialog-confirmation/label"/>
 
     <xhtml:div>
         <xhtml:img src="/apps/fr/style/images/pixelmixer/info_64.png" alt="Question" class="fr-dialog-icon"/>

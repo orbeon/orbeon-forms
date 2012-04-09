@@ -26,7 +26,7 @@
 
       id="fb-add-language-dialog" appearance="minimal" level="modeless">
 
-    <xforms:label ref="$form-resources/dialog-add-language/dialog-title"/>
+    <xforms:label ref="$form-resources/dialog-add-language/label"/>
 
     <xforms:var name="resources" value="$resources" model="fr-form-model"/>
 

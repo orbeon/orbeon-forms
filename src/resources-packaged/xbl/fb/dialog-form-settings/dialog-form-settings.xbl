@@ -65,10 +65,10 @@
             <xf:var name="is-save-as" value="mode = 'save-as'"/>
 
             <xxf:dialog id="dialog" close="false" class="fb-dialog-form-settings">
-                <!-- HACK: Copy expression as we can't use the variable $is-save-as above -->
-                <xf:label value="if (mode = 'save-as')
-                                 then $fr-resources/detail/labels/save-as-document
-                                 else ()"/>
+                <!-- Dialog title -->
+                <xf:label value="if ($is-new-form) then ()
+                                 else if ($is-save-as) then $fr-resources/detail/labels/save-as-document
+                                 else $resources/dialog-form-settings/label"/>
                 <xh:div>
                     <!-- IE warning -->
                     <xf:group ref=".[mode = 'new' and xxf:instance('fb-user-agent-instance')/is-ie = 'true' and xxf:instance('fb-user-agent-instance')/is-supported-ie != 'true']">

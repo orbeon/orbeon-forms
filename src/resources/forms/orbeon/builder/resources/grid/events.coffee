@@ -61,11 +61,13 @@ Event.onDOMReady () ->
         Event.addListener document, "mouseover", (event) ->
             target = Event.getTarget event
             gridThTd =
+                # Give up we we're not in an editable grid, e.g. section template
+                if not $(target).closest('.fr-grid').is('.fr-editable') then null
                 # Target is the grid td, we're good
-                if $(target).is('.fr-grid-th, .fr-grid-td') then target
+                else if $(target).is('.fr-grid-th, .fr-grid-td') then target
                 # Try finding a grid td parent of the target
                 else $(target).closest('.fr-grid-th, .fr-grid-td')[0]
-            if gridThTd
+            if gridThTd?
                 if currentMouseOverGridThTd
                     if gridThTd isnt currentMouseOverGridThTd
                         # From one gridTd to another gridTd

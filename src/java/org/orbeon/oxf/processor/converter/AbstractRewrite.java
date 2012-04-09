@@ -810,7 +810,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
     final String rewriteURI;
 
     /**
-     * Just declares input 'rewrite-in' and output 'rewrite-out'.
+     * Just declares input 'data' and output 'data'.
      *
      * @param rewriteURI e.g. "http://www.w3.org/1999/xhtml" or ""
      */
@@ -822,13 +822,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
 
     @Override
     public ProcessorOutput createOutput(final String name) {
-
         final ProcessorOutput processorOutput = new CacheableTransformerOutputImpl(AbstractRewrite.this, name) {
-
-            /**
-             * Creates a StatefulHandler and uses that to translate the events from the input, rewrite-in, and then
-             * send them to the contentHandler (the output).
-             */
             public void readImpl(final PipelineContext pipelineContext, final XMLReceiver xmlReceiver) {
                 readInputAsSAX(pipelineContext, INPUT_DATA, getRewriteXMLReceiver(NetUtils.getExternalContext().getResponse(), xmlReceiver, false));
             }

@@ -270,8 +270,8 @@
         <p:when test="/html">
             <!-- Rewrite all URLs in HTML documents -->
             <p:processor name="oxf:html-rewrite" >
-                <p:input name="rewrite-in" href="#xformed-data" />
-                <p:output name="rewrite-out" id="rewritten-data" />
+                <p:input name="data" href="#xformed-data" />
+                <p:output name="data" id="rewritten-data" />
             </p:processor>
             <!-- Output regular HTML doctype -->
             <p:processor name="oxf:html-converter">

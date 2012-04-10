@@ -138,14 +138,14 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
         // User-defined classes go first
         appendControlUserClasses(controlAttributes, control, sb);
 
-        // Control name
-        {
+        // Control classes based on the name for built-in controls
+        if (XFormsControlFactory.isBuiltinControl(controlURI, controlName)) {
             if (sb.length() > 0)
                 sb.append(' ');
 
             // We only call xforms-control the actual controls as per the spec
             // TODO: XForms 1.1 has core and container controls, but now we depend on xforms-control class in client
-            if (!XFormsControlFactory.isContainerControl(controlURI, controlName))
+            if (! XFormsControlFactory.isContainerControl(controlURI, controlName))
                 sb.append("xforms-control xforms-");
             else
                 sb.append("xforms-");

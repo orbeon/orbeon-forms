@@ -103,10 +103,9 @@ class Model(val staticStateContext: StaticStateContext, element: Element, parent
     val jVariablesMap = variablesMap.asJava
     
     // For now this only checks actions and submissions, in the future should also build rest of content
-    def findRelevantChildrenElements =
-        Dom4j.elements(element) filter
-            (e ⇒ XFormsActions.isAction(e.getQName) || e.getQName == XFORMS_SUBMISSION_QNAME) map
-                ((_, containerScope))
+    override def findRelevantChildrenElements =
+        super.findRelevantChildrenElements collect
+            { case (e, s) if XFormsActions.isAction(e.getQName) || e.getQName == XFORMS_SUBMISSION_QNAME ⇒ (e, s) }
     
     // Submissions (they are all direct children)
     private lazy val _submissions = children collect { case s: Submission ⇒ s }

@@ -23,12 +23,36 @@ import xbl.Scope
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xml.Dom4j
 
-abstract class LHHAAnalysis(staticStateContext: StaticStateContext, element: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], scope: Scope)
+class LHHAAnalysis(staticStateContext: StaticStateContext, element: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], scope: Scope)
         extends SimpleElementAnalysis(staticStateContext, element, parent, preceding, scope) with AppearanceTrait {
+
+    self ⇒
 
     require(parent.isDefined)
 
-    val isLocal: Boolean
+    val forStaticIdOption = Option(element.attributeValue(XFormsConstants.FOR_QNAME))
+    val isLocal = forStaticIdOption.isEmpty
+
+    /**
+     * Attach this LHHA to a control.
+     */
+    def attachToControl() =
+        forStaticIdOption match {
+            case Some(forStaticId) ⇒
+                // External LHHA
+                staticStateContext.partAnalysis.getControlAnalysis(scope.prefixedIdForStaticId(forStaticId)) match {
+                    case lhhaControl: LHHATrait ⇒ lhhaControl.setExternalLHHA(self)
+                    case _ ⇒ staticStateContext.partAnalysis.getIndentedLogger.logWarning("", "cannot attach exernal LHHA to control",
+                        Array("type", localName, "element", Dom4jUtils.elementToDebugString(element)): _*)
+                }
+            case None ⇒
+                // Local LHHA
+                parent match {
+                    case Some(parent: LHHATrait) ⇒
+                        parent.setExternalLHHA(self)
+                    case None ⇒
+                }
+        }
 
     // TODO: make use of static value
     //

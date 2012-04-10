@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import controls.{RootControl, ExternalLHHAAnalysis}
+import controls.{LHHAAnalysis, RootControl}
 import java.lang.String
 import model.Model
 import scala.collection.JavaConverters._
@@ -90,7 +90,7 @@ class PartAnalysisImpl(
 
     // Builder that produces an ElementAnalysis for a known incoming Element
     def build(parent: ElementAnalysis, preceding: Option[ElementAnalysis], controlElement: Element, containerScope: Scope,
-              externalLHHA: Buffer[ExternalLHHAAnalysis], eventHandlers: Buffer[EventHandlerImpl]) = {
+              externalLHHA: Buffer[LHHAAnalysis], eventHandlers: Buffer[EventHandlerImpl]) = {
 
         assert(containerScope ne null)
 
@@ -132,7 +132,7 @@ class PartAnalysisImpl(
         initializeScopes()
 
         // Global lists of external LHHA and handlers
-        val externalLHHA = Buffer[ExternalLHHAAnalysis]()
+        val externalLHHA = Buffer[LHHAAnalysis]()
         val eventHandlers = Buffer[EventHandlerImpl]()
         
         // Create and index root control
@@ -211,8 +211,8 @@ class PartAnalysisImpl(
             def toXML(helper: ContentHandlerHelper) {
                 for {
                     controlAnalysis ← controlAnalysisMap.values
-                    if ! controlAnalysis.isInstanceOf[ExternalLHHAAnalysis]
-                    if controlAnalysis.localName != "root" // for now don't output root as it's not an interesting container and we don't want to modify the unit tests
+                    if ! controlAnalysis.isInstanceOf[LHHAAnalysis] // not sure why we are filtering out those
+                    if controlAnalysis.localName != "root"          // for now don't output root as it's not an interesting container and we don't want to modify the unit tests
                 } yield
                     controlAnalysis.toXML(helper, List())()
             }

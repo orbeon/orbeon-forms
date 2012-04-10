@@ -28,12 +28,12 @@ object ControlAnalysisFactory {
     type ControlFactory = (StaticStateContext, Element,  Option[ElementAnalysis], Option[ElementAnalysis], Scope) ⇒ ElementAnalysis
 
     // NOTE: Not all controls need separate classes, so for now we use generic ones like e.g. CoreControl instead of InputControl
-    private val valueControlFactory: ControlFactory =     (new CoreControl(_, _, _, _, _) with ValueTrait with ActionChildrenBuilder)
-    private val triggerControlFactory: ControlFactory =   (new CoreControl(_, _, _, _, _) with TriggerAppearanceTrait with ActionChildrenBuilder)
-    private val selectionControlFactory: ControlFactory = (new CoreControl(_, _, _, _, _) with ValueTrait with SelectionControl with ActionChildrenBuilder)
-    private val variableControlFactory: ControlFactory =  (new VariableControl(_, _, _, _, _) with ActionChildrenBuilder)
-    private val containerControlFactory: ControlFactory = (new ContainerControl(_, _, _, _, _) with ContainerLHHATrait with ContainerChildrenBuilder) // NOTE: no LHHA in spec yet, but will make sense
-    private val lhhaControlFactory: ControlFactory =      (new ExternalLHHAAnalysis(_, _, _, _, _))
+    private val valueControlFactory: ControlFactory =     (new CoreControl(_, _, _, _, _) with ValueTrait with ChildrenBuilderTrait with ChildrenLHHAAndActionsTrait)
+    private val triggerControlFactory: ControlFactory =   (new CoreControl(_, _, _, _, _) with TriggerAppearanceTrait with ChildrenBuilderTrait with ChildrenLHHAAndActionsTrait)
+    private val selectionControlFactory: ControlFactory = (new CoreControl(_, _, _, _, _) with ValueTrait with SelectionControl with ChildrenBuilderTrait with ChildrenLHHAAndActionsTrait)
+    private val variableControlFactory: ControlFactory =  (new VariableControl(_, _, _, _, _) with ChildrenActionsTrait)
+    private val containerControlFactory: ControlFactory = (new ContainerControl(_, _, _, _, _) with LHHATrait with ChildrenBuilderTrait) // NOTE: no LHHA in spec yet, but will make sense
+    private val lhhaControlFactory: ControlFactory =      (new LHHAAnalysis(_, _, _, _, _))
 
     // Variable factories indexed by QName
     // NOTE: We have all these QNames for historical reasons (XForms 2 is picking <xforms:var>)
@@ -43,7 +43,7 @@ object ControlAnalysisFactory {
 
     // Other factories indexed by QName
     private val byQNameFactory = Map[QName, ControlFactory](
-        XBL_TEMPLATE_QNAME            → (new ContainerControl(_, _, _, _, _) with ContainerChildrenBuilder),
+        XBL_TEMPLATE_QNAME            → (new ContainerControl(_, _, _, _, _) with ChildrenBuilderTrait),
         // Core value controls
         XFORMS_INPUT_QNAME            → valueControlFactory,
         XFORMS_SECRET_QNAME           → valueControlFactory,

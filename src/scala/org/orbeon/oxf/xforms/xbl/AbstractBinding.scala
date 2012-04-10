@@ -39,6 +39,9 @@ case class AbstractBinding(
         Option(bindingElement.attributeValue(XFormsConstants.XXBL_CONTAINER_QNAME)) getOrElse
             "div"
 
+    // Return a CSS-friendly name for this binding (no `|` or `:`)
+    def cssName = qNameMatch.getQualifiedName.replace(':', '-')
+
     val allowedExternalEvents =
         attSet(bindingElement, XFormsConstants.XXFORMS_EXTERNAL_EVENTS_ATTRIBUTE_NAME)
 
@@ -120,10 +123,11 @@ object AbstractBinding {
         new AbstractBinding(qNameMatch(bindingElement, namespaceMapping), bindingElement, lastModified, bindingId, scripts, styles, handlers, implementations, global)
     }
 
-    private def qNameMatch(bindingElement: Element, namespaceMapping: NamespaceMapping) = {
-        val elementAttribute = bindingElement.attributeValue(ELEMENT_QNAME)
-        Dom4jUtils.extractTextValueQName(namespaceMapping.mapping, elementAttribute.replace('|', ':'), true)
-    }
+    def elementQualifiedName(bindingElement: Element) =
+        bindingElement.attributeValue(ELEMENT_QNAME).replace('|', ':')
+
+    private def qNameMatch(bindingElement: Element, namespaceMapping: NamespaceMapping) =
+        Dom4jUtils.extractTextValueQName(namespaceMapping.mapping, elementQualifiedName(bindingElement), true)
 
     // Find a cached abstract binding or create and cache a new one
     def findOrCreate(path: Option[String], bindingElement: Element, lastModified: Long, scripts: Seq[Element], namespaceMapping: NamespaceMapping) = {

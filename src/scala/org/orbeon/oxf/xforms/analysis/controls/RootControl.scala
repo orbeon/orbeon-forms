@@ -14,16 +14,16 @@
 package org.orbeon.oxf.xforms.analysis.controls
 
 import org.dom4j.Element
-import org.orbeon.oxf.xforms.analysis.{ContainerChildrenBuilder, StaticStateContext}
 import org.orbeon.oxf.xforms.xbl.Scope
 import org.orbeon.oxf.xforms.XFormsConstants.XBL_XBL_QNAME
+import org.orbeon.oxf.xforms.analysis.{ChildrenBuilderTrait, StaticStateContext}
 
 /**
  * Single root container for the entire controls hierarchy.
  */
 class RootControl(staticStateContext: StaticStateContext, element: Element, scope: Scope)
     extends ContainerControl(staticStateContext, element, None, None, scope)
-    with ContainerChildrenBuilder {
+    with ChildrenBuilderTrait {
 
     override val staticId = "#document"
     override val prefixedId = staticStateContext.partAnalysis.startScope.fullPrefix + staticId

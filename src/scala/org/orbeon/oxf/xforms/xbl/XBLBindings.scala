@@ -354,7 +354,7 @@ class XBLBindings(indentedLogger: IndentedLogger, partAnalysis: PartAnalysisImpl
                             Dom4jUtils.createDocumentCopyParentNamespaces(templateElement)
 
                     // 2. Apply xbl:attr, xbl:content, xxbl:attr and index xxbl:scope
-                    XBLTransformer.transform(shadowTreeDocument, boundElement, abstractBinding.modeHandlers)
+                    XBLTransformer.transform(shadowTreeDocument, boundElement, abstractBinding.modeHandlers, abstractBinding.modeLHHA)
                 }
         }
     }

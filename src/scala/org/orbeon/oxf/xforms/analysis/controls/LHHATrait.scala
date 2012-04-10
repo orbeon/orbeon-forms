@@ -14,13 +14,14 @@
 package org.orbeon.oxf.xforms.analysis.controls
 
 import org.orbeon.oxf.xforms.XFormsConstants._
-import org.dom4j.QName
 import org.orbeon.oxf.xml.ContentHandlerHelper
 import collection.mutable.LinkedHashMap
 import org.orbeon.oxf.xforms.analysis.SimpleElementAnalysis
+import org.dom4j.Element
 
 object LHHA {
     val LHHAQNames = Set(LABEL_QNAME, HELP_QNAME, HINT_QNAME, ALERT_QNAME)
+    def isLHHA(e: Element) = LHHAQNames(e.getQName)
 }
 
 /**
@@ -28,21 +29,8 @@ object LHHA {
  */
 trait LHHATrait extends SimpleElementAnalysis {
 
-    self ⇒
-
-    // All LHHA, nested or external
+    // All LHHA, local or external
     private val lhha = LinkedHashMap.empty[String, LHHAAnalysis]
-
-    // Process nested LHHA
-    lhha ++= (
-        for {
-            qName ← LHHA.LHHAQNames
-            lhhaElement ← findNestedLHHAElement(qName)
-        } yield
-            lhhaElement.getName → new LocalLHHAAnalysis(staticStateContext, lhhaElement, Some(self), None, getChildElementScope(lhhaElement))
-    )
-
-    protected def findNestedLHHAElement(qName: QName) = Option(element.element(qName))
 
     // Set external LHHA
     def setExternalLHHA(lhhaAnalysis: LHHAAnalysis): Unit =

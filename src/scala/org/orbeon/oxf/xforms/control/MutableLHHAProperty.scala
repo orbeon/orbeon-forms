@@ -56,7 +56,7 @@ class MutableLHHAProperty(control: XFormsControl, lhhaAnalysis: LHHAAnalysis, su
     }
 
     protected def requireUpdate =
-        control.containingDocument.getXPathDependencies.requireLHHAUpdate(lhhaElement.getName, control.getPrefixedId)
+        control.containingDocument.getXPathDependencies.requireLHHAUpdate(lhhaAnalysis.localName, control.getPrefixedId)
 
     protected def notifyCompute() =
         control.containingDocument.getXPathDependencies.notifyComputeLHHA()
@@ -75,7 +75,7 @@ class MutableLHHAProperty(control: XFormsControl, lhhaAnalysis: LHHAAnalysis, su
         if (lhhaAnalysis.isLocal) {
             // LHHA is direct child of control, evaluate within context
             contextStack.setBinding(control.getBindingContext)
-            contextStack.pushBinding(lhhaElement, control.effectiveId, control.getChildElementScope(lhhaElement))
+            contextStack.pushBinding(lhhaElement, control.effectiveId, lhhaAnalysis.scope)
             val result = XFormsUtils.getElementValue(control.container, contextStack, control.effectiveId, lhhaElement, supportsHTML, tempContainsHTML)
             contextStack.popBinding()
             result
@@ -102,7 +102,7 @@ class MutableLHHAProperty(control: XFormsControl, lhhaAnalysis: LHHAAnalysis, su
 
             if (contextEffectiveId != null) {
                 // Push binding relative to context established above and evaluate
-                contextStack.pushBinding(lhhaElement, contextEffectiveId, control.getResolutionScope)
+                contextStack.pushBinding(lhhaElement, contextEffectiveId, lhhaAnalysis.scope)
                 val result = XFormsUtils.getElementValue(control.container, contextStack, control.effectiveId, lhhaElement, supportsHTML, tempContainsHTML)
                 contextStack.popBinding()
                 result

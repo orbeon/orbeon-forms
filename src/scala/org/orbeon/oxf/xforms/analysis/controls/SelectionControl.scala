@@ -77,7 +77,7 @@ trait SelectionControl extends SimpleElementAnalysis with SelectAppearanceTrait 
                         require(nestedElement ne null)
 
                     if (nestedElement ne null) {
-                        val nestedAnalysis = new LocalLHHAAnalysis(staticStateContext, nestedElement, Some(itemElementAnalysis), None, itemElementAnalysis.getChildElementScope(nestedElement))
+                        val nestedAnalysis = new LHHAAnalysis(staticStateContext, nestedElement, Some(itemElementAnalysis), None, itemElementAnalysis.getChildElementScope(nestedElement))
                         nestedAnalysis.analyzeXPath()
                         combinedAnalysis = combinedAnalysis combine nestedAnalysis.getValueAnalysis.get
                     }

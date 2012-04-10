@@ -21,7 +21,7 @@ import org.orbeon.oxf.xforms.XFormsConstants._
 
 class RepeatControl(staticStateContext: StaticStateContext, element: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], scope: Scope)
     extends ContainerControl(staticStateContext, element, parent, preceding, scope)
-    with ContainerChildrenBuilder {
+    with ChildrenBuilderTrait {
 
     // TODO: add repeat hierarchy information
     

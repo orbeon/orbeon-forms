@@ -20,7 +20,7 @@ import org.dom4j.{Element, QName}
 import org.orbeon.oxf.xforms.event.EventHandlerImpl
 import org.orbeon.oxf.xforms.analysis.controls.ActionTrait
 import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.ControlFactory
-import org.orbeon.oxf.xforms.analysis.{SimpleElementAnalysis, ActionChildrenBuilder}
+import org.orbeon.oxf.xforms.analysis.{ChildrenActionsAndVariablesTrait, SimpleElementAnalysis}
 
 object XFormsActions {
     val LOGGING_CATEGORY = "action"
@@ -66,8 +66,8 @@ object XFormsActions {
         def isEventHandler(e: Element) = EventHandlerImpl.isEventHandler(e)
 
         val actionFactory: PartialFunction[Element, ControlFactory] = {
-            case e if isContainerAction(e.getQName) && isEventHandler(e) ⇒ (new EventHandlerImpl(_, _, _, _, _)      with ActionTrait with ActionChildrenBuilder)
-            case e if isContainerAction(e.getQName)                      ⇒ (new SimpleElementAnalysis(_, _, _, _, _) with ActionTrait with ActionChildrenBuilder)
+            case e if isContainerAction(e.getQName) && isEventHandler(e) ⇒ (new EventHandlerImpl(_, _, _, _, _)      with ActionTrait with ChildrenActionsAndVariablesTrait)
+            case e if isContainerAction(e.getQName)                      ⇒ (new SimpleElementAnalysis(_, _, _, _, _) with ActionTrait with ChildrenActionsAndVariablesTrait)
             case e if isAction(e.getQName) && isEventHandler(e)          ⇒ (new EventHandlerImpl(_, _, _, _, _)      with ActionTrait)
             case e if isAction(e.getQName)                               ⇒ (new SimpleElementAnalysis(_, _, _, _, _) with ActionTrait)
         }

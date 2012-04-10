@@ -16,7 +16,6 @@ package org.orbeon.oxf.xforms.analysis
 import controls._
 import scala.collection.JavaConverters._
 import org.dom4j.QName
-import java.util.{Map ⇒ JMap}
 import org.orbeon.oxf.xforms.XFormsConstants._
 import collection.mutable.{Buffer, HashMap, HashSet, LinkedHashMap}
 import org.orbeon.oxf.xforms.event.EventHandlerImpl
@@ -38,7 +37,7 @@ trait PartControlsAnalysis extends TransientState {
     private[PartControlsAnalysis] var _hasInputPlaceholder = false
     def hasInputPlaceholder = _hasInputPlaceholder
 
-    protected def indexNewControl(elementAnalysis: ElementAnalysis, externalLHHA: Buffer[ExternalLHHAAnalysis], eventHandlers: Buffer[EventHandlerImpl]) {
+    protected def indexNewControl(elementAnalysis: ElementAnalysis, externalLHHA: Buffer[LHHAAnalysis], eventHandlers: Buffer[EventHandlerImpl]) {
         val controlName = elementAnalysis.localName
 
         // Index by prefixed id
@@ -65,7 +64,7 @@ trait PartControlsAnalysis extends TransientState {
 
         // Register special controls
         elementAnalysis match {
-            case lhha: ExternalLHHAAnalysis ⇒ externalLHHA += lhha
+            case lhha: LHHAAnalysis ⇒ externalLHHA += lhha
             case eventHandler: EventHandlerImpl ⇒ eventHandlers += eventHandler
             case _ ⇒
         }

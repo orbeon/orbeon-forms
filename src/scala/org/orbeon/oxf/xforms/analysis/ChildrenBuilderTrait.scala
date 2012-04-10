@@ -15,11 +15,14 @@ package org.orbeon.oxf.xforms.analysis
 
 import org.dom4j.Element
 import org.orbeon.oxf.xforms.xbl.Scope
+import org.orbeon.oxf.xml.Dom4j
 
 trait ChildrenBuilderTrait extends ElementAnalysis {
 
     type Builder = (ElementAnalysis, Option[ElementAnalysis], Element, Scope) ⇒ Option[ElementAnalysis]
-    def findRelevantChildrenElements: Seq[(Element, Scope)]
+
+    // Default implementation: return all children element with the same container scope as the parent element
+    def findRelevantChildrenElements: Seq[(Element, Scope)] = Dom4j.elements(element) map ((_, containerScope))
 
     // This element's children (valid after build() has been called)
     private var _children = Seq[ElementAnalysis]()

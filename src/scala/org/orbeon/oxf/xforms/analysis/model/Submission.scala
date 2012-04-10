@@ -14,13 +14,12 @@
 package org.orbeon.oxf.xforms.analysis.model
 
 import org.dom4j.Element
-import org.orbeon.oxf.xforms.analysis.{ActionChildrenBuilder, StaticStateContext, SimpleElementAnalysis, ElementAnalysis}
 import org.orbeon.oxf.xforms.xbl.Scope
-
+import org.orbeon.oxf.xforms.analysis.{ChildrenActionsTrait, StaticStateContext, SimpleElementAnalysis, ElementAnalysis}
 
 class Submission(staticStateContext: StaticStateContext, element: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], scope: Scope)
         extends SimpleElementAnalysis(staticStateContext, element, parent, preceding, scope)
-        with ActionChildrenBuilder {
+        with ChildrenActionsTrait {
 
     // TODO: attributes
 }

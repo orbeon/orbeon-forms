@@ -2707,9 +2707,9 @@
                     <xhtml:span class="xforms-repeat-delimiter"/>
                     <xhtml:span id="gaga-1·1" class="xbl-component xbl-fr-gaga xforms-repeat-selected-item-1"/>
                     <xhtml:span id="toto-1·1" class="xbl-component xbl-fr-toto xforms-repeat-selected-item-1"/>
-                    <xhtml:span id="gaga-2·1" class="xbl-component xbl-fr-gaga xforms-disabled xforms-repeat-selected-item-1"/>
+                    <xhtml:span id="gaga-2·1" class="xforms-disabled xbl-component xbl-fr-gaga xforms-repeat-selected-item-1"/>
                     <xhtml:span id="toto-2·1" class="xbl-component xbl-fr-toto xforms-repeat-selected-item-1"/>
-                    <xhtml:span id="gaga-3·1" class="xbl-component xbl-fr-gaga xforms-readonly xforms-repeat-selected-item-1"/>
+                    <xhtml:span id="gaga-3·1" class="xforms-readonly xbl-component xbl-fr-gaga xforms-repeat-selected-item-1"/>
                     <xhtml:span id="toto-3·1" class="xbl-component xbl-fr-toto xforms-repeat-selected-item-1"/>
                     <xhtml:span class="xforms-repeat-delimiter"/>
                     <xhtml:span id="gaga-1" class="xbl-component xbl-fr-gaga xforms-repeat-template"/>

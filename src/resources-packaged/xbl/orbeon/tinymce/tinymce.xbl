@@ -18,7 +18,7 @@
     <xbl:script src="/xbl/orbeon/tinymce/jscripts/tiny_mce/tiny_mce.js"/>
     <xbl:script src="/xbl/orbeon/tinymce/tinymce.js"/>
     <xbl:script src="/xbl/orbeon/tinymce/tinymce-config.js"/>
-    <xbl:binding id="fr-tinymce" element="fr|tinymce" xxbl:mode="binding handlers">
+    <xbl:binding id="fr-tinymce" element="fr|tinymce" xxbl:mode="binding lhha">
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">HTML Text</display-name>
             <display-name lang="fr">Zone texte HTML</display-name>
@@ -50,36 +50,33 @@
             </xforms:model>
         </xbl:implementation>
         <xbl:template>
-            <xxforms:variable name="server-value" select="xxforms:binding('fr-tinymce')"/>
-            <xxforms:variable name="client-value" select="client-value"/>
-            <xforms:group ref="$server-value">
-                <xbl:content/>
+            <xforms:var name="server-value" value="xxforms:binding('fr-tinymce')"/>
+            <xforms:var name="client-value" value="client-value"/>
 
-                <!-- XForms control the JavaScript writes to -->
-                <xforms:textarea ref="$client-value" id="tinymce-client-value" class="xbl-fr-tinymce-xforms-client-value fr-hidden">
-                    <xforms:setvalue ev:event="xforms-value-changed" ref="$server-value" value="xxforms:call-xpl('oxf:/ops/xforms/clean-html.xpl', 'dirty-html', $client-value, 'clean-html')"/>
-                </xforms:textarea>
-                <xforms:output ref="$server-value" id="tinymce-server-value" class="xbl-fr-tinymce-xforms-server-value fr-hidden">
-                    <!-- Listen on xforms-enable to refresh TinyMCE with latest value in case the value changed while the component was non-relevant -->
-                    <xxforms:script id="xf-ch" ev:event="xforms-value-changed xforms-enabled xxforms-iteration-moved">YAHOO.xbl.fr.Tinymce.instance(this).serverToClient();</xxforms:script>
-                    <xxforms:script id="xf-ro" ev:event="xforms-readonly">YAHOO.xbl.fr.Tinymce.instance(this).readonly();</xxforms:script>
-                    <xxforms:script id="xf-rw" ev:event="xforms-readwrite">YAHOO.xbl.fr.Tinymce.instance(this).readwrite();</xxforms:script>
-                </xforms:output>
+            <!-- XForms control the JavaScript writes to -->
+            <xforms:textarea ref="$client-value" id="tinymce-client-value" class="xbl-fr-tinymce-xforms-client-value fr-hidden">
+                <xforms:setvalue ev:event="xforms-value-changed" ref="$server-value" value="xxforms:call-xpl('oxf:/ops/xforms/clean-html.xpl', 'dirty-html', $client-value, 'clean-html')"/>
+            </xforms:textarea>
+            <xforms:output ref="$server-value" id="tinymce-server-value" class="xbl-fr-tinymce-xforms-server-value fr-hidden">
+                <!-- Listen on xforms-enable to refresh TinyMCE with latest value in case the value changed while the component was non-relevant -->
+                <xxforms:script id="xf-ch" ev:event="xforms-value-changed xforms-enabled xxforms-iteration-moved">YAHOO.xbl.fr.Tinymce.instance(this).serverToClient();</xxforms:script>
+                <xxforms:script id="xf-ro" ev:event="xforms-readonly">YAHOO.xbl.fr.Tinymce.instance(this).readonly();</xxforms:script>
+                <xxforms:script id="xf-rw" ev:event="xforms-readwrite">YAHOO.xbl.fr.Tinymce.instance(this).readwrite();</xxforms:script>
+            </xforms:output>
 
-                <xhtml:a f:url-type="resource" style="display: none" href="/xbl/orbeon/tinymce/jscripts/tiny_mce.js" class="tinymce-base-url"/>
+            <xhtml:a f:url-type="resource" style="display: none" href="/xbl/orbeon/tinymce/jscripts/tiny_mce.js" class="tinymce-base-url"/>
 
-                <!--
-                    div to be converted into a TinyMCE Editor instance.
-                    By default, a certain div element is used to bind the TinyMCE editor,
-                    instead of the "textareas" default. Important: Make sure that class
-                    attribute corresponds to myDivClass variable in tinymce.js! -->
-                <xhtml:div
-                    class="xbl-fr-tinymce-div xbl-html-input"
-                    id="tinymce-div"
-                    xbl:attr="style tabindex tabindex=navindex" />
-                <!-- Stop propagation of all local UI events -->
-                <xforms:action ev:event="#all" ev:propagate="stop"/>
-            </xforms:group>
+            <!--
+                div to be converted into a TinyMCE Editor instance.
+                By default, a certain div element is used to bind the TinyMCE editor,
+                instead of the "textareas" default. Important: Make sure that class
+                attribute corresponds to myDivClass variable in tinymce.js! -->
+            <xhtml:div
+                class="xbl-fr-tinymce-div xbl-html-input"
+                id="tinymce-div"
+                xbl:attr="style tabindex tabindex=navindex" />
+            <!-- Stop propagation of all local UI events -->
+            <xforms:action ev:event="#all" ev:propagate="stop"/>
         </xbl:template>
     </xbl:binding>
 

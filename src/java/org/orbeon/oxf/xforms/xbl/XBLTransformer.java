@@ -23,6 +23,7 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.dom4j.NodeWrapper;
 import org.orbeon.saxon.om.NodeInfo;
+import org.orbeon.oxf.xforms.analysis.controls.LHHA;
 
 import java.util.*;
 
@@ -37,7 +38,7 @@ public class XBLTransformer {
      *
      * NOTE: This mutates shadowTreeDocument.
      */
-    public static Document transform(final Document shadowTreeDocument, final Element boundElement, final boolean excludeNestedHandlers) {
+    public static Document transform(final Document shadowTreeDocument, final Element boundElement, final boolean excludeNestedHandlers, final boolean excludeNestedLHHA) {
 
         final DocumentWrapper documentWrapper = new DocumentWrapper(boundElement.getDocument(), null, XPathCache.getGlobalConfiguration());
 
@@ -45,6 +46,14 @@ public class XBLTransformer {
 
             boolean isNestedHandler(Element e) {
                 return e.getParent() == boundElement && EventHandlerImpl.isEventHandler(e);
+            }
+
+            boolean isNestedLHHA(Element e) {
+                return e.getParent() == boundElement && LHHA.isLHHA(e);
+            }
+
+            boolean mustFilterOut(Element e) {
+                return excludeNestedHandlers && isNestedHandler(e) || excludeNestedLHHA && isNestedLHHA(e) ;
             }
 
             public void startElement(Element element) {
@@ -64,7 +73,7 @@ public class XBLTransformer {
                         for (final Node node: elementContent) {
                             if (node instanceof Element) {
                                 final Element currentElement = (Element) node;
-                                if (! excludeNestedHandlers || ! isNestedHandler(currentElement))
+                                if (! mustFilterOut(currentElement))
                                     clonedContent.add(Dom4jUtils.copyElementCopyParentNamespaces(currentElement));
                             } else if (!(node instanceof Namespace)) {
                                  clonedContent.add(Dom4jUtils.createCopy(node));
@@ -91,7 +100,7 @@ public class XBLTransformer {
                                 final NodeInfo currentNodeInfo = (NodeInfo) o;
                                 final Element currentElement = (Element) ((NodeWrapper) currentNodeInfo).getUnderlyingNode();
 
-                                if (! excludeNestedHandlers || ! isNestedHandler(currentElement))
+                                if (! mustFilterOut(currentElement))
                                     contentToInsert.add(Dom4jUtils.copyElementCopyParentNamespaces(currentElement));
                             }
                         } else {
@@ -100,7 +109,7 @@ public class XBLTransformer {
                             contentToInsert = new ArrayList<Node>(element.nodeCount());
                             for (Object o: element.elements()) {
                                 final Element currentElement = (Element) o;
-                                if (! excludeNestedHandlers || ! isNestedHandler(currentElement))
+                                if (! mustFilterOut(currentElement))
                                     contentToInsert.add(Dom4jUtils.copyElementCopyParentNamespaces(currentElement));
                             }
                         }

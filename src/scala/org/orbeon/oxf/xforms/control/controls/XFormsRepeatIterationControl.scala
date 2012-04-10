@@ -21,12 +21,12 @@ import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.ContentHandlerHelper
 import org.xml.sax.helpers.AttributesImpl
 import java.util.Map
-import scala.collection.JavaConverters._
 import org.orbeon.oxf.xforms.event.events.XXFormsDndEvent
 import org.orbeon.oxf.xforms.event.{XFormsEvents, XFormsEvent}
 import org.orbeon.oxf.xforms.analysis.controls.RepeatIterationControl
 import org.orbeon.oxf.xforms.control.{NoLHHATrait, XFormsControl, XFormsSingleNodeContainerControl}
 import org.orbeon.oxf.xforms.BindingContext
+import scala.collection.JavaConverters._
 
 /**
  * Represents xforms:repeat iteration information.

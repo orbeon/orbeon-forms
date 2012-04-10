@@ -20,6 +20,7 @@ import org.orbeon.oxf.xforms.xbl.XBLContainer
 import java.util.Map
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.{BindingContext}
+import scala.collection.JavaConverters._
 
 /**
  * Control that represents a custom components.
@@ -110,4 +111,7 @@ class XFormsComponentControl(container: XBLContainer, parent: XFormsControl, ele
     // Simply delegate but switch the container
     override def buildChildren(buildTree: (XBLContainer, BindingContext, ElementAnalysis, Seq[Int]) ⇒ Option[XFormsControl], idSuffix: Seq[Int]) =
         Controls.buildChildren(this, staticControl.children, (_, bindingContext, staticElement, idSuffix) ⇒ buildTree(nestedContainer, bindingContext, staticElement, idSuffix), idSuffix)
+
+    override def getAllowedExternalEvents =
+        staticControl.binding.abstractBinding.allowedExternalEvents.asJava
 }

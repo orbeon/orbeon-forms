@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.xbl
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.dom4j.{Document, QName, Element}
 import org.orbeon.oxf.xforms._
-import analysis.ElementAnalysis
+import analysis.ElementAnalysis.attSet
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.xml.{Dom4j, NamespaceMapping}
@@ -38,6 +38,9 @@ case class AbstractBinding(
     val containerElementName =          // "div" by default
         Option(bindingElement.attributeValue(XFormsConstants.XXBL_CONTAINER_QNAME)) getOrElse
             "div"
+
+    val allowedExternalEvents =
+        attSet(bindingElement, XFormsConstants.XXFORMS_EXTERNAL_EVENTS_ATTRIBUTE_NAME)
 
     private def transformQNameOption = templateElement flatMap
         (e ⇒ Option(Dom4jUtils.extractAttributeValueQName(e, XXBL_TRANSFORM_QNAME)))
@@ -72,7 +75,7 @@ case class AbstractBinding(
     }
 
     // XBL mode
-    val xblMode = ElementAnalysis.attSet(bindingElement, XFormsConstants.XXBL_MODE_QNAME)
+    val xblMode = attSet(bindingElement, XFormsConstants.XXBL_MODE_QNAME)
     def modeAllXForms = xblMode("xforms")
     def modeBinding =   modeAllXForms || xblMode("binding")
     def modeValue =     modeAllXForms || xblMode("value")

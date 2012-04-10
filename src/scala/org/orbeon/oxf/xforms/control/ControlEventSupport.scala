@@ -22,9 +22,8 @@ import org.orbeon.oxf.xforms.event.XFormsEventObserver
 import org.orbeon.oxf.xforms.event.XFormsEvents
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import scala.Option
-import java.util.{Collections, List ⇒ JList}
+import java.util.{List ⇒ JList, Set ⇒ JSet}
 import scala.collection.JavaConverters._
-import ControlEventSupport._
 
 trait ControlEventSupport {
 
@@ -67,11 +66,11 @@ trait ControlEventSupport {
 
     def performTargetAction(container: XBLContainer, event: XFormsEvent) = ()
 
-    // Check whether this concrete control supports receiving the external event specified.
-    def allowExternalEvent(eventName: String) =
-        getAllowedExternalEvents.contains(eventName) || ALLOWED_EXTERNAL_EVENTS.contains(eventName)
+    // Check whether this concrete control supports receiving the external event specified
+    final def allowExternalEvent(eventName: String) =
+        getAllowedExternalEvents.contains(eventName) || Set(XFormsEvents.KEYPRESS)(eventName)
 
-    def getAllowedExternalEvents = Collections.emptySet[String]
+    protected def getAllowedExternalEvents: JSet[String] = Set.empty[String].asJava
 
     // TODO LATER: should probably return true because most controls could then dispatch relevance events
     def supportsRefreshEvents = false
@@ -88,8 +87,4 @@ trait ControlEventSupport {
         throw new UnsupportedOperationException
 
     final def getListeners(eventName: String): JList[org.orbeon.oxf.xforms.event.EventListener] = null
-}
-
-object ControlEventSupport {
-    val ALLOWED_EXTERNAL_EVENTS = collection.immutable.Set(XFormsEvents.KEYPRESS).asJava
 }

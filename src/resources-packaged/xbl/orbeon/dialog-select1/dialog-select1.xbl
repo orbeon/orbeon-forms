@@ -38,6 +38,7 @@
                 <small-icon>/forms/orbeon/builder/images/listbox.png</small-icon>
                 <large-icon>/forms/orbeon/builder/images/listbox.png</large-icon>
             </icon>
+            <editors static-itemset="true"/>
             <template>
                  <fr:dialog-select1 separator=", ">
                      <xforms:label ref=""/>

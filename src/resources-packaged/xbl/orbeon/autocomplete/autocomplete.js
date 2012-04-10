@@ -26,7 +26,7 @@
         yuiAutoComplete: null,      // YUI object for the auto-complete
         searchControl: null,        // xforms:input control in which users type
         searchField: null,          // Form field in which users type
-        valueSelectedButton: null,  // Bridge to tell XForms users selected a value
+        valueSelectedTrigger: null,  // Bridge to tell XForms users selected a value
         externalValueInput : null,  // xforms:input containing the external value
         justMadeSelection: false,   // Reset to false when an Ajax response arrives
         suggestionRequested: false, // Whether users requested the suggestion menu to open by clicking on the button
@@ -37,7 +37,7 @@
         init: function() {
             this.searchControl = YD.getElementsByClassName("fr-autocomplete-search", null, this.container)[0];
             this.searchField = YD.getChildren(this.searchControl)[0];
-            this.valueSelectedButton = OD.getElementByTagName(YD.getElementsByClassName("fr-autocomplete-value-selected", null, this.container)[0], "button");
+            this.valueSelectedTrigger = YD.getElementsByClassName("fr-autocomplete-value-selected", null, this.container)[0];
             var yuiDiv = YD.getElementsByClassName("fr-autocomplete-yui-div", null, this.container)[0];
             YD.generateId(yuiDiv); // Generate ID dynamically as our implementation of XBL doesn't rewrite IDs on HTML
             this.externalValueInput = YD.getElementsByClassName("fr-autocomplete-external-value", null, this.container)[0];
@@ -84,7 +84,9 @@
             var itemLabel = args[2][0];
             this.justMadeSelection = true;
             Document.setValue(this.searchControl.id, itemLabel);
-            this.valueSelectedButton.click();
+            // Send a DOMActivate instead of simulating a click, as the click changes the focus to the button, which we don't want
+            var event = new ORBEON.xforms.server.AjaxServer.Event(null, this.valueSelectedTrigger.id, null, "DOMActivate");
+            ORBEON.xforms.server.AjaxServer.fireEvents([event], false);
         },
 
         /**

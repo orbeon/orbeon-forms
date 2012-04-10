@@ -84,9 +84,7 @@
             var itemLabel = args[2][0];
             this.justMadeSelection = true;
             Document.setValue(this.searchControl.id, itemLabel);
-            // Send a DOMActivate instead of simulating a click, as the click changes the focus to the button, which we don't want
-            var event = new ORBEON.xforms.server.AjaxServer.Event(null, this.valueSelectedTrigger.id, null, "DOMActivate");
-            ORBEON.xforms.server.AjaxServer.fireEvents([event], false);
+            ORBEON.xforms.Document.dispatchEvent(this.container.id, "fr-value-selected");
         },
 
         /**

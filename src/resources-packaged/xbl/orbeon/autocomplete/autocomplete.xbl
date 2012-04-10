@@ -30,7 +30,7 @@
     <xbl:script src="/ops/yui/datasource/datasource.js"/>
     <xbl:script src="/ops/yui/autocomplete/autocomplete.js"/>
 
-    <xbl:binding id="fr-autocomplete" element="fr|autocomplete" xxbl:mode="handlers">
+    <xbl:binding id="fr-autocomplete" element="fr|autocomplete" xxbl:mode="handlers" xxforms:external-events="fr-value-selected">
 
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Autocomplete</display-name>
@@ -97,6 +97,9 @@
                     <xforms:dispatch name="update-external-value" target="component-inner-group"/>
                     <xxforms:script id="out-arp">YAHOO.xbl.fr.Autocomplete.instance(this).ajaxResponseProcessed();</xxforms:script>
                 </xforms:action>
+            </xbl:handler>
+            <xbl:handler event="fr-value-selected">
+                <xforms:dispatch name="update-external-value" target="component-inner-group"/>
             </xbl:handler>
         </xbl:handlers>
         <xbl:template xxbl:transform="oxf:unsafe-xslt">
@@ -217,8 +220,6 @@
                                 <xforms:dispatch name="DOMFocusOut" target="fr-autocomplete"/>
                                 <xforms:dispatch name="update-external-value" target="component-inner-group"/>
                             </xforms:action>
-                            <!-- Selecting a value updates the external value -->
-                            <xforms:dispatch ev:event="DOMActivate" ev:observer="value-selected" name="update-external-value" target="component-inner-group"/>
                             <!-- As the user types, dispatch event to notify the external world about the value entered by the user so far -->
                             <xforms:action ev:event="xforms-value-changed" ev:observer="search" if="$dynamic-itemset">
                                 <xforms:dispatch targetid="fr-autocomplete" name="fr-search-changed">
@@ -289,8 +290,6 @@
 
                             <!-- Input with external value -->
                             <xforms:input id="external-value" ref="$external-value" class="fr-autocomplete-external-value" style="display: none"/>
-                            <!-- Bridge for JS code to notify the XForms code users selected a value -->
-                            <xforms:trigger id="value-selected" class="fr-autocomplete-value-selected" style="display: none"><xforms:label/></xforms:trigger>
 
                             <!-- Stop propagation of all UI events -->
                             <xforms:action ev:event="#all" ev:propagate="stop"/>

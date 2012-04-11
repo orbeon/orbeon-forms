@@ -15,8 +15,7 @@
     xmlns:oxf="http://www.orbeon.com/oxf/processors"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml">
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
     <!-- Extract parameters -->
     <p:processor name="oxf:request">

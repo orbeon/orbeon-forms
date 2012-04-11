@@ -14,9 +14,7 @@
 <resources>
     <resource xml:lang="en">
         <!-- Form metadata -->
-        <application-form-name>
-            <label>Application and Form Names</label>
-        </application-form-name>
+        <!-- NOTE: Summary page expects to find application-name and form-name for the summary page here -->
         <application-name>
             <label>Application Name</label>
             <hint>Identifies a group of forms, for instance by functionality or department (e.g. "sales"). If you have one group of forms, you can use you organization name (e.g. "acme"). This name shows in the URL of the deployed form, so we recommend you use only lowercases characters.</hint>
@@ -799,9 +797,6 @@
         </template>
     </resource>
     <resource xml:lang="fr">
-        <application-form-name>
-            <label>Nom de l'application et du formulaire</label>
-        </application-form-name>
         <application-name>
             <label>Nom de l'application</label>
             <hint>Identifie un groupe de formulaire, par exemple par fonctionnalité ou département (ex. "ventes"). Si vous n'avez qu'un groupe de formulaires, vous pouvez utiliser le nom de votre organisation (e.g. "acme"). Ce nom est visible dans l'URL du formulaire du formulaire quand déployé, donc nous vous recommandons d'utiliser uniquement des minuscules.</hint>
@@ -1580,9 +1575,6 @@
     </resource>
     <resource xml:lang="no">
         <!-- Form metadata -->
-        <application-form-name>
-            <label>Applikasjons- og skjemanavn</label>
-        </application-form-name>
         <application-name>
             <label>Applikasjonsnavn</label>
             <hint>Identifiserer en gruppe skjemaer, for eksempel ved funksjonalitet eller avdeling (f.eks. «salg»). Hvis du har én gruppe skjemaer, kan du bruke organisasjonsnavnet (f.eks. «acme»). Dette navnet vises URL-en i det publiserte skjemaet, so vi anbefaler at det bare brukes små bokstaver.</hint>
@@ -2362,9 +2354,6 @@
     </resource>
     <resource xml:lang="ru">
         <!-- Form metadata -->
-        <application-form-name>
-            <label>Название формы и приложения</label>
-        </application-form-name>
         <application-name>
             <label>Название приложения</label>
             <hint>Определяет логическую группу форм. Например, по функциональности или по принадлежности к департаменту (например, "hr"). Если группа форм всего одна, можно использовать название организации. Название приложения входит в URL формы, поэтому рекомендуется использовать для него строчные латинские буквы.</hint>

@@ -213,8 +213,12 @@
                         </xf:trigger>
                         <xh:div class="fr-hidden">
                             <!-- Application name and form name for the summary page -->
-                            <xf:output id="application-name-control" bind="application-name-bind" class="fr-summary fr-search fr-static"/>
-                            <xf:output id="form-name-control" bind="form-name-bind" class="fr-summary fr-search fr-static"/>
+                            <xf:output id="application-name-control" bind="application-name-bind" class="fr-summary fr-search fr-static">
+                                <xf:label ref="$form-resources/application-name/label"/>
+                            </xf:output>
+                            <xf:output id="form-name-control" bind="form-name-bind" class="fr-summary fr-search fr-static">
+                                <xf:label ref="$form-resources/form-name/label"/>
+                            </xf:output>
                         </xh:div>
 
                         <!-- Add/remove language -->

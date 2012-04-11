@@ -22,7 +22,6 @@
       xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
       xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-      xmlns:widget="http://orbeon.org/oxf/xml/widget"
       xmlns:form-runner="java:org.orbeon.oxf.fr.FormRunner"
       xmlns="http://www.w3.org/1999/xhtml">
 
@@ -308,7 +307,7 @@
                     replace="instance" instance="fr-summary-instance">
                 <!-- Set language upon submitting -->
                 <xforms:action ev:event="xforms-submit">
-                    <xforms:setvalue ref="lang" value="xxforms:instance('fr-language-instance')"/>
+                    <xforms:setvalue ref="instance('fr-search-instance')/lang" value="xxforms:instance('fr-language-instance')"/>
                 </xforms:action>
                 <xforms:action ev:event="xforms-submit-error">
                     <xforms:message>Error performing search.</xforms:message>

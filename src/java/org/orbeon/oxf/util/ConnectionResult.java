@@ -272,4 +272,14 @@ public class ConnectionResult {
             indentedLogger.log(logLevel, logType, "response has no content");
         }
     }
+
+    /**
+     * Get response headers
+     * @return the response headers
+     */
+    public Map<String, List<String>> getResponseHeaders() {
+        return responseHeaders;    
+    }
+
+
 }

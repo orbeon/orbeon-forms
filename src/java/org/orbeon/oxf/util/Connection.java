@@ -737,4 +737,13 @@ public class Connection {
         final String stringValue = propertySet.getString(HTTP_FORWARD_COOKIES_PROPERTY, "JSESSIONID JSESSIONIDSSO");
         return org.apache.commons.lang.StringUtils.split(stringValue);
     }
+
+    /**
+     * Get request headers map
+     * @return The header map
+     */
+    public Map<String, String[]> getHeadersMap() {
+        return headersMap;
+    }
+
 }

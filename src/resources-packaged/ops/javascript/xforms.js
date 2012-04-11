@@ -3481,7 +3481,7 @@ ORBEON.xforms.Events = {
                     ORBEON.util.Utils.displayModalProgressPanel(ORBEON.xforms.Controls.getForm(target).id);
                 }
             }
-        } else if (target != null &&
+        } else if (target != null && ! YAHOO.util.Dom.hasClass(target, "xforms-static") &&
                    (YAHOO.util.Dom.hasClass(target, "xforms-select1-appearance-full")
                 || YAHOO.util.Dom.hasClass(target, "xforms-select-appearance-full")
                 || (YAHOO.util.Dom.hasClass(target, "xforms-input") && YAHOO.util.Dom.hasClass(target, "xforms-type-boolean")))) {

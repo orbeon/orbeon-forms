@@ -728,8 +728,6 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
         final boolean isReplaceText = replace.equals(XFormsConstants.XFORMS_SUBMIT_REPLACE_TEXT);
         final boolean isReplaceNone = replace.equals(XFormsConstants.XFORMS_SUBMIT_REPLACE_NONE);
 
-        final XFormsContextStack contextStack = model.getContextStack();
-
         // Current node for xforms:submission and instance containing the node to submit
         NodeInfo refNodeInfo;
         XFormsInstance refInstance;
@@ -774,7 +772,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                 bindingContext = contextStack.getCurrentBindingContext();
             }
 
-            final XFormsFunction.Context functionContext = contextStack.getFunctionContext(getEffectiveId());
+            final XFormsFunction.Context functionContext = model.getContextStack().getFunctionContext(getEffectiveId());
 
             refNodeInfo = (NodeInfo) bindingContext.getSingleItem();
             submissionElementContextItem = bindingContext.contextItem();

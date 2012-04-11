@@ -106,7 +106,7 @@ public class LocalPortletSubmission extends BaseSubmission {
         final URI resolvedURI = XFormsUtils.resolveXMLBase(containingDocument, submission.getSubmissionElement(), p2.actionOrResource);
 
         // Headers
-        final Map<String, String[]> customHeaderNameValues = evaluateHeaders(p.contextStack);
+        final Map<String, String[]> customHeaderNameValues = evaluateHeaders(submission.getModel().getContextStack());
         final String[] headersToForward = StringUtils.split(XFormsProperties.getForwardSubmissionHeaders(containingDocument, p.isReplaceAll));
 
         final String submissionEffectiveId = submission.getEffectiveId();

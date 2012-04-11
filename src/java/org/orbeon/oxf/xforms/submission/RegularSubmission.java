@@ -51,7 +51,7 @@ public class RegularSubmission extends BaseSubmission {
         final IndentedLogger detailsLogger = getDetailsLogger(p, p2);
 
         // Headers
-        final Map<String, String[]> customHeaderNameValues = evaluateHeaders(p.contextStack);
+        final Map<String, String[]> customHeaderNameValues = evaluateHeaders(submission.getModel().getContextStack());
         final String headersToForward = XFormsProperties.getForwardSubmissionHeaders(containingDocument, p.isReplaceAll);
 
         final String submissionEffectiveId = submission.getEffectiveId();

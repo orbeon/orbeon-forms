@@ -71,6 +71,9 @@
                 <xforms:var name="page-size" value="instance('fr-search-instance')/page-size" as="element(page-size)"/>
                 <xforms:setvalue ref="$page-size" model="fr-persistence-model"
                                  value="xxforms:property(string-join(('oxf.fr.summary.page-size', $app, $form), '.'))"/>
+
+                <!-- Rebuild resource variables after loading -->
+                <xforms:rebuild model="fr-resources-model"/>
             </xforms:action>
 
             <!-- Standard Form Runner data instance -->
@@ -217,6 +220,8 @@
                 <!-- Extract fields which must appear in the summary -->
                 <xforms:insert context="instance('fr-configuration-instance')" ref="*" origin="$summary-elements"/>
 
+                <xforms:var name="form-resources" model="fr-resources-model" value="$fr-form-resources" as="element(resource)?"/>
+
                 <!-- Create elements holding structured search data -->
                 <xforms:action iterate="$summary-elements">
                     <xforms:var name="control" value="." as="element()"/>
@@ -275,7 +280,6 @@
 
                     <!-- Compute label information -->
                     <xforms:var name="label" value="$control/xforms:label" as="xs:element(xforms:label)*"/>
-                    <xforms:var name="form-resources" model="fr-resources-model" value="$fr-form-resources" as="element(resource)?"/>
                     <xforms:setvalue ref="$query/@label"
                                      value="if ($label/@ref or $label/@bind) then $form-resources/*[local-name() = $query/@name]/label else $label"/>
                 </xforms:action>

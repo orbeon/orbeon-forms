@@ -23,6 +23,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.*;
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis;
 import org.orbeon.oxf.xforms.analysis.model.Instance;
 import org.orbeon.oxf.xforms.analysis.model.Model;
 import org.orbeon.oxf.xforms.analysis.model.Submission;
@@ -137,8 +138,18 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         }
 
         // Get all event handlers
-        for (final EventHandlerImpl staticEventHandler : staticModel.jEventHandlers())
-            actions.put(staticEventHandler.staticId(), new XFormsModelAction(XFormsModel.this, staticEventHandler));
+        for (final EventHandlerImpl staticEventHandler : staticModel.jEventHandlers()) {
+            final ElementAnalysis staticParent = staticEventHandler.parent().get();
+
+            final XFormsEventObserver parent;
+            if (staticParent instanceof Submission) {
+                parent = submissions.get(staticParent.staticId());
+            } else {
+                parent = XFormsModel.this;
+            }
+
+            actions.put(staticEventHandler.staticId(), new XFormsModelAction(parent, staticEventHandler));
+        }
 
         // Create binds object
         binds = XFormsModelBinds.create(this);

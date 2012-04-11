@@ -13,11 +13,28 @@
  */
 package org.orbeon.oxf.xforms.model
 
-import org.orbeon.oxf.xforms.event.{EventHandlerImpl, XFormsEventHandler}
-import org.orbeon.oxf.xforms.{XFormsUtils, XFormsContainingDocument, XFormsModel}
+import org.orbeon.oxf.xforms.event.{XFormsEventObserver, EventHandlerImpl, XFormsEventHandler}
+import org.orbeon.oxf.xforms.submission.XFormsModelSubmission
+import org.orbeon.oxf.xforms.{XFormsContextStack, XFormsModel, XFormsUtils, XFormsContainingDocument}
 
-class XFormsModelAction(model: XFormsModel, eventHandler: EventHandlerImpl) extends XFormsEventHandler {
-    val getEffectiveId = XFormsUtils.getRelatedEffectiveId(model.getEffectiveId, eventHandler.staticId)
-    def getXBLContainer(containingDocument: XFormsContainingDocument) = model.getXBLContainer
-    def getBindingContext(containingDocument: XFormsContainingDocument) = model.getDefaultEvaluationContext
+class XFormsModelAction(parent: XFormsEventObserver, eventHandler: EventHandlerImpl) extends XFormsEventHandler {
+
+    val getEffectiveId = XFormsUtils.getRelatedEffectiveId(parent.getEffectiveId, eventHandler.staticId)
+    def getXBLContainer(containingDocument: XFormsContainingDocument) = parent.getXBLContainer(null)
+
+    // This is called by EventHandlerImpl when determining the XPath context for nested event handlers
+    def getBindingContext(containingDocument: XFormsContainingDocument) = parent match {
+        case model: XFormsModel ⇒
+            // Use the model's inner context
+            model.getDefaultEvaluationContext
+        case submission: XFormsModelSubmission ⇒
+            // Evaluate the binding of the submission element based on the model's inner context
+            // NOTE: When the submission actually starts processing, the binding will be re-evaluated
+            val contextStack = new XFormsContextStack(submission.getXBLContainer(null), submission.getModel.getDefaultEvaluationContext)
+            contextStack.pushBinding(submission.getSubmissionElement, submission.getEffectiveId, submission.getModel.getResolutionScope)
+            contextStack.getCurrentBindingContext
+        case _ ⇒
+            // We know we are either nested directly within the model, or within a submission
+            throw new IllegalStateException
+    }
 }

@@ -75,9 +75,9 @@
                             <help/>
                         </section-1>
                         <control-1>
-                            <label>Control 1 label</label>
-                            <hint>Control 1 hint</hint>
-                            <help>Control 1 help</help>
+                            <label/>
+                            <hint/>
+                            <help/>
                             <alert/>
                         </control-1>
                     </resource>

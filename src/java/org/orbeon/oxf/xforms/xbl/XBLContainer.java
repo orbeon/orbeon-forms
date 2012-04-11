@@ -939,7 +939,12 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
                     // fix event retargeting to make more sense in the first place.
                     final boolean isAtTarget = currentEventObserver == targetObject;
                     if (isAtTarget) {
-                        currentEventObserver.performTargetAction(currentEventObserver.getXBLContainer(containingDocument), retargetedEvent);
+                        containingDocument.startHandleEvent(retargetedEvent);
+                        try {
+                            currentEventObserver.performTargetAction(currentEventObserver.getXBLContainer(containingDocument), retargetedEvent);
+                        } finally {
+                            containingDocument.endHandleEvent();
+                        }
                     }
 
                     // Process event handlers

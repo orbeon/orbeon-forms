@@ -17,8 +17,6 @@ import com.lowagie.text.pdf.BaseFont;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.externalcontext.ServletURLRewriter;
-import org.orbeon.oxf.externalcontext.URLRewriter;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorInput;
@@ -69,12 +67,6 @@ public class XHTMLToPDFProcessor extends HttpBinarySerializer {// TODO: HttpBina
 
         final float DEFAULT_DOTS_PER_POINT = 20f * 4f / 3f;
         final int DEFAULT_DOTS_PER_PIXEL = 14;
-
-        // Use servlet URL rewriter for resources, even in portlet mode, so that resources are served over HTTP by
-        // the servlet and not looping back through the portal.
-        // NOTE: We could imagine loading resources through a local portlet submission. To do this, we need to properly
-        // abstract the xforms:submission code.
-        final URLRewriter servletRewriter = new ServletURLRewriter(externalContext.getRequest());
 
         final ITextRenderer renderer = new ITextRenderer(DEFAULT_DOTS_PER_POINT, DEFAULT_DOTS_PER_PIXEL);
 

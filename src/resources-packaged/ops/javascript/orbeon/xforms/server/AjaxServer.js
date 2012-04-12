@@ -73,73 +73,45 @@
     };
 
     AjaxServer.fireEvents = function(events, incremental) {
-        if (!ORBEON.xforms.Offline.isOnline) {
-            // Go through all events
-            var valueChangeEvents = [];
-            for (var eventIndex = 0; eventIndex < events.length; eventIndex++) {
-                var event = events[eventIndex];
-                if (event.eventName == "xxforms-value") {
-                    valueChangeEvents.push(event);
-                    // Store new value of control
-                    ORBEON.xforms.Offline.controlValues[event.targetId] = event.value;
-                }
-            }
-            // Evaluate MIPS if there was a value change event
-            if (valueChangeEvents.length > 0) {
-                // Store in memory the value change events
-                ORBEON.xforms.Offline.memoryOfflineEvents = ORBEON.xforms.Offline.memoryOfflineEvents.concat(valueChangeEvents);
-                // Insert delay before we evaluate MIPS, just to avoid repeatedly evaluating MIPS if nothing changed
-                ORBEON.xforms.Globals.executeEventFunctionQueued++;
-                window.setTimeout(
-                    function() {
-                        ORBEON.xforms.Globals.executeEventFunctionQueued--;
-                        if (ORBEON.xforms.Globals.executeEventFunctionQueued == 0)
-                            ORBEON.xforms.Offline.evaluateMIPs();
-                    },
-                    ORBEON.util.Properties.internalShortDelay.get()
-                );
-            }
-        } else {
-            // We do not filter events when the modal progress panel is shown.
-            //      It is tempting to filter all the events that happen when the modal progress panel is shown.
-            //      However, if we do so we would loose the delayed events that become mature when the modal
-            //      progress panel is shown. So we either need to make sure that it is not possible for the
-            //      browser to generate events while the modal progress panel is up, or we need to filter those
-            //      event before this method is called.
+        // We do not filter events when the modal progress panel is shown.
+        //      It is tempting to filter all the events that happen when the modal progress panel is shown.
+        //      However, if we do so we would loose the delayed events that become mature when the modal
+        //      progress panel is shown. So we either need to make sure that it is not possible for the
+        //      browser to generate events while the modal progress panel is up, or we need to filter those
+        //      event before this method is called.
 
-            // Store the time of the first event to be sent in the queue
-            var currentTime = new Date().getTime();
-            if (ORBEON.xforms.Globals.eventQueue.length == 0)
-                ORBEON.xforms.Globals.eventsFirstEventTime = currentTime;
+        // Store the time of the first event to be sent in the queue
+        var currentTime = new Date().getTime();
+        if (ORBEON.xforms.Globals.eventQueue.length == 0)
+            ORBEON.xforms.Globals.eventsFirstEventTime = currentTime;
 
-            // Store events to fire
-            for (var eventIndex = 0; eventIndex < events.length; eventIndex++) {
-                ORBEON.xforms.Globals.eventQueue.push(events[eventIndex]);
-            }
-
-            // Fire them with a delay to give us a change to aggregate events together
-            ORBEON.xforms.Globals.executeEventFunctionQueued++;
-            if (incremental && !(currentTime - ORBEON.xforms.Globals.eventsFirstEventTime >
-                                 ORBEON.util.Properties.delayBeforeIncrementalRequest.get())) {
-                // After a delay (e.g. 500 ms), run executeNextRequest() and send queued events to server
-                // if there are no other executeNextRequest() that have been added to the queue after this
-                // request.
-                window.setTimeout(
-                    function() { AjaxServer.executeNextRequest(false); },
-                    ORBEON.util.Properties.delayBeforeIncrementalRequest.get()
-                );
-            } else {
-                // After a very short delay (e.g. 20 ms), run executeNextRequest() and force queued events
-                // to be sent to the server, even if there are other executeNextRequest() queued.
-                // The small delay is here so we don't send multiple requests to the server when the
-                // browser gives us a sequence of events (e.g. focus out, change, focus in).
-                window.setTimeout(
-                    function() { AjaxServer.executeNextRequest(true); },
-                    ORBEON.util.Properties.internalShortDelay.get()
-                );
-            }
-            ORBEON.xforms.Globals.lastEventSentTime = new Date().getTime(); // Update the last event sent time
+        // Store events to fire
+        for (var eventIndex = 0; eventIndex < events.length; eventIndex++) {
+            ORBEON.xforms.Globals.eventQueue.push(events[eventIndex]);
         }
+
+        // Fire them with a delay to give us a change to aggregate events together
+        ORBEON.xforms.Globals.executeEventFunctionQueued++;
+        if (incremental && !(currentTime - ORBEON.xforms.Globals.eventsFirstEventTime >
+                             ORBEON.util.Properties.delayBeforeIncrementalRequest.get())) {
+            // After a delay (e.g. 500 ms), run executeNextRequest() and send queued events to server
+            // if there are no other executeNextRequest() that have been added to the queue after this
+            // request.
+            window.setTimeout(
+                function() { AjaxServer.executeNextRequest(false); },
+                ORBEON.util.Properties.delayBeforeIncrementalRequest.get()
+            );
+        } else {
+            // After a very short delay (e.g. 20 ms), run executeNextRequest() and force queued events
+            // to be sent to the server, even if there are other executeNextRequest() queued.
+            // The small delay is here so we don't send multiple requests to the server when the
+            // browser gives us a sequence of events (e.g. focus out, change, focus in).
+            window.setTimeout(
+                function() { AjaxServer.executeNextRequest(true); },
+                ORBEON.util.Properties.internalShortDelay.get()
+            );
+        }
+        ORBEON.xforms.Globals.lastEventSentTime = new Date().getTime(); // Update the last event sent time
     };
 
     /**
@@ -339,7 +311,7 @@
                         if (!event.ignoreErrors)
                             ORBEON.xforms.Globals.requestIgnoreErrors = false;
                         // Figure out whether we need to send the initial dynamic state
-                        if (event.eventName == "xxforms-all-events-required" || event.eventName == "xxforms-offline")
+                        if (event.eventName == "xxforms-all-events-required")
                             sendInitialDynamicState = true;
                         // Remember if we see an event other than a session heartbeat
                         if (event.eventName != "xxforms-session-heartbeat") foundEventOtherThanHeartBeat = true;
@@ -354,13 +326,6 @@
                                     : null;
                         } else {
                             progressMessage = null;
-                        }
-
-                        // Case of going offline
-                        if (event.eventName == "DOMActivate") {
-                            var eventElement = ORBEON.util.Dom.get(event.targetId);
-                            if (eventElement && YAHOO.util.Dom.hasClass(eventElement, "xxforms-offline"))
-                                sendInitialDynamicState = true;
                         }
                     }
 
@@ -731,23 +696,6 @@
                     var attrName = responseRoot.attributes[j].name;
                     xmlNamespace = attrName.substr(attrName.indexOf(":") + 1);
                     break;
-                }
-            }
-
-            // If the last request was taking the form offline
-            if (ORBEON.xforms.Offline.lastRequestIsTakeOnline) {
-                ORBEON.xforms.Offline.lastRequestIsTakeOnline = false;
-                // See if we are still offline (if there is a /xxf:event-response/xxf:action/xxf:offline)
-                var actionElements = ORBEON.util.Dom.getElementsByName(responseRoot, "action", xmlNamespace);
-                var offlineElements = ORBEON.util.Dom.getElementsByName(actionElements[0], "offline", xmlNamespace);
-                if (offlineElements.length == 1) {
-                    // Server is asking us to stay offline
-                    ORBEON.xforms.Offline.isOnline = false;
-                } else {
-                    // Remove form from store and database
-                    ORBEON.xforms.Offline.gearsDatabase.execute("delete from Offline_Forms where url = ?", [ window.location.href ]).close();
-                    ORBEON.xforms.Offline.formStore.remove(window.location.href);
-                    // Then we'll continue processing of the request as usual
                 }
             }
 
@@ -1931,18 +1879,6 @@
                                 var control = ORBEON.util.Dom.get(controlId);
                                 ORBEON.xforms.Controls.showHelp(control);
                                 break;
-                            }
-
-                            // Take form offline
-                            case "offline": {
-                                var offlineElement = actionElement.childNodes[actionIndex];
-                                var eventsElements = ORBEON.util.Dom.getElementsByName(offlineElement, "events", xmlNamespace);
-                                var mappingsElements = ORBEON.util.Dom.getElementsByName(offlineElement, "mappings", xmlNamespace);
-                                if (eventsElements.length != 0 && mappingsElements.length != 0) {
-                                    var replayResponse = ORBEON.util.Dom.getStringValue(eventsElements[0]);
-                                    var mappings = ORBEON.util.Dom.getStringValue(mappingsElements[0]);
-                                    ORBEON.xforms.Offline.takeOffline(replayResponse, formID, mappings);
-                                }
                             }
                         }
                     }

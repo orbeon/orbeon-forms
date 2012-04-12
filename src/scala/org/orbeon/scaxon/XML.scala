@@ -207,7 +207,7 @@ object XML {
         def \@(attName: (String, String)): Seq[NodeInfo] = \@(new NodeQNameTest(Type.ATTRIBUTE, attName))
         def \@(test: Test): Seq[NodeInfo] = find(Axis.ATTRIBUTE, test)
 
-        def \\@(attName: String): Seq[NodeInfo] = \\@(new NodeLocalNameTest(Axis.ATTRIBUTE, attName))
+        def \\@(attName: String): Seq[NodeInfo] = \\@(new NodeLocalNameTest(Type.ATTRIBUTE, attName))
         def \\@(attName: QName): Seq[NodeInfo] = \\@(new NodeQNameTest(Type.ATTRIBUTE, attName))
         def \\@(attName: (String, String)): Seq[NodeInfo] = \\@(new NodeQNameTest(Type.ATTRIBUTE, attName))
         def \\@(test: Test): Seq[NodeInfo] = find(Axis.DESCENDANT, test)

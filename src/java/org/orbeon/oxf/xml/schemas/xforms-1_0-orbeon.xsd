@@ -111,6 +111,7 @@
             </xsd:sequence>
             <xsd:attributeGroup ref="xforms:Common.Attributes"/>
             <xsd:attributeGroup ref="xforms:Linking.Attributes"/>
+            <xsd:attribute name="resource" type="xsd:string" use="optional"/>
             <xsd:anyAttribute namespace="##other" processContents="lax"/>
         </xsd:complexType>
     </xsd:element>

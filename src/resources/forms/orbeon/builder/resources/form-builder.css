@@ -387,7 +387,7 @@ a.xforms-help-image .fb-control-help { vertical-align: baseline; }
 .fr-view table.fr-grid.fr-repeat > thead > tr:first-child > td:first-child { border-bottom: none; }      /* Remove borders in the first column */
 .fr-view table.fr-grid.fr-repeat > * > tr.yui-dt-first > td:first-child { border-top: none }
 .fr-view table.fr-grid.fr-repeat > * > tr > td:first-child { background-color: white }                      /* Remove odd/even background color on the first column */
-.fr-view table.fr-grid.fr-repeat > thead.yui-dt-hd > th:last-child,
+.fr-view table.fr-grid.fr-repeat > thead.yui-dt-hd > tr > th:last-child,
     .fr-view table.fr-grid.fr-repeat > tbody > tr > td:last-child { border-right: 1px solid #7f7f7f }       /* Add thicker border to the right of the table */
 
 .fb-use-toolbar-message, .fb-click-message { display: none; font-size: 70%; color: gray; width: 100%; font-style: italic; text-align: center; margin-top: 2em  }

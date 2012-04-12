@@ -80,7 +80,6 @@
             <xforms:group id="container" ref=".[@relevant = 'true']" appearance="xxforms:internal">
 
                 <!-- Bindings specified on control -->
-                <xforms:var name="form"><xxforms:sequence value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=form-ref"/></xforms:var>
                 <xforms:var name="resources"><xxforms:sequence value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=resources-ref"/></xforms:var>
                 <xforms:var name="local" value="instance('local')"/>
 

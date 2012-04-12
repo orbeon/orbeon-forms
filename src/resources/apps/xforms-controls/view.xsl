@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <!--
   Copyright (C) 2010 Orbeon, Inc.
 
@@ -54,13 +53,6 @@
                 /* Grids */
                 .fr-grid { width: 100% }
 
-                /* Itemset editor */
-                #fb-itemset-editor-dialog { width: 35em }
-                #fb-itemset-editor-dialog .fr-grid-2-columns .xforms-input input { width: 13em }
-                #fb-itemset-editor-dialog .xbl-fr-link-select1 { margin-bottom: .5em; float: right }
-                #fb-itemset-editor-dialog .xbl-fr-link-select1 .xforms-label { display: none }
-                #fb-itemset-editor-dialog .yui-dt { clear: both } /* help IE 6/7 */
-
                 /* Edit Items trigger */
                 .edit-items-trigger { font-size: smaller; display: block }
                 .fr-grid-content .edit-items-trigger, .fr-grid-content .edit-items-trigger:hover { text-decoration: none; clear: both }
@@ -69,12 +61,21 @@
                     .fr-grid-content .xbl-fr-button,
                     .fr-grid .fr-grid-content button.xforms-trigger  { margin-top: .7em }
                 .fr-grid .fr-grid-content .xbl-fr-button button.xforms-trigger  { margin-top: 0 }
-                .fr-grid-content textarea.xforms-textarea, .xforms-textarea textarea { height: 9em }
+                .fr-grid-content textarea.xforms-textarea, .xforms-textarea textarea { height: 9em; width: 100% }
 
                 /* Selectors section */
                 .fr-selectors { text-align: right }
                 .fr-selectors .xbl-fr-link-select1 { display: -moz-inline-box; display: inline-block; text-align: right; margin-left: 1em; margin-bottom: .5em }
                 .fr-selectors .xbl-fr-link-select1 .xforms-label { margin-right: .5em }
+
+                /* ***** Styles from form-builder.css *****************************************************************/
+
+                .fb-itemset-editor-dialog { width: 35em }
+                .fb-itemset-editor-dialog .fr-grid-2-columns .xforms-input input { width: 13em }
+                .fb-itemset-editor-dialog .xbl-fr-link-select1 { margin-bottom: .5em; float: right }
+                .fb-itemset-editor-dialog .xbl-fr-link-select1 .xforms-label { display: none }
+                .fb-itemset-editor-dialog .yui-dt { clear: both } /* help IE 6/7 */
+                .fb-itemset-editor-dialog .xforms-invalid .xforms-input-input { border-color: #DF731B }     /* Show errors also for fields that aren't visited */
 
                 /* ***** Styles from form-runner-orbeon.css ***********************************************************/
                 .xforms-input input, textarea.xforms-textarea, input.xforms-secret, .xforms-textarea textarea, .xforms-secret input {
@@ -121,9 +122,7 @@
     <xsl:template match="xhtml:head/xforms:model">
         <xsl:copy>
             <xsl:copy-of select="@*"/>
-            <!--<xsl:attribute name="xxforms:readonly-appearance">static</xsl:attribute>-->
             <xsl:apply-templates/>
-            <!--<xforms:bind nodeset="xxforms:instance('fr-form-instance')" readonly="true()"/>-->
 
             <!-- Current language -->
             <xforms:instance id="fr-settings-instance">
@@ -212,6 +211,10 @@
 
             <!-- Set focus on first focusable control -->
             <xforms:setfocus ev:event="xforms-ready" control="fr-form-group"/>
+
+            <!-- Variables for itemset editor -->
+            <xxforms:variable name="resources" select="instance('fr-form-resources')"/>
+            <xxforms:variable name="current-resources" select="instance('fr-form-resources')/resource[@xml:lang = instance('fr-settings-instance')/lang]"/>
         </xsl:copy>
     </xsl:template>
 
@@ -264,14 +267,9 @@
             </xhtml:div>
 
             <!-- Import Form Builder itemset editor -->
-            <xsl:variable name="itemset-dialog" as="element()">
-                <xsl:copy-of select="doc('oxf:/forms/orbeon/builder/form/dialog-itemsets.xml')/*"/>
-            </xsl:variable>
-            <xxforms:variable name="form-resources" select="instance('fb-resources')//resource[@xml:lang = instance('fr-settings-instance')/lang]"/>
-            <xxforms:variable name="fb-lang" select="instance('fr-settings-instance')/lang"/>
-            <xxforms:variable name="resources" select="instance('fr-form-resources')"/>
-            <xxforms:variable name="current-resources" select="instance('fr-form-resources')/resource[@xml:lang = instance('fr-settings-instance')/lang]"/>
-            <xsl:apply-templates select="$itemset-dialog"/>
+            <fb:dialog-itemsets
+                    id="dialog-itemsets"
+                    resources-ref="instance('fb-resources')//resource[@xml:lang = instance('fr-settings-instance')/lang]"/>
 
             <!--<fr:xforms-inspector/>-->
         </xsl:copy>
@@ -320,11 +318,10 @@
                 <xhtml:img src="/apps/fr/style/images/silk/text_list_bullets.png" alt=""/>
                 <xhtml:span><xforms:output value="$fr-resources/detail/labels/edit-items"/></xhtml:span>
             </xforms:label>
-            <xforms:action ev:event="DOMActivate">
-                <xxforms:show dialog="fb-itemset-editor-dialog" neighbor="{@id}">
-                    <xxforms:context name="fb:resource-id" select="'{substring-before(@id, '-control')}'"/>
-                </xxforms:show>
-            </xforms:action>
+            <xforms:dispatch ev:event="DOMActivate" name="fb-show-dialog" targetid="dialog-itemsets">
+                <xxforms:context name="control-id" value="'{@id}'"/>
+                <xxforms:context name="control-type" value="'{local-name()}'"/>
+            </xforms:dispatch>
         </xforms:trigger>
     </xsl:template>
 

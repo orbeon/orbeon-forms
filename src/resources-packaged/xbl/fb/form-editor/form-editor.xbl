@@ -80,7 +80,7 @@
                 <fb:dialog-grid-details        id="dialog-grid-details"       form-ref="$binding" resources-ref="$form-resources" components-ref="instance('fb-components-instance')"/>
                 <fb:dialog-section-details     id="dialog-section-details"    form-ref="$binding" resources-ref="$form-resources" components-ref="instance('fb-components-instance')"/>
                 <fb:dialog-help                id="dialog-help"               form-ref="$binding" resources-ref="$form-resources" components-ref="instance('fb-components-instance')"/>
-                <fb:dialog-itemsets            id="dialog-itemsets"           form-ref="$binding" resources-ref="$form-resources" components-ref="instance('fb-components-instance')"/>
+                <fb:dialog-itemsets            id="dialog-itemsets"           resources-ref="$form-resources"/>
 
                 <fr:alert-dialog id="dialog-confirmation">
                     <fr:label ref="$form-resources/dialog-confirmation/label"/>

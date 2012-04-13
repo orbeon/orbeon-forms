@@ -218,7 +218,7 @@ class MemoryCacheTest extends AssertionsForJUnit {
 
         val range = 1 to size
         
-        for (i <- range.reverse)
+        for (i ← range.reverse)
             cache.add(Key("o" + i), VALIDITY, i)
 
         val keysAsInts = cache.iterateCacheKeys map (_.asInstanceOf[Key].key.tail.toInt) toSeq

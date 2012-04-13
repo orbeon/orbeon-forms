@@ -23,7 +23,7 @@ import org.orbeon.oxf.xforms.control.controls.InstanceMirror._
 
 class InstanceMirrorTest extends DocumentTestBase with AssertionsForJUnit {
 
-    implicit def toEventListener(f: XFormsEvent => Any) = new EventListener {
+    implicit def toEventListener(f: XFormsEvent ⇒ Any) = new EventListener {
         def handleEvent(event: XFormsEvent) { f(event) }
     }
 
@@ -80,8 +80,8 @@ class InstanceMirrorTest extends DocumentTestBase with AssertionsForJUnit {
 
         // Attach listeners
         val outerListener = mirrorListener(document, logger,
-            toInnerNode(outerInstance.documentInfo, document.getStaticState.topLevelPart, document), () => nonInstanceChanges += 1) _
-        for (eventName <- mutationEvents)
+            toInnerNode(outerInstance.documentInfo, document.getStaticState.topLevelPart, document), () ⇒ nonInstanceChanges += 1) _
+        for (eventName ← mutationEvents)
             outerInstance.addListener(eventName, outerListener)
 
         // Local helpers
@@ -102,7 +102,7 @@ class InstanceMirrorTest extends DocumentTestBase with AssertionsForJUnit {
             // NOTE: Removing root element doesn't work right now, maybe because doDelete() doesn't support it
 //            ("""""" , 2),
 //            ("""<root/>""" , 2)
-        ).zipWithIndex foreach { case ((expectedInnerInstanceValue, expectedNonInstanceChanges), index) =>
+        ).zipWithIndex foreach { case ((expectedInnerInstanceValue, expectedNonInstanceChanges), index) ⇒
             // Dispatch event and assert result
             dispatch("update" + (index + 1))
 

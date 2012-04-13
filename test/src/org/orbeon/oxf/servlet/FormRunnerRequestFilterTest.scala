@@ -20,7 +20,7 @@ import org.junit.Test
 import javax.servlet.http.{HttpServletRequest, HttpServletRequestWrapper}
 import collection.JavaConversions._
 import collection.immutable.TreeMap
-import java.util.{Enumeration => JEnumeration}
+import java.util.{Enumeration ⇒ JEnumeration}
 
 class FormRunnerRequestFilterTest extends ResourceManagerTestBase with AssertionsForJUnit with MockitoSugar {
 
@@ -28,10 +28,10 @@ class FormRunnerRequestFilterTest extends ResourceManagerTestBase with Assertion
 
         // Initial headers
         val initialHeaders = Map(
-            "p1" -> Seq("v1a", "v1b"),
+            "p1" → Seq("v1a", "v1b"),
             // NOTE: Just use these header names because that's what's configured in the properties for the Liferay test
-            "Orbeon-Liferay-User-Email".toLowerCase -> Seq("test@orbeon.com"),
-            "Orbeon-Liferay-User-Roles".toLowerCase -> Seq("manager,employee")
+            "Orbeon-Liferay-User-Email".toLowerCase → Seq("test@orbeon.com"),
+            "Orbeon-Liferay-User-Roles".toLowerCase → Seq("manager,employee")
         )
 
         // Request with initial headers
@@ -46,13 +46,13 @@ class FormRunnerRequestFilterTest extends ResourceManagerTestBase with Assertion
 
         // NOTE: Use Seq or List but not Array for comparison, because Array's == doesn't work as expected in Scala
         val expectedHeaders = initialHeaders ++ Map(
-            "orbeon-username" -> Seq("test@orbeon.com"),
-            "orbeon-roles" -> Seq("manager", "employee")
+            "orbeon-username" → Seq("test@orbeon.com"),
+            "orbeon-roles" → Seq("manager", "employee")
         )
 
         // NOTE: Use asInstanceOf because servlet API doesn't have generics
         val actualHeaders = amendedRequest.getHeaderNames.asInstanceOf[JEnumeration[String]] map
-            (n => n -> amendedRequest.getHeaders(n).asInstanceOf[JEnumeration[String]].toList) toMap
+            (n ⇒ n → amendedRequest.getHeaders(n).asInstanceOf[JEnumeration[String]].toList) toMap
 
         // Compare using TreeMap to get a reliable order
         def toTreeMap[K, V](map: Map[K, V])(implicit ord: Ordering[K]) = TreeMap[K, V]() ++ map

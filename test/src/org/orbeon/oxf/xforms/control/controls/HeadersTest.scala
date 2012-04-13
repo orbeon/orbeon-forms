@@ -93,25 +93,25 @@ class HeadersTest extends DocumentTestBase with AssertionsForJUnit {
 
         // Expected results per control
         val expected = LinkedHashMap(
-            "output1" -> LinkedHashMap(
-                "Header1" -> Seq("value1"),
-                "Header2" -> Seq("value2"),
-                "Header3" -> Seq("value3")
+            "output1" → LinkedHashMap(
+                "Header1" → Seq("value1"),
+                "Header2" → Seq("value2"),
+                "Header3" → Seq("value3")
             ),
-            "output2" -> LinkedHashMap(
-                "Header1" -> Seq("prepend2", "prepend1", "value1", "append2"),
-                "Header2" -> Seq("prepend2", "value2", "append2", "append2"),
-                "Header3" -> Seq("prepend2", "replace3", "append2"),
-                "Header4" -> Seq("value4")
+            "output2" → LinkedHashMap(
+                "Header1" → Seq("prepend2", "prepend1", "value1", "append2"),
+                "Header2" → Seq("prepend2", "value2", "append2", "append2"),
+                "Header3" → Seq("prepend2", "replace3", "append2"),
+                "Header4" → Seq("value4")
             )
         )
 
         // Test that everything matches
         for {
-            (controlId, expectedHeaders) <- expected
+            (controlId, expectedHeaders) ← expected
             control = getValueControl(controlId).asInstanceOf[XFormsOutputControl]
             actualHeaders = control.testEvaluateHeaders
-            (expectedHeaderName, expectedHeaderValues) <- expectedHeaders
+            (expectedHeaderName, expectedHeaderValues) ← expectedHeaders
         } yield
             assert(expectedHeaderValues === actualHeaders.asScala(expectedHeaderName).toSeq)
     }

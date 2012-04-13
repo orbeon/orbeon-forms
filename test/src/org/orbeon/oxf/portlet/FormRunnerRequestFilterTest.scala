@@ -31,7 +31,7 @@ class FormRunnerRequestFilterTest extends ResourceManagerTestBase with Assertion
     @Test def amendPortletRequest() {
 
         // Initial properties
-        val initialProperties = Map("p1" -> Seq("v1a", "v1b"))
+        val initialProperties = Map("p1" → Seq("v1a", "v1b"))
 
         // Request with initial properties
         val mockRequest = new PortletRequestWrapper(mock[PortletRequest]) {
@@ -56,14 +56,14 @@ class FormRunnerRequestFilterTest extends ResourceManagerTestBase with Assertion
 
         // NOTE: Use Seq or List but not Array for comparison, because Array's == doesn't work as expected in Scala
         val expectedProperties = initialProperties ++ Map(
-            "orbeon-liferay-user-email" -> Seq("test@orbeon.com"),
-            "orbeon-liferay-user-full-name" -> Seq("John Smith"),
-            "orbeon-liferay-user-roles" -> Seq("manager", "employee"),
-            "orbeon-username" -> Seq("test@orbeon.com"),
-            "orbeon-roles" -> Seq("manager", "employee")
+            "orbeon-liferay-user-email" → Seq("test@orbeon.com"),
+            "orbeon-liferay-user-full-name" → Seq("John Smith"),
+            "orbeon-liferay-user-roles" → Seq("manager", "employee"),
+            "orbeon-username" → Seq("test@orbeon.com"),
+            "orbeon-roles" → Seq("manager", "employee")
         )
 
-        val actualProperties = amendedRequest.getPropertyNames map (n => n -> amendedRequest.getProperties(n).toList) toMap
+        val actualProperties = amendedRequest.getPropertyNames map (n ⇒ n → amendedRequest.getProperties(n).toList) toMap
 
         // Compare using TreeMap to get a reliable order
         def toTreeMap[K, V](map: Map[K, V])(implicit ord: Ordering[K]) = TreeMap[K, V]() ++ map

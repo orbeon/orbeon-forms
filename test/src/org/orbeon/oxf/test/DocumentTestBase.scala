@@ -19,7 +19,7 @@ import org.junit.After
 import org.orbeon.oxf.xforms.event.events.XXFormsValue
 import org.orbeon.oxf.xforms.control._
 import controls.XFormsSelect1Control
-import org.dom4j.{Element, Document => JDocument}
+import org.dom4j.{Element, Document ⇒ JDocument}
 import xml.{XML, Elem}
 import org.orbeon.oxf.xforms.event.{ClientEvents, XFormsEventTarget}
 import org.orbeon.oxf.xforms.{XFormsStaticStateImpl, XFormsContainingDocument}

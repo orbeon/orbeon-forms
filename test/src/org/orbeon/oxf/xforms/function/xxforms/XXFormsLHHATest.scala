@@ -59,7 +59,7 @@ class XXFormsLHHATest extends DocumentTestBase with AssertionsForJUnit {
                 </xh:body>
             </xh:html>
 
-        for (lhha <- Seq("label", "help", "hint", "alert"))
+        for (lhha ← Seq("label", "help", "hint", "alert"))
             assert(getValueControl(lhha).getValue === "My " + lhha)
     }
 }

@@ -26,7 +26,7 @@
     <orderEntry type="library" name="Saxon" level="application" />
     <orderEntry type="library" name="ScalaTest" level="application" />
     <orderEntry type="library" name="Rhino" level="application" />
-    <orderEntry type="library" name="Scala 2.9.1" level="project" />
+    <orderEntry type="library" name="Scala 2.9.2" level="project" />
   </component>
 </module>
 

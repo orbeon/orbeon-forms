@@ -13,6 +13,7 @@
  */
 (function() {
     var YD = YAHOO.util.Dom;
+    var Events = ORBEON.xforms.Events;
 
     YAHOO.namespace("xbl.fr");
     YAHOO.xbl.fr.Tinymce = function() {};
@@ -38,8 +39,8 @@
 
             // Create TinyMCE editor instance
             var tinyMceConfig = typeof TINYMCE_CUSTOM_CONFIG !== "undefined" ? TINYMCE_CUSTOM_CONFIG : YAHOO.xbl.fr.Tinymce.DefaultConfig;
-            var tinyMceDivId = YAHOO.util.Dom.getElementsByClassName('xbl-fr-tinymce-div', null, this.container)[0].id;
-            this.myEditor = new tinymce.Editor(tinyMceDivId, tinyMceConfig);
+            var tinyMceDiv = YAHOO.util.Dom.getElementsByClassName('xbl-fr-tinymce-div', null, this.container)[0];
+            this.myEditor = new tinymce.Editor(tinyMceDiv.id, tinyMceConfig);
             var xformsValue = ORBEON.xforms.Document.getValue(this.serverValueOutputId);
             this.onInit(_.bind(function() {
                 this.myEditor.setContent(xformsValue);
@@ -49,8 +50,12 @@
             }, this));
             this.myEditor.onChange.add(_.bind(this.clientToServer, this));
 
-            // Render the component
-            this.myEditor.render();
+            // Render the component when visible (see https://github.com/orbeon/orbeon-forms/issues/172)
+            var renderIfVisible = _.bind(function() {
+                if ($(tinyMceDiv).width() == 0) Events.runOnNext(Events.ajaxResponseProcessedEvent, renderIfVisible);
+                else this.myEditor.render();
+            }, this);
+            renderIfVisible();
         },
 
         // Send value in MCE to server

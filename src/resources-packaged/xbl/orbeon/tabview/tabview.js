@@ -31,19 +31,21 @@ YAHOO.xbl.fr.TabView.prototype = {
      * a tab received the fr-toggle event.
      */
     activeTabChange: function(event) {
-        function getTrigger(selectDeselect, index) {
-            var trigger = ORBEON.util.Dom.get(this.container.id + "$" + "fr-tabview-" + selectDeselect + "-" + (index + 1));
-            return ORBEON.util.Dom.getElementByTagName(trigger, "button");
+        var tabView = this;
+
+        var OrderEnum = { PREV: 0, NEXT: 1 };
+        function changeTab(order, index) {
+            // Click button to inform XForms about the tab change
+            var trigger = $(tabView.container).find('.fr-tabview-' + (order == OrderEnum.PREV ? 'deselect' : 'select'))[index];
+            $(trigger).find('button')[0].click();
         }
 
-        // Deselect other tabs
-        getTrigger.call(this, "deselect", this.yuiTabView.getTabIndex(event.prevValue)).click();
-        // Select new tab
-        getTrigger.call(this, "select", this.yuiTabView.getTabIndex(event.newValue)).click();
+        changeTab(OrderEnum.PREV, tabView.yuiTabView.getTabIndex(event.prevValue));
+        changeTab(OrderEnum.NEXT, tabView.yuiTabView.getTabIndex(event.newValue));
     },
 
     /**
-     * Find position of this elements amongts its sibling elements
+     * Find position of this elements amongst its sibling elements
      */
     getElementIndex: function(element) {
         var children = YAHOO.util.Dom.getChildren(element.parentNode);

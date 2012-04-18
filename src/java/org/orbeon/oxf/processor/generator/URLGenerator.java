@@ -26,14 +26,12 @@ import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.resources.handler.OXFHandler;
 import org.orbeon.oxf.util.*;
-import org.orbeon.oxf.xml.SAXStore;
-import org.orbeon.oxf.xml.TransformerUtils;
-import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.oxf.xml.XPathUtils;
+import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.w3c.tidy.Tidy;
 import org.xml.sax.*;
+import org.xml.sax.helpers.AttributesImpl;
 
 import javax.xml.transform.dom.DOMSource;
 import java.io.IOException;
@@ -73,6 +71,14 @@ public class URLGenerator extends ProcessorImpl {
     public static final String VALIDATING_PROPERTY = "validating";
     public static final String HANDLE_XINCLUDE_PROPERTY = "handle-xinclude";
     public static final String HANDLE_LEXICAL_PROPERTY = "handle-lexical";
+
+    public static final String DEFAULT_ARCHIVE_DOCUMENT_ELEMENT  = "archive";
+    public static final String DEFAULT_HEADER_ELEMENT = "header";
+    public static final String DEFAULT_STATUS_CODE_ELEMENT = "code";
+    public static final String DEFAULT_REQUEST_ELEMENT = "request";
+    public static final String DEFAULT_METHOD_ELEMENT = "method";
+    public static final String DEFAULT_LOCATION_ELEMENT = "location";
+    public static final String DEFAULT_RESPONSE_ELEMENT = "response";
 
     private ConfigURIReferences localConfigURIReferences;
 
@@ -470,6 +476,10 @@ public class URLGenerator extends ProcessorImpl {
                                     // Text mode
                                     handler.readText(output, contentType, validity);
                                     configURIReferences.uriReferences = null;
+                                } else if (mode.equals("archive")) {
+                                    // Archive mode
+                                    handler.readArchive(output, contentType, validity);
+                                    configURIReferences.uriReferences = null;
                                 } else {
                                     // Binary mode
                                     handler.readBinary(output, contentType, validity);
@@ -684,6 +694,7 @@ public class URLGenerator extends ProcessorImpl {
         void readText(ContentHandler output, String contentType, Long lastModified) throws IOException;
         void readXML(PipelineContext pipelineContext, XMLReceiver xmlReceiver, URIProcessorOutputImpl.URIReferences uriReferences) throws IOException;
         void readBinary(ContentHandler output, String contentType, Long lastModified) throws IOException;
+        void readArchive(ContentHandler output, String contentType, Long lastModified) throws IOException;
     }
 
     private static class OXFResourceHandler implements ResourceHandler {
@@ -776,6 +787,10 @@ public class URLGenerator extends ProcessorImpl {
             ProcessorUtils.readBinary(inputStream, output, contentType, lastModified, getConnectionStatusCode());
         }
 
+        public void readArchive(ContentHandler output, String contentType, Long lastModified) throws IOException {
+            throw new ValidationException("Archive mode is not supported for the oxf: protocol", new LocationData(config.getURL().toExternalForm(), -1, -1));
+        }
+
         private String getKey() {
             if (resourceManagerKey == null)
                 resourceManagerKey = config.getURL().getFile();
@@ -788,6 +803,7 @@ public class URLGenerator extends ProcessorImpl {
         private Config config;
         private ConnectionResult connectionResult;
         private InputStream inputStream;
+        private Map<String, String[]> requestHeadersMap;
 
         public URLResourceHandler(PipelineContext pipelineContext, Config config) {
             this.pipelineContext = pipelineContext;
@@ -868,8 +884,10 @@ public class URLGenerator extends ProcessorImpl {
                     newHeaders = config.getHeaderNameValues();
                 }
 
-                connectionResult = new Connection().open(externalContext, indentedLogger, false, Connection.Method.GET.name(),
+                Connection connection = new Connection();
+                connectionResult = connection.open(externalContext, indentedLogger, false, Connection.Method.GET.name(),
                         config.getURL(), null, null, null, null, null, newHeaders, config.getForwardHeaders());
+                requestHeadersMap = connection.getHeadersMap();
                 inputStream = connectionResult.getResponseInputStream(); // empty stream if conditional GET succeeded
             }
         }
@@ -904,6 +922,92 @@ public class URLGenerator extends ProcessorImpl {
             openConnection();
             ProcessorUtils.readBinary(inputStream, output, contentType, lastModified, getConnectionStatusCode());
         }
+
+        public void readArchive(ContentHandler output, String contentType, Long lastModified) throws IOException {
+            openConnection();
+            try {
+                output.startDocument();
+                output.startPrefixMapping(XMLConstants.XSI_PREFIX, XMLConstants.XSI_URI);
+                output.startPrefixMapping(XMLConstants.XSD_PREFIX, XMLConstants.XSD_URI);
+                output.startElement("", DEFAULT_ARCHIVE_DOCUMENT_ELEMENT, DEFAULT_ARCHIVE_DOCUMENT_ELEMENT, new AttributesImpl());
+
+                output.startElement("", DEFAULT_REQUEST_ELEMENT, DEFAULT_REQUEST_ELEMENT, new AttributesImpl());
+
+                output.startElement("", DEFAULT_METHOD_ELEMENT, DEFAULT_METHOD_ELEMENT, new AttributesImpl());
+                output.characters("GET".toCharArray(), 0, "GET".length());
+                output.endElement("", DEFAULT_METHOD_ELEMENT, DEFAULT_METHOD_ELEMENT);
+
+                output.startElement("", DEFAULT_LOCATION_ELEMENT, DEFAULT_LOCATION_ELEMENT, new AttributesImpl());
+                String location = config.getURL().toString();
+                output.characters(location .toCharArray(), 0, location.length());
+                output.endElement("", DEFAULT_LOCATION_ELEMENT, DEFAULT_LOCATION_ELEMENT);
+
+                if (requestHeadersMap != null ) {
+
+                    for (Map.Entry<String,String[]> currentEntry: requestHeadersMap.entrySet()) {
+                        final String currentHeaderName = currentEntry.getKey();
+                        final String[] currentHeaderValues = currentEntry.getValue();
+                        if (currentHeaderValues != null) {
+                            final AttributesImpl attributes = new AttributesImpl();
+                            attributes.addAttribute("", "name", "name", "CDATA", currentHeaderName);
+                            for (String currentHeaderValue: currentHeaderValues) {
+                                output.startElement("", DEFAULT_HEADER_ELEMENT, DEFAULT_HEADER_ELEMENT, attributes);
+                                output.characters(currentHeaderValue.toCharArray(), 0, currentHeaderValue.length());
+                                output.endElement("", DEFAULT_HEADER_ELEMENT, DEFAULT_HEADER_ELEMENT);
+                            }
+                        }
+                    }
+                }
+                output.endElement("", DEFAULT_REQUEST_ELEMENT, DEFAULT_REQUEST_ELEMENT);
+
+                output.startElement("", DEFAULT_RESPONSE_ELEMENT, DEFAULT_RESPONSE_ELEMENT, new AttributesImpl());
+
+                output.startElement("", DEFAULT_STATUS_CODE_ELEMENT, DEFAULT_STATUS_CODE_ELEMENT, new AttributesImpl());
+                String statusCode = Integer.toString(getConnectionStatusCode());
+                output.characters(statusCode.toCharArray(), 0, statusCode.length());
+                output.endElement("", DEFAULT_STATUS_CODE_ELEMENT, DEFAULT_STATUS_CODE_ELEMENT);
+
+
+                Map<String, List<String>> responseHeaders = connectionResult.getResponseHeaders();
+                if (responseHeaders != null ) {
+
+                    for (Map.Entry<String, List<String>> currentEntry: responseHeaders.entrySet()) {
+                        final String currentHeaderName = currentEntry.getKey();
+                        final List<String> currentHeaderValues = currentEntry.getValue();
+                        if (currentHeaderValues != null) {
+                            final AttributesImpl attributes = new AttributesImpl();
+                            attributes.addAttribute("", "name", "name", "CDATA", currentHeaderName);
+                            for (String currentHeaderValue: currentHeaderValues) {
+                                output.startElement("", DEFAULT_HEADER_ELEMENT, DEFAULT_HEADER_ELEMENT, attributes);
+                                output.characters(currentHeaderValue.toCharArray(), 0, currentHeaderValue.length());
+                                output.endElement("", DEFAULT_HEADER_ELEMENT, DEFAULT_HEADER_ELEMENT);
+                            }
+                        }
+                    }
+
+                }
+
+
+                final AttributesImpl attributes = new AttributesImpl();
+                attributes.addAttribute(XMLConstants.XSI_URI, "type", "xsi:type", "CDATA", XMLConstants.XS_BASE64BINARY_QNAME.getQualifiedName());
+                if (contentType != null)
+                    attributes.addAttribute("", "content-type", "content-type", "CDATA", contentType);
+                if (lastModified != null)
+                    attributes.addAttribute("", "last-modified", "last-modified", "CDATA", ISODateUtils.getRFC1123Date(lastModified));                
+                output.startElement("", ProcessorUtils.DEFAULT_BINARY_DOCUMENT_ELEMENT, ProcessorUtils.DEFAULT_BINARY_DOCUMENT_ELEMENT, attributes);
+                XMLUtils.inputStreamToBase64Characters(inputStream, output);
+                output.endElement("", ProcessorUtils.DEFAULT_BINARY_DOCUMENT_ELEMENT, ProcessorUtils.DEFAULT_BINARY_DOCUMENT_ELEMENT);
+
+                output.endElement("", DEFAULT_RESPONSE_ELEMENT, DEFAULT_RESPONSE_ELEMENT);
+
+                output.endElement("", DEFAULT_ARCHIVE_DOCUMENT_ELEMENT, DEFAULT_ARCHIVE_DOCUMENT_ELEMENT);
+                output.endPrefixMapping(XMLConstants.XSD_PREFIX);
+                output.endPrefixMapping(XMLConstants.XSI_PREFIX);
+                output.endDocument();
+            } catch (SAXException e) {
+               throw new OXFException(e);
+            }           
+         }
 
         public void readXML(PipelineContext pipelineContext, XMLReceiver xmlReceiver, URIProcessorOutputImpl.URIReferences uriReferences) throws IOException {
             openConnection();

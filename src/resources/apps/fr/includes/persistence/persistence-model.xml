@@ -569,10 +569,16 @@
             <xxforms:variable name="is-send-email" select="xxforms:property(string-join(('oxf.fr.detail.send.email', $app, $form), '.'))" as="xs:boolean"/>
             <xxforms:variable name="is-send-alfresco" select="xxforms:property(string-join(('oxf.fr.detail.send.alfresco', $app, $form), '.'))" as="xs:boolean"/>
 
+            <xforms:message level="xxforms:log-debug">Sending form data. Navigate: <xforms:output value="$is-send-navigate"/>. Email: <xforms:output value="$is-send-email"/>. Alfresco: <xforms:output value="$is-send-alfresco"/>.</xforms:message>
+
             <!-- Create PDF if requested -->
-            <xforms:send if="($is-send-navigate and xxforms:property(string-join(('oxf.fr.detail.send.pdf', $app, $form), '.')))
-                                or ($is-send-email and xxforms:property(string-join(('oxf.fr.email.attach-pdf', $app, $form), '.')))
-                                or ($is-send-alfresco and xxforms:property(string-join(('oxf.fr.alfresco.send-pdf', $app, $form), '.')))" submission="fr-pdf-service-submission"/>
+            <xxforms:variable name="is-create-pdf"
+                              select="($is-send-navigate and xxforms:property(string-join(('oxf.fr.detail.send.pdf', $app, $form), '.')))
+                                      or ($is-send-email and xxforms:property(string-join(('oxf.fr.email.attach-pdf', $app, $form), '.')))
+                                      or ($is-send-alfresco and xxforms:property(string-join(('oxf.fr.alfresco.send-pdf', $app, $form), '.')))" as="xs:boolean"/>
+
+            <xforms:message level="xxforms:log-debug">Creating PDF.</xforms:message>
+            <xforms:send if="$is-create-pdf" submission="fr-pdf-service-submission"/>
 
             <xforms:action if="instance('fr-persistence-instance')/is-error = 'false'">
                 <!-- Send to Alfresco if requested -->
@@ -589,6 +595,9 @@
 
                     <!-- Send PDF data if requested -->
                     <xforms:action if="xxforms:property(string-join(('oxf.fr.alfresco.send-pdf', $app, $form), '.'))">
+
+                        <xforms:message level="xxforms:log-debug">Sending PDF to Alfresco...</xforms:message>
+
                         <!-- Get URI of PDF data -->
                         <xxforms:variable name="pdf-uri" select="xpl:rewriteServiceURI(instance('fr-workflow-send-instance'), true())" as="xs:anyURI"/>
 
@@ -604,6 +613,9 @@
                     </xforms:action>
                     <!-- Send XML data if requested -->
                     <xforms:action if="xxforms:property(string-join(('oxf.fr.alfresco.send-xml', $app, $form), '.'))">
+
+                        <xforms:message level="xxforms:log-debug">Sending XML to Alfresco...</xforms:message>
+
                         <!-- Send data to Alfresco -->
                         <xforms:dispatch target="fr-alfresco-model" name="alfresco-send-document">
                             <xxforms:context name="fr:name" select="concat($form-title, ' (#', $document, ').xml')"/>
@@ -617,14 +629,16 @@
                 </xforms:action>
             </xforms:action>
 
-            <xforms:action if="instance('fr-persistence-instance')/is-error = 'false'">
-                <!-- Send email if requested -->
-                <xforms:send if="$is-send-email" submission="fr-email-service-submission"/>
+            <!-- Send email if requested -->
+            <xforms:action if="instance('fr-persistence-instance')/is-error = 'false' and $is-send-email">
+                <xforms:message level="xxforms:log-debug">Sending email...</xforms:message>
+                <xforms:send submission="fr-email-service-submission"/>
             </xforms:action>
 
-            <xforms:action if="instance('fr-persistence-instance')/is-error = 'false'">
-                <!-- Navigate to the confirmation page -->
-                <xforms:send if="$is-send-navigate" submission="fr-workflow-send-submission"/>
+            <!-- Navigate to the confirmation page if requested -->
+            <xforms:action if="instance('fr-persistence-instance')/is-error = 'false' and $is-send-navigate">
+                <xforms:message level="xxforms:log-debug">Navigating to success page...</xforms:message>
+                <xforms:send submission="fr-workflow-send-submission"/>
             </xforms:action>
         </xforms:action>
 

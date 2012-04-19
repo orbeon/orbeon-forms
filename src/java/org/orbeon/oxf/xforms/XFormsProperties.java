@@ -108,8 +108,6 @@ public class XFormsProperties {
 
     public static final String HELP_HANDLER_PROPERTY = "help-handler";
     private static final String HELP_TOOLTIP_PROPERTY = "help-tooltip";
-    public static final String OFFLINE_SUPPORT_PROPERTY = "offline";
-    public static final String OFFLINE_REPEAT_COUNT_PROPERTY = "offline-repeat-count";
     public static final String FORWARD_SUBMISSION_HEADERS = "forward-submission-headers";
     public static final String DEFAULT_FORWARD_SUBMISSION_HEADERS = "";
 
@@ -218,7 +216,6 @@ public class XFormsProperties {
             new PropertyDefinition(FLOAT_FORMAT_PROPERTY, "if (. castable as xs:float) then format-number(xs:float(.),'#,##0.000') else .", false),
             new PropertyDefinition(DOUBLE_FORMAT_PROPERTY, "if (. castable as xs:double) then format-number(xs:double(.),'#,##0.000') else .", false),
             new PropertyDefinition(ENCRYPT_ITEM_VALUES_PROPERTY, true, false),
-            new PropertyDefinition(OFFLINE_REPEAT_COUNT_PROPERTY, 4, false),
             new PropertyDefinition(FORWARD_SUBMISSION_HEADERS, DEFAULT_FORWARD_SUBMISSION_HEADERS, false),
             new PropertyDefinition(ASYNC_SUBMISSION_POLL_DELAY, 10 * 1000, false), // 10 seconds
             new PropertyDefinition(AJAX_UPDATE_FULL_THRESHOLD, 20, false),
@@ -249,7 +246,6 @@ public class XFormsProperties {
             new PropertyDefinition(REVISIT_HANDLING_PROPERTY, REVISIT_HANDLING_RESTORE_VALUE, true),
             new PropertyDefinition(HELP_HANDLER_PROPERTY, false, true),// dynamic
             new PropertyDefinition(HELP_TOOLTIP_PROPERTY, false, true),
-            new PropertyDefinition(OFFLINE_SUPPORT_PROPERTY, false, true),// dynamic
             new PropertyDefinition(DATE_FORMAT_INPUT_PROPERTY, "[M]/[D]/[Y]", true),
             new PropertyDefinition(TIME_FORMAT_INPUT_PROPERTY, "[h]:[m]:[s] [P]", true),
             new PropertyDefinition(DATEPICKER_NAVIGATOR_PROPERTY, true, true),

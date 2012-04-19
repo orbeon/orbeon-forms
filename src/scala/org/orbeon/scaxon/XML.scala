@@ -16,7 +16,6 @@ package org.orbeon.scaxon
 import org.orbeon.saxon.`type`.Type
 import org.orbeon.saxon.value.StringValue
 import xml.Elem
-import org.orbeon.saxon.om._
 import org.orbeon.oxf.util.XPathCache
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import collection.JavaConverters._
@@ -28,6 +27,8 @@ import org.orbeon.saxon.dom4j.{DocumentWrapper, NodeWrapper}
 import org.dom4j.{Document, Attribute, QName, Element}
 import org.orbeon.saxon.pattern._
 import org.orbeon.saxon.expr.{Token, ExpressionTool}
+import org.orbeon.saxon.om._
+import scala.Predef._
 
 object XML {
 
@@ -225,7 +226,8 @@ object XML {
         def attClasses = attTokens("class")
 
         def self(test: Test) = find(Axis.SELF, test)
-        def parent = Option(nodeInfo.getParent)
+        def parent: Seq[NodeInfo] = Option(nodeInfo.getParent).toList
+        def parentAxis(test: Test) = find(Axis.PARENT, test)
 
         def ancestor(test: Test): Seq[NodeInfo] = find(Axis.ANCESTOR, test)
         def ancestorOrSelf (test: Test): Seq[NodeInfo] = find(Axis.ANCESTOR_OR_SELF, test)
@@ -273,7 +275,19 @@ object XML {
         def child(test: Test) = \(test)
         def descendant(test: Test) = \\(test)
 
+        def self(test: Test) = seq flatMap (_ self test)
         def parent = seq map (_.getParent) filter (_ ne null)
+        def parentAxis(test: Test) = seq flatMap (_ parentAxis test)
+
+        def ancestor(test: Test): Seq[NodeInfo] = seq flatMap (_ ancestor test)
+        def ancestorOrSelf (test: Test): Seq[NodeInfo] = seq flatMap (_ ancestorOrSelf test)
+        def descendantOrSelf(test: Test): Seq[NodeInfo] = seq flatMap (_ descendantOrSelf test)
+
+        def preceding(test: Test): Seq[NodeInfo] = seq flatMap (_ preceding test)
+        def following(test: Test): Seq[NodeInfo] = seq flatMap (_ following test)
+
+        def precedingSibling(test: Test) = seq flatMap (_ precedingSibling test)
+        def followingSibling(test: Test) = seq flatMap (_ followingSibling test)
 
         // The string value is not defined on sequences. We take the first value, for convenience, like in XPath 2.0's
         // XPath 1.0 compatibility mode.
@@ -325,10 +339,10 @@ object XML {
 
     implicit def itemSeqToSequenceIterator[T <: Item](seq: Seq[T]): SequenceIterator = new ListIterator(seq.asJava)
 
-    implicit def stringToStringValue(s: String) = StringValue.makeStringValue(s)
     implicit def stringToQName(s: String) = QName.get(s)
-    implicit def stringToItem(s: String) = StringValue.makeStringValue(s)
-    implicit def stringToItems(s: String) = Seq(StringValue.makeStringValue(s))
+    def stringToStringValue(s: String) = StringValue.makeStringValue(s)
+//    def stringToItem(s: String) = StringValue.makeStringValue(s)
+//    def stringToItems(s: String) = Seq(StringValue.makeStringValue(s))
 
     implicit def saxonIteratorToItem(i: SequenceIterator): Item = i.next()
 

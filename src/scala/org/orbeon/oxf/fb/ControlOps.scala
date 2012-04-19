@@ -299,7 +299,7 @@ object ControlOps {
 
     def precedingControlNameInSectionForControl(controlElement: NodeInfo) = {
 
-        val td = controlElement.parent.get
+        val td = controlElement.parent.head
         val grid = findAncestorContainers(td).head
         assert(localname(grid) == "grid")
 

@@ -33,7 +33,6 @@ import org.orbeon.scaxon.XML._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.{XFormsStaticState, XFormsModel, XFormsInstance, XFormsContainingDocument}
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
-import org.orbeon.oxf.xml.TransformerUtils
 import collection.JavaConverters._
 import org.orbeon.saxon.dom4j.{NodeWrapper, DocumentWrapper}
 import org.orbeon.saxon.value.BooleanValue
@@ -66,7 +65,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
         assert(findModelElement(doc).getDisplayName === "xforms:model")
         assert(hasId(findModelElement(doc), "fr-form-model"))
 
-        assert(name(formInstanceRoot(doc).parent.get) === "xforms:instance")
+        assert(name(formInstanceRoot(doc).parent.head) === "xforms:instance")
 
         assert(qname(findFRBodyElement(doc)) === (FR → "body"))
     }
@@ -206,7 +205,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
 
                 val newlySelectedTd = findSelectedTd(doc)
                 assert(newlySelectedTd.isDefined)
-                assert((newlySelectedTd flatMap (_.parent) flatMap (_.parent) get) \@ "id" === gridId(newRepeatName))
+                assert((newlySelectedTd flatMap (_.parent.headOption) flatMap (_.parent.headOption) head) \@ "id" === gridId(newRepeatName))
 
                 val containerNames = findContainerNames(newlySelectedTd.get)
                 assert(containerNames === Seq("section-1", newRepeatName))
@@ -246,12 +245,12 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
                 val dataHolder = assertDataHolder(doc, newControlName, isCustomInstance)
                 if (! isCustomInstance) {
                     assert(dataHolder.get precedingSibling * isEmpty)
-                    assert(name(dataHolder.get.parent.get) === newRepeatName)
+                    assert(name(dataHolder.get.parent.head) === newRepeatName)
                 }
 
                 val controlBind = findBindByName(doc, newControlName).get
                 assert(hasId(controlBind, bindId(newControlName)))
-                assert(hasId(controlBind.parent.get, bindId(newRepeatName)))
+                assert(hasId(controlBind.parent.head, bindId(newRepeatName)))
 
                 assert(formResourcesRoot \ "resource" \ newControlName nonEmpty)
 
@@ -260,7 +259,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
                 if (! isCustomInstance) {
                     assert(templateHolder.isDefined)
                     assert(templateHolder.get precedingSibling * isEmpty)
-                    assert(name(templateHolder.get.parent.get) === newRepeatName)
+                    assert(name(templateHolder.get.parent.head) === newRepeatName)
                 } else {
                     assert(templateHolder.isEmpty)
                 }
@@ -412,7 +411,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
         )
 
         assertSelectedTdAfterDelete(beforeAfter) { td ⇒
-            deleteRow(td.parent.get)
+            deleteRow(td.parent.head)
         }
     }
 

@@ -96,7 +96,7 @@ object ContainerOps {
 
     // Find all siblings of the given element with the given name, excepting the given element
     def findSiblingsWithName(element: NodeInfo, siblingName: String) =
-        element.parent.get \ * filter
+        element.parent \ * filter
             (name(_) == siblingName) filterNot
                 (_ isSameNodeInfo element)
 

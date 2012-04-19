@@ -231,7 +231,7 @@ class XFormsInstance(
                 // inserted.
     
                 // Find affected repeats
-                val insertedNodes = insertEvent.getInsertedNodeInfos
+                val insertedNodes = insertEvent.getInsertedItems
     
                 //didInsertNodes = insertedNodes.size() != 0
                 

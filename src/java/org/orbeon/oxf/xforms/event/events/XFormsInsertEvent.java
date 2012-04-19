@@ -31,7 +31,7 @@ import java.util.List;
  */
 public class XFormsInsertEvent extends XFormsEvent {
 
-    private List<Item> insertedNodeInfos;
+    private List<Item> insertedItems;
     private List originItems;
     private NodeInfo insertLocationNodeInfo;
     private String position; // "before | after | into" relative to the insert location node ("into" is an Orbeon extension)
@@ -41,11 +41,11 @@ public class XFormsInsertEvent extends XFormsEvent {
     }
 
     public XFormsInsertEvent(XFormsContainingDocument containingDocument, XFormsEventTarget targetObject,
-                             List<Item> insertedNodes, List originItems,
+                             List<Item> insertedItems, List originItems,
                              NodeInfo insertLocationNodeInfo, String position) {
         super(containingDocument, XFormsEvents.XFORMS_INSERT, targetObject, true, false);
         
-        this.insertedNodeInfos = insertedNodes;
+        this.insertedItems = insertedItems;
         this.originItems = originItems;
         this.insertLocationNodeInfo = insertLocationNodeInfo;
         this.position = position;
@@ -54,7 +54,7 @@ public class XFormsInsertEvent extends XFormsEvent {
     public SequenceIterator getAttribute(String name) {
         if ("inserted-nodes".equals(name)) {
             // "The instance data nodes inserted."
-            return new ListIterator(insertedNodeInfos);
+            return new ListIterator(insertedItems);
         } else if ("origin-nodes".equals(name)) {
             // "The instance data nodes referenced by the insert action's origin attribute if present, or the empty nodeset if not present."
             return (originItems == null) ? EmptyIterator.getInstance() : new ListIterator(originItems);
@@ -69,8 +69,8 @@ public class XFormsInsertEvent extends XFormsEvent {
         }
     }
 
-    public List<Item> getInsertedNodeInfos() {
-        return insertedNodeInfos;
+    public List<Item> getInsertedItems() {
+        return insertedItems;
     }
 
     public List getOriginItems() {

@@ -264,12 +264,16 @@
                         <xxf:attribute id="my-tabview$xf-21" for="my-tabview$nav-2" name="class"/>
                         <xxf:control id="my-tabview$output1">42</xxf:control>
                         <xxf:control id="my-tabview$output2">42</xxf:control>
-                        <xxf:attribute id="my-tabview$fr-tabview-select-1" for="my-tabview$fr-tabview-select-1" name="style">display: none</xxf:attribute>
-                        <xxf:attribute id="my-tabview$fr-tabview-deselect-1" for="my-tabview$fr-tabview-deselect-1" name="style">display: none</xxf:attribute>
+                        <xxf:control id="my-tabview$xf-31" class="fr-tabview-select"/>
+                        <xxf:attribute id="my-tabview$xf-31" for="my-tabview$xf-31" name="style">display: none</xxf:attribute>
+                        <xxf:control id="my-tabview$xf-36" class="fr-tabview-deselect"/>
+                        <xxf:attribute id="my-tabview$xf-36" for="my-tabview$xf-36" name="style">display: none</xxf:attribute>
                         <xxf:control id="my-tabview$output3">42</xxf:control>
                         <xxf:control id="my-tabview$output4">42</xxf:control>
-                        <xxf:attribute id="my-tabview$fr-tabview-select-2" for="my-tabview$fr-tabview-select-2" name="style">display: none</xxf:attribute>
-                        <xxf:attribute id="my-tabview$fr-tabview-deselect-2" for="my-tabview$fr-tabview-deselect-2" name="style">display: none</xxf:attribute>
+                        <xxf:control id="my-tabview$xf-47" class="fr-tabview-select"/>
+                        <xxf:attribute id="my-tabview$xf-47" for="my-tabview$xf-47" name="style">display: none</xxf:attribute>
+                        <xxf:control id="my-tabview$xf-52" class="fr-tabview-deselect"/>
+                        <xxf:attribute id="my-tabview$xf-52" for="my-tabview$xf-52" name="style">display: none</xxf:attribute>
                     </xxf:control-values>
                     <xxf:script name="xf_fa3c6018b6aca63d2389f350f65e272530d03568" target-id="my-tabview$fr-tabview-group" observer-id="my-tabview$fr-tabview-group"/>
                 </xxf:action>
@@ -371,20 +375,34 @@
                         <xxf:control id="my-tabview$xf-44">My label 6</xxf:control>
                         <xxf:attribute id="my-tabview$xf-45" for="my-tabview$nav-7" name="class"/>
                         <xxf:control id="my-tabview$xf-46">My label 7</xxf:control>
-                        <xxf:attribute id="my-tabview$fr-tabview-select-1" for="my-tabview$fr-tabview-select-1" name="style">display: none</xxf:attribute>
-                        <xxf:attribute id="my-tabview$fr-tabview-deselect-1" for="my-tabview$fr-tabview-deselect-1" name="style">display: none</xxf:attribute>
-                        <xxf:attribute id="my-tabview$fr-tabview-select-2" for="my-tabview$fr-tabview-select-2" name="style">display: none</xxf:attribute>
-                        <xxf:attribute id="my-tabview$fr-tabview-deselect-2" for="my-tabview$fr-tabview-deselect-2" name="style">display: none</xxf:attribute>
-                        <xxf:attribute id="my-tabview$fr-tabview-select-3" for="my-tabview$fr-tabview-select-3" name="style">display: none</xxf:attribute>
-                        <xxf:attribute id="my-tabview$fr-tabview-deselect-3" for="my-tabview$fr-tabview-deselect-3" name="style">display: none</xxf:attribute>
-                        <xxf:attribute id="my-tabview$fr-tabview-select-4" for="my-tabview$fr-tabview-select-4" name="style">display: none</xxf:attribute>
-                        <xxf:attribute id="my-tabview$fr-tabview-deselect-4" for="my-tabview$fr-tabview-deselect-4" name="style">display: none</xxf:attribute>
-                        <xxf:attribute id="my-tabview$fr-tabview-select-5" for="my-tabview$fr-tabview-select-5" name="style">display: none</xxf:attribute>
-                        <xxf:attribute id="my-tabview$fr-tabview-deselect-5" for="my-tabview$fr-tabview-deselect-5" name="style">display: none</xxf:attribute>
-                        <xxf:attribute id="my-tabview$fr-tabview-select-6" for="my-tabview$fr-tabview-select-6" name="style">display: none</xxf:attribute>
-                        <xxf:attribute id="my-tabview$fr-tabview-deselect-6" for="my-tabview$fr-tabview-deselect-6" name="style">display: none</xxf:attribute>
-                        <xxf:attribute id="my-tabview$fr-tabview-select-7" for="my-tabview$fr-tabview-select-7" name="style">display: none</xxf:attribute>
-                        <xxf:attribute id="my-tabview$fr-tabview-deselect-7" for="my-tabview$fr-tabview-deselect-7" name="style">display: none</xxf:attribute>
+                        <xxf:control id="my-tabview$xf-52" class="fr-tabview-select"/>
+                        <xxf:attribute id="my-tabview$xf-52" for="my-tabview$xf-52" name="style">display: none</xxf:attribute>
+                        <xxf:control id="my-tabview$xf-57" class="fr-tabview-deselect"/>
+                        <xxf:attribute id="my-tabview$xf-57" for="my-tabview$xf-57" name="style">display: none</xxf:attribute>
+                        <xxf:control id="my-tabview$xf-65" class="fr-tabview-select"/>
+                        <xxf:attribute id="my-tabview$xf-65" for="my-tabview$xf-65" name="style">display: none</xxf:attribute>
+                        <xxf:control id="my-tabview$xf-70" class="fr-tabview-deselect"/>
+                        <xxf:attribute id="my-tabview$xf-70" for="my-tabview$xf-70" name="style">display: none</xxf:attribute>
+                        <xxf:control id="my-tabview$xf-78" class="fr-tabview-select"/>
+                        <xxf:attribute id="my-tabview$xf-78" for="my-tabview$xf-78" name="style">display: none</xxf:attribute>
+                        <xxf:control id="my-tabview$xf-83" class="fr-tabview-deselect"/>
+                        <xxf:attribute id="my-tabview$xf-83" for="my-tabview$xf-83" name="style">display: none</xxf:attribute>
+                        <xxf:control id="my-tabview$xf-91" class="fr-tabview-select"/>
+                        <xxf:attribute id="my-tabview$xf-91" for="my-tabview$xf-91" name="style">display: none</xxf:attribute>
+                        <xxf:control id="my-tabview$xf-96" class="fr-tabview-deselect"/>
+                        <xxf:attribute id="my-tabview$xf-96" for="my-tabview$xf-96" name="style">display: none</xxf:attribute>
+                        <xxf:control id="my-tabview$xf-104" class="fr-tabview-select"/>
+                        <xxf:attribute id="my-tabview$xf-104" for="my-tabview$xf-104" name="style">display: none</xxf:attribute>
+                        <xxf:control id="my-tabview$xf-109" class="fr-tabview-deselect"/>
+                        <xxf:attribute id="my-tabview$xf-109" for="my-tabview$xf-109" name="style">display: none</xxf:attribute>
+                        <xxf:control id="my-tabview$xf-117" class="fr-tabview-select"/>
+                        <xxf:attribute id="my-tabview$xf-117" for="my-tabview$xf-117" name="style">display: none</xxf:attribute>
+                        <xxf:control id="my-tabview$xf-122" class="fr-tabview-deselect"/>
+                        <xxf:attribute id="my-tabview$xf-122" for="my-tabview$xf-122" name="style">display: none</xxf:attribute>
+                        <xxf:control id="my-tabview$xf-130" class="fr-tabview-select"/>
+                        <xxf:attribute id="my-tabview$xf-130" for="my-tabview$xf-130" name="style">display: none</xxf:attribute>
+                        <xxf:control id="my-tabview$xf-135" class="fr-tabview-deselect"/>
+                        <xxf:attribute id="my-tabview$xf-135" for="my-tabview$xf-135" name="style">display: none</xxf:attribute>
                     </xxf:control-values>
                     <xxf:script name="xf_fa3c6018b6aca63d2389f350f65e272530d03568" target-id="my-tabview$fr-tabview-group" observer-id="my-tabview$fr-tabview-group"/>
                 </xxf:action>

@@ -427,7 +427,7 @@ public class XFormsInsertAction extends XFormsAction {
             for (Object insertedNode : insertedNodes)
                 insertedNodeInfos.add(documentWrapper.wrap(insertedNode));
         } else {
-            insertedNodeInfos = Collections.EMPTY_LIST;
+            insertedNodeInfos = Collections.emptyList();
         }
 
         // "4. If the insert is successful, the event xforms-insert is dispatched."

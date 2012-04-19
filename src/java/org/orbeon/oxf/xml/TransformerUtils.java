@@ -18,18 +18,12 @@ import org.dom4j.io.DocumentSource;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
-import org.orbeon.oxf.processor.SAXLoggerProcessor;
 import org.orbeon.oxf.processor.transformer.TransformerURIResolver;
 import org.orbeon.oxf.processor.xinclude.XIncludeProcessor;
 import org.orbeon.oxf.util.StringBuilderWriter;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
-import org.orbeon.oxf.xml.dom4j.LocationDocumentSource;
-import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
+import org.orbeon.oxf.xml.dom4j.*;
 import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.TransformerFactoryImpl;
-import org.orbeon.saxon.functions.FunctionLibrary;
-import org.orbeon.saxon.functions.FunctionLibraryList;
 import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.saxon.tinytree.TinyBuilder;
@@ -535,7 +529,17 @@ public class TransformerUtils {
      * Transform a dom4j Node to SAX events.
      */
     public static void writeDom4j(org.dom4j.Node node, XMLReceiver xmlReceiver) {
-        sourceToSAX(new LocationDocumentSource(node), xmlReceiver);
+
+        // NOTE: Use dom4j directly instead of sourceToSAX as performance is better
+        final LocationSAXWriter locationSAXWriter = new LocationSAXWriter();
+        locationSAXWriter.setContentHandler(xmlReceiver);
+        locationSAXWriter.setLexicalHandler(xmlReceiver);
+
+        try {
+            locationSAXWriter.write(node);
+        } catch (SAXException e) {
+            throw new OXFException(e);
+        }
     }
 
     /**

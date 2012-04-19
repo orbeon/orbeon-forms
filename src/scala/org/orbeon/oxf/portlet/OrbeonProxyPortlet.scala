@@ -57,7 +57,7 @@ class OrbeonProxyPortlet extends GenericPortlet {
 
         val formRunnerURL = getPreference(request, FormRunnerURL)
 
-            val (appName, formName, action, documentId, query) = request.getParameter("orbeon.path") match {
+        val (appName, formName, action, documentId, query) = request.getParameter("orbeon.path") match {
             // Incoming path is Form Runner path without document id
             case FormRunnerPath(appName, formName, action, _, query) ⇒ (appName, formName, filterAction(request, action), None, Option(query))
             // Incoming path is Form Runner path with document id

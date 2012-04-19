@@ -16,7 +16,7 @@ package org.orbeon.oxf.fr
 import org.orbeon.oxf.processor.ProcessorImpl
 import org.orbeon.oxf.pipeline.api.ExternalContext.{Response, Request}
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.pipeline.api.{ExternalContext, PipelineContext}
+import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.util.ScalaUtils._
 import scala.collection.JavaConversions._

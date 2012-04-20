@@ -83,13 +83,12 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
             contextStack.getCurrentBindingContext
         } orNull
 
-    override def onCreate(): Unit = {
+    override def onCreate(): Unit =
         getBoundElement match {
             case Some(node) ⇒ updateSubTree(node)
             case _ ⇒ // don't create binding (maybe we could for a read-only instance)
                 _nested = None
         }
-    }
 
     override def onDestroy(): Unit = {
         // TODO: XXX remove child container from parent
@@ -104,7 +103,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
             case _ ⇒
         }
 
-    private def updateSubTree(node: NodeWrapper): Unit = {
+    private def updateSubTree(node: NodeWrapper): Unit =
         if (previousChangeCount != changeCount) {
             // Document has changed and needs to be fully recreated
             processFullUpdate(node)
@@ -117,7 +116,6 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
             if (xblChanges.nonEmpty)
                 processXBLUpdates()
         }
-    }
 
     private def processFullUpdate(node: NodeWrapper): Unit = {
         previousChangeCount = changeCount

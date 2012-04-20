@@ -36,6 +36,33 @@ import java.util.*;
 
 public class Connection {
 
+    public static class Credentials {
+        public final String username;
+        public final String password;
+        public final String domain;
+
+        public Credentials(String username, String password, String domain) {
+
+            assert username != null;
+
+            this.username = username;
+            this.password = password;
+            this.domain = domain;
+        }
+
+        public String getPrefix() {
+            if (password != null)
+                return username + ":" + password + "@";
+            else
+                return username + "@";
+        }
+
+        @Override
+        public String toString() {
+            return "[" + username + ", " + password + ", " + domain + "]";
+        }
+    }
+
     // NOTE: Could add a distinction for portlet session scope.
     public enum StateScope { NONE, REQUEST, SESSION, APPLICATION }
     public enum Method { GET, PUT, POST }
@@ -60,9 +87,7 @@ public class Connection {
     private boolean logBody;
     private String httpMethod;
     private URL connectionURL;
-    private String username;
-    private String password;
-    private String domain;
+    private Credentials credentials;
     String contentType;
     private byte[] messageBody;
     private Map<String, String[]> headersMap;
@@ -73,21 +98,21 @@ public class Connection {
      * This handles:
      *
      * o PUTting or POSTing a body
-     * o handling username and password
+     * o handling credentials
      * o setting HTTP headers
      * o forwarding session cookies
      * o forwarding specified HTTP headers
      * o managing SOAP POST and GET a la XForms 1.1 (should this be here?)
      */
     public ConnectionResult open(ExternalContext externalContext, IndentedLogger indentedLogger, boolean logBody,
-                                 String httpMethod, final URL connectionURL, String username, String password, String domain,
+                                 String httpMethod, final URL connectionURL, Credentials credentials,
                                  String contentType, byte[] messageBody, Map<String, String[]> headerNameValues,
                                  String headersToForward) {
 
         indentedLogger.startHandleOperation(LOG_TYPE, "opening connection");
         try {
             // Prepare, connect, and cleanup
-            prepare(externalContext, indentedLogger, logBody, httpMethod, connectionURL, username, password, domain, contentType, messageBody, headerNameValues, headersToForward, true);
+            prepare(externalContext, indentedLogger, logBody, httpMethod, connectionURL, credentials, contentType, messageBody, headerNameValues, headersToForward, true);
             final ConnectionResult result = connect();
             cleanup(externalContext, true);
 
@@ -99,7 +124,7 @@ public class Connection {
     }
 
     public Connection prepare(ExternalContext externalContext, IndentedLogger indentedLogger, boolean logBody,
-                              String httpMethod, final URL connectionURL, String username, String password, String domain,
+                              String httpMethod, final URL connectionURL, Credentials credentials,
                               String contentType, byte[] messageBody, Map<String, String[]> headerNameValues,
                               String headersToForward, boolean handleState) {
 
@@ -117,15 +142,13 @@ public class Connection {
         this.logBody = logBody;
         this.httpMethod = httpMethod;
         this.connectionURL = connectionURL;
-        this.username = username;
-        this.password = password;
-        this.domain = domain;
+        this.credentials = credentials;
         this.contentType = contentType;
         this.messageBody = messageBody;
 
         // Get  the headers to forward if any
         headersMap = (externalContext.getRequest() != null) ?
-                getHeadersMap(externalContext, indentedLogger, username, headerNameValues, headersToForward) : headerNameValues;
+                getHeadersMap(externalContext, indentedLogger, credentials, headerNameValues, headersToForward) : headerNameValues;
 
         return this;
     }
@@ -141,17 +164,17 @@ public class Connection {
      *
      * o the incoming request
      * o a list of headers names and values to set
-     * o authentication information including username
+     * o credentials information
      * o a list of headers to forward
      *
      * @param externalContext   context
      * @param indentedLogger    logger or null
-     * @param username          username or null
+     * @param credentials       credentials or null
      * @param headerNameValues  LinkedHashMap<String headerName, String[] headerValues> or null
      * @param headersToForward  headers to forward or null
      * @return LinkedHashMap<String headerName, String[] headerValues>
      */
-    public static Map<String, String[]> getHeadersMap(ExternalContext externalContext, IndentedLogger indentedLogger, String username,
+    public static Map<String, String[]> getHeadersMap(ExternalContext externalContext, IndentedLogger indentedLogger, Credentials credentials,
                                     Map<String, String[]> headerNameValues, String headersToForward) {
 
         final boolean doLog = (indentedLogger != null && indentedLogger.isDebugEnabled());
@@ -179,7 +202,7 @@ public class Connection {
         // Forward cookies for session handling
         // NOTE: We use a property, as some app servers like WebLogic allow configuring the session cookie name.
         final String[] cookiesToForward = getForwardCookies();
-        if (username == null && cookiesToForward.length > 0) {
+        if (credentials == null && cookiesToForward.length > 0) {
 
             // NOTES 2011-01-22:
             //
@@ -319,7 +342,6 @@ public class Connection {
             final Map<String, String[]> requestHeaderValuesMap = externalContext.getRequest().getHeaderValuesMap();
 
             for (final Map.Entry<String, String> currentEntry: headersToForwardMap.entrySet()) {
-                final String currentHeaderName = currentEntry.getValue();
                 final String currentHeaderNameLowercase = currentEntry.getKey();
 
                 // Get incoming header value (Map contains values in lowercase!)
@@ -327,8 +349,8 @@ public class Connection {
                 // Forward header if present
                 if (currentIncomingHeaderValues != null) {
                     final boolean isAuthorizationHeader = currentHeaderNameLowercase.equalsIgnoreCase(Connection.AUTHORIZATION_HEADER);
-                    if (!isAuthorizationHeader || isAuthorizationHeader && username == null) {
-                        // Only forward Authorization header if there is no username provided
+                    if (!isAuthorizationHeader || isAuthorizationHeader && credentials == null) {
+                        // Only forward Authorization header if there is no credentials provided
                         if (doLog)
                             indentedLogger.logDebug(LOG_TYPE, "forwarding header",
                                     "name", currentHeaderNameLowercase, "value", StringUtils.join(currentIncomingHeaderValues, ' '));
@@ -337,7 +359,7 @@ public class Connection {
                         // Just log this information
                         if (doLog)
                             indentedLogger.logDebug(LOG_TYPE,
-                                    "not forwarding Authorization header because username is present");
+                                    "not forwarding Authorization header because credentials are present");
                     }
                 }
             }
@@ -438,13 +460,13 @@ public class Connection {
                     httpURLConnection.setRequestMethod(httpMethod);
 
                     // Set credentials
-                    if (username != null) {
+                    if (credentials != null) {
 
-                        httpURLConnection.setUsername(username);
-                        if (password != null)
-                           httpURLConnection.setPassword(password);
-                        if (domain != null)
-                        	httpURLConnection.setDomain(domain);
+                        httpURLConnection.setUsername(credentials.username);
+                        if (credentials.password != null)
+                           httpURLConnection.setPassword(credentials.password);
+                        if (credentials.domain != null)
+                        	httpURLConnection.setDomain(credentials.domain);
                     }
                 }
 

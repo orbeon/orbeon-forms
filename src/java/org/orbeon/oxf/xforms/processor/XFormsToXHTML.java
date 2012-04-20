@@ -383,8 +383,7 @@ public class XFormsToXHTML extends ProcessorImpl {
                         ExternalContext.Response.REWRITE_MODE_ABSOLUTE);
 
                     if (!instance.isCacheHint()) {
-                        stage1CacheableState.addReference(null, resolvedDependencyURL, instance.xxformsUsername(),
-                                instance.xxformsPassword(), instance.xxformsPassword(), forwardSubmissionHeaders);
+                        stage1CacheableState.addReference(null, resolvedDependencyURL, instance.credentials(), forwardSubmissionHeaders);
 
                         if (indentedLogger.isDebugEnabled())
                                 indentedLogger.logDebug("", "adding document cache dependency for non-cacheable instance", "instance URI", resolvedDependencyURL);
@@ -411,7 +410,7 @@ public class XFormsToXHTML extends ProcessorImpl {
                     if (indentedLogger.isDebugEnabled())
                         indentedLogger.logDebug("", "adding document cache dependency for schema", "schema URI", currentSchemaURI);
 
-                    stage1CacheableState.addReference(null, currentSchemaURI, null, null, null, forwardSubmissionHeaders);// TODO: support username / password on schema refs
+                    stage1CacheableState.addReference(null, currentSchemaURI, null, forwardSubmissionHeaders);// TODO: support credentials on schema refs
                 }
             }
         }
@@ -422,7 +421,7 @@ public class XFormsToXHTML extends ProcessorImpl {
             final Metadata metadata = containingDocument.getStaticState().topLevelPart().metadata();
             final Set<String> includes = metadata.getBindingIncludesJava();
             for (final String include: includes) {
-                stage1CacheableState.addReference(null, "oxf:" + include, null, null, null, null);
+                stage1CacheableState.addReference(null, "oxf:" + include, null, null);
             }
         }
     }

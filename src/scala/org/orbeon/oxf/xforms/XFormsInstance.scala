@@ -33,6 +33,7 @@ import java.util.{List ⇒ JList}
 import scala.collection.JavaConverters._
 import org.orbeon.oxf.util.{XPathCache, IndentedLogger}
 import org.orbeon.saxon.om.{DocumentInfo, Item}
+import org.orbeon.oxf.util.Connection.Credentials
 
 /**
  * Represent an XForms instance.
@@ -44,9 +45,7 @@ class XFormsInstance(
         var modelEffectiveId: String,
 
         val sourceURI: String,  // Option
-        val username: String,   // Option
-        val password: String,   // Option
-        val domain: String,     // Option
+        val credentials: Credentials,   // Option
     
         val cache: Boolean,
         val timeToLive: Long,   // Option
@@ -82,9 +81,7 @@ class XFormsInstance(
             modelEffectiveId,
 
             sourceURI,
-            username,
-            password,
-            domain,
+            credentials,
 
             cache,
             timeToLive,
@@ -109,9 +106,11 @@ class XFormsInstance(
         att("model-id", modelEffectiveId)
 
         if (sourceURI ne null) att("source-uri", sourceURI)
-        if (username ne null) att("username", username)
-        if (password ne null) att("password", password)
-        if (domain ne null) att("domain", domain)
+        if (credentials ne null) {
+            if (credentials.username ne null) att("username", credentials.username)
+            if (credentials.password ne null) att("password", credentials.password)
+            if (credentials.domain ne null) att("domain", credentials.domain)
+        }
 
         if (cache) att("cache", "true")
         if (timeToLive >= 0) att("ttl", timeToLive.toString)

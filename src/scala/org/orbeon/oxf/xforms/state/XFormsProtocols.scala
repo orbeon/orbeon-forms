@@ -24,8 +24,9 @@ import org.apache.commons.lang.StringUtils
 import org.orbeon.oxf.xforms.state.DynamicState.Control
 
 import sbinary._
-import sbinary.Operations._
 import org.dom4j.{Namespace, QName, Document}
+import org.orbeon.oxf.util.Connection.Credentials
+import sbinary.Operations._
 
 object XFormsOperations {
 
@@ -93,9 +94,7 @@ object XFormsProtocols extends StandardTypes with StandardPrimitives with JavaLo
             write(output, instance.modelEffectiveId)
 
             write(output, StringUtils.trimToEmpty(instance.sourceURI))
-            write(output, StringUtils.trimToEmpty(instance.username))
-            write(output, StringUtils.trimToEmpty(instance.password))
-            write(output, StringUtils.trimToEmpty(instance.domain))
+            write(output, instance.credentials)
 
             write(output, instance.cache)
             write(output, instance.timeToLive)
@@ -143,9 +142,7 @@ object XFormsProtocols extends StandardTypes with StandardPrimitives with JavaLo
                 read[String](in),
 
                 StringUtils.trimToNull(read[String](in)),
-                StringUtils.trimToNull(read[String](in)),
-                StringUtils.trimToNull(read[String](in)),
-                StringUtils.trimToNull(read[String](in)),
+                read[Credentials](in),
 
                 cache,
                 read[Long](in),
@@ -159,6 +156,31 @@ object XFormsProtocols extends StandardTypes with StandardPrimitives with JavaLo
 
                 read[Boolean](in)
             )
+        }
+    }
+    
+    implicit object CredentialsFormat extends Format[Credentials] {
+        def writes(out: Output, value: Credentials) {
+            if (value ne null) {
+                write(out, StringUtils.trimToEmpty(value.username))
+                write(out, StringUtils.trimToEmpty(value.password))
+                write(out, StringUtils.trimToEmpty(value.domain))
+            } else {
+                write(out, "")
+                write(out, "")
+                write(out, "")
+            }
+        }
+
+        def reads(in: Input) = {
+            val username = StringUtils.trimToNull(read[String](in))
+            val password = StringUtils.trimToNull(read[String](in))
+            val domain = StringUtils.trimToNull(read[String](in))
+            
+            if (username eq null)
+                null
+            else
+                new Credentials(username, password, domain)
         }
     }
 

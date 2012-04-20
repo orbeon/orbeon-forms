@@ -165,7 +165,7 @@ public abstract class URIProcessorOutputImpl extends ProcessorOutputImpl {
                 return ProcessorImpl.getInputKey(pipelineContext, processorImpl.getInputByName(inputName));
             } else {
                 // Other URIs
-                final String keyString = buildURIUsernamePasswordString(URLFactory.createURL(uriReference.context, uriReference.spec).toExternalForm(), uriReference.username, uriReference.password);
+                final String keyString = buildURIUsernamePasswordString(URLFactory.createURL(uriReference.context, uriReference.spec).toExternalForm(), uriReference.credentials);
                 return new InternalCacheKey(processorImpl, "urlReference", keyString);
             }
         } catch (Exception e) {
@@ -206,8 +206,8 @@ public abstract class URIProcessorOutputImpl extends ProcessorOutputImpl {
 
                     final URIReferencesState state = (URIReferencesState) processorImpl.getState(pipelineContext);
                     final String urlString = url.toExternalForm();
-                    readURLToStateIfNeeded(pipelineContext, url, state, uriReference.username, uriReference.password, uriReference.domain, uriReference.headersToForward);
-                    return state.getLastModified(urlString, uriReference.username, uriReference.password);
+                    readURLToStateIfNeeded(pipelineContext, url, state, uriReference.credentials, uriReference.headersToForward);
+                    return state.getLastModified(urlString, uriReference.credentials);
 
                 } else  {
                     // Other URLs
@@ -262,24 +262,19 @@ public abstract class URIProcessorOutputImpl extends ProcessorOutputImpl {
 
         public final String context;
         public final String spec;
-        public final String username;
-        public final String password;
-        public final String domain;
+        public final Connection.Credentials credentials;
         public final String headersToForward;
 
-        public URIReference(String context, String spec, String username, String password,
-        					String domain, String headersToForward) {
+        public URIReference(String context, String spec, Connection.Credentials credentials, String headersToForward) {
             this.context = context;
             this.spec = spec;
-            this.username = username;
-            this.password = password;
-            this.domain = domain;
+            this.credentials = credentials;
             this.headersToForward = headersToForward;
         }
 
         @Override
         public String toString() {
-            return "[" + context + ", " + spec + ", " + username + ", " + headersToForward + "]";
+            return "[" + context + ", " + spec + ", " + credentials + ", " + headersToForward + "]";
         }
     }
 
@@ -297,23 +292,23 @@ public abstract class URIProcessorOutputImpl extends ProcessorOutputImpl {
 
         private Map<String, DocumentInfo> map;
 
-        public void setDocument(String urlString, String username, String password, SAXStore documentSAXStore, Long lastModified) {
+        public void setDocument(String urlString, Connection.Credentials credentials, SAXStore documentSAXStore, Long lastModified) {
             if (map == null)
                 map = new HashMap<String, DocumentInfo>();
-            map.put(buildURIUsernamePasswordString(urlString, username, password), new DocumentInfo(documentSAXStore, lastModified));
+            map.put(buildURIUsernamePasswordString(urlString, credentials), new DocumentInfo(documentSAXStore, lastModified));
         }
 
-        public boolean isDocumentSet(String urlString, String username, String password) {
-            return map != null && map.get(buildURIUsernamePasswordString(urlString, username, password)) != null;
+        public boolean isDocumentSet(String urlString, Connection.Credentials credentials) {
+            return map != null && map.get(buildURIUsernamePasswordString(urlString, credentials)) != null;
         }
 
-        public Long getLastModified(String urlString, String username, String password) {
-            final DocumentInfo documentInfo = map.get(buildURIUsernamePasswordString(urlString, username, password));
+        public Long getLastModified(String urlString, Connection.Credentials credentials) {
+            final DocumentInfo documentInfo = map.get(buildURIUsernamePasswordString(urlString, credentials));
             return documentInfo.lastModified;
         }
 
-        public SAXStore getDocument(String urlString, String username, String password) {
-            final DocumentInfo documentInfo = map.get(buildURIUsernamePasswordString(urlString, username, password));
+        public SAXStore getDocument(String urlString, Connection.Credentials credentials) {
+            final DocumentInfo documentInfo = map.get(buildURIUsernamePasswordString(urlString, credentials));
             return documentInfo.saxStore;
         }
     }
@@ -331,17 +326,14 @@ public abstract class URIProcessorOutputImpl extends ProcessorOutputImpl {
          *
          * @param context           optional context (can be null)
          * @param spec              URL spec
-         * @param username          optional username
-         * @param password          optional password
-         * @param domain			optional domain
+         * @param credentials       optional credentials
          * @param headersToForward  headers to forward
          */
-        public void addReference(String context, String spec, String username, String password,
-        							String domain, String headersToForward) {
+        public void addReference(String context, String spec, Connection.Credentials credentials, String headersToForward) {
             if (references == null)
                 references = new ArrayList<URIReference>();
 
-            references.add(new URIReference(context, spec, username, password, domain, headersToForward));
+            references.add(new URIReference(context, spec, credentials, headersToForward));
         }
 
         /**
@@ -369,18 +361,15 @@ public abstract class URIProcessorOutputImpl extends ProcessorOutputImpl {
      * @param pipelineContext   current context
      * @param url               URL to read
      * @param state             state to read to
-     * @param username          optional username
-     * @param password          optional password
-     * @param domain          	optional domain
+     * @param credentials       optional credentials
      * @param headersToForward  headers to forward
      */
-    public void readURLToStateIfNeeded(PipelineContext pipelineContext, URL url, URIReferencesState state, String username, String password,
-    									String domain, String headersToForward) {
+    public void readURLToStateIfNeeded(PipelineContext pipelineContext, URL url, URIReferencesState state, Connection.Credentials credentials, String headersToForward) {
 
         final String urlString = url.toExternalForm();
 
         // Use cached state if possible
-        if (!state.isDocumentSet(urlString, username, password)) {
+        if (!state.isDocumentSet(urlString, credentials)) {
             // We read the document and store it temporarily, since it will likely be read just after this anyway
             final SAXStore documentSAXStore;
             final Long lastModifiedLong;
@@ -398,7 +387,7 @@ public abstract class URIProcessorOutputImpl extends ProcessorOutputImpl {
                 // Open connection
                 final ConnectionResult connectionResult
                     = new Connection().open(externalContext, new IndentedLogger(logger, ""), false, Connection.Method.GET.name(),
-                        submissionURL, username, password, domain, null, null, null, headersToForward);
+                        submissionURL, credentials, null, null, null, headersToForward);
 
                 // Throw if connection failed (this is caught by the caller)
                 if (connectionResult.statusCode != 200)
@@ -413,16 +402,14 @@ public abstract class URIProcessorOutputImpl extends ProcessorOutputImpl {
             }
 
             // Cache document and last modified
-            state.setDocument(urlString, username, password, documentSAXStore, lastModifiedLong);
+            state.setDocument(urlString, credentials, documentSAXStore, lastModifiedLong);
         }
     }
 
-    private static String buildURIUsernamePasswordString(String uriString, String username, String password) {
+    private static String buildURIUsernamePasswordString(String uriString, Connection.Credentials credentials) {
         // We don't care that the result is an actual URI
-        if (username != null && password != null)
-            return username + ":" + password + "@" + uriString;
-        else if (username != null)
-            return username + "@" + uriString;
+        if (credentials != null)
+            return credentials.getPrefix() + uriString;
         else
             return uriString;
     }

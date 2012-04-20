@@ -429,7 +429,7 @@ public class PDFTemplateProcessor extends HttpBinarySerializer {// TODO: HttpBin
                         // Use ConnectionResult so that header/session forwarding takes place
                         final ConnectionResult connectionResult
                             = new Connection().open(NetUtils.getExternalContext(), new IndentedLogger(logger, ""), false, Connection.Method.GET.name(),
-                                url, null, null, null, null, null, null, Connection.getForwardHeaders());
+                                url, null, null, null, null, Connection.getForwardHeaders());
 
                         if (connectionResult.statusCode != 200) {
                             connectionResult.close();

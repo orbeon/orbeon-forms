@@ -61,11 +61,10 @@ public class XFormsURIResolver extends TransformerURIResolver {
     @Override
     public Source resolve(String href, String base) throws TransformerException {
         // Use global definition for headers to forward
-        return resolve(href, base, null, null, null, Connection.getForwardHeaders());
+        return resolve(href, base, null, Connection.getForwardHeaders());
     }
 
-    public Source resolve(String href, String base, final String username, final String password,
-    		final String domain, final String headersToForward) throws TransformerException {
+    public Source resolve(String href, String base, final Connection.Credentials credentials, final String headersToForward) throws TransformerException {
 
         final String inputName = ProcessorImpl.getProcessorInputSchemeInputName(href);
         if (inputName != null) {
@@ -89,14 +88,14 @@ public class XFormsURIResolver extends TransformerURIResolver {
                 final URIProcessorOutputImpl.URIReferencesState state = (URIProcessorOutputImpl.URIReferencesState) getProcessor().getState(getPipelineContext());
 
                 // First, put in state if necessary
-                processorOutput.readURLToStateIfNeeded(getPipelineContext(), url, state, username, password, domain, headersToForward);
+                processorOutput.readURLToStateIfNeeded(getPipelineContext(), url, state, credentials, headersToForward);
 
                 // Then try to read from state
-                if (state.isDocumentSet(urlString, username, password)) {// not sure why this would not be the case
+                if (state.isDocumentSet(urlString, credentials)) {// not sure why this would not be the case
                     // This means the document requested is already available. We use the cached document.
                     final XMLReader xmlReader = new XMLReaderToReceiver() {
                         public void parse(String systemId) throws SAXException {
-                            state.getDocument(urlString, username, password).replay(createXMLReceiver());
+                            state.getDocument(urlString, credentials).replay(createXMLReceiver());
                         }
                     };
 
@@ -114,9 +113,9 @@ public class XFormsURIResolver extends TransformerURIResolver {
         }
     }
 
-    public Document readAsDom4j(String urlString, String username, String password, String domain, String headersToForward) {
+    public Document readAsDom4j(String urlString, Connection.Credentials credentials, String headersToForward) {
         try {
-            final SAXSource source = (SAXSource) resolve(urlString, null, username, password, domain, headersToForward);
+            final SAXSource source = (SAXSource) resolve(urlString, null, credentials, headersToForward);
             // XInclude handled by source if needed
             return TransformerUtils.readDom4j(source, false);
         } catch (Exception e) {
@@ -124,10 +123,9 @@ public class XFormsURIResolver extends TransformerURIResolver {
         }
     }
 
-    public DocumentInfo readAsTinyTree(Configuration configuration, String urlString, String username, String password,
-    		String domain, String headersToForward) {
+    public DocumentInfo readAsTinyTree(Configuration configuration, String urlString, Connection.Credentials credentials, String headersToForward) {
         try {
-            final SAXSource source = (SAXSource) resolve(urlString, null, username, password, domain, headersToForward);
+            final SAXSource source = (SAXSource) resolve(urlString, null, credentials, headersToForward);
             // XInclude handled by source if needed
             return TransformerUtils.readTinyTree(configuration, source, false);
         } catch (Exception e) {

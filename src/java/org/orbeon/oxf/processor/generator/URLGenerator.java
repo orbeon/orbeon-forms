@@ -869,7 +869,7 @@ public class URLGenerator extends ProcessorImpl {
                 }
 
                 connectionResult = new Connection().open(externalContext, indentedLogger, false, Connection.Method.GET.name(),
-                        config.getURL(), null, null, null, null, null, newHeaders, config.getForwardHeaders());
+                        config.getURL(), null, null, null, newHeaders, config.getForwardHeaders());
                 inputStream = connectionResult.getResponseInputStream(); // empty stream if conditional GET succeeded
             }
         }

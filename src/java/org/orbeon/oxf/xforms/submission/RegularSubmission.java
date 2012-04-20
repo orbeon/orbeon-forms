@@ -59,7 +59,7 @@ public class RegularSubmission extends BaseSubmission {
         // Prepare Connection in this thread as async submission can't access the request object
         final Connection connection = new Connection();
         connection.prepare(NetUtils.getExternalContext(), detailsLogger, isLogBody(), p.actualHttpMethod, absoluteResolvedURL,
-                p2.username, p2.password, p2.domain, sp.actualRequestMediatype, sp.messageBody,
+                p2.credentials, sp.actualRequestMediatype, sp.messageBody,
                 customHeaderNameValues, headersToForward, true);
 
         // Pack external call into a Callable so it can be run:

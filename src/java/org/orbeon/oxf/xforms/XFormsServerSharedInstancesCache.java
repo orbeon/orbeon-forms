@@ -170,7 +170,7 @@ public class XFormsServerSharedInstancesCache {
 
             // Return a copy because id, etc. can be different
             return new XFormsInstance(instanceStaticId, modelEffectiveId,
-                    instanceSourceURI, null, null, null, readonlyInstance.cache(),
+                    instanceSourceURI, null, readonlyInstance.cache(),
                     readonlyInstance.timeToLive(), readonlyInstance.requestBodyHash(), true, readonlyInstance.validation(),
                     readonlyInstance.handleXInclude(), exposeXPathTypes, readonlyInstance.documentInfo(), false);
         } else {

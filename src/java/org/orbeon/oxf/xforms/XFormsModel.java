@@ -327,7 +327,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
      * have an associated id that identifies it.
      */
     public XFormsInstance setInstanceDocument(Object instanceDocument, String modelEffectiveId, String instanceStaticId, String instanceSourceURI,
-                                              String username, String password, String domain, boolean cached, long timeToLive, String validation, boolean handleXInclude) {
+                                              Connection.Credentials credentials, boolean cached, long timeToLive, String validation, boolean handleXInclude) {
 
         // Prepare and set instance
         final int instancePosition = instanceIds.indexOf(instanceStaticId);
@@ -336,11 +336,11 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
             final boolean exposeXPathTypes = XFormsProperties.isExposeXPathTypes(containingDocument);
             if (instanceDocument instanceof Document) {
                 newInstance = new XFormsInstance(instanceStaticId, modelEffectiveId, instanceSourceURI,
-                        username, password, domain, cached, timeToLive, null, false, validation, handleXInclude, exposeXPathTypes,
+                        credentials, cached, timeToLive, null, false, validation, handleXInclude, exposeXPathTypes,
                         XFormsInstance.wrapDocument((Document) instanceDocument, exposeXPathTypes), false);
             } else if (instanceDocument instanceof DocumentInfo) {
                 newInstance = new XFormsInstance(instanceStaticId, modelEffectiveId, instanceSourceURI,
-                        username, password, domain, cached, timeToLive, null, true, validation, handleXInclude, exposeXPathTypes,
+                        credentials, cached, timeToLive, null, true, validation, handleXInclude, exposeXPathTypes,
                         (DocumentInfo) instanceDocument, false);
             } else {
                 throw new OXFException("Invalid type for instance document: " + instanceDocument.getClass().getName());
@@ -487,7 +487,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
                         children.get(0), xxformsExcludeResultPrefixes, isReadonlyHint);
 
                 // Set instance and associated information
-                setInstanceDocument(instanceDocument, effectiveId, instanceStaticId, null, null, null, null, false, -1, xxformsValidation, false);
+                setInstanceDocument(instanceDocument, effectiveId, instanceStaticId, null, null, false, -1, xxformsValidation, false);
             }
         }
     }
@@ -713,7 +713,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
                     // Set instance and associated information if everything went well
                     // NOTE: No XInclude supported to read instances with @src for now
-                    setInstanceDocument(instanceDocument, effectiveId, instanceStaticId, null, null, null, null, false, -1, instance.xxformsValidation(), false);
+                    setInstanceDocument(instanceDocument, effectiveId, instanceStaticId, null, null, false, -1, instance.xxformsValidation(), false);
                 } catch (Exception e) {
                     final LocationData extendedLocationData = new ExtendedLocationData(instance.locationData(), "processing XForms instance", instanceContainer);
                     final Throwable throwable = new ValidationException("Error extracting or setting inline instance", extendedLocationData);
@@ -803,7 +803,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
             final ExternalContext externalContext = NetUtils.getExternalContext();
             final ConnectionResult connectionResult = new Connection().open(externalContext,
-                    indentedLogger, BaseSubmission.isLogBody(), Connection.Method.GET.name(), sourceURL, null, null, null, null, null, null,
+                    indentedLogger, BaseSubmission.isLogBody(), Connection.Method.GET.name(), sourceURL, null, null, null, null,
                     XFormsProperties.getForwardSubmissionHeaders(containingDocument));
 
             // Handle connection errors
@@ -818,7 +818,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
                 final DocumentInfo documentInfo = TransformerUtils.readTinyTree(containingDocument.getStaticState().xpathConfiguration(),
                         connectionResult.getResponseInputStream(), connectionResult.resourceURI, handleXInclude, true);
                 return new XFormsInstance(instanceStaticId, effectiveId, instanceSourceURI,
-                        null, null, null, true, timeToLive, null, true, validation, handleXInclude,
+                        null, true, timeToLive, null, true, validation, handleXInclude,
                         XFormsProperties.isExposeXPathTypes(containingDocument), documentInfo, false);
             } catch (Exception e) {
                 throw new OXFException("Got exception while loading instance from URI: " + instanceSourceURI, e);
@@ -859,9 +859,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
             }
 
             final ConnectionResult connectionResult = new Connection().open(externalContext, indentedLogger, BaseSubmission.isLogBody(),
-                    Connection.Method.GET.name(), absoluteResolvedURL, instance.xxformsUsername(), instance.xxformsPassword(),
-                    instance.xxformsDomain(), null, null, null,
-                    XFormsProperties.getForwardSubmissionHeaders(containingDocument));
+                    Connection.Method.GET.name(), absoluteResolvedURL, instance.credentials(),
+                    null, null, null, XFormsProperties.getForwardSubmissionHeaders(containingDocument));
 
             try {
                 // Handle connection errors
@@ -893,18 +892,18 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
             if (!instance.isReadonlyHint()) {
                 instanceDocument = containingDocument.getURIResolver().readAsDom4j(
-                        absoluteURLString, instance.xxformsUsername(), instance.xxformsPassword(), instance.xxformsDomain(),
+                        absoluteURLString, instance.credentials(),
                         XFormsProperties.getForwardSubmissionHeaders(containingDocument));
             } else {
                 instanceDocument = containingDocument.getURIResolver().readAsTinyTree(containingDocument.getStaticState().xpathConfiguration(),
-                        absoluteURLString, instance.xxformsUsername(), instance.xxformsPassword(), instance.xxformsDomain(),
+                        absoluteURLString, instance.credentials(),
                         XFormsProperties.getForwardSubmissionHeaders(containingDocument));
             }
         }
 
         // Set instance and associated information if everything went well
         // NOTE: No XInclude supported to read instances with @src for now
-        setInstanceDocument(instanceDocument, effectiveId, instance.staticId(), absoluteURLString, instance.xxformsUsername(), instance.xxformsPassword(), instance.xxformsDomain(), false, -1, instance.xxformsValidation(), false);
+        setInstanceDocument(instanceDocument, effectiveId, instance.staticId(), absoluteURLString, instance.credentials(), false, -1, instance.xxformsValidation(), false);
     }
 
     public void performTargetAction(XBLContainer container, XFormsEvent event) {

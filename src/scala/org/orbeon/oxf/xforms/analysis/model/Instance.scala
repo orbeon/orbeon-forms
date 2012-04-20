@@ -22,6 +22,8 @@ import analysis.{StaticStateContext, SimpleElementAnalysis, ElementAnalysis}
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.dom4j.Element
 import xbl.Scope
+import org.orbeon.oxf.util.Connection.Credentials
+import XFormsConstants._
 
 /**
  * Static analysis of an XForms instance.
@@ -32,18 +34,24 @@ class Instance(staticStateContext: StaticStateContext, element: Element, parent:
     val isReadonlyHint = XFormsInstance.isReadonlyHint(element)
     val isCacheHint = Version.instance.isPEFeatureEnabled(XFormsInstance.isCacheHint(element), "cached XForms instance")
     val xxformsTimeToLive = XFormsInstance.getTimeToLive(element)
-    val xxformsValidation = element.attributeValue(XFormsConstants.XXFORMS_VALIDATION_QNAME)
+    val xxformsValidation = element.attributeValue(XXFORMS_VALIDATION_QNAME)
 
-    // Extension: username, password and domain
-    // NOTE: AVTs not supported because XPath expressions in those could access instances that haven't been loaded
-    val xxformsUsername = element.attributeValue(XFormsConstants.XXFORMS_USERNAME_QNAME)
-    val xxformsPassword = element.attributeValue(XFormsConstants.XXFORMS_PASSWORD_QNAME)
-    val xxformsDomain = element.attributeValue(XFormsConstants.XXFORMS_DOMAIN_QNAME)
+    val credentials = {
+        // NOTE: AVTs not supported because XPath expressions in those could access instances that haven't been loaded
+        def username = element.attributeValue(XXFORMS_USERNAME_QNAME)
+        def password = element.attributeValue(XXFORMS_PASSWORD_QNAME)
+        def domain = element.attributeValue(XXFORMS_DOMAIN_QNAME)
+
+        if (username ne null)
+            new Credentials(username, password, domain)
+        else
+            null
+    }
 
     // Allow "", which will cause an xforms-link-exception at runtime
     // NOTE: It could make sense to throw here
     val src = {
-        val srcAttribute = element.attributeValue(XFormsConstants.SRC_QNAME)
+        val srcAttribute = element.attributeValue(SRC_QNAME)
         if (srcAttribute eq null) null else NetUtils.encodeHRRI(srcAttribute.trim, true)
     }
 

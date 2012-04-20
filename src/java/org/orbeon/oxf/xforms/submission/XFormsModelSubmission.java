@@ -869,9 +869,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
         final boolean indent;
         final boolean omitxmldeclaration;
         final Boolean standalone;
-        final String username;
-        final String password;
-        final String domain;
+        final Connection.Credentials credentials;
         final boolean isReadonly;
         final boolean isCache;
         final long timeToLive;
@@ -910,9 +908,15 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                 standalone = (temp != null) ? Boolean.valueOf(temp) : null;
             }
 
-            username = XFormsUtils.resolveAttributeValueTemplates(p.xpathContext, p.refNodeInfo, avtXXFormsUsername);
-            password = XFormsUtils.resolveAttributeValueTemplates(p.xpathContext, p.refNodeInfo, avtXXFormsPassword);
-            domain = XFormsUtils.resolveAttributeValueTemplates(p.xpathContext, p.refNodeInfo, avtXXFormsDomain);
+            final String username = XFormsUtils.resolveAttributeValueTemplates(p.xpathContext, p.refNodeInfo, avtXXFormsUsername);
+            final String password = XFormsUtils.resolveAttributeValueTemplates(p.xpathContext, p.refNodeInfo, avtXXFormsPassword);
+            final String domain = XFormsUtils.resolveAttributeValueTemplates(p.xpathContext, p.refNodeInfo, avtXXFormsDomain);
+
+            if (username == null)
+                credentials = null;
+            else
+                credentials = new Connection.Credentials(username, password, domain);
+
             {
                 final String temp = XFormsUtils.resolveAttributeValueTemplates(p.xpathContext, p.refNodeInfo, avtXXFormsReadonly);
                 isReadonly = (temp != null) ? Boolean.valueOf(temp) : false;
@@ -965,9 +969,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
             this.indent = other.indent;
             this.omitxmldeclaration = other.omitxmldeclaration;
             this.standalone = other.standalone;
-            this.username = other.username;
-            this.password = other.password;
-            this.domain = other.domain;
+            this.credentials = other.credentials;
             this.isCache = other.isCache;
             this.timeToLive = other.timeToLive;
             this.isHandleXInclude = other.isHandleXInclude;

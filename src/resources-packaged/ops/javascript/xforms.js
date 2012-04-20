@@ -3088,6 +3088,12 @@ ORBEON.xforms.Events = {
 
     keydownEvent: new YAHOO.util.CustomEvent(null, null, false, YAHOO.util.CustomEvent.FLAT),
     keydown: function(event) {
+
+        // On IE prevent default behavior when the esc key is pressed, which otherwise would reset all the form fields
+        // See https://github.com/orbeon/orbeon-forms/issues/131
+        if ($.browser.msie && event.keyCode == 27)
+            YAHOO.util.Event.preventDefault(event);
+
         var target = YAHOO.util.Event.getTarget(event);
         var control = ORBEON.xforms.Events._findParentXFormsControl(target);
         if (control != null) {

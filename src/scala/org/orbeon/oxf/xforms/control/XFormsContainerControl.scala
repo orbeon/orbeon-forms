@@ -48,7 +48,7 @@ trait XFormsContainerControl extends XFormsControl {
     }
 
     // Remove all children at once
-    protected def clearChildren() =
+    def clearChildren() =
         this._children = null
 
     // Update this control's effective id and its descendants based on the parent's effective id

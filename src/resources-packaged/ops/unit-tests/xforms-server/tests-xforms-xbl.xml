@@ -4160,7 +4160,72 @@
         </output>
     </test>
 
-    <test description="Simple xxf:dynamic propagates instance values" name="oxf:pipeline">
+    <test description="xxf:binding(), xxf:binding-context() and xxf:component-context()" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="instance">
+                            <values xmlns="">
+                                <foo/>
+                                <bar/>
+                            </values>
+                        </xf:instance>
+                    </xf:model>
+                    <xbl:xbl>
+                        <xbl:binding id="fr-gaga" element="fr|gaga" xxbl:mode="binding">
+                            <xbl:template>
+                                <xf:output id="binding" value="string-join(for $i in xxf:binding('fr-gaga') return if ($i instance of node()) then name($i) else xs:string($i), ' ')"/>
+                                <xf:output id="binding-context" value="string-join(for $i in xxf:binding-context('fr-gaga') return if ($i instance of node()) then name($i) else xs:string($i), ' ')"/>
+                                <xf:output id="component-context" value="string-join(for $i in xxf:component-context() return if ($i instance of node()) then name($i) else xs:string($i), ' ')"/>
+                            </xbl:template>
+                        </xbl:binding>
+                    </xbl:xbl>
+                </xh:head>
+                <xh:body>
+                    <fr:gaga id="gaga1" ref="foo"/>
+                    <fr:gaga id="gaga2" ref="*"/>
+                    <fr:gaga id="gaga3" ref="1 to 10"/>
+                    <fr:gaga id="gaga4"/>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <values>
+                                    <foo/>
+                                    <bar/>
+                                </values>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="gaga1$binding">foo</xxf:control>
+                        <xxf:control id="gaga1$binding-context">values</xxf:control>
+                        <xxf:control id="gaga1$component-context">values</xxf:control>
+                        <xxf:control id="gaga2$binding">foo</xxf:control>
+                        <xxf:control id="gaga2$binding-context">values</xxf:control>
+                        <xxf:control id="gaga2$component-context">values</xxf:control>
+                        <xxf:control id="gaga3" readonly="true"/>
+                        <xxf:control id="gaga3$binding">1</xxf:control>
+                        <xxf:control id="gaga3$binding-context">values</xxf:control>
+                        <xxf:control id="gaga3$component-context">values</xxf:control>
+                        <xxf:control id="gaga4$binding-context">values</xxf:control>
+                        <xxf:control id="gaga4$component-context">values</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="xxf:dynamic: mirror instance values" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xh:html>
@@ -4226,72 +4291,267 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:inner-html id="my-dynamic">&lt;span id="my-dynamic$my-output" class="xforms-control xforms-output"&gt;42&lt;/span&gt;</xxf:inner-html>
+                        <xxf:control id="my-dynamic$my-output">42</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
         </output>
     </test>
 
-    <test description="xxf:binding(), xxf:binding-context() and xxf:component-context()" name="oxf:pipeline">
+    <test description="xxf:dynamic: change bind type" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xh:html>
                 <xh:head>
                     <xf:model id="model">
                         <xf:instance id="instance">
-                            <values xmlns="">
-                                <foo/>
-                                <bar/>
-                            </values>
+                            <xh:html>
+                                <xh:head>
+                                    <xf:model id="model">
+                                        <xf:instance id="instance">
+                                            <value>42</value>
+                                        </xf:instance>
+                                        <xf:bind id="my-bind" ref="." type="xs:string"/>
+                                    </xf:model>
+                                </xh:head>
+                                <xh:body>
+                                    <xf:output id="my-output" bind="my-bind"/>
+                                </xh:body>
+                            </xh:html>
                         </xf:instance>
+
+                        <!-- Change bind type -->
+                        <xf:setvalue ev:event="xforms-ready" ref="//xf:bind/@type" value="'xs:date'"/>
+
                     </xf:model>
-                    <xbl:xbl>
-                        <xbl:binding id="fr-gaga" element="fr|gaga" xxbl:mode="binding">
-                            <xbl:template>
-                                <xf:output id="binding" value="string-join(for $i in xxf:binding('fr-gaga') return if ($i instance of node()) then name($i) else xs:string($i), ' ')"/>
-                                <xf:output id="binding-context" value="string-join(for $i in xxf:binding-context('fr-gaga') return if ($i instance of node()) then name($i) else xs:string($i), ' ')"/>
-                                <xf:output id="component-context" value="string-join(for $i in xxf:component-context() return if ($i instance of node()) then name($i) else xs:string($i), ' ')"/>
-                            </xbl:template>
-                        </xbl:binding>
-                    </xbl:xbl>
                 </xh:head>
                 <xh:body>
-                    <fr:gaga id="gaga1" ref="foo"/>
-                    <fr:gaga id="gaga2" ref="*"/>
-                    <fr:gaga id="gaga3" ref="1 to 10"/>
-                    <fr:gaga id="gaga4"/>
+                    <xf:group id="my-group">
+                        <xxf:dynamic ref="." id="my-dynamic"/>
+                    </xf:group>
                 </xh:body>
             </xh:html>
         </input>
         <output name="response">
-            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xxf:event-response>
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
                             <instance id="instance" model-id="model">
-                                <values>
-                                    <foo/>
-                                    <bar/>
-                                </values>
+                                <xh:html>
+                                    <xh:head>
+                                        <xf:model id="model" xxforms:state-handling="client">
+                                            <xf:instance id="instance">
+                                                <value>42</value>
+                                            </xf:instance>
+                                            <xf:bind id="my-bind" ref="." type="xs:date"/>
+                                        </xf:model>
+                                    </xh:head>
+                                    <xh:body>
+                                        <xf:output id="my-output" bind="my-bind"/>
+                                    </xh:body>
+                                </xh:html>
+                            </instance>
+                            <instance id="instance" model-id="my-dynamic$model">
+                                <value>42</value>
                             </instance>
                         </instances>
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="gaga1$binding">foo</xxf:control>
-                        <xxf:control id="gaga1$binding-context">values</xxf:control>
-                        <xxf:control id="gaga1$component-context">values</xxf:control>
-                        <xxf:control id="gaga2$binding">foo</xxf:control>
-                        <xxf:control id="gaga2$binding-context">values</xxf:control>
-                        <xxf:control id="gaga2$component-context">values</xxf:control>
-                        <xxf:control id="gaga3" readonly="true"/>
-                        <xxf:control id="gaga3$binding">1</xxf:control>
-                        <xxf:control id="gaga3$binding-context">values</xxf:control>
-                        <xxf:control id="gaga3$component-context">values</xxf:control>
-                        <xxf:control id="gaga4$binding-context">values</xxf:control>
-                        <xxf:control id="gaga4$component-context">values</xxf:control>
+                        <xxf:control id="my-dynamic$my-output" valid="false" type="{http://www.w3.org/2001/XMLSchema}date">42</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="xxf:dynamic: insert and delete bind" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="instance">
+                            <xh:html>
+                                <xh:head>
+                                    <xf:model id="model">
+                                        <xf:instance id="instance">
+                                            <instance>
+                                                <value1>41</value1>
+                                                <value2>42</value2>
+                                            </instance>
+                                        </xf:instance>
+                                        <xf:bind id="bind1" ref="value1"/>
+                                    </xf:model>
+                                </xh:head>
+                                <xh:body>
+                                    <xf:output id="output1" bind="bind1"/>
+                                    <xf:output id="output2" bind="bind2"/>
+                                </xh:body>
+                            </xh:html>
+                        </xf:instance>
+
+                        <xf:action ev:event="xforms-ready">
+                            <!-- Insert new bind -->
+                            <xf:insert ref="//xf:bind" origin="xxf:element('xf:bind', (xxf:attribute('id', 'bind2'), xxf:attribute('ref', 'value2')))"/>
+                            <!-- Delete first bind -->
+                            <xf:delete ref="//xf:bind[@id = 'bind1']"/>
+                        </xf:action>
+
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:group id="my-group">
+                        <xxf:dynamic ref="." id="my-dynamic"/>
+                    </xf:group>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response>
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <xh:html>
+                                    <xh:head>
+                                        <xf:model id="model" xxforms:state-handling="client">
+                                            <xf:instance id="instance">
+                                                <instance>
+                                                    <value1>41</value1>
+                                                    <value2>42</value2>
+                                                </instance>
+                                            </xf:instance>
+                                            <xf:bind id="bind2" ref="value2"/>
+                                        </xf:model>
+                                    </xh:head>
+                                    <xh:body>
+                                        <xf:output id="output1" bind="bind1"/>
+                                        <xf:output id="output2" bind="bind2"/>
+                                    </xh:body>
+                                </xh:html>
+                            </instance>
+                            <instance id="instance" model-id="my-dynamic$model">
+                                <instance>
+                                    <value1>41</value1>
+                                    <value2>42</value2>
+                                </instance>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="my-dynamic$output1" relevant="false"/>
+                        <xxf:control id="my-dynamic$output2">42</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="xxf:dynamic: update to content nested within top-level XBL binding" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="instance">
+                            <xh:html>
+                                <xh:head>
+                                    <xf:model id="model">
+                                        <xf:instance id="instance">
+                                            <instance>
+                                                <value1>41</value1>
+                                                <value2>42</value2>
+                                            </instance>
+                                        </xf:instance>
+                                        <xf:bind id="bind1" ref="value1"/>
+                                        <xf:bind id="bind2" ref="value2"/>
+                                    </xf:model>
+                                    <xbl:xbl>
+                                        <xbl:binding id="fr-bar" element="fr|bar">
+                                            <xbl:template>
+                                                <xbl:content/>
+                                            </xbl:template>
+                                        </xbl:binding>
+                                    </xbl:xbl>
+                                </xh:head>
+                                <xh:body>
+                                    <xf:group id="my-group">
+                                        <fr:bar id="my-bar" xxf:update="full">
+                                            <xf:input id="input1" bind="bind1"/>
+                                        </fr:bar>
+                                    </xf:group>
+                                </xh:body>
+                            </xh:html>
+                        </xf:instance>
+
+                        <xf:action ev:event="xforms-ready">
+                            <!-- Insert new control -->
+                            <xf:insert ref="//xf:input" origin="xxf:element('xf:input', (xxf:attribute('id', 'input2'), xxf:attribute('bind', 'bind2')))"/>
+                        </xf:action>
+
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:group id="my-group">
+                        <xxf:dynamic ref="." id="my-dynamic"/>
+                    </xf:group>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response>
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <xh:html>
+                                    <xh:head>
+                                        <xf:model id="model" xxforms:state-handling="client">
+                                            <xf:instance id="instance">
+                                                <instance>
+                                                    <value1>41</value1>
+                                                    <value2>42</value2>
+                                                </instance>
+                                            </xf:instance>
+                                            <xf:bind id="bind1" ref="value1"/>
+                                            <xf:bind id="bind2" ref="value2"/>
+                                        </xf:model>
+                                        <xbl:xbl>
+                                            <xbl:binding id="fr-bar" element="fr|bar">
+                                                <xbl:template>
+                                                    <xbl:content/>
+                                                </xbl:template>
+                                            </xbl:binding>
+                                        </xbl:xbl>
+                                    </xh:head>
+                                    <xh:body>
+                                        <xf:group id="my-group">
+                                            <fr:bar id="my-bar" xxf:update="full">
+                                                <xf:input id="input1" bind="bind1"/>
+                                                <xf:input id="input2" bind="bind2"/>
+                                            </fr:bar>
+                                        </xf:group>
+                                    </xh:body>
+                                </xh:html>
+                            </instance>
+                            <instance id="instance" model-id="my-dynamic$model">
+                                <instance>
+                                    <value1>41</value1>
+                                    <value2>42</value2>
+                                </instance>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="my-dynamic$my-bar" class="xforms-update-full"/>
+                        <xxf:inner-html id="my-dynamic$my-bar">&lt;input id="my-dynamic$my-bar$input1$xforms-input-1" type="text" name="my-dynamic$my-bar$input1$xforms-input-1" value="41" class="xforms-input-input"&gt;&lt;/input&gt;&lt;input id="my-dynamic$my-bar$input2$xforms-input-1" type="text" name="my-dynamic$my-bar$input2$xforms-input-1" value="42" class="xforms-input-input"&gt;&lt;/input&gt;</xxf:inner-html>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>

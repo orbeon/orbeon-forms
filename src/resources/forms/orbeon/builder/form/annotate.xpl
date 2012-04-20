@@ -28,6 +28,7 @@
                             xmlns:xhtml="http://www.w3.org/1999/xhtml"
                             xmlns:xforms="http://www.w3.org/2002/xforms"
                             xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+                            xmlns:ev="http://www.w3.org/2001/xml-events"
                             xmlns:dataModel="java:org.orbeon.oxf.fb.DataModel">
 
                 <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
@@ -53,21 +54,57 @@
                     </xsl:copy>
                 </xsl:template>
 
-                <!-- fr:view -> fb:view -->
+                <!-- fr:view → xf:group -->
                 <xsl:template match="xhtml:body//fr:view">
-                    <xsl:element name="fb:{local-name()}">
-                        <xsl:apply-templates select="@* | node()"/>
-                    </xsl:element>
+                    <xforms:group class="fb-view">
+                        <!-- NOTE: We don't copy the view label anymore as it's unneeded -->
+
+                        <!-- Scope $lang which is the language of the form being edited -->
+                        <xforms:var name="lang" value="xxforms:get-variable('fr-form-model', 'fb-lang')" as="element()"/>
+                        <!-- Scope $form-resources: resources of the form being edited.
+                             Use the same logic as in resources-model. In the builder, we don't have a resources-model running
+                             for the form being edited, so we duplicate this here. -->
+                        <xforms:var name="form-resources" value="instance('fr-form-resources')/(resource[@xml:lang = $lang], resource[1])[1]" as="element(resource)?"/>
+                        <!-- Scope $fr-resources for Form Runner resources -->
+                        <xforms:var name="fr-resources" value="xxforms:get-variable('fr-resources-model', 'fr-fr-resources')" as="element(resource)?"/>
+                        <!-- Scope $fb-resources for Form Builder resources -->
+                        <xforms:var name="fb-resources" value="xxforms:get-variable('fr-resources-model', 'fr-form-resources')" as="element(resource)?"/>
+        
+                        <!-- Apply all the content -->
+                        <xforms:group class="fb-body">
+                            <xsl:apply-templates select="fr:body/node()"/>
+                        </xforms:group>
+        
+                        <!-- Listen to activations on grid cells -->
+                        <xforms:action ev:event="DOMActivate">
+                            <xforms:var name="control-element" value="xxforms:control-element(xxforms:event('xxforms:effective-targetid'))"/>
+                            <xforms:action if="tokenize($control-element/@class, '\s+') = 'xforms-activable'">
+                                <xforms:var name="th-column" value="count($control-element/preceding-sibling::*[@xxforms:element = 'xh:th']) + 1"/>
+                                <xforms:var name="new-selected-cell" value="if ($control-element/@xxforms:element = 'xh:th') then
+                                    ($control-element/following-sibling::xforms:repeat//*[@xxforms:element = 'xh:td'])[$th-column]/@id
+                                    else $control-element/@id"/>
+                                <xforms:setvalue ref="xxforms:get-variable('fr-form-model', 'selected-cell')" value="$new-selected-cell"/>
+                                <xforms:setvalue ref="xxforms:get-variable('fr-form-model', 'selected-cell-effective')" value="xxforms:event('xxforms:effective-targetid')"/>
+                            </xforms:action>
+                        </xforms:action>
+        
+                        <!--<xforms:output value="xxforms:get-variable('fr-form-model', 'selected-cell')" xxbl:scope="inner">-->
+                            <!--<xforms:label>Selected:</xforms:label>-->
+                        <!--</xforms:output>-->
+        
+                    </xforms:group>
                 </xsl:template>
 
-                <!-- Add @edit-ref -->
+                <!-- fr:section → fb:section/(@edit-ref, @xxf:update) -->
                 <xsl:template match="xhtml:body//fr:section">
                     <xsl:element name="fb:{local-name()}">
                         <xsl:attribute name="edit-ref"/>
+                        <xsl:attribute name="xxforms:update" select="'full'"/>
                         <xsl:apply-templates select="@* | node()"/>
                     </xsl:element>
                 </xsl:template>
 
+                <!-- fr:grid → fr:grid/@edit-ref -->
                 <xsl:template match="xhtml:body//fr:grid">
                     <xsl:copy>
                         <xsl:attribute name="edit-ref"/>
@@ -79,6 +116,8 @@
                 <xsl:template match="xforms:bind/@relevant | xforms:bind/@readonly | xforms:bind/@required | xforms:bind/@constraint | xforms:bind/@calculate | xforms:bind/@xxforms:default">
                     <xsl:attribute name="fb:{local-name()}" select="."/>
                 </xsl:template>
+
+                <!-- TODO: convert legacy fr:repeat -->
 
                 <!-- Saxon serialization adds an extra meta element, make sure to remove it -->
                 <xsl:template match="xhtml:head/meta[@http-equiv = 'Content-Type']"/>

@@ -43,6 +43,10 @@ abstract class ElementAnalysis(val element: Element, val parent: Option[ElementA
     // In-scope variables (for XPath analysis)
     val inScopeVariables: Map[String, VariableTrait]
 
+    def removeFromParent() =
+        parent foreach
+            { case parent: ChildrenBuilderTrait ⇒ parent.removeChild(self); case _ ⇒ }
+
     lazy val treeInScopeVariables: Map[String, VariableTrait] = {
 
         def findPreceding(element: ElementAnalysis): Option[ElementAnalysis] = element.preceding match {

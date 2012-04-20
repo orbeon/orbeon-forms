@@ -14,10 +14,10 @@
 package org.orbeon.oxf.xforms
 
 import analysis.controls.RepeatControl
-import org.dom4j.QName
 import collection.mutable.LinkedHashSet
 import collection.JavaConverters._
 import java.util.{List ⇒ JList}
+import org.dom4j.QName
 
 // Global operations on parts including top-level part and descendant parts
 class StaticStateGlobalOps(topLevelPart: PartAnalysis) extends PartGlobalOps {
@@ -36,6 +36,9 @@ class StaticStateGlobalOps(topLevelPart: PartAnalysis) extends PartGlobalOps {
     // Find in all parts
     private def findInParts[T <: AnyRef](get: PartAnalysis ⇒ T) =
         parts map (part ⇒ get(part)) filter (_ ne null) headOption
+
+    private def findInPartsOpt[T <: AnyRef](get: PartAnalysis ⇒ Option[T]) =
+        parts flatMap (part ⇒ get(part)) headOption
 
     // Exists in all parts
     private def existsInParts(p: PartAnalysis ⇒ Boolean) =
@@ -67,7 +70,7 @@ class StaticStateGlobalOps(topLevelPart: PartAnalysis) extends PartGlobalOps {
     def hasControlByName(controlName: String) = existsInParts(_.hasControlByName(controlName))
     def hasControlAppearance(controlName: String, appearance: QName) = existsInParts(_.hasControlAppearance(controlName, appearance))
     def isComponent(binding: QName) = existsInParts(_.isComponent(binding))
-    def getBinding(prefixedId: String) = findInParts(_.getBinding(prefixedId)) orNull
+    def getBinding(prefixedId: String) = findInPartsOpt(_.getBinding(prefixedId))
     def getBindingId(prefixedId: String) = findInParts(_.getBindingId(prefixedId)) orNull
     def getBindingQNames = collectInParts(_.getBindingQNames)
 

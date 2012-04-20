@@ -34,12 +34,30 @@ import scala.collection.JavaConverters._
 class XFormsComponentControl(container: XBLContainer, parent: XFormsControl, element: Element, effectiveId: String, state: Map[String, String])
         extends XFormsSingleNodeContainerControl(container, parent, element, effectiveId) {
 
-    val nestedContainer = container.createChildContainer(this)
+    private var _nestedContainer: Option[XBLContainer] = None
+    def nestedContainer = _nestedContainer.get
 
-    // There may or may not be nested models
-    nestedContainer.addAllModels()
-    // Make sure there is location data
-    nestedContainer.setLocationData(getLocationData)
+    // Create nested container upon creation
+    createNestedContainer()
+
+    def createNestedContainer(): Unit = {
+
+        assert(_nestedContainer.isEmpty)
+
+        val newContainer = container.createChildContainer(this)
+        // There may or may not be nested models
+        newContainer.addAllModels()
+        // Make sure there is location data
+        newContainer.setLocationData(getLocationData)
+
+        _nestedContainer = Some(newContainer)
+    }
+
+    def destroyNestedContainer(): Unit = {
+        // Destroy container and models if any
+        nestedContainer.destroy()
+        _nestedContainer = None
+    }
 
     override def staticControl = super.staticControl.asInstanceOf[ComponentControl]
 
@@ -105,7 +123,7 @@ class XFormsComponentControl(container: XBLContainer, parent: XFormsControl, ele
         super.iterationRemoved()
 
         // Destroy container and models if any
-        nestedContainer.destroy()
+        destroyNestedContainer()
     }
 
     // Simply delegate but switch the container

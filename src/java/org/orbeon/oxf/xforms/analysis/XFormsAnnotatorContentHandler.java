@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms.analysis;
 
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.common.Version;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.properties.PropertySet;
 import org.orbeon.oxf.xforms.XFormsConstants;
@@ -185,8 +184,8 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
 
                 putMark(xformsElementId);
                 // Add a class to help the client
-                attributes = XMLUtils.appendToClassAttribute(attributes, "xforms-update-full");
-            } else if (templateSAXStore != null && Version.isPE()) {
+                 attributes = XMLUtils.appendToClassAttribute(attributes, "xforms-update-full");
+            } else if (templateSAXStore != null) {
                 // Remember mark if xxforms:update="full"
                 final String xxformsUpdate = attributes.getValue(XFormsConstants.XXFORMS_UPDATE_QNAME.getNamespaceURI(), XFormsConstants.XXFORMS_UPDATE_QNAME.getName());
                 if (XFormsConstants.XFORMS_FULL_UPDATE.equals(xxformsUpdate)) {
@@ -224,6 +223,18 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
 
             // Create a new id and update the attributes if needed
             attributes = getAttributesGatherNamespaces(qName, attributes, reusableStringArray, idIndex);
+            final String xformsElementId = reusableStringArray[0];
+
+            if (templateSAXStore != null) {
+                // Remember mark if xxforms:update="full"
+                final String xxformsUpdate = attributes.getValue(XFormsConstants.XXFORMS_UPDATE_QNAME.getNamespaceURI(), XFormsConstants.XXFORMS_UPDATE_QNAME.getName());
+                if (XFormsConstants.XFORMS_FULL_UPDATE.equals(xxformsUpdate)) {
+                    // Remember this subtree has a full update
+                    putMark(xformsElementId);
+                    // Add a class to help the client
+                    attributes = XMLUtils.appendToClassAttribute(attributes, "xforms-update-full");
+                }
+            }
 
             // Leave element untouched (except for the id attribute)
             startElement(true, uri, localname, qName, attributes);

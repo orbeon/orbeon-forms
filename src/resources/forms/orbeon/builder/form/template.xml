@@ -97,7 +97,6 @@
     </xhtml:head>
     <xhtml:body>
         <fr:view>
-            <xforms:label ref="instance('fr-form-metadata')/title"/>
             <fr:body>
                 <fr:section id="section-1-section" bind="section-1-bind">
                     <xforms:label ref="$form-resources/section-1/label"/>

@@ -91,17 +91,12 @@
             <!-- Scope form resources -->
             <xxforms:variable name="form-resources" model="fr-resources-model" select="$fr-form-resources" as="element(resource)?"/>
 
-            <!-- Title in chosen language from metadata, view, or HTML title -->
-            <!-- Title is used later  -->
-            <xsl:variable name="view-label" select="(/xhtml:html/xhtml:body//fr:view)[1]/xforms:label" as="element(xforms:label)?"/>
+            <!-- Title in chosen language from metadata or HTML title -->
             <xxforms:variable name="title"
                               select="((xxforms:instance('fr-form-metadata')/title[@xml:lang = $metadata-lang],
                                         xxforms:instance('fr-form-metadata')/title[1],
                                         $source-form-metadata/title[@xml:lang = $metadata-lang],
                                         $source-form-metadata/title[1],
-                                        ({$view-label/@ref}),
-                                        ({$view-label/@value}),
-                                        '{replace($view-label, '''', '''''')}',
                                         '{replace(xhtml:head/xhtml:title, '''', '''''')}')[normalize-space() != ''])[1]"/>
 
             <xsl:apply-templates select="node()"/>

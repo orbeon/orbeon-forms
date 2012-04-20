@@ -42,7 +42,7 @@ trait PartModelAnalysis extends TransientState {
 
     def getModelByScopeAndBind(scope: Scope, bindStaticId: String) =
         modelsByScope.get(scope) flatMap
-            (_ find (_.bindsById.get(bindStaticId) ne null)) orNull
+            (_ find (_.bindsById.contains(bindStaticId))) orNull
 
     def getModelsForScope(scope: Scope) =
         modelsByScope.get(scope) getOrElse Seq() asJava
@@ -60,7 +60,7 @@ trait PartModelAnalysis extends TransientState {
         null
     }
 
-    protected def indexModel(model: Model,eventHandlers: Buffer[EventHandlerImpl]) {
+    protected def indexModel(model: Model, eventHandlers: Buffer[EventHandlerImpl]) {
         val models = modelsByScope.getOrElseUpdate(model.scope, Buffer[Model]())
         models += model
         modelsByPrefixedId += model.prefixedId → model
@@ -69,13 +69,20 @@ trait PartModelAnalysis extends TransientState {
             modelByInstancePrefixedId += instance.prefixedId → model
     }
 
+    protected def deindexModel(model: Model) {
+        modelsByScope.get(model.scope) foreach (_ -= model)
+        modelsByPrefixedId -= model.prefixedId
+
+        for (instance ← model.instances.values)
+            modelByInstancePrefixedId -= instance.prefixedId
+    }
+
     protected def analyzeModelsXPath() =
-        if (staticState.isXPathAnalysis)
-            for {
-                (scope, models) ← modelsByScope
-                model ← models
-            } yield
-                model.analyzeXPath()
+        for {
+            (scope, models) ← modelsByScope
+            model ← models
+        } yield
+            model.analyzeXPath()
 
     override def freeTransientState() = {
         super.freeTransientState()

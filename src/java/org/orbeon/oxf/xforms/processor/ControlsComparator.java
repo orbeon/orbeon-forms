@@ -92,26 +92,39 @@ public class ControlsComparator {
             final XFormsControl control1 = (leftIterator == null) ? null : leftIterator.next();
             final XFormsControl control2 = (rightIterator == null) ? null : rightIterator.next();
 
-            // Handle xxforms:update="full"
-            final SAXStore.Mark mark = getUpdateFullMark(control2);
-            final boolean isFullUpdateLevel = mark != null;
-            if (isFullUpdateLevel) {
-                // Start buffering
-                tempCH = ch;
-                ch = new ContentHandlerHelper(new SAXStore());
-            }
-
             // Whether it is necessary to output information about this control because the control was previously non-existing
             // TODO: distinction between new iteration AND control just becoming relevant?
             final boolean isNewlyVisibleSubtree = control1 == null;
 
-            // 1: Check current control
+            // Full updates
+            final SAXStore.Mark mark;
+            final boolean isFullUpdateLevel;
 
+            // 1: Check current control
             boolean mustDoFullUpdate;
-            if (control2 instanceof XXFormsDynamicControl) {
-                // Special case for dynamic control
-                mustDoFullUpdate = !control2.equalsExternal(control1);
+            if (control2.hasStructuralChange()) {
+
+                assert ! withinFullUpdate();
+
+                // This control will need a full update
+                // As of 2012-04-16, includes XXFormsDynamicControl and contained control with updated XBL bindings
+                mustDoFullUpdate = true;
+
+                mark = containingDocument.getStaticOps().getMark(control2.getPrefixedId());
+                assert mark != null;
+                isFullUpdateLevel = true;
+                tempCH = ch;
             } else {
+                // Handle xxforms:update="full"
+                mark = getUpdateFullMark(control2);
+                isFullUpdateLevel = mark != null;
+                if (isFullUpdateLevel) {
+                    // Start buffering
+                    tempCH = ch;
+                    ch = new ContentHandlerHelper(new SAXStore());
+                }
+
+
                 // Don't send anything if nothing has changed, but we force a change for controls whose values changed in the request
                 final boolean isValueChangeControl = valueChangeControlIds != null && valueChangeControlIds.contains(control2.getEffectiveId());
                 if (control2.supportAjaxUpdates() && (!control2.equalsExternal(control1) || isValueChangeControl)) {
@@ -273,8 +286,12 @@ public class ControlsComparator {
         return true;
     }
 
+    private boolean withinFullUpdate() {
+        return tempCH != null;
+    }
+
     private boolean mustDoFullUpdate() {
-        return tempCH != null && ((SAXStore) ch.getXmlReceiver()).getAttributesCount() >= fullUpdateThreshold;
+        return withinFullUpdate() && ((SAXStore) ch.getXmlReceiver()).getAttributesCount() >= fullUpdateThreshold;
     }
 
     private SAXStore.Mark getUpdateFullMark(XFormsControl control) {
@@ -283,9 +300,9 @@ public class ControlsComparator {
         // o there is not already a full update in progress
         // o we are in span layout OR we are using XXFormsDynamicControl
         // o the control supports full Ajax updates
-        // o there is xxforms:update="full"
+        // o there is a mark for the given control
         //
-        if (tempCH == null && (isSpanHTMLLayout || control instanceof XXFormsDynamicControl) && control.supportFullAjaxUpdates()) {
+        if (! withinFullUpdate() && (isSpanHTMLLayout || control instanceof XXFormsDynamicControl) && control.supportFullAjaxUpdates()) {
             return containingDocument.getStaticOps().getMark(control.getPrefixedId());
         } else {
             return null;

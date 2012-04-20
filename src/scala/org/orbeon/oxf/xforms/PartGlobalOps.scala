@@ -44,7 +44,7 @@ trait PartGlobalOps {
 
     // XBL
     def isComponent(binding: QName): Boolean
-    def getBinding(prefixedId: String): ConcreteBinding
+    def getBinding(prefixedId: String): Option[ConcreteBinding]
     def getBindingId(prefixedId: String): String
     def getBindingQNames: Seq[QName]
     def getGlobals: collection.Map[QName, XBLBindings#Global]

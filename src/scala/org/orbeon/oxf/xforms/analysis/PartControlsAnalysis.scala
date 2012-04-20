@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.analysis
 
 import controls._
+import model.Model
 import scala.collection.JavaConverters._
 import org.dom4j.QName
 import org.orbeon.oxf.xforms.XFormsConstants._
@@ -31,13 +32,18 @@ trait PartControlsAnalysis extends TransientState {
     private val controlAppearances = HashMap[String, HashSet[QName]]();
 
     // Special handling of attributes
-    private[PartControlsAnalysis] var attributeControls: Map[String, Map[String, AttributeControl]] = _
+    private[PartControlsAnalysis] var _attributeControls: Map[String, Map[String, AttributeControl]] = Map()
 
     // Special handling of input placeholder
     private[PartControlsAnalysis] var _hasInputPlaceholder = false
     def hasInputPlaceholder = _hasInputPlaceholder
 
-    protected def indexNewControl(elementAnalysis: ElementAnalysis, externalLHHA: Buffer[LHHAAnalysis], eventHandlers: Buffer[EventHandlerImpl]) {
+    protected def indexNewControl(
+            elementAnalysis: ElementAnalysis,
+            lhhas: Buffer[LHHAAnalysis],
+            eventHandlers: Buffer[EventHandlerImpl],
+            models: Buffer[Model],
+            attributes: Buffer[AttributeControl]) {
         val controlName = elementAnalysis.localName
 
         // Index by prefixed id
@@ -64,13 +70,15 @@ trait PartControlsAnalysis extends TransientState {
 
         // Register special controls
         elementAnalysis match {
-            case lhha: LHHAAnalysis ⇒ externalLHHA += lhha
+            case lhha: LHHAAnalysis ⇒ lhhas += lhha
             case eventHandler: EventHandlerImpl ⇒ eventHandlers += eventHandler
+            case model: Model ⇒ models += model
+            case attribute: AttributeControl ⇒ attributes += attribute
             case _ ⇒
         }
     }
 
-    protected def analyzeCustomControls() {
+    protected def analyzeCustomControls(attributes: Buffer[AttributeControl]) {
         // Check whether input controls have "placeholder/minimal" label/hint
         _hasInputPlaceholder =
             controlTypes.get("input") match {
@@ -79,40 +87,41 @@ trait PartControlsAnalysis extends TransientState {
            }
 
         // Index attribute controls
-        attributeControls =
-            controlTypes.get("attribute") match {
-                case Some(map) ⇒
-                    case class AttributeDetails(forPrefixedId: String, attributeName: String, attributeControl: AttributeControl)
-                    val triples =
-                        for {
-                            value ← map.values
-                            attributeControl = value.asInstanceOf[AttributeControl]
-                        } yield
-                            AttributeDetails(attributeControl.forPrefixedId, attributeControl.attributeName, attributeControl)
+        if (attributes.nonEmpty) {
+            case class AttributeDetails(forPrefixedId: String, attributeName: String, attributeControl: AttributeControl)
 
-                    // Nicely group the results in a two-level map
-                    // NOTE: We assume only one control per forPrefixedId/attributeName combination, hence the assert
+            val triples =
+                for (attributeControl ← attributes)
+                    yield AttributeDetails(attributeControl.forPrefixedId, attributeControl.attributeName, attributeControl)
 
-                    triples groupBy
-                        (_.forPrefixedId) mapValues
-                            (_ groupBy (_.attributeName) mapValues {a ⇒ assert(a.size == 1); a.head.attributeControl})
+            // Nicely group the results in a two-level map
+            // NOTE: We assume only one control per forPrefixedId/attributeName combination, hence the assert
+            val newAttributes =
+                triples groupBy
+                    (_.forPrefixedId) mapValues
+                        (_ groupBy (_.attributeName) mapValues {a ⇒ assert(a.size == 1); a.head.attributeControl})
 
-                case None ⇒ Map()
+
+            // Accumulate new attributes into existing map by combining values for a given "for id"
+            _attributeControls = newAttributes.foldLeft(_attributeControls) {
+                case (existingMap, (forId, newAttributes)) ⇒
+                    val existingAttributes = existingMap.get(forId) getOrElse Map[String, AttributeControl]()
+                    existingMap + (forId → (existingAttributes ++ newAttributes))
             }
+        }
     }
 
     protected def analyzeControlsXPath() =
-        if (staticState.isXPathAnalysis)
-            for (control ← controlAnalysisMap.values)
-                control.analyzeXPath()
+        for (control ← controlAnalysisMap.values)
+            control.analyzeXPath()
 
     def getControlAnalysis(prefixedId: String) = controlAnalysisMap.get(prefixedId) orNull
 
     def hasAttributeControl(prefixedForAttribute: String) =
-        attributeControls.get(prefixedForAttribute).isDefined
+        _attributeControls.get(prefixedForAttribute).isDefined
 
     def getAttributeControl(prefixedForAttribute: String, attributeName: String) =
-        attributeControls.get(prefixedForAttribute) flatMap (_.get(attributeName)) orNull
+        _attributeControls.get(prefixedForAttribute) flatMap (_.get(attributeName)) orNull
 
     def hasControlByName(controlName: String) =
         controlTypes.get(controlName).isDefined
@@ -153,5 +162,46 @@ trait PartControlsAnalysis extends TransientState {
 
         for (controlAnalysis ← controlAnalysisMap.values)
             controlAnalysis.freeTransientState()
+    }
+
+    // Deindex the given control
+    def deindexControl(control: ElementAnalysis): Unit = {
+        val controlName = control.localName
+        val prefixedId = control.prefixedId
+
+        controlAnalysisMap -= prefixedId
+        controlTypes.get(controlName) foreach (_ -= prefixedId)
+
+        metadata.removeNamespaceMapping(prefixedId)
+        unmapScopeIds(control)
+
+        control match {
+            case model: Model ⇒ deindexModel(model)
+            case eventHandler: EventHandlerImpl ⇒ deregisterEventHandler(eventHandler)
+            case attributeControl: AttributeControl ⇒ _attributeControls -= attributeControl.forPrefixedId
+            case _ ⇒
+        }
+
+        // NOTE: Can't update controlAppearances and _hasInputPlaceholder without checking all controls again, so for now leave that untouched
+    }
+
+    // Remove the given control and its descendants
+    def deindexTree(tree: ElementAnalysis, self: Boolean): Unit = {
+        if (self) {
+            deindexControl(tree)
+            tree.removeFromParent()
+        }
+
+        tree match {
+            case childrenBuilder: ChildrenBuilderTrait ⇒
+                childrenBuilder.descendants foreach
+                    (deindexControl(_))
+
+                if (! self)
+                    childrenBuilder.children foreach
+                        (_.removeFromParent())
+
+            case _ ⇒
+        }
     }
 }

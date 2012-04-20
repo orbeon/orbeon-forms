@@ -20,9 +20,13 @@ import org.junit.BeforeClass;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorUtils;
+import org.orbeon.oxf.processor.XMLProcessorRegistry;
+import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.processor.test.TestExternalContext;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.util.LoggerFactory;
+import org.orbeon.oxf.util.PipelineUtils;
+import org.orbeon.oxf.xml.XMLUtils;
 
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -53,6 +57,14 @@ public abstract class ResourceManagerTestBase {
             ResourceManagerWrapper.init(props);
             // Initialize properties
             org.orbeon.oxf.properties.Properties.init("oxf:/ops/unit-tests/properties.xml");
+
+            // Run processor registry so we can use XPL
+            final XMLProcessorRegistry registry = new XMLProcessorRegistry();
+            final String processorsXML = "processors.xml";
+            final Document doc = ResourceManagerWrapper.instance().getContentAsDOM4J(processorsXML, XMLUtils.ParserConfiguration.XINCLUDE_ONLY, true);
+            final DOMGenerator config = PipelineUtils.createDOMGenerator(doc, processorsXML, DOMGenerator.ZeroValidity, processorsXML);
+            PipelineUtils.connect(config, "data", registry, "config");
+            registry.start(new PipelineContext());
 
             staticSetupDone  = true;
         }

@@ -22,21 +22,12 @@ import FormBuilderFunctions._
 
 object ContainerOps {
 
-    val GridElementQNames = Set(
-        FR → "grid",
-        FR → "repeat", // for legacy FB
-        XF → "repeat"  // for legacy FB
-    )
+    private val GridElementTest = pairToTest(FR → "grid")
+    private val ContainerElementTest = Seq(pairToTest(FB → "section"), GridElementTest) reduce (_ || _)
 
-    // Hardcoded list of FB controls we know can contain others
-    // TODO: "fr:tab" (special because "fr:tabview/fr:tab" are always combined)
-    val ContainerElementQNames = GridElementQNames ++ Set(
-        FR → "body",
-        FR → "section",
-        FB → "section"
-    )
-
-    val ContainerElementTest = ContainerElementQNames map (pairToTest(_)) reduce (_ || _)
+    // Whether the given node is a container element
+    def isContainer(node: NodeInfo) =
+        (node self ContainerElementTest) || ((node self (XF → "group")) && node.attClasses("fb-body"))
 
     // XForms callers: get the name for a section or grid element or null (the empty sequence)
     def getContainerNameOrEmpty(elem: NodeInfo) = getControlNameOption(elem).orNull
@@ -44,7 +35,7 @@ object ContainerOps {
     // Find ancestor sections and grids (including non-repeated grids) from leaf to root
     def findAncestorContainers(descendant: NodeInfo, includeSelf: Boolean = false) =
         if (includeSelf) descendant ancestorOrSelf * else descendant ancestor * filter
-            (e ⇒ ContainerElementQNames(qname(e)))
+            isContainer
 
     // Find ancestor section and grid names from root to leaf
     def findContainerNames(descendant: NodeInfo): Seq[String] =
@@ -65,11 +56,11 @@ object ContainerOps {
 
     // A container's children containers
     def childrenContainers(container: NodeInfo) =
-        container \ * filter (e ⇒ ContainerElementQNames(qname(e)))
+        container \ * filter isContainer
 
     // A container's children grids (including repeated grids)
     def childrenGrids(container: NodeInfo) =
-        container \ * filter (e ⇒ GridElementQNames(qname(e)))
+        container \ * filter (_ self GridElementTest)
 
     // Delete the entire container and contained controls
     def deleteContainer(container: NodeInfo) = {
@@ -166,7 +157,7 @@ object ContainerOps {
 
     // Return all the container controls in the view
     def getAllContainerControls(inDoc: NodeInfo) =
-        getAllControls(inDoc) filter (e ⇒ ContainerElementQNames(qname(e)))
+        getAllControls(inDoc) filter isContainer
 
     // Whether it is possible to move an item into the given container
     // Currently: must be a section without section template content

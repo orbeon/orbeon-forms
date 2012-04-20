@@ -20,6 +20,7 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.analysis.XPathDependencies;
+import org.orbeon.oxf.xforms.analysis.model.BindTree;
 import org.orbeon.oxf.xforms.analysis.model.Model;
 import org.orbeon.oxf.xforms.event.events.XXFormsXPathErrorEvent;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
@@ -144,7 +145,7 @@ public class XFormsModelBinds {
         // Iterate through all top-level bind elements to create new bind tree
         // TODO: In the future, XPath dependencies must allow for partial rebuild of the tree as is the case with controls
         // Even before that, the bind tree could be modified more dynamically as is the case with controls
-        for (final Model.Bind staticBind : staticModel.topLevelBindsJava())
+        for (final BindTree.Bind staticBind : staticModel.topLevelBindsJava())
             topLevelBinds.add(new Bind(staticBind, true)); // remember as top-level bind
 
         isFirstRebuild = false;
@@ -424,7 +425,7 @@ public class XFormsModelBinds {
             final Map<String, ValueRepresentation> bindVariablesValues = new HashMap<String, ValueRepresentation>();
 
             // Add bind variables
-            for (Map.Entry<String, Model.Bind> currentEntry : staticModel.jBindsByName().entrySet()) {
+            for (Map.Entry<String, BindTree.Bind> currentEntry : staticModel.jBindsByName().entrySet()) {
                 final String currentVariableName = currentEntry.getKey();
                 final String currentBindId = currentEntry.getValue().staticId();
 
@@ -458,7 +459,7 @@ public class XFormsModelBinds {
     }
 
     private void evaluateAndSetCustomMIPs(Bind bind, int position, Map<String, ValueRepresentation> currentVariables) {
-        final Map<String, Model.Bind.XPathMIP> customMips = bind.staticBind.customMIPs();
+        final Map<String, BindTree.Bind.XPathMIP> customMips = bind.staticBind.customMIPs();
         if (customMips != null && customMips.size() > 0) {
             for (final String propertyName: customMips.keySet()) {
                 final String stringResult = evaluateCustomMIP(bind, propertyName, position, currentVariables);
@@ -469,7 +470,7 @@ public class XFormsModelBinds {
     }
 
     private String evaluateCustomMIP(Bind bind, String propertyName, int position, Map<String, ValueRepresentation> currentVariables) {
-        final Map<String, Model.Bind.XPathMIP> customMips = bind.staticBind.customMIPs();
+        final Map<String, BindTree.Bind.XPathMIP> customMips = bind.staticBind.customMIPs();
         if (customMips != null && customMips.size() > 0) {
             final String expression = customMips.get(propertyName).expression();
             if (expression != null) {
@@ -868,14 +869,14 @@ public class XFormsModelBinds {
 
     public class Bind {
 
-        public final Model.Bind staticBind;
+        public final BindTree.Bind staticBind;
         public final List<Item> nodeset;       // actual nodeset for this bind
 
         public final QName typeQName;
 
         private List<BindNode> bindNodes; // List<BindIteration>
 
-        public Bind(Model.Bind staticBind, boolean isSingleNodeContext) {
+        public Bind(BindTree.Bind staticBind, boolean isSingleNodeContext) {
             this.staticBind = staticBind;
 
             // Compute nodeset for this bind
@@ -909,7 +910,7 @@ public class XFormsModelBinds {
                 if (nodesetSize > 0) {
                     // Only then does it make sense to create BindNodes
                     
-                    final List<Model.Bind> childrenStaticBinds = staticBind.jChildren();
+                    final List<BindTree.Bind> childrenStaticBinds = staticBind.jChildren();
                     if (childrenStaticBinds.size() > 0) {
                         // There are children binds (and maybe MIPs)
                         bindNodes = new ArrayList<BindNode>(nodesetSize);
@@ -1137,7 +1138,7 @@ public class XFormsModelBinds {
 
             private List<Bind> childrenBinds;
 
-            public BindIteration(boolean isSingleNodeContext, Item item, List<Model.Bind> childrenStaticBinds) {
+            public BindIteration(boolean isSingleNodeContext, Item item, List<BindTree.Bind> childrenStaticBinds) {
 
                 super(item);
 
@@ -1145,7 +1146,7 @@ public class XFormsModelBinds {
 
                 // Iterate over children and create children binds
                 childrenBinds = new ArrayList<Bind>(childrenStaticBinds.size());
-                for (final Model.Bind staticBind : childrenStaticBinds)
+                for (final BindTree.Bind staticBind : childrenStaticBinds)
                     childrenBinds.add(new Bind(staticBind, isSingleNodeContext));
             }
 

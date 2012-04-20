@@ -18,12 +18,13 @@ import org.scalatest.junit.AssertionsForJUnit
 import org.junit.Test
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.oxf.xforms.event.events.XFormsCustomEvent
-import org.orbeon.oxf.xforms.event.{XFormsEventTarget, EventListener, XFormsEvent}
+import org.orbeon.oxf.xforms.event.{XFormsEventTarget, EventListener ⇒ JEventListener, XFormsEvent}
 import org.orbeon.oxf.xforms.control.controls.InstanceMirror._
+import XXFormsDynamicControl._
 
 class InstanceMirrorTest extends DocumentTestBase with AssertionsForJUnit {
 
-    implicit def toEventListener(f: XFormsEvent ⇒ Any) = new EventListener {
+    implicit def toEventListener(f: XFormsEvent ⇒ Any) = new JEventListener {
         def handleEvent(event: XFormsEvent) { f(event) }
     }
 
@@ -79,17 +80,27 @@ class InstanceMirrorTest extends DocumentTestBase with AssertionsForJUnit {
         var nonInstanceChanges = 0
 
         // Attach listeners
-        val outerListener = mirrorListener(document, logger,
-            toInnerNode(outerInstance.documentInfo, document.getStaticState.topLevelPart, document), () ⇒ nonInstanceChanges += 1) _
-        for (eventName ← mutationEvents)
-            outerInstance.addListener(eventName, outerListener)
+        val outerListener: JEventListener = {
+
+            val unknownChange: EventListener = _ ⇒ {
+                nonInstanceChanges += 1
+                true
+            }
+
+            val outerMirrorListener =
+                mirrorListener(document, logger, toInnerInstanceNode(outerInstance.documentInfo, document.getStaticState.topLevelPart, document))
+
+            composeListeners(Seq(outerMirrorListener, unknownChange))
+        }
+
+        addListener(outerInstance, outerListener)
 
         // Local helpers
         def dispatch(name: String) = document.dispatchEvent(new XFormsCustomEvent(document, name, document.getObjectByEffectiveId("model").asInstanceOf[XFormsEventTarget], true, true))
         def innerInstanceValue = TransformerUtils.tinyTreeToString(innerInstance.documentInfo)
 
         // Test insert, value change and delete
-        Seq(
+        val expected = Seq(
             ("""<instance><first>Arthur</first></instance>""", 0),
             ("""<instance><first>Arthur</first><last>Clark</last></instance>""" , 0),
             ("""<instance><first>Arthur</first><middle>C.</middle><last>Clark</last></instance>""" , 0),
@@ -102,12 +113,15 @@ class InstanceMirrorTest extends DocumentTestBase with AssertionsForJUnit {
             // NOTE: Removing root element doesn't work right now, maybe because doDelete() doesn't support it
 //            ("""""" , 2),
 //            ("""<root/>""" , 2)
-        ).zipWithIndex foreach { case ((expectedInnerInstanceValue, expectedNonInstanceChanges), index) ⇒
-            // Dispatch event and assert result
-            dispatch("update" + (index + 1))
+        )
 
-            assert(innerInstanceValue === expectedInnerInstanceValue)
-            assert(nonInstanceChanges === expectedNonInstanceChanges)
+        expected.zipWithIndex foreach {
+            case ((expectedInnerInstanceValue, expectedNonInstanceChanges), index) ⇒
+                // Dispatch event and assert result
+                dispatch("update" + (index + 1))
+
+                assert(innerInstanceValue === expectedInnerInstanceValue)
+                assert(nonInstanceChanges === expectedNonInstanceChanges)
         }
     }
 }

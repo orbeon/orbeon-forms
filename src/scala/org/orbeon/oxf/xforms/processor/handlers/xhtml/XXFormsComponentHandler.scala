@@ -28,7 +28,7 @@ class XXFormsComponentHandler extends XFormsControlLifecyleHandler(false) {
     protected override def getContainingElementName = elementName
     protected override def getContainingElementQName = elementQName
 
-    private def binding = containingDocument.getStaticOps.getBinding(getPrefixedId)
+    private def binding = containingDocument.getStaticOps.getBinding(getPrefixedId) getOrElse (throw new IllegalStateException)
 
     override def init(uri: String, localname: String, qName: String, attributes: Attributes, matched: AnyRef) = {
         super.init(uri, localname, qName, attributes, matched)

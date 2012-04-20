@@ -15,7 +15,6 @@ package org.orbeon.oxf.fb
 
 import org.scalatest.junit.AssertionsForJUnit
 import org.junit.Test
-import org.orbeon.oxf.processor.ProcessorUtils
 import org.orbeon.oxf.test.DocumentTestBase
 import org.orbeon.oxf.fb.FormBuilderFunctions._
 import org.orbeon.oxf.fb.GridOps._
@@ -39,6 +38,8 @@ import org.orbeon.saxon.value.BooleanValue
 import org.mockito.stubbing.Answer
 import org.mockito.invocation.InvocationOnMock
 import org.orbeon.saxon.om._
+import org.orbeon.scaxon.XML.evalOne
+import org.orbeon.oxf.processor.ProcessorUtils
 
 class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit with MockitoSugar {
 
@@ -47,10 +48,15 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
 
     def getDocument(documentURL: String) = ProcessorUtils.createDocumentFromURL(documentURL, null)
 
-    def getNewDoc(url: String = TemplateDoc) = {
-        // Make a copy because the document is cached behind the scene, and we don't want the original to be mutated
-        val template = Dom4jUtils.createDocumentCopyElement(getDocument(url).getRootElement)
-        new DocumentWrapper(template, null, XPathCache.getGlobalConfiguration)
+    def getNewDoc(url: String = TemplateDoc): DocumentWrapper = {
+        // Get and annotate the template
+        implicit val functionLibrary = XFormsContainingDocument.getFunctionLibrary
+        evalOne(
+            new DocumentWrapper(getDocument(url), null, XPathCache.getGlobalConfiguration),
+            """xxforms:call-xpl('oxf:/forms/orbeon/builder/form/annotate.xpl',
+                                ('data', 'bindings'),
+                                (., .),
+                                'data')""").asInstanceOf[DocumentWrapper]
     }
 
     private val control1 = "control-1"
@@ -67,7 +73,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
 
         assert(name(formInstanceRoot(doc).parent.head) === "xforms:instance")
 
-        assert(qname(findFRBodyElement(doc)) === (FR → "body"))
+        assert(qname(findFRBodyElement(doc)) === (XF → "group"))
     }
 
     @Test def nameAndId() {

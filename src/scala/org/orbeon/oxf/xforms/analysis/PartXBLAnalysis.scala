@@ -13,12 +13,13 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
+import controls.ComponentControl
 import scala.collection.JavaConverters._
-import collection.mutable.HashMap
 import org.orbeon.oxf.common.OXFException
-import org.dom4j.QName
 import org.orbeon.oxf.xforms.xbl.{Scope, XBLBindings}
 import org.orbeon.oxf.xforms.XFormsUtils
+import org.dom4j.{Element, QName}
+import collection.mutable.HashMap
 
 trait PartXBLAnalysis extends TransientState {
 
@@ -33,12 +34,10 @@ trait PartXBLAnalysis extends TransientState {
         val prefix = startScope.fullPrefix
         metadata.idGenerator.add("#document") // top-level is not added to the id generator until now
         for {
-            id ← metadata.idGenerator.ids.asScala
-            prefixedId = prefix + id
-        } yield {
-            startScope += id → prefixedId
-            indexScope(prefixedId, startScope)
-        }
+            staticId ← metadata.idGenerator.ids.asScala
+            prefixedId = prefix + staticId
+        } yield
+            mapScopeIds(staticId, prefixedId, startScope)
 
         // Tell top-level static id generator to stop checking for duplicate ids
         // TODO: not nice, check what this is about (seems needed as of 2012-02-29)
@@ -57,11 +56,27 @@ trait PartXBLAnalysis extends TransientState {
         scope
     }
 
-    def indexScope(prefixedId: String, scope: Scope) {
+    def deregisterScope(scope: Scope) =
+        scopesById -= scope.scopeId
+
+    def mapScopeIds(staticId: String, prefixedId: String, scope: Scope) {
         if (prefixedIdToXBLScopeMap.contains(prefixedId))
             throw new OXFException("Duplicate id found for prefixed id: " + prefixedId)
 
+        scope += staticId → prefixedId
         prefixedIdToXBLScopeMap += prefixedId → scope
+    }
+
+    // Deindex the given control's XBL-related information
+    def unmapScopeIds(control: ElementAnalysis): Unit = {
+        control match {
+            case component: ComponentControl ⇒
+                xblBindings.removeBinding(component.prefixedId)
+                deregisterScope(component.binding.innerScope)
+            case _ ⇒
+        }
+        control.scope -= control.staticId
+        prefixedIdToXBLScopeMap -= control.prefixedId
     }
 
     def containingScope(prefixedId: String) = {
@@ -91,6 +106,26 @@ trait PartXBLAnalysis extends TransientState {
     def getXBLStyles = xblBindings.allStyles
     def getXBLScripts = xblBindings.allScripts
     def baselineResources = xblBindings.baselineResources
+
+    // For the given bound node prefixed id, remove the current shadow tree and create a new one
+    def updateShadowTree(prefixedId: String, element: Element) =
+        getControlAnalysis(prefixedId) match {
+            case existingComponent: ComponentControl ⇒
+
+                // Remove the component's binding, including all controls
+                existingComponent.removeBinding()
+
+                // Create new ConcreteBinding
+                existingComponent.setBinding(element)
+
+                // Rebuild subtree
+                analyzeSubtree(existingComponent)
+
+                existingComponent
+
+            case _ ⇒
+                throw new IllegalArgumentException
+        }
 
     override def freeTransientState() = {
         super.freeTransientState()

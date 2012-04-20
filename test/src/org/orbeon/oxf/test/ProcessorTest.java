@@ -27,21 +27,12 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.DOMSerializer;
 import org.orbeon.oxf.processor.Processor;
 import org.orbeon.oxf.processor.ProcessorUtils;
-import org.orbeon.oxf.processor.XMLProcessorRegistry;
-import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.processor.generator.URLGenerator;
-import org.orbeon.oxf.resources.ResourceManager;
-import org.orbeon.oxf.resources.ResourceManagerWrapper;
-import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.PipelineUtils;
-import org.orbeon.oxf.webapp.ProcessorService;
 import org.orbeon.oxf.xml.Dom4j;
-import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 
-import javax.naming.Context;
-import javax.naming.InitialContext;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -52,9 +43,6 @@ import static org.junit.Assert.fail;
 @RunWith(Parameterized.class)
 public class ProcessorTest extends ResourceManagerTestBase {
 
-    private static Context jndiContext;
-    private static PipelineContext pipelineContext;
-
     private static final int THREAD_COUNT = 1;
     private static final String TEST_CONFIG = "oxf.test.config";
 
@@ -64,7 +52,7 @@ public class ProcessorTest extends ResourceManagerTestBase {
     }
 
     @Rule
-        public TestName name= new TestName() {
+    public TestName name= new TestName() {
         @Override
         public String getMethodName() {
             return getName();
@@ -76,48 +64,19 @@ public class ProcessorTest extends ResourceManagerTestBase {
         return getName();
     }
 
-    private static void setupContext() {
-        try {
-            // Initialize log4j
-            LoggerFactory.initBasicLogger();
-
-            ResourceManager resourceManager = ResourceManagerWrapper.instance();
-            pipelineContext = new PipelineContext();
-            jndiContext = new InitialContext();
-            pipelineContext.setAttribute(ProcessorService.JNDI_CONTEXT, jndiContext);
-
-            // Initialize log4j with a DOMConfiguration
-            LoggerFactory.initLogger();
-
-            // Use Tyrex for JNDI.
-            System.getProperties().setProperty("java.naming.factory.initial", "tyrex.naming.MemoryContextFactory");
-
-            // Run registry.
-            XMLProcessorRegistry registry = new XMLProcessorRegistry();
-            final String fname = "processors.xml";
-            final org.dom4j.Document doc = resourceManager.getContentAsDOM4J(fname, XMLUtils.ParserConfiguration.XINCLUDE_ONLY, true);
-            final DOMGenerator config = PipelineUtils.createDOMGenerator(doc, fname, DOMGenerator.ZeroValidity, fname);
-            PipelineUtils.connect(config, "data", registry, "config");
-            registry.start(pipelineContext);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new OXFException(e);
-        }
-    }
-
     @Parameterized.Parameters(name="{0}")
     public static Collection<Object[]> data() {
 
         String currentTestError = null;
         try {
             staticSetup();
-            setupContext();
             
             final List<Object[]> parameters = new ArrayList<Object[]>();
             final Document tests; {
                 final URLGenerator urlGenerator = new URLGenerator(System.getProperty(TEST_CONFIG), true);
                 final DOMSerializer domSerializer = new DOMSerializer();
                 PipelineUtils.connect(urlGenerator, "data", domSerializer, "data");
+                final PipelineContext pipelineContext = new PipelineContext();
                 domSerializer.start(pipelineContext);
                 tests = domSerializer.getDocument(pipelineContext);
             }
@@ -253,7 +212,6 @@ public class ProcessorTest extends ResourceManagerTestBase {
             try {
                 // Create pipeline context
                 final PipelineContext pipelineContext = StringUtils.isNotEmpty(requestURL) ? createPipelineContextWithExternalContext(requestURL) : createPipelineContextWithExternalContext();
-                pipelineContext.setAttribute(ProcessorService.JNDI_CONTEXT, jndiContext);
 
                 processor.reset(pipelineContext);
                 if (domSerializers.size() == 0) {

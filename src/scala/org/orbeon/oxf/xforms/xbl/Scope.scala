@@ -33,7 +33,8 @@ class Scope(val parent: Scope, val scopeId: String) {
     def isTopLevelScope = scopeId.length == 0
 
     // Return the prefixed id of the given control static id within this scope, null if not found
-    def prefixedIdForStaticId(staticId: String) = idMap.get(staticId).orNull
+    def prefixedIdForStaticId(staticId: String) =
+        idMap.get(staticId).orNull
 
     def contains(staticId: String) = idMap.contains(staticId)
 
@@ -43,6 +44,10 @@ class Scope(val parent: Scope, val scopeId: String) {
             // Index static id ⇒ prefixed id by scope
             idMap += staticId → prefixedId
     }
+
+    // Remove a mapping by static id
+    def -= (staticId: String): Unit =
+        idMap -= staticId
 
     // Equality is defined purely based on the scope id
     override def hashCode = scopeId.hashCode

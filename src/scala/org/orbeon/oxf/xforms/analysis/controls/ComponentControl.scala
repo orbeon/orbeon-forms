@@ -7,7 +7,27 @@ import org.orbeon.oxf.xforms.xbl.Scope
 class ComponentControl(staticStateContext: StaticStateContext, element: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], scope: Scope)
         extends ContainerControl(staticStateContext, element, parent, preceding, scope) with ShadowChildrenBuilder {
 
-    val binding = staticStateContext.partAnalysis.xblBindings.getBinding(prefixedId)
+    // Binding at the time the component is created
+    private var _binding = staticStateContext.partAnalysis.xblBindings.getBinding(prefixedId) orElse (throw new IllegalStateException)
+    def binding = _binding.get
+
+    // Remove the component's binding
+    def removeBinding(): Unit = {
+
+        val part = staticStateContext.partAnalysis
+
+        // Remove all descendants only, keeping the current control
+        part.deindexTree(this, self = false)
+
+        part.deregisterScope(binding.innerScope)
+        part.xblBindings.removeBinding(prefixedId)
+
+        _binding = None
+    }
+
+    // Set the component's binding
+    def setBinding(element: Element): Unit =
+        _binding = staticStateContext.partAnalysis.xblBindings.processElementIfNeeded(element, prefixedId, locationData, scope)
 
     // Only support binding if the control defines it has a binding
     override def hasBinding = binding.abstractBinding.modeBinding && super.hasBinding

@@ -29,6 +29,7 @@ import org.orbeon.saxon.pattern._
 import org.orbeon.saxon.expr.{Token, ExpressionTool}
 import org.orbeon.saxon.om._
 import scala.Predef._
+import org.orbeon.saxon.functions.FunctionLibrary
 
 object XML {
 
@@ -37,11 +38,11 @@ object XML {
     private val wrapper = new DocumentWrapper(Dom4jUtils.createDocument, null, XPathCache.getGlobalConfiguration)
 
     // Convenience methods for the XPath API
-    def evalOne(item: Item, expr: String, namespaces: NamespaceMapping = XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING, variables: Map[String, ValueRepresentation] = null) =
-        XPathCache.evaluaSingleteKeepItems(Collections.singletonList(item), 1, expr, namespaces, if (variables eq null) null else variables.asJava, null, null, null, null)
+    def evalOne(item: Item, expr: String, namespaces: NamespaceMapping = XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING, variables: Map[String, ValueRepresentation] = null)(implicit library: FunctionLibrary = null) =
+        XPathCache.evaluaSingleteKeepItems(Collections.singletonList(item), 1, expr, namespaces, if (variables eq null) null else variables.asJava, library, null, null, null)
 
-    def eval(item: Item, expr: String, namespaces: NamespaceMapping = XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING, variables: Map[String, ValueRepresentation] = null) =
-        XPathCache.evaluate(item, expr, namespaces, if (variables eq null) null else variables.asJava, null, null, null, null)
+    def eval(item: Item, expr: String, namespaces: NamespaceMapping = XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING, variables: Map[String, ValueRepresentation] = null)(implicit library: FunctionLibrary = null) =
+        XPathCache.evaluate(item, expr, namespaces, if (variables eq null) null else variables.asJava, library, null, null, null)
 
     // Runtime conversion to NodeInfo (can fail!)
     def asNodeInfo(item: Item) = item.asInstanceOf[NodeInfo]

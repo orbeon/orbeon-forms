@@ -45,6 +45,8 @@ public class ControlTree implements ExternalCopyable {
 
     // Index of controls
     private ControlIndex controlIndex;
+
+    // Repeat indexes for Ajax updates only
     private Map<String, Integer> indexes = Collections.emptyMap();
 
     private boolean isBindingsDirty;    // whether the bindings must be reevaluated

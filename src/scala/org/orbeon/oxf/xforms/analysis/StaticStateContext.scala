@@ -13,6 +13,4 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import org.orbeon.oxf.xforms.PartAnalysis
-
-case class StaticStateContext(partAnalysis: PartAnalysis, index: Int)
+case class StaticStateContext(partAnalysis: PartAnalysisImpl, index: Int)

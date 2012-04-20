@@ -92,11 +92,7 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
         refreshInfo = null
     }
 
-    /**
-     * Set the repeat index. The index is automatically adjusted to fall within bounds.
-     *
-     * @param index             new repeat index
-     */
+    // Set the repeat index. The index is automatically adjusted to fall within bounds.
     def setIndex(index: Int) {
 
         val oldRepeatIndex = getIndex // 1-based
@@ -120,7 +116,6 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
 
     private def ensureIndexBounds(index: Int) =
         math.min(math.max(index, if (getSize > 0) 1 else 0), getSize)
-
 
     override def getSize =
         // Return the size based on the nodeset size, so we can call this before all iterations have been added.

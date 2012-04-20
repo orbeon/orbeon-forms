@@ -20,8 +20,10 @@ import org.orbeon.oxf.util.UserAgent;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.control.XFormsComponentControl;
 import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xforms.control.controls.XFormsCaseControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatIterationControl;
+import org.orbeon.oxf.xforms.control.controls.XXFormsDynamicControl;
 import org.orbeon.oxf.xml.ElementHandlerController;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -398,7 +400,7 @@ public class HandlerContext {
         // Iterate from root to leaf
         for (final XFormsControl currentControl: controls) {
             if (currentControl instanceof XFormsRepeatIterationControl) {
-                // Handle repeat
+                // Repeat
                 final XFormsRepeatIterationControl repeatIterationControl = (XFormsRepeatIterationControl) currentControl;
                 final XFormsRepeatControl repeatControl = repeatIterationControl.repeat();
 
@@ -408,8 +410,15 @@ public class HandlerContext {
 
                 pushRepeatContext(false, currentRepeatIteration, isRepeatSelected || currentRepeatIteration == repeatControl.getIndex());
             } else if (currentControl instanceof XFormsComponentControl) {
-                // Handle component
+                // Component
                 pushComponentContext(currentControl.getPrefixedId());
+            } else if (currentControl instanceof XXFormsDynamicControl) {
+                // Dynamic
+                pushComponentContext(currentControl.getPrefixedId());
+                pushPartAnalysis(((XXFormsDynamicControl) currentControl).nested().get().partAnalysis());
+            } else if (currentControl instanceof XFormsCaseControl) {
+                // Case (not used as of 2012-04-16)
+                pushCaseContext(((XFormsCaseControl) currentControl).isVisible());
             }
         }
     }

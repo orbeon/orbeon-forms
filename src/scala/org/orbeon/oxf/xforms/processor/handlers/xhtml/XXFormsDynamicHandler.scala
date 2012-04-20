@@ -49,7 +49,7 @@ class XXFormsDynamicHandler extends XFormsBaseHandler(false, false) {
                         helper.startElement(xhtmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "script", Array("type", "text/javascript"))
                         XHTMLHeadHandler.outputScripts(helper, control.newScripts map (script ⇒ script.clientName → script.body))
                         helper.endElement()
-                        control.newScripts = Seq.empty
+                        control.clearNewScripts()
                     }
                     // Output new markup
                     control.nested foreach { nested ⇒

@@ -140,8 +140,6 @@
 
     <!-- Local model -->
     <xforms:model id="fr-publish-model">
-
-        <xforms:var name="body" value="xxforms:instance('fb-form-instance')/xhtml:body/fr:view/fr:body"/>
         
         <!-- Publish form operation -->
         <xforms:action ev:event="fr-publish-form">

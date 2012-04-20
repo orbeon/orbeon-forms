@@ -23,21 +23,18 @@ trait PartEventHandlerAnalysis {
 
     self: PartAnalysisImpl ⇒
 
-    private var eventHandlersMap: Map[String, List[EventHandler]] = _
-    private var eventNames: Set[String] = _
-    private var keyHandlers: List[EventHandler] = _
+    private[PartEventHandlerAnalysis] var _handlersForObserver: Map[String, List[EventHandler]] = Map()
+    private[PartEventHandlerAnalysis] var _eventNames: Set[String] = Set()
+    private[PartEventHandlerAnalysis] var _keypressHandlers: List[EventHandler] = List()
 
     // Scripts
-    private[PartEventHandlerAnalysis] var _scriptsByPrefixedId: Map[String, Script] = _
+    private[PartEventHandlerAnalysis] var _scriptsByPrefixedId: Map[String, Script] = Map()
     def scripts = _scriptsByPrefixedId
-    private[PartEventHandlerAnalysis] var _uniqueClientScripts: Seq[(String, String)] = _
+    private[PartEventHandlerAnalysis] var _uniqueClientScripts: Seq[(String, String)] = Seq()
     def uniqueClientScripts = _uniqueClientScripts
 
-    // Register all event handlers
-    def registerEventHandlers(eventHandlers: Seq[EventHandlerImpl]) {
-
-        // Make sure this is called only once
-        assert(eventHandlersMap eq null)
+    // Register new event handlers
+    def registerEventHandlers(eventHandlers: Seq[EventHandlerImpl]): Unit = {
         
         val tuples =
             for {
@@ -50,13 +47,20 @@ trait PartEventHandlerAnalysis {
                 (observerPrefixedId, handler)
 
         // Group event handlers by observer
-        eventHandlersMap = tuples groupBy (_._1) mapValues (_ map (_._2) toList)
+        val newHandlers = tuples groupBy (_._1) mapValues (_ map (_._2) toList)
+
+        // Accumulate new handlers into existing map by combining values for a given observer
+        _handlersForObserver = newHandlers.foldLeft(_handlersForObserver) {
+            case (existingMap, (observerId, newHandlers)) ⇒
+                val existingHandlers = existingMap.get(observerId) getOrElse Nil
+                existingMap + (observerId → (existingHandlers ::: newHandlers))
+        }
 
         // Gather all event names (NOTE: #all is also included if present)
-        eventNames = (eventHandlers flatMap (_.eventNames) toSet)
+        _eventNames ++= eventHandlers flatMap (_.eventNames)
 
         // Gather all keypress handlers
-        keyHandlers = (eventHandlers filter (_.eventNames(XFormsEvents.KEYPRESS)) toList)
+        _keypressHandlers ++= eventHandlers filter (_.eventNames(XFormsEvents.KEYPRESS))
 
         // Gather all scripts in deterministic order
         def makeScript(eventHandlerImpl: ElementAnalysis) = {
@@ -73,7 +77,8 @@ trait PartEventHandlerAnalysis {
         }
 
         // Index scripts by prefixed id
-        _scriptsByPrefixedId = scriptMappings map { case script ⇒ script.prefixedId → script } toMap
+        _scriptsByPrefixedId ++= scriptMappings map
+            { case script ⇒ script.prefixedId → script }
 
         // Keep only one script body for a given digest
         val distinctNames = scriptMappings collect
@@ -81,18 +86,31 @@ trait PartEventHandlerAnalysis {
 
         val scriptBodiesByDigest = (scriptMappings map { case script ⇒ script.digest → script.body } toMap)
 
-        _uniqueClientScripts = distinctNames map
-            { case (clientName, digest) ⇒ clientName → scriptBodiesByDigest(digest) } toSeq
+        _uniqueClientScripts ++= distinctNames map
+            { case (clientName, digest) ⇒ clientName → scriptBodiesByDigest(digest) }
+    }
+
+    // Deregister the given handler
+    def deregisterEventHandler(eventHandler: EventHandlerImpl): Unit = {
+        eventHandler.observersPrefixedIds foreach (_handlersForObserver -= _)
+
+        if (eventHandler.eventNames(XFormsEvents.KEYPRESS))
+            _keypressHandlers = _keypressHandlers filterNot (_ eq eventHandler)
+
+        if (eventHandler.localName == "script")
+            _scriptsByPrefixedId -= eventHandler.prefixedId
+
+        // NOTE: Can't update eventNames and _uniqueClientScripts without checking all handlers again, so for now leave that untouched
     }
 
     def getEventHandlers(observerPrefixedId: String) =
-        eventHandlersMap.get(observerPrefixedId) map (_.asJava) orNull
+        _handlersForObserver.get(observerPrefixedId) map (_.asJava) orNull
 
     def observerHasHandlerForEvent(observerPrefixedId: String, eventName: String) =
-        eventHandlersMap.get(observerPrefixedId) map
+        _handlersForObserver.get(observerPrefixedId) map
             (handlers ⇒ handlers exists (_.isMatchEventName(eventName))) getOrElse false
 
-    def getKeyHandlers = keyHandlers.asJava
+    def getKeyHandlers = _keypressHandlers.asJava
 
     /**
      * Returns whether there is any event handler registered anywhere in the controls for the given event name.
@@ -103,5 +121,5 @@ trait PartEventHandlerAnalysis {
      * Whether there is any event handler registered anywhere in the controls for the given event name.
      */
     def hasHandlerForEvent(eventName: String, includeAllEvents: Boolean): Boolean =
-        includeAllEvents && eventNames.contains(XFormsConstants.XXFORMS_ALL_EVENTS) || eventNames.contains(eventName)
+        includeAllEvents && _eventNames.contains(XFormsConstants.XXFORMS_ALL_EVENTS) || _eventNames.contains(eventName)
 }

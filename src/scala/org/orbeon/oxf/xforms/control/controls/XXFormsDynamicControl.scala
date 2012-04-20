@@ -13,45 +13,66 @@
  */
 package org.orbeon.oxf.xforms.control.controls
 
-import org.w3c.dom.Node.{ELEMENT_NODE, ATTRIBUTE_NODE}
+import org.w3c.dom.Node.ELEMENT_NODE
 import org.orbeon.oxf.xforms.xbl.{Scope, XBLContainer}
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.xml.sax.helpers.AttributesImpl
 import org.orbeon.oxf.xforms._
-import action.actions.{XFormsDeleteAction, XFormsInsertAction}
+import analysis.PartAnalysisImpl
 import collection.JavaConverters._
-import control.{XFormsSingleNodeContainerControl, XFormsControl}
-import event.events.{XFormsDeleteEvent, XFormsInsertEvent, XXFormsValueChanged}
-import event.{EventListener, XFormsEvent, XFormsEvents}
-import model.DataModel
-import org.orbeon.oxf.util.ScalaUtils._
+import control.{XFormsComponentControl, XFormsSingleNodeContainerControl, XFormsControl}
+import event.XFormsEvents._
 import org.orbeon.saxon.dom4j.{DocumentWrapper, NodeWrapper}
-import org.orbeon.saxon.om.{DocumentInfo, NodeInfo, Navigator}
+import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.oxf.xml._
-import org.orbeon.saxon.value.StringValue
-import java.util.{Collections ⇒ JCollections, Map ⇒ JMap, List ⇒ JList}
-import org.orbeon.oxf.util.{IndentedLogger, XPathCache}
-import java.lang.{IllegalStateException, IllegalArgumentException}
+import java.util.{Map ⇒ JMap}
+import org.orbeon.oxf.util.XPathCache
+import java.lang.IllegalArgumentException
 import org.dom4j._
-import org.orbeon.scaxon.XML.evalOne
-import org.orbeon.oxf.common.OXFException
+import org.orbeon.scaxon.XML._
+import collection.mutable.Buffer
+import XXFormsDynamicControl._
+import scala.None
+import org.orbeon.oxf.xforms.event.{EventListener ⇒ JEventListener, XFormsEvent}
+import scala.Predef._
+import org.orbeon.oxf.xforms.event.events.{XXFormsValueChanged, XFormsDeleteEvent, XFormsInsertEvent}
+import org.orbeon.oxf.xforms.XFormsConstants._
 
+/**
+ * xxforms:dynamic control
+ *
+ * This control must bind to an XHTML+XForms document held in an instance. The document is processed as an XForms
+ * sub-document and handle as a shadow tree of xxforms:dynamic. Changes taking place in the document are dynamically
+ * reported into the shadow tree.
+ *
+ * The following changes are handled specially:
+ *
+ * - changes to inline instance content on both sides are directly mirrored
+ * - changes to content nested within top-level bound nodes cause re-evaluation of the binding only
+ * - changes to nested binds cause incremental add/remove of binds
+ *
+ * All other changes cause the entire sub-document to be reprocessed.
+ *
+ * In the future the hope is to make any change fully incremental.
+ */
 class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, element: Element, effectiveId: String, state: JMap[String, String])
     extends XFormsSingleNodeContainerControl(container, parent, element, effectiveId) {
 
-    implicit def toEventListener(f: XFormsEvent ⇒ Any) = new EventListener {
-        def handleEvent(event: XFormsEvent) { f(event) }
-    }
-
-    class Nested(val container: XBLContainer, val partAnalysis: PartAnalysis, val template: SAXStore, val outerListener: EventListener)
+    class Nested(val container: XBLContainer, val partAnalysis: PartAnalysisImpl, val template: SAXStore, val outerListener: JEventListener)
 
     private var _nested: Option[Nested] = None
     def nested = _nested
 
-    var previousChangeCount = -1
-    var changeCount = 0
+    private var previousChangeCount = -1
+    private var changeCount = 0
+    private val xblChanges = Buffer[(String, Element)]()
+    private val bindChanges = Buffer[(String, Element)]()
 
-    var newScripts: Seq[Script] = Seq.empty
+    // New scripts created during an update (not functional as of 2012-04-19)
+    // NOTE: This should instead be accumulated at the level of the request.
+    private var _newScripts: Seq[Script] = Seq()
+    def newScripts = _newScripts
+    def clearNewScripts() = _newScripts = Seq()
 
     // TODO: This might blow if the control is non-relevant
     override def bindingContextForChild =
@@ -62,7 +83,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
             contextStack.getCurrentBindingContext
         } orNull
 
-    override def onCreate() {
+    override def onCreate(): Unit = {
         getBoundElement match {
             case Some(node) ⇒ updateSubTree(node)
             case _ ⇒ // don't create binding (maybe we could for a read-only instance)
@@ -70,101 +91,214 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
         }
     }
 
-    override def onDestroy() {
+    override def onDestroy(): Unit = {
         // TODO: XXX remove child container from parent
         _nested = None
         previousChangeCount = 0
         changeCount = 0
     }
 
-    override def onBindingUpdate(oldBinding: BindingContext, newBinding: BindingContext) {
+    override def onBindingUpdate(oldBinding: BindingContext, newBinding: BindingContext): Unit =
         getBoundElement match {
             case Some(node) ⇒ updateSubTree(node)
             case _ ⇒
         }
-    }
 
-    private def updateSubTree(node: NodeWrapper) {
+    private def updateSubTree(node: NodeWrapper): Unit = {
         if (previousChangeCount != changeCount) {
             // Document has changed and needs to be fully recreated
-            previousChangeCount = changeCount
+            processFullUpdate(node)
+        } else {
+            // Changes to nested binds
+            if (bindChanges.nonEmpty)
+                processBindsUpdates()
 
-            // Outer instance
-            val outerInstance = containingDocument.getInstanceForNode(node)
-            if (outerInstance eq null)
-                throw new IllegalArgumentException
+            // Changes to top-level XBL bindings
+            if (xblChanges.nonEmpty)
+                processXBLUpdates()
+        }
+    }
 
-            // Remove children controls if any
-            val tree = containingDocument.getControls.getCurrentControlTree
-            if (getSize > 0) {
-                // TODO: PERF: dispatching destruction events takes a lot of time, what can we do?
-                //tree.dispatchDestructionEventsForRemovedContainer(this, false)
-                tree.deindexSubtree(this, false)
-                clearChildren()
-            }
+    private def processFullUpdate(node: NodeWrapper): Unit = {
+        previousChangeCount = changeCount
+        xblChanges.clear()
+        bindChanges.clear()
 
-            _nested foreach { n ⇒
-                // Remove container and associated models
-                n.container.destroy()
-                // Remove part and associated scopes
-                containingDocument.getStaticOps.removePart(n.partAnalysis)
-                // Remove listeners we added to the outer instance (better do this or we will badly leak)
-                // WARNING: Make sure n.outerListener is the exact same object passed to addListener. There can be a
-                // conversion from a function to a listener, in which case identity won't be preserved!
-                for (eventName ← InstanceMirror.mutationEvents)
-                    outerInstance.removeListener(eventName, n.outerListener)
-            }
+        // Outer instance
+        val outerInstance = containingDocument.getInstanceForNode(node)
+        if (outerInstance eq null)
+            throw new IllegalArgumentException
 
-            // Create new part
-            val element = node.getUnderlyingNode.asInstanceOf[Element]
-            val (template, partAnalysis) = createPartAnalysis(Dom4jUtils.createDocumentCopyElement(element), container.getPartAnalysis)
+        // Remove children controls if any
+        val tree = containingDocument.getControls.getCurrentControlTree
+        if (getSize > 0) {
+            // PERF: dispatching destruction events takes a lot of time, what can we do besides not dispatching them?
+            //tree.dispatchDestructionEventsForRemovedContainer(this, false)
+            tree.deindexSubtree(this, false)
+            clearChildren()
+        }
 
-            // Update allowed events as depending on the dynamic subtree this can change
-            tree.updateAllowedEvents(containingDocument)
+        _nested foreach { n ⇒
+            // Remove container and associated models
+            n.container.destroy()
+            // Remove part and associated scopes
+            containingDocument.getStaticOps.removePart(n.partAnalysis)
+            // Remove listeners we added to the outer instance (better do this or we will badly leak)
+            // WARNING: Make sure n.outerListener is the exact same object passed to addListener. There can be a
+            // conversion from a function to a listener, in which case identity won't be preserved!
+            InstanceMirror.removeListener(outerInstance, n.outerListener)
+        }
 
-            // Save new scripts if any
+        // Create new part
+        val element = node.getUnderlyingNode.asInstanceOf[Element]
+        val (template, partAnalysis) = createPartAnalysis(Dom4jUtils.createDocumentCopyElement(element), container.getPartAnalysis)
+
+        // Update allowed events as depending on the dynamic subtree this can change
+        tree.updateAllowedEvents(containingDocument)
+
+        // Save new scripts if any
 //            val newScriptCount = containingDocument.getStaticState.getScripts.size
 //            if (newScriptCount > scriptCount)
 //                newScripts = containingDocument.getStaticState.getScripts.values.slice(scriptCount, newScriptCount).toSeq
+//            also addControlStructuralChange() if new scripts? or other update mechanism?
 
-            // Nested container is initialized after binding and before control tree
-            // TODO: Support updating models/instances
-            val childContainer = container.createChildContainer(this, partAnalysis)
+        // Nested container is initialized after binding and before control tree
+        val childContainer = container.createChildContainer(this, partAnalysis)
 
-            childContainer.addAllModels()
-            childContainer.setLocationData(getLocationData)
-            childContainer.initializeModels(Array(
-                XFormsEvents.XFORMS_MODEL_CONSTRUCT,
-                XFormsEvents.XFORMS_MODEL_CONSTRUCT_DONE)
-            )
+        childContainer.addAllModels()
+        childContainer.setLocationData(getLocationData)
+        childContainer.initializeModels(Array(
+            XFORMS_MODEL_CONSTRUCT,
+            XFORMS_MODEL_CONSTRUCT_DONE)
+        )
 
-            // Add listener to the single outer instance
-            val docWrapper = new DocumentWrapper(element.getDocument, null, XPathCache.getGlobalConfiguration)
-            val outerListener: EventListener = InstanceMirror.mirrorListener(containingDocument, getIndentedLogger,
-                InstanceMirror.toInnerNode(docWrapper, partAnalysis, childContainer), () ⇒ changeCount += 1) _
-            for (eventName ← InstanceMirror.mutationEvents)
-                outerInstance.addListener(eventName, outerListener)
+        // Add listener to the single outer instance
+        val docWrapper = new DocumentWrapper(element.getDocument, null, XPathCache.getGlobalConfiguration)
 
-            // Add mutation listeners to all top-level inline instances, which upon value change propagate the value
-            // change to the related node in the source
-            val innerListener: EventListener = InstanceMirror.mirrorListener(containingDocument, getIndentedLogger,
-                InstanceMirror.toOuterNode(docWrapper, partAnalysis), () ⇒ ()) _
+        // NOTE: Make sure to convert to an EventListener so that addListener/removeListener deal with the exact same object
+        val outerListener: JEventListener = {
 
-            partAnalysis.getModelsForScope(partAnalysis.startScope).asScala foreach {
-                _.instances.values filter (_.src eq null) foreach { instance ⇒
-                    val innerInstance = childContainer.findInstance(instance.staticId)
-                    for (eventName ← InstanceMirror.mutationEvents)
-                        innerInstance.addListener(eventName, innerListener)
-                }
+            // Mark an unknown change, which will require a complete rebuild of the part
+            val unknownChange: EventListener = { case _ ⇒
+                changeCount += 1
+                containingDocument.addControlStructuralChange(prefixedId)
+                true
             }
 
-            // Remember all that we created
-            _nested = Some(new Nested(childContainer, partAnalysis, template, outerListener))
-            
-            // Create new control subtree
-            tree.createAndInitializeSubTree(childContainer, this, partAnalysis.getTopLevelControls.head)
+            def recordChanges(findChange: NodeInfo ⇒ Option[(String, Element)], changes: Buffer[(String, Element)])(nodes: Seq[NodeInfo]): Boolean = {
+                val newChanges = nodes flatMap (findChange(_))
+                changes ++= newChanges
+                newChanges.nonEmpty
+            }
+
+            def changeListener(record: Seq[NodeInfo] ⇒ Boolean): EventListener = {
+                case insert: XFormsInsertEvent ⇒ record(insert.getInsertedItems.asScala collect { case n: NodeInfo ⇒ n })
+                case delete: XFormsDeleteEvent ⇒ record(delete.deleteInfos.asScala map (_.nodeInfo))
+                case valueChanged: XXFormsValueChanged ⇒ record(Seq(valueChanged.node))
+                case _ ⇒ false
+            }
+
+            // Instance mirror listener
+            val instanceListener = InstanceMirror.mirrorListener(
+                containingDocument,
+                getIndentedLogger,
+                InstanceMirror.toInnerInstanceNode(docWrapper, partAnalysis, childContainer))
+
+            // Compose listeners
+            toJEventListener(composeListeners(Seq(
+                instanceListener,
+                changeListener(recordChanges(findXBLChange(partAnalysis, _), xblChanges)),
+                changeListener(recordChanges(findBindChange, bindChanges)),
+                unknownChange)))
         }
+
+        InstanceMirror.addListener(outerInstance, outerListener)
+
+        // Add mutation listeners to all top-level inline instances, which upon value change propagate the value
+        // change to the related node in the source
+        val innerListener: JEventListener = InstanceMirror.mirrorListener(
+            containingDocument,
+            getIndentedLogger,
+            InstanceMirror.toOuterInstanceNode(docWrapper, partAnalysis))
+
+        partAnalysis.getModelsForScope(partAnalysis.startScope).asScala foreach {
+            _.instances.values filter (_.src eq null) foreach { instance ⇒
+                val innerInstance = childContainer.findInstance(instance.staticId)
+                InstanceMirror.addListener(innerInstance, innerListener)
+            }
+        }
+
+        // Remember all that we created
+        _nested = Some(new Nested(childContainer, partAnalysis, template, outerListener))
+
+        // Create new control subtree
+        tree.createAndInitializeSubTree(childContainer, this, partAnalysis.getTopLevelControls.head)
     }
+
+    // If more than one change touches a given id, processed it once using the last element
+    private def groupChanges(changes: Seq[(String, Element)]) =
+        changes groupBy (_._1) mapValues (_ map (_._2) last) toList
+
+    private def processXBLUpdates(): Unit = {
+
+        val tree = containingDocument.getControls.getCurrentControlTree
+
+        for ((prefixedId, element) ← groupChanges(xblChanges)) {
+            // Get control
+            val control = tree.getControl(prefixedId) // TODO: should use effective id if in repeat and process all
+
+            control match {
+                case componentControl: XFormsComponentControl ⇒
+
+                    // Remove concrete models and controls
+                    // PERF: dispatching destruction events takes a lot of time, what can we do besides not dispatching them?
+                    // Also: check whether dispatchDestructionEventsForRemovedContainer dispatches to already non-relevant controls
+                    //tree.dispatchDestructionEventsForRemovedContainer(componentControl, false)
+                    componentControl.destroyNestedContainer()
+                    componentControl.clearChildren()
+
+                    // Remove static controls
+                    tree.deindexSubtree(componentControl, false)
+
+                    // Update the shadow tree
+                    val staticComponent = _nested.get.partAnalysis.updateShadowTree(prefixedId, element)
+
+                    // Create the new models and new concrete subtree rooted at xbl:template
+                    componentControl.createNestedContainer()
+
+                    val templateTree = staticComponent.children find (_.element.getQName == XBL_TEMPLATE_QNAME)
+                    templateTree foreach
+                        (tree.createAndInitializeSubTree(componentControl.nestedContainer, componentControl, _))
+
+                    // Tell client
+                    containingDocument.addControlStructuralChange(componentControl.prefixedId)
+                case _ ⇒
+            }
+        }
+
+        xblChanges.clear()
+    }
+
+    private def processBindsUpdates(): Unit = {
+
+        val partAnalysis = _nested.get.partAnalysis
+
+        for ((modelId, modelElement) ← groupChanges(bindChanges)) {
+
+            val modelPrefixedId = partAnalysis.startScope.prefixedIdForStaticId(modelId)
+            val staticModel = partAnalysis.getModel(modelPrefixedId)
+
+            staticModel.rebuildBinds(modelElement)
+
+            // Q: When should we best notify the concrete model that its binds need build? Since at this point, we
+            // are within a bindings update, it would be nice if the binds are rebuilt before nested controls are
+            // rebuilt below. However, it might not be safe to RRR right here. So for now, we just set the flag.
+            val concreteModel = containingDocument.getObjectByEffectiveId(modelPrefixedId).asInstanceOf[XFormsModel]
+            concreteModel.markStructuralChange(null) // NOTE: PathMapXPathDependencies doesn't yet make use of the `instance` parameter
+        }
+
+        bindChanges.clear()
+   }
 
     private def getBoundElement =
         getBindingContext.getSingleItem match {
@@ -188,200 +322,55 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
         cloned
     }
 
-    override def equalsExternal(other: XFormsControl) = other match {
-        case other: XXFormsDynamicControl ⇒ changeCount == other.changeCount && newScripts.isEmpty
-        case _ ⇒ false
-    }
+    // For now we don't need to output anything particular
+    // LATER: what about new scripts?
+    override def outputAjaxDiff(ch: ContentHandlerHelper, other: XFormsControl, attributesImpl: AttributesImpl, isNewlyVisibleSubtree: Boolean) = ()
 
-    override def outputAjaxDiff(ch: ContentHandlerHelper, other: XFormsControl, attributesImpl: AttributesImpl, isNewlyVisibleSubtree: Boolean) {}
+    // Only if we had a structural change
+    override def supportFullAjaxUpdates = containingDocument.getControlsStructuralChanges.contains(prefixedId)
 }
 
-// Logic to mirror mutations between an outer and an inner instance
-object InstanceMirror {
+object XXFormsDynamicControl {
 
-    val mutationEvents = Seq(XFormsEvents.XXFORMS_VALUE_CHANGED, XFormsEvents.XFORMS_INSERT, XFormsEvents.XFORMS_DELETE)
+    // Type of an event listener
+    type EventListener = XFormsEvent ⇒ Boolean
 
-    // Find the inner instance node from a node in an outer instance
-    def toInnerNode(outerDoc: DocumentInfo, partAnalysis: PartAnalysis, container: XBLContainer)(outerNode: NodeInfo, sourceId: String, into: Boolean) = {
+    // Implicitly convert an EventListener to a Java EventListener
+    implicit def toJEventListener(f: EventListener) = new JEventListener {
+        def handleEvent(event: XFormsEvent) { f(event) }
+    }
 
-        // In "into" mode, use ancestor-or-self because outerNode passed is the containing node (node into which other
-        // nodes are inserted, node from which other nodes are removed, or node which text value changes), which in the
-        // case of a root element is the xforms:instance element. The exception is when you insert a node before or
-        // after an xforms:instance element, in which case the change is not in the instance.
+    // Compose a Seq of listeners by calling them in order until one has successfully processed the event
+    def composeListeners(listeners: Seq[EventListener]): EventListener =
+        e ⇒ listeners exists (_(e))
 
-        val axis = if (! into) "ancestor" else if (outerNode.getNodeKind == ATTRIBUTE_NODE) "../ancestor" else "ancestor-or-self"
-        val expr = "(" + axis + "::xforms:instance)[1]"
+    val XF = XFORMS_NAMESPACE_URI
 
-        evalOne(outerNode, expr) match {
-            case instanceWrapper: NodeWrapper if instanceWrapper.getUnderlyingNode.isInstanceOf[Element] ⇒
-                // This is a change to an instance
+    // Find whether the given node is a bind element or attribute and return the associated model id → element mapping
+    def findBindChange(node: NodeInfo): Option[(String, Element)] = {
 
-                // Find instance id
-                val instanceId = XFormsUtils.getElementId(instanceWrapper.getUnderlyingNode.asInstanceOf[Element])
-                if (instanceId eq null)
-                    throw new IllegalArgumentException
+        // XPath: (self::xf:bind | self::@*/parent::xf:bind)/ancestor::xf:model[1]
+        val modelOption =
+            (node self (XF → "bind")) ++ ((node self @* parentAxis (XF → "bind"))) ancestor (XF → "model") headOption
 
-                // Find path rooted at wrapper
-                val innerPath = {
-                    val pathToInstance = Navigator.getPath(instanceWrapper)
-                    val pathToOuterNode = Navigator.getPath(outerNode)
-
-                    assert(pathToOuterNode.startsWith(pathToInstance))
-
-                    if (pathToOuterNode.size > pathToInstance.size)
-                        pathToOuterNode.substring(pathToInstance.size)
-                    else
-                        "/"
-                }
-
-                // Find inner instance
-                val innerInstance = container.findInstance(instanceId)
-
-                if (innerInstance ne null) { // may not be found if instance was just created
-                    // Find destination path in instance
-                    val namespaces = partAnalysis.getNamespaceMapping(partAnalysis.startScope.fullPrefix, instanceWrapper.getUnderlyingNode.asInstanceOf[Element])
-                    evalOne(innerInstance.documentInfo, innerPath, namespaces) match {
-                        case newNode: NodeWrapper ⇒ Some(newNode)
-                        case _ ⇒ throw new IllegalStateException
-                    }
-                } else
-                    None
-
-            case _ ⇒ None // ignore change as it is not within an instance
+        modelOption map { modelNode ⇒
+            val modelElement = unwrapElement(modelNode)
+            XFormsUtils.getElementId(modelElement) → modelElement
         }
     }
 
-    // Find the outer node in an inline instance from a node in an inner instance
-    def toOuterNode(outerDoc: DocumentInfo, partAnalysis: PartAnalysis)(innerNode: NodeInfo, sourceId: String, into: Boolean) = {
+    // Find whether a change occurred in a descendant of a top-level XBL binding
+    def findXBLChange(partAnalysis: PartAnalysis, node: NodeInfo): Option[(String, Element)] = {
 
-        // Find path in instance
-        val path = dropStartingSlash(Navigator.getPath(innerNode))
+        // Go from root to leaf
+        val ancestorsFromRoot = (node ancestor * reverse)
 
-        // Find instance in original doc
-        evalOne(outerDoc, "//xforms:instance[@id = $sourceId]",
-                variables = Map("sourceId" → StringValue.makeStringValue(sourceId))) match {
-            case instanceWrapper: NodeWrapper if instanceWrapper.getUnderlyingNode.isInstanceOf[Element] ⇒
-                // Find destination node in inline instance in original doc
-                val namespaces = partAnalysis.getNamespaceMapping(partAnalysis.startScope.fullPrefix, instanceWrapper.getUnderlyingNode.asInstanceOf[Element])
-                evalOne(instanceWrapper, path, namespaces) match {
-                    case newNode: NodeWrapper ⇒ Some(newNode)
-                    case _ ⇒ throw new IllegalStateException
-                }
-            case _ ⇒ throw new IllegalStateException
-        }
-    }
-
-    // Listener that mirrors changes from one document to the other
-    def mirrorListener(containingDocument: XFormsContainingDocument, indentedLogger: IndentedLogger,
-                       findMatchingNode: (NodeInfo, String, Boolean) ⇒ Option[NodeInfo],
-                       notifyOtherChange: () ⇒ Unit)(e: XFormsEvent) = e match {
-
-        case valueChanged: XXFormsValueChanged ⇒
-            findMatchingNode(valueChanged.node, valueChanged.getTargetObject.getId, true) match {
-                case Some(newNode) ⇒
-                    DataModel.setValueIfChanged(
-                        newNode,
-                        valueChanged.newValue,
-                        DataModel.logAndNotifyValueChange(containingDocument, indentedLogger, "mirror", newNode, _, valueChanged.newValue, isCalculate = false),
-                        reason ⇒ throw new OXFException(reason.message)
-                    )
-                case None ⇒ // change not in an instance
-                    notifyOtherChange()
-            }
-        case insert: XFormsInsertEvent ⇒
-            findMatchingNode(insert.getInsertLocationNodeInfo, insert.getTargetObject.getId, insert.getPosition == "into") match {
-                case Some(insertNode) ⇒
-                    insert.getPosition match {
-                        case "into" ⇒
-                            XFormsInsertAction.doInsert(containingDocument, indentedLogger, "after", null,
-                                insertNode, insert.getOriginItems, -1, doClone = true, doDispatch = false)
-                        case position @ ("before" | "after") ⇒
-                            XFormsInsertAction.doInsert(containingDocument, indentedLogger, position, JCollections.singletonList(insertNode),
-                                null, insert.getOriginItems, 1, doClone = true, doDispatch = false)
-                        case _ ⇒ throw new IllegalStateException
-                    }
-                case None ⇒ // change not in an instance
-                    notifyOtherChange()
-
-            }
-        case delete: XFormsDeleteEvent ⇒
-            delete.deleteInfos.asScala foreach { deleteInfo ⇒ // more than one node might have been removed
-
-                val removedNodeInfo = deleteInfo.nodeInfo
-                val removedNodeIndex = deleteInfo.index
-
-                // Find the corresponding parent of the removed node and run the body on it. The body returns Some(Node)
-                // if that node can be removed.
-                def withNewParent(body: Node ⇒ Option[Node]) {
-
-                    // If parent is available, find matching node and call body
-                    Option(deleteInfo.parent) match {
-                        case Some(removedParentNodeInfo) ⇒
-                            findMatchingNode(removedParentNodeInfo, delete.getTargetObject.getId, true) match {
-                                case Some(newParentNodeInfo) ⇒
-
-                                    val docWrapper = newParentNodeInfo.getDocumentRoot.asInstanceOf[DocumentWrapper]
-                                    val newParentNode = XFormsUtils.getNodeFromNodeInfo(newParentNodeInfo, "")
-
-                                    body(newParentNode) match {
-                                        case Some(nodeToRemove: Node) ⇒
-                                            XFormsDeleteAction.doDelete(containingDocument, indentedLogger, JCollections.singletonList(docWrapper.wrap(nodeToRemove)), -1, doDispatch = false)
-                                        case _ ⇒ notifyOtherChange()
-                                    }
-                                case _ ⇒ notifyOtherChange()
-                            }
-                        case _ ⇒ notifyOtherChange()
-                    }
-                }
-
-                // Handle removed node depending on type
-                removedNodeInfo.getNodeKind match {
-                    case org.w3c.dom.Node.ATTRIBUTE_NODE ⇒
-                        // An attribute was removed
-                        withNewParent {
-                            case newParentElement: Element ⇒
-                                // Find the attribute  by name (as attributes are unique for a given QName)
-                                val removedAttribute = XFormsUtils.getNodeFromNodeInfo(removedNodeInfo, "").asInstanceOf[Attribute]
-                                newParentElement.attribute(removedAttribute.getQName) match {
-                                    case newAttribute: Attribute ⇒ Some(newAttribute)
-                                    case _ ⇒ None // out of sync, so probably safer
-                                }
-                            case _ ⇒ None
-                        }
-                    case org.w3c.dom.Node.ELEMENT_NODE ⇒
-                        // An element was removed
-                        withNewParent {
-                            case newParentDocument: Document ⇒
-                                // Element removed was root element
-                                val removedElement = XFormsUtils.getNodeFromNodeInfo(removedNodeInfo, "").asInstanceOf[Element]
-                                val newRootElement =  newParentDocument.getRootElement
-
-                                if (newRootElement.getQName == removedElement.getQName)
-                                    Some(newRootElement)
-                                else
-                                    None
-
-                            case newParentElement: Element ⇒
-                                // Element removed had a parent element
-                                val removedElement = XFormsUtils.getNodeFromNodeInfo(removedNodeInfo, "").asInstanceOf[Element]
-
-                                // If we can identify the position
-                                val content = newParentElement.content.asInstanceOf[JList[Node]]
-                                if (content.size > removedNodeIndex) {
-                                    content.get(removedNodeIndex) match {
-                                        case newElement: Element if newElement.getQName == removedElement.getQName ⇒ Some(newElement)
-                                        case _ ⇒ None // out of sync, so probably safer
-                                    }
-                                } else
-                                    None // out of sync, so probably safer
-                            case _ ⇒ None
-                        }
-                    case org.w3c.dom.Node.TEXT_NODE ⇒
-                        // TODO
-                        notifyOtherChange()
-                    case _ ⇒ notifyOtherChange() // we don't know how to propagate the change
-                }
-            }
-        case _ ⇒ throw new IllegalStateException
+        // Find first element whose prefixed id has a binding and return the mapping prefixedId → element
+        ancestorsFromRoot map
+            (e ⇒ (e.attValue("id") → e)) filter
+                (_._1.nonEmpty) map
+                    { case (id, node) ⇒ partAnalysis.startScope.prefixedIdForStaticId(id) → node } filter
+                        { case (prefixedId, node) ⇒ partAnalysis.getBinding(prefixedId).isDefined } map
+                            { case (prefixedId, node) ⇒ prefixedId → unwrapElement(node) } headOption
     }
 }

@@ -27,12 +27,12 @@ object SectionOps {
     // Move the section up if possible
     def moveSectionUp(container: NodeInfo) =
         if (canMoveUp(container))
-            moveContainer(container, container precedingSibling ContainerElementTest head, moveElementBefore)
+            moveContainer(container, container precedingSibling * filter isContainer head, moveElementBefore)
 
     // Move the section down if possible
     def moveSectionDown(container: NodeInfo) =
         if (canMoveDown(container))
-            moveContainer(container, container followingSibling ContainerElementTest head, moveElementAfter)
+            moveContainer(container, container followingSibling * filter isContainer head, moveElementAfter)
 
     // Move the section right if possible
     def moveSectionRight(container: NodeInfo) =
@@ -54,11 +54,11 @@ object SectionOps {
 
     // Whether the given container can be moved up
     def canMoveUp(container: NodeInfo) =
-        container precedingSibling ContainerElementTest nonEmpty
+        container precedingSibling * filter isContainer nonEmpty
 
     // Whether the given container can be moved down
     def canMoveDown(container: NodeInfo) =
-        container followingSibling ContainerElementTest nonEmpty
+        container followingSibling * filter isContainer nonEmpty
 
     // Whether the given container can be moved to the right
     def canMoveRight(container: NodeInfo) =

@@ -86,7 +86,7 @@ class SimpleElementAnalysis(
                 val model = staticStateContext.partAnalysis.getModelByScopeAndBind(scope, bindStaticId)
                 if (model eq null)
                     throw new ValidationException("Reference to non-existing bind id: " + bindStaticId, ElementAnalysis.createLocationData(element))
-                model.bindsById.get(bindStaticId).getBindingAnalysis
+                model.bindsById.get(bindStaticId) map (_.getBindingAnalysis) orNull
             case None ⇒
                 // No @bind
                 ref match {

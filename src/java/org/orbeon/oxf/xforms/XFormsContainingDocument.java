@@ -146,6 +146,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
     private String helpEffectiveControlId;
     private List<DelayedEvent> delayedEvents;
     private List<XFormsError.ServerError> serverErrors;
+    private Set<String> controlsStructuralChanges;
 
     // Page template for noscript mode if stored in dynamic state (otherwise stored in static state)
     private AnnotatedTemplate template;
@@ -576,6 +577,9 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         this.delayedEvents = null;
         
         this.serverErrors = null;
+
+        if (this.controlsStructuralChanges != null)
+            this.controlsStructuralChanges.clear();
     }
 
     /**
@@ -905,6 +909,17 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
     
     public List<XFormsError.ServerError> getServerErrors() {
         return serverErrors != null ? serverErrors : Collections.<XFormsError.ServerError>emptyList();
+    }
+
+    public Set<String> getControlsStructuralChanges() {
+        return controlsStructuralChanges != null ? controlsStructuralChanges : Collections.<String>emptySet();
+    }
+
+    public void addControlStructuralChange(String prefixedId) {
+        if (this.controlsStructuralChanges == null)
+            this.controlsStructuralChanges = new HashSet<String>();
+
+        this.controlsStructuralChanges.add(prefixedId);
     }
 
     @Override

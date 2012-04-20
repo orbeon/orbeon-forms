@@ -77,7 +77,7 @@ object Controls {
             rootAnalysis: ElementAnalysis) = {
 
         val idSuffix = XFormsUtils.getEffectiveIdSuffixParts(containerControl.getEffectiveId).toSeq
-        val bindingContext = container.getContextStack.resetBindingContext()
+        val bindingContext = containerControl.bindingContextForChild
 
         buildTree(
             controlIndex,

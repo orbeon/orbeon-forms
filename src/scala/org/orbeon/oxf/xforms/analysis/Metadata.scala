@@ -148,7 +148,7 @@ trait NamespaceMappings {
     private val namespaceMappings = new HashMap[String, NamespaceMapping]
     private val hashes = new LinkedHashMap[String, NamespaceMapping]
 
-    def addNamespaceMapping(prefixedId: String, mapping: JMap[String, String]) {
+    def addNamespaceMapping(prefixedId: String, mapping: JMap[String, String]): Unit = {
         // Sort mappings by prefix
         val sorted = TreeMap(mapping.asScala.toSeq: _*)
         // Hash key/values
@@ -164,6 +164,9 @@ trait NamespaceMappings {
         // Remember that id has this mapping
         namespaceMappings += prefixedId → namespaceMapping
     }
+
+    def removeNamespaceMapping(prefixedId: String): Unit =
+        namespaceMappings -= prefixedId
 
     def getNamespaceMapping(prefixedId: String) = namespaceMappings.get(prefixedId).orNull
 

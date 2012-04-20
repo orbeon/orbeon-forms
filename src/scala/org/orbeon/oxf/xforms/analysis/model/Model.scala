@@ -14,31 +14,37 @@
 package org.orbeon.oxf.xforms.analysis.model
 
 import org.dom4j._
-import java.util.{LinkedHashMap ⇒ JLinkedHashMap}
 import org.orbeon.oxf.xforms._
 
 import action.XFormsActions
 import analysis._
 import event.EventHandlerImpl
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import scala.collection.JavaConverters._
 import org.orbeon.oxf.xforms.XFormsConstants._
 import java.lang.String
 import collection.immutable.List
 import collection.mutable.{LinkedHashSet, LinkedHashMap}
-import xbl.Scope
 import org.orbeon.oxf.xml.{Dom4j, ContentHandlerHelper}
 import Model._
+import org.orbeon.oxf.xforms.xbl.Scope
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 
 /**
  * Static analysis of an XForms model <xf:model> element.
  */
-class Model(val staticStateContext: StaticStateContext, element: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], val scope: Scope)
-        extends ElementAnalysis(element, parent, preceding)
+class Model(val staticStateContext: StaticStateContext, elem: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], val scope: Scope)
+        extends ElementAnalysis(elem, parent, preceding)
+        with ModelInstances
+        with ModelVariables
+        with ModelSubmissions
+        with ModelEventHandlers
+        with ModelBinds
         with ChildrenBuilderTrait {
 
     require(staticStateContext ne null)
     require(scope ne null)
+
+    type Bind = BindTree#Bind
 
     val namespaceMapping = staticStateContext.partAnalysis.metadata.getNamespaceMapping(prefixedId)
 
@@ -55,15 +61,51 @@ class Model(val staticStateContext: StaticStateContext, element: Element, parent
         PathMapXPathAnalysis(staticStateContext.partAnalysis, PathMapXPathAnalysis.buildInstanceString(defaultInstancePrefixedId),
             null, None, Map.empty[String, VariableTrait], null, scope, Some(defaultInstancePrefixedId), locationData, element)
     }
+    
+    // For now this only checks actions and submissions, in the future should also build rest of content
+    override def findRelevantChildrenElements =
+        super.findRelevantChildrenElements collect
+            { case (e, s) if XFormsActions.isAction(e.getQName) || e.getQName == XFORMS_SUBMISSION_QNAME ⇒ (e, s) }
 
-    // NOTE: It is possible to imagine a model having in-scope variables, but this is not supported now
-    val inScopeVariables = Map.empty[String, VariableTrait]
+    override def analyzeXPath() {
+        // Analyze this
+        super.analyzeXPath()
+
+        analyzeVariablesXPath()
+        analyzeBindsXPath()
+    }
+
+    override def toXML(helper: ContentHandlerHelper, attributes: List[String] = Nil)(content: ⇒ Unit = ()) {
+
+        super.toXML(helper, List(
+            "scope", scope.scopeId,
+            "prefixed-id", prefixedId,
+            "default-instance-prefixed-id", defaultInstancePrefixedId.orNull,
+            "analyzed-binds", figuredAllBindRefAnalysis.toString
+        )) {
+            variablesToXML(helper)
+            bindsToXML(helper)
+            instancesToXML(helper)
+            // TODO: output handlers
+        }
+    }
+
+    override def freeTransientState(): Unit = {
+        super.freeTransientState()
+        freeVariablesTransientState()
+        freeBindsTransientState()
+    }
+}
+
+trait ModelInstances {
+
+    self: Model ⇒
 
     // Instance objects
     val instances = LinkedHashMap((
         for {
-            instanceElement ← Dom4jUtils.elements(element, XFORMS_INSTANCE_QNAME).asScala
-            newInstance = new Instance(staticStateContext, instanceElement, Some(Model.this), scope)
+            instanceElement ← Dom4j.elements(element, XFORMS_INSTANCE_QNAME)
+            newInstance = new Instance(staticStateContext, instanceElement, Some(self), scope)
         } yield newInstance.staticId → newInstance): _*)
 
     def instancesMap = instances.asJava
@@ -72,9 +114,36 @@ class Model(val staticStateContext: StaticStateContext, element: Element, parent
     val hasInstances = instances.nonEmpty
     val defaultInstanceStaticId = instances.headOption map (_._1) orNull
     val defaultInstancePrefixedId = Option(if (hasInstances) scope.fullPrefix + defaultInstanceStaticId else null)
+    // TODO: instances on which MIPs depend
+
+    def getDefaultInstance = if (instances.nonEmpty) instances.head._2 else null
+
+    def instancesToXML(helper: ContentHandlerHelper): Unit = {
+        // Output instances information
+        def outputInstanceList(name: String, values: collection.Set[String]) {
+            if (values.nonEmpty) {
+                helper.startElement(name)
+                for (value ← values)
+                    helper.element("instance", value)
+                helper.endElement()
+            }
+        }
+
+        outputInstanceList("bind-instances", bindInstances)
+        outputInstanceList("computed-binds-instances", computedBindExpressionsInstances)
+        outputInstanceList("validation-binds-instances", validationBindInstances)
+    }
+}
+
+trait ModelVariables {
+
+    self: Model ⇒
+
+    // NOTE: It is possible to imagine a model having in-scope variables, but this is not supported now
+    val inScopeVariables = Map.empty[String, VariableTrait]
 
     // Get *:variable/*:var elements
-    private val variableElements = Dom4jUtils.elements(element).asScala filter (e ⇒ ControlAnalysisFactory.isVariable(e.getQName)) asJava
+    private val variableElements = Dom4j.elements(self.element) filter (e ⇒ ControlAnalysisFactory.isVariable(e.getQName)) asJava
 
     // Handle variables
     val variablesSeq: Seq[VariableAnalysisTrait] = {
@@ -89,7 +158,7 @@ class Model(val staticStateContext: StaticStateContext, element: Element, parent
         for {
             variableElement ← variableElements.asScala
             analysis = {
-                val result = new SimpleElementAnalysis(staticStateContext, variableElement, Some(Model.this), preceding, scope) with VariableAnalysisTrait
+                val result = new SimpleElementAnalysis(staticStateContext, variableElement, Some(self), preceding, scope) with VariableAnalysisTrait
                 preceding = Some(result)
                 result
             }
@@ -101,35 +170,53 @@ class Model(val staticStateContext: StaticStateContext, element: Element, parent
 
     val variablesMap: Map[String, VariableAnalysisTrait] = variablesSeq map (variable ⇒ variable.name → variable) toMap
     val jVariablesMap = variablesMap.asJava
-    
-    // For now this only checks actions and submissions, in the future should also build rest of content
-    override def findRelevantChildrenElements =
-        super.findRelevantChildrenElements collect
-            { case (e, s) if XFormsActions.isAction(e.getQName) || e.getQName == XFORMS_SUBMISSION_QNAME ⇒ (e, s) }
-    
+
+    def analyzeVariablesXPath(): Unit =
+        for (variable ← variablesSeq)
+            variable.analyzeXPath()
+
+    def variablesToXML(helper: ContentHandlerHelper): Unit =
+        // Output variable information
+        for (variable ← variablesSeq)
+            variable.toXML(helper, List())({})
+
+    def freeVariablesTransientState(): Unit =
+        for (variable ← variablesSeq)
+            variable.freeTransientState()
+}
+
+trait ModelSubmissions {
+
+    self: Model ⇒
+
     // Submissions (they are all direct children)
     private lazy val _submissions = children collect { case s: Submission ⇒ s }
     def jSubmissions = _submissions.asJava
+}
+
+trait ModelEventHandlers {
+
+    self: Model ⇒
 
     // Event handlers, including on submissions and within nested actions
     private lazy val _eventHandlers = descendants collect { case e: EventHandlerImpl ⇒ e }
     def jEventHandlers = _eventHandlers.asJava
+}
 
-    // Handle binds
+class BindTree(model: Model, bindElements: Seq[Element]) {
+
+    bindTree ⇒
+
+    // All bind ids
     val bindIds = new LinkedHashSet[String]
-    val bindInstances = new LinkedHashSet[String]                       // instances to which binds apply (i.e. bind/@ref point to them)
-    val computedBindExpressionsInstances = new LinkedHashSet[String]    // instances to which computed binds apply
-    val validationBindInstances = new LinkedHashSet[String]             // instances to which validation binds apply
-
-    // TODO: use and produce variables introduced with xf:bind/@name
 
     // All binds by static id
-    val bindsById = new JLinkedHashMap[String, Bind] // JAVA COLLECTION
+    val bindsById = new LinkedHashMap[String, Bind]
 
     // Binds by name (for binds with a name)
     val bindsByName = new LinkedHashMap[String, Bind]
-    def jBindsByName = bindsByName.asJava
 
+    // Types of binds we have
     var hasInitialValueBind = false
     var hasCalculateBind = false
     var hasTypeBind = false
@@ -139,34 +226,78 @@ class Model(val staticStateContext: StaticStateContext, element: Element, parent
     var hasCalculateComputedCustomBind = false // default
     var hasValidateBind = false // default
 
-    // Top-level binds and create static binds hierarchy
+    // Instances affected by binding XPath expressions
+    val bindInstances = new LinkedHashSet[String]                       // instances to which binds apply (i.e. bind/@ref point to them)
+    val computedBindExpressionsInstances = new LinkedHashSet[String]    // instances to which computed binds apply
+    val validationBindInstances = new LinkedHashSet[String]             // instances to which validation binds apply
+
+    // Create static binds hierarchy and yield top-level binds
     val topLevelBinds: Seq[Bind] = {
         // NOTE: For now, do as if binds follow all top-level variables
-        val preceding = if (variablesSeq.isEmpty) None else Some(variablesSeq.last)
-        for (bindElement ← Dom4jUtils.elements(element, XFORMS_BIND_QNAME).asScala)
-        yield new Bind(bindElement, this, preceding)
+        val preceding = if (model.variablesSeq.isEmpty) None else Some(model.variablesSeq.last)
+        for (bindElement ← bindElements)
+            yield new Bind(bindElement, model, preceding)
     }
 
-    def topLevelBindsJava = topLevelBinds.asJava
+    def hasBinds = topLevelBinds.nonEmpty
+
+    // Destroy the tree of binds
+    def destroy(): Unit =
+        bindsById.values foreach (model.staticStateContext.partAnalysis.unmapScopeIds(_))
+
+    // Add a new bind
+    def addBind(rawBindElement: Element, parentId: String, precedingId: Option[String]): Unit = {
+
+        assert(! model.staticStateContext.partAnalysis.isTopLevel)
+
+        // First annotate tree
+        val (annotatedTree, _) =
+            model.staticStateContext.partAnalysis.xblBindings.annotateSubtree(
+                None,
+                Dom4jUtils.createDocumentCopyParentNamespaces(rawBindElement),
+                model.scope,
+                model.scope,
+                XXBLScope.inner,
+                model.containerScope,
+                hasFullUpdate = false,
+                ignoreRoot = false,
+                needCompact = false)
+
+        // Add new bind to parent
+        bindsById(parentId).addBind(annotatedTree.getRootElement, precedingId)
+
+        // NOTE: We are not in a top-level part, so for now XPath analysis doesn't need to be updated
+    }
+
+    // Remove an existing bind
+    def removeBind(bind: Bind): Unit = {
+
+        assert(! model.staticStateContext.partAnalysis.isTopLevel)
+
+        bind.parent match {
+            case Some(parentBind: Bind) ⇒ parentBind.removeBind(bind)
+            case _ ⇒ throw new IllegalArgumentException // for now, cannot remove top-level binds
+        }
+
+        // TODO: update has*
+        // NOTE: We are not in a top-level part, so for now XPath analysis doesn't need to be updated
+    }
 
     // In-scope variable on binds include variables implicitly declared with bind/@name
-    lazy val bindsVariablesSeq = variablesMap ++ (bindsByName mapValues (new BindAsVariable(_)))
+    // Used by XPath analysis
+    private lazy val bindsVariablesSeq = model.variablesMap ++ (bindsByName mapValues (new BindAsVariable(_)))
 
     class BindAsVariable(bind: Bind) extends VariableTrait {
         def name = bind.name
         def variableAnalysis = bind.getBindingAnalysis
     }
 
-    var figuredAllBindRefAnalysis = !hasBinds // default value sets to true if no binds
-
-    def hasBinds = topLevelBinds.nonEmpty
-    def containsBind(bindId: String) = bindIds.contains(bindId)
-
-    def getDefaultInstance = if (instances.nonEmpty) instances.head._2 else null
+    // Whether we figured out all XPath ref analysis
+    var figuredAllBindRefAnalysis = ! hasBinds // default value sets to true if no binds
 
     // Represent a static <xf:bind> element
     class Bind(element: Element, parent: ElementAnalysis, preceding: Option[ElementAnalysis])
-            extends SimpleElementAnalysis(staticStateContext, element, Some(parent), preceding, scope) {
+            extends SimpleElementAnalysis(model.staticStateContext, element, Some(parent), preceding, model.scope) {
 
         // Represent an individual MIP on an <xf:bind> element
         class MIP(val name: String) {
@@ -198,13 +329,13 @@ class Model(val staticStateContext: StaticStateContext, element: Element, parent
         class TypeMIP(name: String, val datatype: String) extends MIP(name)
 
         // Globally remember binds ids
-        Model.this.bindIds.add(staticId)
-        Model.this.bindsById.put(staticId, Bind.this)
+        bindTree.bindIds += staticId
+        bindTree.bindsById += staticId → Bind.this
 
         // Remember variables mappings
         val name = element.attributeValue(NAME_QNAME)
         if (name ne null)
-            bindsByName.put(name, Bind.this)
+            bindsByName += name → Bind.this
 
         // Built-in XPath MIPs
         val mipNameToXPathMIP =
@@ -223,22 +354,22 @@ class Model(val staticStateContext: StaticStateContext, element: Element, parent
 
         // Custom MIPs
         val customMIPNameToXPathMIP = Predef.Map((
-                for {
-                    attribute ← Dom4j.attributes(element) // check all the element's attributes
+            for {
+                attribute ← Dom4j.attributes(element) // check all the element's attributes
 
-                    attributeQName = attribute.getQName
-                    attributePrefix = attributeQName.getNamespacePrefix
-                    attributeURI = attributeQName.getNamespaceURI
+                attributeQName = attribute.getQName
+                attributePrefix = attributeQName.getNamespacePrefix
+                attributeURI = attributeQName.getNamespaceURI
 
-                    // Any QName-but-not-NCName which is not in the xforms or xxforms namespace or an XML attribute
-                    // NOTE: Also allow for xxf:events-mode extension MIP
-                    if attributePrefix.nonEmpty && !attributePrefix.startsWith("xml") &&
-                            attributeURI != XFORMS_NAMESPACE_URI &&
-                            (attributeURI != XXFORMS_NAMESPACE_URI || attributeQName == XXFORMS_EVENT_MODE_QNAME)
+                // Any QName-but-not-NCName which is not in the xforms or xxforms namespace or an XML attribute
+                // NOTE: Also allow for xxf:events-mode extension MIP
+                if attributePrefix.nonEmpty && !attributePrefix.startsWith("xml") &&
+                        attributeURI != XFORMS_NAMESPACE_URI &&
+                        (attributeURI != XXFORMS_NAMESPACE_URI || attributeQName == XXFORMS_EVENT_MODE_QNAME)
 
-                    customMIPName = buildCustomMIPName(attribute.getQualifiedName)
-                } yield
-                    customMIPName → new XPathMIP(customMIPName, attribute.getValue)): _*)
+                customMIPName = buildCustomMIPName(attribute.getQualifiedName)
+            } yield
+                customMIPName → new XPathMIP(customMIPName, attribute.getValue)): _*)
 
         def customMIPs = customMIPNameToXPathMIP.asJava
 
@@ -246,8 +377,23 @@ class Model(val staticStateContext: StaticStateContext, element: Element, parent
         val allMIPNameToXPathMIP = mipNameToXPathMIP ++ customMIPNameToXPathMIP
 
         // Create children binds
-        val children: Seq[Bind] = Dom4jUtils.elements(element, XFORMS_BIND_QNAME).asScala map (new Bind(_, Bind.this, preceding))
-        def jChildren = children.asJava
+        private var _children: Seq[Bind] = Dom4j.elements(element, XFORMS_BIND_QNAME) map (new Bind(_, Bind.this, None))// NOTE: preceding not handled for now
+        def children = _children
+        def jChildren = _children.asJava
+
+        def addBind(bindElement: Element, precedingId: Option[String]): Unit =
+            _children = _children :+ new Bind(bindElement, Bind.this, None)// NOTE: preceding not handled for now
+
+        def removeBind(bind: Bind): Unit = {
+            bindTree.bindIds -= bind.staticId
+            bindTree.bindsById -= bind.staticId
+            if (bind.name ne null)
+                bindsByName -= bind.name
+
+            _children = _children filterNot (_ eq bind)
+
+            staticStateContext.partAnalysis.unmapScopeIds(bind)
+        }
 
         def getMIP(mipName: String) = if (mipName == TYPE) typeMIP else allMIPNameToXPathMIP.get(mipName)
 
@@ -272,14 +418,14 @@ class Model(val staticStateContext: StaticStateContext, element: Element, parent
         def hasMIPs = hasCalculateComputedMIPs || hasValidateMIPs || hasCustomMIPs
 
         // Globally remember if we have seen these categories of binds
-        Model.this.hasInitialValueBind ||= getInitialValue ne null
-        Model.this.hasCalculateBind ||= getCalculate ne null
-        Model.this.hasTypeBind ||= getType ne null
-        Model.this.hasRequiredBind ||= getRequired ne null
-        Model.this.hasConstraintBind ||= getConstraint ne null
+        bindTree.hasInitialValueBind ||= getInitialValue ne null
+        bindTree.hasCalculateBind ||= getCalculate ne null
+        bindTree.hasTypeBind ||= getType ne null
+        bindTree.hasRequiredBind ||= getRequired ne null
+        bindTree.hasConstraintBind ||= getConstraint ne null
 
-        Model.this.hasCalculateComputedCustomBind ||= hasCalculateComputedMIPs || hasCustomMIPs
-        Model.this.hasValidateBind ||= hasValidateMIPs
+        bindTree.hasCalculateComputedCustomBind ||= hasCalculateComputedMIPs || hasCustomMIPs
+        bindTree.hasValidateBind ||= hasValidateMIPs
 
         // Compute value analysis if we have a type bound, otherwise don't bother
         override protected def computeValueAnalysis: Option[XPathAnalysis] = typeMIP match {
@@ -303,13 +449,13 @@ class Model(val staticStateContext: StaticStateContext, element: Element, parent
 
                                 // Remember dependent instances
                                 val returnableInstances = bindingAnalysis.returnableInstances
-                                bindInstances ++= returnableInstances
+                                bindTree.bindInstances ++= returnableInstances
 
                                 if (hasCalculateComputedMIPs || hasCustomMIPs)
-                                    computedBindExpressionsInstances ++= returnableInstances
+                                    bindTree.computedBindExpressionsInstances ++= returnableInstances
 
                                 if (hasValidateMIPs)
-                                    validationBindInstances ++= returnableInstances
+                                    bindTree.validationBindInstances ++= returnableInstances
 
                                 true
 
@@ -324,7 +470,7 @@ class Model(val staticStateContext: StaticStateContext, element: Element, parent
                 }
 
             // Analyze children
-            val childrenSucceeded = (children map (_.analyzeXPathGather)).foldLeft(true)(_ && _)
+            val childrenSucceeded = (_children map (_.analyzeXPathGather)).foldLeft(true)(_ && _)
 
             // Result
             refSucceeded && childrenSucceeded
@@ -340,7 +486,7 @@ class Model(val staticStateContext: StaticStateContext, element: Element, parent
             }
 
             // Analyze children
-            children foreach (_.analyzeMIPs())
+            _children foreach (_.analyzeMIPs())
         }
 
         override def freeTransientState() {
@@ -350,7 +496,7 @@ class Model(val staticStateContext: StaticStateContext, element: Element, parent
             for (mip ← allMIPNameToXPathMIP.values)
                 mip.analysis.freeTransientState()
 
-            for (child ← children)
+            for (child ← _children)
                 child.freeTransientState()
         }
 
@@ -366,22 +512,13 @@ class Model(val staticStateContext: StaticStateContext, element: Element, parent
                 }
 
                 // Children
-                for (child ← children)
+                for (child ← _children)
                     child.toXML(helper)()
             }
         }
     }
 
-    // TODO: instances on which MIPs depend
-
-    override def analyzeXPath() {
-        // Analyze this
-        super.analyzeXPath()
-
-        // Variables
-        for (variable ← variablesSeq)
-            variable.analyzeXPath()
-
+    def analyzeBindsXPath(): Unit = {
         // Analyze all binds and return whether all of them were successfully analyzed
         figuredAllBindRefAnalysis = (topLevelBinds map (_.analyzeXPathGather)).foldLeft(true)(_ && _)
 
@@ -389,7 +526,7 @@ class Model(val staticStateContext: StaticStateContext, element: Element, parent
         // NOTE: Do this here, because MIPs can depend on bind/@name, which requires all bind/@ref to be analyzed first
         topLevelBinds foreach (_.analyzeMIPs())
 
-        if (!figuredAllBindRefAnalysis) {
+        if (! figuredAllBindRefAnalysis) {
             bindInstances.clear()
             computedBindExpressionsInstances.clear()
             validationBindInstances.clear()
@@ -397,54 +534,80 @@ class Model(val staticStateContext: StaticStateContext, element: Element, parent
         }
     }
 
-    override def toXML(helper: ContentHandlerHelper, attributes: List[String] = Nil)(content: ⇒ Unit = ()) {
-
-        super.toXML(helper, List(
-            "scope", scope.scopeId,
-            "prefixed-id", prefixedId,
-            "default-instance-prefixed-id", defaultInstancePrefixedId.orNull,
-            "analyzed-binds", figuredAllBindRefAnalysis.toString
-        )) {
-            // Output variable information
-            for (variable ← variablesSeq)
-                variable.toXML(helper, List())({})
-            
-            // TODO: output handlers
-
-            // Output binds information
-            if (topLevelBinds.nonEmpty) {
-                helper.startElement("binds")
-                for (bind ← topLevelBinds)
-                    bind.toXML(helper)()
-                helper.endElement()
-            }
-
-            // Output instances information
-            def outputInstanceList(name: String, values: collection.Set[String]) {
-                if (values.nonEmpty) {
-                    helper.startElement(name)
-                    for (value ← values)
-                        helper.element("instance", value)
-                    helper.endElement()
-                }
-            }
-
-            outputInstanceList("bind-instances", bindInstances)
-            outputInstanceList("computed-binds-instances", computedBindExpressionsInstances)
-            outputInstanceList("validation-binds-instances", validationBindInstances)
+    def bindsToXML(helper: ContentHandlerHelper): Unit =
+        // Output binds information
+        if (topLevelBinds.nonEmpty) {
+            helper.startElement("binds")
+            for (bind ← topLevelBinds)
+                bind.toXML(helper)()
+            helper.endElement()
         }
-    }
 
-    override def freeTransientState() {
-
-        super.freeTransientState()
-
-        for (variable ← variablesSeq)
-            variable.freeTransientState()
-
+    def freeBindsTransientState(): Unit =
         for (bind ← topLevelBinds)
-            bind.freeTransientState();
+            bind.freeTransientState()
+}
+
+
+trait ModelBinds {
+
+    selfModel: Model ⇒
+
+    private var bindTree = new BindTree(selfModel, Dom4j.elements(selfModel.element, XFORMS_BIND_QNAME))
+
+    def annotateSubTree(rawElement: Element) = {
+        val (annotatedTree, _) =
+            staticStateContext.partAnalysis.xblBindings.annotateSubtree(
+                None,
+                Dom4jUtils.createDocumentCopyParentNamespaces(rawElement),
+                scope,
+                scope,
+                XXBLScope.inner,
+                containerScope,
+                hasFullUpdate = false,
+                ignoreRoot = false,
+                needCompact = false)
+
+        annotatedTree
     }
+
+    def rebuildBinds(rawModelElement: Element): Unit = {
+
+        assert(! selfModel.staticStateContext.partAnalysis.isTopLevel)
+
+        bindTree.destroy()
+        bindTree = new BindTree(selfModel, Dom4j.elements(rawModelElement, XFORMS_BIND_QNAME) map (annotateSubTree(_).getRootElement))
+    }
+
+    def bindsById = bindTree.bindsById
+    def jBindsByName = bindTree.bindsByName.asJava
+
+    def hasInitialValueBind = bindTree.hasInitialValueBind
+    def hasCalculateBind = bindTree.hasCalculateBind
+    def hasTypeBind = bindTree.hasTypeBind
+    def hasRequiredBind = bindTree.hasRequiredBind
+    def hasConstraintBind = bindTree.hasConstraintBind
+
+    def hasCalculateComputedCustomBind = bindTree.hasCalculateComputedCustomBind
+    def hasValidateBind = bindTree.hasValidateBind
+
+    def bindInstances = bindTree.bindInstances
+    def computedBindExpressionsInstances = bindTree.computedBindExpressionsInstances
+    def validationBindInstances = bindTree.validationBindInstances
+
+    // TODO: use and produce variables introduced with xf:bind/@name
+
+    def topLevelBinds = bindTree.topLevelBinds
+    def topLevelBindsJava = topLevelBinds.asJava
+
+    def hasBinds = bindTree.hasBinds
+    def containsBind(bindId: String) = bindTree.bindIds.contains(bindId)
+
+    def figuredAllBindRefAnalysis = bindTree.figuredAllBindRefAnalysis
+
+    def analyzeBindsXPath() = bindTree.analyzeBindsXPath()
+    def bindsToXML(helper: ContentHandlerHelper) = bindTree.bindsToXML(helper)
+    def freeBindsTransientState() = bindTree.freeBindsTransientState()
 }
 
 object Model {
@@ -502,3 +665,4 @@ object Model {
     val DEFAULT_REQUIRED = false
     val DEFAULT_VALID = true
 }
+

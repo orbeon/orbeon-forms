@@ -58,10 +58,19 @@
                     </xsl:copy>
                 </xsl:template>
 
-                <!-- Remove @edit-ref -->
+                <!-- xf:group → fr:view -->
+                <xsl:template match="xforms:group[tokenize(@class, '\s+') = 'fb-view']">
+                    <fr:view>
+                        <fr:body>
+                            <xsl:apply-templates select="xforms:group[tokenize(@class, '\s+') = 'fb-body']/node()"/>
+                        </fr:body>
+                    </fr:view>
+                </xsl:template>
+
+                <!-- Remove @edit-ref and @xxf:update, fb:view → fr:view, fb:section → fr:section -->
                 <xsl:template match="xhtml:body//fb:view | xhtml:body//fb:section | xhtml:body//fr:grid">
                     <xsl:element name="fr:{local-name()}">
-                        <xsl:apply-templates select="@* except @edit-ref | node()"/>
+                        <xsl:apply-templates select="@* except (@edit-ref, @xxforms:update) | node()"/>
                     </xsl:element>
                 </xsl:template>
 

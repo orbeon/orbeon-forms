@@ -29,7 +29,11 @@ trait ChildrenBuilderTrait extends ElementAnalysis {
     def children = _children
 
     // NOTE: Should probably make it so that controls add themselves to their container upon creation
-    def addChildren(children: Seq[ElementAnalysis]) = _children ++= children
+    def addChildren(children: Seq[ElementAnalysis]) =
+        _children ++= children
+
+    def removeChild(child: ElementAnalysis): Unit =
+        _children = _children filterNot (_ eq child)
 
     // All this element's descendants (valid after build() has been called)
     def descendants: Seq[ElementAnalysis] = {

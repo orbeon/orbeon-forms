@@ -94,7 +94,7 @@ object ControlAnalysisFactory {
         require(scope ne null)
 
         // XBL binding if any
-        val binding = Option(context.partAnalysis.xblBindings.getBinding(scope.prefixedIdForStaticId(XFormsUtils.getElementId(controlElement))))
+        val binding = context.partAnalysis.getBinding(scope.prefixedIdForStaticId(XFormsUtils.getElementId(controlElement)))
 
         // Not all factories are simply indexed by QName, so compose those with factories for components and actions
         val componentFactory: PartialFunction[Element, ControlFactory] = {

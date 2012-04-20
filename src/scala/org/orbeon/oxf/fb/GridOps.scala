@@ -220,7 +220,7 @@ object GridOps {
 
             // For now insert same rowspans as previous column, but could also insert full column as an option
             if (! cell.missing) {
-                insert(into = cell.td.parent, after = cell.td, origin = newTdElement(grid, ids.next(), if (cell.rowspan > 1) Some(cell.rowspan) else None))
+                insert(into = cell.td parent *, after = cell.td, origin = newTdElement(grid, ids.next(), if (cell.rowspan > 1) Some(cell.rowspan) else None))
             }
         }
 
@@ -408,7 +408,7 @@ object GridOps {
 
     // Rename a bind
     def renameTemplate(doc: NodeInfo, oldName: String, newName: String) =
-        templateRoot(doc, oldName) flatMap(_.parent.headOption) foreach
+        templateRoot(doc, oldName) flatMap(_ parent * headOption) foreach
             (template ⇒ ensureAttribute(template, "id", templateId(newName)))
 
     // Get the x/y position of a td given Cell information
@@ -417,7 +417,7 @@ object GridOps {
         // Search rows first, then cols
         // Another solution would be to store the position directly into Cell
 
-        val y = td.parent precedingSibling "*:tr" size
+        val y = td parent * precedingSibling "*:tr" size
         val x = cells(y) indexWhere (_.td == td)
 
         (x, y)

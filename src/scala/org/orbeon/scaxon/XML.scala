@@ -227,8 +227,9 @@ object XML {
         def attClasses = attTokens("class")
 
         def self(test: Test) = find(Axis.SELF, test)
-        def parent: Seq[NodeInfo] = Option(nodeInfo.getParent).toList
-        def parentAxis(test: Test) = find(Axis.PARENT, test)
+        def parent(test: Test) = find(Axis.PARENT, test)
+
+        def parentOption: Seq[NodeInfo] = Option(nodeInfo.getParent).toList
 
         def ancestor(test: Test): Seq[NodeInfo] = find(Axis.ANCESTOR, test)
         def ancestorOrSelf (test: Test): Seq[NodeInfo] = find(Axis.ANCESTOR_OR_SELF, test)
@@ -277,8 +278,7 @@ object XML {
         def descendant(test: Test) = \\(test)
 
         def self(test: Test) = seq flatMap (_ self test)
-        def parent = seq map (_.getParent) filter (_ ne null)
-        def parentAxis(test: Test) = seq flatMap (_ parentAxis test)
+        def parent(test: Test) = seq flatMap (_ parent test)
 
         def ancestor(test: Test): Seq[NodeInfo] = seq flatMap (_ ancestor test)
         def ancestorOrSelf (test: Test): Seq[NodeInfo] = seq flatMap (_ ancestorOrSelf test)

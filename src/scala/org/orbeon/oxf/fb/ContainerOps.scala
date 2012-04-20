@@ -87,7 +87,7 @@ object ContainerOps {
 
     // Find all siblings of the given element with the given name, excepting the given element
     def findSiblingsWithName(element: NodeInfo, siblingName: String) =
-        element.parent \ * filter
+        element parent * child * filter
             (name(_) == siblingName) filterNot
                 (_ isSameNodeInfo element)
 
@@ -172,5 +172,5 @@ object ContainerOps {
         (container self (FR → "section")) || (container self (FB → "section"))
 
     def isSectionTemplateContent(container: NodeInfo) =
-        (container.parent exists (isSection(_))) && container.getNamespaceURI == Component
+        (container parent * exists isSection) && container.getNamespaceURI == Component
 }

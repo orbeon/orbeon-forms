@@ -323,7 +323,7 @@ object ToolboxOps {
 
             // Insert binding into form if needed
             if (! (existingBindings \@ "element" === selector))
-                insert(after = Seq(model) ++ xbl, origin = binding.parent)
+                insert(after = Seq(model) ++ xbl, origin = binding parent * )
 
             // Insert template into section
             val template = binding child (FB → "metadata") child (FB → "template") child *

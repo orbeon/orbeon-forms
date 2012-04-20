@@ -136,21 +136,21 @@ object XFormsAPI {
                 case _ ⇒ throw new IllegalArgumentException
             }
 
-            insert(into = nodeInfo.parent, after = nodeInfo, origin = newNodeInfo)
+            insert(into = nodeInfo parent *, after = nodeInfo, origin = newNodeInfo)
             delete(nodeInfo)
         }
     }
 
     // Move the given element before another element
     def moveElementBefore(element: NodeInfo, other: NodeInfo) = {
-        val inserted = insert(into = element.parent, before = other, origin = element)
+        val inserted = insert(into = element parent *, before = other, origin = element)
         delete(element)
         inserted.head
     }
 
     // Move the given element after another element
     def moveElementAfter(element: NodeInfo, other: NodeInfo) = {
-        val inserted = insert(into = element.parent, after = other, origin = element)
+        val inserted = insert(into = element parent *, after = other, origin = element)
         delete(element)
         inserted.head
     }

@@ -71,7 +71,9 @@
                 <xforms:setvalue ref="$page-size" model="fr-persistence-model"
                                  value="xxforms:property(string-join(('oxf.fr.summary.page-size', $app, $form), '.'))"/>
 
-                <!-- Rebuild resource variables after loading -->
+                <!-- Rebuild resource variables after source form has been loaded, because resources model variables
+                     (e.g. $fr-form-resources) are used right after we are called. If you don't rebuild, control labels
+                     in structured search are not found. -->
                 <xforms:rebuild model="fr-resources-model"/>
             </xforms:action>
 
@@ -307,7 +309,8 @@
                     replace="instance" instance="fr-summary-instance">
                 <!-- Set language upon submitting -->
                 <xforms:action ev:event="xforms-submit">
-                    <xforms:setvalue ref="instance('fr-search-instance')/lang" value="xxforms:instance('fr-language-instance')"/>
+                    <!-- This works now that #122 is fixed https://github.com/orbeon/orbeon-forms/issues/122 -->
+                    <xforms:setvalue ref="lang" value="xxforms:instance('fr-language-instance')"/>
                 </xforms:action>
                 <xforms:action ev:event="xforms-submit-error">
                     <xforms:message>Error performing search.</xforms:message>

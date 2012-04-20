@@ -347,9 +347,9 @@ object XXFormsDynamicControl {
     // Find whether the given node is a bind element or attribute and return the associated model id → element mapping
     def findBindChange(node: NodeInfo): Option[(String, Element)] = {
 
-        // XPath: (self::xf:bind | self::@*/parent::xf:bind)/ancestor::xf:model[1]
+        // XPath: ((self::xf:bind | self::@*/parent::xf:bind)/ancestor::xf:model)[1]
         val modelOption =
-            (node self (XF → "bind")) ++ ((node self @* parentAxis (XF → "bind"))) ancestor (XF → "model") headOption
+            (node self (XF → "bind")) ++ ((node self @* parent (XF → "bind"))) ancestor (XF → "model") headOption
 
         modelOption map { modelNode ⇒
             val modelElement = unwrapElement(modelNode)
@@ -361,14 +361,19 @@ object XXFormsDynamicControl {
     def findXBLChange(partAnalysis: PartAnalysis, node: NodeInfo): Option[(String, Element)] = {
 
         // Go from root to leaf
-        val ancestorsFromRoot = (node ancestor * reverse)
+        val ancestorsFromRoot = node ancestor * reverse
 
         // Find first element whose prefixed id has a binding and return the mapping prefixedId → element
-        ancestorsFromRoot map
-            (e ⇒ (e.attValue("id") → e)) filter
-                (_._1.nonEmpty) map
-                    { case (id, node) ⇒ partAnalysis.startScope.prefixedIdForStaticId(id) → node } filter
-                        { case (prefixedId, node) ⇒ partAnalysis.getBinding(prefixedId).isDefined } map
-                            { case (prefixedId, node) ⇒ prefixedId → unwrapElement(node) } headOption
+        val all =
+            for {
+                ancestor ← ancestorsFromRoot
+                id = ancestor.attValue("id")
+                if id.nonEmpty
+                prefixedId = partAnalysis.startScope.prefixedIdForStaticId(id)
+                binding ← partAnalysis.getBinding(prefixedId)
+            } yield
+                prefixedId → unwrapElement(ancestor)
+
+        all.headOption
     }
 }

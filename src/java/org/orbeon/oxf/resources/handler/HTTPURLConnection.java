@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2012 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -164,6 +164,7 @@ public class HTTPURLConnection extends URLConnection {
 
     private String username;
     private String password;
+    private String preemptiveAuthentication;
     private String domain;
 
     public HTTPURLConnection(URL url) {
@@ -213,7 +214,11 @@ public class HTTPURLConnection extends URLConnection {
                 // by HttpClient's RequestTargetAuthentication which is itself an interceptor, so our interceptor
                 // needs to run before RequestTargetAuthentication, otherwise RequestTargetAuthentication won't find
                 // the appropriate AuthState/AuthScheme/Credentials in the HttpContext
-                httpClient.addRequestInterceptor(preemptiveAuthHttpRequestInterceptor, 0);
+
+                // Don't add the interceptor if we don't want preemptive authentication!
+                if (! "no".equals(preemptiveAuthentication)) {
+                    httpClient.addRequestInterceptor(preemptiveAuthHttpRequestInterceptor, 0);
+                }
 
                 CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
                 httpContext.setAttribute(ClientContext.CREDS_PROVIDER, credentialsProvider);
@@ -386,6 +391,10 @@ public class HTTPURLConnection extends URLConnection {
     public void setDomain(String domain) {
 		this.domain = domain.trim();
 	}
+
+    public void setPreemptiveAuthentication(String preemptiveAuthentication) {
+        this.preemptiveAuthentication = preemptiveAuthentication;
+    }
 
     @Override
     public long getLastModified() {

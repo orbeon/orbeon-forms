@@ -164,8 +164,10 @@ object XFormsProtocols extends StandardTypes with StandardPrimitives with JavaLo
             if (value ne null) {
                 write(out, StringUtils.trimToEmpty(value.username))
                 write(out, StringUtils.trimToEmpty(value.password))
+                write(out, StringUtils.trimToEmpty(value.preemptiveAuthentication))
                 write(out, StringUtils.trimToEmpty(value.domain))
             } else {
+                write(out, "")
                 write(out, "")
                 write(out, "")
                 write(out, "")
@@ -175,12 +177,13 @@ object XFormsProtocols extends StandardTypes with StandardPrimitives with JavaLo
         def reads(in: Input) = {
             val username = StringUtils.trimToNull(read[String](in))
             val password = StringUtils.trimToNull(read[String](in))
+            val preemptiveAuthentication = StringUtils.trimToNull(read[String](in))
             val domain = StringUtils.trimToNull(read[String](in))
             
             if (username eq null)
                 null
             else
-                new Credentials(username, password, domain)
+                new Credentials(username, password, preemptiveAuthentication, domain)
         }
     }
 

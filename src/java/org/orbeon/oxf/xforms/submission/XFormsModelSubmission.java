@@ -100,6 +100,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
 
     private String avtXXFormsUsername;
     private String avtXXFormsPassword;
+    private String avtXXFormsPreemptiveAuthentication;
     private String avtXXFormsDomain;
     private String avtXXFormsReadonly;
     private String avtXXFormsShared;
@@ -230,6 +231,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
             // Extension attributes
             avtXXFormsUsername = submissionElement.attributeValue(XFormsConstants.XXFORMS_USERNAME_QNAME);
             avtXXFormsPassword = submissionElement.attributeValue(XFormsConstants.XXFORMS_PASSWORD_QNAME);
+            avtXXFormsPreemptiveAuthentication = submissionElement.attributeValue(XFormsConstants.XXFORMS_PREEMPTIVE_AUTHENTICATION_QNAME);
             avtXXFormsDomain = submissionElement.attributeValue(XFormsConstants.XXFORMS_DOMAIN_QNAME);
 
             avtXXFormsReadonly = submissionElement.attributeValue(XFormsConstants.XXFORMS_READONLY_ATTRIBUTE_QNAME);
@@ -910,12 +912,13 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
 
             final String username = XFormsUtils.resolveAttributeValueTemplates(p.xpathContext, p.refNodeInfo, avtXXFormsUsername);
             final String password = XFormsUtils.resolveAttributeValueTemplates(p.xpathContext, p.refNodeInfo, avtXXFormsPassword);
+            final String preemptiveAuthentication = XFormsUtils.resolveAttributeValueTemplates(p.xpathContext, p.refNodeInfo, avtXXFormsPreemptiveAuthentication);
             final String domain = XFormsUtils.resolveAttributeValueTemplates(p.xpathContext, p.refNodeInfo, avtXXFormsDomain);
 
             if (username == null)
                 credentials = null;
             else
-                credentials = new Connection.Credentials(username, password, domain);
+                credentials = new Connection.Credentials(username, password, preemptiveAuthentication, domain);
 
             {
                 final String temp = XFormsUtils.resolveAttributeValueTemplates(p.xpathContext, p.refNodeInfo, avtXXFormsReadonly);

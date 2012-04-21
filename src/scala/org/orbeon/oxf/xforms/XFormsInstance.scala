@@ -109,6 +109,7 @@ class XFormsInstance(
         if (credentials ne null) {
             if (credentials.username ne null) att("username", credentials.username)
             if (credentials.password ne null) att("password", credentials.password)
+            if (credentials.preemptiveAuthentication ne null) att("preemptive-authentication", credentials.preemptiveAuthentication)
             if (credentials.domain ne null) att("domain", credentials.domain)
         }
 

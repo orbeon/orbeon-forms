@@ -39,16 +39,19 @@ public class Connection {
     public static class Credentials {
         public final String username;
         public final String password;
+        public final String preemptiveAuthentication;
         public final String domain;
 
-        public Credentials(String username, String password, String domain) {
+        public Credentials(String username, String password, String preemptiveAuthentication, String domain) {
 
             assert username != null;
 
             this.username = username;
             this.password = password;
+            this.preemptiveAuthentication = preemptiveAuthentication;
             this.domain = domain;
         }
+
 
         public String getPrefix() {
             if (password != null)
@@ -59,7 +62,7 @@ public class Connection {
 
         @Override
         public String toString() {
-            return "[" + username + ", " + password + ", " + domain + "]";
+            return "[" + username + ", " + password + ", " + preemptiveAuthentication + ", " + domain + "]";
         }
     }
 
@@ -464,9 +467,11 @@ public class Connection {
 
                         httpURLConnection.setUsername(credentials.username);
                         if (credentials.password != null)
-                           httpURLConnection.setPassword(credentials.password);
+                            httpURLConnection.setPassword(credentials.password);
+                        if (credentials.preemptiveAuthentication != null)
+                            httpURLConnection.setPreemptiveAuthentication(credentials.preemptiveAuthentication);
                         if (credentials.domain != null)
-                        	httpURLConnection.setDomain(credentials.domain);
+                            httpURLConnection.setDomain(credentials.domain);
                     }
                 }
 

@@ -323,6 +323,7 @@ public class XFormsConstants {
     public static final QName XXFORMS_CALCULATE_QNAME = new QName("calculate", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_USERNAME_QNAME = new QName("username", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_PASSWORD_QNAME = new QName("password", XXFORMS_NAMESPACE);
+    public static final QName XXFORMS_PREEMPTIVE_AUTHENTICATION_QNAME = new QName("preemptive_authentication", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_DOMAIN_QNAME = new QName("domain", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_SHARED_QNAME = new QName("shared", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_CACHE_QNAME = new QName("cache", XXFORMS_NAMESPACE);

@@ -317,7 +317,7 @@ object ControlOps {
 
     def precedingControlNameInSectionForGrid(grid: NodeInfo, includeSelf: Boolean) = {
 
-        val precedingOrSelfContainers = (if (includeSelf) Seq(grid) else Seq()) ++ (grid precedingSibling * filter isContainer)
+        val precedingOrSelfContainers = (if (includeSelf) Seq(grid) else Seq()) ++ (grid precedingSibling * filter IsContainer)
 
         // If a container has a name, then use that name, otherwise it must be an unnamed grid so find its last control
         // with a name (there might not be one).

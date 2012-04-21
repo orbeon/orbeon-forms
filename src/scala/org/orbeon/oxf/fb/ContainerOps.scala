@@ -22,12 +22,20 @@ import FormBuilderFunctions._
 
 object ContainerOps {
 
-    private val GridElementTest = pairToTest(FR → "grid")
-    private val ContainerElementTest = Seq(pairToTest(FB → "section"), GridElementTest) reduce (_ || _)
+    // Node tests
+    private val GridElementTest:    Test = FR → "grid"
+    private val SectionElementTest: Test = FB → "section"
+    private val ContainerElementTest = SectionElementTest || GridElementTest
 
-    // Whether the given node is a container element
-    def isContainer(node: NodeInfo) =
-        (node self ContainerElementTest) || ((node self (XF → "group")) && node.attClasses("fb-body"))
+    // Predicates
+    val IsGrid:      NodeInfo ⇒ Boolean = _ self GridElementTest
+    val IsSection:   NodeInfo ⇒ Boolean = _ self SectionElementTest
+
+    val IsContainer: NodeInfo ⇒ Boolean =
+        node ⇒ (node self ContainerElementTest) || ((node self (XF → "group")) && node.attClasses("fb-body"))
+
+    val IsSectionTemplateContent: NodeInfo ⇒ Boolean =
+        container ⇒ (container parent * exists IsSection) && container.getNamespaceURI == Component
 
     // XForms callers: get the name for a section or grid element or null (the empty sequence)
     def getContainerNameOrEmpty(elem: NodeInfo) = getControlNameOption(elem).orNull
@@ -35,7 +43,7 @@ object ContainerOps {
     // Find ancestor sections and grids (including non-repeated grids) from leaf to root
     def findAncestorContainers(descendant: NodeInfo, includeSelf: Boolean = false) =
         if (includeSelf) descendant ancestorOrSelf * else descendant ancestor * filter
-            isContainer
+            IsContainer
 
     // Find ancestor section and grid names from root to leaf
     def findContainerNames(descendant: NodeInfo): Seq[String] =
@@ -56,11 +64,11 @@ object ContainerOps {
 
     // A container's children containers
     def childrenContainers(container: NodeInfo) =
-        container \ * filter isContainer
+        container \ * filter IsContainer
 
     // A container's children grids (including repeated grids)
     def childrenGrids(container: NodeInfo) =
-        container \ * filter (_ self GridElementTest)
+        container \ * filter IsGrid
 
     // Delete the entire container and contained controls
     def deleteContainer(container: NodeInfo) = {
@@ -157,20 +165,11 @@ object ContainerOps {
 
     // Return all the container controls in the view
     def getAllContainerControls(inDoc: NodeInfo) =
-        getAllControls(inDoc) filter isContainer
+        getAllControls(inDoc) filter IsContainer
 
     // Whether it is possible to move an item into the given container
     // Currently: must be a section without section template content
     // Later: fr:tab (maybe fr:tabview), wizard
     def canMoveInto(container: NodeInfo) =
-        isSection(container) && ! (container \ * exists (isSectionTemplateContent(_)))
-
-    def isGrid(container: NodeInfo) =
-        container self (FR → "grid")
-
-    def isSection(container: NodeInfo) =
-        (container self (FR → "section")) || (container self (FB → "section"))
-
-    def isSectionTemplateContent(container: NodeInfo) =
-        (container parent * exists isSection) && container.getNamespaceURI == Component
+        IsSection(container) && ! (container \ * exists IsSectionTemplateContent)
 }

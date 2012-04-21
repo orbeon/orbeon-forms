@@ -216,7 +216,7 @@ public class HTTPURLConnection extends URLConnection {
                 // the appropriate AuthState/AuthScheme/Credentials in the HttpContext
 
                 // Don't add the interceptor if we don't want preemptive authentication!
-                if (! "no".equals(preemptiveAuthentication)) {
+                if (! "false".equals(preemptiveAuthentication)) {
                     httpClient.addRequestInterceptor(preemptiveAuthHttpRequestInterceptor, 0);
                 }
 

@@ -60,7 +60,6 @@ object DataModel {
      *
      * @param nodeInfo              element or attribute NodeInfo to update
      * @param newValue              value to set
-     * @param dataType              type of the value to set (xs:anyURI or xs:base64Binary), null if none
      * @param onSuccess             function called if the value was set
      * @param onError               function called if the value was not set
      *

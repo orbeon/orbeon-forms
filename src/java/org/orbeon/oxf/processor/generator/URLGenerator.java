@@ -69,6 +69,8 @@ public class URLGenerator extends ProcessorImpl {
     private static final boolean DEFAULT_CACHE_USE_LOCAL_CACHE = true;
     private static final boolean DEFAULT_ENABLE_CONDITIONAL_GET = false;
 
+    private static final boolean DEFAULT_PREEMPTIVE_AUTHENTICATION = true;
+
     public static final String URL_NAMESPACE_URI = "http://www.orbeon.org/oxf/xml/url";
     public static final String VALIDATING_PROPERTY = "validating";
     public static final String HANDLE_XINCLUDE_PROPERTY = "handle-xinclude";
@@ -122,7 +124,7 @@ public class URLGenerator extends ProcessorImpl {
         this.localConfigURIReferences = new ConfigURIReferences(new Config(url, contentType, forceContentType, encoding,
                 forceEncoding, ignoreConnectionEncoding, parserConfiguration, handleLexical, mode,
                 headerNameValues, forwardHeaders,
-                cacheUseLocalCache, enableConditionalGET, new TidyConfig(null)));
+                cacheUseLocalCache, enableConditionalGET, null, null, DEFAULT_PREEMPTIVE_AUTHENTICATION, null, new TidyConfig(null)));
         addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA));
     }
 
@@ -142,6 +144,11 @@ public class URLGenerator extends ProcessorImpl {
 
         private boolean cacheUseLocalCache = DEFAULT_CACHE_USE_LOCAL_CACHE;
         private boolean enableConditionalGET = DEFAULT_ENABLE_CONDITIONAL_GET;
+
+        private String username;
+        private String password;
+        private String domain;
+        private boolean preemptiveAuthentication = DEFAULT_PREEMPTIVE_AUTHENTICATION;
 
         private TidyConfig tidyConfig;
 
@@ -168,7 +175,8 @@ public class URLGenerator extends ProcessorImpl {
         public Config(URL url, String contentType, boolean forceContentType, String encoding, boolean forceEncoding,
                       boolean ignoreConnectionEncoding, XMLUtils.ParserConfiguration parserConfiguration,
                       boolean handleLexical, String mode, Map<String, String[]> headerNameValues, String forwardHeaders,
-                      boolean cacheUseLocalCache, boolean enableConditionalGET, TidyConfig tidyConfig) {
+                      boolean cacheUseLocalCache, boolean enableConditionalGET, String username, String password,
+                      boolean preemptiveAuthentication, String domain, TidyConfig tidyConfig) {
 
             this.url = url;
             this.contentType = contentType;
@@ -191,6 +199,12 @@ public class URLGenerator extends ProcessorImpl {
             // cache. Either way, it's complicated. So we disable conditional GET if XInclude is enabled for now. This
             // could be easier if we had a real HTTP client document cache.
             this.enableConditionalGET = enableConditionalGET && ! parserConfiguration.handleXInclude;
+
+            // Authentication
+            this.username = username;
+            this.password = password;
+            this.domain = domain;
+            this.preemptiveAuthentication = preemptiveAuthentication;
 
             this.tidyConfig = tidyConfig;
         }
@@ -251,10 +265,27 @@ public class URLGenerator extends ProcessorImpl {
             return enableConditionalGET;
         }
 
+        public String getUsername() {
+            return username;
+        }
+
+        public String getPassword() {
+            return password;
+        }
+
+        public String getDomain() {
+            return domain;
+        }
+
+        public boolean isPreemptiveAuthentication() {
+            return preemptiveAuthentication;
+        }
+
         @Override
         public String toString() {
             return "[" + getURL().toExternalForm() + "|" + getContentType() + "|" + getEncoding() + "|" + parserConfiguration.getKey() + "|" + isHandleLexical() + "|" + isForceContentType()
-                    + "|" + isForceEncoding() + "|" + isIgnoreConnectionEncoding() + "|" + tidyConfig + "]";
+                    + "|" + isForceEncoding() + "|" + isIgnoreConnectionEncoding() + "|" + getUsername() + "|" + getPassword() + "|" + isPreemptiveAuthentication() + "|" + getDomain()
+                    + "|" + tidyConfig + "]";
         }
     }
 
@@ -357,6 +388,13 @@ public class URLGenerator extends ProcessorImpl {
                                 final boolean cacheUseLocalCache = ProcessorUtils.selectBooleanValue(configElement, "/config/cache-control/use-local-cache", DEFAULT_CACHE_USE_LOCAL_CACHE);
                                 final boolean enableConditionalGET = ProcessorUtils.selectBooleanValue(configElement, "/config/cache-control/conditional-get", DEFAULT_ENABLE_CONDITIONAL_GET);
 
+                                // Authentication
+                                final org.dom4j.Node configAuthentication = XPathUtils.selectSingleNode(configElement, "/config/authentication");
+                                final String username = configAuthentication == null ? null : XPathUtils.selectStringValue(configAuthentication, "username");
+                                final String password = configAuthentication == null ? null : XPathUtils.selectStringValue(configAuthentication, "password");
+                                final boolean preemptiveAuthentication = ProcessorUtils.selectBooleanValue(configElement, "/config/authentication/preemptive", DEFAULT_PREEMPTIVE_AUTHENTICATION);
+                                final String domain = configAuthentication == null ? null : XPathUtils.selectStringValue(configAuthentication, "domain");
+
                                 // Get Tidy config (will only apply if content-type is text/html)
                                 final TidyConfig tidyConfig = new TidyConfig(XPathUtils.selectSingleNode(configElement, "/config/tidy-options"));
 
@@ -374,7 +412,9 @@ public class URLGenerator extends ProcessorImpl {
                                     final Config config = new Config(fullURL, contentType, forceContentType, encoding, forceEncoding,
                                             ignoreConnectionEncoding, new XMLUtils.ParserConfiguration(validating, handleXInclude, externalEntities), handleLexical, mode,
                                             headerNameValues, forwardHeaders,
-                                            cacheUseLocalCache, enableConditionalGET, tidyConfig);
+                                            cacheUseLocalCache, enableConditionalGET,
+                                            username, password, preemptiveAuthentication, domain,
+                                            tidyConfig);
                                     if (logger.isDebugEnabled())
                                         logger.debug("Read configuration: " + config.toString());
                                     return new ConfigURIReferences(config);
@@ -868,8 +908,11 @@ public class URLGenerator extends ProcessorImpl {
                     newHeaders = config.getHeaderNameValues();
                 }
 
+                Connection.Credentials credentials = config.getUsername() == null ?
+                        null :
+                        new Connection.Credentials(config.getUsername(), config.getPassword(), config.isPreemptiveAuthentication() ? "true" : "false", config.getDomain());
                 connectionResult = new Connection().open(externalContext, indentedLogger, false, Connection.Method.GET.name(),
-                        config.getURL(), null, null, null, newHeaders, config.getForwardHeaders());
+                        config.getURL(), credentials, null, null, newHeaders, config.getForwardHeaders());
                 inputStream = connectionResult.getResponseInputStream(); // empty stream if conditional GET succeeded
             }
         }

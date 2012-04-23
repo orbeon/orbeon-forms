@@ -156,6 +156,34 @@
                             </interleave>
                         </element>
                     </optional>
+                    <optional>
+                        <element name="authentication">
+                            <interleave>
+                                <element name="username">
+                                    <data type="string"/>
+                                </element>
+                                <optional>
+                                    <element name="password">
+                                        <data type="string"/>
+                                    </element>
+                                </optional>
+                                <optional>
+                                    <element name="domain">
+                                        <data type="string"/>
+                                    </element>
+                                </optional>
+                                <optional>
+                                    <element name="preemptive">
+                                        <choice>
+                                            <value>true</value>
+                                            <value>false</value>
+                                        </choice>
+                                    </element>
+                                </optional>
+                            </interleave>
+                        </element>
+                    </optional>
+
                 </interleave>
             </choice>
         </element>

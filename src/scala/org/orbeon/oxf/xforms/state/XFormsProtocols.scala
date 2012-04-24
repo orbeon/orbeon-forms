@@ -85,6 +85,34 @@ object XFormsProtocols extends StandardTypes with StandardPrimitives with JavaLo
         def reads(input: Input) =
             Control(read[String](input), read[Map[String, String]](input))
     }
+
+    implicit object CredentialsFormat extends Format[Credentials] {
+        def writes(out: Output, value: Credentials) {
+            if (value ne null) {
+                write(out, StringUtils.trimToEmpty(value.username))
+                write(out, StringUtils.trimToEmpty(value.password))
+                write(out, StringUtils.trimToEmpty(value.preemptiveAuthentication))
+                write(out, StringUtils.trimToEmpty(value.domain))
+            } else {
+                write(out, "")
+                write(out, "")
+                write(out, "")
+                write(out, "")
+            }
+        }
+
+        def reads(in: Input) = {
+            val username = StringUtils.trimToNull(read[String](in))
+            val password = StringUtils.trimToNull(read[String](in))
+            val preemptiveAuthentication = StringUtils.trimToNull(read[String](in))
+            val domain = StringUtils.trimToNull(read[String](in))
+
+            if (username eq null)
+                null
+            else
+                new Credentials(username, password, preemptiveAuthentication, domain)
+        }
+    }
     
     implicit object InstanceFormat extends Format[XFormsInstance] {
         
@@ -156,34 +184,6 @@ object XFormsProtocols extends StandardTypes with StandardPrimitives with JavaLo
 
                 read[Boolean](in)
             )
-        }
-    }
-    
-    implicit object CredentialsFormat extends Format[Credentials] {
-        def writes(out: Output, value: Credentials) {
-            if (value ne null) {
-                write(out, StringUtils.trimToEmpty(value.username))
-                write(out, StringUtils.trimToEmpty(value.password))
-                write(out, StringUtils.trimToEmpty(value.preemptiveAuthentication))
-                write(out, StringUtils.trimToEmpty(value.domain))
-            } else {
-                write(out, "")
-                write(out, "")
-                write(out, "")
-                write(out, "")
-            }
-        }
-
-        def reads(in: Input) = {
-            val username = StringUtils.trimToNull(read[String](in))
-            val password = StringUtils.trimToNull(read[String](in))
-            val preemptiveAuthentication = StringUtils.trimToNull(read[String](in))
-            val domain = StringUtils.trimToNull(read[String](in))
-            
-            if (username eq null)
-                null
-            else
-                new Credentials(username, password, preemptiveAuthentication, domain)
         }
     }
 

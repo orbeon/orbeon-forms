@@ -4396,9 +4396,13 @@ ORBEON.xforms.Init = {
         }
 
         // Run call-back function interested in knowing when the form is initialized
-        if (window.parent.childWindowOrbeonReady) {
-            window.parent.childWindowOrbeonReady();
-            window.parent.childWindowOrbeonReady = null;
+        try {
+            if (window.parent.childWindowOrbeonReady) {
+                window.parent.childWindowOrbeonReady();
+                window.parent.childWindowOrbeonReady = null;
+            }
+        } catch (e) {
+            // Silently ignore if we can't access parent window
         }
 
         ORBEON.xforms.Globals.topLevelListenerRegistered = true;

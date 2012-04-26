@@ -689,6 +689,7 @@
     </xsd:group>
     <xsd:element name="action">
         <xsd:complexType>
+            <xsd:group ref="xforms:UI.Inline"/>
             <xsd:choice minOccurs="0" maxOccurs="unbounded">
                 <xsd:group ref="xforms:Action"/>
                 <xsd:any namespace="##other" processContents="lax"/>

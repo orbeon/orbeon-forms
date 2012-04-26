@@ -47,6 +47,7 @@ import org.orbeon.saxon.value.BooleanValue;
 import org.orbeon.saxon.value.QNameValue;
 import org.orbeon.saxon.value.SequenceExtent;
 import org.orbeon.saxon.value.StringValue;
+import org.orbeon.scaxon.XML;
 
 import java.util.*;
 
@@ -1058,7 +1059,7 @@ public class XFormsModelBinds {
             private BindNode(Item item) {
                 if (item instanceof NodeInfo) {
                     nodeInfo = (NodeInfo) item;
-                    hasChildrenElements = nodeInfo.getNodeKind() == org.w3c.dom.Document.ELEMENT_NODE && XFormsUtils.hasChildrenElements(nodeInfo);
+                    hasChildrenElements = nodeInfo.getNodeKind() == org.w3c.dom.Document.ELEMENT_NODE && XML.hasChildElement(nodeInfo);
 
                     // Add us to the node
                     InstanceData.addBindNode(nodeInfo, this);

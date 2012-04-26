@@ -131,7 +131,7 @@ object XFormsAPI {
 
         if (oldName != newName) {
             val newNodeInfo = nodeInfo.getNodeKind match {
-                case ELEMENT_NODE ⇒ elementInfo(newName, (nodeInfo \@ @*) ++ (nodeInfo \ node))
+                case ELEMENT_NODE ⇒ elementInfo(newName, (nodeInfo \@ @*) ++ (nodeInfo \ Node))
                 case ATTRIBUTE_NODE ⇒  attributeInfo(newName, attValueOption(nodeInfo).get)
                 case _ ⇒ throw new IllegalArgumentException
             }

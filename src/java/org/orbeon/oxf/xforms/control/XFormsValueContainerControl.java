@@ -21,6 +21,7 @@ import org.orbeon.oxf.xforms.model.DataModel;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
+import org.orbeon.scaxon.XML;
 
 /**
  * A container control which supports value change events. Currently:
@@ -52,7 +53,7 @@ public abstract class XFormsValueContainerControl extends XFormsSingleNodeContai
 
     private void readBinding() {
         final Item boundItem = getBoundItem();
-        if (boundItem instanceof NodeInfo && !XFormsUtils.hasChildrenElements((NodeInfo) boundItem)) {
+        if (boundItem instanceof NodeInfo && ! XML.hasChildElement((NodeInfo) boundItem)) {
             hasValue = true;
         } else {
             hasValue = false;

@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms.model
 
 import org.orbeon.saxon.dom4j.NodeWrapper
-import org.dom4j._
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.xforms.event.XFormsEventTarget
 import org.orbeon.oxf.xforms._
@@ -23,8 +22,10 @@ import org.w3c.dom.Node.{ELEMENT_NODE, ATTRIBUTE_NODE, TEXT_NODE, DOCUMENT_NODE}
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.saxon.value.AtomicValue
 import org.orbeon.saxon.om.{Item, NodeInfo}
-import org.orbeon.oxf.xml.dom4j.{LocationData, Dom4jUtils}
+import org.orbeon.oxf.xml.dom4j.LocationData
 import org.orbeon.saxon.om.Axis
+import org.dom4j._
+import org.orbeon.scaxon.XML._
 
 /**
  * Represent access to the data model via the NodeInfo abstraction.
@@ -77,7 +78,7 @@ object DataModel {
         nodeInfo match {
             case nodeWrapper: NodeWrapper ⇒
                 nodeWrapper.getUnderlyingNode match {
-                    case node: Node if Dom4jUtils.isSimpleContent(node) ⇒
+                    case node: Node if hasSimpleContent(nodeWrapper) ⇒
                         setValueForNode(node, newValue)
                         onSuccess()
                         true
@@ -182,7 +183,8 @@ object DataModel {
             // value."
             case attribute: Attribute ⇒ attribute.setValue(newValue)
             // "Text nodes: The text node is replaced with a new one corresponding to the new value."
-            // NOTE: As of 2011-11-03, this should not happen as the caller tests for isSimpleContent() which excludes text nodes.
+            // NOTE: As of 2011-11-03, this should not happen as the caller tests for hasSimpleContent() which excludes text nodes.
+            // NOTE: Even so, here we replace the text value of the node, which is against the spec.
             case text: Text ⇒ text.setText(newValue)
             // "Namespace, processing instruction, comment, and the XPath root node: behavior is undefined."
             case _ ⇒ throw new OXFException("Setting value on node other than element, attribute or text is not supported for node type: " + node.getNodeTypeName)

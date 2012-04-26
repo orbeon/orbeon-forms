@@ -828,28 +828,6 @@ public class XFormsUtils {
     }
 
     /**
-     * Return whether the given node has at least one child element.
-     *
-     * @param nodeInfo  NodeInfo to look at
-     * @return          true iff NodeInfo has at least one child element
-     */
-    public static boolean hasChildrenElements(NodeInfo nodeInfo) {
-        final AxisIterator i = nodeInfo.iterateAxis(Axis.CHILD);
-        i.next();
-        while (i.current() != null) {
-            final Item current = i.current();
-            if (current instanceof NodeInfo) {
-                final NodeInfo currentNodeInfo = (NodeInfo) current;
-                if (currentNodeInfo.getNodeKind() == org.w3c.dom.Document.ELEMENT_NODE) {
-                    return true;
-                }
-            }
-            i.next();
-        }
-        return false;
-    }
-
-    /**
      * Return whether the given string contains a well-formed XPath 2.0 expression.
      *
      * @param xpathString       string to check

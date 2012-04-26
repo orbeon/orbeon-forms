@@ -30,12 +30,14 @@ import org.orbeon.saxon.expr.{Token, ExpressionTool}
 import org.orbeon.saxon.om._
 import scala.Predef._
 import org.orbeon.saxon.functions.FunctionLibrary
+import org.w3c.dom.Node.{ELEMENT_NODE, PROCESSING_INSTRUCTION_NODE, COMMENT_NODE}
 
 object XML {
 
     // TODO: Like for XFSS, this should not be global
 
     private val wrapper = new DocumentWrapper(Dom4jUtils.createDocument, null, XPathCache.getGlobalConfiguration)
+    private val DisallowedNodeTypesForSimpleContent = Set(ELEMENT_NODE, PROCESSING_INSTRUCTION_NODE, COMMENT_NODE) map (_.toInt)
 
     // Convenience methods for the XPath API
     def evalOne(item: Item, expr: String, namespaces: NamespaceMapping = XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING, variables: Map[String, ValueRepresentation] = null)(implicit library: FunctionLibrary = null) =
@@ -169,20 +171,31 @@ object XML {
         def test(nodeInfo: NodeInfo) = new CombinedNodeTest(s1.test(nodeInfo), Token.EXCEPT, s2.test(nodeInfo))
     }
 
-    // Match any element
-    val * = new Test {
-        def test(nodeInfo: NodeInfo) = NodeKindTest.makeNodeKindTest(Type.ELEMENT)
+    private class NodeKindTestBase(nodeKind: Short) extends Test {
+        private val test = NodeKindTest.makeNodeKindTest(nodeKind)
+        def test(nodeInfo: NodeInfo) = test
     }
 
-    // Match any child node
-    val node = new Test {
-        def test(nodeInfo: NodeInfo) = AnyNodeTest.getInstance()
-    }
+    // Match node types, like the XPath * or element(), @* or attribute(), document-node(), processing-instruction(),
+    // comment(), text() or node() tests.
+    val Element   : Test = new NodeKindTestBase(Type.ELEMENT)
+    val *         : Test = Element
+    val Attribute : Test = new NodeKindTestBase(Type.ATTRIBUTE)
+    val @*        : Test = Attribute
+    val Document  : Test = new NodeKindTestBase(Type.DOCUMENT)
+    val PI        : Test = new NodeKindTestBase(Type.PROCESSING_INSTRUCTION)
+    val Comment   : Test = new NodeKindTestBase(Type.COMMENT)
+    val Text      : Test = new NodeKindTestBase(Type.TEXT)
+    val Node      : Test = new NodeKindTestBase(Type.NODE)
 
-    // Match any attribute
-    val @* = new Test {
-        def test(nodeInfo: NodeInfo) = NodeKindTest.makeNodeKindTest(Type.ATTRIBUTE)
-    }
+    // Whether the given node has simple content. Concretely, the node is either an attribute node or an element node
+    // without nested elements processing instructions, or comments.
+    def hasSimpleContent(nodeInfo: NodeInfo): Boolean =
+        (nodeInfo self @*) || ((nodeInfo self *) &&
+            ! (nodeInfo child Node exists (child ⇒ DisallowedNodeTypesForSimpleContent(child.getNodeKind))))
+
+    // Whether the given node has at least one child element.
+    def hasChildElement(nodeInfo: NodeInfo) = nodeInfo child * nonEmpty
 
     // Passing a string as test means to test on the local name of an element
     implicit def stringToTest(s: String): Test = new NodeLocalNameTest(Type.ELEMENT, s)
@@ -303,7 +316,6 @@ object XML {
     implicit def nodeInfoSeqToRichNodeInfoSeq(seq: Seq[NodeInfo]): NodeInfoSeqOps = new NodeInfoSeqOps(seq)
 
     // Other implicits
-
     implicit def itemToItemSeq(item: Item) = Seq(item)
     implicit def nodeInfoToNodeInfoSeq(node: NodeInfo) = if (node ne null) Seq(node) else Seq()// TODO: don't take null
 

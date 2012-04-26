@@ -342,10 +342,10 @@ object XXFormsDynamicControl {
     def composeListeners(listeners: Seq[EventListener]): EventListener =
         e ⇒ listeners exists (_(e))
 
-    val XF = XFORMS_NAMESPACE_URI
-
     // Find whether the given node is a bind element or attribute and return the associated model id → element mapping
     def findBindChange(node: NodeInfo): Option[(String, Element)] = {
+
+        val XF = XFORMS_NAMESPACE_URI
 
         // XPath: ((self::xf:bind | self::@*/parent::xf:bind)/ancestor::xf:model)[1]
         val modelOption =

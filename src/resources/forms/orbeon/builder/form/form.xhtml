@@ -23,6 +23,7 @@
       xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
       xmlns:saxon="http://saxon.sf.net/"
       xmlns:xbl="http://www.w3.org/ns/xbl"
+      xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps"
       xmlns:xformsUtils="java:org.orbeon.oxf.xforms.XFormsUtils">
     <xh:head>
         <xh:title>Orbeon Form Builder</xh:title>
@@ -317,7 +318,6 @@
 
                         <!-- Open dialogs shortcuts -->
                         <xxf:show if="$dialogs-closed" ev:observer="#document" ev:event="keypress" xxf:modifiers="alt" xxf:text="e" dialog="fb-source-editor-dialog"/>
-                        <xf:dispatch if="$dialogs-closed" ev:observer="#document" ev:event="keypress" xxf:modifiers="alt" xxf:text="h" name="DOMActivate" targetid="fb-edit-control-help-trigger"/>
                         <xf:dispatch if="$dialogs-closed" ev:observer="#document" ev:event="keypress" xxf:modifiers="alt" xxf:text="i" name="DOMActivate" targetid="fb-edit-details-trigger"/>
                         <xf:dispatch if="$dialogs-closed" ev:observer="#document" ev:event="keypress" xxf:modifiers="alt" xxf:text="v" name="DOMActivate" targetid="fb-edit-validation-trigger"/>
 
@@ -441,7 +441,7 @@
                                 <!-- Delete control -->
                                 <xf:trigger appearance="minimal" id="fb-delete-trigger">
                                     <xf:label><xh:img src="/apps/fr/style/images/silk/bin.png" alt="{$fb-resources/delete-control-icon/label}" title="{$fb-resources/delete-control-icon/label}"/></xf:label>
-                                    <xf:action ev:event="DOMActivate" type="xpath" xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps">
+                                    <xf:action ev:event="DOMActivate" type="xpath">
                                         controlOps:deleteCellContent($td)
                                     </xf:action>
                                 </xf:trigger>
@@ -524,13 +524,13 @@
 
                             <!-- Label editor -->
                             <xf:output id="fb-enter-label" ref="$form-resources/enter-label/label"/>
-                            <xf:group ref=".[exists($control/xf:label/@ref)]" appearance="xxf:internal" xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps">
+                            <xf:group ref=".[exists($control/xf:label/@ref)]" appearance="xxf:internal">
                                 <xf:input xxf:autocomplete="off" class="fb-control-label" ref="$current-resources/*[name() = controlOps:controlName($control-id)]/label"/>
                             </xf:group>
 
                             <!-- Hint editor -->
                             <xf:output id="fb-enter-hint" ref="$form-resources/enter-hint/label"/>
-                            <xf:group ref=".[exists($control/xf:hint/@ref)]" appearance="xxf:internal" xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps">
+                            <xf:group ref=".[exists($control/xf:hint/@ref)]" appearance="xxf:internal">
                                 <xf:input xxf:autocomplete="off" class="fb-control-hint" ref="$current-resources/*[name() = controlOps:controlName($control-id)]/hint"/>
                             </xf:group>
 

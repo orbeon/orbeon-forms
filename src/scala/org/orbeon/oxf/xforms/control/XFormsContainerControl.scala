@@ -15,8 +15,6 @@ package org.orbeon.oxf.xforms.control
 
 import scala.collection.JavaConverters._
 import collection.mutable.{ArrayBuffer, Buffer}
-import org.orbeon.oxf.xforms.analysis.ChildrenBuilderTrait
-import org.orbeon.oxf.xforms.analysis.controls.ContainerControl
 import org.orbeon.oxf.xml.ContentHandlerHelper
 import java.util.{List ⇒ JList}
 
@@ -28,8 +26,6 @@ trait XFormsContainerControl extends XFormsControl {
     // Get all the direct children controls (never null)
     def children: Seq[XFormsControl] = Option(_children) getOrElse Seq.empty
     def childrenJava: JList[XFormsControl] = children.asJava
-
-    override def staticControl = super.staticControl.asInstanceOf[ContainerControl with ChildrenBuilderTrait]
 
     // Add a child control
     def addChild(control: XFormsControl) {

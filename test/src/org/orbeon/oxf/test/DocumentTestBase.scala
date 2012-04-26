@@ -39,12 +39,10 @@ abstract class DocumentTestBase extends ResourceManagerTestBase {
         }
     }
 
-    def setupDocument(documentURL: String): Unit =
+    def setupDocument(documentURL: String): XFormsContainingDocument =
         setupDocument(ProcessorUtils.createDocumentFromURL(documentURL, null))
 
-    def getDocument = _document
-
-    def setupDocument(xhtml: JDocument) = {
+    def setupDocument(xhtml: JDocument): XFormsContainingDocument = {
         ResourceManagerTestBase.staticSetup()
 
         val (template, staticState) = XFormsStaticStateImpl.createFromDocument(xhtml)
@@ -82,6 +80,8 @@ abstract class DocumentTestBase extends ResourceManagerTestBase {
     implicit def elemToDocument(e: Elem) = Dom4jUtils.readDom4j(e.toString)
     implicit def elemToElement(e: Elem) = Dom4jUtils.readDom4j(e.toString).getRootElement
     implicit def elementToElem(e: Element) = XML.loadString(Dom4jUtils.domToString(e))
+
+//    implicit def elemToDocumentWrapper(e: Elem) = new DocumentWrapper(elemToDocument(e), null, XPathCache.getGlobalConfiguration)
 
 //    // TODO: There is probably a better way to write these conversions
     implicit def scalaElemSeqToDom4jElementSeq(seq: Traversable[Elem]): Seq[Element] = seq map (elemToElement(_)) toList

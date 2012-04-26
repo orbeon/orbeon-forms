@@ -29,15 +29,15 @@
             </xf:instance>
 
             <!-- Bindings -->
-            <xf:bind id="fr-form-binds" nodeset="instance('fr-form-instance')">
-                <xf:bind id="section-1-bind" name="section-1" nodeset="section-1"/>
-                <xf:bind id="section-2-bind" name="section-1" nodeset="section-1"/>
-                <xf:bind id="section-3-bind" name="section-1" nodeset="section-1"/>
+            <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xf:bind id="section-1-bind" name="section-1" ref="section-1"/>
+                <xf:bind id="section-2-bind" name="section-1" ref="section-1"/>
+                <xf:bind id="section-3-bind" name="section-1" ref="section-1"/>
             </xf:bind>
 
             <!-- All form resources -->
             <!-- Don't make readonly by default in case a service modifies the resources -->
-            <xf:instance id="fr-form-resources" xxf:readonly="false">
+            <xf:instance id="fr-form-resources" xxf:readonly="true">
                 <resources>
                     <resource xml:lang="">
                         <section-1>

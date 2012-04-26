@@ -82,7 +82,7 @@ class TextReplacer(submission: XFormsModelSubmission, containingDocument: XForms
         def handleSetValueError(reason: Reason) =
             throwSubmissionException(
                 reason match {
-                    case ComplexContentReason ⇒ """targetref attribute doesn't point to an element without children or to an attribute for replace="text"."""
+                    case DisallowedNodeReason ⇒ """targetref attribute doesn't point to an element without children or to an attribute for replace="text"."""
                     case ReadonlyNodeReason   ⇒ """targetref attribute points to a readonly node for replace="text"."""
                 }
             )

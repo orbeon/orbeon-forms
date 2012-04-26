@@ -574,9 +574,14 @@ public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
 
     @Override
     public void comment(char[] ch, int start, int length) throws SAXException {
-        if (inPreserve) {
+        if (inPreserve)
             super.comment(ch, start, length);
-        }
+    }
+
+    @Override
+    public void processingInstruction(String target, String data) throws SAXException {
+        if (inPreserve)
+            super.processingInstruction(target, data);
     }
 
     private void handleProperties(Attributes attributes) {

@@ -17,15 +17,19 @@ import scala.collection.JavaConverters._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import annotation.tailrec
 import org.orbeon.oxf.fb.FormBuilderFunctions._
-import org.orbeon.scaxon.XML._
 import org.orbeon.oxf.xforms.analysis.model.Model
 import org.orbeon.oxf.fb.GridOps._
 import org.orbeon.oxf.fb.ContainerOps._
 import org.orbeon.oxf.fb.DataModel._
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
-import org.orbeon.saxon.om.{SequenceIterator, NodeInfo}
 import Model._
 import org.orbeon.oxf.xml.{XMLConstants, NamespaceMapping}
+
+import org.orbeon.oxf.xforms.model.{DataModel ⇒ XFormsDataModel}
+import org.orbeon.oxf.xforms.control.XFormsControl
+import org.orbeon.oxf.xforms.analysis.controls.SingleNodeTrait
+import org.orbeon.saxon.om.{NodeInfo, Item, SequenceIterator}
+import org.orbeon.scaxon.XML._
 
 /*
  * Form Builder: operations on controls.
@@ -51,23 +55,27 @@ object ControlOps {
     def isIdForControl(controlOrBindId: String) = controlName(controlOrBindId) ne null
 
     // Find a control by name (less efficient than searching by id)
-    def findControlByName(doc: NodeInfo, controlName: String) =
+    def findControlByName(inDoc: NodeInfo, controlName: String) =
         Stream("control", "grid", "section", "repeat") flatMap // repeat for legacy FB
-            (suffix ⇒ findControlById(doc, controlName + '-' + suffix)) headOption
+            (suffix ⇒ findControlById(inDoc, controlName + '-' + suffix)) headOption
+
+    // Find a control id by name
+    def findControlIdByName(inDoc: NodeInfo, controlName: String) =
+        findControlByName(inDoc, controlName) map (_ attValue "id")
 
     // XForms callers: find a control element by name or null (the empty sequence)
-    def findControlByNameOrEmpty(doc: NodeInfo, controlName: String) =
-        findControlByName(doc, controlName).orNull
+    def findControlByNameOrEmpty(inDoc: NodeInfo, controlName: String) =
+        findControlByName(inDoc, controlName).orNull
 
     // Find a bind by name
-    def findBindByName(doc: NodeInfo, name: String) = findBind(doc, isBindForName(_, name))
+    def findBindByName(inDoc: NodeInfo, name: String) = findBind(inDoc, isBindForName(_, name))
 
     // XForms callers: find a bind by name or null (the empty sequence)
-    def findBindByNameOrEmpty(doc: NodeInfo, name: String) = findBindByName(doc, name).orNull
+    def findBindByNameOrEmpty(inDoc: NodeInfo, name: String) = findBindByName(inDoc, name).orNull
 
     // Find a bind by predicate
-    def findBind(doc: NodeInfo, p: NodeInfo ⇒ Boolean) =
-        ((findModelElement(doc) \ "*:bind" filter (hasId(_, "fr-form-binds"))) \\ "*:bind") filter (p(_)) headOption
+    def findBind(inDoc: NodeInfo, p: NodeInfo ⇒ Boolean) =
+        ((findModelElement(inDoc) \ "*:bind" filter (hasId(_, "fr-form-binds"))) \\ "*:bind") filter (p(_)) headOption
 
     def isBindForName(bind: NodeInfo, name: String) =
         hasId(bind, bindId(name)) || bindRefOrNodeset(bind).toSeq.stringValue == name // also check ref/nodeset in case id is not present
@@ -83,17 +91,17 @@ object ControlOps {
     def hasName(control: NodeInfo) = getControlNameOption(control).isDefined
 
     // Find a control (including grids and sections) element by id
-    def findControlById(doc: NodeInfo, id: String) =
-        findFRBodyElement(doc) \\ * filter (hasId(_, id)) headOption
+    def findControlById(inDoc: NodeInfo, id: String) =
+        findFRBodyElement(inDoc) \\ * filter (hasId(_, id)) headOption
 
     // Return a bind ref or nodeset attribute if present
     def bindRefOrNodeset(bind: NodeInfo) = (bind \@ "ref") ++ (bind \@ "nodeset") headOption
 
     // Find control holder
     // Don't return anything if isCustomInstance is true
-    def findDataHolder(doc: NodeInfo, controlName: String) =
+    def findDataHolder(inDoc: NodeInfo, controlName: String) =
         if (! isCustomInstance)
-            findBindByName(doc, controlName) map { bind ⇒
+            findBindByName(inDoc, controlName) map { bind ⇒
                 // From bind, infer path by looking at ancestor-or-self binds
                 val bindRefs = (bind ancestorOrSelf "*:bind" flatMap
                     (bindRefOrNodeset(_))).reverse.tail
@@ -104,7 +112,7 @@ object ControlOps {
                 val namespaces = new NamespaceMapping(Dom4jUtils.getNamespaceContextNoDefault(bind))
 
                 // Evaluate path from instance root element
-                evalOne(formInstanceRoot(doc), path, namespaces).asInstanceOf[NodeInfo]
+                evalOne(formInstanceRoot(inDoc), path, namespaces).asInstanceOf[NodeInfo]
             }
         else
             None
@@ -129,9 +137,9 @@ object ControlOps {
     def findCurrentResourceHolder(controlName: String) = currentResources \ * filter (name(_) == controlName) headOption
 
     // Ensure that a tree of bind exists
-    def ensureBindsByName(doc: NodeInfo, name: String) =
-        findControlByName(doc, name) foreach { control ⇒
-            ensureBinds(doc, findContainerNames(control) :+ name)
+    def ensureBindsByName(inDoc: NodeInfo, name: String) =
+        findControlByName(inDoc, name) foreach { control ⇒
+            ensureBinds(inDoc, findContainerNames(control) :+ name)
         }
 
     // Find the top-level bind (marked with "fr-form-binds") if any
@@ -158,7 +166,7 @@ object ControlOps {
 
                         val newBind: Seq[NodeInfo] =
                             <xforms:bind id={bindId(bindName)}
-                                         ref={annotatedBindRefIfNeeded(bindName)}
+                                         ref={annotatedBindRefIfNeeded(bindId(bindName), bindName)}
                                          name={bindName}
                                          xmlns:xforms="http://www.w3.org/2002/xforms"/>
 
@@ -196,12 +204,12 @@ object ControlOps {
     }
 
     // Rename a control with its holders, binds, etc.
-    def findRenameControl(doc: NodeInfo, oldName: String, newName: String) =
+    def findRenameControl(inDoc: NodeInfo, oldName: String, newName: String) =
         if (oldName != newName) {
-            findRenameHolders(doc, oldName, newName)
-            findRenameBind(doc, oldName, newName)
-            findControlByName(doc, oldName) foreach (renameControlByElement(_, newName))
-            renameTemplate(doc, oldName, newName)
+            findRenameHolders(inDoc, oldName, newName)
+            findRenameBind(inDoc, oldName, newName)
+            findControlByName(inDoc, oldName) foreach (renameControlByElement(_, newName))
+            renameTemplate(inDoc, oldName, newName)
         }
 
     // Rename the control (but NOT its holders, binds, etc.)
@@ -240,24 +248,24 @@ object ControlOps {
     }
 
     // Rename a bind
-    def findRenameBind(doc: NodeInfo, oldName: String, newName: String) =
-        findBindByName(doc, oldName) foreach
+    def findRenameBind(inDoc: NodeInfo, oldName: String, newName: String) =
+        findBindByName(inDoc, oldName) foreach
             (renameBindByElement(_, newName))
 
     // Rename holders with the given name
-    def findRenameHolders(doc: NodeInfo, oldName: String, newName: String) =
-        findHolders(doc, oldName) foreach
+    def findRenameHolders(inDoc: NodeInfo, oldName: String, newName: String) =
+        findHolders(inDoc, oldName) foreach
             (rename(_, oldName, newName))
 
     // Find all data, resources, and template holders for the given name
-    def findHolders(doc: NodeInfo, holderName: String): Seq[NodeInfo] =
-        Seq(findDataHolder(doc, holderName)) ++
+    def findHolders(inDoc: NodeInfo, holderName: String): Seq[NodeInfo] =
+        Seq(findDataHolder(inDoc, holderName)) ++
             (findResourceHolders(holderName) map (Option(_))) :+
-            (findControlByName(doc, holderName) flatMap (findTemplateHolder(_, holderName))) flatten
+            (findControlByName(inDoc, holderName) flatMap (findTemplateHolder(_, holderName))) flatten
 
-    def findResourceAndTemplateHolders(doc: NodeInfo, holderName: String): Seq[NodeInfo] =
+    def findResourceAndTemplateHolders(inDoc: NodeInfo, holderName: String): Seq[NodeInfo] =
         (findResourceHolders(holderName) map (Option(_))) :+
-            (findControlByName(doc, holderName) flatMap (findTemplateHolder(_, holderName))) flatten
+            (findControlByName(inDoc, holderName) flatMap (findTemplateHolder(_, holderName))) flatten
 
     // Find or create a data holder for the given hierarchy of names
     private def ensureDataHolder(root: NodeInfo, holders: Seq[(() ⇒ NodeInfo, Option[String])]) = {
@@ -365,15 +373,15 @@ object ControlOps {
 
     // Update a mip for the given control, grid or section id
     // The bind is created if needed
-    def updateMip(doc: NodeInfo, controlId: String, mipName: String, mipValue: String) {
+    def updateMip(inDoc: NodeInfo, controlId: String, mipName: String, mipValue: String) {
 
         require(Model.AllMIPNames(mipName))
         val mipQName = convertMIP(mipName)
 
-        findControlById(doc, controlId) foreach { control ⇒
+        findControlById(inDoc, controlId) foreach { control ⇒
 
             // Get or create the bind element
-            val bind = ensureBinds(doc, findContainerNames(control) :+ controlName(controlId))
+            val bind = ensureBinds(inDoc, findContainerNames(control) :+ controlName(controlId))
 
             // Create/update or remove attribute
             Option(mipValue) map (_.trim) match {
@@ -384,19 +392,19 @@ object ControlOps {
     }
 
     // Get the value of a MIP attribute if present
-    def getMip(doc: NodeInfo, controlId: String, mipName: String) = {
+    def getMip(inDoc: NodeInfo, controlId: String, mipName: String) = {
         require(Model.AllMIPNames(mipName))
         val mipQName = convertMIP(mipName)
 
-        findBindByName(doc, controlName(controlId)) flatMap (bind ⇒ attValueOption(bind \@ mipQName))
+        findBindByName(inDoc, controlName(controlId)) flatMap (bind ⇒ attValueOption(bind \@ mipQName))
     }
 
     private def convertMIP(mipName: String) =
         RewrittenMIPs.get(mipName) orElse (AllMIPsByName.get(mipName) map (_.qName)) getOrElse (throw new IllegalArgumentException)
 
     // XForms callers: find the value of a MIP or null (the empty sequence)
-    def getMipOrEmpty(doc: NodeInfo, controlId: String, mipName: String) =
-        getMip(doc, controlId, mipName).orNull
+    def getMipOrEmpty(inDoc: NodeInfo, controlId: String, mipName: String) =
+        getMip(inDoc, controlId, mipName).orNull
 
     // Get all control names by inspecting all elements with an id that converts to a valid name
     def getAllControlNames(inDoc: NodeInfo) =
@@ -411,6 +419,11 @@ object ControlOps {
     def getAllControls(inDoc: NodeInfo) =
         findFRBodyElement(inDoc) \\ * filter
             (e ⇒ isIdForControl(e attValue "id"))
+
+    // TODO: Doesn't count non-repeated grids, but counts repeated grids?
+    // ⇒ This is because we don't provide ids for grids by default! We should.
+    // BUT we could also count containers and grid content, right?
+    def countAllControls(inDoc: NodeInfo) = getAllControls(inDoc).size
 
     // Get the control's resource holder
     def getControlResourceOrEmpty(controlId: String, resourceName: String) =
@@ -522,4 +535,25 @@ object ControlOps {
             (typeLocalname.isEmpty || (typeLocalname exists (_ == controlTypeLocalname)))
         } asJava
     }
+
+    // Find a given static control by name
+    def findStaticControlByName(controlName: String) =
+        for {
+            model ← getFormModel
+            part = model.getStaticModel.staticStateContext.partAnalysis
+            controlId ← findControlIdByName(getFormDoc, controlName)
+            prefixedId = part.startScope.prefixedIdForStaticId(controlId)
+            control ← Option(part.getControlAnalysis(prefixedId))
+        } yield
+            control
+
+    // Find a given concrete control by name
+    def findConcreteControlByName(controlName: String) =
+        for {
+            model ← getFormModel
+            staticModel = model.getStaticModel
+            controlId ← findControlIdByName(getFormDoc, controlName)
+            control ← Option(model.getXBLContainer.resolveObjectById(model.getEffectiveId, controlId, null)) map (_.asInstanceOf[XFormsControl])
+        } yield
+            control
 }

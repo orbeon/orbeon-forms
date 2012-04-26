@@ -19,4 +19,5 @@ import org.orbeon.oxf.xforms.analysis.{ChildrenBuilderTrait, ElementAnalysis, St
 
 class RepeatIterationControl (staticStateContext: StaticStateContext, element: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], scope: Scope)
     extends ContainerControl(staticStateContext, element, parent, preceding, scope)
+    with SingleNodeTrait
     with ChildrenBuilderTrait

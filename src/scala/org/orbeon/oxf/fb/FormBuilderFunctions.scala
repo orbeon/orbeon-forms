@@ -21,8 +21,8 @@ import org.orbeon.oxf.fr.FormRunner
 import org.orbeon.oxf.xforms.XFormsConstants.{XFORMS_NAMESPACE_URI, XBL_NAMESPACE_URI}
 import org.orbeon.oxf.xml.XMLConstants.{XHTML_NAMESPACE_URI, XSD_URI}
 import org.orbeon.oxf.util.DebugLogger._
-import org.orbeon.oxf.xforms.{XFormsProperties, Loggers}
 import org.orbeon.oxf.util.{UserAgent, NetUtils}
+import org.orbeon.oxf.xforms.{XFormsModel, XFormsProperties, Loggers}
 
 /**
  * Form Builder functions.
@@ -49,6 +49,12 @@ object FormBuilderFunctions {
     def gridId(gridName: String) = gridName + "-grid"
     def controlId(controlName: String) = controlName + "-control"
     def templateId(gridName: String) = gridName + "-template"
+
+    // Find the form document being edited
+    def getFormDoc = asNodeInfo(model("fr-form-model").get.getVariable("model")).getDocumentRoot
+
+    // Find the top-level form model of the form being edited
+    def getFormModel = Option(containingDocument.getObjectByEffectiveId("fb$fr-form-model")) map (_.asInstanceOf[XFormsModel])
 
     // Get the body
     // NOTE: annotate.xpl replaces fr:body with xf:group[@class = 'fb-body']

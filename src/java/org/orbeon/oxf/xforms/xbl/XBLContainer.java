@@ -20,6 +20,7 @@ import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.analysis.model.Model;
 import org.orbeon.oxf.xforms.control.XFormsComponentControl;
+import org.orbeon.oxf.xforms.control.XFormsContainerControl;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.Focus;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
@@ -462,7 +463,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
     /**
      * Resolve an object in the scope of this container.
      *
-     * @param sourceEffectiveId effective id of the source (control, model, instance, submission, ...), or null
+     * @param sourceEffectiveId effective id of the source (control, model, instance, submission, ...) (can be null only for absolute ids)
      * @param targetStaticId    static id of the target
      * @param contextItem       context item, or null (used for bind resolution only)
      * @return                  object, or null if not found
@@ -550,8 +551,8 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
     }
 
     protected List<XFormsControl> getChildrenControls(XFormsControls controls) {
-        // We are a nested container so there must be an associated XFormsComponentControl
-        return ((XFormsComponentControl) associatedControl).childrenJava();
+        // We are a nested container so there must be an associated XFormsContainerControl
+        return ((XFormsContainerControl) associatedControl).childrenJava();
     }
 
     private Object searchContainedModels(String sourceEffectiveId, String targetStaticId, Item contextItem) {

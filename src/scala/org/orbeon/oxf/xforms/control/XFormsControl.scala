@@ -17,7 +17,6 @@ import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.processor.converter.XHTMLRewrite
 import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.xforms._
-import analysis.controls.AppearanceTrait
 import org.orbeon.oxf.xforms.analysis.ChildrenBuilderTrait
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.XPathDependencies
@@ -38,6 +37,8 @@ import org.orbeon.oxf.xforms.BindingContext
 import java.util.{Collections, LinkedList, List ⇒ JList}
 import org.dom4j.{QName, Element}
 import org.orbeon.saxon.om.Item
+import org.orbeon.oxf.xforms.analysis.controls.{RepeatControl, SingleNodeTrait, AppearanceTrait}
+import org.orbeon.oxf.xforms.model.DataModel
 
 /**
  * Represents an XForms control.
@@ -270,6 +271,14 @@ object XFormsControl {
             (binding ⇒ Option(binding.parent)) map
                 (binding ⇒ binding.nodeset.asScala) getOrElse
                     Seq()
+
+    // Whether the given item is allowed as a binding item for the given control
+    // TODO: don't like pattern matching here and revisit hierarchy
+    def isAllowedBoundItem(control: XFormsControl, item: Item) = control.staticControl match {
+        case singleNode: SingleNodeTrait ⇒ singleNode.isAllowedBoundItem(item)
+        case repeat: RepeatControl ⇒ DataModel.isAllowedBoundItem(item)
+        case _ ⇒ false
+    }
 
     // Rewrite an HTML value which may contain URLs, for example in @src or @href attributes. Also deals with closing element tags.
     def getEscapedHTMLValue(locationData: LocationData, rawValue: String): String = {

@@ -621,7 +621,13 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
 
     @Override
     public void processingInstruction(String target, String data) throws SAXException {
-        // NOP (could handle in future)
+        if (inPreserve) {
+            // Preserve comments within e.g. instances
+            if (templateReceiver != null && isKeepHead())
+                templateReceiver.processingInstruction(target, data);
+            if (extractorReceiver != null)
+                extractorReceiver.processingInstruction(target, data);
+        }
     }
 
     @Override

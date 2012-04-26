@@ -5,7 +5,9 @@ import org.orbeon.oxf.xforms.analysis._
 import org.orbeon.oxf.xforms.xbl.Scope
 
 class ComponentControl(staticStateContext: StaticStateContext, element: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], scope: Scope)
-        extends ContainerControl(staticStateContext, element, parent, preceding, scope) with ShadowChildrenBuilder {
+        extends ContainerControl(staticStateContext, element, parent, preceding, scope)
+        with ShadowChildrenBuilder
+        with SingleNodeTrait {
 
     // Binding at the time the component is created
     private var _binding = staticStateContext.partAnalysis.xblBindings.getBinding(prefixedId) orElse (throw new IllegalStateException)

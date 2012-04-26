@@ -39,19 +39,22 @@ import org.mockito.invocation.InvocationOnMock
 import org.orbeon.saxon.om._
 import org.orbeon.scaxon.XML.evalOne
 import org.orbeon.oxf.processor.ProcessorUtils
+import org.orbeon.oxf.xforms.control.XFormsControl
 
 class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit with MockitoSugar {
 
-    val TemplateDoc = "oxf:/forms/orbeon/builder/form/template.xml"
+    val TemplateDoc      = "oxf:/forms/orbeon/builder/form/template.xml"
+    val CustomXMLDoc     = "oxf:/org/orbeon/oxf/fb/template-with-custom-xml.xhtml"
     val SectionsGridsDoc = "oxf:/org/orbeon/oxf/fb/template-with-sections-grids.xhtml"
 
-    def getDocument(documentURL: String) = ProcessorUtils.createDocumentFromURL(documentURL, null)
-
     def getNewDoc(url: String = TemplateDoc): DocumentWrapper = {
+
+        def createDoc(documentURL: String) = ProcessorUtils.createDocumentFromURL(documentURL, null)
+
         // Get and annotate the template
         implicit val functionLibrary = XFormsContainingDocument.getFunctionLibrary
         evalOne(
-            new DocumentWrapper(getDocument(url), null, XPathCache.getGlobalConfiguration),
+            new DocumentWrapper(createDoc(url), null, XPathCache.getGlobalConfiguration),
             """xxforms:call-xpl('oxf:/forms/orbeon/builder/form/annotate.xpl',
                                 ('data', 'bindings'),
                                 (., .),
@@ -64,7 +67,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
     private val section1 = "section-1"
     private val section2 = "section-2"
 
-    @Test def modelInstanceBodyElements() {
+    @Test def modelInstanceBodyElements(): Unit = {
         val doc = getNewDoc()
 
         assert(findModelElement(doc).getDisplayName === "xforms:model")
@@ -75,7 +78,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
         assert(qname(findFRBodyElement(doc)) === (XF → "group"))
     }
 
-    @Test def nameAndId() {
+    @Test def nameAndId(): Unit = {
 
         val doc = getNewDoc()
 
@@ -88,7 +91,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
         assert(hasId(findControlByName(doc, control1).get, controlId(control1)))
     }
 
-    @Test def controlElements() {
+    @Test def controlElements(): Unit =
         withActionAndDoc(getNewDoc()) { doc ⇒
 
             // Find bind element
@@ -102,16 +105,15 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
             // TODO
             // controlResourceHolders
         }
-    }
 
-    @Test def sectionName() {
+    @Test def sectionName(): Unit = {
         val doc = getNewDoc()
 
         assert(findSectionName(doc, control1).get === section1)
         assert(getControlNameOption(doc \\ "*:section" head).get === section1)
     }
 
-    @Test def newBinds() {
+    @Test def newBinds(): Unit =
         withActionAndDoc(getNewDoc()) { doc ⇒
             ensureBinds(doc, Seq(section1, control2))
 
@@ -123,9 +125,8 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
             assert(qname(findBindByName(doc, control3).get) === (XF → "bind"))
             assert(hasId(findBindByName(doc, control3).get, bindId(control3)))
         }
-    }
 
-    @Test def findNextId() {
+    @Test def findNextId(): Unit = {
         val doc = getNewDoc()
 
         assert(nextId(doc, "control") === "control-3-control")
@@ -134,7 +135,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
         // TODO: test more collisions
     }
 
-    @Test def containers() {
+    @Test def containers(): Unit = {
 
         val doc = getNewDoc()
 
@@ -150,14 +151,14 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
     }
 
     // Select the first grid td (assume there is one)
-    def selectFirstTd(doc: NodeInfo) {
+    def selectFirstTd(doc: NodeInfo): Unit = {
         selectTd(findFRBodyElement(doc) \\ "*:grid" \\ "*:td" head)
     }
 
     @Test def insertControl(): Unit = insertControl(isCustomInstance = false)
     @Test def insertControlCustomXML(): Unit = insertControl(isCustomInstance = true)
 
-    private def insertControl(isCustomInstance: Boolean) {
+    private def insertControl(isCustomInstance: Boolean): Unit =
         withActionAndDoc(getNewDoc(), isCustomInstance) { doc ⇒
 
             val binding = <binding element="xforms|input" xmlns:xforms="http://www.w3.org/2002/xforms"/>
@@ -191,12 +192,11 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
 
             assert(formResourcesRoot \ "resource" \ newControlName nonEmpty)
         }
-    }
 
     @Test def insertRepeat(): Unit = insertRepeat(false)
     @Test def insertRepeatCustomXML(): Unit = insertRepeat(true)
 
-    private def insertRepeat(isCustomInstance: Boolean) {
+    private def insertRepeat(isCustomInstance: Boolean): Unit =
         withActionAndDoc(getNewDoc(), isCustomInstance) { doc ⇒
 
             // Insert a new repeated grid after the current grid
@@ -270,7 +270,6 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
                 }
             }
         }
-    }
 
     // Return a grid with some rowspans. The tree returned is mutable.
     // Include model and instance, because the code that looks for next ids relies on their presence.
@@ -296,13 +295,13 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
         doc \\ "grid" head
     }
 
-    def compareExpectedCells(grid: NodeInfo, expected: Seq[Seq[Cell]]) {
+    def compareExpectedCells(grid: NodeInfo, expected: Seq[Seq[Cell]]): Unit = {
         val trs = grid \ "tr"
         for ((expected, index) ← expected.zipWithIndex)
             yield assert(getRowCells(trs(index)) === expected)
     }
 
-    @Test def rowspanGetRowCells() {
+    @Test def rowspanGetRowCells(): Unit = {
 
         val grid = gridWithRowspan
 
@@ -322,7 +321,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
         case _ ⇒ node
     }
 
-    @Test def rowspanInsertRowBelow() {
+    @Test def rowspanInsertRowBelow(): Unit = {
 
         val grid = gridWithRowspan
 
@@ -359,7 +358,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
             </fr:grid>
         </fr:section>
 
-    @Test def testPrecedingNameForControl() {
+    @Test def testPrecedingNameForControl(): Unit = {
 
         val section = sectionWithGridAndControls
 
@@ -371,7 +370,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
         assert(actual === expected)
     }
 
-    @Test def testPrecedingNameForGrid() {
+    @Test def testPrecedingNameForGrid(): Unit = {
 
         val section = sectionWithGridAndControls
 
@@ -383,7 +382,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
         assert(actual === expected)
     }
 
-    def assertSelectedTdAfterDelete(beforeAfter: Seq[(String, String)])(delete: NodeInfo ⇒ Any) {
+    def assertSelectedTdAfterDelete(beforeAfter: Seq[(String, String)])(delete: NodeInfo ⇒ Any): Unit = {
 
         // For before/after td ids: create a doc, call the delete function, and assert the resulting selected td
         def deleteRowCheckSelectedTd(beforeTdId: String, afterTdId: String) =
@@ -405,7 +404,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
             deleteRowCheckSelectedTd(beforeTdId, afterTdId)
     }
 
-    @Test def selectedTdAfterDeletedRow() = {
+    @Test def selectedTdAfterDeletedRow(): Unit = {
 
         // A few before/after ids of selected tds
         val beforeAfter = Seq(
@@ -420,7 +419,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
         }
     }
 
-    @Test def selectedTdAfterDeletedCol() = {
+    @Test def selectedTdAfterDeletedCol(): Unit = {
 
         // A few before/after ids of selected tds
         val beforeAfter = Seq(
@@ -435,7 +434,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
         }
     }
 
-    @Test def selectedTdAfterDeletedGrid() = {
+    @Test def selectedTdAfterDeletedGrid(): Unit = {
 
         // A few before/after ids of selected tds
         val beforeAfter = Seq(
@@ -450,7 +449,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
         }
     }
 
-    @Test def selectedTdAfterDeletedSection() = {
+    @Test def selectedTdAfterDeletedSection(): Unit = {
 
         // A few before/after ids of selected tds
         val beforeAfter = Seq(
@@ -465,7 +464,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
         }
     }
 
-    @Test def lastGridInSectionAndCanInsert() {
+    @Test def lastGridInSectionAndCanInsert(): Unit =
         withActionAndDoc(getNewDoc(TemplateDoc)) { doc ⇒
 
             // Initially can insert all
@@ -484,6 +483,68 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
             assert(canInsertGrid(doc) === false)
             assert(canInsertControl(doc) === false)
         }
+
+    @Test def customXMLBindRef(): Unit =
+        withActionAndDoc(getNewDoc(CustomXMLDoc), isCustomInstance = true) { doc ⇒
+
+            def rawBindRef(inDoc: NodeInfo, name: String) =
+                findBindByName(inDoc, name) flatMap
+                    (bindRefOrNodeset(_) map
+                        (_.stringValue))
+
+            // Automatic de-annotation
+            assert(DataModel.getBindRef(doc, "control-1") === Some("control-1"))
+            // Raw bind ref is annotated
+            assert(Some(DataModel.annotatedBindRef(bindId("control-1"), "control-1")) === rawBindRef(doc, "control-1"))
+            // "Annotate if needed" works
+            assert(DataModel.annotatedBindRef(bindId("control-1"), "control-1") === DataModel.annotatedBindRefIfNeeded(bindId("control-1"), "control-1"))
+        }
+
+    @Test def allowedBindingExpressions(): Unit = {
+
+        val doc = this setupDocument
+            <xh:html xmlns:xf="http://www.w3.org/2002/xforms"
+                     xmlns:xh="http://www.w3.org/1999/xhtml"
+                     xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xh:head>
+                    <xf:model xxf:xpath-analysis="true">
+
+                        <xf:instance id="fr-form-instance">
+                            <form>
+                                <section-1>
+                                    <control-1/>
+                                </section-1>
+                            </form>
+                        </xf:instance>
+
+                        <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                            <xf:bind id="section-1-bind" name="section-1" ref="section-1">
+                                <xf:bind id="control-1-bind" name="control-1" ref="control-1"/>
+                            </xf:bind>
+                        </xf:bind>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:group id="section-1-section" bind="section-1-bind">
+                        <xf:input id="control-1-control" bind="control-1-bind"/>
+                    </xf:group>
+                </xh:body>
+            </xh:html>
+
+        val section1 = doc.getObjectByEffectiveId("section-1-section").asInstanceOf[XFormsControl]
+        val control1 = doc.getObjectByEffectiveId("control-1-control").asInstanceOf[XFormsControl]
+        
+        assert(true  === DataModel.isAllowedBindingExpression(section1, "section-1")) // existing node
+        assert(false === DataModel.isAllowedBindingExpression(section1, "foo/bar"))   // non-existing node
+        assert(false === DataModel.isAllowedBindingExpression(section1, "("))         // invalid expression
+        assert(true  === DataModel.isAllowedBindingExpression(section1, "/"))         // root node
+        assert(true  === DataModel.isAllowedBindingExpression(section1, ".."))        // complex content
+
+        assert(true  === DataModel.isAllowedBindingExpression(control1, "control-1")) // existing node
+        assert(false === DataModel.isAllowedBindingExpression(control1, "foo/bar"))   // non-existing node
+        assert(false === DataModel.isAllowedBindingExpression(control1, "("))         // invalid expression
+        assert(false === DataModel.isAllowedBindingExpression(control1, "/"))         // root node
+        assert(false === DataModel.isAllowedBindingExpression(control1, ".."))        // complex content
     }
 
 //    @Test def insertHolders() {
@@ -540,6 +601,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
 
         // Mock useful model variables
         val variables = Map(
+            "model"              → Option(findModelElement(doc)),
             "component-bindings" → None,
             "selected-cell"      → Some(elementInfo("selected-cell")),
             "resources"          → inlineInstanceRootElement(doc, "fr-form-resources"),

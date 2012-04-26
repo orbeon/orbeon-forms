@@ -18,7 +18,9 @@ import org.orbeon.scaxon.XML._
 import org.orbeon.oxf.fb.FormBuilderFunctions._
 import org.orbeon.oxf.fb.ControlOps._
 import org.orbeon.oxf.fb.ContainerOps._
-import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.saxon.om._
+import org.orbeon.oxf.xforms.control.XFormsControl
+import org.orbeon.oxf.xforms.analysis.controls.SingleNodeTrait
 
 object DataModel {
 
@@ -96,20 +98,63 @@ object DataModel {
                 (ref ⇒ deAnnotatedBindRef(ref.stringValue))
 
     // Set a bind ref by name (annotate the expression if needed)
-    def setBindRef(inDoc: NodeInfo, name: String, value: String) =
+    def setBindRef(inDoc: NodeInfo, name: String, ref: String) =
         findBindByName(inDoc, name) foreach { bind ⇒
             delete(bind \@ "nodeset")
-            ensureAttribute(bind, "ref", annotatedBindRefIfNeeded(value))
+            ensureAttribute(bind, "ref", annotatedBindRefIfNeeded(bindId(name), ref))
         }
 
     // XForms callers
     def getBindRefOrEmpty(inDoc: NodeInfo, name: String) = getBindRef(inDoc, name).orNull
 
-    private val AnnotatedBindRef = """\((.*)\),\s*instance\('fb-readonly'\)$""".r
+    private val AnnotatedBindRef = """dataModel:bindRef\([^,]*,(.*)\)$""".r
 
-    def annotatedBindRef(ref: String) = "(" + ref + "), instance('fb-readonly')"
+    def annotatedBindRef(bindId: String, ref: String) = "dataModel:bindRef('" + bindId + "', " + ref + ")"
     def deAnnotatedBindRef(ref: String) = AnnotatedBindRef.replaceFirstIn(ref.trim, "$1").trim
     
-    def annotatedBindRefIfNeeded(ref: String) =
-        if (isCustomInstance) annotatedBindRef(ref) else ref
+    def annotatedBindRefIfNeeded(bindId: String, ref: String) =
+        if (isCustomInstance) annotatedBindRef(bindId, ref) else ref
+
+    // Function called via `dataModel:bindRef()` from the binds to retrieve the adjusted bind node at design time. If
+    // the bound item is non-empty and acceptable for the control, then it is returned. Otherwise, a pointer to
+    // `instance('fb-readonly')` is returned.
+    def bindRef(bindId: String, i: SequenceIterator) = {
+        val itemOption = asScalaSeq(i).headOption
+
+        if (isAllowedValueBoundItem(controlName(bindId), itemOption))
+            i.getAnother
+        else
+            getFormModel flatMap
+                (m ⇒ Option(m.getInstance("fb-readonly"))) map
+                    (instance ⇒ SingletonIterator.makeIterator(instance.getInstanceRootElementInfo)) getOrElse
+                        EmptyIterator.getInstance
+
+    }
+
+    // For a given value control name and XPath expression, whether the resulting bound item is acceptable
+    // Called from control details dialog
+    def isAllowedValueBindingExpression(controlName: String, expr: String): Boolean =
+        findConcreteControlByName(controlName) map (isAllowedBindingExpression(_, expr)) getOrElse false
+
+    // Leave public for unit tests
+    def isAllowedBindingExpression(control: XFormsControl, expr: String): Boolean = {
+
+        def evaluateBoundItem =
+            Option(evalOne(control.getBindingContext.contextItem, expr, control.staticControl.namespaceMapping))
+
+        try evaluateBoundItem map (XFormsControl.isAllowedBoundItem(control, _)) getOrElse false
+        catch { case _ ⇒ false }
+    }
+
+    // For a given value control name and XPath sequence, whether the resulting bound item is acceptable
+    def isAllowedValueBoundItem(controlName: String, itemOption: Option[Item]) = {
+        for {
+            item ← itemOption
+            control ← findStaticControlByName(controlName)
+            if control.isInstanceOf[SingleNodeTrait]
+            singleNodeTrait = control.asInstanceOf[SingleNodeTrait]
+        } yield
+            singleNodeTrait.isAllowedBoundItem(item)
+    } getOrElse
+        false
 }

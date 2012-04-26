@@ -14,12 +14,14 @@
 package org.orbeon.oxf.xforms.analysis.controls
 
 import org.orbeon.oxf.xforms.analysis.{XPathAnalysis, SimpleElementAnalysis}
+import org.orbeon.saxon.om.Item
+import org.orbeon.oxf.xforms.model.DataModel
 
 /**
  * Trait representing an element supporting a value, whether the string value of the binding node or whether through
  * a @value attribute.
  */
-trait ValueTrait extends SimpleElementAnalysis {
+trait ValueTrait extends SimpleElementAnalysis with SingleNodeTrait {
 
     override val canHoldValue = true
 
@@ -27,6 +29,8 @@ trait ValueTrait extends SimpleElementAnalysis {
         val subExpression = if (value.isDefined) "(" + value.get + ")" else "."
         Some(analyzeXPath(getChildrenContext, "xs:string(" + subExpression + "[1])"))
     }
+
+    override def isAllowedBoundItem(item: Item) = DataModel.isAllowedValueBoundItem(item)
 
     // TODO: Move value handling from ElementAnalysis to here? Need base trait to handle value controls, variables, and LHHA.
 }

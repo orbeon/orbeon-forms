@@ -66,7 +66,11 @@
                              calculate="normalize-space()"
                              readonly="false()"
                              constraint=". = ../original-control-name or not(. = tokenize(../control-names, '\s+'))"/>
-                <xforms:bind ref="control-xpath" relevant="../is-custom-instance = 'true'" type="xxforms:xpath2" required="../is-custom-instance = 'true'"/>
+                <xforms:bind ref="control-xpath"
+                             relevant="../is-custom-instance = 'true'"
+                             required="../is-custom-instance = 'true'"
+                             type="xxforms:xpath2"
+                             fb:warning="not(normalize-space() and dataModel:isAllowedValueBindingExpression(../original-control-name, .))"/>
                 <xforms:bind ref="save-trigger" readonly=". = 'disabled'"/>
 
             </xforms:model>

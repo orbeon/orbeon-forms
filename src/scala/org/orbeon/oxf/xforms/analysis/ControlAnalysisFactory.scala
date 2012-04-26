@@ -28,53 +28,55 @@ object ControlAnalysisFactory {
     type ControlFactory = (StaticStateContext, Element,  Option[ElementAnalysis], Option[ElementAnalysis], Scope) ⇒ ElementAnalysis
 
     // NOTE: Not all controls need separate classes, so for now we use generic ones like e.g. CoreControl instead of InputControl
-    private val valueControlFactory: ControlFactory =     (new CoreControl(_, _, _, _, _) with ValueTrait with ChildrenBuilderTrait with ChildrenLHHAAndActionsTrait)
-    private val triggerControlFactory: ControlFactory =   (new CoreControl(_, _, _, _, _) with TriggerAppearanceTrait with ChildrenBuilderTrait with ChildrenLHHAAndActionsTrait)
-    private val selectionControlFactory: ControlFactory = (new CoreControl(_, _, _, _, _) with ValueTrait with SelectionControl with ChildrenBuilderTrait with ChildrenLHHAAndActionsTrait)
-    private val variableControlFactory: ControlFactory =  (new VariableControl(_, _, _, _, _) with ChildrenActionsTrait)
-    private val containerControlFactory: ControlFactory = (new ContainerControl(_, _, _, _, _) with LHHATrait with ChildrenBuilderTrait) // NOTE: no LHHA in spec yet, but will make sense
-    private val lhhaControlFactory: ControlFactory =      (new LHHAAnalysis(_, _, _, _, _))
+    private val ValueControl: ControlFactory =     (new CoreControl(_, _, _, _, _) with ValueTrait with ChildrenBuilderTrait with ChildrenLHHAAndActionsTrait)
+    private val TriggerControl: ControlFactory =   (new CoreControl(_, _, _, _, _) with SingleNodeTrait with TriggerAppearanceTrait with ChildrenBuilderTrait with ChildrenLHHAAndActionsTrait)
+    private val SelectionControl: ControlFactory = (new CoreControl(_, _, _, _, _) with ValueTrait with SelectionControl with ChildrenBuilderTrait with ChildrenLHHAAndActionsTrait)
+    private val VariableControl: ControlFactory =  (new VariableControl(_, _, _, _, _) with ChildrenActionsTrait)
+    private val LHHAControl: ControlFactory =      (new LHHAAnalysis(_, _, _, _, _))
+
+    private val SingleNodeContainerControl: ControlFactory   = (new ContainerControl(_, _, _, _, _) with SingleNodeTrait with LHHATrait with ChildrenBuilderTrait)
+    private val NoSingleNodeContainerControl: ControlFactory = (new ContainerControl(_, _, _, _, _) with SingleNodeTrait with LHHATrait with ChildrenBuilderTrait)
 
     // Variable factories indexed by QName
     // NOTE: We have all these QNames for historical reasons (XForms 2 is picking <xforms:var>)
     private val variableFactory =
         Seq(XXFORMS_VARIABLE_QNAME, XXFORMS_VAR_QNAME, XFORMS_VARIABLE_QNAME, XFORMS_VAR_QNAME, EXFORMS_VARIABLE_QNAME) map
-            (qName ⇒ qName → variableControlFactory) toMap
+            (qName ⇒ qName → VariableControl) toMap
 
     // Other factories indexed by QName
     private val byQNameFactory = Map[QName, ControlFactory](
         XBL_TEMPLATE_QNAME            → (new ContainerControl(_, _, _, _, _) with ChildrenBuilderTrait),
         // Core value controls
-        XFORMS_INPUT_QNAME            → valueControlFactory,
-        XFORMS_SECRET_QNAME           → valueControlFactory,
-        XFORMS_TEXTAREA_QNAME         → valueControlFactory,
-        XFORMS_OUTPUT_QNAME           → valueControlFactory,
-        XFORMS_UPLOAD_QNAME           → valueControlFactory,
-        XFORMS_RANGE_QNAME            → valueControlFactory,
-        XXFORMS_TEXT_QNAME            → valueControlFactory,
+        XFORMS_INPUT_QNAME            → ValueControl,
+        XFORMS_SECRET_QNAME           → ValueControl,
+        XFORMS_TEXTAREA_QNAME         → ValueControl,
+        XFORMS_UPLOAD_QNAME           → ValueControl,
+        XFORMS_RANGE_QNAME            → ValueControl,
+        XXFORMS_TEXT_QNAME            → ValueControl,
+        XFORMS_OUTPUT_QNAME           → (new OutputControl(_, _, _, _, _)),
         // Core controls
-        XFORMS_TRIGGER_QNAME          → triggerControlFactory,
-        XFORMS_SUBMIT_QNAME           → triggerControlFactory,
+        XFORMS_TRIGGER_QNAME          → TriggerControl,
+        XFORMS_SUBMIT_QNAME           → TriggerControl,
         // Selection controls
-        XFORMS_SELECT_QNAME           → selectionControlFactory,
-        XFORMS_SELECT1_QNAME          → selectionControlFactory,
+        XFORMS_SELECT_QNAME           → SelectionControl,
+        XFORMS_SELECT1_QNAME          → SelectionControl,
         // Attributes
         XXFORMS_ATTRIBUTE_QNAME       → (new AttributeControl(_, _, _, _, _)),
         // Container controls
-        XFORMS_GROUP_QNAME            → containerControlFactory,
-        XFORMS_SWITCH_QNAME           → containerControlFactory,
-        XFORMS_CASE_QNAME             → containerControlFactory,
-        XXFORMS_DIALOG_QNAME          → containerControlFactory,
+        XFORMS_GROUP_QNAME            → SingleNodeContainerControl,
+        XFORMS_SWITCH_QNAME           → SingleNodeContainerControl,
+        XFORMS_CASE_QNAME             → NoSingleNodeContainerControl,
+        XXFORMS_DIALOG_QNAME          → NoSingleNodeContainerControl,
         // Dynamic control
-        XXFORMS_DYNAMIC_QNAME         → (new ContainerControl(_, _, _, _, _)),
+        XXFORMS_DYNAMIC_QNAME         → (new ContainerControl(_, _, _, _, _) with SingleNodeTrait),
         // Repeat control
         XFORMS_REPEAT_QNAME           → (new RepeatControl(_, _, _, _, _)),
         XFORMS_REPEAT_ITERATION_QNAME → (new RepeatIterationControl(_, _, _, _, _)),
         // LHHA
-        LABEL_QNAME                   → lhhaControlFactory,
-        HELP_QNAME                    → lhhaControlFactory,
-        HINT_QNAME                    → lhhaControlFactory,
-        ALERT_QNAME                   → lhhaControlFactory,
+        LABEL_QNAME                   → LHHAControl,
+        HELP_QNAME                    → LHHAControl,
+        HINT_QNAME                    → LHHAControl,
+        ALERT_QNAME                   → LHHAControl,
         // Model
         XFORMS_MODEL_QNAME            → (new Model(_, _, _, _, _)),
         XFORMS_SUBMISSION_QNAME       → (new Submission(_, _, _, _, _))

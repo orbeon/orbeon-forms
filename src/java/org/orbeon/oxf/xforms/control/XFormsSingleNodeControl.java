@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.control;
 import org.dom4j.Element;
 import org.dom4j.QName;
 import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.analysis.controls.SingleNodeTrait;
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
@@ -23,7 +24,6 @@ import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
-import org.orbeon.saxon.value.AtomicValue;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.AttributesImpl;
 
@@ -291,27 +291,34 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
     public boolean computeRelevant() {
 
         // If parent is not relevant then we are not relevant either
-        if (!super.computeRelevant())
+        if (! super.computeRelevant())
             return false;
 
         final Item currentItem = bindingContext().getSingleItem();
         if (bindingContext().isNewBind()) {
             // There is a binding
-            if (currentItem instanceof NodeInfo) {
-                final NodeInfo currentNodeInfo = (NodeInfo) currentItem;
-                // Control is bound to a node, get node relevance
-                return InstanceData.getInheritedRelevant(currentNodeInfo);
-            } else if (currentItem instanceof AtomicValue) {
-                // Control bound to a value is considered relevant
-                return true;
+            if (isAllowedBoundItem(currentItem)) {
+                if (currentItem instanceof NodeInfo) {
+                    final NodeInfo currentNodeInfo = (NodeInfo) currentItem;
+                    // Control is bound to an acceptable node, get node relevance
+                    return InstanceData.getInheritedRelevant(currentNodeInfo);
+                } else {
+                    // Control bound to a value is considered relevant
+                    return true;
+                }
             } else {
-                // Control is not bound to a node or item, consider non-relevant
+                // Q: Should warn?
                 return false;
             }
         } else {
             // Control is not bound because it doesn't have a binding (group, trigger, dialog, etc. without @ref)
             return true;
         }
+    }
+
+    // Allow override only for dangling XFormsOutputControl
+    protected boolean isAllowedBoundItem(Item item) {
+        return ((SingleNodeTrait) staticControl()).isAllowedBoundItem(item);
     }
 
     @Override

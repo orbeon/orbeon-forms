@@ -188,14 +188,42 @@ object XML {
     val Text      : Test = new NodeKindTestBase(Type.TEXT)
     val Node      : Test = new NodeKindTestBase(Type.NODE)
 
-    // Whether the given node has simple content. Concretely, the node is either an attribute node or an element node
-    // without nested elements processing instructions, or comments.
-    def hasSimpleContent(nodeInfo: NodeInfo): Boolean =
-        (nodeInfo self @*) || ((nodeInfo self *) &&
-            ! (nodeInfo child Node exists (child ⇒ DisallowedNodeTypesForSimpleContent(child.getNodeKind))))
+    // Whether the node is an element and "supports" simple content, that is doesn't have child elements
+    // NOTE: This ignores PI and comment nodes
+    def supportsSimpleContent(nodeInfo: NodeInfo): Boolean =
+        isElement(nodeInfo) && ! hasChildElement(nodeInfo)
 
-    // Whether the given node has at least one child element.
+    private def hasNonEmptyChildNode(nodeInfo: NodeInfo) =
+        nodeInfo child Text filter (_.stringValue.nonEmpty) nonEmpty
+
+    // Whether the node is an attribute
+    def isAttribute(nodeInfo: NodeInfo) = nodeInfo self @*
+
+    // Whether the node is an attribute
+    def isElement(nodeInfo: NodeInfo) = nodeInfo self *
+
+    // Whether the given node has at least one child element
     def hasChildElement(nodeInfo: NodeInfo) = nodeInfo child * nonEmpty
+
+    // True if the node is an element, doesn't have child elements, and has at least one non-empty child text node,
+    // NOTE: This ignores PI and comment nodes
+    def hasSimpleContent(nodeInfo: NodeInfo): Boolean =
+        isElement(nodeInfo) && ! hasChildElement(nodeInfo) && hasNonEmptyChildNode(nodeInfo)
+
+    // True if the node is an element, has at least one child element, and has at least one non-empty child text node
+    // NOTE: This ignores PI and comment nodes
+    def hasMixedContent(nodeInfo: NodeInfo): Boolean =
+        isElement(nodeInfo) && hasChildElement(nodeInfo) && hasNonEmptyChildNode(nodeInfo)
+
+    // True if the node is an element and has no children nodes
+    // NOTE: This ignores PI and comment nodes
+    def hasEmptyContent(nodeInfo: NodeInfo): Boolean =
+        isElement(nodeInfo) && (nodeInfo child Node isEmpty)
+
+    // True if the node is an element, has at least one child element, and doesn't have non-empty child text nodes
+    // NOTE: This ignores PI and comment nodes
+    def hasElementOnlyContent(nodeInfo: NodeInfo): Boolean =
+        isElement(nodeInfo) && hasChildElement(nodeInfo) && ! hasNonEmptyChildNode(nodeInfo)
 
     // Passing a string as test means to test on the local name of an element
     implicit def stringToTest(s: String): Test = new NodeLocalNameTest(Type.ELEMENT, s)
@@ -340,7 +368,7 @@ object XML {
         if (readonly)
             TransformerUtils.stringToTinyTree(XPathCache.getGlobalConfiguration, e.toString, false, false)
         else
-            new DocumentWrapper(Dom4jUtils.readDom4j(e.toString), null, XPathCache.getGlobalConfiguration)
+            new DocumentWrapper(elemToDom4j(e), null, XPathCache.getGlobalConfiguration)
 
     implicit def elemToItem(e: Elem): Item = elemToDocumentInfo(e) \ * head
     implicit def elemToItemSeq(e: Elem): Seq[Item] = elemToDocumentInfo(e) \ *

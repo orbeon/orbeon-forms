@@ -918,6 +918,11 @@ public class XFormsUtils {
                         // Return given source effective id, so we have a source effective id for resolution of index(), etc.
                         return sourceEffectiveId;
                     }
+
+                    @Override
+                    protected boolean isAllowedBoundItem(Item item) {
+                        return DataModel.isAllowedBoundItem(item);
+                    }
                 };
                 contextStack.pushBinding(element, sourceEffectiveId, outputControl.getChildElementScope(element));
                 {

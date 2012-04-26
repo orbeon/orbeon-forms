@@ -14,17 +14,16 @@
 package org.orbeon.oxf.xforms.model
 
 import org.orbeon.saxon.dom4j.NodeWrapper
-import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.xforms.event.XFormsEventTarget
 import org.orbeon.oxf.xforms._
 import event.events.{XXFormsBindingErrorEvent, XXFormsValueChanged}
-import org.w3c.dom.Node.{ELEMENT_NODE, ATTRIBUTE_NODE, TEXT_NODE, DOCUMENT_NODE}
+import org.w3c.dom.Node.{ELEMENT_NODE, DOCUMENT_NODE}
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.saxon.value.AtomicValue
 import org.orbeon.saxon.om.{Item, NodeInfo}
 import org.orbeon.oxf.xml.dom4j.LocationData
 import org.orbeon.saxon.om.Axis
-import org.dom4j._
+import org.dom4j.{Text ⇒ Text4j, Comment ⇒ Comment4j, _}
 import org.orbeon.scaxon.XML._
 
 /**
@@ -36,25 +35,42 @@ object DataModel {
 
     // Reasons that setting a value on a node can fail
     sealed trait Reason { val message: String }
-    case object  ComplexContentReason extends Reason { val message = "Unable to set value on complex content" }
+    case object  DisallowedNodeReason extends Reason { val message = "Unable to set value on disallowed node" }
     case object  ReadonlyNodeReason   extends Reason { val message = "Unable to set value on read-only node" }
 
-    private val AllowedNodeTypesForGetValue = Set(ELEMENT_NODE, ATTRIBUTE_NODE, TEXT_NODE) map (_.toInt)
+    /**
+     * Whether the given item is acceptable as a bound item.
+     *
+     * NOTE: As of 2012-04-26, we allow binding non-value controls to any node type.
+     */
+    def isAllowedBoundItem(item: Item) = item ne null
 
     /**
-     * Return the value of a bound item, whether a NodeInfo or an AtomicValue. If disallowed, return null.
+     * Whether the given item is acceptable as a bound item storing a value.
+     *
+     * The thinking as of 2012-04-26 is that it is ok for value controls to bind to text, PI and comment nodes, which is
+     * not disallowed by per XForms, however doing so might lead to funny results when writing values back. In
+     * particular, writing an empty value to a text node causes the control to become non-relevant.
      */
-    def getValue(item: Item) = item match {
-        // XForms 1.1: "the XPath root node: an xforms-binding-exception occurs"
-        // NOTE: We do allow binding to a document node, but consider the value is empty when read.
-        case documentNode: NodeInfo if isDocument(documentNode) ⇒ null
-        // Element, attribute, and text nodes.
-        case node: NodeInfo if AllowedNodeTypesForGetValue(node.getNodeKind) ⇒ node.getStringValue
-        // Atomic values
-        case atomicValue: AtomicValue ⇒ atomicValue.getStringValue
-        // XForms 1.1: "Namespace, processing instruction, and comment nodes: behavior is undefined (implementation-dependent)."
-        case _ ⇒ null
+    def isAllowedValueBoundItem(item: Item) = item match {
+        case atomicValue: AtomicValue ⇒ true
+        case node: NodeInfo if isAttribute(node) || isElement(node) && supportsSimpleContent(node) ⇒ true
+        case node: NodeInfo if node self (Text || PI || Comment) ⇒ true
+        case _ ⇒ false
     }
+
+    /**
+     * Return the value of a bound item, whether a NodeInfo or an AtomicValue.
+     *
+     * NOTE: We used to return null for "disallowed" items, such as document nodes. However there doesn't seem to be
+     * much of a drawback to just return the string value. Scenarios where this could happen:
+     *
+     * - bind to simple content element
+     * - insert into that element
+     * - manually run revalidation
+     * - XFormsModelBinds gets node value for validation
+     */
+    def getValue(item: Item) = Option(item) map (_.getStringValue) orNull
 
     /**
      * Set a value on the instance using a NodeInfo and a value.
@@ -78,12 +94,12 @@ object DataModel {
         nodeInfo match {
             case nodeWrapper: NodeWrapper ⇒
                 nodeWrapper.getUnderlyingNode match {
-                    case node: Node if hasSimpleContent(nodeWrapper) ⇒
+                    case node: Node if isAllowedValueBoundItem(nodeWrapper) ⇒
                         setValueForNode(node, newValue)
                         onSuccess()
                         true
                     case _ ⇒
-                        onError(ComplexContentReason)
+                        onError(DisallowedNodeReason)
                         false
                 }
             case _ ⇒
@@ -177,27 +193,20 @@ object DataModel {
 
     private def setValueForNode(node: Node, newValue: String) =
         node match {
-            // NOTE: Previously, there was a "first text node rule" which ended up causing problems and was removed.
-            case element: Element ⇒ element.setText(newValue)
-            // "Attribute nodes: The string-value of the attribute is replaced with a string corresponding to the new
-            // value."
-            case attribute: Attribute ⇒ attribute.setValue(newValue)
-            // "Text nodes: The text node is replaced with a new one corresponding to the new value."
-            // NOTE: As of 2011-11-03, this should not happen as the caller tests for hasSimpleContent() which excludes text nodes.
-            // NOTE: Even so, here we replace the text value of the node, which is against the spec.
-            case text: Text ⇒ text.setText(newValue)
-            // "Namespace, processing instruction, comment, and the XPath root node: behavior is undefined."
-            case _ ⇒ throw new OXFException("Setting value on node other than element, attribute or text is not supported for node type: " + node.getNodeTypeName)
+            case element: Element                       ⇒ element.setText(newValue)
+            case attribute: Attribute                   ⇒ attribute.setValue(newValue)
+            case text: Text4j if text.getText.nonEmpty  ⇒ text.setText(newValue)
+            case text: Text4j                           ⇒ text.getParent.remove(text)
+            case pi: ProcessingInstruction              ⇒ pi.setText(newValue)
+            case comment: Comment4j                     ⇒ comment.setText(newValue)
+            // Should not happen as caller checks for isAllowedValueBoundItem()
+            case _ ⇒ throw new IllegalStateException("Setting value on disallowed node type: " + node.getNodeTypeName)
         }
 
-    /**
-     * Whether the item is an element node.
-     */
+    // Whether the item is an element node.
     def isElement(item: Item) = isNodeType(item, ELEMENT_NODE)
 
-    /**
-     * Whether the an item is a document node.
-     */
+    // Whether the an item is a document node.
     def isDocument(item: Item) = isNodeType(item, DOCUMENT_NODE)
     
     private def isNodeType(item: Item, nodeType: Int) = item match {

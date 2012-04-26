@@ -135,8 +135,7 @@ public class HandlerContext {
 
     private void processedUserAgentIfNeeded() {
         if (!processedUserAgent) {
-            final ExternalContext.Request request = externalContext.getRequest();
-            isRenderingEngineIE6OrEarlier = UserAgent.isRenderingEngineIE6OrEarlier(request);
+            isRenderingEngineIE6OrEarlier = UserAgent.isIE6OrEarlier(externalContext.getRequest());
             processedUserAgent = true;
         }
     }

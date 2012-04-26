@@ -22,6 +22,7 @@ import org.orbeon.oxf.xforms.XFormsConstants.{XFORMS_NAMESPACE_URI, XBL_NAMESPAC
 import org.orbeon.oxf.xml.XMLConstants.{XHTML_NAMESPACE_URI, XSD_URI}
 import org.orbeon.oxf.util.DebugLogger._
 import org.orbeon.oxf.xforms.{XFormsProperties, Loggers}
+import org.orbeon.oxf.util.{UserAgent, NetUtils}
 
 /**
  * Form Builder functions.
@@ -111,6 +112,16 @@ object FormBuilderFunctions {
     }
 
     def makeInstanceExpression(name: String) = "instance('" + name + "')"
+
+    // Minimal version of IE supported
+    val minimalIEVersion = 8
+
+    // Whether the browser is supported
+    // Concretely, we only return false if the browser is an "old" version of IE
+    def isBrowserSupported = {
+        val request = NetUtils.getExternalContext.getRequest
+        ! UserAgent.isUserAgentIE(request) || UserAgent.getMSIEVersion(request) >= minimalIEVersion
+    }
 
     def debugDumpDocument(message: String, inDoc: NodeInfo) =
         if (XFormsProperties.getDebugLogging.contains("form-builder-grid"))

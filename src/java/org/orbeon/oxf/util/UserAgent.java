@@ -16,57 +16,52 @@ package org.orbeon.oxf.util;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 
 public class UserAgent {
-    /**
-     * Test whether the user agent is Trident.
-     *
-     * @param request   incoming request
-     * @return          true if Trident is identified
-     */
-    public static boolean isRenderingEngineTrident(ExternalContext.Request request) {
-        final Object[] userAgentHeader = (Object[]) request.getHeaderValuesMap().get("user-agent");
-        if (userAgentHeader == null)
-            return false;
 
-        final String userAgent = ((String) userAgentHeader[0]).toLowerCase();
-        return userAgent.indexOf("msie") != -1 && userAgent.indexOf("opera") == -1;
+    private static String getUserAgentLowerCase(ExternalContext.Request request) {
+        final String[] userAgentHeader = request.getHeaderValuesMap().get("user-agent");
+        if (userAgentHeader == null)
+            return null;
+        else
+            return userAgentHeader[0].toLowerCase();
+    }
+
+    /**
+     * Test whether the user agent is IE.
+     */
+    public static boolean isUserAgentIE(ExternalContext.Request request) {
+        final String userAgent = getUserAgentLowerCase(request);
+        return userAgent.contains("msie") && ! userAgent.contains("opera");
+    }
+
+    /**
+     * Return the IE version, -1 if not IE.
+     */
+    public static int getMSIEVersion(ExternalContext.Request request) {
+
+        if (! isUserAgentIE(request))
+            return -1;
+
+        final String userAgent = getUserAgentLowerCase(request);
+        final int msieIndex = userAgent.indexOf("msie");
+
+        try {
+            final String versionString = userAgent.substring(msieIndex + 4, userAgent.indexOf(';', msieIndex + 5)).trim();
+
+            final int dotIndex = versionString.indexOf('.');
+            if (dotIndex == -1)
+                return Integer.parseInt(versionString);
+            else
+                return Integer.parseInt(versionString.substring(0, dotIndex));
+        } catch (Exception e) {
+            return -1;
+        }
     }
 
     /**
      * Test whether the user agent is IE 6 or earlier.
-     *
-     * @param request   incoming request
-     * @return          true if IE 6 or earlier is identified
      */
-    public static boolean isRenderingEngineIE6OrEarlier(ExternalContext.Request request) {
-        final Object[] userAgentHeader = (Object[]) request.getHeaderValuesMap().get("user-agent");
-        if (userAgentHeader == null)
-            return false;
-
-        final String userAgent = ((String) userAgentHeader[0]).toLowerCase();
-
-        final int msieIndex = userAgent.indexOf("msie");
-        final boolean isIE = msieIndex != -1 && userAgent.indexOf("opera") == -1;
-        if (!isIE)
-            return false;
-
-        final String versionString = userAgent.substring(msieIndex + 4, userAgent.indexOf(';', msieIndex + 5)).trim();
-
-        final int dotIndex = versionString.indexOf('.');
-        final int version;
-        if (dotIndex == -1) {
-            version = Integer.parseInt(versionString);
-        } else {
-            version = Integer.parseInt(versionString.substring(0, dotIndex));
-        }
-        return version <= 6;
+    public static boolean isIE6OrEarlier(ExternalContext.Request request) {
+        final int version = UserAgent.getMSIEVersion(request);
+        return version != -1 && version <= 6;
     }
-
-//    public static boolean isRenderingEngineSafari(ExternalContext.Request request) {
-//        final Object[] userAgentHeader = (Object[]) request.getHeaderValuesMap().get("user-agent");
-//        if (userAgentHeader == null)
-//            return false;
-//
-//        final String userAgent = ((String) userAgentHeader[0]).toLowerCase();
-//        return userAgent.indexOf("safari") != -1;
-//    }
 }

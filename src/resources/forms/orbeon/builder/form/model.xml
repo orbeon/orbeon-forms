@@ -162,19 +162,8 @@
         </xforms:action>
 
         <!-- Handle user agent -->
-
-        <xforms:var name="user-agent" value="xxforms:get-request-header('user-agent')"/>
-        <xforms:setvalue ref="instance('fb-user-agent-instance')/value" value="$user-agent"/>
-        <!-- IE detection -->
-        <xforms:var name="is-ie" value="contains(lower-case($user-agent), 'msie') and not(contains(lower-case($user-agent), 'opera'))"/>
-        <xforms:setvalue ref="instance('fb-user-agent-instance')/is-ie" value="$is-ie"/>
-        <!-- Try to find IE version -->
-        <xforms:action if="$is-ie">
-            <xforms:var name="msie" value="(for $t in tokenize(lower-case($user-agent), '[;\(\)]') return normalize-space($t))[starts-with(., 'msie')][1]"/>
-            <xforms:var name="ie-version" value="xs:integer(substring-before(normalize-space(substring-after($msie, 'msie')), '.'))"/>
-            <xforms:setvalue ref="instance('fb-user-agent-instance')/ie-version" value="$ie-version"/>
-            <xforms:setvalue ref="instance('fb-user-agent-instance')/is-supported-ie" value="$ie-version gt 7"/>
-        </xforms:action>
+        <xforms:setvalue ref="instance('fb-user-agent-instance')/minimal-ie-version" value="fbf:minimalIEVersion()"/>
+        <xforms:setvalue ref="instance('fb-user-agent-instance')/is-supported-browser" value="fbf:isBrowserSupported()"/>
 
         <xforms:rebuild/>
         <xforms:recalculate/>
@@ -304,10 +293,8 @@
     <!-- Store user-agent details -->
     <xforms:instance id="fb-user-agent-instance">
         <user-agent>
-            <value/>
-            <is-ie/>
-            <ie-version/>
-            <is-supported-ie/>
+            <minimal-ie-version/>
+            <is-supported-browser/>
         </user-agent>
     </xforms:instance>
 

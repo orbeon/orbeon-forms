@@ -105,8 +105,7 @@ public class ResourceServer extends ProcessorImpl {
                         if (newURL.getProtocol().equals("oxf")) {
 
                             // IE 6 hack for PNG images
-                            final boolean isIE6 = UserAgent.isRenderingEngineIE6OrEarlier(externalContext.getRequest());
-                            if (isIE6) {
+                            if (UserAgent.isIE6OrEarlier(externalContext.getRequest())) {
                                 if (urlPath.endsWith(".png")) {
                                     // Case of a PNG image served to IE 6 or earlier: check if there is a .gif instead
                                     urlString = "oxf:" + urlPath.substring(0, urlPath.length() - 3) + "gif";

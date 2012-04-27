@@ -1,5 +1,5 @@
 <!--
-  Copyright (C) 2011 Orbeon, Inc.
+  Copyright (C) 2012 Orbeon, Inc.
 
   This program is free software; you can redistribute it and/or modify it under the terms of the
   GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -23,15 +23,39 @@
         xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:f="http//www.orbeon.com/function"
         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+        xmlns:exist="http://exist.sourceforge.net/NS/exist"
         xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary">
 
     <p:param name="data" type="output"/>
 
-    <!-- TODO: implement ;) -->
+    <p:processor name="oxf:xforms-submission">
+        <p:input name="request">
+            <exist:query max="0"><exist:text>
+                declare namespace xhtml="http://www.w3.org/1999/xhtml";
+                declare namespace xforms="http://www.w3.org/2002/xforms";
 
-    <p:processor name="oxf:identity">
-        <p:input name="data"><forms/></p:input>
-        <p:output name="data" ref="data"/>
+                (: Retrieve the metadata for the deployed form, which are under /db/orbeon/fr/*/*/form/form.xhtml :)
+                (: The beginning of the path, /db/orbeon/fr, is part of the eXist URI we get from the orbeon-exist-uri header :)
+
+                (: TODO: use "current collection" instead of hard coding /db/orbeon/fr, once we know how to get the current collection in XQuery :)
+
+                for $app in xmldb:get-child-collections('/db/orbeon/fr'),
+                    $form in xmldb:get-child-collections(concat('/db/orbeon/fr/', $app))
+                return
+                    element form {
+                        doc(concat('/db/orbeon/fr/', $app, '/', $form, '/form/form.xhtml'))
+                        /xhtml:html/xhtml:head/xforms:model/xforms:instance[@id = 'fr-form-metadata']/metadata/*
+                    }
+            </exist:text></exist:query>
+        </p:input>
+        <p:input name="submission">
+            <xforms:submission method="post" replace="instance"
+                               resource="{xxforms:get-request-header('orbeon-exist-uri')}">
+                <xforms:insert ev:event="xforms-submit-done" nodeset="/*" origin="xxforms:element('forms', *)"/>
+                <xi:include href="propagate-exist-error.xml" xpointer="xpath(/root/*)"/>
+            </xforms:submission>
+        </p:input>
+        <p:output name="response" ref="data"/>
     </p:processor>
 
 </p:config>

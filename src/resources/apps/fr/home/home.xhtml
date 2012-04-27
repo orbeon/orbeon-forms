@@ -43,10 +43,12 @@
                 </xforms:action>
             </xforms:action>
         </xforms:model>
+        <xhtml:title>
+            <xforms:output ref="$fr-resources/home/title"/>
+        </xhtml:title>
     </xhtml:head>
     <xhtml:body>
         <fr:view>
-            <xforms:label ref="$fr-resources/home/title"/>
             <fr:body>
                 <fr:datatable width="100%">
                     <xforms:repeat nodeset="instance('fr-forms')/form[@operations != '']">

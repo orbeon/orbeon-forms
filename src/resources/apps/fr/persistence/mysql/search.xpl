@@ -82,7 +82,7 @@
                         <documents>
                             <sql:connection>
                                 <sql:datasource><xsl:value-of select="doc('input:request')/request/headers/header[name = 'orbeon-datasource']/value/string() treat as xs:string"/></sql:datasource>
-                                <!-- Query that returns all the search results, which we will reuse in multiple palces -->
+                                <!-- Query that returns all the search results, which we will reuse in multiple places -->
                                 <xsl:variable name="query">
                                     select
                                         data.created, data.last_modified, data.document_id
@@ -107,7 +107,7 @@
                                         and data.document_id = latest.document_id
                                         <!-- Don't take document that have been deleted -->
                                         and data.deleted = 'N'
-                                        <!-- Conditions on searcheable columns -->
+                                        <!-- Conditions on searchable columns -->
                                         <xsl:for-each select="/search/query[@path and normalize-space() != '']">
                                             <xsl:choose>
                                                 <xsl:when test="@match = 'exact'">

@@ -19,39 +19,71 @@ Controls = ORBEON.xforms.Controls
 
 # Show/hide placeholders for label and hint
 
-Event.onDOMReady () ->
+$ ->
+    f$ = do ->
+        jQueryObject = $ '<div>'
+        result = {}
+        for m in _.methods ($ '<div>')
+            do (m) ->
+                result[m] = (params...) ->
+                    o = params.pop()
+                    jQueryObject[m].apply o, params
+        result
+
+    class Editable
+        constructor: (@element) ->
+        instances: (container) ->
+            elements = container.find @selector
+            new @constructor $ e for e in elements
+        showPlaceholder: ->
+            if not _.first @valueContainer().contents()
+                @element.addClass 'fb-label-hint-placeholder'
+                placeholderContainer = @initPlaceholderContainer()
+                placeholderText = Controls.getCurrentValue _.first $ @placeholderOutput
+                placeholderContainer.text placeholderText
+        hidePlaceholder: ->
+            if @element.hasClass 'fb-label-hint-placeholder'
+                @element.removeClass 'fb-label-hint-placeholder'
+                @cleanPlaceholderContainer()
+
+    class LabelHint extends Editable
+        valueContainer: -> @element
+        initPlaceholderContainer: -> @element
+        cleanPlaceholderContainer: -> @element.contents().filter(-> @nodeType == @TEXT_NODE).detach()
+
+    class Label extends LabelHint
+        selector: '.xforms-label'
+        placeholderOutput: '#fb-enter-label'
+
+    class Hint extends LabelHint
+        selector: '.xforms-hint'
+        placeholderOutput: '#fb-enter-hint'
+
+    class Button extends Editable
+        selector: '.xforms-trigger-appearance-full'
+        placeholderOutput: '#fb-enter-label'
+        valueContainer: -> @element.children 'button'
+        initPlaceholderContainer: ->
+            # Hide actual button
+            f$.hide f$.find 'button', @element
+            # Create mock button
+            f$.append (mockLabel = $ '<span>'), f$.appendTo @element, ($ '<div class="xforms-mock-button">')
+            mockLabel
+        cleanPlaceholderContainer: ->
+            f$.show f$.find 'button', @element
+            f$.remove f$.find '.xforms-mock-button', @element
+
+    Editables = [Label, Hint, Button]
+    doOnEditables = (method, container) ->
+        instances = (E::instances container  for E in Editables)
+        instances = [].concat instances... # flatten
+        method.call i for i in instances
 
     gridTdWithMouse = null
 
-    showPlaceholder = (labelHint) ->
-        if labelHint.childNodes.length == 0
-            YD.addClass labelHint, 'fb-label-hint-placeholder'
-            classesToIds = [['xforms-label', 'fb-enter-label'], ['xforms-hint', 'fb-enter-hint']]
-            outputId = (ci[1] for ci in classesToIds when YD.hasClass labelHint, ci[0])[0]
-            outputControl = YD.get outputId
-            placeholderText = Controls.getCurrentValue outputControl
-            OD.setStringValue labelHint, placeholderText
-    hidePlaceholder = (labelHint) ->
-        if YD.hasClass labelHint, 'fb-label-hint-placeholder'
-            YD.removeClass labelHint, 'fb-label-hint-placeholder'
-            $(labelHint).contents().filter(-> @nodeType == @TEXT_NODE).detach()
-    doOnLabelHint = (gridThTd, f) ->
-        $gridThTd = $(gridThTd)
-        $table = $gridThTd.closest('table')
-        lookIn = [gridThTd]
-        if $gridThTd.is('td') and $table.is('.fr-repeat-single-row')    # Also look for label/hint in the th
-            columnNumber = $gridThTd.prevAll().length
-            gridTh = $table.find('tr.fr-dt-master-row').children()[columnNumber]
-            lookIn.push gridTh
-        $(lookIn).find('.xforms-label, .xforms-hint').each((index, labelHint) -> f labelHint)
-
     # Show placeholder on mouse entering, and remove them on mouse exiting
-    Builder.mouseEntersGridTdEvent.subscribe ({gridTd}) ->
-        gridTdWithMouse = gridTd
-        doOnLabelHint gridTd, showPlaceholder
-    Builder.mouseExitsGridTdEvent.subscribe ({gridTd}) ->
-        gridTdWithMouse = null
-        doOnLabelHint gridTd, hidePlaceholder
+    Builder.mouseEntersGridTdEvent.subscribe ({gridTd}) -> doOnEditables Editable::showPlaceholder, $ gridTd
+    Builder.mouseExitsGridTdEvent .subscribe ({gridTd}) -> doOnEditables Editable::hidePlaceholder, $ gridTd
 
     # Remove placeholder class when start editing and show it when done editing
     Builder.startLabelHintEditEvent.subscribe ({labelHint}) -> hidePlaceholder labelHint

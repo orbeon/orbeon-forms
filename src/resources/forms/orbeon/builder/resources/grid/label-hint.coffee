@@ -18,7 +18,7 @@ Controls = ORBEON.xforms.Controls
 
 # Show/hide input for label and hint
 
-Event.onDOMReady () ->
+$ ->
 
     labelSavedHTMLFor = null
 

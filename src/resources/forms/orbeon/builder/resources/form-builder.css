@@ -327,7 +327,9 @@ a.xforms-help-image .fb-control-help { vertical-align: baseline; }
 #fr-form-group .fb-static-upload .xforms-upload-remove { padding: 0 }
 
 .fr-grid .fr-grid-td .fb-grid-control-icons img { display: inline }
-.fb-label-hint-placeholder { color: #bbb }
+.fb-label-hint-placeholder,                         /* */
+.fb-label-hint-placeholder .xforms-mock-button
+    { color: #bbb }
 .fr-grid-td .fb-hover { position: relative }        /* So elements shown on hover can be absolutely positioned relative to the cell
                                                        Necessary as Firefox doesn't support position: relative on table cells (http://goo.gl/Atzi2) */
 
@@ -360,7 +362,8 @@ a.xforms-help-image .fb-control-help { vertical-align: baseline; }
 .fr-view .fr-grid.fr-editable .fr-grid-content .xforms-label:hover,          /* Yellow background to hint that the hint and label can be edited by clicking */
 .fr-view .fr-grid.fr-editable .fr-grid-content .xforms-hint:hover,           /* .fr-grid-content for label/hint in body */
 .fr-view .fr-grid.fr-editable .fr-grid-th .xforms-label:hover,               /* .fr-grid-th for label/hint in thead of a repeat */
-.fr-view .fr-grid.fr-editable .fr-grid-th .xforms-hint:hover
+.fr-view .fr-grid.fr-editable .fr-grid-th .xforms-hint:hover,
+.fr-view .fr-grid.fr-editable .xforms-mock-button span:hover
     { background-color: #ffffd3 }
 
 /* Even if the label or hint is empty, we still want space for 1 line to be reserved. */

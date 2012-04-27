@@ -115,11 +115,7 @@
                             <xforms:submission ref="/*/body" method="put" replace="none"
                                     serialization="application/octet-stream"
                                     resource="{/*/exist-uri}/{/*/group[1]}">
-                                <!-- Log and propagate error to caller -->
-                                <xforms:action ev:event="xforms-submit-error" xmlns:form-runner="java:org.orbeon.oxf.fr.FormRunner">
-                                    <xforms:message level="xxforms:log-debug"><xforms:output value="event('response-body')"/></xforms:message>
-                                    <xforms:action type="xpath">form-runner:sendError((event('response-status-code'), 500)[1])</xforms:action>
-                                </xforms:action>
+                                <xi:include href="propagate-exist-error.xml" xpointer="xpath(/root/*)"/>
                             </xforms:submission>
                         </p:input>
                         <p:input name="request" href="#request-description"/>
@@ -134,11 +130,7 @@
                         <p:input name="submission">
                             <xforms:submission method="delete" replace="none" serialization="none"
                                     resource="{/*/exist-uri}/{/*/group[1]}">
-                                <!-- Log and propagate error to caller -->
-                                <xforms:action ev:event="xforms-submit-error" xmlns:form-runner="java:org.orbeon.oxf.fr.FormRunner">
-                                    <xforms:message level="xxforms:log-debug"><xforms:output value="event('response-body')"/></xforms:message>
-                                    <xforms:action type="xpath">form-runner:sendError((event('response-status-code'), 500)[1])</xforms:action>
-                                </xforms:action>
+                                <xi:include href="propagate-exist-error.xml" xpointer="xpath(/root/*)"/>
                             </xforms:submission>
                         </p:input>
                         <p:input name="request" href="#request-description"/>
@@ -153,11 +145,7 @@
                         <p:input name="submission">
                             <xforms:submission ref="/*/*[1]" method="put" replace="none"
                                     resource="{/root/request-description/exist-uri}/{/root/request-description/group[1]}">
-                                <!-- Log and propagate error to caller -->
-                                <xforms:action ev:event="xforms-submit-error" xmlns:form-runner="java:org.orbeon.oxf.fr.FormRunner">
-                                    <xforms:message level="xxforms:log-debug"><xforms:output value="event('response-body')"/></xforms:message>
-                                    <xforms:action type="xpath">form-runner:sendError((event('response-status-code'), 500)[1])</xforms:action>
-                                </xforms:action>
+                                <xi:include href="propagate-exist-error.xml" xpointer="xpath(/root/*)"/>
                             </xforms:submission>
                         </p:input>
                         <p:input name="request" href="aggregate('root', #instance, #request-description)"/>

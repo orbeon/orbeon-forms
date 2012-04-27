@@ -54,16 +54,7 @@
                                             }&amp;lang={/*/lang}" replace="instance">
                 <!-- Move resulting <document> element as root element -->
                 <xforms:insert ev:event="xforms-submit-done" if="event('response-status-code') = 200" nodeset="/*" origin="/*/*[1]"/>
-                <!-- Tricky: eXist returns 202 when there is a syntax error in XQuery. But we do consider this an error of course! -->
-                <xforms:action ev:event="xforms-submit-done" if="not(event('response-status-code') = 200)" xmlns:form-runner="java:org.orbeon.oxf.fr.FormRunner">
-                    <xforms:message level="xxforms:log-debug"><xforms:output value="event('response-body')"/></xforms:message>
-                    <xforms:action type="xpath">form-runner:sendError(500)</xforms:action>
-                </xforms:action>
-                <!-- Log and propagate error to caller -->
-                <xforms:action ev:event="xforms-submit-error" xmlns:form-runner="java:org.orbeon.oxf.fr.FormRunner">
-                    <xforms:message level="xxforms:log-debug"><xforms:output value="event('response-body')"/></xforms:message>
-                    <xforms:action type="xpath">form-runner:sendError((event('response-status-code'), 500)[1])</xforms:action>
-                </xforms:action>
+                <xi:include href="propagate-exist-error.xml" xpointer="xpath(/root/*)"/>
             </xforms:submission>
         </p:input>
         <p:output name="data" id="submission"/>

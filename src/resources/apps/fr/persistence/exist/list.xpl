@@ -38,11 +38,7 @@
                                             }/?_howmany={/*/page-size}&amp;_start={/*/page-number}" replace="instance">
                 <!-- Move resulting <document> element as root element -->
                 <xforms:insert ev:event="xforms-submit-done" nodeset="/*" origin="/*/*[1]"/>
-                <!-- Log and propagate error to caller -->
-                <xforms:action ev:event="xforms-submit-error" xmlns:form-runner="java:org.orbeon.oxf.fr.FormRunner">
-                    <xforms:message level="xxforms:log-debug"><xforms:output value="event('response-body')"/></xforms:message>
-                    <xforms:action type="xpath">form-runner:sendError((event('response-status-code'), 500)[1])</xforms:action>
-                </xforms:action>
+                <xi:include href="propagate-exist-error.xml" xpointer="xpath(/root/*)"/>
             </xforms:submission>
         </p:input>
         <p:output name="data" id="submission"/>

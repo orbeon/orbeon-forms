@@ -23,21 +23,18 @@ import org.orbeon.oxf.xforms.{XFormsStaticStateImpl, XFormsInstance}
 import java.util.Collections
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.xml.{TransformerUtils, NamespaceMapping}
-import org.orbeon.saxon.dom4j.{DocumentWrapper, NodeWrapper}
+import org.orbeon.saxon.dom4j.DocumentWrapper
 import org.dom4j.{Document, Attribute, QName, Element}
 import org.orbeon.saxon.pattern._
 import org.orbeon.saxon.expr.{Token, ExpressionTool}
 import org.orbeon.saxon.om._
 import scala.Predef._
 import org.orbeon.saxon.functions.FunctionLibrary
-import org.w3c.dom.Node.{ELEMENT_NODE, PROCESSING_INSTRUCTION_NODE, COMMENT_NODE}
 
 object XML {
 
     // TODO: Like for XFSS, this should not be global
-
     private val wrapper = new DocumentWrapper(Dom4jUtils.createDocument, null, XPathCache.getGlobalConfiguration)
-    private val DisallowedNodeTypesForSimpleContent = Set(ELEMENT_NODE, PROCESSING_INSTRUCTION_NODE, COMMENT_NODE) map (_.toInt)
 
     // Convenience methods for the XPath API
     def evalOne(item: Item, expr: String, namespaces: NamespaceMapping = XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING, variables: Map[String, ValueRepresentation] = null)(implicit library: FunctionLibrary = null) =
@@ -361,7 +358,7 @@ object XML {
     implicit def itemSeqToFirstItem(items: Seq[Item]): Item = items.headOption.orNull // TODO: don't return null
 
     implicit def unwrapElement(nodeInfo: NodeInfo): Element =
-        nodeInfo.asInstanceOf[NodeWrapper].getUnderlyingNode.asInstanceOf[Element]
+        nodeInfo.asInstanceOf[VirtualNode].getUnderlyingNode.asInstanceOf[Element]
 
     def elemToDom4j(e: Elem): Document = Dom4jUtils.readDom4j(e.toString)
     def elemToDocumentInfo(e: Elem, readonly: Boolean = true): DocumentInfo =
@@ -382,8 +379,6 @@ object XML {
 
     implicit def stringToQName(s: String) = QName.get(s)
     def stringToStringValue(s: String) = StringValue.makeStringValue(s)
-//    def stringToItem(s: String) = StringValue.makeStringValue(s)
-//    def stringToItems(s: String) = Seq(StringValue.makeStringValue(s))
 
     implicit def saxonIteratorToItem(i: SequenceIterator): Item = i.next()
 

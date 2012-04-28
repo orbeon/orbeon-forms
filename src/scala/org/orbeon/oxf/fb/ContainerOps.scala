@@ -77,17 +77,29 @@ object ContainerOps {
         val newTdToSelect = findNewTdToSelect(container, container \\ "*:td")
 
         def recurse(container: NodeInfo): Seq[NodeInfo] = {
+
+            // NOTE: Deleting is tricky because NodeInfo is mutation-averse as it keeps a node's index, among others.
+            // So deleting a node under a given NodeInfo can cause the position of following siblings to be out of date
+            // and cause errors. So we delete from back to front. But a safer solution should be found.
+
             // Go depth-first so we delete containers after all their content has been deleted
-            (childrenContainers(container) flatMap (recurse(_))) ++                     // children containers
-            (if (localname(container) == "grid")                                        // grid controls if any
-                container \\ "*:tr" \\ "*:td" \ * flatMap (controlElementsToDelete(_))
-             else
-                Seq()) ++
-            controlElementsToDelete(container)                                          // container itself
+            // NOTE: Use toList to make sure we are not lazy, otherwise items might be deleted as we go!
+            val children = childrenContainers(container).reverse.toList flatMap recurse
+
+            val gridContent =
+                if (IsGrid(container))
+                    container \\ "*:tr" \\ "*:td" \ * filter IsControl reverse
+                else
+                    Seq()
+
+            children ++ gridContent :+ container
         }
 
-        // Start with top-level container and delete everything that was returned
-        recurse(container) foreach (delete(_))
+        // Start with top-level container
+        val controls = recurse(container)
+
+        //  Delete all controls in order
+        controls flatMap controlElementsToDelete foreach (delete(_))
 
         // Adjust selected td if needed
         newTdToSelect foreach (selectTd(_))

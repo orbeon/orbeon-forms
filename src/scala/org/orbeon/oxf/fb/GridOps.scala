@@ -308,7 +308,7 @@ object GridOps {
     }
 
     // Make the given grid td selected
-    def selectTd(newTd: NodeInfo) = selectedCellId match {
+    def selectTd(newTd: NodeInfo): Unit = selectedCellId match {
         case Some(selectedCell) ⇒
             // New FB
             setvalue(selectedCell, newTd \@ "id" stringValue)

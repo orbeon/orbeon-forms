@@ -25,10 +25,8 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import Model._
 import org.orbeon.oxf.xml.{XMLConstants, NamespaceMapping}
 
-import org.orbeon.oxf.xforms.model.{DataModel ⇒ XFormsDataModel}
 import org.orbeon.oxf.xforms.control.XFormsControl
-import org.orbeon.oxf.xforms.analysis.controls.SingleNodeTrait
-import org.orbeon.saxon.om.{NodeInfo, Item, SequenceIterator}
+import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
 import org.orbeon.scaxon.XML._
 
 /*
@@ -53,6 +51,10 @@ object ControlOps {
 
     // Whether the given id is for a control (given its reserved suffix)
     def isIdForControl(controlOrBindId: String) = controlName(controlOrBindId) ne null
+
+    // Whether the give node corresponds to a control
+    // TODO: should be more restrictive
+    val IsControl: NodeInfo ⇒ Boolean = hasName(_)
 
     // Find a control by name (less efficient than searching by id)
     def findControlByName(inDoc: NodeInfo, controlName: String) =
@@ -194,8 +196,8 @@ object ControlOps {
         val holders = getControlNameOption(control).toSeq flatMap { controlName ⇒
             Seq(findDataHolder(doc, controlName),
                 findBindByName(doc, controlName),
-                instanceElement(doc, templateId(controlName)),
-                findTemplateHolder(control, controlName)) ++
+                findTemplateHolder(control, controlName),
+                instanceElement(doc, templateId(controlName))) ++
                 (findResourceHolders(controlName) map (Option(_))) flatten
         }
 

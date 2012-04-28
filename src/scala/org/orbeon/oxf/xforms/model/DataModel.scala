@@ -13,18 +13,16 @@
  */
 package org.orbeon.oxf.xforms.model
 
-import org.orbeon.saxon.dom4j.NodeWrapper
 import org.orbeon.oxf.xforms.event.XFormsEventTarget
 import org.orbeon.oxf.xforms._
 import event.events.{XXFormsBindingErrorEvent, XXFormsValueChanged}
-import org.w3c.dom.Node.{ELEMENT_NODE, DOCUMENT_NODE}
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.saxon.value.AtomicValue
-import org.orbeon.saxon.om.{Item, NodeInfo}
 import org.orbeon.oxf.xml.dom4j.LocationData
-import org.orbeon.saxon.om.Axis
 import org.dom4j.{Text ⇒ Text4j, Comment ⇒ Comment4j, _}
 import org.orbeon.scaxon.XML._
+import org.w3c.dom.Node._
+import org.orbeon.saxon.om._
 
 /**
  * Represent access to the data model via the NodeInfo abstraction.
@@ -53,10 +51,28 @@ object DataModel {
      * particular, writing an empty value to a text node causes the control to become non-relevant.
      */
     def isAllowedValueBoundItem(item: Item) = item match {
-        case atomicValue: AtomicValue ⇒ true
+        case _: AtomicValue ⇒ true
         case node: NodeInfo if isAttribute(node) || isElement(node) && supportsSimpleContent(node) ⇒ true
         case node: NodeInfo if node self (Text || PI || Comment) ⇒ true
         case _ ⇒ false
+    }
+
+    /**
+     * If it is possible to write to the given item, return a VirtualNode, otherwise return a reason why not.
+     *
+     * It's not possible to write to:
+     *
+     * - atomic values (which are read-only)
+     * - document nodes (even mutable ones)
+     * - element nodes containing other elements
+     * - items not backed by a mutable node (which are read-only)
+     */
+    def isWritableItem(item: Item): VirtualNode Either Reason = item match {
+        case _: AtomicValue ⇒ Right(ReadonlyNodeReason)
+        case _: DocumentInfo ⇒ Right(DisallowedNodeReason)
+        case node: VirtualNode if hasChildElement(node) ⇒ Right(DisallowedNodeReason)
+        case node: VirtualNode  ⇒ Left(node)
+        case _ ⇒ Right(ReadonlyNodeReason)
     }
 
     /**
@@ -91,19 +107,13 @@ object DataModel {
         assert(nodeInfo ne null)
         assert(newValue ne null)
 
-        nodeInfo match {
-            case nodeWrapper: NodeWrapper ⇒
-                nodeWrapper.getUnderlyingNode match {
-                    case node: Node if isAllowedValueBoundItem(nodeWrapper) ⇒
-                        setValueForNode(node, newValue)
-                        onSuccess()
-                        true
-                    case _ ⇒
-                        onError(DisallowedNodeReason)
-                        false
-                }
-            case _ ⇒
-                onError(ReadonlyNodeReason)
+        isWritableItem(nodeInfo) match {
+            case Left(virtualNode) ⇒
+                setValueForNode(virtualNode.getUnderlyingNode.asInstanceOf[Node], newValue)
+                onSuccess()
+                true
+            case Right(reason) ⇒
+                onError(reason)
                 false
         }
     }
@@ -193,13 +203,13 @@ object DataModel {
 
     private def setValueForNode(node: Node, newValue: String) =
         node match {
-            case element: Element                       ⇒ element.setText(newValue)
+            case element: Element                       ⇒ element.clearContent(); if (newValue.nonEmpty) element.setText(newValue)
             case attribute: Attribute                   ⇒ attribute.setValue(newValue)
-            case text: Text4j if text.getText.nonEmpty  ⇒ text.setText(newValue)
+            case text: Text4j if newValue.nonEmpty      ⇒ text.setText(newValue)
             case text: Text4j                           ⇒ text.getParent.remove(text)
             case pi: ProcessingInstruction              ⇒ pi.setText(newValue)
             case comment: Comment4j                     ⇒ comment.setText(newValue)
-            // Should not happen as caller checks for isAllowedValueBoundItem()
+            // Should not happen as caller checks for isWritableItem()
             case _ ⇒ throw new IllegalStateException("Setting value on disallowed node type: " + node.getNodeTypeName)
         }
 

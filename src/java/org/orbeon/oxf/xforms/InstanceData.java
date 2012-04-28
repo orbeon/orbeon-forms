@@ -19,7 +19,6 @@ import org.orbeon.oxf.xforms.analysis.model.Model;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.saxon.dom4j.NodeWrapper;
 import org.orbeon.saxon.om.*;
 
 import java.util.*;
@@ -229,7 +228,7 @@ public class InstanceData {// rename to DataNodeProperties once done
     }
 
     public static boolean getInheritedRelevant(NodeInfo nodeInfo) {
-        if (nodeInfo instanceof NodeWrapper) {
+        if (nodeInfo instanceof VirtualNode) {
             return getInheritedRelevant(XFormsUtils.getNodeFromNodeInfo(nodeInfo, ""));
         } else if (nodeInfo != null) {
             return Model.DEFAULT_RELEVANT();
@@ -260,7 +259,7 @@ public class InstanceData {// rename to DataNodeProperties once done
     }
 
     public static boolean getInheritedReadonly(NodeInfo nodeInfo) {
-        if (nodeInfo instanceof NodeWrapper) {
+        if (nodeInfo instanceof VirtualNode) {
             return getInheritedReadonly(XFormsUtils.getNodeFromNodeInfo(nodeInfo, ""));
         } else if (nodeInfo != null) {
             return true;// Default for non-mutable nodes is to be read-only
@@ -413,12 +412,12 @@ public class InstanceData {// rename to DataNodeProperties once done
     }
 
     private static InstanceData getLocalInstanceData(NodeInfo nodeInfo, boolean forUpdate) {
-        if (nodeInfo instanceof NodeWrapper) {
+        if (nodeInfo instanceof VirtualNode) {
             return getLocalInstanceData(XFormsUtils.getNodeFromNodeInfo(nodeInfo, ""));
         } else if (nodeInfo != null && !forUpdate) {
             return READONLY_LOCAL_INSTANCE_DATA;
         } else if (nodeInfo != null && forUpdate) {
-            throw new OXFException("Cannot update MIP information on non-NodeWrapper NodeInfo.");
+            throw new OXFException("Cannot update MIP information on non-VirtualNode NodeInfo.");
         } else {
             throw new OXFException("Null NodeInfo found.");
         }
@@ -478,10 +477,10 @@ public class InstanceData {// rename to DataNodeProperties once done
     }
 
     private static InstanceData createNewInstanceData(NodeInfo nodeInfo) {
-        if (nodeInfo instanceof NodeWrapper) {
+        if (nodeInfo instanceof VirtualNode) {
             return createNewInstanceData(XFormsUtils.getNodeFromNodeInfo(nodeInfo, ""));
         } else {
-            throw new OXFException("Cannot create InstanceData on non-NodeWrapper NodeInfo.");
+            throw new OXFException("Cannot create InstanceData on non-VirtualNode NodeInfo.");
         }
     }
 

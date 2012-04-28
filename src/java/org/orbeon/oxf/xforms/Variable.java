@@ -24,11 +24,11 @@ import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.oxf.xforms.xbl.Scope;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
-import org.orbeon.saxon.dom4j.NodeWrapper;
 import org.orbeon.saxon.expr.LastPositionFinder;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.SequenceIterator;
 import org.orbeon.saxon.om.ValueRepresentation;
+import org.orbeon.saxon.om.VirtualNode;
 import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.value.EmptySequence;
 import org.orbeon.saxon.value.SequenceExtent;
@@ -174,12 +174,12 @@ public class Variable {
         public Item next() throws XPathException {
             final Item item = iter.next();
 
-            if (item instanceof NodeWrapper) {
+            if (item instanceof VirtualNode) {
                 // Rewrap
-                final NodeWrapper nodeWrapper = (NodeWrapper) item;
-                final DocumentWrapper documentWrapper = (DocumentWrapper) nodeWrapper.getDocumentRoot();
+                final VirtualNode virtualNode = (VirtualNode) item;
+                final DocumentWrapper documentWrapper = (DocumentWrapper) virtualNode.getDocumentRoot();
 
-                current = documentWrapper.wrap(nodeWrapper.getUnderlyingNode());
+                current = documentWrapper.wrap(virtualNode.getUnderlyingNode());
             } else {
                 // Pass through
                 current = item;

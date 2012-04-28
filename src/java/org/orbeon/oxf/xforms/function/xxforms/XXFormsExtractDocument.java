@@ -20,12 +20,12 @@ import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
-import org.orbeon.saxon.dom4j.NodeWrapper;
 import org.orbeon.saxon.expr.ExpressionTool;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
+import org.orbeon.saxon.om.VirtualNode;
 import org.orbeon.saxon.trans.XPathException;
 
 import java.util.HashMap;
@@ -52,8 +52,8 @@ public class XXFormsExtractDocument extends XFormsFunction {
 
         // Get Element
         final Element rootElement;
-        if (item instanceof NodeWrapper) {
-            final Object node = ((NodeWrapper) item).getUnderlyingNode();
+        if (item instanceof VirtualNode) {
+            final Object node = ((VirtualNode) item).getUnderlyingNode();
             rootElement = (Element) node;
         } else {
             final NodeInfo nodeInfo = (NodeInfo) item;

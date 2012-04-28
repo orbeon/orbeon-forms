@@ -31,7 +31,6 @@ import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
-import org.orbeon.saxon.dom4j.NodeWrapper;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.om.*;
@@ -118,11 +117,11 @@ public class XXFormsCallXPL extends XFormsFunction {
 
                         // TODO: We should be able to just pass inputNodeInfo to addInput() and avoid the conversions, but that doesn't work!
 
-                        if (inputNodeInfo instanceof NodeWrapper) {
+                        if (inputNodeInfo instanceof VirtualNode) {
                             // Get reference to dom4j node
 
                             final Element inputElement;
-                            final Node inputNode = (Node) ((NodeWrapper) inputNodeInfo).getUnderlyingNode();
+                            final Node inputNode = (Node) ((VirtualNode) inputNodeInfo).getUnderlyingNode();
 
                             if (inputNode instanceof Document)
                                 inputElement = ((Document) inputNode).getRootElement();

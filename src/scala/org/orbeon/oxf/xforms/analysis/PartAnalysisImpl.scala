@@ -18,12 +18,11 @@ import model.Model
 import scala.collection.JavaConverters._
 import org.orbeon.oxf.xforms.XFormsStaticStateImpl.StaticStateDocument
 import org.orbeon.oxf.util.XPathCache
-import org.orbeon.saxon.dom4j.{NodeWrapper, DocumentWrapper}
+import org.orbeon.saxon.dom4j.DocumentWrapper
 import org.dom4j.Element
 import collection.immutable.Stream._
 import org.orbeon.oxf.xforms._
 import event.EventHandlerImpl
-import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.oxf.xml.dom4j.{ExtendedLocationData, LocationData, Dom4jUtils}
 import collection.mutable.Buffer
 import org.orbeon.oxf.common.ValidationException
@@ -31,6 +30,7 @@ import org.orbeon.oxf.xml.{NamespaceMapping, ContentHandlerHelper, XMLUtils}
 import xbl.Scope
 import org.orbeon.oxf.util.DebugLogger._
 import org.orbeon.oxf.xforms.analysis.controls.{AttributeControl, LHHAAnalysis, RootControl}
+import org.orbeon.saxon.om.{VirtualNode, NodeInfo}
 
 /**
  * Static analysis of a whole part, including:
@@ -273,7 +273,7 @@ object PartAnalysisImpl {
         for {
             item ← modelItems.asScala
             nodeInfo = item.asInstanceOf[NodeInfo]
-            element = nodeInfo.asInstanceOf[NodeWrapper].getUnderlyingNode.asInstanceOf[Element]
+            element = nodeInfo.asInstanceOf[VirtualNode].getUnderlyingNode.asInstanceOf[Element]
             document = Dom4jUtils.createDocumentCopyParentNamespaces(element, detach)
         } yield
             document

@@ -35,11 +35,11 @@ import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.saxon.dom4j.NodeWrapper;
 import org.orbeon.saxon.functions.FunctionLibrary;
 import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
+import org.orbeon.saxon.om.VirtualNode;
 
 import javax.xml.transform.Transformer;
 import javax.xml.transform.stream.StreamResult;
@@ -1244,8 +1244,8 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
     private Document reRootAndPrune(final NodeInfo currentNodeInfo, boolean resolvedRelevant) {
 
         final Document documentToSubmit;
-        if (currentNodeInfo instanceof NodeWrapper) {
-            final Node currentNode = (Node) ((NodeWrapper) currentNodeInfo).getUnderlyingNode();
+        if (currentNodeInfo instanceof VirtualNode) {
+            final Node currentNode = (Node) ((VirtualNode) currentNodeInfo).getUnderlyingNode();
 
             // "A node from the instance data is selected, based on attributes on the submission
             // element. The indicated node and all nodes for which it is an ancestor are considered for

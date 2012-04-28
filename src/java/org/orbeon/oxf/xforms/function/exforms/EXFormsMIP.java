@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms.function.exforms;
 
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsMIPFunction;
-import org.orbeon.saxon.dom4j.NodeWrapper;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.om.Item;

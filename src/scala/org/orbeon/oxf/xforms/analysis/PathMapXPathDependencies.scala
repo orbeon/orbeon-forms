@@ -14,9 +14,7 @@
 package org.orbeon.oxf.xforms.analysis
 
 import model.Model
-import org.orbeon.saxon.om.NodeInfo
 import collection.mutable.{HashSet, HashMap}
-import org.orbeon.saxon.dom4j.NodeWrapper
 import org.orbeon.oxf.xforms._
 import analysis.controls._
 import org.w3c.dom.Node._
@@ -24,6 +22,7 @@ import org.orbeon.oxf.common.OXFException
 import java.util.{Map ⇒ JMap}
 import java.lang.String
 import collection.immutable.Nil
+import org.orbeon.saxon.om.{VirtualNode, NodeInfo}
 
 class PathMapXPathDependencies(private val containingDocument: XFormsContainingDocument) extends XPathDependencies {
 
@@ -205,7 +204,7 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
     def markValueChanged(model: XFormsModel, nodeInfo: NodeInfo) {
 
         // Caller must only call this for a mutable node belonging to the given model
-        require(nodeInfo.isInstanceOf[NodeWrapper])
+        require(nodeInfo.isInstanceOf[VirtualNode])
         require(model.getInstanceForNode(nodeInfo).getModel(containingDocument) == model)
 
         getModelState(model.getPrefixedId).markValueChanged(nodeInfo)

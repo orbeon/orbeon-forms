@@ -39,7 +39,6 @@ import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentSource;
 import org.orbeon.saxon.Configuration;
-import org.orbeon.saxon.dom4j.NodeWrapper;
 import org.orbeon.saxon.functions.FunctionLibrary;
 import org.orbeon.saxon.om.*;
 import org.orbeon.saxon.value.*;
@@ -804,8 +803,8 @@ public class XFormsUtils {
      * @return              Node
      */
     public static Node getNodeFromNodeInfoConvert(NodeInfo nodeInfo) {
-        if (nodeInfo instanceof NodeWrapper)
-            return (Node) ((NodeWrapper) nodeInfo).getUnderlyingNode();
+        if (nodeInfo instanceof VirtualNode)
+            return (Node) ((VirtualNode) nodeInfo).getUnderlyingNode();
         else if (nodeInfo.getNodeKind() == org.w3c.dom.Document.ATTRIBUTE_NODE) {
             return Dom4jUtils.createAttribute(new QName(nodeInfo.getLocalPart(), new Namespace(nodeInfo.getPrefix(), nodeInfo.getURI())), nodeInfo.getStringValue());
         } else
@@ -821,10 +820,10 @@ public class XFormsUtils {
      * @return              Node if found
      */
     public static Node getNodeFromNodeInfo(NodeInfo nodeInfo, String errorMessage) {
-        if (!(nodeInfo instanceof NodeWrapper))
+        if (!(nodeInfo instanceof VirtualNode))
             throw new OXFException(errorMessage);
 
-        return (Node) ((NodeWrapper) nodeInfo).getUnderlyingNode();
+        return (Node) ((VirtualNode) nodeInfo).getUnderlyingNode();
     }
 
     /**

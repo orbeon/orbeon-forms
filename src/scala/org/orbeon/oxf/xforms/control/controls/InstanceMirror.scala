@@ -22,8 +22,7 @@ import event.events.{XFormsDeleteEvent, XFormsInsertEvent, XXFormsValueChanged}
 import event.XFormsEvents._
 import model.DataModel
 import org.orbeon.oxf.util.ScalaUtils._
-import org.orbeon.saxon.dom4j.{DocumentWrapper, NodeWrapper}
-import org.orbeon.saxon.om.{DocumentInfo, NodeInfo, Navigator}
+import org.orbeon.saxon.dom4j.DocumentWrapper
 import org.orbeon.saxon.value.StringValue
 import java.util.{Collections ⇒ JCollections, List ⇒ JList}
 import org.orbeon.oxf.util.IndentedLogger
@@ -34,6 +33,7 @@ import org.orbeon.oxf.common.OXFException
 import XXFormsDynamicControl._
 import scala.None
 import org.orbeon.oxf.xforms.event.{ListenersTrait, EventListener ⇒ JEventListener}
+import org.orbeon.saxon.om.{VirtualNode, DocumentInfo, NodeInfo, Navigator}
 
 // Logic to mirror mutations between an outer and an inner instance
 object InstanceMirror {
@@ -61,7 +61,7 @@ object InstanceMirror {
         val findInstanceExpr = "(" + axis + "::xforms:instance)[1]"
 
         evalOne(outerNode, findInstanceExpr) match {
-            case instanceWrapper: NodeWrapper if instanceWrapper.getUnderlyingNode.isInstanceOf[Element] ⇒
+            case instanceWrapper: VirtualNode if instanceWrapper.getUnderlyingNode.isInstanceOf[Element] ⇒
                 // This is a change to an instance
 
                 // Find instance id
@@ -89,7 +89,7 @@ object InstanceMirror {
                     // Find destination path in instance
                     val namespaces = partAnalysis.getNamespaceMapping(partAnalysis.startScope.fullPrefix, instanceWrapper.getUnderlyingNode.asInstanceOf[Element])
                     evalOne(innerInstance.documentInfo, innerPath, namespaces) match {
-                        case newNode: NodeWrapper ⇒ Some(newNode)
+                        case newNode: VirtualNode ⇒ Some(newNode)
                         case _ ⇒ throw new IllegalStateException
                     }
                 } else
@@ -109,11 +109,11 @@ object InstanceMirror {
         // Find instance in original doc
         evalOne(outerDoc, "//xforms:instance[@id = $sourceId]",
                 variables = Map("sourceId" → StringValue.makeStringValue(sourceId))) match {
-            case instanceWrapper: NodeWrapper if instanceWrapper.getUnderlyingNode.isInstanceOf[Element] ⇒
+            case instanceWrapper: VirtualNode if instanceWrapper.getUnderlyingNode.isInstanceOf[Element] ⇒
                 // Find destination node in inline instance in original doc
                 val namespaces = partAnalysis.getNamespaceMapping(partAnalysis.startScope.fullPrefix, instanceWrapper.getUnderlyingNode.asInstanceOf[Element])
                 evalOne(instanceWrapper, path, namespaces) match {
-                    case newNode: NodeWrapper ⇒ Some(newNode)
+                    case newNode: VirtualNode ⇒ Some(newNode)
                     case _ ⇒ throw new IllegalStateException
                 }
             case _ ⇒ throw new IllegalStateException

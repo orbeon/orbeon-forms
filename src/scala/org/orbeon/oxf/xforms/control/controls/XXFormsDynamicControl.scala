@@ -22,8 +22,7 @@ import analysis.PartAnalysisImpl
 import collection.JavaConverters._
 import control.{XFormsComponentControl, XFormsSingleNodeContainerControl, XFormsControl}
 import event.XFormsEvents._
-import org.orbeon.saxon.dom4j.{DocumentWrapper, NodeWrapper}
-import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.saxon.dom4j.DocumentWrapper
 import org.orbeon.oxf.xml._
 import java.util.{Map ⇒ JMap}
 import org.orbeon.oxf.util.XPathCache
@@ -37,6 +36,7 @@ import org.orbeon.oxf.xforms.event.{EventListener ⇒ JEventListener, XFormsEven
 import scala.Predef._
 import org.orbeon.oxf.xforms.event.events.{XXFormsValueChanged, XFormsDeleteEvent, XFormsInsertEvent}
 import org.orbeon.oxf.xforms.XFormsConstants._
+import org.orbeon.saxon.om.{VirtualNode, NodeInfo}
 
 /**
  * xxforms:dynamic control
@@ -103,7 +103,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
             case _ ⇒
         }
 
-    private def updateSubTree(node: NodeWrapper): Unit =
+    private def updateSubTree(node: VirtualNode): Unit =
         if (previousChangeCount != changeCount) {
             // Document has changed and needs to be fully recreated
             processFullUpdate(node)
@@ -117,7 +117,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
                 processXBLUpdates()
         }
 
-    private def processFullUpdate(node: NodeWrapper): Unit = {
+    private def processFullUpdate(node: VirtualNode): Unit = {
         previousChangeCount = changeCount
         xblChanges.clear()
         bindChanges.clear()
@@ -300,7 +300,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
 
     private def getBoundElement =
         getBindingContext.getSingleItem match {
-            case nodeWrapper: NodeWrapper if nodeWrapper.getNodeKind == ELEMENT_NODE ⇒ Some(nodeWrapper)
+            case node: VirtualNode if node.getNodeKind == ELEMENT_NODE ⇒ Some(node)
             case _ ⇒ None
         }
 

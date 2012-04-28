@@ -21,9 +21,9 @@ import org.orbeon.oxf.xforms.event.EventHandlerImpl;
 import org.orbeon.oxf.xml.NamespaceMapping;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
-import org.orbeon.saxon.dom4j.NodeWrapper;
 import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.oxf.xforms.analysis.controls.LHHA;
+import org.orbeon.saxon.om.VirtualNode;
 
 import java.util.*;
 
@@ -98,7 +98,7 @@ public class XBLTransformer {
                             contentToInsert = new ArrayList<Node>(elements.size());
                             for (Object o: elements) {
                                 final NodeInfo currentNodeInfo = (NodeInfo) o;
-                                final Element currentElement = (Element) ((NodeWrapper) currentNodeInfo).getUnderlyingNode();
+                                final Element currentElement = (Element) ((VirtualNode) currentNodeInfo).getUnderlyingNode();
 
                                 if (! mustFilterOut(currentElement))
                                     contentToInsert.add(Dom4jUtils.copyElementCopyParentNamespaces(currentElement));
@@ -232,7 +232,7 @@ public class XBLTransformer {
                             final NodeInfo currentNodeInfo = (NodeInfo) nodeInfo;
                             if (currentNodeInfo.getNodeKind() == org.w3c.dom.Document.ATTRIBUTE_NODE) {
                                 // This is an attribute
-                                final Attribute currentAttribute = (Attribute) ((NodeWrapper) currentNodeInfo).getUnderlyingNode();
+                                final Attribute currentAttribute = (Attribute) ((VirtualNode) currentNodeInfo).getUnderlyingNode();
                                 setAttribute(resultingNodes, currentAttribute.getQName(), currentAttribute.getValue(), currentAttribute.getParent());
                             }
                         }

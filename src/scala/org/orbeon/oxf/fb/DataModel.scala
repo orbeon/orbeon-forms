@@ -121,7 +121,7 @@ object DataModel {
     def bindRef(bindId: String, i: SequenceIterator) = {
         val itemOption = asScalaSeq(i).headOption
 
-        if (isAllowedValueBoundItem(controlName(bindId), itemOption))
+        if (isAllowedBoundItem(controlName(bindId), itemOption))
             i.getAnother
         else
             getFormModel flatMap
@@ -140,14 +140,14 @@ object DataModel {
     def isAllowedBindingExpression(control: XFormsControl, expr: String): Boolean = {
 
         def evaluateBoundItem =
-            Option(evalOne(control.getBindingContext.contextItem, expr, control.staticControl.namespaceMapping))
+            Option(evalOne(control.getBindingContext.contextItem, expr, control.staticControl.namespaceMapping))// XXX TODO: not the correct namespace mapping, must us that of bind
 
         try evaluateBoundItem map (XFormsControl.isAllowedBoundItem(control, _)) getOrElse false
         catch { case _ ⇒ false }
     }
 
     // For a given value control name and XPath sequence, whether the resulting bound item is acceptable
-    def isAllowedValueBoundItem(controlName: String, itemOption: Option[Item]) = {
+    def isAllowedBoundItem(controlName: String, itemOption: Option[Item]) = {
         for {
             item ← itemOption
             control ← findStaticControlByName(controlName)

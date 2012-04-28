@@ -155,7 +155,7 @@ public class InstanceReplacer extends BaseReplacer {
                             "instance", updatedInstance.getEffectiveId());
 
                     newInstance = new XFormsInstance(updatedInstance.staticId(), updatedInstance.modelEffectiveId(),
-                            connectionResult.resourceURI, p2.credentials,
+                            connectionResult.resourceURI,
                             p2.isCache, p2.timeToLive, resultingRequestBodyHash, p2.isReadonly, updatedInstance.validation(), p2.isHandleXInclude, exposeXPathTypes,
                             XFormsInstance.wrapDocument((Document) resultingDocument, exposeXPathTypes), false);
                 } else {
@@ -166,7 +166,7 @@ public class InstanceReplacer extends BaseReplacer {
                             "instance", updatedInstance.getEffectiveId());
 
                     newInstance = new XFormsInstance(updatedInstance.staticId(), updatedInstance.modelEffectiveId(),
-                            connectionResult.resourceURI, p2.credentials,
+                            connectionResult.resourceURI,
                             p2.isCache, p2.timeToLive, resultingRequestBodyHash, p2.isReadonly, updatedInstance.validation(), p2.isHandleXInclude, exposeXPathTypes,
                             (DocumentInfo) resultingDocument, false);
                 }

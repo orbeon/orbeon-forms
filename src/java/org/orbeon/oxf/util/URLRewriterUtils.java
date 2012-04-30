@@ -93,6 +93,10 @@ public class URLRewriterUtils {
 
         assert (rewriteMode & ExternalContext.Response.REWRITE_MODE_ABSOLUTE) != 0;
 
+        // Case where a protocol is specified: the URL is left untouched
+        if (NetUtils.urlHasProtocol(urlString))
+            return urlString;
+
         final String baseURIProperty = getServiceBaseURI();
         if (StringUtils.isBlank(baseURIProperty)) {
             // Property not specified, use request to build base URI

@@ -654,7 +654,7 @@
     <!-- NOTE: keep non-relevant fields for now, as this is what's done for save/update. Should probably be configurable by the form author. -->
     <!-- TODO: possibly: pass app/form name, e.g.: resource="{$workflow-success-uri}?fr-app={$app}&amp;fr-form={$form}" -->
     <xforms:submission id="fr-workflow-send-submission"
-        resource="{$workflow-success-uri}"
+        resource="{concat($workflow-success-uri, if (contains($workflow-success-uri, '?')) then '&amp;' else '?', 'document=', $document)}"
         relevant="{xxforms:property(string-join(('oxf.fr.detail.send.success.prune', $app, $form), '.'))}"
         validate="false" method="{$workflow-success-method}"
         serialization="{if ($workflow-success-method = 'get') then 'none' else 'application/xml'}"

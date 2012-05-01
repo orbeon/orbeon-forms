@@ -104,6 +104,9 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
     // Global XForms function library
     private static FunctionLibrary functionLibrary = XFormsFunctionLibrary.instance();
 
+    // Whether the document supports updates
+    private final boolean supportUpdates;
+
     // Whether this document is currently being initialized
     private boolean initializing;
 
@@ -204,6 +207,10 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
 
             this.xpathDependencies = Version.instance().createUIDependencies(this);
 
+            // Whether we support updates
+            // NOTE: Reading the property requires the static state set above
+            this.supportUpdates = ! XFormsProperties.isNoUpdates(this);
+
             // Remember parameters used during initialization
             this.uriResolver = uriResolver;
             this.response = response;
@@ -279,8 +286,9 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
      * Used by XFormsStateManager.
      *
      * @param xformsState       XFormsState containing static and dynamic state
+     * @param disableUpdates    whether to disable updates (for recreating initial document upon browser back)
      */
-    public XFormsContainingDocument(XFormsState xformsState) {
+    public XFormsContainingDocument(XFormsState xformsState, boolean disableUpdates) {
         super(CONTAINING_DOCUMENT_PSEUDO_ID, CONTAINING_DOCUMENT_PSEUDO_ID, CONTAINING_DOCUMENT_PSEUDO_ID, "", null, null, null);
 
         // 1. Restore the static state
@@ -314,6 +322,8 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
             setLocationData(this.staticState.locationData());
             this.staticOps = new StaticStateGlobalOps(staticState.topLevelPart());
             this.xpathDependencies = Version.instance().createUIDependencies(this);
+
+            this.supportUpdates = ! disableUpdates && ! XFormsProperties.isNoUpdates(this);
         }
 
         // 2. Restore the dynamic state
@@ -420,13 +430,16 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
     }
 
     /**
-     * Whether the document is currently in a mode where it must handle differences. This is the case when the document
-     * is initializing and producing the initial output.
+     * Whether the document is currently in a mode where it must remember differences. This is the case when:
+     *
+     * - the document is currently handling an update (as opposed to initialization)
+     * - the property "no-updates" is false (the default)
+     * - the document is
      *
      * @return  true iif the document must handle differences
      */
     public boolean isHandleDifferences() {
-        return !initializing;
+        return ! initializing && supportUpdates;
     }
 
     /**

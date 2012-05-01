@@ -231,13 +231,6 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
         dndAttribute != null && dndAttribute != "none"
     }
 
-    override protected def pushBindingImpl(parentContext: BindingContext) = {
-        // Do this before pushBinding() because after that controls are temporarily in an inconsistent state
-        containingDocument.getControls.cloneInitialStateIfNeeded()
-
-        super.pushBindingImpl(parentContext)
-    }
-
     def updateNodesetForInsertDelete(insertedNodeInfos: JList[Item]): Unit = {
 
         // Get old nodeset
@@ -255,6 +248,9 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
                 // If there are some preceding variables in scope, the top of the stack is now the last scoped variable
                 contextStack.popBinding
             }
+
+            // Do this before pushBinding() because after that controls are temporarily in an inconsistent state
+            containingDocument.getControls.cloneInitialStateIfNeeded()
 
             pushBinding(contextStack.getCurrentBindingContext, update = true)
         }

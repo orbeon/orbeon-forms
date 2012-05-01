@@ -433,9 +433,6 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         // Ensure schema are loaded
         loadSchemasIfNeeded();
 
-        // Restore instances
-        restoreInstances();
-
         // Refresh binds, but do not recalculate (only evaluate "computed expression binds")
         deferredActionContext.rebuild = true;
         deferredActionContext.revalidate = true;
@@ -449,7 +446,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
     /**
      * Restore all the instances serialized as children of the given container element.
      */
-    private void restoreInstances() {
+    public void restoreInstances() {
 
         // Find serialized instances from context
         final List<XFormsInstance> contextInstances = (List<XFormsInstance>) PipelineContext.get().getAttribute(XBLContainer.XFORMS_DYNAMIC_STATE_RESTORE_INSTANCES);

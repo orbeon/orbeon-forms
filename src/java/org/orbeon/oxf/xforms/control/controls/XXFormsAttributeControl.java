@@ -65,7 +65,7 @@ public class XXFormsAttributeControl extends XFormsValueControl {
     }
 
     @Override
-    protected void evaluateValue() {
+    public void evaluateValue() {
         // Value comes from the AVT value attribute
         final String rawValue = evaluateAvt(attributeValue);
         super.setValue((rawValue != null) ? rawValue : "");
@@ -96,7 +96,7 @@ public class XXFormsAttributeControl extends XFormsValueControl {
     }
 
     @Override
-    protected void evaluateExternalValue() {
+    public void evaluateExternalValue() {
         // Determine attribute value
         setExternalValue(getExternalValueHandleSrc(getValue(), attributeName, forName));
     }

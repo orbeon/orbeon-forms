@@ -26,16 +26,19 @@ import java.util.{Map ⇒ JMap, List ⇒ JList}
 object Controls {
 
     // Create the entire tree of control from the root
-    def createTree(containingDocument: XFormsContainingDocument, controlIndex: ControlIndex, state: JMap[String, JMap[String, String]]) {
+    def createTree(containingDocument: XFormsContainingDocument, controlIndex: ControlIndex, state: JMap[String, JMap[String, String]]) = {
 
         val bindingContext = containingDocument.getContextStack.resetBindingContext()
         val rootControl = containingDocument.getStaticState.topLevelPart.getTopLevelControls.head
 
-        buildTree(controlIndex, containingDocument, bindingContext, None, rootControl, Seq(), Option(state)) foreach { root ⇒
-            if (XFormsProperties.getDebugLogging.contains("control-tree"))
-                containingDocument.getControls.getIndentedLogger.logDebug("new control tree", root.toXMLString)
-        }
+        buildTree(controlIndex, containingDocument, bindingContext, None, rootControl, Seq(), Option(state))
     }
+
+    def logXML(control: Option[XFormsControl], message: String): Unit =
+        if (XFormsProperties.getDebugLogging.contains("control-tree"))
+            control foreach { control ⇒
+                control.containingDocument.getControls.getIndentedLogger.logDebug(message, control.toXMLString)
+            }
 
     // Create a new repeat iteration for insertion into the current tree of controls
     def createRepeatIterationTree(

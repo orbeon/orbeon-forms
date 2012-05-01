@@ -47,7 +47,9 @@ import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
 import org.xml.sax.SAXException;
+import scala.Option;
 import scala.Tuple3;
+import org.orbeon.oxf.xforms.control.Controls;
 
 import java.io.IOException;
 import java.util.*;
@@ -501,7 +503,12 @@ public class XFormsServer extends ProcessorImpl {
                     initialContainingDocument = null;
                 } else {
                     // NOTE: Document is removed from cache if it was found there. This may or may not be desirable.
-                    initialContainingDocument = XFormsStateManager.instance().findOrRestoreDocument(XFormsStateManager.instance().extractParameters(requestDocument, true), true);
+                    // Set disableUpdates = true so that we don't needlessly try to copy the controls tree. Also addresses:
+                    // #54: "Browser back causes server exception" https://github.com/orbeon/orbeon-forms/issues/54
+                    initialContainingDocument = XFormsStateManager.instance().findOrRestoreDocument(
+                        XFormsStateManager.instance().extractParameters(requestDocument, true),
+                        true,
+                        true);
                 }
 
                 ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "action");
@@ -515,6 +522,7 @@ public class XFormsServer extends ProcessorImpl {
                         // Reload / back case: diff between current state and initial state as obtained from initial dynamic state
                         final ControlTree currentControlTree = xformsControls.getCurrentControlTree();
                         final ControlTree initialControlTree = initialContainingDocument.getControls().getCurrentControlTree();
+
                         diffControls(ch, containingDocument, indentedLogger, initialControlTree.getChildren(),
                                 currentControlTree.getChildren(), null, testOutputAllActions);
                     } else if (testOutputAllActions || containingDocument.isDirtySinceLastRequest()) {
@@ -536,6 +544,7 @@ public class XFormsServer extends ProcessorImpl {
                         // Reload / back case: diff between current state and initial state as obtained from initial dynamic state
                         final ControlTree currentControlTree = xformsControls.getCurrentControlTree();
                         final ControlTree initialControlTree = initialContainingDocument.getControls().getCurrentControlTree();
+
                         diffIndexState(ch, containingDocument, XFormsRepeatControl.findInitialIndexes(containingDocument, initialControlTree),
                                 XFormsRepeatControl.findCurrentIndexes(containingDocument, currentControlTree));
                     } else if (!testOutputAllActions && containingDocument.isDirtySinceLastRequest()) {

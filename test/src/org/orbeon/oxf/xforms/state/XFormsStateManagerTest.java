@@ -328,7 +328,7 @@ public class XFormsStateManagerTest extends ResourceManagerTestBase {
         final State state2 = new State();
 
         // Find document
-        state2.document = XFormsStateManager.instance().findOrRestoreDocument(parameters, true);
+        state2.document = XFormsStateManager.instance().findOrRestoreDocument(parameters, true, false);
 
         assertNotSame(state1.document, state2.document);// can't be the same because either cache is disabled OR we create a duplicate document (could be same if state1 is initial state)
 

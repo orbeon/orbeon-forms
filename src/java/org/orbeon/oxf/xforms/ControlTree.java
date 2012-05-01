@@ -432,6 +432,10 @@ public class ControlTree implements ExternalCopyable {
         this.isBindingsDirty = true;
     }
 
+    public XFormsContainerControl getRoot() {
+        return root;
+    }
+
     public void setRoot(XFormsContainerControl root) {
         this.root = root;
     }

@@ -102,7 +102,7 @@ public class XFormsOutputControl extends XFormsValueControl {
     }
 
     @Override
-    protected void evaluateValue() {
+    public void evaluateValue() {
         final String value;
         if (valueAttribute == null) {
             // Get value from single-node binding
@@ -116,7 +116,7 @@ public class XFormsOutputControl extends XFormsValueControl {
     }
 
     @Override
-    protected void evaluateExternalValue() {
+    public void evaluateExternalValue() {
 
         assert isRelevant();
 

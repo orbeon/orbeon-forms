@@ -76,7 +76,7 @@ public class XFormsRangeControl extends XFormsValueControl {
     }
 
     @Override
-    protected void evaluateExternalValue() {
+    public void evaluateExternalValue() {
         final String internalValue = getValue();
         final String updatedValue;
         if (internalValue == null) {// can it be really?

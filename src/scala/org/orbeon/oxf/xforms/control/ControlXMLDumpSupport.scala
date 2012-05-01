@@ -25,7 +25,7 @@ trait ControlXMLDumpSupport extends DebugXML{
 
     self: XFormsControl ⇒
 
-    def toXML(helper: ContentHandlerHelper, attributes: List[String])(content: ⇒ Unit) {
+    def toXML(helper: ContentHandlerHelper, attributes: List[String])(content: ⇒ Unit): Unit = {
 
         def itemToString(i: Item) = i match {
             case atomic: AtomicValue ⇒ atomic.getStringValue
@@ -45,7 +45,7 @@ trait ControlXMLDumpSupport extends DebugXML{
         helper.endElement()
     }
 
-    def toXML(helper: ContentHandlerHelper) = {
+    def toXML(helper: ContentHandlerHelper): Unit = {
         helper.startDocument()
         toXML(helper, List.empty)()
         helper.endDocument()
@@ -54,6 +54,6 @@ trait ControlXMLDumpSupport extends DebugXML{
     def toXMLString =
         Dom4jUtils.domToPrettyString(XMLUtils.createDocument(this))
 
-    def dumpXML() =
+    def dumpXML(): Unit =
         println(toXMLString)
 }

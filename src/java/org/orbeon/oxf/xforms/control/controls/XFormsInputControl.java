@@ -94,7 +94,7 @@ public class XFormsInputControl extends XFormsValueControl implements FocusableT
     }
 
     @Override
-    protected void evaluateExternalValue() {
+    public void evaluateExternalValue() {
 
         assert isRelevant();
 
@@ -511,7 +511,7 @@ public class XFormsInputControl extends XFormsValueControl implements FocusableT
                             + XFormsProperties.getTypeInputFormat(containingDocument(), valueType)
                             + "', 'en', (), ()) else $v";
 
-            return evaluateAsString(boundItem, xpathExpression, FORMAT_NAMESPACE_MAPPING, variables);
+            return evaluateAsString(boundItem, xpathExpression, XFormsValueControl.FORMAT_NAMESPACE_MAPPING(), variables);
         }
     }
 

@@ -14,9 +14,6 @@
 package org.orbeon.oxf.xforms.state;
 
 import org.dom4j.Document;
-import org.orbeon.oxf.pipeline.api.ExternalContext;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 
 /**
@@ -36,7 +33,7 @@ public interface XFormsStateLifecycle {
 
     RequestParameters extractParameters(Document request, boolean isInitialState);
 
-    XFormsContainingDocument findOrRestoreDocument(RequestParameters parameters, boolean isInitialState);
+    XFormsContainingDocument findOrRestoreDocument(RequestParameters parameters, boolean isInitialState, boolean updates);
 
     XFormsContainingDocument beforeUpdate(RequestParameters parameters);
     void beforeUpdateResponse(XFormsContainingDocument containingDocument, boolean ignoreSequence);

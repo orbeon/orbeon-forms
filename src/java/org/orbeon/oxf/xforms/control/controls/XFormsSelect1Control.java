@@ -188,7 +188,7 @@ public class XFormsSelect1Control extends XFormsValueControl implements Focusabl
     }
 
     @Override
-    protected void evaluateExternalValue() {
+    public void evaluateExternalValue() {
         final String internalValue = getValue();
         final String updatedValue;
 

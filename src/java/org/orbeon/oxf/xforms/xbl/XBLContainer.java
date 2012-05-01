@@ -627,9 +627,15 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
 
     public void restoreModelsState() {
         // Handle this container only
-        for (final XFormsModel model: models) {
+
+        // 1: Restore all instances
+        for (final XFormsModel model: models)
+            model.restoreInstances();
+
+        // 2: Restore everything else
+        // NOTE: It's important to do this as a separate step, because variables which might refer to other models' instances.
+        for (final XFormsModel model: models)
             model.restoreState();
-        }
     }
 
     public void startOutermostActionHandler() {

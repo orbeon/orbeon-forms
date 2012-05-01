@@ -305,7 +305,7 @@ public class XFormsStateManager implements XFormsStateLifecycle {
 
         // We got the lock, return the document
 
-        return findOrRestoreDocument(parameters, false);
+        return findOrRestoreDocument(parameters, false, false);
     }
 
     public static Lock getDocumentLock(String uuid) {
@@ -410,9 +410,10 @@ public class XFormsStateManager implements XFormsStateLifecycle {
      *
      * @param parameters        update parameters
      * @param isInitialState    whether to return the initial state, otherwise return the current state
+     * @param disableUpdates    whether to disable updates (for recreating initial document upon browser back)
      * @return                  document, either from cache or from state information
      */
-    public XFormsContainingDocument findOrRestoreDocument(RequestParameters parameters, boolean isInitialState) {
+    public XFormsContainingDocument findOrRestoreDocument(RequestParameters parameters, boolean isInitialState, boolean disableUpdates) {
 
         // Try cache first unless the initial state is requested
         if (!isInitialState) {
@@ -435,10 +436,10 @@ public class XFormsStateManager implements XFormsStateLifecycle {
         }
 
         // Must recreate from store
-        return createDocumentFromStore(parameters, isInitialState);
+        return createDocumentFromStore(parameters, isInitialState, disableUpdates);
     }
 
-    private XFormsContainingDocument createDocumentFromStore(RequestParameters parameters, boolean isInitialState) {
+    private XFormsContainingDocument createDocumentFromStore(RequestParameters parameters, boolean isInitialState, boolean disableUpdates) {
 
         final boolean isServerState = parameters.getEncodedClientStaticState() == null;
 
@@ -487,7 +488,7 @@ public class XFormsStateManager implements XFormsStateLifecycle {
         }
 
         // Create document
-        final XFormsContainingDocument document = new XFormsContainingDocument(xformsState);
+        final XFormsContainingDocument document = new XFormsContainingDocument(xformsState, disableUpdates);
         assert isServerState ? document.getStaticState().isServerStateHandling() : document.getStaticState().isClientStateHandling();
         return document;
     }

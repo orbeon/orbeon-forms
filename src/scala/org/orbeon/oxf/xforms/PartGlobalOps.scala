@@ -18,7 +18,7 @@ import analysis.ElementAnalysis
 import analysis.model.Instance
 import event.EventHandler
 import org.dom4j.{Element, QName}
-import java.util.{List ⇒ JList}
+import java.util.{List ⇒ JList, Collection ⇒ JCollection}
 import org.orbeon.oxf.xml.SAXStore
 import xbl.{Scope, XBLBindings, ConcreteBinding}
 import org.apache.commons.lang.StringUtils
@@ -29,11 +29,12 @@ trait PartGlobalOps {
     def getMark(prefixedId: String): SAXStore#Mark
 
     // Models
-    def getInstances(modelPrefixedId: String): java.util.Collection[Instance]
+    def getInstances(modelPrefixedId: String): JCollection[Instance]
 
     // Controls
     def getControlAnalysis(prefixedId: String): ElementAnalysis
     def hasControlByName(controlName: String): Boolean
+    def controlsByName(controlName: String): Traversable[ElementAnalysis]
     def hasControlAppearance(controlName: String, appearance: QName): Boolean
     def hasInputPlaceholder: Boolean
 

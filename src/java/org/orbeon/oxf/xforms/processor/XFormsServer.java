@@ -30,6 +30,7 @@ import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.action.XFormsAPI;
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl;
@@ -522,6 +523,14 @@ public class XFormsServer extends ProcessorImpl {
                         // Reload / back case: diff between current state and initial state as obtained from initial dynamic state
                         final ControlTree currentControlTree = xformsControls.getCurrentControlTree();
                         final ControlTree initialControlTree = initialContainingDocument.getControls().getCurrentControlTree();
+
+                        // Make sure all xxforms:dynamic will send full updates during control comparison
+                        // Usually, xxforms:dynamic records structural changes at each update. Here, we don't really
+                        // know whether there were any, so we safely force structural changes. This ensures that the
+                        // client will have all the necessary markup, and also prevents the comparator from choking when
+                        // comparing incompatible trees.
+                        for (final ElementAnalysis e : containingDocument.getStaticOps().jControlsByName("dynamic"))
+                            containingDocument.addControlStructuralChange(e.prefixedId());
 
                         diffControls(ch, containingDocument, indentedLogger, initialControlTree.getChildren(),
                                 currentControlTree.getChildren(), null, testOutputAllActions);

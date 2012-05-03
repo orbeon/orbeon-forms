@@ -470,7 +470,7 @@ class BindTree(model: Model, bindElements: Seq[Element]) {
                 }
 
             // Analyze children
-            val childrenSucceeded = (_children map (_.analyzeXPathGather)).foldLeft(true)(_ && _)
+            val childrenSucceeded = _children map (_.analyzeXPathGather) forall identity
 
             // Result
             refSucceeded && childrenSucceeded
@@ -520,7 +520,7 @@ class BindTree(model: Model, bindElements: Seq[Element]) {
 
     def analyzeBindsXPath(): Unit = {
         // Analyze all binds and return whether all of them were successfully analyzed
-        figuredAllBindRefAnalysis = (topLevelBinds map (_.analyzeXPathGather)).foldLeft(true)(_ && _)
+        figuredAllBindRefAnalysis = topLevelBinds map (_.analyzeXPathGather) forall identity
 
         // Analyze all MIPs
         // NOTE: Do this here, because MIPs can depend on bind/@name, which requires all bind/@ref to be analyzed first

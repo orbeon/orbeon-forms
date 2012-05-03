@@ -466,21 +466,19 @@ public class XFormsStateManager implements XFormsStateLifecycle {
 
                 final String UNABLE_TO_RETRIEVE_XFORMS_STATE_MESSAGE = "Unable to retrieve XForms engine state.";
                 final String PLEASE_RELOAD_PAGE_MESSAGE = "Please reload the current page. Note that you will lose any unsaved changes.";
-                final String UUIDS_MESSAGE = "UUID: " + parameters.getUUID();
 
                 // Produce exception
                 final ExternalContext.Session currentSession =  externalContext.getSession(false);
+                final String message;
                 if (currentSession == null || currentSession.isNew()) {
                     // This means that no session is currently existing, or a session exists but it is newly created
-                    final String message = "Your session has expired. " + PLEASE_RELOAD_PAGE_MESSAGE;
-                    indentedLogger.logError("", message);
-                    throw new OXFException(message + " " + UUIDS_MESSAGE);
+                    message = "Your session has expired. " + PLEASE_RELOAD_PAGE_MESSAGE;
                 } else {
                     // There is a session and it is still known by the client
-                    final String message = UNABLE_TO_RETRIEVE_XFORMS_STATE_MESSAGE + " " + PLEASE_RELOAD_PAGE_MESSAGE;
-                    indentedLogger.logError("", message);
-                    throw new OXFException(message + " " + UUIDS_MESSAGE);
+                    message = UNABLE_TO_RETRIEVE_XFORMS_STATE_MESSAGE + " " + PLEASE_RELOAD_PAGE_MESSAGE;
                 }
+                indentedLogger.logError("", message);
+                throw new OXFException(message);
             }
         } else {
             // State comes directly with request

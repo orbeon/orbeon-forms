@@ -22,11 +22,6 @@
     <property as="xs:string"  name="oxf.xforms.password"                             value="UnitTestsOrbeonPassword"/>
 
     <property as="xs:string"  name="oxf.xforms.state-handling"                       value="server"/>
-    <property as="xs:integer" name="oxf.xforms.store.application.size"               value="20000"/>
-    <property as="xs:string"  name="oxf.xforms.store.application.username"           value="guest"/>
-    <property as="xs:string"  name="oxf.xforms.store.application.password"           value="guest"/>
-    <property as="xs:anyURI"  name="oxf.xforms.store.application.uri"                value="xmldb:exist:///"/>
-    <property as="xs:string"  name="oxf.xforms.store.application.collection"         value="/db/orbeon/xforms/cache/"/>
 
     <property as="xs:string"   name="oxf.xforms.resources.baseline"                  value="fr:button fr:tabview fr:autocomplete"/>
 

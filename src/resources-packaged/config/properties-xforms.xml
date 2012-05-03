@@ -69,18 +69,6 @@
     <property as="xs:string"  name="oxf.xforms.format.input.date"                       value="[M]/[D]/[Y]"/> <!-- [M]/[D]/[Y]  or [D]/[M]/[Y] or [D].[M].[Y]-->
     <property as="xs:string"  name="oxf.xforms.format.input.time"                       value="[h]:[m]:[s] [P]"/> <!-- [h]:[m]:[s] [P]  or  [h]:[m]:[s] [P,2-2]  or  [H]:[m]:[s] -->
 
-    <!-- XForms cache configuration -->
-    <property as="xs:string"  name="oxf.xforms.state-handling"                          value="server"/>
-    <property as="xs:integer" name="oxf.xforms.store.application.size"                  value="20000000"/>
-    <property as="xs:string"  name="oxf.xforms.store.application.username"              value="guest"/>
-    <property as="xs:string"  name="oxf.xforms.store.application.password"              value="guest"/>
-    <property as="xs:anyURI"  name="oxf.xforms.store.application.uri"                   value="xmldb:exist:///"/>
-    <property as="xs:string"  name="oxf.xforms.store.application.collection"            value="/db/orbeon/xforms/cache/"/>
-    <property as="xs:boolean" name="oxf.xforms.cache.document"                          value="true"/>
-    <property as="xs:integer" name="oxf.xforms.cache.documents.size"                    value="50"/>
-    <property as="xs:integer" name="oxf.xforms.cache.static-state.size"                 value="50"/>
-    <property as="xs:integer" name="oxf.xforms.cache.shared-instances.size"             value="50"/>
-
     <!-- Other XForms options -->
     <property as="xs:string"  name="oxf.xforms.order"                                       value="label control help alert hint"/>
     <property as="xs:string"  name="oxf.xforms.label-element"                               value="label"/>

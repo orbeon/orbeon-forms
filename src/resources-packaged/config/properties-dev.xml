@@ -20,6 +20,8 @@
     <xi:include href="oxf:/config/properties-form-runner.xml"/>
     <xi:include href="oxf:/config/properties-form-builder.xml"/>
 
+    <property as="xs:boolean" name="oxf.http.exceptions"                                     value="true"/>
+
     <property as="xs:string"  processor-name="oxf:builtin-saxon"        name="location-mode" value="smart"/>
     <property as="xs:string"  processor-name="oxf:unsafe-builtin-saxon" name="location-mode" value="smart"/>
 

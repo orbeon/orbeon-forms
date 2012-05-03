@@ -13,7 +13,7 @@
   -->
 <!--
 
-  This stylesheet is called from error.xpl and is used to format OPS and Java stack traces.
+  This stylesheet is called from error.xpl and is used to format Orbeon and Java stack traces.
   Developers can customize this at will.
 
 -->
@@ -55,52 +55,55 @@
             <head>
                 <title><xsl:value-of select="$title"/></title>
                 <link rel="stylesheet" href="/config/theme/error.css" type="text/css"/>
-                <script type="text/javascript">
-                    <![CDATA[
-                    function hideShowTBody(id) {
-                        var tbody = document.getElementById(id);
-                        for (var i = 0; tbody.rows.length > i; i++) {
-                            var row = tbody.rows[i];
-                            if (row.style.display == 'none') row.style.display = '';
-                            else row.style.display = 'none';
-                        }
-                    }
-
-                    function hideShowSection (handlerElement) {
-                        var detailsHidden = getElementById("orbeon-error-panel-details-hidden");
-                        var detailsShown = getElementById("orbeon-error-panel-details-shown");
-
-                        if (handlerElement.className == "orbeon-error-panel-show-details") {
-                            detailsHidden.style.display = "none";
-                            detailsShown.style.display = "block";
-                        } else {
-                            detailsHidden.style.display = "block";
-                            detailsShown.style.display = "none";
-                        }
-                    }
-
-                    function getElementById(controlId) {
-                        var result = document.getElementById(controlId);
-                        if (result && (result.id != controlId) && document.all) {
-                            result = null;
-                            documentAll = document.all[controlId];
-                            if (documentAll) {
-                                if (documentAll.length) {
-                                    for (var i = 0; i < documentAll.length; i++) {
-                                        if (documentAll[i].id == controlId) {
-                                            result = documentAll[i];
-                                            break;
-                                        }
-                                    }
-                                } else {
-                                    result = documentAll;
-                                }
+                <!-- Only output the script if exceptions are present -->
+                <xsl:if test="/exceptions/exception">
+                    <script type="text/javascript">
+                        <![CDATA[
+                        function hideShowTBody(id) {
+                            var tbody = document.getElementById(id);
+                            for (var i = 0; tbody.rows.length > i; i++) {
+                                var row = tbody.rows[i];
+                                if (row.style.display == 'none') row.style.display = '';
+                                else row.style.display = 'none';
                             }
                         }
-                        return result;
-                    }
-                    ]]>
-                </script>
+
+                        function hideShowSection (handlerElement) {
+                            var detailsHidden = getElementById("orbeon-error-panel-details-hidden");
+                            var detailsShown = getElementById("orbeon-error-panel-details-shown");
+
+                            if (handlerElement.className == "orbeon-error-panel-show-details") {
+                                detailsHidden.style.display = "none";
+                                detailsShown.style.display = "block";
+                            } else {
+                                detailsHidden.style.display = "block";
+                                detailsShown.style.display = "none";
+                            }
+                        }
+
+                        function getElementById(controlId) {
+                            var result = document.getElementById(controlId);
+                            if (result && (result.id != controlId) && document.all) {
+                                result = null;
+                                documentAll = document.all[controlId];
+                                if (documentAll) {
+                                    if (documentAll.length) {
+                                        for (var i = 0; i < documentAll.length; i++) {
+                                            if (documentAll[i].id == controlId) {
+                                                result = documentAll[i];
+                                                break;
+                                            }
+                                        }
+                                    } else {
+                                        result = documentAll;
+                                    }
+                                }
+                            }
+                            return result;
+                        }
+                        ]]>
+                    </script>
+                </xsl:if>
             </head>
             <body>
                 <div class="orbeon-error-panel">
@@ -128,113 +131,136 @@
                         </li>
                         <li>Return <a href="/">home</a>.</li>
                     </ul>
-                    <!-- Error message -->
-                    <h2>Error Message</h2>
-                    <p class="orbeon-error-panel-message">
-                        <xsl:call-template name="format-message">
-                            <xsl:with-param name="exceptions" select="/exceptions/exception"/>
-                        </xsl:call-template>
-                    </p>
-                    <!-- Details -->
-                    <div id="orbeon-error-panel-details-hidden">
-                        <p>
-                            <a class="orbeon-error-panel-show-details" onclick="hideShowSection(this)">
-                                <img src="/ops/images/xforms/section-closed.png" alt="Show Details"/>
-                                <span>Show details</span>
-                            </a>
+                    <!-- Only output the exceptions if they are present -->
+                    <xsl:if test="/exceptions/exception">
+                        <!-- Error message -->
+                        <h2>Error Message</h2>
+                        <p class="orbeon-error-panel-message">
+                            <xsl:call-template name="format-message">
+                                <xsl:with-param name="exceptions" select="/exceptions/exception"/>
+                            </xsl:call-template>
                         </p>
-                    </div>
-                    <div id="orbeon-error-panel-details-shown" class="orbeon-error-disabled">
-                        <p>
-                            <a class="orbeon-error-panel-hide-details" onclick="hideShowSection(this)">
-                                <img src="/ops/images/xforms/section-opened.png" alt="Hide Details"/>
-                                <span>Hide details</span>
-                            </a>
-                        </p>
-                        <div class="orbeon-error-panel-details">
-                            <!-- Call stack -->
-                            <h2>Orbeon Forms call stack</h2>
-                            <div class="orbeon-error-panel-call-stack">
-                                <xsl:call-template name="format-orbeon-call-stack">
-                                    <xsl:with-param name="exceptions" select="/exceptions/exception"/>
-                                </xsl:call-template>
-                            </div>
-                            <!-- Java exception -->
-                            <h2>Java exception</h2>
+                        <!-- Details -->
+                        <div id="orbeon-error-panel-details-hidden">
                             <p>
-                                Java exceptions are the native mechanism by which Orbeon Forms reports errors. More
-                                than one exception may be provided below but usually the first exception along with the
-                                Orbeon Forms Stack Trace above provide enough information to track down an issue.
+                                <a class="orbeon-error-panel-show-details" onclick="hideShowSection(this)">
+                                    <img src="/ops/images/xforms/section-closed.png" alt="Show Details"/>
+                                    <span>Show details</span>
+                                </a>
                             </p>
-                            <table class="orbeon-error-table orbeon-error-java-table">
-                                <xsl:for-each select="/exceptions/exception[last()]">
-                                    <xsl:sort select="position()" order="descending"/>
-                                    <xsl:variable name="exception-position" select="position()"/>
-                                    <tr>
-                                        <th colspan="2" style="text-align: left">
-                                            <span onclick="hideShowTBody('exception-{$exception-position}')">
-                                                <img src="/ops/images/xforms/section-closed.png" border="0" alt="Toggle"/>
-                                            </span>
-                                            <xsl:text> </xsl:text>
-                                            <xsl:value-of select="type"/>
-                                        </th>
-                                    </tr>
-                                    <xsl:variable name="exception-style" select="concat('display: ', if ($exception-position = 1) then '' else 'none')"/>
-                                    <tbody id="exception-{$exception-position}">
-                                        <tr style="{$exception-style}">
-                                            <th>Exception Class</th>
-                                            <td>
+                        </div>
+                        <div id="orbeon-error-panel-details-shown" class="orbeon-error-disabled">
+                            <p>
+                                <a class="orbeon-error-panel-hide-details" onclick="hideShowSection(this)">
+                                    <img src="/ops/images/xforms/section-opened.png" alt="Hide Details"/>
+                                    <span>Hide details</span>
+                                </a>
+                            </p>
+                            <div class="orbeon-error-panel-details">
+                                <!-- Call stack -->
+                                <h2>Orbeon Forms call stack</h2>
+                                <div class="orbeon-error-panel-call-stack">
+                                    <xsl:call-template name="format-orbeon-call-stack">
+                                        <xsl:with-param name="exceptions" select="/exceptions/exception"/>
+                                    </xsl:call-template>
+                                </div>
+                                <!-- Java exception -->
+                                <h2>Java exception</h2>
+                                <p>
+                                    Java exceptions are the native mechanism by which Orbeon Forms reports errors. More
+                                    than one exception may be provided below but usually the first exception along with the
+                                    Orbeon Forms Stack Trace above provide enough information to track down an issue.
+                                </p>
+                                <table class="orbeon-error-table orbeon-error-java-table">
+                                    <xsl:for-each select="/exceptions/exception[last()]">
+                                        <xsl:sort select="position()" order="descending"/>
+                                        <xsl:variable name="exception-position" select="position()"/>
+                                        <tr>
+                                            <th colspan="2" style="text-align: left">
+                                                <span onclick="hideShowTBody('exception-{$exception-position}')">
+                                                    <img src="/ops/images/xforms/section-closed.png" border="0" alt="Toggle"/>
+                                                </span>
+                                                <xsl:text> </xsl:text>
                                                 <xsl:value-of select="type"/>
-                                            </td>
+                                            </th>
                                         </tr>
-                                        <tr style="{$exception-style}">
-                                            <th>Message</th>
-                                            <td style="color: red">
-                                                <xsl:call-template name="htmlize-line-breaks">
-                                                    <xsl:with-param name="message" select="replace(string(message), ' ', '&#160;')"/>
-                                                </xsl:call-template>
-                                            </td>
-                                        </tr>
-                                        <xsl:for-each select="location[1]">
+                                        <xsl:variable name="exception-style" select="concat('display: ', if ($exception-position = 1) then '' else 'none')"/>
+                                        <tbody id="exception-{$exception-position}">
                                             <tr style="{$exception-style}">
-                                                <th>Resource URL</th>
+                                                <th>Exception Class</th>
                                                 <td>
-                                                    <xsl:value-of select="system-id"/>
+                                                    <xsl:value-of select="type"/>
                                                 </td>
                                             </tr>
                                             <tr style="{$exception-style}">
-                                                <th>Line</th>
-                                                <td>
-                                                    <xsl:value-of select="if (line castable as xs:positiveInteger) then line else 'N/A'"/>
+                                                <th>Message</th>
+                                                <td style="color: red">
+                                                    <xsl:call-template name="htmlize-line-breaks">
+                                                        <xsl:with-param name="message" select="replace(string(message), ' ', '&#160;')"/>
+                                                    </xsl:call-template>
                                                 </td>
                                             </tr>
-                                            <tr style="{$exception-style}">
-                                                <th>Column</th>
-                                                <td>
-                                                    <xsl:value-of select="if (column castable as xs:positiveInteger) then column else 'N/A'"/>
-                                                </td>
-                                            </tr>
-                                        </xsl:for-each>
-
-                                        <xsl:variable name="has-portlet-servlet" as="xs:boolean"
-                                                select="stack-trace-elements/element/class-name = $servlet-classes and stack-trace-elements/element/class-name = $portlet-classes"/>
-
-                                        <xsl:variable name="portlet-stack-trace" as="element()*"
-                                                      select="if ($has-portlet-servlet) then stack-trace-elements/element[class-name = $portlet-classes]/(., preceding-sibling::element) else ()"/>
-
-                                        <xsl:variable name="servlet-stack-trace" as="element()*"
-                                                      select="if ($has-portlet-servlet) then stack-trace-elements/element[class-name = $portlet-classes]/following-sibling::element else stack-trace-elements/element"/>
-
-                                        <xsl:if test="$has-portlet-servlet">
-                                            <xsl:for-each-group select="$portlet-stack-trace" group-ending-with="element[class-name = $portlet-classes]">
+                                            <xsl:for-each select="location[1]">
                                                 <tr style="{$exception-style}">
-                                                    <th valign="top">Portlet Stack Trace<br/>(<xsl:value-of select="count(current-group())"/> method calls)</th>
+                                                    <th>Resource URL</th>
+                                                    <td>
+                                                        <xsl:value-of select="system-id"/>
+                                                    </td>
+                                                </tr>
+                                                <tr style="{$exception-style}">
+                                                    <th>Line</th>
+                                                    <td>
+                                                        <xsl:value-of select="if (line castable as xs:positiveInteger) then line else 'N/A'"/>
+                                                    </td>
+                                                </tr>
+                                                <tr style="{$exception-style}">
+                                                    <th>Column</th>
+                                                    <td>
+                                                        <xsl:value-of select="if (column castable as xs:positiveInteger) then column else 'N/A'"/>
+                                                    </td>
+                                                </tr>
+                                            </xsl:for-each>
+
+                                            <xsl:variable name="has-portlet-servlet" as="xs:boolean"
+                                                    select="stack-trace-elements/element/class-name = $servlet-classes and stack-trace-elements/element/class-name = $portlet-classes"/>
+
+                                            <xsl:variable name="portlet-stack-trace" as="element()*"
+                                                          select="if ($has-portlet-servlet) then stack-trace-elements/element[class-name = $portlet-classes]/(., preceding-sibling::element) else ()"/>
+
+                                            <xsl:variable name="servlet-stack-trace" as="element()*"
+                                                          select="if ($has-portlet-servlet) then stack-trace-elements/element[class-name = $portlet-classes]/following-sibling::element else stack-trace-elements/element"/>
+
+                                            <xsl:if test="$has-portlet-servlet">
+                                                <xsl:for-each-group select="$portlet-stack-trace" group-ending-with="element[class-name = $portlet-classes]">
+                                                    <tr style="{$exception-style}">
+                                                        <th valign="top">Portlet Stack Trace<br/>(<xsl:value-of select="count(current-group())"/> method calls)</th>
+                                                        <td>
+                                                            <xsl:choose>
+                                                                <xsl:when test="current-group()">
+                                                                    <xsl:call-template name="format-java-stack-trace">
+                                                                        <xsl:with-param name="elements" select="current-group()"/>
+                                                                        <xsl:with-param name="trace-id" select="concat($exception-position, '-portlet-', position())"/>
+                                                                    </xsl:call-template>
+                                                                </xsl:when>
+                                                                <xsl:otherwise>
+                                                                    <code>
+                                                                        <xsl:value-of select="stack-trace"/>
+                                                                    </code>
+                                                                </xsl:otherwise>
+                                                            </xsl:choose>
+                                                        </td>
+                                                    </tr>
+                                                </xsl:for-each-group>
+                                            </xsl:if>
+                                            <xsl:for-each-group select="$servlet-stack-trace" group-ending-with="element[class-name = $servlet-classes]">
+                                                <tr style="{$exception-style}">
+                                                    <th valign="top">Servlet Stack Trace<br/>(<xsl:value-of select="count(current-group())"/> method calls)</th>
                                                     <td>
                                                         <xsl:choose>
                                                             <xsl:when test="current-group()">
                                                                 <xsl:call-template name="format-java-stack-trace">
                                                                     <xsl:with-param name="elements" select="current-group()"/>
-                                                                    <xsl:with-param name="trace-id" select="concat($exception-position, '-portlet-', position())"/>
+                                                                    <xsl:with-param name="trace-id" select="concat($exception-position, '-servlet-', position())"/>
                                                                 </xsl:call-template>
                                                             </xsl:when>
                                                             <xsl:otherwise>
@@ -246,32 +272,12 @@
                                                     </td>
                                                 </tr>
                                             </xsl:for-each-group>
-                                        </xsl:if>
-                                        <xsl:for-each-group select="$servlet-stack-trace" group-ending-with="element[class-name = $servlet-classes]">
-                                            <tr style="{$exception-style}">
-                                                <th valign="top">Servlet Stack Trace<br/>(<xsl:value-of select="count(current-group())"/> method calls)</th>
-                                                <td>
-                                                    <xsl:choose>
-                                                        <xsl:when test="current-group()">
-                                                            <xsl:call-template name="format-java-stack-trace">
-                                                                <xsl:with-param name="elements" select="current-group()"/>
-                                                                <xsl:with-param name="trace-id" select="concat($exception-position, '-servlet-', position())"/>
-                                                            </xsl:call-template>
-                                                        </xsl:when>
-                                                        <xsl:otherwise>
-                                                            <code>
-                                                                <xsl:value-of select="stack-trace"/>
-                                                            </code>
-                                                        </xsl:otherwise>
-                                                    </xsl:choose>
-                                                </td>
-                                            </tr>
-                                        </xsl:for-each-group>
-                                    </tbody>
-                                </xsl:for-each>
-                            </table>
+                                        </tbody>
+                                    </xsl:for-each>
+                                </table>
+                            </div>
                         </div>
-                    </div>
+                    </xsl:if>
                     <p class="orbeon-version"><xsl:value-of select="$orbeon-forms-version"/></p>
                 </div>
             </body>

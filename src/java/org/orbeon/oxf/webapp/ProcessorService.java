@@ -19,6 +19,7 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.InitUtils;
 import org.orbeon.oxf.pipeline.api.*;
 import org.orbeon.oxf.processor.Processor;
+import org.orbeon.oxf.properties.Properties;
 import org.orbeon.oxf.resources.ClassLoaderResourceManagerImpl;
 import org.orbeon.oxf.resources.ResourceManager;
 import org.orbeon.oxf.util.LoggerFactory;
@@ -46,9 +47,11 @@ public class ProcessorService {
     public static final String HTTP_FORCE_LAST_MODIFIED_PROPERTY = "oxf.http.force-last-modified";
 
     public static final String HTTP_ACCEPT_METHODS_PROPERTY = "oxf.http.accept-methods";
+    public static final String HTTP_EXCEPTIONS_PROPERTY = "oxf.http.exceptions";
+    public static final boolean DEFAULT_HTTP_EXCEPTIONS = false;
 
-    public static final String JNDI_CONTEXT = "jndi-context";
-    public static final String THROWABLE = "throwable";
+    public static final String JNDI_CONTEXT = "orbeon.jndi-context";
+    public static final String THROWABLE = "orbeon.throwable";
 
     public static Logger logger = LoggerFactory.createLogger(ProcessorService.class);
 
@@ -113,12 +116,20 @@ public class ProcessorService {
         }
     }
 
+    /**
+     * Whether to show exceptions to the client.
+     */
+    private boolean showExceptions() {
+        return Properties.instance().getPropertySet().getBoolean(HTTP_EXCEPTIONS_PROPERTY, DEFAULT_HTTP_EXCEPTIONS);
+    }
+
     private void serviceError(ExternalContext externalContext, Throwable throwable) throws IOException {
         if (errorProcessor != null) {
             // Create pipeline context
             final PipelineContext pipelineContext = new PipelineContext();
             // Put top-level throwable so that the exception page can show the Orbeon Forms call stack if available
-            pipelineContext.setAttribute(THROWABLE, throwable);
+            if (showExceptions())
+                pipelineContext.setAttribute(THROWABLE, throwable);
             // NOTE: Should this just be available from the ExternalContext?
             pipelineContext.setAttribute(JNDI_CONTEXT, jndiContext);
             try {
@@ -143,7 +154,7 @@ public class ProcessorService {
         final Throwable rootThrowable = OXFException.getRootThrowable(throwable);
         final LocationData rootLocationData = ValidationException.getRootLocationData(throwable);
 
-        final StringBuffer sb = new StringBuffer();
+        final StringBuilder sb = new StringBuilder();
         final ExternalContext.Response response = externalContext.getResponse();
         if (!response.isCommitted()) {
             // Send new headers and HTML prologue
@@ -179,34 +190,40 @@ public class ProcessorService {
         // Title
         sb.append("<body>");
         sb.append("<h1>Orbeon Forms Error</h1>");
-        sb.append("<table class=\"gridtable\">");
 
+        // Show details if allowed
+        if (showExceptions()) {
 
-        // Message and exception
-        sb.append("<tr><th>Type</th><td>")
-                .append(rootThrowable.getClass())
-                .append("</td></tr>");
-        sb.append("<tr><th>Message</th><td>")
-                .append(XMLUtils.escapeHTML(rootThrowable.getMessage())).
-                append("</td></tr>");
-        if (rootLocationData != null) {
-            sb.append("<tr><th>Location</th><td>")
-                    .append(rootLocationData.getSystemID())
+            sb.append("<table class=\"gridtable\">");
+
+            // Message and exception
+            sb.append("<tr><th>Type</th><td>")
+                    .append(rootThrowable.getClass())
                     .append("</td></tr>");
-            sb.append("<tr><th>Line</th><td>")
-                    .append(rootLocationData.getLine())
-                    .append("</td></tr>");
-            sb.append("<tr><th>Column</th><td>")
-                    .append(rootLocationData.getCol())
-                    .append("</td></tr>");
+            sb.append("<tr><th>Message</th><td>")
+                    .append(XMLUtils.escapeHTML(rootThrowable.getMessage())).
+                    append("</td></tr>");
+            if (rootLocationData != null) {
+                sb.append("<tr><th>Location</th><td>")
+                        .append(rootLocationData.getSystemID())
+                        .append("</td></tr>");
+                sb.append("<tr><th>Line</th><td>")
+                        .append(rootLocationData.getLine())
+                        .append("</td></tr>");
+                sb.append("<tr><th>Column</th><td>")
+                        .append(rootLocationData.getCol())
+                        .append("</td></tr>");
+            }
+
+            final StringBuilderWriter StringBuilderWriter = new StringBuilderWriter();
+            final PrintWriter printWriter = new PrintWriter(StringBuilderWriter);
+            rootThrowable.printStackTrace(printWriter);
+            sb.append("<tr><th valign=\"top\">Stack Trace</th><td><pre>")
+                    .append(XMLUtils.escapeHTML(StringBuilderWriter.toString()))
+                    .append("</pre></td></tr></table>");
         }
 
-        final StringBuilderWriter StringBuilderWriter = new StringBuilderWriter();
-        final PrintWriter printWriter = new PrintWriter(StringBuilderWriter);
-        rootThrowable.printStackTrace(printWriter);
-        sb.append("<tr><th valign=\"top\">Stack Trace</th><td><pre>")
-                .append(XMLUtils.escapeHTML(StringBuilderWriter.toString()))
-                .append("</pre></td></tr></table></body></html>");
+        sb.append("</body></html>");
 
         // Get a Writer
         PrintWriter writer = null;

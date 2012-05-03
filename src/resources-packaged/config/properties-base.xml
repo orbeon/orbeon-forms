@@ -41,6 +41,8 @@
     <property as="xs:boolean" name="oxf.http.stale-checking-enabled"                 value="true"/>
     <property as="xs:integer" name="oxf.http.so-timeout"                             value="0"/>
 
+    <!-- HTTP response -->
+    <property as="xs:boolean" name="oxf.http.exceptions"                             value="false"/>
     <!--
         Note on Cache-Control for HTTP responses:
 

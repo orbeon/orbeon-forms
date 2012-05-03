@@ -48,25 +48,23 @@ public class ExceptionGenerator extends ProcessorImpl {
             public void readImpl(PipelineContext context, XMLReceiver xmlReceiver) {
                 // Get top throwable
                 Throwable throwable = (Throwable) context.getAttribute(ProcessorService.THROWABLE);
-                // Throwable is mandatory
-                if (throwable == null)
-                    throw new OXFException("Missing throwable object in ExceptionGenerator");
+
+                final ContentHandlerHelper helper = new ContentHandlerHelper(xmlReceiver);
+                helper.startDocument();
+                helper.startElement(ROOT_ELEMENT_NAME);
+
                 // Write out document
                 try {
-                    final ContentHandlerHelper helper = new ContentHandlerHelper(xmlReceiver);
-                    helper.startDocument();
-                    helper.startElement(ROOT_ELEMENT_NAME);
-
                     while (throwable != null) {
                         addThrowable(helper, throwable);
                         throwable = OXFException.getNestedException(throwable);
                     }
-
-                    helper.endElement();
-                    helper.endDocument();
                 } catch (Exception e) {
                     throw new OXFException(e);
                 }
+
+                helper.endElement();
+                helper.endDocument();
             }
         };
         addOutput(name, output);

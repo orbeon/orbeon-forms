@@ -3652,6 +3652,20 @@ ORBEON.xforms.Events = {
     },
 
     /**
+     * Hide both show and hide details section in the error dialog.
+     */
+    errorHideAllDetails: function(errorBodyDiv) {
+        var detailsHidden = ORBEON.util.Dom.getChildElementByClass(errorBodyDiv, "xforms-error-panel-details-hidden");
+        var detailsShown = ORBEON.util.Dom.getChildElementByClass(errorBodyDiv, "xforms-error-panel-details-shown");
+
+        if (detailsHidden != null)
+            YAHOO.util.Dom.addClass(detailsHidden, "xforms-disabled-subsequent");
+
+        if (detailsShown != null)
+            YAHOO.util.Dom.addClass(detailsShown, "xforms-disabled-subsequent");
+    },
+
+    /**
      * When the error dialog is closed, we make sure that the "details" section is closed,
      * so it will be closed the next time the dialog is opened.
      */
@@ -4159,6 +4173,7 @@ ORBEON.xforms.Init = {
                         var hideDetailsA = ORBEON.util.Dom.getChildElementByIndex(ORBEON.util.Dom.getChildElementByIndex(detailsShownDiv, 0), 0);
                         YAHOO.util.Dom.generateId(hideDetailsA);
                         errorPanel.errorTitleDiv = titleDiv;
+                        errorPanel.errorBodyDiv = bodyDiv;
                         errorPanel.errorDetailsDiv = ORBEON.util.Dom.getChildElementByClass(detailsShownDiv, "xforms-error-panel-details");
 
                         // Register listener that will show/hide the detail section

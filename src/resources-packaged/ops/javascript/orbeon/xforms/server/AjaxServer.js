@@ -63,7 +63,14 @@
             if (formErrorPanel) {
                 // Render the dialog if needed
                 formErrorPanel.element.style.display = "block";
-                formErrorPanel.errorDetailsDiv.innerHTML = details;
+                if (details != null) {
+                    formErrorPanel.errorDetailsDiv.innerHTML = details;
+                    // Restore arrow button in case we had called errorHideAllDetails() before
+                    ORBEON.xforms.Events.errorShowHideDetails.apply(formErrorPanel.errorBodyDiv);
+                } else {
+                    // No details so don't show the arrow to show the details
+                    ORBEON.xforms.Events.errorHideAllDetails(formErrorPanel.errorBodyDiv);
+                }
                 formErrorPanel.show();
                 ORBEON.xforms.Globals.lastDialogZIndex += 2;
                 formErrorPanel.cfg.setProperty("zIndex", ORBEON.xforms.Globals.lastDialogZIndex);
@@ -537,7 +544,8 @@
             ORBEON.xforms.Globals.requestDocument = "";
             var formID = ORBEON.xforms.Globals.requestForm.id;
             var title = ORBEON.util.Dom.getStringValue(ORBEON.util.Dom.getElementsByName(o.responseXML.documentElement, "title", null)[0]);
-            var detailsFromBody = ORBEON.util.Dom.getStringValue(ORBEON.util.Dom.getElementsByName(o.responseXML.documentElement, "body", null)[0]);
+            var body = ORBEON.util.Dom.getElementsByName(o.responseXML.documentElement, "body", null)[0]
+            var detailsFromBody = body != null ? ORBEON.util.Dom.getStringValue(body) : null;
             AjaxServer.showError(title, detailsFromBody, formID);
         } else {
             AjaxServer.retryRequestAfterDelay(AjaxServer.asyncAjaxRequest);

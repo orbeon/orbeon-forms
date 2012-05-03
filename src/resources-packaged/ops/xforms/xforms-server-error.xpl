@@ -40,11 +40,14 @@
                                 </xsl:otherwise>
                             </xsl:choose>
                         </title>
-                        <body>
-                            <xsl:call-template name="format-xforms-error-panel-body">
-                                <xsl:with-param name="exceptions" select="/exceptions/exception"/>
-                            </xsl:call-template>
-                        </body>
+                        <!-- Only output the exceptions if they are present -->
+                        <xsl:if test="/exceptions/exception">
+                            <body>
+                                <xsl:call-template name="format-xforms-error-panel-body">
+                                    <xsl:with-param name="exceptions" select="/exceptions/exception"/>
+                                </xsl:call-template>
+                            </body>
+                        </xsl:if>
                     </error>
                 </xsl:template>
             </xsl:stylesheet>

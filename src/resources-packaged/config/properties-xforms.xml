@@ -99,12 +99,10 @@
     <property as="xs:boolean" name="oxf.xforms.noscript"                                    value="false"/>
     <property as="xs:boolean" name="oxf.xforms.noscript-support"                            value="true"/>
     <property as="xs:boolean" name="oxf.xforms.async-portlet-load"                          value="false"/>
-    <!--<property as="xs:boolean" name="oxf.xforms.noscript.select-full-fieldsets"       value="false"/>-->
-    <property as="xs:integer" name="oxf.xforms.offline-repeat-count"                        value="4"/>
     <property as="xs:boolean" name="oxf.xforms.datepicker.navigator"                        value="true"/>
     <property as="xs:boolean" name="oxf.xforms.datepicker.two-months"                       value="false"/>
     <property as="xs:boolean" name="oxf.xforms.show-error-dialog"                           value="true"/>
-    <property as="xs:integer" name="oxf.xforms.show-recoverable-errors"                     value="10"/>
+    <property as="xs:integer" name="oxf.xforms.show-recoverable-errors"                     value="0"/>
     <property as="xs:boolean" name="oxf.xforms.ignore-dynamic-mip-xpath-errors"             value="false"/>
 
     <property as="xs:integer" name="oxf.xforms.internal-short-delay"                        value="100"/>

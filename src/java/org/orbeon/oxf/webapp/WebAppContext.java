@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.webapp;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.Version;
@@ -46,6 +47,7 @@ public class WebAppContext {
     private static WebAppContext instance;
     private static Logger logger = LoggerFactory.createLogger(WebAppContext.class);
 
+    private String runMode;
     private ServletContext servletContext;
     private Map<String, String> contextInitParameters;
 
@@ -56,8 +58,7 @@ public class WebAppContext {
     }
 
     /**
-     * Initialize the context. This method has to be called at least once before Presentation
-     * Server can be used.
+     * Initialize the context. This method has to be called at least once.
      */
     public static synchronized WebAppContext instance(ServletContext servletContext) {
         if (instance == null)
@@ -92,9 +93,19 @@ public class WebAppContext {
             ResourceManagerWrapper.init(properties);
 
             // 2. Initialize properties
-            final String propertiesFile = getServletInitParametersMap().get(PROPERTIES_PROPERTY);
-            if (propertiesFile != null)
-                org.orbeon.oxf.properties.Properties.init(propertiesFile);
+            final String propertiesURL;
+            {
+                // Try to replace the run mode variable so we can write "oxf:/config/properties-${oxf.run-mode}.xml"
+                final String rawPropertiesURL = StringUtils.trimToNull(getServletInitParametersMap().get(PROPERTIES_PROPERTY));
+
+                if (rawPropertiesURL == null)
+                    throw new OXFException("Properties file URL must be specified via oxf.properties in web.xml.");
+
+                propertiesURL = StringUtils.replace(rawPropertiesURL, "${" + RunMode.RunModeProperty() + "}", getRunMode());
+            }
+
+            logger.info("Using properties file: " + propertiesURL);
+            org.orbeon.oxf.properties.Properties.init(propertiesURL);
 
             // 3. Initialize Version object (depends on resource manager)
             // Better to do it here so that log messages will go to the same place as the above logs
@@ -117,18 +128,33 @@ public class WebAppContext {
      * Return an unmodifiable Map of the Servlet initialization parameters.
      */
     public Map<String, String> getServletInitParametersMap() {
+        // NOTE: No need to synchronize because this is first called via instance(), which synchronizes on the class
         if (contextInitParameters == null) {
-            synchronized (this) {
-                if (contextInitParameters == null) {
-                    final Map<String, String> result = new LinkedHashMap<String, String>();
-                    for (Enumeration e = servletContext.getInitParameterNames(); e.hasMoreElements();) {
-                        final String name = (String) e.nextElement();
-                        result.put(name, servletContext.getInitParameter(name));
-                    }
-                    contextInitParameters = Collections.unmodifiableMap(result);
-                }
+            final Map<String, String> result = new LinkedHashMap<String, String>();
+            for (Enumeration e = servletContext.getInitParameterNames(); e.hasMoreElements();) {
+                final String name = (String) e.nextElement();
+                result.put(name, servletContext.getInitParameter(name));
             }
+            contextInitParameters = Collections.unmodifiableMap(result);
         }
         return contextInitParameters;
+    }
+
+    /**
+     * Return the web app's run mode.
+     */
+    public String getRunMode() {
+        // NOTE: No need to synchronize because this is first called via instance(), which synchronizes on the class
+        if (this.runMode == null) {
+            // Get the run mode
+            final String runMode = RunMode.getRunMode(getServletInitParametersMap());
+            // Remember run mode as web app attribute
+            servletContext.setAttribute(RunMode.RunModeProperty(), runMode);
+
+            logger.info("Using run mode: " + runMode);
+            this.runMode = runMode;
+        }
+
+        return this.runMode;
     }
 }

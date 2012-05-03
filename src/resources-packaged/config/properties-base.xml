@@ -98,8 +98,6 @@
 
     <property as="xs:string"  processor-name="oxf:builtin-saxon"        name="location-mode" value="none"/>
     <property as="xs:string"  processor-name="oxf:unsafe-builtin-saxon" name="location-mode" value="none"/>
-    <!-- This property was used prior to January 2010 builds -->
-    <property as="xs:string"  processor-name="oxf:saxon8"               name="location-mode" value="none"/>
 
     <!--<property as="xs:boolean" processor-name="oxf:xml-converter"       name="serialize-xml-11" value="true"/>-->
 

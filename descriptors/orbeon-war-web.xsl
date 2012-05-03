@@ -73,20 +73,16 @@
                 <param-value>org.orbeon.oxf.resources.ClassLoaderResourceManagerFactory</param-value>
             </context-param>
 
-            <xsl:comment>Orbeon Class Loader</xsl:comment>
+            <xsl:comment>Set run mode ("dev" or "prod")</xsl:comment>
             <context-param>
-                <param-name>oxf.classloader.enable</param-name>
-                <param-value>false</param-value>
-            </context-param>
-            <context-param>
-                <param-name>oxf.classloader.ignore-packages</param-name>
-                <param-value>java. javax. org.apache.log4j. org.xml. org.w3c.</param-value>
+                <param-name>oxf.run-mode</param-name>
+                <param-value>prod</param-value>
             </context-param>
 
-            <xsl:comment>Set location of properties.xml (read by resource manager)</xsl:comment>
+            <xsl:comment>Set location of properties.xml</xsl:comment>
             <context-param>
                 <param-name>oxf.properties</param-name>
-                <param-value>oxf:/config/properties.xml</param-value>
+                <param-value>oxf:/config/properties-${oxf.run-mode}.xml</param-value>
             </context-param>
 
             <xsl:comment>Determine whether logging initialization must take place</xsl:comment>

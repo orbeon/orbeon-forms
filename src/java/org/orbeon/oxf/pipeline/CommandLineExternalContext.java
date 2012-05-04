@@ -24,11 +24,11 @@ import java.io.*;
 public class CommandLineExternalContext extends SimpleExternalContext {
 
     public CommandLineExternalContext() {
-        this.request = new CommandLineExternalContext.CommandLineRequest();
-        this.response = new CommandLineExternalContext.CommandLineResponse();
+        this.request = new CommandLineRequest();
+        this.response = new CommandLineResponse();
     }
 
-    private class CommandLineRequest extends Request {
+    private class CommandLineRequest extends SimpleExternalContext.Request {
 
         public String getContextPath() {
             return "";
@@ -43,7 +43,7 @@ public class CommandLineExternalContext extends SimpleExternalContext {
         }
     }
 
-    private class CommandLineResponse extends Response {
+    private class CommandLineResponse extends SimpleExternalContext.Response {
 
         private PrintWriter printWriter;
         public PrintWriter getWriter() throws IOException {

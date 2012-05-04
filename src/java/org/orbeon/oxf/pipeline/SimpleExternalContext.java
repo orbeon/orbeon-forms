@@ -18,20 +18,26 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.StringBuilderWriter;
-import org.orbeon.oxf.util.URLRewriterUtils;
+import org.orbeon.oxf.webapp.TestWebAppContext;
+import org.orbeon.oxf.webapp.WebAppContext;
 
 import java.io.*;
 import java.security.Principal;
 import java.util.*;
 
 /**
- * Simple implementation of the ExternalContext and related interfaces. When embedding
- * Orbeon Forms (e.g. in Eclipse), this class can be used directly or can be subclassed.
+ * Simple implementation of the ExternalContext and related interfaces.
+ *
+ * Used by CommandLineExternalContext.
  */
 public class SimpleExternalContext implements ExternalContext {
 
     private static final Logger logger = LoggerFactory.createLogger(SimpleExternalContext.class);
-    protected Map<String, Object> applicationAttributesMap = new HashMap<String, Object>();
+    private WebAppContext webAppContext = new TestWebAppContext(logger);
+
+    public WebAppContext getWebAppContext() {
+        return webAppContext;
+    }
 
     protected class Request implements ExternalContext.Request {
 
@@ -350,23 +356,9 @@ public class SimpleExternalContext implements ExternalContext {
         }
     }
 
-    protected class Application implements ExternalContext.Application {
-
-        public void addListener(ApplicationListener applicationListener) {
-        }
-
-        public void removeListener(ApplicationListener applicationListener) {
-        }
-    }
-
     protected Request request = new Request();
     protected Response response = new Response();
     protected Session session = new Session();
-    protected Application application = new Application();
-
-    public Object getNativeContext() {
-        return null;
-    }
 
     public Object getNativeRequest() {
         return null;
@@ -388,22 +380,6 @@ public class SimpleExternalContext implements ExternalContext {
         return session;
     }
 
-    public ExternalContext.Application getApplication() {
-        return application;
-    }
-
-    public Map<String, Object> getAttributesMap() {
-        return applicationAttributesMap;
-    }
-
-    public Map<String, String> getInitAttributesMap() {
-        return Collections.emptyMap();
-    }
-
-    public String getRealPath(String path) {
-        return null;
-    }
-
     public String getStartLoggerString() {
         return "Running processor";
     }
@@ -412,19 +388,7 @@ public class SimpleExternalContext implements ExternalContext {
         return "Done running processor";
     }
 
-    public void log(String message, Throwable throwable) {
-        logger.error(message, throwable);
-    }
-
-    public void log(String msg) {
-        logger.info(msg);
-    }
-
     public ExternalContext.RequestDispatcher getRequestDispatcher(String path, boolean isContextRelative) {
         return null;
-    }
-
-    public String rewriteServiceURL(String urlString, int rewriteMode) {
-        return URLRewriterUtils.rewriteServiceURL(getRequest(), urlString, rewriteMode);
     }
 }

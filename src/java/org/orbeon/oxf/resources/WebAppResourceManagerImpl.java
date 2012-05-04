@@ -16,8 +16,8 @@ package org.orbeon.oxf.resources;
 import org.apache.log4j.Logger;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.util.LoggerFactory;
+import org.orbeon.oxf.webapp.WebAppContext;
 
-import javax.servlet.ServletContext;
 import java.io.*;
 import java.net.URL;
 import java.util.Map;
@@ -28,35 +28,25 @@ import java.util.Map;
  */
 public class WebAppResourceManagerImpl extends ResourceManagerBase {
 
-    public static final String SERVLET_CONTEXT_KEY = WebAppResourceManagerImpl.class.getName() + "ServletContext";
+    public static final String SERVLET_CONTEXT_KEY = WebAppResourceManagerImpl.class.getName() + "WebAppContext";
     public static final String ROOT_DIR = "oxf.resources.webapp.rootdir";
 
     private static Logger logger = LoggerFactory.createLogger(WebAppResourceManagerImpl.class);
 
-    private ServletContext servletContext;
+    private WebAppContext webAppContext;
     private String rootDirectory;
 
     public WebAppResourceManagerImpl(Map props) {
         super(props);
-        ServletContext ctx = (ServletContext) props.get(SERVLET_CONTEXT_KEY);
+        WebAppContext ctx = (WebAppContext) props.get(SERVLET_CONTEXT_KEY);
         if (ctx == null)
-            throw new OXFException("WebAppResourceManager needs a ServletContext object in its map (key=" + SERVLET_CONTEXT_KEY + ")");
-        this.servletContext = ctx;
+            throw new OXFException("WebAppResourceManager needs a WebAppContext object in its map (key=" + SERVLET_CONTEXT_KEY + ")");
+        this.webAppContext = ctx;
 
         String root = (String) props.get(ROOT_DIR);
         if (root == null)
             throw new OXFException("WebAppResourceManager: property " + ROOT_DIR + " is null");
         this.rootDirectory = root;
-    }
-
-    /**
-     * Returns a character reader from the resource manager for the specified
-     * key. The key could point to any text document.
-     * @param key A Resource Manager key
-     * @return a character reader
-     */
-    public Reader getContentAsReader(String key) {
-        return new InputStreamReader(getContentAsStream(key));
     }
 
     /**
@@ -69,7 +59,7 @@ public class WebAppResourceManagerImpl extends ResourceManagerBase {
         if (logger.isDebugEnabled())
             logger.debug("getContentAsStream(" + key + ")");
 
-        InputStream result = servletContext.getResourceAsStream(rootDirectory + key);
+        InputStream result = webAppContext.getResourceAsStream(rootDirectory + key);
         if (result == null)
             throw new ResourceNotFoundException(key);
         return result;
@@ -84,12 +74,12 @@ public class WebAppResourceManagerImpl extends ResourceManagerBase {
     protected long lastModifiedImpl(String key, boolean doNotThrowResourceNotFound) {
         try {
             long lm;
-            String realPath = servletContext.getRealPath(rootDirectory + key);
+            String realPath = webAppContext.getRealPath(rootDirectory + key);
             if (realPath == null) {
                 // Some application server do not return a real path, as they do
                 // not uncompress the WAR file. This is in particular the case
                 // when deploying compressed WAR files on Tomcat.
-                URL url = servletContext.getResource(rootDirectory + key);
+                URL url = webAppContext.getResource(rootDirectory + key);
                 if (url == null) {
                     if (doNotThrowResourceNotFound) return -1;
                     else throw new ResourceNotFoundException(key);
@@ -158,7 +148,7 @@ public class WebAppResourceManagerImpl extends ResourceManagerBase {
      * @return The length, in bytes, of the file denoted by this abstract pathname, or 0L if the file does not exist
      */
     public int length(String key) {
-        String realPath = servletContext.getRealPath(rootDirectory + key);
+        String realPath = webAppContext.getRealPath(rootDirectory + key);
         if (realPath == null) {
             // FIXME: this happens when the resources are in a WAR file in
             // WLS. In this case we should try to figure out the last modified of
@@ -170,7 +160,7 @@ public class WebAppResourceManagerImpl extends ResourceManagerBase {
     }
 
     public String getRealPath(String key) {
-        return servletContext.getRealPath(rootDirectory + key);
+        return webAppContext.getRealPath(rootDirectory + key);
         // Need an option for this as some callers call this for non-existing files
 //        final String realPath = servletContext.getRealPath(rootDirectory + key);
 //        if (realPath == null)

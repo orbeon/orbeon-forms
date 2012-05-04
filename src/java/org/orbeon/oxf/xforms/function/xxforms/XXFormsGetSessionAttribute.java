@@ -44,7 +44,7 @@ public class XXFormsGetSessionAttribute extends XXFormsGetScopeAttribute {
         }
 
         // Get attribute value
-        final ExternalContext.Session session = NetUtils.getExternalContext().getSession(false);// do not force session creation
+        final ExternalContext.Session session = NetUtils.getExternalContext().getRequest().getSession(false);// do not force session creation
         if (session != null) {
             // Found session
             final Object attributeObject = session.getAttributesMap().get(attributeName);

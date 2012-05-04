@@ -24,6 +24,8 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.EmailProcessor;
 import org.orbeon.oxf.processor.ProcessorUtils;
 import org.orbeon.oxf.util.*;
+import org.orbeon.oxf.webapp.TestWebAppContext;
+import org.orbeon.oxf.webapp.WebAppContext;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -44,16 +46,18 @@ public class TestExternalContext implements ExternalContext  {
     private PipelineContext pipelineContext;
     private Document requestDocument;
 
+    private WebAppContext webAppContext = new TestWebAppContext(logger);
+
     private Request request;
     private Response response;
-
-    // Make this static so that multiple TestExternalContext run in the same application scope. This is not 100% ideal
-    // because it breaks test isolation.
-    private static Map<String, Object> attributesMap;
 
     public TestExternalContext(PipelineContext pipelineContext, Document requestDocument) {
         this.pipelineContext = pipelineContext;
         this.requestDocument = requestDocument;
+    }
+
+    public WebAppContext getWebAppContext() {
+        return webAppContext;
     }
 
     private class Request implements ExternalContext.Request {
@@ -469,10 +473,6 @@ public class TestExternalContext implements ExternalContext  {
         return session;
     }
 
-    public void setSession(Session session) {
-        this.session = session;
-    }
-
     public static class TestSession implements ExternalContext.Session {
 
 		private String sessionId;
@@ -553,11 +553,6 @@ public class TestExternalContext implements ExternalContext  {
         }
 	}
 
-    public ExternalContext.Application getApplication() {
-        // NIY
-        return null;
-    }
-
     public RequestDispatcher getRequestDispatcher(String path, boolean isContextRelative) {
         // NIY
         return null;
@@ -577,37 +572,5 @@ public class TestExternalContext implements ExternalContext  {
 
     public Object getNativeResponse() {
         return null;
-    }
-
-    public Map<String, Object> getAttributesMap() {
-        if (attributesMap == null) {
-            attributesMap = new LinkedHashMap<String, Object>();
-        }
-        return attributesMap;
-    }
-
-    public Map<String, String> getInitAttributesMap() {
-        return Collections.emptyMap();
-    }
-
-    public Object getNativeContext() {
-        return null;
-    }
-
-    public String getRealPath(String path) {
-        // NIY
-        return null;
-    }
-
-    public void log(String message, Throwable throwable) {
-        logger.error(message, throwable);
-    }
-
-    public void log(String msg) {
-        logger.info(msg);
-    }
-
-    public String rewriteServiceURL(String urlString, int rewriteMode) {
-        return URLRewriterUtils.rewriteServiceURL(getRequest(), urlString, rewriteMode);
     }
 }

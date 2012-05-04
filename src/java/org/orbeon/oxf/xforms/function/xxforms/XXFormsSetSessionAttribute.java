@@ -40,7 +40,7 @@ public class XXFormsSetSessionAttribute extends XXFormsSetScopeAttribute {
         final Item item = valueExpression.evaluateItem(xpathContext);
 
         // Store value
-        final ExternalContext.Session session = NetUtils.getExternalContext().getSession(true);// DO force session creation
+        final ExternalContext.Session session = NetUtils.getExternalContext().getRequest().getSession(true);// DO force session creation
         storeAttribute(session.getAttributesMap(), attributeName, item);
 
         // Return empty sequence

@@ -24,6 +24,7 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.generator.RequestGenerator;
 import org.orbeon.oxf.resources.URLFactory;
+import org.orbeon.oxf.webapp.WebAppListener;
 import org.orbeon.oxf.xml.XMLReceiverAdapter;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
@@ -774,16 +775,11 @@ public class NetUtils {
     public static void deleteFileOnApplicationDestroyed(final FileItem fileItem) {
         // Try to delete the file on exit and on session termination
         final ExternalContext externalContext = getExternalContext();
-        ExternalContext.Application application = externalContext.getApplication();
-        if (application != null) {
-            application.addListener(new ExternalContext.Application.ApplicationListener() {
-                public void servletDestroyed() {
-                    deleteFileItem(fileItem, APPLICATION_SCOPE);
-                }
-            });
-        } else {
-            logger.debug("No application object found so cannot register temporary file deletion upon session destruction: " + fileItem.getName());
-        }
+        externalContext.getWebAppContext().addListener(new WebAppListener() {
+            public void webAppDestroyed() {
+                deleteFileItem(fileItem, APPLICATION_SCOPE);
+            }
+        });
     }
 
     private static void deleteFileItem(FileItem fileItem, int scope) {

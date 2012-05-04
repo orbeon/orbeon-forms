@@ -26,7 +26,7 @@ import org.orbeon.oxf.util.ISODateUtils;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.task.Task;
 import org.orbeon.oxf.util.task.TaskScheduler;
-import org.orbeon.oxf.webapp.ServletContextExternalContext;
+import org.orbeon.oxf.webapp.WebAppExternalContext;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 
@@ -129,8 +129,11 @@ public class SchedulerProcessor extends ProcessorImpl {
                         processor.setId(config.getName());
 
                         // Create and schedule a task
-                        // The ExternalContext passed has limited visibility on the application context only
-                        ProcessorTask task = new ProcessorTask(config.getName(), processor, config.isSynchro(), new ServletContextExternalContext(externalContext));
+                        // NOTE: The ExternalContext passed:
+                        // - has visibility on the application context only
+                        // - doesn't keep references to the current context
+                        ProcessorTask task = new ProcessorTask(config.getName(), processor, config.isSynchro(),
+                                new WebAppExternalContext(externalContext.getWebAppContext(), null));
                         task.setSchedule(config.getStartTime(), config.getInterval());
                         scheduler.schedule(task);
                         break;
@@ -219,10 +222,6 @@ public class SchedulerProcessor extends ProcessorImpl {
             return action;
         }
 
-        public void setAction(int action) {
-            this.action = action;
-        }
-
         public String getName() {
             return name;
         }
@@ -246,7 +245,6 @@ public class SchedulerProcessor extends ProcessorImpl {
         public void setStartTime(long startTime) {
             this.startTime = startTime;
         }
-
 
         public boolean isSynchro() {
             return synchro;

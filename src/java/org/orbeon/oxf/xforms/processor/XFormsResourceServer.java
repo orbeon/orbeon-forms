@@ -61,7 +61,7 @@ public class XFormsResourceServer extends ProcessorImpl {
         if (requestPath.startsWith(DYNAMIC_RESOURCES_PATH)) {
             // Dynamic resource requested
 
-            final ExternalContext.Session session = externalContext.getSession(false);
+            final ExternalContext.Session session = externalContext.getRequest().getSession(false);
             if (session != null) {
                 // Store mapping into session
                 final String lookupKey = DYNAMIC_RESOURCES_SESSION_KEY + filename;
@@ -111,7 +111,11 @@ public class XFormsResourceServer extends ProcessorImpl {
                     OutputStream os = null;
                     try {
                         // The resource URI may already be absolute, or may be relative to the server base. Make sure we work with an absolute URI.
-                        final String absoluteResourceURI = externalContext.rewriteServiceURL(resource.uri, ExternalContext.Response.REWRITE_MODE_ABSOLUTE);
+                        final String absoluteResourceURI = URLRewriterUtils.rewriteServiceURL(
+                            NetUtils.getExternalContext().getRequest(),
+                            resource.uri,
+                            ExternalContext.Response.REWRITE_MODE_ABSOLUTE
+                        );
 
                         final URLConnection connection = URLFactory.createURL(absoluteResourceURI).openConnection();
 
@@ -342,7 +346,7 @@ public class XFormsResourceServer extends ProcessorImpl {
 
         // Get session
         final ExternalContext externalContext = NetUtils.getExternalContext();
-        final ExternalContext.Session session = externalContext.getSession(true);// NOTE: We force session creation here. Should we? What's the alternative?
+        final ExternalContext.Session session = externalContext.getRequest().getSession(true);// NOTE: We force session creation here. Should we? What's the alternative?
 
         if (session != null) {
 

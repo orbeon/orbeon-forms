@@ -94,7 +94,7 @@ public class ServletIncludeGenerator extends ProcessorImpl {
     }
 
     private RequestDispatcher getRequestDispatcher(ExternalContext externalContext, Config config) {
-        Object sc = externalContext.getNativeContext();
+        Object sc = externalContext.getWebAppContext().getNativeContext();
         if ((sc == null) || !(sc instanceof ServletContext))
             throw new OXFException("Can't find servlet context in pipeline context");
 

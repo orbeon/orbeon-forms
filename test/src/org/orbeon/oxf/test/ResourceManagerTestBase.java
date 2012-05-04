@@ -90,24 +90,9 @@ public abstract class ResourceManagerTestBase {
     protected PipelineContext createPipelineContextWithExternalContext(String requestURL) {
         final PipelineContext pipelineContext = new PipelineContext();
         final Document requestDocument = ProcessorUtils.createDocumentFromURL(requestURL, null);
-        final ExternalContext externalContext = new ExtendedTestExternalContext(pipelineContext, requestDocument);
+        final ExternalContext externalContext = new TestExternalContext(pipelineContext, requestDocument);
         pipelineContext.setAttribute(PipelineContext.EXTERNAL_CONTEXT, externalContext);
 
         return pipelineContext;
     }
-
-    protected static class ExtendedTestExternalContext extends TestExternalContext {
-
-		public ExtendedTestExternalContext(PipelineContext pipelineContext, Document requestDocument) {
-			super(pipelineContext, requestDocument);
-		}
-
-        @Override
-		public String getRealPath(String path) {
-            if (path.equals("WEB-INF/exist-conf.xml")) {
-                return ResourceManagerWrapper.instance().getRealPath("/ops/unit-tests/exist-conf.xml");
-            }
-			return super.getRealPath(path);
-		}
-	}
 }

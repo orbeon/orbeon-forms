@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.function.xxforms;
 
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.util.URLRewriterUtils;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.ExpressionVisitor;
 import org.orbeon.saxon.expr.XPathContext;
@@ -52,7 +53,10 @@ public class XXFormsRewriteServiceURI extends SystemFunction {
     }
 
     public static String rewriteServiceURI(String uri, boolean absolute) {
-        return NetUtils.getExternalContext().rewriteServiceURL(uri,
-                absolute ? ExternalContext.Response.REWRITE_MODE_ABSOLUTE : ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH);
+        return URLRewriterUtils.rewriteServiceURL(
+            NetUtils.getExternalContext().getRequest(),
+            uri,
+            absolute ? ExternalContext.Response.REWRITE_MODE_ABSOLUTE : ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH
+        );
     }
 }

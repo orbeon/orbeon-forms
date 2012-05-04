@@ -27,8 +27,8 @@ import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.scaxon.XML._
 import javax.xml.transform.stream.StreamResult
 import org.orbeon.oxf.xforms.action.XFormsAPI
-import org.orbeon.oxf.util.{XPathCache, NetUtils}
 import org.orbeon.oxf.externalcontext.URLRewriter
+import org.orbeon.oxf.util.{URLRewriterUtils, XPathCache, NetUtils}
 
 /**
  * The persistence proxy processor:
@@ -88,7 +88,7 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
     private def proxyEstablishConnection(request: Request, uri: String, headers: Map[String, String]) = {
         // Create the absolute outgoing URL
         val outgoingURL = {
-            val persistenceBaseAbsoluteURL = NetUtils.getExternalContext.rewriteServiceURL(uri, URLRewriter.REWRITE_MODE_ABSOLUTE)
+            val persistenceBaseAbsoluteURL = URLRewriterUtils.rewriteServiceURL(NetUtils.getExternalContext.getRequest, uri, URLRewriter.REWRITE_MODE_ABSOLUTE)
             URLFactory.createURL(persistenceBaseAbsoluteURL)
         }
 

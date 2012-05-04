@@ -15,29 +15,18 @@ package org.orbeon.oxf.externalcontext
 
 import org.orbeon.oxf.pipeline.api.ExternalContext
 
-class ExternalContextWrapper(externalContext: ExternalContext) extends ExternalContext {
+class ExternalContextWrapper(val externalContext: ExternalContext) extends ExternalContext {
+
+    def getWebAppContext = externalContext.getWebAppContext
+    def getSession(create: Boolean) = externalContext.getSession(create)
 
     def getRequest: ExternalContext.Request = externalContext.getRequest
     def getResponse: ExternalContext.Response = externalContext.getResponse
-    def getSession(create: Boolean): ExternalContext.Session = externalContext.getSession(create)
-
-    def getRealPath(path: String) = externalContext.getRealPath(path)
 
     def getStartLoggerString = externalContext.getStartLoggerString
     def getEndLoggerString = externalContext.getEndLoggerString
 
-    def rewriteServiceURL(urlString: String, rewriteMode: Int) = externalContext.rewriteServiceURL(urlString, rewriteMode)
-
-    def log(msg: String) = externalContext.log(msg)
-    def log(message: String, throwable: Throwable) = externalContext.log(message, throwable)
-
-    def getInitAttributesMap = externalContext.getInitAttributesMap
-    def getAttributesMap = externalContext.getAttributesMap
-
-    def getApplication: ExternalContext.Application = externalContext.getApplication
-
     def getRequestDispatcher(path: String, isContextRelative: Boolean): ExternalContext.RequestDispatcher = externalContext.getRequestDispatcher(path, isContextRelative)
     def getNativeRequest = externalContext.getNativeRequest
     def getNativeResponse = externalContext.getNativeResponse
-    def getNativeContext = externalContext.getNativeContext
 }

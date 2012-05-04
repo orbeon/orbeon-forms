@@ -71,7 +71,7 @@ public class AsynchronousSubmissionManager {
     }
 
     private static AsynchronousSubmissions getAsynchronousSubmissions(boolean create, String sessionKey) {
-        final Map<String, Object> sessionMap = NetUtils.getExternalContext().getSession(true).getAttributesMap();
+        final Map<String, Object> sessionMap = NetUtils.getExternalContext().getRequest().getSession(true).getAttributesMap();
         final AsynchronousSubmissions existingAsynchronousSubmissions = (AsynchronousSubmissions) sessionMap.get(sessionKey);
         if (existingAsynchronousSubmissions != null) {
             return existingAsynchronousSubmissions;
@@ -94,13 +94,17 @@ public class AsynchronousSubmissionManager {
         asynchronousSubmissions.submit(new Callable<SubmissionResult>() {
 
             // Submission should not need an ExternalContext, but if it does we must provide access to a safe one
-            final ExternalContext externalContext = new AsyncExternalContext(new AsyncRequest(NetUtils.getExternalContext().getRequest()), NetUtils.getExternalContext().getResponse());
+            final ExternalContext currentExternalContext = NetUtils.getExternalContext();
+            final ExternalContext newExternalContext = new AsyncExternalContext(
+                currentExternalContext.getWebAppContext(),
+                new AsyncRequest(currentExternalContext.getRequest()),
+                currentExternalContext.getResponse());
 
             public SubmissionResult call() throws Exception {
                 // Make sure an ExternalContext is scoped for the callable. We use the same external context as the caller,
                 // even though that can be a dangerous. Should we use AsyncExternalContext here?
                 final PipelineContext pipelineContext = new PipelineContext();
-                pipelineContext.setAttribute(PipelineContext.EXTERNAL_CONTEXT, externalContext);
+                pipelineContext.setAttribute(PipelineContext.EXTERNAL_CONTEXT, newExternalContext);
                 boolean success = false;
                 try {
                     // Perform call

@@ -164,13 +164,13 @@
 
             <xsl:comment>Orbeon context listener</xsl:comment>
             <listener>
-                <listener-class>org.orbeon.oxf.webapp.OrbeonServletContextListenerDelegate</listener-class>
+                <listener-class>org.orbeon.oxf.webapp.OrbeonServletContextListener</listener-class>
             </listener>
 
             <!-- NOTE: The session listener is used by the XForm state store so must be enabled  -->
             <xsl:comment>Orbeon session listener</xsl:comment>
             <listener>
-                <listener-class>org.orbeon.oxf.webapp.OrbeonSessionListenerDelegate</listener-class>
+                <listener-class>org.orbeon.oxf.webapp.OrbeonSessionListener</listener-class>
             </listener>
 
             <!-- NOTE: This also helps with Tomcat shutdown -->
@@ -179,38 +179,10 @@
                 <listener-class>net.sf.ehcache.constructs.web.ShutdownListener</listener-class>
             </listener>
 
-            <!--
-            <servlet>
-                <servlet-name>orbeon-xhtml-xforms-servlet</servlet-name>
-                <servlet-class>org.orbeon.oxf.servlet.OPSServletDelegate</servlet-class>
-                <init-param>
-                    <param-name>oxf.main-processor.name</param-name>
-                    <param-value>{http://www.orbeon.com/oxf/processors}pipeline</param-value>
-                </init-param>
-                <init-param>
-                    <param-name>oxf.main-processor.input.config</param-name>
-                    <param-value>oxf:/config/run-xforms.xpl</param-value>
-                </init-param>
-                <init-param>
-                    <param-name>oxf.error-processor.name</param-name>
-                    <param-value>{http://www.orbeon.com/oxf/processors}pipeline</param-value>
-                </init-param>
-                <init-param>
-                    <param-name>oxf.error-processor.input.config</param-name>
-                    <param-value>oxf:/config/error.xpl</param-value>
-                </init-param>
-            </servlet>
-
-            <servlet-mapping>
-                <servlet-name>orbeon-xhtml-xforms-servlet</servlet-name>
-                <url-pattern>/test/*</url-pattern>
-            </servlet-mapping>
-            -->
-
             <xsl:comment>This is the main Orbeon Forms servlet</xsl:comment>
             <servlet>
                 <servlet-name>orbeon-main-servlet</servlet-name>
-                <servlet-class>org.orbeon.oxf.servlet.OrbeonServletDelegate</servlet-class>
+                <servlet-class>org.orbeon.oxf.servlet.OrbeonServlet</servlet-class>
                 <xsl:comment>Set main processor</xsl:comment>
                 <init-param>
                     <param-name>oxf.main-processor.name</param-name>
@@ -262,7 +234,7 @@
             <xsl:comment>This is the XForms Server servlet</xsl:comment>
             <servlet>
                 <servlet-name>orbeon-xforms-server-servlet</servlet-name>
-                <servlet-class>org.orbeon.oxf.servlet.OrbeonServletDelegate</servlet-class>
+                <servlet-class>org.orbeon.oxf.servlet.OrbeonServlet</servlet-class>
                 <xsl:comment>Set main processor</xsl:comment>
                 <init-param>
                     <param-name>oxf.main-processor.name</param-name>
@@ -286,7 +258,7 @@
             <xsl:comment>This is the XForms Renderer servlet, used to deploy Orbeon Forms as a separate WAR</xsl:comment>
             <servlet>
                 <servlet-name>orbeon-renderer-servlet</servlet-name>
-                <servlet-class>org.orbeon.oxf.servlet.OrbeonServletDelegate</servlet-class>
+                <servlet-class>org.orbeon.oxf.servlet.OrbeonServlet</servlet-class>
                 <xsl:comment>Set main processor</xsl:comment>
                 <init-param>
                     <param-name>oxf.main-processor.name</param-name>

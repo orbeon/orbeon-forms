@@ -31,6 +31,11 @@ import OrbeonPortlet2Delegate._
 import org.orbeon.oxf.util.{DynamicVariable, URLRewriterUtils, NetUtils}
 import org.orbeon.oxf.externalcontext.{URLRewriter, WSRPURLRewriter, AsyncRequest, AsyncExternalContext}
 
+// For backward compatibility
+class OrbeonPortlet2 extends OrbeonPortlet
+class OrbeonPortletDelegate extends OrbeonPortlet
+class OrbeonPortlet2Delegate extends OrbeonPortlet
+
 /**
  * Orbeon portlet.
  *
@@ -43,11 +48,11 @@ import org.orbeon.oxf.externalcontext.{URLRewriter, WSRPURLRewriter, AsyncReques
  *   http://wiki.orbeon.com/forms/projects/xforms-improved-portlet-support#TOC-XForms-aware-caching-of-portlet-out
  * - merge front-end with proxy portlet, as some of the logic is the same
  */
-class OrbeonPortlet2Delegate extends OrbeonPortlet2DelegateBase {
+class OrbeonPortlet extends OrbeonPortletBase {
 
-    private val ResponseSessionKey = "org.orbeon.oxf.response"
-    private val FutureResponseSessionKey = "org.orbeon.oxf.future-response"
-    private val IFrameContentResourceId = "orbeon-iframe-content"
+    private val ResponseSessionKey          = "org.orbeon.oxf.response"
+    private val FutureResponseSessionKey    = "org.orbeon.oxf.future-response"
+    private val IFrameContentResourceId     = "orbeon-iframe-content"
 
     private def isAsyncPortletLoad = XFormsProperties.isAsyncPortletLoad
     private def isMinimal = XFormsProperties.isMinimalResources
@@ -111,7 +116,7 @@ class OrbeonPortlet2Delegate extends OrbeonPortlet2DelegateBase {
     private def doRenderDirectly(request: RenderRequest, response: RenderResponse): Unit =
         try {
             val pipelineContext = new PipelineContext
-            val externalContext = new Portlet2ExternalContext(pipelineContext, getPortletContext, contextInitParameters.asJava, request, response)
+            val externalContext = new Portlet2ExternalContext(pipelineContext, webAppContext, request, response)
 
             // Run the service
             processorService.service(externalContext, pipelineContext)
@@ -135,7 +140,7 @@ class OrbeonPortlet2Delegate extends OrbeonPortlet2DelegateBase {
         val pipelineContext = new PipelineContext
         try {
             // Create a request just so we can create a rewriter
-            val ecRequest = new Portlet2ExternalContext(pipelineContext, getPortletContext, contextInitParameters.asJava, request, response).getRequest
+            val ecRequest = new Portlet2ExternalContext(pipelineContext, webAppContext, request, response).getRequest
             val rewriter = new WSRPURLRewriter(pipelineContext, ecRequest, URLRewriterUtils.isWSRPEncodeResources)
 
             // Output scripts needed by the Ajax portlet
@@ -169,7 +174,7 @@ class OrbeonPortlet2Delegate extends OrbeonPortlet2DelegateBase {
             // Create a temporary Portlet2ExternalContext just so we can wrap its request into an AsyncRequest
             val asyncRequest = {
                 val pipelineContext = new PipelineContext
-                try new AsyncRequest(new Portlet2ExternalContext(pipelineContext, getPortletContext, contextInitParameters.asJava, request, response).getRequest)
+                try new AsyncRequest(new Portlet2ExternalContext(pipelineContext, webAppContext, request, response).getRequest)
                 finally pipelineContext.destroy(true)
             }
 
@@ -177,7 +182,7 @@ class OrbeonPortlet2Delegate extends OrbeonPortlet2DelegateBase {
             val futureResponse =
                 future {
                     val newPipelineContext = new PipelineContext
-                    val asyncExternalContext = new AsyncExternalContext(asyncRequest, new BufferedResponse(newPipelineContext, asyncRequest))
+                    val asyncExternalContext = new AsyncExternalContext(webAppContext, asyncRequest, new BufferedResponse(newPipelineContext, asyncRequest))
                     newPipelineContext.setAttribute(PipelineContext.EXTERNAL_CONTEXT, asyncExternalContext)
 
                     // Run the service
@@ -232,7 +237,7 @@ class OrbeonPortlet2Delegate extends OrbeonPortlet2DelegateBase {
             } else {
                 // Process request
                 val pipelineContext = new PipelineContext
-                val externalContext = new Portlet2ExternalContext(pipelineContext, getPortletContext, contextInitParameters.asJava, request, response)
+                val externalContext = new Portlet2ExternalContext(pipelineContext, webAppContext, request, response)
                 processorService.service(externalContext, pipelineContext)
 
                 // Write out the response
@@ -251,7 +256,7 @@ class OrbeonPortlet2Delegate extends OrbeonPortlet2DelegateBase {
 
             // Run the service
             val pipelineContext = new PipelineContext
-            val externalContext = new Portlet2ExternalContext(pipelineContext, getPortletContext, contextInitParameters.asJava, request)
+            val externalContext = new Portlet2ExternalContext(pipelineContext, webAppContext, request)
 
             // Run the service
             processorService.service(externalContext, pipelineContext)
@@ -345,7 +350,7 @@ object OrbeonPortlet2Delegate {
     val PathParameter = "orbeon.path"
     val MethodParameter = "orbeon.method"
 
-    val currentPortlet = new DynamicVariable[OrbeonPortlet2Delegate]
+    val currentPortlet = new DynamicVariable[OrbeonPortlet]
 
     // Convert to immutable String → List[String] so that map equality works as expected
     def toScalaMap(m: JMap[String, Array[String]]) =

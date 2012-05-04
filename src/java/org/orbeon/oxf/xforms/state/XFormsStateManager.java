@@ -249,7 +249,7 @@ public class XFormsStateManager implements XFormsStateLifecycle {
         final ExternalContext externalContext = NetUtils.getExternalContext();
         final XFormsStateStore stateStore = XFormsStateStoreFactory.instance(externalContext);
 
-        final ExternalContext.Session session = externalContext.getSession(XFormsStateManager.FORCE_SESSION_CREATION);
+        final ExternalContext.Session session = externalContext.getRequest().getSession(XFormsStateManager.FORCE_SESSION_CREATION);
 
         stateStore.storeDocumentState(containingDocument, session, isInitialState);
     }
@@ -457,7 +457,7 @@ public class XFormsStateManager implements XFormsStateLifecycle {
                         "max store size", Integer.toString(stateStore.getMaxSize())
                 );
 
-            final ExternalContext.Session session = externalContext.getSession(XFormsStateManager.FORCE_SESSION_CREATION);
+            final ExternalContext.Session session = externalContext.getRequest().getSession(XFormsStateManager.FORCE_SESSION_CREATION);
 
             xformsState = stateStore.findState(session, parameters.getUUID(), isInitialState);
 
@@ -468,7 +468,7 @@ public class XFormsStateManager implements XFormsStateLifecycle {
                 final String PLEASE_RELOAD_PAGE_MESSAGE = "Please reload the current page. Note that you will lose any unsaved changes.";
 
                 // Produce exception
-                final ExternalContext.Session currentSession =  externalContext.getSession(false);
+                final ExternalContext.Session currentSession =  externalContext.getRequest().getSession(false);
                 final String message;
                 if (currentSession == null || currentSession.isNew()) {
                     // This means that no session is currently existing, or a session exists but it is newly created
@@ -580,7 +580,7 @@ public class XFormsStateManager implements XFormsStateLifecycle {
             return -1;
         } else {
             final boolean isSessionHeartbeat = XFormsProperties.isSessionHeartbeat(containingDocument);
-            final ExternalContext.Session session = externalContext.getSession(FORCE_SESSION_CREATION);
+            final ExternalContext.Session session = externalContext.getRequest().getSession(FORCE_SESSION_CREATION);
 
             final long heartbeatDelay;
             if (isSessionHeartbeat)

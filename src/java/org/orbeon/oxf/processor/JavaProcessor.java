@@ -402,12 +402,12 @@ public class JavaProcessor extends ProcessorImpl {
         ExternalContext externalContext = (ExternalContext) context.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
         boolean gotLibDir = false;
         if (externalContext != null) {
-            String webInfLibPath = externalContext.getRealPath("WEB-INF/lib");
+            String webInfLibPath = externalContext.getWebAppContext().getRealPath("WEB-INF/lib");
             if (webInfLibPath != null) {
                 jarpath.append(webInfLibPath).append(PATH_SEPARATOR);
                 gotLibDir = true;
             }
-            String webInfClasses = externalContext.getRealPath("WEB-INF/classes");
+            String webInfClasses = externalContext.getWebAppContext().getRealPath("WEB-INF/classes");
             if (webInfClasses != null)
                 classpath.append(webInfClasses).append(PATH_SEPARATOR);
         }

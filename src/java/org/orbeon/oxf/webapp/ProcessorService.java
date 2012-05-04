@@ -46,7 +46,6 @@ public class ProcessorService {
     // Other properties
     public static final String HTTP_FORCE_LAST_MODIFIED_PROPERTY = "oxf.http.force-last-modified";
 
-    public static final String HTTP_ACCEPT_METHODS_PROPERTY = "oxf.http.accept-methods";
     public static final String HTTP_EXCEPTIONS_PROPERTY = "oxf.http.exceptions";
     public static final boolean DEFAULT_HTTP_EXCEPTIONS = false;
 

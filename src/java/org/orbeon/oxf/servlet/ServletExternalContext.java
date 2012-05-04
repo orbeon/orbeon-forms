@@ -24,6 +24,7 @@ import org.orbeon.oxf.portlet.OrbeonPortletXFormsFilter;
 import org.orbeon.oxf.properties.Properties;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.webapp.ProcessorService;
+import org.orbeon.oxf.webapp.WebAppContext;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -37,7 +38,7 @@ import java.util.*;
 /*
  * Servlet-specific implementation of ExternalContext.
  */
-public class ServletExternalContext extends ServletWebAppExternalContext implements ExternalContext  {
+public class ServletExternalContext implements ExternalContext  {
 
     public static Logger logger = LoggerFactory.createLogger(ServletExternalContext.class);
 
@@ -51,7 +52,6 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
     public static final String HTTP_RESOURCE_CACHE_HEADERS_PROPERTY = "oxf.http.resource.cache-headers";
 
     public static final String SESSION_LISTENERS = "oxf.servlet.session-listeners";
-    public static final String APPLICATION_LISTENERS = "oxf.servlet.application-listeners";
 
     private final static String REWRITING_STRATEGY_DEFAULT = "servlet";
 
@@ -645,30 +645,6 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
         }
     }
 
-    private class Application implements ExternalContext.Application {
-        private ServletContext servletContext;
-
-        public Application(ServletContext servletContext) {
-          this.servletContext = servletContext;
-        }
-
-        public void addListener(ApplicationListener applicationListener) {
-
-            ApplicationListeners listeners = (ApplicationListeners) servletContext.getAttribute(APPLICATION_LISTENERS);
-            if (listeners == null) {
-                listeners = new ApplicationListeners();
-                servletContext.setAttribute(APPLICATION_LISTENERS, listeners);
-            }
-            listeners.addListener(applicationListener);
-        }
-
-        public void removeListener(ApplicationListener applicationListener) {
-            final ApplicationListeners listeners = (ApplicationListeners) servletContext.getAttribute(APPLICATION_LISTENERS);
-            if (listeners != null)
-                listeners.removeListener(applicationListener);
-        }
-    }
-
     public static class SessionListeners implements Serializable {
         // Store this class instead of the List directly, so we can have a transient member
         private transient List<ExternalContext.Session.SessionListener> listeners;
@@ -689,37 +665,17 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
         }
     }
 
-    public static class ApplicationListeners implements Serializable {
-        private transient List<ExternalContext.Application.ApplicationListener> listeners;
-        public void addListener(ExternalContext.Application.ApplicationListener applicationListener) {
-            if (listeners == null) {
-                listeners = new ArrayList<ExternalContext.Application.ApplicationListener>();
-            }
-            listeners.add(applicationListener);
-        }
-
-        public void removeListener(ExternalContext.Application.ApplicationListener applicationListener) {
-            if (listeners != null)
-                listeners.remove(applicationListener);
-        }
-
-        public Iterator<ExternalContext.Application.ApplicationListener> iterator() {
-            return (listeners != null) ? listeners.iterator() : Collections.<ExternalContext.Application.ApplicationListener>emptyList().iterator();
-        }
-    }
-
     private Request request;
     private Response response;
     private Session session;
-    private Application application;
 
+    private WebAppContext webAppContext;
     private PipelineContext pipelineContext;
     private HttpServletRequest nativeRequest;
     private HttpServletResponse nativeResponse;
 
-    public ServletExternalContext(ServletContext servletContext, PipelineContext pipelineContext, Map<String, String> initAttributesMap, HttpServletRequest request, HttpServletResponse response) {
-        super(servletContext, initAttributesMap);
-
+    public ServletExternalContext(PipelineContext pipelineContext, WebAppContext webAppContext, HttpServletRequest request, HttpServletResponse response) {
+        this.webAppContext = webAppContext;
         this.pipelineContext = pipelineContext;
 
         // Wrap request if needed
@@ -734,6 +690,10 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
         }
 
         this.nativeResponse = response;
+    }
+
+    public WebAppContext getWebAppContext() {
+        return webAppContext;
     }
 
     public Object getNativeRequest() {
@@ -798,12 +758,6 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
         return session;
     }
 
-    public ExternalContext.Application getApplication() {
-        if (application == null)
-                application = new Application(super.servletContext);
-
-        return application;
-    }
     public String getStartLoggerString() {
         return getRequest().getRequestPath() + " - Received request";
     }
@@ -813,6 +767,8 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
     }
 
     public RequestDispatcher getRequestDispatcher(String path, boolean isContextRelative) {
+
+        final ServletContext servletContext = (ServletContext) webAppContext.getNativeContext();
 
         if (isContextRelative) {
             // Path is relative to the current context root
@@ -843,9 +799,5 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
 
             return new ServletToExternalContextRequestDispatcherWrapper(otherServletContext.getRequestDispatcher(modifiedPath), isDefaultContext);
         }
-    }
-
-    public String rewriteServiceURL(String urlString, int rewriteMode) {
-        return URLRewriterUtils.rewriteServiceURL(getRequest(), urlString, rewriteMode);
     }
 }

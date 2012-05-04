@@ -22,6 +22,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.serializer.CachedSerializer;
 import org.orbeon.oxf.servlet.ServletExternalContext;
 import org.orbeon.oxf.util.*;
+import org.orbeon.oxf.webapp.WebAppContext;
 
 import javax.portlet.*;
 import java.io.*;
@@ -31,9 +32,7 @@ import java.util.*;
 /*
  * Portlet-specific implementation of ExternalContext.
  */
-public class Portlet2ExternalContext extends PortletWebAppExternalContext implements ExternalContext {
-
-    private static final String OPS_CONTEXT_NAMESPACE_KEY = "org.orbeon.ops.portlet.namespace";
+public class Portlet2ExternalContext implements ExternalContext {
 
     private static RequestFilter requestFilter;
     static {
@@ -49,15 +48,15 @@ public class Portlet2ExternalContext extends PortletWebAppExternalContext implem
     private ExternalContext.Request request;
     private ExternalContext.Response response;
     private ExternalContext.Session session;
-    private ExternalContext.Application application;
 
+    private WebAppContext webAppContext;
     private PipelineContext pipelineContext;
     private PortletRequest portletRequest;
     private ClientDataRequest clientDataRequest;
     private MimeResponse mimeResponse;
 
-    Portlet2ExternalContext(PipelineContext pipelineContext, PortletContext portletContext, Map<String, String> initAttributesMap, PortletRequest portletRequest) {
-        this(portletContext, initAttributesMap);
+    Portlet2ExternalContext(PipelineContext pipelineContext, WebAppContext webAppContext, PortletRequest portletRequest) {
+        this.webAppContext = webAppContext;
         this.pipelineContext = pipelineContext;
 
         // Wrap request if needed
@@ -75,20 +74,18 @@ public class Portlet2ExternalContext extends PortletWebAppExternalContext implem
             this.clientDataRequest = (ClientDataRequest) portletRequest;
     }
 
-    Portlet2ExternalContext(PipelineContext pipelineContext, PortletContext portletContext, Map<String, String> initAttributesMap, PortletRequest portletRequest, MimeResponse mimeResponse) {
-        this(pipelineContext, portletContext, initAttributesMap, portletRequest);
+    Portlet2ExternalContext(PipelineContext pipelineContext, WebAppContext webAppContext, PortletRequest portletRequest, MimeResponse mimeResponse) {
+        this(pipelineContext, webAppContext, portletRequest);
         this.mimeResponse = mimeResponse;
     }
 
-    private Portlet2ExternalContext(PortletContext portletContext, Map<String, String> initAttributesMap) {
-        super(portletContext, initAttributesMap);
+    public WebAppContext getWebAppContext() {
+        return webAppContext;
     }
 
     private class Request implements ExternalContext.Request {
 
         private Request() {}
-
-        private String namespace = null;
 
         private Map<String, Object> attributesMap;
         private Map<String, String[]> headerValuesMap;
@@ -404,31 +401,6 @@ public class Portlet2ExternalContext extends PortletWebAppExternalContext implem
         }
     }
 
-
-    private class Application implements ExternalContext.Application {
-        private PortletContext portletContext;
-
-        public Application(PortletContext portletContext) {
-          this.portletContext = portletContext;
-        }
-
-        public void addListener(ApplicationListener applicationListener) {
-
-            ServletExternalContext.ApplicationListeners listeners = (ServletExternalContext.ApplicationListeners) portletContext.getAttribute(ServletExternalContext.APPLICATION_LISTENERS);
-            if (listeners == null) {
-                listeners = new ServletExternalContext.ApplicationListeners();
-                portletContext.setAttribute(ServletExternalContext.APPLICATION_LISTENERS, listeners);
-            }
-            listeners.addListener(applicationListener);
-        }
-
-        public void removeListener(ApplicationListener applicationListener) {
-            final ServletExternalContext.ApplicationListeners listeners = (ServletExternalContext.ApplicationListeners) portletContext.getAttribute(ServletExternalContext.APPLICATION_LISTENERS);
-            if (listeners != null)
-                listeners.removeListener(applicationListener);
-        }
-    }
-
     public abstract static class BaseResponse implements ExternalContext.Response {
 
         private final URLRewriter urlRewriter;
@@ -645,15 +617,6 @@ public class Portlet2ExternalContext extends PortletWebAppExternalContext implem
         return session;
     }
 
-    public ExternalContext.Application getApplication() {
-        if (portletContext == null && portletRequest.getPortletSession() != null)
-          portletContext = portletRequest.getPortletSession().getPortletContext();
-        if (portletContext != null)
-          application = new Application(portletContext);
-
-        return application;
-    }
-
     public String getStartLoggerString() {
         return getRequest().getRequestPath() + " - Received request";
     }
@@ -663,7 +626,7 @@ public class Portlet2ExternalContext extends PortletWebAppExternalContext implem
     }
 
     public RequestDispatcher getRequestDispatcher(String path, boolean isContextRelative) {
-        return new PortletToExternalContextRequestDispatcherWrapper(portletContext.getRequestDispatcher(path));
+        return new PortletToExternalContextRequestDispatcherWrapper(((PortletContext) webAppContext.getNativeContext()).getRequestDispatcher(path));
     }
 
     /**
@@ -714,9 +677,5 @@ public class Portlet2ExternalContext extends PortletWebAppExternalContext implem
                 }
             });
         }
-    }
-
-    public String rewriteServiceURL(String urlString, int rewriteMode) {
-        return URLRewriterUtils.rewriteServiceURL(getRequest(), urlString, rewriteMode);
     }
 }

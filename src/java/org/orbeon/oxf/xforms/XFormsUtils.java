@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 import org.ccil.cowan.tagsoup.HTMLSchema;
 import org.dom4j.*;
 import org.dom4j.io.DocumentSource;
@@ -603,7 +602,7 @@ public class XFormsUtils {
 
         final URI resolvedURI = resolveXMLBase(containingDocument, element, url);
 
-        return NetUtils.getExternalContext().rewriteServiceURL(resolvedURI.toString(), rewriteMode);
+        return URLRewriterUtils.rewriteServiceURL(NetUtils.getExternalContext().getRequest(), resolvedURI.toString(), rewriteMode);
     }
 
     /**

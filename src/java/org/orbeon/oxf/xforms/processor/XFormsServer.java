@@ -135,7 +135,7 @@ public class XFormsServer extends ProcessorImpl {
         final List<Element> clientEvents = (actionElement != null) ? Dom4jUtils.elements(actionElement, XFormsConstants.XXFORMS_EVENT_QNAME) : Collections.<Element>emptyList();
 
         // Hit session if it exists (it's probably not even necessary to do so)
-        final ExternalContext.Session session = externalContext.getSession(false);
+        final ExternalContext.Session session = request.getSession(false);
 
         // Quick return for heartbeat and upload progress if those events are alone -> we don't need to access the XForms document
         if (clientEvents.size() == 1) {

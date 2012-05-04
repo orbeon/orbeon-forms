@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.webapp
 
-import java.util.{Map ⇒ JMap}
 import org.apache.commons.lang.StringUtils
 
 object RunMode {
@@ -26,6 +25,6 @@ object RunMode {
     val DefaultRunMode = ProdRunMode
 
     // Return the web app's run mode
-    def getRunMode(contextParams: JMap[String, String]) =
-        Option(StringUtils.trimToNull(contextParams.get(RunModeProperty))) getOrElse DefaultRunMode
+    def getRunMode(contextParams: Map[String, String]) =
+        Option(StringUtils.trimToNull(contextParams.get(RunModeProperty).orNull)) getOrElse DefaultRunMode
 }

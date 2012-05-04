@@ -113,7 +113,7 @@ public abstract class XMLDBProcessor extends ProcessorImpl {
                     // This is specific for eXist
                     // TODO: move this to properties?
                     ExternalContext externalContext = NetUtils.getExternalContext();
-                    String configurationFile = externalContext.getRealPath("WEB-INF/exist-conf.xml");
+                    String configurationFile = externalContext.getWebAppContext().getRealPath("WEB-INF/exist-conf.xml");
                     database.setProperty("create-database", "true");
                     database.setProperty("configuration", configurationFile);
                 }

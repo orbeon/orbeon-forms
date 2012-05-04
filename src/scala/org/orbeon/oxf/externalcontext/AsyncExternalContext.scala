@@ -14,39 +14,22 @@
 package org.orbeon.oxf.externalcontext
 
 import org.orbeon.oxf.pipeline.api.ExternalContext
-import java.lang.{Throwable, String}
-import org.orbeon.oxf.pipeline.api.ExternalContext.{Response, Application}
-import org.orbeon.oxf.pipeline.api.ExternalContext.Application.ApplicationListener
-import org.orbeon.oxf.util.URLRewriterUtils
+import org.orbeon.oxf.pipeline.api.ExternalContext.Response
+import org.orbeon.oxf.webapp.WebAppContext
 
 // This context copies all the values of the given request. It uses the original session.
-class AsyncExternalContext(request: AsyncRequest, response: Response) extends ExternalContext {
+class AsyncExternalContext(val webAppContext: WebAppContext,  request: AsyncRequest, response: Response) extends ExternalContext {
+
+    def getWebAppContext = webAppContext
+    def getSession(create: Boolean) = request.getSession(create)
 
     val getRequest = request
     val getResponse = response
-    def getSession(create: Boolean) = getRequest.getSession(create)
-
-    def getRealPath(path: String) = throw new UnsupportedOperationException
 
     def getStartLoggerString = getRequest.getRequestPath + " - Received request";
     def getEndLoggerString = getRequest.getRequestPath
 
-    def rewriteServiceURL(urlString: String, rewriteMode: Int) =
-        URLRewriterUtils.rewriteServiceURL(getRequest, urlString, rewriteMode)
-
-    def log(msg: String) = throw new UnsupportedOperationException
-    def log(message: String, throwable: Throwable) = throw new UnsupportedOperationException
-
-    def getInitAttributesMap = throw new UnsupportedOperationException
-    def getAttributesMap = throw new UnsupportedOperationException
-
-    def getApplication = new Application {
-        def removeListener(applicationListener: ApplicationListener) = throw new UnsupportedOperationException
-        def addListener(applicationListener: ApplicationListener) = throw new UnsupportedOperationException
-    }
-
     def getRequestDispatcher(path: String, isContextRelative: Boolean) = throw new UnsupportedOperationException
     def getNativeRequest = null
     def getNativeResponse = null
-    def getNativeContext = throw new UnsupportedOperationException
 }

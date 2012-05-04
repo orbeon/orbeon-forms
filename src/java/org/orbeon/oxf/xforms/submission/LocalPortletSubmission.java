@@ -114,10 +114,11 @@ public class LocalPortletSubmission extends BaseSubmission {
         // If async, use a "safe" copy of the context
         final OrbeonPortlet2Delegate currentPortlet = (OrbeonPortlet2Delegate) OrbeonPortlet2Delegate.currentPortlet().value().get();
 
-        final ExternalContext.Response response = containingDocument.getResponse() != null ? containingDocument.getResponse() : NetUtils.getExternalContext().getResponse();
-        final ExternalContext asyncExternalContext = p2.isAsynchronous
-                ? new AsyncExternalContext(new AsyncRequest(NetUtils.getExternalContext().getRequest()), response)
-                : NetUtils.getExternalContext();
+        final ExternalContext currentExternalContext = NetUtils.getExternalContext();
+        final ExternalContext.Response response = containingDocument.getResponse() != null ? containingDocument.getResponse() : currentExternalContext.getResponse();
+        final ExternalContext newExternalContext = p2.isAsynchronous
+                ? new AsyncExternalContext(currentExternalContext.getWebAppContext(), new AsyncRequest(currentExternalContext.getRequest()), response)
+                : currentExternalContext;
 
         // Pack external call into a Runnable so it can be run synchronously or asynchronously.
         final Callable<SubmissionResult> callable = new Callable<SubmissionResult>() {
@@ -132,13 +133,13 @@ public class LocalPortletSubmission extends BaseSubmission {
                 final boolean[] status = { false , false };
                 ConnectionResult connectionResult = null;
                 try {
-                    connectionResult = openLocalConnection(asyncExternalContext, response,
+                    connectionResult = openLocalConnection(newExternalContext, response,
                         detailsLogger, p.isDeferredSubmissionSecondPassReplaceAll ? null : submission,
                         p.actualHttpMethod, resolvedURI.toString(), sp.actualRequestMediatype, sp.messageBody,
                         sp.queryString, p.isReplaceAll, headersToForward, customHeaderNameValues, new SubmissionProcess() {
                             public void process(final ExternalContext.Request request, final ExternalContext.Response response) {
                                 // Delegate to portlet
-                                currentPortlet.processorService().service(new ExternalContextWrapper(asyncExternalContext) {
+                                currentPortlet.processorService().service(new ExternalContextWrapper(newExternalContext) {
                                     @Override
                                     public ExternalContext.Request getRequest() {
                                         return request;

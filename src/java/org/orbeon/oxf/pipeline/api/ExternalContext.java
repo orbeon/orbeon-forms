@@ -14,6 +14,7 @@
 package org.orbeon.oxf.pipeline.api;
 
 import org.orbeon.oxf.externalcontext.URLRewriter;
+import org.orbeon.oxf.webapp.WebAppContext;
 
 import java.io.*;
 import java.security.Principal;
@@ -28,7 +29,7 @@ import java.util.Map;
  * It is also possible to use ExternalContext to embed Orbeon Forms and to provide a web-like request/response
  * interface.
  */
-public interface ExternalContext extends WebAppExternalContext {
+public interface ExternalContext {
 
     static final int SC_OK = 200;
     static final int SC_NOT_FOUND = 404;
@@ -157,14 +158,11 @@ public interface ExternalContext extends WebAppExternalContext {
         }
     }
 
-    public interface Application {
-        void addListener(ApplicationListener applicationListener);
-        void removeListener(ApplicationListener applicationListener);
+    WebAppContext getWebAppContext();
 
-        interface ApplicationListener {
-            void servletDestroyed();
-        }
-    }
+    // NOTE: The only reason the session is available here is for session created/destroyed listeners, which make
+    // available a session even though no request or response is available.
+    Session getSession(boolean create);
 
     public interface RequestDispatcher {
         abstract void forward(Request request, Response response) throws IOException;
@@ -186,20 +184,6 @@ public interface ExternalContext extends WebAppExternalContext {
 
     Request getRequest();
     Response getResponse();
-    Session getSession(boolean create);
-    Application getApplication();
-
-    /**
-     * Rewrite a service URL. The URL is rewritten against a base URL which is:
-     *
-     * o specified externally or
-     * o the incoming request if not specified externally
-     *
-     * @param urlString     URL to rewrite
-     * @param rewriteMode   rewrite mode
-     * @return              rewritten URL
-     */
-    String rewriteServiceURL(String urlString, int rewriteMode);
 
     String getStartLoggerString();
     String getEndLoggerString();

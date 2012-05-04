@@ -385,7 +385,7 @@ public class Connection {
                     cookieStore = (CookieStore) session.getAttributesMap().get(HTTP_COOKIE_STORE_ATTRIBUTE);
                 break;
             case APPLICATION:
-                cookieStore = (CookieStore) externalContext.getAttributesMap().get(HTTP_COOKIE_STORE_ATTRIBUTE);
+                cookieStore = (CookieStore) externalContext.getWebAppContext().getAttributesMap().get(HTTP_COOKIE_STORE_ATTRIBUTE);
                 break;
         }
 
@@ -408,7 +408,7 @@ public class Connection {
                         session.getAttributesMap().put(HTTP_COOKIE_STORE_ATTRIBUTE, cookieStore);
                     break;
                 case APPLICATION:
-                    externalContext.getAttributesMap().put(HTTP_COOKIE_STORE_ATTRIBUTE, cookieStore);
+                    externalContext.getWebAppContext().getAttributesMap().put(HTTP_COOKIE_STORE_ATTRIBUTE, cookieStore);
                     break;
             }
 

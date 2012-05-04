@@ -93,7 +93,11 @@ public class XHTMLToPDFProcessor extends HttpBinarySerializer {// TODO: HttpBina
                     // NOTE: We used to call rewriteResourceURL() here as the PDF pipeline did not do URL rewriting.
                     // However this caused issues, for example resources like background images referred by CSS files
                     // could be rewritten twice: once by the XForms resource rewriter, and a second time here.
-                    return externalContext.rewriteServiceURL(uri, ExternalContext.Response.REWRITE_MODE_ABSOLUTE | ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT);
+                    return URLRewriterUtils.rewriteServiceURL(
+                        NetUtils.getExternalContext().getRequest(),
+                        uri,
+                        ExternalContext.Response.REWRITE_MODE_ABSOLUTE | ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT
+                    );
                 }
 
                 // Called by:

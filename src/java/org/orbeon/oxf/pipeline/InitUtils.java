@@ -29,8 +29,8 @@ import org.orbeon.oxf.properties.Properties;
 import org.orbeon.oxf.resources.ResourceNotFoundException;
 import org.orbeon.oxf.util.AttributesToMap;
 import org.orbeon.oxf.util.PipelineUtils;
-import org.orbeon.oxf.webapp.ServletContextExternalContext;
-import org.orbeon.oxf.webapp.WebAppContext;
+import org.orbeon.oxf.webapp.JWebAppContext;
+import org.orbeon.oxf.webapp.WebAppExternalContext;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.NodeInfo;
@@ -39,7 +39,10 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.net.URI;
-import java.util.*;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.Map;
 
 
 public class InitUtils {
@@ -195,7 +198,7 @@ public class InitUtils {
 
         // Make sure the Web app context is initialized
         try {
-            WebAppContext.instance(servletContext);
+            JWebAppContext.instance(servletContext);
         } catch (Throwable e) {
             final Throwable rootThrowable = OXFException.getRootThrowable(e);
             logger.error(logMessagePrefix + " - Error initializing the WebAppContext", rootThrowable);
@@ -224,7 +227,7 @@ public class InitUtils {
         if (processorDefinition != null) {
             logger.info(logMessagePrefix + " - About to run processor: " +  processorDefinition.toString());
             final Processor processor = createProcessor(processorDefinition);
-            final ExternalContext externalContext = (servletContext != null) ? new ServletContextExternalContext(servletContext, session) : null;
+            final ExternalContext externalContext = (servletContext != null) ? new WebAppExternalContext(JWebAppContext.instance(servletContext), session) : null;
 
             boolean success = false;
             final PipelineContext pipelineContext = new PipelineContext();
@@ -287,15 +290,6 @@ public class InitUtils {
                 }
             }
         }
-    }
-
-    public static Map<String, String> getContextInitParametersMap(ServletContext servletContext) {
-        final Map<String, String> contextInitParameters = new HashMap<String, String>();
-        for (java.util.Enumeration e = servletContext.getInitParameterNames(); e.hasMoreElements();) {
-            final String name = (String) e.nextElement();
-            contextInitParameters.put(name, servletContext.getInitParameter(name));
-        }
-        return java.util.Collections.unmodifiableMap(contextInitParameters);
     }
 
     public static ProcessorDefinition getDefinitionFromServletContext(ServletContext servletContext, String uriNamePropertyPrefix, String inputPropertyPrefix) {

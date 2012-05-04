@@ -15,8 +15,6 @@ createCustomEvent = () -> new YAHOO.util.CustomEvent null, null, false, YAHOO.ut
 ORBEON.Builder =
     mouseEntersGridTdEvent:     createCustomEvent()
     mouseExitsGridTdEvent:      createCustomEvent()
-    startLabelHintEditEvent:    createCustomEvent()
-    endLabelHintEditEvent:      createCustomEvent()
     triggerClickEvent:          createCustomEvent()
 
 YD = YAHOO.util.Dom
@@ -89,33 +87,3 @@ Event.onDOMReady () ->
         Events.clickEvent.subscribe ({control}) ->
             if control in cellEditorTriggers
                 Builder.triggerClickEvent.fire {trigger: control}
-
-    # Fire events related to users starting or being done with editing a label/hint
-    do ->
-        labelHint = null
-
-        Events.clickEvent.subscribe ({target}) ->
-            isLabel = YD.hasClass target, 'xforms-label'
-            isHint = YD.hasClass target, 'xforms-hint'
-            isInGridThTd = $(target).closest('th, td').is('.fr-grid-th, .fr-grid-td')
-            if (isLabel or isHint) and isInGridThTd
-              # Wait for Ajax response before showing editor to make sure the editor is bound to the current control
-              Events.runOnNext Events.ajaxResponseProcessedEvent, ->
-                  labelHint = target
-                  Builder.startLabelHintEditEvent.fire {inputs: cellEditorInputs, labelHint}
-
-        # Update labelHint before we call hide so not to call hide more than once
-        fireEndHideLabelHintInput = ->
-            currentLabelHint = labelHint
-            labelHint = null
-            Builder.endLabelHintEditEvent.fire {inputs: cellEditorInputs, labelHint: currentLabelHint}
-
-        # On enter or escape, restore label/hint to its view mode
-        Events.keypressEvent.subscribe ({control, keyCode}) ->
-            if labelHint? and control.parentNode == labelHint and keyCode == 13
-                fireEndHideLabelHintInput()
-        # On blur of input, restore value
-        Events.blurEvent.subscribe ({control}) ->
-            if labelHint?
-                editor = YD.getFirstChild labelHint
-                fireEndHideLabelHintInput() if control == editor

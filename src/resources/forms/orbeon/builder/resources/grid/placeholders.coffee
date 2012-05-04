@@ -17,82 +17,165 @@ Event = YAHOO.util.Event
 Events = ORBEON.xforms.Events
 Controls = ORBEON.xforms.Controls
 
-# Show/hide placeholders for label and hint
+# For the generic label, generic hint, button's label, and link's label:
+#   Show/hide placeholders
+#   Handle editing of the label/hint
 
 $ ->
+    # Functional jQuery, which should be moved to a common location
     f$ = do ->
         jQueryObject = $ '<div>'
         result = {}
-        for m in _.methods ($ '<div>')
+        for m in _.methods jQueryObject
             do (m) ->
                 result[m] = (params...) ->
                     o = params.pop()
                     jQueryObject[m].apply o, params
         result
+    f$.findOrIs = (selector, element) ->                                                                                # Like find, but includes the current element if matching
+        result = f$.find selector, element
+        result = f$.add element, result if f$.is selector, element
+        result
 
-    class Editable
-        constructor: (@element) ->
-        instances: (container) ->
-            elements = container.find @selector
-            new @constructor $ e for e in elements
-        showPlaceholder: ->
-            if not _.first @valueContainer().contents()
-                @element.addClass 'fb-label-hint-placeholder'
-                placeholderContainer = @initPlaceholderContainer()
-                placeholderText = Controls.getCurrentValue _.first $ @placeholderOutput
-                placeholderContainer.text placeholderText
-        hidePlaceholder: ->
-            if @element.hasClass 'fb-label-hint-placeholder'
-                @element.removeClass 'fb-label-hint-placeholder'
-                @cleanPlaceholderContainer()
+    # Low-level operations on editables
+    editables = [
+        {
+            selector: '.xforms-label'
+            editInputSelector: '#fb-edit-label'
+            placeholderOutputSelector: '#fb-placeholder-label'
+            placeholderContainerSelector: '.xforms-label'
+            initialValueSelector: '.xforms-label'
+        }
+        {
+            selector: '.xforms-hint'
+            editInputSelector: '#fb-edit-hint'
+            placeholderOutputSelector: '#fb-placeholder-hint'
+            placeholderContainerSelector: '.xforms-hint'
+            initialValueSelector: '.xforms-hint'
+        }
+        {
+            selector: '.xforms-trigger-appearance-full'
+            editInputSelector: '#fb-edit-label'
+            placeholderOutputSelector: '#fb-placeholder-label'
+            placeholderContainerSelector: '.xforms-mock-button span'
+            initialValueSelector: 'button'
+            createMock: (element) ->
+                button = f$.find 'button', element                                                                      # Hide actual button
+                f$.hide button
+                mockDiv = f$.appendTo element, ($ '<div class="xforms-mock-button">')                                   # Create mock button
+                f$.append (mockLabel = $ '<span>'), mockDiv
+                mockLabel.text f$.text button
+            removeMock: (element) ->
+                f$.show f$.find 'button', element
+                f$.remove f$.find '.xforms-mock-button', element
+        }
+        {
+            selector: '.fr-grid-content .xforms-trigger-appearance-minimal'
+            editInputSelector: '#fb-edit-label'
+            placeholderOutputSelector: '#fb-placeholder-label'
+            placeholderContainerSelector: '.fb-mock-link'
+            initialValueSelector: 'a'
+            createMock: (element) ->
+                anchor = f$.find 'a', element                                                                           # Hide link
+                f$.hide anchor
+                f$.appendTo element, (mockLink = $ '<div class="fb-mock-link">')                                        # Create mock link
+                mockLink.text f$.text anchor
+            removeMock: (element) ->
+                f$.show f$.find 'a', element
+                f$.remove f$.find '.fb-mock-link', element
+        }
+    ]
 
-    class LabelHint extends Editable
-        valueContainer: -> @element
-        initPlaceholderContainer: -> @element
-        cleanPlaceholderContainer: -> @element.contents().filter(-> @nodeType == @TEXT_NODE).detach()
+    # Function dealing with editables
+    anyEditableSelector = (_.pluck editables, 'selector').join ', '                                                     # A CSS selector matching any editable
+    editable = (element) -> _.first _.filter editables, (e) -> f$.is '*', f$.findOrIs e.selector, element               # element: editable -> editable info
+    editableEditInput = (element) -> $ (editable element).editInputSelector                                             # Input field used for editing
+    editablePlaceholderOutput = (element) -> $ (editable element).placeholderOutputSelector                             # Element in which we put the placeholder
+    editableInside = (selectorType, element) -> f$.findOrIs (editable element)[selectorType], element                   # Find an element inside a container element for a certain type of selector
+    editablePlaceholderContainer = (element) -> editableInside 'placeholderContainerSelector', element
+    editableInitialValue = (element) -> editableInside 'initialValueSelector', element
+    editableDo = (actionName) -> (element) ->
+        action = (editable element)[actionName]
+        action element if action
+    matchState = (states, element) ->
+        state = f$.data 'state', element
+        ((_.isUndefined state) and (_.contains states, 'initial')) or (_.contains states, state)
 
-    class Label extends LabelHint
-        selector: '.xforms-label'
-        placeholderOutput: '#fb-enter-label'
+    # Events
+    mouseEntersGridTd = (f) -> Builder.mouseEntersGridTdEvent.subscribe ({gridTd}) -> f $ gridTd
+    mouseExistsGridTd = (f) -> Builder.mouseExitsGridTdEvent .subscribe ({gridTd}) -> f $ gridTd
+    ajaxResponse = (f) -> Events.ajaxResponseProcessedEvent.subscribe f
+    click = (f) -> ($ document).click ({target}) -> f $ target
+    enterKey = (f) -> ($ document).keypress ({target, which}) -> f $ target if which == 13
+    looseFocus = (f) -> ($ document).focusout ({target}) -> f $ target
+    editDoneCallbacks = $.Callbacks()
+    editDone = (f) -> editDoneCallbacks.add f
 
-    class Hint extends LabelHint
-        selector: '.xforms-hint'
-        placeholderOutput: '#fb-enter-hint'
+    # Return elements, maybe relative to a node
+    elementsInContainer = (container) -> f$.find anyEditableSelector, container
+    elementClosest = (element) -> f$.closest anyEditableSelector, element
+    elementsAll = -> $ anyEditableSelector
 
-    class Button extends Editable
-        selector: '.xforms-trigger-appearance-full'
-        placeholderOutput: '#fb-enter-label'
-        valueContainer: -> @element.children 'button'
-        initPlaceholderContainer: ->
-            # Hide actual button
-            f$.hide f$.find 'button', @element
-            # Create mock button
-            f$.append (mockLabel = $ '<span>'), f$.appendTo @element, ($ '<div class="xforms-mock-button">')
-            mockLabel
-        cleanPlaceholderContainer: ->
-            f$.show f$.find 'button', @element
-            f$.remove f$.find '.xforms-mock-button', @element
+    # Conditions
+    isEmpty = (element) -> (f$.text editableInitialValue element) == ''
+    isNonEmpty = (element) -> not isEmpty element
+    pointerInsideCell = do ->
+        currentCell = null
+        Builder.mouseEntersGridTdEvent.subscribe ({gridTd}) -> currentCell = gridTd
+        Builder.mouseExitsGridTdEvent.subscribe () -> currentCell = null
+        (element) -> currentCell? and f$.is '*', f$.closest currentCell, element
+    pointerOutsideCell = (element) -> not pointerInsideCell element
 
-    Editables = [Label, Hint, Button]
-    doOnEditables = (method, container) ->
-        instances = (E::instances container  for E in Editables)
-        instances = [].concat instances... # flatten
-        method.call i for i in instances
+    # Actions
+    removeFor = (element) -> f$.removeAttr 'for', element                                                               # So on click on the label, the focus isn't set on the input on click
+    showPlaceholder = (element) ->
+        f$.addClass 'fb-label-hint-placeholder', element
+        placeholderText = Controls.getCurrentValue _.first editablePlaceholderOutput element
+        f$.text placeholderText, editablePlaceholderContainer element
+    hidePlaceholder = (element) ->
+        f$.removeClass 'fb-label-hint-placeholder', element
+        f$.text '', editablePlaceholderContainer element
+    createMock = editableDo 'createMock'
+    removeMock = editableDo 'removeMock'
+    startEdit = (element) ->
+        f$.removeClass 'fb-label-hint-placeholder', element
+        f$.removeClass 'xforms-disabled', element                                                                       # Remove disabled which we have on hint when their value is empty
+        input = editableEditInput element
+        f$.append input, f$.empty editablePlaceholderContainer element
+        f$.show input
+        f$.focus f$.find 'input', input
+    endEdit = (element) ->
+        input = editableEditInput element
+        f$.append input, $ '.fb-cell-editor'                                                                            # Move editor out of grid, so it doesn't get removed by HTML replacements
+        newValue = Controls.getCurrentValue input[0]
+        f$.text newValue, editableInitialValue element                                                                  # Restore text under label/hint
+    fireEditDone = -> editDoneCallbacks.fire()
 
-    gridTdWithMouse = null
+    # Finite state machine description
+    # Diagram: https://docs.google.com/a/orbeon.com/drawings/d/1cJ0B3Tl7QRTMkVUbtlA55C0TUvRiOt5hzR8-dc-aBrk/edit
+    transitions = [
+        { from: [ 'initial' ],                  events: [ mouseEntersGridTd ],      elements: elementsInContainer,  conditions: [ isEmpty ],                        to: 'placeholder',              actions: [ removeFor, createMock, showPlaceholder ]  }
+        { from: [ 'initial' ],                  events: [ mouseEntersGridTd ],      elements: elementsInContainer,  conditions: [ isNonEmpty ],                     to: 'mock',                     actions: [ removeFor, createMock ]                   }
+        { from: [ 'mock' ],                     events: [ mouseExistsGridTd ],      elements: elementsInContainer,                                                  to: 'initial',                  actions: [ removeMock ]                              }
+        { from: [ 'placeholder' ],              events: [ mouseExistsGridTd ],      elements: elementsInContainer,                                                  to: 'initial',                  actions: [ hidePlaceholder, removeMock  ]            }
+        { from: [ 'placeholder', 'mock' ],      events: [ click ],                  elements: elementClosest,                                                       to: 'wait-xhr-to-edit'                                                               }
+        { from: [ 'wait-xhr-to-edit' ],         events: [ ajaxResponse ],           elements: elementsAll,                                                          to: 'edit',                     actions: [ startEdit ]                               }
+        { from: [ 'edit' ],                     events: [ enterKey, looseFocus ],   elements: elementClosest,                                                       to: 'edit-done',                actions: [ endEdit, removeMock, fireEditDone ]       }
+        { from: [ 'edit-done' ],                events: [ editDone ],               elements: elementsAll,          conditions: [ pointerOutsideCell ],             to: 'initial'                                                                        }
+        { from: [ 'edit-done' ],                events: [ editDone ],               elements: elementsAll,          conditions: [ pointerInsideCell, isEmpty ],     to: 'placeholder-after-edit',   actions: [ createMock, showPlaceholder ]             }
+        { from: [ 'edit-done' ],                events: [ editDone ],               elements: elementsAll,          conditions: [ pointerInsideCell, isNonEmpty ],  to: 'mock',                     actions: [ createMock ]                              }
+        { from: [ 'placeholder-after-edit' ],   events: [ ajaxResponse ],           elements: elementsAll,                                                          to: 'placeholder',              actions: [ showPlaceholder ]                         }
+    ]
 
-    # Show placeholder on mouse entering, and remove them on mouse exiting
-    Builder.mouseEntersGridTdEvent.subscribe ({gridTd}) -> doOnEditables Editable::showPlaceholder, $ gridTd
-    Builder.mouseExitsGridTdEvent .subscribe ({gridTd}) -> doOnEditables Editable::hidePlaceholder, $ gridTd
-
-    # Remove placeholder class when start editing and show it when done editing
-    Builder.startLabelHintEditEvent.subscribe ({labelHint}) -> hidePlaceholder labelHint
-    Builder.endLabelHintEditEvent.subscribe ({labelHint}) ->
-        Events.runOnNext Events.ajaxResponseProcessedEvent, ->
-            isLabelHintInCurrentGridTd =
-                if gridTdWithMouse? false
-                else
-                    parentGridTd = YD.getAncestorByClassName labelHint, 'fr-grid-td'
-                    parentGridTd? and parentGridTd == gridTdWithMouse
-            showPlaceholder labelHint if isLabelHintInCurrentGridTd
-
+    # Finite state machine runner
+    _.each transitions, (transition) ->
+        _.each transition.events, (event) ->
+            event (event) ->
+                elements = transition.elements event                                                                    # Get elements from event (e.g. editable inside cell for mouseover)
+                if transition.conditions                                                                                # Filter elements that match all the conditions
+                    elements = _.filter elements, (e) ->
+                        _.all transition.conditions, (c) -> c $ e
+                elements = _.filter elements, (e) -> matchState transition.from, $ e                                    # Filter elements that are in the 'from' state
+                _.each elements, (element) ->
+                    f$.data 'state', transition.to, $ element                                                           # Change state before running action, so if action trigger an event, that event runs against the new state
+                    _.each transition.actions, (action) -> action $ element                                             # Run all the actions on the elements

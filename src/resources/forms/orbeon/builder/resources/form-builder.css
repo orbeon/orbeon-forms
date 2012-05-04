@@ -260,20 +260,20 @@ h1.fr-form-title {
 .fr-section-container .xforms-repeat-selected-item-2 { border-left: 0 solid #004B92}
 
 /* Control editor */
-.fb-control-label .xforms-label { display: none }
-.fb-control-label .fr-inplace-content {
+.fb-edit-label .xforms-label { display: none }
+.fb-edit-label .fr-inplace-content {
     display: inline;
     margin-bottom: .2em;
 }
 
-.fb-control-label .fr-inplace-edit .xforms-alert { display: none }
+.fb-edit-label .fr-inplace-edit .xforms-alert { display: none }
 
 a.xforms-help-image .fb-control-help { vertical-align: baseline; }
 
 /* Would be nice to make text gray when only a hint */
 /*.fb-control-label .fr-inplace-content { color: gray }*/
 
-.fb-control-hint .fr-inplace-content {
+.fb-edit-hint .fr-inplace-content {
     font-size: smaller;
     font-style: italic;
     display: block;
@@ -327,27 +327,34 @@ a.xforms-help-image .fb-control-help { vertical-align: baseline; }
 #fr-form-group .fb-static-upload .xforms-upload-remove { padding: 0 }
 
 .fr-grid .fr-grid-td .fb-grid-control-icons img { display: inline }
-.fb-label-hint-placeholder,                         /* */
-.fb-label-hint-placeholder .xforms-mock-button
-    { color: #bbb }
-.fr-grid-td .fb-hover { position: relative }        /* So elements shown on hover can be absolutely positioned relative to the cell
-                                                       Necessary as Firefox doesn't support position: relative on table cells (http://goo.gl/Atzi2) */
+.fb-label-hint-placeholder,                                                         /* Grey color for placeholder "Click here to edit…" so users can distinguish it from an actual value */
+.fb-label-hint-placeholder .xforms-mock-button { color: #bbb }                      /* To take precedence over color set for button's labels in xforms.css */
+.fr-grid .fr-grid-content .xforms-trigger .xforms-mock-button input,                /* Override margin set in form-runner-base.css for buttons in noscript (rendered as input) */
+.fr-grid .fr-grid-content .xforms-trigger .fb-mock-link input
+    { margin: 0 }
+.fb-mock-link { color: #004B92; text-decoration: underline }                        /* Simulate  styling of a link */
+.xforms-mock-button .xforms-label { margin: 0 }                                     /* Override margin set in form-runner-base.css for regular labels */
+.fb-label-hint-placeholder .fb-mock-link { color: #bbb; text-decoration: none }     /* When placeholder shown, don't underline and use grey color, to make it clear this is a placeholder */
+.fb-mock-link:hover { background-color: #ffffd3 }                                   /* Simulated link get yellow background on mouse over to suggest it can be edited */
+
+.fr-grid-td .fb-hover { position: relative }                                        /* So elements shown on hover can be absolutely positioned relative to the cell
+                                                                                       Necessary as Firefox doesn't support position: relative on table cells (http://goo.gl/Atzi2) */
 
 /* Column icons */
-.fr-grid thead .fb-grid-column-toolbar-td {         /* .fr-grid and thead added to take precedence over YUI's text-align: left */
+.fr-grid thead .fb-grid-column-toolbar-td {                                         /* .fr-grid and thead added to take precedence over YUI's text-align: left */
     text-align: center;
-    padding-bottom: 2px;                            /* Padding so that the icon doesn't touch the table border */
-    height: 22px;                                   /* Tall enough so that FF doesn't do funny things when the icons are shown upon hover */
+    padding-bottom: 2px;                                                            /* Padding so that the icon doesn't touch the table border */
+    height: 22px;                                                                   /* Tall enough so that FF doesn't do funny things when the icons are shown upon hover */
 }
 .fb-grid-column-toolbar-td .fb-insert-left { float: left }
 .fb-grid-column-toolbar-td .fb-insert-right { float: right }
-.fb-grid-column-toolbar-td a { display: none }      /* By default, don't show the icons at the top of the grid */
-.fb-grid-column-toolbar-td:hover a,                 /* Show them when the mouse is specifically over that toolbar td */
-.fb-grid-column-toolbar-td.fb-hover a               /* Show them when the mouse is in a cell of the same column; style.coffee adds the .fb-hover */
+.fb-grid-column-toolbar-td a { display: none }                                      /* By default, don't show the icons at the top of the grid */
+.fb-grid-column-toolbar-td:hover a,                                                 /* Show them when the mouse is specifically over that toolbar td */
+.fb-grid-column-toolbar-td.fb-hover a                                               /* Show them when the mouse is in a cell of the same column; style.coffee adds the .fb-hover */
     { display: block }
 
-.fb-selected {                                      /* Selected cell */
-    background-color: #cdf; }                       /* Darker "blue" than the one used for alternating rows */
+.fb-selected {                                                                      /* Selected cell */
+    background-color: #cdf; }                                                       /* Darker "blue" than the one used for alternating rows */
 
 /* Grid content */
 /* Margin leaves space for the icons to the left and right of the control */

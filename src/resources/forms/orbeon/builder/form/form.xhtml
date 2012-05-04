@@ -36,7 +36,6 @@
         <xh:script type="text/javascript" src="/forms/orbeon/builder/resources/accordion-menu-v2.js"/>
         <xh:script type="text/javascript" src="/forms/orbeon/builder/resources/grid/events.js"/>
         <xh:script type="text/javascript" src="/forms/orbeon/builder/resources/grid/action-icons.js"/>
-        <xh:script type="text/javascript" src="/forms/orbeon/builder/resources/grid/label-hint.js"/>
         <xh:script type="text/javascript" src="/forms/orbeon/builder/resources/grid/placeholders.js"/>
         <xh:script type="text/javascript" src="/forms/orbeon/builder/resources/grid/static-upload.js"/>
         <xh:script type="text/javascript" src="/forms/orbeon/builder/resources/grid/style.js"/>
@@ -523,15 +522,15 @@
                             </xh:span>
 
                             <!-- Label editor -->
-                            <xf:output id="fb-enter-label" ref="$form-resources/enter-label/label"/>
+                            <xf:output id="fb-placeholder-label" ref="$form-resources/enter-label/label"/>
                             <xf:group ref=".[exists($control/xf:label/@ref)]" appearance="xxf:internal">
-                                <xf:input xxf:autocomplete="off" class="fb-control-label" ref="$current-resources/*[name() = controlOps:controlName($control-id)]/label"/>
+                                <xf:input xxf:autocomplete="off" id="fb-edit-label" class="fb-edit-label" ref="$current-resources/*[name() = controlOps:controlName($control-id)]/label"/>
                             </xf:group>
 
                             <!-- Hint editor -->
-                            <xf:output id="fb-enter-hint" ref="$form-resources/enter-hint/label"/>
+                            <xf:output id="fb-placeholder-hint" ref="$form-resources/enter-hint/label"/>
                             <xf:group ref=".[exists($control/xf:hint/@ref)]" appearance="xxf:internal">
-                                <xf:input xxf:autocomplete="off" class="fb-control-hint" ref="$current-resources/*[name() = controlOps:controlName($control-id)]/hint"/>
+                                <xf:input xxf:autocomplete="off" id="fb-edit-hint" class="fb-edit-hint" ref="$current-resources/*[name() = controlOps:controlName($control-id)]/hint"/>
                             </xf:group>
 
                             <!-- Itemset editor -->

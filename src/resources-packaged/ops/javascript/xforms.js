@@ -3390,49 +3390,49 @@ ORBEON.xforms.Events = {
                 // we can avoid a round trip and show the help right away
                 ORBEON.xforms.Controls.showHelp(control);
             }
-        } else {
-            // Click on something that is not an XForms element, but which might still be in an repeat iteration,
-            // in which case we want to let the server know about where in the iteration the click was.
+        }
 
-            var node = originalTarget;
+        // Click on something that is not an XForms element, but which might still be in an repeat iteration,
+        // in which case we want to let the server know about where in the iteration the click was.
 
-            // Iterate on ancestors, stop when we don't find ancestors anymore or we arrive at the form element
-            while (node != null && ! (ORBEON.util.Dom.isElement(node) && node.tagName.toLowerCase() == "form")) {
+        var node = originalTarget;
 
-                // First check clickable group
-                if (YAHOO.util.Dom.hasClass(node, "xforms-activable")) {
-                    var event = new ORBEON.xforms.server.AjaxServer.Event(form, node.id, null, "DOMActivate");
-                    ORBEON.xforms.server.AjaxServer.fireEvents([event]);
-                    break;
-                }
+        // Iterate on ancestors, stop when we don't find ancestors anymore or we arrive at the form element
+        while (node != null && ! (ORBEON.util.Dom.isElement(node) && node.tagName.toLowerCase() == "form")) {
 
-                // Iterate on previous siblings
-                var delimiterCount = 0;
-                var foundRepeatBegin = false;
-                var sibling = node;
-                while (sibling != null) {
-                    if (ORBEON.util.Dom.isElement(sibling)) {
-                        if (sibling.id.indexOf("repeat-begin-") == 0) {
-                            // Found beginning of current iteration, tell server
-                            var form = ORBEON.xforms.Controls.getForm(sibling);
-                            var targetId = sibling.id.substring("repeat-begin-".length);
-                            targetId += targetId.indexOf(XFORMS_SEPARATOR_1) == -1 ? XFORMS_SEPARATOR_1 : XFORMS_SEPARATOR_2;
-                            targetId += delimiterCount;
-                            var event = new ORBEON.xforms.server.AjaxServer.Event(form, targetId, null, "xxforms-repeat-activate");
-                            ORBEON.xforms.server.AjaxServer.fireEvents([event]);
-                            foundRepeatBegin = true;
-                            break;
-                        } else if (YAHOO.util.Dom.hasClass(sibling, "xforms-repeat-delimiter")) {
-                            delimiterCount++;
-                        }
-                    }
-                    sibling = sibling.previousSibling;
-                }
-                // We found what we were looking for, no need to go to parents
-                if (foundRepeatBegin) break;
-                // Explore parent
-                node = node.parentNode;
+            // First check clickable group
+            if (YAHOO.util.Dom.hasClass(node, "xforms-activable")) {
+                var event = new ORBEON.xforms.server.AjaxServer.Event(form, node.id, null, "DOMActivate");
+                ORBEON.xforms.server.AjaxServer.fireEvents([event]);
+                break;
             }
+
+            // Iterate on previous siblings
+            var delimiterCount = 0;
+            var foundRepeatBegin = false;
+            var sibling = node;
+            while (sibling != null) {
+                if (ORBEON.util.Dom.isElement(sibling)) {
+                    if (sibling.id.indexOf("repeat-begin-") == 0) {
+                        // Found beginning of current iteration, tell server
+                        var form = ORBEON.xforms.Controls.getForm(sibling);
+                        var targetId = sibling.id.substring("repeat-begin-".length);
+                        targetId += targetId.indexOf(XFORMS_SEPARATOR_1) == -1 ? XFORMS_SEPARATOR_1 : XFORMS_SEPARATOR_2;
+                        targetId += delimiterCount;
+                        var event = new ORBEON.xforms.server.AjaxServer.Event(form, targetId, null, "xxforms-repeat-activate");
+                        ORBEON.xforms.server.AjaxServer.fireEvents([event]);
+                        foundRepeatBegin = true;
+                        break;
+                    } else if (YAHOO.util.Dom.hasClass(sibling, "xforms-repeat-delimiter")) {
+                        delimiterCount++;
+                    }
+                }
+                sibling = sibling.previousSibling;
+            }
+            // We found what we were looking for, no need to go to parents
+            if (foundRepeatBegin) break;
+            // Explore parent
+            node = node.parentNode;
         }
     },
 

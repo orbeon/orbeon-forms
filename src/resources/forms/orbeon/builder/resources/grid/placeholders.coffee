@@ -107,7 +107,7 @@ $ ->
     ajaxResponse = (f) -> Events.ajaxResponseProcessedEvent.subscribe f
     click = (f) -> ($ document).click ({target}) -> f $ target
     enterKey = (f) -> ($ document).keypress ({target, which}) -> f $ target if which == 13
-    looseFocus = (f) -> ($ document).focusout ({target}) -> f $ target
+    lostFocus = (f) -> ($ document).focusout ({target}) -> f $ target
     editDoneCallbacks = $.Callbacks()
     editDone = (f) -> editDoneCallbacks.add f
 
@@ -160,7 +160,7 @@ $ ->
         { from: [ 'placeholder' ],              events: [ mouseExistsGridTd ],      elements: elementsInContainer,                                                  to: 'initial',                  actions: [ hidePlaceholder, removeMock  ]            }
         { from: [ 'placeholder', 'mock' ],      events: [ click ],                  elements: elementClosest,                                                       to: 'wait-xhr-to-edit'                                                               }
         { from: [ 'wait-xhr-to-edit' ],         events: [ ajaxResponse ],           elements: elementsAll,                                                          to: 'edit',                     actions: [ startEdit ]                               }
-        { from: [ 'edit' ],                     events: [ enterKey, looseFocus ],   elements: elementClosest,                                                       to: 'edit-done',                actions: [ endEdit, removeMock, fireEditDone ]       }
+        { from: [ 'edit' ],                     events: [ enterKey, lostFocus ],    elements: elementClosest,                                                       to: 'edit-done',                actions: [ endEdit, removeMock, fireEditDone ]       }
         { from: [ 'edit-done' ],                events: [ editDone ],               elements: elementsAll,          conditions: [ pointerOutsideCell ],             to: 'initial'                                                                        }
         { from: [ 'edit-done' ],                events: [ editDone ],               elements: elementsAll,          conditions: [ pointerInsideCell, isEmpty ],     to: 'placeholder-after-edit',   actions: [ createMock, showPlaceholder ]             }
         { from: [ 'edit-done' ],                events: [ editDone ],               elements: elementsAll,          conditions: [ pointerInsideCell, isNonEmpty ],  to: 'mock',                     actions: [ createMock ]                              }

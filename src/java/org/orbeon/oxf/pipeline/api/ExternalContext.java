@@ -187,7 +187,4 @@ public interface ExternalContext {
 
     String getStartLoggerString();
     String getEndLoggerString();
-
-    Object getNativeRequest();
-    Object getNativeResponse();
 }

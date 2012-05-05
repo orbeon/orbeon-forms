@@ -361,7 +361,7 @@ public class TestExternalContext implements ExternalContext  {
         }
 
         public Object getNativeRequest() {
-            return TestExternalContext.this.getNativeRequest();
+            return null;
         }
     }
 
@@ -448,7 +448,7 @@ public class TestExternalContext implements ExternalContext  {
         }
 
         public Object getNativeResponse() {
-            return TestExternalContext.this.getNativeResponse();
+            return null;
         }
     }
 
@@ -564,13 +564,5 @@ public class TestExternalContext implements ExternalContext  {
 
     public String getEndLoggerString() {
         return "Done running test processor";
-    }
-
-    public Object getNativeRequest() {
-        return null;
-    }
-
-    public Object getNativeResponse() {
-        return null;
     }
 }

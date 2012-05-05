@@ -27,6 +27,4 @@ class ExternalContextWrapper(val externalContext: ExternalContext) extends Exter
     def getEndLoggerString = externalContext.getEndLoggerString
 
     def getRequestDispatcher(path: String, isContextRelative: Boolean): ExternalContext.RequestDispatcher = externalContext.getRequestDispatcher(path, isContextRelative)
-    def getNativeRequest = externalContext.getNativeRequest
-    def getNativeResponse = externalContext.getNativeResponse
 }

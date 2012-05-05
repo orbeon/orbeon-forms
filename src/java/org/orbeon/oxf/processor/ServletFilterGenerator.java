@@ -17,7 +17,6 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
-import org.orbeon.oxf.processor.impl.ProcessorOutputImpl;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -31,7 +30,6 @@ import java.io.IOException;
  */
 public class ServletFilterGenerator extends ProcessorImpl {
 
-    public static final String SERVLET_FILTER_NAMESPACE_URI = "http://www.orbeon.org/oxf/servlet-filter";
     public static final String FILTER_CHAIN = "filter-chain"; // used by ServletFilterGenerator and OPSServletFilter
 
     public ServletFilterGenerator() {
@@ -45,8 +43,8 @@ public class ServletFilterGenerator extends ProcessorImpl {
                 final FilterChain chain = (FilterChain) context.getAttribute(FILTER_CHAIN);
 
                 ExternalContext externalContext = (ExternalContext) context.getAttribute(org.orbeon.oxf.pipeline.api.PipelineContext.EXTERNAL_CONTEXT);
-                ServletRequest request = (ServletRequest) externalContext.getNativeRequest();
-                ServletResponse response = (ServletResponse) externalContext.getNativeResponse();
+                ServletRequest request = (ServletRequest) externalContext.getRequest().getNativeRequest();
+                ServletResponse response = (ServletResponse) externalContext.getResponse().getNativeResponse();
 
                 if (chain == null)
                     throw new OXFException("Filter chain not found. Make sure that ServletFilterGenerator is used only when ProcessorFilter is configured.");

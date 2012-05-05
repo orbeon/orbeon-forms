@@ -382,7 +382,7 @@ public class ServletExternalContext implements ExternalContext  {
         }
 
         public Object getNativeRequest() {
-            return ServletExternalContext.this.getNativeRequest();
+            return nativeRequest;
         }
 
         private void handleInputEncoding() throws UnsupportedEncodingException {
@@ -550,7 +550,7 @@ public class ServletExternalContext implements ExternalContext  {
         }
 
         public Object getNativeResponse() {
-            return ServletExternalContext.this.getNativeResponse();
+            return nativeResponse;
         }
 
         public String rewriteActionURL(String urlString) {
@@ -694,14 +694,6 @@ public class ServletExternalContext implements ExternalContext  {
 
     public WebAppContext getWebAppContext() {
         return webAppContext;
-    }
-
-    public Object getNativeRequest() {
-        return nativeRequest;
-    }
-
-    public Object getNativeResponse() {
-        return nativeResponse;
     }
 
     public ExternalContext.Request getRequest() {

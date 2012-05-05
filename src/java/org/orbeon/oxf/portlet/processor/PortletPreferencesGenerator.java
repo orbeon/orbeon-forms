@@ -39,10 +39,10 @@ public class PortletPreferencesGenerator extends ProcessorImpl {
             public void readImpl(PipelineContext pipelineContext, XMLReceiver xmlReceiver) {
                 final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
 
-                if (!(externalContext.getNativeRequest() instanceof PortletRequest))
+                if (!(externalContext.getRequest().getNativeRequest() instanceof PortletRequest))
                     throw new OXFException("Portlet preferences are only available from within a portlet");
 
-                final PortletRequest portletRequest = (PortletRequest) externalContext.getNativeRequest();
+                final PortletRequest portletRequest = (PortletRequest) externalContext.getRequest().getNativeRequest();
                 final PortletPreferences preferences = portletRequest.getPreferences();
 
                 final ContentHandlerHelper helper = new ContentHandlerHelper(xmlReceiver);

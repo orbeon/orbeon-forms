@@ -43,7 +43,7 @@ public class PortletPreferencesSerializer extends ProcessorImpl {
 
         final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
 
-        final PortletRequest portletRequest = (PortletRequest) externalContext.getNativeRequest();
+        final PortletRequest portletRequest = (PortletRequest) externalContext.getRequest().getNativeRequest();
         final PortletPreferences preferences = portletRequest.getPreferences();
 
         final Document document = readInputAsDOM4J(pipelineContext, INPUT_DATA);

@@ -30,6 +30,4 @@ class AsyncExternalContext(val webAppContext: WebAppContext,  request: AsyncRequ
     def getEndLoggerString = getRequest.getRequestPath
 
     def getRequestDispatcher(path: String, isContextRelative: Boolean) = throw new UnsupportedOperationException
-    def getNativeRequest = null
-    def getNativeResponse = null
 }

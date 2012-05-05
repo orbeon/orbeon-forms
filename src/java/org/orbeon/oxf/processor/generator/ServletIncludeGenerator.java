@@ -71,8 +71,8 @@ public class ServletIncludeGenerator extends ProcessorImpl {
                 if (externalContext == null)
                     throw new OXFException("Can't find external context in pipeline context");
 
-                HttpServletRequest request = (HttpServletRequest) externalContext.getNativeRequest();
-                HttpServletResponse response = (HttpServletResponse) externalContext.getNativeResponse();
+                HttpServletRequest request = (HttpServletRequest) externalContext.getRequest().getNativeRequest();
+                HttpServletResponse response = (HttpServletResponse) externalContext.getResponse().getNativeResponse();
 
                 // Include the result as XML or HTML
                 ServletResponseWrapper wrapper = new ServletResponseWrapper(response);

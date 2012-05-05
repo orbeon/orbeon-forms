@@ -57,7 +57,7 @@ object PipelineResponse {
                     // Don't allow other headers
                 }
 
-                override def getNativeResponse = externalContext.getNativeResponse
+                override def getNativeResponse = externalContext.getResponse.getNativeResponse
                 override def getNamespacePrefix = originalResponse.getNamespacePrefix
 
                 override def setTitle(title: String): Unit = {

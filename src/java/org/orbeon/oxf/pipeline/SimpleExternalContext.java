@@ -191,7 +191,7 @@ public class SimpleExternalContext implements ExternalContext {
         }
 
         public Object getNativeRequest() {
-            return SimpleExternalContext.this.getNativeRequest();
+            return null;
         }
 
         public String getPortletMode() {
@@ -303,7 +303,7 @@ public class SimpleExternalContext implements ExternalContext {
         }
 
         public Object getNativeResponse() {
-            return SimpleExternalContext.this.getNativeResponse();
+            return null;
         }
     }
 
@@ -359,14 +359,6 @@ public class SimpleExternalContext implements ExternalContext {
     protected Request request = new Request();
     protected Response response = new Response();
     protected Session session = new Session();
-
-    public Object getNativeRequest() {
-        return null;
-    }
-
-    public Object getNativeResponse() {
-        return null;
-    }
 
     public ExternalContext.Request getRequest() {
         return request;

@@ -320,7 +320,7 @@ public class Portlet2ExternalContext implements ExternalContext {
         }
 
         public Object getNativeRequest() {
-            return Portlet2ExternalContext.this.getNativeRequest();
+            return portletRequest;
         }
 
         public String getPortletMode() {
@@ -586,14 +586,6 @@ public class Portlet2ExternalContext implements ExternalContext {
         public String getTitle() {
             return title;
         }
-    }
-
-    public Object getNativeRequest() {
-        return portletRequest;
-    }
-
-    public Object getNativeResponse() {
-        return mimeResponse;
     }
 
     public ExternalContext.Request getRequest() {

@@ -235,7 +235,7 @@ public class Connection {
             // incoming JSESSIONID. To do this, we get the cookie, then serialize it as a header.
 
             // TODO: ExternalContext must provide direct access to cookies
-            final Object nativeRequest = externalContext.getNativeRequest();
+            final Object nativeRequest = externalContext.getRequest().getNativeRequest();
             boolean sessionCookieSet = false;
             if (nativeRequest instanceof HttpServletRequest) {
                 final HttpServletRequest httpServletRequest = (HttpServletRequest) nativeRequest;
@@ -306,15 +306,15 @@ public class Connection {
                         final String[] cookieHeaders = externalContext.getRequest().getHeaderValuesMap().get("cookie");
                         if (cookieHeaders != null) {
                             for (final String cookie: cookieHeaders) {
-                                if (cookie.indexOf(sessionCookieName) != -1) {
+                                if (cookie.contains(sessionCookieName)) {
                                     incomingSessionHeader = cookie;
                                 }
                             }
                         }
 
                         String incomingSessionCookie = null;
-                        if (externalContext.getNativeRequest() instanceof HttpServletRequest) {
-                            final Cookie[] cookies = ((HttpServletRequest) externalContext.getNativeRequest()).getCookies();
+                        if (externalContext.getRequest().getNativeRequest() instanceof HttpServletRequest) {
+                            final Cookie[] cookies = ((HttpServletRequest) externalContext.getRequest().getNativeRequest()).getCookies();
                             if (cookies != null) {
                                 for (final Cookie cookie: cookies) {
                                     if (cookie.getName().equals(sessionCookieName)) {

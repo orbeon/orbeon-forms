@@ -23,6 +23,7 @@
     <property as="xs:boolean" name="oxf.resources.versioned"                         value="false"/>
     <property as="xs:string"  name="oxf.resources.version-number"                    value="3.1415"/>
 
+    <!-- URL rewriting -->
     <property as="xs:string"  name="oxf.url-rewriting.platform-paths"                value="^/(ops/|config/|xbl/orbeon/|forms/orbeon/|apps/fr/|xforms-server).*$"/>
     <property as="xs:string"  name="oxf.url-rewriting.app-paths"                     value="^/(apps|xbl|forms)/.*$"/>
     <property as="xs:string"  name="oxf.url-rewriting.app-prefix"                    value="/apps"/>
@@ -35,11 +36,22 @@
     <property as="xs:string"  name="oxf.url-rewriting.wsrp.context"                  value=""/>
     <property as="xs:boolean" name="oxf.url-rewriting.wsrp.encode-resources"         value="false"/>
 
+    <!-- HTTP client -->
     <property as="xs:string"  name="oxf.http.state"                                  value="session"/>
     <property as="xs:string"  name="oxf.http.forward-headers"                        value=""/>
     <property as="xs:string"  name="oxf.http.forward-cookies"                        value="JSESSIONID JSESSIONIDSSO"/> <!-- forward JSESSIONIDSSO for JBoss -->
     <property as="xs:boolean" name="oxf.http.stale-checking-enabled"                 value="true"/>
     <property as="xs:integer" name="oxf.http.so-timeout"                             value="0"/>
+
+    <property as="xs:string"  name="oxf.http.ssl.hostname-verifier"                  value="strict"/>
+    <property as="xs:anyURI"  name="oxf.http.ssl.keystore.uri"                       value=""/>
+    <property as="xs:string"  name="oxf.http.ssl.keystore.password"                  value="changeit"/>
+
+    <property as="xs:boolean" name="oxf.http.proxy.use-ssl"                          value="false"/>
+    <!--<property as="xs:string"  name="oxf.http.proxy.host"                             value="localhost"/>-->
+    <!--<property as="xs:integer" name="oxf.http.proxy.port"                             value="8090"/>-->
+    <!--<property as="xs:string"  name="oxf.http.proxy.ntlm.host"                        value=""/>-->
+    <!--<property as="xs:string"  name="oxf.http.proxy.ntlm.domain"                      value=""/>-->
 
     <!-- HTTP response -->
     <property as="xs:boolean" name="oxf.http.exceptions"                             value="false"/>
@@ -64,16 +76,6 @@
     -->
     <property as="xs:string"  name="oxf.http.page.cache-headers"                     value="Cache-Control: private, max-age=0; Pragma:"/>
     <property as="xs:string"  name="oxf.http.resource.cache-headers"                 value="Cache-Control: public; Pragma:"/>
-
-    <property as="xs:string"  name="oxf.http.ssl.hostname-verifier"                  value="strict"/>
-    <property as="xs:anyURI"  name="oxf.http.ssl.keystore.uri"                       value=""/>
-    <property as="xs:string"  name="oxf.http.ssl.keystore.password"                  value="changeit"/>
-
-    <property as="xs:boolean" name="oxf.http.proxy.use-ssl"                          value="false"/>
-    <!--<property as="xs:string"  name="oxf.http.proxy.host"                             value="localhost"/>-->
-    <!--<property as="xs:integer" name="oxf.http.proxy.port"                             value="8090"/>-->
-    <!--<property as="xs:string"  name="oxf.http.proxy.ntlm.host"                        value=""/>-->
-    <!--<property as="xs:string"  name="oxf.http.proxy.ntlm.domain"                      value=""/>-->
 
     <!-- Epilogue configuration -->
     <property as="xs:anyURI"  name="oxf.epilogue.theme"                              value="oxf:/config/theme-examples.xsl"/>

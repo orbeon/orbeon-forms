@@ -13,46 +13,41 @@
  */
 package org.orbeon.oxf.webapp
 
-import org.apache.log4j.Logger
-import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.pipeline.InitUtils
 import org.orbeon.oxf.servlet.ServletExternalContext
-import org.orbeon.oxf.util.LoggerFactory
 import javax.servlet.http.HttpSessionEvent
 import javax.servlet.http.HttpSessionListener
 import collection.JavaConverters._
+import javax.servlet.ServletException
+import ProcessorService.logger
 
+// For backward compatibility
 class OrbeonSessionListenerDelegate extends OrbeonSessionListener
 
 /**
  * This listener listens for HTTP session lifecycle changes.
  */
-class OrbeonSessionListener extends HttpSessionListener {
-
-    private val logger = LoggerFactory.createLogger(classOf[OrbeonSessionListener])
+class OrbeonSessionListener extends HttpSessionListener with ServletPortlet {
 
     private val InitProcessorPrefix     = "oxf.session-created-processor."
     private val InitInputPrefix         = "oxf.session-created-processor.input."
     private val DestroyProcessorPrefix  = "oxf.session-destroyed-processor."
     private val DestroyInputPrefix      = "oxf.session-destroyed-processor.input."
 
-    def logPrefix = "Session Listener"
+    def logPrefix = "Session listener"
+    def initParameters = Map()
 
     def sessionCreated(event: HttpSessionEvent): Unit =
-        try {
+        withRootException("session creation", new ServletException(_)) {
             val httpSession = event.getSession
             val servletContext = httpSession.getServletContext
             InitUtils.run(servletContext, httpSession, null, logger, logPrefix, "Session created.", InitProcessorPrefix, InitInputPrefix)
-        } catch {
-            case e: Exception ⇒
-                logger.error(logPrefix + " - Exception when running session creation processor.", OXFException.getRootThrowable(e))
-                throw new OXFException(e)
         }
 
-    def sessionDestroyed(event: HttpSessionEvent): Unit = {
-        val httpSession = event.getSession
-        if (httpSession ne null) {
-            try {
+    def sessionDestroyed(event: HttpSessionEvent): Unit =
+        withRootException("session destruction", new ServletException(_)) {
+            val httpSession = event.getSession
+            if (httpSession ne null) {
                 // Run processor
                 val servletContext = httpSession.getServletContext
                 InitUtils.run(servletContext, httpSession, null, logger, logPrefix, "Session destroyed.", DestroyProcessorPrefix, DestroyInputPrefix)
@@ -64,11 +59,6 @@ class OrbeonSessionListener extends HttpSessionListener {
                     // Run listener and ignore exceptions so we can continue running the remaining listeners
                     listener ⇒ try listener.sessionDestroyed() catch { case t ⇒ logger.error("Throwable caught when calling listener", t) }
                 }
-            } catch {
-                case e: Exception ⇒
-                    logger.error(logPrefix + " - Exception when running session destruction processor.", OXFException.getRootThrowable(e))
-                    throw new OXFException(e)
             }
         }
-    }
 }

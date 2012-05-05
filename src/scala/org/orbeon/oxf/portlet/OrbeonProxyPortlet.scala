@@ -203,7 +203,7 @@ class OrbeonProxyPortlet extends GenericPortlet {
             // Read content
             val content = Net.readStreamAsString(new InputStreamReader(connection.getInputStream, "utf-8"))
             // Rewrite and send
-            WSRP2Utils.write(response, content, OrbeonPortlet2Delegate.shortIdNamespace(response, getPortletContext), escape)
+            WSRP2Utils.write(response, content, OrbeonPortlet.shortIdNamespace(response, getPortletContext), escape)
 
         } else {
             // Simply forward content

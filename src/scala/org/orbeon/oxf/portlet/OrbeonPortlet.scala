@@ -14,7 +14,6 @@
 package org.orbeon.oxf.portlet
 
 import javax.portlet._
-import org.orbeon.oxf.common.OXFException
 import collection.JavaConverters._
 import java.util.{Map ⇒ JMap}
 import org.orbeon.oxf.pipeline.api.PipelineContext
@@ -27,7 +26,7 @@ import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.xforms.XFormsProperties
 import org.orbeon.oxf.xforms.processor.{ResourcesAggregator, XFormsFeatures}
 import collection.mutable.LinkedHashSet
-import OrbeonPortlet2Delegate._
+import OrbeonPortlet._
 import org.orbeon.oxf.util.{DynamicVariable, URLRewriterUtils, NetUtils}
 import org.orbeon.oxf.externalcontext.{URLRewriter, WSRPURLRewriter, AsyncRequest, AsyncExternalContext}
 
@@ -114,7 +113,7 @@ class OrbeonPortlet extends OrbeonPortletBase {
     }
 
     private def doRenderDirectly(request: RenderRequest, response: RenderResponse): Unit =
-        try {
+        withRootException("render", new PortletException(_)) {
             val pipelineContext = new PipelineContext
             val externalContext = new Portlet2ExternalContext(pipelineContext, webAppContext, request, response)
 
@@ -132,8 +131,6 @@ class OrbeonPortlet extends OrbeonPortletBase {
                 setResponseWithParameters(request, responseWithParameters)
             
             writeResponseWithParameters(request, response, responseWithParameters)
-        } catch {
-            case e: Exception ⇒ throw new PortletException(OXFException.getRootThrowable(e))
         }
 
     private def renderDiv(request: RenderRequest, response: RenderResponse) {
@@ -166,7 +163,7 @@ class OrbeonPortlet extends OrbeonPortletBase {
     }
 
     private def doRenderAsync(request: RenderRequest, response: RenderResponse, renderHTML: (RenderRequest, RenderResponse) ⇒ Unit): Unit =
-        try {
+        withRootException("render", new PortletException(_)) {
             // Make sure any content is removed, as serveContentAsync checks for this
             if (tryStoringRenderResponse)
                 clearResponseWithParameters(request)
@@ -200,8 +197,6 @@ class OrbeonPortlet extends OrbeonPortletBase {
             response.setContentType("text/html")
             renderHTML(request, response)
 
-        } catch {
-            case e: Exception ⇒ throw new PortletException(OXFException.getRootThrowable(e))
         }
 
     private def writeResponseAsResource(responseWithParameters: ResponseWithParameters, request: ResourceRequest, response: ResourceResponse) = {
@@ -230,7 +225,7 @@ class OrbeonPortlet extends OrbeonPortletBase {
         }
 
     private def doServeResource(request: ResourceRequest, response: ResourceResponse): Unit =
-        try {
+        withRootException("resource", new PortletException(_)) {
             if (request.getResourceID == IFrameContentResourceId) {
                 // Special case: serve content previously stored
                 serveContentFunction foreach (_(request, response))
@@ -245,12 +240,10 @@ class OrbeonPortlet extends OrbeonPortletBase {
                 Option(directResponse.getContentType) foreach (response.setContentType(_))
                 write(response, getResponseData(directResponse), Option(directResponse.getContentType))
             }
-        } catch {
-            case e: Exception ⇒ throw new PortletException(OXFException.getRootThrowable(e))
         }
 
     private def doProcessAction(request: ActionRequest, response: ActionResponse): Unit =
-        try {
+        withRootException("action", new PortletException(_)) {
             // Make sure the previously cached output is cleared, if there is any. We keep the result of only one action.
             clearResponseWithParameters(request)
 
@@ -293,8 +286,6 @@ class OrbeonPortlet extends OrbeonPortletBase {
                 // Nothing happened, throw an exception (or should we just ignore?)
                 throw new IllegalStateException("Processor execution did not return content or issue a redirect.")
             }
-        } catch {
-            case e: Exception ⇒ throw new PortletException(OXFException.getRootThrowable(e))
         }
 
     private def write(response: MimeResponse, data: String Either Array[Byte], contentType: Option[String]): Unit =
@@ -345,7 +336,7 @@ class OrbeonPortlet extends OrbeonPortletBase {
         request.getPortletSession.removeAttribute(FutureResponseSessionKey)
 }
 
-object OrbeonPortlet2Delegate {
+object OrbeonPortlet {
 
     val PathParameter = "orbeon.path"
     val MethodParameter = "orbeon.method"

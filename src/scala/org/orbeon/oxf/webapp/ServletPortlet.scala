@@ -20,11 +20,47 @@ import org.orbeon.oxf.common.OXFException
 import collection.JavaConverters._
 
 // Servlet/portlet helper for processor definitions and services
-trait ServletPortletDefinitions {
+trait ServletPortlet {
 
     def logPrefix: String
     def initParameters: Map[String, String]
-    def webAppContext: WebAppContext
+
+    private var _processorService: ProcessorService = _
+    def processorService = _processorService
+
+    // Web application context instance shared between all components of a web application
+    private var _webAppContext: WebAppContext = _
+    def webAppContext = _webAppContext
+
+    def withRootException(action: String, newException: Throwable ⇒ Exception)(body: ⇒ Any) =
+        try body
+        catch {
+            case e: Exception ⇒
+                logger.error(logPrefix + " - Exception when running " + action, OXFException.getRootThrowable(e))
+                throw newException(OXFException.getRootThrowable(e))
+        }
+
+    // Initialize the servlet or portlet
+    def init(webAppContext: WebAppContext, processor: Option[(String, String)]): Unit = {
+        _webAppContext = webAppContext
+        _processorService = getProcessorService
+
+        // Run listener if needed
+        processor foreach { case (processorPrefix, inputPrefix) ⇒ runListenerProcessor(_, _) }
+        logger.info(logPrefix + " initialized.")
+    }
+
+    // Destroy the servlet or portlet
+    def destroy(processor: Option[(String, String)]): Unit = {
+        // Run listener if needed
+        processor foreach { case (processorPrefix, inputPrefix) ⇒ runListenerProcessor(_, _) }
+        logger.info(logPrefix + " destroyed.")
+
+         // Clean-up
+        _processorService.destroy()
+        _processorService = null
+        _webAppContext = null
+    }
 
     def getProcessorService =
         searchDefinition(MAIN_PROCESSOR_PROPERTY_PREFIX, MAIN_PROCESSOR_INPUT_PROPERTY_PREFIX) match {
@@ -37,7 +73,7 @@ trait ServletPortletDefinitions {
                 throw new OXFException("Unable to find main processor definition")
         }
 
-    def runListenerProcessor(processorPrefix: String, inputPrefix: String) {
+    private def runListenerProcessor(processorPrefix: String, inputPrefix: String): Unit = {
         try {
             // Create and run processor if definition is found
             searchDefinition(processorPrefix, inputPrefix) foreach  { definition ⇒
@@ -54,7 +90,7 @@ trait ServletPortletDefinitions {
     }
 
     // Search a processor definition in order from: servlet/portlet parameters, properties, context parameters
-    def searchDefinition(processorPrefix: String, inputPrefix: String) = {
+    private def searchDefinition(processorPrefix: String, inputPrefix: String) = {
         // All search functions
         val functions: Seq[(String, String) ⇒ ProcessorDefinition] =
             Seq(getDefinitionFromMap(initParameters.asJava, _, _),

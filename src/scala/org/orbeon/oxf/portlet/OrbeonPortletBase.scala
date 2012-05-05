@@ -14,10 +14,9 @@
 package org.orbeon.oxf.portlet
 
 import collection.JavaConverters._
-import org.orbeon.oxf.webapp.ProcessorService._
-import org.orbeon.oxf.common.{OXFException, Version}
+import org.orbeon.oxf.common.Version
+import org.orbeon.oxf.webapp.{ServletPortlet, WebAppContext}
 import javax.portlet.{PortletException, GenericPortlet}
-import org.orbeon.oxf.webapp.{ServletPortletDefinitions, WebAppContext, ProcessorService}
 
 /**
  * This is the Portlet (JSR-286) entry point of Orbeon.
@@ -27,53 +26,25 @@ import org.orbeon.oxf.webapp.{ServletPortletDefinitions, WebAppContext, Processo
  *
  * All servlets and portlets instances in a given web app share the same resource manager.
  */
-abstract class OrbeonPortletBase extends GenericPortlet with ServletPortletDefinitions {
-    
-    private val InitProcessorPrefix     = "oxf.portlet-initialized-processor."
-    private val InitInputPrefix         = "oxf.portlet-initialized-processor.input."
-    private val DestroyProcessorPrefix  = "oxf.portlet-destroyed-processor."
-    private val DestroyInputPrefix      = "oxf.portlet-destroyed-processor.input."
+abstract class OrbeonPortletBase extends GenericPortlet with ServletPortlet {
 
     def logPrefix = "Portlet"
-
-    private var _webAppContext: WebAppContext = _
-    def webAppContext = _webAppContext
-
-    private var _processorService: ProcessorService = _
-    def processorService = _processorService
 
     // Immutable map of portlet parameters
     lazy val initParameters =
         getInitParameterNames.asScala map
             (n ⇒ n → getInitParameter(n)) toMap
 
+    // Portlet init
     override def init(): Unit =
-        try {
-
-            // This is a PE feature
-            Version.instance.checkPEFeature("Orbeon Forms portlet")
-
-            _webAppContext = WebAppContext.instance(getPortletContext)
-            _processorService = getProcessorService
-
-            // Run listeners
-            runListenerProcessor(InitProcessorPrefix, InitInputPrefix)
-            logger.info(logPrefix + " - " + "Portlet initialized.")
-        } catch {
-            case e: Exception ⇒ throw new PortletException(OXFException.getRootThrowable(e))
+        withRootException("initialization", new PortletException(_)) {
+            Version.instance.checkPEFeature("Orbeon Forms portlet") // this is a PE feature
+            init(WebAppContext.instance(getPortletContext), Some("oxf.portlet-initialized-processor." → "oxf.portlet-initialized-processor.input."))
         }
 
+    // Portlet destroy
     override def destroy(): Unit =
-        try {
-            // Run listeners
-            logger.info(logPrefix + " - " + "Portlet destroyed.")
-            runListenerProcessor(DestroyProcessorPrefix, DestroyInputPrefix)
-
-            // Clean-up
-            _processorService.destroy()
-            _processorService = null
-            _webAppContext = null
-        } catch {
-            case e: Exception ⇒ throw new PortletException(OXFException.getRootThrowable(e))
+        withRootException("destruction", new PortletException(_)) {
+            destroy(Some("oxf.portlet-destroyed-processor." → "oxf.portlet-destroyed-processor.input."))
         }
 }

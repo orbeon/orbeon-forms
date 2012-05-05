@@ -13,61 +13,48 @@
  */
 package org.orbeon.oxf.servlet
 
-import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.pipeline.api._
 import org.orbeon.oxf.processor.ServletFilterGenerator
 import javax.servlet._
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 import collection.JavaConverters._
-import org.orbeon.oxf.webapp.{ServletPortletDefinitions, ProcessorService, WebAppContext}
+import org.orbeon.oxf.webapp.{ServletPortlet, WebAppContext}
 
 // For backward compatibility
 class OrbeonServletFilterDelegate extends OrbeonServletFilter
 
-class OrbeonServletFilter extends Filter with ServletPortletDefinitions {
+class OrbeonServletFilter extends Filter with ServletPortlet {
 
     def logPrefix = "Servlet filter"
-
-    private var _processorService: ProcessorService = _
-
-    // Web application context instance shared between all components of a web application
-    private var _webAppContext: WebAppContext = _
-    def webAppContext = _webAppContext
 
     // Immutable map of servlet parameters
     private var _initParameters: Map[String, String] = _
     def initParameters = _initParameters
 
+    // Filter init
     def init(config: FilterConfig): Unit =
-        try {
-            _webAppContext = WebAppContext.instance(config.getServletContext)
+        withRootException("initialization", new ServletException(_)) {
 
             _initParameters =
                 config.getInitParameterNames.asScala.asInstanceOf[Iterator[String]] map
                     (n ⇒ n → config.getInitParameter(n)) toMap
 
-             _processorService = getProcessorService
-        } catch {
-            case e: Exception ⇒ throw new ServletException(OXFException.getRootThrowable(e))
+            init(WebAppContext.instance(config.getServletContext), None)
         }
 
+    // Filter destroy
+    def destroy(): Unit =
+        withRootException("destruction", new ServletException(_)) {
+            destroy(None)
+        }
+
+    // Filter request
     def doFilter(request: ServletRequest, response: ServletResponse, chain: FilterChain): Unit =
-        try {
+        withRootException("request", new ServletException(_)) {
             val pipelineContext = new PipelineContext
             pipelineContext.setAttribute(ServletFilterGenerator.FILTER_CHAIN, chain)
             val externalContext = new ServletExternalContext(pipelineContext, webAppContext, request.asInstanceOf[HttpServletRequest], response.asInstanceOf[HttpServletResponse])
-            _processorService.service(externalContext, pipelineContext)
-        } catch {
-            case e: Exception ⇒ throw new ServletException(OXFException.getRootThrowable(e))
-        }
-
-    def destroy(): Unit =
-        try {
-            _processorService.destroy()
-            _processorService = null
-            _webAppContext = null
-        } catch {
-            case e: Exception ⇒ throw new ServletException(OXFException.getRootThrowable(e))
+            processorService.service(externalContext, pipelineContext)
         }
 }

@@ -62,7 +62,18 @@ trait ServletPortlet {
         _webAppContext = null
     }
 
-    def getProcessorService =
+    private def runListenerProcessor(processorPrefix: String, inputPrefix: String): Unit = {
+        // Create and run processor if definition is found
+        searchDefinition(processorPrefix, inputPrefix) foreach  { definition ⇒
+            logger.info(logPrefix + " - About to run processor: " +  definition.toString)
+
+            val processor = createProcessor(definition)
+            val externalContext = new WebAppExternalContext(webAppContext)
+            runProcessor(processor, externalContext, new PipelineContext, logger)
+        }
+    }
+
+    private def getProcessorService =
         searchDefinition(MAIN_PROCESSOR_PROPERTY_PREFIX, MAIN_PROCESSOR_INPUT_PROPERTY_PREFIX) match {
             case Some(definition) ⇒
                 // Create and initialize service
@@ -72,22 +83,6 @@ trait ServletPortlet {
             case _ ⇒
                 throw new OXFException("Unable to find main processor definition")
         }
-
-    private def runListenerProcessor(processorPrefix: String, inputPrefix: String): Unit = {
-        try {
-            // Create and run processor if definition is found
-            searchDefinition(processorPrefix, inputPrefix) foreach  { definition ⇒
-                logger.info(logPrefix + " - About to run processor: " +  definition.toString)
-
-                val processor = createProcessor(definition)
-                val externalContext = new WebAppExternalContext(webAppContext)
-                runProcessor(processor, externalContext, new PipelineContext, logger)
-            }
-        } catch {
-            case e: Exception ⇒
-                logger.error(logPrefix + " - Exception when running listener processor.", OXFException.getRootThrowable(e))
-        }
-    }
 
     // Search a processor definition in order from: servlet/portlet parameters, properties, context parameters
     private def searchDefinition(processorPrefix: String, inputPrefix: String) = {

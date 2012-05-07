@@ -57,7 +57,7 @@ trait WebAppContext {
         listener ⇒ try listener.webAppDestroyed() catch { case t ⇒ log("Throwable caught when calling listener", t) }
     }
 
-    private def webAppListenersOption = Option(attributes.get(WebAppContext.WebAppListeners).asInstanceOf[WebAppListeners])
+    private def webAppListenersOption = attributes.get(WebAppContext.WebAppListeners) map (_.asInstanceOf[WebAppListeners])
 
     // Access to native context
     def getNativeContext: AnyRef
@@ -168,7 +168,7 @@ object WebAppContext {
         instanceOrCreate(portletContext.getAttribute(WebAppContext), new PortletWebAppContext(portletContext), portletContext.setAttribute(WebAppContext, _))
 
     // If `value` is not null, return it as a WebAppContext, otherwise create a new instance and store it in the context
-    // There is be no need for synchronization here because servlets and portlets and won't be initialized concurrently.
+    // There is no need for synchronization here because servlets and portlets and won't be initialized concurrently.
     private def instanceOrCreate(value: AnyRef, context: ⇒ WebAppContext, setAttribute: AnyRef ⇒ Unit) =
         Option(value.asInstanceOf[WebAppContext]) getOrElse {
             val newContext = context

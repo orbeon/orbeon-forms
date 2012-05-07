@@ -21,6 +21,7 @@ import org.orbeon.oxf.fb.ContainerOps._
 import org.orbeon.saxon.om._
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.analysis.controls.SingleNodeTrait
+import org.orbeon.oxf.xml.NamespaceMapping
 
 object DataModel {
 
@@ -139,11 +140,15 @@ object DataModel {
     // Leave public for unit tests
     def isAllowedBindingExpression(control: XFormsControl, expr: String): Boolean = {
 
-        def evaluateBoundItem =
-            Option(evalOne(control.getBindingContext.contextItem, expr, control.staticControl.namespaceMapping))// XXX TODO: not the correct namespace mapping, must us that of bind
+        def evaluateBoundItem(namespaces: NamespaceMapping) =
+            Option(evalOne(control.getBindingContext.contextItem, expr, namespaces))
 
-        try evaluateBoundItem map (XFormsControl.isAllowedBoundItem(control, _)) getOrElse false
-        catch { case _ ⇒ false }
+        try {
+            control.bind flatMap
+                (bind ⇒ evaluateBoundItem(bind.namespaceMapping)) map
+                    (XFormsControl.isAllowedBoundItem(control, _)) getOrElse
+                        false
+        } catch { case _ ⇒ false }
     }
 
     // For a given value control name and XPath sequence, whether the resulting bound item is acceptable

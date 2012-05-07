@@ -533,7 +533,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
 
         val section1 = doc.getObjectByEffectiveId("section-1-section").asInstanceOf[XFormsControl]
         val control1 = doc.getObjectByEffectiveId("control-1-control").asInstanceOf[XFormsControl]
-        
+
         assert(true  === DataModel.isAllowedBindingExpression(section1, "section-1")) // existing node
         assert(false === DataModel.isAllowedBindingExpression(section1, "foo/bar"))   // non-existing node
         assert(false === DataModel.isAllowedBindingExpression(section1, "("))         // invalid expression

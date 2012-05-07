@@ -877,6 +877,11 @@ public class XFormsModelBinds {
 
         private List<BindNode> bindNodes; // List<BindIteration>
 
+        // To work around Scala compiler bug ("error: not found: value BindTree") when accessing staticBind directly
+        public NamespaceMapping namespaceMapping() {
+            return staticBind.namespaceMapping();
+        }
+
         public Bind(BindTree.Bind staticBind, boolean isSingleNodeContext) {
             this.staticBind = staticBind;
 

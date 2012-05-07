@@ -25,6 +25,11 @@ trait ControlBindingSupport {
     final def getBindingContext: BindingContext = bindingContext
     final def getBindingContext(containingDocument: XFormsContainingDocument): BindingContext = bindingContext
 
+    // Find the bind object for this control, if it has one
+    def bind = staticControl.bind flatMap
+        (bindId ⇒ Option(container.resolveObjectByIdInScope(effectiveId, bindId, bindingContext.contextItem))) collect
+            { case bind: XFormsModelBinds#Bind ⇒ bind }
+
     // Relevance
     private var _isRelevant = false
     final def isRelevant = _isRelevant

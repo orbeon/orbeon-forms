@@ -10,12 +10,13 @@
 #
 # The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 
-YD = YAHOO.util.Dom
-OD = ORBEON.util.Dom
 Builder = ORBEON.Builder
+Controls = ORBEON.xforms.Controls
+Document = ORBEON.xforms.Document
 Event = YAHOO.util.Event
 Events = ORBEON.xforms.Events
-Controls = ORBEON.xforms.Controls
+OD = ORBEON.util.Dom
+YD = YAHOO.util.Dom
 
 # For the generic label, generic hint, button's label, and link's label:
 #   Show/hide placeholders
@@ -87,7 +88,10 @@ $ ->
     ]
 
     # Function dealing with editables
-    anyEditableSelector = (_.pluck editables, 'selector').join ', '                                                     # A CSS selector matching any editable
+    anyEditableSelector = do ->                                                                                         # A CSS selector matching any editable
+        selectors = _.pluck editables, 'selector'
+        selectors = _.map selectors, (s) -> '.fr-editable ' + s
+        selectors.join ', '
     editable = (element) -> _.first _.filter editables, (e) -> f$.is '*', f$.findOrIs e.selector, element               # element: editable -> editable info
     editableEditInput = (element) -> $ (editable element).editInputSelector                                             # Input field used for editing
     editablePlaceholderOutput = (element) -> $ (editable element).placeholderOutputSelector                             # Element in which we put the placeholder
@@ -100,6 +104,11 @@ $ ->
     matchState = (states, element) ->
         state = f$.data 'state', element
         ((_.isUndefined state) and (_.contains states, 'initial')) or (_.contains states, state)
+
+    # Utility
+    currentSeqNo = (element) ->
+        form = f$.closest 'form', element
+        parseInt Document.getFromClientState (f$.attr 'id', form), "sequence"
 
     # Events
     mouseEntersGridTd = (f) -> Builder.mouseEntersGridTdEvent.subscribe ({gridTd}) -> f $ gridTd
@@ -125,6 +134,9 @@ $ ->
         Builder.mouseExitsGridTdEvent.subscribe () -> currentCell = null
         (element) -> currentCell? and f$.is '*', f$.closest currentCell, element
     pointerOutsideCell = (element) -> not pointerInsideCell element
+    isNextSeqNo = (element) ->
+        storeSeqNo = parseInt (f$.data 'seqNo', element)
+        (currentSeqNo element) == storeSeqNo + 1
 
     # Actions
     removeFor = (element) -> f$.removeAttr 'for', element                                                               # So on click on the label, the focus isn't set on the input on click
@@ -137,6 +149,7 @@ $ ->
         f$.text '', editablePlaceholderContainer element
     createMock = editableDo 'createMock'
     removeMock = editableDo 'removeMock'
+    storeSeqNo = (element) -> f$.data 'seqNo', (currentSeqNo element), element
     startEdit = (element) ->
         f$.removeClass 'fb-label-hint-placeholder', element
         f$.removeClass 'xforms-disabled', element                                                                       # Remove disabled which we have on hint when their value is empty
@@ -154,17 +167,17 @@ $ ->
     # Finite state machine description
     # Diagram: https://docs.google.com/a/orbeon.com/drawings/d/1cJ0B3Tl7QRTMkVUbtlA55C0TUvRiOt5hzR8-dc-aBrk/edit
     transitions = [
-        { from: [ 'initial' ],                  events: [ mouseEntersGridTd ],      elements: elementsInContainer,  conditions: [ isEmpty ],                        to: 'placeholder',              actions: [ removeFor, createMock, showPlaceholder ]  }
-        { from: [ 'initial' ],                  events: [ mouseEntersGridTd ],      elements: elementsInContainer,  conditions: [ isNonEmpty ],                     to: 'mock',                     actions: [ removeFor, createMock ]                   }
-        { from: [ 'mock' ],                     events: [ mouseExistsGridTd ],      elements: elementsInContainer,                                                  to: 'initial',                  actions: [ removeMock ]                              }
-        { from: [ 'placeholder' ],              events: [ mouseExistsGridTd ],      elements: elementsInContainer,                                                  to: 'initial',                  actions: [ hidePlaceholder, removeMock  ]            }
-        { from: [ 'placeholder', 'mock' ],      events: [ click ],                  elements: elementClosest,                                                       to: 'wait-xhr-to-edit'                                                               }
-        { from: [ 'wait-xhr-to-edit' ],         events: [ ajaxResponse ],           elements: elementsAll,                                                          to: 'edit',                     actions: [ startEdit ]                               }
-        { from: [ 'edit' ],                     events: [ enterKey, lostFocus ],    elements: elementClosest,                                                       to: 'edit-done',                actions: [ endEdit, removeMock, fireEditDone ]       }
-        { from: [ 'edit-done' ],                events: [ editDone ],               elements: elementsAll,          conditions: [ pointerOutsideCell ],             to: 'initial'                                                                        }
-        { from: [ 'edit-done' ],                events: [ editDone ],               elements: elementsAll,          conditions: [ pointerInsideCell, isEmpty ],     to: 'placeholder-after-edit',   actions: [ createMock, showPlaceholder ]             }
-        { from: [ 'edit-done' ],                events: [ editDone ],               elements: elementsAll,          conditions: [ pointerInsideCell, isNonEmpty ],  to: 'mock',                     actions: [ createMock ]                              }
-        { from: [ 'placeholder-after-edit' ],   events: [ ajaxResponse ],           elements: elementsAll,                                                          to: 'placeholder',              actions: [ showPlaceholder ]                         }
+        { events: [ mouseEntersGridTd ],      elements: elementsInContainer,  from: [ 'initial' ],                  conditions: [ isEmpty ],                        to: 'placeholder',              actions: [ removeFor, createMock, showPlaceholder ]  }
+        { events: [ mouseEntersGridTd ],      elements: elementsInContainer,  from: [ 'initial' ],                  conditions: [ isNonEmpty ],                     to: 'mock',                     actions: [ removeFor, createMock ]                   }
+        { events: [ mouseExistsGridTd ],      elements: elementsInContainer,  from: [ 'mock' ],                                                                     to: 'initial',                  actions: [ removeMock ]                              }
+        { events: [ mouseExistsGridTd ],      elements: elementsInContainer,  from: [ 'placeholder' ],                                                              to: 'initial',                  actions: [ hidePlaceholder, removeMock  ]            }
+        { events: [ click ],                  elements: elementClosest,       from: [ 'placeholder', 'mock' ],                                                      to: 'wait-xhr-to-edit',         actions: [ storeSeqNo ]                              }
+        { events: [ ajaxResponse ],           elements: elementsAll,          from: [ 'wait-xhr-to-edit' ],         conditions: [ isNextSeqNo ],                    to: 'edit',                     actions: [ startEdit ]                               }
+        { events: [ enterKey, lostFocus ],    elements: elementClosest,       from: [ 'edit' ],                                                                     to: 'edit-done',                actions: [ endEdit, removeMock, fireEditDone ]       }
+        { events: [ editDone ],               elements: elementsAll,          from: [ 'edit-done' ],                conditions: [ pointerOutsideCell ],             to: 'initial'                                                                        }
+        { events: [ editDone ],               elements: elementsAll,          from: [ 'edit-done' ],                conditions: [ pointerInsideCell, isEmpty ],     to: 'placeholder-after-edit',   actions: [ storeSeqNo, createMock, showPlaceholder ] }
+        { events: [ editDone ],               elements: elementsAll,          from: [ 'edit-done' ],                conditions: [ pointerInsideCell, isNonEmpty ],  to: 'mock',                     actions: [ createMock ]                              }
+        { events: [ ajaxResponse ],           elements: elementsAll,          from: [ 'placeholder-after-edit' ],   conditions: [ isNextSeqNo ],                    to: 'placeholder',              actions: [ showPlaceholder ]                         }
     ]
 
     # Finite state machine runner
@@ -172,10 +185,10 @@ $ ->
         _.each transition.events, (event) ->
             event (event) ->
                 elements = transition.elements event                                                                    # Get elements from event (e.g. editable inside cell for mouseover)
+                elements = _.filter elements, (e) -> matchState transition.from, $ e                                    # Filter elements that are in the 'from' state
                 if transition.conditions                                                                                # Filter elements that match all the conditions
                     elements = _.filter elements, (e) ->
                         _.all transition.conditions, (c) -> c $ e
-                elements = _.filter elements, (e) -> matchState transition.from, $ e                                    # Filter elements that are in the 'from' state
                 _.each elements, (element) ->
                     f$.data 'state', transition.to, $ element                                                           # Change state before running action, so if action trigger an event, that event runs against the new state
                     _.each transition.actions, (action) -> action $ element                                             # Run all the actions on the elements

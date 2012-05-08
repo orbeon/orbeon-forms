@@ -35,9 +35,9 @@
             <xsl:when test="exists($context/*[local-name() = $property and namespace-uri() = $namespace])">
                 <!-- Parameter bound to a node -->
                 <!-- Create an input field with all the binding attributes of the nested element, i.e. fr:foo/fr:bar/@ref -->
-                <xxforms:variable name="{$property}">
+                <xforms:var name="{$property}">
                     <xxforms:sequence xxbl:attr="{$prefix}:{$property}/(@model | @context | @ref | @bind)" select="." xxbl:scope="outer"/>
-                </xxforms:variable>
+                </xforms:var>
                 <xforms:input ref="${$property}" class="xbl-{$prefix}-{$component}-{$property}" style="display: none">
                     <xxforms:script ev:event="xforms-value-changed">
                         <xsl:text>ORBEON.xforms.XBL.callValueChanged("</xsl:text>
@@ -53,8 +53,8 @@
             <xsl:otherwise>
                 <!-- Parameter is constant -->
                 <!-- NOTE: We have a "default" value in the variable so we can detect the difference between the attribute value being the empty string vs. the attribute not being there -->
-                <xxforms:variable name="{$property}-orbeon-xbl" xbl:attr="xbl:text={$property}">&#xb7;</xxforms:variable>
-                <xxforms:variable name="{$property}" select="if (${$property}-orbeon-xbl != '&#xb7;') then ${$property}-orbeon-xbl else xxforms:property('oxf.xforms.xbl.{$prefix}.{$component}.{$property}')"/>
+                <xforms:var name="{$property}-orbeon-xbl" xbl:attr="xbl:text={$property}">&#xb7;</xforms:var>
+                <xforms:var name="{$property}" value="if (${$property}-orbeon-xbl != '&#xb7;') then ${$property}-orbeon-xbl else xxforms:property('oxf.xforms.xbl.{$prefix}.{$component}.{$property}')"/>
                 <xforms:output class="xbl-{$prefix}-{$component}-{$property}" style="display: none" value="${$property}"/>
             </xsl:otherwise>
         </xsl:choose>

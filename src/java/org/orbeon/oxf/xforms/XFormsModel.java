@@ -673,40 +673,16 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
         indentedLogger.startHandleOperation("load", "loading instance", "instance id", instance.staticId());
         {
-            // Get instance resource URI, can be from @src or @resource
-
-            final List<Element> children = Dom4jUtils.elements(instanceContainer);
-            if (instance.src() != null) {
-                // "If the src attribute is given, then it takes precedence over inline content and the resource
-                // attribute, and the XML data for the instance is obtained from the link."
-
-                if (instance.src().equals("")) {
-                    // Got a blank src attribute, just dispatch xforms-link-exception
-                    final LocationData extendedLocationData = new ExtendedLocationData(instance.locationData(), "processing XForms instance", instanceContainer);
-                    final Throwable throwable = new ValidationException("Invalid blank URL specified for instance/@src: " + instanceStaticId, extendedLocationData);
-                    container.dispatchEvent(new XFormsLinkExceptionEvent(containingDocument, XFormsModel.this, instance.src(), instanceContainer, throwable));
-                }
-
-                // Load instance
-                loadExternalInstance(instance, instance.src());
-            } else if (children != null && children.size() >= 1) {
-                // "If the src attribute is omitted, then the data for the instance is obtained from inline content if
-                // it is given or the resource attribute otherwise. If both the resource attribute and inline content
-                // are provided, the inline content takes precedence."
-
-                final String xxformsExcludeResultPrefixes = instanceContainer.attributeValue(XFormsConstants.XXFORMS_EXCLUDE_RESULT_PREFIXES);
-
-                if (children.size() > 1) {
-                    final LocationData extendedLocationData = new ExtendedLocationData(instance.locationData(), "processing XForms instance", instanceContainer);
-                    final Throwable throwable = new ValidationException("xforms:instance element must contain exactly one child element", extendedLocationData);
-                    container.dispatchEvent(new XFormsLinkExceptionEvent(containingDocument, XFormsModel.this, null, instanceContainer, throwable));
-                }
-
+            if (instance.useExternalContent()) {
+                // Load from @src or @resource
+                loadExternalInstance(instance);
+            } else if (instance.useInlineContent()) {
+                // Load from inline content
                 try {
                     // Extract document
                     final Object instanceDocument
                             = XXFormsExtractDocument.extractDocument(containingDocument.getStaticState().xpathConfiguration(),
-                            (Element) children.get(0), xxformsExcludeResultPrefixes, instance.isReadonlyHint());
+                                instance.root().get(), instance.excludeResultPrefixes(), instance.isReadonlyHint());
 
                     // Set instance and associated information if everything went well
                     // NOTE: No XInclude supported to read instances with @src for now
@@ -716,19 +692,6 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
                     final Throwable throwable = new ValidationException("Error extracting or setting inline instance", extendedLocationData);
                     container.dispatchEvent(new XFormsLinkExceptionEvent(containingDocument, XFormsModel.this, null, instanceContainer, throwable));
                 }
-            } else if (instance.resource() != null) {
-                // "the data for the instance is obtained from inline content if it is given or the
-                // resource attribute otherwise"
-
-                if (instance.resource().equals("")) {
-                    // Got a blank src attribute, just dispatch xforms-link-exception
-                    final LocationData extendedLocationData = new ExtendedLocationData(instance.locationData(), "processing XForms instance", instanceContainer);
-                    final Throwable throwable = new ValidationException("Invalid blank URL specified for instance/@resource: " + instanceStaticId, extendedLocationData);
-                    container.dispatchEvent(new XFormsLinkExceptionEvent(containingDocument, XFormsModel.this, instance.resource(), instanceContainer, throwable));
-                }
-
-                // Load instance
-                loadExternalInstance(instance, instance.resource());
             } else {
                 // Everything missing
                 final LocationData extendedLocationData = new ExtendedLocationData(instance.locationData(), "processing XForms instance", instanceContainer);
@@ -739,7 +702,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         indentedLogger.endHandleOperation();
     }
 
-    private void loadExternalInstance(Instance instance, String instanceResource) {
+    private void loadExternalInstance(Instance instance) {
+        final String instanceResource = instance.instanceSource().get();
         try {
             if (instance.isCacheHint() && ProcessorImpl.getProcessorInputSchemeInputName(instanceResource) == null) {
                 // Instance 1) has cache hint and 2) is not input:*, so it can be cached
@@ -747,7 +711,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
                 // TODO: This doesn't handle optimized submissions.
 
-                final String resolvedInstanceURL = XFormsUtils.resolveServiceURL(containingDocument, instance.element(), instance.instanceSource(),
+                final String resolvedInstanceURL = XFormsUtils.resolveServiceURL(containingDocument, instance.element(), instanceResource,
                         ExternalContext.Response.REWRITE_MODE_ABSOLUTE);
 
                 // NOTE: No XInclude supported to read instances with @src for now
@@ -831,7 +795,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
      */
     private void loadInstance(ExternalContext externalContext, Instance instance) {
 
-        final String absoluteURLString = XFormsUtils.resolveServiceURL(containingDocument, instance.element(), instance.instanceSource(),
+        final String absoluteURLString = XFormsUtils.resolveServiceURL(containingDocument, instance.element(), instance.instanceSource().get(),
                 ExternalContext.Response.REWRITE_MODE_ABSOLUTE);
 
         assert NetUtils.urlHasProtocol(absoluteURLString);

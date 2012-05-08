@@ -220,7 +220,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
             InstanceMirror.toOuterInstanceNode(docWrapper, partAnalysis))
 
         partAnalysis.getModelsForScope(partAnalysis.startScope).asScala foreach {
-            _.instances.values filter (_.src eq null) foreach { instance ⇒
+            _.instances.values filter (_.useInlineContent) foreach { instance ⇒
                 val innerInstance = childContainer.findInstance(instance.staticId)
                 InstanceMirror.addListener(innerInstance, innerListener)
             }

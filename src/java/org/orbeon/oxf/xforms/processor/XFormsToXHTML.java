@@ -377,9 +377,9 @@ public class XFormsToXHTML extends ProcessorImpl {
         final PartAnalysis topLevelPart = containingDocument.getStaticState().topLevelPart();
         for (final Model model : topLevelPart.getModelsForScope(topLevelPart.startScope())) {
             for (final Instance instance: model.instancesMap().values()) {
-                if (instance.dependencyURL() != null) {
+                if (instance.dependencyURL().isDefined()) {
 
-                    final String resolvedDependencyURL = XFormsUtils.resolveServiceURL(containingDocument, instance.element(), instance.dependencyURL(),
+                    final String resolvedDependencyURL = XFormsUtils.resolveServiceURL(containingDocument, instance.element(), instance.dependencyURL().get(),
                         ExternalContext.Response.REWRITE_MODE_ABSOLUTE);
 
                     if (!instance.isCacheHint()) {

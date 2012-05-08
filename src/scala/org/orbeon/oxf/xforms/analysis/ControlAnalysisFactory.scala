@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.analysis
 
 import controls._
-import model.{Model, Submission}
+import model.{Instance, Model, Submission}
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsUtils
 import org.dom4j.{QName, Element}
@@ -79,7 +79,8 @@ object ControlAnalysisFactory {
         ALERT_QNAME                   → LHHAControl,
         // Model
         XFORMS_MODEL_QNAME            → (new Model(_, _, _, _, _)),
-        XFORMS_SUBMISSION_QNAME       → (new Submission(_, _, _, _, _))
+        XFORMS_SUBMISSION_QNAME       → (new Submission(_, _, _, _, _)),
+        XFORMS_INSTANCE_QNAME         → (new Instance(_, _, _, _, _))
     ) ++ variableFactory
 
     private val controlFactory: PartialFunction[Element, ControlFactory] =

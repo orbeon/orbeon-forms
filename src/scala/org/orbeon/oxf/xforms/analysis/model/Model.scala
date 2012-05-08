@@ -34,12 +34,12 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils
  */
 class Model(val staticStateContext: StaticStateContext, elem: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], val scope: Scope)
         extends ElementAnalysis(elem, parent, preceding)
+        with ChildrenBuilderTrait
         with ModelInstances
         with ModelVariables
         with ModelSubmissions
         with ModelEventHandlers
-        with ModelBinds
-        with ChildrenBuilderTrait {
+        with ModelBinds {
 
     require(staticStateContext ne null)
     require(scope ne null)
@@ -65,7 +65,7 @@ class Model(val staticStateContext: StaticStateContext, elem: Element, parent: O
     // For now this only checks actions and submissions, in the future should also build rest of content
     override def findRelevantChildrenElements =
         super.findRelevantChildrenElements collect
-            { case (e, s) if XFormsActions.isAction(e.getQName) || e.getQName == XFORMS_SUBMISSION_QNAME ⇒ (e, s) }
+            { case (e, s) if XFormsActions.isAction(e.getQName) || Set(XFORMS_SUBMISSION_QNAME, XFORMS_INSTANCE_QNAME)(e.getQName) ⇒ (e, s) }
 
     override def analyzeXPath() {
         // Analyze this
@@ -102,18 +102,14 @@ trait ModelInstances {
     self: Model ⇒
 
     // Instance objects
-    val instances = LinkedHashMap((
-        for {
-            instanceElement ← Dom4j.elements(element, XFORMS_INSTANCE_QNAME)
-            newInstance = new Instance(staticStateContext, instanceElement, Some(self), scope)
-        } yield newInstance.staticId → newInstance): _*)
+    lazy val instances = LinkedHashMap(children collect { case instance: Instance ⇒ instance.staticId → instance }: _*)
 
     def instancesMap = instances.asJava
 
     // General info about instances
-    val hasInstances = instances.nonEmpty
-    val defaultInstanceStaticId = instances.headOption map (_._1) orNull
-    val defaultInstancePrefixedId = Option(if (hasInstances) scope.fullPrefix + defaultInstanceStaticId else null)
+    lazy val hasInstances = instances.nonEmpty
+    lazy val defaultInstanceStaticId = instances.headOption map (_._1) orNull
+    lazy val defaultInstancePrefixedId = Option(if (hasInstances) scope.fullPrefix + defaultInstanceStaticId else null)
     // TODO: instances on which MIPs depend
 
     def getDefaultInstance = if (instances.nonEmpty) instances.head._2 else null

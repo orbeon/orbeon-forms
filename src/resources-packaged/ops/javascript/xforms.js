@@ -4664,6 +4664,12 @@ ORBEON.xforms.Init = {
         var dialogDiv = YAHOO.util.Dom.getElementsByClassName("xforms-dialog", "div", yuiDialog.element)[0];
         dialogDiv.setAttribute("aria-live", "polite");
 
+        // If the dialog has a close "x" in the dialog toolbar, register a listener on the escape key that does the same as clicking on the "x"
+        if (hasClose) {
+            var escapeListener = new YAHOO.util.KeyListener(document, { keys:27 }, { fn: yuiDialog.hide, scope: yuiDialog, correctScope: true } );
+            yuiDialog.cfg.queueProperty("keylisteners", escapeListener);
+        }
+
         // Move the dialog under the form element, as if the dialog is inside another absolute block it can be cropped
         // (can't escape that block), and in some cases the mask can show on top of the dialog (even if the z-index
         // for the dialog is higher than the z-index for the mask). See:

@@ -29,6 +29,8 @@ import collection.mutable.LinkedHashSet
 import OrbeonPortlet._
 import org.orbeon.oxf.util.{DynamicVariable, URLRewriterUtils, NetUtils}
 import org.orbeon.oxf.externalcontext.{URLRewriter, WSRPURLRewriter, AsyncRequest, AsyncExternalContext}
+import org.orbeon.oxf.common.Version
+import org.orbeon.oxf.webapp.{ServletPortlet, WebAppContext}
 
 // For backward compatibility
 class OrbeonPortlet2 extends OrbeonPortlet
@@ -36,7 +38,12 @@ class OrbeonPortletDelegate extends OrbeonPortlet
 class OrbeonPortlet2Delegate extends OrbeonPortlet
 
 /**
- * Orbeon portlet.
+ * This is the Portlet (JSR-286) entry point of Orbeon.
+ *
+ * Several servlets and portlets can be used in the same web application. They all share the same context initialization
+ * parameters, but each servlet and portlet can be configured with its own main processor and inputs.
+ *
+ * All servlets and portlets instances in a given web app share the same resource manager.
  *
  * Ideas for improvements:
  *
@@ -47,7 +54,7 @@ class OrbeonPortlet2Delegate extends OrbeonPortlet
  *   http://wiki.orbeon.com/forms/projects/xforms-improved-portlet-support#TOC-XForms-aware-caching-of-portlet-out
  * - merge front-end with proxy portlet, as some of the logic is the same
  */
-class OrbeonPortlet extends OrbeonPortletBase {
+class OrbeonPortlet extends GenericPortlet with ServletPortlet {
 
     private val ResponseSessionKey          = "org.orbeon.oxf.response"
     private val FutureResponseSessionKey    = "org.orbeon.oxf.future-response"
@@ -58,6 +65,26 @@ class OrbeonPortlet extends OrbeonPortletBase {
 
     private def renderFunction = if (isAsyncPortletLoad) doRenderAsync(_: RenderRequest, _: RenderResponse, renderDiv _) else doRenderDirectly _
     private def serveContentFunction = if (isAsyncPortletLoad) Some(serveContentAsync _) else None
+
+    def logPrefix = "Portlet"
+
+    // Immutable map of portlet parameters
+    lazy val initParameters =
+        getInitParameterNames.asScala map
+            (n ⇒ n → getInitParameter(n)) toMap
+
+    // Portlet init
+    override def init(): Unit =
+        withRootException("initialization", new PortletException(_)) {
+            Version.instance.checkPEFeature("Orbeon Forms portlet") // this is a PE feature
+            init(WebAppContext.instance(getPortletContext), Some("oxf.portlet-initialized-processor." → "oxf.portlet-initialized-processor.input."))
+        }
+
+    // Portlet destroy
+    override def destroy(): Unit =
+        withRootException("destruction", new PortletException(_)) {
+            destroy(Some("oxf.portlet-destroyed-processor." → "oxf.portlet-destroyed-processor.input."))
+        }
 
     // Portlet action
     override def processAction(request: ActionRequest, response: ActionResponse) =
@@ -341,6 +368,7 @@ object OrbeonPortlet {
     val PathParameter = "orbeon.path"
     val MethodParameter = "orbeon.method"
 
+    // As of 2012-05-08, used only by LocalPortletSubmission to get access to ProcessorService
     val currentPortlet = new DynamicVariable[OrbeonPortlet]
 
     // Convert to immutable String → List[String] so that map equality works as expected

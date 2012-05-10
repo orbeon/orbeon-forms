@@ -88,10 +88,7 @@ $ ->
     ]
 
     # Function dealing with editables
-    anyEditableSelector = do ->                                                                                         # A CSS selector matching any editable
-        selectors = _.pluck editables, 'selector'
-        selectors = _.map selectors, (s) -> '.fr-editable ' + s
-        selectors.join ', '
+    anyEditableSelector = _.pluck editables, 'selector'                                                                 # CSS selectors for all the editables
     editable = (element) -> _.first _.filter editables, (e) -> f$.is '*', f$.findOrIs e.selector, element               # element: editable -> editable info
     editableEditInput = (element) -> $ (editable element).editInputSelector                                             # Input field used for editing
     editablePlaceholderOutput = (element) -> $ (editable element).placeholderOutputSelector                             # Element in which we put the placeholder
@@ -121,9 +118,12 @@ $ ->
     editDone = (f) -> editDoneCallbacks.add f
 
     # Return elements, maybe relative to a node
-    elementsInContainer = (container) -> f$.find anyEditableSelector, container
-    elementClosest = (element) -> f$.closest anyEditableSelector, element
-    elementsAll = -> $ anyEditableSelector
+    elementsInContainer = (container) -> f$.find (anyEditableSelector.join ', '), container
+    elementClosest = (element) -> f$.closest (anyEditableSelector.join ', '), element
+    elementsAll = ->
+        selectors = _.map anyEditableSelector, (s) -> '.fr-editable ' + s
+        selectors = selectors.join ', '
+        $ selectors
 
     # Conditions
     isEmpty = (element) -> (f$.text editableInitialValue element) == ''

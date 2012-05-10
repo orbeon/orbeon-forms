@@ -82,7 +82,7 @@ object ScalaUtils {
     }
 
     // Use a closable item and make sure an attempt to close it is done after use
-    def useAndClose[T <: {def close()}](closable: T)(block: T ⇒ Unit) =
+    def useAndClose[T <: {def close()}, U](closable: T)(block: T ⇒ U): U =
         try block(closable)
         finally {
             if (closable ne null)

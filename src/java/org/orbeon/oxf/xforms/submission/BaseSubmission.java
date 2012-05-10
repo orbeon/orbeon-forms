@@ -263,7 +263,7 @@ public abstract class BaseSubmission implements Submission {
 
             } else {
                 // We must intercept the reply
-                final ResponseAdapter responseAdapter = new ResponseAdapter(response.getNativeResponse(), response);
+                final ResponseAdapter responseAdapter = new ResponseAdapter(response);
                 submissionProcess.process(requestAdapter, responseAdapter);
 
                 // Get response information that needs to be forwarded

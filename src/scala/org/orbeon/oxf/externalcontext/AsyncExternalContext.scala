@@ -18,7 +18,7 @@ import org.orbeon.oxf.pipeline.api.ExternalContext.Response
 import org.orbeon.oxf.webapp.WebAppContext
 
 // This context copies all the values of the given request. It uses the original session.
-class AsyncExternalContext(val webAppContext: WebAppContext,  request: AsyncRequest, response: Response) extends ExternalContext {
+class AsyncExternalContext(val webAppContext: WebAppContext, request: AsyncRequest, response: Response) extends ExternalContext {
 
     def getWebAppContext = webAppContext
     def getSession(create: Boolean) = request.getSession(create)

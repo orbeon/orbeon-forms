@@ -302,7 +302,6 @@ public class XFormsSubmissionUtils {
 
 class ResponseAdapter implements ExternalContext.Response {
 
-    private Object nativeResponse;
     private ExternalContext.Response response;
 
     private int status = 200;
@@ -314,8 +313,7 @@ class ResponseAdapter implements ExternalContext.Response {
 
     private InputStream inputStream;
 
-    public ResponseAdapter(Object nativeResponse, ExternalContext.Response response) {
-        this.nativeResponse = nativeResponse;
+    public ResponseAdapter(ExternalContext.Response response) {
         this.response = response;
     }
 
@@ -439,6 +437,6 @@ class ResponseAdapter implements ExternalContext.Response {
     }
 
     public Object getNativeResponse() {
-        return nativeResponse;
+        throw new OXFException("NIY");
     }
 }

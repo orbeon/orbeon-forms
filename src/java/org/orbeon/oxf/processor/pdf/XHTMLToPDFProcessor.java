@@ -115,7 +115,7 @@ public class XHTMLToPDFProcessor extends HttpBinarySerializer {// TODO: HttpBina
                         // a browser retrieving resources directly, not like a portlet. This is the case also if we are
                         // called by the proxy portlet or if we are directly within a portlet.
                         final Map<String, String[]> headers = new HashMap<String, String[]>();
-                        headers.put("Orbeon-Container", new String[] { "servlet" });
+                        headers.put("Orbeon-Client", new String[] { "servlet" });
                         
                         final ConnectionResult connectionResult
                             = new Connection().open(externalContext, new IndentedLogger(logger, ""), false, Connection.Method.GET.name(),

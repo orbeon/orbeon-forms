@@ -90,6 +90,18 @@ public class NetUtils {
     }
 
     /**
+     * Return the first header for the given name in a headers map, or null
+     */
+    public static String getHeader(Map<String, String[]> headers, String name) {
+        final String[] results = headers.get(name);
+        final String overrideContainer;
+        if (results == null || results.length < 1)
+            return null;
+        else
+            return results[0];
+    }
+
+    /**
      * Return true if the document was modified since the given date, based on the If-Modified-Since
      * header. If the request method was not "GET", or if no valid lastModified value was provided,
      * consider the document modified.

@@ -711,10 +711,12 @@ public class ServletExternalContext implements ExternalContext  {
             // Check if there is an override of container type. This is currently used by the proxy portlet and by
             // XHTMLToPDF, as both require a specific type of URL rewriting to take place. Using this header means that
             // using a global property is not required anymore.
-            final String override = nativeRequest.getHeader("Orbeon-Container");
-            
+
+            // NOTE: use request.getHeaderValuesMap() which normalizes header names to lowercase. This is important if
+            // the headers map is generated internally as in that case it might be lowercase already.
+            final String override = NetUtils.getHeader(request.getHeaderValuesMap(), "orbeon-client");
             if ("portlet".equals(override)) {
-                response.setURLRewriter(new WSRPURLRewriter(pipelineContext, getRequest(), URLRewriterUtils.isWSRPEncodeResources()));
+                response.setURLRewriter(new WSRPURLRewriter(URLRewriterUtils.getPathMatchersCallable(), getRequest(), true)); // always set wsrpEncodeResources to true if the client is a portlet
             } else if ("servlet".equals(override)) {
                 response.setURLRewriter(new ServletURLRewriter(getRequest()));
             } else {
@@ -725,7 +727,7 @@ public class ServletExternalContext implements ExternalContext  {
                 } else if ("portlet2".equals(URLRewriterUtils.getRewritingStrategy("servlet", REWRITING_STRATEGY_DEFAULT)) ||
                             "wsrp".equals(URLRewriterUtils.getRewritingStrategy("servlet", REWRITING_STRATEGY_DEFAULT))) {
                     // Configuration asks to use portlet2/wsrp
-                    response.setURLRewriter(new WSRPURLRewriter(pipelineContext, getRequest(), URLRewriterUtils.isWSRPEncodeResources()));
+                    response.setURLRewriter(new WSRPURLRewriter(URLRewriterUtils.getPathMatchersCallable(), getRequest(), URLRewriterUtils.isWSRPEncodeResources()));
                 } else {
                     // Default
                     response.setURLRewriter(new ServletURLRewriter(getRequest()));

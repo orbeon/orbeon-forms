@@ -44,7 +44,7 @@ class AsyncRequest(req: Request) extends ExternalContext.Request {
     def getClientContextPath(urlString: String) =
         if (URLRewriterUtils.isPlatformPath(urlString)) platformClientContextPath else applicationClientContextPath
 
-    def getNativeRequest = throw new UnsupportedOperationException
+    def getNativeRequest = null
 
     // Copy all other values right away
     val getWindowState = req.getWindowState

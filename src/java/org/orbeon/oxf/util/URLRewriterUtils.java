@@ -25,12 +25,12 @@ import org.orbeon.oxf.properties.Properties;
 import org.orbeon.oxf.servlet.OrbeonXFormsFilter;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 
-import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
 /**
  * Utility class to rewrite URLs.
@@ -502,5 +502,14 @@ public class URLRewriterUtils {
     public static List<URLRewriterUtils.PathMatcher> getPathMatchers() {
         final List<URLRewriterUtils.PathMatcher> pathMatchers = (List<URLRewriterUtils.PathMatcher>) PipelineContext.get().getAttribute(PageFlowControllerProcessor.PATH_MATCHERS);
         return (pathMatchers != null) ? pathMatchers : URLRewriterUtils.EMPTY_PATH_MATCHER_LIST;
+    }
+
+    // Get path matchers from the pipeline context
+    public static Callable<List<PathMatcher>> getPathMatchersCallable()  {
+        return new Callable<List<URLRewriterUtils.PathMatcher>>() {
+            public List<URLRewriterUtils.PathMatcher> call() throws Exception {
+                return URLRewriterUtils.getPathMatchers();
+            }
+        };
     }
 }

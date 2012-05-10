@@ -16,9 +16,7 @@ package org.orbeon.oxf.externalcontext;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.portlet.OrbeonPortletXFormsFilter;
-import org.orbeon.oxf.processor.PageFlowControllerProcessor;
 import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.util.URLRewriterUtils;
 import org.orbeon.oxf.xforms.processor.XFormsResourceServer;
 
@@ -27,6 +25,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
 
 public class WSRPURLRewriter implements URLRewriter {
@@ -52,23 +51,28 @@ public class WSRPURLRewriter implements URLRewriter {
 //    public static final String URL_PARAM = "wsrp-url";
 //    public static final String REQUIRES_REWRITE_PARAM = "wsrp-requiresRewrite";
 
-    private final PropertyContext propertyContext;
     private final ExternalContext.Request request;
     private final boolean wsrpEncodeResources;
+    private final Callable<List<URLRewriterUtils.PathMatcher>> getPathMatchers;
     private List<URLRewriterUtils.PathMatcher> pathMatchers;
 
-    public WSRPURLRewriter(PropertyContext propertyContext, ExternalContext.Request request, boolean wsrpEncodeResources) {
-        this.propertyContext = propertyContext;
+    public WSRPURLRewriter(Callable<List<URLRewriterUtils.PathMatcher>> getPathMatchers, ExternalContext.Request request, boolean wsrpEncodeResources) {
+        this.getPathMatchers = getPathMatchers;
         this.request = request;
         this.wsrpEncodeResources = wsrpEncodeResources;
     }
 
-    @SuppressWarnings("unchecked")
     private List<URLRewriterUtils.PathMatcher> getPathMatchers() {
         if (pathMatchers == null) {
-            pathMatchers = (List<URLRewriterUtils.PathMatcher>) propertyContext.getAttribute(PageFlowControllerProcessor.PATH_MATCHERS);
-            if (pathMatchers == null)
-                pathMatchers = URLRewriterUtils.EMPTY_PATH_MATCHER_LIST;
+            if (getPathMatchers != null) {
+                try {
+                    this.pathMatchers = getPathMatchers.call();
+                } catch (Exception e) {
+                    throw new OXFException(e);
+                }
+            }
+            if (this.pathMatchers == null)
+                this.pathMatchers = URLRewriterUtils.EMPTY_PATH_MATCHER_LIST;
         }
         return pathMatchers;
     }
@@ -126,6 +130,10 @@ public class WSRPURLRewriter implements URLRewriter {
     }
 
     public String rewriteResourceURL(String urlString, int rewriteMode) { // NOTE: the mode is ignored
+        return rewriteResourceURL(urlString, wsrpEncodeResources);
+    }
+
+    public String rewriteResourceURL(String urlString, boolean wsrpEncodeResources) {
         // NOTE: Always encode dynamic resources
         if (wsrpEncodeResources || urlString.equals("/xforms-server") || urlString.startsWith(XFormsResourceServer.DYNAMIC_RESOURCES_PATH)) {
 

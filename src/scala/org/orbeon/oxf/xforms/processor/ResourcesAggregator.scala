@@ -81,6 +81,7 @@ class ResourcesAggregator extends ProcessorImpl {
                         val request = NetUtils.getExternalContext.getRequest
                         val isAsyncPortletLoad = request.getContainerType == "portlet" && XFormsProperties.isAsyncPortletLoad && request.getMethod == "get" // limited to GET for now
                         val isMinimal = XFormsProperties.isMinimalResources
+                        val isCacheCombinedResources = XFormsProperties.isCacheCombinedResources
                         val asyncPortletLoadScripts = if (isAsyncPortletLoad) XFormsFeatures.getAsyncPortletLoadScripts map (_.getResourcePath(isMinimal)) else Array.empty[String]
 
                         // Whether a path is a user resource in separate deployment
@@ -180,15 +181,15 @@ class ResourcesAggregator extends ProcessorImpl {
 //                                outputStuff(baselineJS, supplementalJS, preservedJS, false, appendJS, appendPreservedElement)
 
                                 builder append
-                                    (aggregate(baselineJS -- asyncPortletLoadScripts, false, appendJS) ++
-                                        aggregate(supplementalJS -- baselineJS -- asyncPortletLoadScripts, false, appendJS) ++
+                                    (aggregate(baselineJS -- asyncPortletLoadScripts, appendJS, isCacheCombinedResources, isCSS = false) ++
+                                        aggregate(supplementalJS -- baselineJS -- asyncPortletLoadScripts, appendJS, isCacheCombinedResources, isCSS = false) ++
                                             (preservedJS flatMap (appendPreservedElement(_).toSeq)) mkString ",")
                                 
                                 builder append """],"styles":["""
 
                                 builder append
-                                    (aggregate(baselineCSS, true, appendCSS) ++
-                                        aggregate(supplementalCSS -- baselineCSS, true, appendCSS) ++
+                                    (aggregate(baselineCSS, appendCSS, isCacheCombinedResources, isCSS = true) ++
+                                        aggregate(supplementalCSS -- baselineCSS, appendCSS, isCacheCombinedResources, isCSS = true) ++
                                             (preservedCSS flatMap (appendPreservedElement(_).toSeq)) mkString ",")
                                 
                                 builder append """]}"""
@@ -200,15 +201,15 @@ class ResourcesAggregator extends ProcessorImpl {
 
                             def outputCSS() = {
                                 val outputCSSElement = outputElement(resource ⇒ Array("rel", "stylesheet", "href", resource, "type", "text/css", "media", "all"), "link") _
-                                aggregate(baselineCSS, true, outputCSSElement)
-                                aggregate(supplementalCSS -- baselineCSS, true, outputCSSElement)
+                                aggregate(baselineCSS, outputCSSElement, isCacheCombinedResources, isCSS = true)
+                                aggregate(supplementalCSS -- baselineCSS, outputCSSElement, isCacheCombinedResources, isCSS = true)
                                 preservedCSS foreach (outputPreservedElement(_))
                             }
 
                             def outputJS() = {
                                 val outputJSElement = outputElement(resource ⇒ Array("type", "text/javascript", "src", resource), "script") _
-                                aggregate(baselineJS -- asyncPortletLoadScripts, false, outputJSElement)
-                                aggregate(supplementalJS -- baselineJS -- asyncPortletLoadScripts, false, outputJSElement)
+                                aggregate(baselineJS -- asyncPortletLoadScripts, outputJSElement, isCacheCombinedResources, isCSS = false)
+                                aggregate(supplementalJS -- baselineJS -- asyncPortletLoadScripts, outputJSElement, isCacheCombinedResources, isCSS = false)
                                 preservedJS foreach (outputPreservedElement(_))
                             }
 
@@ -272,7 +273,7 @@ class ResourcesAggregator extends ProcessorImpl {
 
 object ResourcesAggregator {
     // Output combined resources
-    def aggregate[T](resources: scala.collection.Set[String], isCSS: Boolean, outputElement: String ⇒ T): Option[T] = {
+    def aggregate[T](resources: scala.collection.Set[String], outputElement: String ⇒ T, isCacheCombinedResources: Boolean, isCSS: Boolean): Option[T] = {
         if (resources.nonEmpty) {
             // If there is at least one non-platform path, we also hash the app version number
             val hasAppResource = resources exists (! URLRewriterUtils.isPlatformPath(_))
@@ -293,7 +294,7 @@ object ResourcesAggregator {
             val result = outputElement(path)
 
             // Store on disk if requested to make the resource available to external software, like Apache
-            if (XFormsProperties.isCacheCombinedResources) {
+            if (isCacheCombinedResources) {
                 val resourcesConfig = resources.toSeq map (r ⇒ new XFormsFeatures.ResourceConfig(r, r))
 
                 assert(resourcesConfig.head.getResourcePath(false) == resources.head) // set order is tricky so make sure order is kept

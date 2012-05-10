@@ -49,18 +49,18 @@ public class Portlet2ExternalContext implements ExternalContext {
     private ExternalContext.Response response;
     private ExternalContext.Session session;
 
-    private WebAppContext webAppContext;
-    private PipelineContext pipelineContext;
+    private final WebAppContext webAppContext;
+    private final PipelineContext pipelineContext;
+
     private PortletRequest portletRequest;
     private ClientDataRequest clientDataRequest;
-    private MimeResponse mimeResponse;
 
-    Portlet2ExternalContext(PipelineContext pipelineContext, WebAppContext webAppContext, PortletRequest portletRequest) {
+    Portlet2ExternalContext(PipelineContext pipelineContext, WebAppContext webAppContext, PortletRequest portletRequest, boolean amendRequest) {
         this.webAppContext = webAppContext;
         this.pipelineContext = pipelineContext;
 
         // Wrap request if needed
-        if (requestFilter != null) {
+        if (amendRequest && requestFilter != null) {
             try {
                 this.portletRequest = requestFilter.amendRequest(portletRequest);
             } catch (Exception e) {
@@ -72,11 +72,6 @@ public class Portlet2ExternalContext implements ExternalContext {
 
         if (portletRequest instanceof ClientDataRequest)
             this.clientDataRequest = (ClientDataRequest) portletRequest;
-    }
-
-    Portlet2ExternalContext(PipelineContext pipelineContext, WebAppContext webAppContext, PortletRequest portletRequest, MimeResponse mimeResponse) {
-        this(pipelineContext, webAppContext, portletRequest);
-        this.mimeResponse = mimeResponse;
     }
 
     public WebAppContext getWebAppContext() {
@@ -405,8 +400,8 @@ public class Portlet2ExternalContext implements ExternalContext {
 
         private final URLRewriter urlRewriter;
 
-        public BaseResponse(PipelineContext pipelineContext, ExternalContext.Request request) {
-            urlRewriter = new WSRPURLRewriter(pipelineContext, request, URLRewriterUtils.isWSRPEncodeResources());
+        public BaseResponse(ExternalContext.Request request) {
+            urlRewriter = new WSRPURLRewriter(URLRewriterUtils.getPathMatchersCallable(), request, URLRewriterUtils.isWSRPEncodeResources());
         }
 
         public boolean checkIfModifiedSince(long lastModified, boolean allowOverride) {
@@ -479,7 +474,6 @@ public class Portlet2ExternalContext implements ExternalContext {
 
         public Object getNativeResponse() {
             throw new OXFException("NIY");
-//            return Portlet2ExternalContext.this.getNativeResponse();
         }
     }
 
@@ -494,8 +488,8 @@ public class Portlet2ExternalContext implements ExternalContext {
         private ByteArrayOutputStream byteStream;
         private String title;
         
-        public BufferedResponse(PipelineContext pipelineContext, ExternalContext.Request request) {
-            super(pipelineContext, request);
+        public BufferedResponse(ExternalContext.Request request) {
+            super( request);
         }
         
         public String getContentType() {
@@ -596,7 +590,7 @@ public class Portlet2ExternalContext implements ExternalContext {
 
     public Response getResponse() {
         if (response == null)
-            response = new BufferedResponse(pipelineContext, request);
+            response = new BufferedResponse(request);
         return response;
     }
 

@@ -18,6 +18,7 @@ import org.dom4j.QName;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
+import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis;
 import org.orbeon.oxf.xforms.analysis.controls.AppearanceTrait;
@@ -72,11 +73,15 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
         // TODO: would be nice to do this here, but then we need to make sure this prefix is available to other handlers
 //        formattingPrefix = handlerContext.findFormattingPrefixDeclare();
 
+        final boolean isPortletClient; {
+            final ExternalContext.Request request = handlerContext.getExternalContext().getRequest();
+            isPortletClient = "portlet".equals(NetUtils.getHeader(request.getHeaderValuesMap(), "orbeon-client"));
+        }
+
         final String requestPath = containingDocument.getRequestPath();
         final String xformsSubmissionPath;
         {
-            final ExternalContext.Request request = handlerContext.getExternalContext().getRequest();
-            if (containingDocument.getDeploymentType() != XFormsConstants.DeploymentType.standalone || request.getContainerType().equals("portlet")) {
+            if (containingDocument.getDeploymentType() != XFormsConstants.DeploymentType.standalone || containingDocument.getContainerType().equals("portlet") || isPortletClient) {
                 // Integrated or separate deployment mode or portlet
                 xformsSubmissionPath =  "/xforms-server-submit";
             } else {
@@ -94,7 +99,8 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
         }
 
         // Create xhtml:form element
-        final boolean hasUpload = containingDocument.getStaticOps().hasControlByName("upload");
+        // NOTE: Do multipart as well with portlet client to simplify the proxying so we don't have to re-encode parameters
+        final boolean doMultipartPOST = containingDocument.getStaticOps().hasControlByName("upload") || isPortletClient;
         helper.startElement(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "form", new String[] {
                 // Add id so that things work in portals
                 "id", XFormsUtils.getFormId(containingDocument),
@@ -105,7 +111,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
                 "action", xformsSubmissionPath, "method", "POST",
                 // In noscript mode, don't add event handler
                 "onsubmit", handlerContext.isNoScript() ? null : "return false",
-                hasUpload ? "enctype" : null, hasUpload ? "multipart/form-data" : null});
+                doMultipartPOST ? "enctype" : null, doMultipartPOST ? "multipart/form-data" : null});
 
         {
             // Output encoded static and dynamic state
@@ -137,10 +143,10 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
 
         if (!handlerContext.isNoScript()) {
             // Other fields used by JavaScript
-            helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[]{
+            helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[] {
                     "type", "hidden", "name", "$server-events", "value", ""
             });
-            helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[]{
+            helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[] {
                     "type", "text", "name", "$client-state", "value", "", "class", "xforms-initially-hidden"
             });
 

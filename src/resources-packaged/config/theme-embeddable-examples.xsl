@@ -23,6 +23,11 @@
 
     <xsl:template match="/">
         <xhtml:div class="orbeon-portlet-div">
+            <!-- Copy xforms-disable-hint-as-tooltip and xforms-disable-alert-as-tooltip from the body to the div -->
+            <xsl:variable name="classes-to-copy" select="tokenize(/xhtml:html/xhtml:body/@class, '\s+')[matches(., '^xforms-disable-[^-]+-as-tooltip$')]"/>
+            <xsl:if test="exists($classes-to-copy)">
+                <xsl:attribute name="class" select="$classes-to-copy"/>
+            </xsl:if>
             <!-- Styles and scripts -->
             <xhtml:link rel="stylesheet" href="/config/theme/orbeon.css" type="text/css"/>
             <!-- Handle head elements except scripts -->

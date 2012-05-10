@@ -3203,8 +3203,8 @@ ORBEON.xforms.Events = {
         var target = ORBEON.xforms.Events._findParentXFormsControl(YAHOO.util.Event.getTarget(event));
         if (target != null) {
 
-            // Control tooltip
-            if (! YAHOO.util.Dom.hasClass(document.body, "xforms-disable-hint-as-tooltip")) {
+            // Hint tooltip
+            if (! $(target).closest(".xforms-disable-hint-as-tooltip").is("*")) {
                 var message = ORBEON.xforms.Controls.getHintMessage(target);
                 if (YAHOO.util.Dom.hasClass(target, "xforms-trigger") || YAHOO.util.Dom.hasClass(target, "xforms-submit")) {
                     // Remove the title, to avoid having both the YUI tooltip and the browser tooltip based on the title showing up
@@ -3215,8 +3215,7 @@ ORBEON.xforms.Events = {
             }
 
             // Alert tooltip
-            if (YAHOO.util.Dom.hasClass(target, "xforms-alert-active")
-                    && ! YAHOO.util.Dom.hasClass(document.body, "xforms-disable-alert-as-tooltip")) {
+            if (YAHOO.util.Dom.hasClass(target, "xforms-alert-active") && ! $(target).closest(".xforms-disable-alert-as-tooltip").is("*")) {
                 // NOTE: control may be null if we have <div for="">. Using target.getAttribute("for") returns a proper
                 // for, but then tooltips sometimes fail later with Ajax portlets in particular. So for now, just don't
                 // do anything if there is no control found.
@@ -3275,8 +3274,7 @@ ORBEON.xforms.Events = {
             // create a YUI tooltip, (3) the mouseout happens before the YUI dialog got a chance to register its listener
             // on mouseout, (4) the YUI dialog is only dismissed after autodismissdelay (5 seconds) leaving a trail.
             var yuiTooltip = ORBEON.xforms.Globals.hintTooltipForControl[target.id];
-            if (! YAHOO.util.Dom.hasClass(document.body, "xforms-disable-hint-as-tooltip")
-                    && YAHOO.lang.isObject(yuiTooltip)) {
+            if (YAHOO.lang.isObject(yuiTooltip) && ! $(target).closest(".xforms-disable-hint-as-tooltip").is("*")) {
                 yuiTooltip.onContextMouseOut.call(target.id, event, yuiTooltip);
             }
         }

@@ -48,9 +48,7 @@ import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
 import org.xml.sax.SAXException;
-import scala.Option;
 import scala.Tuple3;
-import org.orbeon.oxf.xforms.control.Controls;
 
 import java.io.IOException;
 import java.util.*;
@@ -423,8 +421,6 @@ public class XFormsServer extends ProcessorImpl {
 
         final XFormsControls xformsControls = containingDocument.getControls();
 
-        final boolean testOutputStaticState = false;
-
         try {
             final ContentHandlerHelper ch = new ContentHandlerHelper(xmlReceiver);
             ch.startDocument();
@@ -471,18 +467,6 @@ public class XFormsServer extends ProcessorImpl {
                     // Encode events so that the client cannot send back arbitrary events
                     if (requireClientSubmission)
                         submissionServerEvents = XFormsUtils.encodeXML(eventsDocument, false);
-                }
-            }
-
-            // Output static state when testing
-            if (testOutputStaticState) {
-                final String staticState = XFormsStateManager.instance().getClientEncodedStaticState(containingDocument);
-                if (staticState != null) {
-                    ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "static-state", new String[] {
-                            "container-type", NetUtils.getExternalContext().getRequest().getContainerType()
-                    });
-                    ch.text(staticState);
-                    ch.endElement();
                 }
             }
 

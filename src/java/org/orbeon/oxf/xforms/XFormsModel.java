@@ -727,17 +727,15 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
                 // NOTE: Optimizing with include() for servlets has limitations, in particular
                 // the proper split between servlet path and path info is not done.
-                final ExternalContext externalContext = NetUtils.getExternalContext();
-                final ExternalContext.Request request = externalContext.getRequest();
 
                 // TODO: Temporary. Use XFormsModelSubmission to load instances instead
-                if (!NetUtils.urlHasProtocol(instanceResource) && request.getContainerType().equals("portlet"))
+                if (!NetUtils.urlHasProtocol(instanceResource) && containingDocument.getContainerType().equals("portlet"))
                     throw new UnsupportedOperationException("<xforms:instance src=\"\"> with relative path within a portlet");
 
                 // Use full resolved resource URL
                 // o absolute URL, e.g. http://example.org/instance.xml
                 // o absolute path relative to server root, e.g. /orbeon/foo/bar/instance.xml
-                loadInstance(externalContext, instance);
+                loadInstance(instance);
             }
         } catch (Exception e) {
             final ValidationException validationException
@@ -793,7 +791,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
     /*
      * Load an external instance using an absolute URL.
      */
-    private void loadInstance(ExternalContext externalContext, Instance instance) {
+    private void loadInstance(Instance instance) {
 
         final String absoluteURLString = XFormsUtils.resolveServiceURL(containingDocument, instance.element(), instance.instanceSource().get(),
                 ExternalContext.Response.REWRITE_MODE_ABSOLUTE);
@@ -819,7 +817,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
                 throw new OXFException("Invalid URL: " + absoluteURLString);
             }
 
-            final ConnectionResult connectionResult = new Connection().open(externalContext, indentedLogger, BaseSubmission.isLogBody(),
+            final ConnectionResult connectionResult = new Connection().open(
+                    NetUtils.getExternalContext(), indentedLogger, BaseSubmission.isLogBody(),
                     Connection.Method.GET.name(), absoluteResolvedURL, instance.credentials(),
                     null, null, null, XFormsProperties.getForwardSubmissionHeaders(containingDocument));
 

@@ -232,8 +232,11 @@
 
             <xhtml:span class="fr-hidden">
                 <!-- Hidden field to communicate to the client whether the data is safe -->
-                <xforms:input model="fr-persistence-model" ref="instance('fr-persistence-instance')/data-safe" id="fr-data-safe-input"
-                    class="xforms-disabled"/>
+                <xforms:input
+                        model="fr-persistence-model"
+                        ref="instance('fr-persistence-instance')/data-safe"
+                        id="fr-data-safe-input"
+                        class="xforms-disabled"/>
 
                 <!-- This is a bit of a HACK for Form Builder only: place non-relevant instances of all toolbox controls
                      so that xxf:dynamic will have all the JavaScript and CSS resources available on the client.
@@ -352,9 +355,6 @@
                     </xforms:group>
                     <!-- React to activation of both triggers -->
                     <xforms:action ev:event="DOMActivate">
-                        <!-- Set data-safe-override -->
-                        <xforms:setvalue model="fr-persistence-model" ref="instance('fr-persistence-instance')/data-safe-override"
-                            >true</xforms:setvalue>
                         <!-- Send submission -->
                         <xsl:choose>
                             <xsl:when test="$mode = 'summary'">

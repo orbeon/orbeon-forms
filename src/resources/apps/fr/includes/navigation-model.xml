@@ -37,6 +37,18 @@
     <!-- NOTE: Passing the language is not strictly necessary since the current language is in the session but from a
          URL design perspective having the language better identifies the resource -->
 
+    <!-- Temporarily set data-safe-override when we know we are not losing data upon navigation -->
+    <xforms:setvalue
+            ev:observer="fr-edit-switch-script-summary-submission fr-edit-switch-script-submission fr-workflow-edit-submission fr-workflow-review-submission"
+            ev:event="xforms-submit"
+            ref="xxforms:instance('fr-persistence-instance')/data-safe-override">true</xforms:setvalue>
+
+    <!-- Reset data-safe-override -->
+    <xforms:setvalue
+            ev:observer="fr-edit-switch-script-summary-submission fr-edit-switch-script-submission fr-workflow-edit-submission fr-workflow-review-submission"
+            ev:event="xforms-submit-done xforms-submit-error"
+            ref="xxforms:instance('fr-persistence-instance')/data-safe-override"/>
+
     <xforms:submission id="fr-edit-switch-script-summary-submission"
         resource="/fr/{$parameters/app}/{$parameters/form}/{$parameters/mode}?{$common-get-parameters}{if (not(property('xxforms:noscript'))) then '&amp;fr-noscript=true' else ''}"
         method="get" serialization="none" replace="all" validate="false" relevant="false"/>
@@ -65,24 +77,14 @@
             relevant="false" validate="false" method="post"
             ref="xxforms:instance('fr-form-instance')"
             resource="/fr/{$parameters/app}/{$parameters/form}/edit/{$parameters/document}?{$common-get-parameters}{if (property('xxforms:noscript')) then '&amp;fr-noscript=true' else ''}"
-            replace="all">
-        <!-- Set data-safe-override -->
-        <xforms:setvalue ev:event="xforms-submit" ref="xxforms:instance('fr-persistence-instance')/data-safe-override">true</xforms:setvalue>
-        <!-- Reset data-safe-override -->
-        <xforms:setvalue ev:event="xforms-submit-done xforms-submit-error" ref="xxforms:instance('fr-persistence-instance')/data-safe-override"/>
-    </xforms:submission>
+            replace="all"/>
 
     <!-- Submission to preview the XML form -->
     <xforms:submission id="fr-workflow-review-submission"
             relevant="false" validate="false" method="post"
             ref="xxforms:instance('fr-form-instance')"
             resource="/fr/{$parameters/app}/{$parameters/form}/view/{$parameters/document}?{$common-get-parameters}{if (property('xxforms:noscript')) then '&amp;fr-noscript=true' else ''}"
-            replace="all">
-        <!-- Set data-safe-override -->
-        <xforms:setvalue ev:event="xforms-submit" ref="xxforms:instance('fr-persistence-instance')/data-safe-override">true</xforms:setvalue>
-        <!-- Reset data-safe-override -->
-        <xforms:setvalue ev:event="xforms-submit-done xforms-submit-error" ref="xxforms:instance('fr-persistence-instance')/data-safe-override"/>
-    </xforms:submission>
+            replace="all"/>
 
     <!-- Open PDF for the current form data (dispatch from XPL) -->
     <xforms:action ev:event="fr-open-pdf">

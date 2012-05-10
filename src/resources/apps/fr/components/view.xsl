@@ -35,37 +35,38 @@
                     class="{if (fr:left) then 'yui-t2 ' else ''}{concat(' fr-mode-', $mode)}">
                     <!-- Header -->
                     <xhtml:div class="fr-header">
-                        <xsl:choose>
-                            <xsl:when test="fr:header">
-                                <!-- Custom header -->
-                                <xforms:group model="fr-form-model" context="instance('fr-form-instance')">
-                                    <xsl:apply-templates select="fr:header/node()"/>
-                                </xforms:group>
-                            </xsl:when>
-                            <xsl:when test="$mode = 'view'">
-                                <!-- View header -->
-                                <xsl:variable name="default-objects" as="element()+">
-                                    <fr:logo/>
-                                </xsl:variable>
-
-                                <xsl:apply-templates select="$default-objects"/>
-                            </xsl:when>
-                            <xsl:when test="not($mode = ('email'))  and not($hide-header)">
-                                <!-- Standard header -->
-                                <xsl:variable name="default-objects" as="element()+">
-                                    <xsl:if test="not($hide-logo)">
+                        <xsl:if test="not($mode = ('email')) and not($hide-header)">
+                            <xsl:choose>
+                                <xsl:when test="fr:header">
+                                    <!-- Custom header -->
+                                    <xforms:group model="fr-form-model" context="instance('fr-form-instance')">
+                                        <xsl:apply-templates select="fr:header/node()"/>
+                                    </xforms:group>
+                                </xsl:when>
+                                <xsl:when test="$mode = 'view'">
+                                    <!-- View header -->
+                                    <xsl:variable name="default-objects" as="element()+">
                                         <fr:logo/>
-                                    </xsl:if>
-                                    <fr:language-selector/>
-                                    <fr:noscript-selector/>
-                                    <fr:form-builder-doc/>
-                                    <fr:goto-content/>
-                                </xsl:variable>
+                                    </xsl:variable>
 
-                                <xsl:apply-templates select="$default-objects"/>
-                            </xsl:when>
-                            <xsl:otherwise/>
-                        </xsl:choose>
+                                    <xsl:apply-templates select="$default-objects"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <!-- Standard header -->
+                                    <xsl:variable name="default-objects" as="element()+">
+                                        <xsl:if test="not($hide-logo)">
+                                            <fr:logo/>
+                                        </xsl:if>
+                                        <fr:language-selector/>
+                                        <fr:noscript-selector/>
+                                        <fr:form-builder-doc/>
+                                        <fr:goto-content/>
+                                    </xsl:variable>
+
+                                    <xsl:apply-templates select="$default-objects"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </xsl:if>
                     </xhtml:div>
                     <xhtml:div id="hd" class="fr-shadow">&#160;</xhtml:div>
                     <xhtml:div id="bd" class="fr-container">
@@ -211,18 +212,20 @@
                         </xsl:if>
                     </xhtml:div>
                     <xhtml:div id="ft" class="fr-footer">
-                        <xsl:choose>
-                            <xsl:when test="fr:footer">
-                                <xsl:apply-templates select="fr:footer/node()"/>
-                            </xsl:when>
-                            <xsl:otherwise>
-                                <xsl:variable name="default-objects" as="element()+">
-                                    <fr:version/>
-                                </xsl:variable>
+                        <xsl:if test="not($hide-footer)">
+                            <xsl:choose>
+                                <xsl:when test="fr:footer">
+                                    <xsl:apply-templates select="fr:footer/node()"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:variable name="default-objects" as="element()+">
+                                        <fr:version/>
+                                    </xsl:variable>
 
-                                <xsl:apply-templates select="$default-objects"/>
-                            </xsl:otherwise>
-                        </xsl:choose>
+                                    <xsl:apply-templates select="$default-objects"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </xsl:if>
                     </xhtml:div>
                 </xhtml:div>
             </xforms:group>

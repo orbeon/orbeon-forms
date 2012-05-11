@@ -22,6 +22,7 @@
       xmlns:saxon="http://saxon.sf.net/"
       xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
       xmlns:toolboxOps="java:org.orbeon.oxf.fb.ToolboxOps"
+      xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps"
 
       id="fb-toolbox">
 
@@ -137,11 +138,13 @@
                                                 <xhtml:img src="{($binding/fb:metadata/fb:icon/fb:small-icon[@lang = $lang],$binding/fb:metadata/fb:icon/fb:small-icon[1], '/apps/fr/style/images/silk/plugin.png')[1]}" alt="" width="16" height="16"/>
                                                 <xhtml:span><xforms:output value="($binding/fb:metadata/fb:display-name[@lang = $lang], $binding/fb:metadata/fb:display-name[1])[1]"/></xhtml:span>
                                             </xforms:label>
-                                            <xforms:action type="xpath" ev:event="DOMActivate" if="$is-section-component">
-                                                toolboxOps:insertNewSectionTemplate($model, $binding)
-                                            </xforms:action>
-                                            <xforms:action type="xpath" ev:event="DOMActivate" if="not($is-section-component)">
-                                                toolboxOps:insertNewControl($model, $binding)
+                                            <xforms:action ev:event="DOMActivate">
+                                                <xforms:action if="$is-section-component" type="xpath">toolboxOps:insertNewSectionTemplate($model, $binding)</xforms:action>
+                                                <xforms:action if="not($is-section-component)">
+                                                    <xforms:action type="xpath">toolboxOps:insertNewControl($model, $binding)</xforms:action>
+                                                    <xforms:var name="effective-id" value="controlOps:buildControlEffectiveIdOrEmpty(instance('fb-form-instance'), $selected-cell)"/>
+                                                    <xforms:load resource="javascript:ORBEON.Builder.controlAdded.fire('{$effective-id}')"/>
+                                                </xforms:action>
                                             </xforms:action>
 -                                        </xforms:trigger>
                                     </xhtml:div>

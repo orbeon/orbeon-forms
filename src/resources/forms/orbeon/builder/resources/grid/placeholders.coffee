@@ -39,22 +39,20 @@ $ ->
         result
 
     # Low-level operations on editables
-    editables = [
-        {
+    editables =
+        label:
             selector: '.xforms-label'
             editInputSelector: '#fb-edit-label'
             placeholderOutputSelector: '#fb-placeholder-label'
             placeholderContainerSelector: '.xforms-label'
             initialValueSelector: '.xforms-label'
-        }
-        {
+        hint:
             selector: '.xforms-hint'
             editInputSelector: '#fb-edit-hint'
             placeholderOutputSelector: '#fb-placeholder-hint'
             placeholderContainerSelector: '.xforms-hint'
             initialValueSelector: '.xforms-hint'
-        }
-        {
+        button:
             selector: '.xforms-trigger-appearance-full'
             editInputSelector: '#fb-edit-label'
             placeholderOutputSelector: '#fb-placeholder-label'
@@ -69,8 +67,7 @@ $ ->
             removeMock: (element) ->
                 f$.show f$.find 'button', element
                 f$.remove f$.find '.xforms-mock-button', element
-        }
-        {
+        link:
             selector: '.fr-grid-content .xforms-trigger-appearance-minimal'
             editInputSelector: '#fb-edit-label'
             placeholderOutputSelector: '#fb-placeholder-label'
@@ -84,12 +81,10 @@ $ ->
             removeMock: (element) ->
                 f$.show f$.find 'a', element
                 f$.remove f$.find '.fb-mock-link', element
-        }
-    ]
 
     # Function dealing with editables
-    anyEditableSelector = _.pluck editables, 'selector'                                                                 # CSS selectors for all the editables
-    editable = (element) -> _.first _.filter editables, (e) -> f$.is '*', f$.findOrIs e.selector, element               # element: editable -> editable info
+    anyEditableSelector = _.pluck (_.values editables), 'selector'                                                      # CSS selectors for all the editables
+    editable = (element) -> _.first _.filter (_.values editables), (e) -> f$.is '*', f$.findOrIs e.selector, element    # element: editable -> editable info
     editableEditInput = (element) -> $ (editable element).editInputSelector                                             # Input field used for editing
     editablePlaceholderOutput = (element) -> $ (editable element).placeholderOutputSelector                             # Element in which we put the placeholder
     editableInside = (selectorType, element) -> f$.findOrIs (editable element)[selectorType], element                   # Find an element inside a container element for a certain type of selector
@@ -110,6 +105,7 @@ $ ->
     # Events
     mouseEntersGridTd = (f) -> Builder.mouseEntersGridTdEvent.subscribe ({gridTd}) -> f $ gridTd
     mouseExistsGridTd = (f) -> Builder.mouseExitsGridTdEvent .subscribe ({gridTd}) -> f $ gridTd
+    controlAdded = (f) -> Builder.controlAdded.add (containerId) -> f $ document.getElementById containerId
     ajaxResponse = (f) -> Events.ajaxResponseProcessedEvent.subscribe f
     click = (f) -> ($ document).click ({target}) -> f $ target
     enterKey = (f) -> ($ document).keypress ({target, which}) -> f $ target if which == 13
@@ -118,7 +114,9 @@ $ ->
     editDone = (f) -> editDoneCallbacks.add f
 
     # Return elements, maybe relative to a node
-    elementsInContainer = (container) -> f$.find (anyEditableSelector.join ', '), container
+    elementsInContainerWithSelector = (container, selectors) -> f$.find (selectors.join ', '), container
+    elementsInContainer = (container) -> elementsInContainerWithSelector container, anyEditableSelector
+    labelsInContainer = (container) -> elementsInContainerWithSelector container, _.pluck (_.pick editables, ['label', 'button', 'link']), 'selector'
     elementClosest = (element) -> f$.closest (anyEditableSelector.join ', '), element
     elementsAll = ->
         selectors = _.map anyEditableSelector, (s) -> '.fr-editable ' + s
@@ -167,17 +165,18 @@ $ ->
     # Finite state machine description
     # Diagram: https://docs.google.com/a/orbeon.com/drawings/d/1cJ0B3Tl7QRTMkVUbtlA55C0TUvRiOt5hzR8-dc-aBrk/edit
     transitions = [
-        { events: [ mouseEntersGridTd ],      elements: elementsInContainer,  from: [ 'initial' ],                  conditions: [ isEmpty ],                        to: 'placeholder',              actions: [ removeFor, createMock, showPlaceholder ]  }
-        { events: [ mouseEntersGridTd ],      elements: elementsInContainer,  from: [ 'initial' ],                  conditions: [ isNonEmpty ],                     to: 'mock',                     actions: [ removeFor, createMock ]                   }
-        { events: [ mouseExistsGridTd ],      elements: elementsInContainer,  from: [ 'mock' ],                                                                     to: 'initial',                  actions: [ removeMock ]                              }
-        { events: [ mouseExistsGridTd ],      elements: elementsInContainer,  from: [ 'placeholder' ],                                                              to: 'initial',                  actions: [ hidePlaceholder, removeMock  ]            }
-        { events: [ click ],                  elements: elementClosest,       from: [ 'placeholder', 'mock' ],                                                      to: 'wait-xhr-to-edit',         actions: [ storeSeqNo ]                              }
-        { events: [ ajaxResponse ],           elements: elementsAll,          from: [ 'wait-xhr-to-edit' ],         conditions: [ isNextSeqNo ],                    to: 'edit',                     actions: [ startEdit ]                               }
-        { events: [ enterKey, lostFocus ],    elements: elementClosest,       from: [ 'edit' ],                                                                     to: 'edit-done',                actions: [ endEdit, removeMock, fireEditDone ]       }
-        { events: [ editDone ],               elements: elementsAll,          from: [ 'edit-done' ],                conditions: [ pointerOutsideCell ],             to: 'initial'                                                                        }
-        { events: [ editDone ],               elements: elementsAll,          from: [ 'edit-done' ],                conditions: [ pointerInsideCell, isEmpty ],     to: 'placeholder-after-edit',   actions: [ storeSeqNo, createMock, showPlaceholder ] }
-        { events: [ editDone ],               elements: elementsAll,          from: [ 'edit-done' ],                conditions: [ pointerInsideCell, isNonEmpty ],  to: 'mock',                     actions: [ createMock ]                              }
-        { events: [ ajaxResponse ],           elements: elementsAll,          from: [ 'placeholder-after-edit' ],   conditions: [ isNextSeqNo ],                    to: 'placeholder',              actions: [ showPlaceholder ]                         }
+        { events: [ mouseEntersGridTd ],      elements: elementsInContainer,  from: [ 'initial' ],                          conditions: [ isEmpty ],                        to: 'placeholder',              actions: [ removeFor, createMock, showPlaceholder ]  }
+        { events: [ mouseEntersGridTd ],      elements: elementsInContainer,  from: [ 'initial' ],                          conditions: [ isNonEmpty ],                     to: 'mock',                     actions: [ removeFor, createMock ]                   }
+        { events: [ mouseExistsGridTd ],      elements: elementsInContainer,  from: [ 'mock' ],                                                                             to: 'initial',                  actions: [ removeMock ]                              }
+        { events: [ mouseExistsGridTd ],      elements: elementsInContainer,  from: [ 'placeholder' ],                                                                      to: 'initial',                  actions: [ hidePlaceholder, removeMock  ]            }
+        { events: [ click ],                  elements: elementClosest,       from: [ 'placeholder', 'mock' ],                                                              to: 'wait-xhr-to-edit',         actions: [ storeSeqNo ]                              }
+        { events: [ controlAdded ],           elements: labelsInContainer,    from: [ 'initial' ],                                                                          to: 'edit',                     actions: [ removeFor, createMock, startEdit ]        }
+        { events: [ ajaxResponse ],           elements: elementsAll,          from: [ 'wait-xhr-to-edit' ],                 conditions: [ isNextSeqNo ],                    to: 'edit',                     actions: [ startEdit ]                               }
+        { events: [ enterKey, lostFocus ],    elements: elementClosest,       from: [ 'edit' ],                                                                             to: 'edit-done',                actions: [ endEdit, removeMock, fireEditDone ]       }
+        { events: [ editDone ],               elements: elementsAll,          from: [ 'edit-done' ],                        conditions: [ pointerOutsideCell ],             to: 'initial'                                                                        }
+        { events: [ editDone ],               elements: elementsAll,          from: [ 'edit-done' ],                        conditions: [ pointerInsideCell, isEmpty ],     to: 'placeholder-after-edit',   actions: [ storeSeqNo, createMock, showPlaceholder ] }
+        { events: [ editDone ],               elements: elementsAll,          from: [ 'edit-done' ],                        conditions: [ pointerInsideCell, isNonEmpty ],  to: 'mock',                     actions: [ createMock ]                              }
+        { events: [ ajaxResponse ],           elements: elementsAll,          from: [ 'placeholder-after-edit' ],           conditions: [ isNextSeqNo ],                    to: 'placeholder',              actions: [ showPlaceholder ]                         }
     ]
 
     # Finite state machine runner

@@ -16,13 +16,14 @@ ORBEON.Builder =
     mouseEntersGridTdEvent:     createCustomEvent()
     mouseExitsGridTdEvent:      createCustomEvent()
     triggerClickEvent:          createCustomEvent()
+    controlAdded:               $.Callbacks()
 
 YD = YAHOO.util.Dom
 Event = YAHOO.util.Event
 Events = ORBEON.xforms.Events
 Builder = ORBEON.Builder
 
-Event.onDOMReady () ->
+$ ->
 
     # Get a reference to the icons to the top left of the cell
     cellEditorsContainer = null

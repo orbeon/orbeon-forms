@@ -87,8 +87,9 @@
                     <xsl:attribute name="xxforms:{local-name()}" select="."/>
                 </xsl:template>
 
-                <!-- Remove automatic td ids -->
-                <xsl:template match="xhtml:body//fr:grid//*:td/@id[ends-with(., '-td')]"/>
+                <!-- Remove automatic grid and td ids -->
+                <xsl:template match="xhtml:body//fr:grid/@id[starts-with(., 'tmp-') and ends-with(., '-tmp')]"/>
+                <xsl:template match="xhtml:body//fr:grid//*:td/@id[starts-with(., 'tmp-') and ends-with(., '-tmp')]"/>
 
                 <!-- Remove xbl:xbl containing section templates bindings -->
                 <xsl:template match="xbl:xbl[xbl:binding[tokenize(@class, '\s+') = 'fr-section-component']]"/>

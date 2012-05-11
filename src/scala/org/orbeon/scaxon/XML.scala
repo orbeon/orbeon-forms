@@ -102,7 +102,8 @@ object XML {
 
     // Useful predicates
     val hasChildren: NodeInfo ⇒ Boolean = element ⇒ element \ * nonEmpty
-    val hasId: (NodeInfo, String) ⇒ Boolean = (element, id) ⇒ element \@ "id" === id
+    val hasId: (NodeInfo) ⇒ Boolean = (element) ⇒ element \@ "id" nonEmpty
+    val hasIdValue: (NodeInfo, String) ⇒ Boolean = (element, id) ⇒ element \@ "id" === id
     val exists: (Seq[Item]) ⇒ Boolean = (items) ⇒ items.nonEmpty
 
     // Get the value of the first attribute passed if any

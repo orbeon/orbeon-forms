@@ -292,33 +292,18 @@ object GridOps {
         allRowCells map (_(x)) filterNot (_.missing) filter (cell ⇒ hasChildren(cell.td)) size
     }
 
-    private def selectedCellId =
-        Option(asNodeInfo(model("fr-form-model").get.getVariable("selected-cell")))
-
-    private def legacySelectedCell =
-        Option(asNodeInfo(model("fr-form-model").get.getVariable("current-td")))
+    private def selectedCellVar =
+        asNodeInfo(model("fr-form-model").get.getVariable("selected-cell"))
 
     // Find the currently selected grid td if any
-    def findSelectedTd(inDoc: NodeInfo) = selectedCellId match {
-        case Some(selectedCell) ⇒
-            val tdId = selectedCell.stringValue
-            findFRBodyElement(inDoc) \\ "*:grid" \\ "*:td" filter (_ \@ "id" === tdId) headOption
-        case _ ⇒ // legacy FB
-            legacySelectedCell
+    def findSelectedTd(inDoc: NodeInfo) = {
+        val tdId = selectedCellVar.stringValue
+        findFRBodyElement(inDoc) \\ "*:grid" \\ "*:td" filter (_ \@ "id" === tdId) headOption
     }
 
     // Make the given grid td selected
-    def selectTd(newTd: NodeInfo): Unit = selectedCellId match {
-        case Some(selectedCell) ⇒
-            // New FB
-            setvalue(selectedCell, newTd \@ "id" stringValue)
-        case _ ⇒
-            // Legacy FB
-            val (x, y) = tdCoordinates(newTd)
-
-            setindex("fb-section-content-grid-tr-repeat", y + 1)
-            setindex("fb-section-content-grid-td-repeat", x + 1)
-    }
+    def selectTd(newTd: NodeInfo): Unit =
+        setvalue(selectedCellVar, newTd \@ "id" stringValue)
 
     // Whether a call to ensureEmptyTd() will succeed
     def willEnsureEmptyTdSucceed(inDoc: NodeInfo): Boolean =
@@ -477,18 +462,24 @@ object GridOps {
 
     def initializeGrids(doc: NodeInfo) {
         // 1. Annotate all the grid tds of the given document with unique ids, if they don't have them already
+        // We do this so that ids are stable as we move things around, otherwise if the XForms document is recreated
+        // new automatic ids are generated for objects without id.
 
-        // All grid tds with no existing id
-        val gridTds = findFRBodyElement(doc) \\ "*:grid" \\ "*:td" filterNot (td ⇒ exists(td \@ "id"))
+        def annotate(token: String, elements: Seq[NodeInfo]) = {
+            // Get as many fresh ids as there are tds
+            val ids = nextIds(doc, token, elements.size, false).toIterator
 
-        // Get as many fresh ids as there are tds
-        val ids = nextIds(doc, "td", gridTds.size, false).toIterator
+            // Add the missing ids
+            elements foreach (ensureAttribute(_, "id", ids.next()))
+        }
 
-        // Add the missing ids
-        gridTds foreach (ensureAttribute(_, "id", ids.next()))
+        // All grids and grid tds with no existing id
+        val bodyElement = findFRBodyElement(doc)
+        annotate("tmp", bodyElement \\ "*:grid" \\ "*:td" filterNot hasId)
+        annotate("tmp", bodyElement \\ "*:grid" filterNot hasId)
 
         // 2. Select the first td if any
-        findFRBodyElement(doc) \\ "*:grid" \\ "*:td" take 1 foreach (selectTd(_))
+        bodyElement \\ "*:grid" \\ "*:td" take 1 foreach (selectTd(_))
     }
 
     def moveRowUp(td: NodeInfo) {

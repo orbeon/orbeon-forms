@@ -54,18 +54,18 @@ object FormBuilderFunctions {
     def getFormDoc = asNodeInfo(model("fr-form-model").get.getVariable("model")).getDocumentRoot
 
     // Find the top-level form model of the form being edited
-    def getFormModel = Option(containingDocument.getObjectByEffectiveId("fb$fr-form-model")) map (_.asInstanceOf[XFormsModel])
+    def getFormModel = containingDocument.getObjectByEffectiveId("fb$fr-form-model").asInstanceOf[XFormsModel] ensuring (_ ne null, "did not find fb$fr-form-model")
 
     // Get the body
     // NOTE: annotate.xpl replaces fr:body with xf:group[@class = 'fb-body']
     def findFRBodyElement(inDoc: NodeInfo) = inDoc.getDocumentRoot \ * \ "*:body" \\ (XF → "group") filter (_.attClasses("fb-body")) head
 
     // Get the form model
-    def findModelElement(inDoc: NodeInfo) = inDoc.getDocumentRoot \ * \ "*:head" \ "*:model" filter (hasId(_, "fr-form-model")) head
+    def findModelElement(inDoc: NodeInfo) = inDoc.getDocumentRoot \ * \ "*:head" \ "*:model" filter (hasIdValue(_, "fr-form-model")) head
 
     // Find an xforms:instance element
     def instanceElement(inDoc: NodeInfo, id: String) =
-        findModelElement(inDoc) \ "*:instance" filter (hasId(_, id)) headOption
+        findModelElement(inDoc) \ "*:instance" filter (hasIdValue(_, id)) headOption
 
     // Find an inline instance's root element
     def inlineInstanceRootElement(inDoc: NodeInfo, id: String) =

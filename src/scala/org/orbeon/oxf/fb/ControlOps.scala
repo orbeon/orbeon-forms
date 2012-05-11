@@ -77,24 +77,24 @@ object ControlOps {
 
     // Find a bind by predicate
     def findBind(inDoc: NodeInfo, p: NodeInfo ⇒ Boolean) =
-        ((findModelElement(inDoc) \ "*:bind" filter (hasId(_, "fr-form-binds"))) \\ "*:bind") filter (p(_)) headOption
+        ((findModelElement(inDoc) \ "*:bind" filter (hasIdValue(_, "fr-form-binds"))) \\ "*:bind") filter (p(_)) headOption
 
     def isBindForName(bind: NodeInfo, name: String) =
-        hasId(bind, bindId(name)) || bindRefOrNodeset(bind).toSeq.stringValue == name // also check ref/nodeset in case id is not present
+        hasIdValue(bind, bindId(name)) || bindRefOrNodeset(bind).toSeq.stringValue == name // also check ref/nodeset in case id is not present
 
     // Get the control's name based on the control element
     def getControlName(control: NodeInfo) = getControlNameOption(control).get
 
     // Get the control's name based on the control element
     def getControlNameOption(control: NodeInfo) =
-        (control \@ "id" headOption) map
-            (id ⇒ controlName(id.stringValue))
+        (control \@ "id" headOption) flatMap
+            (id ⇒ Option(controlName(id.stringValue)))
 
     def hasName(control: NodeInfo) = getControlNameOption(control).isDefined
 
     // Find a control (including grids and sections) element by id
     def findControlById(inDoc: NodeInfo, id: String) =
-        findFRBodyElement(inDoc) \\ * filter (hasId(_, id)) headOption
+        findFRBodyElement(inDoc) \\ * filter (hasIdValue(_, id)) headOption
 
     // Return a bind ref or nodeset attribute if present
     def bindRefOrNodeset(bind: NodeInfo) = (bind \@ "ref") ++ (bind \@ "nodeset") headOption
@@ -146,7 +146,7 @@ object ControlOps {
 
     // Find the top-level bind (marked with "fr-form-binds") if any
     def findTopLevelBind(inDoc: NodeInfo) =
-        findModelElement(inDoc) \ "*:bind" collectFirst { case bind if hasId(bind, "fr-form-binds") ⇒ bind }
+        findModelElement(inDoc) \ "*:bind" collectFirst { case bind if hasIdValue(bind, "fr-form-binds") ⇒ bind }
 
     // Ensure that a tree of bind exists
     def ensureBinds(inDoc: NodeInfo, names: Seq[String]): NodeInfo = {
@@ -155,7 +155,7 @@ object ControlOps {
         val model = findModelElement(inDoc)
         val topLevelBind = findTopLevelBind(inDoc) match {
             case Some(bind) ⇒ bind
-            case None ⇒ insert(into = model, after = model \ "*:instance" filter (hasId(_, "fr-form-instance")), origin = topLevelBindTemplate).head
+            case None ⇒ insert(into = model, after = model \ "*:instance" filter (hasIdValue(_, "fr-form-instance")), origin = topLevelBindTemplate).head
         }
 
         // Insert a bind into one level
@@ -539,23 +539,24 @@ object ControlOps {
     }
 
     // Find a given static control by name
-    def findStaticControlByName(controlName: String) =
+    def findStaticControlByName(controlName: String) = {
+        val model = getFormModel
+        val part = model.getStaticModel.staticStateContext.partAnalysis
         for {
-            model ← getFormModel
-            part = model.getStaticModel.staticStateContext.partAnalysis
             controlId ← findControlIdByName(getFormDoc, controlName)
             prefixedId = part.startScope.prefixedIdForStaticId(controlId)
             control ← Option(part.getControlAnalysis(prefixedId))
         } yield
             control
+    }
 
     // Find a given concrete control by name
-    def findConcreteControlByName(controlName: String) =
+    def findConcreteControlByName(controlName: String) = {
+        val model = getFormModel
         for {
-            model ← getFormModel
-            staticModel = model.getStaticModel
             controlId ← findControlIdByName(getFormDoc, controlName)
             control ← Option(model.getXBLContainer.resolveObjectById(model.getEffectiveId, controlId, null)) map (_.asInstanceOf[XFormsControl])
         } yield
             control
+    }
 }

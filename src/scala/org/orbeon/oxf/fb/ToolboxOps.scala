@@ -180,7 +180,7 @@ object ToolboxOps {
 
         // The grid template
         val gridTemplate: NodeInfo =
-            <fr:grid edit-ref=""
+            <fr:grid edit-ref="" id={nextId(inDoc, "tmp")}
                      xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
                      xmlns:xhtml="http://www.w3.org/1999/xhtml">
                 <xhtml:tr>
@@ -216,7 +216,7 @@ object ToolboxOps {
                 <xforms:label ref={"$form-resources/" + newSectionName + "/label"}/>
                 <xforms:help ref={"$form-resources/" + newSectionName + "/help"}/>{
                 if (withGrid)
-                    <fr:grid edit-ref="">
+                    <fr:grid edit-ref="" id={nextId(inDoc, "tmp")}>
                         <xhtml:tr>
                             <xhtml:td id={nextId(inDoc, "td", false)}/>
                         </xhtml:tr>
@@ -263,7 +263,7 @@ object ToolboxOps {
 
         // Handle data template
         val modelElement = findModelElement(inDoc)
-        modelElement \ "*:instance" filter (hasId(_, templateInstanceId)) headOption match {
+        modelElement \ "*:instance" filter (hasIdValue(_, templateInstanceId)) headOption match {
             case Some(templateInstance) ⇒
                 // clear existing template instance content
                 delete(templateInstance \ *)

@@ -125,10 +125,8 @@ object DataModel {
         if (isAllowedBoundItem(controlName(bindId), itemOption))
             i.getAnother
         else
-            getFormModel flatMap
-                (m ⇒ Option(m.getInstance("fb-readonly"))) map
-                    (instance ⇒ SingletonIterator.makeIterator(instance.getInstanceRootElementInfo)) getOrElse
-                        EmptyIterator.getInstance
+            SingletonIterator.makeIterator(
+                getFormModel.getInstance("fb-readonly") ensuring (_ ne null, "did not find fb-readonly") getInstanceRootElementInfo)
 
     }
 

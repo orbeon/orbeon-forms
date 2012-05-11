@@ -71,7 +71,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
         val doc = getNewDoc()
 
         assert(findModelElement(doc).getDisplayName === "xforms:model")
-        assert(hasId(findModelElement(doc), "fr-form-model"))
+        assert(hasIdValue(findModelElement(doc), "fr-form-model"))
 
         assert(name(formInstanceRoot(doc) parent * head) === "xforms:instance")
 
@@ -88,7 +88,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
 
         // Find control element
         assert(qname(findControlByName(doc, control1).get) === (XF → "input"))
-        assert(hasId(findControlByName(doc, control1).get, controlId(control1)))
+        assert(hasIdValue(findControlByName(doc, control1).get, controlId(control1)))
     }
 
     @Test def controlElements(): Unit =
@@ -96,7 +96,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
 
             // Find bind element
             assert(qname(findBindByName(doc, control1).get) === (XF → "bind"))
-            assert(hasId(findBindByName(doc, control1).get, bindId(control1)))
+            assert(hasIdValue(findBindByName(doc, control1).get, bindId(control1)))
 
             // Check content of value holder
             assert(findDataHolder(doc, control1).isDefined)
@@ -118,12 +118,12 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
             ensureBinds(doc, Seq(section1, control2))
 
             assert(qname(findBindByName(doc, control2).get) === (XF → "bind"))
-            assert(hasId(findBindByName(doc, control2).get, bindId(control2)))
+            assert(hasIdValue(findBindByName(doc, control2).get, bindId(control2)))
 
             ensureBinds(doc, Seq(section2, "grid-1", control3))
 
             assert(qname(findBindByName(doc, control3).get) === (XF → "bind"))
-            assert(hasId(findBindByName(doc, control3).get, bindId(control3)))
+            assert(hasIdValue(findBindByName(doc, control3).get, bindId(control3)))
         }
 
     @Test def findNextId(): Unit = {
@@ -172,7 +172,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
             val newControlName = newControlNameOption.get
 
             // Test result
-            assert(hasId(findControlByName(doc, newControlName).get, controlId(newControlName)))
+            assert(hasIdValue(findControlByName(doc, newControlName).get, controlId(newControlName)))
 
             val newlySelectedTd = findSelectedTd(doc)
             assert(newlySelectedTd.isDefined)
@@ -187,7 +187,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
                 assert(name(dataHolder.get precedingSibling * head) === "control-1")
 
             val controlBind = findBindByName(doc, newControlName).get
-            assert(hasId(controlBind, bindId(newControlName)))
+            assert(hasIdValue(controlBind, bindId(newControlName)))
             assert((controlBind precedingSibling * att "id") === bindId("control-1"))
 
             assert(formResourcesRoot \ "resource" \ newControlName nonEmpty)
@@ -221,10 +221,10 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
                     assert(name(dataHolder.get precedingSibling * head) === "control-1")
 
                 val controlBind = findBindByName(doc, newRepeatName).get
-                assert(hasId(controlBind, bindId(newRepeatName)))
+                assert(hasIdValue(controlBind, bindId(newRepeatName)))
                 assert((controlBind precedingSibling * att "id") === bindId("control-1"))
 
-                assert(findModelElement(doc) \ "*:instance" filter(hasId(_, "grid-3-template")) nonEmpty)
+                assert(findModelElement(doc) \ "*:instance" filter(hasIdValue(_, "grid-3-template")) nonEmpty)
             }
 
             // Insert a new control
@@ -244,7 +244,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
                 val containerNames = findContainerNames(newlySelectedTd.get)
                 assert(containerNames === Seq("section-1", newRepeatName))
 
-                assert(hasId(findControlByName(doc, newControlName).get, controlId(newControlName)))
+                assert(hasIdValue(findControlByName(doc, newControlName).get, controlId(newControlName)))
 
                 // NOTE: We should maybe just compare the XML for holders, binds, and resources
                 val dataHolder = assertDataHolder(doc, newControlName, isCustomInstance)
@@ -254,8 +254,8 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
                 }
 
                 val controlBind = findBindByName(doc, newControlName).get
-                assert(hasId(controlBind, bindId(newControlName)))
-                assert(hasId(controlBind parent * head, bindId(newRepeatName)))
+                assert(hasIdValue(controlBind, bindId(newControlName)))
+                assert(hasIdValue(controlBind parent * head, bindId(newRepeatName)))
 
                 assert(formResourcesRoot \ "resource" \ newControlName nonEmpty)
 
@@ -305,7 +305,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
 
         val grid = gridWithRowspan
 
-        def td(id: String) = grid \\ * filter (hasId(_, id)) head
+        def td(id: String) = grid \\ * filter (hasIdValue(_, id)) head
 
         val expected = Seq(
             Seq(Cell(td("11"), 1, false), Cell(td("12"), 2, false), Cell(td("13"), 1, false)),
@@ -329,7 +329,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
         for (tr ← grid \ "tr" toList)
             insertRowBelow(rewrap(tr)) // rewrap after mutation (it's dangerous to play with NodeInfo and mutation!)
 
-        def td(id: String) = grid \\ * filter (hasId(_, id)) head
+        def td(id: String) = grid \\ * filter (hasIdValue(_, id)) head
 
         val expected = Seq(
             Seq(Cell(td("11"),      1, false), Cell(td("12"),      3, false), Cell(td("13"),      1, false)),
@@ -388,7 +388,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
         def deleteRowCheckSelectedTd(beforeTdId: String, afterTdId: String) =
             withActionAndDoc(getNewDoc(SectionsGridsDoc)) { doc ⇒
 
-                def getTd(id: String) = doc \\ "*:td" find (hasId(_, id)) head
+                def getTd(id: String) = doc \\ "*:td" find (hasIdValue(_, id)) head
 
                 val beforeTd = getTd(beforeTdId)
                 selectTd(beforeTd)

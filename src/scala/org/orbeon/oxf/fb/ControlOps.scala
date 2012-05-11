@@ -28,6 +28,7 @@ import org.orbeon.oxf.xml.{XMLConstants, NamespaceMapping}
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
 import org.orbeon.scaxon.XML._
+import org.orbeon.oxf.xforms.XFormsConstants
 
 /*
  * Form Builder: operations on controls.
@@ -559,4 +560,31 @@ object ControlOps {
         } yield
             control
     }
+
+    // XForms callers: build an effective id for a given static id or return null (the empty sequence)
+    def buildControlEffectiveIdOrEmpty(inDoc: NodeInfo, staticId: String) =
+        buildControlEffectiveId(inDoc, staticId).orNull
+
+    // Build an effective id for a given static id
+    //
+    // This assumes a certain hierarchy:
+    //
+    // - top-level xxf:dynamic
+    // - zero or more *:section containers
+    // - zero or more fr:grid containers
+    // - the only repeats are containers
+    // - all containers must have stable ids
+    def buildControlEffectiveId(inDoc: NodeInfo, staticId: String) =
+        findControlById(inDoc, staticId) map { control ⇒
+            // Ancestors from root to leaf except the top-level
+            val ancestorContainers = findAncestorContainers(control, includeSelf = false).reverse.tail
+
+            val containerIds = ancestorContainers map (_ attValue "id")
+            val repeatDepth = ancestorContainers filter IsRepeat size
+
+            def suffix = 1 to repeatDepth map (_ ⇒ 1) mkString "-"
+            val prefixedId = containerIds :+ staticId mkString "$"
+
+            DynamicControlId + "$" + prefixedId + (if (repeatDepth == 0) "" else XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1 + suffix)
+        }
 }

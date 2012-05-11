@@ -39,6 +39,9 @@ object FormBuilderFunctions {
     val FB = "http://orbeon.org/oxf/xml/form-builder"
     val Component = "http://orbeon.org/oxf/xml/form-builder/component/orbeon/library"
 
+    // Id of the xxf:dynamic control holding the edited form
+    val DynamicControlId = "fb"
+
     // Get an id based on a name
     // NOTE: The idea as of 2011-06-21 is that we support reading indiscriminately the -control, -grid and -section
     // suffixes, whatever type of actual control they apply to. The idea is that in the end we might decide to just use
@@ -54,7 +57,7 @@ object FormBuilderFunctions {
     def getFormDoc = asNodeInfo(model("fr-form-model").get.getVariable("model")).getDocumentRoot
 
     // Find the top-level form model of the form being edited
-    def getFormModel = containingDocument.getObjectByEffectiveId("fb$fr-form-model").asInstanceOf[XFormsModel] ensuring (_ ne null, "did not find fb$fr-form-model")
+    def getFormModel = containingDocument.getObjectByEffectiveId(DynamicControlId + "$fr-form-model").asInstanceOf[XFormsModel] ensuring (_ ne null, "did not find fb$fr-form-model")
 
     // Get the body
     // NOTE: annotate.xpl replaces fr:body with xf:group[@class = 'fb-body']

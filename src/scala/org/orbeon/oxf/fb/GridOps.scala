@@ -39,16 +39,16 @@ object GridOps {
     def findGridElementOrEmpty(doc: NodeInfo, gridName: String) =
         findGridElement(doc, gridName).orNull
 
-    def isGridOrRepeat(nodeInfo: NodeInfo) = nodeInfo self ("*:grid" || "*:repeat") nonEmpty
-    def isRepeat(nodeInfo: NodeInfo) = ((nodeInfo self "*:grid" nonEmpty) && nodeInfo \@ "repeat" === "true") || (nodeInfo self "*:repeat" nonEmpty)
+    // Predicates
+    val IsRepeat: NodeInfo ⇒ Boolean = node ⇒ IsGrid(node) && node.attValue("repeat") == "true"
 
     // Find the first enclosing repeated grid or legacy repeat if any
     def findContainingRepeat(descendantOrSelf: NodeInfo, includeSelf: Boolean = false) =
-        findAncestorContainers(descendantOrSelf, includeSelf) filter (isRepeat(_)) headOption
+        findAncestorContainers(descendantOrSelf, includeSelf) filter (IsRepeat(_)) headOption
 
     // Get the first enclosing repeated grid or legacy repeat
-    def getContainingGridOrRepeat(descendantOrSelf: NodeInfo, includeSelf: Boolean = false) =
-        findAncestorContainers(descendantOrSelf, includeSelf) filter (isGridOrRepeat(_)) head
+    def getContainingGrid(descendantOrSelf: NodeInfo, includeSelf: Boolean = false) =
+        findAncestorContainers(descendantOrSelf, includeSelf) filter (IsGrid(_)) head
 
     // Extract the rowspan of a td (default is 1 if there is no attribute)
     private def getRowspan(td: NodeInfo) =  attValueOption(td \@ "rowspan") map (_.toInt) getOrElse 1
@@ -116,7 +116,7 @@ object GridOps {
 
         // NOTE: This algorithm expands rowspans that span over the current row, but not rowspans that end with the
         // current row.
-        val grid = getContainingGridOrRepeat(tr)
+        val grid = getContainingGrid(tr)
         val rowCells = getRowCells(tr)
 
         // Number of cells that end at the current row
@@ -143,7 +143,7 @@ object GridOps {
                 insertRowBelow(prevRow)
             case None ⇒
                 // Insert as first row of the table
-                val grid = getContainingGridOrRepeat(tr)
+                val grid = getContainingGrid(tr)
                 val result = insert(into = grid, before = tr, origin = newRow(grid, getGridSize(grid))).head
                 debugDumpDocument("insert row above", grid)
                 result
@@ -161,7 +161,7 @@ object GridOps {
     // Delete a row and contained controls
     def deleteRow(tr: NodeInfo) {
 
-        val allRowCells  = getAllRowCells(getContainingGridOrRepeat(tr))
+        val allRowCells  = getAllRowCells(getContainingGrid(tr))
 
         val posy = tr precedingSibling "*:tr" size
         val rowCells = allRowCells(posy)
@@ -209,7 +209,7 @@ object GridOps {
     // Insert a column to the right
     def insertColRight(firstRowTd: NodeInfo) {
 
-        val grid = getContainingGridOrRepeat(firstRowTd)
+        val grid = getContainingGrid(firstRowTd)
         val allRowCells = getAllRowCells(grid)
         val pos = firstRowTd precedingSibling "*:td" size
 
@@ -230,7 +230,7 @@ object GridOps {
     // Insert a column to the left
     def insertColLeft(firstRowTd: NodeInfo) {
 
-        val grid = getContainingGridOrRepeat(firstRowTd)
+        val grid = getContainingGrid(firstRowTd)
         val pos = firstRowTd precedingSibling "*:td" size
 
         if (pos > 0) {
@@ -252,7 +252,7 @@ object GridOps {
 
     // Find a column's tds
     def getColTds(td: NodeInfo) = {
-        val rows = getContainingGridOrRepeat(td) \ "*:tr"
+        val rows = getContainingGrid(td) \ "*:tr"
         val (x, _) = tdCoordinates(td)
 
         rows map (row ⇒ (row \ "*:td")(x))
@@ -261,7 +261,7 @@ object GridOps {
     // Insert a column and contained controls
     def deleteCol(firstRowTd: NodeInfo) {
 
-        val grid = getContainingGridOrRepeat(firstRowTd)
+        val grid = getContainingGrid(firstRowTd)
         val allRowCells = getAllRowCells(grid)
         val pos = firstRowTd precedingSibling "*:td" size
 
@@ -284,7 +284,7 @@ object GridOps {
     }
 
     def controlsInCol(firstRowTd: NodeInfo) = {
-        val grid = getContainingGridOrRepeat(firstRowTd)
+        val grid = getContainingGrid(firstRowTd)
         val allRowCells = getAllRowCells(grid)
         
         val (x, _) = tdCoordinates(firstRowTd: NodeInfo, allRowCells: Seq[Seq[Cell]])
@@ -410,11 +410,11 @@ object GridOps {
 
     // Get the x/y position of a td given Cell information
     def tdCoordinates(td: NodeInfo): (Int, Int) =
-        tdCoordinates(td, getAllRowCells(getContainingGridOrRepeat(td)))
+        tdCoordinates(td, getAllRowCells(getContainingGrid(td)))
 
     // Whether there will be controls to delete if the cell is expanded
     def expandCellTouchesControl(td: NodeInfo): Boolean = {
-        val allRowCells = getAllRowCells(getContainingGridOrRepeat(td))
+        val allRowCells = getAllRowCells(getContainingGrid(td))
         val (x, y) = tdCoordinates(td, allRowCells)
 
         val cell = allRowCells(y)(x)
@@ -424,7 +424,7 @@ object GridOps {
 
     // Vertically expand the given cell
     def expandCell(td: NodeInfo) {
-        val allRowCells  = getAllRowCells(getContainingGridOrRepeat(td))
+        val allRowCells  = getAllRowCells(getContainingGrid(td))
         val (x, y) = tdCoordinates(td, allRowCells)
 
         val cell = allRowCells(y)(x)
@@ -440,7 +440,7 @@ object GridOps {
     // Vertically shrink the given cell
     def shrinkCell(td: NodeInfo) {
 
-        val grid = getContainingGridOrRepeat(td)
+        val grid = getContainingGrid(td)
         val allRowCells  = getAllRowCells(grid)
 
         val (x, y) = tdCoordinates(td, allRowCells)

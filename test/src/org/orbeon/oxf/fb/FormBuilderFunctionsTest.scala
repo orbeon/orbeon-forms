@@ -43,9 +43,10 @@ import org.orbeon.oxf.xforms.control.XFormsControl
 
 class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit with MockitoSugar {
 
-    val TemplateDoc      = "oxf:/forms/orbeon/builder/form/template.xml"
-    val CustomXMLDoc     = "oxf:/org/orbeon/oxf/fb/template-with-custom-xml.xhtml"
-    val SectionsGridsDoc = "oxf:/org/orbeon/oxf/fb/template-with-sections-grids.xhtml"
+    val TemplateDoc        = "oxf:/forms/orbeon/builder/form/template.xml"
+    val CustomXMLDoc       = "oxf:/org/orbeon/oxf/fb/template-with-custom-xml.xhtml"
+    val SectionsGridsDoc   = "oxf:/org/orbeon/oxf/fb/template-with-sections-grids.xhtml"
+    val SectionsRepeatsDoc = "oxf:/org/orbeon/oxf/fb/template-with-sections-repeats.xhtml"
 
     def getNewDoc(url: String = TemplateDoc): DocumentWrapper = {
 
@@ -445,7 +446,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
         )
 
         assertSelectedTdAfterDelete(beforeAfter) { td ⇒
-            deleteGrid(getContainingGridOrRepeat(td))
+            deleteGrid(getContainingGrid(td))
         }
     }
 
@@ -460,7 +461,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
         )
 
         assertSelectedTdAfterDelete(beforeAfter) { td ⇒
-            deleteSection(findAncestorContainers(getContainingGridOrRepeat(td)) head)
+            deleteSection(findAncestorContainers(getContainingGrid(td)) head)
         }
     }
 
@@ -546,6 +547,20 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
         assert(false === DataModel.isAllowedBindingExpression(control1, "/"))         // root node
         assert(false === DataModel.isAllowedBindingExpression(control1, ".."))        // complex content
     }
+
+    @Test def controlEffectiveId(): Unit =
+        withActionAndDoc(getNewDoc(SectionsRepeatsDoc)) { doc ⇒
+
+            val expected = Map(
+                "fb$section-1-section$tmp-3-tmp$control-1-control"                       → "control-1-control",
+                "fb$section-1-section$grid-4-grid$control-5-control·1"                   → "control-5-control",
+                "fb$section-1-section$section-3-section$tmp-4-tmp$control-6-control"     → "control-6-control",
+                "fb$section-1-section$section-3-section$grid-7-grid$control-8-control·1" → "control-8-control"
+            )
+
+            for ((expected, id) ← expected)
+                assert(Some(expected) === buildControlEffectiveId(doc, id))
+        }
 
 //    @Test def insertHolders() {
 //

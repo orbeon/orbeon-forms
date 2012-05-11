@@ -80,12 +80,12 @@
                         <xforms:var name="fr-resources" value="xxforms:get-variable('fr-resources-model', 'fr-fr-resources')" as="element(resource)?"/>
                         <!-- Scope $fb-resources for Form Builder resources -->
                         <xforms:var name="fb-resources" value="xxforms:get-variable('fr-resources-model', 'fr-form-resources')" as="element(resource)?"/>
-        
+
                         <!-- Apply all the content -->
                         <xforms:group class="fb-body">
                             <xsl:apply-templates select="fr:body/node()"/>
                         </xforms:group>
-        
+
                         <!-- Listen to activations on grid cells -->
                         <xforms:action ev:event="DOMActivate">
                             <xforms:var name="control-element" value="xxforms:control-element(xxforms:event('xxforms:effective-targetid'))"/>
@@ -95,14 +95,13 @@
                                     ($control-element/following-sibling::xforms:repeat//*[@xxforms:element = 'xh:td'])[$th-column]/@id
                                     else $control-element/@id"/>
                                 <xforms:setvalue ref="xxforms:get-variable('fr-form-model', 'selected-cell')" value="$new-selected-cell"/>
-                                <xforms:setvalue ref="xxforms:get-variable('fr-form-model', 'selected-cell-effective')" value="xxforms:event('xxforms:effective-targetid')"/>
                             </xforms:action>
                         </xforms:action>
-        
+
                         <!--<xforms:output value="xxforms:get-variable('fr-form-model', 'selected-cell')" xxbl:scope="inner">-->
                             <!--<xforms:label>Selected:</xforms:label>-->
                         <!--</xforms:output>-->
-        
+
                     </xforms:group>
                 </xsl:template>
 

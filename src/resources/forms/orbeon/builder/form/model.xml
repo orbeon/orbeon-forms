@@ -325,7 +325,6 @@
 
             <!-- Currently selected cell td id -->
             <selected-cell/>
-            <selected-cell-effective/>
 
 
             <new-language/>
@@ -348,7 +347,6 @@
 
     <xforms:var name="variables" value="instance('fb-variables')"/>
     <xforms:var name="selected-cell" value="$variables/selected-cell"/>
-    <xforms:var name="selected-cell-effective" value="$variables/selected-cell-effective"/>
 
     <xforms:setvalue ev:event="xxforms-dialog-open" ev:observer="#document"
                      ref="instance('fb-variables')/dialogs-open" value="xs:integer(.) + 1"/>

@@ -558,7 +558,7 @@
                                         current node when user interact with it, but we also need to be able to show empty/non-empty
                                         versions of the upload when user mouse over other cells.
                             -->
-                            <xf:var name="control-effective-id" value="xformsUtils:getRelatedEffectiveId($selected-cell-effective, $control-id)"/>
+                            <xf:var name="control-effective-id" value="controlOps:buildControlEffectiveIdOrEmpty(instance('fb-form-instance'), $control-id)"/>
                             <xf:var name="bound-item" value="xxf:binding(concat('/', $control-effective-id))"/>
                             <xf:upload class="fb-static-upload" id="fb-static-upload-empty" ref="$bound-item[string(.) = ''], instance('fb-static-upload')/empty"/>
                             <xf:upload class="fb-static-upload" id="fb-static-upload-non-empty" ref="$bound-item[string(.) != ''], instance('fb-static-upload')/non-empty"/>

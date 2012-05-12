@@ -67,7 +67,8 @@ trait VariableAnalysisTrait extends SimpleElementAnalysis with VariableTrait {
 
     def variableAnalysis = getValueAnalysis
 
-    override val canHoldValue = true // TODO: not clear that this is useful at this point, see who calls this
+    // NOTE: This is used by isValueControl, but it's not clear if a variable should return true
+    override val canHoldValue = true
 
     override def computeValueAnalysis =
         sequenceAnalysis match {

@@ -23,7 +23,7 @@ class OrbeonServletContextListenerDelegate extends OrbeonServletContextListener
 /**
  * This listener listens for HTTP context lifecycle changes.
  */
-class OrbeonServletContextListener extends ServletContextListener with ServletPortlet {
+class OrbeonServletContextListener extends ServletContextListener {
 
     private val InitProcessorPrefix     = "oxf.context-initialized-processor."
     private val InitInputPrefix         = "oxf.context-initialized-processor.input."

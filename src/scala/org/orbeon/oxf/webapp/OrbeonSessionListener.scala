@@ -27,7 +27,7 @@ class OrbeonSessionListenerDelegate extends OrbeonSessionListener
 /**
  * This listener listens for HTTP session lifecycle changes.
  */
-class OrbeonSessionListener extends HttpSessionListener with ServletPortlet {
+class OrbeonSessionListener extends HttpSessionListener {
 
     private val InitProcessorPrefix     = "oxf.session-created-processor."
     private val InitInputPrefix         = "oxf.session-created-processor.input."

@@ -30,7 +30,7 @@ public class UserAgent {
      */
     public static boolean isUserAgentIE(ExternalContext.Request request) {
         final String userAgent = getUserAgentLowerCase(request);
-        return userAgent.contains("msie") && ! userAgent.contains("opera");
+        return userAgent != null && userAgent.contains("msie") && ! userAgent.contains("opera");
     }
 
     /**

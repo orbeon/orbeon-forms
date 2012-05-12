@@ -15,7 +15,7 @@ package org.orbeon.oxf.webapp
 
 import org.orbeon.oxf.pipeline.InitUtils
 import javax.servlet.{ServletException, ServletContextEvent, ServletContextListener}
-import ProcessorService.logger
+import org.orbeon.oxf.util.ScalaUtils._
 
 // For backward compatibility
 class OrbeonServletContextListenerDelegate extends OrbeonServletContextListener
@@ -29,6 +29,8 @@ class OrbeonServletContextListener extends ServletContextListener {
     private val InitInputPrefix         = "oxf.context-initialized-processor.input."
     private val DestroyProcessorPrefix  = "oxf.context-destroyed-processor."
     private val DestroyInputPrefix      = "oxf.context-destroyed-processor.input."
+
+    private implicit val logger = ProcessorService.logger
 
     def logPrefix = "Context listener"
     def initParameters = Map()

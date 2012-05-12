@@ -14,6 +14,8 @@
 package org.orbeon.oxf.util
 
 import java.security.MessageDigest
+import org.orbeon.oxf.common.OXFException
+import org.apache.log4j.Logger
 
 object ScalaUtils {
 
@@ -92,6 +94,15 @@ object ScalaUtils {
         try block
         catch {
             case _ ⇒ // NOP
+        }
+
+    // Run the body and log/rethrow the root cause of any Exception caught
+    def withRootException[T](action: String, newException: Throwable ⇒ Exception)(body: ⇒ T)(implicit logger: Logger): T =
+        try body
+        catch {
+            case e: Exception ⇒
+                logger.error("Exception when running " + action, OXFException.getRootThrowable(e))
+                throw newException(OXFException.getRootThrowable(e))
         }
 
     def digest(algorithm: String, data: Traversable[String]) = {

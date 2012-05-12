@@ -30,7 +30,8 @@ import OrbeonPortlet._
 import org.orbeon.oxf.util.{DynamicVariable, URLRewriterUtils, NetUtils}
 import org.orbeon.oxf.externalcontext.{URLRewriter, WSRPURLRewriter, AsyncRequest, AsyncExternalContext}
 import org.orbeon.oxf.common.Version
-import org.orbeon.oxf.webapp.{ServletPortlet, WebAppContext}
+import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.webapp.{ProcessorService, ServletPortlet, WebAppContext}
 
 // For backward compatibility
 class OrbeonPortlet2 extends OrbeonPortlet
@@ -65,6 +66,7 @@ class OrbeonPortlet extends GenericPortlet with ServletPortlet {
 
     private def renderFunction = if (isAsyncPortletLoad) doRenderAsync(_: RenderRequest, _: RenderResponse, renderDiv _) else doRenderDirectly _
     private def serveContentFunction = if (isAsyncPortletLoad) Some(serveContentAsync _) else None
+    private implicit val logger = ProcessorService.logger
 
     def logPrefix = "Portlet"
 

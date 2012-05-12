@@ -18,7 +18,8 @@ import org.orbeon.oxf.pipeline.api._
 import javax.servlet.ServletException
 import javax.servlet.http._
 import collection.JavaConverters._
-import org.orbeon.oxf.webapp.{ServletPortlet, WebAppContext}
+import org.orbeon.oxf.webapp.{ProcessorService, ServletPortlet, WebAppContext}
+import org.orbeon.oxf.util.ScalaUtils._
 
 // For backward compatibility
 class OrbeonServletDelegate extends OrbeonServlet
@@ -32,6 +33,8 @@ class OrbeonServletDelegate extends OrbeonServlet
  * All servlets and portlets instances in a given web app share the same resource manager.
  */
 class OrbeonServlet extends HttpServlet with ServletPortlet {
+
+    private implicit val logger = ProcessorService.logger
 
     val HttpAcceptMethodsParam = "oxf.http.accept-methods"
     val DefaultMethods = "get post head"

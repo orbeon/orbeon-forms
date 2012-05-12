@@ -32,14 +32,6 @@ trait ServletPortlet {
     private var _webAppContext: WebAppContext = _
     def webAppContext = _webAppContext
 
-    def withRootException(action: String, newException: Throwable ⇒ Exception)(body: ⇒ Any) =
-        try body
-        catch {
-            case e: Exception ⇒
-                logger.error(logPrefix + " - Exception when running " + action, OXFException.getRootThrowable(e))
-                throw newException(OXFException.getRootThrowable(e))
-        }
-
     // Initialize the servlet or portlet
     def init(webAppContext: WebAppContext, processor: Option[(String, String)]): Unit = {
         _webAppContext = webAppContext

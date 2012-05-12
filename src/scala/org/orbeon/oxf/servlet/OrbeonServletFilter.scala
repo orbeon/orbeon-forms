@@ -19,12 +19,15 @@ import javax.servlet._
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 import collection.JavaConverters._
-import org.orbeon.oxf.webapp.{ServletPortlet, WebAppContext}
+import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.webapp.{ProcessorService, ServletPortlet, WebAppContext}
 
 // For backward compatibility
 class OrbeonServletFilterDelegate extends OrbeonServletFilter
 
 class OrbeonServletFilter extends Filter with ServletPortlet {
+
+    private implicit val logger = ProcessorService.logger
 
     def logPrefix = "Servlet filter"
 

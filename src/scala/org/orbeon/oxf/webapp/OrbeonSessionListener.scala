@@ -19,7 +19,7 @@ import javax.servlet.http.HttpSessionEvent
 import javax.servlet.http.HttpSessionListener
 import collection.JavaConverters._
 import javax.servlet.ServletException
-import ProcessorService.logger
+import org.orbeon.oxf.util.ScalaUtils._
 
 // For backward compatibility
 class OrbeonSessionListenerDelegate extends OrbeonSessionListener
@@ -33,6 +33,8 @@ class OrbeonSessionListener extends HttpSessionListener {
     private val InitInputPrefix         = "oxf.session-created-processor.input."
     private val DestroyProcessorPrefix  = "oxf.session-destroyed-processor."
     private val DestroyInputPrefix      = "oxf.session-destroyed-processor.input."
+
+    private implicit val logger = ProcessorService.logger
 
     def logPrefix = "Session listener"
     def initParameters = Map()

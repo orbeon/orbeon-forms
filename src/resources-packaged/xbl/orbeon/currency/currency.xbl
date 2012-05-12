@@ -32,21 +32,13 @@
             </icon>
             <datatype>xforms:decimal</datatype>
             <template>
-                 <fr:currency prefix="$">
+                 <fr:currency>
                      <xforms:label ref=""/>
                      <xforms:hint ref=""/>
                      <xforms:help ref=""/>
                      <xforms:alert ref=""/>
                 </fr:currency>
             </template>
-            <control-details>
-                <xforms:input ref="@prefix">
-                    <xforms:label lang="en">Currency sign</xforms:label>
-                    <xforms:label lang="fr">Symbole monétaire</xforms:label>
-                    <xforms:hint lang="en">Sumbol shown before the amount</xforms:hint>
-                    <xforms:hint lang="fr">Symbole affiché avant le montant</xforms:hint>
-                </xforms:input>
-            </control-details>
         </metadata>
 
         <xbl:resources>

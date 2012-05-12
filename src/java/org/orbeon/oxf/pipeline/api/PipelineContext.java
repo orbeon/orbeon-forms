@@ -13,13 +13,12 @@
  */
 package org.orbeon.oxf.pipeline.api;
 
-import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.processor.impl.ProcessorOutputImpl;
-import org.orbeon.oxf.properties.Properties;
-import org.orbeon.oxf.properties.PropertySet;
 import org.orbeon.oxf.util.PropertyContext;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * PipelineContext represents a context object passed to all the processors running in a given
@@ -52,16 +51,9 @@ public class PipelineContext implements PropertyContext {
         }
     }
 
-    public interface Trace extends ContextListener {
-        void setPipelineContext(PipelineContext pipelineContext);
-        TraceEntry getTraceEntry(ProcessorOutputImpl processorOutputImpl);
-    }
-
     private Map<Object, Object> attributes = new HashMap<Object, Object>();
     private List<ContextListener> listeners;
     private boolean destroyed;
-    private Trace trace;
-    private boolean traceStopped;
 
     private static ThreadLocal<PipelineContext> threadLocal = new ThreadLocal<PipelineContext>();
     private PipelineContext originalPipelineContext;
@@ -70,9 +62,6 @@ public class PipelineContext implements PropertyContext {
      * Create a new pipeline context.
      */
     public PipelineContext() {
-        // Use global property
-        startTrace("oxf.pipeline.trace.class");
-
         // Save and set ThreadLocal
         originalPipelineContext = threadLocal.get();
         threadLocal.set(this);
@@ -80,64 +69,6 @@ public class PipelineContext implements PropertyContext {
 
     public static PipelineContext get() {
         return threadLocal.get();
-    }
-
-    /**
-     * Start a trace using the class from the given global property name if present.
-     *
-     * @param propertyName  property name containing a class name
-     * @return              true iif new trace was started
-     */
-    public boolean startTrace(String propertyName) {
-        if (trace == null) { // don't create if already present
-            final Properties properties = Properties.instance();
-            trace = createTraceIfNeeded(properties, propertyName);
-            return trace != null;
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * Stop the trace for the remaining duration of this context.
-     */
-    public void stopTrace() {
-        if (trace != null)
-            traceStopped = true;
-    }
-
-    private Trace createTraceIfNeeded(Properties properties, String propertyName) {
-        if (properties != null) {
-            final PropertySet propertySet = properties.getPropertySet();
-            if (propertySet != null) {
-                final String traceClass = propertySet.getNCName(propertyName);
-                if (traceClass != null) {
-                    return createTrace(traceClass);
-                }
-            }
-        }
-        return null;
-    }
-
-    private Trace createTrace(String traceClass) {
-        Trace trace;
-        try {
-            final Class clazz = Class.forName(traceClass);
-            trace = (Trace) clazz.newInstance();
-            trace.setPipelineContext(this);
-        } catch (final Exception e) {
-            throw new OXFException(e);
-        }
-        return trace;
-    }
-
-    /**
-     * Return the trace for update if available.
-     *
-     * @return trace
-     */
-    public Trace getTraceForUpdate() {
-        return traceStopped ? null : trace;
     }
 
     /**
@@ -180,9 +111,6 @@ public class PipelineContext implements PropertyContext {
     public void destroy(boolean success) {
         if (!destroyed) {
             try {
-                if (trace != null) {
-                    trace.contextDestroyed(success);
-                }
                 if (listeners != null) {
                     for (final ContextListener contextListener: listeners) {
                         contextListener.contextDestroyed(success);

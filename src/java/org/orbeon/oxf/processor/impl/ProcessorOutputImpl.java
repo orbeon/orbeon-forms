@@ -19,6 +19,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.TraceEntry;
+import org.orbeon.oxf.pipeline.api.TracingPipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
@@ -391,9 +392,12 @@ public abstract class ProcessorOutputImpl implements ProcessorOutput {
         TraceEntry traceEntry = null;
         try {
             // Update trace if needed
-            if (pipelineContext.getTraceForUpdate() != null) {
-                traceEntry = pipelineContext.getTraceForUpdate().getTraceEntry(this);
-                traceEntry.outputReadCalled();
+            if (pipelineContext instanceof TracingPipelineContext) {
+                final TracingPipelineContext tracingPipelineContext = (TracingPipelineContext) pipelineContext;
+                if (tracingPipelineContext.getTraceForUpdate() != null) {
+                    traceEntry = tracingPipelineContext.getTraceForUpdate().getTraceEntry(this);
+                    traceEntry.outputReadCalled();
+                }
             }
 
             // Delegate

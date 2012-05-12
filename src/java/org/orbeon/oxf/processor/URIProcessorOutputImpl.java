@@ -18,6 +18,7 @@ import org.orbeon.oxf.cache.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.TracingPipelineContext;
 import org.orbeon.oxf.processor.impl.ProcessorOutputImpl;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.resources.URLFactory;
@@ -240,8 +241,13 @@ public abstract class URIProcessorOutputImpl extends ProcessorOutputImpl {
         // Make sure the config input is cacheable
         final ProcessorImpl.KeyValidity keyValidity = processorImpl.getInputKeyValidity(pipelineContext, configInputName);
 
-        if (keyValidity == null && pipelineContext.getTraceForUpdate() != null) {
-            processorImpl.getInputKeyValidity(pipelineContext, configInputName);
+        if (keyValidity == null) {
+            if (pipelineContext instanceof TracingPipelineContext) {
+                final TracingPipelineContext tracingPipelineContext = (TracingPipelineContext) pipelineContext;
+                if (tracingPipelineContext.getTraceForUpdate() != null) {
+                    processorImpl.getInputKeyValidity(pipelineContext, configInputName);
+                }
+            }
         }
 
         if (keyValidity == null)

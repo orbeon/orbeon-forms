@@ -14,7 +14,7 @@
 package org.orbeon.oxf.processor.trace;
 
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.pipeline.api.PipelineContext.Trace;
+import org.orbeon.oxf.pipeline.api.TracingPipelineContext.Trace;
 import org.orbeon.oxf.pipeline.api.TraceEntry;
 import org.orbeon.oxf.processor.impl.ProcessorOutputImpl;
 import org.orbeon.oxf.xml.ContentHandlerHelper;

@@ -79,10 +79,7 @@ trait AsyncPortlet extends BufferedPortlet {
             // Create a request just so we can create a rewriter
             val ecRequest = new Portlet2ExternalContext(pipelineContext, null, request, false).getRequest
             // We know we want to rewrite all paths (no PFC will run here so we won't have anything better)
-            val getMatchers = new Callable[JList[URLRewriterUtils.PathMatcher]] {
-                def call = URLRewriterUtils.getMatchAllPathMatcher
-            }
-            val rewriter = new WSRPURLRewriter(getMatchers, ecRequest, isWSRPEncodeResources)
+            val rewriter = new WSRPURLRewriter(URLRewriterUtils.getMatchAllPathMatcher, ecRequest, isWSRPEncodeResources)
 
             // Output scripts needed by the Ajax portlet
             val sb = new StringBuilder

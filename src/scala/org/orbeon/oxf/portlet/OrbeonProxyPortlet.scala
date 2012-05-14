@@ -19,6 +19,7 @@ import org.orbeon.oxf.util.ScalaUtils._
 import java.net.{HttpURLConnection, URL}
 import org.orbeon.oxf.xml.XMLUtils
 import org.orbeon.oxf.util.{LoggerFactory, NetUtils}
+import org.orbeon.oxf.externalcontext.WSRPURLRewriter
 
 /**
  * Orbeon Forms Form Runner proxy portlet.
@@ -95,7 +96,7 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
     private def createContext(request: PortletRequest, namespace: String): AsyncContext = {
         // Determine URL based on preferences and request
         val url = {
-            val pathParameter = request.getParameter("orbeon.path")
+            val pathParameter = request.getParameter(WSRPURLRewriter.PathParameterName)
 
             if (pathParameter == "/xforms-server-submit")
                 // XForms server submit

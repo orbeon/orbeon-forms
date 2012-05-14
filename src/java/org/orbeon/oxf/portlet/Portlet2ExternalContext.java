@@ -101,7 +101,7 @@ public class Portlet2ExternalContext implements ExternalContext {
         public String getPathInfo() {
             // Use the resource id if we are a ResourceRequest
             // In that case, remove the query string part of the resource id, that's handled by getParameterMap()
-            String result = (portletRequest instanceof ResourceRequest) ? NetUtils.removeQueryString(((ResourceRequest) portletRequest).getResourceID()) : portletRequest.getParameter(OrbeonPortletXFormsFilter.PATH_PARAMETER_NAME);
+            String result = (portletRequest instanceof ResourceRequest) ? NetUtils.removeQueryString(((ResourceRequest) portletRequest).getResourceID()) : portletRequest.getParameter(WSRPURLRewriter.PathParameterName());
             if (result == null) result = "";
             return (result.startsWith("/")) ? result : "/" + result;
         }
@@ -200,7 +200,7 @@ public class Portlet2ExternalContext implements ExternalContext {
                 } else {
                     // Not a resource request, so just use native request parameters
                     parameterMap = new HashMap<String, Object[]>(portletRequest.getParameterMap());
-                    parameterMap.remove(OrbeonPortletXFormsFilter.PATH_PARAMETER_NAME);
+                    parameterMap.remove(WSRPURLRewriter.PathParameterName());
                     parameterMap = Collections.unmodifiableMap(parameterMap);
                 }
             }

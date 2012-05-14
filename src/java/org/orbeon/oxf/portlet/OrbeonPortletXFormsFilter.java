@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.portlet;
 
+import org.orbeon.oxf.externalcontext.WSRPURLRewriter;
 import org.orbeon.oxf.servlet.OrbeonXFormsFilter;
 
 import javax.portlet.*;
@@ -25,8 +26,6 @@ import java.util.*;
  * request to the trampoline servlet for XForms rendering. 
  */
 public class OrbeonPortletXFormsFilter implements RenderFilter, ActionFilter, ResourceFilter {
-
-    public static final String PATH_PARAMETER_NAME = "orbeon.path";
 
     public static final String PATH_TEMPLATE = "6b45488abd86954c28ce1a7ee10ab1b9193eb4dd"; // some unlikely value
     public static final String PORTLET_NAMESPACE_TEMPLATE_ATTRIBUTE = "oxf.xforms.renderer.portlet.namespace";
@@ -103,7 +102,7 @@ public class OrbeonPortletXFormsFilter implements RenderFilter, ActionFilter, Re
      * Filter action requests.
      */
     public void doFilter(ActionRequest actionRequest, ActionResponse actionResponse, FilterChain filterChain) throws IOException, PortletException {
-        final String orbeonPath = actionRequest.getParameter(PATH_PARAMETER_NAME);
+        final String orbeonPath = actionRequest.getParameter(WSRPURLRewriter.PathParameterName());
         if (orbeonPath != null) {
             // This is an Orbeon action: let Orbeon handle it
             setRequestRequestAttributes(actionRequest, actionResponse, actionRequest.getMethod(), orbeonPath);
@@ -194,13 +193,13 @@ public class OrbeonPortletXFormsFilter implements RenderFilter, ActionFilter, Re
             final MimeResponse mimeResponse = (MimeResponse) response;
             {
                 final PortletURL renderURL = mimeResponse.createRenderURL();
-                renderURL.setParameter(PATH_PARAMETER_NAME, PATH_TEMPLATE);
+                renderURL.setParameter(WSRPURLRewriter.PathParameterName(), PATH_TEMPLATE);
 
                 request.setAttribute(PORTLET_RENDER_URL_TEMPLATE_ATTRIBUTE, renderURL.toString());
             }
             {
                 final PortletURL actionURL = mimeResponse.createActionURL();
-                actionURL.setParameter(PATH_PARAMETER_NAME, PATH_TEMPLATE);
+                actionURL.setParameter(WSRPURLRewriter.PathParameterName(), PATH_TEMPLATE);
 
                 request.setAttribute(PORTLET_ACTION_URL_TEMPLATE_ATTRIBUTE, actionURL.toString());
             }

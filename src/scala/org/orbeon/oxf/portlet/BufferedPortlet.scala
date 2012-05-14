@@ -19,9 +19,9 @@ import BufferedPortlet._
 import javax.portlet._
 import java.util.{Map ⇒ JMap}
 import collection.JavaConverters._
-import OrbeonPortletXFormsFilter.PATH_PARAMETER_NAME
 import org.orbeon.oxf.xml.XMLUtils
 import org.orbeon.oxf.processor.serializer.CachedSerializer
+import org.orbeon.oxf.externalcontext.WSRPURLRewriter.PathParameterName
 
 // Abstract portlet logic including buffering of portlet actions
 // This doesn't deal direct with ProcessorService or HTTP proxying
@@ -67,7 +67,7 @@ trait BufferedPortlet {
                 response.sendRedirect(NetUtils.pathInfoParametersToPathInfoQueryString(path, parameters.asJava))
             case Redirect(path, parameters, _) ⇒
                 // Just update the render parameters to simulate a redirect within the portlet
-                val redirectParameters = parameters + (PATH_PARAMETER_NAME → List(path))
+                val redirectParameters = parameters + (PathParameter → List(path))
 
                 // Set the new parameters for the subsequent render requests
                 response.setRenderParameters(toJavaMap(redirectParameters))
@@ -133,7 +133,7 @@ trait BufferedPortlet {
 
 object BufferedPortlet {
 
-    val PathParameter = "orbeon.path"
+    val PathParameter = PathParameterName
     val MethodParameter = "orbeon.method"
 
     val ResponseSessionKey = "org.orbeon.oxf.response"

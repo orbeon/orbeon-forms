@@ -46,36 +46,36 @@ public class WSRP2Utils {
         int index;
         final Writer writer = response.getWriter();
 
-        while ((index = content.indexOf(WSRPURLRewriter.BASE_TAG, currentIndex)) != -1) {
+        while ((index = content.indexOf(WSRPURLRewriter.BaseTag(), currentIndex)) != -1) {
             // Write up to the current mark
             writer.write(content, currentIndex, index - currentIndex);
 
             // Check if escaping is requested
-            if (index + WSRPURLRewriter.BASE_TAG_LENGTH * 2 <= stringLength
-                    && content.substring(index + WSRPURLRewriter.BASE_TAG_LENGTH, index + WSRPURLRewriter.BASE_TAG_LENGTH * 2).equals(WSRPURLRewriter.BASE_TAG)) {
+            if (index + WSRPURLRewriter.BaseTagLength() * 2 <= stringLength
+                    && content.substring(index + WSRPURLRewriter.BaseTagLength(), index + WSRPURLRewriter.BaseTagLength() * 2).equals(WSRPURLRewriter.BaseTag())) {
                 // Write escaped tag, update index and keep looking
-                writer.write(WSRPURLRewriter.BASE_TAG);
-                currentIndex = index + WSRPURLRewriter.BASE_TAG_LENGTH * 2;
+                writer.write(WSRPURLRewriter.BaseTag());
+                currentIndex = index + WSRPURLRewriter.BaseTagLength() * 2;
                 continue;
             }
 
-            if (index < stringLength - WSRPURLRewriter.BASE_TAG_LENGTH && content.charAt(index + WSRPURLRewriter.BASE_TAG_LENGTH) == '?') {
+            if (index < stringLength - WSRPURLRewriter.BaseTagLength() && content.charAt(index + WSRPURLRewriter.BaseTagLength()) == '?') {
                 // URL encoding
                 // Find the matching end mark
-                int endIndex = content.indexOf(WSRPURLRewriter.END_TAG, index);
+                int endIndex = content.indexOf(WSRPURLRewriter.EndTag(), index);
                 if (endIndex == -1)
                     throw new OXFException("Missing end tag for WSRP encoded URL.");
-                final String encodedURL = content.substring(index + WSRPURLRewriter.START_TAG_LENGTH, endIndex);
+                final String encodedURL = content.substring(index + WSRPURLRewriter.StartTagLength(), endIndex);
 
-                currentIndex = endIndex + WSRPURLRewriter.END_TAG_LENGTH;
+                currentIndex = endIndex + WSRPURLRewriter.EndTagLength();
 
                 final String decodedPortletURL = wsrpToPortletURL(encodedURL, response);
                 writer.write(encodeForXML ? escapeXMLMinimal(decodedPortletURL) : decodedPortletURL);
 
-            } else if (index < stringLength - WSRPURLRewriter.BASE_TAG_LENGTH && content.charAt(index + WSRPURLRewriter.BASE_TAG_LENGTH) == '_') {
+            } else if (index < stringLength - WSRPURLRewriter.BaseTagLength() && content.charAt(index + WSRPURLRewriter.BaseTagLength()) == '_') {
                 // Namespace encoding
                 writer.write(namespace);
-                currentIndex = index + WSRPURLRewriter.PREFIX_TAG_LENGTH;
+                currentIndex = index + WSRPURLRewriter.PrefixTagLength();
             } else {
                 throw new OXFException("Invalid wsrp rewrite tagging.");
             }
@@ -149,25 +149,25 @@ public class WSRP2Utils {
 
         // Check URL type and create URL
         try {
-            final String urlTypeValue = StringConversions.getStringFromObjectArray(wsrpParameters.get(WSRPURLRewriter.URL_TYPE_PARAM));
+            final String urlTypeValue = StringConversions.getStringFromObjectArray(wsrpParameters.get(WSRPURLRewriter.URLTypeParam()));
             if (urlTypeValue == null)
                 throw new OXFException("Missing URL type for WSRP encoded URL: " + encodedURL);
 
             // Case of a render or action request
             // Create a BaseURL
             final BaseURL baseURL;
-            if (urlTypeValue.equals(WSRPURLRewriter.URL_TYPE_RESOURCE_STRING))
+            if (urlTypeValue.equals(WSRPURLRewriter.URLTypeResourceString()))
                 baseURL = response.createResourceURL();
-            else if (urlTypeValue.equals(WSRPURLRewriter.URL_TYPE_BLOCKING_ACTION_STRING))
+            else if (urlTypeValue.equals(WSRPURLRewriter.URLTypeBlockingActionString()))
                 baseURL = response.createActionURL();
-            else if (urlTypeValue.equals(WSRPURLRewriter.URL_TYPE_RENDER_STRING))
+            else if (urlTypeValue.equals(WSRPURLRewriter.URLTypeRenderString()))
                 baseURL = response.createRenderURL();
             else
                 throw new OXFException("Invalid URL type for WSRP encoded URL: " + encodedURL);
 
             // Get navigational state
             final Map<String, String[]> navigationParameters; {
-                final String navigationalStateValue = StringConversions.getStringFromObjectArray(wsrpParameters.get(WSRPURLRewriter.NAVIGATIONAL_STATE_PARAM));
+                final String navigationalStateValue = StringConversions.getStringFromObjectArray(wsrpParameters.get(WSRPURLRewriter.NavigationalStateParam()));
                 if (navigationalStateValue != null) {
                     final String decodedNavigationalState;
                     try {
@@ -183,12 +183,12 @@ public class WSRP2Utils {
                 }
             }
 
-            if (urlTypeValue.equals(WSRPURLRewriter.URL_TYPE_RESOURCE_STRING)) {// NOTE: With Liferay, baseURL instanceof ResourceURL is always true!
-                final String resourcePath = navigationParameters.get(OrbeonPortletXFormsFilter.PATH_PARAMETER_NAME)[0];
+            if (urlTypeValue.equals(WSRPURLRewriter.URLTypeResourceString())) {// NOTE: With Liferay, baseURL instanceof ResourceURL is always true!
+                final String resourcePath = navigationParameters.get(WSRPURLRewriter.PathParameterName())[0];
 
                 // Encode the other parameters directly into the resource id, as they are really part of the identity
                 // of the resource and have nothing to do with the current render parameters.
-                navigationParameters.remove(OrbeonPortletXFormsFilter.PATH_PARAMETER_NAME); // WARNING: mutate navigationParameters
+                navigationParameters.remove(WSRPURLRewriter.PathParameterName()); // WARNING: mutate navigationParameters
                 final String resourceQuery = NetUtils.encodeQueryString2(navigationParameters);
                 final String resourceId = NetUtils.appendQueryString(resourcePath, resourceQuery);
 
@@ -215,14 +215,14 @@ public class WSRP2Utils {
                 final PortletURL portletURL = (PortletURL) baseURL;
 
                 // Get and set portlet mode
-                final String portletModeValue = StringConversions.getStringFromObjectArray(wsrpParameters.get(WSRPURLRewriter.MODE_PARAM));
+                final String portletModeValue = StringConversions.getStringFromObjectArray(wsrpParameters.get(WSRPURLRewriter.ModeParam()));
                 if (portletModeValue != null) {
                     final String portletMode = portletModeValue.startsWith("amp;") ? portletModeValue.substring(4) : portletModeValue;
                     portletURL.setPortletMode(new PortletMode(portletMode));
                 }
 
                 // Get and set window state
-                final String windowStateValue = StringConversions.getStringFromObjectArray(wsrpParameters.get(WSRPURLRewriter.WINDOW_STATE_PARAM));
+                final String windowStateValue = StringConversions.getStringFromObjectArray(wsrpParameters.get(WSRPURLRewriter.WindowStateParam()));
                 if (windowStateValue != null) {
                     final String windowState = windowStateValue.startsWith("amp;") ? windowStateValue.substring(4) : windowStateValue;
                     portletURL.setWindowState(new WindowState(windowState));

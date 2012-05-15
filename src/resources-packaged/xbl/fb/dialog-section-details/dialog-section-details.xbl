@@ -29,7 +29,8 @@
          xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderFunctions"
          xmlns:containerOps="java:org.orbeon.oxf.fb.ContainerOps"
          xmlns:sectionOps="java:org.orbeon.oxf.fb.SectionOps"
-         xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps">
+         xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps"
+         xmlns:dataModel="java:org.orbeon.oxf.fb.DataModel">
 
     <xbl:binding id="fb-dialog-section-details" element="fb|dialog-section-details">
         <xbl:handlers>
@@ -38,8 +39,8 @@
                 <xf:setvalue iterate="*[not(*)]" ref="."/> <!-- Clear all local values -->
                 <xf:setvalue ref="@relevant" value="'true'"/>
 
-                <xf:setvalue ref="original-section-name" value="containerOps:getContainerNameOrEmpty(event('section'))"/>
-                <xf:setvalue ref="section-name" value="../original-section-name"/>
+                <xf:setvalue ref="original-control-name" value="containerOps:getContainerNameOrEmpty(event('section'))"/>
+                <xf:setvalue ref="control-name" value="../original-control-name"/>
 
                 <xf:refresh/> <!-- The view needs to be relevant before it gets the event for action to run in a proper context -->
                 <xxf:show dialog="dialog"/>
@@ -51,8 +52,11 @@
         
                 <xf:instance id="local">
                     <local relevant=""><!-- TODO: Relevance must be handled automatically by the XForms engine! -->
-                        <original-section-name/>
-                        <section-name/>
+                        <original-control-name/>
+                        <control-name/>
+                        
+                        <control-xpath/>         <!-- XPath expression to node might be editable if using custom XML -->
+                        <is-custom-instance/>
                         
                         <relevant/>
                         <readonly/>
@@ -68,12 +72,16 @@
                 <xf:setvalue ev:observer="local" ref="save-trigger" ev:event="xxforms-valid">enabled</xf:setvalue>
                 
                 <!-- NOTE: We use normalize-space() to make sure there is no leading/trailing space -->
-                <xf:bind ref="section-name"
+                <xf:bind ref="control-name"
                          type="xs:NCName"
                          calculate="normalize-space()"
                          readonly="false()"
-                         constraint=". = ../original-section-name or not(. = tokenize(../control-names, '\s+'))"/>
-                
+                         constraint=". = ../original-control-name or not(. = tokenize(../control-names, '\s+'))"/>
+                <xf:bind ref="control-xpath"
+                         relevant="../is-custom-instance = 'true'"
+                         required="../is-custom-instance = 'true'"
+                         type="xxf:xpath2"
+                         fb:warning="not(normalize-space() and dataModel:isAllowedValueBindingExpression(../original-control-name, .))"/>
                 <xf:bind ref="relevant | readonly" type="xxf:xpath2" required="false()"/>
                 <xf:bind ref="save-trigger" readonly=". = 'disabled'"/>
         
@@ -93,8 +101,11 @@
                 <!-- Show dialog -->
                 <xf:action ev:event="xxforms-dialog-open" ev:observer="dialog">
             
-                    <xf:setvalue ref="$local/relevant" value="controlOps:getMipOrEmpty($form, fbf:controlId($local/original-section-name), 'relevant')"/>
-                    <xf:setvalue ref="$local/readonly" value="controlOps:getMipOrEmpty($form, fbf:controlId($local/original-section-name), 'readonly')"/>
+                    <xf:setvalue ref="$local/control-xpath" value="dataModel:getBindRefOrEmpty($form, $local/control-name)"/>
+                    <xf:setvalue ref="$local/is-custom-instance" value="dataModel:isCustomInstance()"/>
+                    
+                    <xf:setvalue ref="$local/relevant" value="controlOps:getMipOrEmpty($form, fbf:controlId($local/original-control-name), 'relevant')"/>
+                    <xf:setvalue ref="$local/readonly" value="controlOps:getMipOrEmpty($form, fbf:controlId($local/original-control-name), 'readonly')"/>
 
                     <xf:setvalue ref="$local/control-names" value="string-join(controlOps:getAllControlNamesXPath($body), ' ')"/>
                     
@@ -106,13 +117,17 @@
                 <!-- Save data upon close -->
                 <xf:action ev:event="DOMActivate" ev:observer="dialog" if="event('xxf:targetid') != 'cancel-trigger' and $local/save-trigger = 'enabled'">
             
-                    <xf:var name="old-name" value="$local/original-section-name/string()"/>
-                    <xf:var name="new-name" value="$local/section-name/string()"/>
+                    <xf:var name="old-name" value="$local/original-control-name/string()"/>
+                    <xf:var name="new-name" value="$local/control-name/string()"/>
                                 
                     <xf:action type="xpath">
                         controlOps:findRenameControl($form, $old-name, $new-name),
                         controlOps:updateMip($form, fbf:sectionId($new-name), 'relevant', $local/relevant),
                         controlOps:updateMip($form, fbf:sectionId($new-name), 'readonly', $local/readonly)
+                    </xf:action>
+                    <!-- Update XPath on bind -->
+                    <xf:action if="dataModel:isCustomInstance()" type="xpath">
+                        dataModel:setBindRef($form, $new-name, $local/control-xpath)
                     </xf:action>
                     <!-- No classes for sections for now -->
                     
@@ -130,13 +145,22 @@
                         <xh:div class="fr-grid">
                             <xh:div class="fr-grid-content">
                                 <!-- Section name -->
-                                <xf:input ref="section-name" incremental="true" id="fb-section-name-input">
+                                <xf:input ref="control-name" incremental="true" id="fb-control-name-input">
                                     <xf:label>
                                         <xh:img src="/apps/fr/style/images/silk/tag_blue.png" alt="" title=""/>
                                         <xh:span><xf:output value="$resources/dialog-section-details/control-name/label"/></xh:span>
                                     </xf:label>
                                     <xf:alert ref="$resources/dialog-section-details/control-name/alert"/>
                                     <xf:hint ref="$resources/dialog-section-details/control-name/hint"/>
+                                </xf:input>
+                                <!-- XPath -->
+                                <xf:input ref="$local/control-xpath" incremental="true" id="fb-edit-details-control-xpath">
+                                    <xf:label>
+                                        <xh:img src="/apps/fr/style/images/silk/database.png" alt="" title=""/>
+                                        <xh:span><xf:output value="$resources/dialog-control-details/control-xpath/label"/></xh:span>
+                                    </xf:label>
+                                    <xf:alert ref="$resources/dialog-control-details/control-xpath/alert"/>
+                                    <xf:hint ref="$resources/dialog-control-details/control-xpath/hint"/>
                                 </xf:input>
                                 <!-- Relevant -->
                                 <xf:input ref="relevant" incremental="true">

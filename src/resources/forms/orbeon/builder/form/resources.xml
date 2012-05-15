@@ -683,6 +683,17 @@
                     <value>xforms-ready</value>
                 </item>
             </event-type>
+            <event-condition>
+                <label>Condition</label>
+                <item>
+                    <label>Run always</label>
+                    <value>true()</value>
+                </item>
+                <item>
+                    <label>Run on creation only</label>
+                    <value>$fr-mode='new'</value>
+                </item>
+            </event-condition>
             <event-control>
                 <label>Control</label>
             </event-control>
@@ -1460,6 +1471,17 @@
                     <value>xforms-ready</value>
                 </item>
             </event-type>
+            <event-condition>
+                <label>Condition d'exécution</label>
+                <item>
+                    <label>Toujours</label>
+                    <value>true()</value>
+                </item>
+                <item>
+                    <label>Création seulement</label>
+                    <value>$fr-mode='new'</value>
+                </item>
+            </event-condition>
             <event-control>
                 <label>Contrôle</label>
             </event-control>
@@ -2239,6 +2261,17 @@
                     <value>xforms-ready</value>
                 </item>
             </event-type>
+            <event-condition>
+                <label>[Condition]</label>
+                <item>
+                    <label>[Run always]</label>
+                    <value>true()</value>
+                </item>
+                <item>
+                    <label>[Run on creation only]</label>
+                    <value>$fr-mode='new'</value>
+                </item>
+            </event-condition>
             <event-control>
                 <label>Kontroll</label>
             </event-control>
@@ -3017,6 +3050,17 @@
                     <value>xforms-ready</value>
                 </item>
             </event-type>
+            <event-condition>
+                <label>[Condition]</label>
+                <item>
+                    <label>[Run always]</label>
+                    <value>true()</value>
+                </item>
+                <item>
+                    <label>[Run on creation only]</label>
+                    <value>$fr-mode='new'</value>
+                </item>
+            </event-condition>
             <event-control>
                 <label>Элемент</label>
             </event-control>

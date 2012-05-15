@@ -109,135 +109,127 @@
                 <!-- Set request values -->
                 <xforms:group ref="xforms:action[@ev:event = 'xforms-submit']/xforms:action">
                     <xforms:label ref="$form-resources/dialog-actions/request-parameters/label"/>
-                    <fr:repeat ref="xforms:action[@class = 'fr-set-service-value-action']" id="fb-actions-setvalue-repeat" origin="instance('fb-binding-action-template')/xforms:action[@class = 'fr-set-service-value-action']" columns="2" appearance="xxforms:table">
-                        <fr:body>
-                            <xhtml:tr>
-                                <xhtml:td>
-                                    <xforms:select1 ref="xxforms:variable[@name = 'control-name']/@select">
-                                        <xforms:label ref="$form-resources/dialog-actions/source-control/label"/>
-                                        <xforms:item>
-                                            <xforms:label ref="$form-resources/select/label"/>
-                                            <xforms:value/>
-                                        </xforms:item>
-                                        <xforms:itemset ref="$body//*[(@ref or @bind) and ends-with(@id, '-control')]">
-                                            <!-- Try to build a reasonably user-friendly label -->
-                                            <xforms:label value="for $id in substring-before(@id, '-control') return concat($current-resources/*[name() = $id]/label, ' (', $id, ')')"/>
-                                            <xforms:value value="concat('''', substring-before(@id, '-control'), '''')"/>
-                                        </xforms:itemset>
-                                    </xforms:select1>
-                                </xhtml:td>
-                                <xhtml:td>
-                                    <xforms:input ref="xxforms:variable[@name = 'path']/@select">
-                                        <xforms:label ref="$form-resources/dialog-actions/destination-xpath/label"/>
-                                    </xforms:input>
-                                </xhtml:td>
-                            </xhtml:tr>
-                        </fr:body>
-                    </fr:repeat>
+                    <fr:grid repeat="true" ref="xforms:action[@class = 'fr-set-service-value-action']" id="fb-actions-setvalue-repeat" origin="instance('fb-binding-action-template')/xforms:action[@class = 'fr-set-service-value-action']">
+                        <xhtml:tr>
+                            <xhtml:td>
+                                <xforms:select1 ref="(*:variable | *:var)[@name = 'control-name']/(@value | @select)[1]">
+                                    <xforms:label ref="$form-resources/dialog-actions/source-control/label"/>
+                                    <xforms:item>
+                                        <xforms:label ref="$form-resources/select/label"/>
+                                        <xforms:value/>
+                                    </xforms:item>
+                                    <xforms:itemset ref="$body//*[(@ref or @bind) and ends-with(@id, '-control')]">
+                                        <!-- Try to build a reasonably user-friendly label -->
+                                        <xforms:label value="for $id in substring-before(@id, '-control') return concat($current-resources/*[name() = $id]/label, ' (', $id, ')')"/>
+                                        <xforms:value value="concat('''', substring-before(@id, '-control'), '''')"/>
+                                    </xforms:itemset>
+                                </xforms:select1>
+                            </xhtml:td>
+                            <xhtml:td>
+                                <xforms:input ref="(*:variable | *:var)[@name = 'path']/(@value | @select)[1]">
+                                    <xforms:label ref="$form-resources/dialog-actions/destination-xpath/label"/>
+                                </xforms:input>
+                            </xhtml:td>
+                        </xhtml:tr>
+                    </fr:grid>
                 </xforms:group>
                 <xforms:group ref="xforms:action[@ev:event = 'xforms-submit']/xforms:action">
                     <xforms:label ref="$form-resources/dialog-actions/request-database-parameter/label"/>
-                    <fr:repeat ref="xforms:action[@class = 'fr-set-database-service-value-action']" id="fb-actions-database-setvalue-repeat" origin="instance('fb-binding-action-template')/xforms:action[@class = 'fr-set-database-service-value-action']" columns="2" appearance="xxforms:table">
-                        <fr:body>
-                            <xhtml:tr>
-                                <xhtml:td>
-                                    <xforms:select1 ref="xxforms:variable[@name = 'control-name']/@select">
-                                        <xforms:label ref="$form-resources/dialog-actions/source-control/label"/>
-                                        <xforms:item>
-                                            <xforms:label ref="$form-resources/select/label"/>
-                                            <xforms:value/>
-                                        </xforms:item>
-                                        <xforms:itemset ref="$body//*[(@ref or @bind) and ends-with(@id, '-control')]">
-                                            <!-- Try to build a reasonably user-friendly label -->
-                                            <xforms:label value="for $id in substring-before(@id, '-control') return concat($current-resources/*[name() = $id]/label, ' (', $id, ')')"/>
-                                            <xforms:value value="concat('''', substring-before(@id, '-control'), '''')"/>
-                                        </xforms:itemset>
-                                    </xforms:select1>
-                                </xhtml:td>
-                                <xhtml:td>
-                                    <xforms:input ref="xxforms:variable[@name = 'parameter']/@select">
-                                        <xforms:label ref="$form-resources/dialog-actions/parameter-number/label"/>
-                                    </xforms:input>
-                                </xhtml:td>
-                            </xhtml:tr>
-                        </fr:body>
-                    </fr:repeat>
+                    <fr:grid repeat="true" ref="xforms:action[@class = 'fr-set-database-service-value-action']" id="fb-actions-database-setvalue-repeat" origin="instance('fb-binding-action-template')/xforms:action[@class = 'fr-set-database-service-value-action']">
+                        <xhtml:tr>
+                            <xhtml:td>
+                                <xforms:select1 ref="(*:variable | *:var)[@name = 'control-name']/(@value | @select)[1]">
+                                    <xforms:label ref="$form-resources/dialog-actions/source-control/label"/>
+                                    <xforms:item>
+                                        <xforms:label ref="$form-resources/select/label"/>
+                                        <xforms:value/>
+                                    </xforms:item>
+                                    <xforms:itemset ref="$body//*[(@ref or @bind) and ends-with(@id, '-control')]">
+                                        <!-- Try to build a reasonably user-friendly label -->
+                                        <xforms:label value="for $id in substring-before(@id, '-control') return concat($current-resources/*[name() = $id]/label, ' (', $id, ')')"/>
+                                        <xforms:value value="concat('''', substring-before(@id, '-control'), '''')"/>
+                                    </xforms:itemset>
+                                </xforms:select1>
+                            </xhtml:td>
+                            <xhtml:td>
+                                <xforms:input ref="(*:variable | *:var)[@name = 'parameter']/(@value | @select)[1]">
+                                    <xforms:label ref="$form-resources/dialog-actions/parameter-number/label"/>
+                                </xforms:input>
+                            </xhtml:td>
+                        </xhtml:tr>
+                    </fr:grid>
                 </xforms:group>
                 <!-- Set control values -->
                 <xforms:group ref="xforms:action[@ev:event = 'xforms-submit-done']">
                     <xforms:label ref="$form-resources/dialog-actions/response-values/label"/>
-                    <fr:repeat ref="xforms:action[@class = 'fr-set-control-value-action']" id="fb-bindings-setvalue-repeat" origin="instance('fb-binding-action-template')/xforms:action[@class = 'fr-set-control-value-action']" columns="2" appearance="xxforms:table">
-                        <fr:body>
-                            <xhtml:tr>
-                                <xhtml:td>
-                                    <xforms:select1 ref="xxforms:variable[@name = 'control-name']/@select">
-                                        <xforms:label ref="$form-resources/dialog-actions/destination-control/label"/>
-                                        <xforms:item>
-                                            <xforms:label ref="$form-resources/select/label"/>
-                                            <xforms:value/>
-                                        </xforms:item>
-                                        <xforms:itemset ref="$body//*[(@ref or @bind) and ends-with(@id, '-control')]">
-                                            <xforms:label value="substring-before(@id, '-control')"/>
-                                            <xforms:value value="concat('''', substring-before(@id, '-control'), '''')"/>
-                                        </xforms:itemset>
-                                    </xforms:select1>
-                                </xhtml:td>
-                                <xhtml:td>
-                                    <xforms:input ref="xxforms:variable[@name = 'control-value']/@select">
-                                        <xforms:label ref="$form-resources/dialog-actions/source-xpath/label"/>
-                                    </xforms:input>
-                                </xhtml:td>
-                            </xhtml:tr>
-                        </fr:body>
-                    </fr:repeat>
+                    <fr:grid repeat="true" ref="xforms:action[@class = 'fr-set-control-value-action']" id="fb-bindings-setvalue-repeat" origin="instance('fb-binding-action-template')/xforms:action[@class = 'fr-set-control-value-action']">
+                        <xhtml:tr>
+                            <xhtml:td>
+                                <xforms:select1 ref="(*:variable | *:var)[@name = 'control-name']/(@value | @select)[1]">
+                                    <xforms:label ref="$form-resources/dialog-actions/destination-control/label"/>
+                                    <xforms:item>
+                                        <xforms:label ref="$form-resources/select/label"/>
+                                        <xforms:value/>
+                                    </xforms:item>
+                                    <xforms:itemset ref="$body//*[(@ref or @bind) and ends-with(@id, '-control')]">
+                                        <xforms:label value="substring-before(@id, '-control')"/>
+                                        <xforms:value value="concat('''', substring-before(@id, '-control'), '''')"/>
+                                    </xforms:itemset>
+                                </xforms:select1>
+                            </xhtml:td>
+                            <xhtml:td>
+                                <xforms:input ref="(*:variable | *:var)[@name = 'control-value']/(@value | @select)[1]">
+                                    <xforms:label ref="$form-resources/dialog-actions/source-xpath/label"/>
+                                </xforms:input>
+                            </xhtml:td>
+                        </xhtml:tr>
+                    </fr:grid>
                 </xforms:group>
                 <!-- Only show this section if there are selection controls -->
                 <xforms:var name="controls-with-itemset" value="$body//*[(@ref or @bind) and ends-with(@id, '-control') and exists(xforms:itemset)]" as="element()*"/>
                 <xforms:group ref="xforms:action[@ev:event = 'xforms-submit-done' and exists($controls-with-itemset)]">
                     <xforms:label ref="$form-resources/dialog-actions/response-itemset/label"/>
-                    <fr:repeat ref="xforms:action[@class = 'fr-itemset-action']" id="fb-bindings-itemset-repeat" origin="instance('fb-binding-action-template')/xforms:action[@class = 'fr-itemset-action']" columns="2" appearance="xxforms:table">
-                        <fr:body>
-                            <xhtml:tr>
-                                <xhtml:td>
-                                    <!-- Only list selection controls -->
-                                    <xforms:select1 ref="xxforms:variable[@name = 'control-name']/@select">
-                                        <xforms:label ref="$form-resources/dialog-actions/destination-selection-control/label"/>
-                                        <!--<xforms:hint ref="$form-resources/dialog-actions/destination-selection-control/hint"/>-->
-                                        <xforms:item>
-                                            <xforms:label ref="$form-resources/select/label"/>
-                                            <xforms:value/>
-                                        </xforms:item>
-                                        <xforms:itemset ref="$controls-with-itemset">
-                                            <!-- Try to build a reasonably user-friendly label -->
-                                            <xforms:label value="for $id in substring-before(@id, '-control') return concat($current-resources/*[name() = $id]/label, ' (', $id, ')')"/>
-                                            <xforms:value value="concat('''', substring-before(@id, '-control'), '''')"/>
-                                        </xforms:itemset>
-                                    </xforms:select1>
-                                </xhtml:td>
-                                <xhtml:td>
-                                    <!-- Only display this if a selection control is picked -->
-                                    <xforms:group ref=".[xxforms:variable[@name = 'control-name']/@select != '']">
-                                        <xforms:label ref="$form-resources/dialog-actions/itemset/label"/>
-                                        <xforms:hint ref="$form-resources/dialog-actions/itemset/hint"/>
-                                        <xhtml:div class="fb-parameters">
-                                            <xforms:input ref="xxforms:variable[@name = 'response-items']/@select">
-                                                <xforms:label ref="$form-resources/dialog-actions/items/label"/>
-                                                <xforms:hint ref="$form-resources/dialog-actions/items/hint"/>
-                                            </xforms:input>
-                                            <xforms:input ref=".//xxforms:variable[@name = 'item-label']/@select">
-                                                <xforms:label ref="$form-resources/dialog-actions/label/label"/>
-                                                <xforms:hint ref="$form-resources/dialog-actions/label/hint"/>
-                                            </xforms:input>
-                                            <xforms:input ref=".//xxforms:variable[@name = 'item-value']/@select">
-                                                <xforms:label ref="$form-resources/dialog-actions/value/label"/>
-                                                <xforms:hint ref="$form-resources/dialog-actions/value/hint"/>
-                                            </xforms:input>
-                                        </xhtml:div>
-                                    </xforms:group>
-                                </xhtml:td>
-                            </xhtml:tr>
-                        </fr:body>
-                    </fr:repeat>
+                    <fr:grid repeat="true" ref="xforms:action[@class = 'fr-itemset-action']" id="fb-bindings-itemset-repeat" origin="instance('fb-binding-action-template')/xforms:action[@class = 'fr-itemset-action']">
+                        <xhtml:tr>
+                            <xhtml:td>
+                                <!-- Only list selection controls -->
+                                <xforms:select1 ref="(*:variable | *:var)[@name = 'control-name']/(@value | @select)[1]">
+                                    <xforms:label ref="$form-resources/dialog-actions/destination-selection-control/label"/>
+                                    <!--<xforms:hint ref="$form-resources/dialog-actions/destination-selection-control/hint"/>-->
+                                    <xforms:item>
+                                        <xforms:label ref="$form-resources/select/label"/>
+                                        <xforms:value/>
+                                    </xforms:item>
+                                    <xforms:itemset ref="$controls-with-itemset">
+                                        <!-- Try to build a reasonably user-friendly label -->
+                                        <xforms:label value="for $id in substring-before(@id, '-control') return concat($current-resources/*[name() = $id]/label, ' (', $id, ')')"/>
+                                        <xforms:value value="concat('''', substring-before(@id, '-control'), '''')"/>
+                                    </xforms:itemset>
+                                </xforms:select1>
+                            </xhtml:td>
+                            <xhtml:td>
+                                <!-- Only display this if a selection control is picked -->
+                                <xforms:group ref=".[(*:variable | *:var)[@name = 'control-name']/(@value | @select)[1] != '']">
+                                    <xforms:label ref="$form-resources/dialog-actions/itemset/label"/>
+                                    <xforms:hint ref="$form-resources/dialog-actions/itemset/hint"/>
+                                    <xhtml:div class="fb-parameters">
+                                        <xforms:input ref="(*:variable | *:var)[@name = 'response-items']/(@value | @select)[1]">
+                                            <xforms:label ref="$form-resources/dialog-actions/items/label"/>
+                                            <xforms:hint ref="$form-resources/dialog-actions/items/hint"/>
+                                        </xforms:input>
+                                        <xforms:input ref=".//(*:variable | *:var)[@name = 'item-label']/(@value | @select)[1]">
+                                            <xforms:label ref="$form-resources/dialog-actions/label/label"/>
+                                            <xforms:hint ref="$form-resources/dialog-actions/label/hint"/>
+                                        </xforms:input>
+                                        <xforms:input ref=".//(*:variable | *:var)[@name = 'item-value']/(@value | @select)[1]">
+                                            <xforms:label ref="$form-resources/dialog-actions/value/label"/>
+                                            <xforms:hint ref="$form-resources/dialog-actions/value/hint"/>
+                                        </xforms:input>
+                                    </xhtml:div>
+                                </xforms:group>
+                            </xhtml:td>
+                        </xhtml:tr>
+                    </fr:grid>
                 </xforms:group>
             </xforms:group>
         </xhtml:div>
@@ -363,7 +355,7 @@
                 <!-- xforms-submit -->
                 <xforms:bind ref="xforms:action[@ev:event = 'xforms-submit']">
                     <xforms:bind ref="@ev:observer" calculate="$submission-bind"/>
-                    <xforms:bind ref="xxforms:variable[@name = 'request-instance-name']/@select"
+                    <xforms:bind ref="(*:variable | *:var)[@name = 'request-instance-name']/(@value | @select)[1]"
                                  calculate="concat('''', substring-before($submission-bind, '-submission'), '-instance''')"/>
                     <!--<xforms:bind ref="xforms:setvalue/@ref | xforms:setvalue/@value" required="true()"/>-->
                     <!-- TODO: more validation -->
@@ -373,11 +365,11 @@
                     <xforms:bind ref="@ev:observer" calculate="$submission-bind"/>
                     <!-- Setvalue actions -->
                     <xforms:bind ref="xforms:action[@class = 'fr-set-control-value-action']">
-                        <xforms:bind ref="xxforms:variable/@select" required="true()"/>
+                        <xforms:bind ref="(*:variable | *:var)/(@value | @select)[1]" required="true()"/>
                     </xforms:bind>
                     <!-- Itemset actions -->
                     <xforms:bind ref="xforms:action[@class = 'fr-itemset-action']">
-                        <xforms:bind ref=".//xxforms:variable/@select" required="true()"/>
+                        <xforms:bind ref=".//(*:variable | *:var)/(@value | @select)[1]" required="true()"/>
                     </xforms:bind>
                 </xforms:bind>
             </xforms:bind>
@@ -420,7 +412,7 @@
                     <xforms:var name="control-name" value="" as="xs:string"/>
                     <xforms:var name="path" value="" as="xs:string"/>
                     <!-- Set value -->
-                    <xforms:setvalue ref="$path" value="instance('fb-form-instance')/*/*[name() = $control-name]"/>
+                    <xforms:setvalue ref="$path" value="instance('fr-form-instance')/*/*[name() = $control-name]"/>
                 </xforms:action>
                 <!-- Set database service value -->
                 <xforms:action class="fr-set-database-service-value-action" xmlns:sql="http://orbeon.org/oxf/xml/sql">
@@ -428,8 +420,8 @@
                     <xforms:var name="control-name" value="" as="xs:string"/>
                     <xforms:var name="parameter" value="" as="xs:integer"/>
                     <!-- Set value and escape single quotes -->
-                    <xforms:setvalue ref="/sql:config/sql:query/sql:param[xs:integer($parameter)]/@select"
-                                     value="concat('''', replace(instance('fb-form-instance')/*/*[name() = $control-name], '''', ''''''), '''')"/>
+                    <xforms:setvalue ref="/sql:config/sql:query/sql:param[xs:integer($parameter)]/(@value | @select)[1]"
+                                     value="concat('''', replace(instance('fr-form-instance')/*/*[name() = $control-name], '''', ''''''), '''')"/>
                 </xforms:action>
                 <!-- Set control value -->
                 <xforms:action class="fr-set-control-value-action">
@@ -437,7 +429,7 @@
                     <xforms:var name="control-name" value="" as="xs:string"/>
                     <xforms:var name="control-value" value="" as="xs:string"/>
                     <!-- Set value -->
-                    <xforms:setvalue ref="instance('fb-form-instance')/*/*[name() = $control-name]" value="$control-value"/>
+                    <xforms:setvalue ref="instance('fr-form-instance')/*/*[name() = $control-name]" value="$control-value"/>
                 </xforms:action>
                 <!-- Set control itemset -->
                 <xforms:action class="fr-itemset-action">

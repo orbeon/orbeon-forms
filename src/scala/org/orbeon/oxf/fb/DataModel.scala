@@ -78,18 +78,21 @@ object DataModel {
 
     // Update binds for custom mode
     def updateBindsForCustom(inDoc: NodeInfo) = {
+        // NOTE: We used to remove xf:bind/@ref for container controls, but we shouldn't do this until we properly
+        // support sections without bindings (and possibly other controls like triggers) to nodes. Also, if we do this,
+        // we must modify insertNewSection and dialog-section-details.xml.
 
-        val allContainerNames = getAllContainerControls(inDoc) map (e ⇒ controlName(e attValue "id")) toSet
-
-        foreachBindWithName(inDoc) { child ⇒
-            def path = (ancestorOrSelfBindsWithNames(child) map (_ attValue "name") reverse) mkString "/"
-
-            delete(child \@ "nodeset")
-            if (allContainerNames(child attValue "name"))
-                delete(child \@ "ref")
-            else
-                ensureAttribute(child, "ref", path)
-        }
+//        val allContainerNames = getAllContainerControls(inDoc) map (e ⇒ controlName(e attValue "id")) toSet
+//
+//        foreachBindWithName(inDoc) { child ⇒
+//            def path = (ancestorOrSelfBindsWithNames(child) map (_ attValue "name") reverse) mkString "/"
+//
+//            delete(child \@ "nodeset")
+//            if (allContainerNames(child attValue "name"))
+//                delete(child \@ "ref")
+//            else
+//                ensureAttribute(child, "ref", path)
+//        }
     }
 
     // Find a bind ref by name (deannotate the expression if needed)

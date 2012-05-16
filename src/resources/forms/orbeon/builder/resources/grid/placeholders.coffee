@@ -33,10 +33,12 @@ $ ->
                     o = params.pop()
                     jQueryObject[m].apply o, params
         result
-    f$.findOrIs = (selector, element) ->                                                                                # Like find, but includes the current element if matching
-        result = f$.find selector, element
-        result = f$.add element, result if f$.is selector, element
+    f$.findOrIs = (selector, jQueryObject) ->                                                                                # Like find, but includes the current element if matching
+        result = f$.find selector, jQueryObject
+        result = f$.add jQueryObject, result if f$.is selector, jQueryObject
         result
+    f$.length = (jQueryObject) -> jQueryObject.length
+    f$.nth = (n, jQueryObject) -> $ jQueryObject[n - 1]
 
     # Low-level operations on editables
     editables =
@@ -114,7 +116,14 @@ $ ->
     editDone = (f) -> editDoneCallbacks.add f
 
     # Return elements, maybe relative to a node
-    elementsInContainerWithSelector = (container, selectors) -> f$.find (selectors.join ', '), container
+    adjustContainerForRepeat = (container) ->
+        grid =  f$.closest '.fr-grid', container
+        if f$.is '.fr-repeat-single-row', grid
+            position = 1 + f$.length f$.prevAll container
+            thContainer = f$.nth position, f$.children f$.find 'tr.fr-dt-master-row', grid
+            f$.add thContainer, container
+        else container
+    elementsInContainerWithSelector = (container, selectors) -> f$.find (selectors.join ', '), adjustContainerForRepeat container
     elementsInContainer = (container) -> elementsInContainerWithSelector container, anyEditableSelector
     labelsInContainer = (container) -> elementsInContainerWithSelector container, _.pluck (_.pick editables, ['label', 'button', 'link']), 'selector'
     elementClosest = (element) -> f$.closest (anyEditableSelector.join ', '), element

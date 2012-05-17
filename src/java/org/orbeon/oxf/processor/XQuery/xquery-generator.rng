@@ -35,6 +35,7 @@
             <choice>
                 <value>exist</value>
                 <value>oracle</value>
+                <value>saxon</value>
             </choice>
         </element>
     </define>

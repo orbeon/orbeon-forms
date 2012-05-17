@@ -53,6 +53,7 @@ public class XQueryGenerator extends ProcessorImpl {
         HashMap<String, String> implementations = new HashMap<String, String>();
         implementations.put("exist", "net.xqj.exist.ExistXQDataSource");
         implementations.put("oracle", "oracle.xquery.xqj.OXQDataSource");
+        implementations.put("saxon", "org.orbeon.saxon.xqj.SaxonXQDataSource");
         return implementations;
     }
 

@@ -232,15 +232,21 @@
                                                     </xf:group>
                                                 </xsl:if>
                                                 <xsl:for-each select="$grid-rows[1]/*:td">
+                                                    <xsl:variable name="control" select="*[1]"/>
                                                     <xh:th class="fr-grid-th{if ($is-editable) then ' xforms-activable' else ''}">
                                                         <xsl:if test="$is-editable"><xsl:attribute name="xxf:control">true</xsl:attribute></xsl:if>
                                                         <xsl:copy-of select="@colspan"/>
                                                         <xh:div class="yui-dt-liner">
-                                                            <xsl:if test="$lhh-in-header">
-                                                                <!-- NOTE: At this time, assume that XPath expressions on LHH
-                                                                     elements are not relative to their enclosing control. -->
+                                                            <xsl:if test="$lhh-in-header and empty($control/self::xf:trigger)">
+                                                                <!-- NOTE: At this time, assume that XPath expressions on LHH elements are not relative to their enclosing control. -->
                                                                 <xf:group xxbl:scope="outer">
-                                                                    <xsl:copy-of select="*[1]/(xf:label | xf:help | xf:hint)"/>
+                                                                    <xsl:for-each select="$control/(xf:label | xf:help | xf:hint)">
+                                                                        <xsl:copy>
+                                                                            <!-- TODO: Once labels outside repeats are supported (http://goo.gl/tSz4i), uncomment the repeat and change the group to be internal -->
+                                                                            <!--<xsl:attribute name="for" select="$control/@id"/>-->
+                                                                            <xsl:copy-of select="@* | node()"/>
+                                                                        </xsl:copy>
+                                                                    </xsl:for-each>
                                                                 </xf:group>
                                                             </xsl:if>
                                                         </xh:div>
@@ -327,7 +333,6 @@
                                                             </xsl:if>
                                                             <xsl:if test="$is-repeat">
                                                                 <xsl:if test="not($readonly) and $static-row-pos = 1">
-                                                                    <!--<xf:group ref="$grid[not(exf:readonly(.))]">-->
                                                                     <xf:group ref=".">
                                                                         <xh:td class="fr-repeat-column fr-repeat-column-trigger" rowspan="{$static-row-count}">
                                                                             <xh:div class="yui-dt-liner">
@@ -380,22 +385,19 @@
                                                                     <!-- NOTE: Add itemset or upload classes to allow the client to decide whether to place the itemset editor or the upload button -->
                                                                     <xh:div class="{('fr-grid-content', if ($has-upload) then 'fb-upload' else ())}{
                                                                             if ($is-editable) then '{if (exists($control) and controlOps:hasEditor($control, ''static-itemset'')) then '' fb-itemset'' else ''''}' else ''}">
-                                                                        <xsl:choose>
-                                                                            <xsl:when test="not($is-editable)">
-                                                                                <xf:group xxbl:scope="outer" appearance="xxf:internal">
-                                                                                    <!-- Bind group to current repeat iteration if in repeat mode -->
-                                                                                    <xsl:if test="$is-repeat">
-                                                                                        <xsl:attribute name="ref">xxf:repeat-current()</xsl:attribute>
-                                                                                    </xsl:if>
-                                                                                    <xsl:copy-of select="node()"/>
-                                                                                </xf:group>
-                                                                            </xsl:when>
-                                                                            <xsl:when test="$has-control">
-                                                                                <xf:group xxbl:scope="outer" appearance="xxf:internal">
-                                                                                    <xsl:copy-of select="node()"/>
-                                                                                </xf:group>
-                                                                            </xsl:when>
-                                                                        </xsl:choose>
+                                                                        <!-- Optimization: don't generate a group for empty cells -->
+                                                                        <xsl:if test="$has-control">
+                                                                            <xf:group xxbl:scope="outer" appearance="xxf:internal">
+                                                                                <!-- If the label, help, and hint are shown in the table header, don't put them in the cell -->
+                                                                                <xsl:for-each select="$control">
+                                                                                    <xsl:copy>
+                                                                                        <xsl:variable name="lhh" select="xf:label | xf:help | xf:hint"/>
+                                                                                        <xsl:variable name="nodes" select="@* | node()"/>
+                                                                                        <xsl:copy-of select="if ($lhh-in-header and empty($control/self::xf:trigger)) then ($nodes except $lhh) else $nodes"/>
+                                                                                    </xsl:copy>
+                                                                                </xsl:for-each>
+                                                                            </xf:group>
+                                                                        </xsl:if>
                                                                     </xh:div>
                                                                 </xh:td>
                                                             </xsl:for-each>

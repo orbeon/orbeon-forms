@@ -55,7 +55,7 @@ $ ->
             placeholderContainerSelector: '.xforms-hint'
             initialValueSelector: '.xforms-hint'
         button:
-            selector: '.xforms-trigger-appearance-full'
+            selector: '.fr-grid-content > .xforms-trigger-appearance-full'
             editInputSelector: '#fb-edit-label'
             placeholderOutputSelector: '#fb-placeholder-label'
             placeholderContainerSelector: '.xforms-mock-button span'
@@ -70,7 +70,7 @@ $ ->
                 f$.show f$.find 'button', element
                 f$.remove f$.find '.xforms-mock-button', element
         link:
-            selector: '.fr-grid-content .xforms-trigger-appearance-minimal'
+            selector: '.fr-grid-content > .xforms-trigger-appearance-minimal'
             editInputSelector: '#fb-edit-label'
             placeholderOutputSelector: '#fb-placeholder-label'
             placeholderContainerSelector: '.fb-mock-link'

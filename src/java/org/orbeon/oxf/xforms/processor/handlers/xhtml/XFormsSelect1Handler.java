@@ -416,7 +416,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
             final String itemNamespacedId = XFormsUtils.namespaceId(handlerContext.getContainingDocument(), itemEffectiveId);
             if (labelNonEmpty) {
                 reusableAttributes.clear();
-                outputLabelForStart(handlerContext, reusableAttributes, itemNamespacedId, itemNamespacedId, LHHAC.LABEL, "label", false);
+                outputLabelForStart(handlerContext, reusableAttributes, null, itemNamespacedId, LHHAC.LABEL, "label", false);
             }
 
             {
@@ -526,10 +526,10 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
     }
 
     @Override
-    public String getForEffectiveId() {
+    public String getForEffectiveId(String effectiveId) {
         // For full appearance we don't put a @for attribute so that selecting the main label doesn't select the item
         final SelectAppearanceTrait appearanceTrait = getAppearanceTrait();
-        return appearanceTrait != null && appearanceTrait.isFull() ? null : super.getForEffectiveId();
+        return appearanceTrait != null && appearanceTrait.isFull() ? null : super.getForEffectiveId(effectiveId);
     }
 
     @Override

@@ -376,10 +376,10 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
         controller.registerHandler(XFormsSelect1Handler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "select1", ANY_MATCHER);
 
         // Add handlers for LHHA elements
-        controller.registerHandler(XFormsLabelHintHelpAlertHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "label", ANY_MATCHER);
-        controller.registerHandler(XFormsLabelHintHelpAlertHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "help", ANY_MATCHER);
-        controller.registerHandler(XFormsLabelHintHelpAlertHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "hint", ANY_MATCHER);
-        controller.registerHandler(XFormsLabelHintHelpAlertHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "alert", ANY_MATCHER);
+        controller.registerHandler(XFormsLHHAHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "label", ANY_MATCHER);
+        controller.registerHandler(XFormsLHHAHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "help", ANY_MATCHER);
+        controller.registerHandler(XFormsLHHAHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "hint", ANY_MATCHER);
+        controller.registerHandler(XFormsLHHAHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "alert", ANY_MATCHER);
 
         // Add handlers for custom components
         final Seq<QName> componentBindings = containingDocument.getStaticOps().getBindingQNames();

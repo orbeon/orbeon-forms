@@ -291,7 +291,7 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
     }
 
     @Override
-    public String getForEffectiveId() {
+    public String getForEffectiveId(String effectiveId) {
         if (isBoolean()) {
             return XFormsSelect1Handler.getItemId(getEffectiveId(), "0");
         } else {

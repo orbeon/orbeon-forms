@@ -33,26 +33,22 @@ class LHHAAnalysis(staticStateContext: StaticStateContext, element: Element, par
     val forStaticIdOption = Option(element.attributeValue(XFormsConstants.FOR_QNAME))
     val isLocal = forStaticIdOption.isEmpty
 
-    /**
-     * Attach this LHHA to a control.
-     */
-    def attachToControl() =
-        forStaticIdOption match {
-            case Some(forStaticId) ⇒
-                // External LHHA
-                staticStateContext.partAnalysis.getControlAnalysis(scope.prefixedIdForStaticId(forStaticId)) match {
-                    case lhhaControl: LHHATrait ⇒ lhhaControl.setExternalLHHA(self)
-                    case _ ⇒ staticStateContext.partAnalysis.getIndentedLogger.logWarning("", "cannot attach exernal LHHA to control",
-                        Array("type", localName, "element", Dom4jUtils.elementToDebugString(element)): _*)
-                }
-            case None ⇒
-                // Local LHHA
-                parent match {
-                    case Some(parent: LHHATrait) ⇒
-                        parent.setExternalLHHA(self)
-                    case None ⇒
-                }
-        }
+    // Find the target control if any
+    def targetControl =
+        forStaticIdOption map
+            (forStaticId ⇒ staticStateContext.partAnalysis.getControlAnalysis(scope.prefixedIdForStaticId(forStaticId))) orElse
+                parent collect
+                    { case lhhaControl: LHHATrait ⇒ lhhaControl }
+
+    // Attach this LHHA to its target control if any
+    def attachToControl() = targetControl match {
+        case Some(lhhaControl) ⇒
+            lhhaControl.setExternalLHHA(self)
+        case None if ! isLocal ⇒
+            staticStateContext.partAnalysis.getIndentedLogger.logWarning("", "cannot attach exernal LHHA to control",
+                Array("type", localName, "element", Dom4jUtils.elementToDebugString(element)): _*)
+        case None ⇒
+    }
 
     // TODO: make use of static value
     //

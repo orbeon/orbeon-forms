@@ -244,22 +244,22 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandlerXHTM
 
     protected void handleLabel() throws SAXException {
         // May be overridden by subclasses
-        handleLabelHintHelpAlert(getEffectiveId(), getForEffectiveId(), LHHAC.LABEL, getControl(), isTemplate(), !handlerContext.isSpanHTMLLayout());
+        handleLabelHintHelpAlert(getLHHAAnalysis(getPrefixedId(), LHHAC.LABEL), getEffectiveId(), getForEffectiveId(getEffectiveId()), LHHAC.LABEL, getControl(), isTemplate(), !handlerContext.isSpanHTMLLayout());
     }
 
     protected void handleAlert() throws SAXException {
         // May be overridden by subclasses
-        handleLabelHintHelpAlert(getEffectiveId(), getForEffectiveId(), LHHAC.ALERT, getControl(), isTemplate(), !handlerContext.isSpanHTMLLayout());
+        handleLabelHintHelpAlert(getLHHAAnalysis(getPrefixedId(), LHHAC.ALERT), getEffectiveId(), getForEffectiveId(getEffectiveId()), LHHAC.ALERT, getControl(), isTemplate(), !handlerContext.isSpanHTMLLayout());
     }
 
     protected void handleHint() throws SAXException {
         // May be overridden by subclasses
-        handleLabelHintHelpAlert(getEffectiveId(), getForEffectiveId(), LHHAC.HINT, getControl(), isTemplate(), !handlerContext.isSpanHTMLLayout());
+        handleLabelHintHelpAlert(getLHHAAnalysis(getPrefixedId(), LHHAC.HINT), getEffectiveId(), getForEffectiveId(getEffectiveId()), LHHAC.HINT, getControl(), isTemplate(), !handlerContext.isSpanHTMLLayout());
     }
 
     protected void handleHelp() throws SAXException {
         // May be overridden by subclasses
-        handleLabelHintHelpAlert(getEffectiveId(), getForEffectiveId(), LHHAC.HELP, getControl(), isTemplate(), !handlerContext.isSpanHTMLLayout());
+        handleLabelHintHelpAlert(getLHHAAnalysis(getPrefixedId(), LHHAC.HELP), getEffectiveId(), getForEffectiveId(getEffectiveId()), LHHAC.HELP, getControl(), isTemplate(), !handlerContext.isSpanHTMLLayout());
     }
 
     // Must be overridden by subclasses
@@ -316,10 +316,8 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandlerXHTM
 
     /**
      * Return the effective id of the element to which label/@for, etc. must point to.
-     *
-     * @return                      @for effective id
      */
-    public String getForEffectiveId() {
+    public String getForEffectiveId(String effectiveId) {
         // Default:
         // o new layout: point to foo$bar$$c.1-2-3
         // o old layout: point to foo$bar.1-2-3

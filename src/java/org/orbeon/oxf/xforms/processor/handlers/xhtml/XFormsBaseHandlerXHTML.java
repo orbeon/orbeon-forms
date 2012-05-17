@@ -254,13 +254,29 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
         return sb;
     }
 
-    protected void handleLabelHintHelpAlert(String controlEffectiveId, String forEffectiveId, XFormsBaseHandler.LHHAC lhhaType, XFormsControl control, boolean isTemplate, boolean addIds) throws SAXException {
+    protected ElementAnalysis getLHHAAnalysis(String controlPrefixedId, XFormsBaseHandler.LHHAC lhhaType) {
+        // Statically obtain attributes information
+        final StaticStateGlobalOps globalOps = containingDocument.getStaticOps();
+        if (lhhaType == LHHAC.LABEL) {
+            return globalOps.getLabel(controlPrefixedId);
+        } else if (lhhaType == LHHAC.HELP) {
+            return globalOps.getHelp(controlPrefixedId);
+        } else if (lhhaType == LHHAC.HINT) {
+            return globalOps.getHint(controlPrefixedId);
+        } else if (lhhaType == LHHAC.ALERT) {
+            return globalOps.getAlert(controlPrefixedId);
+        } else {
+            throw new IllegalStateException("Illegal type requested");
+        }
+    }
+
+    protected void handleLabelHintHelpAlert(ElementAnalysis lhhaAnalysis, String targetControlEffectiveId, String forEffectiveId, XFormsBaseHandler.LHHAC lhhaType, XFormsControl control, boolean isTemplate, boolean addIds) throws SAXException {
 
         // NOTE: We used to not handle alerts and help in read-only mode. We now prefer to controls this with CSS.
-        final boolean isHint = lhhaType == LHHAC.HINT;
-        final boolean isAlert = lhhaType == LHHAC.ALERT;
         final boolean isLabel = lhhaType == LHHAC.LABEL;
         final boolean isHelp = lhhaType == LHHAC.HELP;
+        final boolean isHint = lhhaType == LHHAC.HINT;
+        final boolean isAlert = lhhaType == LHHAC.ALERT;
 
         final String labelHintHelpAlertValue;
         final boolean mustOutputHTMLFragment;
@@ -290,30 +306,22 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
         }
 
         final String elementName;
-        final Attributes labelHintHelpAlertAttributes;
         {
             // Statically obtain attributes information
-            final StaticStateGlobalOps globalOps = containingDocument.getStaticOps();
-            final LHHAAnalysis lhhaAnalysis;
-            final String forPrefixedId = XFormsUtils.getPrefixedId(controlEffectiveId);
             if (isLabel) {
                 elementName = handlerContext.getLabelElementName();
-                lhhaAnalysis = globalOps.getLabel(forPrefixedId);
             } else if (isHelp) {
                 elementName = handlerContext.getHelpElementName();
-                lhhaAnalysis = globalOps.getHelp(forPrefixedId);
             } else if (isHint) {
                 elementName = handlerContext.getHintElementName();
-                lhhaAnalysis = globalOps.getHint(forPrefixedId);
             } else if (isAlert) {
                 elementName = handlerContext.getAlertElementName();
-                lhhaAnalysis = globalOps.getAlert(forPrefixedId);
             } else {
                 throw new IllegalStateException("Illegal type requested");
             }
-
-            labelHintHelpAlertAttributes = (lhhaAnalysis != null) ? XMLUtils.getSAXAttributes(lhhaAnalysis.element()) : null;
         }
+
+        final Attributes labelHintHelpAlertAttributes = XMLUtils.getSAXAttributes(lhhaAnalysis.element());
 
         if (labelHintHelpAlertAttributes != null || isAlert) {
             // If no attributes were found, there is no such label / help / hint / alert
@@ -384,7 +392,7 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
                     // Start <a href="#my-control-id-help">
 
                     final AttributesImpl aAttributes = new AttributesImpl();
-                    aAttributes.addAttribute("", "href", "href", ContentHandlerHelper.CDATA, "#" + getLHHACId(containingDocument, controlEffectiveId, LHHAC_CODES.get(LHHAC.HELP)));
+                    aAttributes.addAttribute("", "href", "href", ContentHandlerHelper.CDATA, "#" + getLHHACId(containingDocument, targetControlEffectiveId, LHHAC_CODES.get(LHHAC.HELP)));
                     aAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-help-anchor");
 
                     final String aQName = XMLUtils.buildQName(xhtmlPrefix, "a");
@@ -396,7 +404,7 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
 
                 final AttributesImpl imgAttributes = new AttributesImpl();
                 if (addIds)
-                    imgAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, getLHHACId(containingDocument, controlEffectiveId, "i"));
+                    imgAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, getLHHACId(containingDocument, targetControlEffectiveId, "i"));
                 imgAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, helpImageClasses);
                 imgAttributes.addAttribute("", "src", "src", ContentHandlerHelper.CDATA, XFormsConstants.HELP_IMAGE_URI);
                 imgAttributes.addAttribute("", "title", "title", ContentHandlerHelper.CDATA, "");// do we need a title for screen readers?
@@ -418,27 +426,31 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
 
                 // We handle null attributes as well because we want a placeholder for "alert" even if there is no xforms:alert
                 final Attributes newAttributes = (labelHintHelpAlertAttributes != null) ? labelHintHelpAlertAttributes : new AttributesImpl();
-                outputLabelFor(handlerContext, getAttributes(newAttributes, labelClasses, null), controlEffectiveId,
+                outputLabelFor(handlerContext, getAttributes(newAttributes, labelClasses, null), targetControlEffectiveId,
                         forEffectiveId, lhhaType, elementName, labelHintHelpAlertValue, mustOutputHTMLFragment, addIds);
             }
         }
     }
 
-    protected static void outputLabelFor(HandlerContext handlerContext, Attributes attributes, String controlEffectiveId,
+    protected static void outputLabelFor(HandlerContext handlerContext, Attributes attributes, String targetControlEffectiveId,
                                          String forEffectiveId, LHHAC lhha, String elementName, String labelValue,
                                          boolean mustOutputHTMLFragment, boolean addIds) throws SAXException {
-        outputLabelForStart(handlerContext, attributes, controlEffectiveId, forEffectiveId, lhha, elementName, addIds);
+        outputLabelForStart(handlerContext, attributes, targetControlEffectiveId, forEffectiveId, lhha, elementName, addIds);
         outputLabelForEnd(handlerContext, elementName, labelValue, mustOutputHTMLFragment);
     }
 
-    protected static void outputLabelForStart(HandlerContext handlerContext, Attributes attributes, String controlEffectiveId,
+    protected static void outputLabelForStart(HandlerContext handlerContext, Attributes attributes, String targetControlEffectiveId,
                                               String forEffectiveId, LHHAC lhha, String elementName, boolean addIds) throws SAXException {
+
+        assert lhha != null;
+        assert ! addIds || targetControlEffectiveId != null;
 
         // Replace id attribute to be foo-label, foo-hint, foo-help, or foo-alert
         final AttributesImpl newAttribute;
-        if (addIds && lhha != null && controlEffectiveId != null) {
+        if (addIds && targetControlEffectiveId != null) {
             // Add or replace existing id attribute
-            newAttribute = XMLUtils.addOrReplaceAttribute(attributes, "", "", "id", getLHHACId(handlerContext.getContainingDocument(), controlEffectiveId, LHHAC_CODES.get(lhha)));
+            // NOTE: addIds == true in nospan mode OR for external LHHA
+            newAttribute = XMLUtils.addOrReplaceAttribute(attributes, "", "", "id", getLHHACId(handlerContext.getContainingDocument(), targetControlEffectiveId, LHHAC_CODES.get(lhha)));
         } else {
             // Remove existing id attribute if any
             newAttribute = XMLUtils.removeAttribute(attributes, "", "id");

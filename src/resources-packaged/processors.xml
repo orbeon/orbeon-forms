@@ -325,6 +325,11 @@
     </processor>
 
     <!-- XQuery Processors-->
+    <processor name="oxf:xquery-generator">
+        <class name="org.orbeon.oxf.processor.XQuery.XQueryGenerator"/>
+    </processor>
+
+
     <processor name="oxf:generic-saxon-xquery">
         <class name="org.orbeon.oxf.processor.transformer.SaxonXQueryProcessor"/>
     </processor>

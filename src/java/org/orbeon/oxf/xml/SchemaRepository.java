@@ -16,6 +16,7 @@ package org.orbeon.oxf.xml;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.portlet.processor.PortletPreferencesSerializer;
 import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.processor.XQuery.XQueryGenerator;
 import org.orbeon.oxf.processor.converter.*;
 import org.orbeon.oxf.processor.execute.ExecuteProcessor;
 import org.orbeon.oxf.processor.file.FileProcessor;
@@ -124,6 +125,9 @@ public class SchemaRepository {
         // XML:DB schemas
         SCHEMAS.put(XMLDBProcessor.XMLDB_DATASOURCE_URI, PROCESSORS_SCHEMA_PATH + "xmldb/xmldb-processor-datasource.rng");
         SCHEMAS.put(XMLDBProcessor.XMLDB_QUERY_URI, PROCESSORS_SCHEMA_PATH + "xmldb/xmldb-processor-query.rng");
+
+        // XQuery Generator schema
+        SCHEMAS.put(XQueryGenerator.XQUERY_NAMESPACE_URI, PROCESSORS_SCHEMA_PATH + "XQuery/xquery-generator.rng");
 
         // Test processor schema
         SCHEMAS.put(TestScriptProcessor.TEST_NAMESPACE_URI, PROCESSORS_SCHEMA_PATH + "test/test-processor-config.rng");

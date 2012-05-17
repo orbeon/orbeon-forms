@@ -164,6 +164,12 @@
         <!-- For SSH support (currently in oxf:file processor) -->
         <include name="ant-jsch-1_6_5.jar"/>
         <include name="jsch-0.1.42.jar"/>
+
+        <!-- For the XQuery Processor -->
+        <include name="xqjapi.jar"/>
+        <include name="xqj2-0.0.1.jar"/>
+        <include name="exist-xqj-1.0.1.jar"/>
+        
     </fileset>
 
     <target name="init">

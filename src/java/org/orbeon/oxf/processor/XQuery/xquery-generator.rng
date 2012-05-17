@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<grammar xmlns="http://relaxng.org/ns/structure/1.0" xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+    <start>
+        <ref name="config"/>
+    </start>
+
+    <define name="config">
+        <element name="config">
+            <choice>
+                <ref name="vendor"/>
+                <ref name="implementation"/>
+            </choice>
+            <choice>
+                <group>
+                    <optional>
+                        <choice>
+                            <group>
+                                <ref name="username"/>
+                                <ref name="password"/>
+                            </group>
+                            <ref name="jdbc"/>
+                        </choice>
+                    </optional>
+                    <ref name="properties"/>
+                    <ref name="query"/>
+                    <ref name="parameters"/>
+                </group>
+                <ref name="info"/>
+            </choice>
+        </element>
+    </define>
+
+    <define name="vendor">
+        <element name="vendor">
+            <choice>
+                <value>exist</value>
+                <value>oracle</value>
+            </choice>
+        </element>
+    </define>
+
+    <define name="implementation">
+        <element name="implementation">
+            <data type="string"/>
+        </element>
+    </define>
+
+    <define name="username">
+        <element name="username">
+            <data type="string"/>
+        </element>
+    </define>
+
+    <define name="password">
+        <element name="password">
+            <data type="string"/>
+        </element>
+    </define>
+
+    <define name="query">
+        <element name="query">
+            <data type="string"/>
+        </element>
+    </define>
+
+    <define name="properties">
+        <zeroOrMore>
+            <element name="property">
+                <ref name="name-value-pair"/>
+            </element>
+        </zeroOrMore>
+    </define>
+
+    <define name="parameters">
+        <zeroOrMore>
+            <element name="parameter">
+                <ref name="name-value-pair"/>
+            </element>
+        </zeroOrMore>
+    </define>
+
+    <define name="name-value-pair">
+        <element name="name">
+            <data type="string"/>
+        </element>
+        <element name="value">
+            <data type="string"/>
+        </element>
+    </define>
+
+    <define name="jdbc">
+        <element name="jdbc">
+            <ref name="url"/>
+            <optional>
+                <ref name="implementation"/>
+            </optional>
+        </element>
+    </define>
+
+    <define name="url">
+        <element name="url">
+            <data type="anyURI"/>
+        </element>
+    </define>
+
+    <define name="info">
+        <element name="info">
+            <empty/>
+        </element>
+    </define>
+
+</grammar>

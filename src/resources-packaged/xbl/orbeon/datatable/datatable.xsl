@@ -757,7 +757,7 @@
             else if ($fr-dt-columnDesc/@currentSortOrder = 'descending') then 'yui-dt-desc' else '' }}
 
              {@class}
-            " id="header-{$index}">
+            ">
             <xsl:apply-templates select="@*[name() != 'class']" mode="dynamic"/>
             <xsl:call-template name="header-cell">
                 <xsl:with-param name="index" select="$index"/>

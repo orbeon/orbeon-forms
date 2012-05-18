@@ -101,7 +101,6 @@ trait PartControlsAnalysis extends TransientState {
                     (_.forPrefixedId) mapValues
                         (_ groupBy (_.attributeName) mapValues {a ⇒ assert(a.size == 1); a.head.attributeControl})
 
-
             // Accumulate new attributes into existing map by combining values for a given "for id"
             _attributeControls = newAttributes.foldLeft(_attributeControls) {
                 case (existingMap, (forId, newAttributes)) ⇒

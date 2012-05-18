@@ -37,8 +37,8 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
     def portletContext = getPortletContext
 
     // For AsyncPortlet
-    def isMinimalResources = true
-    def isWSRPEncodeResources = true
+    val isMinimalResources = true
+    val isWSRPEncodeResources = true
     case class AsyncContext(content: Option[Content], session: PortletSession, url: URL, namespace: String)
 
     private val FormRunnerPath = """/fr/([^/]+)/([^/]+)/(new|summary)(\?(.*))?""".r

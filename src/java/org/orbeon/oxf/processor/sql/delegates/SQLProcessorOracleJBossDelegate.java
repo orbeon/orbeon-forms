@@ -15,8 +15,8 @@ package org.orbeon.oxf.processor.sql.delegates;
 
 import oracle.jdbc.OraclePreparedStatement;
 import oracle.jdbc.OracleResultSet;
-import org.jboss.resource.adapter.jdbc.jdk5.WrappedPreparedStatementJDK5;
-import org.jboss.resource.adapter.jdbc.jdk5.WrappedResultSetJDK5;
+import org.jboss.resource.adapter.jdbc.WrappedPreparedStatement;
+import org.jboss.resource.adapter.jdbc.WrappedResultSet;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.processor.sql.DatabaseDelegate;
 import org.orbeon.oxf.processor.sql.SQLProcessorOracleDelegateBase;
@@ -34,7 +34,7 @@ public class SQLProcessorOracleJBossDelegate  extends SQLProcessorOracleDelegate
             return (OraclePreparedStatement) stmt;
         else {
 			try {
-				return (OraclePreparedStatement) ((WrappedPreparedStatementJDK5) stmt).getUnderlyingStatement();
+				return (OraclePreparedStatement) ((WrappedPreparedStatement) stmt).getUnderlyingStatement();
 			} catch (SQLException e) {
                 throw new OXFException(e);
 			}
@@ -47,7 +47,7 @@ public class SQLProcessorOracleJBossDelegate  extends SQLProcessorOracleDelegate
             return (OracleResultSet) resultSet;
 		else
 			try {
-				return (OracleResultSet) ((WrappedResultSetJDK5) resultSet).getUnderlyingResultSet();
+				return (OracleResultSet) ((WrappedResultSet) resultSet).getUnderlyingResultSet();
 			} catch (SQLException e) {
                 throw new OXFException(e);
 			}

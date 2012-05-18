@@ -11,7 +11,7 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.xforms.event;
+package org.orbeon.oxf.xforms.event
 
 import events.XXFormsActionErrorEvent
 import org.orbeon.oxf.xforms._
@@ -119,18 +119,24 @@ class EventHandlerImpl(
             else
                 prefixedIds(XML_EVENTS_EV_TARGET_ATTRIBUTE_QNAME.getName)
 
-        _observersPrefixedIds =
-            if (observersPrefixedIds.nonEmpty)
+        _observersPrefixedIds = {
+            // Special observer id indicating that the observer is the preceding sibling control
+            val ObserverIsPrecedingSibling = "#preceding-sibling"
+
+            if (observersPrefixedIds(ObserverIsPrecedingSibling))
+                observersPrefixedIds - ObserverIsPrecedingSibling ++ (preceding map (p ⇒ Set(p.prefixedId)) getOrElse Set())
+            else if (observersPrefixedIds.nonEmpty)
                 observersPrefixedIds
             else
                 parent collect { case parent: ElementAnalysis ⇒ Set(parent.prefixedId) } getOrElse Set()
+        }
 
         _targetPrefixedIds = {
             // Special target id indicating that the target is the observer
-            val targetIsObserver = "#observer"
+            val TargetIsObserver = "#observer"
 
-            if (targetsPrefixedIds(targetIsObserver))
-                targetsPrefixedIds - targetIsObserver ++ _observersPrefixedIds
+            if (targetsPrefixedIds(TargetIsObserver))
+                targetsPrefixedIds - TargetIsObserver ++ _observersPrefixedIds
             else
                 targetsPrefixedIds
         }

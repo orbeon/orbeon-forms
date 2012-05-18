@@ -1009,9 +1009,20 @@
 
         <xforms:repeat ref="$fr-dt-rewritten-paginated-nodeset">
             <xsl:apply-templates select="@*[not(name()='nodeset')]" mode="dynamic"/>
+            <xsl:apply-templates select="node()" mode="dynamic"/>
+        </xforms:repeat>
 
-            <xforms:action ev:event="xxforms-nodeset-changed xforms-enabled xforms-disabled" ev:target="#observer">
-                <xxforms:script> YAHOO.xbl.fr.Datatable.instance(this).updateRows(); </xxforms:script>
+        <!--
+            Send fr-selection-changed events when needed:
+                - xforms-enabled is triggered when the repeat becomes relevant
+                - xforms-disabled is triggered when the repeat becomes non-relevant (including when it has no iterations)
+                - xxforms-index-changed is fired when the index is changed (by the user or using xforms:setindex)
+                - xxforms-nodeset-changed is fired when the nodeset changed (happens also when the user changes the sort order or page)
+        -->
+        <xforms:action ev:event="xforms-enabled xforms-disabled xxforms-index-changed xxforms-nodeset-changed" ev:observer="#preceding-sibling" ev:target="#observer">
+
+            <xforms:action if="event('xxforms:type') = ('xxforms-nodeset-changed', 'xforms-enabled', 'xforms-disabled')">
+                <xxforms:script>YAHOO.xbl.fr.Datatable.instance(this).updateRows();</xxforms:script>
                 <xsl:if test="$paginated and $is-internally-paginated">
                     <!-- Workaround, see https://forge.ow2.org/tracker/index.php?func=detail&aid=314429&group_id=168&atid=350207 -->
                     <xforms:setvalue model="datatable-model" ref="instance('page')/@nbPages" value="$nbPages" xxbl:scope="inner"/>
@@ -1020,30 +1031,19 @@
                 </xsl:if>
             </xforms:action>
 
-            <!--
-                Send  fr-selection-changed events when needed:
-                    - xforms-enabled is triggered at init time
-                    - xxforms-index-changed is fired when the index is changed (by the user or using xforms:setindex)
-                    - xxforms-nodeset-changed is fired when the nodeset changed (happens also when the user changes the sort order or page)
-            -->
-            <xforms:action ev:event="xforms-enabled xforms-disabled xxforms-index-changed xxforms-nodeset-changed" ev:target="#observer">
+            <xforms:var name="context" xxbl:scope="inner">
+                <xxforms:sequence value="xxforms:binding(event('xxforms:targetid'))[index(event('xxforms:targetid'))]" xxbl:scope="outer"/>
+            </xforms:var>
+            <xforms:var name="index" xxbl:scope="inner">
+                <xxforms:sequence value="index(event('xxforms:targetid'))" xxbl:scope="outer"/>
+            </xforms:var>
 
-                <xforms:var name="context" xxbl:scope="inner">
-                    <xxforms:sequence value="xxforms:repeat-nodeset()[xxforms:index()]" xxbl:scope="outer"/>
-                </xforms:var>
-                <xforms:var name="index" xxbl:scope="inner">
-                    <xxforms:sequence value="xxforms:index()" xxbl:scope="outer"/>
-                </xforms:var>
+            <xforms:dispatch name="fr-selection-changed" target="fr.datatable" xxbl:scope="inner">
+                <xxforms:context name="index" value="$index"/>
+                <xxforms:context name="selected" value="$context"/>
+            </xforms:dispatch>
 
-                <xforms:dispatch name="fr-selection-changed" target="fr.datatable" xxbl:scope="inner">
-                    <xxforms:context name="index" value="$index"/>
-                    <xxforms:context name="selected" value="$context"/>
-                </xforms:dispatch>
-
-            </xforms:action>
-
-            <xsl:apply-templates select="node()" mode="dynamic"/>
-        </xforms:repeat>
+        </xforms:action>
 
     </xsl:template>
 

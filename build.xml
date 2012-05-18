@@ -152,6 +152,7 @@
         <include name="itext-bcprov-jdk14-138.jar"/>
 
         <include name="barcode4j-1.0.jar"/>
+        <include name="simplecaptcha-1.2.1.jar"/>
 
         <include name="jms-api-1_1.jar"/>
         <include name="mail-1_3_2.jar"/>
@@ -320,9 +321,12 @@
                 classpathref="class.path"
                 fork="true" encoding="utf-8" jvmargs="-Xmx400m"
                 addparams="-Xfatal-warnings">
-            <src path="${build.dir}/src"/>
+            <src path="${build.dir}/src"/> <!-- Location of the copy of Version.java with the release/edition set -->
             <src path="${java-src.dir}"/>
             <src path="${scala-src.dir}"/>
+            <!-- Scala code bundled with XBL components -->
+            <!-- NOTE: Ideally we'd like to use a pattern instead of multiple lines, but src doesn't support patterns, and scalac doesn't support fileset child elements, only include/exclude -->
+            <src path="src/resources-packaged/xbl/orbeon/simple-captcha/src/scala"/>
             <exclude name="org/orbeon/oxf/common/Version.java"/>
         </scalac>
 

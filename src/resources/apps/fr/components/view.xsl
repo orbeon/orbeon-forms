@@ -127,21 +127,28 @@
                                             <xxforms:variable name="mode" select="xxforms:instance('fr-parameters-instance')/mode"/>
                                             <xsl:if test="$has-captcha">
                                                 <xforms:group ref=".[$mode = ('new', 'edit') and not(property('xxforms:noscript')) and $captcha = 'false']" class="fr-captcha">
-                                                    <fr:recaptcha id="recaptcha" theme="clean">
+                                                    <!-- Captcha component: either reCAPTCHA or SimpleCaptcha -->
+                                                    <xforms:group appearance="xxforms:internal">
                                                         <!-- Success: remember the captcha passed, which also influences validity -->
                                                         <xforms:action ev:event="fr-verify-done">
                                                             <xforms:setvalue ref="$captcha">true</xforms:setvalue>
                                                             <xforms:revalidate model="fr-persistence-model"/>
                                                             <xforms:refresh/>
                                                         </xforms:action>
-                                                        <!-- Failure: load another challenge -->
-                                                        <xforms:dispatch ev:event="fr-verify-error" if="event('fr-error-code') != 'empty'" target="recaptcha" name="fr-reload"/>
-                                                    </fr:recaptcha>
+                                                        <!-- Failure: load another challenge (supported by reCAPTCHA; SimpleCaptcha won't do anything) -->
+                                                        <xforms:dispatch ev:event="fr-verify-error" if="event('fr-error-code') != 'empty'" target="captcha" name="fr-reload"/>
+                                                        <xsl:if test="$captcha = 'reCAPTCHA'">
+                                                            <fr:recaptcha id="captcha" theme="clean"/>
+                                                        </xsl:if>
+                                                        <xsl:if test="$captcha = 'SimpleCaptcha'">
+                                                            <fr:simple-captcha id="captcha"/>
+                                                        </xsl:if>
+                                                    </xforms:group>
                                                     <!-- Non-visible output bound to captcha node to influence form validity -->
                                                     <xhtml:span style="display: none">
                                                         <xforms:output ref="$captcha">
                                                             <!-- Focus from error summary proxies to captcha -->
-                                                            <xforms:setfocus ev:event="xforms-focus" control="recaptcha"/>
+                                                            <xforms:setfocus ev:event="xforms-focus" control="captcha"/>
                                                             <xforms:label ref="$fr-resources/detail/labels/captcha-label"/>
                                                             <xforms:alert ref="$fr-resources/detail/labels/captcha-help"/>
                                                         </xforms:output>

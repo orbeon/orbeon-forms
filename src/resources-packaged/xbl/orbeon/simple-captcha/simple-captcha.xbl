@@ -1,0 +1,67 @@
+<!--
+  Copyright (C) 2012 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:ev="http://www.w3.org/2001/xml-events"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:saxon="http://saxon.sf.net/"
+         xmlns:xbl="http://www.w3.org/ns/xbl"
+         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+         xmlns:oxf="http://www.orbeon.com/oxf/processors">
+
+    <xbl:binding id="fr-simple-captcha" element="fr|simple-captcha">
+        <xbl:resources>
+            <!-- <xbl:style src="/xbl/orbeon/simple-captcha/simple-captcha.css"/> -->
+        </xbl:resources>
+        <xbl:handlers>
+            <xbl:handler event="fr-verify" phase="target">
+                <xf:dispatch name="fr-verify" target="component-inner-group"/>
+            </xbl:handler>
+        </xbl:handlers>
+        <xbl:implementation>
+            <!-- Local model -->
+            <xf:model id="simple-captcha-model">
+                <xf:instance id="simple-captcha-instance">
+                    <instance>
+                        <value/>
+                    </instance>
+                </xf:instance>
+            </xf:model>
+        </xbl:implementation>
+        <xbl:template>
+            <xf:group id="component-inner-group">
+                <xf:action ev:event="xforms-enabled">
+                    <xf:var name="already-verified" value="exists(xxf:get-session-attribute('fr-simple-captcha.verified'))"/>
+                    <xf:dispatch if="$already-verified" name="fr-verify-done" target="fr-simple-captcha"/>
+                </xf:action>
+                <xf:action ev:event="fr-verify" xmlns:SimpleCaptcha="java:org.orbeon.xbl.SimpleCaptcha">
+                    <xf:var name="correct" value="SimpleCaptcha:isCorrect(value)"/>
+                    <xf:dispatch if="not($correct)" name="fr-verify-error" target="fr-simple-captcha"/>
+                    <xf:action if="$correct">
+                        <xf:action type="xpath">xxf:set-session-attribute('fr-simple-captcha.verified', true())</xf:action>
+                        <xf:dispatch name="fr-verify-done" target="fr-simple-captcha"/>
+                    </xf:action>
+                </xf:action>
+                <xh:img src="/simple-captcha" alt="Captcha"/>
+                <xf:input ref="value"/>
+            </xf:group>
+        </xbl:template>
+    </xbl:binding>
+
+</xbl:xbl>

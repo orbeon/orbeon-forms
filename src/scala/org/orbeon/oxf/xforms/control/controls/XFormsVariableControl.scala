@@ -72,16 +72,8 @@ class XFormsVariableControl(container: XBLContainer, parent: XFormsControl, elem
         // nice to keep _bindingContextForChild/_bindingContextForFollowing if no reevaluation is needed, but then we
         // must make sure the chain of contexts is correct.
         val staticVariable = staticControl
-        val contextStack = container.getContextStack
-        contextStack.setBinding(bindingContext)
-        contextStack.pushVariable(staticVariable.element, staticVariable.name, getValue, staticVariable.scope)
-        this._bindingContextForChild = contextStack.getCurrentBindingContext
-
-        contextStack.setBinding(bindingContext.parent)
-        contextStack.pushVariable(staticVariable.element, staticVariable.name, getValue, staticVariable.scope)
-
-        this._bindingContextForFollowing = contextStack.getCurrentBindingContext
-
+        _bindingContextForChild = bindingContext.pushVariable(staticVariable.element, staticVariable.name, getValue, staticVariable.scope)
+        _bindingContextForFollowing = bindingContext.parent.pushVariable(staticVariable.element, staticVariable.name, getValue, staticVariable.scope)
     }
 
     override def markDirtyImpl(xpathDependencies: XPathDependencies) {

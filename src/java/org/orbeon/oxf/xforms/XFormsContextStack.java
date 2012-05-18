@@ -104,7 +104,7 @@ public class XFormsContextStack {
     }
 
     private BindingContext pushCopy(BindingContext parent) {
-        this.head = new BindingContext(parent, parent.model(), parent.nodeset(),
+        this.head = new BindingContext(parent, parent.model(), parent.bind(), parent.nodeset(),
                 parent.position(), parent.elementId(), false, parent.controlElement(),
                 parent.locationData(), false, parent.contextItem(), parent.scope());
 
@@ -152,12 +152,12 @@ public class XFormsContextStack {
             // Push the default context if there is a model with an instance
             final Item defaultNode = model.getDefaultInstance().getInstanceRootElementInfo();
             final List<Item> defaultNodeset = Arrays.asList(defaultNode);
-            this.head = new BindingContext(parentBindingContext, model, defaultNodeset, 1, null, true, null,
+            this.head = new BindingContext(parentBindingContext, model, null, defaultNodeset, 1, null, true, null,
                     model.getDefaultInstance().getLocationData(), false, defaultNode, container.getResolutionScope());
         } else {
             // Push empty context
             final List<Item> defaultContext = DEFAULT_CONTEXT;
-            this.head = new BindingContext(parentBindingContext, model, defaultContext, defaultContext.size(), null, true, null,
+            this.head = new BindingContext(parentBindingContext, model, null, defaultContext, defaultContext.size(), null, true, null,
                     (model != null) ? model.getLocationData() : null, false, null, container.getResolutionScope());
         }
 
@@ -214,7 +214,7 @@ public class XFormsContextStack {
         // further variables values could not be added. The method below temporarily adds more elements on the
         // stack but it is safer.
         getFunctionContext(sourceEffectiveId);
-        pushVariable(((ElementAnalysis) staticVariable).element(), variable.getVariableName(), variable.getVariableValue(sourceEffectiveId, true, handleNonFatal), newScope);
+        this.head = this.head.pushVariable(((ElementAnalysis) staticVariable).element(), variable.getVariableName(), variable.getVariableValue(sourceEffectiveId, true, handleNonFatal), newScope);
         returnFunctionContext();
 
         assert this.head.variables().size() == 1;
@@ -307,6 +307,7 @@ public class XFormsContextStack {
 
             // Handle nodeset
             final boolean isNewBind;
+            final XFormsModelBinds.Bind bind;
             final int newPosition;
             final List<Item> newNodeset;
             final boolean hasOverriddenContext;
@@ -322,6 +323,7 @@ public class XFormsContextStack {
                         // The bind attribute was valid for this scope, but no runtime object was found for the bind
                         // This can happen e.g. if a nested bind is within a bind with an empty nodeset
 
+                        bind = null;
                         newNodeset = XFormsConstants.EMPTY_ITEM_LIST;
                         hasOverriddenContext = false;
                         contextItem = null;
@@ -335,19 +337,23 @@ public class XFormsContextStack {
                             throw new ValidationException("Reference to non-existing bind id: " + bindId, locationData);
 
                         // Default to an empty binding
+                        bind = null;
                         newNodeset = XFormsConstants.EMPTY_ITEM_LIST;
                         hasOverriddenContext = false;
                         contextItem = null;
                         isNewBind = true;
                         newPosition = 0;
                     } else {
-                        newNodeset = ((XFormsModelBinds.Bind) o).nodeset;
+                        bind = (XFormsModelBinds.Bind) o;
+                        newNodeset = bind.nodeset;
                         hasOverriddenContext = false;
                         contextItem = baseBindingContext.getSingleItem();
                         isNewBind = true;
                         newPosition = Math.min(newNodeset.size(), 1);
                     }
                 } else if (ref != null || nodeset != null) {
+
+                    bind = null;
 
                     // Check whether there is an optional context (XForms 1.1, likely generalized in XForms 1.2)
                     final BindingContext evaluationContextBinding;
@@ -486,6 +492,8 @@ public class XFormsContextStack {
                 } else if (isNewModel && context == null) {
                     // Only the model has changed
 
+                    bind = null;
+
                     final BindingContext modelBindingContext = getCurrentBindingContextForModel(newModel);
                     if (modelBindingContext != null) {
                         newNodeset = modelBindingContext.getNodeset();
@@ -500,6 +508,9 @@ public class XFormsContextStack {
                     isNewBind = false;
 
                 } else if (context != null) {
+
+                    bind = null;
+
                     // Only the context has changed, and possibly the model
                     pushBinding(null, null, context, modelId, null, null, bindingElementNamespaceMapping, sourceEffectiveId, scope, handleNonFatal);
                     {
@@ -513,6 +524,7 @@ public class XFormsContextStack {
 
                 } else {
                     // No change to anything
+                    bind = null;
                     isNewBind = false;
                     newNodeset = baseBindingContext.getNodeset();
                     newPosition = baseBindingContext.getPosition();
@@ -531,7 +543,7 @@ public class XFormsContextStack {
 
             // Push new context
             final String bindingElementId = (bindingElement == null) ? null : XFormsUtils.getElementId(bindingElement);
-            this.head = new BindingContext(this.head, newModel, newNodeset, newPosition, bindingElementId, isNewBind,
+            this.head = new BindingContext(this.head, newModel, bind, newNodeset, newPosition, bindingElementId, isNewBind,
                     bindingElement, locationData, hasOverriddenContext, contextItem, scope);
 
             // Restore context
@@ -550,7 +562,7 @@ public class XFormsContextStack {
     }
 
     private void pushTemporaryContext(BindingContext parent, BindingContext base, Item contextItem) {
-        this.head = new BindingContext(parent, base.model(), base.getNodeset(), base.getPosition(), base.elementId(),
+        this.head = new BindingContext(parent, base.model(), null, base.getNodeset(), base.getPosition(), base.elementId(),
                 false, base.getControlElement(), base.locationData(), false, contextItem, base.scope());
     }
 
@@ -570,24 +582,11 @@ public class XFormsContextStack {
         else
             newContextItem = currentNodeset.get(currentPosition - 1);
 
-        this.head = new BindingContext(currentBindingContext, currentBindingContext.model(),
+        this.head = new BindingContext(currentBindingContext, currentBindingContext.model(), null,
                 currentNodeset, currentPosition, currentBindingContext.elementId(), true, null, currentBindingContext.locationData(),
                 false, newContextItem, currentBindingContext.scope());
 
         return this.head;
-    }
-
-    /**
-     * Push a new variable in scope, providing its name and value.
-     *
-     * @param variableElement   variable element
-     * @param name              variable name
-     * @param value             variable value
-     * @param scope             XBL scope of the variable visibility
-     */
-    public void pushVariable(Element variableElement, String name, ValueRepresentation value, Scope scope) {
-        final LocationData locationData = new ExtendedLocationData((LocationData) variableElement.getData(), "pushing variable binding", variableElement);
-        this.head = new BindingContext(this.head, getBindingContext(scope), variableElement, locationData, name, value, scope);
     }
 
     public BindingContext getCurrentBindingContext() {

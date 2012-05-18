@@ -251,27 +251,6 @@ object XFormsControl {
     def controlSupportsRefreshEvents(control: XFormsControl) =
         (control ne null) && control.supportsRefreshEvents
 
-    // Find a control's binding, either single-item or item-sequence binding
-    // TODO: Instead of pattern matching, add `binding` method to all controls
-    def controlBinding(control: XFormsControl): Seq[Item] = control match {
-        case control: XFormsSingleNodeControl ⇒
-            // Single-node (single-item) binding
-            Option(control.getBoundItem).toList
-        case control: XFormsNoSingleNodeContainerControl ⇒
-            // Node-set (item-sequence) binding
-            Option(control.bindingContext) filter (_.isNewBind) map (_.nodeset.asScala) getOrElse Seq()
-        case _ ⇒
-            Seq()
-    }
-
-    // Find a control's binding context
-    // TODO: Instead of pattern matching, add `bindingContext` method to all controls
-    def controlBindingContext(control: XFormsControl): Seq[Item] =
-        Option(control.bindingContext) flatMap
-            (binding ⇒ Option(binding.parent)) map
-                (binding ⇒ binding.nodeset.asScala) getOrElse
-                    Seq()
-
     // Whether the given item is allowed as a binding item for the given control
     // TODO: don't like pattern matching here and revisit hierarchy
     def isAllowedBoundItem(control: XFormsControl, item: Item) = control.staticControl match {

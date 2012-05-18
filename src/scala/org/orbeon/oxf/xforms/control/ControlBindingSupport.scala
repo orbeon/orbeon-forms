@@ -15,6 +15,8 @@ package org.orbeon.oxf.xforms.control
 
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.BindingContext
+import org.orbeon.saxon.om.Item
+import collection.JavaConverters._
 
 trait ControlBindingSupport {
 
@@ -25,10 +27,17 @@ trait ControlBindingSupport {
     final def getBindingContext: BindingContext = bindingContext
     final def getBindingContext(containingDocument: XFormsContainingDocument): BindingContext = bindingContext
 
+    // The control's binding, by default none
+    def binding: Seq[Item] = Seq()
+
+    // Find the control's binding context
+    def contextForBinding: Seq[Item] = Option(bindingContext) flatMap
+        (binding ⇒ Option(binding.parent)) map
+            (binding ⇒ binding.nodeset.asScala) getOrElse
+                Seq()
+
     // Find the bind object for this control, if it has one
-    def bind = staticControl.bind flatMap
-        (bindId ⇒ Option(container.resolveObjectByIdInScope(effectiveId, bindId, bindingContext.contextItem))) collect
-            { case bind: XFormsModelBinds#Bind ⇒ bind }
+    def bind = Option(bindingContext.bind)
 
     // Relevance
     private var _isRelevant = false

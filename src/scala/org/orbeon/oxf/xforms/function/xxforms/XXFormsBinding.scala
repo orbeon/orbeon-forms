@@ -15,7 +15,6 @@ package org.orbeon.oxf.xforms.function.xxforms
 
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om._
-import org.orbeon.oxf.xforms.control.XFormsControl
 import scala.collection.JavaConverters._
 import org.orbeon.oxf.xforms.function.FunctionHelpers
 
@@ -29,7 +28,7 @@ class XXFormsBinding extends FunctionHelpers {
         // Resolve control and get its binding
         staticIdOption flatMap
             (resolveControl(xpathContext, _)) map
-                (control ⇒ new ListIterator(XFormsControl.controlBinding(control).asJava)) getOrElse
+                (control ⇒ new ListIterator(control.binding.asJava)) getOrElse
                     EmptyIterator.getInstance
     }
 

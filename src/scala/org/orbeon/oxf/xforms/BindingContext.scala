@@ -24,6 +24,7 @@ import org.orbeon.oxf.xml.dom4j.{ExtendedLocationData, LocationData}
 case class BindingContext(
         parent: BindingContext,
         model: XFormsModel,
+        bind: XFormsModelBinds#Bind,
         nodeset: JList[Item],
         position: Int,
         elementId: String,
@@ -57,21 +58,21 @@ case class BindingContext(
             variableValue: ValueRepresentation,
             scope: Scope) {
 
-        this(parent, base.model, base.nodeset, base.position, base.elementId, false,
+        this(parent, base.model, null, base.nodeset, base.position, base.elementId, false,
              controlElement, locationData, false, base.contextItem, scope)
 
         _variables = new JArrayList[VariableInfo]
         _variables.add(new VariableInfo(variableName, variableValue))
     }
 
-    private def ancestorInScope(scope: Scope) =
-        new AncestorIterator(includeSelf = false) find (_.scope == scope) getOrElse
-            (throw new IllegalStateException)
-
     // Create a copy with a new variable in scope
     def pushVariable(variableElement: Element, name: String, value: ValueRepresentation, scope: Scope) = {
+
+        def ancestorOrSelfInScope(scope: Scope) =
+            new AncestorIterator(includeSelf = true) find (_.scope == scope) getOrElse (throw new IllegalStateException)
+
         val locationData = new ExtendedLocationData(variableElement.getData.asInstanceOf[LocationData], "pushing variable binding", variableElement)
-        new BindingContext(this, ancestorInScope(scope), variableElement, locationData, name, value, scope)
+        new BindingContext(this, ancestorOrSelfInScope(scope), variableElement, locationData, name, value, scope)
     }
 
     // Java callers

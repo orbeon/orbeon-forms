@@ -58,7 +58,7 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
         Fun("repeat-nodeset", classOf[XXFormsRepeatNodeset], 0, 0, Type.NODE_TYPE, ALLOWS_ZERO_OR_MORE,
             Arg(STRING, EXACTLY_ONE)
         )
-    
+
         // xxforms:bind
         Fun("bind", classOf[XXFormsBind], 0, 1, Type.NODE_TYPE, ALLOWS_ZERO_OR_MORE,
             Arg(STRING, EXACTLY_ONE)

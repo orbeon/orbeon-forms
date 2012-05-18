@@ -891,7 +891,6 @@ public class XFormsModelBinds {
                 // NOTE: This should probably go into XFormsContextStack
                 if (model.getContextStack().getCurrentBindingContext().isNewBind()) {
                     // Case where a @nodeset or @ref attribute is present -> a current nodeset is therefore available
-                    // NOTE: @ref is not supported by XForms 1.1, but it probably should!
                     nodeset = model.getContextStack().getCurrentNodeset();
                 } else {
                     // Case where of missing @nodeset attribute (it is optional in XForms 1.1 and defaults to the context item)

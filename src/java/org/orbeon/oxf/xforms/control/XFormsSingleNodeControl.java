@@ -26,6 +26,7 @@ import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.AttributesImpl;
+import scala.collection.immutable.Seq;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -141,6 +142,11 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
         wasRequired();
         wasReadonly();
         wasValid();
+    }
+
+    @Override
+    public Seq<Item> binding() {
+        return scala.Option.apply(boundItem).toList();
     }
 
     /**

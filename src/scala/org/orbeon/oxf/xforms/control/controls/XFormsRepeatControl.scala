@@ -64,6 +64,9 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
         } else
             false
 
+    // The repeat's sequence binding
+    override def binding = Option(bindingContext) filter (_.isNewBind) map (_.nodeset.asScala) getOrElse Seq()
+
     // Store initial repeat index information
     private val startIndexString = element.attributeValue("startindex")
     private val startIndex = Option(startIndexString) map (_.toInt) getOrElse  1

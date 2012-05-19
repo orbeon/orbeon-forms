@@ -22,6 +22,8 @@ import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis;
 import org.orbeon.oxf.xforms.analysis.controls.ActionTrait;
+import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xforms.event.EventHandlerImpl;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
@@ -401,25 +403,28 @@ public class XFormsActionInterpreter {
 
         // Get indexes as space-separated list
         final String repeatIndexes = resolveAVT(actionElement, XFormsConstants.XXFORMS_REPEAT_INDEXES_QNAME);
+
+        // First resolve the object by static id
+        final Object result = resolutionScopeContainer.resolveObjectById(getSourceEffectiveId(actionElement), targetStaticId, null);
         if (StringUtils.isBlank(repeatIndexes)) {
-            // Most common case: resolve effective id based on source and target
-            return resolutionScopeContainer.resolveObjectById(getSourceEffectiveId(actionElement), targetStaticId, null);
+            // Most common case: just return the resolved object
+            return result;
         } else {
-            // Extension: effective id is provided through repeat indexes, modify appropriately and directly reach control
-            final int[] containerParts = XFormsUtils.getEffectiveIdSuffixParts(resolutionScopeContainer.getEffectiveId());
-            final String[] additionalParts = StringUtils.split(repeatIndexes);
+            // Extension: repeat indexes are provided
+            if (result instanceof XFormsControl) {
+                final XFormsControl tempControl = (XFormsControl) result;
 
-            final String[] parts = new String[containerParts.length + additionalParts.length];
-            for (int i = 0; i < containerParts.length; i++) {
-                parts[i] = Integer.toString(containerParts[i]);
-            }
-            System.arraycopy(additionalParts, 0, parts, containerParts.length, additionalParts.length);
+                // Repeat indexes in current scope
+                final int[] containerParts = XFormsUtils.getEffectiveIdSuffixParts(resolutionScopeContainer.getEffectiveId());
 
-            return
-                xformsControls.getObjectByEffectiveId(resolutionScopeContainer.getFullPrefix() +
-                targetStaticId +
-                XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1 +
-                StringUtils.join(parts, XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_2));
+                // Append new indexes
+                final int[] newSuffix = EventHandlerImpl.appendSuffixes(containerParts, repeatIndexes);
+
+                final String effectiveId = EventHandlerImpl.replaceIdSuffix(tempControl.getEffectiveId(), newSuffix);
+
+                return xformsControls.getObjectByEffectiveId(effectiveId);
+            } else
+                return null;
         }
     }
 

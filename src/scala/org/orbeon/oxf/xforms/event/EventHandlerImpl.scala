@@ -226,4 +226,20 @@ object EventHandlerImpl {
     // Whether the element is an event handler (a known action element with @*:event)
     def isEventHandler(element: Element) =
         XFormsActions.isAction(element.getQName) && (element.attribute(XML_EVENTS_EV_EVENT_ATTRIBUTE_QNAME.getName) ne null)
+
+    // E.g.:
+    // - foo$bar.1-2 and Array(4, 5, 6) => foo$bar.4-5-6
+    // - foo$bar.1-2 and Array() => foo$bar
+    def replaceIdSuffix(prefixedOrEffectiveId: String , parts: Array[Int]): String = {
+        val prefixedId = prefixedOrEffectiveId split REPEAT_HIERARCHY_SEPARATOR_1 head
+
+        if (parts.length == 0)
+            prefixedId
+        else
+            prefixedId + REPEAT_HIERARCHY_SEPARATOR_1 + (parts mkString REPEAT_HIERARCHY_SEPARATOR_2_STRING)
+    }
+
+    // Append space-separated suffix indexes to existing indexes
+    def appendSuffixes(first: Array[Int], second: String) =
+        first ++ (second.trim split """\s+""" map (_.toInt))
 }

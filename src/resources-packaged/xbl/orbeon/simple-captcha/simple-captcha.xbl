@@ -23,11 +23,11 @@
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
          xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-         xmlns:oxf="http://www.orbeon.com/oxf/processors">
+         xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xforms="http://www.w3.org/1999/XSL/Transform">
 
     <xbl:binding id="fr-simple-captcha" element="fr|simple-captcha">
         <xbl:resources>
-            <!-- <xbl:style src="/xbl/orbeon/simple-captcha/simple-captcha.css"/> -->
+             <xbl:style src="/xbl/orbeon/simple-captcha/simple-captcha.css"/>
         </xbl:resources>
         <xbl:handlers>
             <xbl:handler event="fr-verify" phase="target">
@@ -37,29 +37,30 @@
         <xbl:implementation>
             <!-- Local model -->
             <xf:model id="simple-captcha-model">
-                <xf:instance id="simple-captcha-instance">
-                    <instance>
-                        <value/>
-                    </instance>
+                <xf:instance id="answer"><answer/></xf:instance>
+                <xf:instance id="resources">
+                    <resources>
+                        <resource xml:lang="en">
+                            <ask-to-type-word>Type the word above:</ask-to-type-word>
+                        </resource>
+                    </resources>
                 </xf:instance>
             </xf:model>
         </xbl:implementation>
         <xbl:template>
             <xf:group id="component-inner-group">
-                <xf:action ev:event="xforms-enabled">
-                    <xf:var name="already-verified" value="exists(xxf:get-session-attribute('fr-simple-captcha.verified'))"/>
-                    <xf:dispatch if="$already-verified" name="fr-verify-done" target="fr-simple-captcha"/>
-                </xf:action>
+                <xf:var name="resource" value="instance('resources')/resource[@xml:lang = 'en']"/>
                 <xf:action ev:event="fr-verify" xmlns:SimpleCaptcha="java:org.orbeon.xbl.SimpleCaptcha">
-                    <xf:var name="correct" value="SimpleCaptcha:isCorrect(value)"/>
+                    <xf:var name="correct" value="SimpleCaptcha:isCorrect(instance('answer'))"/>
                     <xf:dispatch if="not($correct)" name="fr-verify-error" target="fr-simple-captcha"/>
-                    <xf:action if="$correct">
-                        <xf:action type="xpath">xxf:set-session-attribute('fr-simple-captcha.verified', true())</xf:action>
-                        <xf:dispatch name="fr-verify-done" target="fr-simple-captcha"/>
-                    </xf:action>
+                    <xf:dispatch if="$correct" name="fr-verify-done" target="fr-simple-captcha"/>
                 </xf:action>
-                <xh:img src="/simple-captcha" alt="Captcha"/>
-                <xf:input ref="value"/>
+                <xh:div >
+                    <xh:img src="/simple-captcha" alt="Captcha"/>
+                    <xf:input ref="instance('answer')">
+                        <xf:label ref="$resource/ask-to-type-word"/>
+                    </xf:input>
+                </xh:div>
             </xf:group>
         </xbl:template>
     </xbl:binding>

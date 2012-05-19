@@ -20,9 +20,11 @@ import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
+import org.orbeon.oxf.processor.transformer.TransformerURIResolver;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.SimpleForwardingXMLReceiver;
 import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.saxon.xqj.SaxonXQDataSource;
 import org.xml.sax.SAXException;
 
 import javax.xml.namespace.QName;
@@ -145,7 +147,7 @@ public class XQueryGenerator extends ProcessorImpl {
                         int i = 1;
                         while (iter.hasNext()) {
                             ConfigContainer.Config.NameValuePair parameter = iter.next();
-                            xquery.append((i==1? "PASSING " : ", ") + ":" + i + " AS \"" + parameter.name + "\" ");
+                            xquery.append((i == 1 ? "PASSING " : ", ") + ":" + i + " AS \"" + parameter.name + "\" ");
                             i++;
                         }
                         xquery.append("RETURNING CONTENT) FROM DUAL");
@@ -163,7 +165,7 @@ public class XQueryGenerator extends ProcessorImpl {
                         helper.startElement("results");
 
                         while (rs.next()) {
-                            for (i=1; i <= rs.getMetaData().getColumnCount(); i++) {
+                            for (i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
                                 helper.startElement("result");
                                 SQLXML sqlxml = rs.getSQLXML(i);
                                 if (sqlxml != null) {
@@ -212,6 +214,11 @@ public class XQueryGenerator extends ProcessorImpl {
                                 ConfigContainer.Config.NameValuePair property = iter.next();
                                 xqs.setProperty(property.name, property.value);
                             }
+                            if (SaxonXQDataSource.class.isInstance(xqs)) {
+                                // For Saxon: setup a URI resolver to support the "input:" scheme
+                                final TransformerURIResolver resolver = new TransformerURIResolver(XQueryGenerator.this, pipelineContext, INPUT_CONFIG, XMLUtils.ParserConfiguration.PLAIN);
+                                ((SaxonXQDataSource) xqs).getConfiguration().setURIResolver(resolver);
+                            }
                             XQConnection conn;
                             if (config.jdbc != null) {
                                 Driver driver = (Driver) Class.forName(config.getJDBCImplementation()).newInstance();
@@ -257,7 +264,7 @@ public class XQueryGenerator extends ProcessorImpl {
 
                 } catch (Exception e) {
                     throw new OXFException(e);
-                } 
+                }
             }
         };
         addOutput(name, output);

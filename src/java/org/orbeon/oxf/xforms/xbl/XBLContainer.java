@@ -860,6 +860,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
                                 containingDocument.startHandleEvent(retargetedEvent);
                                 try {
                                     retargetedEvent.setCurrentPhase(XFormsEvent.Phase.capture);
+                                    retargetedEvent.setCurrentObserver(currentEventObserver);
                                     eventHandler.handleEvent(containingDocument, currentEventObserver, retargetedEvent);
                                 } finally {
                                     containingDocument.endHandleEvent();
@@ -964,6 +965,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
                                 containingDocument.startHandleEvent(retargetedEvent);
                                 try {
                                     retargetedEvent.setCurrentPhase(isAtTarget ? XFormsEvent.Phase.target : XFormsEvent.Phase.bubbling);
+                                    retargetedEvent.setCurrentObserver(currentEventObserver);
                                     eventHandler.handleEvent(containingDocument, currentEventObserver, retargetedEvent);
                                 } finally {
                                     containingDocument.endHandleEvent();

@@ -42,6 +42,7 @@ public abstract class XFormsEvent implements Cloneable {
     private static final String XXFORMS_TYPE_ATTRIBUTE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "type");
     private static final String XXFORMS_TARGET_ATTRIBUTE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "target");
     private static final String XXFORMS_TARGETID_ATTRIBUTE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "targetid");
+    private static final String XXFORMS_OBSERVERID_ATTRIBUTE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "observerid");
     private static final String XXFORMS_BUBBLES_ATTRIBUTE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "bubbles");
     private static final String XXFORMS_CANCELABLE_ATTRIBUTE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "cancelable");
     private static final String XXFORMS_PHASE_ATTRIBUTE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "phase");
@@ -51,6 +52,7 @@ public abstract class XFormsEvent implements Cloneable {
     private static final String XXFORMS_TARGET_PREFIXES_ATTRIBUTE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "target-prefixes");
 
     private static final String XXFORMS_EFFECTIVE_TARGETID_ATTRIBUTE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "effective-targetid");
+    private static final String XXFORMS_EFECTIVE_OBSERVERID_ATTRIBUTE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "effective-observerid");
 
     // Properties that change as the event propagates
     // TODO
@@ -69,6 +71,7 @@ public abstract class XFormsEvent implements Cloneable {
     public enum Phase { capture, target, bubbling }
 
     private Phase currentPhase = Phase.capture;
+    private XFormsEventObserver currentObserver;
 
     private Map<String, SequenceExtent> customAttributes;
 
@@ -89,6 +92,14 @@ public abstract class XFormsEvent implements Cloneable {
 
     public void setCurrentPhase(Phase currentPhase) {
         this.currentPhase = currentPhase;
+    }
+
+    public XFormsEventObserver getCurrentObserver() {
+        return currentObserver;
+    }
+
+    public void setCurrentObserver(XFormsEventObserver currentObserver) {
+        this.currentObserver = currentObserver;
     }
 
     public XBLContainer getTargetXBLContainer() {
@@ -155,6 +166,12 @@ public abstract class XFormsEvent implements Cloneable {
         } else if (XXFORMS_PHASE_ATTRIBUTE.equals(name)) {
             // Return the current event phase
             return SingletonIterator.makeIterator(StringValue.makeStringValue(getCurrentPhase().name()));
+        } else if (XXFORMS_OBSERVERID_ATTRIBUTE.equals(name)) {
+            // Return the current event observer id
+            return SingletonIterator.makeIterator(StringValue.makeStringValue(getCurrentObserver().getId()));
+        } else if (XXFORMS_EFECTIVE_OBSERVERID_ATTRIBUTE.equals(name)) {
+            // Return the current event observer id
+            return SingletonIterator.makeIterator(StringValue.makeStringValue(getCurrentObserver().getEffectiveId()));
         } else if (XXFORMS_EFFECTIVE_TARGETID_ATTRIBUTE.equals(name)) {
             // Return the target effective id
             return SingletonIterator.makeIterator(StringValue.makeStringValue(targetObject.getEffectiveId()));

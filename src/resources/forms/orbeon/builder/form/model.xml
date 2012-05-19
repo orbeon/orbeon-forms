@@ -319,13 +319,8 @@
     <!-- Global variables -->
     <xforms:instance id="fb-variables">
         <variables>
-            <!-- Currently open in-place editor -->
-            <inplace-id/>
-            <inplace-repeat-indexes/>
-
             <!-- Currently selected cell td id -->
             <selected-cell/>
-
 
             <new-language/>
             <new-language-trigger/>

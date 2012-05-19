@@ -372,24 +372,6 @@
                                 <xf:case id="fb-ie-warning-case-off"/>
                             </xf:switch>
                         </xf:group>
-                        <!-- Form editor -->
-
-                        <!-- In-place view deselected, remember id -->
-                        <xf:action ev:event="xforms-deselect" if="for $target in event('xxf:targetid') return starts-with($target, 'fr-inplace-') and ends-with($target, '-view')">
-
-                            <!-- Hide currently visible in-place edit if any -->
-                            <xf:toggle if="$variables/inplace-id != ''" case="{$variables/inplace-id}" xxf:repeat-indexes="{$variables/inplace-repeat-indexes}"/>
-
-                            <!-- Remember new id and indexes -->
-                            <xf:setvalue ref="$variables/inplace-id" value="event('xxf:targetid')"/>
-                            <xf:setvalue ref="$variables/inplace-repeat-indexes" value="string-join(event('xxf:repeat-indexes'), ' ')"/>
-                        </xf:action>
-
-                        <!-- In-place edit deselected, forget id -->
-                        <xf:action ev:event="xforms-deselect" if="for $target in event('xxf:targetid') return starts-with($target, 'fr-inplace-') and ends-with($target, '-edit')">
-                            <xf:setvalue ref="$variables/inplace-id"/>
-                            <xf:setvalue ref="$variables/inplace-repeat-indexes"/>
-                        </xf:action>
 
                         <!-- Component holding some common form edition functions -->
                         <fb:form-editor ref="instance('fb-form-instance')" id="fb-form-editor"/>

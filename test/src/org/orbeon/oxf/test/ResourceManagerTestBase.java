@@ -58,6 +58,9 @@ public abstract class ResourceManagerTestBase {
             // Initialize properties
             org.orbeon.oxf.properties.Properties.init("oxf:/ops/unit-tests/properties.xml");
 
+            // Initialize logger
+            LoggerFactory.initLogger();
+
             // Run processor registry so we can use XPL
             final XMLProcessorRegistry registry = new XMLProcessorRegistry();
             final String processorsXML = "processors.xml";

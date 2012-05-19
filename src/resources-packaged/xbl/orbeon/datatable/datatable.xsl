@@ -1018,8 +1018,13 @@
                 - xforms-disabled is triggered when the repeat becomes non-relevant (including when it has no iterations)
                 - xxforms-index-changed is fired when the index is changed (by the user or using xforms:setindex)
                 - xxforms-nodeset-changed is fired when the nodeset changed (happens also when the user changes the sort order or page)
+
+            We must leave the listener outside so that xforms-disabled works, otherwise nested listeners won't run.
         -->
-        <xforms:action ev:event="xforms-enabled xforms-disabled xxforms-index-changed xxforms-nodeset-changed" ev:observer="#preceding-sibling" ev:target="#observer">
+        <xforms:action
+                ev:event="xforms-enabled xforms-disabled xxforms-index-changed xxforms-nodeset-changed"
+                ev:observer="#preceding-sibling"
+                ev:target="#observer">
 
             <xforms:action if="event('xxforms:type') = ('xxforms-nodeset-changed', 'xforms-enabled', 'xforms-disabled')">
                 <xxforms:script>YAHOO.xbl.fr.Datatable.instance(this).updateRows();</xxforms:script>

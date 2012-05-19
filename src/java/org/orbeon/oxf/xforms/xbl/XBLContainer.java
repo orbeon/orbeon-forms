@@ -787,26 +787,12 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
 
         final IndentedLogger indentedLogger = containingDocument.getIndentedLogger(XFormsEvents.LOGGING_CATEGORY);
 
+        final XFormsEventTarget targetObject = originalEvent.getTargetObject();
+        assert targetObject != null;
+
         if (indentedLogger.isDebugEnabled()) {
-            indentedLogger.startHandleOperation("dispatchEvent", "dispatching", "name", originalEvent.getName(), "id", originalEvent.getTargetObject().getEffectiveId(), "location",
+            indentedLogger.startHandleOperation("dispatchEvent", "dispatching", "name", originalEvent.getName(), "id", targetObject.getEffectiveId(), "location",
                     originalEvent.getLocationData() != null ? originalEvent.getLocationData().toString() : null);
-        }
-
-        if (originalEvent.getTargetObject() == null)
-            throw new ValidationException("Target object null for event: " + originalEvent.getName(), getLocationData());
-
-        // For now (2011-12-15), all events reach the repeat iteration instead of the repeat container, except
-        // xforms-enabled/xforms-disabled. This might not be the final design, see also:
-        // http://wiki.orbeon.com/forms/projects/xforms-repeat-events
-        final XFormsEventTarget targetObject; {
-            if (originalEvent.getTargetObject() instanceof XFormsRepeatControl && ! (originalEvent.getName().equals("xforms-enabled") || originalEvent.getName().equals("xforms-disabled") || originalEvent.getName().equals("xxforms-setindex"))) {
-                // Handle special case of repeat being the target: use repeat iteration instead
-                targetObject = ((XFormsRepeatControl) originalEvent.getTargetObject()).getIndexIteration();
-                // If no repeat iteration is found the dispatch is a NOP
-                if (targetObject == null)
-                    return;
-            } else
-                targetObject = originalEvent.getTargetObject();
         }
 
         try {
@@ -893,8 +879,8 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
                     if (indentedLogger.isDebugEnabled()) {
                         indentedLogger.logDebug("dispatchEvent", "retargeting",
                                 "name", originalEvent.getName(),
-                                "original id", originalEvent.getTargetObject().getEffectiveId(),
-                                "new id", retargetedEvent.getTargetObject().getEffectiveId()
+                                "original id", targetObject.getEffectiveId(),
+                                "new id", targetObject.getEffectiveId()
                         );
                     }
                 }
@@ -934,8 +920,8 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
                         if (indentedLogger.isDebugEnabled()) {
                             indentedLogger.logDebug("dispatchEvent", "retargeting",
                                     "name", originalEvent.getName(),
-                                    "original id", originalEvent.getTargetObject().getEffectiveId(),
-                                    "new id", retargetedEvent.getTargetObject().getEffectiveId()
+                                    "original id", targetObject.getEffectiveId(),
+                                    "new id", targetObject.getEffectiveId()
                             );
                         }
                     }
@@ -1013,7 +999,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
         }
 
         if (indentedLogger.isDebugEnabled()) {
-            indentedLogger.endHandleOperation("name", originalEvent.getName(), "id", originalEvent.getTargetObject().getEffectiveId(), "location",
+            indentedLogger.endHandleOperation("name", originalEvent.getName(), "id", targetObject.getEffectiveId(), "location",
                     originalEvent.getLocationData() != null ? originalEvent.getLocationData().toString() : null);
         }
     }

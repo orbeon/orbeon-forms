@@ -1716,7 +1716,7 @@
                                                              xxforms:attribute('indexes', string-join(xxforms:event('xxforms:repeat-indexes'), ' '))))"/>
                                             </xbl:handler>
                                             <xbl:handler event="up-value2" phase="target" xxbl:scope="outer">
-                                                <xforms:dispatch id="xxx" name="up-value3" targetid="level3-component">
+                                                <xforms:dispatch name="up-value3" targetid="level3-component">
                                                     <xxforms:context name="title-value3" select="event('title-value2')"/>
                                                 </xforms:dispatch>
                                             </xbl:handler>

@@ -16,8 +16,10 @@ package org.orbeon.oxf.xforms.event
 import events.XXFormsActionErrorEvent
 import org.orbeon.oxf.xforms._
 import action.{XFormsActions, XFormsAPI, XFormsActionInterpreter}
+import analysis.controls.{RepeatControl, RepeatIterationControl}
 import analysis.ElementAnalysis._
 import analysis.{ElementAnalysis, StaticStateContext, SimpleElementAnalysis}
+import control.controls.XFormsRepeatControl
 import control.XFormsComponentControl
 import org.orbeon.oxf.xforms.XFormsConstants._
 
@@ -128,7 +130,15 @@ class EventHandlerImpl(
             else if (observersPrefixedIds.nonEmpty)
                 observersPrefixedIds
             else
-                parent collect { case parent: ElementAnalysis ⇒ Set(parent.prefixedId) } getOrElse Set()
+                parent collect {
+                    case iteration: RepeatIterationControl ⇒
+                        // Special case where the handler doesn't have an explicit observer and is within a repeat
+                        // iteration. As of 2012-05-18, the handler observes the enclosing repeat container.
+                        Set(iteration.parent.get.prefixedId)
+                    case parent: ElementAnalysis ⇒
+                        // Special case where the handler doesn't have an explicit observer. It observes its parent.
+                        Set(parent.prefixedId)
+                } getOrElse Set()
         }
 
         _targetPrefixedIds = {
@@ -182,15 +192,54 @@ class EventHandlerImpl(
                         throw new IllegalStateException
                 }
 
-                if (eventObserver.getScope(containingDocument) == scope) {
-                    // The scopes match so we can resolve the id relative to the observer
-                    findEventHandler(eventObserver.getXBLContainer(containingDocument).resolveObjectByIdInScope(eventObserver.getEffectiveId, staticId, null))
-                } else if (Some(eventObserver.getPrefixedId) == (parent map (_.prefixedId))) {
-                    // Scopes don't match which implies that the event handler must be a child of the observer
-                    val handlerEffectiveId = XFormsUtils.getRelatedEffectiveId(eventObserver.getEffectiveId, staticId)
-                    findEventHandler(containingDocument.getObjectByEffectiveId(handlerEffectiveId))
-                } else
-                    throw new IllegalStateException
+                val targetObject = event.getTargetObject
+
+                val concreteHandler =
+                    if (targetObject.getScope(containingDocument) == scope) {
+                        // The scopes match so we can resolve the id relative to the target
+                        targetObject.getXBLContainer(containingDocument).resolveObjectByIdInScope(targetObject.getEffectiveId, staticId, null)
+                    } else {
+                        // Scopes don't match which implies that the event handler must be a child (or grand-child in the case of repeat) of the observer
+                        def parentPrefixedId = parent map (_.prefixedId)
+                        def grandParent = parent flatMap (_.parent)
+                        def grandParentPrefixedId = grandParent map (_.prefixedId)
+
+                        // Here we want to find the
+                        val handlerEffectiveId =
+                            if (Some(eventObserver.getPrefixedId) == parentPrefixedId) {
+                                // Observing the parent
+                                 XFormsUtils.getRelatedEffectiveId(eventObserver.getEffectiveId, staticId)
+                            } else if (Some(eventObserver.getPrefixedId) == grandParentPrefixedId) {
+                                // Observing the grand-parent, which must be a repeat control
+                                assert(grandParent exists (_.isInstanceOf[RepeatControl]))
+                                assert(eventObserver.isInstanceOf[XFormsRepeatControl])
+
+                                val repeat = eventObserver.asInstanceOf[XFormsRepeatControl]
+
+                                // What we do below is infer the effective id of the handler
+                                if (targetObject eq eventObserver) {
+                                    // Event targets the repeat object itself
+                                    Option(repeat.getIndexIteration) map
+                                        (iteration ⇒ XFormsUtils.getRelatedEffectiveId(iteration.effectiveId, staticId)) getOrElse
+                                            (return)
+                                } else {
+                                    // Event must target the iteration or a descendant (including the case of a repeat iteration)
+                                    val targetParts = XFormsUtils.getEffectiveIdSuffixParts(targetObject.getEffectiveId)
+                                    val repeatParts = XFormsUtils.getEffectiveIdSuffixParts(repeat.effectiveId)
+
+                                    assert(targetParts.startsWith(repeatParts))
+
+                                    val suffix = targetParts.take(repeatParts.size + 1)
+
+                                    EventHandlerImpl.replaceIdSuffix(prefixedId, suffix)
+                                }
+                            } else
+                                throw new IllegalStateException
+
+                        containingDocument.getObjectByEffectiveId(handlerEffectiveId)
+                    }
+
+                findEventHandler(concreteHandler)
             }
 
         // Run the action within the context

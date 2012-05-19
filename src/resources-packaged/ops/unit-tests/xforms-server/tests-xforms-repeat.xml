@@ -23,8 +23,10 @@
     xmlns:xforms="http://www.w3.org/2002/xforms"
     xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
     xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
     <test description="xforms:repeat initialization" name="oxf:pipeline">
@@ -967,6 +969,7 @@
                             </instance>
                             <instance id="events" model-id="model">
                                 <events>
+                                    <event type="xforms-enabled" target="my-repeat" indexes=""/>
                                     <event type="xforms-enabled" target="my-input" indexes="1"/>
                                     <event type="xforms-enabled" target="my-input" indexes="2"/>
                                     <event type="xforms-enabled" target="my-input" indexes="2"/>
@@ -2032,6 +2035,7 @@
                         <xxforms:variable name="department-index-2" select="xxforms:index('department-repeat')" as="element*"/>
                         <xforms:output id="department-output-1" value="$department-index-1"/>
                         <xforms:output id="department-output-2" value="$department-index-2"/>
+
                         <xforms:repeat id="employee-repeat" nodeset="employee" startindex="3">
                             <xxforms:variable name="employee-index-1" select="xxforms:index()" as="element*"/>
                             <xxforms:variable name="employee-index-2" select="xxforms:index('employee-repeat')" as="element*"/>
@@ -2366,7 +2370,7 @@
                         <xforms:insert ev:event="xforms-enabled"
                                        context="instance('events')" nodeset="*"
                                        origin="xxforms:element('event',
-                                                (xxforms:attribute('observer', 'my-group'),
+                                                (xxforms:attribute('observer', event('xxforms:observerid')),
                                                  xxforms:attribute('type', event('xxforms:type')),
                                                  xxforms:attribute('target', event('xxforms:targetid'))
                                                  ))"/>
@@ -2380,12 +2384,11 @@
                         <!-- Repeat has one relevant iteration so is relevant -->
                         <xforms:repeat nodeset="instance('instance-3')/value" id="my-repeat-3">
                             <!-- Test handler with ev:target="#observer" -->
-                            <!-- NOTE: Observer here is the repeat iteration! And xforms-enabled is currently not dispatched
-                                 to repeat iterations. -->
-                            <xforms:insert ev:event="xforms-enabled" ev:target="#observer" ev:propagate="stop"
+                            <!-- NOTE: Since 2012-05-18, the observer is (again) the repeat object -->
+                            <xforms:insert ev:event="xforms-enabled" ev:target="#observer"
                                        context="instance('events')" nodeset="*"
                                        origin="xxforms:element('event',
-                                                (xxforms:attribute('observer', 'my-repeat-3~iteration'),
+                                                (xxforms:attribute('observer', event('xxforms:observerid')),
                                                  xxforms:attribute('type', event('xxforms:type')),
                                                  xxforms:attribute('target', event('xxforms:targetid'))
                                                  ))"/>
@@ -2395,7 +2398,7 @@
                         <xforms:insert ev:event="xforms-enabled" ev:observer="my-repeat-3" ev:target="my-repeat-3"
                                        context="instance('events')" nodeset="*"
                                        origin="xxforms:element('event',
-                                                (xxforms:attribute('observer', 'my-repeat-3'),
+                                                (xxforms:attribute('observer', event('xxforms:observerid')),
                                                  xxforms:attribute('type', event('xxforms:type')),
                                                  xxforms:attribute('target', event('xxforms:targetid'))
                                                  ))"/>
@@ -2441,6 +2444,7 @@
                                 <events>
                                     <event observer="my-group" type="xforms-enabled" target="my-group"/>
                                     <event observer="my-group" type="xforms-enabled" target="my-repeat-1a"/>
+                                    <event observer="my-repeat-3" type="xforms-enabled" target="my-repeat-3"/>
                                     <event observer="my-repeat-3" type="xforms-enabled" target="my-repeat-3"/>
                                     <event observer="my-group" type="xforms-enabled" target="my-repeat-3"/>
                                 </events>
@@ -3031,6 +3035,152 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="Listener XPath context within repeat is the closest from the target" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html>
+                <xhtml:head>
+                    <xforms:model id="model">
+                        <xforms:instance id="instance">
+                            <company>
+                                <department id="1"/>
+                                <department id="2"/>
+                            </company>
+                        </xforms:instance>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:repeat id="department-repeat" ref="department">
+                        <xforms:output id="my-output" value="."/>
+                        <xforms:setvalue ev:event="xforms-enabled" ev:target="my-output" ref="." value="@id"/>
+                    </xforms:repeat>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response>
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <company>
+                                    <department id="1">1</department>
+                                    <department id="2">2</department>
+                                </company>
+                            </instance>
+                        </instances>
+                        <controls>
+                            <control effective-id="department-repeat" index="1"/>
+                        </controls>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="my-output·1">1</xxf:control>
+                        <xxf:control id="my-output·2">2</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="Listener child of repeat iteration with different XBL scopes" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html>
+                <xhtml:head>
+                    <xforms:model id="model">
+                        <xforms:instance id="instance">
+                            <company>
+                                <department id="1"/>
+                                <department id="2"/>
+                            </company>
+                        </xforms:instance>
+                        <!-- TEST: Events to gather -->
+                        <xforms:instance id="events">
+                            <events/>
+                        </xforms:instance>
+                    </xforms:model>
+                    <xbl:xbl>
+                        <xbl:binding id="fr-bar" element="fr|bar">
+                            <xbl:template>
+                                <xforms:group>
+                                    <!-- Upon group becoming relevant -->
+                                    <xforms:action ev:event="xforms-enabled" ev:target="#observer">
+                                        <!-- Dispatch an event to the repeat itself -->
+                                        <xforms:dispatch name="my-event" xbl:attr="targetid=repeatid" xxbl:scope="outer"/>
+                                        <!-- Dispatch an event to the (first) output control -->
+                                        <xforms:dispatch name="my-event" targetid="my-output"/>
+                                    </xforms:action>
+
+                                    <!-- Repeat is in outer scope -->
+                                    <xforms:repeat xbl:attr="ref id=repeatid" xxbl:scope="outer">
+                                        <!-- Event handler in inner scope observes the repeat -->
+                                        <xforms:action ev:event="xforms-enabled my-event" xxbl:scope="inner">
+                                            <xforms:insert xxbl:scope="outer"
+                                               context="instance('events')" ref="*"
+                                               origin="xxforms:element('event',
+                                                        (xxforms:attribute('observer', event('xxforms:effective-observerid')),
+                                                         xxforms:attribute('type', event('xxforms:type')),
+                                                         xxforms:attribute('target', event('xxforms:effective-targetid'))
+                                                         ))"/>
+
+                                        </xforms:action>
+
+                                        <!-- Output control in inner scope -->
+                                        <xforms:output id="my-output" value="'42'" xxbl:scope="inner"/>
+
+                                    </xforms:repeat>
+
+                                </xforms:group>
+                            </xbl:template>
+                        </xbl:binding>
+                    </xbl:xbl>
+                </xhtml:head>
+                <xhtml:body>
+                    <!-- Listener will run as there are iterations -->
+                    <fr:bar id="my-bar-1" ref="department" repeatid="my-department-repeat"/>
+                    <!-- Listener won't run as there are no iterations -->
+                    <fr:bar id="my-bar-2" ref="()" repeatid="my-empty-repeat"/>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response>
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <company>
+                                    <department id="1"/>
+                                    <department id="2"/>
+                                </company>
+                            </instance>
+                            <instance id="events" model-id="model">
+                                <events>
+                                    <event observer="my-bar-1$my-department-repeat" type="my-event" target="my-bar-1$my-department-repeat"/>
+                                    <event observer="my-bar-1$my-department-repeat" type="my-event" target="my-bar-1$my-output·1"/>
+                                    <event observer="my-bar-1$my-department-repeat" type="xforms-enabled" target="my-bar-1$my-department-repeat"/>
+                                    <event observer="my-bar-1$my-department-repeat" type="xforms-enabled" target="my-bar-1$my-output·1"/>
+                                    <event observer="my-bar-1$my-department-repeat" type="xforms-enabled" target="my-bar-1$my-output·2"/>
+                                </events>
+                            </instance>
+                        </instances>
+                        <controls>
+                            <control effective-id="my-bar-1$my-department-repeat" index="1"/>
+                        </controls>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="my-bar-1$my-output·1">42</xxf:control>
+                        <xxf:control id="my-bar-1$my-output·2">42</xxf:control>
+                    </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
         </output>

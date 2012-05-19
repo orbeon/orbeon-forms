@@ -209,7 +209,7 @@ object Focus {
             case _ ⇒ targetObject.getParentEventObserver(doc) // why this is needed?
         }
 
-        val ignoreObserver = (o: XFormsEventObserver) ⇒ o.isInstanceOf[XFormsRepeatControl] && (o ne targetObject) || o.isInstanceOf[XXFormsRootControl]
+        val ignoreObserver = (o: XFormsEventObserver) ⇒ o.isInstanceOf[XXFormsRootControl]
         val notReachedComponent = (o: XFormsEventObserver) ⇒ ! (o.isInstanceOf[XFormsComponentControl] && (o ne targetObject))
 
         // Iterator over all observers except those we always ignore
@@ -228,7 +228,7 @@ object Focus {
                     // Broken retargeting for other UI events
 
                     def addRetarget(o: XFormsEventObserver) {
-                        boundaries.add(o);
+                        boundaries.add(o)
                         eventsForBoundaries.put(o.getEffectiveId, null)
                     }
 

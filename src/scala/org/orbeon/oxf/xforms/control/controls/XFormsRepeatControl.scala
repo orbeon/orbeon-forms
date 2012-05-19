@@ -590,11 +590,9 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
     }
 
     override def performDefaultAction(event: XFormsEvent) = event match {
-        case e: XXFormsSetindexEvent ⇒
-            // Set the index if we receive this event
-            setIndex(e.index)
-        case _ ⇒
-            super.performDefaultAction(event)
+        case e: XXFormsSetindexEvent ⇒ setIndex(e.index)
+        case e: XXFormsDndEvent ⇒ doDnD(e)
+        case _ ⇒ super.performDefaultAction(event)
     }
 
     override def buildChildren(buildTree: (XBLContainer, BindingContext, ElementAnalysis, Seq[Int]) ⇒ Option[XFormsControl], idSuffix: Seq[Int]) = {

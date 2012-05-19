@@ -21,8 +21,7 @@ import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.ContentHandlerHelper
 import org.xml.sax.helpers.AttributesImpl
 import java.util.Map
-import org.orbeon.oxf.xforms.event.events.XXFormsDndEvent
-import org.orbeon.oxf.xforms.event.{XFormsEvents, XFormsEvent}
+import org.orbeon.oxf.xforms.event.XFormsEvents
 import org.orbeon.oxf.xforms.analysis.controls.RepeatIterationControl
 import org.orbeon.oxf.xforms.control.{NoLHHATrait, XFormsControl, XFormsSingleNodeContainerControl}
 import org.orbeon.oxf.xforms.BindingContext
@@ -73,14 +72,6 @@ class XFormsRepeatIterationControl(container: XBLContainer, parent: XFormsContro
         // Update this iteration's effective id
         setEffectiveId(XFormsUtils.getIterationEffectiveId(parent.getEffectiveId, _iterationIndex))
         children foreach (_.updateEffectiveId())
-    }
-
-    override def performDefaultAction(event: XFormsEvent) = event match {
-        // For now (2011-12-15), all events reach the repeat iteration instead of the repeat container, except
-        // xforms-enabled/xforms-disabled. This might not be the final design, see also:
-        // http://wiki.orbeon.com/forms/projects/xforms-repeat-events
-        case dndEvent: XXFormsDndEvent ⇒ repeat.doDnD(dndEvent)
-        case _ ⇒ super.performDefaultAction(event)
     }
 
     override def equalsExternal(other: XFormsControl): Boolean = {

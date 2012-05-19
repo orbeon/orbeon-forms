@@ -763,7 +763,7 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
         this.locationData = locationData;
     }
 
-    public XFormsEventObserver getParentEventObserver(XBLContainer container) {
+    public XFormsEventObserver getParentEventObserver(XFormsContainingDocument containingDocument) {
         // There is no point for events to propagate beyond the container
         return null;
     }

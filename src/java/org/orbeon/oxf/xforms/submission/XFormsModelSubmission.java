@@ -279,7 +279,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
         return (LocationData) submissionElement.getData();
     }
 
-    public XFormsEventObserver getParentEventObserver(XBLContainer container) {
+    public XFormsEventObserver getParentEventObserver(XFormsContainingDocument containingDocument) {
         return model;
     }
 

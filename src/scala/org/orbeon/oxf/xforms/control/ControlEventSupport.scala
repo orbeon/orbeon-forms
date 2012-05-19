@@ -77,7 +77,7 @@ trait ControlEventSupport {
 
     // Consider that the parent of top-level controls is the containing document. This allows events to propagate to
     // the top-level.
-    final def getParentEventObserver(container: XBLContainer): XFormsEventObserver =
+    final def getParentEventObserver(containingDocument: XFormsContainingDocument): XFormsEventObserver =
         Option(parent) getOrElse containingDocument
 
     final def addListener(eventName: String, listener: org.orbeon.oxf.xforms.event.EventListener): Unit =

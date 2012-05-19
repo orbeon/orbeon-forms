@@ -198,8 +198,8 @@ class XFormsInstance(
         else
             new LocationData(documentInfo.getSystemId, documentInfo.getLineNumber, -1)
 
-    def getParentEventObserver(container: XBLContainer): XFormsEventObserver =
-        getModel(container.getContainingDocument)
+    def getParentEventObserver(containingDocument: XFormsContainingDocument): XFormsEventObserver =
+        getModel(containingDocument)
 
     def performDefaultAction(event: XFormsEvent) =
         event.getName match {

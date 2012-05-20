@@ -142,7 +142,7 @@ public class XQueryGenerator extends ProcessorImpl {
                         // (see https://forums.oracle.com/forums/thread.jspa?messageID=10338407#10338407)
                         Driver driver = (Driver) Class.forName(config.getJDBCImplementation()).newInstance();
                         Connection conn = driver.connect(config.jdbc.url, null);
-                        StringBuffer xquery = new StringBuffer("SELECT XMLQuery('" + config.query.replaceAll("'", "''") + "' ");
+                        StringBuffer xquery = new StringBuffer("SELECT * from XMLTable('" + config.query.replaceAll("'", "''") + "' ");
                         Iterator<ConfigContainer.Config.NameValuePair> iter = config.parameter.iterator();
                         int i = 1;
                         while (iter.hasNext()) {
@@ -150,7 +150,7 @@ public class XQueryGenerator extends ProcessorImpl {
                             xquery.append((i == 1 ? "PASSING " : ", ") + ":" + i + " AS \"" + parameter.name + "\" ");
                             i++;
                         }
-                        xquery.append("RETURNING CONTENT) FROM DUAL");
+                        xquery.append(")");
                         logger.debug("XQuery: " + xquery.toString());
                         PreparedStatement statement = conn.prepareStatement(xquery.toString());
                         i = 1;

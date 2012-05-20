@@ -41,12 +41,12 @@ import java.util.Vector;
  */
 
 
-public class XQueryGenerator extends ProcessorImpl {
+public class XQueryProcessor extends ProcessorImpl {
 
 
     public static final String XQUERY_NAMESPACE_URI = "http://www.orbeon.org/oxf/xml/xquery";
 
-    private static Logger logger = Logger.getLogger(XQueryGenerator.class);
+    private static Logger logger = Logger.getLogger(XQueryProcessor.class);
 
 
     private static HashMap<String, String> knownImplementations = initKnownImplementations();
@@ -68,14 +68,14 @@ public class XQueryGenerator extends ProcessorImpl {
     }
 
 
-    public XQueryGenerator() {
+    public XQueryProcessor() {
         addInputInfo(new ProcessorInputOutputInfo(INPUT_CONFIG, XQUERY_NAMESPACE_URI));
         addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA));
     }
 
     @Override
     public ProcessorOutput createOutput(String name) {
-        final ProcessorOutput output = new ProcessorOutputImpl(XQueryGenerator.this, name) {
+        final ProcessorOutput output = new ProcessorOutputImpl(XQueryProcessor.this, name) {
             public void readImpl(final PipelineContext pipelineContext, XMLReceiver xmlReceiver) {
 
                 class ConfigContainer extends ObjectReceiver {
@@ -216,7 +216,7 @@ public class XQueryGenerator extends ProcessorImpl {
                             }
                             if (SaxonXQDataSource.class.isInstance(xqs)) {
                                 // For Saxon: setup a URI resolver to support the "input:" scheme
-                                final TransformerURIResolver resolver = new TransformerURIResolver(XQueryGenerator.this, pipelineContext, INPUT_CONFIG, XMLUtils.ParserConfiguration.PLAIN);
+                                final TransformerURIResolver resolver = new TransformerURIResolver(XQueryProcessor.this, pipelineContext, INPUT_CONFIG, XMLUtils.ParserConfiguration.PLAIN);
                                 ((SaxonXQDataSource) xqs).getConfiguration().setURIResolver(resolver);
                             }
                             XQConnection conn;

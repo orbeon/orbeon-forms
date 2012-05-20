@@ -325,16 +325,22 @@
     </processor>
 
     <!-- XQuery Processors-->
+    <processor name="oxf:xquery">
+        <class name="org.orbeon.oxf.processor.XQuery.XQueryProcessor"/>
+    </processor>
+
+    <!-- The XQuery processor has been called "generator" in May 2012. This name will be deprecated in future versions  -->
     <processor name="oxf:xquery-generator">
-        <class name="org.orbeon.oxf.processor.XQuery.XQueryGenerator"/>
+        <class name="org.orbeon.oxf.processor.XQuery.XQueryProcessor"/>
     </processor>
 
 
+    <!-- The Saxon XQuery processor is deprecated in favor of the XQuery processor -->
     <processor name="oxf:generic-saxon-xquery">
         <class name="org.orbeon.oxf.processor.transformer.SaxonXQueryProcessor"/>
     </processor>
 
-    <processor name="oxf:xquery">
+    <processor name="oxf:saxon-xquery-deprecated">
         <instantiation name="oxf:generic-saxon-xquery">
             <input name="attributes">
                 <attributes xmlns:xs="http://www.w3.org/2001/XMLSchema">

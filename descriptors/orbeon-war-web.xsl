@@ -286,7 +286,7 @@
 
             <servlet>
                 <servlet-name>SimpleCaptcha</servlet-name>
-                <servlet-class>nl.captcha.servlet.StickyCaptchaServlet</servlet-class>
+                <servlet-class>nl.captcha.servlet.SimpleCaptchaServlet</servlet-class>
                 <init-param>
                     <param-name>width</param-name>
                     <param-value>200</param-value>

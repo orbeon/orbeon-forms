@@ -47,7 +47,7 @@
     </p:processor>
     
     <!-- Execute query -->
-    <p:processor name="oxf:xquery">
+    <p:processor name="oxf:saxon-xquery-deprecated">
         <p:input name="config" href="#xquery-prepared"/>
         <p:input name="data" href="#input-parsed"/>
         <p:output name="data" id="output"/>

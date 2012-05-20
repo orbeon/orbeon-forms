@@ -151,7 +151,7 @@
         </output>
     </test>
 
-    <test description="XQuery: a little bit of everything" name="oxf:xquery">
+    <test description="XQuery: a little bit of everything" name="oxf:saxon-xquery-deprecated">
         <input name="data">
             <company>
                 <department id="1" name="HR">
@@ -215,7 +215,7 @@
         </output>
     </test>
 
-    <test description="XQuery: a little bit of everything (as xs:string)" name="oxf:xquery">
+    <test description="XQuery: a little bit of everything (as xs:string)" name="oxf:saxon-xquery-deprecated">
         <input name="data">
             <company>
                 <department id="1" name="HR">

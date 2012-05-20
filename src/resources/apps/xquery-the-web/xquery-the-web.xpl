@@ -78,7 +78,7 @@
         <p:output name="data" id="xquery"/>
     </p:processor>
     
-    <p:processor name="oxf:xquery">
+    <p:processor name="oxf:saxon-xquery-deprecated">
         <p:input name="config" href="#xquery"/>
         <p:input name="data" href="#page"/>
         <p:output name="data" id="xquery-output"/>

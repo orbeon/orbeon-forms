@@ -55,7 +55,7 @@
                     <xf:dispatch if="not($correct)" name="fr-verify-error" target="fr-simple-captcha"/>
                     <xf:dispatch if="$correct" name="fr-verify-done" target="fr-simple-captcha"/>
                 </xf:action>
-                <xh:div >
+                <xh:div>
                     <xh:img src="/simple-captcha" alt="Captcha"/>
                     <xf:input ref="instance('answer')">
                         <xf:label ref="$resource/ask-to-type-word"/>

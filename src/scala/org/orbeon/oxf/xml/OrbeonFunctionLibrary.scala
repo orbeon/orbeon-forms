@@ -37,6 +37,14 @@ abstract class OrbeonFunctionLibrary extends FunctionLibrary {
             block
             _currentURI = None
         }
+
+        def apply(uris: Seq[String])(block: ⇒ Any): Unit = {
+            uris foreach  { uri ⇒
+                _currentURI = Some(uri)
+                block
+                _currentURI = None
+            }
+        }
     }
 
     protected case class Arg(itemType: ItemType, arity: Int, resultIfEmpty: Value = null)

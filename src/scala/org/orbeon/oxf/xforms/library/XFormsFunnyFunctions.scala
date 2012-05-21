@@ -24,7 +24,7 @@ import org.orbeon.oxf.xforms.function.{Power, CountNonEmpty, IsCardNumber, Boole
 trait XFormsFunnyFunctions extends OrbeonFunctionLibrary {
 
     // Define in early definition of subclass
-    val XFormsFunnyFunctionsNS: String
+    val XFormsFunnyFunctionsNS: Seq[String]
 
     Namespace(XFormsFunnyFunctionsNS) {
         Fun("boolean-from-string", classOf[BooleanFromString], 0, 1, BOOLEAN, EXACTLY_ONE,

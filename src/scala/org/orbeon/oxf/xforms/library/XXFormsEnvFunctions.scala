@@ -26,7 +26,7 @@ import org.orbeon.oxf.xforms.function.{XFormsAttribute, XFormsElement, If}
 trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
 
     // Define in early definition of subclass
-    val XXFormsEnvFunctionsNS: String
+    val XXFormsEnvFunctionsNS: Seq[String]
 
     Namespace(XXFormsEnvFunctionsNS) {
     

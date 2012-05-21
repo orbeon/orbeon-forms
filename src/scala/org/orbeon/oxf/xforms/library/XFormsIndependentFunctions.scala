@@ -24,7 +24,7 @@ import org.orbeon.oxf.xforms.function.{Random, Hmac, Digest}
 trait XFormsIndependentFunctions extends OrbeonFunctionLibrary {
 
     // Define in early definition of subclass
-    val XFormsIndependentFunctionsNS: String
+    val XFormsIndependentFunctionsNS: Seq[String]
 
     Namespace(XFormsIndependentFunctionsNS) {
         Fun("digest", classOf[Digest], 0, 2, STRING, EXACTLY_ONE,

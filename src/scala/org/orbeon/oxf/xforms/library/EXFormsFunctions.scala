@@ -25,7 +25,7 @@ import org.orbeon.oxf.xml.OrbeonFunctionLibrary
 trait EXFormsFunctions extends OrbeonFunctionLibrary {
 
     // Define in early definition of subclass
-    val EXFormsFunctionsNS: String
+    val EXFormsFunctionsNS: Seq[String]
 
     Namespace(EXFormsFunctionsNS) {
         

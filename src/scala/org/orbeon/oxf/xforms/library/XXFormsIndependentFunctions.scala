@@ -26,7 +26,7 @@ import org.orbeon.oxf.xml.OrbeonFunctionLibrary
 trait XXFormsIndependentFunctions extends OrbeonFunctionLibrary {
 
     // Define in early definition of subclass
-    val XXFormsIndependentFunctionsNS: String
+    val XXFormsIndependentFunctionsNS: Seq[String]
 
     Namespace(XXFormsIndependentFunctionsNS) {
     

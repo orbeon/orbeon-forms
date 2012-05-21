@@ -25,7 +25,7 @@ import org.orbeon.saxon.om.StandardNames
 trait XSLTFunctions extends OrbeonFunctionLibrary {
 
     // Define in early definition of subclass
-    val XSLTFunctionsNS: String
+    val XSLTFunctionsNS: Seq[String]
 
     Namespace(XSLTFunctionsNS) {
 

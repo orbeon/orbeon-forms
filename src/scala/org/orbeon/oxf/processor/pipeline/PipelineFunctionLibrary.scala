@@ -19,11 +19,11 @@ import org.orbeon.oxf.util.NetUtils
 import org.orbeon.saxon.sxpath.XPathEvaluator
 import org.orbeon.oxf.common.Version
 import org.w3c.dom.Node
-import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.oxf.xml.OrbeonFunctionLibrary
 import org.orbeon.oxf.xforms.library._
 import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.state.DynamicState
+import org.orbeon.saxon.om.{NamespaceConstant, NodeInfo}
 
 // For backward compatibility
 object PipelineFunctionLibrary extends PipelineFunctionLibrary
@@ -39,9 +39,9 @@ object PipelineFunctionLibrary extends PipelineFunctionLibrary
  */
 class PipelineFunctionLibrary extends {
     // Namespace the functions (we wish we had trait constructors!)
-    val XFormsIndependentFunctionsNS = PIPELINE_NAMESPACE_URI
-    val XXFormsIndependentFunctionsNS = PIPELINE_NAMESPACE_URI
-    val XSLTFunctionsNS = PIPELINE_NAMESPACE_URI // or FN?
+    val XFormsIndependentFunctionsNS  = Seq(PIPELINE_NAMESPACE_URI)
+    val XXFormsIndependentFunctionsNS = Seq(PIPELINE_NAMESPACE_URI)
+    val XSLTFunctionsNS               = Seq(NamespaceConstant.FN, PIPELINE_NAMESPACE_URI)
 }
     with OrbeonFunctionLibrary
     with XFormsIndependentFunctions

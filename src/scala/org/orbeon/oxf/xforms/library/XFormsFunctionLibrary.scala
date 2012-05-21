@@ -28,13 +28,13 @@ import org.orbeon.saxon.om.NamespaceConstant
  */
 object XFormsFunctionLibrary extends {
     // Namespace the functions (we wish we had trait constructors!)
-    val XFormsIndependentFunctionsNS = NamespaceConstant.FN
-    val XFormsEnvFunctionsNS = NamespaceConstant.FN
-    val XFormsFunnyFunctionsNS = NamespaceConstant.FN
-    val XXFormsIndependentFunctionsNS = XXFORMS_NAMESPACE_URI
-    val XXFormsEnvFunctionsNS = XXFORMS_NAMESPACE_URI
-    val EXFormsFunctionsNS = EXFORMS_NAMESPACE_URI
-    val XSLTFunctionsNS = NamespaceConstant.FN
+    val XFormsIndependentFunctionsNS  = Seq(NamespaceConstant.FN, XFORMS_NAMESPACE_URI)
+    val XFormsEnvFunctionsNS          = Seq(NamespaceConstant.FN, XFORMS_NAMESPACE_URI)
+    val XFormsFunnyFunctionsNS        = Seq(NamespaceConstant.FN, XFORMS_NAMESPACE_URI)
+    val XXFormsIndependentFunctionsNS = Seq(XXFORMS_NAMESPACE_URI)
+    val XXFormsEnvFunctionsNS         = Seq(XXFORMS_NAMESPACE_URI)
+    val EXFormsFunctionsNS            = Seq(EXFORMS_NAMESPACE_URI)
+    val XSLTFunctionsNS               = Seq(NamespaceConstant.FN)
 }
     with OrbeonFunctionLibrary
     with XFormsIndependentFunctions

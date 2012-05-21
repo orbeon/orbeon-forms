@@ -26,7 +26,7 @@ import org.orbeon.saxon.om.NamespaceConstant
  */
 trait XFormsDeprecatedFunctions extends OrbeonFunctionLibrary {
 
-    Namespace(NamespaceConstant.FN) {
+    Namespace(Seq(NamespaceConstant.FN, XFormsConstants.XFORMS_NAMESPACE_URI)) {
 
         Fun("local-date", classOf[LocalDate], 0, 0, STRING, EXACTLY_ONE,
             Arg(STRING, ALLOWS_ZERO_OR_ONE)

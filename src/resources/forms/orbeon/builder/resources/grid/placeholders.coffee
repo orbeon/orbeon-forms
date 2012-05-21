@@ -108,7 +108,9 @@ $ ->
         else container
     elementsInContainerWithSelector = (container, selectors) -> f$.find (selectors.join ', '), adjustContainerForRepeat container
     elementsInContainer = (container) -> elementsInContainerWithSelector container, anyEditableSelector
-    labelsInContainer = (container) -> elementsInContainerWithSelector container, _.pluck (_.pick editables, ['label', 'button', 'link']), 'selector'
+    labelsInContainer = (container) ->
+        labelLikeEditables = _.pick editables, ['label', 'button', 'link']
+        elementsInContainerWithSelector container, _.pluck labelLikeEditables, 'selector'
     elementClosest = (element) -> f$.closest (anyEditableSelector.join ', '), element
     elementsAll = ->
         selectors = _.map anyEditableSelector, (s) -> '.fr-editable ' + s
@@ -141,6 +143,7 @@ $ ->
     removeMock = editableDo 'removeMock'
     storeSeqNo = (element) -> f$.data 'seqNo', (currentSeqNo element), element
     startEdit = (element) ->
+        Builder.beforeAddingEditorCallbacks.fire element
         f$.removeClass 'fb-label-hint-placeholder', element
         f$.removeClass 'xforms-disabled', element                                                                       # Remove disabled which we have on hint when their value is empty
         input = editableEditInput element

@@ -48,6 +48,8 @@ relevanceRules = do ->
     'fb-static-upload-empty':       (gridTd) -> isUpload(gridTd) and isEmptyUpload(gridTd)
     'fb-static-upload-non-empty':   (gridTd) -> isUpload(gridTd) and not isEmptyUpload(gridTd)
 
+Builder.beforeAddingEditorCallbacks = $.Callbacks()
+
 $ ->
 
     # Save reference to last operation that positioned the triggers
@@ -85,7 +87,10 @@ $ ->
     # which require us to detach the TinyMCE iframe from the DOM. So here we preempltively add the td.fr-grid-td around
     # the TinyMCE just before it is initialized.
     tinyMCE.onAddEditor.add (sender, editor) ->
-        gridTd = $(document.getElementById(editor.id)).closest('td.fr-grid-td')
+        Builder.beforeAddingEditorCallbacks.fire $ document.getElementById editor.id
+
+    Builder.beforeAddingEditorCallbacks.add (editor) ->
+        gridTd = f$.closest 'td.fr-grid-td', editor
         createHoverDiv gridTd
 
     # We leave the div.fb-hover that was created on mouseEntersGridTdEvent, as removing it would dispatch a blur to the control

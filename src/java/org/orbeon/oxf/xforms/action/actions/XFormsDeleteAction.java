@@ -210,7 +210,7 @@ public class XFormsDeleteAction extends XFormsAction {
             return null;
         } else {
             // Node to remove doesn't have a parent so we can't delete it
-            // This can happen for nodes already detached, or nodes newly created with e.g. xxforms:element()
+            // This can happen for nodes already detached, or nodes newly created with e.g. xforms:element()
             return null;
         }
 

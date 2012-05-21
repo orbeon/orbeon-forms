@@ -177,7 +177,6 @@
                                 </xf:input>
                                 <!-- Min -->
                                 <xf:group appearance="xxf:fieldset">
-                                    <xf:message level="xxf:log-info" ev:event="xforms-enabled" ev:target="#observer">xxx group</xf:message>
 
                                     <xf:label>
                                         <!--<xh:img src="/apps/fr/style/images/silk/key.png" alt="" title=""/>-->

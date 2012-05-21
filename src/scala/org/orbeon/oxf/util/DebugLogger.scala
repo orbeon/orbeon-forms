@@ -18,8 +18,12 @@ object DebugLogger {
 
     // Simple debug with optional parameters
     def warn(message: ⇒ String, parameters: ⇒ Seq[(String, String)] = Seq())(implicit logger: IndentedLogger) =
-        if (logger.isDebugEnabled)
-            logger.logWarning("", message, flattenTuples(parameters): _*)
+        logger.logWarning("", message, flattenTuples(parameters): _*)
+
+    // Simple debug with optional parameters
+    def info(message: ⇒ String, parameters: ⇒ Seq[(String, String)] = Seq())(implicit logger: IndentedLogger) =
+        if (logger.isInfoEnabled)
+            logger.logInfo("", message, flattenTuples(parameters): _*)
 
     // Simple debug with optional parameters
     def debug(message: ⇒ String, parameters: ⇒ Seq[(String, String)] = Seq())(implicit logger: IndentedLogger) =

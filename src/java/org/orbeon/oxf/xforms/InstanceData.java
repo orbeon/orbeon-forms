@@ -37,7 +37,7 @@ public class InstanceData {// rename to DataNodeProperties once done
     private LocationData locationData;
 
     // Point back to binds that impacted this node
-    private List<XFormsModelBinds.Bind.BindNode> bindNodes;
+    private List<XFormsModelBinds.BindNode> bindNodes;
 
     // Types set by schema or binds
     private QName bindType;
@@ -49,15 +49,15 @@ public class InstanceData {// rename to DataNodeProperties once done
     // Annotations (used only for multipart submission as of 2010-12)
     private Map<String, String> transientAnnotations;
 
-    public static void addBindNode(NodeInfo nodeInfo, XFormsModelBinds.Bind.BindNode bindNode) {
+    public static void addBindNode(NodeInfo nodeInfo, XFormsModelBinds.BindNode bindNode) {
         final InstanceData instanceData = getOrCreateInstanceData(nodeInfo, false);
         if (instanceData != READONLY_LOCAL_INSTANCE_DATA) {
             // only register ourselves if we are not a readonly node
             if (instanceData.bindNodes == null)
                 instanceData.bindNodes = Collections.singletonList(bindNode);
             else if (instanceData.bindNodes.size() == 1) {
-                final XFormsModelBinds.Bind.BindNode oldBindNode = instanceData.bindNodes.get(0);
-                instanceData.bindNodes = new ArrayList<XFormsModelBinds.Bind.BindNode>(4); // hoping that situations where many binds point to same node are rare
+                final XFormsModelBinds.BindNode oldBindNode = instanceData.bindNodes.get(0);
+                instanceData.bindNodes = new ArrayList<XFormsModelBinds.BindNode>(4); // hoping that situations where many binds point to same node are rare
                 instanceData.bindNodes.add(oldBindNode);
                 instanceData.bindNodes.add(bindNode);
             } else {
@@ -105,7 +105,7 @@ public class InstanceData {// rename to DataNodeProperties once done
 
     public boolean getLocalRelevant() {
         if (bindNodes != null && bindNodes.size() > 0)
-            for (final XFormsModelBinds.Bind.BindNode bindNode : bindNodes)
+            for (final XFormsModelBinds.BindNode bindNode : bindNodes)
                 if (bindNode.isRelevant() != Model.DEFAULT_RELEVANT())
                     return !Model.DEFAULT_RELEVANT();
 
@@ -114,7 +114,7 @@ public class InstanceData {// rename to DataNodeProperties once done
 
     public boolean getLocalReadonly() {
         if (bindNodes != null && bindNodes.size() > 0)
-            for (final XFormsModelBinds.Bind.BindNode bindNode : bindNodes)
+            for (final XFormsModelBinds.BindNode bindNode : bindNodes)
                 if (bindNode.isReadonly() != Model.DEFAULT_READONLY())
                     return !Model.DEFAULT_READONLY();
 
@@ -123,7 +123,7 @@ public class InstanceData {// rename to DataNodeProperties once done
 
     public boolean getRequired() {
         if (bindNodes != null && bindNodes.size() > 0)
-            for (final XFormsModelBinds.Bind.BindNode bindNode : bindNodes)
+            for (final XFormsModelBinds.BindNode bindNode : bindNodes)
                 if (bindNode.isRequired() != Model.DEFAULT_REQUIRED())
                     return !Model.DEFAULT_REQUIRED();
 
@@ -136,7 +136,7 @@ public class InstanceData {// rename to DataNodeProperties once done
             return false;
 
         if (bindNodes != null && bindNodes.size() > 0)
-            for (final XFormsModelBinds.Bind.BindNode bindNode : bindNodes)
+            for (final XFormsModelBinds.BindNode bindNode : bindNodes)
                 if (bindNode.isValid() != Model.DEFAULT_VALID())
                     return !Model.DEFAULT_VALID();
 
@@ -149,7 +149,7 @@ public class InstanceData {// rename to DataNodeProperties once done
             return false;
 
         if (bindNodes != null && bindNodes.size() > 0)
-            for (final XFormsModelBinds.Bind.BindNode bindNode : bindNodes)
+            for (final XFormsModelBinds.BindNode bindNode : bindNodes)
                 if (bindNode.isTypeValid() != Model.DEFAULT_VALID())
                     return !Model.DEFAULT_VALID();
 
@@ -161,7 +161,7 @@ public class InstanceData {// rename to DataNodeProperties once done
         Map<String, String> result = null;
         boolean doCopy = false;
         if (bindNodes != null && bindNodes.size() > 0)
-            for (final XFormsModelBinds.Bind.BindNode bindNode : bindNodes)
+            for (final XFormsModelBinds.BindNode bindNode : bindNodes)
                 if (bindNode.getCustomMips() != null) {
                     if (result == null) {
                         // Just reference first Map (it is unmodifiable) as it's the common case
@@ -190,7 +190,7 @@ public class InstanceData {// rename to DataNodeProperties once done
     public String getInvalidBindIds() {
         StringBuffer sb = null;
         if (bindNodes != null && bindNodes.size() > 0)
-            for (final XFormsModelBinds.Bind.BindNode bindNode : bindNodes)
+            for (final XFormsModelBinds.BindNode bindNode : bindNodes)
                 if (bindNode.isValid() != Model.DEFAULT_VALID()) {
                     if (sb == null)
                         sb = new StringBuffer();

@@ -24,10 +24,7 @@ import org.orbeon.scaxon.XML._
 import org.orbeon.oxf.xml.Dom4j
 
 /**
- * xxforms:element(xs:string) as element()
- *
- * Creates a new XML element. The argument is a string representing a QName. If a prefix is present, it is resolved
- * with the namespace mappings in scope where the expression is evaluated.
+ * xxforms:element()
  */
 class XFormsElement extends XFormsFunction {
 

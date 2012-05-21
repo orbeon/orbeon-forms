@@ -18,11 +18,7 @@ import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om.Item
 
 /**
- * xxforms:attribute(xs:string, xs:anyAtomicType?) as attribute()
- *
- * Creates a new XML attribute. The first argument is a string representing a QName representing the name of the
- * attribute to create. If a prefix is present, it is resolved with the namespace mappings in scope where the expression
- * is evaluated. The second attribute is an optional attribute value. The default is the empty string.
+ * xxforms:attribute()
  */
 class XFormsAttribute extends XFormsFunction {
     override def evaluateItem(xpathContext: XPathContext): Item = {

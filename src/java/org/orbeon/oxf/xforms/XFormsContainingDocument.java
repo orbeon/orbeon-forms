@@ -75,23 +75,20 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
     // Per-document current logging indentation
     private final IndentedLogger.Indentation indentation = new IndentedLogger.Indentation();
 
-    private static final String LOGGING_CATEGORY = "document";
-
     private final Map<String, IndentedLogger> loggersMap = new HashMap<String, IndentedLogger>();
-    {
-        final Logger globalLogger = XFormsServer.logger;
-        final Set<String> debugConfig = XFormsProperties.getDebugLogging();
-
-        registerLogger(globalLogger, debugConfig, XFormsContainingDocument.LOGGING_CATEGORY);
-        registerLogger(globalLogger, debugConfig, XFormsModel.LOGGING_CATEGORY);
-        registerLogger(globalLogger, debugConfig, XFormsModelSubmission.LOGGING_CATEGORY);
-        registerLogger(globalLogger, debugConfig, XFormsControls.LOGGING_CATEGORY);
-        registerLogger(globalLogger, debugConfig, XFormsEvents.LOGGING_CATEGORY);
-        registerLogger(globalLogger, debugConfig, XFormsActions.LOGGING_CATEGORY());
-    }
 
     private void registerLogger(Logger globalLogger, Set<String> debugConfig, String category) {
         loggersMap.put(category, new IndentedLogger(globalLogger, globalLogger.isDebugEnabled() && debugConfig.contains(category), indentation, category));
+    }
+
+    /**
+     * Return a logger given a category.
+     */
+    public IndentedLogger getIndentedLogger(String loggingCategory) {
+        if (! loggersMap.containsKey(loggingCategory))
+            registerLogger(XFormsServer.logger, XFormsProperties.getDebugLogging(), loggingCategory);
+
+        return loggersMap.get(loggingCategory);
     }
 
     private String uuid;        // UUID of this document
@@ -99,7 +96,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
 
     private SAXStore lastAjaxResponse; // last Ajax response for retry feature
 
-    private final IndentedLogger indentedLogger = getIndentedLogger(LOGGING_CATEGORY);
+    private final IndentedLogger indentedLogger = getIndentedLogger("document");
 
     // Global XForms function library
     private static FunctionLibrary functionLibrary = XFormsFunctionLibrary.instance();
@@ -1155,16 +1152,6 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
      */
     public XFormsEvent getCurrentEvent() {
         return (eventStack.size() == 0) ? null : eventStack.peek();
-    }
-
-    /**
-     * Return a logger given a category.
-     *
-     * @param loggingCategory   category
-     * @return                  logger
-     */
-    public IndentedLogger getIndentedLogger(String loggingCategory) {
-        return loggersMap.get(loggingCategory);
     }
 
     public IndentedLogger getIndentedLogger() {

@@ -17,11 +17,13 @@ import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.scaxon.XML._
 import org.orbeon.oxf.fb.FormBuilderFunctions._
 import org.orbeon.oxf.fb.ControlOps._
-import org.orbeon.oxf.fb.ContainerOps._
 import org.orbeon.saxon.om._
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.analysis.controls.SingleNodeTrait
 import org.orbeon.oxf.xml.NamespaceMapping
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils
+import org.orbeon.oxf.xforms.InstanceData
+import org.orbeon.oxf.xforms.XFormsModelBinds.BindNode
 
 object DataModel {
 
@@ -121,17 +123,22 @@ object DataModel {
 
     // Function called via `dataModel:bindRef()` from the binds to retrieve the adjusted bind node at design time. If
     // the bound item is non-empty and acceptable for the control, then it is returned. Otherwise, a pointer to
-    // `instance('fb-readonly')` is returned.
-    def bindRef(bindId: String, i: SequenceIterator) = {
-        val itemOption = asScalaSeq(i).headOption
-
-        if (isAllowedBoundItem(controlName(bindId), itemOption))
+    // a dangling element is returned. This allows that element to hold MIPs. The element is marked as readonly so that
+    // controls cannot write to it directly.
+    def bindRef(bindId: String, i: SequenceIterator): SequenceIterator =
+        if (isAllowedBoundItem(controlName(bindId), asScalaSeq(i).headOption))
             i.getAnother
-        else
-            SingletonIterator.makeIterator(
-                getFormModel.getInstance("fb-readonly") ensuring (_ ne null, "did not find fb-readonly") getInstanceRootElementInfo)
+        else {
+            // Create and wrap the dangling element
+            val newElement = Dom4jUtils.createElement("orbeon-dangling-element")
+            val newElementInfo = containingDocument.getStaticState.documentWrapper.wrap(newElement)
+            // Then attach a readonly bind node to it. This is as if there was a <bind readonly="true" for the node>
+            val bindNode = new BindNode(bindId, newElementInfo, null)
+            bindNode.setReadonly(true)
+            InstanceData.addBindNode(newElementInfo, bindNode)
 
-    }
+            SingletonIterator.makeIterator(newElementInfo)
+        }
 
     // For a given value control name and XPath expression, whether the resulting bound item is acceptable
     // Called from control details dialog

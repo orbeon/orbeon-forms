@@ -22,14 +22,14 @@ import org.orbeon.oxf.xforms.XFormsConstants.{XFORMS_NAMESPACE_URI, XBL_NAMESPAC
 import org.orbeon.oxf.xml.XMLConstants.{XHTML_NAMESPACE_URI, XSD_URI}
 import org.orbeon.oxf.util.DebugLogger._
 import org.orbeon.oxf.util.{UserAgent, NetUtils}
-import org.orbeon.oxf.xforms.{XFormsModel, XFormsProperties, Loggers}
+import org.orbeon.oxf.xforms.{XFormsModel, XFormsProperties}
 
 /**
  * Form Builder functions.
  */
 object FormBuilderFunctions {
 
-    private implicit val Logger = Loggers.getIndentedLogger("form-builder")
+    implicit def logger = containingDocument.getIndentedLogger("form-builder")
 
     val XH = XHTML_NAMESPACE_URI
     val XF = XFORMS_NAMESPACE_URI

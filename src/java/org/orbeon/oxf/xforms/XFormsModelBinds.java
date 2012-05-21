@@ -630,7 +630,7 @@ public class XFormsModelBinds {
 
         // Don't try to apply validity to a node if it has children nodes or if it's not a node
         // "The type model item property is not applied to instance nodes that contain child elements"
-        final Bind.BindNode bindNode = bind.getBindNode(position);
+        final BindNode bindNode = bind.getBindNode(position);
         final NodeInfo currentNodeInfo = bindNode.nodeInfo;
         if (currentNodeInfo == null || bindNode.hasChildrenElements)
             return;
@@ -690,7 +690,8 @@ public class XFormsModelBinds {
         // Remember invalid instances
         if (!typeValidity || !requiredValidity) {
             final XFormsInstance instanceForNodeInfo = containingDocument.getInstanceForNode(currentNodeInfo);
-            invalidInstances.add(instanceForNodeInfo.getEffectiveId());
+            if (instanceForNodeInfo != null)
+                invalidInstances.add(instanceForNodeInfo.getEffectiveId());
         }
     }
 
@@ -699,7 +700,7 @@ public class XFormsModelBinds {
         assert bind.staticBind.getConstraint() != null;
 
         // Don't try to apply validity to a node if it's not a node
-        final Bind.BindNode bindNode = bind.getBindNode(position);
+        final BindNode bindNode = bind.getBindNode(position);
         final NodeInfo currentNodeInfo = bindNode.nodeInfo;
         if (currentNodeInfo == null)
             return;
@@ -927,7 +928,7 @@ public class XFormsModelBinds {
                             {
                                 // Create iteration and remember it
                                 final boolean isNewSingleNodeContext = isSingleNodeContext && nodesetSize == 1;
-                                final BindIteration currentBindIteration = new BindIteration(isNewSingleNodeContext, item, childrenStaticBinds);
+                                final BindIteration currentBindIteration = new BindIteration(getStaticId(), isNewSingleNodeContext, item, childrenStaticBinds, typeQName);
                                 bindNodes.add(currentBindIteration);
     
                                 // Create mapping context node -> iteration
@@ -948,7 +949,7 @@ public class XFormsModelBinds {
                         bindNodes = new ArrayList<BindNode>(nodesetSize);
     
                         for (final Item item : nodeset)
-                            bindNodes.add(new BindNode(item));
+                            bindNodes.add(new BindNode(getStaticId(), item, typeQName));
                     }
                 }
 
@@ -1044,108 +1045,14 @@ public class XFormsModelBinds {
             return getBindNode(position).isValid();
         }
 
-        // BindNode holds MIP values for a given bind node
-        public class BindNode {
-
-            // Current MIP state
-            private boolean relevant = Model.DEFAULT_RELEVANT();
-            protected boolean readonly = Model.DEFAULT_READONLY();
-            private boolean required = Model.DEFAULT_REQUIRED();
-            private Map<String, String> customMips = null;
-
-            private boolean typeValidity = Model.DEFAULT_VALID();
-            private boolean requiredValidity = Model.DEFAULT_VALID();
-            private boolean constraintValidity = Model.DEFAULT_VALID();
-
-            public final NodeInfo nodeInfo;
-            public final boolean hasChildrenElements;
-
-            private BindNode(Item item) {
-                if (item instanceof NodeInfo) {
-                    nodeInfo = (NodeInfo) item;
-                    hasChildrenElements = nodeInfo.getNodeKind() == org.w3c.dom.Document.ELEMENT_NODE && XML.hasChildElement(nodeInfo);
-
-                    // Add us to the node
-                    InstanceData.addBindNode(nodeInfo, this);
-                    if (Bind.this.typeQName != null)
-                        InstanceData.setBindType(nodeInfo, Bind.this.typeQName);
-                } else {
-                    nodeInfo = null;
-                    hasChildrenElements = false;
-                }
-            }
-
-            public String getBindStaticId() {
-                return Bind.this.getStaticId();
-            }
-
-            public void setRelevant(boolean value) {
-                this.relevant = value;
-            }
-
-            public void setReadonly(boolean value) {
-                this.readonly = value;
-            }
-
-            public void setRequired(boolean value) {
-                this.required = value;
-            }
-
-            public void setCustom(String name, String value) {
-                if (customMips == null)
-                    customMips = new HashMap<String, String>(); // maybe should be LinkedHashMap for reproducibility
-                customMips.put(name, value);
-            }
-
-            public void setTypeValidity(boolean value) {
-                this.typeValidity = value;
-            }
-
-            public void setRequiredValidity(boolean value) {
-                this.requiredValidity = value;
-            }
-
-            public void setConstraintValidity(boolean value) {
-                this.constraintValidity = value;
-            }
-
-            public boolean isRelevant() {
-                return relevant;
-            }
-
-            public boolean isReadonly() {
-                return readonly;
-            }
-
-            public boolean isRequired() {
-                return required;
-            }
-
-            public boolean isValid() {
-                return typeValidity && requiredValidity && constraintValidity;
-            }
-
-            public boolean isTypeValid() {
-                return typeValidity;
-            }
-
-            public boolean isConstraintValidity() {
-                return constraintValidity;
-            }
-
-            public Map<String, String> getCustomMips() {
-                return customMips == null ? null : Collections.unmodifiableMap(customMips);
-            }
-        }
-
         // Bind node that also contains nested binds
         private class BindIteration extends BindNode {// TODO: if bind doesn't have MIPs, BindNode storage is not needed
 
             private List<Bind> childrenBinds;
 
-            public BindIteration(boolean isSingleNodeContext, Item item, List<BindTree.Bind> childrenStaticBinds) {
+            public BindIteration(String bindStaticId, boolean isSingleNodeContext, Item item, List<BindTree.Bind> childrenStaticBinds, QName typeQName) {
 
-                super(item);
+                super(bindStaticId, item, typeQName);
 
                 assert childrenStaticBinds.size() > 0;
 
@@ -1166,6 +1073,102 @@ public class XFormsModelBinds {
                         return currentBind;
                 return null;
             }
+        }
+    }
+
+    // BindNode holds MIP values for a given bind node
+    public static class BindNode {
+
+        // Current MIP state
+        private boolean relevant = Model.DEFAULT_RELEVANT();
+        protected boolean readonly = Model.DEFAULT_READONLY();
+        private boolean required = Model.DEFAULT_REQUIRED();
+        private Map<String, String> customMips = null;
+
+        private boolean typeValidity = Model.DEFAULT_VALID();
+        private boolean requiredValidity = Model.DEFAULT_VALID();
+        private boolean constraintValidity = Model.DEFAULT_VALID();
+
+        public final String bindStaticId;
+        public final NodeInfo nodeInfo;
+        public final boolean hasChildrenElements;
+
+        public BindNode(String bindStaticId, Item item, QName typeQName) {
+            this.bindStaticId = bindStaticId;
+            if (item instanceof NodeInfo) {
+                nodeInfo = (NodeInfo) item;
+                hasChildrenElements = nodeInfo.getNodeKind() == org.w3c.dom.Document.ELEMENT_NODE && XML.hasChildElement(nodeInfo);
+
+                // Add us to the node
+                InstanceData.addBindNode(nodeInfo, this);
+                if (typeQName != null)
+                    InstanceData.setBindType(nodeInfo, typeQName);
+            } else {
+                nodeInfo = null;
+                hasChildrenElements = false;
+            }
+        }
+
+        public String getBindStaticId() {
+            return bindStaticId;
+        }
+
+        public void setRelevant(boolean value) {
+            this.relevant = value;
+        }
+
+        public void setReadonly(boolean value) {
+            this.readonly = value;
+        }
+
+        public void setRequired(boolean value) {
+            this.required = value;
+        }
+
+        public void setCustom(String name, String value) {
+            if (customMips == null)
+                customMips = new HashMap<String, String>(); // maybe should be LinkedHashMap for reproducibility
+            customMips.put(name, value);
+        }
+
+        public void setTypeValidity(boolean value) {
+            this.typeValidity = value;
+        }
+
+        public void setRequiredValidity(boolean value) {
+            this.requiredValidity = value;
+        }
+
+        public void setConstraintValidity(boolean value) {
+            this.constraintValidity = value;
+        }
+
+        public boolean isRelevant() {
+            return relevant;
+        }
+
+        public boolean isReadonly() {
+            return readonly;
+        }
+
+        public boolean isRequired() {
+            return required;
+        }
+
+        public boolean isValid() {
+            return typeValidity && requiredValidity && constraintValidity;
+        }
+
+        public boolean isTypeValid() {
+            return typeValidity;
+        }
+
+        public boolean isConstraintValidity() {
+            return constraintValidity;
+        }
+
+        public Map<String, String> getCustomMips() {
+            return customMips == null ? null : Collections.unmodifiableMap(customMips);
         }
     }
 }

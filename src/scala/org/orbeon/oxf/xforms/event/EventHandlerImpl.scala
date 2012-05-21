@@ -22,6 +22,7 @@ import analysis.{ElementAnalysis, StaticStateContext, SimpleElementAnalysis}
 import control.controls.XFormsRepeatControl
 import control.XFormsComponentControl
 import org.orbeon.oxf.xforms.XFormsConstants._
+import org.orbeon.oxf.util.DebugLogger._
 
 import collection.JavaConverters._
 import org.dom4j.{QName, Element}
@@ -291,7 +292,25 @@ object EventHandlerImpl {
                         throw new IllegalStateException
 
                 // From there find the concrete object if it is an event handler (which it must be!)
-                handlerEffectiveId map (containingDocument.getObjectByEffectiveId(_))
+                val result = handlerEffectiveId map (containingDocument.getObjectByEffectiveId(_))
+
+                // NOTE: The above is a lot of code for an apparently simple resolution. This stems from the fact that
+                // we allow listening on an element in a different XBL scope. This is not a good idea in the first
+                // place, as it breaks encapsulation. The logger below allows us to track cases where this happens, and
+                // hopefully to ultimately remove this behavior. See:
+                // https://github.com/orbeon/orbeon-forms/issues/243
+                implicit val logger = containingDocument.getIndentedLogger(XFormsEvents.LOGGING_CATEGORY)
+                debug("observing event in different scope (isssue #243)", Seq(
+                    "target id"             → targetObject.getEffectiveId,
+                    "handler id"            → handler.prefixedId,
+                    "observer id"           → eventObserver.getEffectiveId,
+                    "target scope"          → targetObject.getScope(containingDocument).scopeId,
+                    "handler scope"         → handler.scope.scopeId,
+                    "observer scope"        → eventObserver.getScope(containingDocument).scopeId,
+                    "effective handler id"  → handlerEffectiveId.orNull
+                ))
+
+                result
             }
 
         resolvedObject map (_.ensuring(_.isInstanceOf[XFormsEventHandler]).asInstanceOf[XFormsEventHandler])

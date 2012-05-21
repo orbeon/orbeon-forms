@@ -17,6 +17,11 @@ package org.orbeon.oxf.util
 object DebugLogger {
 
     // Simple debug with optional parameters
+    def warn(message: ⇒ String, parameters: ⇒ Seq[(String, String)] = Seq())(implicit logger: IndentedLogger) =
+        if (logger.isDebugEnabled)
+            logger.logWarning("", message, flattenTuples(parameters): _*)
+
+    // Simple debug with optional parameters
     def debug(message: ⇒ String, parameters: ⇒ Seq[(String, String)] = Seq())(implicit logger: IndentedLogger) =
         if (logger.isDebugEnabled)
             logger.logDebug("", message, flattenTuples(parameters): _*)

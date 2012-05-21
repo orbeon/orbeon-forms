@@ -17,8 +17,8 @@ import org.orbeon.saxon.`type`.Type
 import org.orbeon.saxon.expr.StaticProperty._
 import org.orbeon.saxon.`type`.BuiltInAtomicType._
 import org.orbeon.oxf.xforms.function.xxforms._
-import org.orbeon.oxf.xforms.function.If
 import org.orbeon.oxf.xml.OrbeonFunctionLibrary
+import org.orbeon.oxf.xforms.function.{XFormsAttribute, XFormsElement, If}
 
 /*
  * Orbeon extension functions that depend on the XForms environment.
@@ -101,14 +101,14 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
         )
     
         // xxforms:element
-        Fun("element", classOf[XXFormsElement], 0, 1, Type.NODE_TYPE, EXACTLY_ONE,
-            Arg(ANY_ATOMIC, ALLOWS_ZERO_OR_ONE),
+        Fun("element", classOf[XFormsElement], 0, 1, Type.NODE_TYPE, EXACTLY_ONE,
+            Arg(ANY_ATOMIC, EXACTLY_ONE),
             Arg(Type.ITEM_TYPE, ALLOWS_ZERO_OR_MORE)
         )
     
         // xxforms:attribute
-        Fun("attribute", classOf[XXFormsAttribute], 0, 1, Type.NODE_TYPE, EXACTLY_ONE,
-            Arg(ANY_ATOMIC, ALLOWS_ZERO_OR_ONE),
+        Fun("attribute", classOf[XFormsAttribute], 0, 1, Type.NODE_TYPE, EXACTLY_ONE,
+            Arg(ANY_ATOMIC, EXACTLY_ONE),
             Arg(ANY_ATOMIC, EXACTLY_ONE)
         )
     

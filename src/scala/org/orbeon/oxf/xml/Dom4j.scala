@@ -20,6 +20,7 @@ import java.util.{List ⇒ JList, Map ⇒ JMap}
 import org.apache.commons.lang.StringUtils._
 import collection.JavaConverters._
 import org.orbeon.saxon.value.Whitespace
+import collection.mutable.Buffer
 
 object Dom4j {
 
@@ -103,6 +104,9 @@ object Dom4j {
 
     // Return an element's directly nested elements with the given QName
     def elements(e: Element, qName: QName): Seq[Element] = Dom4jUtils.elements(e, qName).asScala
+
+    // Return the element's content as a mutable buffer
+    def content(e: Element): Buffer[Node] = e.content.asInstanceOf[JList[Node]].asScala
 
     // Return an element's attributes
     def attributes(e: Element): Seq[Attribute] = Dom4jUtils.attributes(e).asScala

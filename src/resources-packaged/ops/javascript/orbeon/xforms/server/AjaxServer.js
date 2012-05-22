@@ -1833,7 +1833,11 @@
                                 var show = ORBEON.util.Dom.getAttribute(loadElement, "show");
                                 var target = ORBEON.util.Dom.getAttribute(loadElement, "target");
                                 var showProcess = ORBEON.util.Dom.getAttribute(loadElement, "show-progress");
-                                if (show == "replace") {
+
+                                if (resource.indexOf("javascript:") == 0) {
+                                    // JavaScript URL
+                                    ORBEON.util.String.eval(resource.substring("javascript:".length));
+                                } else  if (show == "replace") {
                                     if (target == null) {
                                         // Display loading indicator unless the server tells us not to display it
                                         if (resource.charAt(0) != '#' && showProcess != "false")

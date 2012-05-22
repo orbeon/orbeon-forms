@@ -123,7 +123,6 @@
                                         <!-- Captcha -->
                                         <xforms:group appearance="xxforms:internal"  model="fr-persistence-model">
                                             <xxforms:variable name="captcha" model="fr-persistence-model" select="instance('fr-persistence-instance')/captcha"/>
-                                            <xxforms:variable name="has-captcha" select="xxforms:property(string-join(('oxf.fr.detail.captcha', $app, $form), '.'))"/>
                                             <xxforms:variable name="mode" select="xxforms:instance('fr-parameters-instance')/mode"/>
                                             <xsl:if test="$has-captcha">
                                                 <xforms:group ref=".[$mode = ('new', 'edit') and not(property('xxforms:noscript')) and $captcha = 'false']" class="fr-captcha">

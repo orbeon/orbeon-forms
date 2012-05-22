@@ -285,19 +285,6 @@
             </servlet>
 
             <servlet>
-                <servlet-name>SimpleCaptcha</servlet-name>
-                <servlet-class>nl.captcha.servlet.SimpleCaptchaServlet</servlet-class>
-                <init-param>
-                    <param-name>width</param-name>
-                    <param-value>200</param-value>
-                </init-param>
-                <init-param>
-                    <param-name>height</param-name>
-                    <param-value>50</param-value>
-                </init-param>
-            </servlet>
-
-            <servlet>
                 <servlet-name>exist-xmlrpc-servlet</servlet-name>
                 <servlet-class>org.exist.xmlrpc.RpcServlet</servlet-class>
             </servlet>
@@ -402,11 +389,6 @@
             <servlet-mapping>
                 <servlet-name>display-chart-servlet</servlet-name>
                 <url-pattern>/chartDisplay</url-pattern>
-            </servlet-mapping>
-
-            <servlet-mapping>
-               <servlet-name>SimpleCaptcha</servlet-name>
-               <url-pattern>/simple-captcha</url-pattern>
             </servlet-mapping>
 
             <xsl:call-template name="comment">

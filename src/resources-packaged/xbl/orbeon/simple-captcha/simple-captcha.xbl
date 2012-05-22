@@ -23,7 +23,9 @@
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
          xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-         xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xforms="http://www.w3.org/1999/XSL/Transform">
+         xmlns:oxf="http://www.orbeon.com/oxf/processors"
+         xmlns:xforms="http://www.w3.org/1999/XSL/Transform"
+         xmlns:SimpleCaptcha="java:org.orbeon.xbl.SimpleCaptcha">
 
     <xbl:binding id="fr-simple-captcha" element="fr|simple-captcha">
         <xbl:resources>
@@ -37,7 +39,14 @@
         <xbl:implementation>
             <!-- Local model -->
             <xf:model id="simple-captcha-model">
-                <xf:instance id="answer"><answer/></xf:instance>
+                <xf:instance id="instance">
+                    <instance>
+                        <user-answer/>
+                        <expected-answer/>
+                        <image/>
+                    </instance>
+                </xf:instance>
+                <xf:bind ref="image" type="xs:base64Binary"/>
                 <xf:instance id="resources">
                     <resources>
                         <resource xml:lang="en">
@@ -50,14 +59,19 @@
         <xbl:template>
             <xf:group id="component-inner-group">
                 <xf:var name="resource" value="instance('resources')/resource[@xml:lang = 'en']"/>
-                <xf:action ev:event="fr-verify" xmlns:SimpleCaptcha="java:org.orbeon.xbl.SimpleCaptcha">
-                    <xf:var name="correct" value="SimpleCaptcha:isCorrect(instance('answer'))"/>
+                <xf:action ev:event="xforms-enabled">
+                    <xf:var name="captcha" value="SimpleCaptcha:createCaptcha()"/>
+                    <xf:setvalue ref="instance()/image" value="SimpleCaptcha:image($captcha)"/>
+                    <xf:setvalue ref="instance()/expected-answer" value="SimpleCaptcha:answer($captcha)"/>
+                </xf:action>
+                <xf:action ev:event="fr-verify">
+                    <xf:var name="correct" value="instance()/user-answer = instance()/expected-answer"/>
                     <xf:dispatch if="not($correct)" name="fr-verify-error" target="fr-simple-captcha"/>
                     <xf:dispatch if="$correct" name="fr-verify-done" target="fr-simple-captcha"/>
                 </xf:action>
                 <xh:div>
-                    <xh:img src="/simple-captcha" alt="Captcha"/>
-                    <xf:input ref="instance('answer')">
+                    <xf:output ref="instance()/image" mediatype="image/png"/>
+                    <xf:input ref="instance()/user-answer">
                         <xf:label ref="$resource/ask-to-type-word"/>
                     </xf:input>
                 </xh:div>

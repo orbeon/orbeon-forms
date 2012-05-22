@@ -81,7 +81,8 @@
                                 <form>
                                     <xsl:value-of select="if ($metadata/form-name) then $metadata/form-name else 'no-name'"/>
                                 </form>
-                                <mode>Edit</mode>
+                                <document/>
+                                <mode>new</mode>
                             </parameters>
                         </p:input>
                         <p:output name="data" id="parameters"/>

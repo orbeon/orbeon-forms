@@ -25,7 +25,7 @@
          xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
          xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
-    <xbl:binding id="fr-alert-dialog" element="fr|alert-dialog">
+    <xbl:binding id="fr-alert-dialog" element="fr|alert-dialog" xxbl:mode="">
         <xbl:resources>
             <xbl:style src="/xbl/orbeon/alert-dialog/alert-dialog.css"/>
         </xbl:resources>
@@ -45,7 +45,7 @@
                 <xsl:template match="/*">
                     
                     <xsl:variable name="has-multiple-choices" select="count(fr:positive-choice | fr:negative-choice | fr:neutral-choice) > 1"/>
-                    <xxforms:dialog xxbl:scope="inner" id="dialog" level="modal" appearance="full" close="false"
+                    <xxforms:dialog xxbl:scope="inner" id="dialog" level="modal" appearance="full" close="{exists(fr:neutral-choice) and not ($has-multiple-choices)}"
                             class="xbl-fr-alert-dialog xbl-fr-alert-dialog-{if ($has-multiple-choices) then 'question' else 'info'}">
 
                         <xforms:model>

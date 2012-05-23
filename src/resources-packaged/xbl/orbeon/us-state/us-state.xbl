@@ -20,7 +20,7 @@
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
 
-    <xbl:binding id="fr-us-state-binding" element="fr|us-state" xxbl:container="span">
+    <xbl:binding id="fr-us-state-binding" element="fr|us-state" xxbl:container="span" xxbl:mode="binding lhha">
 
         <!-- Orbeon Form Builder Component Metadata -->
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xforms="http://www.w3.org/2002/xforms">
@@ -48,8 +48,9 @@
             </xf:model>
         </xbl:implementation>
         <xbl:template>
-            <xf:select1 appearance="minimal" xbl:attr="model context ref bind appearance class" xxbl:scope="outer">
-                <xbl:content includes="xforms|label,xforms|help,xforms|hint,xforms|alert"/>
+            <!-- NOTE: We copy the class so that classes like fr-width-10em apply to the select, but it's not great as
+                 the class will also be on the XBL element. -->
+            <xf:select1 appearance="minimal" ref="." xbl:attr="appearance class" xxbl:scope="outer">
                 <xf:item>
                     <xf:label/>
                     <xf:value/>

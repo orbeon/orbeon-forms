@@ -829,6 +829,7 @@
             </zipfileset>
             <zipfileset file="${build.distrib.dir}/${versioned-proxy-portlet-name}.war" prefix="${versioned-name}"/>
             <zipfileset file="README.md" prefix="${versioned-name}"/>
+            <zipfileset file="README.md" fullpath="${versioned-name}/README.txt"/>
             <zipfileset file="LICENSE.txt" prefix="${versioned-name}"/>
             <zipfileset dir="${build.doc.dir}" prefix="${versioned-name}/doc"/>
             <zipfileset dir="third-party-licenses" prefix="${versioned-name}/third-party-licenses"/>

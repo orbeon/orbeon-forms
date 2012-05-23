@@ -160,6 +160,28 @@
                     <!-- Actions toolbox -->
                     <xhtml:div class="fb-tools">
                         <xhtml:div class="fb-tool">
+                            <xforms:group ref="instance('fb-metadata-instance')/toolbox/edit-source">
+                                <!-- Edit Source -->
+                                <xforms:trigger>
+                                    <xforms:label>
+                                        <xhtml:img src="/apps/fr/style/images/silk/xhtml.png" alt=""/>
+                                        <xhtml:span><xforms:output ref="$form-resources/edit-source/label"/></xhtml:span>
+                                    </xforms:label>
+                                    <xxforms:show ev:event="DOMActivate" dialog="fb-source-editor-dialog"/>
+                                </xforms:trigger>
+                            </xforms:group>
+                            <xforms:group ref="instance('fb-metadata-instance')/toolbox/custom-xml">
+                                <!-- Custom XML -->
+                                <fb:custom-xml id="fb-custom-xml" form-ref="instance('fb-form-instance')" resources-ref="$form-resources"/>
+                                <xforms:trigger>
+                                    <xforms:label>
+                                        <xhtml:img src="/apps/fr/style/images/silk/brick_edit.png" alt=""/>
+                                        <xhtml:span><xforms:output ref="$form-resources/custom-xml/label"/></xhtml:span>
+                                    </xforms:label>
+                                    <xforms:dispatch ev:event="DOMActivate" if="$is-pe" name="fb-show-dialog" target="fb-custom-xml"/>
+                                    <xforms:dispatch ev:event="DOMActivate" if="not($is-pe)" target="fb-pe-dialog" name="fr-show"/>
+                                </xforms:trigger>
+                            </xforms:group>
                             <xforms:group ref="instance('fb-metadata-instance')/toolbox/schema">
                                 <!-- Upload XML Schema -->
                                 <xforms:trigger>
@@ -198,27 +220,6 @@
                                     <xforms:dispatch ev:event="DOMActivate" if="not($is-pe)" target="fb-pe-dialog" name="fr-show"/>
                                 </xforms:trigger>
                             </xforms:group>
-                            <xforms:group ref="instance('fb-metadata-instance')/toolbox/edit-source">
-                                <!-- Edit Source -->
-                                <xforms:trigger>
-                                    <xforms:label>
-                                        <xhtml:img src="/apps/fr/style/images/silk/xhtml.png" alt=""/>
-                                        <xhtml:span><xforms:output ref="$form-resources/edit-source/label"/></xhtml:span>
-                                    </xforms:label>
-                                    <xxforms:show ev:event="DOMActivate" dialog="fb-source-editor-dialog"/>
-                                </xforms:trigger>
-                            </xforms:group>
-                            <xforms:group ref="instance('fb-metadata-instance')/toolbox/custom-xml">
-                                <!-- Custom XML -->
-                                <fb:custom-xml id="fb-custom-xml" form-ref="instance('fb-form-instance')" resources-ref="$form-resources"/>
-                                <xforms:trigger>
-                                    <xforms:label>
-                                        <xhtml:img src="/apps/fr/style/images/silk/brick_edit.png" alt=""/>
-                                        <xhtml:span><xforms:output ref="$form-resources/custom-xml/label"/></xhtml:span>
-                                    </xforms:label>
-                                    <xforms:dispatch ev:event="DOMActivate" name="fb-show-dialog" target="fb-custom-xml"/>
-                                </xforms:trigger>
-                            </xforms:group>
                             <xforms:group ref="instance('fb-metadata-instance')/toolbox/permissions">
                                 <!-- Permissions -->
                                 <fb:permissions id="fb-permissions" resources-ref="$form-resources"
@@ -228,7 +229,8 @@
                                         <xhtml:img src="/apps/fr/style/images/silk/lock.png" alt=""/>
                                         <xhtml:span><xforms:output ref="$form-resources/permissions/label"/></xhtml:span>
                                     </xforms:label>
-                                    <xforms:dispatch ev:event="DOMActivate" name="fb-show-dialog" target="fb-permissions"/>
+                                    <xforms:dispatch ev:event="DOMActivate" if="$is-pe" name="fb-show-dialog" target="fb-permissions"/>
+                                    <xforms:dispatch ev:event="DOMActivate" if="not($is-pe)" target="fb-pe-dialog" name="fr-show"/>
                                 </xforms:trigger>
                             </xforms:group>
                         </xhtml:div>

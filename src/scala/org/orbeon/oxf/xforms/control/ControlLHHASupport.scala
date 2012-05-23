@@ -52,7 +52,7 @@ trait ControlLHHASupport {
         val index = lhhaType.ordinal
         Option(lhha(index)) getOrElse {
             val lhhaElement = container.getPartAnalysis.getLHHA(getPrefixedId, lhhaType.name)
-            val result = Option(lhhaElement) map (new MutableLHHAProperty(self, _, lhhaHTMLSupport(index))) getOrElse NULL_LHHA
+            val result = Option(lhhaElement) map (new MutableLHHAProperty(self, _, lhhaHTMLSupport(index))) getOrElse NullLHHA
             lhha(index) = result
             result
         }
@@ -87,10 +87,10 @@ trait ControlLHHASupport {
 // NOTE: Use name different from trait so that the Java compiler is happy
 object LHHASupport {
 
-    val NULL_LHHA = new NullLHHAProperty
+    val NullLHHA = new NullLHHAProperty
 
     // By default all controls support HTML LHHA
-    def DefaultLHHAHTMLSupport = Array.fill(4)(true)
+    val DefaultLHHAHTMLSupport = Array.fill(4)(true)
 
     // Control property for LHHA
     trait LHHAProperty extends ControlProperty[String] {

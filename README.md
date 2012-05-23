@@ -1,7 +1,9 @@
 Orbeon Forms - Open source web forms done the right way
 =======================================================
 
-Last updated for Orbeon Forms 3.9, March 2011
+Last updated for Orbeon Forms 4.0 M1, May 2012
+
+NOTE: This is a milestone build, not a final release.
 
 
 What is Orbeon Forms?
@@ -68,11 +70,11 @@ What's new in the latest release
 
 A complete list of changes can be found online at:
 
-> <http://wiki.orbeon.com/forms/doc/developer-guide/release-orbeon-forms-39>
+> <http://wiki.orbeon.com/forms/doc/developer-guide/release-notes/40>
 
 Changes for the previous release:
 
-> <http://wiki.orbeon.com/forms/doc/developer-guide/release-orbeon-forms-38>
+> <http://wiki.orbeon.com/forms/doc/developer-guide/release-notes/39>
 
 
 Documentation
@@ -98,7 +100,8 @@ In addition, the Orbeon Forms tutorial also tackles installation:
 What's happening?
 -----------------
 
-- Follow Orbeon on Twitter: <http://twitter.com/orbeon>
+- Orbeon Blog: <http://blog.orbeon.com/>
+- Orbeon on Twitter: <http://twitter.com/orbeon>
 - Latest commits on github: <https://github.com/orbeon/orbeon-forms/commits/>
 - Mailing-list archive: <http://orbeon-forms-ops-users.24843.n4.nabble.com/>
 
@@ -118,8 +121,9 @@ The source code is on github:
 Orbeon Forms is written mainly using the following languages and technologies:
 
 - Java
-- JavaScript
 - Scala
+- JavaScript
+- CoffeeScript
 - XForms, XSLT, and related XML technologies
 
 
@@ -128,7 +132,8 @@ Known bugs and requests for enhancements
 
 For a list of known issues and RFEs, check the issue tracking system:
 
-> <http://goo.gl/iSEyq>
+- New issue tracker on github: <https://github.com/orbeon/orbeon-forms/issues>
+- Legacy issue tracker: <http://goo.gl/iSEyq>
 
 
 License
@@ -219,4 +224,4 @@ about individual licenses.
 
 ---
 
-Copyright 1999-2011 (C) Orbeon, Inc. All rights reserved.
+Copyright 1999-2012 (C) Orbeon, Inc. All rights reserved.

@@ -909,13 +909,11 @@
         <move file="${rsync.dir}/${versioned-name}.tgz" tofile="${rsync.dir}/${unversioned-name}.tgz"/>
         <move file="${rsync.dir}/${versioned-name}.war" tofile="${rsync.dir}/${unversioned-name}.war"/>
         <move file="${rsync.dir}/${versioned-name}-src.zip" tofile="${rsync.dir}/${unversioned-name}-src.zip"/>
-        <move file="${rsync.dir}/${versioned-proxy-portlet-name}.war" tofile="${rsync.dir}/${unversioned-proxy-portlet-name}.war"/>
 
         <move file="${rsync.dir}/${versioned-name}.zip.MD5" tofile="${rsync.dir}/${unversioned-name}.zip.MD5"/>
         <move file="${rsync.dir}/${versioned-name}.tgz.MD5" tofile="${rsync.dir}/${unversioned-name}.tgz.MD5"/>
         <move file="${rsync.dir}/${versioned-name}.war.MD5" tofile="${rsync.dir}/${unversioned-name}.war.MD5"/>
         <move file="${rsync.dir}/${versioned-name}-src.zip.MD5" tofile="${rsync.dir}/${unversioned-name}-src.zip.MD5"/>
-        <move file="${rsync.dir}/${versioned-proxy-portlet-name}.war.MD5" tofile="${rsync.dir}/${unversioned-proxy-portlet-name}.war.MD5"/>
 
         <!-- Post the unstable build -->
         <exec executable="rsync" failonerror="true" dir="${rsync.dir}">
@@ -925,10 +923,12 @@
             <arg value="-c"/>
             <arg value="--rsh=/usr/bin/ssh"/>
             <arg value="--bwlimit=50"/>
-            <arg value="${unversioned-name}.war"/>
-            <arg value="${unversioned-name}.war.MD5"/>
             <arg value="${unversioned-name}.zip"/>
             <arg value="${unversioned-name}.zip.MD5"/>
+            <arg value="${unversioned-name}.tgz"/>
+            <arg value="${unversioned-name}.tgz.MD5"/>
+            <arg value="${unversioned-name}.war"/>
+            <arg value="${unversioned-name}.war.MD5"/>
             <arg value="${unversioned-name}-src.zip"/>
             <arg value="${unversioned-name}-src.zip.MD5"/>
             <arg value="orbeonbld2@forge.objectweb.org:/var/lib/gforge/chroot/home/groups/ops/htdocs/unstable/ops"/>

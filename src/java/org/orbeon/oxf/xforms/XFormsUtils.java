@@ -922,6 +922,9 @@ public class XFormsUtils {
                         return DataModel.isAllowedBoundItem(item);
                     }
                 };
+
+                final boolean isHTMLMediatype = "text/html".equals(element.attributeValue(XFormsConstants.MEDIATYPE_QNAME));
+
                 contextStack.pushBinding(element, sourceEffectiveId, outputControl.getChildElementScope(element));
                 {
                     outputControl.setBindingContext(contextStack.getCurrentBindingContext());
@@ -931,7 +934,7 @@ public class XFormsUtils {
 
                 if (outputControl.isRelevant()) {
                     if (acceptHTML) {
-                        if (XFormsControl.isHTMLMediatype(outputControl)) {
+                        if (isHTMLMediatype) {
                             if (containsHTML != null)
                                 containsHTML[0] = true; // this indicates for sure that there is some nested HTML
                             sb.append(outputControl.getExternalValue());
@@ -940,7 +943,7 @@ public class XFormsUtils {
                             sb.append(XMLUtils.escapeXMLMinimal(outputControl.getExternalValue()));
                         }
                     } else {
-                        if (XFormsControl.isHTMLMediatype(outputControl)) {
+                        if (isHTMLMediatype) {
                             // HTML is not allowed here, better tell the user
                             throw new OXFException("HTML not allowed within element: " + childElement.getName());
                         } else {

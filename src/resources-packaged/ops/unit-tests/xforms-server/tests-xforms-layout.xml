@@ -2725,4 +2725,48 @@
         </output>
     </test>
 
+    <test description="#252: Label with nested HTML output produces escaped HTML" name="oxf:pipeline">
+        <!-- See: https://github.com/orbeon/orbeon-forms/issues/252 -->
+        <input name="config" href="wrap-xforms-init-allcontrols.xpl"/>
+        <input name="document">
+            <xhtml:html>
+                <xhtml:head>
+                    <xforms:model xxforms:xhtml-layout="span">
+                        <xforms:instance>
+                            <value>
+                                <span xmlns="">
+                                    <span>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</span>
+                                    <span>Pellentesque gravida scelerisque leo, vel <a href="http://orbeon.com/" target="_blank">viverra</a> lacus dignissim nec.</span>
+                                </span>
+                            </value>
+                        </xforms:instance>
+                        <xforms:bind ref="." type="xs:date" readonly="true()"/>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+                <xforms:output value="''" id="my-output">
+                    <xforms:label>
+                        <xforms:output value="xxforms:serialize(*[1], 'html')" mediatype="text/html"/>
+                    </xforms:label>
+                </xforms:output>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <controls>
+                <xhtml:span id="my-output" class="xforms-control xforms-output">
+                    <xhtml:label class="xforms-label" for="my-output$$c">
+                        <xhtml:span>
+                            <xhtml:span>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</xhtml:span>
+                            <xhtml:span>Pellentesque gravida scelerisque leo, vel
+                                <xhtml:a href="http://orbeon.com/" shape="rect" target="_blank">viverra</xhtml:a>lacus dignissim nec.
+                            </xhtml:span>
+                        </xhtml:span>
+                    </xhtml:label>
+                    <xhtml:span id="my-output$$c" class="xforms-output-output"/>
+                </xhtml:span>
+            </controls>
+        </output>
+    </test>
+
 </group>

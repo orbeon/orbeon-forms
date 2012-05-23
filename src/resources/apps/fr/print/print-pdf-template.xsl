@@ -117,7 +117,7 @@
                     <xsl:choose>
                         <xsl:when test="$classes = 'xbl-component'">
                             <!-- XBL component -->
-                            <xsl:variable name="component-name" select="for $c in $classes return if ($c != 'xbl-component' or not(starts-with($c, 'xbl-'))) then substring-after($c, 'xbl-') else ()"/>
+                            <xsl:variable name="component-name" select="for $c in $classes return if (starts-with($c, 'xbl-') and $c != 'xbl-component') then substring-after($c, 'xbl-') else ()"/>
                             <xsl:copy-of select="formRunner:getPDFFormatExpression($pdfFormats, $parameters/app, $parameters/form, $component-name, ())"/>
                         </xsl:when>
                         <xsl:when test="$classes = $control-classes">

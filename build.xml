@@ -929,10 +929,8 @@
             <arg value="${unversioned-name}.war.MD5"/>
             <arg value="${unversioned-name}.zip"/>
             <arg value="${unversioned-name}.zip.MD5"/>
-            <arg value="${unversioned-proxy-portlet-name}.war"/>
-            <arg value="${unversioned-proxy-portlet-name}.war.MD5"/>
-            <arg value="${unversioned.name}-src.zip"/>
-            <arg value="${unversioned.name}-src.zip.MD5"/>
+            <arg value="${unversioned-name}-src.zip"/>
+            <arg value="${unversioned-name}-src.zip.MD5"/>
             <arg value="orbeonbld2@forge.objectweb.org:/var/lib/gforge/chroot/home/groups/ops/htdocs/unstable/ops"/>
         </exec>
 

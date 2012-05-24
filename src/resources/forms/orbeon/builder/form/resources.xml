@@ -120,17 +120,23 @@
         <enter-label>
             <label>Click to add a label</label>
         </enter-label>
+        <type-label>
+            <label>Type your label here</label>
+        </type-label>
         <enter-hint>
             <label>Click to add a hint</label>
         </enter-hint>
+        <type-hint>
+            <label>Type your hint here</label>
+        </type-hint>
         <enter-text>
-            <label>click to enter text</label>
+            <label>Click to enter text</label>
         </enter-text>
         <click-cell>
-            <label>click to select this cell</label>
+            <label>Click to select this cell</label>
         </click-cell>
         <insert-control>
-            <label>use the toolbar to insert a control</label>
+            <label>Use the toolbar to insert a control</label>
         </insert-control>
         <edit-items>
             <label>Edit Items</label>

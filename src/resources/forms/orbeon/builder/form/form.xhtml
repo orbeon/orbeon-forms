@@ -503,13 +503,17 @@
                             <!-- Label editor -->
                             <xf:output id="fb-placeholder-label" ref="$form-resources/enter-label/label"/>
                             <xf:group ref=".[exists($control/xf:label/@ref)]" appearance="xxf:internal">
-                                <xf:input xxf:autocomplete="off" id="fb-edit-label" class="fb-edit-label" ref="$current-resources/*[name() = controlOps:controlName($control-id)]/label"/>
+                                <xf:input xxf:autocomplete="off" id="fb-edit-label" class="fb-edit-label" ref="$current-resources/*[name() = controlOps:controlName($control-id)]/label">
+                                    <xf:label appearance="minimal" ref="$form-resources/type-label/label"/>
+                                </xf:input>
                             </xf:group>
 
                             <!-- Hint editor -->
                             <xf:output id="fb-placeholder-hint" ref="$form-resources/enter-hint/label"/>
                             <xf:group ref=".[exists($control/xf:hint/@ref)]" appearance="xxf:internal">
-                                <xf:input xxf:autocomplete="off" id="fb-edit-hint" class="fb-edit-hint" ref="$current-resources/*[name() = controlOps:controlName($control-id)]/hint"/>
+                                <xf:input xxf:autocomplete="off" id="fb-edit-hint" class="fb-edit-hint" ref="$current-resources/*[name() = controlOps:controlName($control-id)]/hint">
+                                    <xf:label appearance="minimal" ref="$form-resources/type-hint/label"/>
+                                </xf:input>
                             </xf:group>
 
                             <!-- Itemset editor -->

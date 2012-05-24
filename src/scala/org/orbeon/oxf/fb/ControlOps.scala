@@ -14,7 +14,6 @@
 package org.orbeon.oxf.fb
 
 import scala.collection.JavaConverters._
-import org.orbeon.oxf.xforms.action.XFormsAPI._
 import annotation.tailrec
 import org.orbeon.oxf.fb.FormBuilderFunctions._
 import org.orbeon.oxf.xforms.analysis.model.Model
@@ -29,6 +28,7 @@ import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
 import org.orbeon.scaxon.XML._
 import org.orbeon.oxf.xforms.XFormsConstants
+import org.orbeon.oxf.xforms.action.XFormsAPI._
 
 /*
  * Form Builder: operations on controls.
@@ -43,7 +43,7 @@ object ControlOps {
     private val topLevelBindTemplate: NodeInfo =
         <xforms:bind id="fr-form-binds" ref="instance('fr-form-instance')"
                      xmlns:xforms="http://www.w3.org/2002/xforms"/>
-    
+
     // Get the control name based on the control, bind, grid, section or template id
     def controlName(controlOrBindId: String) = controlOrBindId match {
         case ControlName(name, _) ⇒ name
@@ -301,10 +301,15 @@ object ControlOps {
 
     // Insert data and resource holders for all languages
     def insertHolders(controlElement: NodeInfo, dataHolder: NodeInfo, resourceHolder: NodeInfo, precedingControlName: Option[String]) {
-        // Create one holder per existing language
-        val resourceHolders = (formResourcesRoot \ "resource" \@ "*:lang") map
-            (att ⇒ (att.stringValue → resourceHolder))
 
+        // Maybe add template items to the resource holder
+        if (hasEditor(controlElement, "static-itemset")) {
+            val fbResourceInFBLang = asNodeInfo(model("fr-resources-model").get.getVariable("fr-form-resources"))
+            val templateItems = fbResourceInFBLang \ "template" \ "items" \ "item"
+            insert(into = resourceHolder, origin = templateItems)
+        }
+        // Create one holder per existing language
+        val resourceHolders = (formResourcesRoot \ "resource" \@ "*:lang") map (_.stringValue → resourceHolder)
         insertHolders(controlElement, dataHolder, resourceHolders, precedingControlName)
     }
 
@@ -356,12 +361,11 @@ object ControlOps {
         // Insert resources placeholders for all languages
         if (resourceHolders.nonEmpty) {
             val resourceHoldersMap = resourceHolders.toMap
-            for {
-                resource ← formResourcesRoot \ "resource"
-                lang = (resource \@ "*:lang").stringValue
-                holder = resourceHoldersMap.get(lang) getOrElse resourceHolders(0)._2
-            } yield
+            formResourcesRoot \ "resource" foreach (resource ⇒ {
+                val lang = (resource \@ "*:lang").stringValue
+                val holder = resourceHoldersMap.get(lang) getOrElse resourceHolders(0)._2
                 insert(into = resource, after = resource \ * filter (name(_) == precedingControlName.getOrElse("")), origin = holder)
+            })
         }
 
         // Insert repeat template holder if needed

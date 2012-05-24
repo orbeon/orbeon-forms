@@ -805,6 +805,20 @@
         <template>
             <untitled-form>Untitled Form</untitled-form>
             <untitled-section>Untitled Section</untitled-section>
+            <items>
+                <item>
+                    <label>First choice</label>
+                    <value>one</value>
+                </item>
+                <item>
+                    <label>Second choice</label>
+                    <value>two</value>
+                </item>
+                <item>
+                    <label>Third choice</label>
+                    <value>three</value>
+                </item>
+            </items>
         </template>
     </resource>
     <resource xml:lang="fr">
@@ -1593,6 +1607,20 @@
         <template>
             <untitled-form>Formulaire sans titre</untitled-form>
             <untitled-section>Section sans titre</untitled-section>
+            <items>
+                <item>
+                    <label>Premier choix</label>
+                    <value>un</value>
+                </item>
+                <item>
+                    <label>Deuxième choix</label>
+                    <value>deux</value>
+                </item>
+                <item>
+                    <label>Troisième choix</label>
+                    <value>trois</value>
+                </item>
+            </items>
         </template>
     </resource>
     <resource xml:lang="no">
@@ -2383,6 +2411,20 @@
         <template>
             <untitled-form>Uten tittel</untitled-form>
             <untitled-section>Uten tittel</untitled-section>
+            <items>
+                <item>
+                    <label>[First choice]</label>
+                    <value>[one]</value>
+                </item>
+                <item>
+                    <label>[Second choice]</label>
+                    <value>[two]</value>
+                </item>
+                <item>
+                    <label>[Third choice]</label>
+                    <value>[three]</value>
+                </item>
+            </items>
         </template>
     </resource>
     <resource xml:lang="ru">
@@ -3172,6 +3214,20 @@
         <template>
             <untitled-form>Новая форма</untitled-form>
             <untitled-section>Новый раздел</untitled-section>
+            <items>
+                <item>
+                    <label>[First choice]</label>
+                    <value>[one]</value>
+                </item>
+                <item>
+                    <label>[Second choice]</label>
+                    <value>[two]</value>
+                </item>
+                <item>
+                    <label>[Third choice]</label>
+                    <value>[three]</value>
+                </item>
+            </items>
         </template>
     </resource>
 </resources>

@@ -37,7 +37,6 @@ object FormBuilderFunctions {
     val XBL = XBL_NAMESPACE_URI
     val FR = FormRunner.NS
     val FB = "http://orbeon.org/oxf/xml/form-builder"
-    val Component = "http://orbeon.org/oxf/xml/form-builder/component/orbeon/library"
 
     // Id of the xxf:dynamic control holding the edited form
     val DynamicControlId = "fb"

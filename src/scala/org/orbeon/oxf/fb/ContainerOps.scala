@@ -34,8 +34,11 @@ object ContainerOps {
     val IsContainer: NodeInfo ⇒ Boolean =
         node ⇒ (node self ContainerElementTest) || ((node self (XF → "group")) && node.attClasses("fb-body"))
 
+    // Namespace URL a section template component must match
+    private val ComponentURI = """^http://orbeon.org/oxf/xml/form-builder/component/([^/]+)/([^/]+)$""".r
+
     val IsSectionTemplateContent: NodeInfo ⇒ Boolean =
-        container ⇒ (container parent * exists IsSection) && container.getNamespaceURI == Component
+        container ⇒ (container parent * exists IsSection) && ComponentURI.findFirstIn(container.getNamespaceURI).nonEmpty
 
     // XForms callers: get the name for a section or grid element or null (the empty sequence)
     def getContainerNameOrEmpty(elem: NodeInfo) = getControlNameOption(elem).orNull

@@ -378,7 +378,7 @@
 
                         <!--  Cell editor -->
                         <xh:div class="fb-cell-editor">
-                            <xf:var name="td" value="instance('fb-form-instance')//*:td[@id = $selected-cell]"/>
+                            <xf:var name="td" value="instance('fb-form-instance')/xhtml:body//*:td[@id = $selected-cell]"/>
                             <xf:var name="grid" value="$td/ancestor::*:grid[1]"/>
                             <xf:var name="control" value="$td/*[1]"/>
                             <xf:var name="control-id" value="$control/@id"/>

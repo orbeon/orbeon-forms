@@ -328,7 +328,7 @@ object ControlOps {
                 (getControlNameOption(_).toSeq) headOption
 
         // Return that if found, otherwise find before the current grid
-        nameInGridOption orElse precedingControlNameInSectionForGrid(grid, false)
+        nameInGridOption orElse precedingControlNameInSectionForGrid(grid, includeSelf = false)
     }
 
     def precedingControlNameInSectionForGrid(grid: NodeInfo, includeSelf: Boolean) = {

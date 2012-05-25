@@ -184,7 +184,7 @@ object ToolboxOps {
                      xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
                      xmlns:xhtml="http://www.w3.org/1999/xhtml">
                 <xhtml:tr>
-                    <xhtml:td id={nextId(inDoc, "td", false)}/>
+                    <xhtml:td id={nextId(inDoc, "tmp", useInstance = false)}/>
                 </xhtml:tr>
             </fr:grid>
 
@@ -218,7 +218,7 @@ object ToolboxOps {
                 if (withGrid)
                     <fr:grid edit-ref="" id={nextId(inDoc, "tmp")}>
                         <xhtml:tr>
-                            <xhtml:td id={nextId(inDoc, "td", false)}/>
+                            <xhtml:td id={nextId(inDoc, "tmp", useInstance = false)}/>
                         </xhtml:tr>
                     </fr:grid>
             }</fb:section>
@@ -284,7 +284,7 @@ object ToolboxOps {
                      xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
                      xmlns:xhtml="http://www.w3.org/1999/xhtml">
                 <xhtml:tr>
-                    <xhtml:td id={nextId(inDoc, "td", false)}/>
+                    <xhtml:td id={nextId(inDoc, "tmp", useInstance = false)}/>
                 </xhtml:tr>
             </fr:grid>
 

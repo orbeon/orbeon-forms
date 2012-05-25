@@ -57,16 +57,16 @@ object GridOps {
     private def newCellsRow(previousRow: Seq[Cell], tds: Seq[NodeInfo]): Seq[Cell] = previousRow match {
         case Seq() ⇒
             // First row: start with initial rowspans
-            tds map (td ⇒ Cell(td, getRowspan(td), false))
+            tds map (td ⇒ Cell(td, getRowspan(td), missing = false))
         case _ ⇒
             // Subsequent rows
             val tdsIterator = tds.toIterator
             previousRow map {
                 case Cell(_, 1, _) ⇒
                     val td = tdsIterator.next()
-                    Cell(td, getRowspan(td), false)
+                    Cell(td, getRowspan(td), missing = false)
                 case Cell(td, rowspan, _) ⇒
-                    Cell(td, rowspan - 1, true)
+                    Cell(td, rowspan - 1, missing = true)
             }
     }
 
@@ -151,7 +151,7 @@ object GridOps {
 
     private def newRow(grid: NodeInfo, size: Int): NodeInfo = {
         // Get as many fresh ids as there are tds
-        val ids = nextIds(grid, "td", size, false).toIterator
+        val ids = nextIds(grid, "tmp", size, useInstance = false).toIterator
 
         <xhtml:tr xmlns:xhtml="http://www.w3.org/1999/xhtml">{
             (1 to size) map (_ ⇒ <xhtml:td id={ids.next()}/>)
@@ -213,7 +213,7 @@ object GridOps {
         val allRowCells = getAllRowCells(grid)
         val pos = firstRowTd precedingSibling "*:td" size
 
-        val ids = nextIds(grid, "td", allRowCells.size, false).toIterator
+        val ids = nextIds(grid, "tmp", allRowCells.size, useInstance = false).toIterator
 
         allRowCells foreach { cells ⇒
             val cell = cells(pos)
@@ -240,7 +240,7 @@ object GridOps {
         } else {
             // First column: just insert plain tds as the first row
             val trs = grid \ "*:tr"
-            val ids = nextIds(grid, "td", trs.size, false).toIterator
+            val ids = nextIds(grid, "tmp", trs.size, useInstance = false).toIterator
 
             trs foreach { tr ⇒
                 insert(into = tr, origin = newTdElement(grid, ids.next()))
@@ -384,7 +384,7 @@ object GridOps {
     // Find template holder
     def findTemplateHolder(descendantOrSelf: NodeInfo, controlName: String) =
         for {
-            grid ← findContainingRepeat(descendantOrSelf, true)
+            grid ← findContainingRepeat(descendantOrSelf, includeSelf = true)
             gridName ← getControlNameOption(grid)
             root ← templateRoot(descendantOrSelf, gridName)
             holder ← root descendantOrSelf * filter (name(_) == controlName) headOption
@@ -457,7 +457,7 @@ object GridOps {
         val trToInsertInto = grid \ "*:tr" apply posyToInsertInto
         val tdToInsertAfter = rowBelow.slice(0, x).reverse find (! _.missing) map (_.td) toSeq
         
-        insert(into = trToInsertInto, after = tdToInsertAfter, origin = newTdElement(grid, nextId(grid, "td")))
+        insert(into = trToInsertInto, after = tdToInsertAfter, origin = newTdElement(grid, nextId(grid, "tmp")))
     }
 
     def initializeGrids(doc: NodeInfo) {
@@ -467,7 +467,7 @@ object GridOps {
 
         def annotate(token: String, elements: Seq[NodeInfo]) = {
             // Get as many fresh ids as there are tds
-            val ids = nextIds(doc, token, elements.size, false).toIterator
+            val ids = nextIds(doc, token, elements.size, useInstance = false).toIterator
 
             // Add the missing ids
             elements foreach (ensureAttribute(_, "id", ids.next()))

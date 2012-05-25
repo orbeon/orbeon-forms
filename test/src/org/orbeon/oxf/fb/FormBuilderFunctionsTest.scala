@@ -333,11 +333,11 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
         def td(id: String) = grid \\ * filter (hasIdValue(_, id)) head
 
         val expected = Seq(
-            Seq(Cell(td("11"),      1,   false), Cell(td("12"),      3,   false), Cell(td("13"),      1,   false)),
-            Seq(Cell(td("tmp-1-tmp"), 1, false), Cell(td("12"),      2,   true),  Cell(td("tmp-2-tmp"), 1, false)),
-            Seq(Cell(td("21"),      3,   false), Cell(td("12"),      1,   true),  Cell(td("23"),      1,   false)),
-            Seq(Cell(td("21"),      2,   true),  Cell(td("tmp-3-tmp"), 1, false), Cell(td("tmp-4-tmp"), 1, false)),
-            Seq(Cell(td("21"),      1,   true),  Cell(td("32"),      1,   false), Cell(td("33"),      1,   false)),
+            Seq(Cell(td("11"),        1, false), Cell(td("12"),        3, false), Cell(td("13"),        1, false)),
+            Seq(Cell(td("tmp-1-tmp"), 1, false), Cell(td("12"),        2, true),  Cell(td("tmp-2-tmp"), 1, false)),
+            Seq(Cell(td("21"),        3, false), Cell(td("12"),        1, true),  Cell(td("23"),        1, false)),
+            Seq(Cell(td("21"),        2, true),  Cell(td("tmp-3-tmp"), 1, false), Cell(td("tmp-4-tmp"), 1, false)),
+            Seq(Cell(td("21"),        1, true),  Cell(td("32"),        1, false), Cell(td("33"),        1, false)),
             Seq(Cell(td("tmp-5-tmp"), 1, false), Cell(td("tmp-6-tmp"), 1, false), Cell(td("tmp-7-tmp"), 1, false))
         )
 

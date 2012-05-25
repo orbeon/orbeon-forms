@@ -84,7 +84,7 @@ object DataModel {
         // support sections without bindings (and possibly other controls like triggers) to nodes. Also, if we do this,
         // we must modify insertNewSection and dialog-section-details.xml.
 
-//        val allContainerNames = getAllContainerControls(inDoc) map (e ⇒ controlName(e attValue "id")) toSet
+//        val allContainerNames = getAllContainerControlsWithIds(inDoc) map (e ⇒ controlName(e attValue "id")) toSet
 //
 //        foreachBindWithName(inDoc) { child ⇒
 //            def path = (ancestorOrSelfBindsWithNames(child) map (_ attValue "name") reverse) mkString "/"

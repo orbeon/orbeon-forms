@@ -22,7 +22,8 @@
          xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
          xmlns:saxon="http://saxon.sf.net/"
          xmlns:xbl="http://www.w3.org/ns/xbl"
-         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+         xmlns:containerOps="java:org.orbeon.oxf.fb.ContainerOps">
 
     <xbl:binding id="fb-dialog-form-settings" element="fb|dialog-form-settings">
         <xbl:handlers>
@@ -58,6 +59,7 @@
         <xbl:template>
 
             <!-- Bindings specified on control -->
+            <xf:var name="body"><xxf:sequence value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=body-ref"/></xf:var>
             <xf:var name="resources"><xxf:sequence value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=resources-ref"/></xf:var>
             <xf:var name="fr-resources"><xxf:sequence value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=fr-resources-ref"/></xf:var>
 
@@ -96,7 +98,7 @@
                                               else $resources/messages/edit-metadata-output"/>
                     </xh:p>
                     <xh:img src="/forms/orbeon/builder/images/label_64.png" alt=""/>
-                    <xh:div class="fb-editor-metadata-dialog-fields">
+                    <xh:div class="fb-dialog-form-settings-fields">
                         <!-- Application name -->
 
                         <!-- Use an input if app name is a wildcard -->
@@ -125,7 +127,34 @@
                             <xf:hint ref="$resources/form-name/hint"/>
                             <xf:alert ref="$resources/form-name/alert"/>
                         </xf:input>
+
+                        <!-- Stats -->
+                        <xf:group ref=".[not($is-new-form or $is-save-as)]" class="fb-dialog-form-settings-stats">
+                            <xf:label value="$resources/dialog-form-settings/stats"/>
+
+                            <xf:var name="labels"
+                                    value="$resources/dialog-form-settings/(sections, repeats, grids, section-templates, controls, all)"/>
+                            <xf:var name="counts"
+                                    value="(containerOps:countSections($body),
+                                            containerOps:countRepeats($body),
+                                            containerOps:countGrids($body),
+                                            containerOps:countSectionTemplates($body),
+                                            containerOps:countAllNonContainers($body),
+                                            containerOps:countAllControls($body))"/>
+
+                            <xh:table>
+                                <xf:repeat ref="1 to count($labels)">
+                                    <xf:var name="i" value="position()"/>
+                                    <xh:tr>
+                                        <xh:th><xf:output value="$labels[$i]"/></xh:th>
+                                        <xh:td><xf:output value="$counts[$i]"/></xh:td>
+                                    </xh:tr>
+                                </xf:repeat>
+                            </xh:table>
+
+                        </xf:group>
                     </xh:div>
+
                     <xh:div class="fr-dialog-buttons">
                         <xf:trigger id="fb-metadata-continue-trigger" tabindex="3">
                             <xf:label value="$resources/(if ($is-new-form) then continue else apply)/label"/>
@@ -161,6 +190,7 @@
                     <!-- Stop value change propagation so changes in this section of the form don't cause data
                          to become dirty in fr-persistence-model -->
                     <xf:action ev:event="#all" ev:propagate="stop"/>
+
                 </xh:div>
             </xxf:dialog>
         </xbl:template>

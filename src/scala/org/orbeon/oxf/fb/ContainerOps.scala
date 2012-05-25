@@ -176,8 +176,18 @@ object ContainerOps {
     }
 
     // Return all the container controls in the view
-    def getAllContainerControls(inDoc: NodeInfo) =
-        getAllControls(inDoc) filter IsContainer
+    def getAllContainerControlsWithIds(inDoc: NodeInfo) = getAllControlsWithIds(inDoc) filter IsContainer
+    def getAllContainerControls(inDoc: NodeInfo) = findFRBodyElement(inDoc) descendant * filter IsContainer
+
+    // Various counts
+    def countSections(inDoc: NodeInfo) = getAllControlsWithIds(inDoc) filter IsSection size
+    def countAllGrids(inDoc: NodeInfo) = findFRBodyElement(inDoc) descendant * filter IsGrid size // includes repeated grids
+    def countRepeats(inDoc: NodeInfo) = getAllControlsWithIds(inDoc) filter IsRepeat size
+    def countGrids(inDoc: NodeInfo) = countAllGrids(inDoc) - countRepeats(inDoc) // non-repeated grids
+    def countSectionTemplates(inDoc: NodeInfo) = findFRBodyElement(inDoc) descendant * filter IsSectionTemplateContent size
+    def countAllNonContainers(inDoc: NodeInfo) = getAllControlsWithIds(inDoc) filterNot IsContainer size
+    def countAllContainers(inDoc: NodeInfo) = getAllContainerControls(inDoc).size
+    def countAllControls(inDoc: NodeInfo) = countAllContainers(inDoc) + countAllNonContainers(inDoc) + countSectionTemplates(inDoc)
 
     // Whether it is possible to move an item into the given container
     // Currently: must be a section without section template content

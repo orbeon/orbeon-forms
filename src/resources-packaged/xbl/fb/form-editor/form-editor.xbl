@@ -38,7 +38,7 @@
                 <xf:action ev:event="#all" ev:propagate="stop"/>
 
                 <!-- Form settings dialog -->
-                <fb:dialog-form-settings id="dialog-form-settings" resources-ref="$form-resources" fr-resources-ref="$fr-resources">
+                <fb:dialog-form-settings id="dialog-form-settings" resources-ref="$form-resources" fr-resources-ref="$fr-resources" body-ref="$body">
                     <xf:action ev:event="fb-update-metadata">
                         <!-- Copy data to main instance -->
                         <xf:setvalue ref="xxf:bind('application-name-bind')" value="event('app')"/>

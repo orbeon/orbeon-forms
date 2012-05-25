@@ -423,14 +423,9 @@ object ControlOps {
     def getAllControlNamesXPath(inDoc: NodeInfo): SequenceIterator = getAllControlNames(inDoc)
 
     // Return all the controls in the view
-    def getAllControls(inDoc: NodeInfo) =
+    def getAllControlsWithIds(inDoc: NodeInfo) =
         findFRBodyElement(inDoc) \\ * filter
             (e ⇒ isIdForControl(e attValue "id"))
-
-    // TODO: Doesn't count non-repeated grids, but counts repeated grids?
-    // ⇒ This is because we don't provide ids for grids by default! We should.
-    // BUT we could also count containers and grid content, right?
-    def countAllControls(inDoc: NodeInfo) = getAllControls(inDoc).size
 
     // Get the control's resource holder
     def getControlResourceOrEmpty(controlId: String, resourceName: String) =

@@ -115,7 +115,7 @@
             <label>Set permissions</label>
         </permissions>
         <reload-components>
-            <label>Reload Controls</label>
+            <label>Reload Toolbox</label>
         </reload-components>
         <enter-label>
             <label>Click to add a label</label>
@@ -242,6 +242,13 @@
         <dialog-form-settings>
             <label>Form Settings</label>
             <open><label>Form settings</label></open>
+            <stats>Form statistics</stats>
+            <sections>Sections</sections>
+            <repeats>Repeats</repeats>
+            <grids>Grids</grids>
+            <section-templates>Section templates</section-templates>
+            <controls>Controls</controls>
+            <all>All</all>
         </dialog-form-settings>
         <dialog-control-details>
             <label>Edit Control Details</label>
@@ -928,7 +935,7 @@
             <label>Définir les permissions</label>
         </permissions>
         <reload-components>
-            <label>Recharger les contrôles</label>
+            <label>Recharger la boîte à outils</label>
         </reload-components>
         <enter-label>
             <label>cliquez pour entrer un libellé</label>
@@ -1049,6 +1056,13 @@
         <dialog-form-settings>
             <label>Paramètres du formulaire</label>
             <open><label>Paramètres du formulaire</label></open>
+            <stats>Statistiques du formulaire</stats>
+            <sections>Sections</sections>
+            <repeats>Grilles répétées</repeats>
+            <grids>Grilles</grids>
+            <section-templates>Modèles de sections</section-templates>
+            <controls>Contrôles</controls>
+            <all>Total</all>
         </dialog-form-settings>
         <dialog-control-details>
             <label>Détails du contrôle</label>
@@ -1853,6 +1867,13 @@
         <dialog-form-settings>
             <label>[Form Settings]</label>
             <open><label>[Form settings]</label></open>
+            <stats>[Form statistics</stats>
+            <sections>[Sections]</sections>
+            <repeats>[Repeats]</repeats>
+            <grids>[Grids]</grids>
+            <section-templates>[Section templates]</section-templates>
+            <controls>[Controls]</controls>
+            <all>[All]</all>
         </dialog-form-settings>
         <dialog-control-details>
             <label>Rediger elementdetaljer</label>
@@ -2656,6 +2677,13 @@
         <dialog-form-settings>
             <label>[Form Settings]</label>
             <open><label>[Form Settings]</label></open>
+            <stats>[Form statistics</stats>
+            <sections>[Sections]</sections>
+            <repeats>[Repeats]</repeats>
+            <grids>[Grids]</grids>
+            <section-templates>[Section templates]</section-templates>
+            <controls>[Controls]</controls>
+            <all>[All]</all>
         </dialog-form-settings>
         <dialog-control-details>
             <label>Настройки элемента</label>

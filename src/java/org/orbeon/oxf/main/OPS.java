@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010 Orbeon, Inc.
+ * Copyright (C) 2012 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -64,6 +64,7 @@ public class OPS {
     private String[] otherArgs;
 
     private ProcessorDefinition processorDefinition;
+    private String[] inputs;
 
     public OPS(String[] args) {
         // 1. Parse the command-line arguments
@@ -116,6 +117,16 @@ public class OPS {
             }
 
             processorDefinition.addInput("config", configURL);
+
+            // Add additional inputs if any
+            for (int i=0; inputs!=null && i < inputs.length; i ++) {
+                String input = inputs[i];
+                int iEqual = input.indexOf("=");
+                if (iEqual <= 0 || iEqual >= input.length() - 1) {
+                    throw new OXFException("Input \"" + input + "\" doesn't follow the syntax <name>=<url>");
+                }
+                processorDefinition.addInput(input.substring(0, iEqual ), input.substring(iEqual + 1));
+            }
         } else {
             throw new OXFException("No main processor definition found.");
         }
@@ -133,6 +144,11 @@ public class OPS {
             o.setRequired(false);
             options.addOption(o);
         }
+        {
+            final Option o = new Option("i", "input", true, "Map an input on a URL (<input name>=<URL>)");
+            o.setRequired(false);
+            options.addOption(o);
+        }
 
         try {
             // Parse the command line options
@@ -140,6 +156,8 @@ public class OPS {
 
             // Get resource manager root if any
             resourceManagerSandbox = cmd.getOptionValue('r');
+            // Get inputs if any
+            inputs = cmd.getOptionValues('i');
 
             // Check for remaining args
             otherArgs = cmd.getArgs();

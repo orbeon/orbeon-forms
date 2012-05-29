@@ -626,7 +626,7 @@ public class SoftCacheImpl {
     }
 
     public synchronized String dump() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         if (true) {
             for (Iterator it = elements(); it.hasNext();) {
                 Object o = it.next();
@@ -646,7 +646,7 @@ public class SoftCacheImpl {
     }
 
     private static String arrayToString(Object[] array) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < array.length; i++)
             sb.append("[element[").append(i).append("]=").append(array[i]).append("]");
         return sb.toString();

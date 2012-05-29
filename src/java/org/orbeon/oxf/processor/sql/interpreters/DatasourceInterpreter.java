@@ -10,7 +10,7 @@ import org.orbeon.oxf.xml.dom4j.LocationData;
  */
 public class DatasourceInterpreter extends SQLProcessor.InterpreterContentHandler {
 
-    private StringBuffer datasourceName;
+    private StringBuilder datasourceName;
 
     public DatasourceInterpreter(SQLProcessorInterpreterContext interpreterContext) {
         super(interpreterContext, false);
@@ -18,7 +18,7 @@ public class DatasourceInterpreter extends SQLProcessor.InterpreterContentHandle
 
     public void characters(char[] chars, int start, int length) {
         if (datasourceName == null)
-            datasourceName = new StringBuffer();
+            datasourceName = new StringBuilder();
         datasourceName.append(chars, start, length);
     }
 

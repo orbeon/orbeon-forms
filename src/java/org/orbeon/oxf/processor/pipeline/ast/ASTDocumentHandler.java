@@ -91,7 +91,7 @@ public class ASTDocumentHandler implements ASTHandler {
     }
 
     public void endHrefAggregate(ASTHrefAggregate hrefAggregate) {
-        StringBuffer result = new StringBuffer("aggregate('" + hrefAggregate.getRoot() + "'");
+        StringBuilder result = new StringBuilder("aggregate('" + hrefAggregate.getRoot() + "'");
 
         // Get arguments from stack
         List hrefs = new ArrayList();

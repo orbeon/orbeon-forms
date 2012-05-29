@@ -522,7 +522,7 @@ public class XFormsUtils {
         // TODO: this is wrong, must use regular URL resolution methods
         final InputStreamReader reader = new InputStreamReader(url.openStream());
         try {
-            final StringBuffer value = new StringBuffer();
+            final StringBuilder value = new StringBuilder();
             final char[] buff = new char[SRC_CONTENT_BUFFER_SIZE];
             int c;
             while ((c = reader.read(buff, 0, SRC_CONTENT_BUFFER_SIZE - 1)) != -1) value.append(buff, 0, c);

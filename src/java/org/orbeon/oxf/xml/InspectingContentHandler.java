@@ -227,7 +227,7 @@ public class InspectingContentHandler extends ForwardingXMLReceiver {
         }
 
         public String toString() {
-            final StringBuffer sb = new StringBuffer();
+            final StringBuilder sb = new StringBuilder();
 
             sb.append('[');
             sb.append("uri = ");

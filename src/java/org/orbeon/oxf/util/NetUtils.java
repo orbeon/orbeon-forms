@@ -552,7 +552,7 @@ public class NetUtils {
     }
 
     public static String headersToString(HttpServletRequest request) {
-        final StringBuffer sb = new StringBuffer();
+        final StringBuilder sb = new StringBuilder();
         for (Enumeration e = request.getHeaderNames(); e.hasMoreElements();) {
             final String name = (String) e.nextElement();
             sb.append(name);

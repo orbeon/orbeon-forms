@@ -102,7 +102,7 @@ public class SystemUtils {
             throws java.io.UnsupportedEncodingException {
         final TreeSet sysPths = new TreeSet();
         gatherSystemPaths(sysPths);
-        final StringBuffer sbuf = new StringBuffer();
+        final StringBuilder sbuf = new StringBuilder();
         final LinkedList urlLst = new LinkedList();
         for (ClassLoader cl = clazz.getClassLoader(); cl != null; cl = cl.getParent()) {
             if (!(cl instanceof java.net.URLClassLoader)) {

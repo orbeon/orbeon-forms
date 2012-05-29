@@ -136,7 +136,7 @@ public class XFormsModelSchemaValidator {
                 logger.warn(message);
             } else {
                 final String first = XMLUtils.toString(locators[0]);
-                final StringBuffer sb = new StringBuffer(first);
+                final StringBuilder sb = new StringBuilder(first);
                 for (int i = 1; i < locators.length; i++) {
                     sb.append(',');
                     final String locMsg = XMLUtils.toString(locators[i]);

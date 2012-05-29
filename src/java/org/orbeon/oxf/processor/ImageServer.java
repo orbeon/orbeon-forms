@@ -479,7 +479,7 @@ public class ImageServer extends ProcessorImpl {
 
     private String computePathNameHierarchical(String path) {
         StringTokenizer st = new StringTokenizer(path, "/\\:");
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         while (st.hasMoreElements()) {
             if (sb.length() > 0)
                 sb.append(File.separatorChar);

@@ -314,7 +314,7 @@ public class PipelineReader extends ProcessorImpl {
             char quoteType = 0;
 
             String rest = result.rest.substring(matcher.getMatch().endOffset(0));
-            StringBuffer xpath = new StringBuffer();
+            StringBuilder xpath = new StringBuilder();
 
             while(true) {
                 if (inString) {

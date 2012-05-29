@@ -384,8 +384,8 @@ public class JavaProcessor extends ProcessorImpl {
 
     private String buildClassPath(PipelineContext context) throws UnsupportedEncodingException {
 
-        StringBuffer classpath = new StringBuffer();
-        StringBuffer jarpath = new StringBuffer();
+        StringBuilder classpath = new StringBuilder();
+        StringBuilder jarpath = new StringBuilder();
 
         String propJarpath = getPropertySet().getString(JARPATH_PROPERTY);
         String propClasspath = getPropertySet().getString(CLASSPATH_PROPERTY);

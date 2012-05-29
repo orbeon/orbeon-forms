@@ -355,7 +355,7 @@ class TDOM4JXMLOutputter implements Cloneable {
 	 * @param indentSize <code>int</code> number of spaces in indentation.
 	 */
     public void setIndentSize(int indentSize) {
-		StringBuffer indentBuffer = new StringBuffer();
+		StringBuilder indentBuffer = new StringBuilder();
 		for (int i=0; i<indentSize; i++) {
 			indentBuffer.append(" ");
 		}
@@ -1154,7 +1154,7 @@ class TDOM4JXMLOutputter implements Cloneable {
 	 * @return <code>String</code> with escaped content.
 	 */
     protected String escapeAttributeEntities(String st) {
-		StringBuffer buff = new StringBuffer();
+		StringBuilder buff = new StringBuilder();
 		char[] block = st.toCharArray();
 		String stEntity = null;
 		int i, last;
@@ -1206,7 +1206,7 @@ class TDOM4JXMLOutputter implements Cloneable {
 	 * @return <code>String</code> with escaped content.
 	 */
     protected String escapeElementEntities(String st) {
-		StringBuffer buff = new StringBuffer();
+		StringBuilder buff = new StringBuilder();
 		char[] block = st.toCharArray();
 		String stEntity = null;
 		int i, last;

@@ -33,7 +33,7 @@ public class CacheUtils {
             return StringUtils.repeat(" ", INDENTATION * level) +
                     new Date((Long) validity).toString();
         } else if (validity instanceof List) {
-            StringBuffer result = new StringBuffer();
+            StringBuilder result = new StringBuilder();
             result.append(StringUtils.repeat(" ", INDENTATION * level));
             result.append("[\n");
             for (Iterator i = ((List) validity).iterator(); i.hasNext();) {

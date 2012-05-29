@@ -74,7 +74,7 @@ public class SAXStore extends ForwardingXMLReceiver implements Externalizable {
     private int attributeCountBufferPosition;
     private int attributeCount;
 
-    private List<String> stringBuffer = new ArrayList<String>();
+    private List<String> StringBuilder = new ArrayList<String>();
 
     private boolean hasDocumentLocator;
     private String publicId;
@@ -93,7 +93,7 @@ public class SAXStore extends ForwardingXMLReceiver implements Externalizable {
         public final int lineBufferPosition;
         public final int systemIdBufferPosition;
         public final int attributeCountBufferPosition;
-        public final int stringBufferPosition;
+        public final int StringBuilderPosition;
 
         private Mark() {
             id = null;
@@ -103,7 +103,7 @@ public class SAXStore extends ForwardingXMLReceiver implements Externalizable {
             this.lineBufferPosition = 0;
             this.systemIdBufferPosition = 0;
             this.attributeCountBufferPosition = 0;
-            this.stringBufferPosition = 0;
+            this.StringBuilderPosition = 0;
         }
 
         private Mark(final SAXStore store, final String id) {
@@ -114,7 +114,7 @@ public class SAXStore extends ForwardingXMLReceiver implements Externalizable {
             this.lineBufferPosition = store.lineBufferPosition;
             this.systemIdBufferPosition = store.systemIdBufferPosition;
             this.attributeCountBufferPosition = store.attributeCountBufferPosition;
-            this.stringBufferPosition = store.stringBuffer.size();
+            this.StringBuilderPosition = store.StringBuilder.size();
             
             rememberMark();
         }
@@ -128,7 +128,7 @@ public class SAXStore extends ForwardingXMLReceiver implements Externalizable {
             this.lineBufferPosition = values[i++];
             this.systemIdBufferPosition = values[i++];
             this.attributeCountBufferPosition = values[i++];
-            this.stringBufferPosition = values[i++];
+            this.StringBuilderPosition = values[i++];
             
             rememberMark();
         }
@@ -171,7 +171,7 @@ public class SAXStore extends ForwardingXMLReceiver implements Externalizable {
 
         {
             String previousString = null;
-            for (Iterator<String> i = stringBuffer.iterator(); i.hasNext();) {
+            for (Iterator<String> i = StringBuilder.iterator(); i.hasNext();) {
                 final String currentString = i.next();
                 // This is rough, but entries in the list could point to the same string, so we try to detect this case.
                 if (currentString != null && currentString != previousString)
@@ -227,7 +227,7 @@ public class SAXStore extends ForwardingXMLReceiver implements Externalizable {
         attributeCountBufferPosition = 0;
         attributeCountBuffer = new int[INITIAL_SIZE];
 
-        stringBuffer.clear();
+        StringBuilder.clear();
 
         locator = null;
     }
@@ -239,7 +239,7 @@ public class SAXStore extends ForwardingXMLReceiver implements Externalizable {
     public void replay(XMLReceiver xmlReceiver, Mark mark) throws SAXException {
         int intBufferPos = mark.intBufferPosition;
         int charBufferPos = mark.charBufferPosition;
-        int stringBufferPos = mark.stringBufferPosition;
+        int StringBuilderPos = mark.StringBuilderPosition;
         int attributeCountBufferPos = mark.attributeCountBufferPosition;
         final int[] lineBufferPos = { mark.lineBufferPosition } ;
         final int[] systemIdBufferPos = { mark.systemIdBufferPosition } ;
@@ -297,15 +297,15 @@ public class SAXStore extends ForwardingXMLReceiver implements Externalizable {
                     break;
                 }
                 case START_ELEMENT: {
-                    final String namespaceURI = stringBuffer.get(stringBufferPos++);
-                    final String localName = stringBuffer.get(stringBufferPos++);
-                    final String qName = stringBuffer.get(stringBufferPos++);
+                    final String namespaceURI = StringBuilder.get(StringBuilderPos++);
+                    final String localName = StringBuilder.get(StringBuilderPos++);
+                    final String qName = StringBuilder.get(StringBuilderPos++);
                     attributes.clear();
                     final int attributeCount = attributeCountBuffer[attributeCountBufferPos++];
                     for (int i = 0; i < attributeCount; i++) {
-                        attributes.addAttribute(stringBuffer.get(stringBufferPos++),
-                                stringBuffer.get(stringBufferPos++), stringBuffer.get(stringBufferPos++),
-                                stringBuffer.get(stringBufferPos++), stringBuffer.get(stringBufferPos++));
+                        attributes.addAttribute(StringBuilder.get(StringBuilderPos++),
+                                StringBuilder.get(StringBuilderPos++), StringBuilder.get(StringBuilderPos++),
+                                StringBuilder.get(StringBuilderPos++), StringBuilder.get(StringBuilderPos++));
                     }
                     xmlReceiver.startElement(namespaceURI, localName, qName, attributes);
                     elementLevel++;
@@ -319,9 +319,9 @@ public class SAXStore extends ForwardingXMLReceiver implements Externalizable {
                 }
                 case END_ELEMENT: {
                     elementLevel--;
-                    xmlReceiver.endElement(stringBuffer.get(stringBufferPos++),
-                            stringBuffer.get(stringBufferPos++),
-                            stringBuffer.get(stringBufferPos++));
+                    xmlReceiver.endElement(StringBuilder.get(StringBuilderPos++),
+                            StringBuilder.get(StringBuilderPos++),
+                            StringBuilder.get(StringBuilderPos++));
 
                     if (handleElementMark && elementLevel == 0) {
                         // Back to ground level, we are done!
@@ -335,7 +335,7 @@ public class SAXStore extends ForwardingXMLReceiver implements Externalizable {
                     break;
                 }
                 case END_PREFIX_MAPPING: {
-                    xmlReceiver.endPrefixMapping(stringBuffer.get(stringBufferPos++));
+                    xmlReceiver.endPrefixMapping(StringBuilder.get(StringBuilderPos++));
                     break;
                 }
                 case IGN_WHITESPACE: {
@@ -345,17 +345,17 @@ public class SAXStore extends ForwardingXMLReceiver implements Externalizable {
                     break;
                 }
                 case PI: {
-                    xmlReceiver.processingInstruction(stringBuffer.get(stringBufferPos++),
-                            stringBuffer.get(stringBufferPos++));
+                    xmlReceiver.processingInstruction(StringBuilder.get(StringBuilderPos++),
+                            StringBuilder.get(StringBuilderPos++));
                     break;
                 }
                 case SKIPPED_ENTITY: {
-                    xmlReceiver.skippedEntity(stringBuffer.get(stringBufferPos++));
+                    xmlReceiver.skippedEntity(StringBuilder.get(StringBuilderPos++));
                     break;
                 }
                 case START_PREFIX_MAPPING: {
-                    xmlReceiver.startPrefixMapping(stringBuffer.get(stringBufferPos++),
-                            stringBuffer.get(stringBufferPos++));
+                    xmlReceiver.startPrefixMapping(StringBuilder.get(StringBuilderPos++),
+                            StringBuilder.get(StringBuilderPos++));
                     break;
                 }
                 case COMMENT: {
@@ -454,9 +454,9 @@ public class SAXStore extends ForwardingXMLReceiver implements Externalizable {
 
         addToEventBuffer(END_ELEMENT);
         addLocation();
-        stringBuffer.add(uri);
-        stringBuffer.add(localname);
-        stringBuffer.add(qName);
+        StringBuilder.add(uri);
+        StringBuilder.add(localname);
+        StringBuilder.add(qName);
 
         super.endElement(uri, localname, qName);
     }
@@ -466,7 +466,7 @@ public class SAXStore extends ForwardingXMLReceiver implements Externalizable {
 
         addToEventBuffer(END_PREFIX_MAPPING);
         // NOTE: We don't keep location data for this event as it is very unlikely to be used
-        stringBuffer.add(s);
+        StringBuilder.add(s);
 
         super.endPrefixMapping(s);
     }
@@ -488,8 +488,8 @@ public class SAXStore extends ForwardingXMLReceiver implements Externalizable {
 
         addToEventBuffer(PI);
         addLocation();
-        stringBuffer.add(s);
-        stringBuffer.add(s1);
+        StringBuilder.add(s);
+        StringBuilder.add(s1);
 
         super.processingInstruction(s, s1);
     }
@@ -506,7 +506,7 @@ public class SAXStore extends ForwardingXMLReceiver implements Externalizable {
 
         addToEventBuffer(SKIPPED_ENTITY);
         addLocation();
-        stringBuffer.add(s);
+        StringBuilder.add(s);
 
         super.skippedEntity(s);
     }
@@ -530,9 +530,9 @@ public class SAXStore extends ForwardingXMLReceiver implements Externalizable {
             if (publicId == null && locator.getPublicId() != null)
                 publicId = locator.getPublicId();
         }
-        stringBuffer.add(uri);
-        stringBuffer.add(localname);
-        stringBuffer.add(qName);
+        StringBuilder.add(uri);
+        StringBuilder.add(localname);
+        StringBuilder.add(qName);
 
         addToAttributeBuffer(attributes);
 
@@ -544,8 +544,8 @@ public class SAXStore extends ForwardingXMLReceiver implements Externalizable {
 
         addToEventBuffer(START_PREFIX_MAPPING);
         // NOTE: We don't keep location data for this event as it is very unlikely to be used
-        stringBuffer.add(s);
-        stringBuffer.add(s1);
+        StringBuilder.add(s);
+        StringBuilder.add(s1);
 
         super.startPrefixMapping(s, s1);
     }
@@ -683,11 +683,11 @@ public class SAXStore extends ForwardingXMLReceiver implements Externalizable {
             attributeCountBuffer[attributeCountBufferPosition++] = count;
             attributeCount += count;
             for (int i = 0; i < attributes.getLength(); i++) {
-                stringBuffer.add(attributes.getURI(i));
-                stringBuffer.add(attributes.getLocalName(i));
-                stringBuffer.add(attributes.getQName(i));
-                stringBuffer.add(attributes.getType(i));
-                stringBuffer.add(attributes.getValue(i));
+                StringBuilder.add(attributes.getURI(i));
+                StringBuilder.add(attributes.getLocalName(i));
+                StringBuilder.add(attributes.getQName(i));
+                StringBuilder.add(attributes.getType(i));
+                StringBuilder.add(attributes.getValue(i));
             }
         }
     }
@@ -719,9 +719,9 @@ public class SAXStore extends ForwardingXMLReceiver implements Externalizable {
         for (int i = 0; i < attributeCountBufferPosition; i++)
             out.writeInt(attributeCountBuffer[i]);
 
-        out.writeInt(stringBuffer.size());
-        for (int i = 0; i < stringBuffer.size(); i++)
-            out.writeObject(stringBuffer.get(i));
+        out.writeInt(StringBuilder.size());
+        for (int i = 0; i < StringBuilder.size(); i++)
+            out.writeObject(StringBuilder.get(i));
 
         out.writeBoolean(hasDocumentLocator);
         out.writeObject(publicId == null ? "" : publicId);
@@ -738,7 +738,7 @@ public class SAXStore extends ForwardingXMLReceiver implements Externalizable {
                 out.writeInt(mark.lineBufferPosition);
                 out.writeInt(mark.systemIdBufferPosition);
                 out.writeInt(mark.attributeCountBufferPosition);
-                out.writeInt(mark.stringBufferPosition);
+                out.writeInt(mark.StringBuilderPosition);
             }
         }
 
@@ -782,9 +782,9 @@ public class SAXStore extends ForwardingXMLReceiver implements Externalizable {
             attributeCount += count;
         }
 
-        final int stringBufferSize = in.readInt();
-        for (int i = 0; i < stringBufferSize; i++)
-            stringBuffer.add((String) in.readObject());
+        final int StringBuilderSize = in.readInt();
+        for (int i = 0; i < StringBuilderSize; i++)
+            StringBuilder.add((String) in.readObject());
 
         hasDocumentLocator = in.readBoolean();
         publicId = (String) in.readObject();

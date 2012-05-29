@@ -107,7 +107,7 @@ public class CacheProcessor extends ProcessorImpl {
             CachedValidity validity =  (CachedValidity) readCacheInputAsObject
                     (context, getInputByName(INPUT_VALIDITY), new CacheableInputReader() {
                 public Object read(PipelineContext context, ProcessorInput input) {
-                    final StringBuffer validityBuffer = new StringBuffer();
+                    final StringBuilder validityBuffer = new StringBuilder();
                     final CachedValidity cachedValidity = new CachedValidity();
                     readInputAsSAX(context, input, new XMLReceiverAdapter() {
                         Locator locator;

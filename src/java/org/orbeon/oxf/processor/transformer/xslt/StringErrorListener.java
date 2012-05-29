@@ -32,7 +32,7 @@ public class StringErrorListener implements ErrorListener {
     private Logger logger;
     private boolean hasErrors;
     private List<LocationData> errorLocationData;
-    private StringBuffer messages = new StringBuffer();
+    private StringBuilder messages = new StringBuilder();
 
     public StringErrorListener(Logger logger) {
         this.logger = logger;

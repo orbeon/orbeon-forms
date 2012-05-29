@@ -188,12 +188,12 @@ public class InstanceData {// rename to DataNodeProperties once done
     }
 
     public String getInvalidBindIds() {
-        StringBuffer sb = null;
+        StringBuilder sb = null;
         if (bindNodes != null && bindNodes.size() > 0)
             for (final XFormsModelBinds.BindNode bindNode : bindNodes)
                 if (bindNode.isValid() != Model.DEFAULT_VALID()) {
                     if (sb == null)
-                        sb = new StringBuffer();
+                        sb = new StringBuilder();
                     else if (sb.length() > 0)
                         sb.append(' ');
 

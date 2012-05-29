@@ -61,14 +61,14 @@ public class ZipProcessor extends ProcessorImpl {
                         readInputAsSAX(context, INPUT_DATA, new XMLReceiverAdapter() {
 
                             String name;
-                            StringBuffer uri;
+                            StringBuilder uri;
 
                             // Get the file name, store it
                             @Override
                             public void startElement(String namespaceURI, String localName, String qName, Attributes atts) throws SAXException {
                                 if ("file".equals(localName)) {
                                     name = atts.getValue("name");
-                                    uri = new StringBuffer();
+                                    uri = new StringBuilder();
                                 } else if ("files".equals(localName)) {
                                     fileName = atts.getValue("filename");
                                     String value = atts.getValue("status-code");

@@ -156,7 +156,7 @@ public class ImportResourceTask extends Task {
     }
 
     protected String pathToKey(String path) throws IOException {
-        StringBuffer buff = new StringBuffer(path);
+        StringBuilder buff = new StringBuilder(path);
 
         // remove parent dir
         buff.delete(0, new File(getInDir()).getCanonicalPath().toString().length());
@@ -188,7 +188,7 @@ public class ImportResourceTask extends Task {
                     File file = (File) keys.get(key);
 
                     stmt = connection.createStatement();
-                    StringBuffer sqlInsert = new StringBuffer();
+                    StringBuilder sqlInsert = new StringBuilder();
                     sqlInsert.append("INSERT INTO ").append(getTable());
                     sqlInsert.append(" (");
                     sqlInsert.append(KEY_NAME).append(',');
@@ -200,7 +200,7 @@ public class ImportResourceTask extends Task {
                     stmt.executeUpdate(sqlInsert.toString());
 
                     connection.setAutoCommit(false);
-                    StringBuffer sqlSelect = new StringBuffer();
+                    StringBuilder sqlSelect = new StringBuilder();
                     sqlSelect.append("SELECT ").append(XML_NAME);
                     sqlSelect.append(" FROM ").append(getTable());
                     sqlSelect.append(" WHERE ").append(KEY_NAME);

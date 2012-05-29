@@ -157,13 +157,9 @@ abstract class AbstractRewrite extends ProcessorImpl {
     static class RewriteState extends State2 {
 
         /**
-         * Used to accumulate characters from characters event. Lazily init'd in characters. Btw we use
-         * CharacterBuffer instead of StringBuffer because :
+         * Used to accumulate characters from characters event. Lazily init'd in characters.
          *
-         * o We want something that works in JDK 1.4.
-         * o We don't want the performance penalty of StringBuffer's synchronization in JDK 1.5.
-         *
-         * Btw if we didn't care about 1.4 we could use StringBuilder instead.
+         * NOTE: We use CharBuffer for historical reasons. Since we support Java 1.5 and up, we could use StringBuilder.
          */
         private java.nio.CharBuffer charactersBuf;
 

@@ -55,7 +55,7 @@ public class QueryInterpreter extends SQLProcessor.InterpreterContentHandler {
 
     private int type;
 
-    private StringBuffer query;
+    private StringBuilder query;
     private List queryParameters;
     private boolean hasReplaceOrSeparator;
     private Iterator nodeIterator;
@@ -68,7 +68,7 @@ public class QueryInterpreter extends SQLProcessor.InterpreterContentHandler {
 
     public void characters(char[] chars, int start, int length) throws SAXException {
         if (query == null)
-            query = new StringBuffer();
+            query = new StringBuilder();
         query.append(chars, start, length);
     }
 
@@ -77,7 +77,7 @@ public class QueryInterpreter extends SQLProcessor.InterpreterContentHandler {
         if (SQLProcessor.SQL_NAMESPACE_URI.equals(uri)) {
             if (localname.equals("param") || localname.equals("parameter")) {
                 if (query == null)
-                    query = new StringBuffer();
+                    query = new StringBuilder();
                 // Add parameter information
                 String direction = attributes.getValue("direction");
                 String type = attributes.getValue("type");
@@ -234,9 +234,9 @@ public class QueryInterpreter extends SQLProcessor.InterpreterContentHandler {
                     getInterpreterContext().pushFunctions(functions);
 
                     // Replace inline parameters
-                    StringBuffer replacedQuery = query;
+                    StringBuilder replacedQuery = query;
                     if (hasReplaceOrSeparator) {
-                        replacedQuery = new StringBuffer();
+                        replacedQuery = new StringBuilder();
                         String queryString = query.toString();
                         int firstIndex = 0;
                         for (Iterator i = queryParameters.iterator(); i.hasNext();) {

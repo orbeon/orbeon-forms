@@ -51,7 +51,7 @@ public class GetterInterpreter extends SQLProcessor.InterpreterContentHandler {
     private String getColumnsPrefix;
     private boolean getColumnsAllElements;
     private boolean inExclude;
-    private StringBuffer getColumnsCurrentExclude;
+    private StringBuilder getColumnsCurrentExclude;
     private Map getColumnsExcludes;
 
     public GetterInterpreter(SQLProcessorInterpreterContext interpreterContext) {
@@ -262,7 +262,7 @@ public class GetterInterpreter extends SQLProcessor.InterpreterContentHandler {
             // Collect excludes
             if (getColumnsExcludes == null)
                 getColumnsExcludes = new HashMap();
-            getColumnsCurrentExclude = new StringBuffer();
+            getColumnsCurrentExclude = new StringBuilder();
             inExclude = true;
         }
     }

@@ -35,7 +35,7 @@ public class AttributeInterpreter extends SQLProcessor.InterpreterContentHandler
 
     private DeferredXMLReceiver savedOutput;
     private String attributeName;
-    private StringBuffer content;
+    private StringBuilder content;
 
     public AttributeInterpreter(SQLProcessorInterpreterContext interpreterContext) {
         super(interpreterContext, false);
@@ -52,7 +52,7 @@ public class AttributeInterpreter extends SQLProcessor.InterpreterContentHandler
         getInterpreterContext().setOutput(new DeferredXMLReceiverImpl(new XMLReceiverAdapter() {
             public void characters(char ch[], int start, int length) {
                 if (content == null)
-                    content = new StringBuffer();
+                    content = new StringBuilder();
                 content.append(ch, start, length);
             }
         }));

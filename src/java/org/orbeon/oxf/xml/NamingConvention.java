@@ -42,7 +42,7 @@ public class NamingConvention {
         if (lastDollar != -1)
             javaName = javaName.substring(lastDollar + 1);
 
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
         for (int i = 0; i < javaName.length(); i++) {
             // ASTWhen switch from lower to upper, add a dash before upper.
             if (i > 0  && Character.isLowerCase(javaName.charAt(i - 1))

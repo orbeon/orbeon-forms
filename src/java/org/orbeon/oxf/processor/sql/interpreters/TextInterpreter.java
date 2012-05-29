@@ -22,7 +22,7 @@ import org.xml.sax.SAXException;
  *
  */
 public class TextInterpreter extends SQLProcessor.InterpreterContentHandler {
-    private StringBuffer text;
+    private StringBuilder text;
 
     public TextInterpreter(SQLProcessorInterpreterContext interpreterContext) {
         super(interpreterContext, false);
@@ -30,7 +30,7 @@ public class TextInterpreter extends SQLProcessor.InterpreterContentHandler {
 
     public void characters(char[] chars, int start, int length) throws SAXException {
         if (text == null)
-            text = new StringBuffer();
+            text = new StringBuilder();
         text.append(chars, start, length);
     }
 

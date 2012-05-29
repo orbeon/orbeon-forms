@@ -142,7 +142,7 @@ public class XQueryProcessor extends ProcessorImpl {
                         // (see https://forums.oracle.com/forums/thread.jspa?messageID=10338407#10338407)
                         Driver driver = (Driver) Class.forName(config.getJDBCImplementation()).newInstance();
                         Connection conn = driver.connect(config.jdbc.url, null);
-                        StringBuffer xquery = new StringBuffer("SELECT * from XMLTable('" + config.query.replaceAll("'", "''") + "' ");
+                        StringBuilder xquery = new StringBuilder("SELECT * from XMLTable('" + config.query.replaceAll("'", "''") + "' ");
                         Iterator<ConfigContainer.Config.NameValuePair> iter = config.parameter.iterator();
                         int i = 1;
                         while (iter.hasNext()) {

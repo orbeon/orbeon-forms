@@ -871,7 +871,7 @@ public class XMLUtils {
     }
 
     private static String nZeros(int n) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < n; i++)
             sb.append('0');
         return sb.toString();

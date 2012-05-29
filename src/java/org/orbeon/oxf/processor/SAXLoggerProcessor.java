@@ -207,7 +207,7 @@ public class SAXLoggerProcessor extends ProcessorImpl {
         }
 
         private String getLogSpaces() {
-            final StringBuffer sb = new StringBuffer();
+            final StringBuilder sb = new StringBuilder();
             for (int i = 0; i < level; i++)
                 sb.append(" ");
             return sb.toString();

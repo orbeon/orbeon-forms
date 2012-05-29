@@ -198,7 +198,7 @@ public class Utils {
                             try {
                                 List strings = (List) args.get(0);
                                 String pattern = (String) Dom4jUtils.createXPath("string(.)").evaluate(args.get(1));
-                                StringBuffer result = new StringBuffer();
+                                StringBuilder result = new StringBuilder();
                                 boolean isFirst = true;
                                 for (Iterator i = strings.iterator(); i.hasNext();) {
                                     if (! isFirst) result.append(pattern); else isFirst = false;
@@ -344,7 +344,7 @@ public class Utils {
     public static String xpathObjectToString(Object xpathObject) {
         List list = xpathObject instanceof List ? (List) xpathObject
                 : Collections.singletonList(xpathObject);
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
         for (Iterator i = list.iterator(); i.hasNext();) {
             Object object = i.next();
             buffer.append(object instanceof Node ? Dom4jUtils.nodeToString((Node) object) : object.toString());

@@ -32,7 +32,7 @@ public class ObjectReceiver implements XMLReceiver {
     private XMLReceiver currentReceiver = null;
     private Field currentField = null;
     private Class currentMemberType = null;
-    private StringBuffer buffer = null;
+    private StringBuilder buffer = null;
     private int level = 0;
 
     public void setDocumentLocator(Locator locator) {
@@ -209,7 +209,7 @@ public class ObjectReceiver implements XMLReceiver {
         if (currentReceiver != null) {
             currentReceiver.characters(chars, i, i1);
         } else if (buffer == null) {
-            buffer = new StringBuffer(new String(chars, i, i1));
+            buffer = new StringBuilder(new String(chars, i, i1));
         } else {
             buffer.append(chars, i, i1);
         }

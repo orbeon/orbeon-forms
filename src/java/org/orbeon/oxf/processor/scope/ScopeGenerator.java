@@ -24,7 +24,6 @@ import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.impl.DigestState;
 import org.orbeon.oxf.processor.impl.DigestTransformerOutputImpl;
-import org.orbeon.oxf.util.ISODateUtils;
 import org.orbeon.oxf.xml.SAXStore;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -149,7 +148,7 @@ public class ScopeGenerator extends ScopeProcessorBase {
             final SAXStore result = new SAXStore();
             if (value instanceof String) {
                 // Creating a stream from the String! Better to extend the ProcessorUtils class to support String or StringReader or something...
-                ProcessorUtils.readText((String) value, result, contentType, ISODateUtils.getCurrentTimeMillis());
+                ProcessorUtils.readText((String) value, result, contentType, System.currentTimeMillis());
             } else {
                 logger.error("Content-type: " + ScopeProcessorBase.TEXT_PLAIN + " not applicable for key: " + key);
                 XMLUtils.streamNullDocument(result);

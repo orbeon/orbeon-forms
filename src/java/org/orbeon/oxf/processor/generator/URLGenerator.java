@@ -903,7 +903,7 @@ public class URLGenerator extends ProcessorImpl {
                     newHeaders = new HashMap<String, String[]>();
                     if (config.getHeaderNameValues() != null)
                         newHeaders.putAll(config.getHeaderNameValues());
-                    newHeaders.put("If-Modified-Since", new String[] { ISODateUtils.getRFC1123Date(lastModified) });
+                    newHeaders.put("If-Modified-Since", new String[] { DateUtils.format(lastModified, DateUtils.RFC1123Date()) });
                 } else {
                     // Regular GET
                     newHeaders = config.getHeaderNameValues();

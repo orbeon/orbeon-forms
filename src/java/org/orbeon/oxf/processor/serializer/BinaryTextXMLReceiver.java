@@ -19,7 +19,7 @@ import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.util.Base64XMLReceiver;
-import org.orbeon.oxf.util.ISODateUtils;
+import org.orbeon.oxf.util.DateUtils;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.TextXMLReceiver;
 import org.orbeon.oxf.xml.XMLConstants;
@@ -141,7 +141,7 @@ public class BinaryTextXMLReceiver extends XMLReceiverAdapter {
             if (StringUtils.isNotBlank(validityAttribute)) {
                 // Override caching settings which may have taken place before
                 if (response != null)
-                    response.setPageCaching(ISODateUtils.parseRFC1123Date(validityAttribute));
+                    response.setPageCaching(DateUtils.parseRFC1123(validityAttribute));
             }
 
             // Set filename if available

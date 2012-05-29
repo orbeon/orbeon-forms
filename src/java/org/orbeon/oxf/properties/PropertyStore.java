@@ -18,7 +18,7 @@ import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.QName;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.util.ISODateUtils;
+import org.orbeon.oxf.util.DateUtils;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
@@ -152,7 +152,8 @@ public class PropertyStore {
 
     public static class DateConverter implements Converter {
         public Object convert(final String value, final Element element) {
-            return ISODateUtils.parseDate(value);
+            // NOTE: Not sure if we ever use dates in properties as of 2012-05-29
+            return new Date(DateUtils.parse(value));
         }
     }
 

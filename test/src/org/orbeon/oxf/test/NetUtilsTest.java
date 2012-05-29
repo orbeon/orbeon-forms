@@ -22,7 +22,7 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorUtils;
 import org.orbeon.oxf.processor.test.TestExternalContext;
-import org.orbeon.oxf.util.ISODateUtils;
+import org.orbeon.oxf.util.DateUtils;
 import org.orbeon.oxf.util.NetUtils;
 
 import java.util.HashMap;
@@ -54,7 +54,7 @@ public class NetUtilsTest extends ResourceManagerTestBase {
 
         // Get long value for If-Modified-Since present in request
         final String ifModifiedHeaderString = "Thu, 28 Jun 2007 14:17:36 GMT";
-        final long ifModifiedHeaderLong = ISODateUtils.parseRFC1123Date(ifModifiedHeaderString);
+        final long ifModifiedHeaderLong = DateUtils.parseRFC1123(ifModifiedHeaderString);
 
         final ExternalContext.Request request = new RequestAdapter() {
             @Override

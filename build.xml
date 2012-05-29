@@ -80,6 +80,7 @@
         <include name="commons-logging-1.1.1.jar"/>
         <include name="commons-pool-1.5.4.jar"/>
         <include name="commons-validator-1_0_2.jar"/>
+        <include name="joda-time-2.1.jar"/>
 
         <include name="httpclient-4.1.jar"/>
         <!--<include name="httpclient-cache-4.1.jar"/>-->

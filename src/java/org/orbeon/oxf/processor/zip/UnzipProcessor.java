@@ -18,9 +18,11 @@ import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
-import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.processor.ProcessorImpl;
+import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
+import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.processor.serializer.BinaryTextXMLReceiver;
-import org.orbeon.oxf.util.ISODateUtils;
+import org.orbeon.oxf.util.DateUtils;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.xml.sax.SAXException;
@@ -30,7 +32,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Date;
 import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -67,7 +68,7 @@ public class UnzipProcessor extends ProcessorImpl {
                         // Get file name
                         String fileName = zipEntry.getName();
                         long fileSize = zipEntry.getSize();
-                        String fileTime = ISODateUtils.XS_DATE_TIME.format(new Date(zipEntry.getTime()));
+                        String fileTime = DateUtils.format(zipEntry.getTime(), DateUtils.XsDateTime());
 
                         InputStream entryInputStream = zipFile.getInputStream(zipEntry);
                         String uri = NetUtils.inputStreamToAnyURI(entryInputStream, NetUtils.REQUEST_SCOPE);

@@ -23,7 +23,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.processor.generator.URLGenerator;
 import org.orbeon.oxf.resources.URLFactory;
-import org.orbeon.oxf.util.ISODateUtils;
+import org.orbeon.oxf.util.DateUtils;
 import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -237,7 +237,7 @@ public class ProcessorUtils {
             if (fileName != null)
                 attributes.addAttribute("", "filename", "filename", "CDATA", fileName);
             if (lastModified != null)
-                attributes.addAttribute("", "last-modified", "last-modified", "CDATA", ISODateUtils.getRFC1123Date(lastModified));
+                attributes.addAttribute("", "last-modified", "last-modified", "CDATA", DateUtils.format(lastModified, DateUtils.RFC1123Date()));
             if (statusCode > 0)
                 attributes.addAttribute("", "status-code", "status-code", "CDATA", Integer.toString(statusCode));
 

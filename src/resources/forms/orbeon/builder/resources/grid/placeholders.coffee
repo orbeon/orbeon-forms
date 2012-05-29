@@ -86,6 +86,15 @@ $ ->
     currentSeqNo = (element) ->
         form = f$.closest 'form', element
         parseInt Document.getFromClientState (f$.attr 'id', form), "sequence"
+    # A way of setting the focus that works for IE
+    # See: http://wiki.orbeon.com/forms/doc/contributor-guide/browser?pli=1#TOC-Setting-the-focus-on-IE
+    setFocus = (element) ->
+        deferred = $.Deferred()
+        do setFocusWorker = ->
+            f$.focus element
+            focusSet = document.activeElement == element[0]
+            if focusSet then deferred.resolve() else _.defer setFocusWorker
+        deferred
 
     # Events
     mouseEntersGridTd = (f) -> Builder.mouseEntersGridTdEvent.subscribe ({gridTd}) -> f $ gridTd
@@ -150,7 +159,9 @@ $ ->
             input = editableEditInput element
             f$.append input, f$.empty editablePlaceholderContainer element
             f$.show input
-            f$.focus f$.find 'input', input
+            htmlInput = f$.find 'input', input
+            saveButton = $ '#fr-save-button button'
+            (setFocus saveButton).then -> setFocus htmlInput
         endEdit: (element) ->
             input = editableEditInput element
             f$.append input, $ '.fb-cell-editor'                                                                        # Move editor out of grid, so it doesn't get removed by HTML replacements

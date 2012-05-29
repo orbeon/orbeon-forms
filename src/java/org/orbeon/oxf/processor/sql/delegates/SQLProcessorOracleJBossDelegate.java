@@ -26,30 +26,30 @@ import java.sql.*;
 /**
  * Custom Delegate for Oracle / JBoss.
  */
-public class SQLProcessorOracleJBossDelegate  extends SQLProcessorOracleDelegateBase implements DatabaseDelegate {
+public class SQLProcessorOracleJBossDelegate extends SQLProcessorOracleDelegateBase implements DatabaseDelegate {
 
     protected OraclePreparedStatement getOraclePreparedStatement(PreparedStatement stmt) {
-       
+
         if (stmt instanceof OraclePreparedStatement)
             return (OraclePreparedStatement) stmt;
         else {
-			try {
-				return (OraclePreparedStatement) ((WrappedPreparedStatement) stmt).getUnderlyingStatement();
-			} catch (SQLException e) {
+            try {
+                return (OraclePreparedStatement) ((WrappedPreparedStatement) stmt).getUnderlyingStatement();
+            } catch (SQLException e) {
                 throw new OXFException(e);
-			}
+            }
         }
     }
 
     protected OracleResultSet getOracleResultSet(ResultSet resultSet) {
-       
+
         if (resultSet instanceof OracleResultSet)
             return (OracleResultSet) resultSet;
-		else
-			try {
-				return (OracleResultSet) ((WrappedResultSet) resultSet).getUnderlyingResultSet();
-			} catch (SQLException e) {
+        else
+            try {
+                return (OracleResultSet) ((WrappedResultSet) resultSet).getUnderlyingResultSet();
+            } catch (SQLException e) {
                 throw new OXFException(e);
-			}
+            }
     }
 }

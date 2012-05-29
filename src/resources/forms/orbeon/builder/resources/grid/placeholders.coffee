@@ -131,48 +131,49 @@ $ ->
         (currentSeqNo element) == storeSeqNo + 1
 
     # Actions
-    removeFor = (element) -> f$.removeAttr 'for', element                                                               # So on click on the label, the focus isn't set on the input on click
-    showPlaceholder = (element) ->
-        f$.addClass 'fb-label-hint-placeholder', element
-        placeholderText = Controls.getCurrentValue _.first editablePlaceholderOutput element
-        f$.text placeholderText, editablePlaceholderContainer element
-    hidePlaceholder = (element) ->
-        f$.removeClass 'fb-label-hint-placeholder', element
-        f$.text '', editablePlaceholderContainer element
-    createMock = editableDo 'createMock'
-    removeMock = editableDo 'removeMock'
-    storeSeqNo = (element) -> f$.data 'seqNo', (currentSeqNo element), element
-    startEdit = (element) ->
-        Builder.beforeAddingEditorCallbacks.fire element
-        f$.removeClass 'fb-label-hint-placeholder', element
-        f$.removeClass 'xforms-disabled', element                                                                       # Remove disabled which we have on hint when their value is empty
-        input = editableEditInput element
-        f$.append input, f$.empty editablePlaceholderContainer element
-        f$.show input
-        f$.focus f$.find 'input', input
-    endEdit = (element) ->
-        input = editableEditInput element
-        f$.append input, $ '.fb-cell-editor'                                                                            # Move editor out of grid, so it doesn't get removed by HTML replacements
-        newValue = Controls.getCurrentValue input[0]
-        f$.text newValue, editableInitialValue element                                                                  # Restore text under label/hint
-    fireEditDone = -> editDoneCallbacks.fire()
+    actions =
+        removeFor: (element) -> f$.removeAttr 'for', element                                                            # So on click on the label, the focus isn't set on the input on click
+        showPlaceholder: (element) ->
+            f$.addClass 'fb-label-hint-placeholder', element
+            placeholderText = Controls.getCurrentValue _.first editablePlaceholderOutput element
+            f$.text placeholderText, editablePlaceholderContainer element
+        hidePlaceholder: (element) ->
+            f$.removeClass 'fb-label-hint-placeholder', element
+            f$.text '', editablePlaceholderContainer element
+        createMock: editableDo 'createMock'
+        removeMock: editableDo 'removeMock'
+        storeSeqNo: (element) -> f$.data 'seqNo', (currentSeqNo element), element
+        startEdit: (element) ->
+            Builder.beforeAddingEditorCallbacks.fire element
+            f$.removeClass 'fb-label-hint-placeholder', element
+            f$.removeClass 'xforms-disabled', element                                                                   # Remove disabled which we have on hint when their value is empty
+            input = editableEditInput element
+            f$.append input, f$.empty editablePlaceholderContainer element
+            f$.show input
+            f$.focus f$.find 'input', input
+        endEdit: (element) ->
+            input = editableEditInput element
+            f$.append input, $ '.fb-cell-editor'                                                                        # Move editor out of grid, so it doesn't get removed by HTML replacements
+            newValue = Controls.getCurrentValue input[0]
+            f$.text newValue, editableInitialValue element                                                              # Restore text under label/hint
+        fireEditDone: -> editDoneCallbacks.fire()
 
     # Finite state machine description
     # Diagram: https://docs.google.com/a/orbeon.com/drawings/d/1cJ0B3Tl7QRTMkVUbtlA55C0TUvRiOt5hzR8-dc-aBrk/edit
     transitions = [
-        { events: [ mouseEntersGridTd ],      elements: elementsInContainer,  from: [ 'initial' ],                          conditions: [ isEmpty ],                        to: 'placeholder',              actions: [ removeFor, createMock, showPlaceholder ]  }
-        { events: [ mouseEntersGridTd ],      elements: elementsInContainer,  from: [ 'initial' ],                          conditions: [ isNonEmpty ],                     to: 'mock',                     actions: [ removeFor, createMock ]                   }
-        { events: [ mouseExistsGridTd ],      elements: elementsInContainer,  from: [ 'mock' ],                                                                             to: 'initial',                  actions: [ removeMock ]                              }
-        { events: [ mouseExistsGridTd ],      elements: elementsInContainer,  from: [ 'placeholder' ],                                                                      to: 'initial',                  actions: [ hidePlaceholder, removeMock  ]            }
-        { events: [ click ],                  elements: elementClosest,       from: [ 'placeholder', 'mock' ],                                                              to: 'wait-xhr-to-edit',         actions: [ storeSeqNo ]                              }
-        { events: [ controlAdded ],           elements: elementsAll,          from: [ 'edit' ],                                                                             to: 'edit-done',                actions: [ endEdit, removeMock, fireEditDone ]        }
-        { events: [ controlAdded ],           elements: labelsInContainer,    from: [ 'initial' ],                                                                          to: 'edit',                     actions: [ removeFor, createMock, startEdit ]        }
-        { events: [ ajaxResponse ],           elements: elementsAll,          from: [ 'wait-xhr-to-edit' ],                 conditions: [ isNextSeqNo ],                    to: 'edit',                     actions: [ startEdit ]                               }
-        { events: [ enterKey, lostFocus ],    elements: elementClosest,       from: [ 'edit' ],                                                                             to: 'edit-done',                actions: [ endEdit, removeMock, fireEditDone ]       }
-        { events: [ editDone ],               elements: elementsAll,          from: [ 'edit-done' ],                        conditions: [ pointerOutsideCell ],             to: 'initial'                                                                        }
-        { events: [ editDone ],               elements: elementsAll,          from: [ 'edit-done' ],                        conditions: [ pointerInsideCell, isEmpty ],     to: 'placeholder-after-edit',   actions: [ storeSeqNo, createMock, showPlaceholder ] }
-        { events: [ editDone ],               elements: elementsAll,          from: [ 'edit-done' ],                        conditions: [ pointerInsideCell, isNonEmpty ],  to: 'mock',                     actions: [ createMock ]                              }
-        { events: [ ajaxResponse ],           elements: elementsAll,          from: [ 'placeholder-after-edit' ],           conditions: [ isNextSeqNo ],                    to: 'placeholder',              actions: [ showPlaceholder ]                         }
+        { events: [ mouseEntersGridTd ],      elements: elementsInContainer,  from: [ 'initial' ],                          conditions: [ isEmpty ],                        to: 'placeholder',              actions: [ 'removeFor', 'createMock', 'showPlaceholder' ]   }
+        { events: [ mouseEntersGridTd ],      elements: elementsInContainer,  from: [ 'initial' ],                          conditions: [ isNonEmpty ],                     to: 'mock',                     actions: [ 'removeFor', 'createMock' ]                      }
+        { events: [ mouseExistsGridTd ],      elements: elementsInContainer,  from: [ 'mock' ],                                                                             to: 'initial',                  actions: [ 'removeMock' ]                                   }
+        { events: [ mouseExistsGridTd ],      elements: elementsInContainer,  from: [ 'placeholder' ],                                                                      to: 'initial',                  actions: [ 'hidePlaceholder', 'removeMock'  ]               }
+        { events: [ click ],                  elements: elementClosest,       from: [ 'placeholder', 'mock' ],                                                              to: 'wait-xhr-to-edit',         actions: [ 'storeSeqNo' ]                                   }
+        { events: [ controlAdded ],           elements: elementsAll,          from: [ 'edit' ],                                                                             to: 'edit-done',                actions: [ 'endEdit', 'removeMock', 'fireEditDone' ]        }
+        { events: [ controlAdded ],           elements: labelsInContainer,    from: [ 'initial' ],                                                                          to: 'edit',                     actions: [ 'removeFor', 'createMock', 'startEdit' ]         }
+        { events: [ ajaxResponse ],           elements: elementsAll,          from: [ 'wait-xhr-to-edit' ],                 conditions: [ isNextSeqNo ],                    to: 'edit',                     actions: [ 'startEdit' ]                                    }
+        { events: [ enterKey, lostFocus ],    elements: elementClosest,       from: [ 'edit' ],                                                                             to: 'edit-done',                actions: [ 'endEdit', 'removeMock', 'fireEditDone' ]        }
+        { events: [ editDone ],               elements: elementsAll,          from: [ 'edit-done' ],                        conditions: [ pointerOutsideCell ],             to: 'initial'                                                                               }
+        { events: [ editDone ],               elements: elementsAll,          from: [ 'edit-done' ],                        conditions: [ pointerInsideCell, isEmpty ],     to: 'placeholder-after-edit',   actions: [ 'storeSeqNo', 'createMock', 'showPlaceholder' ]  }
+        { events: [ editDone ],               elements: elementsAll,          from: [ 'edit-done' ],                        conditions: [ pointerInsideCell, isNonEmpty ],  to: 'mock',                     actions: [ 'createMock' ]                                   }
+        { events: [ ajaxResponse ],           elements: elementsAll,          from: [ 'placeholder-after-edit' ],           conditions: [ isNextSeqNo ],                    to: 'placeholder',              actions: [ 'showPlaceholder' ]                              }
     ]
 
     # Finite state machine runner
@@ -186,4 +187,4 @@ $ ->
                         _.all transition.conditions, (c) -> c $ e
                 _.each elements, (element) ->
                     f$.data 'state', transition.to, $ element                                                           # Change state before running action, so if action trigger an event, that event runs against the new state
-                    _.each transition.actions, (action) -> action $ element                                             # Run all the actions on the elements
+                    _.each transition.actions, (action) -> actions[action] $ element                                    # Run all the actions on the elements

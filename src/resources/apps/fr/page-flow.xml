@@ -138,6 +138,9 @@
     <!-- Import a collection of form data -->
     <page path-info="/fr/service/([^/]+)/([^/]+)/(import)" matcher="oxf:perl5-matcher" view="import/import.xpl"/>
 
+    <!-- Generate a schema for a form -->
+    <page path-info="/fr/service/[^/]+/[^/]+/schema" matcher="oxf:perl5-matcher" view="import/import.xpl"/>
+
     <!-- ==== Custom services and pages ============================================================================ -->
 
     <!-- Custom persistence implementation provided by the application -->

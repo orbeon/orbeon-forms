@@ -783,6 +783,9 @@
     <processor name="fr:persistence-proxy">
         <class name="org.orbeon.oxf.fr.FormRunnerPersistenceProxy"/>
     </processor>
+    <processor name="fr:schema-generator">
+        <class name="org.orbeon.oxf.fr.SchemaGenerator"/>
+    </processor>
 
     <!-- No longer supported processors -->
 

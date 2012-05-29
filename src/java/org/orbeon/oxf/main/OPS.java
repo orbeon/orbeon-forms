@@ -20,13 +20,20 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.common.Version;
 import org.orbeon.oxf.pipeline.CommandLineExternalContext;
+import org.orbeon.oxf.pipeline.InitUtils;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.PipelineEngine;
 import org.orbeon.oxf.pipeline.api.PipelineEngineFactory;
 import org.orbeon.oxf.pipeline.api.ProcessorDefinition;
+import org.orbeon.oxf.processor.Processor;
+import org.orbeon.oxf.processor.ProcessorOutput;
+import org.orbeon.oxf.processor.serializer.URLSerializer;
 import org.orbeon.oxf.properties.Properties;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
+import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.webapp.ProcessorService;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -37,8 +44,11 @@ import javax.naming.NamingException;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import static org.orbeon.oxf.pipeline.InitUtils.createProcessor;
 
 /**
  * This is a simple command-line interface to the pipeline engine.
@@ -65,6 +75,7 @@ public class OPS {
 
     private ProcessorDefinition processorDefinition;
     private String[] inputs;
+    private String[] outputs;
 
     public OPS(String[] args) {
         // 1. Parse the command-line arguments
@@ -145,7 +156,12 @@ public class OPS {
             options.addOption(o);
         }
         {
-            final Option o = new Option("i", "input", true, "Map an input on a URL (<input name>=<URL>)");
+            final Option o = new Option("i", "input", true, "Map an input to a URL (<input name>=<URL>)");
+            o.setRequired(false);
+            options.addOption(o);
+        }
+        {
+            final Option o = new Option("o", "output", true, "Map an output to a URL (<output name>=<URL>)");
             o.setRequired(false);
             options.addOption(o);
         }
@@ -156,8 +172,9 @@ public class OPS {
 
             // Get resource manager root if any
             resourceManagerSandbox = cmd.getOptionValue('r');
-            // Get inputs if any
+            // Get inputs and outputs if any
             inputs = cmd.getOptionValues('i');
+            outputs = cmd.getOptionValues('o');
 
             // Check for remaining args
             otherArgs = cmd.getArgs();
@@ -207,7 +224,35 @@ public class OPS {
         try {
             // 7. Run the pipeline from the processor definition created earlier. An ExternalContext
             // is supplied for those processors using external contexts, such as most serializers.
-            PipelineEngineFactory.instance().executePipeline(processorDefinition, new CommandLineExternalContext(), pipelineContext, logger);
+
+            if (outputs == null) {
+                // No outputs to connect: just execute the pipeline
+                PipelineEngine pipelineEngine = PipelineEngineFactory.instance();
+                pipelineEngine.executePipeline(processorDefinition, new CommandLineExternalContext(), pipelineContext, logger);
+            } else {
+                // At least one output to connect...
+                InitUtils.initializeProcessorDefinitions();
+                Processor processor = createProcessor(processorDefinition);
+                processor.reset(pipelineContext);
+                // Loop over outputs
+                for (int i=0;  i < outputs.length; i ++) {
+                    String outputArg = outputs[i];
+                    int iEqual = outputArg.indexOf("=");
+                    if (iEqual <= 0 || iEqual >= outputArg.length() - 1) {
+                        throw new OXFException("Output \"" + outputArg + "\" doesn't follow the syntax <name>=<url>");
+                    }
+                    String outputName = outputArg.substring(0, iEqual );
+                    URL url = URLFactory.createURL(outputArg.substring(iEqual + 1));
+                    // Create the output
+                    ProcessorOutput output = processor.createOutput(outputName);
+                    // Connect to an URLserializer
+                    URLSerializer urlSerializer = new URLSerializer();
+                    PipelineUtils.connect(processor, output.getName(), urlSerializer, "data");
+                    // Serialize
+                    urlSerializer.serialize(pipelineContext, url);                    
+                }
+
+            }
         } catch (Exception e) {
             // 8. Display exceptions if needed
             final LocationData locationData = ValidationException.getRootLocationData(e);

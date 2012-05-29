@@ -56,7 +56,14 @@ public class URLSerializer extends ProcessorImpl {
                     }
                 }
             });
+            serialize(pipelineContext, url);
+        } catch (Exception e) {
+            throw new OXFException(e);
+        }
+    }
 
+    public void serialize(PipelineContext pipelineContext, URL url) {
+        try {
             if (OXFHandler.PROTOCOL.equals(url.getProtocol())) {
                 // NOTE: This is probably done as an optimization. Is this really necessary?
 

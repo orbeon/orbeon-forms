@@ -302,26 +302,34 @@
                 <xforms:dispatch targetid="fr-form-model" name="fr-data-save-prepare"/>
 
                 <!-- Find all instance nodes containing upload file URLs -->
-                <xforms:var name="upload-nodes" model="fr-form-model" value="instance('fr-form-instance')/root()//(*[not(*)] | @*)[formRunner:isUploadedFileURL(string(.))]"/>
+                <xforms:var name="upload-holders"
+                            model="fr-form-model"
+                            value="instance('fr-form-instance')/root()//(*[not(*)] | @*)[formRunner:isUploadedFileURL(string(.))]"/>
+
+                <xforms:var name="before-urls"
+                            value="$upload-holders/normalize-space()"/>
+
+                <!-- For each one compute the persistence resource name -->
+                <xforms:var name="after-urls"
+                            value="for $holder in $upload-holders return
+                                   for $upload-extension in normalize-space(tokenize($holder/@filename, '\.')[last()]) return
+                                   for $upload-has-extension in count(tokenize($holder/@filename, '\.')) gt 1 and $upload-extension != '' return
+                                   for $new-id in digest(string(random(true())), 'MD5', 'hex') return
+                                   for $new-filename in string-join(($new-id, if (not($upload-has-extension)) then 'bin' else $upload-extension), '.') return
+                                        concat('/fr/service/persistence/crud/',
+                                               $app, '/', $form, '/data/',
+                                               $document, '/', $new-filename)"/>
                 
                 <!--<xforms:message level="xxforms:log-debug">-->
-                    <!--xxx <xforms:output value="count($upload-nodes)"/>-->
+                    <!--xxx <xforms:output value="count($upload-holders)"/>-->
                 <!--</xforms:message>-->
                 
-                <xforms:action iterate="$upload-nodes">
-                    
+                <xforms:action iterate="$upload-holders">
+
+                    <xforms:var name="p" value="position()"/>
                     <xforms:var name="holder" value="."/>
                     <xforms:var name="uri" value="normalize-space(substring-before($holder, '?'))"/>
-
-                    <!-- Compute the persistence resource name -->
-                    <xforms:var name="upload-extension" value="normalize-space(tokenize($holder/@filename, '\.')[last()])"/>
-                    <xforms:var name="upload-has-extension" value="count(tokenize($holder/@filename, '\.')) gt 1 and $upload-extension != ''"/>
-                    <xforms:var name="new-id" value="digest(string(random(true())), 'MD5', 'hex')" />
-                    <xforms:var name="new-filename" value="string-join(($new-id, if (not($upload-has-extension)) then 'bin' else $upload-extension), '.')"/>
-                    <xforms:var name="resource" as="xs:string"
-                                      value="concat('/fr/service/persistence/crud/',
-                                                $app, '/', $form, '/data/',
-                                                $document, '/', $new-filename)"/>
+                    <xforms:var name="resource" value="$after-urls[$p]"/>
 
                     <!--<xforms:message level="xxforms:log-debug">-->
                         <!--xxx-->
@@ -345,7 +353,7 @@
 
                 <xforms:action if="instance('fr-persistence-instance')/is-error = 'false'">
 
-                    <!-- Handle XML document -->
+                    <!-- Save XML document -->
                     <xforms:send submission="fr-create-update-submission" >
                         <xxforms:context name="holder" select="xxforms:instance('fr-form-instance')"/>
                         <!-- We always store form data as "data.xml" -->
@@ -357,7 +365,10 @@
                 </xforms:action>
 
                 <!-- Notify that the data is saved -->
-                <xforms:dispatch if="instance('fr-persistence-instance')/is-error = 'false'" targetid="fr-form-model" name="fr-data-save-done"/>
+                <xforms:dispatch if="instance('fr-persistence-instance')/is-error = 'false'" targetid="fr-form-model" name="fr-data-save-done">
+                    <xxforms:context name="before-urls" value="$before-urls"/>
+                    <xxforms:context name="after-urls" value="$after-urls"/>
+                </xforms:dispatch>
             </xforms:action>
         </xforms:action>
     </xforms:action>

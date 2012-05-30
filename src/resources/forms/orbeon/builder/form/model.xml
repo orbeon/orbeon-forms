@@ -177,12 +177,15 @@
                        origin="xxforms:call-xpl('oxf:/forms/orbeon/builder/form/deannotate.xpl', 'data', instance('fb-form-instance'), 'data')"/>
     </xforms:action>
 
-    <!-- Re-annotate data after saving because attachments holders might have been updated -->
-    <!-- TODO: don't do that, just update data? -->
+    <!-- Update attachment URLs, if any, after saving -->
     <xforms:action ev:event="fr-data-save-done">
-        <xforms:dispatch targetid="fr-form-model" name="fr-annotate-data">
-            <xxforms:context name="data" value="instance('fr-form-instance')"/>
-        </xforms:dispatch>
+        <xforms:action iterate="event('before-urls')">
+            <xforms:var name="p" value="position()"/>
+            <xforms:var name="before" value="."/>
+            <xforms:var name="after" value="event('after-urls')[$p]"/>
+
+            <xforms:setvalue ref="instance('fb-form-instance')/root()//(*[not(*)] | @*)[normalize-space() = $before]" value="$after"/>
+        </xforms:action>
     </xforms:action>
 
     <!-- Form is ready -->

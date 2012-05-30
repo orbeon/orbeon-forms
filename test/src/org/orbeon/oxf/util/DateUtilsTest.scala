@@ -29,7 +29,9 @@ class DateUtilsTest extends AssertionsForJUnit {
         assert(1338249600000L === DateUtils.parse("2012-05-29"))
 
         assert(1338320104000L === DateUtils.parseRFC1123("Tue, 29 May 2012 19:35:04 GMT"))
+    }
 
+    @Test def format(): Unit = {
         assert("1970-01-01T00:00:00.000"        === DateUtils.format(0L, DateUtils.XsDateTimeLong))
         assert("1970-01-01T00:00:00"            === DateUtils.format(0L, DateUtils.XsDateTime))
         assert("1970-01-01"                     === DateUtils.format(0L, DateUtils.XsDate))

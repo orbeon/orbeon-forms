@@ -43,7 +43,7 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
         extends XFormsValueControl(container, parent, element, id)
         with FocusableTrait with FileMetadata {
 
-    def supportedFileMetadata = FileMetadata.EvaluatorNames
+    def supportedFileMetadata = FileMetadata.AllMetadataNames
 
     override def evaluateImpl(): Unit = {
         super.evaluateImpl()

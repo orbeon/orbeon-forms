@@ -20,11 +20,12 @@ import scala.collection.JavaConverters._
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.oxf.util.{NetUtils, XPathCache}
 import org.orbeon.oxf.pipeline.InitUtils
 import org.orbeon.oxf.xforms.function.xxforms.{XXFormsProperty, XXFormsPropertiesStartsWith}
 import java.util.{Map ⇒ JMap}
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
+import org.orbeon.oxf.xforms.function.Random
+import org.orbeon.oxf.util.{SecureUtils, NetUtils, XPathCache}
 
 object FormRunner {
 
@@ -298,5 +299,23 @@ object FormRunner {
     def isUploadedFileURL(value: String): Boolean = {
         val trimmed = value.trim
         trimmed.startsWith("file:/") && XFormsUploadControl.verifyHmacURL(trimmed)
+    }
+
+    // Create a new attachment URL
+    def createAttachmentURL(app: String, form: String, document: String, localURL: String): String = {
+
+        // Here we could decide to use a nicer extension for the file. But since initially the filename comes from the
+        // client, it cannot be trusted, nor can its mediatype. A first step would be to do content-sniffing to
+        // determine a more trusted mediatype. A second step would be to put in an API for virus scanning. For now, we
+        // just use .bin as an extension.
+
+        //val nonTrustedFilename = XFormsUploadControl.getParameter(localURL, "filename")
+        //val nonTrustedMediatype = XFormsUploadControl.getParameter(localURL, "mediatype")
+
+        val ext = ".bin"
+        val randomHex = SecureUtils.digestString(Random.evaluate(true).toString, "MD5", "hex")
+        val filename = randomHex + ext
+
+        "/fr/service/persistence/crud/" + app + '/' + form + "/data/" + document + '/' + filename
     }
 }

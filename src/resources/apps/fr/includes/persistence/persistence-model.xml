@@ -312,13 +312,7 @@
                 <!-- For each one compute the persistence resource name -->
                 <xforms:var name="after-urls"
                             value="for $holder in $upload-holders return
-                                   for $upload-extension in normalize-space(tokenize($holder/@filename, '\.')[last()]) return
-                                   for $upload-has-extension in count(tokenize($holder/@filename, '\.')) gt 1 and $upload-extension != '' return
-                                   for $new-id in digest(string(random(true())), 'MD5', 'hex') return
-                                   for $new-filename in string-join(($new-id, if (not($upload-has-extension)) then 'bin' else $upload-extension), '.') return
-                                        concat('/fr/service/persistence/crud/',
-                                               $app, '/', $form, '/data/',
-                                               $document, '/', $new-filename)"/>
+                                   formRunner:createAttachmentURL($app, $form, $document, normalize-space($holder))"/>
                 
                 <!--<xforms:message level="xxforms:log-debug">-->
                     <!--xxx <xforms:output value="count($upload-holders)"/>-->

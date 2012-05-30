@@ -49,11 +49,11 @@
     <!-- Properties -->
     <xsl:variable name="has-version" select="xpl:property(string-join(('oxf.fr.version', $app, $form), '.'))" as="xs:boolean?"/>
     <xsl:variable name="has-noscript-link" select="xpl:property(string-join(('oxf.fr.noscript-link', $app, $form), '.'))" as="xs:boolean?"/>
+    <xsl:variable name="is-noscript-table" select="not(not(xpl:property(string-join(('oxf.fr.detail.noscript.table', $app, $form), '.'))) = false())" as="xs:boolean"/>
+    <xsl:variable name="is-noscript-section-collapse" select="not(xpl:property(string-join(('oxf.fr.detail.noscript.section.collapse', $app, $form), '.')) = false())" as="xs:boolean"/>
     <xsl:variable name="min-toc" select="(xpl:property(string-join(('oxf.fr.detail.toc', $app, $form), '.')), -1)[1]" as="xs:integer"/>
     <xsl:variable name="has-toc" select="$min-toc ge 0" as="xs:boolean"/>
     <xsl:variable name="error-summary" select="xpl:property(string-join(('oxf.fr.detail.error-summary', $app, $form), '.'))" as="xs:string?"/>
-    <xsl:variable name="is-noscript-table" select="not(not(xpl:property(string-join(('oxf.fr.detail.noscript.table', $app, $form), '.'))) = false())" as="xs:boolean"/>
-    <xsl:variable name="is-noscript-section-collapse" select="not(xpl:property(string-join(('oxf.fr.detail.noscript.section.collapse', $app, $form), '.')) = false())" as="xs:boolean"/>
     <xsl:variable name="is-ajax-section-collapse" select="not(xpl:property(string-join(('oxf.fr.detail.ajax.section.collapse', $app, $form), '.')) = false())" as="xs:boolean"/>
     <xsl:variable name="default-logo-uri" select="xpl:property(string-join(('oxf.fr.default-logo.uri', $app, $form), '.'))" as="xs:string?"/>
     <xsl:variable name="hide-logo" select="xpl:property(string-join(('oxf.fr.detail.hide-logo', $app, $form), '.'))" as="xs:boolean?"/>

@@ -239,8 +239,8 @@ public class ResourceServer extends ProcessorImpl {
     }
 
     private static class PatternToMimeType {
-        public String pattern;
-        public String mimeType;
+        public final String pattern;
+        public final String mimeType;
 
         public PatternToMimeType(String pattern, String mimeType) {
             this.pattern = pattern;
@@ -261,10 +261,6 @@ public class ResourceServer extends ProcessorImpl {
                 return path.equals(pattern);
             }
         }
-
-        public String getMimeType() {
-            return mimeType;
-        }
     }
 
     private static class MimeTypeConfig {
@@ -278,7 +274,7 @@ public class ResourceServer extends ProcessorImpl {
             path = path.toLowerCase();
             for (final PatternToMimeType patternToMimeType: patternToMimeTypes) {
                 if (patternToMimeType.matches(path))
-                    return patternToMimeType.getMimeType();
+                    return patternToMimeType.mimeType;
             }
             return null;
         }

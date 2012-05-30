@@ -100,25 +100,26 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
         doStoreExternalValue(value, "", "", "")
     }
 
-    private def isFileURL(url: String) =
-        NetUtils.urlHasProtocol(url) && url.startsWith("file:")
-
-    private def deleteFileIfPossible(url: String): Unit =
-        if (isFileURL(url))
-            try {
-                val file = new File(new URI(url))
-                if (file.exists) {
-                    if (file.delete())
-                        getIndentedLogger.logDebug("xforms:upload", "deleted temporary file upon upload", "path", file.getCanonicalPath)
-                    else
-                        getIndentedLogger.logWarning("xforms:upload", "could not delete temporary file upon upload", "path", file.getCanonicalPath)
-                }
-            } catch {
-                case e: Exception ⇒
-                    getIndentedLogger.logWarning("xforms:upload", "could not delete temporary file upon upload", "path", url)
-            }
-
     private def doStoreExternalValue(rawNewValue: String, filename: String, mediatype: String, size: String): Unit = {
+
+        def isFileURL(url: String) =
+            NetUtils.urlHasProtocol(url) && url.startsWith("file:")
+
+        def deleteFileIfPossible(url: String): Unit =
+            if (isFileURL(url))
+                try {
+                    val file = new File(new URI(url))
+                    if (file.exists) {
+                        if (file.delete())
+                            getIndentedLogger.logDebug("xforms:upload", "deleted temporary file upon upload", "path", file.getCanonicalPath)
+                        else
+                            getIndentedLogger.logWarning("xforms:upload", "could not delete temporary file upon upload", "path", file.getCanonicalPath)
+                    }
+                } catch {
+                    case e: Exception ⇒
+                        getIndentedLogger.logWarning("xforms:upload", "could not delete temporary file upon upload", "path", url)
+                }
+
         // Clean values
         val newValue = StringUtils.trimToEmpty(rawNewValue)
         val oldValue = StringUtils.trimToEmpty(getValue)

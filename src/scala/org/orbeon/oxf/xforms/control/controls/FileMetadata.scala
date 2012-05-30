@@ -29,6 +29,7 @@ trait FileMetadata extends XFormsValueControl {
 
     self: XFormsControl ⇒
 
+    // Children elements
     private val mediatypeElement = Option(self.element.element(XFORMS_MEDIATYPE_QNAME))
     private val filenameElement  = Option(self.element.element(XFORMS_FILENAME_QNAME))
     private val sizeElement      = Option(self.element.element(XXFORMS_SIZE_QNAME))
@@ -39,6 +40,7 @@ trait FileMetadata extends XFormsValueControl {
 
         protected def isRelevant = self.isRelevant
         protected def wasRelevant = self.wasRelevant
+
         // No dependencies yet
         protected def requireUpdate = true
         protected def notifyCompute() = ()
@@ -46,8 +48,8 @@ trait FileMetadata extends XFormsValueControl {
     }
 
     // Supported file metadata properties
-    private var props: Map[String, ControlProperty[String]]
-        = supportedFileMetadata map (name ⇒ name → new FileMetadataProperty(FileMetadata.Evaluators(name))) toMap
+    private var props: Map[String, ControlProperty[String]] =
+        supportedFileMetadata map (name ⇒ name → new FileMetadataProperty(FileMetadata.Evaluators(name))) toMap
 
     // Properties to support
     def supportedFileMetadata: Seq[String]
@@ -60,10 +62,12 @@ trait FileMetadata extends XFormsValueControl {
     def markFileMetadataDirty() =
         props.values foreach (_.handleMarkDirty())
 
+    // Getters
     def fileMediatype        = props("mediatype").value
     def filename             = props("filename") .value
     def fileSize             = props("size")     .value
 
+    // Setters
     def setFileMediatype(mediatype: String): Unit =
         setInfoValue(mediatypeElement, mediatype)
 

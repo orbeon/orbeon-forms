@@ -24,7 +24,6 @@ import org.orbeon.oxf.xforms.XFormsError
 import org.orbeon.oxf.xforms.XFormsProperties
 import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.analysis.XPathDependencies
-import org.orbeon.oxf.xforms.control.AjaxSupport
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.control.XFormsValueControl
 import org.orbeon.oxf.xforms.event.XFormsEvents._
@@ -239,6 +238,6 @@ object XFormsOutputControl {
             // Default for other mediatypes
             null
 
-    val DownloadAppearanceExtensionAttributes: Array[QName] = Array(XXFORMS_TARGET_QNAME)
+    val DownloadAppearanceExtensionAttributes = Array(XXFORMS_TARGET_QNAME)
     val AllowedExternalEvents = Set(XFORMS_HELP, DOM_ACTIVATE)
 }

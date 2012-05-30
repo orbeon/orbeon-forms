@@ -189,7 +189,7 @@ public class XFormsSubmissionUtils {
                                     // Value is valid as per xs:anyURI
                                     // Don't close the stream here, as it will get read later when the MultipartEntity
                                     // we create here is written to an output stream
-                                    addPart(multipartEntity, URLFactory.createURL(value).openStream(), element);
+                                    addPart(multipartEntity, URLFactory.createURL(value).openStream(), element, value);
                                 } else {
                                     // Value is invalid as per xs:anyURI
                                     // Just use the value as is (could also ignore it)
@@ -201,7 +201,7 @@ public class XFormsSubmissionUtils {
 
                                 if (InstanceData.getValid(element) && value.trim().length() > 0) {
                                     // Value is valid as per xs:base64Binary
-                                    addPart(multipartEntity, new ByteArrayInputStream(NetUtils.base64StringToByteArray(value)), element);
+                                    addPart(multipartEntity, new ByteArrayInputStream(NetUtils.base64StringToByteArray(value)), element, null);
                                 } else {
                                     // Value is invalid as per xs:base64Binary
                                     // Just use the value as is (could also ignore it)
@@ -226,13 +226,54 @@ public class XFormsSubmissionUtils {
         return multipartEntity;
     }
 
-    static private void addPart(MultipartEntity multipartEntity, InputStream inputStream, Element element) {
+    static private void addPart(MultipartEntity multipartEntity, InputStream inputStream, Element element, String url) {
         // Gather mediatype and filename if known
         // NOTE: special MIP-like annotations were added just before re-rooting/pruning element. Those will be
         // removed during the next recalculate.
-        final String mediatype = InstanceData.getTransientAnnotation(element, "xxforms-mediatype");
-        final String filename = InstanceData.getTransientAnnotation(element, "xxforms-filename");
-        ContentBody contentBody = new InputStreamBody(inputStream, mediatype, filename);
+
+        // See this WG action item (which was decided but not carried out): "Clarify that upload activation produces
+        // content and possibly filename and mediatype info as metadata. If available, filename and mediatype are copied
+        // to instance data if upload filename and mediatype elements are specified. At serialization, filename and
+        // mediatype from instance data are used if upload filename and mediatype are specified; otherwise, filename and
+        // mediatype are drawn from upload metadata, if they were available at time of upload activation"
+        //
+        // See:
+        // http://lists.w3.org/Archives/Public/public-forms/2009May/0052.html
+        // http://lists.w3.org/Archives/Public/public-forms/2009Apr/att-0010/2009-04-22.html#ACTION2
+        //
+        // See also this clarification:
+        // http://lists.w3.org/Archives/Public/public-forms/2009May/0053.html
+        // http://lists.w3.org/Archives/Public/public-forms/2009Apr/att-0003/2009-04-01.html#ACTION1
+        //
+        // The bottom line is that if we can find the xf:upload control bound to a node to submit, we try to get
+        // metadata from that control. If that fails (which can be because the control is non-relevant, bound to another
+        // control, or never had nested xf:filename/xf:mediatype elements), we try URL metadata. URL metadata is only
+        // present on nodes written by xf:upload as temporary file: URLs. It is not present if the data is stored as
+        // xs:base64Binary. In any case, metadata can be absent.
+        //
+        // If an xf:upload control saved data to a node as xs:anyURI, has xf:filename/xf:mediatype elements, is still
+        // relevant and bound to the original node (as well as its children elements), and if the nodes pointed to by
+        // the children elements have not been modified (e.g. by xf:setvalue), then retrieving the metadata via
+        // xf:upload should be equivalent to retrieving it via the URL metadata.
+        //
+        // Benefits of URL metadata: a single xf:upload can be used to save data to multiple nodes over time, and it
+        // doesn't have to be relevant and bound upon submission.
+        //
+        // Benefits of using xf:upload metadata: it is possible to modify the filename and mediatype subsequently.
+        //
+        // URL metadata was added 2012-05-29.
+
+        // Get mediatype, first via xf:upload control, or, if not found, try URL metadata
+        String mediatype = InstanceData.getTransientAnnotation(element, "xxforms-mediatype");
+        if (mediatype == null && url != null)
+            mediatype = XFormsUploadControl.getParameterOrNull(url, "mediatype");
+
+        // Get filename, first via xf:upload control, or, if not found, try URL metadata
+        String filename = InstanceData.getTransientAnnotation(element, "xxforms-filename");
+        if (filename == null && url != null)
+            filename = XFormsUploadControl.getParameterOrNull(url, "filename");
+
+        final ContentBody contentBody = new InputStreamBody(inputStream, mediatype, filename);
         multipartEntity.addPart(element.getName(), contentBody);
 
     }
@@ -257,11 +298,11 @@ public class XFormsSubmissionUtils {
                             // Found one relevant upload control bound to the instance we are submitting
                             // NOTE: special MIP-like annotations were added just before re-rooting/pruning element. Those
                             // will be removed during the next recalculate.
-                            final String fileName = currentControl.getFileName();
+                            final String fileName = currentControl.filename();
                             if (fileName != null) {
                                 InstanceData.setTransientAnnotation(controlBoundNodeInfo, "xxforms-filename", fileName);
                             }
-                            final String mediatype = currentControl.getFileMediatype();
+                            final String mediatype = currentControl.fileMediatype();
                             if (mediatype != null) {
                                 InstanceData.setTransientAnnotation(controlBoundNodeInfo, "xxforms-mediatype", mediatype);
                             }

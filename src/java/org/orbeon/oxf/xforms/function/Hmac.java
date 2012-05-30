@@ -21,7 +21,7 @@ import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.value.StringValue;
 
 /**
- * XForms digest() function (XForms 1.1).
+ * XForms hmac() function (XForms 1.1).
  */
 public class Hmac extends XFormsFunction {
 

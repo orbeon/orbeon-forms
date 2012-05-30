@@ -70,6 +70,9 @@
                                                 <optional>
                                                     <attribute name="mediatype"/>
                                                 </optional>
+                                                <optional>
+                                                    <attribute name="filename"/>
+                                                </optional>
                                             </group>
                                             <!-- Optional attributes for xforms:upload -->
                                             <group>

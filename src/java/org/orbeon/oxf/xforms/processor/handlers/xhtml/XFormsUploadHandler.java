@@ -87,7 +87,7 @@ public class XFormsUploadHandler extends XFormsControlLifecyleHandler {
                             reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-upload-filename");
                             contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, reusableAttributes);
                             {
-                                final String filename = (uploadControl == null) ? null : uploadControl.getFileName();
+                                final String filename = (uploadControl == null) ? null : uploadControl.filename();
                                 if (filename != null)
                                     contentHandler.characters(filename.toCharArray(), 0, filename.length());
                             }
@@ -98,7 +98,7 @@ public class XFormsUploadHandler extends XFormsControlLifecyleHandler {
                             reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-upload-mediatype");
                             contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, reusableAttributes);
                             {
-                                final String mediatype = (uploadControl == null) ? null : uploadControl.getFileMediatype();
+                                final String mediatype = (uploadControl == null) ? null : uploadControl.fileMediatype();
                                 if (mediatype != null)
                                     contentHandler.characters(mediatype.toCharArray(), 0, mediatype.length());
                             }
@@ -109,7 +109,7 @@ public class XFormsUploadHandler extends XFormsControlLifecyleHandler {
                             reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-upload-size");
                             contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, reusableAttributes);
                             {
-                                final String size = (uploadControl == null) ? null : uploadControl.getFileSize();
+                                final String size = (uploadControl == null) ? null : uploadControl.fileSize();
                                 if (size != null)
                                     contentHandler.characters(size.toCharArray(), 0, size.length());
                             }

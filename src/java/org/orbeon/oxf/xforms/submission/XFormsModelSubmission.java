@@ -1056,17 +1056,14 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                     // Binary serialization
                     final QName nodeType = InstanceData.getType(documentToSubmit.getRootElement());
 
-                    if (XMLConstants.XS_ANYURI_QNAME.equals(nodeType)) {
-                        // Interpret node as anyURI
-                        // TODO: PERFORMANCE: Must pass InputStream all the way to the submission instead of storing into byte[] in memory!
-                        final String uri = documentToSubmit.getRootElement().getStringValue();
-                        messageBody = NetUtils.uriToByteArray(uri);
-                    } else if (XMLConstants.XS_BASE64BINARY_QNAME.equals(nodeType)) {
+                    if (XMLConstants.XS_BASE64BINARY_QNAME.equals(nodeType)) {
                         // TODO
                         throw new XFormsSubmissionException(XFormsModelSubmission.this, "xforms:submission: binary serialization with base64Binary type is not yet implemented.", "serializing instance");
                     } else {
-                        // TODO
-                        throw new XFormsSubmissionException(XFormsModelSubmission.this, "xforms:submission: binary serialization without a type is not yet implemented.", "serializing instance");
+                        // Default to anyURI
+                        // TODO: PERFORMANCE: Must pass InputStream all the way to the submission instead of storing into byte[] in memory!
+                        final String uri = documentToSubmit.getRootElement().getStringValue();
+                        messageBody = NetUtils.uriToByteArray(uri);
                     }
                     defaultMediatypeForSerialization = "application/octet-stream";
                     queryString = null;

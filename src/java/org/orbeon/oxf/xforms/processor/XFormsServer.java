@@ -172,7 +172,7 @@ public class XFormsServer extends ProcessorImpl {
 
                     final boolean hasEvents = clientEvents.size() > 0|| serverEventsElements.size() > 0;
                     // Whether there are uploaded files to handle
-                    final boolean hasFiles = XFormsUploadControl.hasUploadedFiles(filesElement);
+                    final boolean hasFiles = XFormsUploadControl.hasSubmittedFiles(filesElement);
 
                     // NOTE: As of 2010-12, background uploads in script mode are handled in xforms-server.xpl. In
                     // most cases should get files here only in noscript mode, but there is a chance in script mode in
@@ -195,7 +195,7 @@ public class XFormsServer extends ProcessorImpl {
                                     // Handle uploaded files for noscript if any
                                     if (hasFiles) {
                                         eventsIndentedLogger.logDebug("", "handling uploaded files");
-                                        XFormsUploadControl.handleUploadedFiles(containingDocument, filesElement);
+                                        XFormsUploadControl.handleSubmittedFiles(containingDocument, filesElement);
                                     }
         
                                     // Dispatch the events

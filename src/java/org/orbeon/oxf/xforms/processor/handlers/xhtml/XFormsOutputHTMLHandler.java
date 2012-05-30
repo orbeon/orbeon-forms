@@ -44,7 +44,7 @@ public class XFormsOutputHTMLHandler extends XFormsOutputHandler {
         {
             if (isConcreteControl) {
                 final String mediatypeValue = attributes.getValue("mediatype");
-                final String htmlValue = XFormsOutputControl.getExternalValue(outputControl, mediatypeValue);
+                final String htmlValue = XFormsOutputControl.getExternalValueOrDefault(outputControl, mediatypeValue);
                 XFormsUtils.streamHTMLFragment(xmlReceiver, htmlValue, outputControl.getLocationData(), xhtmlPrefix);
             }
         }

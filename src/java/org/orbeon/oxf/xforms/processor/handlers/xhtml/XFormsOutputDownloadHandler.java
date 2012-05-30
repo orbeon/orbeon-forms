@@ -66,7 +66,7 @@ public class XFormsOutputDownloadHandler extends XFormsOutputHandler {
 
     private AttributesImpl getAnchorAttributes(XFormsOutputControl outputControl, AttributesImpl containerAttributes) {
         final AttributesImpl aAttributes = handlerContext.isSpanHTMLLayout() ? containerAttributes : new AttributesImpl();
-        final String hrefValue = XFormsOutputControl.getExternalValue(outputControl, null);
+        final String hrefValue = XFormsOutputControl.getExternalValueOrDefault(outputControl, null);
 
         if (hrefValue == null || hrefValue.trim().equals("")) {
             // No URL so make sure a click doesn't cause navigation, and add class

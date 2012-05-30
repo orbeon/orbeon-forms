@@ -24,7 +24,7 @@
               xmlns:saxon="http://saxon.sf.net/"
               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
               xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-              xmlns:form-runner="java:org.orbeon.oxf.fr.FormRunner"
+              xmlns:formRunner="java:org.orbeon.oxf.fr.FormRunner"
               xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary">
 
     <xxforms:variable name="parameters" value="xxforms:instance('fr-parameters-instance')" as="element()"/>
@@ -61,11 +61,11 @@
         </xforms:action>
 
         <!--  Send a "Not Found" error if the form definition is not found -->
-        <xforms:action if="empty(instance('fr-source-form-instance')/xhtml:head/xforms:model)" type="xpath">form-runner:sendError(404)</xforms:action>
+        <xforms:action if="empty(instance('fr-source-form-instance')/xhtml:head/xforms:model)" type="xpath">formRunner:sendError(404)</xforms:action>
 
         <!-- Compute authorized operations -->
         <xxforms:variable name="metadata" select="instance('fr-source-form-instance')/xhtml:head/xforms:model/xforms:instance[@id = 'fr-form-metadata']/metadata treat as element()"/>
-        <xforms:setvalue ref="instance('fr-authorized-operations')" value="string-join(form-runner:authorizedOperationsOnForm($metadata), ' ')"/>
+        <xforms:setvalue ref="instance('fr-authorized-operations')" value="string-join(formRunner:authorizedOperationsOnForm($metadata), ' ')"/>
         <!-- If user can't perform the required operations, deny access to this page -->
         <xxforms:variable name="mode" select="xxforms:instance('fr-parameters-instance')/mode treat as element()"/>
         <xxforms:variable name="operations" select="tokenize(instance('fr-authorized-operations'), '\s')"/>
@@ -75,7 +75,7 @@
             ($mode = 'edit' and not($operations = ('*', 'update'))) or
             ($mode = ('view', 'pdf') and not($operations = ('*', 'read')))"/>
         <!-- Send an "Unauthorized" error if the user is unauthorized -->
-        <xforms:action if="$unauthorized-access" type="xpath">form-runner:sendError(401)</xforms:action>
+        <xforms:action if="$unauthorized-access" type="xpath">formRunner:sendError(401)</xforms:action>
 
         <xforms:action if="$mode != 'summary'">
 
@@ -298,93 +298,52 @@
             <xforms:action if="$validity-passed and not(xxforms:pending-uploads() > 0)">
                 <!-- Data valid: proceed with saving attachments and data -->
 
-                <!-- Handle attachments -->
-                <xxforms:variable name="attachment-controls" as="element()*"
-                                  select="instance('fr-source-form-instance')/xhtml:body//(xforms:* | fr:*)[@bind and @class and tokenize(@class, '\s+') = 'fr-attachment']"/>
+                <!-- Notify that the data is about to be saved -->
+                <xforms:dispatch targetid="fr-form-model" name="fr-data-save-prepare"/>
 
-                <!-- Find all binds with fb-attachment, or to which controls with fb-attachment are bound -->
-                <xxforms:variable name="attachment-binds" as="element(xforms:bind)*"
-                                  select="instance('fr-source-form-instance')/xhtml:head/xforms:model//xforms:bind[(@class and tokenize(@class, '\s+') = 'fr-attachment')
-                                            or @id = $attachment-controls/@bind]"/>
-
+                <!-- Find all instance nodes containing upload file URLs -->
+                <xforms:var name="upload-nodes" model="fr-form-model" value="instance('fr-form-instance')/root()//(*[not(*)] | @*)[formRunner:isUploadedFileURL(string(.))]"/>
+                
                 <!--<xforms:message level="xxforms:log-debug">-->
-                    <!--xxx <xforms:output value="count($attachment-controls)"/> xxx-->
+                    <!--xxx <xforms:output value="count($upload-nodes)"/>-->
                 <!--</xforms:message>-->
+                
+                <xforms:action iterate="$upload-nodes">
+                    
+                    <xforms:var name="holder" value="."/>
+                    <xforms:var name="uri" value="normalize-space(substring-before($holder, '?'))"/>
 
-                <!-- Use a global variable to determine whether we must continue -->
-                <xforms:setvalue ref="instance('fr-persistence-instance')/is-error">false</xforms:setvalue>
-                <xforms:setvalue ref="instance('fr-persistence-instance')/error"/>
+                    <!-- Compute the persistence resource name -->
+                    <xforms:var name="upload-extension" value="normalize-space(tokenize($holder/@filename, '\.')[last()])"/>
+                    <xforms:var name="upload-has-extension" value="count(tokenize($holder/@filename, '\.')) gt 1 and $upload-extension != ''"/>
+                    <xforms:var name="new-id" value="digest(string(random(true())), 'MD5', 'hex')" />
+                    <xforms:var name="new-filename" value="string-join(($new-id, if (not($upload-has-extension)) then 'bin' else $upload-extension), '.')"/>
+                    <xforms:var name="resource" as="xs:string"
+                                      value="concat('/fr/service/persistence/crud/',
+                                                $app, '/', $form, '/data/',
+                                                $document, '/', $new-filename)"/>
 
-                <!-- Iterate over attachment controls while there is no submission error -->
-                <xforms:action iterate="(1 to count($attachment-binds))">
+                    <!--<xforms:message level="xxforms:log-debug">-->
+                        <!--xxx-->
+                        <!--<xforms:output value="$upload-extension"/> --->
+                        <!--<xforms:output value="$upload-has-extension"/> --->
+                        <!--<xforms:output value="$new-id"/> --->
+                        <!--<xforms:output value="$new-filename"/> --->
+                        <!--<xforms:output value="$resource"/>-->
+                    <!--</xforms:message>-->
 
-                    <xforms:action if="instance('fr-persistence-instance')/is-error = 'false'">
-                        <xxforms:variable name="bind" as="element(xforms:bind)"
-                                          select="(instance('fr-source-form-instance')/xhtml:head/xforms:model//xforms:bind[(@class and tokenize(@class, '\s+') = 'fr-attachment')
-                                                    or @id = $attachment-controls/@bind])[number(context())]"/>
+                    <!-- Save attachment -->
+                    <xforms:send submission="fr-create-update-attachment-submission">
+                        <xxforms:context name="holder" value="$holder"/>
+                        <xxforms:context name="resource" value="$resource"/>
+                    </xforms:send>
 
-                        <!--
-                            NOTE: Finally as of 20090617 the "ancestor-or-self" bug is fixed
-                            http://forge.ow2.org/tracker/?group_id=168&atid=350207&func=detail&aid=304850
-                        -->
-
-                        <xxforms:variable name="expression" as="xs:string"
-                                          select="string-join($bind/ancestor-or-self::xforms:bind/((@ref, @nodeset)[1]), '/')"/>
-
-                        <xxforms:variable name="holders" model="fr-form-model" select="instance('fr-form-instance')/saxon:evaluate($expression)"/>
-                        <!--<xxforms:variable name="binds" select="($bind/ancestor-or-self::xforms:bind)[position() gt 1]" as="element(xforms:bind)+"/>-->
-                        <!--<xforms:message level="xxforms:log-debug">-->
-                            <!--xxx Expression: <xforms:output value="$expression"/> xxx-->
-                            <!--xxx Straight: <xforms:output value="string-join($binds/(@ref, @nodeset), '/')"/> xxx-->
-                            <!--xxx Combined straight: <xforms:output value="string-join(($bind/ancestor-or-self::xforms:bind/(@ref, @nodeset)), '/')"/> xxx-->
-                            <!--xxx Combined reversed: <xforms:output value="string-join(reverse($bind/ancestor-or-self::xforms:bind/(@ref, @nodeset)), '/')"/> xxx-->
-                            <!--xxx Count holders: <xforms:output value="count($holders)"/> xxx-->
-                            <!--xxx Holders content: <xforms:output value="string-join($holders, ' - ')"/> xxx-->
-                        <!--</xforms:message>-->
-
-                        <xforms:action iterate="$holders">
-                            <xxforms:variable name="holder" select="." as="node()"/>
-                            <!-- Found attachment URI location -->
-                            <xxforms:variable name="uri" select="normalize-space($holder)" as="xs:string"/>
-                            <xforms:action if="$uri != '' and starts-with($uri, 'file:')">
-                                <!-- There is a URI to process -->
-
-                                <xxforms:variable name="upload-extension" select="normalize-space(tokenize($holder/@filename, '\.')[last()])" as="xs:string"/>
-                                <xxforms:variable name="upload-has-extension" select="count(tokenize($holder/@filename, '\.')) gt 1 and $upload-extension != ''" as="xs:string"/>
-                                <xxforms:variable name="new-id" select="digest(string(random(true())), 'MD5', 'hex')" as="xs:string"/>
-                                <xxforms:variable name="new-filename" select="string-join(($new-id,
-                                                                                            if (not($upload-has-extension)) then 'bin' else $upload-extension), '.')" as="xs:string"/>
-                                <xxforms:variable name="resource" as="xs:string"
-                                                  select="concat('/fr/service/persistence/crud/',
-                                                            $app, '/', $form, '/data/',
-                                                            $document, '/', $new-filename)"/>
-
-                                <!--<xforms:message level="xxforms:log-debug">-->
-                                    <!--<xforms:output value="$upload-extension"/> - -->
-                                    <!--<xforms:output value="$upload-has-extension"/> - -->
-                                    <!--<xforms:output value="$new-id"/> - -->
-                                    <!--<xforms:output value="$new-filename"/> - -->
-                                    <!--<xforms:output value="$resource"/>-->
-                                <!--</xforms:message>-->
-
-                                <!-- Save attachment -->
-                                <xforms:send submission="fr-create-update-attachment-submission">
-                                    <xxforms:context name="holder" select="$holder"/>
-                                    <xxforms:context name="resource" select="$resource"/>
-                                </xforms:send>
-
-                                <!-- Only keep the last part of the path -->
-                                <xforms:setvalue ref="$holder" value="$resource"/>
-
-                            </xforms:action>
-                        </xforms:action>
-                    </xforms:action>
-
+                    <!-- Update the path -->
+                    <xforms:setvalue if="instance('fr-persistence-instance')/is-error = 'false'" ref="$holder" value="$resource"/>
+                    
                 </xforms:action>
 
                 <xforms:action if="instance('fr-persistence-instance')/is-error = 'false'">
-                    <!-- Notify that the data is about to be saved -->
-                    <xforms:dispatch targetid="fr-form-model" name="fr-data-save-prepare"/>
 
                     <!-- Handle XML document -->
                     <xforms:send submission="fr-create-update-submission" >
@@ -396,6 +355,9 @@
                     <!-- If we were in new mode, now we must be in edit mode -->
                     <xforms:setvalue ref="$parameters/mode" value="'edit'"/>
                 </xforms:action>
+
+                <!-- Notify that the data is saved -->
+                <xforms:dispatch if="instance('fr-persistence-instance')/is-error = 'false'" targetid="fr-form-model" name="fr-data-save-done"/>
             </xforms:action>
         </xforms:action>
     </xforms:action>
@@ -703,7 +665,7 @@
 
     <!-- React to issue loading the document. We consider this fatal. -->
     <xforms:action ev:event="xforms-submit-error" ev:target="fr-get-document-submission" type="xpath">
-        form-runner:sendError((event('response-status-code'), 500)[1])
+        formRunner:sendError((event('response-status-code'), 500)[1])
     </xforms:action>
 
     <!-- React to failed submission -->

@@ -24,6 +24,7 @@ import org.orbeon.oxf.util.{NetUtils, XPathCache}
 import org.orbeon.oxf.pipeline.InitUtils
 import org.orbeon.oxf.xforms.function.xxforms.{XXFormsProperty, XXFormsPropertiesStartsWith}
 import java.util.{Map ⇒ JMap}
+import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
 
 object FormRunner {
 
@@ -285,5 +286,17 @@ object FormRunner {
                 expression
 
         expressionOption.orNull
+    }
+
+    // Check whether a value correspond to an uploaded file
+    //
+    // For this to be true
+    // - the protocol must be file:
+    // - the URL must have a valid signature
+    //
+    // This guarantees that the local file was in fact placed there by the upload control, and not tampered with.
+    def isUploadedFileURL(value: String): Boolean = {
+        val trimmed = value.trim
+        trimmed.startsWith("file:/") && XFormsUploadControl.verifyHmacURL(trimmed)
     }
 }

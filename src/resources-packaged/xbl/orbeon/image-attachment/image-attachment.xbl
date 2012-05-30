@@ -38,17 +38,20 @@
                 <large-icon>/apps/fr/style/images/silk/picture.png</large-icon>
             </icon>
             <datatype>xs:anyURI</datatype>
-            <template>
-                 <fr:image-attachment id="" ref="" class="fr-attachment">
-                    <xforms:label ref=""/>
-                    <xforms:hint ref=""/>
-                    <xforms:help ref=""/>
-                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
-                    <xforms:filename ref="@filename"/>
-                    <xforms:mediatype ref="@mediatype"/>
-                    <xxforms:size ref="@size"/>
-                </fr:image-attachment>
-            </template>
+            <templates>
+                <instance filename="" mediatype="" size=""/>
+                <view>
+                     <fr:image-attachment id="" ref="" class="fr-attachment">
+                        <xforms:label ref=""/>
+                        <xforms:hint ref=""/>
+                        <xforms:help ref=""/>
+                        <xforms:alert ref="$fr-resources/detail/labels/alert"/>
+                        <xforms:filename ref="@filename"/>
+                        <xforms:mediatype ref="@mediatype"/>
+                        <xxforms:size ref="@size"/>
+                    </fr:image-attachment>
+                </view>
+            </templates>
         </metadata>
 
         <xbl:template>

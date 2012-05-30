@@ -78,8 +78,6 @@ object ToolboxOps {
                 val dataHolder =
                     if (! instanceTemplate.isEmpty)
                         elementInfo(newControlName, (instanceTemplate.head \@ @*) ++ (instanceTemplate \ *))
-                    else if (Set("xs:anyURI", "xforms:anyURI")(controlType))
-                        elementInfo(newControlName, Seq("filename", "mediatype", "size") map (attributeInfo(_)))
                     else
                         elementInfo(newControlName)
 

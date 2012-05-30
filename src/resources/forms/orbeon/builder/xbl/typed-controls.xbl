@@ -130,14 +130,18 @@
                 <large-icon>/apps/fr/style/images/silk/photo.png</large-icon>
             </icon>
             <datatype>xforms:anyURI</datatype>
-            <template>
-                <xforms:output id="" bind="" mediatype="image/*" class="fr-attachment" xmlns="">
-                    <xforms:label ref=""/>
-                    <xforms:help ref=""/>
-                    <!-- No hint? -->
-                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
-                </xforms:output>
-            </template>
+            <templates>
+                <!-- NOTE: Don't place filename, mediatype and size as those are not needed -->
+                <instance/>
+                <view>
+                    <xforms:output id="" bind="" mediatype="image/*" class="fb-attachment" xmlns="">
+                        <xforms:label ref=""/>
+                        <xforms:help ref=""/>
+                        <!-- No hint? -->
+                        <xforms:alert ref="$fr-resources/detail/labels/alert"/>
+                    </xforms:output>
+                </view>
+            </templates>
         </metadata>
     </xbl:binding>
 

@@ -295,7 +295,7 @@ button.xforms-trigger, input.xforms-trigger, .xforms-trigger button, .xforms-tri
 .fr-dialog-icon { float: left; margin-right: 2em; margin-left: 1em; padding-bottom: 1em }
 .fr-dialog-buttons { text-align: right; padding-right: .5em; padding-top: .5em; padding-bottom: .5em; margin-top: .5em; border-top: 2px solid #DDDDEE; clear: both }
 
-#fr-submission-result-dialog { width: 800px }
+#fr-submission-result-dialog { width: 300px }   /* Make dialog fairly narrow, as it usually contains just a short message */
 
 /* ***** Sections *************************************************************************************************** */
 

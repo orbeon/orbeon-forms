@@ -808,7 +808,7 @@
             <delete-action>Are you sure you want to delete action</delete-action>
             <controls-will-be-deleted>{0,choice,0#No controls|1#1 control|1&lt;{0,number,integer} controls} will be deleted.</controls-will-be-deleted>
             <publish-form>Are you sure you want to publish this form? This will override the existing form with the following properties:</publish-form>
-            <publish-success>The form was published successfully.</publish-success>
+            <publish-success>The form was published successfully. {0,choice,0#No attachment has|1#1 attachment has|1&lt;{0,number,integer} attachments have} been published.</publish-success>
             <publish-error>There was an error during form publishing.</publish-error>
             <metadata-edit-title>Form Metadata</metadata-edit-title>
             <new-metadata-output>Provide an application and form name, which will be used to identify your form (you can also change those later):</new-metadata-output>
@@ -1617,7 +1617,7 @@
             <delete-action>Etes-vous sûr de vouloir supprimer l'action</delete-action>
             <controls-will-be-deleted>{0,choice,0#Aucun contrôle ne sera supprimé.|1#1 contrôle sera supprimé.|1&lt;{0,number,integer} contrôles seront supprimés.}</controls-will-be-deleted>
             <publish-form>Etes-vous sûr de vouloir publier ce formulaire ? Ceci remplacera le formulaire déjà publié sous les propriétés suivantes :</publish-form>
-            <publish-success>Le formulaire a été publié avec succès.</publish-success>
+            <publish-success>Le formulaire a été publié avec succès. {0,choice,0#Aucun attachment n'a|1#1 attachment a|1&lt;{0,number,integer} attachements ont} été publiés.</publish-success>
             <publish-error>Une erreur s'est produite durant la publication du formulaire.</publish-error>
             <metadata-edit-title>Métadonnées</metadata-edit-title>
             <new-metadata-output>Veuillez fournir un nom d'application et un nom de formulaire (vous pouvez les changer plus tard):</new-metadata-output>
@@ -2428,7 +2428,7 @@
             <delete-action>Er du sikker på at du ønsker å slette handlingen</delete-action>
             <controls-will-be-deleted>{0,choice,0#Ingen kontroller|1#1 kontroll|1&lt;{0,number,integer} kontroller} vil slettes.</controls-will-be-deleted>
             <publish-form>Er du sikker på at du vil publisere skjemaet? Dette vil erstatte et eventuelt eksisterende skjema med samme egenskaper:</publish-form>
-            <publish-success>Skjemaet ble publisert.</publish-success>
+            <publish-success>Skjemaet ble publisert. [{0,choice,0#No attachment has|1#1 attachment has|1&lt;{0,number,integer} attachments have} been published.]</publish-success>
             <publish-error>Det oppsto en feil ved publisering.</publish-error>
             <metadata-edit-title>Metadata for skjemaet</metadata-edit-title>
             <new-metadata-output>Angi et applikasjons- og et skjemanavn som vil brukes for å identifisere skjemaet (de kan endres senere):</new-metadata-output>
@@ -3238,7 +3238,7 @@
             <delete-action>Вы уверены, что хотите удалить действие?</delete-action>
             <controls-will-be-deleted>{0,choice,0#Нет элементов для удаления.|1#1 элемент будет удален.|1&lt;{0,number,integer} элемента будут удалены.}</controls-will-be-deleted>
             <publish-form>Вы уверены, что хотите опубликовать эту форму? Это перезапишет существующую форму со следующими свойствами:</publish-form>
-            <publish-success>Форма была успешно опубликована.</publish-success>
+            <publish-success>Форма была успешно опубликована. [{0,choice,0#No attachment has|1#1 attachment has|1&lt;{0,number,integer} attachments have} been published.]</publish-success>
             <publish-error>При публикации формы произошла ошибка.</publish-error>
             <metadata-edit-title>Описание формы</metadata-edit-title>
             <new-metadata-output>Задайте название приложения и название формы. (При необходимости их можно будет изменить потом.)</new-metadata-output>

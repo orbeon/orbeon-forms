@@ -304,7 +304,7 @@
                 <!-- Find all instance nodes containing upload file URLs -->
                 <xforms:var name="upload-holders"
                             model="fr-form-model"
-                            value="instance('fr-form-instance')/root()//(*[not(*)] | @*)[formRunner:isUploadedFileURL(string(.))]"/>
+                            value="instance('fr-form-instance')/root()//(*[not(*)] | @*)[formRunner:isUploadedFileURL(normalize-space(.))]"/>
 
                 <xforms:var name="before-urls"
                             value="$upload-holders/normalize-space()"/>
@@ -312,13 +312,13 @@
                 <!-- For each one compute the persistence resource name -->
                 <xforms:var name="after-urls"
                             value="for $holder in $upload-holders return
-                                   formRunner:createAttachmentURL($app, $form, $document, normalize-space($holder))"/>
+                                   formRunner:createAttachmentPath($app, $form, $document, normalize-space($holder))"/>
                 
                 <!--<xforms:message level="xxforms:log-debug">-->
                     <!--xxx <xforms:output value="count($upload-holders)"/>-->
                 <!--</xforms:message>-->
                 
-                <xforms:action iterate="$upload-holders">
+                <xforms:action iterate="$upload-holders" if="instance('fr-persistence-instance')/is-error = 'false'">
 
                     <xforms:var name="p" value="position()"/>
                     <xforms:var name="holder" value="."/>

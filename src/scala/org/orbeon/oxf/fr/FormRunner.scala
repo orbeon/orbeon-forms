@@ -296,13 +296,11 @@ object FormRunner {
     // - the URL must have a valid signature
     //
     // This guarantees that the local file was in fact placed there by the upload control, and not tampered with.
-    def isUploadedFileURL(value: String): Boolean = {
-        val trimmed = value.trim
-        trimmed.startsWith("file:/") && XFormsUploadControl.verifyHmacURL(trimmed)
-    }
+    def isUploadedFileURL(value: String): Boolean =
+        value.startsWith("file:/") && XFormsUploadControl.verifyHmacURL(value)
 
-    // Create a new attachment URL
-    def createAttachmentURL(app: String, form: String, document: String, localURL: String): String = {
+    // Create a new attachment path
+    def createAttachmentPath(app: String, form: String, document: String, localURL: String): String = {
 
         // Here we could decide to use a nicer extension for the file. But since initially the filename comes from the
         // client, it cannot be trusted, nor can its mediatype. A first step would be to do content-sniffing to
@@ -312,10 +310,23 @@ object FormRunner {
         //val nonTrustedFilename = XFormsUploadControl.getParameter(localURL, "filename")
         //val nonTrustedMediatype = XFormsUploadControl.getParameter(localURL, "mediatype")
 
-        val ext = ".bin"
         val randomHex = SecureUtils.digestString(Random.evaluate(true).toString, "MD5", "hex")
-        val filename = randomHex + ext
-
-        "/fr/service/persistence/crud/" + app + '/' + form + "/data/" + document + '/' + filename
+        createFormDataAttachmentPath(app, form, document, randomHex + ".bin")
     }
+
+    // Path for a form definition attachment
+    def createFormDefinitionAttachmentPath(app: String, form: String, filename: String): String =
+        "/fr/service/persistence/crud/" + app + '/' + form + "/form/" + filename
+
+    // Path for a form data attachment
+    def createFormDataAttachmentPath(app: String, form: String, document: String, filename: String): String =
+        "/fr/service/persistence/crud/" + app + '/' + form + "/data/" + document + '/' + filename
+
+    // Whether the given path is an attachment path
+    def isDataAttachmentPath(app: String, form: String, document: String, path: String): Boolean =
+        path.startsWith("/fr/service/persistence/crud/" + app + '/' + form + "/data/" + document + '/') &&
+            path.endsWith(".bin")
+
+    // For a given attachment path, return the filename
+    def getAttachmentPathFilename(path: String): String = path.split('/').last
 }

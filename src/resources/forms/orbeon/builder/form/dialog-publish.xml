@@ -11,212 +11,264 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xxforms:dialog xmlns:xhtml="http://www.w3.org/1999/xhtml"
-      xmlns:xforms="http://www.w3.org/2002/xforms"
+<xxf:dialog xmlns:xh="http://www.w3.org/1999/xhtml"
+      xmlns:xf="http://www.w3.org/2002/xforms"
       xmlns:xs="http://www.w3.org/2001/XMLSchema"
       xmlns:ev="http://www.w3.org/2001/xml-events"
       xmlns:xi="http://www.w3.org/2001/XInclude"
       xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
-      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+      xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
       xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
       xmlns:saxon="http://saxon.sf.net/"
+      xmlns:formRunner="java:org.orbeon.oxf.fr.FormRunner"
 
-      id="fb-publish-dialog" level="modal" close="true" draggable="true" class="fr-dialog">
+      id="fb-publish-dialog" level="modal" close="true" draggable="true" class="fr-dialog" model="fb-publish-model">
 
-    <xforms:label ref="$form-resources/dialog-publish/label"/>
+    <xf:label ref="$form-resources/dialog-publish/label"/>
+
+    <xf:var name="app"  model="fr-form-model" value="$metadata-instance/application-name"/>
+    <xf:var name="form" model="fr-form-model" value="$metadata-instance/form-name" />
 
     <!-- Switch to display initial / success / error cases -->
-    <xforms:switch>
-        <xforms:case id="fb-publish-dialog-message-start">
-            <xhtml:div>
-                <xhtml:p>
-                    <xforms:output value="$form-resources/messages/publish-form"/>
-                </xhtml:p>
+    <xf:switch>
+        <!-- Initial case -->
+        <xf:case id="fb-publish-dialog-message-start">
+            <xh:div>
+                <xh:p>
+                    <xf:output value="$form-resources/messages/publish-form"/>
+                </xh:p>
                 <!-- TODO: check whether a form w/ same app/form name already exists -->
                 <!-- TODO: if so, also check whether data for that form already exists -->
-                <xhtml:div class="fr-grid">
-                    <xhtml:div class="fr-grid-content fb-publish-message">
-                        <xforms:output value="$metadata-instance/application-name">
-                            <xforms:label><xforms:output value="$form-resources/application-name/label"/></xforms:label>
-                        </xforms:output>
-                        <xforms:output value="$metadata-instance/form-name">
-                            <xforms:label><xforms:output value="$form-resources/form-name/label"/></xforms:label>
-                        </xforms:output>
-                    </xhtml:div>
-                </xhtml:div>
-            </xhtml:div>
-            <xhtml:div class="fr-dialog-buttons">
-                <xforms:group>
-                    <xforms:trigger xxforms:modal="true">
-                        <xforms:label>
-                            <xhtml:img src="/forms/orbeon/builder/images/upload.png"/>
-                            <xhtml:span><xforms:output value="$form-resources/dialog-publish/publish/label"/></xhtml:span>
-                        </xforms:label>
-                        <xforms:action ev:event="DOMActivate">
-                            <!-- Clear submission result -->
-                            <xforms:setvalue model="fr-publish-model" ref="instance('fr-publish-form-submission-response')"/>
-                            <xforms:dispatch name="fr-publish-form" target="fr-publish-model">
-                                <xxforms:context name="fb:app" value="$metadata-instance/application-name"/>
-                                <xxforms:context name="fb:form" value="$metadata-instance/form-name"/>
-                            </xforms:dispatch>
-                        </xforms:action>
-                    </xforms:trigger>
-                    <xforms:trigger>
-                        <xforms:label>
-                            <xhtml:img src="/apps/fr/style/close.gif" alt=""/>
-                            <xhtml:span><xforms:output value="$form-resources/cancel/label"/></xhtml:span>
-                        </xforms:label>
-                        <xxforms:hide ev:event="DOMActivate" dialog="fb-publish-dialog"/>
-                    </xforms:trigger>
-                </xforms:group>
-            </xhtml:div>
-        </xforms:case>
-        <xforms:case id="fb-publish-dialog-success">
-            <xhtml:div>
-                <xhtml:p>
-                    <xforms:output value="$form-resources/messages/publish-success"/>
-                </xhtml:p>
+                <xh:div class="fr-grid">
+                    <xh:div class="fr-grid-content fb-publish-message">
+                        <xf:output value="$app">
+                            <xf:label><xf:output value="$form-resources/application-name/label"/></xf:label>
+                        </xf:output>
+                        <xf:output value="$form">
+                            <xf:label><xf:output value="$form-resources/form-name/label"/></xf:label>
+                        </xf:output>
+                    </xh:div>
+                </xh:div>
+            </xh:div>
+            <xh:div class="fr-dialog-buttons">
+                <xf:group>
+                    <!-- Submit button -->
+                    <xf:trigger xxf:modal="true">
+                        <xf:label>
+                            <xh:img src="/forms/orbeon/builder/images/upload.png"/>
+                            <xh:span><xf:output value="$form-resources/dialog-publish/publish/label"/></xh:span>
+                        </xf:label>
+                        <!-- Dispatch publish event -->
+                        <xf:dispatch ev:event="DOMActivate" name="fb-publish-form" target="fb-publish-model">
+                            <xxf:context name="app" value="$app"/>
+                            <xxf:context name="form" value="$form"/>
+                        </xf:dispatch>
+                    </xf:trigger>
+                    <!-- Cancel button -->
+                    <xf:trigger>
+                        <xf:label>
+                            <xh:img src="/apps/fr/style/close.gif" alt=""/>
+                            <xh:span><xf:output value="$form-resources/cancel/label"/></xh:span>
+                        </xf:label>
+                        <xxf:hide ev:event="DOMActivate" dialog="fb-publish-dialog"/>
+                    </xf:trigger>
+                </xf:group>
+            </xh:div>
+        </xf:case>
+        <!-- Success case -->
+        <xf:case id="fb-publish-dialog-success">
+            <xh:div>
+                <xh:p>
+                    <xf:output value="xxf:format-message($form-resources/messages/publish-success, xs:integer(instance('fb-publish-instance')/attachments))"/>
+                </xh:p>
                 <!-- Display response content if present -->
-                <xforms:var name="response" model="fr-publish-model" value="instance('fr-publish-form-submission-response')" as="element()"/>
-                <xforms:group ref=".[normalize-space($response) != '']">
-                    <xhtml:div class="fb-publish-message">
-                        <xforms:output value="$response" mediatype="text/html"/>
-                    </xhtml:div>
-                </xforms:group>
-                <xforms:group ref=".[not(normalize-space($response) != '')]">
-                    <xhtml:div class="fb-publish-message">
-                        <xhtml:ol>
-                            <xhtml:li>
-                                <xhtml:a href="/fr/{$metadata-instance/application-name}/{$metadata-instance/form-name}/summary" target="_blank">
-                                    <xforms:output value="$form-resources/dialog-publish/messages/open-summary"/>
-                                </xhtml:a>
-                            </xhtml:li>
-                            <xhtml:li>
+                <xf:var name="response" value="instance('fb-publish-instance')/response"/>
+                <xf:group ref=".[normalize-space($response) != '']">
+                    <xh:div class="fb-publish-message">
+                        <xf:output value="$response" mediatype="text/html"/>
+                    </xh:div>
+                </xf:group>
+                <xf:group ref=".[not(normalize-space($response) != '')]">
+                    <xh:div class="fb-publish-message">
+                        <xh:ol>
+                            <xh:li>
+                                <xh:a href="/fr/{$app}/{$form}/summary" target="_blank">
+                                    <xf:output value="$form-resources/dialog-publish/messages/open-summary"/>
+                                </xh:a>
+                            </xh:li>
+                            <xh:li>
                                 <!-- TODO: i18n -->
-                                <xhtml:a href="/fr/{$metadata-instance/application-name}/{$metadata-instance/form-name}/new" target="_blank">
-                                    <xforms:output value="$form-resources/dialog-publish/messages/open-new"/>
-                                </xhtml:a>
-                            </xhtml:li>
-                        </xhtml:ol>
-                    </xhtml:div>
-                </xforms:group>
-            </xhtml:div>
-            <xhtml:div class="fr-dialog-buttons">
-                <xforms:trigger id="fb-publish-dialog-close-button">
-                    <xforms:label>
-                        <xhtml:img src="/apps/fr/style/close.gif" alt=""/>
-                        <xhtml:span><xforms:output value="$form-resources/close/label"/></xhtml:span>
-                    </xforms:label>
-                    <xxforms:hide ev:event="DOMActivate" dialog="fb-publish-dialog"/>
-                </xforms:trigger>
-            </xhtml:div>
-        </xforms:case>
-        <xforms:case id="fb-publish-dialog-error">
-            <xhtml:div>
-                <xhtml:p>
-                    <xforms:output value="$form-resources/messages/publish-error"/>
-                </xhtml:p>
-            </xhtml:div>
-            <xhtml:div class="fr-dialog-buttons">
-                <xforms:trigger>
-                    <xforms:label>
-                        <xhtml:img src="/apps/fr/style/close.gif" alt=""/>
-                        <xhtml:span><xforms:output value="$form-resources/close/label"/></xhtml:span>
-                    </xforms:label>
-                    <xxforms:hide ev:event="DOMActivate" dialog="fb-publish-dialog"/>
-                </xforms:trigger>
-            </xhtml:div>
-        </xforms:case>
-    </xforms:switch>
+                                <xh:a href="/fr/{$app}/{$form}/new" target="_blank">
+                                    <xf:output value="$form-resources/dialog-publish/messages/open-new"/>
+                                </xh:a>
+                            </xh:li>
+                        </xh:ol>
+                    </xh:div>
+                </xf:group>
+            </xh:div>
+            <xh:div class="fr-dialog-buttons">
+                <xf:trigger>
+                    <xf:label>
+                        <xh:img src="/apps/fr/style/close.gif" alt=""/>
+                        <xh:span><xf:output value="$form-resources/close/label"/></xh:span>
+                    </xf:label>
+                    <xxf:hide ev:event="DOMActivate" dialog="fb-publish-dialog"/>
+                </xf:trigger>
+            </xh:div>
+        </xf:case>
+        <!-- Error case -->
+        <xf:case id="fb-publish-dialog-error">
+            <xh:div>
+                <xh:p>
+                    <xf:output value="$form-resources/messages/publish-error"/>
+                </xh:p>
+            </xh:div>
+            <xh:div class="fr-dialog-buttons">
+                <xf:trigger>
+                    <xf:label>
+                        <xh:img src="/apps/fr/style/close.gif" alt=""/>
+                        <xh:span><xf:output value="$form-resources/close/label"/></xh:span>
+                    </xf:label>
+                    <xxf:hide ev:event="DOMActivate" dialog="fb-publish-dialog"/>
+                </xf:trigger>
+            </xh:div>
+        </xf:case>
+    </xf:switch>
 
     <!-- Initialize dialog -->
-    <xforms:action ev:event="xxforms-dialog-open">
-        <!-- Clear publish submission response -->
-        <xforms:setvalue model="fr-publish-model" ref="instance('fr-publish-form-submission-response')"/>
-        <!-- Open start area -->
-        <xforms:toggle case="fb-publish-dialog-message-start"/>
-    </xforms:action>
+    <xf:toggle ev:event="xxforms-dialog-open" case="fb-publish-dialog-message-start"/>
+
+    <!-- Clean-up upon close -->
+    <xf:setvalue ev:event="xxforms-dialog-close" ref="instance('fb-publish-instance')/response"/>
 
     <!-- Local model -->
-    <xforms:model id="fr-publish-model">
+    <xf:model id="fb-publish-model">
         
         <!-- Publish form operation -->
-        <xforms:action ev:event="fr-publish-form">
-            <!-- TODO: must also publish attachments! and make sure URLs are relative (?) -->
-            <!-- Determine the URI of the collection to deploy to -->
-            <xforms:send submission="fr-publish-form-submission">
-                <xxforms:context name="fb:app" value="event('fb:app')"/>
-                <xxforms:context name="fb:form" value="event('fb:form')"/>
-            </xforms:send>
-        </xforms:action>
+        <xf:action ev:event="fb-publish-form">
+            <!-- ASSUMPTION: the form has been previously saved, and so all attachments are saved as well -->
+            
+            <!-- Clear results -->
+            <xf:setvalue ref="instance('fb-publish-instance')/is-error">false</xf:setvalue>
+            <xf:setvalue ref="instance('fb-publish-instance')/attachments" value="0"/>
+            <xf:setvalue ref="instance('fb-publish-instance')/response"/>
 
-        <!-- Instance to store the result of the create/update submission -->
-        <xforms:instance id="fr-publish-form-submission-response">
-            <response xmlns=""/>
-        </xforms:instance>
+            <!-- Copy de-annotated form locally -->
+            <xf:dispatch targetid="fr-form-model" name="fr-data-save-prepare"/>
 
-        <!-- Form to submit -->
-        <xforms:instance id="fr-form-to-publish-instance">
+            <!-- Make sure XBL bindings for section templates are present -->
+            <xf:insert ref="instance('fb-form-to-publish-instance')"
+                           origin="xxf:call-xpl('oxf:/forms/orbeon/builder/form/add-template-bindings.xpl',
+                                                    ('data', 'bindings'),
+                                                    (xxf:instance('fr-form-instance'), xxf:instance('fb-components-instance')),
+                                                    'data')"/>
+
+            <!-- Publish attachments if any -->
+            <xf:var name="fb-app"      model="fr-persistence-model" value="$app"/>
+            <xf:var name="fb-form"     model="fr-persistence-model" value="$form" />
+            <xf:var name="fb-document" model="fr-persistence-model" value="$document" />
+
+            <xf:var name="attachment-holders"
+                        value="instance('fb-form-to-publish-instance')/root()//(*[not(*)] | @*)
+                                [formRunner:isDataAttachmentPath($fb-app, $fb-form, $fb-document, normalize-space(.))]"/>
+
+            <xf:action iterate="$attachment-holders" if="instance('fb-publish-instance')/is-error = 'false'">
+
+                <xf:var name="p" value="position()"/>
+                <xf:var name="holder" value="."/>
+                <xf:var name="filename" value="formRunner:getAttachmentPathFilename(normalize-space($holder))"/>
+                <xf:var name="resource" value="formRunner:createFormDefinitionAttachmentPath(event('app'), event('form'), $filename)"/>
+
+                <!-- Publish attachment -->
+                <xf:send submission="fr-publish-attachment-submission">
+                    <xxf:context name="holder" value="$holder"/>
+                    <xxf:context name="resource" value="$resource"/>
+                </xf:send>
+
+                <!-- Update attachment path in form to submit -->
+                <xf:setvalue
+                    if="instance('fb-publish-instance')/is-error = 'false'"
+                    ref="$holder"
+                    value="$resource"/>
+
+            </xf:action>
+
+            <!-- Publish form -->
+            <xf:send submission="fr-publish-form-submission" if="instance('fb-publish-instance')/is-error = 'false'">
+                <xxf:context name="app" value="event('app')"/>
+                <xxf:context name="form" value="event('form')"/>
+            </xf:send>
+        </xf:action>
+
+        <!-- Other stuff -->
+        <xf:instance id="fb-publish-instance">
+            <publish>
+                <is-error/>
+                <attachments>0</attachments>
+                <response/>
+            </publish>
+        </xf:instance>
+
+        <!-- De-annotated form to submit -->
+        <xf:instance id="fb-form-to-publish-instance">
             <dummy xmlns=""/>
-        </xforms:instance>
+        </xf:instance>
+
+        <!-- Submission to create/update an attachment -->
+        <xf:submission
+                id="fr-publish-attachment-submission"
+                method="put" serialization="application/octet-stream"
+                ref="event('holder')"
+                resource="{event('resource')}"
+                replace="none"/>
+
+        <!-- Increment number of attachments saved -->
+        <xf:setvalue
+            ev:event="xforms-submit-done"
+            ev:observer="fr-publish-attachment-submission"
+            ref="instance('fb-publish-instance')/attachments"
+            value="xs:integer(.) + 1"/>
 
         <!-- Submission to publish the form -->
-        <xforms:submission id="fr-publish-form-submission"
-                ref="instance('fr-form-to-publish-instance')" method="put"
-                resource="/fr/service/persistence/crud/{event('fb:app')}/{event('fb:form')}/form/form.xhtml"
-                replace="text" target="instance('fr-publish-form-submission-response')">
-
-            <!-- Prepare submission -->
-            <!-- See also model.xml -->
-            <xforms:action ev:event="xforms-submit">
-                <!-- Copy de-annotated form locally -->
-                <xforms:dispatch targetid="fr-form-model" name="fr-data-save-prepare"/>
-
-                <!-- Make sure XBL bindings for section templates are present -->
-                <xforms:insert ref="instance('fr-form-to-publish-instance')"
-                               origin="xxforms:call-xpl('oxf:/forms/orbeon/builder/form/add-template-bindings.xpl',
-                                                        ('data', 'bindings'),
-                                                        (xxforms:instance('fr-form-instance'), xxforms:instance('fb-components-instance')),
-                                                        'data')"/>
-
-            </xforms:action>
+        <xf:submission
+                id="fr-publish-form-submission"
+                ref="instance('fb-form-to-publish-instance')"
+                method="put"
+                resource="/fr/service/persistence/crud/{event('app')}/{event('form')}/form/form.xhtml?document={xxforms:instance('fr-parameters-instance')/document}"
+                replace="text"
+                targetref="instance('fb-publish-instance')/response">
 
             <!-- Clean-up after submission -->
-            <xforms:action ev:event="xforms-submit-done xforms-submit-error">
-                <!-- Remove form content in order to save memory -->
-                <xforms:insert ref="instance('fr-form-to-publish-instance')" origin="xxforms:element('dummy')"/>
-            </xforms:action>
-
-            <!--<xforms:message ev:event="xforms-submit">-->
-                <!--zzz-->
-                <!--<xforms:output value="event('fb:application')"/>-->
-                <!--xxx-->
-                <!--<xforms:output value="event('fb:form')"/>-->
-            <!--</xforms:message>-->
+            <xf:insert
+                ev:event="xforms-submit-done xforms-submit-error"
+                ref="instance('fb-form-to-publish-instance')"
+                origin="xforms:element('dummy')"/>
 
             <!-- Respond to successful publish submission -->
-            <xforms:action ev:event="xforms-submit-done">
+            <xf:action ev:event="xforms-submit-done">
                 <!-- Try to invalidate shared instances with the given resource URI so that the deployed form will be
                      re-read by Form Runner. This works only if Form Builder is in the same webapp as the Form Runner
                      running the deployed form. -->
-                <xxforms:invalidate-instance resource="{event('resource-uri')}"/>
+                <xxf:invalidate-instance resource="{event('resource-uri')}"/>
                 <!-- Clear response if not HTML -->
-                <xforms:setvalue if="not(starts-with(event('response-headers')[lower-case(name) = 'content-type']/value, 'text/html'))"
-                    ref="instance('fr-publish-form-submission-response')"/>
+                <xf:setvalue
+                        if="not(starts-with(event('response-headers')[lower-case(name) = 'content-type']/value, 'text/html'))"
+                        ref="instance('fb-publish-instance')/response"/>
                 <!-- Open success area -->
-                <xforms:toggle case="fb-publish-dialog-success"/>
-                <xforms:setfocus control="fb-publish-dialog-close-button"/>
-            </xforms:action>
+                <xf:toggle case="fb-publish-dialog-success"/>
+                <xf:setfocus control="fb-publish-dialog"/>
+            </xf:action>
 
-            <!-- Respond to unsuccessful publish submission -->
-            <xforms:action ev:event="xforms-submit-error">
-                <!-- Open error area -->
-                <xforms:toggle case="fb-publish-dialog-error"/>
-            </xforms:action>
+        </xf:submission>
 
-        </xforms:submission>
+        <!-- Any submission error -->
+        <xf:action ev:event="xforms-submit-error">
+            <xf:setvalue ref="instance('fb-publish-instance')/is-error">true</xf:setvalue>
+            <xf:toggle case="fb-publish-dialog-error"/>
+            <xf:setfocus control="fb-publish-dialog"/>
+        </xf:action>
 
-    </xforms:model>
+    </xf:model>
 
-</xxforms:dialog>
+</xxf:dialog>

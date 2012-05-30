@@ -1062,8 +1062,16 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                     } else {
                         // Default to anyURI
                         // TODO: PERFORMANCE: Must pass InputStream all the way to the submission instead of storing into byte[] in memory!
-                        final String uri = documentToSubmit.getRootElement().getStringValue();
-                        messageBody = NetUtils.uriToByteArray(uri);
+
+                        // NOTE: We support a relative path, in which case the path is resolved as a service URL
+                        final String resolvedURI =
+                            XFormsUtils.resolveServiceURL(
+                                containingDocument,
+                                    getSubmissionElement(),
+                                    documentToSubmit.getRootElement().getStringValue(),
+                                    ExternalContext.Response.REWRITE_MODE_ABSOLUTE);
+
+                        messageBody = NetUtils.uriToByteArray(resolvedURI);
                     }
                     defaultMediatypeForSerialization = "application/octet-stream";
                     queryString = null;

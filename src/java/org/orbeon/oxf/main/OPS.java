@@ -15,6 +15,8 @@ package org.orbeon.oxf.main;
 
 import org.apache.commons.cli.*;
 import org.apache.log4j.Logger;
+import org.dom4j.DocumentException;
+import org.dom4j.DocumentHelper;
 import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
@@ -136,7 +138,19 @@ public class OPS {
                 if (iEqual <= 0 || iEqual >= input.length() - 1) {
                     throw new OXFException("Input \"" + input + "\" doesn't follow the syntax <name>=<url>");
                 }
-                processorDefinition.addInput(input.substring(0, iEqual ), input.substring(iEqual + 1));
+                String inputName = input.substring(0, iEqual );
+                String inputValue = input.substring(iEqual + 1);
+                if (inputValue.startsWith("<")) {
+                    // XML document
+                    try {
+                        processorDefinition.addInput(inputName, DocumentHelper.parseText(inputValue).getRootElement());
+                    } catch (DocumentException e) {
+                        throw new OXFException(e);
+                    }
+                } else {
+                    // URL
+                    processorDefinition.addInput(inputName, inputValue);                    
+                }
             }
         } else {
             throw new OXFException("No main processor definition found.");

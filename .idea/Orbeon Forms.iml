@@ -4,7 +4,7 @@
     <facet type="scala" name="Scala">
       <configuration>
         <option name="compilerLibraryLevel" value="Project" />
-        <option name="compilerLibraryName" value="Scala 2.9.1" />
+        <option name="compilerLibraryName" value="Scala 2.9.2" />
         <option name="fsc" value="true" />
       </configuration>
     </facet>

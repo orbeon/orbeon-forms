@@ -122,8 +122,8 @@
 
     <xbl:binding id="fb-output-image" element="xforms|output">
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
-            <display-name lang="en">Static Image</display-name>
-            <display-name lang="fr">Image statique</display-name>
+            <display-name lang="en">Image</display-name>
+            <display-name lang="fr">Image</display-name>
             <display-name lang="ru">Изображение</display-name>
             <icon lang="en">
                 <small-icon>/apps/fr/style/images/silk/photo.png</small-icon>

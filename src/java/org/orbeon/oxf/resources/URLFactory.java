@@ -15,6 +15,7 @@ package org.orbeon.oxf.resources;
 
 import org.orbeon.oxf.resources.handler.HTTPHandler;
 import org.orbeon.oxf.resources.handler.OXFHandler;
+import org.orbeon.oxf.resources.handler.SystemHandler;
 
 import java.net.*;
 
@@ -30,6 +31,7 @@ public class URLFactory {
 
     private static final URLStreamHandler oxfHandler = new OXFHandler();
     private static final URLStreamHandler httpHandler = new HTTPHandler();
+    private static final URLStreamHandler systemHandler = new SystemHandler();
 
     public static URL createURL(String spec) throws MalformedURLException {
         return createURL((URL) null, spec);
@@ -42,6 +44,7 @@ public class URLFactory {
     public static URL createURL(URL context, String spec) throws MalformedURLException {
         return spec.startsWith(OXFHandler.PROTOCOL + ":") ? new URL(context, spec, oxfHandler)
              : spec.startsWith("http:") || spec.startsWith("https:") ? new URL(context, spec, httpHandler)
+             : spec.startsWith(SystemHandler.PROTOCOL + ":") ? new URL(context, spec, systemHandler)
              : new URL(context, spec);
     }
 }

@@ -25,6 +25,7 @@ import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.resources.handler.OXFHandler;
+import org.orbeon.oxf.resources.handler.SystemHandler;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xml.SAXStore;
 import org.orbeon.oxf.xml.TransformerUtils;
@@ -994,6 +995,90 @@ public class URLGenerator extends ProcessorImpl {
 
     }
 
+    /**
+     * This resource handler reads from System.in...
+     */
+        private static class SystemResourceHandler implements ResourceHandler {
+        private Config config;
+        private String resourceManagerKey;
+        private InputStream inputStream;
+
+        public SystemResourceHandler(Config config) {
+            this.config = config;
+        }
+
+        public String getResourceMediaType() throws IOException {
+            // We generally don't know the "connection" content-type
+            return null;
+        }
+
+        public String getConnectionEncoding() throws IOException {
+            // We generally don't know the "connection" encoding
+            // NOTE: We could know, if the underlying protocol was for example HTTP. But we may
+            // want to abstract that anyway, so that the behavior is consistent whatever the sandbox
+            // is.
+            return null;
+        }
+
+        public int getConnectionStatusCode() throws IOException {
+            return -1;
+        }
+
+        public Long getValidity() throws IOException {
+            return null;
+        }
+
+        public Long getConditional(Long lastModified) throws IOException {
+            return getValidity();
+        }
+
+        public void destroy() throws IOException {
+        }
+
+        private String getExternalEncoding() throws IOException {
+            if (config.isForceEncoding())
+                return config.getEncoding();
+
+            String connectionEncoding = getConnectionEncoding();
+            if (!config.isIgnoreConnectionEncoding() && connectionEncoding != null)
+                return connectionEncoding;
+
+            String userEncoding = config.getEncoding();
+            if (userEncoding != null)
+                return userEncoding;
+
+            return java.nio.charset.Charset.defaultCharset().name();
+        }
+
+        public void readHTML(XMLReceiver xmlReceiver) throws IOException {
+            URLResourceHandler.readHTML(System.in, config.getTidyConfig(), getExternalEncoding(), xmlReceiver);
+        }
+
+        public void readText(ContentHandler output, String contentType, Long lastModified) throws IOException {
+            ProcessorUtils.readText(System.in, getExternalEncoding(), output, contentType, lastModified, getConnectionStatusCode());
+        }
+
+        public void readXML(PipelineContext pipelineContext, XMLReceiver xmlReceiver, URIProcessorOutputImpl.URIReferences uriReferences) throws IOException {
+            final XMLUtils.ParserConfiguration parserConfiguration = new XMLUtils.ParserConfiguration(config.getParserConfiguration(), uriReferences);
+            if (getExternalEncoding() != null) {
+                // The encoding is set externally, either forced by the user, or set by the connection
+                XMLUtils.readerToSAX(new InputStreamReader(System.in, getExternalEncoding()), config.getURL().toExternalForm(),
+                        xmlReceiver, parserConfiguration, config.isHandleLexical());
+            } else {
+                // Regular case, the resource manager does the job and autodetects the encoding
+                ResourceManagerWrapper.instance().getContentAsSAX(getKey(),
+                        xmlReceiver, parserConfiguration, config.isHandleLexical());
+            }
+        }
+
+        public void readBinary(ContentHandler output, String contentType, Long lastModified) throws IOException {
+            ProcessorUtils.readBinary(System.in, output, contentType, lastModified, getConnectionStatusCode());
+        }
+
+        private String getKey() {
+            return "system:in";
+        }
+    }
     // The idea of URLGeneratorState is that, during a pipeline execution with a given PipelineContext, there is typically:
     //
     // o a call to getValidity()
@@ -1024,8 +1109,8 @@ public class URLGenerator extends ProcessorImpl {
         public ResourceHandler ensureMainResourceHandler(PipelineContext pipelineContext, Config config) {
             if (mainResourceHandler == null) {
                 // Create and remember handler
-                mainResourceHandler = OXFHandler.PROTOCOL.equals(config.getURL().getProtocol())
-                        ? new OXFResourceHandler(config)
+                mainResourceHandler = OXFHandler.PROTOCOL.equals(config.getURL().getProtocol()) ? new OXFResourceHandler(config)
+                        : SystemHandler.PROTOCOL.equals(config.getURL().getProtocol()) ?  new SystemResourceHandler(config)
                         : new URLResourceHandler(pipelineContext, config);
                 // Make sure it is destroyed when the pipeline ends at the latest
                 pipelineContext.addContextListener(new PipelineContext.ContextListener() {

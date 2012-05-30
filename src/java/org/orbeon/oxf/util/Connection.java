@@ -238,8 +238,7 @@ public class Connection {
             final Object nativeRequest = externalContext.getRequest().getNativeRequest();
             boolean sessionCookieSet = false;
             if (nativeRequest instanceof HttpServletRequest) {
-                final HttpServletRequest httpServletRequest = (HttpServletRequest) nativeRequest;
-                final Cookie[] cookies = httpServletRequest.getCookies();
+                final Cookie[] cookies = ((HttpServletRequest) nativeRequest).getCookies();
 
                 final StringBuilder sb = new StringBuilder();
 
@@ -251,7 +250,7 @@ public class Connection {
                     boolean forwardSessionCookies = false;
                     final ExternalContext.Session session = externalContext.getSession(false);
                     if (session != null) {
-                        final String requestedSessionId = httpServletRequest.getRequestedSessionId();
+                        final String requestedSessionId = externalContext.getRequest().getRequestedSessionId();
                         if (session.getId().equals(requestedSessionId)) {
                             forwardSessionCookies = true;
                         }
@@ -313,7 +312,7 @@ public class Connection {
                         }
 
                         String incomingSessionCookie = null;
-                        if (externalContext.getRequest().getNativeRequest() instanceof HttpServletRequest) {
+                        if (nativeRequest instanceof HttpServletRequest) {
                             final Cookie[] cookies = ((HttpServletRequest) externalContext.getRequest().getNativeRequest()).getCookies();
                             if (cookies != null) {
                                 for (final Cookie cookie: cookies) {

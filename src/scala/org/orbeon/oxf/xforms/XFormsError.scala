@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms
 
 import action.XFormsAPI._
+import event.XFormsEventTarget
 import model.DataModel.Reason
 import org.orbeon.oxf.resources.ResourceManagerWrapper
 import org.orbeon.scaxon.XML._
@@ -28,6 +29,7 @@ import org.orbeon.saxon.om.NodeInfo
 import org.apache.commons.lang.StringUtils
 import org.orbeon.oxf.common.{ValidationException, OXFException}
 import java.util.{List ⇒ JList}
+import xbl.{Scope, XBLContainer}
 
 object XFormsError {
 
@@ -37,10 +39,10 @@ object XFormsError {
         assert(message ne null)
 
         val file = locationData flatMap (l ⇒ Option(l.getSystemID))
-        val line = locationData map (_.getLine) filter (_ >= 0)
-        val col = locationData map (_.getCol) filter (_ >= 0)
+        val line = locationData map     (_.getLine) filter (_ >= 0)
+        val col  = locationData map     (_.getCol)  filter (_ >= 0)
 
-        private val attributes = Seq("file", "line", "column", "exception")
+        private val attributes  = Seq("file", "line", "column", "exception")
         private val description = Seq("in", "line", "column", "cause")
 
         private def collectSeq(names: Seq[String]) = names zip
@@ -60,45 +62,54 @@ object XFormsError {
         }
     }
 
-    def handleNonFatalXPathError(containingDocument: XFormsContainingDocument, t: Throwable) {
-        handleNonFatalXFormsError(containingDocument, "exception while evaluating XPath expression", t)
-    }
+    def handleNonFatalXPathError(container: XBLContainer, t: Throwable): Unit =
+        handleNonFatalXFormsError(container, "exception while evaluating XPath expression", t)
 
-    def logNonFatalXPathErrorAsDebug(containingDocument: XFormsContainingDocument, t: Throwable) {
-        containingDocument.getIndentedLogger.logDebug("", "exception while evaluating XPath expression", t)
-    }
+    def logNonFatalXPathErrorAsDebug(container: XBLContainer, scope: Scope, t: Throwable): Unit =
+        container.getContainingDocument.getIndentedLogger.logDebug("", "exception while evaluating XPath expression", t)
 
-    def handleNonFatalXFormsError(containingDocument: XFormsContainingDocument, message: String, t: Throwable) {
-        if (containingDocument.isInitializing) {
-            // The error is non fatal only upon XForms updates
-            throw new OXFException(t)
-        } else {
+    def handleNonFatalActionError(target: XFormsEventTarget, t: Throwable): Unit =
+        handleNonFatalXFormsError(target.container, "exception while running action", t)
+
+    private def handleNonFatalXFormsError(container: XBLContainer, message: String, t: Throwable): Unit = {
+
+        def log() = {
             // Log + add server error
+            val containingDocument = container.getContainingDocument
             containingDocument.getIndentedLogger.logWarning("", message, t)
             containingDocument.addServerError(ServerError(t))
         }
+
+        fatalOrNot(container, () ⇒ throw new OXFException(t), log _)
     }
 
-    def handleNonFatalSetvalueError(containingDocument: XFormsContainingDocument, locationData: LocationData, reason: Reason) {
-        if (containingDocument.isInitializing) {
-            // The error is non fatal only upon XForms updates
-            throw new OXFException(reason.message)
-        } else {
+    def handleNonFatalSetvalueError(target: XFormsEventTarget, locationData: LocationData, reason: Reason): Unit = {
+
+        def log() = {
             // Log + add server error
+            val containingDocument = target.container.getContainingDocument
             containingDocument.getIndentedLogger.logWarning("", reason.message)
             containingDocument.addServerError(ServerError(reason.message, Option(locationData)))
         }
+
+        fatalOrNot(target.container, () ⇒ throw new OXFException(reason.message), log _)
     }
 
+    // The error is non fatal only upon XForms updates OR for nested parts
+    private def fatalOrNot(container: XBLContainer, fatal: () ⇒ Any, nonFatal: () ⇒ Any) =
+        if (container.getPartAnalysis.isTopLevel && container.getContainingDocument.isInitializing)
+            fatal()
+        else
+            nonFatal()
+
     // Output the Ajax error panel with a placeholder for errors
-    def outputAjaxErrorPanel(containingDocument: XFormsContainingDocument, helper: ContentHandlerHelper, htmlPrefix: String) {
+    def outputAjaxErrorPanel(containingDocument: XFormsContainingDocument, helper: ContentHandlerHelper, htmlPrefix: String): Unit =
         helper.element("", XMLConstants.XINCLUDE_URI, "include", Array(
             "href", XHTMLBodyHandler.getIncludedResourceURL(containingDocument.getRequestPath, "error-dialog.xml"),
             "fixup-xml-base", "false"))
-    }
 
     // Output the Noscript error panel and insert the errors
-    def outputNoscriptErrorPanel(containingDocument: XFormsContainingDocument, helper: ContentHandlerHelper, htmlPrefix: String) {
+    def outputNoscriptErrorPanel(containingDocument: XFormsContainingDocument, helper: ContentHandlerHelper, htmlPrefix: String): Unit = {
         val errors = containingDocument.getServerErrors.asScala
         if (errors nonEmpty) {
 
@@ -127,7 +138,7 @@ object XFormsError {
     }
 
     // Insert server errors into the Ajax response
-    def outputAjaxErrors(ch: ContentHandlerHelper, errors: JList[ServerError]) {
+    def outputAjaxErrors(ch: ContentHandlerHelper, errors: JList[ServerError]): Unit = {
         ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "errors")
         for (error ← errors.asScala) {
             ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "error", error.getDetailsAsArray)

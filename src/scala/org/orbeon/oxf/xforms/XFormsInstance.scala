@@ -20,8 +20,7 @@ import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver
 import org.orbeon.oxf.pipeline.api.XMLReceiver
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl
 import org.orbeon.oxf.xforms.event._
-import org.orbeon.oxf.xforms.event.events.XFormsDeleteEvent
-import org.orbeon.oxf.xforms.event.events.XFormsInsertEvent
+import events.{XXFormsInstanceInvalidate, XXFormsActionErrorEvent, XFormsDeleteEvent, XFormsInsertEvent}
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.xml.dom4j.LocationData
@@ -148,10 +147,9 @@ class XFormsInstance(
     def parentEventObserver: XFormsEventObserver = model
 
     def performDefaultAction(event: XFormsEvent) =
-        event.getName match {
-            case XFormsEvents.XXFORMS_INSTANCE_INVALIDATE ⇒
+        event match {
+            case ev: XXFormsInstanceInvalidate ⇒
                 implicit val indentedLogger = event.containingDocument.getIndentedLogger(XFormsModel.LOGGING_CATEGORY)
-                // Invalidate instance if it is cached
                 _instanceCaching match {
                     case Some(instanceCaching) ⇒
                         XFormsServerSharedInstancesCache.remove(indentedLogger, instanceCaching.sourceURI, null, instanceCaching.handleXInclude)
@@ -159,6 +157,8 @@ class XFormsInstance(
                         warn("xxforms-instance-invalidate event dispatched to non-cached instance", Seq("instance id" → getEffectiveId))
 
                 }
+            case ev: XXFormsActionErrorEvent ⇒
+                XFormsError.handleNonFatalActionError(this, ev.throwable)
             case _ ⇒ 
         }
 

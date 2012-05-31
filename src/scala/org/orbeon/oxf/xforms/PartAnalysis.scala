@@ -27,6 +27,7 @@ trait PartAnalysis extends PartGlobalOps with PartStaticAnalysisOps with XMLUtil
     def locationData: LocationData
     def getIndentedLogger: IndentedLogger
 
+    def isTopLevel: Boolean
     val parent: Option[PartAnalysis]
 
     def ancestors: Stream[PartAnalysis]

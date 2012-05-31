@@ -153,12 +153,12 @@ public class XFormsContextStack {
             final Item defaultNode = model.getDefaultInstance().instanceRoot();
             final List<Item> defaultNodeset = Arrays.asList(defaultNode);
             this.head = new BindingContext(parentBindingContext, model, null, defaultNodeset, 1, null, true, null,
-                    model.getDefaultInstance().getLocationData(), false, defaultNode, container.getResolutionScope());
+                    model.getDefaultInstance().getLocationData(), false, defaultNode, container.innerScope());
         } else {
             // Push empty context
             final List<Item> defaultContext = DEFAULT_CONTEXT;
             this.head = new BindingContext(parentBindingContext, model, null, defaultContext, defaultContext.size(), null, true, null,
-                    (model != null) ? model.getLocationData() : null, false, null, container.getResolutionScope());
+                    (model != null) ? model.getLocationData() : null, false, null, container.innerScope());
         }
 
         // Add model variables for default model
@@ -284,7 +284,7 @@ public class XFormsContextStack {
             final XFormsModel newModel;
             final boolean isNewModel;
             if (modelId != null) {
-                final XBLContainer resolutionScopeContainer = container.findResolutionScope(scope);
+                final XBLContainer resolutionScopeContainer = container.findScopeRoot(scope);
                 final Object o = resolutionScopeContainer.resolveObjectById(sourceEffectiveId, modelId, null);
                 if (!(o instanceof XFormsModel)) {
                     // Invalid model id
@@ -317,7 +317,7 @@ public class XFormsContextStack {
                     // Resolve the bind id to a nodeset
 
                     // NOTE: For now, only the top-level models in a resolution scope are considered
-                    final XBLContainer resolutionScopeContainer = container.findResolutionScope(scope);
+                    final XBLContainer resolutionScopeContainer = container.findScopeRoot(scope);
                     final Object o = resolutionScopeContainer.resolveObjectById(sourceEffectiveId, bindId, baseBindingContext.getSingleItem());
                     if (o == null && resolutionScopeContainer.containsBind(bindId)) {
                         // The bind attribute was valid for this scope, but no runtime object was found for the bind
@@ -427,7 +427,7 @@ public class XFormsContextStack {
                                         functionContext, null, locationData);
                             } catch (Exception e) {
                                 if (handleNonFatal) {
-                                    XFormsError.handleNonFatalXPathError(container.getContainingDocument(), e);
+                                    XFormsError.handleNonFatalXPathError(container, e);
                                     result = XFormsConstants.EMPTY_ITEM_LIST;
                                 } else {
                                     throw e;
@@ -465,7 +465,7 @@ public class XFormsContextStack {
                                             functionContext, null, locationData);
                                 } catch (Exception e) {
                                     if (handleNonFatal) {
-                                        XFormsError.handleNonFatalXPathError(container.getContainingDocument(), e);
+                                        XFormsError.handleNonFatalXPathError(container, e);
                                         result = XFormsConstants.EMPTY_ITEM_LIST;
                                     } else {
                                         throw e;

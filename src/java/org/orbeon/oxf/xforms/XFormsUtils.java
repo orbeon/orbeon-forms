@@ -24,7 +24,6 @@ import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.DebugProcessor;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.*;
-import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl;
 import org.orbeon.oxf.xforms.control.controls.XXFormsAttributeControl;
 import org.orbeon.oxf.xforms.event.Dispatch;
@@ -317,7 +316,7 @@ public class XFormsUtils {
                                 contextStack.getFunctionContext(sourceEffectiveId), null,
                                 (LocationData) childElement.getData());
                     } catch (Exception e) {
-                        XFormsError.handleNonFatalXPathError(container.getContainingDocument(), e);
+                        XFormsError.handleNonFatalXPathError(container, e);
                         tempResult = "";
                     } finally {
                         contextStack.returnFunctionContext();

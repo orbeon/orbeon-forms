@@ -54,7 +54,7 @@ trait ControlXPathSupport {
                 catch {
                     case e: Exception ⇒
                         // Don't consider this as fatal
-                        XFormsError.handleNonFatalXPathError(containingDocument, e)
+                        XFormsError.handleNonFatalXPathError(container, e)
                         null
                 } finally
                     // Restore function context to prevent leaks caused by context pointing to removed controls
@@ -83,7 +83,7 @@ trait ControlXPathSupport {
             catch {
                 case e: Exception ⇒
                     // Don't consider this as fatal
-                    XFormsError.handleNonFatalXPathError(containingDocument, e)
+                    XFormsError.handleNonFatalXPathError(container, e)
                     null
             } finally
                 // Restore function context to prevent leaks caused by context pointing to removed controls
@@ -113,7 +113,7 @@ trait ControlXPathSupport {
             catch {
                 case e: Exception ⇒
                     // Don't consider this as fatal
-                    XFormsError.handleNonFatalXPathError(containingDocument, e)
+                    XFormsError.handleNonFatalXPathError(container, e)
                     null
             } finally
                 // Restore function context to prevent leaks caused by context pointing to removed controls

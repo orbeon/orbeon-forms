@@ -107,7 +107,7 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
         }
 
         // Handle rebuild flags for container affected by changes to this repeat
-        val resolutionScopeContainer = container.findResolutionScope(getPrefixedId)
+        val resolutionScopeContainer = container.findScopeRoot(getPrefixedId)
         resolutionScopeContainer.setDeferredFlagsForSetindex()
     }
 

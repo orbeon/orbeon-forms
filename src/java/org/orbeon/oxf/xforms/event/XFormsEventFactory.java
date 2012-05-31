@@ -286,6 +286,11 @@ public class XFormsEventFactory {
                 return new XXFormsRepeatActivateEvent(containingDocument, targetObject);
             }
         });
+        nameToClassMap.put(XFormsEvents.XXFORMS_INSTANCE_INVALIDATE, new Factory() {
+            public XFormsEvent createEvent(XFormsContainingDocument containingDocument, String eventName, XFormsEventTarget targetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable, String contextString, Element contextElement, Throwable contextThrowable, Map<String, String> parameters) {
+                return new XXFormsInstanceInvalidate(containingDocument, targetObject);
+            }
+        });
     }
 
     // For internal events

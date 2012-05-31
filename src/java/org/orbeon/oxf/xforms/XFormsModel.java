@@ -448,11 +448,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
             // 4.3.8 The xforms-reset Event
             // Bubbles: Yes / Cancelable: Yes / Context Info: None
             doReset();
-        } else if (XFormsEvents.XFORMS_COMPUTE_EXCEPTION.equals(eventName) || XFormsEvents.XFORMS_LINK_EXCEPTION.equals(eventName)) {
-            // 4.5.4 The xforms-compute-exception Event
-            // Bubbles: Yes / Cancelable: No / Context Info: Implementation-specific error string.
-            // The default action for this event results in the following: Fatal error.
-
+        } else if (XFormsEvents.XFORMS_LINK_EXCEPTION.equals(eventName)) {
             // 4.5.2 The xforms-link-exception Event
             // Bubbles: Yes / Cancelable: No / Context Info: The URI that failed to load (xsd:anyURI)
             // The default action for this event results in the following: Fatal error.
@@ -471,16 +467,19 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
             final XXFormsXPathErrorEvent ev = (XXFormsXPathErrorEvent) event;
             final Throwable t = ev.throwable();
             if (isIgnorableXPathError(t))
-                XFormsError.logNonFatalXPathErrorAsDebug(containingDocument, t);
+                XFormsError.logNonFatalXPathErrorAsDebug(container(), scope(), t);
             else
-                XFormsError.handleNonFatalXPathError(containingDocument, t);
+                XFormsError.handleNonFatalXPathError(container(), t);
         } else if (XFormsEvents.XXFORMS_BINDING_ERROR.equals(eventName)) {
             // Custom event for binding errors
             // NOTE: We don't like this event very much as it is dispatched in the middle of rebuild/recalculate/revalidate,
             // and event handlers for this have to be careful. It might be better to dispatch it *after* RRR.
 
             final XXFormsBindingErrorEvent ev = (XXFormsBindingErrorEvent) event;
-            XFormsError.handleNonFatalSetvalueError(containingDocument, ev.locationData(), ev.reason());
+            XFormsError.handleNonFatalSetvalueError(this, ev.locationData(), ev.reason());
+        } else if (XFormsEvents.XXFORMS_ACTION_ERROR.equals(eventName)) {
+            final XXFormsActionErrorEvent ev = (XXFormsActionErrorEvent) event;
+            XFormsError.handleNonFatalActionError(this, ev.throwable());
         }
     }
 

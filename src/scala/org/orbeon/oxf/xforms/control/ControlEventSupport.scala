@@ -18,7 +18,6 @@ import control.Controls.AncestorIterator
 import event.events._
 import event.{EventListener, XFormsEvent, XFormsEventObserver, XFormsEvents}
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatIterationControl
-import org.orbeon.oxf.xforms.xbl.XBLContainer
 import scala.Option
 import java.util.{Set ⇒ JSet}
 import scala.collection.JavaConverters._
@@ -58,7 +57,9 @@ trait ControlEventSupport {
         case _: XFormsHelpEvent ⇒
             containingDocument.setClientHelpEffectiveControlId(getEffectiveId)
         case ev: XXFormsBindingErrorEvent ⇒
-            XFormsError.handleNonFatalSetvalueError(containingDocument, ev.locationData, ev.reason)
+            XFormsError.handleNonFatalSetvalueError(this, ev.locationData, ev.reason)
+        case ev: XXFormsActionErrorEvent ⇒
+            XFormsError.handleNonFatalActionError(this, ev.throwable)
         case _ ⇒
     }
 

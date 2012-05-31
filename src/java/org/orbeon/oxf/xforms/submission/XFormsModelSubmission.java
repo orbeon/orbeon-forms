@@ -18,7 +18,6 @@ import org.apache.log4j.Logger;
 import org.dom4j.*;
 import org.dom4j.io.DocumentSource;
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.*;
@@ -27,6 +26,7 @@ import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitDoneEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitErrorEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitSerializeEvent;
+import org.orbeon.oxf.xforms.event.events.XXFormsActionErrorEvent;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.oxf.xforms.xbl.Scope;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
@@ -294,12 +294,10 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
         if (XFormsEvents.XFORMS_SUBMIT.equals(eventName) || XFormsEvents.XXFORMS_SUBMIT.equals(eventName)) {
             // 11.1 The xforms-submit Event
             // Bubbles: Yes / Cancelable: Yes / Context Info: None
-
             doSubmit(event);
-
-        } else if (XFormsEvents.XFORMS_BINDING_EXCEPTION.equals(eventName)) {
-            // The default action for this event results in the following: Fatal error.
-            throw new ValidationException("Binding exception for target: " + event.getTargetObject().getEffectiveId(), event.getTargetObject().getLocationData());
+        } else if (XFormsEvents.XXFORMS_ACTION_ERROR.equals(eventName)) {
+            final XXFormsActionErrorEvent ev = (XXFormsActionErrorEvent) event;
+            XFormsError.handleNonFatalActionError(this, ev.throwable());
         }
     }
 
@@ -779,7 +777,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
             refNodeInfo = (NodeInfo) bindingContext.getSingleItem();
             submissionElementContextItem = bindingContext.contextItem();
             // NOTE: Current instance may be null if the document submitted is not part of an instance
-            refInstance = bindingContext.getInstance();
+            refInstance = bindingContext.instanceOrNull();
             xpathContext = new XPathCache.XPathContext(namespaceMapping, bindingContext.getInScopeVariables(), functionLibrary, functionContext, null, getLocationData());
         }
 

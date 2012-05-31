@@ -162,8 +162,7 @@ case class BindingContext(
     */
 
     // NOTE: This is as of 2009-09-17 used only to determine the submission instance based on a submission node.
-    // May return null
-    def getInstance =
+    def instanceOrNull =
         Option(getSingleItem) collect
             { case node: NodeInfo ⇒ model.getContainingDocument.getInstanceForNode(node) } orNull
 

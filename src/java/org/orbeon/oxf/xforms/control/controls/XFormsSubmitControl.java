@@ -48,7 +48,7 @@ public class XFormsSubmitControl extends XFormsTriggerControl {
 
             // Find submission object and dispatch submit event to it
 
-            final Object object = container().findResolutionScope(XFormsUtils.getPrefixedId(getEffectiveId())).resolveObjectById(getEffectiveId(), submissionId, null);
+            final Object object = container().findScopeRoot(XFormsUtils.getPrefixedId(getEffectiveId())).resolveObjectById(getEffectiveId(), submissionId, null);
             if (object instanceof XFormsModelSubmission) {
                 final XFormsModelSubmission submission = (XFormsModelSubmission) object;
                 Dispatch.dispatchEvent(new XFormsSubmitEvent(containingDocument(), submission));

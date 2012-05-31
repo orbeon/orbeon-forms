@@ -19,7 +19,7 @@ import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.event.XFormsExceptionEvent;
 
 /**
- * 4.5.4 The xforms-compute-exception Event
+ * 4.5.4 The xforms-link-exception Event
  *
  * Target: model / Bubbles: Yes / Cancelable: No / Context Info: Implementation-specific error string.
  * The default action for this event results in the following: Fatal error.

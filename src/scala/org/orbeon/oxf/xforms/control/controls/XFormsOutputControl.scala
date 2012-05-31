@@ -120,7 +120,7 @@ class XFormsOutputControl(container: XBLContainer, parent: XFormsControl, elemen
         try Headers.evaluateHeaders(container, getContextStack, getEffectiveId, staticControl.element)
         catch {
             case e: Exception ⇒ {
-                XFormsError.handleNonFatalXPathError(containingDocument, e)
+                XFormsError.handleNonFatalXPathError(container, e)
                 return Collections.emptyMap()
             }
         }

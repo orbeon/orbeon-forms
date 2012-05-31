@@ -443,7 +443,7 @@ public class XFormsActionInterpreter {
     }
 
     private XBLContainer findResolutionScopeContainer(Element actionElement) {
-        return _container.findResolutionScope(getActionPrefixedId(actionElement));
+        return _container.findScopeRoot(getActionPrefixedId(actionElement));
     }
 
     /**

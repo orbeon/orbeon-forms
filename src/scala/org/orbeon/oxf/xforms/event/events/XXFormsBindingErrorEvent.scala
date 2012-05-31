@@ -23,4 +23,4 @@ class XXFormsBindingErrorEvent(
         target: XFormsEventTarget,
         val locationData: LocationData,
         val reason: Reason)
-    extends XFormsEvent(containingDocument, XFormsEvents.XXFORMS_BINDING_ERROR, target, true, true)
+    extends XFormsEvent(containingDocument, XFormsEvents.XXFORMS_BINDING_ERROR, target, bubbles = true, cancelable = false)

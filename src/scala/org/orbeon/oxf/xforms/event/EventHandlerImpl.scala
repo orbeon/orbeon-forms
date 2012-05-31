@@ -201,10 +201,13 @@ class EventHandlerImpl(
             }
         } catch {
             case e: Exception ⇒
-                // Something bad happened while running the action
-                // NOTE: Dispatch directly to #document. Ideally it would bubble and a default listener on the document would handle it.
-                val target = containingDocument.getObjectByEffectiveId("#document").asInstanceOf[XFormsEventTarget]
-                Dispatch.dispatchEvent(new XXFormsActionErrorEvent(containingDocument, target, e))
+                // Something bad happened while running the action: dispatch error event to the root of the current scope
+                // NOTE: We used to dispatch the event to XFormsContainingDocument, but that is no longer a event
+                // target. We thought about dispatching to the root control of the current scope, BUT in case the action
+                // is running within a model before controls are created, that won't be available. SO the answer is to
+                // dispatch to what we know exists, and that is the current observer or the target. The observer is
+                // "closer" from the action, so we dispatch to that.
+                Dispatch.dispatchEvent(new XXFormsActionErrorEvent(container.getContainingDocument, eventObserver, e))
         }
     }
 

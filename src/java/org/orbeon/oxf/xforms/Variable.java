@@ -104,7 +104,7 @@ public class Variable {
                         if (handleNonFatal) {
                             // Don't consider this as fatal
                             // Default value is the empty sequence
-                            XFormsError.handleNonFatalXPathError(contextStack.containingDocument, e);
+                            XFormsError.handleNonFatalXPathError(contextStack.container, e);
                             variableValue = EmptySequence.getInstance();
                         } else {
                             throw new OXFException(e);

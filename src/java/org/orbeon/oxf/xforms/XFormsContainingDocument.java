@@ -936,7 +936,8 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
     }
 
     @Override
-    public Scope getResolutionScope() {
+    public Scope innerScope() {
+        // Do it here because at construction time, we don't yet have access to the static state!
         return staticState.topLevelPart().startScope();
     }
 

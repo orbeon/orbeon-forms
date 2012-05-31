@@ -77,7 +77,11 @@ public class XBLContainer implements XFormsObjectResolver {
     // NOTE: null if this instanceof XFormsContainingDocument BUT could use a root control instead!
     private final XFormsControl associatedControl;
 
-    private final Scope innerScope;
+    private final Scope _innerScope;
+
+    public Scope innerScope() {
+        return _innerScope;
+    }
 
     /**
      * Create a new container child of the given control
@@ -134,11 +138,7 @@ public class XBLContainer implements XFormsObjectResolver {
         this.contextStack = new XFormsContextStack(this);
 
         this.associatedControl = associatedControl;
-        this.innerScope = innerScope;
-    }
-
-    public Scope getResolutionScope() {
-        return innerScope;
+        this._innerScope = innerScope;
     }
 
     /**
@@ -235,35 +235,23 @@ public class XBLContainer implements XFormsObjectResolver {
         return contextStack;
     }
 
-    /**
-     * Find the resolution scope of a given prefixed id. The id must belong to the current container.
-     *
-     * @param prefixedId    prefixed id of XForms element
-     * @return              container corresponding to the scope
-     */
-    public XBLContainer findResolutionScope(String prefixedId) {
-        final String xblScopeIdFullPrefix; {
-            final Scope xblScope = getPartAnalysis().scopeForPrefixedId(prefixedId);
-            if (xblScope == null)
-                throw new IllegalArgumentException("Prefixed id not found in current part: " + prefixedId);
-            xblScopeIdFullPrefix = xblScope.fullPrefix();// e.g. "" or "my-tab$my-component" => "" or "my-tab$my-component$"
-        }
+    // Find the root container for the given prefixed id, starting with the current container.
+    // This is the container which has the given scope as inner scope.
+    // The prefixed id must be within the current container.
+    public XBLContainer findScopeRoot(String prefixedId) {
+        final Scope scope = getPartAnalysis().scopeForPrefixedId(prefixedId);
+        if (scope == null)
+            throw new IllegalArgumentException("Prefixed id not found in current part: " + prefixedId);
 
-        XBLContainer currentContainer = this;
-        do {
-            if (currentContainer.getFullPrefix().equals(xblScopeIdFullPrefix))
-                return currentContainer;
-
-            currentContainer = currentContainer.getParentXBLContainer();
-        } while (currentContainer != null);
-
-        throw new OXFException("XBL resolution scope not found for id: " + prefixedId);
+        return findScopeRoot(scope);
     }
 
-    public XBLContainer findResolutionScope(Scope scope) {
+    // Find the root container for the given scope, starting with the current container.
+    // This is the container which has the given scope as inner scope.
+    public XBLContainer findScopeRoot(Scope scope) {
         XBLContainer currentContainer = this;
         do {
-            if (currentContainer.getResolutionScope() == scope)
+            if (currentContainer.innerScope() == scope)
                 return currentContainer;
 
             currentContainer = currentContainer.getParentXBLContainer();
@@ -279,7 +267,7 @@ public class XBLContainer implements XFormsObjectResolver {
      * @return
      */
     public boolean containsBind(String bindId) {
-        for (final Model model : getPartAnalysis().getModelsForScope(getResolutionScope())) {
+        for (final Model model : getPartAnalysis().getModelsForScope(innerScope())) {
             if (model.containsBind(bindId))
                 return true;
         }
@@ -291,7 +279,7 @@ public class XBLContainer implements XFormsObjectResolver {
      */
     public void addAllModels() {
         // Iterate through all models and finds the one that apply to this container
-        for (final Model model: getPartAnalysis().getModelsForScope(getResolutionScope())) {
+        for (final Model model: getPartAnalysis().getModelsForScope(innerScope())) {
             // Find model's effective id, e.g. if container's effective id is foo$bar.1-2 and models static id is
             // my-model => foo$bar$my-model.1-2
             final String modelEffectiveId = model.prefixedId() + XFormsUtils.getEffectiveIdSuffixWithSeparator(effectiveId);
@@ -447,7 +435,7 @@ public class XBLContainer implements XFormsObjectResolver {
 
     public Object resolveObjectByIdInScope(String sourceEffectiveId, String targetStaticId, Item contextItem) {
         final String sourcePrefixedId = XFormsUtils.getPrefixedId(sourceEffectiveId);
-        final XBLContainer resolutionScopeContainer = findResolutionScope(sourcePrefixedId);
+        final XBLContainer resolutionScopeContainer = findScopeRoot(sourcePrefixedId);
         return resolutionScopeContainer.resolveObjectById(sourceEffectiveId, targetStaticId, contextItem);
     }
 
@@ -556,7 +544,7 @@ public class XBLContainer implements XFormsObjectResolver {
     }
 
     private boolean isEffectiveIdResolvableByThisContainer(String effectiveId) {
-        return this == findResolutionScope(XFormsUtils.getPrefixedId(effectiveId));
+        return this == findScopeRoot(XFormsUtils.getPrefixedId(effectiveId));
     }
 
     /**

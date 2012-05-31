@@ -287,7 +287,7 @@ public class XFormsItemUtils {
                                     contextStack.getFunctionContext(elementEffectiveId), null,
                                     (LocationData) itemChoiceItemsetElement.getData());
                         } catch (Exception e) {
-                            XFormsError.handleNonFatalXPathError(container.getContainingDocument(), e);
+                            XFormsError.handleNonFatalXPathError(container, e);
                             tempResult = "";
                         } finally {
                             contextStack.returnFunctionContext();

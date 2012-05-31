@@ -26,14 +26,22 @@
         <p:input name="config">
             <xsl:stylesheet version="2.0">
                 <xsl:template match="/">
-                    <xsl:copy-of select="saxon:parse(string(/))"/>
+                    <xsl:for-each select="saxon:parse(string(/))/*">
+                        <xsl:copy>
+                            <!-- Add namespace declaration for xs if not there already -->
+                            <xsl:if test="not(in-scope-prefixes(.) = 'xs')">
+                                <xsl:namespace name="xs" select="'http://www.w3.org/2001/XMLSchema'"/>
+                            </xsl:if>
+                            <xsl:copy-of select="@* | node()"/>
+                        </xsl:copy>
+                    </xsl:for-each>
                 </xsl:template>
             </xsl:stylesheet>
         </p:input>
         <p:output name="data" id="input-parsed"/>
     </p:processor>
 
-    <!-- Execute XPath expresssion-->
+    <!-- Execute XPath expression-->
     <p:processor name="oxf:xslt">
         <p:input name="data" href="#input-parsed"/>
         <p:input name="xpath" href="#instance#xpointer(/*/*[2])"/>

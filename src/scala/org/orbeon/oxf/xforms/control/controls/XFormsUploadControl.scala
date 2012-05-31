@@ -167,10 +167,9 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
             // Store the value
             super.storeExternalValue(valueToStore)
 
-            // When a value is set, make sure associated file information is cleared, because even though the control might
-            // not be re-evaluated, a submission might attempt to access file name, etc. information for bound upload
-            // controls. A little tricky: can we find a better solution?
-            markFileMetadataDirty()
+            // NOTE: We used to call markFileMetadataDirty() here, but it was wrong, because getBackCopy would then
+            // obtain the new data, and control diffs wouldn't work properly. This was done for XFormsSubmissionUtils,
+            // which is now modified to use boundFileMediatype/boundFilename instead.
 
             // Filename, mediatype and size
             setFilename(filename)

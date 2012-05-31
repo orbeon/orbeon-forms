@@ -298,11 +298,11 @@ public class XFormsSubmissionUtils {
                             // Found one relevant upload control bound to the instance we are submitting
                             // NOTE: special MIP-like annotations were added just before re-rooting/pruning element. Those
                             // will be removed during the next recalculate.
-                            final String fileName = currentControl.filename();
+                            final String fileName = currentControl.boundFilename();
                             if (fileName != null) {
                                 InstanceData.setTransientAnnotation(controlBoundNodeInfo, "xxforms-filename", fileName);
                             }
-                            final String mediatype = currentControl.fileMediatype();
+                            final String mediatype = currentControl.boundFileMediatype();
                             if (mediatype != null) {
                                 InstanceData.setTransientAnnotation(controlBoundNodeInfo, "xxforms-mediatype", mediatype);
                             }

@@ -67,6 +67,10 @@ trait FileMetadata extends XFormsValueControl {
     def filename             = props("filename") .value
     def fileSize             = props("size")     .value
 
+    // "Instant" evaluators which go straight to the bound nodes if possible
+    def boundFileMediatype  = FileMetadata.Evaluators("mediatype")(self)
+    def boundFilename       = FileMetadata.Evaluators("filename")(self)
+
     // Setters
     def setFileMediatype(mediatype: String): Unit =
         setInfoValue(mediatypeElement, mediatype)

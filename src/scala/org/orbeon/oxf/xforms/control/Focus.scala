@@ -226,6 +226,7 @@ object Focus {
 
                 case uiEvent: XFormsUIEvent ⇒
                     // Broken retargeting for other UI events
+                    // See: https://github.com/orbeon/orbeon-forms/issues/282
 
                     def addRetarget(o: XFormsEventObserver) {
                         boundaries.add(o)
@@ -237,6 +238,7 @@ object Focus {
                 case _ ⇒
                     // For other events, simply stop propagation at the component boundary
                     // This is broken too as it doesn't follow scopes!
+                    // See: https://github.com/orbeon/orbeon-forms/issues/282
 
                     commonIterator takeWhile (notReachedComponent)
             }

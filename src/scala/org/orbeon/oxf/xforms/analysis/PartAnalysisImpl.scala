@@ -117,6 +117,7 @@ class PartAnalysisImpl(
         // 2. Create new control if possible
         val elementAnalysis = {
             val controlScope = scopeForPrefixedId(controlPrefixedId)
+            // NOTE: Wondering if there is a benefit to use separate StaticStateContext vs. just passing the 2 args
             val staticStateContext = StaticStateContext(partAnalysis, controlAnalysisMap.size + 1)
             ControlAnalysisFactory.create(staticStateContext, controlElement, Some(parent), preceding, controlScope)
         }

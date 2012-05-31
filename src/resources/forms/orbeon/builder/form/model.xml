@@ -217,6 +217,11 @@
                                  required="true()"
                                  constraint="not((for $t in for $n in name(..) return ../../../resource/*[name() = $n]/label return normalize-space($t) = '') = true())"/>
                 </xforms:bind>
+                <!-- Global attachments (also used by Form Runner) -->
+                <xforms:bind ref="xforms:instance[@id = 'fr-form-attachments']/*">
+                    <xforms:bind id="css-attachment-bind" ref="css" type="xs:anyURI"/>
+                    <xforms:bind id="pdf-attachment-bind" ref="pdf" type="xs:anyURI"/>
+                </xforms:bind>
             </xforms:bind>
         </xforms:bind>
         <!-- Keep all @edit-ref attributes pointing to the right spot -->
@@ -243,11 +248,6 @@
                     <xforms:bind ref="description[@xml:lang = $fb-lang]"/>
                     <xforms:bind ref="logo"
                                  type="xs:anyURI"/>
-                </xforms:bind>
-                <!-- Global attachments (also used by Form Runner) -->
-                <xforms:bind ref="xforms:instance[@id = 'fr-form-attachments']/*">
-                    <xforms:bind id="css-attachment-bind" ref="css" type="xs:anyURI"/>
-                    <xforms:bind id="pdf-attachment-bind" ref="pdf" type="xs:anyURI"/>
                 </xforms:bind>
             </xforms:bind>
         </xforms:bind>

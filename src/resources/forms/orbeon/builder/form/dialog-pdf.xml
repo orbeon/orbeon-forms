@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <!--
   Copyright (C) 2010 Orbeon, Inc.
 
@@ -12,75 +11,64 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xxforms:dialog  xmlns:xhtml="http://www.w3.org/1999/xhtml"
-      xmlns:xforms="http://www.w3.org/2002/xforms"
+<xxf:dialog xmlns:xh="http://www.w3.org/1999/xhtml"
+      xmlns:xf="http://www.w3.org/2002/xforms"
       xmlns:xs="http://www.w3.org/2001/XMLSchema"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:ev="http://www.w3.org/2001/xml-events"
       xmlns:xi="http://www.w3.org/2001/XInclude"
       xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
-      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+      xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
       xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
       xmlns:saxon="http://saxon.sf.net/"
 
-      id="fb-pdf-upload-dialog" level="modal" close="true" draggable="true" class="fr-dialog">
+      id="fb-pdf-upload-dialog" level="modal" close="false" draggable="true" class="fr-dialog" model="fb-pdf-upload-model">
 
-    <xforms:label ref="$form-resources/dialog-upload-pdf/label"/>
+    <xf:label ref="$form-resources/dialog-upload-pdf/label"/>
 
-    <xforms:var name="attachments-instance" value="$model/xforms:instance[@id = 'fr-form-attachments']/*"/>
-    <xhtml:div>
-        <xhtml:div class="fr-dialog-message">
+    <xh:div>
+        <xh:div class="fr-dialog-message">
+            <xf:upload ref="pdf">
+                <xf:label ref="$form-resources/dialog-upload-pdf/upload-pdf/label"/>
+                <xf:filename ref="@filename"/>
+                <xf:mediatype ref="@mediatype"/>
+                <xxf:size ref="@size"/>
+            </xf:upload>
+        </xh:div>
+    </xh:div>
+    <xh:div class="fr-dialog-buttons">
+        <xf:trigger>
+            <xf:label ref="$form-resources/apply/label"/>
+            <!-- Commit PDF information -->
+            <xf:action ev:event="DOMActivate">
+                <xf:setvalue ref="xxf:bind('pdf-attachment-bind')"     value="instance()/pdf"/>
+                <xf:insert   context="xxf:bind('pdf-attachment-bind')" origin="instance()/pdf/@*"/>
+            </xf:action>
+        </xf:trigger>
+        <xf:output value="$form-resources/or/label"/>
+        <xf:trigger appearance="minimal" class="fr-inplace-cancel">
+            <xf:label ref="$form-resources/cancel/label"/>
+        </xf:trigger>
+    </xh:div>
 
-            <!-- Upload a PDF file -->
-            <xforms:upload bind="pdf-attachment-bind" class="fr-attachment">
-                <xforms:label ref="$form-resources/dialog-upload-pdf/upload-pdf/label"/>
-                <xforms:filename ref="@filename"/>
-                <xforms:mediatype ref="@mediatype"/>
-                <xxforms:size ref="@size"/>
+    <!-- Read PDF information upon dialog open -->
+    <xf:action ev:event="xxforms-dialog-open">
+        <xf:setvalue ref="pdf"     value="xxf:bind('pdf-attachment-bind')"/>
+        <xf:insert   context="pdf" origin="xxf:bind('pdf-attachment-bind')/@*"/>
+    </xf:action>
 
-                <!-- Clear information when deselected -->
-                <xforms:action ev:event="xforms-deselect">
-                    <!-- Clear uploaded content -->
-                    <xforms:setvalue ref="."/>
-                    <xforms:setvalue ref="@filename"/>
-                    <xforms:setvalue ref="@mediatype"/>
-                    <xforms:setvalue ref="@size"/>
-                </xforms:action>
-            </xforms:upload>
+    <!-- Hide dialog for any button -->
+    <xxf:hide ev:event="DOMActivate" dialog="fb-pdf-upload-dialog"/>
+    
+    <!-- Local model -->
+    <xf:model id="fb-pdf-upload-model">
 
-            <!--<xforms:group context="$attachments-instance/attachment[1]" appearance="xxforms:internal">-->
-                <!--<xhtml:ul>-->
-                    <!--<xhtml:li>-->
-                        <!--<xhtml:p>-->
-                            <!--<xhtml:b>File Name:</xhtml:b>-->
-                            <!--<xforms:output value="@filename"/>-->
-                        <!--</xhtml:p>-->
-                    <!--</xhtml:li>-->
-                    <!--<xhtml:li>-->
-                        <!--<xhtml:p>-->
-                            <!--<xhtml:b>Mediatype:</xhtml:b>-->
-                            <!--<xforms:output value="@mediatype"/>-->
-                        <!--</xhtml:p>-->
-                    <!--</xhtml:li>-->
-                    <!--<xhtml:li>-->
-                        <!--<xhtml:p>-->
-                            <!--<xhtml:b>Size:</xhtml:b>-->
-                            <!--<xforms:output value="@size"/>-->
-                        <!--</xhtml:p>-->
-                    <!--</xhtml:li>-->
-                <!--</xhtml:ul>-->
-            <!--</xforms:group>-->
+        <xf:instance id="fb-pdf-upload-instance">
+            <instance>
+                <pdf filename="" mediatype="" size=""/>
+            </instance>
+        </xf:instance>
 
-        </xhtml:div>
-    </xhtml:div>
-    <xhtml:div class="fr-dialog-buttons">
-        <xforms:group>
-            <xforms:trigger xxforms:modal="true">
-                <xforms:label ref="$form-resources/apply/label"/>
-            </xforms:trigger>
-        </xforms:group>
-    </xhtml:div>
-    <!-- Hide dialog -->
-    <xxforms:hide ev:event="DOMActivate" dialog="fb-pdf-upload-dialog"/>
-</xxforms:dialog>
+    </xf:model>
+</xxf:dialog>

@@ -39,13 +39,6 @@
                 <xsl:variable name="is-custom-instance"
                               select="$model/xforms:instance[@id = 'fr-form-metadata']/*/form-instance-mode = 'custom'"/>
 
-                <!-- Custom instance: remove/add read-only instance -->
-                <xsl:template match="*[. is $model]/xforms:instance[@id = 'fr-readonly']"/>
-                <xsl:template match="*[. is $model]/xforms:instance[@id = 'fr-form-instance']">
-                    <xsl:next-match/>
-                    <!-- NOTE: add even if not($is-custom-instance) so that things work if we switch to $is-custom-instance -->
-                    <xforms:instance id="fb-readonly" xxforms:readonly="true"><readonly/></xforms:instance>
-                </xsl:template>
                 <!-- Custom instance: add dataModel namespace binding to top-level bind -->
                 <xsl:template match="xforms:bind[@id = 'fr-form-binds']">
                     <xsl:copy>

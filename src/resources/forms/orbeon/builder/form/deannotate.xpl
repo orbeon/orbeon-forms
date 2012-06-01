@@ -47,9 +47,6 @@
                     </xsl:copy>
                 </xsl:template>
 
-                <!-- Remove temporary fb-readonly instance -->
-                <xsl:template match="xforms:instance[@id = 'fb-readonly']"/>
-
                 <!-- Restore read-only instances -->
                 <xsl:template match="xforms:instance[@fb:readonly = 'true']">
                     <xsl:copy>
@@ -74,7 +71,7 @@
                     </xsl:element>
                 </xsl:template>
 
-                <!-- Restore binds pointing to fb-readonly -->
+                <!-- Restore binds pointing via deAnnotatedBindRef() -->
                 <xsl:template match="xforms:bind/@ref[$is-custom-instance] | xforms:bind/@nodeset[$is-custom-instance]">
                     <xsl:attribute name="{name()}" select="dataModel:deAnnotatedBindRef(.)"/>
                 </xsl:template>

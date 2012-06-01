@@ -14,9 +14,12 @@
 package org.orbeon.oxf.util
 
 import org.joda.time.format.{DateTimeFormatter, DateTimeFormat}
-import java.util.Locale
 import org.joda.time.DateTimeZone
-
+import org.orbeon.saxon.expr.XPathContext
+import org.orbeon.saxon.`type`.ValidationFailure
+import org.mockito.Mockito
+import org.orbeon.saxon.value.{CalendarValue, DateValue, DateTimeValue}
+import java.util.{Date, Locale}
 
 object DateUtils {
 
@@ -31,15 +34,43 @@ object DateUtils {
 
     private def withLocaleTZ(format: DateTimeFormatter) = format withLocale Locale.US withZone DateTimeZone.UTC
 
-    // Parse a date in one of the 3 ISO formats above
-    // Throws IllegalArgumentException if the date format is not known
-    def parse(date: String): Long =
-        if (date.length == 10)
-            XsDate.parseDateTime(date).getMillis
-        else if (date.indexOf('.') > 0)
-            XsDateTimeLong.parseDateTime(date).getMillis
-        else
-            XsDateTime.parseDateTime(date).getMillis
+    // Epoch dateTime/date
+    private val EpochDateTime = new DateTimeValue(1970, 1, 1, 0, 0, 0, 0, 0)
+    private val EpochDate = new DateValue(1970, 1, 1, 0)
+
+    // Default timezone offset in minutes
+    // This is obtained once at the time the current object initializes
+    val DefaultOffsetMinutes = {
+        val currentInstant = (new Date).getTime
+        DateTimeZone.getDefault.getOffset(currentInstant) / 1000 / 60
+    }
+
+    // Create a mock XPathContext which only cares about getImplicitTimezone
+    // Mockito doc: "You can let multiple threads call methods on a shared mock to test in concurrent conditions"
+    // See: http://code.google.com/p/mockito/wiki/FAQ
+    private val TZXPathContext = Mockito mock classOf[XPathContext]
+    Mockito when TZXPathContext.getImplicitTimezone thenReturn DefaultOffsetMinutes
+
+    // Parse a date in XML Schema-compatible ISO format:
+    //
+    // - Format for a dateTime: [-]yyyy-mm-ddThh:mm:ss[.fff*][([+|-]hh:mm | Z)]
+    // - Format for a date:     [-]yyyy-mm-dd[([+|-]hh:mm | Z)]
+    //
+    // Throws IllegalArgumentException if the date format is incorrect.
+    def parse(date: String): Long = {
+        val valueOrFailure =
+            if (date.length >= 11 && date.charAt(10) == 'T')
+                DateTimeValue.makeDateTimeValue(date)
+            else
+                DateValue.makeDateValue(date)
+
+        valueOrFailure match {
+                case value: CalendarValue ⇒
+                    value.subtract(if (value.isInstanceOf[DateTimeValue]) EpochDateTime else EpochDate, TZXPathContext).getLengthInMilliseconds
+                case failure: ValidationFailure ⇒
+                    throw new IllegalArgumentException(failure.getMessage)
+            }
+    }
 
     // Parse an RFC 1123 dateTime
     def parseRFC1123(date: String): Long = RFC1123Date.parseDateTime(date).getMillis

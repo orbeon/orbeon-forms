@@ -94,13 +94,13 @@
             <label>Change PDF</label>
         </change-pdf>
         <upload-pdf>
-            <label>Upload PDF</label>
+            <label>Attach PDF</label>
         </upload-pdf>
         <change-css>
             <label>Change CSS</label>
         </change-css>
         <upload-css>
-            <label>Upload CSS</label>
+            <label>Attach CSS</label>
         </upload-css>
         <show-source>
             <label>Show Source</label>
@@ -535,7 +535,7 @@
             <label>View Source</label>
         </dialog-view-source>
         <dialog-upload-pdf>
-            <label>Upload PDF</label>
+            <label>Attach a PDF template file</label>
             <upload-pdf>
                 <label>PDF File</label>
             </upload-pdf>
@@ -914,13 +914,13 @@
             <label>Changer PDF</label>
         </change-pdf>
         <upload-pdf>
-            <label>Importer PDF</label>
+            <label>Attacher PDF</label>
         </upload-pdf>
         <change-css>
             <label>Changer CSS</label>
         </change-css>
         <upload-css>
-            <label>Importer CSS</label>
+            <label>Attacher CSS</label>
         </upload-css>
         <show-source>
             <label>Voir source</label>
@@ -1344,7 +1344,7 @@
             <label>Visualisation du code source</label>
         </dialog-view-source>
         <dialog-upload-pdf>
-            <label>Insertion de fichier PDF</label>
+            <label>Attacher un fichier PDF</label>
             <upload-pdf>
                 <label>Fichier PDF</label>
             </upload-pdf>

@@ -33,6 +33,6 @@ public class XXFormsInvalidateInstancesAction extends XFormsAction {
 
         // Use XFormsModel logger because it's what's used by XFormsServerSharedInstancesCache in other places
         final IndentedLogger indentedLogger = actionInterpreter.containingDocument().getIndentedLogger(XFormsModel.LOGGING_CATEGORY);
-        XFormsServerSharedInstancesCache.instance().removeAll(indentedLogger);
+        XFormsServerSharedInstancesCache.removeAll(indentedLogger);
     }
 }

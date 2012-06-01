@@ -17,13 +17,15 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.util.ConnectionResult;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.SecureUtils;
+import org.orbeon.oxf.xforms.InstanceCaching;
 import org.orbeon.oxf.xforms.XFormsInstance;
-import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.XFormsServerSharedInstancesCache;
+import org.orbeon.oxf.xforms.analysis.model.Instance;
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitErrorEvent;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.saxon.om.NodeInfo;
+import org.orbeon.saxon.om.VirtualNode;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -71,20 +73,12 @@ public class CacheableSubmission extends BaseSubmission {
 
         // Parameters to callable
         final String submissionEffectiveId = submission.getEffectiveId();
-        final String instanceStaticId;
-        final String modelEffectiveId;
-        final String validation;
-        {
-            // Find and check replacement location
-            final XFormsInstance updatedInstance = checkInstanceToUpdate(detailsLogger, p);
 
-            instanceStaticId = updatedInstance.staticId();
-            modelEffectiveId = updatedInstance.modelEffectiveId();
-            validation = updatedInstance.validation();
-        }
-        final boolean isReadonly = p2.isReadonly;
-        final boolean handleXInclude = p2.isHandleXInclude;
-        final long timeToLive = p2.timeToLive;
+        // Find and check replacement location
+        final XFormsInstance instanceToUpdate = checkInstanceToUpdate(detailsLogger, p);
+        final Instance staticInstance = instanceToUpdate.instance();
+        final InstanceCaching instanceCaching = InstanceCaching.fromValues(p2.timeToLive, p2.isHandleXInclude, absoluteResolvedURLString, requestBodyHash);
+        final String instanceStaticId = staticInstance.staticId();
 
         // Obtain replacer
         // Pass a pseudo connection result which contains information used by getReplacer()
@@ -92,19 +86,17 @@ public class CacheableSubmission extends BaseSubmission {
         final ConnectionResult connectionResult = createPseudoConnectionResult(absoluteResolvedURLString);
         final InstanceReplacer replacer = (InstanceReplacer) submission.getReplacer(connectionResult, p);
 
-        // Try from cache first
-        final XFormsInstance cacheResult = XFormsServerSharedInstancesCache.instance().findConvertNoLoad(
-                detailsLogger, instanceStaticId, modelEffectiveId, absoluteResolvedURLString, requestBodyHash, isReadonly,
-                handleXInclude, XFormsProperties.isExposeXPathTypes(containingDocument));
+        // As an optimization, try from cache first
+        // The purpose of this is to avoid starting a new thread in asynchronous mode if the instance is already in cache
+        final DocumentInfo cachedDocumentInfo = XFormsServerSharedInstancesCache.findContentOrNull(
+                detailsLogger,
+                staticInstance,
+                instanceCaching,
+                p2.isReadonly);
 
-        if (cacheResult != null) {
-            // Result was immediately available, so return it right away
-            // The purpose of this is to avoid starting a new thread in asynchronous mode if the instance is already in cache
-
+        if (cachedDocumentInfo != null) {
             // Here we cheat a bit: instead of calling generically deserialize(), we directly set the instance document
-            replacer.setInstance(cacheResult);
-
-            // Return result
+            replacer.setCachedResult(cachedDocumentInfo, instanceCaching);
             return new SubmissionResult(submissionEffectiveId, replacer, connectionResult);
         } else {
 
@@ -124,75 +116,77 @@ public class CacheableSubmission extends BaseSubmission {
 
                     final boolean[] status = { false , false};
                     try {
-                        final XFormsInstance newInstance = XFormsServerSharedInstancesCache.instance().findConvert(
-                                detailsLogger, instanceStaticId, modelEffectiveId, absoluteResolvedURLString, requestBodyHash, isReadonly,
-                                handleXInclude, XFormsProperties.isExposeXPathTypes(containingDocument), timeToLive, validation,
-                            new XFormsServerSharedInstancesCache.Loader() {
-                                public XFormsInstance load(String instanceStaticId,
-                                                                   String modelEffectiveId, String instanceSourceURI,
-                                                                   boolean handleXInclude, long timeToLive, String validation) {
+                        final DocumentInfo newDocumentInfo = XFormsServerSharedInstancesCache.findContentOrLoad(
+                                detailsLogger, staticInstance, instanceCaching, p2.isReadonly,
+                                new XFormsServerSharedInstancesCache.Loader() {
+                                    public DocumentInfo load(String instanceSourceURI, boolean handleXInclude) {
 
-                                    // Update status
-                                    status[0] = true;
+                                        // Update status
+                                        status[0] = true;
 
-                                    // Call regular submission
-                                    SubmissionResult submissionResult = null;
-                                    try {
-                                        // Run regular submission but force synchronous execution and readonly result
-                                        final XFormsModelSubmission.SecondPassParameters updatedP2 = p2.amend(false, true);
+                                        // Call regular submission
+                                        SubmissionResult submissionResult = null;
+                                        try {
+                                            // Run regular submission but force:
+                                            // - synchronous execution
+                                            // - readonly result
+                                            final XFormsModelSubmission.SecondPassParameters updatedP2 = p2.amend(false, true);
 
-                                        // For now support caching local portlet, request dispatcher, and regular submissions
-                                        final Submission[] submissions = new Submission[] {
-                                            new LocalPortletSubmission(submission),
-                                            new RequestDispatcherSubmission(submission),
-                                            new RegularSubmission(submission)
-                                        };
+                                            // For now support caching local portlet, request dispatcher, and regular submissions
+                                            final Submission[] submissions = new Submission[]{
+                                                    new LocalPortletSubmission(submission),
+                                                    new RequestDispatcherSubmission(submission),
+                                                    new RegularSubmission(submission)
+                                            };
 
-                                        // Iterate through submissions and run the first match
-                                        for (final Submission submission : submissions) {
-                                            if (submission.isMatch(p, p2, sp)) {
-                                                if (detailsLogger.isDebugEnabled())
-                                                    detailsLogger.startHandleOperation("", "connecting", "type", submission.getType());
-                                                try {
-                                                    submissionResult = submission.connect(p, updatedP2, sp);
-                                                    break;
-                                                } finally {
+                                            // Iterate through submissions and run the first match
+                                            for (final Submission submission : submissions) {
+                                                if (submission.isMatch(p, p2, sp)) {
                                                     if (detailsLogger.isDebugEnabled())
-                                                        detailsLogger.endHandleOperation();
+                                                        detailsLogger.startHandleOperation("", "connecting", "type", submission.getType());
+                                                    try {
+                                                        submissionResult = submission.connect(p, updatedP2, sp);
+                                                        break;
+                                                    } finally {
+                                                        if (detailsLogger.isDebugEnabled())
+                                                            detailsLogger.endHandleOperation();
+                                                    }
                                                 }
                                             }
+
+                                            // Check if the connection returned a throwable
+                                            final Throwable throwable = submissionResult.getThrowable();
+                                            if (throwable != null) {
+                                                // Propagate
+                                                throw new ThrowableWrapper(throwable, submissionResult.getConnectionResult());
+                                            } else {
+                                                // There was no throwable
+                                                // We know that RegularSubmission returns a Replacer with an instance document
+                                                final Object documentOrDocumentInfo =
+                                                        ((InstanceReplacer) submissionResult.getReplacer()).getResultingDocumentOrDocumentInfo();
+
+                                                // Update status
+                                                status[1] = true;
+
+                                                // load() requires an immutable TinyTree
+                                                // Since we forced readonly above, the result must also be a readonly instance7
+                                                assert documentOrDocumentInfo instanceof DocumentInfo;
+                                                assert ! (documentOrDocumentInfo instanceof VirtualNode);
+
+                                                return (DocumentInfo) documentOrDocumentInfo;
+                                            }
+                                        } catch (ThrowableWrapper throwableWrapper) {
+                                            // In case we just threw it above, just propagate
+                                            throw throwableWrapper;
+                                        } catch (Throwable throwable) {
+                                            // Exceptions are handled further down
+                                            throw new ThrowableWrapper(throwable, (submissionResult != null) ? submissionResult.getConnectionResult() : null);
                                         }
-
-                                        // Check if the connection returned a throwable
-                                        final Throwable throwable = submissionResult.getThrowable();
-                                        if (throwable != null) {
-                                            // Propagate
-                                            throw new ThrowableWrapper(throwable, submissionResult.getConnectionResult());
-                                        } else {
-                                            // There was no throwable
-                                            // We know that RegularSubmission returns a Replacer with an instance document
-                                            final DocumentInfo documentInfo = (DocumentInfo) ((InstanceReplacer) submissionResult.getReplacer()).getResultingDocument();
-
-                                            // Update status
-                                            status[1] = true;
-
-                                            // Create new shared instance
-                                            return new XFormsInstance(instanceStaticId, modelEffectiveId, instanceSourceURI,
-                                                    true, timeToLive, requestBodyHash, p2.isReadonly, validation, handleXInclude,
-                                                    XFormsProperties.isExposeXPathTypes(containingDocument), documentInfo, false);
-                                        }
-                                    } catch (ThrowableWrapper throwableWrapper) {
-                                        // In case we just threw it above, just propagate
-                                        throw throwableWrapper;
-                                    } catch (Throwable throwable) {
-                                        // Exceptions are handled further down
-                                        throw new ThrowableWrapper(throwable, (submissionResult != null) ? submissionResult.getConnectionResult() : null);
                                     }
-                                }
-                            });
+                                });
 
                         // Here we cheat a bit: instead of calling generically deserialize(), we directly set the DocumentInfo
-                        replacer.setInstance(newInstance);
+                        replacer.setCachedResult(newDocumentInfo, instanceCaching);
 
                         // Return result
                         return new SubmissionResult(submissionEffectiveId, replacer, connectionResult);

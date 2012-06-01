@@ -416,14 +416,6 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <instance id="instance" model-id="model">
-                                <instance>
-                                    <relevant/>
-                                    <non-relevant>
-                                        <nested-non-relevant/>
-                                    </non-relevant>
-                                </instance>
-                            </instance>
                             <instance id="events" model-id="model">
                                 <events>
                                     <event type="xforms-enabled" target="events-group"/>
@@ -1135,11 +1127,6 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <instance id="instance" model-id="model">
-                                <instance>
-                                    <name>Ada</name>
-                                </instance>
-                            </instance>
                             <instance id="events" model-id="model">
                                 <events>
                                     <group1 type="my-event" phase="capture" target="my-input"/>
@@ -1368,11 +1355,6 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <instance id="instance" model-id="model">
-                                <values>
-                                    <value/>
-                                </values>
-                            </instance>
                             <instance id="events" model-id="model">
                                 <events>
                                     <handler1/>
@@ -1516,12 +1498,6 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <instance id="instance" model-id="model">
-                                <instance>
-                                    <value>42</value>
-                                    <value>43</value>
-                                </instance>
-                            </instance>
                             <instance id="events" model-id="model">
                                 <events>
                                     <event type="xforms-enabled" target="my-switch" indexes=""/>
@@ -1598,12 +1574,6 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <instance id="instance" model-id="model">
-                                <instance>
-                                    <value>42</value>
-                                    <value>43</value>
-                                </instance>
-                            </instance>
                             <instance id="events" model-id="model">
                                 <events>
                                     <event type="xforms-enabled" target="my-switch" indexes=""/>
@@ -1680,12 +1650,6 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <instance id="instance" model-id="model">
-                                <instance>
-                                    <value>42</value>
-                                    <value>43</value>
-                                </instance>
-                            </instance>
                             <instance id="events" model-id="model">
                                 <events>
                                     <event type="xforms-enabled" target="input1" indexes=""/>
@@ -2297,13 +2261,7 @@
         <output name="response">
             <xxf:event-response>
                 <xxf:dynamic-state>
-                    <dynamic-state>
-                        <instances>
-                            <instance id="instance" model-id="model">
-                                <instance/>
-                            </instance>
-                        </instances>
-                    </dynamic-state>
+                    <dynamic-state/>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values/>

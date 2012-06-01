@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms.submission;
 
-import org.dom4j.Document;
 import org.orbeon.oxf.util.ConnectionResult;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.xforms.*;
@@ -27,6 +26,8 @@ import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
+import scala.Option;
+import org.orbeon.oxf.xforms.model.DataModel;
 
 import java.util.Collections;
 import java.util.List;
@@ -36,8 +37,10 @@ import java.util.List;
  */
 public class InstanceReplacer extends BaseReplacer {
 
-    private Object resultingDocument;           // Document or DocumentInfo
-    private String resultingRequestBodyHash;    // can be null
+    private Object resultingDocumentOrDocumentInfo; // not CacheableSubmission: unwrapped document set by deserialize() below
+
+    private DocumentInfo wrappedDocumentInfo;       // CacheableSubmission: DocumentInfo ready to be used by the instance
+    private InstanceCaching instanceCaching;        // CacheableSubmission: caching information
 
     public InstanceReplacer(XFormsModelSubmission submission, XFormsContainingDocument containingDocument) {
         super(submission, containingDocument);
@@ -48,7 +51,7 @@ public class InstanceReplacer extends BaseReplacer {
         if (XMLUtils.isXMLMediatype(connectionResult.getResponseMediaType())) {
             // XML media type
             final IndentedLogger detailsLogger = getDetailsLogger(p, p2);
-            resultingDocument = deserializeInstance(detailsLogger, p2.isReadonly, p2.isHandleXInclude, connectionResult);
+            resultingDocumentOrDocumentInfo = deserializeInstance(detailsLogger, p2.isReadonly, p2.isHandleXInclude, connectionResult);
         } else {
             // Other media type is not allowed
             throw new XFormsSubmissionException(submission, "Body received with non-XML media type for replace=\"instance\": " + connectionResult.getResponseMediaType(), "processing instance replacement",
@@ -63,7 +66,7 @@ public class InstanceReplacer extends BaseReplacer {
         // 1. Wraps a Document within a DocumentInfo if needed
         // 2. Performs text nodes adjustments if needed
         try {
-            if (!isReadonly) {
+            if (! isReadonly) {
                 // Resulting instance must not be read-only
 
                 // TODO: What about configuring validation? And what default to choose?
@@ -141,38 +144,9 @@ public class InstanceReplacer extends BaseReplacer {
             final IndentedLogger detailsLogger = getDetailsLogger(p, p2);
 
             // Obtain root element to insert
-            final NodeInfo newDocumentRootElement;
-            final XFormsInstance newInstance;
-            {
-                // Create resulting instance whether entire instance is replaced or not, because this:
-                // 1. Wraps a Document within a DocumentInfo if needed
-                // 2. Performs text nodes adjustments if needed
-                final boolean exposeXPathTypes = XFormsProperties.isExposeXPathTypes(containingDocument);
-                if (!p2.isReadonly) {
-                    // Resulting instance must not be read-only
-
-                    if (detailsLogger.isDebugEnabled())
-                        detailsLogger.logDebug("", "replacing instance with mutable instance",
-                            "instance", updatedInstance.getEffectiveId());
-
-                    newInstance = new XFormsInstance(updatedInstance.staticId(), updatedInstance.modelEffectiveId(),
-                            connectionResult.resourceURI,
-                            p2.isCache, p2.timeToLive, resultingRequestBodyHash, p2.isReadonly, updatedInstance.validation(), p2.isHandleXInclude, exposeXPathTypes,
-                            XFormsInstance.wrapDocument((Document) resultingDocument, exposeXPathTypes), false);
-                } else {
-                    // Resulting instance must be read-only
-
-                    if (detailsLogger.isDebugEnabled())
-                        detailsLogger.logDebug("", "replacing instance with read-only instance",
-                            "instance", updatedInstance.getEffectiveId());
-
-                    newInstance = new XFormsInstance(updatedInstance.staticId(), updatedInstance.modelEffectiveId(),
-                            connectionResult.resourceURI,
-                            p2.isCache, p2.timeToLive, resultingRequestBodyHash, p2.isReadonly, updatedInstance.validation(), p2.isHandleXInclude, exposeXPathTypes,
-                            (DocumentInfo) resultingDocument, false);
-                }
-                newDocumentRootElement = newInstance.getInstanceRootElementInfo();
-            }
+            if (detailsLogger.isDebugEnabled())
+                detailsLogger.logDebug("", p2.isReadonly ? "replacing instance with read-only instance" : "replacing instance with mutable instance",
+                    "instance", updatedInstance.getEffectiveId());
 
             // Perform insert/delete. This will dispatch xforms-insert/xforms-delete events.
             // "the replacement is performed by an XForms action that performs some
@@ -182,16 +156,22 @@ public class InstanceReplacer extends BaseReplacer {
 
             // NOTE: As of 2009-03-18 decision, XForms 1.1 specifies that deferred event handling flags are set instead of
             // performing RRRR directly.
+            final DocumentInfo newDocumentInfo =
+                    wrappedDocumentInfo != null ? wrappedDocumentInfo : XFormsInstance.createDocumentInfo(resultingDocumentOrDocumentInfo, updatedInstance.instance().isExposeXPathTypes());
 
             if (isDestinationRootElement) {
                 // Optimized insertion for instance root element replacement
 
-                // Update model instance
-                final XFormsModel replaceModel = newInstance.getModel(containingDocument);
-                replaceModel.setInstance(newInstance, true);
+                // Update the instance (this also marks it as modified)
+                updatedInstance.update(
+                    Option.<InstanceCaching>apply(instanceCaching),
+                    newDocumentInfo,
+                    p2.isReadonly);
+
+                final NodeInfo newDocumentRootElement = updatedInstance.getInstanceRootElementInfo();
 
                 // Call this directly, since we are not using insert/delete here
-                replaceModel.markStructuralChange(newInstance);
+                updatedInstance.getModel(containingDocument).markStructuralChange(updatedInstance);
 
                 // Dispatch xforms-delete event
                 // NOTE: Do NOT dispatch so we are compatible with the regular root element replacement
@@ -202,11 +182,14 @@ public class InstanceReplacer extends BaseReplacer {
                 // Dispatch xforms-insert event
                 // NOTE: use the root node as insert location as it seems to make more sense than pointing to the earlier root element
                 Dispatch.dispatchEvent(
-                        new XFormsInsertEvent(containingDocument, newInstance, Collections.singletonList((Item) newDocumentRootElement), null, newDocumentRootElement.getDocumentRoot(),
+                        new XFormsInsertEvent(containingDocument, updatedInstance, Collections.singletonList((Item) newDocumentRootElement), null, newDocumentRootElement.getDocumentRoot(),
                                 "after"));
 
             } else {
                 // Generic insertion
+
+                updatedInstance.markModified();
+                final NodeInfo newDocumentRootElement = DataModel.firstChildElement(newDocumentInfo);
 
                 final List<NodeInfo> destinationCollection = Collections.singletonList(destinationNodeInfo);
 
@@ -214,6 +197,7 @@ public class InstanceReplacer extends BaseReplacer {
 
                 // Insert before the target node, so that the position of the inserted node
                 // wrt its parent does not change after the target node is removed
+                // This will also mark a structural change
                 XFormsInsertAction.doInsert(containingDocument, detailsLogger, "before",
                         destinationCollection, destinationNodeInfo.getParent(),
                         Collections.singletonList(newDocumentRootElement), 1, false, true);
@@ -230,8 +214,6 @@ public class InstanceReplacer extends BaseReplacer {
                 // * doInsert() dispatches an event which might itself change the instance
                 // * doDelete() does as well
                 // Does this mean that we should check that the node is still where it should be?
-                final XFormsModel updatedModel = updatedInstance.getModel(containingDocument);
-                updatedModel.setInstance(updatedInstance, true);
             }
 
             // Dispatch xforms-submit-done
@@ -239,13 +221,13 @@ public class InstanceReplacer extends BaseReplacer {
         }
     }
 
-    public void setInstance(XFormsInstance instance) {
-        final Document instanceDocument = instance.getDocument();
-        this.resultingRequestBodyHash = instance.requestBodyHash();
-        this.resultingDocument = (instanceDocument != null) ? instanceDocument : instance.documentInfo();
+    // CacheableSubmission: set fully wrapped resulting document info and caching info
+    public void setCachedResult(DocumentInfo wrappedDocumentInfo, InstanceCaching instanceCaching) {
+        this.wrappedDocumentInfo = wrappedDocumentInfo;
+        this.instanceCaching = instanceCaching;
     }
 
-    public Object getResultingDocument() {
-        return resultingDocument;
+    public Object getResultingDocumentOrDocumentInfo() {
+        return resultingDocumentOrDocumentInfo;
     }
 }

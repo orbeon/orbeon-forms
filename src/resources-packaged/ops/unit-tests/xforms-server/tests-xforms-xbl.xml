@@ -95,11 +95,6 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <instance id="instance" model-id="model">
-                                <instance>
-                                    <foo1>42</foo1>
-                                </instance>
-                            </instance>
                             <instance id="instance" model-id="my-foo$model">
                                 <instance>43</instance>
                             </instance>
@@ -540,12 +535,6 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <instance id="main-instance" model-id="main-model">
-                                <values>
-                                    <value1>foo-value</value1>
-                                    <value2>bar-value</value2>
-                                </values>
-                            </instance>
                             <instance id="super-control-instance" model-id="fr-super-control-1$super-control-model">
                                 <instance>
                                     <value>foo-value</value>
@@ -743,12 +732,7 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <instance id="initial-instance" model-id="my-component$xbl-model" replaced="true">
-                                <instance>
-                                    <value>2</value>
-                                </instance>
-                            </instance>
-                            <instance id="new-instance" model-id="my-component$xbl-model">
+                            <instance id="initial-instance" model-id="my-component$xbl-model">
                                 <instance>
                                     <value>2</value>
                                 </instance>
@@ -820,14 +804,6 @@
             <xxf:event-response>
                 <xxf:dynamic-state>
                     <dynamic-state>
-                        <instances>
-                            <instance id="instance" model-id="model">
-                                <values>
-                                    <value1>color: red</value1>
-                                    <value2>font-weight: bold</value2>
-                                </values>
-                            </instance>
-                        </instances>
                         <controls>
                             <control effective-id="repeat" index="1"/>
                         </controls>
@@ -1050,13 +1026,7 @@
         <output name="response">
             <xxf:event-response>
                 <xxf:dynamic-state>
-                    <dynamic-state>
-                        <instances>
-                            <instance id="instance" model-id="model">
-                                <value>Hello, world!</value>
-                            </instance>
-                        </instances>
-                    </dynamic-state>
+                    <dynamic-state/>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
@@ -1373,22 +1343,7 @@
         <output name="response">
             <xxf:event-response>
                 <xxf:dynamic-state>
-                    <dynamic-state>
-                        <instances>
-                            <instance id="global-instance-1" model-id="model">
-                                <global-instance-1/>
-                            </instance>
-                            <instance id="global-instance-2" model-id="model">
-                                <global-instance-2/>
-                            </instance>
-                            <instance id="local-instance" model-id="my-foobar$local-model">
-                                <local-instance/>
-                            </instance>
-                            <instance id="local-instance" model-id="my-foobar2$local-model">
-                                <local-instance/>
-                            </instance>
-                        </instances>
-                    </dynamic-state>
+                    <dynamic-state/>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
@@ -1505,9 +1460,6 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <instance id="instance" model-id="model">
-                                <instance/>
-                            </instance>
                             <instance id="instance" model-id="my-bar-1$model">
                                 <instance>
                                     <value1>Red</value1>
@@ -1620,13 +1572,7 @@
         <output name="response">
             <xxf:event-response>
                 <xxf:dynamic-state>
-                    <dynamic-state>
-                        <instances>
-                            <instance id="main-instance" model-id="model">
-                                <instance>42</instance>
-                            </instance>
-                        </instances>
-                    </dynamic-state>
+                    <dynamic-state/>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
@@ -1936,11 +1882,6 @@
             <xxf:event-response>
                 <xxf:dynamic-state>
                     <dynamic-state>
-                        <instances>
-                            <instance id="instance" model-id="model">
-                                <instance/>
-                            </instance>
-                        </instances>
                         <controls>
                             <control effective-id="my-foobar$my-switch" case-id="my-case-2"/>
                         </controls>
@@ -2002,11 +1943,6 @@
             <xxf:event-response>
                 <xxf:dynamic-state>
                     <dynamic-state>
-                        <instances>
-                            <instance id="instance" model-id="model">
-                                <instance/>
-                            </instance>
-                        </instances>
                         <controls>
                             <control effective-id="my-foo$xf-5$my-switch" case-id="my-case-2"/>
                         </controls>
@@ -2060,13 +1996,7 @@
         <output name="response">
             <xxf:event-response>
                 <xxf:dynamic-state>
-                    <dynamic-state>
-                        <instances>
-                            <instance id="instance" model-id="model">
-                                <instance>42</instance>
-                            </instance>
-                        </instances>
-                    </dynamic-state>
+                    <dynamic-state/>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
@@ -2136,11 +2066,6 @@
             <xxf:event-response>
                 <xxf:dynamic-state>
                     <dynamic-state>
-                        <instances>
-                            <instance id="instance" model-id="model">
-                                <instance/>
-                            </instance>
-                        </instances>
                         <controls>
                             <control effective-id="my-foo-1$my-switch" case-id="my-case-2"/>
                             <control effective-id="my-foo-2$my-switch" case-id="my-case-2"/>
@@ -2226,9 +2151,6 @@
                                     <index>2</index>
                                 </instance>
                             </instance>
-                            <instance id="foo-instance" model-id="my-foo$foo-model">
-                                <instance/>
-                            </instance>
                         </instances>
                         <controls>
                             <control effective-id="my-foo$my-repeat" index="2"/>
@@ -2305,9 +2227,6 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <instance id="instance" model-id="model">
-                                <instance/>
-                            </instance>
                             <instance id="events" model-id="model">
                                 <events>
                                     <event type="xforms-enabled" target="my-foo"/>
@@ -2374,16 +2293,7 @@
         <output name="response">
             <xxf:event-response>
                 <xxf:dynamic-state>
-                    <dynamic-state>
-                        <instances>
-                            <instance id="instance" model-id="model">
-                                <instance>
-                                    <foo>42</foo>
-                                    <bar>43</bar>
-                                </instance>
-                            </instance>
-                        </instances>
-                    </dynamic-state>
+                    <dynamic-state/>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
@@ -2477,24 +2387,7 @@
         <output name="response">
             <xxf:event-response>
                 <xxf:dynamic-state>
-                    <dynamic-state>
-                        <instances>
-                            <instance id="instance" model-id="model">
-                                <instance>
-                                    <foo>42</foo>
-                                    <bar>43</bar>
-                                </instance>
-                            </instance>
-                            <instance id="items" model-id="model">
-                                <items>
-                                    <item label="Apple" value="apple"/>
-                                    <item label="Orange" value="orange"/>
-                                    <item label="Banana" value="banana"/>
-                                    <item label="Kiwi" value="kiwi"/>
-                                </items>
-                            </instance>
-                        </instances>
-                    </dynamic-state>
+                    <dynamic-state/>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
@@ -2558,16 +2451,7 @@
         <output name="response">
             <xxf:event-response>
                 <xxf:dynamic-state>
-                    <dynamic-state>
-                        <instances>
-                            <instance id="instance" model-id="model">
-                                <instance>
-                                    <foo>42</foo>
-                                    <bar>43</bar>
-                                </instance>
-                            </instance>
-                        </instances>
-                    </dynamic-state>
+                    <dynamic-state/>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
@@ -2651,22 +2535,7 @@
         <output name="response">
             <xxf:event-response>
                 <xxf:dynamic-state>
-                    <dynamic-state>
-                        <instances>
-                            <instance id="instance1" model-id="model1">
-                                <instance>
-                                    <foo>42</foo>
-                                    <bar>43</bar>
-                                </instance>
-                            </instance>
-                            <instance id="instance2" model-id="model2">
-                                <instance>
-                                    <foo>44</foo>
-                                    <bar>45</bar>
-                                </instance>
-                            </instance>
-                        </instances>
-                    </dynamic-state>
+                    <dynamic-state/>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
@@ -2748,22 +2617,7 @@
         <output name="response">
             <xxf:event-response>
                 <xxf:dynamic-state>
-                    <dynamic-state>
-                        <instances>
-                            <instance id="instance1" model-id="model1">
-                                <instance>
-                                    <foo>42</foo>
-                                    <bar>43</bar>
-                                </instance>
-                            </instance>
-                            <instance id="instance2" model-id="model2">
-                                <instance>
-                                    <foo>44</foo>
-                                    <bar>45</bar>
-                                </instance>
-                            </instance>
-                        </instances>
-                    </dynamic-state>
+                    <dynamic-state/>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
@@ -3237,15 +3091,7 @@
         <output name="response">
             <xxf:event-response>
                 <xxf:dynamic-state>
-                    <dynamic-state>
-                        <instances>
-                            <instance id="instance" model-id="model">
-                                <instance>
-                                    <foo1 label="My label">42</foo1>
-                                </instance>
-                            </instance>
-                        </instances>
-                    </dynamic-state>
+                    <dynamic-state/>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
@@ -3295,15 +3141,7 @@
         <output name="response">
             <xxf:event-response>
                 <xxf:dynamic-state>
-                    <dynamic-state>
-                        <instances>
-                            <instance id="instance" model-id="model">
-                                <instance>
-                                    <foo1 label="My label">42</foo1>
-                                </instance>
-                            </instance>
-                        </instances>
-                    </dynamic-state>
+                    <dynamic-state/>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
@@ -3348,15 +3186,7 @@
         <output name="response">
             <xxf:event-response>
                 <xxf:dynamic-state>
-                    <dynamic-state>
-                        <instances>
-                            <instance id="instance" model-id="model">
-                                <instance>
-                                    <foo1 label="My label">42</foo1>
-                                </instance>
-                            </instance>
-                        </instances>
-                    </dynamic-state>
+                    <dynamic-state/>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
@@ -3458,13 +3288,7 @@
         <output name="response">
             <xxf:event-response>
                 <xxf:dynamic-state>
-                    <dynamic-state>
-                        <instances>
-                            <instance id="instance" model-id="model">
-                                <my:value xmlns:my="http://orbeon.org/oxf/xml/my">42</my:value>
-                            </instance>
-                        </instances>
-                    </dynamic-state>
+                    <dynamic-state/>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
@@ -3524,12 +3348,6 @@
                         <instances>
                             <instance id="instance" model-id="model">
                                 <instance>43</instance>
-                            </instance>
-                            <instance id="my-xbl-instance" model-id="my-foo1$my-xbl-model">
-                                <instance/>
-                            </instance>
-                            <instance id="my-xbl-instance" model-id="my-foo3$my-xbl-model">
-                                <instance/>
                             </instance>
                         </instances>
                     </dynamic-state>
@@ -3804,11 +3622,6 @@
             <xxf:event-response>
                 <xxf:dynamic-state>
                     <dynamic-state>
-                        <instances>
-                            <instance id="instance" model-id="model">
-                                <item/>
-                            </instance>
-                        </instances>
                         <controls>
                             <control effective-id="my-foo$my-repeat" index="1"/>
                         </controls>
@@ -4149,16 +3962,7 @@
         <output name="response">
             <xxf:event-response>
                 <xxf:dynamic-state>
-                    <dynamic-state>
-                        <instances>
-                            <instance id="instance" model-id="model">
-                                <no>Oops!</no>
-                            </instance>
-                            <instance id="answer" model-id="model">
-                                <answer>42</answer>
-                            </instance>
-                        </instances>
-                    </dynamic-state>
+                    <dynamic-state/>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
@@ -4204,16 +4008,7 @@
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                 <xxf:dynamic-state>
-                    <dynamic-state>
-                        <instances>
-                            <instance id="instance" model-id="model">
-                                <values>
-                                    <foo/>
-                                    <bar/>
-                                </values>
-                            </instance>
-                        </instances>
-                    </dynamic-state>
+                    <dynamic-state/>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
@@ -4362,9 +4157,6 @@
                                     </xh:body>
                                 </xh:html>
                             </instance>
-                            <instance id="instance" model-id="my-dynamic$model">
-                                <value>42</value>
-                            </instance>
                         </instances>
                     </dynamic-state>
                 </xxf:dynamic-state>
@@ -4442,12 +4234,6 @@
                                         <xf:output id="output2" bind="bind2"/>
                                     </xh:body>
                                 </xh:html>
-                            </instance>
-                            <instance id="instance" model-id="my-dynamic$model">
-                                <instance>
-                                    <value1>41</value1>
-                                    <value2>42</value2>
-                                </instance>
                             </instance>
                         </instances>
                     </dynamic-state>
@@ -4548,12 +4334,6 @@
                                         </xf:group>
                                     </xh:body>
                                 </xh:html>
-                            </instance>
-                            <instance id="instance" model-id="my-dynamic$model">
-                                <instance>
-                                    <value1>41</value1>
-                                    <value2>42</value2>
-                                </instance>
                             </instance>
                         </instances>
                     </dynamic-state>

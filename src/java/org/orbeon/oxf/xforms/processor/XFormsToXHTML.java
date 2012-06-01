@@ -382,7 +382,7 @@ public class XFormsToXHTML extends ProcessorImpl {
                     final String resolvedDependencyURL = XFormsUtils.resolveServiceURL(containingDocument, instance.element(), instance.dependencyURL().get(),
                         ExternalContext.Response.REWRITE_MODE_ABSOLUTE);
 
-                    if (!instance.isCacheHint()) {
+                    if (!instance.cache()) {
                         stage1CacheableState.addReference(null, resolvedDependencyURL, instance.credentials(), forwardSubmissionHeaders);
 
                         if (indentedLogger.isDebugEnabled())

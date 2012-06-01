@@ -98,27 +98,6 @@
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                 <xxf:dynamic-state>
                     <dynamic-state>
-                        <instances>
-                            <instance id="xf-2" model-id="xf-1">
-                                <form>
-                                    <company>
-                                        <department>
-                                            <employee first="f11" last="l11"/>
-                                            <employee first="f12" last="l12"/>
-                                        </department>
-                                        <department>
-                                            <employee first="f21" last="l21"/>
-                                        </department>
-                                        <department>
-                                            <employee first="f31" last="l31"/>
-                                            <employee first="f32" last="l32"/>
-                                            <employee first="f33" last="l33"/>
-                                            <employee first="f34" last="l34"/>
-                                        </department>
-                                    </company>
-                                </form>
-                            </instance>
-                        </instances>
                         <controls>
                         <control effective-id="id123" index="1"/>
                             <control effective-id="id124·1" index="2"/>
@@ -384,25 +363,6 @@
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                 <xxf:dynamic-state>
                     <dynamic-state>
-                        <instances>
-                            <instance id="instance" model-id="model">
-                                <company>
-                                    <department>
-                                        <employee/>
-                                        <employee/>
-                                    </department>
-                                    <department>
-                                        <employee/>
-                                    </department>
-                                    <department>
-                                        <employee/>
-                                        <employee/>
-                                        <employee/>
-                                        <employee/>
-                                    </department>
-                                </company>
-                            </instance>
-                        </instances>
                         <controls>
                             <control effective-id="department-repeat" index="3"/>
                             <control effective-id="employee-repeat·1" index="2"/>
@@ -465,25 +425,6 @@
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                 <xxf:dynamic-state>
                     <dynamic-state>
-                        <instances>
-                            <instance id="main-instance" model-id="main-model">
-                                <company>
-                                    <department>
-                                        <employee/>
-                                        <employee/>
-                                    </department>
-                                    <department>
-                                        <employee/>
-                                    </department>
-                                    <department>
-                                        <employee/>
-                                        <employee/>
-                                        <employee/>
-                                        <employee/>
-                                    </department>
-                                </company>
-                            </instance>
-                        </instances>
                         <controls>
                             <control effective-id="department-repeat" index="2"/>
                             <control effective-id="employee-repeat·1" index="1"/>
@@ -548,27 +489,6 @@
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                 <xxf:dynamic-state>
                     <dynamic-state>
-                        <instances>
-                            <instance id="main-instance" model-id="main-model">
-                                <form>
-                                    <company>
-                                        <department>
-                                            <employee first="f11" last="l11"/>
-                                            <employee first="f12" last="l12"/>
-                                        </department>
-                                        <department>
-                                            <employee first="f21" last="l21"/>
-                                        </department>
-                                        <department>
-                                            <employee first="f31" last="l31"/>
-                                            <employee first="f32" last="l32"/>
-                                            <employee first="f33" last="l33"/>
-                                            <employee first="f34" last="l34"/>
-                                        </department>
-                                    </company>
-                                </form>
-                            </instance>
-                        </instances>
                         <controls>
                             <control effective-id="id123" index="3"/>
                             <control effective-id="id124·1" index="1"/>
@@ -804,24 +724,6 @@
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                 <xxf:dynamic-state>
                     <dynamic-state>
-                        <instances>
-                            <instance id="main-instance" model-id="main-model">
-                                <instance>
-                                    <book>
-                                        <title>Don Quixote de la Mancha</title>
-                                        <author>Miguel de Cervantes Saavedra</author>
-                                    </book>
-                                    <book>
-                                        <title>Jacques le fataliste et son maître</title>
-                                        <author>Denis Diderot</author>
-                                    </book>
-                                    <book>
-                                        <title>Childhood's End</title>
-                                        <author>Arthur C. Clarke</author>
-                                    </book>
-                                </instance>
-                            </instance>
-                        </instances>
                         <controls>
                             <control effective-id="book-repeat" index="1"/>
                         </controls>
@@ -963,9 +865,6 @@
                                     <pear>yellow</pear>
                                     <apple>green</apple>
                                 </fruits>
-                            </instance>
-                            <instance id="fruit-template" model-id="model">
-                                <pear>yellow</pear>
                             </instance>
                             <instance id="events" model-id="model">
                                 <events>
@@ -1165,20 +1064,6 @@
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                 <xxf:dynamic-state>
                     <dynamic-state>
-                        <instances>
-                            <instance id="instance" model-id="model">
-                                <oranges>
-                                    <orange>
-                                        <type>Persian</type>
-                                        <id>1</id>
-                                    </orange>
-                                    <orange>
-                                        <type>Navel</type>
-                                        <id>2</id>
-                                    </orange>
-                                </oranges>
-                            </instance>
-                        </instances>
                         <controls>
                             <control effective-id="orange-repeat" index="1"/>
                         </controls>
@@ -1253,12 +1138,6 @@
                                         <author>A3</author>
                                     </book>
                                 </books>
-                            </instance>
-                            <instance id="templates" model-id="xf-1">
-                                <book>
-                                    <title/>
-                                    <author/>
-                                </book>
                             </instance>
                         </instances>
                         <controls>
@@ -1615,19 +1494,6 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <instance id="instance" model-id="model">
-                                <instance>
-                                    <outer>
-                                        <value/>
-                                        <inner>
-                                            <value/>
-                                        </inner>
-                                        <inner>
-                                            <value/>
-                                        </inner>
-                                    </outer>
-                                </instance>
-                            </instance>
                             <instance id="events" model-id="model">
                                 <events>
                                     <event type="my-event-1" target="my-outer-input" indexes="1"/>
@@ -1805,43 +1671,6 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <instance id="instance" model-id="model">
-                                <instance>
-                                    <value/>
-                                    <outer>
-                                        <value/>
-                                        <inner>
-                                            <value/>
-                                        </inner>
-                                        <inner>
-                                            <value/>
-                                        </inner>
-                                    </outer>
-                                    <outer>
-                                        <!-- Event #2 reaches associated input -->
-                                        <value/>
-                                        <inner>
-                                            <value/>
-                                        </inner>
-                                        <inner>
-                                            <value/>
-                                        </inner>
-                                    </outer>
-                                    <outer>
-                                        <value/>
-                                        <inner>
-                                            <value/>
-                                        </inner>
-                                        <inner>
-                                            <!-- Event #1 reaches associated input -->
-                                            <value/>
-                                        </inner>
-                                        <inner>
-                                            <value/>
-                                        </inner>
-                                    </outer>
-                                </instance>
-                            </instance>
                             <instance id="events" model-id="model">
                                 <events>
                                     <event type="my-event-1" target="my-inner-input" indexes="3 2"/>
@@ -2077,9 +1906,6 @@
                                     </department>
                                 </company>
                             </instance>
-                            <instance id="instance2" model-id="model2">
-                                <form2/>
-                            </instance>
                         </instances>
                         <controls>
                             <control effective-id="department-repeat" index="3"/>
@@ -2166,11 +1992,6 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <instance id="item-instance" model-id="xf-1">
-                                <item>
-                                    <name>New item</name>
-                                </item>
-                            </instance>
                             <instance id="items-instance" model-id="xf-1">
                                 <items>
                                     <item>
@@ -2241,12 +2062,6 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <instance id="instance" model-id="model">
-                                <instance>
-                                    <event>000000000000</event>
-                                    <event>000000000001</event>
-                                </instance>
-                            </instance>
                             <instance id="other" model-id="model">
                                 <instance>
                                     <order>descending</order>
@@ -2416,30 +2231,6 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <instance id="instance-1" model-id="model">
-                                <values>
-                                    <value>1</value>
-                                    <value>2</value>
-                                    <value>3</value>
-                                    <value>4</value>
-                                </values>
-                            </instance>
-                            <instance id="instance-2" model-id="model">
-                                <values>
-                                    <value>1</value>
-                                    <value>2</value>
-                                    <value>3</value>
-                                    <value>4</value>
-                                </values>
-                            </instance>
-                            <instance id="instance-3" model-id="model">
-                                <values>
-                                    <value>1</value>
-                                    <value>2</value>
-                                    <value>3</value>
-                                    <value>4</value>
-                                </values>
-                            </instance>
                             <instance id="events" model-id="model">
                                 <events>
                                     <event observer="my-group" type="xforms-enabled" target="my-group"/>
@@ -2744,21 +2535,6 @@
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                 <xxf:dynamic-state>
                     <dynamic-state>
-                        <instances>
-                            <instance id="instance" model-id="model">
-                                <instance>
-                                    <department>
-                                        <employee/>
-                                        <employee/>
-                                    </department>
-                                    <department>
-                                        <employee/>
-                                        <employee/>
-                                        <employee/>
-                                    </department>
-                                </instance>
-                            </instance>
-                        </instances>
                         <controls>
                             <control effective-id="repeat-department" index="2"/>
                             <control effective-id="repeat-employee·1" index="2"/>
@@ -3155,12 +2931,6 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <instance id="instance" model-id="model">
-                                <company>
-                                    <department id="1"/>
-                                    <department id="2"/>
-                                </company>
-                            </instance>
                             <instance id="events" model-id="model">
                                 <events>
                                     <event observer="my-bar-1$my-department-repeat" type="my-event" target="my-bar-1$my-department-repeat"/>

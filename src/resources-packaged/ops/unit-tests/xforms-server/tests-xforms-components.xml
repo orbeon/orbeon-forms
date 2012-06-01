@@ -58,18 +58,6 @@
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                 <xxf:dynamic-state>
                     <dynamic-state>
-                        <instances>
-                            <instance id="instance" model-id="model">
-                                <instance>
-                                    <value/>
-                                    <label>Label me!</label>
-                                    <hint>Hint hint!</hint>
-                                </instance>
-                            </instance>
-                            <instance id="instance" model-id="my-inplace-input$model">
-                                <value/>
-                            </instance>
-                        </instances>
                         <controls>
                             <control effective-id="my-inplace-input$xf-4" case-id="fr-inplace-view"/>
                         </controls>
@@ -119,16 +107,6 @@
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                 <xxf:dynamic-state>
                     <dynamic-state>
-                        <instances>
-                            <instance id="instance" model-id="model">
-                                <instance>
-                                    <value>42</value>
-                                </instance>
-                            </instance>
-                            <instance id="instance" model-id="my-inplace-input$model">
-                                <value/>
-                            </instance>
-                        </instances>
                         <controls>
                             <control effective-id="my-inplace-input$xf-4" case-id="fr-inplace-view"/>
                         </controls>
@@ -242,11 +220,6 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <instance id="instance" model-id="model">
-                                <instance>
-                                    <value>42</value>
-                                </instance>
-                            </instance>
                             <instance id="events" model-id="model">
                                 <events>
                                     <event type="my-event" target="group1" indexes=""/>
@@ -345,19 +318,6 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <instance id="instance" model-id="model">
-                                <instance>
-                                    <label3>My label 3</label3>
-                                    <label4>My label 4</label4>
-                                    <label5>My label 5</label5>
-                                    <label6>My label 6</label6>
-                                </instance>
-                            </instance>
-                            <instance id="instance2" model-id="model2">
-                                <instance>
-                                    <label7>My label 7</label7>
-                                </instance>
-                            </instance>
                             <instance id="tabview-instance" model-id="my-tabview$tabview-model">
                                 <tabview-instance>
                                     <active-tab-position>1</active-tab-position>
@@ -512,9 +472,6 @@
                                     <error id="last-name-control" full-id="last-name-control" position="156" repeats="" indexes="" label="Last name" alert="Invalid last name" binds="last-name-bind"/>
                                 </errors>
                             </instance>
-                            <instance id="fr-snapshot-instance" model-id="my-summary$fr-error-summary-model">
-                                <errors/>
-                            </instance>
                             <instance id="fr-visited-instance" model-id="my-summary$fr-error-summary-model">
                                 <controls all="false">last-name-control repeat·3/note-control</controls>
                             </instance>
@@ -596,15 +553,7 @@
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                 <xxf:dynamic-state>
-                    <dynamic-state>
-                        <instances>
-                            <instance id="instance" model-id="model">
-                                <instance>
-                                    <date>2010-01-13</date>
-                                </instance>
-                            </instance>
-                        </instances>
-                    </dynamic-state>
+                    <dynamic-state/>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
@@ -649,15 +598,7 @@
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                 <xxf:dynamic-state>
-                    <dynamic-state>
-                        <instances>
-                            <instance id="instance" model-id="model">
-                                <instance>
-                                    <currency>12.34</currency>
-                                </instance>
-                            </instance>
-                        </instances>
-                    </dynamic-state>
+                    <dynamic-state/>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
@@ -715,14 +656,6 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <instance id="instance" model-id="model">
-                                <instance>
-                                    <value>One</value>
-                                    <item>One</item>
-                                    <item>Two</item>
-                                    <item>Three</item>
-                                </instance>
-                            </instance>
                             <instance id="local" model-id="my-autocomplete$autocomplete-model">
                                 <autocomplete>
                                     <relevant>true</relevant>
@@ -730,9 +663,6 @@
                                     <textfield-value/>
                                     <resource/>
                                 </autocomplete>
-                            </instance>
-                            <instance id="suggestions-instance" model-id="my-autocomplete$autocomplete-model">
-                                <dummy/>
                             </instance>
                         </instances>
                     </dynamic-state>

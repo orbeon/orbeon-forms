@@ -190,6 +190,7 @@ object DataModel {
         Option(containingDocument.getInstanceForNode(nodeInfo)) match {
             case Some(modifiedInstance) ⇒
                 // Tell the model about the value change
+                modifiedInstance.markModified()
                 modifiedInstance.getModel(containingDocument).markValueChange(nodeInfo, isCalculate)
 
                 // Dispatch extension event to instance

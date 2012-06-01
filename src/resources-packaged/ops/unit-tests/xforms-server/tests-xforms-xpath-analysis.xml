@@ -3265,7 +3265,7 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <instance id="po" model-id="model" types="true">
+                            <instance id="po" model-id="model">
                                 <purchaseOrder>
                                     <items>
                                         <item>
@@ -3297,7 +3297,7 @@
                                     </info>
                                 </purchaseOrder>
                             </instance>
-                            <instance id="events-instance" model-id="events-model" types="true">
+                            <instance id="events-instance" model-id="events-model">
                                 <events>
                                     <event type="xforms-value-changed" target="price" indexes="1"/>
                                     <event type="xforms-invalid" target="price" indexes="1"/>

@@ -11,7 +11,7 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<group description="XForms Repeat" xmlns:p="http://www.orbeon.com/oxf/pipeline"
+<group description="XForms Validation" xmlns:p="http://www.orbeon.com/oxf/pipeline"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
@@ -68,18 +68,7 @@
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                 <xxf:dynamic-state>
-                    <dynamic-state>
-                        <instances>
-                            <instance id="instance" model-id="model">
-                                <values>
-                                    <value code="1">One</value>
-                                    <value code="3"/>
-                                    <value code="">Five</value>
-                                    <value code="7">Seven</value>
-                                </values>
-                            </instance>
-                        </instances>
-                    </dynamic-state>
+                    <dynamic-state/>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
@@ -130,19 +119,7 @@
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                 <xxf:dynamic-state>
-                    <dynamic-state>
-                        <instances>
-                            <instance id="instance" model-id="model">
-                                <values>
-                                    <value>2009</value>
-                                    <value>2009-03</value>
-                                    <value>2009-03-09</value>
-                                    <value>2009-13</value>
-                                    <value>2009-03-32</value>
-                                </values>
-                            </instance>
-                        </instances>
-                    </dynamic-state>
+                    <dynamic-state/>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>

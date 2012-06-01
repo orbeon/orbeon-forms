@@ -22,6 +22,7 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.analysis.model.Instance;
 import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitDoneEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitErrorEvent;
@@ -933,7 +934,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                 isCache = "application".equals(XFormsUtils.resolveAttributeValueTemplates(p.xpathContext, p.refNodeInfo, avtXXFormsShared));
             }
 
-            timeToLive = XFormsInstance.getTimeToLive(getSubmissionElement());
+            timeToLive = Instance.timeToLiveOrDefault(getSubmissionElement());
 
             // Default is "false" for security reasons
             final String tempHandleXInclude = XFormsUtils.resolveAttributeValueTemplates(p.xpathContext, p.refNodeInfo, avtXXFormsHandleXInclude);

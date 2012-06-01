@@ -97,27 +97,7 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <instance id="main-instance" model-id="main-model" replaced="true">
-                                <instance>
-                                    <r1/>
-                                    <r1>
-                                        <r2/>
-                                        <!-- Force repeat2 from 2 to 1 -->
-                                    </r1>
-                                    <r1/>
-                                    <!-- Force repeat3 from 1 to 0 -->
-                                    <r4>
-                                        <r5/>
-                                        <!-- Force repeat5 from 0 to 1 -->
-                                    </r4>
-                                    <r4>
-                                        <r5/>
-                                        <r5/>
-                                    </r4>
-                                    <r4/>
-                                </instance>
-                            </instance>
-                            <instance id="new-instance" model-id="main-model">
+                            <instance id="main-instance" model-id="main-model">
                                 <instance>
                                     <r1/>
                                     <r1>
@@ -249,7 +229,7 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <instance readonly="true" id="initial-instance" model-id="xf-1" replaced="true">
+                            <instance readonly="true" id="initial-instance" model-id="xf-1">
                                 <instance>
                                     <value>2</value>
                                 </instance>
@@ -294,7 +274,7 @@
                     </xforms:model>
                 </xhtml:head>
                 <xhtml:body>
-                    <!-- The title is found under the XIncluded content -->
+                    <!-- The title is found under the XIncluded content and it must be readonly -->
                     <xforms:output id="my-output-xinclude" ref="instance('instance-xinclude')//xhtml:title"/>
 
                     <xforms:output id="my-output-no-xinclude" ref="instance('instance-no-xinclude')//xhtml:title"/>
@@ -306,8 +286,8 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <instance readonly="true" cache="true" id="instance-xinclude" model-id="model" source-uri="oxf:/ops/unit-tests/url-generator/included-1.xml" xinclude="true" replaced="true"/>
-                            <instance readonly="true" cache="true" id="instance-no-xinclude" model-id="model" source-uri="oxf:/ops/unit-tests/url-generator/included-1.xml" replaced="true"/>
+                            <instance readonly="true" cache="true" id="instance-xinclude" model-id="model" source-uri="oxf:/ops/unit-tests/url-generator/included-1.xml" xinclude="true"/>
+                            <instance readonly="true" cache="true" id="instance-no-xinclude" model-id="model" source-uri="oxf:/ops/unit-tests/url-generator/included-1.xml"/>
                         </instances>
                     </dynamic-state>
                 </xxf:dynamic-state>
@@ -369,7 +349,7 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <instance id="source-instance" model-id="model" source-uri="oxf:/ops/unit-tests/xforms-server/sample-instance.xml" replaced="true">
+                            <instance id="source-instance" model-id="model">
                                 <book>
                                     <title lang="en">Pale Blue Dot</title>
                                     <author>Carl Sagan</author>
@@ -439,7 +419,7 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <instance id="source-instance" model-id="model" source-uri="oxf:/ops/unit-tests/xforms-server/sample-instance.xml" replaced="true">
+                            <instance id="source-instance" model-id="model">
                                 <book>
                                     <title lang="en">Pale Blue Dot</title>
                                     <author>Carl Sagan</author>
@@ -513,7 +493,7 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <instance id="source-instance" model-id="model" replaced="true">
+                            <instance id="source-instance" model-id="model">
                                 <books>
                                     <before/>
                                     <book>
@@ -592,10 +572,7 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <instance id="source-instance" model-id="model">
-                                <dummy/>
-                            </instance>
-                            <instance id="destination-instance" model-id="model" source-uri="oxf:/ops/unit-tests/xforms-server/sample-instance.xml" replaced="true">
+                            <instance id="destination-instance" model-id="model">
                                 <book>
                                     <title lang="en">Pale Blue Dot</title>
                                     <author>Carl Sagan</author>
@@ -669,10 +646,7 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <instance id="source-instance" model-id="model">
-                                <dummy/>
-                            </instance>
-                            <instance id="destination-instance" model-id="model" source-uri="oxf:/ops/unit-tests/xforms-server/sample-instance.xml" replaced="true">
+                            <instance id="destination-instance" model-id="model">
                                 <book>
                                     <title lang="en">Pale Blue Dot</title>
                                     <author>Carl Sagan</author>
@@ -746,10 +720,7 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <instance id="source-instance" model-id="model">
-                                <dummy/>
-                            </instance>
-                            <instance id="destination-instance" model-id="model" source-uri="oxf:/ops/unit-tests/xforms-server/sample-instance.xml" replaced="true">
+                            <instance id="destination-instance" model-id="model">
                                 <book>
                                     <title lang="en">Pale Blue Dot</title>
                                     <author>Carl Sagan</author>
@@ -827,10 +798,7 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <instance id="source-instance" model-id="model">
-                                <dummy/>
-                            </instance>
-                            <instance id="destination-instance" model-id="model" replaced="true">
+                            <instance id="destination-instance" model-id="model">
                                 <books>
                                     <before/>
                                     <book>
@@ -918,9 +886,6 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                          <instances>
-                            <instance id="source-instance" model-id="model">
-                                <dummy foo="bar"/>
-                            </instance>
                             <instance id="events" model-id="model">
                                 <events>
                                     <event type="xforms-submit-error" target="replace-instance-1" error-type="target-error"/>
@@ -1015,7 +980,7 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <instance id="source-instance" model-id="model" replaced="true">
+                            <instance id="source-instance" model-id="model">
                                 <books>
                                     <book>
                                         <title lang="en">Pale Blue Dot</title>
@@ -1183,7 +1148,7 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <instance id="source-instance" model-id="model" replaced="true">
+                            <instance id="source-instance" model-id="model">
                                 <dummy>
                                     <book>
                                         <title lang="en">Pale Blue Dot</title>
@@ -1253,8 +1218,8 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <instance cache="true" id="instance-1" model-id="model" source-uri="oxf:/ops/unit-tests/test-data/book-diderot.xml" replaced="true"/>
-                            <instance cache="true" id="instance-2" model-id="model" source-uri="oxf:/ops/unit-tests/test-data/book-diderot.xml" replaced="true"/>
+                            <instance cache="true" id="instance-1" model-id="model" source-uri="oxf:/ops/unit-tests/test-data/book-diderot.xml"/>
+                            <instance cache="true" id="instance-2" model-id="model" source-uri="oxf:/ops/unit-tests/test-data/book-diderot.xml"/>
                         </instances>
                     </dynamic-state>
                 </xxf:dynamic-state>
@@ -1392,7 +1357,7 @@
                                     <source>888</source>
                                 </request>
                             </instance>
-                            <instance id="response-calculate-norebuild" model-id="model" replaced="true">
+                            <instance id="response-calculate-norebuild" model-id="model">
                                 <request>
                                     <value>888</value>
                                     <value/>
@@ -1400,7 +1365,7 @@
                                     <source>888</source>
                                 </request>
                             </instance>
-                            <instance id="response-calculate-rebuild" model-id="model" replaced="true">
+                            <instance id="response-calculate-rebuild" model-id="model">
                                 <request>
                                     <value/>
                                     <value>888</value>
@@ -1408,7 +1373,7 @@
                                     <source>888</source>
                                 </request>
                             </instance>
-                            <instance id="response-nocalculate-norebuild1" model-id="model" replaced="true">
+                            <instance id="response-nocalculate-norebuild1" model-id="model">
                                 <request>
                                     <value>42</value>
                                     <value/>
@@ -1416,7 +1381,7 @@
                                     <source>888</source>
                                 </request>
                             </instance>
-                            <instance id="response-nocalculate-norebuild2" model-id="model" replaced="true">
+                            <instance id="response-nocalculate-norebuild2" model-id="model">
                                 <request>
                                     <value/>
                                     <value/>
@@ -1594,12 +1559,6 @@
                                     <type/>
                                 </response>
                             </instance>
-                            <instance id="response-novalidate-norebuild2" model-id="model">
-                                <response>
-                                    <type/>
-                                    <type/>
-                                </response>
-                            </instance>
                         </instances>
                     </dynamic-state>
                 </xxf:dynamic-state>
@@ -1686,7 +1645,7 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <instance id="instance" model-id="model" source-uri="oxf:/ops/unit-tests/xforms-server/sample-instance.xml" replaced="true">
+                            <instance id="instance" model-id="model">
                                 <book>
                                     <title lang="en">Pale Blue Dot</title>
                                     <author>Carl Sagan</author>
@@ -1750,13 +1709,7 @@ az4K</document>
         <output name="response">
             <xxf:event-response>
                 <xxf:dynamic-state>
-                    <dynamic-state>
-                        <instances>
-                            <instance id="instance" model-id="model">
-                                <instance/>
-                            </instance>
-                        </instances>
-                    </dynamic-state>
+                    <dynamic-state/>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values/>
@@ -1793,9 +1746,6 @@ az4K</document>
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <instance id="instance1" model-id="model">
-                                <value/>
-                            </instance>
                             <instance id="instance2" model-id="model">
                                 <value>42</value>
                             </instance>

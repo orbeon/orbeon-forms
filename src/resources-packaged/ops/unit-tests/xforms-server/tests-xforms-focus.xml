@@ -56,15 +56,7 @@
         <output name="response">
             <xxf:event-response>
                 <xxf:dynamic-state>
-                    <dynamic-state>
-                        <instances>
-                            <instance id="instance" model-id="model">
-                                <instance>
-                                    <first-name>Ada</first-name>
-                                </instance>
-                            </instance>
-                        </instances>
-                    </dynamic-state>
+                    <dynamic-state/>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
@@ -121,13 +113,6 @@
             <xxf:event-response>
                 <xxf:dynamic-state>
                     <dynamic-state>
-                        <instances>
-                            <instance id="instance" model-id="model">
-                                <instance>
-                                    <first-name>Ada</first-name>
-                                </instance>
-                            </instance>
-                        </instances>
                         <controls>
                             <control effective-id="my-switch-1" case-id="my-case-12"/>
                             <control effective-id="my-switch-2" case-id="my-case-21"/>
@@ -178,13 +163,7 @@
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                 <xxf:dynamic-state>
-                    <dynamic-state>
-                        <instances>
-                            <instance id="instance" model-id="model">
-                                <instance/>
-                            </instance>
-                        </instances>
-                    </dynamic-state>
+                    <dynamic-state/>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
@@ -227,15 +206,6 @@
             <xxf:event-response>
                 <xxf:dynamic-state>
                     <dynamic-state>
-                        <instances>
-                            <instance id="instance" model-id="model">
-                                <instance>
-                                    <first-name>Ada</first-name>
-                                    <first-name>Marie</first-name>
-                                    <first-name>Clara</first-name>
-                                </instance>
-                            </instance>
-                        </instances>
                         <controls>
                             <control effective-id="my-repeat" index="2"/>
                         </controls>
@@ -319,9 +289,6 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <instance id="instance" model-id="model">
-                                <instance/>
-                            </instance>
                             <instance id="events-instance" model-id="events-model">
                                 <events>
                                     <event type="DOMFocusIn" target="my-group-1"/>
@@ -735,20 +702,6 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <instance id="instance" model-id="model">
-                                <instance>
-                                    <outer>
-                                        <inner/>
-                                        <inner/>
-                                    </outer>
-                                    <outer>
-                                        <inner/>
-                                        <inner/>
-                                        <inner/>
-                                    </outer>
-                                    <outer/>
-                                </instance>
-                            </instance>
                             <instance id="events-instance" model-id="events-model">
                                 <events>
                                     <event type="DOMFocusIn" target="my-outer-repeat"/>
@@ -859,13 +812,6 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <instance id="instance" model-id="model">
-                                <instance>
-                                    <value/>
-                                    <value/>
-                                    <value/>
-                                </instance>
-                            </instance>
                             <instance id="events-instance" model-id="events-model">
                                 <events>
                                     <event type="DOMFocusIn" target="my-switch"/>
@@ -983,11 +929,6 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <instance id="instance" model-id="model">
-                                <instance>
-                                    <value/>
-                                </instance>
-                            </instance>
                             <instance id="events-instance" model-id="events-model">
                                 <events>
                                     <event type="DOMFocusIn" target="my-input-1"/>
@@ -1109,9 +1050,6 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <instance id="instance" model-id="model">
-                                <value/>
-                            </instance>
                             <instance id="events-instance" model-id="events-model">
                                 <events>
                                     <event type="DOMFocusIn" target="my-input-1"/>
@@ -1127,9 +1065,6 @@
                                     <event type="DOMFocusOut" target="my-toto$toto-1"/>
                                     <event type="DOMFocusIn" target="my-toto$toto-2"/>
                                 </events>
-                            </instance>
-                            <instance id="instance" model-id="my-gaga$model">
-                                <value/>
                             </instance>
                         </instances>
                     </dynamic-state>

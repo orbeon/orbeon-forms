@@ -48,13 +48,13 @@ public class XXFormsInvalidateInstanceAction extends XFormsAction {
         if (handleXIncludeString == null) {
             // No @xinclude attribute specified so remove all instances matching @resource
             // NOTE: For now, we can't individually invalidate instances obtained through POST or PUT
-            XFormsServerSharedInstancesCache.instance().remove(indentedLogger, resolvedResourceURI, null, true);
-            XFormsServerSharedInstancesCache.instance().remove(indentedLogger, resolvedResourceURI, null, false);
+            XFormsServerSharedInstancesCache.remove(indentedLogger, resolvedResourceURI, null, true);
+            XFormsServerSharedInstancesCache.remove(indentedLogger, resolvedResourceURI, null, false);
         } else {
             // Just remove instances matching both @resource and @xinclude
             final boolean handleXInclude = Boolean.valueOf(handleXIncludeString);
             // NOTE: For now, we can't individually invalidate instances obtained through POST or PUT
-            XFormsServerSharedInstancesCache.instance().remove(indentedLogger, resolvedResourceURI, null, handleXInclude);
+            XFormsServerSharedInstancesCache.remove(indentedLogger, resolvedResourceURI, null, handleXInclude);
         }
     }
 }

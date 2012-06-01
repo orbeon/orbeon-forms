@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms.event.events;
 
-import org.dom4j.Element;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
@@ -26,21 +25,7 @@ import org.orbeon.oxf.xforms.event.XFormsExceptionEvent;
  * The default action for this event results in the following: Fatal error.
  */
 public class XFormsLinkExceptionEvent extends XFormsExceptionEvent {
-
-    private Element controlElement;
-    private String urlString;
-
-    public XFormsLinkExceptionEvent(XFormsContainingDocument containingDocument, XFormsEventTarget targetObject, String urlString, Element controlElement, Throwable throwable) {
+    public XFormsLinkExceptionEvent(XFormsContainingDocument containingDocument, XFormsEventTarget targetObject, String url, Throwable throwable) {
         super(containingDocument, XFormsEvents.XFORMS_LINK_EXCEPTION, targetObject, throwable, true, false);
-        this.urlString = urlString;
-        this.controlElement = controlElement;
-    }
-
-    public Element getControlElement() {
-        return controlElement;
-    }
-
-    public String getUrlString() {
-        return urlString;
     }
 }

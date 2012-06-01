@@ -379,12 +379,6 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <instance id="instance1" model-id="model1">
-                                <instance>
-                                    <foo>42</foo>
-                                    <bar>43</bar>
-                                </instance>
-                            </instance>
                             <instance id="result1" model-id="model1">
                                 <instance>
                                     <foo>42</foo>
@@ -395,23 +389,12 @@
                                     <newfoo>42</newfoo>
                                 </instance>
                             </instance>
-                            <instance id="instance2" model-id="model2">
-                                <instance>
-                                    <foo>100</foo>
-                                    <gaga>7</gaga>
-                                </instance>
-                            </instance>
                             <instance id="result2" model-id="model2">
                                 <instance>
                                     <foo>100</foo>
                                     <gaga>7</gaga>
                                     <sum>85</sum>
                                     <product>1806</product>
-                                </instance>
-                            </instance>
-                            <instance id="instance3" model-id="model3">
-                                <instance>
-                                    <lucky>888</lucky>
                                 </instance>
                             </instance>
                             <instance id="result3" model-id="model3">
@@ -484,12 +467,6 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <instance id="instance" model-id="model">
-                                <instance>
-                                    <foo>42</foo>
-                                    <bar>43</bar>
-                                </instance>
-                            </instance>
                             <instance id="result" model-id="model">
                                 <instance>
                                     <sum>85</sum>
@@ -600,16 +577,7 @@
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                 <xxf:dynamic-state>
-                    <dynamic-state>
-                        <instances>
-                            <instance id="instance1" model-id="model1">
-                                <instance>42</instance>
-                            </instance>
-                            <instance id="instance2" model-id="model2">
-                                <instance>43</instance>
-                            </instance>
-                        </instances>
-                    </dynamic-state>
+                    <dynamic-state/>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
@@ -701,16 +669,7 @@
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                 <xxf:dynamic-state>
-                    <dynamic-state>
-                        <instances>
-                            <instance id="instance1" model-id="model1">
-                                <value1>42</value1>
-                            </instance>
-                            <instance id="instance2" model-id="model2">
-                                <value2>43</value2>
-                            </instance>
-                        </instances>
-                    </dynamic-state>
+                    <dynamic-state/>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>

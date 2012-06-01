@@ -117,15 +117,7 @@
         <output name="response">
             <xxf:event-response>
                 <xxf:dynamic-state>
-                    <dynamic-state>
-                        <instances>
-                            <instance id="main-instance" model-id="main-model">
-                                <instance>
-                                    <this-is-an-existing-node/>
-                                </instance>
-                            </instance>
-                        </instances>
-                    </dynamic-state>
+                    <dynamic-state/>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
@@ -179,24 +171,7 @@
         <output name="response">
             <xxf:event-response>
                 <xxf:dynamic-state>
-                    <dynamic-state>
-                        <instances>
-                            <instance id="instance" model-id="main-model">
-                                <e1 gege="gigi1">
-                                    <e2>
-                                        <e3>
-                                            <gege>gigi2</gege>
-                                        </e3>
-                                    </e2>
-                                    <e4>
-                                        <e5>
-                                            <gege>gigi3</gege>
-                                        </e5>
-                                    </e4>
-                                </e1>
-                            </instance>
-                        </instances>
-                    </dynamic-state>
+                    <dynamic-state/>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
@@ -265,22 +240,6 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <instance id="instance" model-id="model">
-                                <instance>
-                                    <a/>
-                                    <b/>
-                                    <c/>
-                                    <d/>
-                                    <e/>
-                                    <f/>
-                                    <g/>
-                                    <h/>
-                                    <i/>
-                                    <j/>
-                                    <false>false</false>
-                                    <true>true</true>
-                                </instance>
-                            </instance>
                             <instance id="result" model-id="model">
                                 <result>
                                     <a>true</a>
@@ -362,23 +321,6 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <instance id="instance" model-id="xf-1">
-                                <instance>
-                                    <emails>
-                                        <email/>
-                                        <email>editors@example.com</email>>
-                                        <email>~my_mail+{nospam}$?@sub-domain.example.info</email>
-                                        <email>editors@(this is a comment)example.info</email>
-                                        <email>editors{at}example{dot}info</email>
-                                        <email>mailto:editors@example.com</email>
-                                        <email>a</email>
-                                        <email>a@</email>
-                                        <email>a@b</email>
-                                        <email>a@b.</email>
-                                        <email>a@b..</email>
-                                    </emails>
-                                </instance>
-                            </instance>
                             <instance id="result" model-id="xf-1">
                                 <result>
                                     <email>true</email>
@@ -447,20 +389,6 @@
            <xxf:event-response>
                 <xxf:dynamic-state>
                     <dynamic-state>
-                        <instances>
-                            <instance id="my-instance" model-id="my-model">
-                                <fruits>
-                                    <orange>bloody</orange>
-                                    <orange>valencia</orange>
-                                    <apple>green</apple>
-                                    <apple>red</apple>
-                                    <apple>iPod</apple>
-                                    <pear>green</pear>
-                                    <pear>williams</pear>
-                                    <pear>yellow</pear>
-                                </fruits>
-                            </instance>
-                        </instances>
                         <controls>
                             <control effective-id="my-repeat" index="1"/>
                         </controls>
@@ -533,18 +461,7 @@
         <output name="response">
             <xxf:event-response>
                 <xxf:dynamic-state>
-                    <dynamic-state>
-                        <instances>
-                            <instance id="instance" model-id="model">
-                                <instance>
-                                    <readonly/>
-                                    <required/>
-                                    <relevant/>
-                                    <valid/>
-                                </instance>
-                            </instance>
-                        </instances>
-                    </dynamic-state>
+                    <dynamic-state/>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
@@ -632,14 +549,8 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <instance id="form-instance" model-id="form-model">
-                                <first-name/>
-                            </instance>
                             <instance id="form-valid-instance" model-id="errors-model">
                                 <valid>false</valid>
-                            </instance>
-                            <instance id="triggers-instance" model-id="persistence-model">
-                                <submit/>
                             </instance>
                         </instances>
                     </dynamic-state>
@@ -772,21 +683,7 @@
         <output name="response">
             <xxf:event-response>
                 <xxf:dynamic-state>
-                    <dynamic-state>
-                        <instances>
-                            <instance id="values" model-id="form-model" types="true">
-                                <values>
-                                    <value>Lucy</value>
-                                    <value xsi:type="xs:integer">35</value>
-                                    <value xsi:type="xs:boolean">false</value>
-                                    <value xsi:type="xs:date">1980-01-01</value>
-                                    <value xsi:type="xs:time">12:00:00</value>
-                                    <value xsi:type="xs:double">12.5E0</value>
-                                    <value xsi:type="xs:string">Lucy</value>
-                                </values>
-                            </instance>
-                        </instances>
-                    </dynamic-state>
+                    <dynamic-state/>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
@@ -1110,12 +1007,7 @@
                                     <data-status>clean</data-status>
                                 </save>
                             </instance>
-                            <instance id="fr-triggers-instance" model-id="fr-persistence-model">
-                                <triggers>
-                                    <save/>
-                                </triggers>
-                            </instance>
-                            <instance id="fr-form-instance" model-id="fr-form-model" source-uri="oxf:/apps/xforms-sandbox/samples/bugs/bug-events-data.xml" replaced="true">
+                            <instance id="fr-form-instance" model-id="fr-form-model">
                                 <!--
   Copyright (C) 2009 Orbeon, Inc.
 
@@ -1202,22 +1094,7 @@
         <output name="response">
             <xxf:event-response>
                 <xxf:dynamic-state>
-                    <dynamic-state>
-                        <instances>
-                            <instance id="xf-2" model-id="xf-1">
-                                <instance>
-                                    <company>
-                                        <employee/>
-                                        <employee/>
-                                    </company>
-                                    <company>
-                                        <employee/>
-                                        <employee/>
-                                    </company>
-                                </instance>
-                            </instance>
-                        </instances>
-                    </dynamic-state>
+                    <dynamic-state/>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
@@ -1280,20 +1157,6 @@
             <xxf:event-response>
                 <xxf:dynamic-state>
                     <dynamic-state>
-                        <instances>
-                            <instance id="instance" model-id="model">
-                                <instance>
-                                    <company>
-                                        <employee>Mickey</employee>
-                                        <employee>Minnie</employee>
-                                    </company>
-                                    <company>
-                                        <employee>Donald</employee>
-                                        <employee>Daisy</employee>
-                                    </company>
-                                </instance>
-                            </instance>
-                        </instances>
                         <controls>
                             <control effective-id="repeat1" index="1"/>
                             <control effective-id="repeat2·1" index="1"/>
@@ -1447,16 +1310,7 @@
         <output name="response">
             <xxf:event-response>
                 <xxf:dynamic-state>
-                    <dynamic-state>
-                        <instances>
-                            <instance id="instance" model-id="model">
-                                <instance>
-                                    <value1/>
-                                    <value2/>
-                                </instance>
-                            </instance>
-                        </instances>
-                    </dynamic-state>
+                    <dynamic-state/>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
@@ -1634,16 +1488,7 @@
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                 <xxf:dynamic-state>
-                    <dynamic-state>
-                        <instances>
-                            <instance id="instance" model-id="model">
-                                <data>
-                                    <test attr1="false" attr2="true"/>
-                                    <test2 attr1="true"/>
-                                </data>
-                            </instance>
-                        </instances>
-                    </dynamic-state>
+                    <dynamic-state/>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>

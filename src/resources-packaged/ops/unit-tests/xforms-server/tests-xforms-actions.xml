@@ -392,13 +392,6 @@
                                     <value>2</value>
                                 </values>
                             </instance>
-                            <instance id="instance2" model-id="model">
-                                <values>
-                                    <value/>
-                                    <bar/>
-                                    <value/>
-                                </values>
-                            </instance>
                             <instance id="instance3" model-id="model">
                                 <values>
                                     <value>1</value>

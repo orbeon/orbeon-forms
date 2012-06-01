@@ -18,14 +18,13 @@ import javax.xml.transform.OutputKeys
 import org.orbeon.oxf.xml.dom4j.LocationDocumentSource
 import javax.xml.transform.stream.StreamResult
 import java.io._
-import org.orbeon.oxf.xforms.XFormsInstance
 import org.orbeon.oxf.util.URLRewriterUtils.PathMatcher
 import org.apache.commons.lang.StringUtils
-import org.orbeon.oxf.xforms.state.DynamicState.Control
 
 import sbinary._
 import org.dom4j.{Namespace, QName, Document}
 import sbinary.Operations._
+import org.orbeon.oxf.xforms.InstanceCaching
 
 object XFormsOperations {
 
@@ -66,91 +65,68 @@ object XFormsProtocols extends StandardTypes with StandardPrimitives with JavaLo
     implicit object Dom4jFormat extends Format[Document] {
         def writes(output: Output, document: Document) = {
             val identity = TransformerUtils.getXMLIdentityTransformer
-            identity.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-            identity.transform(new LocationDocumentSource(document), new StreamResult(new JavaOutputStream(output)));
+            identity.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes")
+            identity.transform(new LocationDocumentSource(document), new StreamResult(new JavaOutputStream(output)))
         }
 
         def reads(input: Input) =
             TransformerUtils.readDom4j(new JavaInputStream(input), null, false, false)
     }
 
-    implicit object ControlFormat extends Format[Control] {
+    implicit object ControlFormat extends Format[ControlState] {
 
-        def writes(output: Output, control: Control) = {
+        def writes(output: Output, control: ControlState) = {
             write(output, control.effectiveId)
             write(output, control.keyValues)
         }
 
         def reads(input: Input) =
-            Control(read[String](input), read[Map[String, String]](input))
+            ControlState(read[String](input), read[Map[String, String]](input))
     }
-    
-    implicit object InstanceFormat extends Format[XFormsInstance] {
-        
-        def writes(output: Output, instance: XFormsInstance) {
 
-            write(output, instance.staticId)
-            write(output, instance.modelEffectiveId)
+    implicit object InstanceCachingFormat extends Format[InstanceCaching] {
 
-            write(output, StringUtils.trimToEmpty(instance.sourceURI))
-
-            write(output, instance.cache)
+        def writes(output: Output, instance: InstanceCaching) {
             write(output, instance.timeToLive)
-            write(output, StringUtils.trimToEmpty(instance.requestBodyHash))
-
-            write(output, instance.readonly)
-            write(output, StringUtils.trimToEmpty(instance.validation))
             write(output, instance.handleXInclude)
-            write(output, instance.exposeXPathTypes)
+            write(output, instance.sourceURI)
+            write(output, StringUtils.trimToEmpty(instance.requestBodyHash))
+        }
 
-            if (! instance.cache) {
-                val xmlString =
-                    if (instance.getDocument ne null)
-                        // LATER: Measure performance of Dom4jUtils.domToString(instance.getDocument)
-                        TransformerUtils.dom4jToString(instance.getDocument, false)
-                    else
-                        TransformerUtils.tinyTreeToString(instance.documentInfo)
+        def reads(in: Input) =
+            InstanceCaching(
+                read[Long](in),
+                read[Boolean](in),
+                read[String](in),
+                StringUtils.trimToNull(read[String](in))
+            )
+    }
 
-                def debug() {
-                    println("Serializing instance: " + instance.modelEffectiveId + "/" + instance.staticId + (if (instance.getDocument ne null) " read-write" else " readonly"))
-                    println("  size: " + xmlString.length)
-                }
-
-                write(output, xmlString)
+    implicit object InstanceFormat extends Format[InstanceState] {
+        
+        def writes(output: Output, instance: InstanceState) {
+            write(output, instance.effectiveId)
+            write(output, instance.modelEffectiveId)
+            instance.cachingOrContent match {
+                case Left(caching)  ⇒ write[Byte](output, 0); write(output, caching)
+                case Right(content) ⇒ write[Byte](output, 1); write(output, content)
             }
-
-            write(output, instance.replaced)
+            write(output, instance.readonly)
+            write(output, instance.modified)
         }
         
         def reads(in: Input) = {
 
-            lazy val cache = read[Boolean](in)
-            lazy val readonly = read[Boolean](in)
-            lazy val exposeXPathTypes = read[Boolean](in)
+            def readCachingOrContent = read[Byte](in) match {
+                case 0 ⇒ Left(read[InstanceCaching](in))
+                case 1 ⇒ Right(read[String](in))
+            }
 
-            def documentInfo =
-                if (! cache) {
-                    val xmlString = read[String](in)
-                    XFormsInstance.createDocumentInfo(xmlString, readonly = readonly, exposeXPathTypes = exposeXPathTypes)
-                } else
-                    null
-
-            new XFormsInstance(
+            InstanceState(
                 read[String](in),
                 read[String](in),
-
-                StringUtils.trimToNull(read[String](in)),
-
-                cache,
-                read[Long](in),
-                StringUtils.trimToNull(read[String](in)),
-
-                readonly,
-                StringUtils.trimToNull(read[String](in)),
+                readCachingOrContent,
                 read[Boolean](in),
-                exposeXPathTypes,
-                documentInfo,
-
                 read[Boolean](in)
             )
         }

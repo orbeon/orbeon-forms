@@ -701,7 +701,7 @@ public class Dom4jUtils {
      * element, except those with the prefixes appearing in the Map, assuming they are not already declared on the new
      * root element.
      */
-    public static Document createDocumentCopyParentNamespaces(final Element newRoot, Map prefixesToFilter) {
+    public static Document createDocumentCopyParentNamespaces(final Element newRoot, Set<String> prefixesToFilter) {
 
         final Document document = Dom4jUtils.createDocumentCopyElement(newRoot);
         final Element rootElement = document.getRootElement();
@@ -713,7 +713,7 @@ public class Dom4jUtils {
         for (final String prefix: parentNamespaceContext.keySet()) {
             // NOTE: Don't use rootElement.getNamespaceForPrefix() because that will return the element prefix's
             // namespace even if there are no namespace nodes
-            if (rootElementNamespaceContext.get(prefix) == null && prefixesToFilter.get(prefix) == null) {
+            if (rootElementNamespaceContext.get(prefix) == null && ! prefixesToFilter.contains(prefix)) {
                 final String uri = parentNamespaceContext.get(prefix);
                 rootElement.addNamespace(prefix, uri);
             }
@@ -871,20 +871,6 @@ public class Dom4jUtils {
         void startElement(Element element);
         void endElement(Element element);
         void text(Text text);
-    }
-
-    /**
-     * Return a list of all elements that precede startElement (not included) up to and including the given ancestor
-     * element. Elements are ordered from the starting element to the ancestor.
-     *
-     * @param startElement      element to start with
-     * @param ancestorElement   ancestor element to stop at
-     * @return                  List<Element>
-     */
-    public static List<Element> findPrecedingElements(Element startElement, Element ancestorElement) {
-        final List<Element> result = new ArrayList<Element>();
-        findPrecedingElements(result, startElement, ancestorElement);
-        return result;
     }
 
     private static void findPrecedingElements(List<Element> finalResult, Element startElement, Element ancestorElement) {

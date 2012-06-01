@@ -32,10 +32,13 @@ import org.orbeon.oxf.xml.{ContentHandlerHelper, Dom4j}
 class Instance(staticStateContext: StaticStateContext, element: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], scope: Scope)
         extends SimpleElementAnalysis(staticStateContext, element, parent, preceding, scope) {
 
-    val isReadonlyHint = XFormsInstance.isReadonlyHint(element)
-    val isCacheHint = Version.instance.isPEFeatureEnabled(XFormsInstance.isCacheHint(element), "cached XForms instance")
-    val xxformsTimeToLive = XFormsInstance.getTimeToLive(element)
-    val xxformsValidation = element.attributeValue(XXFORMS_VALIDATION_QNAME)
+    val readonly = element.attributeValue(XXFORMS_READONLY_ATTRIBUTE_QNAME) == "true"
+    val cache = Version.instance.isPEFeatureEnabled(element.attributeValue(XXFORMS_CACHE_QNAME) == "true", "cached XForms instance")
+    val timeToLive = Instance.timeToLiveOrDefault(element)
+    val handleXInclude = false
+
+    val validation = element.attributeValue(XXFORMS_VALIDATION_QNAME)
+    def isExposeXPathTypes = staticStateContext.partAnalysis.staticState.isExposeXPathTypes
 
     val credentials = {
         // NOTE: AVTs not supported because XPath expressions in those could access instances that haven't been loaded
@@ -87,4 +90,11 @@ class Instance(staticStateContext: StaticStateContext, element: Element, parent:
 
     // For now we don't want to see instances printed as controls in unit tests
     override def toXML(helper: ContentHandlerHelper, attributes: List[String])(content: ⇒ Unit) = ()
+}
+
+object Instance {
+    def timeToLiveOrDefault(element: Element) = {
+        val timeToLiveValue = element.attributeValue(XXFORMS_TIME_TO_LIVE_QNAME)
+        Option(timeToLiveValue) map (_.toLong) getOrElse -1L
+    }
 }

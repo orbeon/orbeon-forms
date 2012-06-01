@@ -313,50 +313,7 @@
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                 <xxf:dynamic-state>
-                    <dynamic-state>
-                        <instances>
-                            <instance id="instance11" model-id="main-model">
-                                <nested111>
-                                    <nested112>
-                                        <first>111</first>
-                                        <second>112</second>
-                                        <third>113</third>
-                                        <fourth>114</fourth>
-                                    </nested112>
-                                </nested111>
-                            </instance>
-                            <instance id="instance12" model-id="main-model">
-                                <nested121>
-                                    <nested122>
-                                        <first>121</first>
-                                        <second>122</second>
-                                        <third>123</third>
-                                        <fourth>124</fourth>
-                                    </nested122>
-                                </nested121>
-                            </instance>
-                            <instance id="instance21" model-id="model2">
-                                <nested211>
-                                    <nested212>
-                                        <first>211</first>
-                                        <second>212</second>
-                                        <third>213</third>
-                                        <fourth>214</fourth>
-                                    </nested212>
-                                </nested211>
-                            </instance>
-                            <instance id="instance22" model-id="model2">
-                                <nested221>
-                                    <nested222>
-                                        <first>221</first>
-                                        <second>222</second>
-                                        <third>223</third>
-                                        <fourth>224</fourth>
-                                    </nested222>
-                                </nested221>
-                            </instance>
-                        </instances>
-                    </dynamic-state>
+                    <dynamic-state/>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
@@ -407,13 +364,7 @@
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                 <xxf:dynamic-state>
-                    <dynamic-state>
-                        <instances>
-                            <instance id="instance" model-id="model">
-                                <date>2005-10-11</date>
-                            </instance>
-                        </instances>
-                    </dynamic-state>
+                    <dynamic-state/>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
@@ -525,14 +476,6 @@
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                 <xxf:dynamic-state>
                     <dynamic-state>
-                        <instances>
-                            <instance id="instance2" model-id="model2">
-                                <instance>
-                                    <record/>
-                                    <record/>
-                                </instance>
-                            </instance>
-                        </instances>
                         <controls>
                             <control effective-id="my-repeat" index="2"/>
                         </controls>
@@ -830,18 +773,7 @@
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                 <xxf:dynamic-state>
-                    <dynamic-state>
-                        <instances>
-                            <instance id="instance" model-id="model">
-                                <labels>
-                                    <!-- Comment 2 -->
-                                    <label>Banana</label>
-                                    <!-- Comment 3 --><!-- Comment 4 -->
-                                    <label>Strawberry</label>
-                                </labels>
-                            </instance>
-                        </instances>
-                    </dynamic-state>
+                    <dynamic-state/>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
@@ -873,7 +805,7 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <instance id="instance-readwrite" model-id="model" source-uri="oxf:/ops/unit-tests/comments.xml">
+                            <instance id="instance-readwrite" model-id="model">
                                 <document>
                                     <!-- Comment 1 -->
                                     <element/>
@@ -882,7 +814,7 @@
                                     <element/>
                                 </document>
                             </instance>
-                            <instance readonly="true" id="instance-readonly" model-id="model" source-uri="oxf:/ops/unit-tests/comments.xml">
+                            <instance readonly="true" id="instance-readonly" model-id="model">
                                 <document>
                                     <!-- Comment 1 -->
                                     <element/>
@@ -936,7 +868,7 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <instance id="instance-readwrite" model-id="model" source-uri="oxf:/ops/unit-tests/comments.xml" replaced="true">
+                            <instance id="instance-readwrite" model-id="model">
                                 <document>
                                     <!-- Comment 1 -->
                                     <element/>
@@ -945,7 +877,7 @@
                                     <element/>
                                 </document>
                             </instance>
-                            <instance readonly="true" id="instance-readonly" model-id="model" source-uri="oxf:/ops/unit-tests/comments.xml" replaced="true">
+                            <instance readonly="true" id="instance-readonly" model-id="model">
                                 <document>
                                     <!-- Comment 1 -->
                                     <element/>
@@ -1032,7 +964,7 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <instance id="instance-readwrite" model-id="model" replaced="true">
+                            <instance id="instance-readwrite" model-id="model">
                                 <document>
                                     <!-- Comment 1 -->
                                     <element/>
@@ -1040,7 +972,7 @@
                                     <element/>
                                 </document>
                             </instance>
-                            <instance readonly="true" id="instance-readonly" model-id="model" replaced="true">
+                            <instance readonly="true" id="instance-readonly" model-id="model">
                                 <document>
                                     <!-- Comment 1 -->
                                     <element/>
@@ -1105,16 +1037,7 @@
         <output name="response">
             <xxf:event-response>
                 <xxf:dynamic-state>
-                    <dynamic-state>
-                        <instances>
-                            <instance id="foo-instance" model-id="foo-model">
-                                <value>foo</value>
-                            </instance>
-                            <instance id="bar-instance" model-id="bar-model">
-                                <value>bar</value>
-                            </instance>
-                        </instances>
-                    </dynamic-state>
+                    <dynamic-state/>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>

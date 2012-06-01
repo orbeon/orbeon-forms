@@ -81,33 +81,7 @@
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                 <xxf:dynamic-state>
-                    <dynamic-state>
-                        <instances>
-                            <instance id="selection" model-id="model">
-                                <selected>1</selected>
-                            </instance>
-                            <instance id="itemset" model-id="model">
-                                <fruits>
-                                    <fruit id="1">
-                                        <description>Apple</description>
-                                        <color>Green</color>
-                                    </fruit>
-                                    <fruit id="2">
-                                        <description>Banana</description>
-                                        <color>Yellow</color>
-                                    </fruit>
-                                    <fruit id="3">
-                                        <description>Orange</description>
-                                        <color>Orange</color>
-                                    </fruit>
-                                    <fruit id="4">
-                                        <description>Kiwi</description>
-                                        <color>Green</color>
-                                    </fruit>
-                                </fruits>
-                            </instance>
-                        </instances>
-                    </dynamic-state>
+                    <dynamic-state/>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
@@ -173,31 +147,7 @@
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                 <xxf:dynamic-state>
-                    <dynamic-state>
-                        <instances>
-                            <instance id="selection" model-id="model">
-                                <selected>1</selected>
-                            </instance>
-                            <instance id="itemset" model-id="model">
-                                <items>
-                                    <item label="Encyclopedia" value="en1">
-                                        <item label="Science" value="sc1"/>
-                                        <item label="Culture" value="cu1">
-                                            <item label="Art" value="ar1"/>
-                                            <item label="Craft" value="cr1"/>
-                                        </item>
-                                    </item>
-                                    <item label="Encyclopedia" value="en2">
-                                        <item label="Science" value="sc2"/>
-                                        <item label="Culture" value="cu2">
-                                            <item label="Art" value="ar2"/>
-                                            <item label="Craft" value="cr2"/>
-                                        </item>
-                                    </item>
-                                </items>
-                            </instance>
-                        </instances>
-                    </dynamic-state>
+                    <dynamic-state/>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
@@ -320,67 +270,7 @@
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                 <xxf:dynamic-state>
-                    <dynamic-state>
-                        <instances>
-                            <instance id="selection" model-id="model">
-                                <value/>
-                            </instance>
-                            <instance id="itemset-1" model-id="model">
-                                <items>
-                                    <item id="1"/>
-                                    <item id="2">
-                                        <item id="2.1"/>
-                                        <item id="2.2"/>
-                                        <item id="2.3">
-                                            <item id="2.3.1"/>
-                                            <item id="2.3.2">
-                                                <item id="2.3.3"/>
-                                            </item>
-                                        </item>
-                                    </item>
-                                    <item id="3"/>
-                                </items>
-                            </instance>
-                            <instance id="itemset-2" model-id="model">
-                                <items>
-                                    <item id="1" relevant="false"/>
-                                    <item id="2">
-                                        <item id="2.1"/>
-                                        <!-- All the content of 2.2 will be non-relevant -->
-                                        <item id="2.2" relevant="false">
-                                            <item id="2.2.1"/>
-                                            <item id="2.2.2" relevant="false"/>
-                                        </item>
-                                        <item id="2.3">
-                                            <item id="2.3.1"/>
-                                            <item id="2.3.2">
-                                                <item id="2.3.3"/>
-                                            </item>
-                                        </item>
-                                    </item>
-                                    <item id="3"/>
-                                </items>
-                            </instance>
-                            <instance id="itemset-3" model-id="model">
-                                <items>
-                                    <item id="1"/>
-                                    <item id="2">
-                                        <item id="2.1"/>
-                                        <item id="2.2"/>
-                                        <item id="2.3">
-                                            <item id="2.3.1"/>
-                                            <item id="2.3.2">
-                                                <item id="2.3.3"/>
-                                                <!-- This one must appear -->
-                                                <item id="2.three.4"/>
-                                            </item>
-                                        </item>
-                                    </item>
-                                    <item id="3"/>
-                                </items>
-                            </instance>
-                        </instances>
-                    </dynamic-state>
+                    <dynamic-state/>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
@@ -443,28 +333,7 @@
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                 <xxf:dynamic-state>
-                    <dynamic-state>
-                        <instances>
-                            <instance id="selection" model-id="model">
-                                <value/>
-                            </instance>
-                            <instance id="itemset-1" model-id="model">
-                                <items>
-                                    <item id="1"/>
-                                    <item id="2">
-                                        <item id="2.1"/>
-                                        <item id="2.2">
-                                            <item id="2.2.1"/>
-                                            <item id="2.2.2">
-                                                <item id="2.2.2.1"/>
-                                                <item id="2.2.2.2"/>
-                                            </item>
-                                        </item>
-                                    </item>
-                                </items>
-                            </instance>
-                        </instances>
-                    </dynamic-state>
+                    <dynamic-state/>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
@@ -519,11 +388,8 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <instance id="selection" model-id="model">
-                                <value/>
-                            </instance>
                             <instance id="itemset-1" model-id="model">
-                                <items>
+                                <items xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xxi="http://orbeon.org/oxf/xml/xinclude" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xf="http://www.w3.org/2002/xforms" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
                                     <item id="1"/>
                                     <item id="2">
                                         <item id="2.1"/>
@@ -663,12 +529,6 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <instance id="selection" model-id="model">
-                                <selection>
-                                    <single>3</single>
-                                    <multiple>2 4</multiple>
-                                </selection>
-                            </instance>
                             <instance id="xml-result-single" model-id="model">
                                 <itemset>
                                     <choices>
@@ -889,12 +749,6 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <instance id="selection" model-id="model">
-                                <selection>
-                                    <single>2.1</single>
-                                    <multiple>1 2.2.1 2.2.2.2</multiple>
-                                </selection>
-                            </instance>
                             <instance id="xml-result-single" model-id="model">
                                 <itemset>
                                     <choices>
@@ -1185,12 +1039,6 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <instance id="selection" model-id="model">
-                                <selection>
-                                    <relevant>3</relevant>
-                                    <non-relevant>3</non-relevant>
-                                </selection>
-                            </instance>
                             <instance id="xml-result-relevant" model-id="model">
                                 <itemset>
                                     <choices>
@@ -1215,12 +1063,6 @@
                             </instance>
                             <instance id="json-result-relevant" model-id="model">
                                 <result>[{"label":"Apple","value":"1"},{"label":"Banana","value":"2"},{"label":"Orange","value":"3"},{"label":"Kiwi","value":"4"}]</result>
-                            </instance>
-                            <instance id="xml-result-non-relevant" model-id="model">
-                                <result/>
-                            </instance>
-                            <instance id="json-result-non-relevant" model-id="model">
-                                <result/>
                             </instance>
                         </instances>
                     </dynamic-state>
@@ -1265,13 +1107,7 @@
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                 <xxf:dynamic-state>
-                    <dynamic-state>
-                        <instances>
-                            <instance id="instance" model-id="model">
-                                <value/>
-                            </instance>
-                        </instances>
-                    </dynamic-state>
+                    <dynamic-state/>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
@@ -1335,33 +1171,7 @@
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                 <xxf:dynamic-state>
-                    <dynamic-state>
-                        <instances>
-                            <instance id="instance" model-id="model">
-                                <value/>
-                            </instance>
-                            <instance id="itemset" model-id="model">
-                                <itemset>
-                                    <item>
-                                        <label>Apple</label>
-                                        <value>1</value>
-                                    </item>
-                                    <item>
-                                        <label>Banana</label>
-                                        <value>2</value>
-                                    </item>
-                                    <item>
-                                        <label>Orange</label>
-                                        <value>3</value>
-                                    </item>
-                                    <item>
-                                        <label>Kiwi</label>
-                                        <value>4</value>
-                                    </item>
-                                </itemset>
-                            </instance>
-                        </instances>
-                    </dynamic-state>
+                    <dynamic-state/>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
@@ -1433,13 +1243,6 @@
                                 <values show="true">
                                     <value>1</value>
                                 </values>
-                            </instance>
-                            <instance id="itemset" model-id="model">
-                                <fruits>
-                                    <fruit id="1">
-                                        <description>Apple</description>
-                                    </fruit>
-                                </fruits>
                             </instance>
                         </instances>
                         <controls>

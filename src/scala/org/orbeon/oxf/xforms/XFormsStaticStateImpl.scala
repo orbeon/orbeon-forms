@@ -65,6 +65,7 @@ class XFormsStaticStateImpl(
     }
     lazy val isNoscript = XFormsStaticStateImpl.isNoscript(staticStateDocument.nonDefaultProperties)
     lazy val isXPathAnalysis = Version.instance.isPEFeatureEnabled(getProperty[Boolean](P.XPATH_ANALYSIS_PROPERTY), P.XPATH_ANALYSIS_PROPERTY)
+    lazy val isExposeXPathTypes = getProperty[Boolean](P.EXPOSE_XPATH_TYPES_PROPERTY)
     lazy val isHTMLDocument = staticStateDocument.isHTMLDocument
 
     def isCacheDocument = staticStateDocument.isCacheDocument

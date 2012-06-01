@@ -578,22 +578,6 @@
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                 <xxf:dynamic-state>
                     <dynamic-state>
-                        <instances>
-                            <instance id="main-instance" model-id="model">
-                                <instance>
-                                    <record code="c"/>
-                                    <record code="a"/>
-                                    <record code="b"/>
-                                </instance>
-                            </instance>
-                            <instance id="lookup-instance" model-id="model">
-                                <instance>
-                                    <record code="c">1-CCC</record>
-                                    <record code="a">3-AAA</record>
-                                    <record code="b">2-BBB</record>
-                                </instance>
-                            </instance>
-                        </instances>
                         <controls>
                             <control effective-id="exforms-sort-repeat" index="1"/>
                             <control effective-id="xxforms-sort-repeat" index="1"/>
@@ -652,14 +636,6 @@
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
             <xxf:dynamic-state>
                 <dynamic-state>
-                    <instances>
-                        <instance id="instance1" model-id="model1">
-                            <instance>
-                                <state>CA</state>
-                                <city>San Francisco</city>
-                            </instance>
-                        </instance>
-                    </instances>
                     <controls>
                         <control effective-id="repeat" index="1"/>
                     </controls>
@@ -718,22 +694,7 @@
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                 <xxf:dynamic-state>
-                    <dynamic-state>
-                        <instances>
-                            <instance id="instance1" model-id="model1">
-                                <value>42</value>
-                            </instance>
-                            <instance id="instance2" model-id="model1">
-                                <value>43</value>
-                            </instance>
-                            <instance id="instance3" model-id="model2">
-                                <value>44</value>
-                            </instance>
-                            <instance id="instance4" model-id="model2">
-                                <value>45</value>
-                            </instance>
-                        </instances>
-                    </dynamic-state>
+                    <dynamic-state/>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
@@ -845,13 +806,7 @@
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                 <xxf:dynamic-state>
-                    <dynamic-state>
-                        <instances>
-                            <instance id="xf-1" model-id="model1">
-                                <root>341111111111111</root>
-                            </instance>
-                        </instances>
-                    </dynamic-state>
+                    <dynamic-state/>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
@@ -1046,23 +1001,6 @@
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                 <xxf:dynamic-state>
                     <dynamic-state>
-                        <instances>
-                            <instance id="xf-1" model-id="model1">
-                                <petlist>
-                                    <dogs>
-                                        <dog name="Benji"/>
-                                        <dog name="Cujo"/>
-                                        <dog name="Lassie"/>
-                                    </dogs>
-                                    <cats>
-                                        <cat name="Garfield"/>
-                                        <cat name="Heathcliff"/>
-                                        <cat name="Felix"/>
-                                        <cat name="Tom"/>
-                                    </cats>
-                                </petlist>
-                            </instance>
-                        </instances>
                         <controls>
                             <control effective-id="xf-2" index="1"/>
                         </controls>
@@ -1130,21 +1068,7 @@
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                 <xxf:dynamic-state>
-                    <dynamic-state>
-                        <instances>
-                            <instance id="xf-2" model-id="model1">
-                                <ex:driver xmlns:ex="http://example.com">
-                                    <ex:safe>true</ex:safe>
-                                    <ex:experienced>TRUE</ex:experienced>
-                                    <ex:insured>1</ex:insured>
-                                    <ex:points>false</ex:points>
-                                    <ex:accidents>FALSE</ex:accidents>
-                                    <ex:mv_violation>0</ex:mv_violation>
-                                    <ex:junk>3dod0</ex:junk>
-                                </ex:driver>
-                            </instance>
-                        </instances>
-                    </dynamic-state>
+                    <dynamic-state/>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
@@ -1187,13 +1111,7 @@
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                 <xxf:dynamic-state>
-                    <dynamic-state>
-                        <instances>
-                            <instance id="xf-3" model-id="xf-2">
-                                <ex:root xmlns:ex="http://example.org"></ex:root>
-                            </instance>
-                        </instances>
-                    </dynamic-state>
+                    <dynamic-state/>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
@@ -1227,13 +1145,7 @@
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                 <xxf:dynamic-state>
-                    <dynamic-state>
-                        <instances>
-                            <instance id="xf-3" model-id="xf-2">
-                                <ex:root xmlns:ex="http://example.org"></ex:root>
-                            </instance>
-                        </instances>
-                    </dynamic-state>
+                    <dynamic-state/>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
@@ -1345,16 +1257,7 @@
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                 <xxf:dynamic-state>
-                    <dynamic-state>
-                        <instances>
-                            <instance id="instance" model-id="model">
-                                <expressions>
-                                    <expression>'gaga'</expression>
-                                    <expression>concat('The message is ', expression[1])</expression>
-                                </expressions>
-                            </instance>
-                        </instances>
-                    </dynamic-state>
+                    <dynamic-state/>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values/>
@@ -1431,14 +1334,6 @@
                                     <convertedAmount>8023.451</convertedAmount>
                                 </converter>
                             </instance>
-                            <instance id="convTable" model-id="model">
-                                <convTable date="20040212" currency="cdn">
-                                    <rate currency="eur">0.59376</rate>
-                                    <rate currency="mxn">8.37597</rate>
-                                    <rate currency="jpy">80.23451</rate>
-                                    <rate currency="usd">0.76138</rate>
-                                </convTable>
-                            </instance>
                             <instance id="values" model-id="model">
                                 <values>
                                     <value>100</value>
@@ -1479,15 +1374,7 @@
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                 <xxf:dynamic-state>
-                    <dynamic-state>
-                        <instances>
-                            <instance id="instance" model-id="model">
-                                <instance>
-                                    <record code="c">C</record>
-                                </instance>
-                            </instance>
-                        </instances>
-                    </dynamic-state>
+                    <dynamic-state/>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
@@ -1519,15 +1406,7 @@
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                 <xxf:dynamic-state>
-                    <dynamic-state>
-                        <instances>
-                            <instance id="instance" model-id="model">
-                                <instance>
-                                    <record code="c">C</record>
-                                </instance>
-                            </instance>
-                        </instances>
-                    </dynamic-state>
+                    <dynamic-state/>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
@@ -1667,13 +1546,7 @@
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                 <xxf:dynamic-state>
-                    <dynamic-state>
-                        <instances>
-                            <instance id="instance" model-id="model">
-                                <lang>it</lang>
-                            </instance>
-                        </instances>
-                    </dynamic-state>
+                    <dynamic-state/>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
@@ -1719,15 +1592,6 @@
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                 <xxf:dynamic-state>
                     <dynamic-state>
-                        <instances>
-                            <instance id="instance" model-id="model">
-                                <instance>
-                                    <file>0</file>
-                                    <file>1</file>
-                                    <file>1273</file>
-                                </instance>
-                            </instance>
-                        </instances>
                         <controls>
                             <control effective-id="xf-1" index="1"/>
                         </controls>
@@ -1795,13 +1659,7 @@
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                 <xxf:dynamic-state>
-                    <dynamic-state>
-                        <instances>
-                            <instance id="instance" model-id="model">
-                                <lang>zh</lang>
-                            </instance>
-                        </instances>
-                    </dynamic-state>
+                    <dynamic-state/>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
@@ -1904,13 +1762,7 @@
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                 <xxf:dynamic-state>
-                    <dynamic-state>
-                        <instances>
-                            <instance id="instance" model-id="model">
-                                <document/>
-                            </instance>
-                        </instances>
-                    </dynamic-state>
+                    <dynamic-state/>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values/>
@@ -1986,21 +1838,6 @@
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                 <xxf:dynamic-state>
                     <dynamic-state>
-                        <instances>
-                            <instance id="instance" model-id="model">
-                                <instance>
-                                    <department>
-                                        <employee/>
-                                        <employee/>
-                                    </department>
-                                    <department>
-                                        <employee/>
-                                        <employee/>
-                                        <employee/>
-                                    </department>
-                                </instance>
-                            </instance>
-                        </instances>
                         <controls>
                             <control effective-id="repeat-department" index="1"/>
                             <control effective-id="repeat-employee·1" index="1"/>
@@ -2075,34 +1912,6 @@
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                 <xxf:dynamic-state>
                     <dynamic-state>
-                        <instances>
-                            <instance id="instance" model-id="model">
-                                <instance>
-                                    <items>
-                                        <element>
-                                            <valid-relevant/>
-                                        </element>
-                                        <element>
-                                            <invalid-relevant/>
-                                        </element>
-                                        <element>
-                                            <valid-non-relevant/>
-                                        </element>
-                                        <element>
-                                            <invalid-non-relevant/>
-                                        </element>
-                                    </items>
-                                    <valid-attribute my-att=""/>
-                                    <valid-descendant>
-                                        <my-element/>
-                                    </valid-descendant>
-                                    <invalid-attribute my-att=""/>
-                                    <invalid-descendant>
-                                        <my-element/>
-                                    </invalid-descendant>
-                                </instance>
-                            </instance>
-                        </instances>
                         <controls>
                             <control effective-id="xf-8" index="1"/>
                         </controls>
@@ -2170,20 +1979,6 @@
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                 <xxf:dynamic-state>
                     <dynamic-state>
-                        <instances>
-                            <instance id="my-instance" model-id="my-model">
-                                <fruits>
-                                    <orange>bloody</orange>
-                                    <orange>valencia</orange>
-                                    <apple>green</apple>
-                                    <apple>red</apple>
-                                    <apple>iPod</apple>
-                                    <pear>green</pear>
-                                    <pear>williams</pear>
-                                    <pear>yellow</pear>
-                                </fruits>
-                            </instance>
-                        </instances>
                         <controls>
                             <control effective-id="my-repeat" index="1"/>
                         </controls>

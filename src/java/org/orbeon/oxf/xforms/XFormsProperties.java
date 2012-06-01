@@ -60,7 +60,7 @@ public class XFormsProperties {
     private static final String LOCAL_SUBMISSION_INCLUDE_PROPERTY = "local-submission-include";
     private static final String LOCAL_INSTANCE_INCLUDE_PROPERTY = "local-instance-include";
 //    private static final String XFORMS_OPTIMIZE_LOCAL_INSTANCE_LOADS_PROPERTY = "optimize-local-instance-loads";
-    private static final String EXPOSE_XPATH_TYPES_PROPERTY = "expose-xpath-types";
+    public static final String EXPOSE_XPATH_TYPES_PROPERTY = "expose-xpath-types";
     private static final String AJAX_SHOW_LOADING_ICON_PROPERTY = "ajax.show-loading-icon";
     private static final String AJAX_UPDATE_FULL_THRESHOLD = "ajax.update.full.threshold";
     private static final String NO_UPDATES = "no-updates";

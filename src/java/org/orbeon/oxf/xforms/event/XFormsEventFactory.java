@@ -57,7 +57,7 @@ public class XFormsEventFactory {
         });
         nameToClassMap.put(XFormsEvents.XFORMS_LINK_EXCEPTION, new Factory() {
             public XFormsEvent createEvent(XFormsContainingDocument containingDocument, String eventName, XFormsEventTarget targetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable, String contextString, Element contextElement, Throwable contextThrowable, Map<String, String> parameters) {
-                return new XFormsLinkExceptionEvent(containingDocument, targetObject, contextString, contextElement, contextThrowable);
+                return new XFormsLinkExceptionEvent(containingDocument, targetObject, contextString, contextThrowable);
             }
         });
         nameToClassMap.put(XFormsEvents.XFORMS_REFRESH, new Factory() {
@@ -248,11 +248,6 @@ public class XFormsEventFactory {
         nameToClassMap.put(XFormsEvents.XFORMS_SCROLL_LAST, new Factory() {
             public XFormsEvent createEvent(XFormsContainingDocument containingDocument, String eventName, XFormsEventTarget targetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable, String contextString, Element contextElement, Throwable contextThrowable, Map<String, String> parameters) {
                 return new XFormsScrollLastEvent(containingDocument, targetObject);
-            }
-        });
-        nameToClassMap.put(XFormsEvents.XFORMS_LINK_EXCEPTION, new Factory() {
-            public XFormsEvent createEvent(XFormsContainingDocument containingDocument, String eventName, XFormsEventTarget targetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable, String contextString, Element contextElement, Throwable contextThrowable, Map<String, String> parameters) {
-                return new XFormsLinkExceptionEvent(containingDocument, targetObject, contextString, contextElement, contextThrowable);
             }
         });
         nameToClassMap.put(XFormsEvents.XFORMS_LINK_ERROR, new Factory() {

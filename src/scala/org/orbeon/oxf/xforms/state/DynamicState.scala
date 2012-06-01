@@ -21,11 +21,11 @@ import XFormsProtocols._
 
 import org.orbeon.oxf.util.URLRewriterUtils.PathMatcher
 import collection.mutable.Buffer
-import org.orbeon.oxf.xforms.state.DynamicState.Control
 import org.orbeon.oxf.xforms._
 import control.{Controls, XFormsControl}
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.xml.{TransformerUtils, SAXStore}
+import org.dom4j.Element
 
 // Immutable representation of the dynamic state
 case class DynamicState(
@@ -49,8 +49,8 @@ case class DynamicState(
     def decodePendingUploads = fromByteSeq[Set[String]](pendingUploads)
     def decodeAnnotatedTemplate = annotatedTemplate map (AnnotatedTemplate(_))
     def decodeLastAjaxResponse = fromByteSeq[Option[SAXStore]](lastAjaxResponse)
-    def decodeInstances = fromByteSeq[List[XFormsInstance]](instances)
-    def decodeControls = fromByteSeq[List[Control]](controls) map (c ⇒ (c.effectiveId, c.keyValues))
+    def decodeInstances = fromByteSeq[List[InstanceState]](instances)
+    def decodeControls = fromByteSeq[List[ControlState]](controls) map (c ⇒ (c.effectiveId, c.keyValues))
 
     // For Java callers
     def decodeDeploymentTypeJava = deploymentType.orNull
@@ -107,10 +107,31 @@ case class DynamicState(
 
         // Serialize instances
         locally {
-            val instances = decodeInstances
-            if (instances.nonEmpty) {
+            val instanceStates = decodeInstances
+            if (instanceStates.nonEmpty) {
                 val instancesElement = rootElement.addElement("instances")
-                instances foreach (i ⇒ instancesElement.add(i.toXML(! i.cache)))
+
+                // Encode to an XML representation (as of 2012-02-05, used only by unit tests)
+                def instanceToXML(instanceState: InstanceState): Element = {
+                    val instanceElement = Dom4jUtils.createElement("instance")
+
+                    def att(name: String,  value: String): Unit = instanceElement.addAttribute(name, value)
+
+                    att("id", XFormsUtils.getStaticIdFromId(instanceState.effectiveId))
+                    att("model-id", instanceState.modelEffectiveId)
+
+                    if (instanceState.readonly) att("readonly", "true")
+
+                    instanceState.cachingOrContent match {
+                        case Left(caching)  ⇒ caching.writeAttributes(att)
+                        case Right(content) ⇒ instanceElement.addText(content)
+
+                    }
+
+                    instanceElement
+                }
+
+                instanceStates foreach (instanceState ⇒ instancesElement.add(instanceToXML(instanceState)))
             }
         }
 
@@ -165,10 +186,28 @@ case class DynamicState(
     }
 }
 
-object DynamicState {
+// Minimal immutable representation of a serialized control
+case class ControlState(effectiveId: String, keyValues: Map[String, String])
 
-    // Minimal representation of a serialized control
-    case class Control(effectiveId: String, keyValues: Map[String, String])
+// Minimal immutable representation of a serialized instance
+// If there is caching information, don't include the actual content
+case class InstanceState(
+        effectiveId: String,
+        modelEffectiveId: String,
+        cachingOrContent: InstanceCaching Either String,
+        readonly: Boolean,
+        modified: Boolean) {
+
+    def this(instance: XFormsInstance) =
+        this(
+            instance.getEffectiveId,
+            instance.parent.getEffectiveId,
+            instance.instanceCaching.toLeft(instance.contentAsString),
+            instance.readonly,
+            instance.modified)
+}
+
+object DynamicState {
 
     // Create a DynamicState from a document
     def apply(document: XFormsContainingDocument): DynamicState = {
@@ -177,15 +216,15 @@ object DynamicState {
         // NOTE: As of 2012-02-02, only repeat, switch and dialogs controls serialize state. The state of all the other
         // controls is rebuilt from model data. This way we minimize the size of serialized controls. In the future,
         // more information might be serialized.
-        def controlsToSerialize(document: XFormsContainingDocument): Seq[Control] = {
-            val result = Buffer[Control]()
+        def controlsToSerialize(document: XFormsContainingDocument): Seq[ControlState] = {
+            val result = Buffer[ControlState]()
 
             // Gather relevant control
             Controls.visitAllControls(document, new Controls.XFormsControlVisitorAdapter {
                 override def startVisitControl(control: XFormsControl) = {
                     if (control.isRelevant) { // don't serialize anything for non-relevant controls
                         Option(control.serializeLocal.asScala) filter (_.nonEmpty) foreach {
-                            nameValues ⇒ result += Control(control.getEffectiveId, nameValues.toMap)
+                            nameValues ⇒ result += ControlState(control.getEffectiveId, nameValues.toMap)
                         }
                     }
                     true
@@ -220,7 +259,7 @@ object DynamicState {
             toByteSeq(document.getPendingUploads.asScala.toSet),
             Option(document.getTemplate) map (_.asByteSeq), // template returns its own serialization
             toByteSeq(Option(document.getLastAjaxResponse)),
-            toByteSeq(document.getAllModels.asScala flatMap (_.getInstances.asScala) filter (_.mustSerialize) toList),
+            toByteSeq(document.getAllModels.asScala flatMap (_.getInstances.asScala) filter (_.mustSerialize) map (new InstanceState(_)) toList),
             toByteSeq(controlsToSerialize(document).toList)
         )
     }

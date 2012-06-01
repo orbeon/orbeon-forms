@@ -16,10 +16,10 @@ package org.orbeon.oxf.util
 import org.joda.time.format.{DateTimeFormatter, DateTimeFormat}
 import org.joda.time.DateTimeZone
 import org.orbeon.saxon.expr.XPathContext
-import org.orbeon.saxon.`type`.ValidationFailure
-import org.mockito.Mockito
 import org.orbeon.saxon.value.{CalendarValue, DateValue, DateTimeValue}
-import java.util.{Date, Locale}
+import org.orbeon.saxon.`type`.ValidationFailure
+import java.util.{Properties, Date, Locale}
+import javax.xml.transform.Result
 
 object DateUtils {
 
@@ -44,12 +44,6 @@ object DateUtils {
         val currentInstant = (new Date).getTime
         DateTimeZone.getDefault.getOffset(currentInstant) / 1000 / 60
     }
-
-    // Create a mock XPathContext which only cares about getImplicitTimezone
-    // Mockito doc: "You can let multiple threads call methods on a shared mock to test in concurrent conditions"
-    // See: http://code.google.com/p/mockito/wiki/FAQ
-    private val TZXPathContext = Mockito mock classOf[XPathContext]
-    Mockito when TZXPathContext.getImplicitTimezone thenReturn DefaultOffsetMinutes
 
     // Parse a date in XML Schema-compatible ISO format:
     //
@@ -77,4 +71,59 @@ object DateUtils {
 
     // Format the given instant
     def format(instant: Long, format: DateTimeFormatter): String = format.print(instant)
+}
+
+// Mock XPathContext
+// We tried using Mockito, but then that's yet another runtime dependency
+object TZXPathContext extends XPathContext {
+
+    import org.orbeon.saxon.expr.XPathContext
+    import org.orbeon.saxon.event.SequenceReceiver
+    import org.orbeon.saxon.`type`.SchemaType
+    import org.orbeon.saxon.trace.InstructionInfo
+    import org.orbeon.saxon.instruct.LocalParam
+    import org.orbeon.saxon.om.{ValueRepresentation, StructuredQName, SequenceIterator}
+
+    // Return the default timezone offset
+    def getImplicitTimezone = DateUtils.DefaultOffsetMinutes
+
+    // None of these methods are called by Saxon upon subtract()
+    def newContext() = Illegal
+    def newCleanContext() = Illegal
+    def newMinorContext() = Illegal
+    def getLocalParameters = Illegal
+    def getTunnelParameters = Illegal
+    def setOrigin(expr: InstructionInfo) = Illegal
+    def setOriginatingConstructType(loc: Int) = Illegal
+    def getOrigin = Illegal
+    def getOriginatingConstructType = Illegal
+    def getController = Illegal
+    def getConfiguration = Illegal
+    def getNamePool = Illegal
+    def setCaller(caller: XPathContext) = Illegal
+    def getCaller = Illegal
+    def setCurrentIterator(iter: SequenceIterator) = Illegal
+    def getCurrentIterator = Illegal
+    def getContextPosition = Illegal
+    def getContextItem = Illegal
+    def getLast = Illegal
+    def isAtLast = Illegal
+    def getCollation(name: String) = Illegal
+    def getDefaultCollation = Illegal
+    def useLocalParameter(qName: StructuredQName, binding: LocalParam, isTunnel: Boolean) = Illegal
+    def getStackFrame = Illegal
+    def evaluateLocalVariable(slotnumber: Int) = Illegal
+    def setLocalVariable(slotnumber: Int, value: ValueRepresentation) = Illegal
+    def changeOutputDestination(props: Properties, result: Result, isFinal: Boolean, hostLanguage: Int, validation: Int, schemaType: SchemaType) = Illegal
+    def setTemporaryReceiver(out: SequenceReceiver) = Illegal
+    def setReceiver(receiver: SequenceReceiver) = Illegal
+    def getReceiver = Illegal
+    def getCurrentMode = Illegal
+    def getCurrentTemplateRule = Illegal
+    def getCurrentGroupIterator = Illegal
+    def getCurrentRegexIterator = Illegal
+    def getCurrentDateTime = Illegal
+    def iterateStackFrames() = Illegal
+
+    private def Illegal = throw new IllegalStateException
 }

@@ -61,7 +61,7 @@ class XFormsOutputControl(container: XBLContainer, parent: XFormsControl, elemen
             null
 
     override def evaluateImpl(): Unit = {
-        super.evaluateImpl
+        super.evaluateImpl()
         evaluateFileMetadata()
     }
 

@@ -13,21 +13,19 @@
  */
 package org.orbeon.oxf.util
 
-import org.joda.time.format.{DateTimeFormatter, DateTimeFormat}
 import org.joda.time.DateTimeZone
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.value.{CalendarValue, DateValue, DateTimeValue}
 import org.orbeon.saxon.`type`.ValidationFailure
 import java.util.{Properties, Date, Locale}
 import javax.xml.transform.Result
+import org.joda.time.format.{DateTimeFormatter, DateTimeFormat, ISODateTimeFormat}
 
 object DateUtils {
 
-    // ISO 8601 formats without timezones
+    // ISO 8601 xs:dateTime formats with timezone, which we should always use when serializing a date
     // From the doc: "DateTimeFormat is thread-safe and immutable, and the formatters it returns are as well."
-    val XsDateTimeLong = withLocaleTZ(DateTimeFormat forPattern "yyyy-MM-dd'T'HH:mm:ss.SSS")
-    val XsDateTime     = withLocaleTZ(DateTimeFormat forPattern "yyyy-MM-dd'T'HH:mm:ss")
-    val XsDate         = withLocaleTZ(DateTimeFormat forPattern "yyyy-MM-dd")
+    val DateTime = ISODateTimeFormat.dateTime().withZoneUTC()
 
     // RFC 1123 format
     val RFC1123Date    = withLocaleTZ(DateTimeFormat forPattern "EEE, dd MMM yyyy HH:mm:ss 'GMT'")
@@ -68,9 +66,6 @@ object DateUtils {
 
     // Parse an RFC 1123 dateTime
     def parseRFC1123(date: String): Long = RFC1123Date.parseDateTime(date).getMillis
-
-    // Format the given instant
-    def format(instant: Long, format: DateTimeFormatter): String = format.print(instant)
 }
 
 // Mock XPathContext

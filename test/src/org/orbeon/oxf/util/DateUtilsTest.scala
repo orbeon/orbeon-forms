@@ -48,14 +48,10 @@ class DateUtilsTest extends AssertionsForJUnit {
     }
 
     @Test def format(): Unit = {
-        assert("1970-01-01T00:00:00.000"        === DateUtils.format(0L, DateUtils.XsDateTimeLong))
-        assert("1970-01-01T00:00:00"            === DateUtils.format(0L, DateUtils.XsDateTime))
-        assert("1970-01-01"                     === DateUtils.format(0L, DateUtils.XsDate))
-        assert("Thu, 01 Jan 1970 00:00:00 GMT"  === DateUtils.format(0L, DateUtils.RFC1123Date))
+        assert("1970-01-01T00:00:00.000Z"       === DateUtils.DateTime.print(0L))
+        assert("Thu, 01 Jan 1970 00:00:00 GMT"  === DateUtils.RFC1123Date.print(0L))
 
-        assert("2012-05-29T19:35:04.123"        === DateUtils.format(1338320104123L, DateUtils.XsDateTimeLong))
-        assert("2012-05-29T19:35:04"            === DateUtils.format(1338320104123L, DateUtils.XsDateTime))
-        assert("2012-05-29"                     === DateUtils.format(1338320104123L, DateUtils.XsDate))
-        assert("Tue, 29 May 2012 19:35:04 GMT"  === DateUtils.format(1338320104123L, DateUtils.RFC1123Date))
+        assert("2012-05-29T19:35:04.123Z"       === DateUtils.DateTime.print(1338320104123L))
+        assert("Tue, 29 May 2012 19:35:04 GMT"  === DateUtils.RFC1123Date.print(1338320104123L))
     }
 }

@@ -237,7 +237,7 @@ public class ProcessorUtils {
             if (fileName != null)
                 attributes.addAttribute("", "filename", "filename", "CDATA", fileName);
             if (lastModified != null)
-                attributes.addAttribute("", "last-modified", "last-modified", "CDATA", DateUtils.format(lastModified, DateUtils.RFC1123Date()));
+                attributes.addAttribute("", "last-modified", "last-modified", "CDATA", DateUtils.RFC1123Date().print(lastModified));
             if (statusCode > 0)
                 attributes.addAttribute("", "status-code", "status-code", "CDATA", Integer.toString(statusCode));
 

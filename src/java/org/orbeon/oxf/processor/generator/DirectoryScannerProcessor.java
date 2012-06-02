@@ -28,11 +28,11 @@ import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.resources.URLFactory;
-import org.orbeon.oxf.util.DateUtils;
 import org.orbeon.oxf.util.NumberUtils;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.util.DateUtils;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -230,7 +230,7 @@ public class DirectoryScannerProcessor extends ProcessorImpl {
                             String filePath = path + name;
                             File file = new File(config.getBaseDirectory(), filePath);
                             long lastModified = file.lastModified();
-                            String lastModifiedDate = DateUtils.format(lastModified, DateUtils.XsDateTimeLong());
+                            String lastModifiedDate = DateUtils.DateTime().print(lastModified);
                             long fileSize = file.length();
 
                             helper.startElement(FILE_ELEMENT, new String[]{"last-modified-ms", Long.toString(lastModified),

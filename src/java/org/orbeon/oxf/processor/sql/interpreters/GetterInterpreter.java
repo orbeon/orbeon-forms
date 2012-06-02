@@ -13,12 +13,12 @@
  */
 package org.orbeon.oxf.processor.sql.interpreters;
 
+import org.joda.time.format.ISODateTimeFormat;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.processor.sql.SQLProcessor;
 import org.orbeon.oxf.processor.sql.SQLProcessorInterpreterContext;
 import org.orbeon.oxf.properties.PropertySet;
-import org.orbeon.oxf.util.DateUtils;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -456,11 +456,11 @@ public class GetterInterpreter extends SQLProcessor.InterpreterContentHandler {
         if (columnType == Types.DATE) {
             final Date value = resultSet.getDate(columnIndex);
             if (value != null)
-                stringValue = DateUtils.format(value.getTime(), DateUtils.XsDate());
+                stringValue = ISODateTimeFormat.date().print(value.getTime());
         } else if (columnType == Types.TIMESTAMP) {
             final Timestamp value = resultSet.getTimestamp(columnIndex);
             if (value != null)
-                stringValue = DateUtils.format(value.getTime(), DateUtils.XsDateTimeLong());
+                stringValue = ISODateTimeFormat.dateTime().print(value.getTime());
         } else if (columnType == Types.DECIMAL
                 || columnType == Types.NUMERIC) {
             final BigDecimal value = resultSet.getBigDecimal(columnIndex);

@@ -45,7 +45,9 @@
                 <xsl:template match="/*">
                     
                     <xsl:variable name="has-multiple-choices" select="count(fr:positive-choice | fr:negative-choice | fr:neutral-choice) > 1"/>
-                    <xxforms:dialog xxbl:scope="inner" id="dialog" level="modal" appearance="full" close="{exists(fr:neutral-choice) and not ($has-multiple-choices)}"
+
+                    <!-- Once AVTs are supported: close="{exists(fr:neutral-choice) and not ($has-multiple-choices)}"  -->
+                    <xxforms:dialog xxbl:scope="inner" id="dialog" level="modal" appearance="full" close="false"
                             class="xbl-fr-alert-dialog xbl-fr-alert-dialog-{if ($has-multiple-choices) then 'question' else 'info'}">
 
                         <xforms:model>

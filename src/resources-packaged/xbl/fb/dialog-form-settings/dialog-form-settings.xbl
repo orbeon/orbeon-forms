@@ -63,9 +63,11 @@
             <xf:var name="resources"><xxf:sequence value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=resources-ref"/></xf:var>
             <xf:var name="fr-resources"><xxf:sequence value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=fr-resources-ref"/></xf:var>
 
-            <xf:var name="is-new-form" value="mode = 'new'"/>
-            <xf:var name="is-save-as" value="mode = 'save-as'"/>
+            <xf:var name="is-new-form"      value="mode = 'new'"/>
+            <xf:var name="is-save-as"       value="mode = 'save-as'"/>
+            <xf:var name="is-form-settings" value="not($is-new-form or $is-save-as)"/>
 
+            <!-- Once AVTs are supported: close="{not($is-new-form)}"  -->
             <xxf:dialog id="dialog" close="false" class="fb-dialog-form-settings">
                 <!-- Dialog title -->
                 <xf:label value="if ($is-new-form) then ()
@@ -129,7 +131,7 @@
                         </xf:input>
 
                         <!-- Stats -->
-                        <xf:group ref=".[not($is-new-form or $is-save-as)]" class="fb-dialog-form-settings-stats">
+                        <xf:group ref=".[$is-form-settings]" class="fb-dialog-form-settings-stats">
                             <xf:label value="$resources/dialog-form-settings/stats"/>
 
                             <xf:var name="labels"

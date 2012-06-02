@@ -382,12 +382,9 @@ a.xforms-help-image .fb-control-help { vertical-align: baseline; }
 .fr-grid-th .xforms-label, .fr-grid-th .xforms-hint             /* In grid header, for the repeat single line */
     { min-height: 1.321em }
 
-/* Show disabled hints, which are hints that don't contain any text, as we want them to show since use them as placeholders */
+/* Show disabled hints, which are hints that don't contain any text, as we want them to show since use them as placeholders containers */
 #fr-view                                    /* Use an id to override the #fr-view .xforms-disabled { display: none } in form-runner-base.css */
-    .fr-grid:not(.fr-repeat-single-row)     /* In grids that are not single-row repeats (where the hint shows in the header) */
-    .xforms-hint.xforms-disabled,
-#fr-view .fr-grid.fr-repeat-single-row      /* In single-row repeats unhide hint in header */
-    th .xforms-hint.xforms-disabled
+    .fr-grid .xforms-hint.xforms-disabled
         { display: block;
         position: static }                  /* The position: static overrides the position: absolute; top: -10000px; left: -10000px in xforms.css. */
 

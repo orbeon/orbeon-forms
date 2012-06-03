@@ -202,8 +202,9 @@ class EventHandlerImpl(
         } catch {
             case e: Exception ⇒
                 // Something bad happened while running the action
-                // NOTE: Dispatch directly to the containing document. Ideally it would bubble and a default listener on the document would handle it.
-                container.dispatchEvent(new XXFormsActionErrorEvent(container.getContainingDocument, container.getContainingDocument, e))
+                // NOTE: Dispatch directly to #document. Ideally it would bubble and a default listener on the document would handle it.
+                val target = containingDocument.getObjectByEffectiveId("#document").asInstanceOf[XFormsEventTarget]
+                container.dispatchEvent(new XXFormsActionErrorEvent(containingDocument, target, e))
         }
     }
 

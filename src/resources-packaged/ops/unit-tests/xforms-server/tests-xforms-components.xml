@@ -66,7 +66,7 @@
                                     <hint>Hint hint!</hint>
                                 </instance>
                             </instance>
-                            <instance id="fr-inplace-instance" model-id="my-inplace-input$fr-inplace-model">
+                            <instance id="instance" model-id="my-inplace-input$model">
                                 <value/>
                             </instance>
                         </instances>
@@ -77,13 +77,14 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-inplace-input$xf-4" class="fr-component-group" label="Label me!"/>
+                        <xxf:control id="my-inplace-input" label="Label me!" hint="Hint hint!"/>
+                        <xxf:control id="my-inplace-input$xf-4" class="fr-component-group"/>
                         <xxf:div id="my-inplace-input$fr-inplace-view" visibility="visible"/>
                         <xxf:div id="my-inplace-input$fr-inplace-edit" visibility="hidden"/>
-                        <xxf:control id="my-inplace-input$xf-8" class="fr-inplace-hint xforms-activable">[Hint hint!]</xxf:control>
-                        <xxf:control id="my-inplace-input$fr-inplace-input-edit-group" class="fr-inplace-content fr-inplace-edit"/>
-                        <xxf:control id="my-inplace-input$xf-15" class="fr-inplace-rename" label="Apply"/>
-                        <xxf:control id="my-inplace-input$xf-19" class="fr-inplace-cancel" label="Cancel"/>
+                        <xxf:control id="my-inplace-input$xf-6" class="xforms-activable fr-inplace-hint">Hint hint!</xxf:control>
+                        <xxf:control id="my-inplace-input$xf-11" class="fr-inplace-content fr-inplace-edit"/>
+                        <xxf:control id="my-inplace-input$apply" class="fr-inplace-rename" label="Apply"/>
+                        <xxf:control id="my-inplace-input$xf-13" class="fr-inplace-cancel" label="Cancel"/>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -124,7 +125,7 @@
                                     <value>42</value>
                                 </instance>
                             </instance>
-                            <instance id="fr-inplace-instance" model-id="my-inplace-input$fr-inplace-model">
+                            <instance id="instance" model-id="my-inplace-input$model">
                                 <value/>
                             </instance>
                         </instances>
@@ -135,14 +136,15 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-inplace-input$xf-4" class="fr-component-group" label="Label me!" readonly="true"/>
+                        <xxf:control id="my-inplace-input" label="Label me!" hint="Hint hint!" readonly="true"/>
+                        <xxf:control id="my-inplace-input$xf-4" class="fr-component-group"/>
                         <xxf:div id="my-inplace-input$fr-inplace-view" visibility="visible"/>
                         <xxf:div id="my-inplace-input$fr-inplace-edit" visibility="hidden"/>
-                        <xxf:control id="my-inplace-input$xf-8" class="xforms-activable" readonly="true">42</xxf:control>
-                        <xxf:control id="my-inplace-input$fr-inplace-input-edit-group" class="fr-inplace-content fr-inplace-edit" relevant="false"/>
-                        <xxf:control id="my-inplace-input$fr-inplace-input" relevant="false"/>
-                        <xxf:control id="my-inplace-input$xf-15" class="fr-inplace-rename" relevant="false"/>
-                        <xxf:control id="my-inplace-input$xf-19" class="fr-inplace-cancel" relevant="false"/>
+                        <xxf:control id="my-inplace-input$xf-6" class="xforms-activable fr-inplace-hint" readonly="true">42</xxf:control>
+                        <xxf:control id="my-inplace-input$xf-11" class="fr-inplace-content fr-inplace-edit" relevant="false"/>
+                        <xxf:control id="my-inplace-input$input" relevant="false"/>
+                        <xxf:control id="my-inplace-input$apply" class="fr-inplace-rename" relevant="false"/>
+                        <xxf:control id="my-inplace-input$xf-13" class="fr-inplace-cancel" relevant="false"/>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -857,7 +859,7 @@
                         <xxf:attribute id="my-datatable$xf-44·3" for="my-datatable$xf-43·3" name="class"/>
                         <xxf:control id="my-datatable$my-input·3">3</xxf:control>
                     </xxf:control-values>
-                    <xxf:script name="xf_19d824bfbd2ccf090ad04959fa9462f0ccbb7617" target-id="my-datatable$fr-dt-group" observer-id="my-datatable$my-datatable-container"/>
+                    <xxf:script name="xf_d23c3ac47cd301b3f95dc8eefa47ad79bba4be9f" target-id="my-datatable$fr-dt-group" observer-id="my-datatable$fr-dt-group"/>
                     <xxf:script name="xf_52595b4daac0bd02a78d55df0ac544208d73c48c" target-id="my-datatable$xf-37" observer-id="my-datatable$xf-37"/>
                     <xxf:script name="xf_52595b4daac0bd02a78d55df0ac544208d73c48c" target-id="my-datatable$xf-37" observer-id="my-datatable$xf-37"/>
                     <xxf:focus control-id="my-datatable$my-input·2"/>

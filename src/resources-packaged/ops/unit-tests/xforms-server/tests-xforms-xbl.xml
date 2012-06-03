@@ -873,7 +873,7 @@
                                             <!-- Local controls -->
                                             <xforms:group id="internal-group">
                                                 <!-- React to creation of group -->
-                                                <xforms:action ev:event="xforms-enabled" ev:target="internal-group">
+                                                <xforms:action ev:event="xforms-enabled" ev:target="#observer">
                                                     <!-- Simulate user click on all triggers -->
                                                     <xforms:dispatch name="DOMActivate" targetid="internal-trigger-1"/>
                                                     <xforms:dispatch name="DOMActivate" targetid="internal-trigger-2"/>
@@ -1680,7 +1680,7 @@
                                                 <!-- TEST: Event listener -->
                                                 <xforms:insert if="not(xxforms:event('xxforms:type') = 'xxforms-index-changed')" context="xxforms:instance('events')" nodeset="*"
                                                    origin="xxforms:element('event',
-                                                            (xxforms:attribute('observer', 'fr-level1-binding'),
+                                                            (xxforms:attribute('observer', event('xxforms:observerid')),
                                                              xxforms:attribute('type', xxforms:event('xxforms:type')),
                                                              xxforms:attribute('target', event('xxforms:targetid')),
                                                              xxforms:attribute('phase', event('xxforms:phase')),
@@ -1708,7 +1708,7 @@
                                                 <!-- TEST: Event listener -->
                                                 <xforms:insert if="not(xxforms:event('xxforms:type') = 'xxforms-index-changed')" context="xxforms:instance('events')" nodeset="*"
                                                    origin="xxforms:element('event',
-                                                            (xxforms:attribute('observer', 'fr-level2-binding'),
+                                                            (xxforms:attribute('observer', event('xxforms:observerid')),
                                                              xxforms:attribute('type', xxforms:event('xxforms:type')),
                                                              xxforms:attribute('target', event('xxforms:targetid')),
                                                              xxforms:attribute('phase', event('xxforms:phase')),
@@ -1736,7 +1736,7 @@
                                                 <!-- TEST: Event listener -->
                                                 <xforms:insert if="not(xxforms:event('xxforms:type') = 'xxforms-index-changed')" context="xxforms:instance('events')" nodeset="*"
                                                    origin="xxforms:element('event',
-                                                            (xxforms:attribute('observer', 'fr-level3-binding'),
+                                                            (xxforms:attribute('observer', event('xxforms:observerid')),
                                                              xxforms:attribute('type', xxforms:event('xxforms:type')),
                                                              xxforms:attribute('target', event('xxforms:targetid')),
                                                              xxforms:attribute('phase', event('xxforms:phase')),
@@ -1767,7 +1767,7 @@
                                     <!-- TEST: Event listener -->
                                     <xforms:insert if="not(xxforms:event('xxforms:type') = 'xxforms-index-changed')" ev:event="#all" context="instance('events')" nodeset="*"
                                                    origin="xxforms:element('event',
-                                                            (xxforms:attribute('observer', 'main-group'),
+                                                            (xxforms:attribute('observer', event('xxforms:observerid')),
                                                              xxforms:attribute('type', xxforms:event('xxforms:type')),
                                                              xxforms:attribute('target', event('xxforms:targetid')),
                                                              xxforms:attribute('phase', event('xxforms:phase')),
@@ -1786,78 +1786,88 @@
             </p:config>
         </input>
         <output name="response">
-            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xxf:event-response>
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
                             <instance id="events" model-id="model">
                                 <events>
                                     <event observer="main-group" type="xforms-enabled" target="main-group" phase="target" original-target="main-group" indexes=""/>
-                                    <event observer="fr-level1-binding" type="xforms-enabled" target="level1-component" phase="target" original-target="level1-component" indexes=""/>
+                                    <event observer="level1-component" type="xforms-enabled" target="level1-component" phase="target" original-target="level1-component" indexes=""/>
                                     <event observer="main-group" type="xforms-enabled" target="level1-component" phase="bubbling" original-target="level1-component" indexes=""/>
-                                    <event observer="fr-level1-binding" type="xforms-enabled" target="level1-component" phase="bubbling" original-target="level1-repeat" indexes=""/>
-                                    <event observer="main-group" type="xforms-enabled" target="level1-component" phase="bubbling" original-target="level1-repeat" indexes=""/>
-                                    <event observer="fr-level2-binding" type="xforms-enabled" target="level2-component" phase="target" original-target="level2-component" indexes="1"/>
-                                    <event observer="fr-level1-binding" type="xforms-enabled" target="level1-component" phase="bubbling" original-target="level2-component" indexes="1"/>
-                                    <event observer="main-group" type="xforms-enabled" target="level1-component" phase="bubbling" original-target="level2-component" indexes="1"/>
-                                    <event observer="fr-level2-binding" type="xforms-enabled" target="level2-component" phase="bubbling" original-target="level2-repeat" indexes="1"/>
-                                    <event observer="fr-level1-binding" type="xforms-enabled" target="level1-component" phase="bubbling" original-target="level2-repeat" indexes="1"/>
-                                    <event observer="main-group" type="xforms-enabled" target="level1-component" phase="bubbling" original-target="level2-repeat" indexes="1"/>
-                                    <event observer="fr-level3-binding" type="xforms-enabled" target="level3-component" phase="target" original-target="level3-component" indexes="1 1"/>
-                                    <event observer="fr-level2-binding" type="xforms-enabled" target="level2-component" phase="bubbling" original-target="level3-component" indexes="1 1"/>
-                                    <event observer="fr-level1-binding" type="xforms-enabled" target="level1-component" phase="bubbling" original-target="level3-component" indexes="1 1"/>
-                                    <event observer="main-group" type="xforms-enabled" target="level1-component" phase="bubbling" original-target="level3-component" indexes="1 1"/>
-                                    <event observer="fr-level3-binding" type="xforms-enabled" target="level3-component" phase="bubbling" original-target="level3-repeat" indexes="1 1"/>
-                                    <event observer="fr-level2-binding" type="xforms-enabled" target="level2-component" phase="bubbling" original-target="level3-repeat" indexes="1 1"/>
-                                    <event observer="fr-level1-binding" type="xforms-enabled" target="level1-component" phase="bubbling" original-target="level3-repeat" indexes="1 1"/>
-                                    <event observer="main-group" type="xforms-enabled" target="level1-component" phase="bubbling" original-target="level3-repeat" indexes="1 1"/>
-                                    <event observer="fr-level3-binding" type="xforms-enabled" target="level3-component" phase="bubbling" original-target="title-control" indexes="1 1 1"/>
-                                    <event observer="fr-level2-binding" type="xforms-enabled" target="level2-component" phase="bubbling" original-target="title-control" indexes="1 1 1"/>
-                                    <event observer="fr-level1-binding" type="xforms-enabled" target="level1-component" phase="bubbling" original-target="title-control" indexes="1 1 1"/>
-                                    <event observer="main-group" type="xforms-enabled" target="level1-component" phase="bubbling" original-target="title-control" indexes="1 1 1"/>
-                                    <event observer="fr-level1-binding" type="up-value1" target="level1-component" phase="target" original-target="level1-component" indexes=""/>
-                                    <event observer="fr-level2-binding" type="up-value2" target="level2-component" phase="target" original-target="level2-component" indexes="1"/>
-                                    <event observer="fr-level3-binding" type="up-value3" target="level3-component" phase="target" original-target="level3-component" indexes="1 1"/>
-                                    <event observer="fr-level3-binding" type="xforms-value-changed" target="level3-component" phase="bubbling" original-target="title-control" indexes="1 1 1"/>
-                                    <event observer="fr-level2-binding" type="xforms-value-changed" target="level2-component" phase="bubbling" original-target="title-control" indexes="1 1 1"/>
-                                    <event observer="fr-level1-binding" type="xforms-value-changed" target="level1-component" phase="bubbling" original-target="title-control" indexes="1 1 1"/>
-                                    <event observer="main-group" type="xforms-value-changed" target="level1-component" phase="bubbling" original-target="title-control" indexes="1 1 1"/>
+                                    <event observer="level1-component" type="xforms-enabled" target="level1-repeat" phase="bubbling" original-target="level1-repeat" indexes=""/>
+                                    <event observer="main-group" type="xforms-enabled" target="level1-repeat" phase="bubbling" original-target="level1-repeat" indexes=""/>
+                                    <event observer="level2-component" type="xforms-enabled" target="level2-component" phase="target" original-target="level2-component" indexes="1"/>
+                                    <event observer="level1-component" type="xforms-enabled" target="level2-component" phase="bubbling" original-target="level2-component" indexes="1"/>
+                                    <event observer="main-group" type="xforms-enabled" target="level2-component" phase="bubbling" original-target="level2-component" indexes="1"/>
+                                    <event observer="level2-component" type="xforms-enabled" target="level2-repeat" phase="bubbling" original-target="level2-repeat" indexes="1"/>
+                                    <event observer="level1-component" type="xforms-enabled" target="level2-repeat" phase="bubbling" original-target="level2-repeat" indexes="1"/>
+                                    <event observer="main-group" type="xforms-enabled" target="level2-repeat" phase="bubbling" original-target="level2-repeat" indexes="1"/>
+                                    <event observer="level3-component" type="xforms-enabled" target="level3-component" phase="target" original-target="level3-component" indexes="1 1"/>
+                                    <event observer="level2-component" type="xforms-enabled" target="level3-component" phase="bubbling" original-target="level3-component" indexes="1 1"/>
+                                    <event observer="level1-component" type="xforms-enabled" target="level3-component" phase="bubbling" original-target="level3-component" indexes="1 1"/>
+                                    <event observer="main-group" type="xforms-enabled" target="level3-component" phase="bubbling" original-target="level3-component" indexes="1 1"/>
+                                    <event observer="level3-component" type="xforms-enabled" target="level3-repeat" phase="bubbling" original-target="level3-repeat" indexes="1 1"/>
+                                    <event observer="level2-component" type="xforms-enabled" target="level3-repeat" phase="bubbling" original-target="level3-repeat" indexes="1 1"/>
+                                    <event observer="level1-component" type="xforms-enabled" target="level3-repeat" phase="bubbling" original-target="level3-repeat" indexes="1 1"/>
+                                    <event observer="main-group" type="xforms-enabled" target="level3-repeat" phase="bubbling" original-target="level3-repeat" indexes="1 1"/>
+                                    <event observer="level3-component" type="xforms-enabled" target="title-control" phase="bubbling" original-target="title-control" indexes="1 1 1"/>
+                                    <event observer="level2-component" type="xforms-enabled" target="title-control" phase="bubbling" original-target="title-control" indexes="1 1 1"/>
+                                    <event observer="level1-component" type="xforms-enabled" target="title-control" phase="bubbling" original-target="title-control" indexes="1 1 1"/>
+                                    <event observer="main-group" type="xforms-enabled" target="title-control" phase="bubbling" original-target="title-control" indexes="1 1 1"/>
+                                    <event observer="level1-component" type="up-value1" target="level1-component" phase="target" original-target="level1-component" indexes=""/>
+                                    <event observer="level2-component" type="up-value2" target="level2-component" phase="target" original-target="level2-component" indexes="1"/>
+                                    <event observer="level3-component" type="up-value3" target="level3-component" phase="target" original-target="level3-component" indexes="1 1"/>
+                                    <event observer="level3-component" type="xforms-value-changed" target="title-control" phase="bubbling" original-target="title-control" indexes="1 1 1"/>
+                                    <event observer="level2-component" type="xforms-value-changed" target="title-control" phase="bubbling" original-target="title-control" indexes="1 1 1"/>
+                                    <event observer="level1-component" type="xforms-value-changed" target="title-control" phase="bubbling" original-target="title-control" indexes="1 1 1"/>
+                                    <event observer="main-group" type="xforms-value-changed" target="title-control" phase="bubbling" original-target="title-control" indexes="1 1 1"/>
                                     <event observer="main-group" type="DOMFocusIn" target="main-group" phase="target" original-target="main-group" indexes=""/>
-                                    <event observer="fr-level1-binding" type="DOMFocusIn" target="level1-component" phase="target" original-target="level1-component" indexes=""/>
+                                    <event observer="level1-component" type="DOMFocusIn" target="level1-component" phase="target" original-target="level1-component" indexes=""/>
                                     <event observer="main-group" type="DOMFocusIn" target="level1-component" phase="bubbling" original-target="level1-component" indexes=""/>
-                                    <event observer="fr-level1-binding" type="DOMFocusIn" target="level1-repeat" phase="bubbling" original-target="level1-repeat" indexes=""/>
+                                    <event observer="level1-component" type="DOMFocusIn" target="level1-repeat" phase="bubbling" original-target="level1-repeat" indexes=""/>
                                     <event observer="main-group" type="DOMFocusIn" target="level1-repeat" phase="bubbling" original-target="level1-repeat" indexes=""/>
-                                    <event observer="fr-level1-binding" type="DOMFocusIn" target="level1-repeat~iteration" phase="bubbling" original-target="level1-repeat~iteration" indexes="1"/>
+                                    <event observer="level1-component" type="DOMFocusIn" target="level1-repeat~iteration" phase="bubbling" original-target="level1-repeat~iteration" indexes="1"/>
                                     <event observer="main-group" type="DOMFocusIn" target="level1-repeat~iteration" phase="bubbling" original-target="level1-repeat~iteration" indexes="1"/>
-                                    <event observer="fr-level2-binding" type="DOMFocusIn" target="level2-component" phase="target" original-target="level2-component" indexes="1"/>
-                                    <event observer="fr-level1-binding" type="DOMFocusIn" target="level2-component" phase="bubbling" original-target="level2-component" indexes="1"/>
+                                    <event observer="level2-component" type="DOMFocusIn" target="level2-component" phase="target" original-target="level2-component" indexes="1"/>
+                                    <event observer="level1-component" type="DOMFocusIn" target="level2-component" phase="bubbling" original-target="level2-component" indexes="1"/>
                                     <event observer="main-group" type="DOMFocusIn" target="level2-component" phase="bubbling" original-target="level2-component" indexes="1"/>
-                                    <event observer="fr-level2-binding" type="DOMFocusIn" target="level2-repeat" phase="bubbling" original-target="level2-repeat" indexes="1"/>
-                                    <event observer="fr-level1-binding" type="DOMFocusIn" target="level2-repeat" phase="bubbling" original-target="level2-repeat" indexes="1"/>
+                                    <event observer="level2-component" type="DOMFocusIn" target="level2-repeat" phase="bubbling" original-target="level2-repeat" indexes="1"/>
+                                    <event observer="level1-component" type="DOMFocusIn" target="level2-repeat" phase="bubbling" original-target="level2-repeat" indexes="1"/>
                                     <event observer="main-group" type="DOMFocusIn" target="level2-repeat" phase="bubbling" original-target="level2-repeat" indexes="1"/>
-                                    <event observer="fr-level2-binding" type="DOMFocusIn" target="level2-repeat~iteration" phase="bubbling" original-target="level2-repeat~iteration" indexes="1 1"/>
-                                    <event observer="fr-level1-binding" type="DOMFocusIn" target="level2-repeat~iteration" phase="bubbling" original-target="level2-repeat~iteration" indexes="1 1"/>
+                                    <event observer="level2-component" type="DOMFocusIn" target="level2-repeat~iteration" phase="bubbling" original-target="level2-repeat~iteration" indexes="1 1"/>
+                                    <event observer="level1-component" type="DOMFocusIn" target="level2-repeat~iteration" phase="bubbling" original-target="level2-repeat~iteration" indexes="1 1"/>
                                     <event observer="main-group" type="DOMFocusIn" target="level2-repeat~iteration" phase="bubbling" original-target="level2-repeat~iteration" indexes="1 1"/>
-                                    <event observer="fr-level3-binding" type="DOMFocusIn" target="level3-component" phase="target" original-target="level3-component" indexes="1 1"/>
-                                    <event observer="fr-level2-binding" type="DOMFocusIn" target="level3-component" phase="bubbling" original-target="level3-component" indexes="1 1"/>
-                                    <event observer="fr-level1-binding" type="DOMFocusIn" target="level3-component" phase="bubbling" original-target="level3-component" indexes="1 1"/>
+                                    <event observer="level3-component" type="DOMFocusIn" target="level3-component" phase="target" original-target="level3-component" indexes="1 1"/>
+                                    <event observer="level2-component" type="DOMFocusIn" target="level3-component" phase="bubbling" original-target="level3-component" indexes="1 1"/>
+                                    <event observer="level1-component" type="DOMFocusIn" target="level3-component" phase="bubbling" original-target="level3-component" indexes="1 1"/>
                                     <event observer="main-group" type="DOMFocusIn" target="level3-component" phase="bubbling" original-target="level3-component" indexes="1 1"/>
-                                    <event observer="fr-level3-binding" type="DOMFocusIn" target="level3-repeat" phase="bubbling" original-target="level3-repeat" indexes="1 1"/>
-                                    <event observer="fr-level2-binding" type="DOMFocusIn" target="level3-repeat" phase="bubbling" original-target="level3-repeat" indexes="1 1"/>
-                                    <event observer="fr-level1-binding" type="DOMFocusIn" target="level3-repeat" phase="bubbling" original-target="level3-repeat" indexes="1 1"/>
+                                    <event observer="level3-component" type="DOMFocusIn" target="level3-repeat" phase="bubbling" original-target="level3-repeat" indexes="1 1"/>
+                                    <event observer="level2-component" type="DOMFocusIn" target="level3-repeat" phase="bubbling" original-target="level3-repeat" indexes="1 1"/>
+                                    <event observer="level1-component" type="DOMFocusIn" target="level3-repeat" phase="bubbling" original-target="level3-repeat" indexes="1 1"/>
                                     <event observer="main-group" type="DOMFocusIn" target="level3-repeat" phase="bubbling" original-target="level3-repeat" indexes="1 1"/>
-                                    <event observer="fr-level3-binding" type="DOMFocusIn" target="level3-repeat~iteration" phase="bubbling" original-target="level3-repeat~iteration" indexes="1 1 1"/>
-                                    <event observer="fr-level2-binding" type="DOMFocusIn" target="level3-repeat~iteration" phase="bubbling" original-target="level3-repeat~iteration" indexes="1 1 1"/>
-                                    <event observer="fr-level1-binding" type="DOMFocusIn" target="level3-repeat~iteration" phase="bubbling" original-target="level3-repeat~iteration" indexes="1 1 1"/>
+                                    <event observer="level3-component" type="DOMFocusIn" target="level3-repeat~iteration" phase="bubbling" original-target="level3-repeat~iteration" indexes="1 1 1"/>
+                                    <event observer="level2-component" type="DOMFocusIn" target="level3-repeat~iteration" phase="bubbling" original-target="level3-repeat~iteration" indexes="1 1 1"/>
+                                    <event observer="level1-component" type="DOMFocusIn" target="level3-repeat~iteration" phase="bubbling" original-target="level3-repeat~iteration" indexes="1 1 1"/>
                                     <event observer="main-group" type="DOMFocusIn" target="level3-repeat~iteration" phase="bubbling" original-target="level3-repeat~iteration" indexes="1 1 1"/>
-                                    <event observer="fr-level3-binding" type="down-3" target="level3-component" phase="target" original-target="level3-component" indexes="1 1"/>
-                                    <event observer="fr-level2-binding" type="down-2" target="level2-component" phase="target" original-target="level2-component" indexes="1"/>
-                                    <event observer="fr-level1-binding" type="down-1" target="level1-component" phase="target" original-target="level1-component" indexes=""/>
+                                    <event observer="level3-component" type="down-3" target="level3-component" phase="target" original-target="level3-component" indexes="1 1"/>
+                                    <event observer="level2-component" type="down-2" target="level2-component" phase="target" original-target="level2-component" indexes="1"/>
+                                    <event observer="level1-component" type="down-1" target="level1-component" phase="target" original-target="level1-component" indexes=""/>
                                     <event observer="main-group" type="down-1" target="level1-component" phase="bubbling" original-target="level1-component" indexes=""/>
-                                    <event observer="fr-level3-binding" type="DOMFocusIn" target="title-control" phase="bubbling" original-target="title-control" indexes="1 1 1"/>
-                                    <event observer="fr-level2-binding" type="DOMFocusIn" target="title-control" phase="bubbling" original-target="title-control" indexes="1 1 1"/>
-                                    <event observer="fr-level1-binding" type="DOMFocusIn" target="title-control" phase="bubbling" original-target="title-control" indexes="1 1 1"/>
+                                    <event observer="level1-component" type="down-2" target="level2-component" phase="bubbling" original-target="level2-component" indexes="1"/>
+                                    <event observer="main-group" type="down-2" target="level2-component" phase="bubbling" original-target="level2-component" indexes="1"/>
+                                    <event observer="level2-component" type="down-3" target="level3-component" phase="bubbling" original-target="level3-component" indexes="1 1"/>
+                                    <event observer="level1-component" type="down-3" target="level3-component" phase="bubbling" original-target="level3-component" indexes="1 1"/>
+                                    <event observer="main-group" type="down-3" target="level3-component" phase="bubbling" original-target="level3-component" indexes="1 1"/>
+                                    <event observer="level3-component" type="DOMFocusIn" target="title-control" phase="bubbling" original-target="title-control" indexes="1 1 1"/>
+                                    <event observer="level2-component" type="DOMFocusIn" target="title-control" phase="bubbling" original-target="title-control" indexes="1 1 1"/>
+                                    <event observer="level1-component" type="DOMFocusIn" target="title-control" phase="bubbling" original-target="title-control" indexes="1 1 1"/>
                                     <event observer="main-group" type="DOMFocusIn" target="title-control" phase="bubbling" original-target="title-control" indexes="1 1 1"/>
+                                    <event observer="level2-component" type="up-value3" target="level3-component" phase="bubbling" original-target="level3-component" indexes="1 1"/>
+                                    <event observer="level1-component" type="up-value3" target="level3-component" phase="bubbling" original-target="level3-component" indexes="1 1"/>
+                                    <event observer="main-group" type="up-value3" target="level3-component" phase="bubbling" original-target="level3-component" indexes="1 1"/>
+                                    <event observer="level1-component" type="up-value2" target="level2-component" phase="bubbling" original-target="level2-component" indexes="1"/>
+                                    <event observer="main-group" type="up-value2" target="level2-component" phase="bubbling" original-target="level2-component" indexes="1"/>
                                     <event observer="main-group" type="up-value1" target="level1-component" phase="bubbling" original-target="level1-component" indexes=""/>
                                 </events>
                             </instance>

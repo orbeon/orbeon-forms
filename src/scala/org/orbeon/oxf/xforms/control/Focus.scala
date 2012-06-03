@@ -23,6 +23,7 @@ import collection.JavaConverters._
 import java.util.{ArrayList ⇒ JArrayList, LinkedHashMap ⇒ JLinkedHashMap}
 import org.orbeon.oxf.xforms.event._
 import org.orbeon.oxf.xforms.event.XFormsEvents.{DOM_FOCUS_OUT, DOM_FOCUS_IN}
+import collection.mutable.Buffer
 
 // Handle control focus
 object Focus {
@@ -209,54 +210,61 @@ object Focus {
             case _ ⇒ targetObject.getParentEventObserver(doc) // why this is needed?
         }
 
-        val ignoreObserver = (o: XFormsEventObserver) ⇒ o.isInstanceOf[XXFormsRootControl]
-        val notReachedComponent = (o: XFormsEventObserver) ⇒ ! (o.isInstanceOf[XFormsComponentControl] && (o ne targetObject))
+        // Iterator over a target's ancestor observers
+        class ObserverIterator(start: XFormsEventObserver, doc: XFormsContainingDocument) extends Iterator[XFormsEventObserver] {
+            private var _next = start
+            def hasNext = _next ne null
+            def next() = {
+                val result = _next
+                _next = _next.getParentEventObserver(doc)
+                result
+            }
+        }
 
-        // Iterator over all observers except those we always ignore
-        val commonIterator = new ObserverIterator(startObserver, doc) filterNot (ignoreObserver)
+        // Iterator over all observers
+        val commonIterator = new ObserverIterator(startObserver, doc)
 
         // Iterator over all the observers we need to handle
         val observerIterator =
             event match {
-                case focusEvent @ (_: DOMFocusInEvent | _: DOMFocusOutEvent) ⇒
-                    // Proper event propagation over scopes for focus events
-
-                    val targetScope = targetObject.getScope(doc)
-                    commonIterator filter (_.getScope(doc) == targetScope)
-
-                case uiEvent: XFormsUIEvent ⇒
-                    // Broken retargeting for other UI events
+                case uiEvent: XFormsUIEvent if ! (uiEvent.isInstanceOf[DOMFocusInEvent] || uiEvent.isInstanceOf[DOMFocusOutEvent]) ⇒
+                    // Broken retargeting for UI events other than focus events
                     // See: https://github.com/orbeon/orbeon-forms/issues/282
 
-                    def addRetarget(o: XFormsEventObserver) {
-                        boundaries.add(o)
-                        eventsForBoundaries.put(o.getEffectiveId, null)
+                    // Register a retarget boundary
+                    def addRetarget(observer: XFormsEventObserver) {
+                        boundaries.add(observer)
+                        eventsForBoundaries.put(observer.getEffectiveId, null)
                     }
 
-                    commonIterator map {o ⇒ if (! notReachedComponent(o)) addRetarget(o); o}
+                    // Algorithm as follows: start with target and go up following scopes. If we reach an XBL root, then
+                    // we retarget the event to the containing component.
+                    var currentTargetScope = targetObject.getScope(doc)
+                    val result = Buffer[XFormsEventObserver]()
+                    while (commonIterator.hasNext) {
+                        val current = commonIterator.next()
+
+                        if (current.getScope(doc) == currentTargetScope) {
+                            if (current.isInstanceOf[XXFormsComponentRootControl]) {
+                                val component = current.getParentEventObserver(doc)
+                                addRetarget(component)
+                                currentTargetScope = component.getScope(doc)
+                            }
+                            result += current
+                        }
+                    }
+
+                    result.toIterator
 
                 case _ ⇒
-                    // For other events, simply stop propagation at the component boundary
-                    // This is broken too as it doesn't follow scopes!
-                    // See: https://github.com/orbeon/orbeon-forms/issues/282
-
-                    commonIterator takeWhile (notReachedComponent)
+                    // For other events, including focus events, just follow scopes
+                    val targetScope = targetObject.getScope(doc)
+                    commonIterator filter (_.getScope(doc) == targetScope)
             }
 
         eventObservers.addAll(observerIterator.toList.asJava)
 
         (boundaries, eventsForBoundaries, eventObservers)
-    }
-
-    // Iterator over a control's ancestors
-    private class ObserverIterator(start: XFormsEventObserver, doc: XFormsContainingDocument) extends Iterator[XFormsEventObserver] {
-        private var _next = start
-        def hasNext = _next ne null
-        def next() = {
-            val result = _next
-            _next = _next.getParentEventObserver(doc)
-            result
-        }
     }
 
     // Whether the control is hidden within a non-visible case or dialog
@@ -266,7 +274,7 @@ object Focus {
         case _ ⇒ false
     }
 
-    // Whether the control is focusable, that is it supports focus, is relevant, not read-only, and is not in a hidden case
+    // Whether the control is focusable, that is it supports focus, is relevant, not read-only, and is not in a hidden case or dialog
     private def isFocusable(control: XFormsControl) = control match {
         case focusable: XFormsSingleNodeControl with FocusableTrait if focusable.isReadonly ⇒ false
         case focusable: FocusableTrait if focusable.isRelevant && ! isHidden(focusable) ⇒ true

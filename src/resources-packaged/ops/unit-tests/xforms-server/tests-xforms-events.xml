@@ -28,6 +28,7 @@
     xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xbl="http://www.w3.org/ns/xbl"
+    xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
     <test description="ev:observer and ev:target" name="oxf:pipeline">
@@ -2021,7 +2022,7 @@
         </output>
     </test>
 
-    <test description="[ #315922 ] Event handler nested within bound node causes errors" name="oxf:pipeline" only="false">
+    <test description="[ #315922 ] Event handler nested within bound node causes errors" name="oxf:pipeline">
         <!-- See: http://forge.ow2.org/tracker/index.php?func=detail&aid=315922&group_id=168&atid=350207 -->
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
@@ -2239,7 +2240,7 @@
                     <dynamic-state>
                         <instances>
                             <instance id="instance" model-id="model">
-                                <values xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxi="http://orbeon.org/oxf/xml/xinclude" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xu="http://www.xmldb.org/xupdate" xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:xf="http://www.w3.org/2002/xforms" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                                <values>
                                     <value>Use of `event`</value>
                                     <value>Use of `event` and `observer`</value>
                                     <value>Use of `event`, `observer`, and `target`</value>
@@ -2250,6 +2251,72 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="#284: xforms-invalid doesn't escape the XBL control" name="oxf:pipeline">
+        <!-- See: https://github.com/orbeon/orbeon-forms/issues/284 -->
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+                <xhtml:head>
+                    <xforms:model id="model">
+                        <xforms:instance id="instance">
+                            <instance/>
+                        </xforms:instance>
+                        <!-- Dispatch my-event to my-input -->
+                        <xforms:dispatch ev:event="xforms-ready" name="my-event" targetid="my-input"/>
+                    </xforms:model>
+                    <xbl:xbl>
+                        <xbl:binding element="fr|foo">
+                            <xbl:template id="my-template">
+                                <!-- This must not run because in different scope -->
+                                <xf:message ev:event="my-event xforms-enabled"><xforms:output value="concat('target: ', event('xxforms:targetid'), ', observer: ', event('xxforms:observerid'), ', event: ', event('xxforms:type'))"/></xf:message>
+                                <xf:group id="inner-group">
+                                    <!-- This must not run because in different scope -->
+                                    <xf:message ev:event="my-event xforms-enabled"><xforms:output value="concat('target: ', event('xxforms:targetid'), ', observer: ', event('xxforms:observerid'), ', event: ', event('xxforms:type'))"/></xf:message>
+                                    <xf:group xxbl:scope="outer" id="outer-group">
+                                        <!-- This must run -->
+                                        <xf:message ev:event="my-event xforms-enabled"><xforms:output value="concat('target: ', event('xxforms:targetid'), ', observer: ', event('xxforms:observerid'), ', event: ', event('xxforms:type'))"/></xf:message>
+                                        <xf:input ref="." id="my-input"/>
+                                    </xf:group>
+                                </xf:group>
+                            </xbl:template>
+                        </xbl:binding>
+                    </xbl:xbl>
+                </xhtml:head>
+                <xhtml:body>
+                    <!-- This must run -->
+                    <xf:message ev:event="my-event xforms-enabled"><xforms:output value="concat('target: ', event('xxforms:targetid'), ', observer: ', event('xxforms:observerid'), ', event: ', event('xxforms:type'))"/></xf:message>
+                    <fr:foo id="my-foo"/>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response>
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <instance/>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values/>
+                    <xxf:message level="modal">target: my-foo, observer: #document, event: xforms-enabled</xxf:message>
+                    <xxf:message level="modal">target: inner-group, observer: inner-group, event: xforms-enabled</xxf:message>
+                    <xxf:message level="modal">target: inner-group, observer: my-template, event: xforms-enabled</xxf:message>
+                    <xxf:message level="modal">target: my-foo, observer: #document, event: xforms-enabled</xxf:message>
+                    <xxf:message level="modal">target: outer-group, observer: outer-group, event: xforms-enabled</xxf:message>
+                    <xxf:message level="modal">target: outer-group, observer: #document, event: xforms-enabled</xxf:message>
+                    <xxf:message level="modal">target: my-input, observer: outer-group, event: xforms-enabled</xxf:message>
+                    <xxf:message level="modal">target: my-input, observer: #document, event: xforms-enabled</xxf:message>
+                    <xxf:message level="modal">target: my-input, observer: outer-group, event: my-event</xxf:message>
+                    <xxf:message level="modal">target: my-input, observer: #document, event: my-event</xxf:message>
                 </xxf:action>
             </xxf:event-response>
         </output>

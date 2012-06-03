@@ -17,6 +17,14 @@ import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xforms.control.{XFormsControl, XFormsNoSingleNodeContainerControl}
 import org.dom4j.Element
 import java.util.{Map ⇒ JMap}
+import org.orbeon.oxf.xforms.event.events.{XXFormsActionErrorEvent, XXFormsLoadEvent}
+import org.orbeon.oxf.util.NetUtils
+import java.io.IOException
+import org.orbeon.oxf.common.ValidationException
+import org.orbeon.oxf.xforms.XFormsError
+import org.orbeon.oxf.xforms.event.XFormsEvent
+import org.orbeon.oxf.xforms.event.XFormsEvents._
+import collection.JavaConverters._
 
 // Control at the root of the control tree
 // NOTE: This is also the root of a dynamic sub-tree, in which case the control is a child of xxf:dynamic
@@ -28,10 +36,39 @@ class XXFormsRootControl(container: XBLContainer, parent: XFormsControl, element
     override def addChild(control: XFormsControl ) {
         super.addChild(control)
 
-        if (parent eq null)
+        if (parent eq null) // ne null when child of xxf:dynamic
             containingDocument.getControls.getCurrentControlTree.setRoot(this)
     }
 
+    override def performDefaultAction(event: XFormsEvent): Unit = event match {
+        case load: XXFormsLoadEvent ⇒
+            // Internal load event
+            try {
+                val resource = load.getResource
+                val qmIndex = resource.indexOf('?')
+                val (pathInfo, parameters) =
+                    if (qmIndex != -1) {
+                        (resource.substring(0, qmIndex),
+                         NetUtils.decodeQueryString(resource.substring(qmIndex + 1), false))
+                    } else
+                        (resource, null)
+                NetUtils.getExternalContext.getResponse.sendRedirect(pathInfo, parameters, false, false)
+            } catch {
+                case e: IOException ⇒ throw new ValidationException(e, getLocationData)
+            }
+        case actionError: XXFormsActionErrorEvent ⇒
+            // Handle action error
+            XFormsError.handleNonFatalXFormsError(containingDocument, "exception while running action", actionError.throwable)
+        case _ ⇒
+            super.performDefaultAction(event)
+    }
+
+    override protected def getAllowedExternalEvents = XXFormsRootControl.AllowedExternalEvents
+
     // FIXME: Support refresh events? Simply enabling below doesn't seem to work for enabled/disabled.
     //override def supportsRefreshEvents = true
+}
+
+object XXFormsRootControl {
+    val AllowedExternalEvents = Set(KEYPRESS, XXFORMS_LOAD, XXFORMS_POLL).asJava
 }

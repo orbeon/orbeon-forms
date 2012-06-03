@@ -189,11 +189,11 @@ h1.fr-form-title {
 .fr-top .xbl-fr-inplace-input .fr-inplace-content .xforms-input input { color: #6E6E6E }
 .fr-top .xbl-fr-inplace-input .fr-inplace-buttons .xforms-trigger-appearance-minimal { color: white }
 
-.fr-top .xbl-fr-inplace-input .fb-title-control .xforms-output { font-size: 20pt }
-.fr-top .xbl-fr-inplace-input .fb-title-control .xforms-input input { font-size: 20pt }
+.fr-top .xbl-fr-inplace-input.fb-title-control .xforms-output { font-size: 20pt }
+.fr-top .xbl-fr-inplace-input.fb-title-control .xforms-input input { font-size: 20pt }
 
-.fr-top .xbl-fr-inplace-input .fb-description-control .xforms-output { font-size: 8pt }
-.fr-top .xbl-fr-inplace-input .fb-description-control .xforms-input input { font-size: 8pt  }
+.fr-top .xbl-fr-inplace-input.fb-description-control .xforms-output { font-size: 8pt }
+.fr-top .xbl-fr-inplace-input.fb-description-control .xforms-input input { font-size: 8pt  }
 
 /* ***** Footer ***************************************************************************************************** */
 

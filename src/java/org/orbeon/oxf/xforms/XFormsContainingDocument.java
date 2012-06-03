@@ -26,7 +26,6 @@ import org.orbeon.oxf.processor.PageFlowControllerProcessor;
 import org.orbeon.oxf.servlet.OrbeonXFormsFilter;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.action.XFormsAPI;
-import org.orbeon.oxf.xforms.action.XFormsActions;
 import org.orbeon.oxf.xforms.analysis.XPathDependencies;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
@@ -34,8 +33,6 @@ import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
-import org.orbeon.oxf.xforms.event.events.XXFormsActionErrorEvent;
-import org.orbeon.oxf.xforms.event.events.XXFormsLoadEvent;
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.processor.XFormsURIResolver;
@@ -51,9 +48,7 @@ import org.orbeon.oxf.xml.SAXStore;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.saxon.functions.FunctionLibrary;
-import org.orbeon.saxon.om.Item;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.locks.Lock;
@@ -944,17 +939,6 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
     }
 
     @Override
-    public Object resolveObjectById(String sourceEffectiveId, String targetStaticId, Item contextItem) {
-        if (targetStaticId.equals(CONTAINING_DOCUMENT_PSEUDO_ID)) {
-            // Special case of containing document
-            return this;
-        } else {
-            // All other cases
-            return super.resolveObjectById(sourceEffectiveId, targetStaticId, contextItem);
-        }
-    }
-
-    @Override
     public void dispatchEvent(XFormsEvent event) {
         // Ensure that the event uses the proper container to dispatch the event
         final XBLContainer targetContainer = event.getTargetObject().getXBLContainer(this);
@@ -1052,43 +1036,6 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         return response;
     }
 
-    public void performDefaultAction(XFormsEvent event) {
-
-        final String eventName = event.getName();
-        if (XFormsEvents.XXFORMS_LOAD.equals(eventName)) {
-            // Internal load event
-            final XXFormsLoadEvent xxformsLoadEvent = (XXFormsLoadEvent) event;
-            final ExternalContext externalContext = NetUtils.getExternalContext();
-            try {
-                final String resource = xxformsLoadEvent.getResource();
-
-                final String pathInfo;
-                final Map<String, String[]> parameters;
-
-                final int qmIndex = resource.indexOf('?');
-                if (qmIndex != -1) {
-                    pathInfo = resource.substring(0, qmIndex);
-                    parameters = NetUtils.decodeQueryString(resource.substring(qmIndex + 1), false);
-                } else {
-                    pathInfo = resource;
-                    parameters = null;
-                }
-                externalContext.getResponse().sendRedirect(pathInfo, parameters, false, false);
-            } catch (IOException e) {
-                throw new ValidationException(e, getLocationData());
-            }
-        } else if (XFormsEvents.XXFORMS_POLL.equals(eventName)) {
-            // Poll event for submissions
-            // NOP, as we check for async submission in the client event loop
-        } else if (XFormsEvents.XXFORMS_ACTION_ERROR.equals(eventName)) {
-            // Handle action error
-            final XXFormsActionErrorEvent ev = (XXFormsActionErrorEvent) event;
-            XFormsError.handleNonFatalXFormsError(getContainingDocument(), "exception while running action", ev.throwable());
-        } else {
-            super.performDefaultAction(event);
-        }
-    }
-
     public AsynchronousSubmissionManager getAsynchronousSubmissionManager(boolean create) {
         if (asynchronousSubmissionManager == null && create)
             asynchronousSubmissionManager = new AsynchronousSubmissionManager(this);
@@ -1161,17 +1108,6 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
     @Override
     protected List<XFormsControl> getChildrenControls(XFormsControls controls) {
         return controls.getCurrentControlTree().getChildren();
-    }
-
-    private static final Set<String> ALLOWED_EXTERNAL_EVENTS = new HashSet<String>();
-    static {
-        ALLOWED_EXTERNAL_EVENTS.add(XFormsEvents.KEYPRESS);
-        ALLOWED_EXTERNAL_EVENTS.add(XFormsEvents.XXFORMS_LOAD);
-        ALLOWED_EXTERNAL_EVENTS.add(XFormsEvents.XXFORMS_POLL);
-    }
-
-    public boolean allowExternalEvent(String eventName) {
-        return ALLOWED_EXTERNAL_EVENTS.contains(eventName);
     }
 
     /**

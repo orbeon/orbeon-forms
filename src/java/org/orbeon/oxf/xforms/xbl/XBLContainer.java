@@ -52,7 +52,7 @@ import java.util.*;
  *
  * In the future we want flexible model placement, so models should get out of this class.
  */
-public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFormsObjectResolver {
+public class XBLContainer implements XFormsObjectResolver {
 
     // PipelineContext attribute used during instance restoration
     public static final String XFORMS_DYNAMIC_STATE_RESTORE_INSTANCES = "xforms-dynamic-state-instances";
@@ -763,23 +763,6 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
         this.locationData = locationData;
     }
 
-    public XFormsEventObserver getParentEventObserver(XFormsContainingDocument containingDocument) {
-        // There is no point for events to propagate beyond the container
-        return null;
-    }
-
-    public void performDefaultAction(XFormsEvent event) {
-        // NOP at this time
-    }
-
-    public void performTargetAction(XBLContainer container, XFormsEvent event) {
-        // NOP
-    }
-
-    public XBLContainer getXBLContainer(XFormsContainingDocument containingDocument) {
-        return this;
-    }
-
     /**
      * Main event dispatching entry.
      */
@@ -1027,21 +1010,5 @@ public class XBLContainer implements XFormsEventTarget, XFormsEventObserver, XFo
 
             model.markValueChange(null, false);
         }
-    }
-
-    public boolean allowExternalEvent(String eventName) {
-        return false;
-    }
-
-    public void addListener(String eventName, EventListener listener) {
-        throw new UnsupportedOperationException();
-    }
-
-    public void removeListener(String eventName, EventListener listener) {
-        throw new UnsupportedOperationException();
-    }
-
-    public List<EventListener> getListeners(String eventName) {
-        return null;
     }
 }

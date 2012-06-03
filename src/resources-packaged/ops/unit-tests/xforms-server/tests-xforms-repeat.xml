@@ -3164,10 +3164,7 @@
                             <instance id="events" model-id="model">
                                 <events>
                                     <event observer="my-bar-1$my-department-repeat" type="my-event" target="my-bar-1$my-department-repeat"/>
-                                    <event observer="my-bar-1$my-department-repeat" type="my-event" target="my-bar-1$my-output·1"/>
                                     <event observer="my-bar-1$my-department-repeat" type="xforms-enabled" target="my-bar-1$my-department-repeat"/>
-                                    <event observer="my-bar-1$my-department-repeat" type="xforms-enabled" target="my-bar-1$my-output·1"/>
-                                    <event observer="my-bar-1$my-department-repeat" type="xforms-enabled" target="my-bar-1$my-output·2"/>
                                 </events>
                             </instance>
                         </instances>

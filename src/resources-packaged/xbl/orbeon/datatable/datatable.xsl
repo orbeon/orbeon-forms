@@ -516,18 +516,19 @@
                 <xxforms:sequence value=".{if ($hasLoadingFeature) then '[not($fr-dt-loading = true())]' else ''}" xxbl:scope="outer"/>
             </xforms:var>
 
-            <xxforms:script ev:event="xforms-enabled" ev:target="fr-dt-group" xxbl:scope="inner">
-                YAHOO.log("Enabling datatable id <xsl:value-of select="$id"/>","info");
-                <xsl:choose>
-                    <xsl:when test="$scrollH or $scrollV">
-                        var target = this;
-                        _.defer(function() { YAHOO.xbl.fr.Datatable.instance(target).init(); });
-                    </xsl:when>
-                    <xsl:otherwise>YAHOO.xbl.fr.Datatable.instance(this).init();</xsl:otherwise>
-                </xsl:choose>
-            </xxforms:script>
-
             <xforms:group ref="$group-ref" id="fr-dt-group" xxbl:scope="inner">
+
+                <xxforms:script ev:event="xforms-enabled" ev:target="#observer">
+                    YAHOO.log("Enabling datatable id <xsl:value-of select="$id"/>","info");
+                    <xsl:choose>
+                        <xsl:when test="$scrollH or $scrollV">
+                            var target = this;
+                            _.defer(function() { YAHOO.xbl.fr.Datatable.instance(target).init(); });
+                        </xsl:when>
+                        <xsl:otherwise>YAHOO.xbl.fr.Datatable.instance(this).init();</xsl:otherwise>
+                    </xsl:choose>
+                </xxforms:script>
+
                 <xhtml:span class="fr-dt-inner-table-width" style="display: none">
                     <xsl:value-of select="$innerTableWidth"/>
                 </xhtml:span>

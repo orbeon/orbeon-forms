@@ -66,7 +66,7 @@ object XFormsControlFactory {
     private val byQNameFactory = Map[QName, ControlFactory](
         // Root control
         QName.get("root")               → (new XXFormsRootControl(_, _, _, _, _)),
-        XBL_TEMPLATE_QNAME              → (new XXFormsRootControl(_, _, _, _, _)), // NOTE: could use group? or other?
+        XBL_TEMPLATE_QNAME              → (new XXFormsComponentRootControl(_, _, _, _, _)),
         // Built-in standard controls
         XFORMS_CASE_QNAME               → (new XFormsCaseControl(_, _, _, _, _)),
         XFORMS_GROUP_QNAME              → (new XFormsGroupControl(_, _, _, _, _)),

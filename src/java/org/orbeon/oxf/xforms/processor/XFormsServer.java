@@ -453,7 +453,8 @@ public class XFormsServer extends ProcessorImpl {
                                 if (load.isReplace() && containingDocument.isPortletContainer() && !NetUtils.urlHasProtocol(load.getResource()) && !"resource".equals(load.getUrlType())) {
                                     // We need to submit the event so that the portlet can load the new path
                                     final Element eventElement = eventsElement.addElement(XFormsConstants.XXFORMS_EVENT_QNAME);
-                                    eventElement.addAttribute("source-control-id", XFormsContainingDocument.CONTAINING_DOCUMENT_PSEUDO_ID);
+                                    // Dispatch to #document
+                                    eventElement.addAttribute("source-control-id", "#document");
                                     eventElement.setText(load.getResource());
                                     // NOTE: don't care about the target for portlets
                                     eventElement.addAttribute("name", XFormsEvents.XXFORMS_LOAD);

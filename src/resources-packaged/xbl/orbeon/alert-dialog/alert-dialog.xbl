@@ -78,31 +78,30 @@
                             if (buttons.length > 0) buttons[0].focus();
                         </xxforms:script>
                         <xforms:label xxbl:scope="outer"><xsl:copy-of select="fr:label/(@* | node())"/></xforms:label>
-                        <xforms:group appearance="xxforms:internal">
-                            <!-- Any button click closes the dialog and clears the local data -->
-                            <xforms:action ev:event="DOMActivate">
-                                <xxforms:hide dialog="dialog"/>
-                                <xforms:setvalue iterate="*" ref="."/>
-                            </xforms:action>
-
-                            <xhtml:div class="xbl-fr-alert-dialog-message">
-                                <xsl:choose>
-                                    <xsl:when test="fr:message">
-                                        <!-- Use static message -->
-                                        <xforms:output value="''" xxbl:scope="outer">
-                                            <xforms:label><xsl:copy-of select="fr:message/(@* | node())"/></xforms:label>
-                                        </xforms:output>
-                                    </xsl:when>
-                                    <xsl:otherwise>
-                                        <!-- use dynamic message -->
-                                        <xforms:output value="''"><xforms:label ref="$local/message"/></xforms:output>
-                                    </xsl:otherwise>
-                                </xsl:choose>
-                            </xhtml:div>
-                            <xhtml:div class="xbl-fr-alert-dialog-buttons">
+                        <xhtml:div class="xbl-fr-alert-dialog-message">
+                            <xsl:choose>
+                                <xsl:when test="fr:message">
+                                    <!-- Use static message -->
+                                    <xforms:output value="''" xxbl:scope="outer">
+                                        <xforms:label><xsl:copy-of select="fr:message/(@* | node())"/></xforms:label>
+                                    </xforms:output>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <!-- use dynamic message -->
+                                    <xforms:output value="''"><xforms:label ref="$local/message"/></xforms:output>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </xhtml:div>
+                        <xhtml:div class="xbl-fr-alert-dialog-buttons">
+                            <xforms:group appearance="xxforms:internal" xxbl:scope="outer">
+                                <!-- Any button click closes the dialog and clears the local data -->
+                                <xforms:action ev:event="DOMActivate">
+                                    <xxforms:hide dialog="dialog" xxbl:scope="inner"/>
+                                    <xforms:setvalue iterate="*" ref="." xxbl:scope="inner"/>
+                                </xforms:action>
                                 <xsl:apply-templates/>
-                            </xhtml:div>
-                        </xforms:group>
+                            </xforms:group>
+                        </xhtml:div>
                     </xxforms:dialog>
                 </xsl:template>
 
@@ -143,7 +142,9 @@
                         <xsl:copy-of select="$content except $fr-label"/>
                         <!-- If a custom target is provided, dispatch to it -->
                         <!-- NOTE: For now target must be an effective id -->
-                        <xforms:dispatch ev:event="DOMActivate" if="normalize-space($local/{$handler})" name="fr-{$handler}" targetid="{{$local/{$handler}}}" xxbl:scope="inner"/>
+                        <xforms:action ev:event="DOMActivate">
+                            <xforms:dispatch if="normalize-space($local/{$handler})" name="fr-{$handler}" targetid="{{$local/{$handler}}}" xxbl:scope="inner"/>
+                        </xforms:action>
                     </xforms:trigger>
                 </xsl:function>
 

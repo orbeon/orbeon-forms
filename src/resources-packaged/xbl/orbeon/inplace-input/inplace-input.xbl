@@ -11,25 +11,24 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xbl:xbl xmlns:xhtml="http://www.w3.org/1999/xhtml"
-         xmlns:xforms="http://www.w3.org/2002/xforms"
+<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
          xmlns:ev="http://www.w3.org/2001/xml-events"
          xmlns:xi="http://www.w3.org/2001/XInclude"
          xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
-         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
          xmlns:saxon="http://saxon.sf.net/"
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
-         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
          xmlns:oxf="http://www.orbeon.com/oxf/processors"
          xmlns:exf="http://www.exforms.org/exf/1-0" >
 
     <!--
         In-place input field.
      -->
-    <xbl:binding id="fr-inplace-input-binding" element="fr|inplace-input">
+    <xbl:binding id="fr-inplace-input-binding" element="fr|inplace-input" xxbl:mode="binding lhha">
 
         <!-- Orbeon Form Builder Component Metadata -->
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
@@ -42,10 +41,10 @@
             </icon>
             <template>
                  <fr:inplace-input>
-                     <xforms:label ref=""/>
-                     <xforms:hint ref=""/>
-                     <xforms:help ref=""/>
-                     <xforms:alert ref=""/>
+                     <xf:label ref=""/>
+                     <xf:hint ref=""/>
+                     <xf:help ref=""/>
+                     <xf:alert ref=""/>
                 </fr:inplace-input>
             </template>
         </metadata>
@@ -57,106 +56,74 @@
                 .xbl-fr-inplace-input .xforms-input input { background-color: #FFFF88; background-image: none; border: none }
                 .xbl-fr-inplace-input .fr-inplace-buttons { display: block; margin-top:0.5em }
                 .xbl-fr-inplace-input .fr-inplace-buttons .xforms-control { display: inline }
+                .xbl-fr-inplace-input .xforms-hint { display: none }
             </xbl:style>
         </xbl:resources>
         <xbl:implementation>
-            <!-- Local model -->
-            <xforms:model id="fr-inplace-model">
-                <xforms:instance id="fr-inplace-instance">
-                    <value/>
-                </xforms:instance>
-            </xforms:model>
+            <!-- Local model and instance -->
+            <xf:model id="model">
+                <xf:instance id="instance"><value/></xf:instance>
+            </xf:model>
         </xbl:implementation>
-        <xbl:template xxbl:transform="oxf:xslt">
-            <xsl:transform version="2.0">
-                <!-- Matches the bound element -->
-                <xsl:template match="/*">
+        <xbl:template>
+            <xf:switch class="fr-component-group">
+                <xf:var name="binding" value="xxf:binding('fr-inplace-input-binding')"/>
 
-                    <!-- Place @ref/@bind and alert in order to obtain validity MIP -->
-                    <xforms:switch xxbl:scope="outer" xbl:attr="model context ref bind">
-                        <xsl:attribute name="class" select="string-join(('fr-component-group', @class), ' ')"/>
-                        <!-- We handle validity at the switch level so we have only one alert in use for view/edit -->
-                        <xbl:content includes="xforms|label, xforms|alert, xforms|help"/>
+                <xf:case id="fr-inplace-view">
+                    <!-- View mode -->
+                    <xh:span class="fr-inplace-content fr-inplace-view">
+                        <!--
+                          - if value if blank and not readonly and there is a hint value, use hint, otherwise value
+                          - add fr-inplace-hint class so we can distinguish between hint case and value case
+                        -->
+                        <xf:output
+                                ref="$binding"
+                                xbl:attr="navindex navindex=tabindex"
+                                class="xforms-activable{if (normalize-space(xxf:hint('fr-inplace-input-binding'))) then ' fr-inplace-hint' else ''}"
+                                value="if (normalize-space() = '' and not(exf:readonly()) and normalize-space(xxf:hint('fr-inplace-input-binding'))) then xxf:hint('fr-inplace-input-binding') else .">
+                        </xf:output>
+                    </xh:span>
+                    <!-- React to user click on value unless the bound node is readonly -->
+                    <xf:action ev:event="DOMActivate" if="not(exf:readonly($binding))">
+                        <!-- Read value in -->
+                        <xf:setvalue ref="instance()" value="$binding"/>
+                        <!-- Toggle and set focus -->
+                        <xf:toggle case="fr-inplace-edit"/>
+                        <xf:setfocus control="fr-inplace-edit"/>
+                    </xf:action>
+                </xf:case>
+                <xf:case id="fr-inplace-edit">
+                    <!-- Edit mode -->
+                    <!-- Show unless the bound node is readonly (2012-06-04: not sure if this is needed) -->
+                    <xf:group class="fr-inplace-content fr-inplace-edit" ref=".[not(exf:readonly($binding))]">
+                        <!-- Input points to internal instance -->
+                        <xf:input id="input" xbl:attr="navindex navindex=tabindex incremental" ref="instance()"/>
+                        <!-- TODO: i18n -->
+                        <xh:span class="fr-inplace-buttons">
+                            <xf:trigger class="fr-inplace-rename" id="apply">
+                                <xf:label>Apply</xf:label>
+                            </xf:trigger>
+                            or
+                            <xf:trigger appearance="minimal" class="fr-inplace-cancel">
+                                <xf:label>Cancel</xf:label>
+                            </xf:trigger>
+                        </xh:span>
 
-                        <!-- Variable pointing to external single-node binding -->
-                        <xxforms:variable name="result" as="node()?" xxbl:scope="inner">
-                            <xxforms:sequence select="." xxbl:scope="outer"/>
-                        </xxforms:variable>
+                        <!-- Write value back -->
+                        <xf:setvalue
+                            ev:event="DOMActivate"
+                            ev:target="input apply"
+                            ref="$binding"
+                            value="context()"/>
 
-                        <xforms:case id="fr-inplace-view" xxbl:scope="inner">
-                            <!-- View mode -->
-                            <xhtml:span class="fr-inplace-content fr-inplace-view">
-                                <!-- NOTE: Output is in outer scope so it can evaluate hint in outer scope -->
-                                <xforms:output ref="." xbl:attr="navindex navindex=tabindex" xxbl:scope="outer" class="xforms-activable">
-                                    <xsl:if test="xforms:hint">
-                                        <!-- Add class so we can distinguish between hint case and value case -->
-                                        <xsl:attribute name="class">{for $value in . return
-                                                                        if (normalize-space($value) = '' and not(exf:readonly($value)))
-                                                                          then 'fr-inplace-hint xforms-activable' else 'xforms-activable'}</xsl:attribute>
-                                    </xsl:if>
-                                    <!-- Handle inline hint-->
-                                    <xsl:choose>
-                                        <xsl:when test="xforms:hint">
-                                            <!-- Show value if it is non-blank, or if the bound node is readonly, or if there is no hint -->
-                                            <xsl:attribute name="value"
-                                                           select="concat('for $value in .
-                                                                           return if (normalize-space($value) = '''' and not(exf:readonly($value)))
-                                                                                  then concat(''['', ', if (xforms:hint/@ref) then xforms:hint/@ref else concat('''', xforms:hint, ''''), ', '']'')
-                                                                                  else $value')"/>
-                                        </xsl:when>
-                                        <xsl:otherwise>
-                                            <xsl:attribute name="value" select="'.'"/>
-                                        </xsl:otherwise>
-                                    </xsl:choose>
-                                </xforms:output>
-                            </xhtml:span>
-                            <!-- React to user click on value unless the bound node is readonly -->
-                            <xforms:action ev:event="DOMActivate" if="not(exf:readonly($result))">
-                                <!-- Copy value to local instance -->
-                                <xforms:setvalue ref="instance('fr-inplace-instance')" value="$result"/>
-                                <!-- Toggle and set focus -->
-                                <xforms:toggle case="fr-inplace-edit"/>
-                                <xforms:setfocus control="fr-inplace-input"/>
-                            </xforms:action>
-                        </xforms:case>
-                        <xforms:case id="fr-inplace-edit" xxbl:scope="inner">
-                            <!-- Edit mode -->
-                            <!-- Show edit mode unless the bound node is readonly -->
-                            <xforms:group class="fr-inplace-content fr-inplace-edit" model="fr-inplace-model" ref=".[not(exf:readonly($result))]" id="fr-inplace-input-edit-group">
-                                <xforms:input id="fr-inplace-input" xbl:attr="navindex navindex=tabindex incremental" ref=".">
-                                    <xforms:action ev:event="DOMActivate">
-                                        <!-- Write value back -->
-                                        <xforms:setvalue ref="$result" value="context()"/>
-                                    </xforms:action>
-                                </xforms:input>
-                                <xhtml:span class="fr-inplace-buttons">
-                                    <xforms:trigger class="fr-inplace-rename">
-                                        <!-- TODO: i18n -->
-                                        <xforms:label>Apply</xforms:label>
-                                        <xforms:action ev:event="DOMActivate">
-                                            <!-- Write value back -->
-                                            <xforms:setvalue ref="$result" value="context()"/>
-                                        </xforms:action>
-                                    </xforms:trigger>
-                                    or
-                                    <xforms:trigger appearance="minimal" class="fr-inplace-cancel">
-                                        <!-- TODO: i18n -->
-                                        <xforms:label>Cancel</xforms:label>
-                                        <!-- No action here, handled below -->
-                                    </xforms:trigger>
-                                </xhtml:span>
-
-                                <xforms:action ev:event="DOMActivate">
-                                    <!-- Clear local value -->
-                                    <xforms:setvalue ref="."/>
-                                    <!-- Toggle back -->
-                                    <xforms:toggle case="fr-inplace-view"/>
-                                </xforms:action>
-                            </xforms:group>
-                        </xforms:case>
-                    </xforms:switch>
-                </xsl:template>
-            </xsl:transform>
+                        <!-- Clear local value and toggle back -->
+                        <xf:action ev:event="DOMActivate">
+                            <xf:setvalue ref="instance()"/>
+                            <xf:toggle case="fr-inplace-view"/>
+                        </xf:action>
+                    </xf:group>
+                </xf:case>
+            </xf:switch>
         </xbl:template>
     </xbl:binding>
 </xbl:xbl>

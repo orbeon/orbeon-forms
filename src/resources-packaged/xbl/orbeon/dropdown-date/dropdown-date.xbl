@@ -152,10 +152,10 @@
                             <!-- NOTE: navindex is copied to first field, but need one for second field too! -->
                             <xf:select1 ref="year" xbl:attr="navindex navindex=tabindex">
                                 <!--<xf:label>Year</xf:label>-->
-                                <xf:itemset ref=".[not(context() = instance('years-itemset')/year)]">
+                                <xf:item>
                                     <xf:label>Year</xf:label>
                                     <xf:value/>
-                                </xf:itemset>
+                                </xf:item>
                                 <xf:itemset ref="instance('years-itemset')/year">
                                     <xf:label ref="."/>
                                     <xf:value ref="."/>
@@ -163,10 +163,10 @@
                             </xf:select1>
                             <xf:select1 ref="month">
                                 <!--<xf:label>Month</xf:label>-->
-                                <xf:itemset ref=".[not(context() = instance('months-itemset')/month)]">
+                                <xf:item>
                                     <xf:label>Month</xf:label>
                                     <xf:value/>
-                                </xf:itemset>
+                                </xf:item>
                                 <xf:itemset ref="instance('months-itemset')/month">
                                     <xf:label ref="."/>
                                     <xf:value ref="."/>
@@ -174,10 +174,10 @@
                             </xf:select1>
                             <xf:select1 ref="day">
                                 <!--<xf:label>Day</xf:label>-->
-                                <xf:itemset ref=".[not(context() = instance('days-itemset')/day)]">
+                                <xf:item>
                                     <xf:label>Day</xf:label>
                                     <xf:value/>
-                                </xf:itemset>
+                                </xf:item>
                                 <xf:itemset ref="instance('days-itemset')/day">
                                     <xf:label ref="."/>
                                     <xf:value ref="."/>

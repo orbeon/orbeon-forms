@@ -16,7 +16,6 @@ package org.orbeon.oxf.xforms.function.xxforms
 import org.orbeon.saxon.expr._
 import org.orbeon.saxon.om._
 import org.orbeon.oxf.xforms.function.{MatchSimpleAnalysis, XFormsFunction}
-import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.xforms.analysis.SimpleElementAnalysis
 
 /**
@@ -28,7 +27,7 @@ class XXFormsContext extends XFormsFunction with MatchSimpleAnalysis {
 
     override def iterate(xpathContext: XPathContext): SequenceIterator = {
         // Match on context expression
-        getContextIdExpression match {
+        argument.lift(0) match {
             case Some(contextIdExpression) ⇒
                 // Get context id by evaluating expression
                 val contextStaticId = contextIdExpression.evaluateAsString(xpathContext).toString
@@ -45,7 +44,7 @@ class XXFormsContext extends XFormsFunction with MatchSimpleAnalysis {
 
     override def addToPathMap(pathMap: PathMap, pathMapNodeSet: PathMap.PathMapNodeSet): PathMap.PathMapNodeSet = {
         // Match on context expression
-        getContextIdExpression match {
+        argument.lift(0) match {
             case Some(contextIdExpression: StringLiteral) ⇒
                 // Argument is literal and we have a context to ask
                 pathMap.getPathMapContext match {
@@ -54,7 +53,7 @@ class XXFormsContext extends XFormsFunction with MatchSimpleAnalysis {
                         val contextStaticId = contextIdExpression.getStringValue
                         // Handle context
                         matchSimpleAnalysis(pathMap, context.getInScopeContexts.get(contextStaticId))
-                    case _ ⇒ throw new OXFException("Can't process PathMap because context is not of expected type.")
+                    case _ ⇒ throw new IllegalStateException("Can't process PathMap because context is not of expected type.")
                 }
             case _ ⇒
                 // Argument is not literal so we can't figure it out
@@ -62,6 +61,4 @@ class XXFormsContext extends XFormsFunction with MatchSimpleAnalysis {
                 null
         }
     }
-
-    private def getContextIdExpression = if (argument.length == 0) None else Some(argument(0))
 }

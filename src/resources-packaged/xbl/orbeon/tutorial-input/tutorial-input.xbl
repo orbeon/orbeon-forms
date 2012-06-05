@@ -26,7 +26,7 @@
             <!-- Outer group implementing the single-node binding -->
             <xforms:group xbl:attr="model context ref bind" xxbl:scope="outer">
                 <!-- Copy LHHA elements if any -->
-                <xbl:content includes="xforms|label,xforms|help,xforms|hint,xforms|alert"/>
+                <xbl:content includes="fr|* > xforms|label, fr|* > xforms|help, fr|* > xforms|hint, fr|* > xforms|alert"/>
                 <!-- Inner group -->
                 <xforms:group xxbl:scope="inner">
                     <!-- Variable pointing to external single-node binding -->

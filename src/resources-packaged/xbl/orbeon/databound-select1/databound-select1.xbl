@@ -29,11 +29,6 @@
          xmlns:oxf="http://www.orbeon.com/oxf/processors"
          script-type="application/xhtml+xml">
 
-    <!-- NOTE: We don't use the binding mode as it doesn't help us much here, as we need to generate a select1
-               in outer scope, as it contains the itemset put by the user in the fr:databound-select1.
-               Since we don't use the binding mode, we can't use the lhha mode either, as the alert
-               wouldn't show, as it doesn't not it has to become active, as it isn't attached to a control
-               which becomes invalid. -->
     <xbl:binding id="fr-databound-select1" element="fr|databound-select1">
         <fb:metadata>
             <fb:display-name lang="en">Data Dropdown</fb:display-name>
@@ -129,7 +124,7 @@
                 <!-- The concrete select1 -->
                 <xxforms:variable name="binding" xxbl:scope="outer"><xxforms:sequence select="$binding" xxbl:scope="inner"/></xxforms:variable>
                 <xforms:select1 ref="$binding" xxbl:scope="outer">
-                    <xsl:copy-of select="/*/(xforms:label | xforms:help | xforms:hint | xforms:alert)"/>
+                    <xbl:content includes="fr|* > xforms|label, fr|* > xforms|help, fr|* > xforms|hint, fr|* > xforms|alert"/>
                     <!-- Blank item -->
                     <xforms:item>
                         <xforms:label/>

@@ -56,7 +56,7 @@
 
         <xbl:template>
             <xforms:group xbl:attr="model context ref bind" class="fr-component-group" xxbl:scope="outer">
-                <xbl:content includes="xforms|label,xforms|help,xforms|hint,xforms|alert"/>
+                <xbl:content includes="fr|* > xforms|label, fr|* > xforms|help, fr|* > xforms|hint, fr|* > xforms|alert"/>
                 <xforms:upload ref=".">
                     <xbl:content includes="xforms|filename,xforms|mediatype,xxforms:size"/>
                 </xforms:upload>

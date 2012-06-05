@@ -53,7 +53,7 @@
         </xbl:resources>
         <xbl:template>
             <xf:group xbl:attr="model context ref bind" class="fr-component-group" xxbl:scope="outer">
-                <xbl:content includes="xforms|label,xforms|help,xforms|hint,xforms|alert"/><xf:output ref="."/><xf:input ref=".[not(exf:readonly() and property('xxf:readonly-appearance') = 'static')]" appearance="minimal"/>
+                <xbl:content includes="fr|* > xforms|label, fr|* > xforms|help, fr|* > xforms|hint, fr|* > xforms|alert"/><xf:output ref="."/><xf:input ref=".[not(exf:readonly() and property('xxf:readonly-appearance') = 'static')]" appearance="minimal"/>
             </xf:group>
         </xbl:template>
     </xbl:binding>

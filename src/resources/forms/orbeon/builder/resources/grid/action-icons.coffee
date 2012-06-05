@@ -57,13 +57,13 @@ $ ->
 
     # Create a div.fb-hover inside the td, if there isn't one already
     # We do this because Firefox doesn't support position: relative on table cells (http://goo.gl/Atzi2)
-    createHoverDiv = (gridTd) ->
-        hoverDiv = $(gridTd).children('.fb-hover')
+    createHoverDiv = (gridThTd) ->
+        hoverDiv = $(gridThTd).children('.fb-hover')
         # Create a div.fb-hover inside the td, if there isn't one already
         if hoverDiv.length == 0
             hoverDiv = $('<div>').addClass('fb-hover')
-            hoverDiv.append($(gridTd).children())
-            $(gridTd).append(hoverDiv)
+            hoverDiv.append($(gridThTd).children())
+            $(gridThTd).append(hoverDiv)
         hoverDiv
 
     Builder.mouseEntersGridTdEvent.subscribe ({triggers, triggerGroups, gridTd}) ->
@@ -90,8 +90,8 @@ $ ->
         Builder.beforeAddingEditorCallbacks.fire $ document.getElementById editor.id
 
     Builder.beforeAddingEditorCallbacks.add (editor) ->
-        gridTd = f$.closest 'td.fr-grid-td', editor
-        createHoverDiv gridTd
+        gridThTd = f$.closest 'th.fr-grid-th, td.fr-grid-td', editor
+        createHoverDiv gridThTd
 
     # We leave the div.fb-hover that was created on mouseEntersGridTdEvent, as removing it would dispatch a blur to the control
     # See: https://github.com/orbeon/orbeon-forms/issues/44

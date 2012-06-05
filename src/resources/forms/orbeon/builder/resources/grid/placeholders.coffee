@@ -103,7 +103,8 @@ $ ->
     ajaxResponse = (f) -> Events.ajaxResponseProcessedEvent.subscribe f
     click = (f) -> ($ document).click ({target}) -> f $ target
     enterKey = (f) -> ($ document).keypress ({target, which}) -> f $ target if which == 13
-    lostFocus = (f) -> ($ document).focusout ({target}) -> f $ target
+    lostFocus = (f) -> ($ document).focusout ({target}) ->
+        f $ target if f$.is '.fb-edit-label, .fb-edit-hint', f$.parent $ target                                         # Make sure an editor got the focus. http://goo.gl/rkEAB
     editDoneCallbacks = $.Callbacks()
     editDone = (f) -> editDoneCallbacks.add f
 

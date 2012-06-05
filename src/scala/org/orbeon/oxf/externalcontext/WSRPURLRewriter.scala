@@ -95,7 +95,7 @@ class WSRPURLRewriter(
         val navigationalState = NetUtils.encodeQueryString2(parameters)
 
         // Encode the URL a la WSRP
-        encodePortletURL(urlType, navigationalState, portletMode, windowState, u.getRef, false)
+        encodePortletURL(urlType, navigationalState, portletMode, windowState, u.getRef, secure = false)
     }
 
     def rewriteResourceURL(urlString: String, wsrpEncodeResources: Boolean): String = {
@@ -120,6 +120,10 @@ object WSRPURLRewriter {
     private val URLTypeRender = 2
     private val URLTypeResource = 3
 
+    val URLTypeBlockingActionString = "blockingAction"
+    val URLTypeRenderString = "render"
+    val URLTypeResourceString = "resource"
+
     private val URLTypes = Map(
         URLTypeBlockingAction   → URLTypeBlockingActionString,
         URLTypeRender           → URLTypeRenderString,
@@ -135,10 +139,6 @@ object WSRPURLRewriter {
     val ModeParam = "wsrp-mode"
     val WindowStateParam = "wsrp-windowState"
     val NavigationalStateParam = "wsrp-navigationalState"
-
-    val URLTypeBlockingActionString = "blockingAction"
-    val URLTypeRenderString = "render"
-    val URLTypeResourceString = "resource"
 
     val BaseTagLength   = BaseTag.length
     val StartTagLength  = StartTag.length

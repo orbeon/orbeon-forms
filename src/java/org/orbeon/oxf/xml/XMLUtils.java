@@ -1246,8 +1246,20 @@ public class XMLUtils {
         final LocationDocumentResult result = new LocationDocumentResult();
         identity.setResult(result);
 
-        final ContentHandlerHelper helper = new ContentHandlerHelper(identity);
-        debugXML.toXML(helper);
+        final ContentHandlerHelper helper = new ContentHandlerHelper(new ForwardingXMLReceiver(identity) {
+            @Override
+            public void startDocument() {}
+            @Override
+            public void endDocument() {}
+        });
+
+        try {
+            identity.startDocument();
+            debugXML.toXML(helper);
+            identity.endDocument();
+        } catch (SAXException e) {
+            throw new OXFException(e);
+        }
 
         return result.getDocument();
     }

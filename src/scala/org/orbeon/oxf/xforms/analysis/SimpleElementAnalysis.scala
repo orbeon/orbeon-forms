@@ -134,15 +134,14 @@ class SimpleElementAnalysis(
     }
 
     class SimplePathMapContext {
-        /**
-         * Return a map of static id ⇒ analysis for all the ancestor-or-self in scope.
-         */
+        // Return the analysis for the context in scope
+        def context = ElementAnalysis.getClosestAncestorInScope(self, self.scope)
+
+        // Return a map of static id ⇒ analysis for all the ancestor-or-self in scope.
         def getInScopeContexts: collection.Map[String, ElementAnalysis] =
             LinkedHashMap(ElementAnalysis.getAllAncestorsOrSelfInScope(self) map (elementAnalysis ⇒ elementAnalysis.staticId → elementAnalysis): _*)
 
-        /**
-         * Return analysis for closest ancestor repeat in scope.
-         */
+        // Return analysis for closest ancestor repeat in scope.
         def getInScopeRepeat = RepeatControl.getAncestorRepeatInScope(self)
     }
 }

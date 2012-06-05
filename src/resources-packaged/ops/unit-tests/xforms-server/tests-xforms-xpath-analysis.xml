@@ -3552,6 +3552,249 @@
         </output>
     </test>
 
+    <test description="context() function" name="oxf:java">
+        <input name="config">
+            <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
+        </input>
+        <input name="form">
+            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+                     xmlns:exf="http://www.exforms.org/exf/1-0"
+                     xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+                <xh:head>
+                    <xf:model xxf:xpath-analysis="true" id="model">
+                        <xf:instance id="i1">
+                            <instance/>
+                        </xf:instance>
+                        <xf:instance id="i2">
+                            <instance/>
+                        </xf:instance>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:output id="o1" value="context()"/>
+                    <!-- Group w/ ref -->
+                    <xf:group id="g1" ref="instance()/foo">
+                        <xf:output id="o2" value="context()"/>
+                        <!-- Group w/ ref to other instance -->
+                        <xf:group id="g2" ref="instance('i2')/bar">
+                            <xf:output id="o3" value="context()"/>
+                            <!-- Group w/o ref -->
+                            <xf:group id="g3">
+                                <xf:output id="o4" value="baz[context() = instance('i1')]"/>
+                            </xf:group>
+                            <!-- Group w/ context -->
+                            <xf:group id="g4" context="toto">
+                                <xf:output id="o5" value="baz[context() = instance('i1')]"/>
+                            </xf:group>
+                            <!-- Group w/ context and ref -->
+                            <xf:group id="g5" context="toto" ref="gaga">
+                                <xf:output id="o6" value="baz[context() = instance('i1')]"/>
+                            </xf:group>
+                        </xf:group>
+                    </xf:group>
+                    <!-- Repeat -->
+                    <xf:repeat id="r1" ref="item">
+                        <xf:output id="o7" value="context()"/>
+                    </xf:repeat>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="analysis">
+            <request request-uri="/orbeon/doc/home-welcome" query-string="id=12&amp;print=false" method="GET">
+                <model scope="" prefixed-id="model" default-instance-prefixed-id="i1" analyzed-binds="true"/>
+                <output scope="" prefixed-id="o1" model-prefixed-id="model" binding="false" value="true">
+                    <value>
+                        <analysis expression="xs:string((context())[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('i1')</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>i1</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </output>
+                <group scope="" prefixed-id="g1" model-prefixed-id="model" binding="true" value="false">
+                    <binding>
+                        <analysis expression="instance()/foo" analyzed="true">
+                            <returnable>
+                                <path>instance('i1')/foo</path>
+                            </returnable>
+                            <dependent-models>
+                                <model>model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>i1</instance>
+                            </dependent-instances>
+                            <returnable-instances>
+                                <instance>i1</instance>
+                            </returnable-instances>
+                        </analysis>
+                    </binding>
+                </group>
+                <output scope="" prefixed-id="o2" model-prefixed-id="model" binding="false" value="true">
+                    <value>
+                        <analysis expression="xs:string((context())[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('i1')/foo</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>i1</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </output>
+                <group scope="" prefixed-id="g2" model-prefixed-id="model" binding="true" value="false">
+                    <binding>
+                        <analysis expression="instance('i2')/bar" analyzed="true">
+                            <returnable>
+                                <path>instance('i2')/bar</path>
+                            </returnable>
+                            <dependent-models>
+                                <model>model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>i2</instance>
+                            </dependent-instances>
+                            <returnable-instances>
+                                <instance>i2</instance>
+                            </returnable-instances>
+                        </analysis>
+                    </binding>
+                </group>
+                <output scope="" prefixed-id="o3" model-prefixed-id="model" binding="false" value="true">
+                    <value>
+                        <analysis expression="xs:string((context())[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('i2')/bar</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>i2</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </output>
+                <group scope="" prefixed-id="g3" model-prefixed-id="model" binding="false" value="false"/>
+                <output scope="" prefixed-id="o4" model-prefixed-id="model" binding="false" value="true">
+                    <value>
+                        <analysis expression="xs:string((baz[context() = instance('i1')])[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('i2')/bar/baz</path>
+                                <path>instance('i2')/bar</path>
+                                <path>instance('i1')</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>i2</instance>
+                                <instance>i1</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </output>
+                <group scope="" prefixed-id="g4" model-prefixed-id="model" binding="false" value="false"/>
+                <output scope="" prefixed-id="o5" model-prefixed-id="model" binding="false" value="true">
+                    <value>
+                        <analysis expression="xs:string((baz[context() = instance('i1')])[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('i2')/bar/toto/baz</path>
+                                <path>instance('i2')/bar/toto</path>
+                                <path>instance('i1')</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>i2</instance>
+                                <instance>i1</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </output>
+                <group scope="" prefixed-id="g5" model-prefixed-id="model" binding="true" value="false">
+                    <binding>
+                        <analysis expression="gaga" analyzed="true">
+                            <returnable>
+                                <path>instance('i2')/bar/toto/gaga</path>
+                            </returnable>
+                            <dependent-models>
+                                <model>model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>i2</instance>
+                            </dependent-instances>
+                            <returnable-instances>
+                                <instance>i2</instance>
+                            </returnable-instances>
+                        </analysis>
+                    </binding>
+                </group>
+                <output scope="" prefixed-id="o6" model-prefixed-id="model" binding="false" value="true">
+                    <value>
+                        <analysis expression="xs:string((baz[context() = instance('i1')])[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('i2')/bar/toto/gaga/baz</path>
+                                <path>instance('i2')/bar/toto/gaga</path>
+                                <path>instance('i1')</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>i2</instance>
+                                <instance>i1</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </output>
+                <repeat scope="" prefixed-id="r1" model-prefixed-id="model" binding="true" value="false">
+                    <binding>
+                        <analysis expression="item" analyzed="true">
+                            <returnable>
+                                <path>instance('i1')/item</path>
+                            </returnable>
+                            <dependent-models>
+                                <model>model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>i1</instance>
+                            </dependent-instances>
+                            <returnable-instances>
+                                <instance>i1</instance>
+                            </returnable-instances>
+                        </analysis>
+                    </binding>
+                </repeat>
+                <repeat-iteration scope="" prefixed-id="r1~iteration" model-prefixed-id="model" binding="false" value="false"/>
+                <output scope="" prefixed-id="o7" model-prefixed-id="model" binding="false" value="true">
+                    <value>
+                        <analysis expression="xs:string((context())[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('i1')/item</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>i1</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </output>
+            </request>
+        </output>
+    </test>
+
     <test description="Simple use of xxf:repeat-current() function" name="oxf:java">
         <input name="config">
             <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>

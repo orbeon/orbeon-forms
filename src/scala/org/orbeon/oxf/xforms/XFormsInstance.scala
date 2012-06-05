@@ -204,7 +204,7 @@ class XFormsInstance(
     def performDefaultAction(event: XFormsEvent) =
         event.getName match {
             case XFormsEvents.XXFORMS_INSTANCE_INVALIDATE ⇒
-                val indentedLogger = event.getTargetXBLContainer.getContainingDocument.getIndentedLogger(XFormsModel.LOGGING_CATEGORY)
+                val indentedLogger = event.containingDocument.getIndentedLogger(XFormsModel.LOGGING_CATEGORY)
                 // Invalidate instance if it is cached
                 if (cache)
                     XFormsServerSharedInstancesCache.instance.remove(indentedLogger, sourceURI, null, handleXInclude)

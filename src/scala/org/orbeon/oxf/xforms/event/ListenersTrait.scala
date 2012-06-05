@@ -14,8 +14,6 @@
 package org.orbeon.oxf.xforms.event
 
 import collection.mutable.{Map, HashMap}
-import java.util.{List ⇒ JList}
-import scala.collection.JavaConverters._
 
 // Support for adding/removing/getting event listeners.
 trait ListenersTrait {
@@ -60,6 +58,6 @@ trait ListenersTrait {
     }
 
     // API for Java callers
-    def getListeners(eventName: String): JList[EventListener] =
-        (if (listeners ne null) listeners.get(eventName) getOrElse Vector.empty else Vector.empty).asJava
+    def getListeners(eventName: String): Seq[EventListener] =
+        if (listeners ne null) listeners.get(eventName) getOrElse Vector.empty else Vector.empty
 }

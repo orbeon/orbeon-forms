@@ -44,6 +44,7 @@ import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.*;
 import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.value.Value;
+import scala.collection.Seq;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -574,10 +575,10 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
         // "Then, the events xforms-rebuild, xforms-recalculate, xforms-revalidate and
         // xforms-refresh are dispatched to the model element in sequence."
-        container.dispatchEvent(new XFormsRebuildEvent(containingDocument, XFormsModel.this));
-        container.dispatchEvent(new XFormsRecalculateEvent(containingDocument, XFormsModel.this));
-        container.dispatchEvent(new XFormsRevalidateEvent(containingDocument, XFormsModel.this));
-        container.dispatchEvent(new XFormsRefreshEvent(containingDocument, XFormsModel.this));
+        Dispatch.dispatchEvent(new XFormsRebuildEvent(containingDocument, XFormsModel.this));
+        Dispatch.dispatchEvent(new XFormsRecalculateEvent(containingDocument, XFormsModel.this));
+        Dispatch.dispatchEvent(new XFormsRevalidateEvent(containingDocument, XFormsModel.this));
+        Dispatch.dispatchEvent(new XFormsRefreshEvent(containingDocument, XFormsModel.this));
     }
 
     private void doAfterReady() {
@@ -592,7 +593,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
             loadSchemasIfNeeded();
         } catch (Exception e) {
             final String schemaAttribute = modelElement.attributeValue(XFormsConstants.SCHEMA_QNAME);
-            container.dispatchEvent(new XFormsLinkExceptionEvent(containingDocument, XFormsModel.this,
+            Dispatch.dispatchEvent(new XFormsLinkExceptionEvent(containingDocument, XFormsModel.this,
                     schemaAttribute, modelElement, e));
         }
 
@@ -690,13 +691,13 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
                 } catch (Exception e) {
                     final LocationData extendedLocationData = new ExtendedLocationData(instance.locationData(), "processing XForms instance", instanceContainer);
                     final Throwable throwable = new ValidationException("Error extracting or setting inline instance", extendedLocationData);
-                    container.dispatchEvent(new XFormsLinkExceptionEvent(containingDocument, XFormsModel.this, null, instanceContainer, throwable));
+                    Dispatch.dispatchEvent(new XFormsLinkExceptionEvent(containingDocument, XFormsModel.this, null, instanceContainer, throwable));
                 }
             } else {
                 // Everything missing
                 final LocationData extendedLocationData = new ExtendedLocationData(instance.locationData(), "processing XForms instance", instanceContainer);
                 final Throwable throwable = new ValidationException("Required @src attribute, @resource attribute, or inline content for instance: " + instanceStaticId, extendedLocationData);
-                container.dispatchEvent(new XFormsLinkExceptionEvent(containingDocument, XFormsModel.this, "", instanceContainer, throwable));
+                Dispatch.dispatchEvent(new XFormsLinkExceptionEvent(containingDocument, XFormsModel.this, "", instanceContainer, throwable));
             }
         }
         indentedLogger.endHandleOperation();
@@ -740,7 +741,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         } catch (Exception e) {
             final ValidationException validationException
                 = ValidationException.wrapException(e, new ExtendedLocationData(instance.locationData(), "reading external instance", instance.element()));
-            container.dispatchEvent(new XFormsLinkExceptionEvent(containingDocument, XFormsModel.this, instanceResource, instance.element(), validationException));
+            Dispatch.dispatchEvent(new XFormsLinkExceptionEvent(containingDocument, XFormsModel.this, instanceResource, instance.element(), validationException));
         }
     }
 
@@ -978,9 +979,9 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
                 // TODO: Must dispatch after marking revalidate = false, right?
                 for (final XFormsInstance instance: instances) {
                     if (invalidInstances.contains(instance.getEffectiveId())) {
-                        container.dispatchEvent(new XXFormsInvalidEvent(containingDocument, instance));
+                        Dispatch.dispatchEvent(new XXFormsInvalidEvent(containingDocument, instance));
                     } else {
-                        container.dispatchEvent(new XXFormsValidEvent(containingDocument, instance));
+                        Dispatch.dispatchEvent(new XXFormsValidEvent(containingDocument, instance));
                     }
                 }
 
@@ -1087,17 +1088,17 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
         if (currentDeferredActionContext.rebuild) {
             containingDocument.startOutermostActionHandler();
-            container.dispatchEvent(new XFormsRebuildEvent(containingDocument, this));
+            Dispatch.dispatchEvent(new XFormsRebuildEvent(containingDocument, this));
             containingDocument.endOutermostActionHandler();
         }
         if (currentDeferredActionContext.recalculate) {
             containingDocument.startOutermostActionHandler();
-            container.dispatchEvent(new XFormsRecalculateEvent(containingDocument, this));
+            Dispatch.dispatchEvent(new XFormsRecalculateEvent(containingDocument, this));
             containingDocument.endOutermostActionHandler();
         }
         if (currentDeferredActionContext.revalidate) {
             containingDocument.startOutermostActionHandler();
-            container.dispatchEvent(new XFormsRevalidateEvent(containingDocument, this));
+            Dispatch.dispatchEvent(new XFormsRevalidateEvent(containingDocument, this));
             containingDocument.endOutermostActionHandler();
         }
     }
@@ -1129,7 +1130,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         throw new UnsupportedOperationException();
     }
 
-    public List<EventListener> getListeners(String eventName) {
-        return null;
+    public Seq<EventListener> getListeners(String eventName) {
+        return scala.collection.immutable.List.empty();
     }
 }

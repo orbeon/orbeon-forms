@@ -19,6 +19,7 @@ import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xforms.event.Dispatch;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitEvent;
@@ -50,7 +51,7 @@ public class XFormsSubmitControl extends XFormsTriggerControl {
             final Object object = container().findResolutionScope(XFormsUtils.getPrefixedId(getEffectiveId())).resolveObjectById(getEffectiveId(), submissionId, null);
             if (object instanceof XFormsModelSubmission) {
                 final XFormsModelSubmission submission = (XFormsModelSubmission) object;
-                submission.getXBLContainer(containingDocument()).dispatchEvent(new XFormsSubmitEvent(containingDocument(), submission));
+                Dispatch.dispatchEvent(new XFormsSubmitEvent(containingDocument(), submission));
             } else {
                 // "If there is a null search result for the target object and the source object is an XForms action such as
                 // dispatch, send, setfocus, setindex or toggle, then the action is terminated with no effect."

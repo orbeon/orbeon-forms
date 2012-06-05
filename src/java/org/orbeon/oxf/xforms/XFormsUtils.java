@@ -27,6 +27,7 @@ import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl;
 import org.orbeon.oxf.xforms.control.controls.XXFormsAttributeControl;
+import org.orbeon.oxf.xforms.event.Dispatch;
 import org.orbeon.oxf.xforms.event.events.XFormsLinkErrorEvent;
 import org.orbeon.oxf.xforms.model.DataModel;
 import org.orbeon.oxf.xforms.xbl.Scope;
@@ -346,7 +347,7 @@ public class XFormsUtils {
                     // Dispatch xforms-link-error to model
                     final XFormsModel currentModel = currentBindingContext.model();
                     // NOTE: xforms-link-error is no longer in XForms 1.1 starting 2009-03-10
-                    currentModel.getXBLContainer(null).dispatchEvent(new XFormsLinkErrorEvent(container.getContainingDocument(), currentModel, srcAttributeValue, childElement, e));
+                    Dispatch.dispatchEvent(new XFormsLinkErrorEvent(container.getContainingDocument(), currentModel, srcAttributeValue, childElement, e));
                     // Exception when dereferencing the linking attribute
                     return null;
                 }

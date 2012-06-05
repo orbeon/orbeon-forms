@@ -18,9 +18,9 @@ import org.scalatest.junit.AssertionsForJUnit
 import org.junit.Test
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.oxf.xforms.event.events.XFormsCustomEvent
-import org.orbeon.oxf.xforms.event.{XFormsEventTarget, EventListener ⇒ JEventListener, XFormsEvent}
 import org.orbeon.oxf.xforms.control.controls.InstanceMirror._
 import XXFormsDynamicControl._
+import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEventTarget, EventListener ⇒ JEventListener, XFormsEvent}
 
 class InstanceMirrorTest extends DocumentTestBase with AssertionsForJUnit {
 
@@ -96,7 +96,7 @@ class InstanceMirrorTest extends DocumentTestBase with AssertionsForJUnit {
         addListener(outerInstance, outerListener)
 
         // Local helpers
-        def dispatch(name: String) = document.dispatchEvent(new XFormsCustomEvent(document, name, document.getObjectByEffectiveId("model").asInstanceOf[XFormsEventTarget], true, true))
+        def dispatch(name: String) = Dispatch.dispatchEvent(new XFormsCustomEvent(document, name, document.getObjectByEffectiveId("model").asInstanceOf[XFormsEventTarget], true, true))
         def innerInstanceValue = TransformerUtils.tinyTreeToString(innerInstance.documentInfo)
 
         // Test insert, value change and delete

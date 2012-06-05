@@ -20,11 +20,9 @@ import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsModel;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
-import org.orbeon.oxf.xforms.event.XFormsEvent;
-import org.orbeon.oxf.xforms.event.XFormsEventObserver;
+import org.orbeon.oxf.xforms.event.Dispatch;
 import org.orbeon.oxf.xforms.event.events.XFormsRefreshEvent;
 import org.orbeon.oxf.xforms.xbl.Scope;
-import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.Item;
 
@@ -35,7 +33,6 @@ public class XFormsRefreshAction extends XFormsAction {
     public void execute(XFormsActionInterpreter actionInterpreter, Element actionElement,
                         Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
 
-        final XBLContainer container = actionInterpreter.container();
         final XFormsContainingDocument containingDocument = actionInterpreter.containingDocument();
 
         final String modelId = actionElement.attributeValue(XFormsConstants.MODEL_QNAME);
@@ -46,6 +43,6 @@ public class XFormsRefreshAction extends XFormsAction {
 
         // NOTE: We no longer need to force the refresh flag here because the refresh flag is global. If a change in any
         // model occurred, then the flag will be already set and we are safe. Otherwise, it is safe not to do anything.
-        container.dispatchEvent(new XFormsRefreshEvent(containingDocument, model));
+        Dispatch.dispatchEvent(new XFormsRefreshEvent(containingDocument, model));
     }
 }

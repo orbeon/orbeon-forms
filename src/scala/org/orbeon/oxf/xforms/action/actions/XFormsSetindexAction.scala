@@ -19,6 +19,7 @@ import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl
 import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction, XFormsActionInterpreter}
 import org.orbeon.oxf.xforms.event.events.XXFormsSetindexEvent
 import org.orbeon.oxf.xforms.control.{Focus, XFormsControl}
+import org.orbeon.oxf.xforms.event.Dispatch
 
 /**
  * 9.3.7 The setindex Element
@@ -46,7 +47,7 @@ object XFormsSetindexAction {
                 val focusedBefore = interpreter.containingDocument().getControls.getFocusedControl
 
                 // Dispatch to any control so that other custom controls can implement the notion of "setindex"
-                interpreter.container().dispatchEvent(new XXFormsSetindexEvent(interpreter.containingDocument(), control, index))
+                Dispatch.dispatchEvent(new XXFormsSetindexEvent(interpreter.containingDocument(), control, index))
 
                 // Handle focus changes
                 Focus.updateFocusWithEvents(focusedBefore)

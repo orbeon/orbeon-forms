@@ -104,7 +104,7 @@ trait PartEventHandlerAnalysis {
     }
 
     def getEventHandlers(observerPrefixedId: String) =
-        _handlersForObserver.get(observerPrefixedId) map (_.asJava) orNull
+        _handlersForObserver.get(observerPrefixedId) getOrElse Seq()
 
     def observerHasHandlerForEvent(observerPrefixedId: String, eventName: String) =
         _handlersForObserver.get(observerPrefixedId) map

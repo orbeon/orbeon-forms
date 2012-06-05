@@ -20,6 +20,7 @@ import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.Focus;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsNoSingleNodeContainerControl;
+import org.orbeon.oxf.xforms.event.Dispatch;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.event.events.XFormsFocusEvent;
@@ -191,7 +192,7 @@ public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
         } else if (XFormsEvents.XXFORMS_DIALOG_OPEN.equals(event.getName())) {
             // If the dialog is open and the focus has not been set within the dialog, attempt to set the focus within
             if (isVisible() && ! Focus.isFocusWithinContainer(this))
-                container().dispatchEvent(new XFormsFocusEvent(containingDocument(), this));
+                Dispatch.dispatchEvent(new XFormsFocusEvent(containingDocument(), this));
         }
         super.performDefaultAction(event);
     }

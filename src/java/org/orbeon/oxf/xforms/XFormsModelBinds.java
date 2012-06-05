@@ -22,6 +22,7 @@ import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.analysis.XPathDependencies;
 import org.orbeon.oxf.xforms.analysis.model.BindTree;
 import org.orbeon.oxf.xforms.analysis.model.Model;
+import org.orbeon.oxf.xforms.event.Dispatch;
 import org.orbeon.oxf.xforms.event.events.XXFormsXPathErrorEvent;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.oxf.xforms.model.DataModel;
@@ -366,7 +367,7 @@ public class XFormsModelBinds {
         final ValidationException ve = ValidationException.wrapException(e, new ExtendedLocationData(bind.staticBind.locationData(), message,
             bind.staticBind.element(), "expression", expression));
 
-        container.dispatchEvent(new XXFormsXPathErrorEvent(containingDocument, model, ve.getMessage(), ve));
+        Dispatch.dispatchEvent(new XXFormsXPathErrorEvent(containingDocument, model, ve.getMessage(), ve));
     }
 
     private String evaluateXXFormsDefaultBind(Bind bind, int position) {

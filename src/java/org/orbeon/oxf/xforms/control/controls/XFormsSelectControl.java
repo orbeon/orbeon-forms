@@ -17,6 +17,7 @@ import org.apache.commons.lang.StringUtils;
 import org.dom4j.Element;
 import org.orbeon.oxf.xforms.analysis.XPathDependencies;
 import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xforms.event.Dispatch;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsDeselectEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsSelectEvent;
@@ -92,14 +93,14 @@ public class XFormsSelectControl extends XFormsSelect1Control {
             // Dispatch xforms-deselect events
             if (deselectEvents.size() > 0) {
                 for (XFormsEvent currentEvent: deselectEvents) {
-                    currentEvent.getTargetObject().getXBLContainer(containingDocument()).dispatchEvent(currentEvent);
+                    Dispatch.dispatchEvent(currentEvent);
                 }
             }
             // Select events must be sent after all xforms-deselect events
             final boolean hasSelectedItem = selectEvents.size() > 0;
             if (hasSelectedItem) {
                 for (XFormsEvent currentEvent: selectEvents) {
-                    currentEvent.getTargetObject().getXBLContainer(containingDocument()).dispatchEvent(currentEvent);
+                    Dispatch.dispatchEvent(currentEvent);
                 }
             }
 

@@ -30,7 +30,6 @@ import org.mockito.{Matchers, Mockito}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.scaxon.XML._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
-import org.orbeon.oxf.xforms.{XFormsStaticState, XFormsModel, XFormsInstance, XFormsContainingDocument}
 import collection.JavaConverters._
 import org.orbeon.saxon.dom4j.{NodeWrapper, DocumentWrapper}
 import org.orbeon.saxon.value.BooleanValue
@@ -40,6 +39,7 @@ import org.orbeon.saxon.om._
 import org.orbeon.scaxon.XML.evalOne
 import org.orbeon.oxf.processor.ProcessorUtils
 import org.orbeon.oxf.xforms.control.XFormsControl
+import org.orbeon.oxf.xforms._
 
 class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit with MockitoSugar {
 
@@ -638,12 +638,17 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
         }
 
         // Everything else
+        val part = mock[PartAnalysis]
+        Mockito when part.getEventHandlers(Matchers.any[String]) thenReturn Seq()
+
         val xblContainer = mock[XBLContainer]
+        Mockito when xblContainer.getPartAnalysis thenReturn part
 
         val instance = mock[XFormsInstance]
         Mockito when instance.getModel(Matchers.any[XFormsContainingDocument]) thenReturn model
         Mockito when instance.getXBLContainer(Matchers.any[XFormsContainingDocument]) thenReturn xblContainer
         Mockito when instance.documentInfo thenReturn doc
+        Mockito when instance.getListeners(Matchers.any[String]) thenReturn Seq()
 
         val staticState = mock[XFormsStaticState]
         Mockito when staticState.documentWrapper thenReturn doc
@@ -652,6 +657,8 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
         Mockito when document.getStaticState thenReturn staticState
         Mockito when document.getInstanceForNode(Matchers.any[NodeInfo]) thenReturn instance
         Mockito when document.getModels thenReturn Seq(model).asJava
+        Mockito when document.getIndentedLogger(Matchers.any[String]) thenReturn new IndentedLogger(XFormsServer.logger, "any")
+        Mockito when document.getIndentedLogger thenReturn new IndentedLogger(XFormsServer.logger, "document")
 
         val actionInterpreter = mock[XFormsActionInterpreter]
         Mockito when actionInterpreter.containingDocument thenReturn document

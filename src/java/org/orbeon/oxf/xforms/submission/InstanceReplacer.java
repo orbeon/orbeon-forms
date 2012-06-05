@@ -19,6 +19,7 @@ import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.action.actions.XFormsDeleteAction;
 import org.orbeon.oxf.xforms.action.actions.XFormsInsertAction;
+import org.orbeon.oxf.xforms.event.Dispatch;
 import org.orbeon.oxf.xforms.event.events.XFormsInsertEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitErrorEvent;
 import org.orbeon.oxf.xml.TransformerUtils;
@@ -200,9 +201,9 @@ public class InstanceReplacer extends BaseReplacer {
 
                 // Dispatch xforms-insert event
                 // NOTE: use the root node as insert location as it seems to make more sense than pointing to the earlier root element
-                newInstance.getXBLContainer(containingDocument).dispatchEvent(
+                Dispatch.dispatchEvent(
                         new XFormsInsertEvent(containingDocument, newInstance, Collections.singletonList((Item) newDocumentRootElement), null, newDocumentRootElement.getDocumentRoot(),
-                            "after"));
+                                "after"));
 
             } else {
                 // Generic insertion

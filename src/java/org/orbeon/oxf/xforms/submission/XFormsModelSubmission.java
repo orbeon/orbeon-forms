@@ -40,6 +40,7 @@ import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.saxon.om.VirtualNode;
+import scala.collection.immutable.Seq;
 
 import javax.xml.transform.Transformer;
 import javax.xml.transform.stream.StreamResult;
@@ -47,7 +48,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
@@ -432,7 +432,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                     // Submission Options."
 
                     final XFormsSubmitSerializeEvent serializeEvent = new XFormsSubmitSerializeEvent(containingDocument, XFormsModelSubmission.this, p.refNodeInfo, requestedSerialization);
-                    container.dispatchEvent(serializeEvent);
+                    Dispatch.dispatchEvent(serializeEvent);
 
                     // TODO: rest of submission should happen upon default action of event
 
@@ -606,8 +606,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                 // After a submission, the context might have changed
                 model.resetAndEvaluateVariables();
 
-                getXBLContainer(containingDocument)
-                    .dispatchEvent(new XFormsSubmitDoneEvent(containingDocument, XFormsModelSubmission.this, connectionResult));
+                Dispatch.dispatchEvent(new XFormsSubmitDoneEvent(containingDocument, XFormsModelSubmission.this, connectionResult));
             }
         };
     }
@@ -632,7 +631,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
 
         // Dispatch event
         submitErrorEvent.setThrowable(throwable);
-        container.dispatchEvent(submitErrorEvent);
+        Dispatch.dispatchEvent(submitErrorEvent);
     }
 
     private void sendSubmitError(String resolvedActionOrResource, Throwable throwable) {
@@ -655,7 +654,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
 
         // Dispatch event
         submitErrorEvent.setThrowable(throwable);
-        container.dispatchEvent(submitErrorEvent);
+        Dispatch.dispatchEvent(submitErrorEvent);
     }
 
     public Replacer getReplacer(ConnectionResult connectionResult, SubmissionParameters p) throws IOException {
@@ -1357,7 +1356,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
         throw new UnsupportedOperationException();
     }
 
-    public List<EventListener> getListeners(String eventName) {
-        return null;
+    public Seq<EventListener> getListeners(String eventName) {
+        return scala.collection.immutable.List.empty();
     }
 }

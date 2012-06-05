@@ -19,6 +19,7 @@ import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.control.controls.XXFormsDialogControl;
+import org.orbeon.oxf.xforms.event.Dispatch;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.events.XXFormsDialogCloseEvent;
 import org.orbeon.oxf.xforms.xbl.Scope;
@@ -47,7 +48,7 @@ public class XXFormsHideAction extends XFormsAction {
                 final XXFormsDialogControl targetDialog = (XXFormsDialogControl) controlObject;
                 final XFormsEvent newEvent = new XXFormsDialogCloseEvent(containingDocument, targetDialog);
                 addContextAttributes(actionInterpreter, actionElement, newEvent);
-                targetDialog.getXBLContainer(containingDocument).dispatchEvent(newEvent);
+                Dispatch.dispatchEvent(newEvent);
             } else {
                 final IndentedLogger indentedLogger = actionInterpreter.indentedLogger();
                 if (indentedLogger.isDebugEnabled())

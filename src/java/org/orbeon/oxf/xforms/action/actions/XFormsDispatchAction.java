@@ -20,6 +20,7 @@ import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
+import org.orbeon.oxf.xforms.event.Dispatch;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventFactory;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
@@ -97,7 +98,7 @@ public class XFormsDispatchAction extends XFormsAction {
                 // Create and dispatch the event
                 final XFormsEvent newEvent = XFormsEventFactory.createEvent(containingDocument, resolvedNewEventName, (XFormsEventTarget) xformsEventTarget, newEventBubbles, newEventCancelable);
                 addContextAttributes(actionInterpreter, actionElement, newEvent);
-                actionInterpreter.container().dispatchEvent(newEvent);
+                Dispatch.dispatchEvent(newEvent);
             } else {
                 // "If there is a null search result for the target object and the source object is an XForms action such as
                 // dispatch, send, setfocus, setindex or toggle, then the action is terminated with no effect."

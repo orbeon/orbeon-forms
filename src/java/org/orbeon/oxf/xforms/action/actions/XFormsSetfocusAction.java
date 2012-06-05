@@ -21,6 +21,7 @@ import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xforms.event.Dispatch;
 import org.orbeon.oxf.xforms.event.events.XFormsFocusEvent;
 import org.orbeon.oxf.xforms.xbl.Scope;
 import org.orbeon.saxon.om.Item;
@@ -62,7 +63,7 @@ public class XFormsSetfocusAction extends XFormsAction {
         }
         if (controlObject instanceof XFormsControl) {
             // Dispatch event to control object
-            containingDocument.dispatchEvent(new XFormsFocusEvent(containingDocument, (XFormsControl) controlObject));
+            Dispatch.dispatchEvent(new XFormsFocusEvent(containingDocument, (XFormsControl) controlObject));
         } else {
             // "If there is a null search result for the target object and the source object is an XForms action such as
             // dispatch, send, setfocus, setindex or toggle, then the action is terminated with no effect."

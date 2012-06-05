@@ -19,6 +19,7 @@ import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
+import org.orbeon.oxf.xforms.event.Dispatch;
 import org.orbeon.oxf.xforms.event.events.XFormsInsertEvent;
 import org.orbeon.oxf.xforms.model.DataModel;
 import org.orbeon.oxf.xforms.xbl.Scope;
@@ -433,7 +434,7 @@ public class XFormsInsertAction extends XFormsAction {
         // "4. If the insert is successful, the event xforms-insert is dispatched."
         // XFormsInstance handles index and repeat items updates 
         if (doDispatch && modifiedInstance != null) {
-            modifiedInstance.getXBLContainer(containingDocument).dispatchEvent(
+            Dispatch.dispatchEvent(
                     new XFormsInsertEvent(containingDocument, modifiedInstance, insertedNodeInfos, originItems, insertLocationNodeInfo, beforeAfterInto));
         }
 

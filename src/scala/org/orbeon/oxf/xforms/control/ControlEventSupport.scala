@@ -16,13 +16,11 @@ package org.orbeon.oxf.xforms.control
 import org.orbeon.oxf.xforms._
 import control.Controls.AncestorIterator
 import event.events._
+import event.{EventListener, XFormsEvent, XFormsEventObserver, XFormsEvents}
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatIterationControl
-import org.orbeon.oxf.xforms.event.XFormsEvent
-import org.orbeon.oxf.xforms.event.XFormsEventObserver
-import org.orbeon.oxf.xforms.event.XFormsEvents
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import scala.Option
-import java.util.{List ⇒ JList, Set ⇒ JSet}
+import java.util.{Set ⇒ JSet}
 import scala.collection.JavaConverters._
 
 trait ControlEventSupport {
@@ -80,11 +78,11 @@ trait ControlEventSupport {
     final def getParentEventObserver(containingDocument: XFormsContainingDocument): XFormsEventObserver =
         Option(parent) orNull
 
-    final def addListener(eventName: String, listener: org.orbeon.oxf.xforms.event.EventListener): Unit =
+    final def addListener(eventName: String, listener: EventListener): Unit =
         throw new UnsupportedOperationException
 
-    final def removeListener(eventName: String, listener: org.orbeon.oxf.xforms.event.EventListener): Unit =
+    final def removeListener(eventName: String, listener: EventListener): Unit =
         throw new UnsupportedOperationException
 
-    final def getListeners(eventName: String): JList[org.orbeon.oxf.xforms.event.EventListener] = null
+    final def getListeners(eventName: String): Seq[EventListener] = Seq()
 }

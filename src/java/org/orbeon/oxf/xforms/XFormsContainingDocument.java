@@ -24,7 +24,10 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.PageFlowControllerProcessor;
 import org.orbeon.oxf.servlet.OrbeonXFormsFilter;
-import org.orbeon.oxf.util.*;
+import org.orbeon.oxf.util.IndentedLogger;
+import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.util.URLRewriterUtils;
+import org.orbeon.oxf.util.UUIDUtils;
 import org.orbeon.oxf.xforms.action.XFormsAPI;
 import org.orbeon.oxf.xforms.analysis.XPathDependencies;
 import org.orbeon.oxf.xforms.control.XFormsControl;
@@ -32,7 +35,6 @@ import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
-import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.processor.XFormsURIResolver;
@@ -936,17 +938,6 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
     @Override
     public Scope getResolutionScope() {
         return staticState.topLevelPart().startScope();
-    }
-
-    @Override
-    public void dispatchEvent(XFormsEvent event) {
-        // Ensure that the event uses the proper container to dispatch the event
-        final XBLContainer targetContainer = event.getTargetObject().getXBLContainer(this);
-        if (targetContainer == this) {
-            super.dispatchEvent(event);
-        } else {
-            targetContainer.dispatchEvent(event);
-        }
     }
 
     /**

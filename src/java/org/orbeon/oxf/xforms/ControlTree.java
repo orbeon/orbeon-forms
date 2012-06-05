@@ -22,6 +22,7 @@ import org.orbeon.oxf.xforms.control.controls.XFormsRepeatIterationControl;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
+import org.orbeon.oxf.xforms.event.Dispatch;
 
 import java.util.*;
 
@@ -148,15 +149,14 @@ public class ControlTree implements ExternalCopyable {
     private void dispatchCreationEvents(XFormsControl control) {
         if (XFormsControl.controlSupportsRefreshEvents(control)) {
             if (control.isRelevant()) {
-                final XBLContainer container = control.container();
-                final XFormsContainingDocument containingDocument = container.getContainingDocument();
+                final XFormsContainingDocument containingDocument = control.containingDocument();
 
                 // Commit current control state
                 control.commitCurrentUIState();
 
                 // Dispatch xforms-enabled if needed
                 if (isAllowSendingRelevantEvents) {
-                    container.dispatchEvent(new XFormsEnabledEvent(containingDocument, control));
+                    Dispatch.dispatchEvent(new XFormsEnabledEvent(containingDocument, control));
                 }
                 if (control instanceof XFormsSingleNodeControl) {
                     final XFormsSingleNodeControl singleNodeControl = (XFormsSingleNodeControl) control;
@@ -165,19 +165,19 @@ public class ControlTree implements ExternalCopyable {
                     // Dispatch xforms-required if needed
                     // TODO: must reacquire control and test for relevance again
                     if (isAllowSendingRequiredEvents && singleNodeControl.isRequired()) {
-                        container.dispatchEvent(new XFormsRequiredEvent(containingDocument, singleNodeControl));
+                        Dispatch.dispatchEvent(new XFormsRequiredEvent(containingDocument, singleNodeControl));
                     }
 
                     // Dispatch xforms-readonly if needed
                     // TODO: must reacquire control and test for relevance again
                     if (isAllowSendingReadonlyEvents && singleNodeControl.isReadonly()) {
-                        container.dispatchEvent(new XFormsReadonlyEvent(containingDocument, singleNodeControl));
+                        Dispatch.dispatchEvent(new XFormsReadonlyEvent(containingDocument, singleNodeControl));
                     }
 
                     // Dispatch xforms-invalid if needed
                     // TODO: must reacquire control and test for relevance again
                     if (isAllowSendingValidEvents && !singleNodeControl.isValid()) {
-                        container.dispatchEvent(new XFormsInvalidEvent(containingDocument, singleNodeControl));
+                        Dispatch.dispatchEvent(new XFormsInvalidEvent(containingDocument, singleNodeControl));
                     }
                 }
             }
@@ -218,8 +218,7 @@ public class ControlTree implements ExternalCopyable {
 
     private void dispatchDestructionEvents(XFormsControl control) {
         if (XFormsControl.controlSupportsRefreshEvents(control)) {
-            final XBLContainer container = control.container();
-            final XFormsContainingDocument containingDocument = container.getContainingDocument();
+            final XFormsContainingDocument containingDocument = control.containingDocument();
 
             // Don't test for relevance here
             // o In iteration removal case, control is still relevant
@@ -227,7 +226,7 @@ public class ControlTree implements ExternalCopyable {
 
             // Dispatch xforms-disabled if needed
             if (isAllowSendingRelevantEvents) {
-                container.dispatchEvent(new XFormsDisabledEvent(containingDocument, control));
+                Dispatch.dispatchEvent(new XFormsDisabledEvent(containingDocument, control));
             }
 
             // TODO: if control *becomes* non-relevant and value changed, arguably we should dispatch the value-changed event
@@ -247,19 +246,18 @@ public class ControlTree implements ExternalCopyable {
                 if (control instanceof XFormsSingleNodeControl) {
 
                     final XFormsSingleNodeControl singleNodeControl = (XFormsSingleNodeControl) control;
-                    final XBLContainer container = singleNodeControl.container();
-                    final XFormsContainingDocument containingDocument = container.getContainingDocument();
+                    final XFormsContainingDocument containingDocument = control.containingDocument();
 
                     // xforms-value-changed
                     if (isAllowSendingValueChangedEvents && singleNodeControl.isValueChanged()) {
-                        container.dispatchEvent(new XFormsValueChangeEvent(containingDocument, singleNodeControl));
+                        Dispatch.dispatchEvent(new XFormsValueChangeEvent(containingDocument, singleNodeControl));
                     }
 
                     // Dispatch moved xxforms-iteration-changed if needed
                     if (isAllowSendingIterationMovedEvents
                             && control.previousEffectiveIdCommit() != control.getEffectiveId()
                             && control.container().getPartAnalysis().observerHasHandlerForEvent(control.getPrefixedId(), XFormsEvents.XXFORMS_ITERATION_MOVED)) {
-                        container.dispatchEvent(new XXFormsIterationMovedEvent(containingDocument, control));
+                        Dispatch.dispatchEvent(new XXFormsIterationMovedEvent(containingDocument, control));
                     }
 
                     // Dispatch events only if the MIP value is different from the previous value
@@ -271,9 +269,9 @@ public class ControlTree implements ExternalCopyable {
 
                         if (previousValidState != newValidState) {
                             if (newValidState) {
-                                container.dispatchEvent(new XFormsValidEvent(containingDocument, singleNodeControl));
+                                Dispatch.dispatchEvent(new XFormsValidEvent(containingDocument, singleNodeControl));
                             } else {
-                                container.dispatchEvent(new XFormsInvalidEvent(containingDocument, singleNodeControl));
+                                Dispatch.dispatchEvent(new XFormsInvalidEvent(containingDocument, singleNodeControl));
                             }
                         }
                     }
@@ -284,9 +282,9 @@ public class ControlTree implements ExternalCopyable {
 
                         if (previousRequiredState != newRequiredState) {
                             if (newRequiredState) {
-                                container.dispatchEvent(new XFormsRequiredEvent(containingDocument, singleNodeControl));
+                                Dispatch.dispatchEvent(new XFormsRequiredEvent(containingDocument, singleNodeControl));
                             } else {
-                                container.dispatchEvent(new XFormsOptionalEvent(containingDocument, singleNodeControl));
+                                Dispatch.dispatchEvent(new XFormsOptionalEvent(containingDocument, singleNodeControl));
                             }
                         }
                     }
@@ -297,9 +295,9 @@ public class ControlTree implements ExternalCopyable {
 
                         if (previousReadonlyState != newReadonlyState) {
                             if (newReadonlyState) {
-                                container.dispatchEvent(new XFormsReadonlyEvent(containingDocument, singleNodeControl));
+                                Dispatch.dispatchEvent(new XFormsReadonlyEvent(containingDocument, singleNodeControl));
                             } else {
-                                container.dispatchEvent(new XFormsReadwriteEvent(containingDocument, singleNodeControl));
+                                Dispatch.dispatchEvent(new XFormsReadwriteEvent(containingDocument, singleNodeControl));
                             }
                         }
                     }

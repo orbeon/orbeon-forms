@@ -20,6 +20,7 @@ import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsValueContainerControl;
+import org.orbeon.oxf.xforms.event.Dispatch;
 import org.orbeon.oxf.xforms.event.events.XFormsDeselectEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsSelectEvent;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
@@ -113,8 +114,7 @@ public class XFormsSwitchControl extends XFormsValueContainerControl {
             // performs the following:"
 
             // "1. Dispatching an xforms-deselect event to the currently selected case."
-            previouslySelectedCaseControl.container().dispatchEvent(
-                    new XFormsDeselectEvent(containingDocument(), previouslySelectedCaseControl));
+            Dispatch.dispatchEvent(new XFormsDeselectEvent(containingDocument(), previouslySelectedCaseControl));
 
             if (isXForms11Switch()) {
                 // Partial refresh on the case that is being deselected
@@ -127,8 +127,7 @@ public class XFormsSwitchControl extends XFormsValueContainerControl {
             }
 
             // "2. Dispatching an xforms-select event to the case to be selected."
-            caseControlToSelect.container().dispatchEvent(
-                    new XFormsSelectEvent(containingDocument(), caseControlToSelect));
+            Dispatch.dispatchEvent(new XFormsSelectEvent(containingDocument(), caseControlToSelect));
         }
     }
 

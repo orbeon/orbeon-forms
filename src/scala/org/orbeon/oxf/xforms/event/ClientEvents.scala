@@ -440,7 +440,7 @@ object ClientEvents {
 
         def dispatchEventCheckTarget(event: XFormsEvent) =
             if (checkEventTarget(event))
-                doc.dispatchEvent(event)
+                Dispatch.dispatchEvent(event)
 
         implicit val CurrentLogger = doc.getIndentedLogger(LOGGING_CATEGORY)
         val target = event.getTargetObject

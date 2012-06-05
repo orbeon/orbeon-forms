@@ -20,11 +20,9 @@ import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsModel;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
-import org.orbeon.oxf.xforms.event.XFormsEvent;
-import org.orbeon.oxf.xforms.event.XFormsEventObserver;
+import org.orbeon.oxf.xforms.event.Dispatch;
 import org.orbeon.oxf.xforms.event.events.XFormsRecalculateEvent;
 import org.orbeon.oxf.xforms.xbl.Scope;
-import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.Item;
 
@@ -35,7 +33,6 @@ public class XFormsRecalculateAction extends XFormsAction {
     public void execute(XFormsActionInterpreter actionInterpreter, Element actionElement,
                         Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
 
-        final XBLContainer container = actionInterpreter.container();
         final XFormsContainingDocument containingDocument = actionInterpreter.containingDocument();
 
         final String modelId = actionElement.attributeValue(XFormsConstants.MODEL_QNAME);
@@ -52,6 +49,6 @@ public class XFormsRecalculateAction extends XFormsAction {
 
         // Because of inter-model dependencies, we consider for now that the action must force the operation
         model.getDeferredActionContext().recalculate = true;
-        container.dispatchEvent(new XFormsRecalculateEvent(containingDocument, model, applyInitialValues));
+        Dispatch.dispatchEvent(new XFormsRecalculateEvent(containingDocument, model, applyInitialValues));
     }
 }

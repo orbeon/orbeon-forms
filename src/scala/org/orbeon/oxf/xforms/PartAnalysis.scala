@@ -34,7 +34,7 @@ trait PartAnalysis extends PartGlobalOps with PartStaticAnalysisOps with XMLUtil
 
     def startScope: Scope
 
-    def getEventHandlers(observerPrefixedId: String): JList[EventHandler]
+    def getEventHandlers(observerPrefixedId: String): Seq[EventHandler]
     def observerHasHandlerForEvent(observerPrefixedId: String, eventName: String): Boolean
 
     def hasControls: Boolean

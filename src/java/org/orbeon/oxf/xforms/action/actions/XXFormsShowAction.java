@@ -20,6 +20,7 @@ import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XXFormsDialogControl;
+import org.orbeon.oxf.xforms.event.Dispatch;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.events.XXFormsDialogOpenEvent;
 import org.orbeon.oxf.xforms.xbl.Scope;
@@ -57,7 +58,7 @@ public class XXFormsShowAction extends XFormsAction {
 
                 final XFormsEvent newEvent = new XXFormsDialogOpenEvent(containingDocument, targetDialog, neighborEffectiveId, constrainToViewport);
                 addContextAttributes(actionInterpreter, actionElement, newEvent);
-                targetDialog.container().dispatchEvent(newEvent);
+                Dispatch.dispatchEvent(newEvent);
 
             } else {
                 final IndentedLogger indentedLogger = actionInterpreter.indentedLogger();

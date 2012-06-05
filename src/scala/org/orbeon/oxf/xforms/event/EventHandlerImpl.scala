@@ -204,7 +204,7 @@ class EventHandlerImpl(
                 // Something bad happened while running the action
                 // NOTE: Dispatch directly to #document. Ideally it would bubble and a default listener on the document would handle it.
                 val target = containingDocument.getObjectByEffectiveId("#document").asInstanceOf[XFormsEventTarget]
-                container.dispatchEvent(new XXFormsActionErrorEvent(containingDocument, target, e))
+                Dispatch.dispatchEvent(new XXFormsActionErrorEvent(containingDocument, target, e))
         }
     }
 

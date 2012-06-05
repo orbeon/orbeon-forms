@@ -13,9 +13,9 @@
  */
 package org.orbeon.oxf.xforms.model
 
-import org.orbeon.oxf.xforms.event.XFormsEventTarget
 import org.orbeon.oxf.xforms._
 import event.events.{XXFormsBindingErrorEvent, XXFormsValueChanged}
+import event.{Dispatch, XFormsEventTarget}
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.saxon.value.AtomicValue
 import org.orbeon.oxf.xml.dom4j.LocationData
@@ -166,7 +166,7 @@ object DataModel {
             nodeInfo,
             valueToSet,
             logAndNotifyValueChange(containingDocument, indentedLogger, source, nodeInfo, _, valueToSet, isCalculate),
-            reason ⇒ containingDocument.dispatchEvent(new XXFormsBindingErrorEvent(containingDocument, eventTarget, locationData, reason))
+            reason ⇒ Dispatch.dispatchEvent(new XXFormsBindingErrorEvent(containingDocument, eventTarget, locationData, reason))
         )
     }
 
@@ -193,8 +193,7 @@ object DataModel {
                 modifiedInstance.getModel(containingDocument).markValueChange(nodeInfo, isCalculate)
 
                 // Dispatch extension event to instance
-                val modifiedContainer = modifiedInstance.getXBLContainer(containingDocument)
-                modifiedContainer.dispatchEvent(new XXFormsValueChanged(containingDocument, modifiedInstance, nodeInfo, oldValue, newValue))
+                Dispatch.dispatchEvent(new XXFormsValueChanged(containingDocument, modifiedInstance, nodeInfo, oldValue, newValue))
             case None ⇒
                 // Value modified is not in an instance
                 // Q: Is the code below the right thing to do?

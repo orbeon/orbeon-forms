@@ -19,11 +19,9 @@ import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsModel;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
-import org.orbeon.oxf.xforms.event.XFormsEvent;
-import org.orbeon.oxf.xforms.event.XFormsEventObserver;
+import org.orbeon.oxf.xforms.event.Dispatch;
 import org.orbeon.oxf.xforms.event.events.XFormsRebuildEvent;
 import org.orbeon.oxf.xforms.xbl.Scope;
-import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.saxon.om.Item;
 
 /**
@@ -33,7 +31,6 @@ public class XFormsRebuildAction extends XFormsAction {
     public void execute(XFormsActionInterpreter actionInterpreter, Element actionElement,
                         Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
 
-        final XBLContainer container = actionInterpreter.container();
         final XFormsContainingDocument containingDocument = actionInterpreter.containingDocument();
 
         final String modelId = actionElement.attributeValue(XFormsConstants.MODEL_QNAME);
@@ -41,6 +38,6 @@ public class XFormsRebuildAction extends XFormsAction {
 
         // Because of inter-model dependencies, we consider for now that the action must force the operation
         model.getDeferredActionContext().rebuild = true;
-        container.dispatchEvent(new XFormsRebuildEvent(containingDocument, model));
+        Dispatch.dispatchEvent(new XFormsRebuildEvent(containingDocument, model));
     }
 }

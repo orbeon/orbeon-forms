@@ -26,6 +26,7 @@ import org.orbeon.oxf.xforms.control.FocusableTrait;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
+import org.orbeon.oxf.xforms.event.Dispatch;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsDeselectEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsSelectEvent;
@@ -258,14 +259,14 @@ public class XFormsSelect1Control extends XFormsValueControl implements Focusabl
             // Dispatch xforms-deselect events
             if (deselectEvents.size() > 0) {
                 for (XFormsEvent currentEvent: deselectEvents) {
-                    currentEvent.getTargetObject().getXBLContainer(containingDocument()).dispatchEvent(currentEvent);
+                    Dispatch.dispatchEvent(currentEvent);
                 }
             }
             // Select events must be sent after all xforms-deselect events
             final boolean hasSelectedItem = selectEvents.size() > 0;
             if (hasSelectedItem) {
                 for (XFormsEvent currentEvent: selectEvents) {
-                    currentEvent.getTargetObject().getXBLContainer(containingDocument()).dispatchEvent(currentEvent);
+                    Dispatch.dispatchEvent(currentEvent);
                 }
             }
 

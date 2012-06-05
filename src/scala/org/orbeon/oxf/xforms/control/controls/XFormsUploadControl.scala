@@ -20,7 +20,6 @@ import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.analysis.XPathDependencies
 import org.orbeon.oxf.xforms.control._
-import org.orbeon.oxf.xforms.event.XFormsEvent
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.xml.sax.helpers.AttributesImpl
@@ -35,6 +34,7 @@ import collection.JavaConverters._
 import org.orbeon.oxf.util.{SecureUtils, Multipart, NetUtils}
 import org.orbeon.oxf.xforms.{XFormsProperties, XFormsContainingDocument}
 import java.net.{URLDecoder, URLEncoder, URI}
+import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
 
 /**
  * Represents an xforms:upload control.
@@ -152,7 +152,7 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
 
                     if (StringUtils.isNotEmpty(oldValue))
                         // TODO: This should probably take place during refresh instead.
-                        container.dispatchEvent(new XFormsDeselectEvent(containingDocument, this))
+                        Dispatch.dispatchEvent(new XFormsDeselectEvent(containingDocument, this))
 
                     // Try to delete temporary file associated with old value if any
                     deleteFileIfPossible(oldValue)

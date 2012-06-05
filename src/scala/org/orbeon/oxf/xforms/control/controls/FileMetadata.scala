@@ -23,6 +23,7 @@ import org.orbeon.oxf.xforms.event.events.XXFormsBindingErrorEvent
 import org.orbeon.oxf.xforms.control.XFormsControl.{ImmutableControlProperty, MutableControlProperty, ControlProperty}
 import org.xml.sax.helpers.AttributesImpl
 import org.orbeon.oxf.xforms.control.{AjaxSupport, XFormsControl, XFormsValueControl}
+import org.orbeon.oxf.xforms.event.Dispatch
 
 // This trait is used by controls that support nested file metadata such as "filename"
 trait FileMetadata extends XFormsValueControl {
@@ -132,7 +133,7 @@ trait FileMetadata extends XFormsValueControl {
                             currentSingleItem,
                             value,
                             oldValue ⇒ DataModel.logAndNotifyValueChange(self.container.getContainingDocument, self.getIndentedLogger, "file metadata", currentSingleItem, oldValue, value, isCalculate = false),
-                            reason ⇒ self.container.getContainingDocument.dispatchEvent(new XXFormsBindingErrorEvent(self.container.getContainingDocument, self, self.getLocationData, reason))
+                            reason ⇒ Dispatch.dispatchEvent(new XXFormsBindingErrorEvent(self.containingDocument, self, self.getLocationData, reason))
                         )
                     case _ ⇒
                 }

@@ -20,11 +20,9 @@ import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsModel;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
-import org.orbeon.oxf.xforms.event.XFormsEvent;
-import org.orbeon.oxf.xforms.event.XFormsEventObserver;
+import org.orbeon.oxf.xforms.event.Dispatch;
 import org.orbeon.oxf.xforms.event.events.XFormsResetEvent;
 import org.orbeon.oxf.xforms.xbl.Scope;
-import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.Item;
 
@@ -37,7 +35,6 @@ public class XFormsResetAction extends XFormsAction {
     public void execute(XFormsActionInterpreter actionInterpreter, Element actionElement,
                         Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
 
-        final XBLContainer container = actionInterpreter.container();
         final XFormsContainingDocument containingDocument = actionInterpreter.containingDocument();
 
         final String modelId = actionElement.attributeValue(XFormsConstants.MODEL_QNAME);
@@ -47,6 +44,6 @@ public class XFormsResetAction extends XFormsAction {
             throw new ValidationException("Invalid model id for xforms:reset: " + modelId, (LocationData) actionElement.getData());
 
         // "This action initiates reset processing by dispatching an xforms-reset event to the specified model."
-        container.dispatchEvent(new XFormsResetEvent(containingDocument, model));
+        Dispatch.dispatchEvent(new XFormsResetEvent(containingDocument, model));
     }
 }

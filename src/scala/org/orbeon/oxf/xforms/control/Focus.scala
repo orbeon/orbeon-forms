@@ -14,16 +14,11 @@
 package org.orbeon.oxf.xforms.control
 
 import controls._
-import org.orbeon.oxf.xforms.event.events.{DOMFocusOutEvent,DOMFocusInEvent}
 import org.orbeon.oxf.xforms.control.Controls.AncestorIterator
 import org.orbeon.oxf.xforms.XFormsContainingDocument
-import org.orbeon.oxf.xforms.event.events.XFormsUIEvent
-import collection.JavaConverters._
 
-import java.util.{ArrayList ⇒ JArrayList, LinkedHashMap ⇒ JLinkedHashMap}
 import org.orbeon.oxf.xforms.event._
 import org.orbeon.oxf.xforms.event.XFormsEvents.{DOM_FOCUS_OUT, DOM_FOCUS_IN}
-import collection.mutable.Buffer
 
 // Handle control focus
 object Focus {
@@ -194,79 +189,6 @@ object Focus {
     def removeFocus(doc: XFormsContainingDocument) =
         removeFocusPartially(doc, boundary = None)
 
-    // Find boundaries for event dispatch
-    // Put here temporarily as this deals with focus events, but must be moved to some better place when possible
-    def findBoundaries(targetObject: XFormsEventTarget, event: XFormsEvent):
-        (JArrayList[XFormsEventObserver], JLinkedHashMap[String, XFormsEvent], JArrayList[XFormsEventObserver]) = {
-
-        val doc = event.getTargetXBLContainer.getContainingDocument
-
-        val boundaries = new JArrayList[XFormsEventObserver]
-        val eventsForBoundaries = new JLinkedHashMap[String, XFormsEvent] // Map<String effectiveId, XFormsEvent event>
-        val eventObservers = new JArrayList[XFormsEventObserver]
-
-        val startObserver = targetObject match {
-            case targetObject: XFormsEventObserver ⇒ targetObject
-            case _ ⇒ targetObject.getParentEventObserver(doc) // why this is needed?
-        }
-
-        // Iterator over a target's ancestor observers
-        class ObserverIterator(start: XFormsEventObserver, doc: XFormsContainingDocument) extends Iterator[XFormsEventObserver] {
-            private var _next = start
-            def hasNext = _next ne null
-            def next() = {
-                val result = _next
-                _next = _next.getParentEventObserver(doc)
-                result
-            }
-        }
-
-        // Iterator over all observers
-        val commonIterator = new ObserverIterator(startObserver, doc)
-
-        // Iterator over all the observers we need to handle
-        val observerIterator =
-            event match {
-                case uiEvent: XFormsUIEvent if ! (uiEvent.isInstanceOf[DOMFocusInEvent] || uiEvent.isInstanceOf[DOMFocusOutEvent]) ⇒
-                    // Broken retargeting for UI events other than focus events
-                    // See: https://github.com/orbeon/orbeon-forms/issues/282
-
-                    // Register a retarget boundary
-                    def addRetarget(observer: XFormsEventObserver) {
-                        boundaries.add(observer)
-                        eventsForBoundaries.put(observer.getEffectiveId, null)
-                    }
-
-                    // Algorithm as follows: start with target and go up following scopes. If we reach an XBL root, then
-                    // we retarget the event to the containing component.
-                    var currentTargetScope = targetObject.getScope(doc)
-                    val result = Buffer[XFormsEventObserver]()
-                    while (commonIterator.hasNext) {
-                        val current = commonIterator.next()
-
-                        if (current.getScope(doc) == currentTargetScope) {
-                            if (current.isInstanceOf[XXFormsComponentRootControl]) {
-                                val component = current.getParentEventObserver(doc)
-                                addRetarget(component)
-                                currentTargetScope = component.getScope(doc)
-                            }
-                            result += current
-                        }
-                    }
-
-                    result.toIterator
-
-                case _ ⇒
-                    // For other events, including focus events, just follow scopes
-                    val targetScope = targetObject.getScope(doc)
-                    commonIterator filter (_.getScope(doc) == targetScope)
-            }
-
-        eventObservers.addAll(observerIterator.toList.asJava)
-
-        (boundaries, eventsForBoundaries, eventObservers)
-    }
-
     // Whether the control is hidden within a non-visible case or dialog
     private def isHidden(control: XFormsControl) = new AncestorIterator(control.parent) exists {
         case switchCase: XFormsCaseControl if ! switchCase.isVisible ⇒ true
@@ -286,7 +208,7 @@ object Focus {
     private def focusIn(control: XFormsControl)  = dispatch(control, DOM_FOCUS_IN)
 
     private def dispatch(control: XFormsControl, eventName: String) =
-        control.container.dispatchEvent(XFormsEventFactory.createEvent(control.containingDocument, eventName, control))
+        Dispatch.dispatchEvent(XFormsEventFactory.createEvent(control.containingDocument, eventName, control))
 
     // Find all ancestor container controls of the given control from leaf to root
     private def containers(control: XFormsControl) =

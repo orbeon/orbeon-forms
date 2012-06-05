@@ -19,7 +19,6 @@ import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.event.events.XFormsUIEvent;
-import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.*;
@@ -61,12 +60,12 @@ public abstract class XFormsEvent implements Cloneable {
 //    private static final String XXFORMS_OBSERVER_ATTRIBUTE = XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "observer");
 
     private XFormsEvent originalEvent;  // original event (for retargeted event)
-
-    private final XBLContainer targetXBLContainer;
-    private final String name;
     private XFormsEventTarget targetObject;
-    private final boolean bubbles;
-    private final boolean cancelable;
+
+    public final XFormsContainingDocument containingDocument;
+    public final String name;
+    public final boolean bubbles;
+    public final boolean cancelable;
 
     public enum Phase { capture, target, bubbling }
 
@@ -75,11 +74,8 @@ public abstract class XFormsEvent implements Cloneable {
 
     private Map<String, SequenceExtent> customAttributes;
 
-    // TODO: Assign for debugging
-    private LocationData locationData;
-
     protected XFormsEvent(XFormsContainingDocument containingDocument, String name, XFormsEventTarget targetObject, boolean bubbles, boolean cancelable) {
-        this.targetXBLContainer = targetObject.getXBLContainer(containingDocument);
+        this.containingDocument = containingDocument;
         this.name = name;
         this.targetObject = targetObject;
         this.bubbles = bubbles;
@@ -101,13 +97,9 @@ public abstract class XFormsEvent implements Cloneable {
     public void setCurrentObserver(XFormsEventObserver currentObserver) {
         this.currentObserver = currentObserver;
     }
-
-    public XBLContainer getTargetXBLContainer() {
-        return targetXBLContainer;
-    }
     
     protected XFormsContainingDocument getContainingDocument() {
-        return targetXBLContainer.getContainingDocument();
+        return containingDocument;
     }
 
     protected IndentedLogger getIndentedLogger() {
@@ -122,16 +114,8 @@ public abstract class XFormsEvent implements Cloneable {
         return targetObject;
     }
 
-    public boolean isBubbles() {
-        return bubbles;
-    }
-
-    public boolean isCancelable() {
-        return cancelable;
-    }
-
     public LocationData getLocationData() {
-        return locationData;
+        return null;// TODO
     }
 
     public void setAttribute(String name, SequenceExtent value) {

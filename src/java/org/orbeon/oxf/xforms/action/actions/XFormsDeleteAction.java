@@ -21,6 +21,7 @@ import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
+import org.orbeon.oxf.xforms.event.Dispatch;
 import org.orbeon.oxf.xforms.event.events.XFormsDeleteEvent;
 import org.orbeon.oxf.xforms.xbl.Scope;
 import org.orbeon.saxon.om.Item;
@@ -170,7 +171,7 @@ public class XFormsDeleteAction extends XFormsAction {
 
                 // "4. If the delete is successful, the event xforms-delete is dispatched."
                 if (doDispatch)
-                    modifiedInstance.getXBLContainer(containingDocument).dispatchEvent(new XFormsDeleteEvent(containingDocument, modifiedInstance, deleteInfos, deleteIndex));
+                    Dispatch.dispatchEvent(new XFormsDeleteEvent(containingDocument, modifiedInstance, deleteInfos, deleteIndex));
             }
         }
 

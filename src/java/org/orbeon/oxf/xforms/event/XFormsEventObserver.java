@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.event;
 
-import java.util.List;
+import scala.collection.Seq;
 
 /**
  * Represents an event observer. Implemented in particular by controls, xforms:model, xforms:instance, xforms:submission.
@@ -21,5 +21,5 @@ import java.util.List;
 public interface XFormsEventObserver extends XFormsEventTarget {
     void addListener(String eventName, EventListener listener);
     void removeListener(String eventName, EventListener listener);
-    List<EventListener> getListeners(String eventName);
+    Seq<EventListener> getListeners(String eventName);
 }

@@ -21,10 +21,9 @@ import org.orbeon.oxf.xforms._
 import analysis.controls.{RepeatIterationControl, RepeatControl}
 import analysis.ElementAnalysis
 import control._
+import event.{Dispatch, XFormsEvent, XFormsEvents}
 import org.orbeon.oxf.xforms.action.actions.XFormsDeleteAction
 import org.orbeon.oxf.xforms.action.actions.XFormsInsertAction
-import org.orbeon.oxf.xforms.event.XFormsEvent
-import org.orbeon.oxf.xforms.event.XFormsEvents
 import org.orbeon.oxf.xforms.event.events.XXFormsDndEvent
 import org.orbeon.oxf.xforms.event.events.XXFormsIndexChangedEvent
 import org.orbeon.oxf.xforms.event.events.XXFormsNodesetChangedEvent
@@ -104,7 +103,7 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
         setIndexInternal(index)
         if (oldRepeatIndex != getIndex) {
             // Dispatch custom event to notify that the repeat index has changed
-            container.dispatchEvent(new XXFormsIndexChangedEvent(containingDocument, this, oldRepeatIndex, getIndex))
+            Dispatch.dispatchEvent(new XXFormsIndexChangedEvent(containingDocument, this, oldRepeatIndex, getIndex))
         }
 
         // Handle rebuild flags for container affected by changes to this repeat
@@ -535,13 +534,13 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
             this.refreshInfo = null
             if (refreshInfo.isNodesetChanged) {
                 // Dispatch custom event to xforms:repeat to notify that the nodeset has changed
-                container.dispatchEvent(new XXFormsNodesetChangedEvent(containingDocument, this, refreshInfo.newIterations.asJava,
+                Dispatch.dispatchEvent(new XXFormsNodesetChangedEvent(containingDocument, this, refreshInfo.newIterations.asJava,
                     refreshInfo.movedIterationsOldPositions, refreshInfo.movedIterationsNewPositions))
             }
 
             if (refreshInfo.oldRepeatIndex != getIndex) {
                 // Dispatch custom event to notify that the repeat index has changed
-                container.dispatchEvent(new XXFormsIndexChangedEvent(containingDocument, this, refreshInfo.oldRepeatIndex, getIndex))
+                Dispatch.dispatchEvent(new XXFormsIndexChangedEvent(containingDocument, this, refreshInfo.oldRepeatIndex, getIndex))
             }
         }
     }

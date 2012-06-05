@@ -42,33 +42,44 @@ class PathMapXPathAnalysis(val xpathString: String,
                            val dependentInstances: collection.Set[String])
         extends XPathAnalysis {
 
-    def combine(other: XPathAnalysis): XPathAnalysis = {
-
-        if (!figuredOutDependencies || !other.figuredOutDependencies)
+    // If `values` is false, the other analysis just adds to the dependencies of the current analysis, but no new
+    // returnable values are added.
+    def combine(other: XPathAnalysis): XPathAnalysis =
+        if (! figuredOutDependencies || ! other.figuredOutDependencies)
             // Either side is negative, return a constant negative with the combined expression
             NegativeAnalysis(XPathAnalysis.combineXPathStrings(xpathString, other.xpathString))
         else
             other match {
-                case other: XPathAnalysis.ConstantXPathAnalysis ⇒
+                case _: XPathAnalysis.ConstantXPathAnalysis ⇒
                     // Other is constant positive analysis, so just return this
                     this
                 case other: PathMapXPathAnalysis ⇒
                     // Both are PathMap analysis so actually combine
-                    new PathMapXPathAnalysis(XPathAnalysis.combineXPathStrings(xpathString, other.xpathString),
+                    new PathMapXPathAnalysis(
+                        XPathAnalysis.combineXPathStrings(xpathString, other.xpathString),
                         {
                             val newPathmap = pathmap.get.clone
                             newPathmap.addRoots(other.pathmap.get.clone.getPathMapRoots)
                             Some(newPathmap)
                         },
                         true,
-                        valueDependentPaths.combine(other.valueDependentPaths),
-                        returnablePaths.combine(other.returnablePaths),
+                        valueDependentPaths combine other.valueDependentPaths,
+                        returnablePaths combine other.returnablePaths,
                         dependentModels ++ other.dependentModels,
                         dependentInstances ++ other.dependentInstances)
                 case _ ⇒
                     throw new IllegalStateException // should not happen
             }
-    }
+
+    def makeValuesDependencies =
+        new PathMapXPathAnalysis(
+            xpathString,
+            Some(pathmap.get.clone),
+            true,
+            valueDependentPaths combine returnablePaths,
+            MapSet.empty[String, String],
+            dependentModels,
+            dependentInstances)
 
     def toXML(helper: ContentHandlerHelper) {
 
@@ -141,7 +152,7 @@ object PathMapXPathAnalysis {
 
                         val newNodeset = expression.addToPathMap(clonedPathmap, clonedPathmap.findFinalNodes)
 
-                        if (!clonedPathmap.isInvalidated)
+                        if (! clonedPathmap.isInvalidated)
                             clonedPathmap.updateFinalNodes(newNodeset)
 
                         Some(clonedPathmap)
@@ -161,7 +172,7 @@ object PathMapXPathAnalysis {
                 }
 
             pathmap match {
-                case Some(pathmap) if !pathmap.isInvalidated ⇒
+                case Some(pathmap) if ! pathmap.isInvalidated ⇒
 
                     // Try to reduce ancestor axis before anything else
                     reduceAncestorAxis(pathmap)
@@ -229,7 +240,7 @@ object PathMapXPathAnalysis {
                             // Process children nodes if any
                             for (arc ← node.getArcs) {
                                 stack.push(arc.getStep)
-                                if (!processNode(arc.getTarget, node.isAtomized))
+                                if (! processNode(arc.getTarget, node.isAtomized))
                                     return false // we can't deal with this path so stop here
                                 stack.pop()
                             }
@@ -240,7 +251,7 @@ object PathMapXPathAnalysis {
 
                         for (root ← pathmap.getPathMapRoots) {
                             stack.push(root.getRootExpression)
-                            if (!processNode(root))
+                            if (! processNode(root))
                                 return false
                             stack.pop()
                         }
@@ -277,7 +288,7 @@ object PathMapXPathAnalysis {
                     if instanceExpression.isInstanceOf[Instance] || instanceExpression.isInstanceOf[XXFormsInstance] ⇒
 
                 val hasParameter = instanceExpression.getArguments.nonEmpty
-                if (!hasParameter) {
+                if (! hasParameter) {
                     // instance() resolves to default instance for scope
                     defaultInstancePrefixedId match {
                         case Some(defaultInstancePrefixedId) ⇒
@@ -318,7 +329,7 @@ object PathMapXPathAnalysis {
                                 // Instance found
 
                                 // If needed, rewrite expression to replace its argument with a prefixed instance id
-                                if (!alreadyRewritten)
+                                if (! alreadyRewritten)
                                     instanceExpression.setArguments(Array(new PrefixedIdStringLiteral(prefixedInstanceId)))
 
                                 Right(Some(prefixedInstanceId))

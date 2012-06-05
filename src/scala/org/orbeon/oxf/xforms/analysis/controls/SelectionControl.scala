@@ -32,7 +32,7 @@ trait SelectionControl extends SimpleElementAnalysis with SelectAppearanceTrait 
     // Try to figure out if we have dynamic items. This attempts to cover all cases, including
     // nested xforms:output controls. Check only under xforms:choices, xforms:item and xforms:itemset so that we
     // don't check things like event handlers. Also check for AVTs ion @class and @style.
-    val hasStaticItemset = !XPathCache.evaluateSingle(new DocumentWrapper(element.getDocument, null, XPathCache.getGlobalConfiguration).wrap(element),
+    val hasStaticItemset = ! XPathCache.evaluateSingle(new DocumentWrapper(element.getDocument, null, XPathCache.getGlobalConfiguration).wrap(element),
             "exists((xforms:choices | xforms:item | xforms:itemset)/(., .//xforms:*)[@ref or @nodeset or @bind or @value or @*[contains(., '{')]])",
             XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING, null, null, null, null, locationData).asInstanceOf[Boolean]
 
@@ -65,15 +65,15 @@ trait SelectionControl extends SimpleElementAnalysis with SelectAppearanceTrait 
 
             val stack: Stack[SimpleElementAnalysis] = Stack(SelectionControl.this)
 
-            def startElement(element: Element) {
+            def startElement(element: Element): Unit = {
 
                 // Make lazy as might not be used
                 lazy val itemElementAnalysis = new SimpleElementAnalysis(staticStateContext, element, Some(stack.top), None, stack.top.getChildElementScope(element)) with ValueTrait with ViewTrait
 
-                def processElement(qName: QName, doRequire: Boolean) {
+                def processElement(qName: QName, required: Boolean) {
                     val nestedElement = element.element(qName)
 
-                    if (doRequire)
+                    if (required)
                         require(nestedElement ne null)
 
                     if (nestedElement ne null) {
@@ -87,16 +87,33 @@ trait SelectionControl extends SimpleElementAnalysis with SelectAppearanceTrait 
 
                     case ITEM_QNAME | ITEMSET_QNAME ⇒
 
+                        // Analyze container and add as a value dependency
+                        // We add this as dependency because the itemset must also be recomputed if any returned item of
+                        // a container is changing. That's because that influences whether the item is present or not,
+                        // as in:
+                        //
+                        // <xf:itemset ref=".[not(context() = instance('foo'))]">
+                        //   <xf:label>Year</xf:label>
+                        //   <xf:value/>
+                        // </xf:itemset>
+                        //
+                        // This is not an issue with controls, as container relevance ensures we don't evaluate nested
+                        // expressions, but it must be done for itemsets.
+                        //
+                        // See also #289 https://github.com/orbeon/orbeon-forms/issues/289
                         itemElementAnalysis.analyzeXPath()
+                        combinedAnalysis = combinedAnalysis combine itemElementAnalysis.getBindingAnalysis.get.makeValuesDependencies
 
-                        processElement(LABEL_QNAME, true)
-                        processElement(XFORMS_VALUE_QNAME, true)
+                        processElement(LABEL_QNAME, required = true)
+                        processElement(XFORMS_VALUE_QNAME, required = true)
 
                     case CHOICES_QNAME ⇒
 
+                        // Analyze container and add as a value dependency (see above)
                         itemElementAnalysis.analyzeXPath()
+                        combinedAnalysis = combinedAnalysis combine itemElementAnalysis.getBindingAnalysis.get.makeValuesDependencies
 
-                        processElement(LABEL_QNAME, false) // label is optional on xf:choices
+                        processElement(LABEL_QNAME, required = false) // label is optional on xf:choices
 
                         // Always push the container
                         stack push itemElementAnalysis
@@ -151,7 +168,7 @@ trait SelectionControl extends SimpleElementAnalysis with SelectAppearanceTrait 
 
             private var currentContainer: ItemContainer = result
 
-            def startElement(element: Element) {
+            def startElement(element: Element): Unit = {
 
                 element.getQName match {
 
@@ -194,7 +211,7 @@ trait SelectionControl extends SimpleElementAnalysis with SelectAppearanceTrait 
             }
 
             def endElement(element: Element): Unit =
-                if (element == CHOICES_QNAME) {
+                if (element.getQName == CHOICES_QNAME) {
                     // xforms:choices
                     val labelElement = element.element(LABEL_QNAME)
                     if (labelElement ne null)

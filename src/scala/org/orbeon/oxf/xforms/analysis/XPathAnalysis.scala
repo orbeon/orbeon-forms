@@ -13,13 +13,14 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import org.orbeon.oxf.xml.ContentHandlerHelper
 import org.orbeon.oxf.xforms.MapSet
+import org.orbeon.oxf.xml.XMLUtils.DebugXML
+import org.orbeon.oxf.xml.ContentHandlerHelper
 
 /**
  * Abstract representation of an XPath analysis as usable by the XForms engine.
  */
-abstract class XPathAnalysis {
+abstract class XPathAnalysis extends DebugXML  {
 
     val xpathString: String
     val figuredOutDependencies: Boolean
@@ -42,10 +43,11 @@ abstract class XPathAnalysis {
 
     def intersectsModels(touchedModels: collection.Set[String]) = dependentModels exists (touchedModels contains _)
 
-    /**
-     * Combine this analysis with another one and return a new analysis.
-     */
+    // Combine this analysis with another one and return a new analysis
     def combine(other: XPathAnalysis): XPathAnalysis
+
+    // Convert this analysis into the same analysis, where values have become dependencies
+    def makeValuesDependencies: XPathAnalysis
 
     def toXML(helper: ContentHandlerHelper)
 
@@ -69,6 +71,8 @@ object XPathAnalysis {
         val returnablePaths = MapSet.empty[String, String]
         val valueDependentPaths = MapSet.empty[String, String]
 
+        def makeValuesDependencies = this
+
         def toXML(helper: ContentHandlerHelper) =
             helper.element("analysis", Array("expression", xpathString, "analyzed", figuredOutDependencies.toString))
     }
@@ -85,9 +89,9 @@ object NegativeAnalysis {
 
 object StringAnalysis {
 
-    private val CONSTANT_ANALYSIS = new XPathAnalysis.ConstantXPathAnalysis("'CONSTANT'", true) {
+    private val ConstantAnalysis = new XPathAnalysis.ConstantXPathAnalysis("'CONSTANT'", true) {
         override def combine(other: XPathAnalysis) = other
     }
 
-    def apply(): XPathAnalysis = CONSTANT_ANALYSIS
+    def apply(): XPathAnalysis = ConstantAnalysis
 }

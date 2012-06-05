@@ -5447,8 +5447,9 @@
                         </analysis>
                     </value>
                     <itemset>
-                        <analysis expression="(xs:string(.[1])) | (xs:string(.[1]))" analyzed="true">
+                        <analysis expression="((../item) | (xs:string(.[1]))) | (xs:string(.[1]))" analyzed="true">
                             <value-dependent>
+                                <path>instance('instance')/item</path>
                                 <path>instance('instance')/item/label</path>
                                 <path>instance('instance')/item/value</path>
                             </value-dependent>
@@ -5553,19 +5554,26 @@
                         </analysis>
                     </value>
                     <itemset>
-                        <analysis expression="((((((((((((xs:string(.[1])) | (xs:string((value)[1]))) | (xs:string(.[1]))) | (xs:string(.[1]))) | (xs:string(.[1]))) | (xs:string(.[1]))) | (xs:string((value)[1]))) | (xs:string(.[1]))) | (xs:string(.[1]))) | (xs:string(.[1]))) | (xs:string((item1/value)[1]))) | (xs:string(.[1]))) | (xs:string((value)[1]))" analyzed="true">
+                        <analysis expression="((((((((((((((((((((../item) | (xs:string(.[1]))) | (xs:string((value)[1]))) | (item)) | (xs:string(.[1]))) | (xs:string(.[1]))) | (../choices)) | (xs:string(.[1]))) | (item)) | (xs:string(.[1]))) | (xs:string((value)[1]))) | (itemset)) | (xs:string(.[1]))) | (xs:string(.[1]))) | (items)) | (items)) | (xs:string(.[1]))) | (xs:string((item1/value)[1]))) | (item2)) | (xs:string(.[1]))) | (xs:string((value)[1]))" analyzed="true">
                             <value-dependent>
+                                <path>instance('instance1')/item</path>
                                 <path>instance('instance1')/item/label</path>
                                 <path>instance('instance1')/item/value</path>
+                                <path>instance('instance1')/itemset/item</path>
                                 <path>instance('instance1')/itemset/item/label</path>
                                 <path>instance('instance1')/itemset/item/value</path>
+                                <path>instance('instance1')/choices</path>
                                 <path>instance('instance1')/choices/label</path>
+                                <path>instance('instance1')/choices/item</path>
                                 <path>instance('instance1')/choices/item/label</path>
                                 <path>instance('instance1')/choices/item/value</path>
+                                <path>instance('instance1')/choices/itemset</path>
                                 <path>instance('instance1')/choices/itemset/label</path>
                                 <path>instance('instance1')/choices/itemset/value</path>
+                                <path>instance('instance2')/items</path>
                                 <path>instance('instance2')/items/item1/label</path>
                                 <path>instance('instance2')/items/item1/value</path>
+                                <path>instance('instance2')/items/item2</path>
                                 <path>instance('instance2')/items/item2/label</path>
                                 <path>instance('instance2')/items/item2/value</path>
                             </value-dependent>

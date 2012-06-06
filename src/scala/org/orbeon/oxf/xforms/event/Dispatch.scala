@@ -24,6 +24,7 @@ import org.orbeon.oxf.xml.dom4j.ExtendedLocationData
 import org.orbeon.oxf.util.DebugLogger._
 import collection.mutable.Buffer
 import util.control.Breaks
+import XFormsEvent.Phase
 
 object Dispatch {
 
@@ -44,24 +45,35 @@ object Dispatch {
             } finally
                 containingDocument.endHandleEvent()
 
-        // Handle the given event on the given observer
-        def handleEvent(event: XFormsEvent, observer: XFormsEventObserver) = {
+        // Call all the handlers relevant for the given event on the given observer
+        def callHandlers(event: XFormsEvent, observer: XFormsEventObserver, phase: Phase) = {
 
             var propagate = true
             var performDefaultAction = true
 
             def handlersForObserver(observer: XFormsEventObserver) = {
-                def part = observer.getXBLContainer(containingDocument).getPartAnalysis
+                val part = observer.getXBLContainer(containingDocument).getPartAnalysis
                 part.getEventHandlers(observer.getPrefixedId)
             }
 
             def matches(eventHandler: EventHandler) =
-                (eventHandler.isCapturePhaseOnly && event.getCurrentPhase == XFormsEvent.Phase.capture ||
-                 eventHandler.isTargetPhase      && event.getCurrentPhase == XFormsEvent.Phase.target   ||
-                 eventHandler.isBubblingPhase    && event.getCurrentPhase == XFormsEvent.Phase.bubbling && originalEvent.bubbles) && eventHandler.isMatch(event)
+                (eventHandler.isCapturePhaseOnly && event.getCurrentPhase == Phase.capture ||
+                 eventHandler.isTargetPhase      && event.getCurrentPhase == Phase.target   ||
+                 eventHandler.isBubblingPhase    && event.getCurrentPhase == Phase.bubbling && originalEvent.bubbles) && eventHandler.isMatch(event)
+
+            // For target phase, also perform "action at target" before running event handler
+            // NOTE: As of 2011-03-07, this is used XFormsInstance for xforms-insert/xforms-delete processing,
+            // and in XFormsUploadControl for upload processing.
+            // NOTE: Possibly testing on retargetedEvent.getTargetObject() might be more correct, but we should
+            // fix event retargeting to make more sense in the first place.
+            if (phase == Phase.target)
+                withEvent(event) {
+                    observer.performTargetAction(observer.getXBLContainer(containingDocument), event)
+                }
 
             for (handler ← handlersForObserver(observer) filter matches) {
-                withDebug("handler", Seq("phase" → event.getCurrentPhase.name(), "observer" → observer.getEffectiveId)) {// TODO logging
+
+                withDebug("handler", Seq("phase" → event.getCurrentPhase.name(), "observer" → observer.getEffectiveId)) {// TODO meaningful logging
                     withEvent(event) {
                         handler.handleEvent(containingDocument, observer, event)
                     }
@@ -76,109 +88,107 @@ object Dispatch {
                 performDefaultAction &= handler.isPerformDefaultAction
             }
 
+            // For target or bubbling phase, also call native listeners
+            // TODO: Would be nice to have all listeners exposed this way
+            if (Set(Phase.target, Phase.bubbling)(phase))
+                for (listener ← observer.getListeners(originalEvent.getName))
+                    withEvent(event) {
+                        listener.handleEvent(event)
+                    }
+
             (propagate, performDefaultAction)
         }
 
-        def nextOrNull(i: Iterator[XFormsEventObserver]) = if (i.hasNext) i.next() else null
+        // Encapsulate all the dirty retargeting stuff
+        object Retargeter {
+
+            private var _retargetedEvents: Iterator[XFormsEvent] = null
+            private var _boundaryIterator: Iterator[XFormsEventObserver] = null
+
+            private var _retargetedEvent: XFormsEvent = null
+            private var _nextBoundary: XFormsEventObserver = null
+
+            def reset(retargetedEvents: Iterator[XFormsEvent], boundaryIterator: Iterator[XFormsEventObserver]) = {
+
+                _retargetedEvents = retargetedEvents
+                _boundaryIterator = boundaryIterator
+
+                _retargetedEvent = _retargetedEvents.next()
+                _nextBoundary = nextOrNull(boundaryIterator)
+            }
+
+            def retargetIfNeeded(observer: XFormsEventObserver) =
+                if (_nextBoundary eq observer) {
+                    _nextBoundary = nextOrNull(_boundaryIterator)
+                    _retargetedEvent = _retargetedEvents.next()
+
+                    debug("retargeting",
+                        Seq("name"            → originalEvent.getName,
+                            "original target" → targetObject.getEffectiveId,
+                            "new target"      → _retargetedEvent.getTargetObject.getEffectiveId))
+                }
+
+            def currentEvent(observer: XFormsEventObserver, phase: Phase) = {
+                _retargetedEvent.setCurrentObserver(observer)
+                _retargetedEvent.setCurrentPhase(phase)
+
+                _retargetedEvent
+            }
+
+            private def nextOrNull(i: Iterator[XFormsEventObserver]) = if (i.hasNext) i.next() else null
+        }
 
         try {
             withDebug("dispatching", Seq("name" → originalEvent.getName, "id" → targetObject.getEffectiveId, "location" → (Option(originalEvent.getLocationData) map (_.toString) orNull))) {
-                // Find all observers
-                val (boundaries, eventObservers) = findObservers(targetObject, originalEvent)
+
                 var propagate = true
                 var performDefaultAction = true
 
-                val boundariesFromRoot = boundaries.reverse
-                val retargetedEventsFromRoot = (boundariesFromRoot map (originalEvent.retarget(_))) :+ originalEvent
-
-                breakable {
-                    // Handle event retargeting
-                    val retargetedEvents = retargetedEventsFromRoot.iterator
-                    var retargetedEvent = retargetedEvents.next()
-
-                    val boundaryIterator = boundariesFromRoot.iterator
-                    var nextBoundary = nextOrNull(boundaryIterator)
-
-                    // Capture phase, from root to leaf, ignoring the last observer which is the target
-                    for (observer ← eventObservers.reverse.init) {
-
-                        // Update event with current phase and observer
-                        retargetedEvent.setCurrentPhase(XFormsEvent.Phase.capture)
-                        retargetedEvent.setCurrentObserver(observer)
-
-                        // Process event handlers
-                        val (propagate1, performDefaultAction1) = handleEvent(retargetedEvent, observer)
-
-                        propagate &= propagate1
-                        performDefaultAction &= performDefaultAction1
-
-                        // Cancel propagation if requested
-                        if (! propagate)
-                            break()
-
-                        // Handle event retargeting
-                        if (nextBoundary eq observer) {
-                            nextBoundary = nextOrNull(boundaryIterator)
-                            retargetedEvent = retargetedEvents.next()
-
-                            debug("retargeting", Seq("name" → originalEvent.getName, "original id" → targetObject.getEffectiveId, "new id" → targetObject.getEffectiveId))
-                        }
-                    }
-                }
-
-                // Target and bubbling phases
-                if (propagate) {
+                // Run all observers for the given phase
+                def doPhase(observers: Seq[XFormsEventObserver], phase: Phase) =
                     breakable {
-                        // Handle event retargeting
-                        val retargetedEvents = retargetedEventsFromRoot.reverseIterator
-                        var retargetedEvent = retargetedEvents.next()
+                        for (observer ← observers) {
 
-                        val boundaryIterator = boundaries.iterator
-                        var nextBoundary = nextOrNull(boundaryIterator)
+                            if (phase == Phase.bubbling)
+                                Retargeter.retargetIfNeeded(observer)
 
-                        // Go from leaf to root
-                        for (observer ← eventObservers) {
-                            // Handle event retargeting
-                            if (nextBoundary eq observer) {
-                                nextBoundary = nextOrNull(boundaryIterator)
-                                retargetedEvent = retargetedEvents.next()
+                            // Call event handlers
+                            val (localPropagate, localPerformDefaultAction) =
+                                callHandlers(Retargeter.currentEvent(observer, phase), observer, phase)
 
-                                debug("retargeting", Seq("name" → originalEvent.getName, "original id" → targetObject.getEffectiveId, "new id" → targetObject.getEffectiveId))
-                            }
-
-                            // Process "action at target"
-                            // NOTE: As of 2011-03-07, this is used XFormsInstance for xforms-insert/xforms-delete processing,
-                            // and in XFormsUploadControl for upload processing.
-                            // NOTE: Possibly testing on retargetedEvent.getTargetObject() might be more correct, but we should
-                            // fix event retargeting to make more sense in the first place.
-                            val isAtTarget = observer eq targetObject
-                            if (isAtTarget)
-                                withEvent(retargetedEvent) {
-                                    observer.performTargetAction(observer.getXBLContainer(containingDocument), retargetedEvent)
-                                }
-
-                            // Update event with current phase and observer
-                            retargetedEvent.setCurrentPhase(if (isAtTarget) XFormsEvent.Phase.target else XFormsEvent.Phase.bubbling)
-                            retargetedEvent.setCurrentObserver(observer)
-
-                            // Process event handlers
-                            val (propagate1, performDefaultAction1) = handleEvent(retargetedEvent, observer)
-
-                            propagate &= propagate1
-                            performDefaultAction &= performDefaultAction1
-
-                            // Custom event listeners
-                            // TODO: Would be nice to have all listeners exposed this way
-                            for (listener ← observer.getListeners(originalEvent.getName))
-                                withEvent(retargetedEvent) {
-                                    listener.handleEvent(retargetedEvent)
-                                }
+                            propagate &= localPropagate
+                            performDefaultAction &= localPerformDefaultAction
 
                             // Cancel propagation if requested
                             if (! propagate)
                                 break()
+
+                            if (phase == Phase.capture)
+                                Retargeter.retargetIfNeeded(observer)
                         }
                     }
+
+                // Find all boundaries and observers
+                val (boundaries, eventObservers) = findObservers(targetObject, originalEvent)
+
+                val boundariesFromRoot = boundaries.reverse
+                val retargetedEventsFromRoot = (boundariesFromRoot map (originalEvent.retarget(_))) :+ originalEvent
+
+                // Capture phase
+                locally {
+                    Retargeter.reset(retargetedEventsFromRoot.iterator, boundariesFromRoot.iterator)
+                    doPhase(eventObservers.reverse.init, Phase.capture)
+                }
+
+                // Target phase
+                if (propagate) {
+                    Retargeter.reset(retargetedEventsFromRoot.reverseIterator, boundaries.iterator)
+                    doPhase(Seq(eventObservers.head), Phase.target)
+                }
+
+                // Bubbling phase
+                if (propagate) {
+                    doPhase(eventObservers.tail, Phase.bubbling)
                 }
 
                 // Perform default action if allowed to
@@ -203,7 +213,7 @@ object Dispatch {
 
         val doc = event.containingDocument
 
-        val startObserver = targetObject match {
+        val targetObserver = targetObject match {
             case targetObject: XFormsEventObserver ⇒ targetObject
             case _ ⇒ throw new IllegalArgumentException // this must not happen with the current class hierarchy
         }
@@ -224,7 +234,7 @@ object Dispatch {
         val boundaries = Buffer[XFormsEventObserver]()
 
         // Iterator over all observers
-        val commonIterator = new ObserverIterator(startObserver, doc)
+        val commonIterator = new ObserverIterator(targetObserver, doc)
 
         // Iterator over all the observers we need to handle
         val observerIterator =

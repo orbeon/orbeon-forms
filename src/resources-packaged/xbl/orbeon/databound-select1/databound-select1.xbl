@@ -44,7 +44,7 @@
                     <xforms:label ref=""/>
                     <xforms:hint ref=""/>
                     <xforms:help ref=""/>
-                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
+                    <xforms:alert ref=""/>
                     <xforms:itemset ref="">
                         <xforms:label ref=""/>
                         <xforms:value ref=""/>

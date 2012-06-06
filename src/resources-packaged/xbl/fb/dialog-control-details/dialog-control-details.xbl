@@ -115,7 +115,8 @@
                     <xf:action iterate="$local/fb:control-details/*">
                         <xf:var name="position" value="position()"/>
                         <xf:var name="xforms-control" value="."/>
-                        <xf:insert context="$local/control-details" ref="*" origin="xxf:element('control-detail', string($control/saxon:evaluate($xforms-control/@ref)))"/>
+                        <xf:var name="control-ref" value="$control/saxon:eval(saxon:expression($xforms-control/@ref, $xforms-control/@ref))"/>
+                        <xf:insert context="$local/control-details" ref="*" origin="xxf:element('control-detail', string($control-ref))"/>
                     </xf:action>
                 </xf:action>
 
@@ -149,7 +150,7 @@
                         <xf:var name="position" value="position()"/>
                         <xf:var name="bound-node" value="$local/control-details/*[$position]"/>
                         <xf:var name="xforms-control" value="."/>
-                        <xf:setvalue ref="$control/saxon:evaluate($xforms-control/@ref)" value="$bound-node"/>
+                        <xf:setvalue ref="$control/saxon:eval(saxon:expression($xforms-control/@ref, $xforms-control/@ref))" value="$bound-node"/>
                     </xf:action>
                     <xxf:hide dialog="dialog"/>
                 </xf:action>

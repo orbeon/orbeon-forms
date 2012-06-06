@@ -168,7 +168,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
      */
     public XFormsContainingDocument(XFormsStaticState staticState, AnnotatedTemplate template,
                                     XFormsURIResolver uriResolver, ExternalContext.Response response) {
-        super(CONTAINING_DOCUMENT_PSEUDO_ID, CONTAINING_DOCUMENT_PSEUDO_ID, CONTAINING_DOCUMENT_PSEUDO_ID, "", null, null, null);
+        super(CONTAINING_DOCUMENT_PSEUDO_ID, CONTAINING_DOCUMENT_PSEUDO_ID, "", null, null, null);
 
         // Remember location data
         setLocationData(staticState.locationData());
@@ -283,7 +283,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
      * @param disableUpdates    whether to disable updates (for recreating initial document upon browser back)
      */
     public XFormsContainingDocument(XFormsState xformsState, boolean disableUpdates) {
-        super(CONTAINING_DOCUMENT_PSEUDO_ID, CONTAINING_DOCUMENT_PSEUDO_ID, CONTAINING_DOCUMENT_PSEUDO_ID, "", null, null, null);
+        super(CONTAINING_DOCUMENT_PSEUDO_ID, CONTAINING_DOCUMENT_PSEUDO_ID, "", null, null, null);
 
         // 1. Restore the static state
         {

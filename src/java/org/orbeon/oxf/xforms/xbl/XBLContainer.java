@@ -54,8 +54,6 @@ public class XBLContainer implements XFormsObjectResolver {
     public static final String XFORMS_DYNAMIC_STATE_RESTORE_INSTANCES = "xforms-dynamic-state-instances";
     protected static final String XFORMS_DYNAMIC_STATE_RESTORE_CONTROLS = "xforms-dynamic-state-controls";
 
-    // Static id of the control containing this container, e.g. "#document" for root container, "my-foo-bar", etc.
-    private String staticId;
     // Effective id of the control containing this container, e.g. "#document" for root container, "my-stuff$my-foo-bar.1-2", etc.
     private String effectiveId;
     // Prefixed id of the control containing this container, e.g. "#document" for root container, "my-stuff$my-foo-bar", etc.
@@ -103,18 +101,16 @@ public class XBLContainer implements XFormsObjectResolver {
     }
 
     protected XBLContainer(XFormsControl associatedControl, XBLContainer parentXBLContainer, Scope innerScope) {
-        this(XFormsUtils.getStaticIdFromId(associatedControl.getEffectiveId()),
-                associatedControl.getEffectiveId(),
-                XFormsUtils.getPrefixedId(associatedControl.getEffectiveId()),
-                XFormsUtils.getPrefixedId(associatedControl.getEffectiveId()) + XFormsConstants.COMPONENT_SEPARATOR,
-                parentXBLContainer,
-                associatedControl,
-                innerScope);
+        this(associatedControl.getEffectiveId(),
+             XFormsUtils.getPrefixedId(associatedControl.getEffectiveId()),
+             XFormsUtils.getPrefixedId(associatedControl.getEffectiveId()) + XFormsConstants.COMPONENT_SEPARATOR,
+             parentXBLContainer,
+             associatedControl,
+             innerScope);
     }
 
-    protected XBLContainer(String staticId, String effectiveId, String prefixedId, String fullPrefix, XBLContainer parentXBLContainer, XFormsControl associatedControl, Scope innerScope) {
+    protected XBLContainer(String effectiveId, String prefixedId, String fullPrefix, XBLContainer parentXBLContainer, XFormsControl associatedControl, Scope innerScope) {
 
-        this.staticId = staticId;
         this.effectiveId = effectiveId;
         this.prefixedId = prefixedId;
         this.fullPrefix = fullPrefix;
@@ -158,7 +154,6 @@ public class XBLContainer implements XFormsObjectResolver {
         }
 
         // Update all ids
-        this.staticId = XFormsUtils.getStaticIdFromId(effectiveId);
         this.effectiveId = effectiveId;
         this.prefixedId = XFormsUtils.getPrefixedId(effectiveId);
         this.fullPrefix = this.prefixedId + XFormsConstants.COMPONENT_SEPARATOR;
@@ -735,10 +730,6 @@ public class XBLContainer implements XFormsObjectResolver {
         containingDocument.getControls().refreshIfNeeded(this);
     }
 
-    public String getId() {
-        return staticId;
-    }
-
     public String getPrefixedId() {
         return prefixedId;
     }
@@ -749,10 +740,6 @@ public class XBLContainer implements XFormsObjectResolver {
 
     public LocationData getLocationData() {
         return locationData;
-    }
-
-    public Scope getScope(XFormsContainingDocument containingDocument) {
-        return getResolutionScope();
     }
 
     public void setLocationData(LocationData locationData) {

@@ -30,16 +30,16 @@ class XFormsUploadControlTest extends ResourceManagerTestBase with AssertionsFor
         val signed = hmacFromSeq(parameters)
 
         // Basic asserts
-        assert("file:/foo/bar.tmp?filename=bar.png&mediatype=image%2Fpng&size=1234&signature=2db6140c988970391e8cd1513af3cc3a3dbcf6ff" === signed)
-        assert(Some("2db6140c988970391e8cd1513af3cc3a3dbcf6ff") === getSignature(signed))
-        assert("file:/foo/bar.tmp?filename=bar.png&mediatype=image%2Fpng&size=1234" === removeSignature(signed))
+        assert("file:/foo/bar.tmp?filename=bar.png&mediatype=image%2Fpng&size=1234&mac=2db6140c988970391e8cd1513af3cc3a3dbcf6ff" === signed)
+        assert(Some("2db6140c988970391e8cd1513af3cc3a3dbcf6ff") === getMAC(signed))
+        assert("file:/foo/bar.tmp?filename=bar.png&mediatype=image%2Fpng&size=1234" === removeMAC(signed))
 
-        assert(true === verifyHmacURL(signed))
+        assert(true === verifyMAC(signed))
 
-        // Modify each parameter in turn and make sure the signature is different
+        // Modify each parameter in turn and make sure the MAC is different
         for (pos ← 0 to parameters.size - 1) {
             val newParameters = parameters.updated(pos, parameters(pos) + 'x')
-            assert(getSignature(signed) != getSignature(hmacFromSeq(newParameters)))
+            assert(getMAC(signed) != getMAC(hmacFromSeq(newParameters)))
         }
     }
 }

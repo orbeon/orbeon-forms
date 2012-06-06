@@ -130,7 +130,7 @@ class XFormsOutputControl(container: XBLContainer, parent: XFormsControl, elemen
 
         // If the value is a file:, we make sure it is signed before returning it
         def hmacValueOrDefault(initial: String, value: ⇒ String, default: ⇒ String) =
-            if (initial.startsWith("file:/") && ! XFormsUploadControl.verifyHmacURL(initial))
+            if (initial.startsWith("file:/") && ! XFormsUploadControl.verifyMAC(initial))
                 default
             else
                 value

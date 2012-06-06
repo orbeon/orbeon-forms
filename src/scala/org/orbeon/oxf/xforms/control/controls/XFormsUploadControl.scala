@@ -140,7 +140,7 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
                             val newFile = NetUtils.renameAndExpireWithSession(newValue, getIndentedLogger.getLogger)
                             val newFileURL = newFile.toURI.toString
 
-                            // The result is a file: append a signature
+                            // The result is a file: append a MAC
                             hmacURL(newFileURL, Option(filename), Option(mediatype), Option(size))
                         }
                     }
@@ -202,15 +202,15 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
 
 object XFormsUploadControl {
 
-    // Append metadata and signature to the URl
-    // The idea is that whenever the upload control stores a local file: URL, that URL contains a signature. This
-    // allows:
+    // Append metadata and MAC to the URl
+    // The idea is that whenever the upload control stores a local file: URL, that URL contains a MAC (message
+    // authentication code). This allows:
     //
     // - making sure that the URL has not been tampered with (e.g. xf:output now uses this so that you can't point it to
     //   any file: URL)
     // - easily searching instance for uploaded resources
     //
-    // The signature includes the URL protocol, path and metadata
+    // The MAC includes the URL protocol, path and metadata
     def hmacURL(url: String, filename: Option[String], mediatype: Option[String], size: Option[String]) = {
 
         val candidates = Seq(
@@ -222,18 +222,18 @@ object XFormsUploadControl {
         val query = candidates collect { case (name, Some(value)) ⇒ name + '=' + URLEncoder.encode(value, "utf-8") } mkString "&"
         val urlWithQuery = NetUtils.appendQueryString(url, query)
 
-        NetUtils.appendQueryString(urlWithQuery, "signature=" + hmacSignature(urlWithQuery))
+        NetUtils.appendQueryString(urlWithQuery, "mac=" + hmac(urlWithQuery))
     }
 
-    // Get the signature for a given string
-    def hmacSignature(value: String) =
+    // Get the MAC for a given string
+    def hmac(value: String) =
         SecureUtils.hmacString(XFormsProperties.getXFormsPassword, value, "sha-1", "hex")
 
-    // Remove the signature from the URL
-    def removeSignature(url: String) = {
+    // Remove the MAC from the URL
+    def removeMAC(url: String) = {
         val uri = new URI(url)
         val query = decodeSimpleQuery(Option(uri.getQuery))
-        val filteredQuery = query filterNot (_._1 == "signature") map { case (name, value) ⇒ name + '=' + URLEncoder.encode(value, "utf-8") } mkString "&"
+        val filteredQuery = query filterNot (_._1 == "mac") map { case (name, value) ⇒ name + '=' + URLEncoder.encode(value, "utf-8") } mkString "&"
 
         NetUtils.appendQueryString(url.substring(0, url.indexOf('?')), filteredQuery)
     }
@@ -249,18 +249,15 @@ object XFormsUploadControl {
     // For Java callers
     def getParameterOrNull(url: String, name: String) = getParameter(url, name).orNull
 
-    // Get the signature from the URL
-    def getSignature(url: String) = getParameter(url, "signature")
+    // Get the MAC from the URL
+    def getMAC(url: String) = getParameter(url, "mac")
 
-    // Check that the given URL is properly signed
-    def verifyHmacURL(url: String) = {
-        getSignature(url) match {
-            case Some(signature) ⇒
-                hmacSignature(removeSignature(url)) == signature
-            case None ⇒
-                false
+    // Check that the given URL as a correct MAC
+    def verifyMAC(url: String) =
+        getMAC(url) match {
+            case Some(mac) ⇒ hmac(removeMAC(url)) == mac
+            case None      ⇒ false
         }
-    }
 
     private def decodeSimpleQuery(queryOption: Option[String]): Seq[(String, String)] =
         for {

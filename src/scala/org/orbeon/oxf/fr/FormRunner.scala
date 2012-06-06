@@ -297,7 +297,7 @@ object FormRunner {
     //
     // This guarantees that the local file was in fact placed there by the upload control, and not tampered with.
     def isUploadedFileURL(value: String): Boolean =
-        value.startsWith("file:/") && XFormsUploadControl.verifyHmacURL(value)
+        value.startsWith("file:/") && XFormsUploadControl.verifyMAC(value)
 
     // Create a new attachment path
     def createAttachmentPath(app: String, form: String, document: String, localURL: String): String = {

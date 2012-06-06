@@ -32,9 +32,7 @@ public class XFormsRebuildAction extends XFormsAction {
                         Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
 
         final XFormsContainingDocument containingDocument = actionInterpreter.containingDocument();
-
-        final String modelId = actionElement.attributeValue(XFormsConstants.MODEL_QNAME);
-        final XFormsModel model = actionInterpreter.resolveModel(actionElement, modelId);
+        final XFormsModel model = actionInterpreter.actionXPathContext().getCurrentModel();
 
         // Because of inter-model dependencies, we consider for now that the action must force the operation
         model.getDeferredActionContext().rebuild = true;

@@ -44,7 +44,10 @@ class DateUtilsTest extends AssertionsForJUnit {
         for ((value, expected) ← valuesWithExplicitTz)
             assert(expected === DateUtils.parse(value))
 
-        assert(1338320104000L === DateUtils.parseRFC1123("Tue, 29 May 2012 19:35:04 GMT"))
+        // Test all 3 HTTP date formats
+        for (value ← Seq("Tue, 29 May 2012 19:35:04 GMT", "Tuesday, 29-May-12 19:35:04 GMT", "Tue May 29 19:35:04 2012"))
+            assert(1338320104000L === DateUtils.parseRFC1123(value))
+
     }
 
     @Test def format(): Unit = {

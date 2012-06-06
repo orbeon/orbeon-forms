@@ -32,8 +32,6 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;
 import java.net.*;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -47,12 +45,6 @@ public class NetUtils {
 
     public static final int COPY_BUFFER_SIZE = 8192;
     public static final String STANDARD_PARAMETER_ENCODING = "utf-8";
-
-    private static final SimpleDateFormat dateHeaderFormats[] = {
-        new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.US),
-        new SimpleDateFormat("EEEEEE, dd-MMM-yy HH:mm:ss zzz", Locale.US),
-        new SimpleDateFormat("EEE MMMM d HH:mm:ss yyyy", Locale.US)
-    };
 
     private static final TimeZone gmtZone = TimeZone.getTimeZone("GMT");
     private static FileItemFactory fileItemFactory;
@@ -68,25 +60,13 @@ public class NetUtils {
     public static final String APPLICATION_SOAP_XML = "application/soap+xml";
 
     static {
-        // Set timezone to GMT as required for HTTP headers
-        for (SimpleDateFormat dateHeaderFormat: dateHeaderFormats)
-            dateHeaderFormat.setTimeZone(gmtZone);
-
         final String token = "[^=&]";
         PATTERN_NO_AMP = Pattern.compile( "(" + token + "+)=(" + token + "*)(?:&|(?<!&)\\z)" );
         PATTERN_AMP = Pattern.compile( "(" + token + "+)=(" + token + "*)(?:&amp;|&|(?<!&amp;|&)\\z)" );
     }
 
-    public static long getDateHeader(String stringValue) throws ParseException {
-        for (SimpleDateFormat dateHeaderFormat: dateHeaderFormats) {
-            try {
-                Date date = dateHeaderFormat.parse(stringValue);
-                return date.getTime();
-            } catch (Exception e) {// used to be ParseException, but NumberFormatException may be thrown as well
-                // Ignore and try next
-            }
-        }
-        throw new ParseException(stringValue, 0);
+    public static long getDateHeader(String stringValue) {
+        return DateUtils.parseRFC1123(stringValue);
     }
 
     /**

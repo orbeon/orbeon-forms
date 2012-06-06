@@ -22,6 +22,7 @@ import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.SignatureVerifierProcessor;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
+import org.orbeon.oxf.util.DateUtils;
 import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.analysis.DumbXPathDependencies;
@@ -31,8 +32,6 @@ import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 
 import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.StringTokenizer;
 
@@ -103,17 +102,13 @@ public class PEVersion extends Version {
         final String email = XPathUtils.selectStringValueNormalize(licenceDocument, "/license/email");
         final String issued = XPathUtils.selectStringValueNormalize(licenceDocument, "/license/issued");
         final String version = XPathUtils.selectStringValueNormalize(licenceDocument, "/license/version");
-        final Date expiration;
-        try {
+        final Date expiration; {
             final String expireStr = XPathUtils.selectStringValueNormalize(licenceDocument, "/license/expiration");
             if (StringUtils.isNotBlank(expireStr)) {
-                final SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-                expiration = df.parse(expireStr);
+                expiration = new Date(DateUtils.parse(expireStr));
             } else {
                 expiration = null;
             }
-        } catch (ParseException e) {
-            throw new OXFException(e);
         }
 
         // Check version

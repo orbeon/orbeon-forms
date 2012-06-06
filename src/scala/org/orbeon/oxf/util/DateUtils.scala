@@ -28,7 +28,16 @@ object DateUtils {
     val DateTime = ISODateTimeFormat.dateTime().withZoneUTC()
 
     // RFC 1123 format
-    val RFC1123Date    = withLocaleTZ(DateTimeFormat forPattern "EEE, dd MMM yyyy HH:mm:ss 'GMT'")
+    // RFC 2616 says: "The first format is preferred as an Internet standard and represents a fixed-length subset of
+    // that defined by RFC 1123 [8] (an update to RFC 822 [9]). The second format is in common use, but is based on the
+    // obsolete RFC 850 [12] date format and lacks a four-digit year. HTTP/1.1 clients and servers that parse the date
+    // value MUST accept all three formats (for compatibility with HTTP/1.0), though they MUST only generate the RFC
+    // 1123 format for representing HTTP-date values in header fields." Also: "All HTTP date/time stamps MUST be
+    // represented in Greenwich Mean Time (GMT), without exception. For the purposes of HTTP, GMT is exactly equal to
+    // UTC (Coordinated Universal Time)."
+    val RFC1123Date          = withLocaleTZ(DateTimeFormat forPattern "EEE, dd MMM yyyy HH:mm:ss 'GMT'")
+    private val RFC1123Date2 = withLocaleTZ(DateTimeFormat forPattern "EEEEEE, dd-MMM-yy HH:mm:ss 'GMT'")
+    private val RFC1123Date3 = withLocaleTZ(DateTimeFormat forPattern "EEE MMMM d HH:mm:ss yyyy")
 
     private def withLocaleTZ(format: DateTimeFormatter) = format withLocale Locale.US withZone DateTimeZone.UTC
 
@@ -65,7 +74,16 @@ object DateUtils {
     }
 
     // Parse an RFC 1123 dateTime
-    def parseRFC1123(date: String): Long = RFC1123Date.parseDateTime(date).getMillis
+    def parseRFC1123(date: String): Long =
+        try RFC1123Date.parseDateTime(date).getMillis
+        catch {
+            case _: IllegalArgumentException ⇒
+                try RFC1123Date2.parseDateTime(date).getMillis
+                catch {
+                    case _: IllegalArgumentException ⇒
+                        RFC1123Date3.parseDateTime(date).getMillis
+                }
+        }
 }
 
 // Mock XPathContext

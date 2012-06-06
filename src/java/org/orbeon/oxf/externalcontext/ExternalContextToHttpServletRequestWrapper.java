@@ -14,7 +14,7 @@
 package org.orbeon.oxf.externalcontext;
 
 import org.orbeon.oxf.pipeline.api.ExternalContext;
-import org.orbeon.oxf.util.FastHttpDateFormat;
+import org.orbeon.oxf.util.DateUtils;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.StringConversions;
 
@@ -25,7 +25,6 @@ import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpSession;
 import java.io.*;
 import java.security.Principal;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -209,21 +208,13 @@ public class ExternalContextToHttpServletRequestWrapper extends HttpServletReque
 
     /* SUPPORTED: request headers */
 
-    // From Apache Tomcat 5.5.7, under Apache 2.0 license.
-    protected SimpleDateFormat formats[] = {
-        new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.US),
-        new SimpleDateFormat("EEEEEE, dd-MMM-yy HH:mm:ss zzz", Locale.US),
-        new SimpleDateFormat("EEE MMMM d HH:mm:ss yyyy", Locale.US)
-    };
-
-    // From Apache Tomcat 5.5.7, under Apache 2.0 license.
     public long getDateHeader(String name) {
         final String value = getHeader(name);
         if (value == null)
             return -1L;
 
         // Attempt to convert the date header in a variety of formats
-        final long result = FastHttpDateFormat.parseDate(value, formats);
+        final long result = DateUtils.parseRFC1123(value);
         if (result != -1L) {
             return result;
         }

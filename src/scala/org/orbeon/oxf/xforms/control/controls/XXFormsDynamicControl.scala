@@ -253,10 +253,10 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
                     // Also: check whether dispatchDestructionEventsForRemovedContainer dispatches to already non-relevant controls
                     //tree.dispatchDestructionEventsForRemovedContainer(componentControl, false)
                     componentControl.destroyNestedContainer()
-                    componentControl.clearChildren()
 
                     // Remove static controls
                     tree.deindexSubtree(componentControl, false)
+                    componentControl.clearChildren()
 
                     // Update the shadow tree
                     val staticComponent = _nested.get.partAnalysis.updateShadowTree(prefixedId, element)

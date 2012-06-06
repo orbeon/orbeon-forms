@@ -38,7 +38,7 @@
                 <fb:large-icon>/forms/orbeon/builder/images/dropdown.png</fb:large-icon>
             </fb:icon>
             <fb:datatype>xforms:string</fb:datatype>
-            <fb:editors static-itemset="true"/>
+            <fb:editors static-itemset="false"/>
             <fb:template>
                 <fr:databound-select1 id="" appearance="minimal" ref="" resource="">
                     <xforms:label ref=""/>

@@ -42,7 +42,7 @@
                 <xsl:template match="/*">
 
                     <xforms:group xbl:attr="model context ref bind" xxbl:scope="outer">
-                        <xbl:content includes="xforms|label, xforms|help, xforms|hint, xforms|alert"/>
+                        <xbl:content includes=":root > xforms|label, :root > xforms|help, :root > xforms|hint, :root > xforms|alert"/>
                         <!-- TODO: why doesn't this work with a appearance="xxforms:internal"? -->
                         <xforms:group xxbl:scope="inner" id="component-inner-group">
                             <xforms:action ev:event="#all" ev:propagate="stop"/>

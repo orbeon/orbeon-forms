@@ -236,7 +236,7 @@
         <xbl:template xxbl:transform="oxf:unsafe-xslt">
             <!-- Outer group -->
             <xforms:group xbl:attr="model context ref bind" xxbl:scope="outer" xsl:version="2.0">
-                <xbl:content includes="fr|* > xforms|label, fr|* > xforms|help, fr|* > xforms|hint, fr|* > xforms|alert"/>
+                <xbl:content includes=":root > xforms|label, :root > xforms|help, :root > xforms|hint, :root > xforms|alert"/>
 
                 <!-- Stop all events dispatched to outer group -->
                 <xforms:action ev:event="#all" ev:propagate="stop" ev:target="#observer"/>
@@ -264,7 +264,7 @@
                     <!-- NOTE: Events on this control will propagate out -->
                     <xforms:select ref="$binding" appearance="xxforms:internal" id="hidden-select">
                         <!-- Copy again label and alert for the error summary -->
-                        <xbl:content includes="fr|* > xforms|label, fr|* > xforms|alert"/>
+                        <xbl:content includes=":root > xforms|label, :root > xforms|alert"/>
                         <!-- Copy itemset information -->
                         <xforms:choices xxbl:scope="outer">
                             <xbl:content includes="fr|* > xforms|itemset, fr|* > xforms|item, fr|* > xforms|choices"/>

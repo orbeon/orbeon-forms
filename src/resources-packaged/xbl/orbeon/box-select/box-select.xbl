@@ -81,7 +81,7 @@
         <!-- NOTE: use XSLT so we can fetch attributes from under the itemset -->
         <xbl:template xxbl:transform="oxf:xslt">
             <xforms:group xbl:attr="model context ref bind" xsl:version="2.0" xxbl:scope="outer">
-                <xbl:content includes="fr|box-select > xforms|label, fr|box-select > xforms|help, fr|box-select > xforms|hint, fr|box-select > xforms|alert"/>
+                <xbl:content includes=":root > xforms|label, :root > xforms|help, :root > xforms|hint, :root > xforms|alert"/>
 
                 <xforms:group class="fr-component-group">
 

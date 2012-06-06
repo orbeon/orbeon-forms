@@ -36,7 +36,7 @@
                 <xsl:import href="oxf:/oxf/xslt/utils/xbl.xsl"/>
                 <xsl:template match="/*">
                     <xforms:group xbl:attr="model context ref bind" xxbl:scope="outer">
-                        <xbl:content includes="xforms|label"/>
+                        <xbl:content includes=":root > xforms|label"/>
                         <xsl:variable name="fr-prefix" as="xs:string" select="namespace::*[. = 'http://orbeon.org/oxf/xml/form-runner']/local-name()"/>
                         <xsl:choose>
                             <!-- Inline data picker-->
@@ -52,7 +52,7 @@
                                 <xforms:input ref="." xbl:attr="tabindex accesskey"/>
                             </xsl:otherwise>
                         </xsl:choose>
-                        <xbl:content includes="xforms|help,xforms|hint,xforms|alert"/>
+                        <xbl:content includes=":root > xforms|help, :root > xforms|hint, :root > xforms|alert"/>
 
                         <!-- Properties -->
                         <!-- NOTE: Put this last so that xforms:setfocus works properly on xforms:input above -->

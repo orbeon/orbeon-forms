@@ -109,7 +109,7 @@
                 <xsl:template match="/*">
                     <!-- Outer group -->
                     <xforms:group xxbl:scope="outer" class="fr-autocomplete-container" xbl:attr="model context ref bind">
-                        <xbl:content includes="fr|autocomplete > xforms|label, fr|autocomplete > xforms|help, fr|autocomplete > xforms|hint, fr|autocomplete > xforms|alert"/>
+                        <xbl:content includes=":root > xforms|label, :root > xforms|help, :root > xforms|hint, :root > xforms|alert"/>
 
                         <!-- Inner group -->
                         <xforms:group id="component-inner-group" xxbl:scope="inner">

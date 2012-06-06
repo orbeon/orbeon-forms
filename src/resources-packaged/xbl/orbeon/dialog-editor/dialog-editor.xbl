@@ -87,7 +87,7 @@
                 <xxforms:variable name="binding" as="node()?"><xxforms:sequence select="." xxbl:scope="outer" xbl:attr="model context ref bind"/></xxforms:variable>
                 <!-- For access to label with xxforms:label() -->
                 <xforms:group appearance="xxforms:internal" ref="$binding" id="group-with-label">
-                    <xbl:content includes="xforms|label"/>
+                    <xbl:content includes=":root > xforms|label"/>
                 </xforms:group>
                 <xxforms:variable name="readonly" select="exforms:readonly($binding)"/>
                 <xforms:group ref="$binding" id="group-external">

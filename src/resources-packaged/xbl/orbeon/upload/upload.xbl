@@ -62,11 +62,11 @@
         </xbl:resources>
         <xbl:template>
             <xforms:group>
-                <xbl:content includes="xforms|label, xforms|help, xforms|hint"/>
+                <xbl:content includes=":root > xforms|label, :root > xforms|help, :root > xforms|hint"/>
                 <xhtml:div class="xbl-fr-upload-field-container">
                     <xforms:upload xbl:attr="model context ref bind" xxbl:scope="outer">
                         <xxforms:script id="xf-en" ev:event="xforms-enabled">YAHOO.xbl.fr.Upload.instance(this).init();</xxforms:script>
-                        <xbl:content includes="xforms:filename, xforms:mediatype, xxforms:size"/>
+                        <xbl:content includes=":root > xforms|filename, :root > xforms|mediatype, :root > xxforms|size"/>
                     </xforms:upload>
                 	<xhtml:div class="xbl-fr-upload-fakefile">
                 		<xhtml:input class="xbl-fr-upload-visible-input"/>

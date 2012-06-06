@@ -63,7 +63,7 @@
         <xbl:template>
             <!-- Outer group -->
             <xforms:group xbl:attr="model context ref bind" xxbl:scope="outer">
-                <xbl:content includes="fr:* > xforms|label, fr:* > xforms|help, fr:* > xforms|hint, fr:* > xforms|alert"/>
+                <xbl:content includes=":root > xforms|label, :root > xforms|help, :root > xforms|hint, :root > xforms|alert"/>
 
                 <xforms:group class="fr-component-group" xxbl:scope="inner">
                     <xforms:action ev:event="#all" ev:propagate="stop"/>
@@ -71,7 +71,7 @@
                     <!-- Hidden select to hold itemset -->
                     <xxforms:variable name="binding"><xxforms:sequence value="." xxbl:scope="outer"/></xxforms:variable>
                     <xforms:select ref="$binding" appearance="xxforms:internal" id="hidden-select">
-                        <xbl:content includes="fr:* > xforms|itemset, fr:* > xforms|item, fr:* > xforms|choices"/>
+                        <xbl:content includes=":root > xforms|itemset, :root > xforms|item, :root > xforms|choices"/>
                     </xforms:select>
                     <xxforms:variable name="items" value="xxforms:itemset('hidden-select', 'xml')//item"/>
 

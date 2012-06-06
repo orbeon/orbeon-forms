@@ -82,7 +82,7 @@
                             </xforms:group>
 
                             <xforms:setvalue ev:event="xforms-enabled xforms-value-changed" ref="$state/full-value" value="$binding"/>
-                            <xbl:content includes="xforms|label, xforms|help, xforms|hint, xforms|alert"/>
+                            <xbl:content includes=":root > xforms|label, :root > xforms|help, :root > xforms|hint, :root > xforms|alert"/>
                             <xhtml:span class="xbl-fr-expandable-output-output">
                                 <xforms:output ref="if ($state/open = 'false') then $state/short-value else $state/full-value"/>
                                 <xxforms:variable name="open-different-than-closed" select="string-length($state/full-value) gt string-length($state/short-value)"/>

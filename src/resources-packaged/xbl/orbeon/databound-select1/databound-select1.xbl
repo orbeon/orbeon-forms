@@ -124,14 +124,14 @@
                 <!-- The concrete select1 -->
                 <xxforms:variable name="binding" xxbl:scope="outer"><xxforms:sequence select="$binding" xxbl:scope="inner"/></xxforms:variable>
                 <xforms:select1 ref="$binding" xxbl:scope="outer">
-                    <xbl:content includes="fr|* > xforms|label, fr|* > xforms|help, fr|* > xforms|hint, fr|* > xforms|alert"/>
+                    <xbl:content includes=":root > xforms|label, :root > xforms|help, :root > xforms|hint, :root > xforms|alert"/>
                     <!-- Blank item -->
                     <xforms:item>
                         <xforms:label/>
                         <xforms:value/>
                     </xforms:item>
                     <!-- Itemset unconventionally evaluates wrt inner scope -->
-                    <xbl:content includes="xforms|itemset" xxbl:scope="inner"/>
+                    <xbl:content includes=":root > xforms|itemset" xxbl:scope="inner"/>
                 </xforms:select1>
             </xforms:group>
         </xbl:template>

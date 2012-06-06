@@ -17,15 +17,18 @@ import org.apache.commons.lang.StringUtils;
 import org.dom4j.*;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.analysis.controls.LHHA;
 import org.orbeon.oxf.xforms.event.EventHandlerImpl;
 import org.orbeon.oxf.xml.NamespaceMapping;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.om.NodeInfo;
-import org.orbeon.oxf.xforms.analysis.controls.LHHA;
 import org.orbeon.saxon.om.VirtualNode;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.StringTokenizer;
 
 public class XBLTransformer {
 
@@ -85,7 +88,7 @@ public class XBLTransformer {
                         // Apply CSS selector
 
                         // Convert CSS to XPath
-                        final String xpathExpression = cssToXPath(includesAttribute);
+                        final String xpathExpression = CSSParser.toXPath(includesAttribute);
 
                         final NodeInfo boundElementInfo = documentWrapper.wrap(boundElement);
 
@@ -308,60 +311,5 @@ public class XBLTransformer {
         }, true);
 
         return shadowTreeDocument;
-    }
-
-    /**
-     * Poor man's CSS selector parser:
-     *
-     * o input: foo|a foo|b, bar|a bar|b
-     * o output: descendant-or-self::foo:a//foo:b|descendant-or-self:://bar:a//bar:b
-     *
-     * Also support the ">" combinator.
-     *
-     * TODO: handle [att], [att=val], [att~=val], [att|=val]
-     * TODO: does Flying Saucer have a reusable CSS parser? Could possibly be used here.
-     *
-     * @param cssSelector   CSS selector
-     * @return              XPath expression
-     */
-    public static String cssToXPath(String cssSelector) {
-
-        final StringBuilder sb = new StringBuilder(cssSelector.length());
-        final String[] selectors = StringUtils.split(cssSelector, ',');
-        for (int i = 0; i < selectors.length; i++) {
-            // For each comma-separated string
-            final String selector = selectors[i];
-            if (i > 0)
-                sb.append("|");
-            final String[] pathElements = StringUtils.split(selector.trim(), ' ');
-            boolean previousIsChild = false;
-            for (int j = 0; j < pathElements.length; j++) {
-                // For each path element
-                final String pathElement = pathElements[j];
-                if (j == 0) {
-                    // First path element
-                    if (">".equals(pathElement)) {
-                        sb.append("./");
-                        previousIsChild = true;
-                        continue;
-                    } else {
-                        sb.append("descendant-or-self::");
-                    }
-                } else {
-                    // Subsequent path element
-                    if (">".equals(pathElement)) {
-                        sb.append("/");
-                        previousIsChild = true;
-                        continue;
-                    } else if (!previousIsChild) {
-                        sb.append("//");
-                    }
-                }
-
-                sb.append(pathElement.replace('|', ':').trim());
-                previousIsChild = false;
-            }
-        }
-        return sb.toString();
     }
 }

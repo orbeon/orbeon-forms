@@ -73,7 +73,7 @@
                             <xsl:if test="exists(/fr:button/(@ref, @bind))">
                                 <xsl:attribute name="ref">xxforms:binding('fr-button')</xsl:attribute>
                             </xsl:if>
-                            <xbl:content includes="xforms|label, xforms|help, xforms|hint"/>
+                            <xbl:content includes=":root > xforms|label, :root > xforms|help, :root > xforms|hint"/>
                             <xxforms:script ev:event="xforms-enabled xxforms-iteration-moved" ev:target="#observer">YAHOO.xbl.fr.Button.instance(this).enabled();</xxforms:script>
                             <xxforms:script ev:event="xforms-readonly" ev:target="#observer">YAHOO.xbl.fr.Button.instance(this).readonly();</xxforms:script>
                             <xxforms:script ev:event="xforms-readwrite" ev:target="#observer">YAHOO.xbl.fr.Button.instance(this).readwrite();</xxforms:script>

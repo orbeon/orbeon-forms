@@ -64,7 +64,7 @@
         <xbl:template>
             <!-- Local controls -->
             <xforms:group xbl:attr="model context ref bind" xxbl:scope="outer">
-                <xbl:content includes="fr|* > xforms|label, fr|* > xforms|help, fr|* > xforms|hint, fr|* > xforms|alert"/>
+                <xbl:content includes=":root > xforms|label, :root > xforms|help, :root > xforms|hint, :root > xforms|alert"/>
 
                 <!-- Inner group -->
                 <xforms:group appearance="xxforms:internal" xxbl:scope="inner">

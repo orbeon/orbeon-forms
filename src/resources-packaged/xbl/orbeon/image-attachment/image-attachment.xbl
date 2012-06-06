@@ -57,7 +57,7 @@
         <xbl:template>
             <xforms:group appearance="xxforms:internal" xbl:attr="model context ref bind" xxbl:scope="outer">
                 <xforms:upload ref=".">
-                    <xbl:content includes="xforms|label,xforms|help,xforms|hint,xforms|alert,xforms|filename,xforms|mediatype,xxforms:size"/>
+                    <xbl:content includes=":root > xforms|label, :root > xforms|help, :root > xforms|hint, :root > xforms|alert, :root > xforms|filename, :root > xforms|mediatype, :root > xxforms|size"/>
                 </xforms:upload>
                 <xforms:output mediatype="image/*" ref=".[normalize-space()]"/>
             </xforms:group>

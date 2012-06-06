@@ -469,7 +469,7 @@ Inserting error information into error list:
                         <xforms:group ref=".[exists($visible-errors){if (exists($fr-errors)) then ' or exists($global-errors)' else ''}]" xxbl:scope="inner" id="ig">
 
                             <!-- Include optional header -->
-                            <xbl:content includes="fr|error-summary > fr|header > *"/>
+                            <xbl:content includes=":root > fr|header > *"/>
 
                             <!-- Body of the error summary -->
                             <xforms:group class="fr-error-summary-body" id="body" appearance="xxforms:fieldset">
@@ -542,7 +542,7 @@ Inserting error information into error list:
                             </xforms:group>
 
                             <!-- Include optional footer -->
-                            <xbl:content includes="fr|error-summary > fr|footer > *"/>
+                            <xbl:content includes=":root > fr|footer > *"/>
 
                         </xforms:group>
                     </xforms:group>

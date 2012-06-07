@@ -376,7 +376,16 @@
                         <!-- Component holding some common form edition functions -->
                         <fb:form-editor ref="instance('fb-form-instance')" id="fb-form-editor"/>
 
-                        <!--  Cell editor -->
+                        <xf:group id="fb-details-group">
+                            <!-- Don't leak events -->
+                            <xf:action ev:event="#all" ev:propagate="stop"/>
+                            <!-- Display the form being edited -->
+                            <xxf:dynamic id="fb" ref="instance('fb-form-instance')"/>
+                        </xf:group>
+
+                        <!-- Cell editor -->
+                        <!-- NOTE: This needs to be after the xxf:dynamic as the shared upload control use xxf:binding() to get the binding of the current node,
+                                   which only works if the control exists -->
                         <xh:div class="fb-cell-editor">
                             <xf:var name="td" value="instance('fb-form-instance')/xhtml:body//*:td[@id = $selected-cell]"/>
                             <xf:var name="grid" value="$td/ancestor::*:grid[1]"/>
@@ -440,64 +449,6 @@
                                         <xxf:context name="control-id" value="$control/@id"/>
                                     </xf:dispatch>
                                 </xf:trigger>
-
-                                <!--&lt;!&ndash; Change appearance for selection controls &ndash;&gt;-->
-                                <!--<xf:group ref=".[xf:select1 | xf:select]">-->
-                                    <!--<xf:trigger appearance="minimal">-->
-                                        <!--<xf:label>-->
-                                            <!--<xh:img src="/apps/fr/style/update.gif" alt="{$fb-resources/switch-appearance-icon/label}" title="{$fb-resources/switch-appearance-icon/label}"/>-->
-                                        <!--</xf:label>-->
-                                        <!--<xf:action ev:event="DOMActivate">-->
-                        <!---->
-                                            <!--&lt;!&ndash; select1 minimal -> compact -> full -> select compact -> full &ndash;&gt;-->
-                        <!---->
-                                            <!--<xf:setvalue ref="$variables/done">false</xf:setvalue>-->
-                                            <!--<xf:action if="xf:select1 and xf:select1/@appearance = 'full'">-->
-                                                <!--&lt;!&ndash; Switch to xf:select &ndash;&gt;-->
-                        <!---->
-                                                <!--&lt;!&ndash; Create xf:select, copy all attributes and children elements, and delete xf:select1 &ndash;&gt;-->
-                                                <!--<xf:insert ref="xf:select1" origin="xxf:element('xf:select')"/>-->
-                                                <!--<xf:insert context="xf:select" origin="../xf:select1/(@*, *)"/>-->
-                                                <!--<xf:delete ref="xf:select1"/>-->
-                                                <!--<xf:setvalue ref="xf:select/@appearance" value="'compact'"/>-->
-                        <!---->
-                                                <!--<xf:setvalue ref="$variables/done">true</xf:setvalue>-->
-                                            <!--</xf:action>-->
-                                            <!--<xf:action if="$variables/done != 'true' and xf:select and xf:select/@appearance = 'full'">-->
-                                                <!--&lt;!&ndash; Switch to xf:select1 &ndash;&gt;-->
-                        <!---->
-                                                <!--&lt;!&ndash; Create xf:select1, copy all attributes and children elements, and delete xf:select &ndash;&gt;-->
-                                                <!--<xf:insert ref="xf:select" origin="xxf:element('xf:select1')"/>-->
-                                                <!--<xf:insert context="xf:select1" origin="../xf:select/(@*, *)"/>-->
-                                                <!--<xf:delete ref="xf:select"/>-->
-                                                <!--<xf:setvalue ref="xf:select1/@appearance" value="'minimal'"/>-->
-                        <!---->
-                                                <!--<xf:setvalue ref="$variables/done">true</xf:setvalue>-->
-                                            <!--</xf:action>-->
-                                            <!--<xf:action if="$variables/done != 'true' and xf:select1">-->
-                                                <!--&lt;!&ndash; Simply update the appearance of xf:select1 &ndash;&gt;-->
-                                                <!--<xf:setvalue ref="xf:select1/@appearance"-->
-                                                                 <!--value="if (. = 'minimal') then 'compact' else if (. = 'compact') then 'full' else ."/>-->
-                                            <!--</xf:action>-->
-                                            <!--<xf:action if="$variables/done != 'true' and xf:select">-->
-                                                <!--&lt;!&ndash; Simply update the appearance of xf:select &ndash;&gt;-->
-                                                <!--<xf:setvalue ref="xf:select/@appearance"-->
-                                                                 <!--value="if (. = 'compact') then 'full' else ."/>-->
-                                            <!--</xf:action>-->
-                        <!---->
-                                            <!--<xf:action if="xf:select1/@appearance = 'minimal'">-->
-                                                <!--&lt;!&ndash; Make sure there is the [Select...] item &ndash;&gt;-->
-                                                <!--<xf:insert ref="xf:select1/xf:itemset[1]" position="before"-->
-                                                    <!--origin="instance('fb-controls-template')//xf:select1[@appearance = 'minimal']/xf:item"/>-->
-                                            <!--</xf:action>-->
-                                            <!--<xf:action if="not(xf:select1/@appearance = 'minimal')">-->
-                                                <!--&lt;!&ndash; Make sure there is NO [Select...] &ndash;&gt;-->
-                                                <!--<xf:delete ref="xf:select1/xf:item[1]"/>-->
-                                            <!--</xf:action>-->
-                        <!---->
-                                        <!--</xf:action>-->
-                                    <!--</xf:trigger>-->
-                                <!--</xf:group>-->
                             </xh:span>
 
                             <!-- Label editor -->
@@ -548,14 +499,8 @@
                             <xf:var name="bound-item" value="xxf:binding(concat('/', $control-effective-id))"/>
                             <xf:upload class="fb-static-upload" id="fb-static-upload-empty" ref="$bound-item[string(.) = ''], instance('fb-static-upload')/empty"/>
                             <xf:upload class="fb-static-upload" id="fb-static-upload-non-empty" ref="$bound-item[string(.) != ''], instance('fb-static-upload')/non-empty"/>
-                        </xh:div>
 
-                        <xf:group id="fb-details-group">
-                            <!-- Don't leak events -->
-                            <xf:action ev:event="#all" ev:propagate="stop"/>
-                            <!-- Display the form being edited -->
-                            <xxf:dynamic id="fb" ref="instance('fb-form-instance')"/>
-                        </xf:group>
+                        </xh:div>
 
                         <!--<fr:xforms-inspector xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>-->
 

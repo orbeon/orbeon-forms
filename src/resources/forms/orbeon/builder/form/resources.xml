@@ -453,6 +453,10 @@
                 <alert>Incorrect XPath expression</alert>
                 <hint>XPath expression</hint>
             </calculate>
+            <help>
+                <label>Help message</label>
+                <hint>Message displayed when users click on the help icon next to the label</hint>
+            </help>
             <alert>
                 <label>Error Message</label>
                 <hint>Message to display when the control data is incorrect or missing</hint>
@@ -1262,6 +1266,10 @@
                 <alert>Expression XPath incorrecte</alert>
                 <hint>Expression XPath</hint>
             </calculate>
+            <help>
+                <label>Message d'aide</label>
+                <hint>Message affiché lorsque les utilisateurs cliquent sur l'icône d'aide à coté du contrôle</hint>
+            </help>
             <alert>
                 <label>Message d'erreur</label>
                 <hint>Message à afficher lorsque la donnée est incorrecte ou manquante</hint>
@@ -2073,6 +2081,10 @@
                 <alert>Galt XPath-uttrykk</alert>
                 <hint>XPath-uttrykk</hint>
             </calculate>
+            <help>
+                <label>[Help message]</label>
+                <hint>[Message displayed when users click on the help icon next to the label]</hint>
+            </help>
             <alert>
                 <label>Feilmelding</label>
                 <hint>Melding som skal vises når kontrolldata mangler eller er galt</hint>
@@ -2883,6 +2895,10 @@
                 <alert>Некорректное выражение XPath</alert>
                 <hint>Булево выражение XPath</hint>
             </calculate>
+            <help>
+                <label>[Help message]</label>
+                <hint>[Message displayed when users click on the help icon next to the label]</hint>
+            </help>
             <alert>
                 <label>Сообщение об ошибке</label>
                 <hint>Сообщение, которое будет показано, если введенное значение некорректно</hint>

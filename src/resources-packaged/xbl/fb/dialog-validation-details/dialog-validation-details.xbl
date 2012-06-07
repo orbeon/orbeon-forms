@@ -58,6 +58,7 @@
                         <initial-value/>
                         <calculate/>
                         <schema-type/>
+                        <help/>
                         <alert/>
 
                         <save-trigger/>
@@ -67,7 +68,7 @@
                 <!-- Enable/disable trigger -->
                 <xforms:setvalue ev:event="xxforms-invalid" ev:observer="local" ref="save-trigger">disabled</xforms:setvalue>
                 <xforms:setvalue ev:event="xxforms-valid" ev:observer="local" ref="save-trigger">enabled</xforms:setvalue>
-                
+
                 <xforms:bind ref="required" readonly="../schema-type != ''"/>
                 <xforms:bind ref="relevant | readonly | constraint | initial-value | calculate" type="xxforms:xpath2" required="false()"/>
                 <xforms:bind ref="save-trigger" readonly=". = 'disabled'"/>
@@ -81,7 +82,7 @@
                 <xforms:var name="form"><xxforms:sequence value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=form-ref"/></xforms:var>
                 <xforms:var name="resources"><xxforms:sequence value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=resources-ref"/></xforms:var>
                 <xforms:var name="components"><xxforms:sequence value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=components-ref"/></xforms:var>
-                
+
                 <xforms:var name="local" value="instance('local')"/>
                 <xforms:var name="form-resources" value="$form/xhtml:head/xforms:model/xforms:instance[@id = 'fr-form-resources']/* treat as element()"/>
 
@@ -90,7 +91,8 @@
 
                 <!-- When the dialog opens, get type information from the form -->
                 <xforms:action ev:event="xxforms-dialog-open" ev:observer="dialog">
-                    <!-- Read alert -->
+                    <!-- Read help/alert -->
+                    <xforms:setvalue ref="$local/help" value="controlOps:getControlHelpOrEmpty(fbf:controlId($local/control-name))"/>
                     <xforms:setvalue ref="$local/alert" value="controlOps:getControlAlertOrEmpty(fbf:controlId($local/control-name))"/>
 
                     <!-- Read bind information -->
@@ -128,8 +130,9 @@
                 <xforms:action ev:event="xxforms-dialog-close" if="event('fb:save') and $local/save-trigger = 'enabled'" ev:observer="dialog">
                     <xforms:var name="current-control" value="if ($local/control-name != '') then controlOps:findControlByNameOrEmpty($form, $local/control-name) else ()"/>
 
-                    <!-- Copy back the alert -->
+                    <!-- Copy back the help/alert -->
                     <xforms:action type="xpath">
+                        controlOps:setControlHelp(fbf:controlId($local/control-name), $local/help),
                         controlOps:setControlAlert(fbf:controlId($local/control-name), $local/alert)
                     </xforms:action>
 
@@ -269,6 +272,15 @@
                                         <xforms:hint ref="$resources/dialog-validation-details/calculate/hint"/>
                                     </xforms:input>
                                 </xforms:group>
+
+                                <!-- Help message -->
+                                <xforms:textarea ref="help" incremental="true">
+                                    <xforms:label>
+                                        <xhtml:img src="/ops/images/xforms/help.png" alt="" title=""/>
+                                        <xhtml:span><xforms:output value="$resources/dialog-validation-details/help/label"/></xhtml:span>
+                                    </xforms:label>
+                                    <xforms:hint ref="$resources/dialog-validation-details/help/hint"/>
+                                </xforms:textarea>
 
                                 <!-- Alert message -->
                                 <xforms:textarea ref="alert" incremental="true">

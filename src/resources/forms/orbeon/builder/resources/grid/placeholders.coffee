@@ -161,7 +161,7 @@ $ ->
             f$.append input, f$.empty editablePlaceholderContainer element
             f$.show input
             htmlInput = f$.find 'input', input
-            saveButton = $ '#fr-save-button button'
+            saveButton = $ '#fr-save-button button'                                                                     # HACK: Focus on something else (we know we have a Save button in Form Builder)
             (setFocus saveButton).then -> setFocus htmlInput
         endEdit: (element) ->
             input = editableEditInput element

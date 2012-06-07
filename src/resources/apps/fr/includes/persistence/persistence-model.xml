@@ -208,10 +208,11 @@
             replace="none"/>
 
     <!-- Respond to save button activation -->
-    <xforms:action ev:event="DOMActivate" ev:observer="fr-save-button">
+    <xforms:action ev:event="DOMActivate" ev:observer="fr-save-button fr-novalidation-save-button">
         <xforms:setvalue ref="instance('fr-persistence-instance')/submit-or-save-or-send">save</xforms:setvalue>
         <xforms:dispatch name="fr-save-action" target="fr-persistence-model">
-            <xxforms:context name="fr:check-data-valid" select="true()"/>
+            <!-- Don't check data validity if using fr-novalidation-save-button -->
+            <xxforms:context name="fr:check-data-valid" select="not(event('xxforms:targetid') = 'fr-novalidation-save-button')"/>
         </xforms:dispatch>
     </xforms:action>
 

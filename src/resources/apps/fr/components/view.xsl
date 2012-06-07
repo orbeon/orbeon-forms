@@ -244,6 +244,21 @@
                         id="fr-data-safe-input"
                         class="xforms-disabled"/>
 
+                <!-- Expose document id to JavaScript -->
+                <xforms:output id="fr-parameters-instance-document" ref="xxforms:instance('fr-parameters-instance')/document" style="display: none"/>
+
+                <!-- When the mode changes to "edit" after a save from /new, attempt to change the URL -->
+                <xxforms:variable name="mode-for-save" select="xxforms:instance('fr-parameters-instance')/mode/string()">
+                    <!-- If URI is /new (it should be), change it to /edit/id -->
+                    <!-- If browser supporting the HTML5 history API (http://goo.gl/Ootqu) -->
+                    <xxforms:script ev:event="xforms-value-changed" if="$mode-for-save = 'edit'">
+                        if (history &amp;&amp; history.replaceState) {
+                            if (location.href.lastIndexOf("/new") == location.href.length - 4)
+                                history.replaceState(null, "", "edit/" + ORBEON.xforms.Document.getValue("fr-parameters-instance-document"));
+                        }
+                    </xxforms:script>
+                </xxforms:variable>
+
                 <!-- This is a bit of a HACK for Form Builder only: place non-relevant instances of all toolbox controls
                      so that xxf:dynamic will have all the JavaScript and CSS resources available on the client.
                      See: https://github.com/orbeon/orbeon-forms/issues/31 -->

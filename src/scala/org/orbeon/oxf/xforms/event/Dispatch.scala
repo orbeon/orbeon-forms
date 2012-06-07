@@ -64,8 +64,7 @@ object Dispatch {
             // For target phase, also perform "action at target" before running event handler
             // NOTE: As of 2011-03-07, this is used XFormsInstance for xforms-insert/xforms-delete processing,
             // and in XFormsUploadControl for upload processing.
-            // NOTE: Possibly testing on retargetedEvent.getTargetObject() might be more correct, but we should
-            // fix event retargeting to make more sense in the first place.
+            // withDebug("performing action at target")
             if (phase == Phase.target)
                 withEvent(event) {
                     observer.performTargetAction(observer.getXBLContainer(containingDocument), event)
@@ -73,7 +72,7 @@ object Dispatch {
 
             for (handler ← handlersForObserver(observer) filter matches) {
 
-                withDebug("handler", Seq("phase" → event.getCurrentPhase.name(), "observer" → observer.getEffectiveId)) {// TODO meaningful logging
+                withDebug("handler", Seq("name" → originalEvent.getName, "phase" → event.getCurrentPhase.name(), "observer" → observer.getEffectiveId)) {
                     withEvent(event) {
                         handler.handleEvent(containingDocument, observer, event)
                     }
@@ -89,7 +88,7 @@ object Dispatch {
             }
 
             // For target or bubbling phase, also call native listeners
-            // TODO: Would be nice to have all listeners exposed this way
+            // NOTE: It would be nice to have all listeners exposed this way
             if (Set(Phase.target, Phase.bubbling)(phase))
                 for (listener ← observer.getListeners(originalEvent.getName))
                     withEvent(event) {
@@ -113,20 +112,12 @@ object Dispatch {
                 _retargetedEvents = retargetedEvents
                 _boundaryIterator = boundaryIterator
 
-                _retargetedEvent = _retargetedEvents.next()
-                _nextBoundary = nextOrNull(boundaryIterator)
+                retarget()
             }
 
             def retargetIfNeeded(observer: XFormsEventObserver) =
-                if (_nextBoundary eq observer) {
-                    _nextBoundary = nextOrNull(_boundaryIterator)
-                    _retargetedEvent = _retargetedEvents.next()
-
-                    debug("retargeting",
-                        Seq("name"            → originalEvent.getName,
-                            "original target" → targetObject.getEffectiveId,
-                            "new target"      → _retargetedEvent.getTargetObject.getEffectiveId))
-                }
+                if (_nextBoundary eq observer)
+                    retarget()
 
             def currentEvent(observer: XFormsEventObserver, phase: Phase) = {
                 _retargetedEvent.setCurrentObserver(observer)
@@ -135,11 +126,22 @@ object Dispatch {
                 _retargetedEvent
             }
 
+            private def retarget(): Unit = {
+                _retargetedEvent = _retargetedEvents.next()
+                _nextBoundary = nextOrNull(_boundaryIterator)
+
+                if (targetObject ne _retargetedEvent.getTargetObject)
+                    debug("retargeting",
+                        Seq("name"            → originalEvent.getName,
+                            "original target" → targetObject.getEffectiveId,
+                            "new target"      → _retargetedEvent.getTargetObject.getEffectiveId))
+            }
+
             private def nextOrNull(i: Iterator[XFormsEventObserver]) = if (i.hasNext) i.next() else null
         }
 
         try {
-            withDebug("dispatching", Seq("name" → originalEvent.getName, "id" → targetObject.getEffectiveId, "location" → (Option(originalEvent.getLocationData) map (_.toString) orNull))) {
+            withDebug("dispatching", Seq("name" → originalEvent.getName, "target" → targetObject.getEffectiveId, "location" → (Option(originalEvent.getLocationData) map (_.toString) orNull))) {
 
                 var propagate = true
                 var performDefaultAction = true
@@ -193,7 +195,7 @@ object Dispatch {
 
                 // Perform default action if allowed to
                 if (performDefaultAction || ! originalEvent.cancelable)
-                    withDebug("default action handler") {
+                    withDebug("performing default action") {
                         withEvent(originalEvent) {
                             targetObject.performDefaultAction(originalEvent)
                         }

@@ -301,7 +301,7 @@ object EventHandlerImpl {
                 // hopefully to ultimately remove this behavior. See:
                 // https://github.com/orbeon/orbeon-forms/issues/243
                 implicit val logger = containingDocument.getIndentedLogger(XFormsEvents.LOGGING_CATEGORY)
-                debug("observing event in different scope (isssue #243)", Seq(
+                debug("observing event in different scope (issue #243)", Seq(
                     "target id"             → targetObject.getEffectiveId,
                     "handler id"            → handler.prefixedId,
                     "observer id"           → eventObserver.getEffectiveId,

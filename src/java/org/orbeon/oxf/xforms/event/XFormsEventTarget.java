@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms.event;
 
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.xbl.Scope;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -23,19 +22,17 @@ import org.orbeon.oxf.xml.dom4j.LocationData;
  */
 public interface XFormsEventTarget {
 
-    // TODO: when possible remove unneeded containingDocument parameters, which are used only by XFormsInstance
-
-    Scope getScope(XFormsContainingDocument containingDocument);
+    Scope scope();
     String getId();
     String getPrefixedId();
     String getEffectiveId();
 
     LocationData getLocationData();
 
-    XBLContainer getXBLContainer(XFormsContainingDocument containingDocument);
-    XFormsEventObserver getParentEventObserver(XFormsContainingDocument containingDocument);
+    XBLContainer container();
+    XFormsEventObserver parentEventObserver();
 
-    void performTargetAction(XBLContainer container, XFormsEvent event);
+    void performTargetAction(XFormsEvent event);
     void performDefaultAction(XFormsEvent event);
 
     boolean allowExternalEvent(String eventName);

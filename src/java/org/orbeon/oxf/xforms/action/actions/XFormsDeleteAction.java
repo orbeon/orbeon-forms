@@ -168,7 +168,7 @@ public class XFormsDeleteAction extends XFormsAction {
                 
                 // "XForms Actions that change the tree structure of instance data result in setting all four flags to true"
                 modifiedInstance.markModified();
-                modifiedInstance.getModel(containingDocument).markStructuralChange(modifiedInstance);
+                modifiedInstance.model().markStructuralChange(modifiedInstance);
 
                 // "4. If the delete is successful, the event xforms-delete is dispatched."
                 if (doDispatch)

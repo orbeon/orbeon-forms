@@ -56,7 +56,7 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
     }
 
     // NOTE: Perform all actions at target, so that user event handlers are called after these operations.
-    override def performTargetAction(container: XBLContainer, event: XFormsEvent): Unit =
+    override def performTargetAction(event: XFormsEvent): Unit =
         event match {
             case startEvent: XXFormsUploadStartEvent ⇒
                 // Upload started
@@ -74,7 +74,7 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
                 handleUploadedFile(uploadDoneEvent.file, uploadDoneEvent.filename, uploadDoneEvent.mediatype, uploadDoneEvent.size)
             case progressEvent: XXFormsUploadProgressEvent ⇒
                 // NOP: upload progress information will be sent through the diff process
-            case _ ⇒ super.performTargetAction(container, event)
+            case _ ⇒ super.performTargetAction(event)
         }
 
     override def onDestroy(): Unit = {

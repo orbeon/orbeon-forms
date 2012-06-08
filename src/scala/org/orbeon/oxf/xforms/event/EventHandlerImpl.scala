@@ -184,7 +184,7 @@ class EventHandlerImpl(
                 // Resolve the concrete handler
                 EventHandlerImpl.resolveHandler(containingDocument, this, eventObserver, event.getTargetObject) match {
                     case Some(concreteHandler) ⇒
-                        val handlerContainer = concreteHandler.getXBLContainer(containingDocument)
+                        val handlerContainer = concreteHandler.container
                         val handlerEffectiveId = concreteHandler.getEffectiveId
                         val stack =  new XFormsContextStack(handlerContainer, concreteHandler.getBindingContext(containingDocument))
 
@@ -252,9 +252,9 @@ object EventHandlerImpl {
             targetObject: XFormsEventTarget): Option[XFormsEventHandler] = {
 
         val resolvedObject =
-            if (targetObject.getScope(containingDocument) == handler.scope) {
+            if (targetObject.scope == handler.scope) {
                 // The scopes match so we can resolve the id relative to the target
-                Option(targetObject.getXBLContainer(containingDocument).resolveObjectByIdInScope(targetObject.getEffectiveId, handler.staticId, null))
+                Option(targetObject.container.resolveObjectByIdInScope(targetObject.getEffectiveId, handler.staticId, null))
             } else {
                 // Scopes don't match which implies that the event handler must be a child (or grand-child in the case of repeat) of the observer
                 def parentPrefixedId = handler.parent map (_.prefixedId)
@@ -305,9 +305,9 @@ object EventHandlerImpl {
                     "target id"             → targetObject.getEffectiveId,
                     "handler id"            → handler.prefixedId,
                     "observer id"           → eventObserver.getEffectiveId,
-                    "target scope"          → targetObject.getScope(containingDocument).scopeId,
+                    "target scope"          → targetObject.scope.scopeId,
                     "handler scope"         → handler.scope.scopeId,
-                    "observer scope"        → eventObserver.getScope(containingDocument).scopeId,
+                    "observer scope"        → eventObserver.scope.scopeId,
                     "effective handler id"  → handlerEffectiveId.orNull
                 ))
 

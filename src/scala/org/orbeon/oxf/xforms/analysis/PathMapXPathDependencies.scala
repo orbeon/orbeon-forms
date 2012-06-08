@@ -205,7 +205,7 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
 
         // Caller must only call this for a mutable node belonging to the given model
         require(nodeInfo.isInstanceOf[VirtualNode])
-        require(model.getInstanceForNode(nodeInfo).getModel(containingDocument) == model)
+        require(model.getInstanceForNode(nodeInfo).model == model)
 
         getModelState(model.getPrefixedId).markValueChanged(nodeInfo)
     }

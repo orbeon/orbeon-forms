@@ -113,7 +113,7 @@ public class XFormsContextStack {
 
     // Constructor for XFormsModel
     public XFormsContextStack(XFormsModel containingModel) {
-        this.container = containingModel.getXBLContainer();
+        this.container = containingModel.container();
         this.containingDocument = this.container.getContainingDocument();
         this.functionContext = new XFormsFunction.Context(containingModel, this);
     }

@@ -62,7 +62,7 @@ trait ControlEventSupport {
         case _ ⇒
     }
 
-    def performTargetAction(container: XBLContainer, event: XFormsEvent) = ()
+    def performTargetAction(event: XFormsEvent) = ()
 
     // Check whether this concrete control supports receiving the external event specified
     final def allowExternalEvent(eventName: String) =
@@ -73,10 +73,7 @@ trait ControlEventSupport {
     // TODO LATER: should probably return true because most controls could then dispatch relevance events
     def supportsRefreshEvents = false
 
-    // Consider that the parent of top-level controls is the containing document. This allows events to propagate to
-    // the top-level.
-    final def getParentEventObserver(containingDocument: XFormsContainingDocument): XFormsEventObserver =
-        Option(parent) orNull
+    final def parentEventObserver: XFormsEventObserver = Option(parent) orNull
 
     final def addListener(eventName: String, listener: EventListener): Unit =
         throw new UnsupportedOperationException

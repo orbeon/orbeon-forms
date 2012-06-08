@@ -146,8 +146,8 @@ public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
     }
 
     @Override
-    public void performTargetAction(XBLContainer container, XFormsEvent event) {
-        super.performTargetAction(container, event);
+    public void performTargetAction(XFormsEvent event) {
+        super.performTargetAction(event);
 
         if (XFormsEvents.XXFORMS_DIALOG_OPEN.equals(event.getName())) {
             // Open the dialog

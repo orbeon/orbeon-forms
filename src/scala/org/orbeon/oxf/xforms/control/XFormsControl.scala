@@ -79,8 +79,7 @@ class XFormsControl(
     final def getId = staticControl.staticId
     final def getPrefixedId = prefixedId
 
-    def getScope(containingDocument: XFormsContainingDocument) = staticControl.scope
-    final def getXBLContainer(containingDocument: XFormsContainingDocument) = container
+    def scope = staticControl.scope
 
     final def getName = staticControl.localName
     final def getControlElement = element

@@ -417,7 +417,7 @@ public class XFormsInsertAction extends XFormsAction {
         if (didInsertNodes && modifiedInstance != null) {
             // NOTE: Can be null if document into which delete is performed is not in an instance, e.g. in a variable
             modifiedInstance.markModified();
-            modifiedInstance.getModel(containingDocument).markStructuralChange(modifiedInstance);
+            modifiedInstance.model().markStructuralChange(modifiedInstance);
         }
 
         // Gather list of modified nodes

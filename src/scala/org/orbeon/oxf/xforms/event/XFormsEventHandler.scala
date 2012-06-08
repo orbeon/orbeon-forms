@@ -21,6 +21,6 @@ trait XFormsEventHandler {
 
     def getEffectiveId: String
 
-    def getXBLContainer(containingDocument: XFormsContainingDocument): XBLContainer
+    def container: XBLContainer
     def getBindingContext(containingDocument: XFormsContainingDocument): BindingContext
 }

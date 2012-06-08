@@ -97,7 +97,7 @@ public class XFormsModelBinds {
         this.model = model;
 
         this.indentedLogger = model.getIndentedLogger();
-        this.container = model.getXBLContainer();
+        this.container = model.container();
         this.containingDocument = model.getContainingDocument();
         this.dependencies = this.containingDocument.getXPathDependencies();
 

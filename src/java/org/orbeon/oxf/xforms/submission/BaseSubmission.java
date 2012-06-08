@@ -74,7 +74,7 @@ public abstract class BaseSubmission implements Submission {
 
     protected Map<String, String[]> evaluateHeaders(XFormsContextStack contextStack) {
         try {
-            return Headers.evaluateHeaders(submission.getXBLContainer(containingDocument), contextStack,
+            return Headers.evaluateHeaders(submission.container(), contextStack,
                     submission.getEffectiveId(), submission.getSubmissionElement());
         } catch (OXFException e) {
             throw new XFormsSubmissionException(submission, e, e.getMessage(), "processing <header> elements");

@@ -193,12 +193,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         return contextStack;
     }
 
-    public XBLContainer getXBLContainer() {
+    public XBLContainer container() {
         return container;
-    }
-
-    public XBLContainer getXBLContainer(XFormsContainingDocument containingDocument) {
-        return getXBLContainer();
     }
 
     public XFormsContainingDocument getContainingDocument() {
@@ -215,8 +211,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
     public Object getObjectByEffectiveId(String effectiveId) {
 
         // If prefixes or suffixes don't match, object can't be found here
-        if (!getXBLContainer().getFullPrefix().equals(XFormsUtils.getEffectiveIdPrefix(effectiveId))
-                || !XFormsUtils.getEffectiveIdSuffix(getXBLContainer().getEffectiveId()).equals(XFormsUtils.getEffectiveIdSuffix(effectiveId))) {
+        if (!container().getFullPrefix().equals(XFormsUtils.getEffectiveIdPrefix(effectiveId))
+                || !XFormsUtils.getEffectiveIdSuffix(container().getEffectiveId()).equals(XFormsUtils.getEffectiveIdSuffix(effectiveId))) {
             return null;
         }
 
@@ -331,7 +327,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         return effectiveId;
     }
 
-    public Scope getScope(XFormsContainingDocument containingDocument) {
+    public Scope scope() {
         return staticModel.scope();
     }
 
@@ -413,7 +409,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
         // Then get missing instances from static state if necessary
         // This can happen if the instance is not replaced, readonly and inline
-        for (final Instance instance : getXBLContainer().getPartAnalysis().getInstances(getPrefixedId()))
+        for (final Instance instance : container().getPartAnalysis().getInstances(getPrefixedId()))
             if (instancesMap.get(instance.staticId()) == null)
                 setInlineInstance(instance);
     }
@@ -767,7 +763,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         indexInstance(XFormsInstance.apply(this, instance, documentInfo));
     }
 
-    public void performTargetAction(XBLContainer container, XFormsEvent event) {
+    public void performTargetAction(XFormsEvent event) {
         // NOP
     }
 
@@ -788,7 +784,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
                 // Controls may have @bind or xxforms:bind() references, so we need to mark them as dirty. Will need dependencies for controls to fix this.
                 // TODO: Handle XPathDependencies
-                getXBLContainer().requireRefresh();
+                container().requireRefresh();
             }
 
             // "Actions that directly invoke rebuild, recalculate, revalidate, or refresh always
@@ -906,7 +902,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         // side effect of performing RRR on models, but  but not update the UI, which wouldn't make sense for xforms-refresh.
         // This said, is unlikely (impossible?) that the RRR flags would be set but not the refresh flag.
         if (containingDocument.getControls().isRequireRefresh()) {
-            getXBLContainer().synchronizeAndRefresh();
+            container().synchronizeAndRefresh();
         }
     }
 
@@ -926,7 +922,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
             recalculate = true;
             revalidate = true;
 
-            getXBLContainer().requireRefresh();
+            container().requireRefresh();
         }
 
         public void markValueChange(boolean isCalculate) {
@@ -941,7 +937,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
             revalidate = true;
 
-            getXBLContainer().requireRefresh();
+            container().requireRefresh();
         }
     }
 
@@ -1003,7 +999,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         }
     }
 
-    public XFormsEventObserver getParentEventObserver(XFormsContainingDocument containingDocument) {
+    public XFormsEventObserver parentEventObserver() {
         // There is no point for events to propagate beyond the model
         // NOTE: This could change in the future once models are more integrated in the components hierarchy
         return null;

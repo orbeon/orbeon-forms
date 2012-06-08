@@ -171,7 +171,7 @@ public class InstanceReplacer extends BaseReplacer {
                 final NodeInfo newDocumentRootElement = updatedInstance.getInstanceRootElementInfo();
 
                 // Call this directly, since we are not using insert/delete here
-                updatedInstance.getModel(containingDocument).markStructuralChange(updatedInstance);
+                updatedInstance.model().markStructuralChange(updatedInstance);
 
                 // Dispatch xforms-delete event
                 // NOTE: Do NOT dispatch so we are compatible with the regular root element replacement

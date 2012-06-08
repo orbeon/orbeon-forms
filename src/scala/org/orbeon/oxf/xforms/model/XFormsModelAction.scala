@@ -20,7 +20,7 @@ import org.orbeon.oxf.xforms.{XFormsContextStack, XFormsModel, XFormsUtils, XFor
 class XFormsModelAction(parent: XFormsEventObserver, eventHandler: EventHandlerImpl) extends XFormsEventHandler {
 
     val getEffectiveId = XFormsUtils.getRelatedEffectiveId(parent.getEffectiveId, eventHandler.staticId)
-    def getXBLContainer(containingDocument: XFormsContainingDocument) = parent.getXBLContainer(null)
+    def container = parent.container
 
     // This is called by EventHandlerImpl when determining the XPath context for nested event handlers
     def getBindingContext(containingDocument: XFormsContainingDocument) = parent match {
@@ -30,7 +30,7 @@ class XFormsModelAction(parent: XFormsEventObserver, eventHandler: EventHandlerI
         case submission: XFormsModelSubmission ⇒
             // Evaluate the binding of the submission element based on the model's inner context
             // NOTE: When the submission actually starts processing, the binding will be re-evaluated
-            val contextStack = new XFormsContextStack(submission.getXBLContainer(null), submission.getModel.getDefaultEvaluationContext)
+            val contextStack = new XFormsContextStack(submission.container, submission.getModel.getDefaultEvaluationContext)
             contextStack.pushBinding(submission.getSubmissionElement, submission.getEffectiveId, submission.getModel.getResolutionScope)
             contextStack.getCurrentBindingContext
         case _ ⇒

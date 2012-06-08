@@ -131,15 +131,15 @@ class XFormsInstance(
     def mustSerialize = ! (instance.useInlineContent && ! _modified)
 
     // Return the model that contains this instance
-    def getModel(containingDocument: XFormsContainingDocument) = parent
+    def model = parent
 
     def getInstanceRootElementInfo = DataModel.firstChildElement(_documentInfo)
 
     def getId = instance.staticId
     def getPrefixedId = XFormsUtils.getPrefixedId(getEffectiveId)
-    def getScope(containingDocument: XFormsContainingDocument) = getModel(containingDocument).getStaticModel.scope
+    def scope = model.getStaticModel.scope
     def getEffectiveId = XFormsUtils.getRelatedEffectiveId(parent.getEffectiveId, instance.staticId)
-    def getXBLContainer(containingDocument: XFormsContainingDocument) = getModel(containingDocument).getXBLContainer
+    def container = model.container
 
     def isLaxValidation = (instance.validation eq null) || instance.validation == "lax"
     def isStrictValidation = instance.validation == "strict"
@@ -196,8 +196,7 @@ class XFormsInstance(
         else
             new LocationData(_documentInfo.getSystemId, _documentInfo.getLineNumber, -1)
 
-    def getParentEventObserver(containingDocument: XFormsContainingDocument): XFormsEventObserver =
-        getModel(containingDocument)
+    def parentEventObserver: XFormsEventObserver = model
 
     def performDefaultAction(event: XFormsEvent) =
         event.getName match {
@@ -214,7 +213,7 @@ class XFormsInstance(
             case _ ⇒ 
         }
 
-    def performTargetAction(container: XBLContainer, event: XFormsEvent) =
+    def performTargetAction(event: XFormsEvent) =
         event match {
             case insertEvent: XFormsInsertEvent ⇒
                 // New nodes were just inserted
@@ -245,7 +244,7 @@ class XFormsInstance(
     private def updateRepeatNodesets(controls: XFormsControls, insertedNodes: JList[Item]) {
         val repeatControlsMap = controls.getCurrentControlTree.getRepeatControls
         if (! repeatControlsMap.isEmpty) {
-            val instanceScope = getXBLContainer(controls.getContainingDocument).getPartAnalysis.scopeForPrefixedId(getPrefixedId)
+            val instanceScope = container.getPartAnalysis.scopeForPrefixedId(getPrefixedId)
             
             // NOTE: Copy into List as the list of repeat controls may change within updateNodesetForInsertDelete()
             val repeatControls = repeatControlsMap.values.asScala.toList

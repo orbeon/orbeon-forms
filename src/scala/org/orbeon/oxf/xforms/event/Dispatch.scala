@@ -18,7 +18,6 @@ import org.orbeon.oxf.xforms.event.events.{DOMFocusOutEvent, DOMFocusInEvent}
 import org.orbeon.oxf.xforms.event.events.XFormsUIEvent
 
 import org.orbeon.oxf.xforms.control.controls.XXFormsComponentRootControl
-import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData
 import org.orbeon.oxf.util.DebugLogger._
@@ -52,7 +51,7 @@ object Dispatch {
             var performDefaultAction = true
 
             def handlersForObserver(observer: XFormsEventObserver) = {
-                val part = observer.getXBLContainer(containingDocument).getPartAnalysis
+                val part = observer.container.getPartAnalysis
                 part.getEventHandlers(observer.getPrefixedId)
             }
 
@@ -67,7 +66,7 @@ object Dispatch {
             // withDebug("performing action at target")
             if (phase == Phase.target)
                 withEvent(event) {
-                    observer.performTargetAction(observer.getXBLContainer(containingDocument), event)
+                    observer.performTargetAction(event)
                 }
 
             for (handler ← handlersForObserver(observer) filter matches) {
@@ -213,22 +212,20 @@ object Dispatch {
     // The first observer will be the target object
     def findObservers(targetObject: XFormsEventTarget, event: XFormsEvent): (Seq[XFormsEventObserver], Seq[XFormsEventObserver]) = {
 
-        val doc = event.containingDocument
-
         val targetObserver = targetObject match {
             case targetObject: XFormsEventObserver ⇒ targetObject
             case _ ⇒ throw new IllegalArgumentException // this must not happen with the current class hierarchy
         }
 
         // Iterator over a target's ancestor observers
-        class ObserverIterator(start: XFormsEventObserver, doc: XFormsContainingDocument) extends Iterator[XFormsEventObserver] {
+        class ObserverIterator(start: XFormsEventObserver) extends Iterator[XFormsEventObserver] {
             private var _next = start
 
             def hasNext = _next ne null
 
             def next() = {
                 val result = _next
-                _next = _next.getParentEventObserver(doc)
+                _next = _next.parentEventObserver
                 result
             }
         }
@@ -236,7 +233,7 @@ object Dispatch {
         val boundaries = Buffer[XFormsEventObserver]()
 
         // Iterator over all observers
-        val commonIterator = new ObserverIterator(targetObserver, doc)
+        val commonIterator = new ObserverIterator(targetObserver)
 
         // Iterator over all the observers we need to handle
         val observerIterator =
@@ -251,16 +248,16 @@ object Dispatch {
 
                     // Algorithm as follows: start with target and go up following scopes. If we reach an XBL root, then
                     // we retarget the event to the containing component.
-                    var currentTargetScope = targetObject.getScope(doc)
+                    var currentTargetScope = targetObject.scope
                     val result = Buffer[XFormsEventObserver]()
                     while (commonIterator.hasNext) {
                         val current = commonIterator.next()
 
-                        if (current.getScope(doc) == currentTargetScope) {
+                        if (current.scope == currentTargetScope) {
                             if (current.isInstanceOf[XXFormsComponentRootControl]) {
-                                val component = current.getParentEventObserver(doc)
+                                val component = current.parentEventObserver
                                 addRetarget(component)
-                                currentTargetScope = component.getScope(doc)
+                                currentTargetScope = component.scope
                             }
                             result += current
                         }
@@ -270,8 +267,8 @@ object Dispatch {
 
                 case _ ⇒
                     // For other events, including focus events, just follow scopes
-                    val targetScope = targetObject.getScope(doc)
-                    commonIterator filter (_.getScope(doc) == targetScope)
+                    val targetScope = targetObject.scope
+                    commonIterator filter (_.scope == targetScope)
             }
 
         (boundaries.toList, observerIterator.toList.ensuring(_.head eq targetObject))

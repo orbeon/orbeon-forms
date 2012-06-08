@@ -191,7 +191,7 @@ object DataModel {
             case Some(modifiedInstance) ⇒
                 // Tell the model about the value change
                 modifiedInstance.markModified()
-                modifiedInstance.getModel(containingDocument).markValueChange(nodeInfo, isCalculate)
+                modifiedInstance.model.markValueChange(nodeInfo, isCalculate)
 
                 // Dispatch extension event to instance
                 Dispatch.dispatchEvent(new XXFormsValueChanged(containingDocument, modifiedInstance, nodeInfo, oldValue, newValue))

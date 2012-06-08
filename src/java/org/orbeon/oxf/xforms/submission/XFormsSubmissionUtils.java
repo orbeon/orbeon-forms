@@ -294,7 +294,7 @@ public class XFormsSubmissionUtils {
                     final Item controlBoundItem = currentControl.getBoundItem();
                     if (controlBoundItem instanceof NodeInfo) {
                         final NodeInfo controlBoundNodeInfo = (NodeInfo) controlBoundItem;
-                        if (currentInstance == currentInstance.getModel(containingDocument).getInstanceForNode(controlBoundNodeInfo)) {
+                        if (currentInstance == currentInstance.model().getInstanceForNode(controlBoundNodeInfo)) {
                             // Found one relevant upload control bound to the instance we are submitting
                             // NOTE: special MIP-like annotations were added just before re-rooting/pruning element. Those
                             // will be removed during the next recalculate.
@@ -329,7 +329,7 @@ public class XFormsSubmissionUtils {
                     final XFormsUploadControl currentControl = (XFormsUploadControl) o;
                     if (currentControl.isRelevant() && containingDocument.isUploadPendingFor(currentControl)) {
                         final Item controlBoundItem = currentControl.getBoundItem();
-                        if (controlBoundItem instanceof NodeInfo && currentInstance == currentInstance.getModel(containingDocument).getInstanceForNode((NodeInfo) controlBoundItem)) {
+                        if (controlBoundItem instanceof NodeInfo && currentInstance == currentInstance.model().getInstanceForNode((NodeInfo) controlBoundItem)) {
                             // Found one relevant upload control with pending upload bound to the instance we are submitting
                             return true;
                         }

@@ -264,7 +264,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
         return XFormsUtils.getPrefixedId(getEffectiveId());
     }
 
-    public Scope getScope(XFormsContainingDocument containingDocument) {
+    public Scope scope() {
         return staticSubmission.scope();
     }
 
@@ -272,15 +272,15 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
         return XFormsUtils.getRelatedEffectiveId(model.getEffectiveId(), getId());
     }
 
-    public XBLContainer getXBLContainer(XFormsContainingDocument containingDocument) {
-        return getModel().getXBLContainer();
+    public XBLContainer container() {
+        return getModel().container();
     }
 
     public LocationData getLocationData() {
         return (LocationData) submissionElement.getData();
     }
 
-    public XFormsEventObserver getParentEventObserver(XFormsContainingDocument containingDocument) {
+    public XFormsEventObserver parentEventObserver() {
         return model;
     }
 
@@ -353,7 +353,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                 // "The data model is updated"
                 final XFormsModel modelForInstance;
                 if (p.refInstance != null) {
-                    modelForInstance = p.refInstance.getModel(containingDocument);
+                    modelForInstance = p.refInstance.model();
                     if (modelForInstance != null) {
                         // NOTE: XForms 1.1 says that we should rebuild/recalculate the "model containing this submission".
                         // Here, we rebuild/recalculate instead the model containing the submission's single-node binding.
@@ -1166,7 +1166,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
             return null;
     }
 
-    public void performTargetAction(XBLContainer container, XFormsEvent event) {
+    public void performTargetAction(XFormsEvent event) {
         // NOP
     }
 

@@ -118,7 +118,7 @@ abstract public class XFormsFunction extends SystemFunction {
 
         // Constructor for XFormsModel
         public Context(XFormsModel containingModel, XFormsContextStack contextStack) {
-            this.container = containingModel.getXBLContainer();
+            this.container = containingModel.container();
             this.contextStack = contextStack;
         }
 

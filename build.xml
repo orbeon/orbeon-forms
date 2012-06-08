@@ -319,7 +319,7 @@
 
         <scalac destdir="${build.classes.dir}"
                 classpathref="class.path"
-                fork="true" encoding="utf-8" jvmargs="-Xmx400m"
+                fork="true" encoding="utf-8" jvmargs="-Xmx500m"
                 addparams="-Xfatal-warnings">
             <src path="${build.dir}/src"/> <!-- Location of the copy of Version.java with the release/edition set -->
             <src path="${java-src.dir}"/>
@@ -347,7 +347,7 @@
 
         <scalac destdir="${build.test-classes.dir}"
                 classpathref="test.class.path"
-                fork="true" encoding="utf-8" jvmargs="-Xmx300m"
+                fork="true" encoding="utf-8" jvmargs="-Xmx500m"
                 addparams="-Xfatal-warnings">
             <src path="${test-src.dir}"/>
         </scalac>

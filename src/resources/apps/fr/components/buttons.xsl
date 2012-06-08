@@ -122,15 +122,6 @@
         </xforms:trigger>
     </xsl:template>
 
-    <xsl:template match="fr:save-novalidation-button">
-        <xforms:trigger id="fr-novalidation-save-button" xxforms:modal="true" model="fr-persistence-model" ref="instance('fr-triggers-instance')/save">
-            <xforms:label>
-                <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/database_save.png" alt=""/>
-                <xhtml:span><xforms:output value="$fr-resources/detail/labels/save-document"/></xhtml:span>
-            </xforms:label>
-        </xforms:trigger>
-    </xsl:template>
-
     <xsl:template match="fr:save-locally-button">
         <xforms:trigger id="fr-save-locally-button" model="fr-persistence-model" ref="instance('fr-triggers-instance')/other">
             <xforms:label>

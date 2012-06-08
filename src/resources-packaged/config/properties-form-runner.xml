@@ -169,6 +169,9 @@
     <!--<property as="xs:string"  name="oxf.fr.detail.buttons.orbeon.bookshelf"                     value="refresh back clear pdf email submit collapse-all expand-all"/>-->
     <!--<property as="xs:string"  name="oxf.fr.detail.submit.buttons.orbeon.bookshelf"              value="clear"/>-->
 
+    <!-- Save button validates by default -->
+    <property as="xs:boolean" name="oxf.fr.detail.save.validate.*.*"                            value="true"/>
+
     <!-- FR/FB examples bundled with Orbeon -->
     <property as="xs:string"  name="oxf.fr.detail.buttons.orbeon.w4"                            value="pdf"/>
     <property as="xs:integer" name="oxf.fr.detail.toc.orbeon.w4"                                value="-1"/>

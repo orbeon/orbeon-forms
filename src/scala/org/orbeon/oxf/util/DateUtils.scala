@@ -66,14 +66,15 @@ object DateUtils {
                 DateValue.makeDateValue(date)
 
         valueOrFailure match {
-                case value: CalendarValue ⇒
-                    value.subtract(if (value.isInstanceOf[DateTimeValue]) EpochDateTime else EpochDate, TZXPathContext).getLengthInMilliseconds
-                case failure: ValidationFailure ⇒
-                    throw new IllegalArgumentException(failure.getMessage)
-            }
+            case value: CalendarValue ⇒
+                value.subtract(if (value.isInstanceOf[DateTimeValue]) EpochDateTime else EpochDate, TZXPathContext).getLengthInMilliseconds
+            case failure: ValidationFailure ⇒
+                throw new IllegalArgumentException(failure.getMessage)
+        }
     }
 
     // Parse an RFC 1123 dateTime
+    // NOTE: This is a bit ugly and repetitive, but it is clear and works fine!
     def parseRFC1123(date: String): Long =
         try RFC1123Date.parseDateTime(date).getMillis
         catch {

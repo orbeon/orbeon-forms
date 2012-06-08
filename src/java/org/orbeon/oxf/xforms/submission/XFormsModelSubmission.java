@@ -1141,7 +1141,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
         if (targetref == null) {
             // There is no explicit @targetref, so the target is implicitly the root element of either the instance
             // pointed to by @ref, or the instance specified by @instance or @xxforms:instance.
-            destinationObject = defaultReplaceInstance.getInstanceRootElementInfo();
+            destinationObject = defaultReplaceInstance.instanceRoot();
         } else {
             // There is an explicit @targetref, which must be evaluated.
 
@@ -1151,7 +1151,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
             // if it is specified."
             final boolean hasInstanceAttribute = xxfReplaceInstanceId != null || replaceInstanceId != null;
             final Item targetRefContextItem = hasInstanceAttribute
-                    ? defaultReplaceInstance.getInstanceRootElementInfo() : submissionElementContextItem;
+                    ? defaultReplaceInstance.instanceRoot() : submissionElementContextItem;
 
             // Evaluate destination node
             // "This attribute is evaluated only once a successful submission response has been received and if the replace

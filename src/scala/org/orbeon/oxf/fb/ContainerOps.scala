@@ -38,7 +38,7 @@ object ContainerOps {
     private val ComponentURI = """^http://orbeon.org/oxf/xml/form-builder/component/([^/]+)/([^/]+)$""".r
 
     val IsSectionTemplateContent: NodeInfo ⇒ Boolean =
-        container ⇒ (container parent * exists IsSection) && ComponentURI.findFirstIn(container.getNamespaceURI).nonEmpty
+        container ⇒ (container parent * exists IsSection) && ComponentURI.findFirstIn(namespaceURI(container)).nonEmpty
 
     // XForms callers: get the name for a section or grid element or null (the empty sequence)
     def getContainerNameOrEmpty(elem: NodeInfo) = getControlNameOption(elem).orNull

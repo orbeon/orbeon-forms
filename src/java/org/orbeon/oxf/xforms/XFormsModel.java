@@ -584,7 +584,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
     private void setInlineInstance(Instance instance) {
         // Extract document
         final DocumentInfo instanceDocument =
-            XFormsInstance.extractDocument(instance.root().get(), instance.excludeResultPrefixes(), instance.readonly(), instance.isExposeXPathTypes());
+            XFormsInstance.extractDocument(instance.root().get(), instance.excludeResultPrefixes(), instance.readonly(), instance.exposeXPathTypes());
 
         // Set instance and associated information if everything went well
         // NOTE: No XInclude supported to read instances with @src for now
@@ -759,7 +759,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
         // Set instance and associated information if everything went well
         // NOTE: No XInclude supported to read instances with @src for now
-        final DocumentInfo documentInfo = XFormsInstance.createDocumentInfo(instanceDocument, instance.isExposeXPathTypes());
+        final DocumentInfo documentInfo = XFormsInstance.createDocumentInfo(instanceDocument, instance.exposeXPathTypes());
         indexInstance(XFormsInstance.apply(this, instance, documentInfo));
     }
 
@@ -839,7 +839,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
                     // The reason is that clearing this state can take quite some time
                     final boolean instanceMightBeSchemaValidated = hasSchema && instance.isSchemaValidation();
                     if (instanceMightBeSchemaValidated) {
-                        DataModel.visitElementJava(instance.getInstanceRootElementInfo(), new DataModel.NodeVisitor() {
+                        DataModel.visitElementJava(instance.instanceRoot(), new DataModel.NodeVisitor() {
                             public void visit(NodeInfo nodeInfo) {
                                 InstanceData.clearSchemaState(nodeInfo);
                             }

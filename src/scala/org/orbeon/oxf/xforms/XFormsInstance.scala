@@ -22,7 +22,6 @@ import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl
 import org.orbeon.oxf.xforms.event._
 import org.orbeon.oxf.xforms.event.events.XFormsDeleteEvent
 import org.orbeon.oxf.xforms.event.events.XFormsInsertEvent
-import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.xml.dom4j.LocationData
@@ -35,8 +34,7 @@ import org.orbeon.oxf.util.DebugLogger._
 import org.orbeon.oxf.common.OXFException
 import state.InstanceState
 import org.orbeon.oxf.xforms.XFormsServerSharedInstancesCache.Loader
-import java.util.{StringTokenizer, List ⇒ JList}
-import collection.mutable.HashSet
+import java.util.{List ⇒ JList}
 import org.orbeon.saxon.om.{VirtualNode, DocumentInfo, Item}
 
 // Caching information associated with an instance loaded with xxf:cache="true"
@@ -44,25 +42,23 @@ case class InstanceCaching(
         timeToLive: Long,
         handleXInclude: Boolean,
         sourceURI: String,
-        requestBodyHash: String) {
+        requestBodyHash: Option[String]) {
     
-    require(! isInline, """Only XForms instances externally loaded through the src attribute may have xxforms:cache="true".""")
-
-    def isInline = sourceURI eq null
+    require(sourceURI ne null, """Only XForms instances externally loaded through the src attribute may have xxforms:cache="true".""")
 
     def debugPairs = Seq(
         "timeToLive"      → timeToLive.toString,
         "handleXInclude"  → handleXInclude.toString,
         "sourceURI"       → sourceURI,
-        "requestBodyHash" → requestBodyHash
+        "requestBodyHash" → requestBodyHash.orNull
     )
     
     def writeAttributes(att: (String, String) ⇒ Unit) {
         att("cache", "true")
-        if (timeToLive >= 0)         att("ttl", timeToLive.toString)
-        if (handleXInclude)          att("xinclude", "true")
-        if (sourceURI ne null)       att("source-uri", sourceURI)
-        if (requestBodyHash ne null) att("request-body-hash", requestBodyHash)
+        if (timeToLive >= 0) att("ttl", timeToLive.toString)
+        if (handleXInclude)  att("xinclude", "true")
+        att("source-uri", sourceURI)
+        requestBodyHash foreach (att("request-body-hash", _))
     }
 }
 
@@ -70,11 +66,11 @@ object InstanceCaching {
 
     // Not using "apply" as that causes issues for Java callers
     def fromValues(timeToLive: Long, handleXInclude: Boolean, sourceURI: String, requestBodyHash: String): InstanceCaching =
-        InstanceCaching(timeToLive, handleXInclude, sourceURI, requestBodyHash)
+        InstanceCaching(timeToLive, handleXInclude, sourceURI, Option(requestBodyHash))
 
     // Not using "apply" as that causes issues for Java callers
     def fromInstance(instance: Instance, sourceURI: String, requestBodyHash: String): InstanceCaching =
-        InstanceCaching(instance.timeToLive, instance.handleXInclude, sourceURI, requestBodyHash)
+        InstanceCaching(instance.timeToLive, instance.handleXInclude, sourceURI, Option(requestBodyHash))
 }
 
 /**
@@ -107,9 +103,6 @@ class XFormsInstance(
     def readonly = _readonly
     def modified = _modified
 
-    // NOTE: `replaced`: Whether the instance was ever replaced. This is useful so that we know whether we can use an
-    // instance from the static state or not: if it was ever replaced, then we can't use instance information from the
-    // static state.
     // Mark the instance as modified
     // This is used so we can optimize serialization: if an instance is inline and not modified, we don't need to
     // serialize its content
@@ -124,7 +117,7 @@ class XFormsInstance(
         markModified()
     }
 
-    def exposeXPathTypes = instance.isExposeXPathTypes
+    def exposeXPathTypes = instance.exposeXPathTypes
 
     // Don't serialize if the instance is inline and hasn't been modified
     // NOTE: If the instance is cacheable, its metadata gets serialized, but not it's XML content
@@ -133,66 +126,22 @@ class XFormsInstance(
     // Return the model that contains this instance
     def model = parent
 
-    def getInstanceRootElementInfo = DataModel.firstChildElement(_documentInfo)
+    def instanceRoot = DataModel.firstChildElement(_documentInfo)
 
     def getId = instance.staticId
     def getPrefixedId = XFormsUtils.getPrefixedId(getEffectiveId)
-    def scope = model.getStaticModel.scope
     def getEffectiveId = XFormsUtils.getRelatedEffectiveId(parent.getEffectiveId, instance.staticId)
+
+    def scope = model.getStaticModel.scope
     def container = model.container
 
     def isLaxValidation = (instance.validation eq null) || instance.validation == "lax"
     def isStrictValidation = instance.validation == "strict"
     def isSchemaValidation = (isLaxValidation || isStrictValidation) && ! _readonly
 
-    // Output the instance document to the specified ContentHandler
-    def write(xmlReceiver: XMLReceiver) =
-        TransformerUtils.sourceToSAX(_documentInfo, xmlReceiver)
-
-    // Print the instance with extra annotation attributes to Console.out. For debug only.
-    def debugPrintOut() = {
-        val identityTransformerHandler: TransformerXMLReceiver = TransformerUtils.getIdentityTransformerHandler
-        identityTransformerHandler.setResult(new StreamResult(Console.out))
-        write(identityTransformerHandler)
-    }
-
-    // Log the current MIP values applied to this instance
-    def debugLogMIPs() = {
-        val result = Dom4jUtils.createDocument
-        getDocument.accept(new VisitorSupport {
-            final override def visit(element: Element) = {
-                currentElement = rootElement.addElement("element")
-                currentElement.addAttribute("qname", element.getQualifiedName)
-                currentElement.addAttribute("namespace-uri", element.getNamespaceURI)
-                addMIPInfo(currentElement, element)
-            }
-
-            final override def visit(attribute: Attribute) = {
-                val attributeElement = currentElement.addElement("attribute")
-                attributeElement.addAttribute("qname", attribute.getQualifiedName)
-                attributeElement.addAttribute("namespace-uri", attribute.getNamespaceURI)
-                addMIPInfo(attributeElement, attribute)
-            }
-
-            private def addMIPInfo(parentInfoElement: Element, node: Node) = {
-                parentInfoElement.addAttribute("readonly", InstanceData.getInheritedReadonly(node).toString)
-                parentInfoElement.addAttribute("relevant", InstanceData.getInheritedRelevant(node).toString)
-                parentInfoElement.addAttribute("required", InstanceData.getRequired(node).toString)
-                parentInfoElement.addAttribute("valid", InstanceData.getValid(node).toString)
-                val typeQName = InstanceData.getType(node)
-                parentInfoElement.addAttribute("type", Option(typeQName) map (_.getQualifiedName) getOrElse "")
-            }
-
-            private val rootElement = result.addElement("mips")
-            private var currentElement: Element = null
-        })
-
-        XFormsUtils.logDebugDocument("MIPs: ", result)
-    }
-
     def getLocationData =
         if (_documentInfo.isInstanceOf[DocumentWrapper])
-            XFormsUtils.getNodeLocationData(getDocument.getRootElement)
+            XFormsUtils.getNodeLocationData(underlyingDocumentOrNull.getRootElement)
         else
             new LocationData(_documentInfo.getSystemId, _documentInfo.getLineNumber, -1)
 
@@ -260,33 +209,77 @@ class XFormsInstance(
         }
     }
 
-    // Return the instance document as a dom4j Document.
-    // NOTE: Should use getInstanceDocumentInfo() whenever possible.
-    def getDocument: Document =
+    // Return the instance document as a dom4j Document
+    // If the instance is readonly, this returns null. Callers should use instanceRoot() whenever possible.
+    def underlyingDocumentOrNull: Document =
         _documentInfo match {
-            case virtualNode: VirtualNode ⇒
-                virtualNode.getUnderlyingNode.asInstanceOf[Document]
-            case _ ⇒
-                null
+            case virtualNode: VirtualNode ⇒ virtualNode.getUnderlyingNode.asInstanceOf[Document]
+            case _ ⇒ null
         }
 
     // LATER: Measure performance of Dom4jUtils.domToString(instance.getDocument)
     def contentAsString =
-        Option(getDocument) map
+        Option(underlyingDocumentOrNull) map
             (TransformerUtils.dom4jToString(_, false)) getOrElse
                 TransformerUtils.tinyTreeToString(_documentInfo)
 
-    def logInstance(indentedLogger: IndentedLogger, message: String): Unit = {
+    // Don't allow any external events
+    def allowExternalEvent(eventName: String) = false
+
+    // Write the instance document to the specified ContentHandler
+    def write(xmlReceiver: XMLReceiver) =
+        TransformerUtils.sourceToSAX(_documentInfo, xmlReceiver)
+
+    // Log the instance
+    def logContent(indentedLogger: IndentedLogger, message: String): Unit = {
         implicit val logger = indentedLogger
         debug(message, Seq(
             "model effective id"    → parent.getEffectiveId,
             "instance effective id" → getEffectiveId,
-            "instance"              → TransformerUtils.tinyTreeToString(getInstanceRootElementInfo)
+            "instance"              → TransformerUtils.tinyTreeToString(instanceRoot)
         ))
     }
 
-    // Don't allow any external events
-    def allowExternalEvent(eventName: String) = false
+    // Print the instance with extra annotation attributes to Console.out. For debug only.
+    def debugPrintOut() = {
+        val identityTransformerHandler: TransformerXMLReceiver = TransformerUtils.getIdentityTransformerHandler
+        identityTransformerHandler.setResult(new StreamResult(Console.out))
+        write(identityTransformerHandler)
+    }
+
+    // Log the current MIP values applied to this instance
+    def debugLogMIPs() = {
+        val result = Dom4jUtils.createDocument
+        underlyingDocumentOrNull.accept(new VisitorSupport {
+            final override def visit(element: Element) = {
+                currentElement = rootElement.addElement("element")
+                currentElement.addAttribute("qname", element.getQualifiedName)
+                currentElement.addAttribute("namespace-uri", element.getNamespaceURI)
+                addMIPInfo(currentElement, element)
+            }
+
+            final override def visit(attribute: Attribute) = {
+                val attributeElement = currentElement.addElement("attribute")
+                attributeElement.addAttribute("qname", attribute.getQualifiedName)
+                attributeElement.addAttribute("namespace-uri", attribute.getNamespaceURI)
+                addMIPInfo(attributeElement, attribute)
+            }
+
+            private def addMIPInfo(parentInfoElement: Element, node: Node) = {
+                parentInfoElement.addAttribute("readonly", InstanceData.getInheritedReadonly(node).toString)
+                parentInfoElement.addAttribute("relevant", InstanceData.getInheritedRelevant(node).toString)
+                parentInfoElement.addAttribute("required", InstanceData.getRequired(node).toString)
+                parentInfoElement.addAttribute("valid", InstanceData.getValid(node).toString)
+                val typeQName = InstanceData.getType(node)
+                parentInfoElement.addAttribute("type", Option(typeQName) map (_.getQualifiedName) getOrElse "")
+            }
+
+            private val rootElement = result.addElement("mips")
+            private var currentElement: Element = null
+        })
+
+        XFormsUtils.logDebugDocument("MIPs: ", result)
+    }
 }
 
 object XFormsInstance {
@@ -351,7 +344,7 @@ object XFormsInstance {
                 case Right(content) ⇒
                     debug("using initialized instance from state", Seq("id" → instanceState.effectiveId))
                     (None,
-                        createDocumentInfo(content, instanceState.readonly, instance.isExposeXPathTypes))
+                        createDocumentInfo(content, instanceState.readonly, instance.exposeXPathTypes))
             }
 
         model.indexInstance(
@@ -364,32 +357,28 @@ object XFormsInstance {
                 instanceState.modified))
     }
 
-    private def extractDocument(element: Element, excludeResultPrefixes: String): Document = {
-        // Extract document and adjust namespaces
-        // TODO: Implement exactly as per XSLT 2.0
-        // TODO: Must implement namespace fixup, the code below can break serialization
-        if (excludeResultPrefixes == "#all") {
-            // Special #all
-            Dom4jUtils.createDocumentCopyElement(element)
-        } else if ((excludeResultPrefixes ne null) && excludeResultPrefixes.trim.nonEmpty) {
-            // List of prefixes
-            val st = new StringTokenizer(excludeResultPrefixes)
-            val prefixesToExclude = new HashSet[String]
-            while (st.hasMoreTokens)
-                prefixesToExclude += st.nextToken()
-            Dom4jUtils.createDocumentCopyParentNamespaces(element, prefixesToExclude.asJava)
-        } else {
-            // No exclusion
-            Dom4jUtils.createDocumentCopyParentNamespaces(element)
+    // Extract a document and adjust namespaces if requested
+    // NOTE: Should implement exactly as per XSLT 2.0
+    // NOTE: Should implement namespace fixup, the code below can break serialization
+    private def extractDocument(element: Element, excludeResultPrefixes: Set[String]): Document =
+        excludeResultPrefixes match {
+            case prefixes if prefixes("#all") ⇒
+                // Special #all
+                Dom4jUtils.createDocumentCopyElement(element)
+            case prefixes if prefixes.nonEmpty ⇒
+                // List of prefixes
+                Dom4jUtils.createDocumentCopyParentNamespaces(element, prefixes.asJava)
+            case _ ⇒
+                // No exclusion
+                Dom4jUtils.createDocumentCopyParentNamespaces(element)
         }
-    }
 
     // Extract the document starting at the given root element
     // This always creates a copy of the original sub-tree
     //
     // @readonly         if true, the document returned is a compact TinyTree, otherwise a DocumentWrapper
     // @exposeXPathTypes if true, use a TypedDocumentWrapper
-    def extractDocument(element: Element, excludeResultPrefixes: String, readonly: Boolean, exposeXPathTypes: Boolean): DocumentInfo = {
+    def extractDocument(element: Element, excludeResultPrefixes: Set[String], readonly: Boolean, exposeXPathTypes: Boolean): DocumentInfo = {
 
         require(! (readonly && exposeXPathTypes), "can't expose XPath types on readonly content")
 

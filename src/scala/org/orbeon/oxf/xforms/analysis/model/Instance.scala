@@ -25,6 +25,7 @@ import org.dom4j.{QName, Element}
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData
 import org.orbeon.oxf.common.{ValidationException, Version}
 import org.orbeon.oxf.xml.{ContentHandlerHelper, Dom4j}
+import org.orbeon.oxf.util.ScalaUtils.stringOptionToSet
 
 /**
  * Static analysis of an XForms instance.
@@ -38,7 +39,7 @@ class Instance(staticStateContext: StaticStateContext, element: Element, parent:
     val handleXInclude = false
 
     val validation = element.attributeValue(XXFORMS_VALIDATION_QNAME)
-    def isExposeXPathTypes = staticStateContext.partAnalysis.staticState.isExposeXPathTypes
+    def exposeXPathTypes = staticStateContext.partAnalysis.staticState.isExposeXPathTypes
 
     val credentials = {
         // NOTE: AVTs not supported because XPath expressions in those could access instances that haven't been loaded
@@ -53,7 +54,7 @@ class Instance(staticStateContext: StaticStateContext, element: Element, parent:
             null
     }
 
-    val excludeResultPrefixes = element.attributeValue(XXFORMS_EXCLUDE_RESULT_PREFIXES)
+    val excludeResultPrefixes = stringOptionToSet(Option(element.attributeValue(XXFORMS_EXCLUDE_RESULT_PREFIXES)))
 
     // Inline root element if any
     val root = Dom4j.elements(element) headOption

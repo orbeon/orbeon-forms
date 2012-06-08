@@ -134,7 +134,7 @@ public class InstanceReplacer extends BaseReplacer {
             }
 
             // Whether the destination node is the root element of an instance
-            final boolean isDestinationRootElement = updatedInstance.getInstanceRootElementInfo().isSameNodeInfo(destinationNodeInfo);
+            final boolean isDestinationRootElement = updatedInstance.instanceRoot().isSameNodeInfo(destinationNodeInfo);
             if (p2.isReadonly && !isDestinationRootElement) {
                 // Only support replacing the root element of an instance when using a shared instance
                 throw new XFormsSubmissionException(submission, "targetref attribute must point to instance root element when using read-only instance replacement.", "processing targetref attribute",
@@ -157,7 +157,7 @@ public class InstanceReplacer extends BaseReplacer {
             // NOTE: As of 2009-03-18 decision, XForms 1.1 specifies that deferred event handling flags are set instead of
             // performing RRRR directly.
             final DocumentInfo newDocumentInfo =
-                    wrappedDocumentInfo != null ? wrappedDocumentInfo : XFormsInstance.createDocumentInfo(resultingDocumentOrDocumentInfo, updatedInstance.instance().isExposeXPathTypes());
+                    wrappedDocumentInfo != null ? wrappedDocumentInfo : XFormsInstance.createDocumentInfo(resultingDocumentOrDocumentInfo, updatedInstance.instance().exposeXPathTypes());
 
             if (isDestinationRootElement) {
                 // Optimized insertion for instance root element replacement
@@ -168,7 +168,7 @@ public class InstanceReplacer extends BaseReplacer {
                     newDocumentInfo,
                     p2.isReadonly);
 
-                final NodeInfo newDocumentRootElement = updatedInstance.getInstanceRootElementInfo();
+                final NodeInfo newDocumentRootElement = updatedInstance.instanceRoot();
 
                 // Call this directly, since we are not using insert/delete here
                 updatedInstance.model().markStructuralChange(updatedInstance);

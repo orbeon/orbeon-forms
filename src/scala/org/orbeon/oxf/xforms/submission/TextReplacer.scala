@@ -72,7 +72,7 @@ class TextReplacer(submission: XFormsModelSubmission, containingDocument: XForms
                 }
             } else {
                 // Use default destination
-                submission.findReplaceInstanceNoTargetref(p.refInstance).getInstanceRootElementInfo
+                submission.findReplaceInstanceNoTargetref(p.refInstance).instanceRoot
             }
 
         def handleSetValueSuccess(oldValue: String) =

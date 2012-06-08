@@ -124,4 +124,10 @@ object ScalaUtils {
     // Semi-standard pipe operator
     class PipeOps[A](a: A) { def |>[B](f: A ⇒ B) = f(a) }
     implicit def anyToPipeOps[A](a: A) = new PipeOps(a)
+
+    // Convert a string of tokens to a set
+    def stringOptionToSet(s: Option[String]) = s match {
+        case Some(list) ⇒ list split """\s+""" toSet
+        case None ⇒ Set[String]()
+    }
 }

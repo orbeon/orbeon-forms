@@ -193,7 +193,7 @@ object XFormsAPI {
         containersToSearch map
                 (_.findInstance(staticId)) find
                     (_ ne null) map
-                        (_.getInstanceRootElementInfo)
+                        (_.instanceRoot)
     }
 
     // Return a model

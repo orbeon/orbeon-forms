@@ -19,7 +19,6 @@ import org.orbeon.oxf.xml.dom4j.LocationDocumentSource
 import javax.xml.transform.stream.StreamResult
 import java.io._
 import org.orbeon.oxf.util.URLRewriterUtils.PathMatcher
-import org.apache.commons.lang.StringUtils
 
 import sbinary._
 import org.dom4j.{Namespace, QName, Document}
@@ -90,7 +89,7 @@ object XFormsProtocols extends StandardTypes with StandardPrimitives with JavaLo
             write(output, instance.timeToLive)
             write(output, instance.handleXInclude)
             write(output, instance.sourceURI)
-            write(output, StringUtils.trimToEmpty(instance.requestBodyHash))
+            write(output, instance.requestBodyHash)
         }
 
         def reads(in: Input) =
@@ -98,7 +97,7 @@ object XFormsProtocols extends StandardTypes with StandardPrimitives with JavaLo
                 read[Long](in),
                 read[Boolean](in),
                 read[String](in),
-                StringUtils.trimToNull(read[String](in))
+                read[Option[String]](in)
             )
     }
 

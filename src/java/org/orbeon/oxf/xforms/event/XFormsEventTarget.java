@@ -23,13 +23,14 @@ import org.orbeon.oxf.xml.dom4j.LocationData;
 public interface XFormsEventTarget {
 
     Scope scope();
+    XBLContainer container();
+
     String getId();
     String getPrefixedId();
     String getEffectiveId();
 
     LocationData getLocationData();
 
-    XBLContainer container();
     XFormsEventObserver parentEventObserver();
 
     void performTargetAction(XFormsEvent event);

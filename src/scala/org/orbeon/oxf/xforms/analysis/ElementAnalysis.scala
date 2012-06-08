@@ -21,6 +21,7 @@ import org.orbeon.oxf.xml.NamespaceMapping
 import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, LocationData, ExtendedLocationData}
 import org.orbeon.oxf.xml.ContentHandlerHelper
 import org.orbeon.oxf.xforms.xbl.Scope
+import org.orbeon.oxf.util.ScalaUtils.stringOptionToSet
 
 /**
  * Abstract representation of a common XForms element supporting optional context, binding and value.
@@ -262,20 +263,15 @@ object ElementAnalysis {
 
     def createLocationData(element: Element): ExtendedLocationData =
         if (element ne null) new ExtendedLocationData(element.getData.asInstanceOf[LocationData], "gathering static information", element) else null
-
-    private def stringToSet(s: Option[String]) = s match {
-        case Some(list) ⇒ list split """\s+""" toSet
-        case None ⇒ Set[String]()
-    }
     
     /**
      * Get the value of an attribute containing a space-separated list of tokens as a set.
      */
     def attSet(element: Element, qName: QName) =
-        stringToSet(Option(element.attributeValue(qName)))
+        stringOptionToSet(Option(element.attributeValue(qName)))
     
     def attSet(element: Element, name: String) =
-        stringToSet(Option(element.attributeValue(name)))
+        stringOptionToSet(Option(element.attributeValue(name)))
 
     /**
      * Get the value of an attribute containing a space-separated list of QNames as a set.

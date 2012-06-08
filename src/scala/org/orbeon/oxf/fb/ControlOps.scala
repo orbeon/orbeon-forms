@@ -112,7 +112,7 @@ object ControlOps {
                 val path = bindRefs map ("(" + _.stringValue + ")") mkString "/"
 
                 // Assume that namespaces in scope on leaf bind apply to ancestor binds (in theory mappings could be overridden along the way!)
-                val namespaces = new NamespaceMapping(Dom4jUtils.getNamespaceContextNoDefault(bind))
+                val namespaces = new NamespaceMapping(Dom4jUtils.getNamespaceContextNoDefault(unwrapElement(bind)))
 
                 // Evaluate path from instance root element
                 evalOne(formInstanceRoot(inDoc), path, namespaces).asInstanceOf[NodeInfo]

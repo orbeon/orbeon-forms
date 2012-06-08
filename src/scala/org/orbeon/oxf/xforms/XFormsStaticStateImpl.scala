@@ -31,6 +31,7 @@ import state.AnnotatedTemplate
 import xbl.Scope
 import org.dom4j.{Element, Document}
 import org.orbeon.oxf.util.{NumberUtils, XPathCache}
+import org.orbeon.oxf.util.ScalaUtils.stringOptionToSet
 
 class XFormsStaticStateImpl(
         val encodedState: String,
@@ -59,10 +60,7 @@ class XFormsStaticStateImpl(
     def toXML(helper: ContentHandlerHelper) = topLevelPart.toXML(helper)
 
     // Properties
-    lazy val allowedExternalEvents = getProperty[String](P.EXTERNAL_EVENTS_PROPERTY) match {
-        case s: String ⇒ s split """\s+""" toSet
-        case _ ⇒ Set.empty[String]
-    }
+    lazy val allowedExternalEvents = stringOptionToSet(Option(getProperty[String](P.EXTERNAL_EVENTS_PROPERTY)))
     lazy val isNoscript = XFormsStaticStateImpl.isNoscript(staticStateDocument.nonDefaultProperties)
     lazy val isXPathAnalysis = Version.instance.isPEFeatureEnabled(getProperty[Boolean](P.XPATH_ANALYSIS_PROPERTY), P.XPATH_ANALYSIS_PROPERTY)
     lazy val isExposeXPathTypes = getProperty[Boolean](P.EXPOSE_XPATH_TYPES_PROPERTY)

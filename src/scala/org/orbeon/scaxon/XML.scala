@@ -30,6 +30,7 @@ import org.orbeon.saxon.expr.{Token, ExpressionTool}
 import org.orbeon.saxon.om._
 import scala.Predef._
 import org.orbeon.saxon.functions.FunctionLibrary
+import org.orbeon.oxf.util.ScalaUtils.stringOptionToSet
 
 object XML {
 
@@ -262,7 +263,7 @@ object XML {
         def descendant(test: Test) = \\(test)
 
         def attValue(attName: String) = \@(attName).stringValue
-        def attTokens(attName: String) = attValue(attName) split """\s+""" toSet
+        def attTokens(attName: String) = stringOptionToSet(Some(attValue(attName)))
         def attClasses = attTokens("class")
 
         def self(test: Test) = find(Axis.SELF, test)
@@ -345,7 +346,7 @@ object XML {
     implicit def itemToItemSeq(item: Item) = Seq(item)
     implicit def nodeInfoToNodeInfoSeq(node: NodeInfo) = if (node ne null) Seq(node) else Seq()// TODO: don't take null
 
-    implicit def instanceToNodeInfo(instance: XFormsInstance) = instance.getInstanceRootElementInfo
+    implicit def instanceToNodeInfo(instance: XFormsInstance) = instance.instanceRoot
 
     implicit def itemSeqToString(items: Seq[Item]): String = itemSeqToStringOption(items).orNull // TODO: don't return null
     implicit def itemSeqToItemOption(items: Seq[Item]): Option[Item] = items.headOption
@@ -358,8 +359,11 @@ object XML {
 
     implicit def itemSeqToFirstItem(items: Seq[Item]): Item = items.headOption.orNull // TODO: don't return null
 
-    implicit def unwrapElement(nodeInfo: NodeInfo): Element =
+    def unwrapElement(nodeInfo: NodeInfo): Element =
         nodeInfo.asInstanceOf[VirtualNode].getUnderlyingNode.asInstanceOf[Element]
+
+    def unwrapDocument(nodeInfo: NodeInfo): Document =
+        nodeInfo.asInstanceOf[VirtualNode].getUnderlyingNode.asInstanceOf[Document]
 
     def elemToDom4j(e: Elem): Document = Dom4jUtils.readDom4j(e.toString)
     def elemToDocumentInfo(e: Elem, readonly: Boolean = true): DocumentInfo =

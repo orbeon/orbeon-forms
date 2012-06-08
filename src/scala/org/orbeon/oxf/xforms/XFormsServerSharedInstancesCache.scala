@@ -31,7 +31,7 @@ object XFormsServerSharedInstancesCache {
     private val ConstantValidity = 0L
     private val SharedInstanceKeyType = XFormsSharedInstancesCacheName
 
-    // Equivalent to loadContent: (String, Boolean) ⇒ DocumentInfo
+    // Equivalent to load: (String, Boolean) ⇒ DocumentInfo
     trait Loader {
         def load(instanceSourceURI: String, handleXInclude: Boolean): DocumentInfo
     }
@@ -45,7 +45,7 @@ object XFormsServerSharedInstancesCache {
             instance: Instance,
             instanceCaching: InstanceCaching,
             readonly: Boolean) =
-        find(instanceCaching)(indentedLogger) map (wrapDocumentInfo(_, readonly, instance.isExposeXPathTypes)) orNull
+        find(instanceCaching)(indentedLogger) map (wrapDocumentInfo(_, readonly, instance.exposeXPathTypes)) orNull
 
     // Try to find instance content in the cache or load it
     def findContentOrLoad(
@@ -86,7 +86,7 @@ object XFormsServerSharedInstancesCache {
             Some(instanceContent)
         }
 
-        find(instanceCaching) orElse loadAndCache map (wrapDocumentInfo(_, readonly, instance.isExposeXPathTypes)) get
+        find(instanceCaching) orElse loadAndCache map (wrapDocumentInfo(_, readonly, instance.exposeXPathTypes)) get
     }
 
     // Remove the given entry from the cache if present
@@ -95,7 +95,7 @@ object XFormsServerSharedInstancesCache {
         debug("removing instance", Seq("URI" → instanceSourceURI, "request hash" → requestBodyHash))
 
         val cache = ObjectCache.instance(XFormsSharedInstancesCacheName, XFormsSharedInstancesCacheDefaultSize)
-        val cacheKey = createCacheKey(instanceSourceURI, handleXInclude, requestBodyHash)
+        val cacheKey = createCacheKey(instanceSourceURI, handleXInclude, Option(requestBodyHash))
         cache.remove(cacheKey)
     }
 
@@ -138,7 +138,7 @@ object XFormsServerSharedInstancesCache {
     private def createCacheKey(instanceCaching: InstanceCaching): InternalCacheKey =
         createCacheKey(instanceCaching.sourceURI, instanceCaching.handleXInclude, instanceCaching.requestBodyHash)
 
-    private def createCacheKey(sourceURI: String, handleXInclude: Boolean, requestBodyHash: String): InternalCacheKey =
+    private def createCacheKey(sourceURI: String, handleXInclude: Boolean, requestBodyHash: Option[String]): InternalCacheKey =
         new InternalCacheKey(SharedInstanceKeyType,
-            sourceURI + "|" + handleXInclude.toString + (Option(requestBodyHash) map ('|' + _) getOrElse ""))
+            sourceURI + "|" + handleXInclude.toString + (requestBodyHash map ('|' + _) getOrElse ""))
 }

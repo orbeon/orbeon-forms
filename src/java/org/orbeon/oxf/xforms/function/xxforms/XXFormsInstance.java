@@ -56,7 +56,7 @@ public class XXFormsInstance extends XFormsFunction {
         // Return instance document if found
         if (instance != null) {
             // "this function returns a node-set containing just the root element node"
-            return SingletonIterator.makeIterator(instance.getInstanceRootElementInfo());
+            return SingletonIterator.makeIterator(instance.instanceRoot());
         } else {
             // "an empty node-set is returned"
             getContainingDocument(xpathContext).getIndentedLogger(XFormsModel.LOGGING_CATEGORY).logWarning("xxforms:instance()", "instance not found", "instance id", instanceId);

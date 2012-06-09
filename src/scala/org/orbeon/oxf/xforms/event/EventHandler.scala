@@ -31,6 +31,8 @@ trait EventHandler {
     def isPropagate: Boolean
     def isPerformDefaultAction: Boolean
 
+    val isPhantom: Boolean
+
     def jObserversPrefixedIds: JSet[String]
     def eventNames: Set[String]
 

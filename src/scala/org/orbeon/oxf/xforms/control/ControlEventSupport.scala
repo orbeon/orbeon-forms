@@ -51,7 +51,7 @@ trait ControlEventSupport {
             }
 
             // Focus on current control if possible
-            if (XFormsEvents.XFORMS_FOCUS == event.getName)
+            if (XFormsEvents.XFORMS_FOCUS == event.name)
                 setFocus()
 
         case _: XFormsHelpEvent ⇒

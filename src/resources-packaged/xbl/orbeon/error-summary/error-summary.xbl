@@ -249,6 +249,7 @@ Inserting error information into error list:
                         <xforms:setvalue ev:event="xforms-enabled" ref="instance('fr-state-instance')/incremental"
                                          xxbl:scope="inner" xbl:attr="xbl:text=incremental"/>
                         <!-- When the group becomes relevant, remember observer -->
+                        <!-- TODO: Q WHY? doesn't seem used ? -->
                         <xforms:setvalue ev:event="xforms-enabled" ref="instance('fr-state-instance')/observer"
                                          xxbl:scope="inner" xbl:attr="xbl:text=observer"/>
 
@@ -256,7 +257,7 @@ Inserting error information into error list:
                         <xsl:copy-of select="xxbl:parameter(., 'observer')"/>
 
                         <!-- Control visited: handle events on observer(s) passed -->
-                        <xforms:action xbl:attr="ev:observer=observer" ev:event="DOMFocusOut xforms-value-changed xforms-disabled">
+                        <xforms:action xbl:attr="ev:observer=observer" ev:event="DOMFocusOut xforms-value-changed xforms-disabled" xxforms:phantom="true">
                             <xforms:action xxbl:scope="inner">
 
                                 <!-- Useful stuff passed to us -->
@@ -281,7 +282,7 @@ Inserting error information into error list:
                         </xforms:action>
 
                         <!-- Control becomes invalid: handle xforms-invalid on observer(s) passed -->
-                        <xforms:action xbl:attr="ev:observer=observer" ev:event="xforms-invalid xforms-value-changed">
+                        <xforms:action xbl:attr="ev:observer=observer" ev:event="xforms-invalid xforms-value-changed" xxforms:phantom="true">
 
                             <xforms:action xxbl:scope="inner">
 
@@ -319,7 +320,7 @@ Inserting error information into error list:
                         </xforms:action>
 
                         <!-- Control becomes valid or is removed: handle xforms-valid and xforms-disabled on observer(s) passed -->
-                        <xforms:action xbl:attr="ev:observer=observer" ev:event="xforms-valid xforms-disabled">
+                        <xforms:action xbl:attr="ev:observer=observer" ev:event="xforms-valid xforms-disabled" xxforms:phantom="true">
 
                             <xforms:action xxbl:scope="inner">
 
@@ -341,7 +342,7 @@ Inserting error information into error list:
                         </xforms:action>
 
                         <!-- Node-set changed: handle xxforms-nodeset-changed on observer(s) passed -->
-                        <xforms:action xbl:attr="ev:observer=observer" ev:event="xxforms-nodeset-changed"
+                        <xforms:action xbl:attr="ev:observer=observer" ev:event="xxforms-nodeset-changed" xxforms:phantom="true"
                                        if="count(xxforms:event('xxforms:to-positions')) > 0">
                             <xforms:action xxbl:scope="inner">
                                 <!-- One or more iterations have moved. This is a bit tricky: we must update the error summary properly. -->

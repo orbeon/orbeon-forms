@@ -34,11 +34,11 @@ public class KeypressEvent extends XFormsEvent {
             // NOTE: See also normalization logic in XFormsEventHandlerImpl
             final String keyModifiersParameter = parameters.get(MODIFIERS_ATTRIBUTE);
             if (StringUtils.isNotBlank(keyModifiersParameter))
-                setAttributeAsString(MODIFIERS_ATTRIBUTE,  keyModifiersParameter.trim());
+                setCustomAsString(MODIFIERS_ATTRIBUTE, keyModifiersParameter.trim());
 
             final String keyTextParameter = parameters.get(TEXT_ATTRIBUTE);
             if (StringUtils.isNotEmpty(keyTextParameter))// allow for e.g. " "
-                setAttributeAsString(TEXT_ATTRIBUTE, keyTextParameter);
+                setCustomAsString(TEXT_ATTRIBUTE, keyTextParameter);
         }
     }
 

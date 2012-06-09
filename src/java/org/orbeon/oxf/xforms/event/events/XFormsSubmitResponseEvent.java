@@ -96,11 +96,11 @@ public abstract class XFormsSubmitResponseEvent extends XFormsEvent {
 
                 sb.append("</headers>");
 
-                final Item headersDocument = TransformerUtils.stringToTinyTree(getContainingDocument().getStaticState().xpathConfiguration(),
+                final Item headersDocument = TransformerUtils.stringToTinyTree(containingDocument().getStaticState().xpathConfiguration(),
                         sb.toString(), false, false);
 
                 return XPathCache.evaluateAsExtent(Collections.singletonList(headersDocument), 1,
-                        "/headers/header", NamespaceMapping.EMPTY_MAPPING, null, null, null, null, getLocationData()).iterate();
+                        "/headers/header", NamespaceMapping.EMPTY_MAPPING, null, null, null, null, locationData()).iterate();
             } else {
                 // No headers
                 return EmptyIterator.getInstance();
@@ -108,7 +108,7 @@ public abstract class XFormsSubmitResponseEvent extends XFormsEvent {
         } else if ("response-reason-phrase".equals(name)) {
             // "The protocol response reason phrase of the error response. The string is empty if the failed submission
             // did not receive an error response or if the error response did not contain a reason phrase."
-            throw new ValidationException("Property Not implemented yet: " + name, getLocationData());
+            throw new ValidationException("Property Not implemented yet: " + name, locationData());
             // TODO
         } else {
             return super.getAttribute(name);
@@ -116,7 +116,7 @@ public abstract class XFormsSubmitResponseEvent extends XFormsEvent {
     }
 
     @Override
-    protected IndentedLogger getIndentedLogger () {
-        return getContainingDocument().getIndentedLogger(XFormsModelSubmission.LOGGING_CATEGORY);
+    public IndentedLogger indentedLogger() {
+        return containingDocument().getIndentedLogger(XFormsModelSubmission.LOGGING_CATEGORY);
     }
 }

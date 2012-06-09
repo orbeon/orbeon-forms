@@ -74,6 +74,10 @@ class EventHandlerImpl(
     val keyModifiers = attOption(XXFORMS_EVENTS_MODIFIERS_ATTRIBUTE_QNAME.getName)
     val keyText = attOption(XXFORMS_EVENTS_TEXT_ATTRIBUTE_QNAME.getName)
 
+    val isPhantom = att(XXFORMS_EVENTS_PHANTOM_ATTRIBUTE_QNAME.getName) == "true"
+
+    assert(! (isPhantom && isWithinRepeat), "phantom observers are not supported within repeats at this time")
+
     // For Java callers
     def getKeyModifiers = keyModifiers.orNull
     def getKeyText = keyText.orNull
@@ -182,7 +186,7 @@ class EventHandlerImpl(
                 // Regular observer
 
                 // Resolve the concrete handler
-                EventHandlerImpl.resolveHandler(containingDocument, this, eventObserver, event.getTargetObject) match {
+                EventHandlerImpl.resolveHandler(containingDocument, this, eventObserver, event.targetObject) match {
                     case Some(concreteHandler) ⇒
                         val handlerContainer = concreteHandler.container
                         val handlerEffectiveId = concreteHandler.getEffectiveId
@@ -221,8 +225,8 @@ class EventHandlerImpl(
         targetPrefixedIds.isEmpty || targetPrefixedIds(targetPrefixedId)
 
     def isMatch(event: XFormsEvent) =
-            isMatchEventName(event.getName) &&
-            isMatchTarget(XFormsUtils.getPrefixedId(event.getTargetObject.getEffectiveId)) &&
+            isMatchEventName(event.name) &&
+            isMatchTarget(XFormsUtils.getPrefixedId(event.targetObject.getEffectiveId)) &&
             event.matches(self)
 }
 
@@ -258,6 +262,10 @@ object EventHandlerImpl {
             if (targetObject.scope == handler.scope) {
                 // The scopes match so we can resolve the id relative to the target
                 Option(targetObject.container.resolveObjectByIdInScope(targetObject.getEffectiveId, handler.staticId, null))
+            } else if (handler.isPhantom) {
+                // Special case of a phantom handler
+                // NOTE: For now, we only support phantom handlers outside of repeats so we can resolve by prefixed id
+                Option(containingDocument.getObjectByEffectiveId(handler.prefixedId))
             } else {
                 // Scopes don't match which implies that the event handler must be a child (or grand-child in the case of repeat) of the observer
                 def parentPrefixedId = handler.parent map (_.prefixedId)

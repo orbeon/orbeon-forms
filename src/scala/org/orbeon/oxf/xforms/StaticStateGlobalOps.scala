@@ -16,7 +16,6 @@ package org.orbeon.oxf.xforms
 import analysis.controls.RepeatControl
 import collection.mutable.LinkedHashSet
 import collection.JavaConverters._
-import java.util.{List ⇒ JList}
 import org.dom4j.QName
 
 // Global operations on parts including top-level part and descendant parts
@@ -104,10 +103,6 @@ class StaticStateGlobalOps(topLevelPart: PartAnalysis) extends PartGlobalOps {
 
         (allScripts, allStyles)
     }
-
-    // For Java callers
-    def getAncestorRepeatsJava(startPrefixedId: String, endPrefixedId: String): JList[String] =
-        getAncestorRepeats(startPrefixedId, Option(endPrefixedId)).asJava
 
     /**
      * Get prefixed ids of all of the start control's repeat ancestors, stopping at endPrefixedId if not null. If

@@ -208,6 +208,7 @@ public class XFormsConstants {
 
     public static final QName XXFORMS_EVENTS_MODIFIERS_ATTRIBUTE_QNAME = new QName("modifiers", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_EVENTS_TEXT_ATTRIBUTE_QNAME = new QName("text", XXFORMS_NAMESPACE);
+    public static final QName XXFORMS_EVENTS_PHANTOM_ATTRIBUTE_QNAME = new QName("phantom", XXFORMS_NAMESPACE);
 
     public static final String XXFORMS_ALL_EVENTS = "#all";
 

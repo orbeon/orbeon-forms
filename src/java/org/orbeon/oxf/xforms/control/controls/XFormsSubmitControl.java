@@ -39,7 +39,7 @@ public class XFormsSubmitControl extends XFormsTriggerControl {
     @Override
     public void performDefaultAction(XFormsEvent event) {
         // Do the default stuff upon receiving a DOMActivate event
-        if (XFormsEvents.DOM_ACTIVATE.equals(event.getName())) {
+        if (XFormsEvents.DOM_ACTIVATE.equals(event.name())) {
 
             // Find submission id
             final String submissionId =  getControlElement().attributeValue(XFormsConstants.SUBMISSION_QNAME);

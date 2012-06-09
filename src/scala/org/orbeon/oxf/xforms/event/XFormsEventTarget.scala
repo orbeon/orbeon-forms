@@ -11,30 +11,29 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.xforms.event;
+package org.orbeon.oxf.xforms.event
 
-import org.orbeon.oxf.xforms.xbl.Scope;
-import org.orbeon.oxf.xforms.xbl.XBLContainer;
-import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xforms.xbl.Scope
+import org.orbeon.oxf.xforms.xbl.XBLContainer
+import org.orbeon.oxf.xml.dom4j.LocationData
 
 /**
  * XFormsEventTarget is implemented by classes that support dispatching of events.
  */
-public interface XFormsEventTarget {
+trait XFormsEventTarget {
+    def scope: Scope
+    def container: XBLContainer
 
-    Scope scope();
-    XBLContainer container();
+    def getId: String
+    def getPrefixedId: String
+    def getEffectiveId: String
 
-    String getId();
-    String getPrefixedId();
-    String getEffectiveId();
+    def getLocationData: LocationData
 
-    LocationData getLocationData();
+    def parentEventObserver: XFormsEventObserver
 
-    XFormsEventObserver parentEventObserver();
+    def performTargetAction(event: XFormsEvent)
+    def performDefaultAction(event: XFormsEvent)
 
-    void performTargetAction(XFormsEvent event);
-    void performDefaultAction(XFormsEvent event);
-
-    boolean allowExternalEvent(String eventName);
+    def allowExternalEvent(eventName: String): Boolean
 }

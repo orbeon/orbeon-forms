@@ -2268,7 +2268,6 @@
                     <xxf:message level="modal">target: my-foo, observer: #document, event: xforms-enabled</xxf:message>
                     <xxf:message level="modal">target: inner-group, observer: inner-group, event: xforms-enabled</xxf:message>
                     <xxf:message level="modal">target: inner-group, observer: my-template, event: xforms-enabled</xxf:message>
-                    <xxf:message level="modal">target: my-foo, observer: #document, event: xforms-enabled</xxf:message>
                     <xxf:message level="modal">target: outer-group, observer: outer-group, event: xforms-enabled</xxf:message>
                     <xxf:message level="modal">target: outer-group, observer: #document, event: xforms-enabled</xxf:message>
                     <xxf:message level="modal">target: my-input, observer: outer-group, event: xforms-enabled</xxf:message>

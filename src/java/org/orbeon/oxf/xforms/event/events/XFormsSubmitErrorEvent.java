@@ -61,7 +61,7 @@ public class XFormsSubmitErrorEvent extends XFormsSubmitResponseEvent {
         super(containingDocument, XFormsEvents.XFORMS_SUBMIT_ERROR, targetObject, connectionResult);
         this.errorType = errorType;
 
-        final IndentedLogger indentedLogger = getIndentedLogger();
+        final IndentedLogger indentedLogger = indentedLogger();
 
         if (connectionResult != null) {
 
@@ -145,7 +145,7 @@ public class XFormsSubmitErrorEvent extends XFormsSubmitResponseEvent {
 
         if (errorType != ErrorType.VALIDATION_ERROR) {
             // Don't log validation errors as actual errors
-            getIndentedLogger().logError("xforms-submit-error", "setting throwable", "throwable", throwableToString(throwable));
+            indentedLogger().logError("xforms-submit-error", "setting throwable", "throwable", throwableToString(throwable));
         }
     }
 
@@ -161,7 +161,7 @@ public class XFormsSubmitErrorEvent extends XFormsSubmitResponseEvent {
 
     private void setBodyDocument(DocumentInfo bodyDocument) {
         if (XFormsProperties.getErrorLogging().contains("submission-error-body"))
-            getIndentedLogger().logError("xforms-submit-error", "setting body document", "body", "\n" + TransformerUtils.tinyTreeToString(bodyDocument));
+            indentedLogger().logError("xforms-submit-error", "setting body document", "body", "\n" + TransformerUtils.tinyTreeToString(bodyDocument));
         this.bodyDocument = bodyDocument;
     }
 
@@ -171,7 +171,7 @@ public class XFormsSubmitErrorEvent extends XFormsSubmitResponseEvent {
 
     private void setBodyString(String bodyString) {
         if (XFormsProperties.getErrorLogging().contains("submission-error-body"))
-            getIndentedLogger().logError("xforms-submit-error", "setting body string", "body", "\n" + bodyString);
+            indentedLogger().logError("xforms-submit-error", "setting body string", "body", "\n" + bodyString);
         this.bodyString = bodyString;
     }
 
@@ -181,7 +181,7 @@ public class XFormsSubmitErrorEvent extends XFormsSubmitResponseEvent {
             // Return the body of the response if possible
 
             if ("body".equals(name)) {
-                getIndentedLogger().logWarning("xforms-submit-error", "event('body') is deprecated. Use event('response-body') instead.");
+                indentedLogger().logWarning("xforms-submit-error", "event('body') is deprecated. Use event('response-body') instead.");
             }
 
             // "When the error response specifies an XML media type as defined by [RFC 3023], the response body is

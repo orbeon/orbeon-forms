@@ -127,7 +127,7 @@ object InstanceMirror {
             findMatchingNode: (NodeInfo, String, Boolean) ⇒ Option[NodeInfo]): EventListener = {
 
         case valueChanged: XXFormsValueChanged ⇒
-            findMatchingNode(valueChanged.node, valueChanged.getTargetObject.getId, true) match {
+            findMatchingNode(valueChanged.node, valueChanged.targetObject.getId, true) match {
                 case Some(newNode) ⇒
                     DataModel.setValueIfChanged(
                         newNode,
@@ -140,7 +140,7 @@ object InstanceMirror {
                     false
             }
         case insert: XFormsInsertEvent ⇒
-            findMatchingNode(insert.getInsertLocationNodeInfo, insert.getTargetObject.getId, insert.getPosition == "into") match {
+            findMatchingNode(insert.getInsertLocationNodeInfo, insert.targetObject.getId, insert.getPosition == "into") match {
                 case Some(insertNode) ⇒
                     insert.getPosition match {
                         case "into" ⇒
@@ -168,7 +168,7 @@ object InstanceMirror {
                     // If parent is available, find matching node and call body
                     Option(deleteInfo.parent) match {
                         case Some(removedParentNodeInfo) ⇒
-                            findMatchingNode(removedParentNodeInfo, delete.getTargetObject.getId, true) match {
+                            findMatchingNode(removedParentNodeInfo, delete.targetObject.getId, true) match {
                                 case Some(newParentNodeInfo) ⇒
 
                                     val docWrapper = newParentNodeInfo.getDocumentRoot.asInstanceOf[DocumentWrapper]

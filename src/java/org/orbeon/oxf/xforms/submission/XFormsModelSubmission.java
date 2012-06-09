@@ -289,7 +289,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
     }
 
     public void performDefaultAction(XFormsEvent event) {
-        final String eventName = event.getName();
+        final String eventName = event.name();
 
         if (XFormsEvents.XFORMS_SUBMIT.equals(eventName) || XFormsEvents.XXFORMS_SUBMIT.equals(eventName)) {
             // 11.1 The xforms-submit Event
@@ -317,7 +317,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
         try {
             try {
                 // Big bag of initial runtime parameters
-                p = new SubmissionParameters(event.getName());
+                p = new SubmissionParameters(event.name());
 
                 if (indentedLogger.isDebugEnabled()) {
                     final String message = p.isDeferredSubmissionFirstPass ? "submission first pass" : p.isDeferredSubmissionSecondPass ? "submission second pass" : "submission";

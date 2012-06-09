@@ -21,6 +21,6 @@ import org.orbeon.oxf.xforms.model.DataModel.Reason
 class XXFormsBindingErrorEvent(
         containingDocument: XFormsContainingDocument,
         target: XFormsEventTarget,
-        val locationData: LocationData,
+        override val locationData: LocationData,
         val reason: Reason)
     extends XFormsEvent(containingDocument, XFormsEvents.XXFORMS_BINDING_ERROR, target, bubbles = true, cancelable = false)

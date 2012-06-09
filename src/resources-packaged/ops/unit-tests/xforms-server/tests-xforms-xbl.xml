@@ -260,6 +260,7 @@
                                 <xforms:group>
                                     <!-- TEST: Event listener -->
                                     <xforms:insert ev:event="xforms-value-changed xforms-enabled xforms-disabled"
+                                                   xxforms:phantom="true"
                                                    context="instance('events')" nodeset="*"
                                                    origin="xxforms:element('event',
                                                             (xxforms:attribute('type', xxforms:event('xxforms:type')),
@@ -821,7 +822,7 @@
         </output>
     </test>
 
-    <test description="XBL event retargeting and dispatch to bound node" name="oxf:pipeline">
+    <test description="XBL event hiding and dispatch to bound node" name="oxf:pipeline">
         <input name="config">
             <p:config>
                 <p:param name="response" type="output"/>
@@ -928,22 +929,8 @@
                                     <event type="xforms-enabled" target="external-group" phase="target" original-target="external-group" indexes="" original-indexes=""/>
                                     <event type="xforms-enabled" target="my-foobar" phase="capture" original-target="my-foobar" indexes="" original-indexes=""/>
                                     <event type="xforms-enabled" target="my-foobar" phase="bubbling" original-target="my-foobar" indexes="" original-indexes=""/>
-                                    <event type="xforms-enabled" target="my-foobar" phase="capture" original-target="internal-group" indexes="" original-indexes=""/>
-                                    <event type="DOMActivate" target="my-foobar" phase="capture" original-target="internal-trigger-1" indexes="" original-indexes=""/>
                                     <event type="fr:my-event" target="my-foobar" phase="capture" original-target="my-foobar" indexes="" original-indexes=""/>
                                     <event type="fr:my-event" target="my-foobar" phase="bubbling" original-target="my-foobar" indexes="" original-indexes=""/>
-                                    <event type="DOMActivate" target="my-foobar" phase="bubbling" original-target="internal-trigger-1" indexes="" original-indexes=""/>
-                                    <event type="DOMActivate" target="my-foobar" phase="capture" original-target="internal-trigger-2" indexes="" original-indexes=""/>
-                                    <event type="DOMActivate" target="my-foobar" phase="bubbling" original-target="internal-trigger-2" indexes="" original-indexes=""/>
-                                    <event type="DOMActivate" target="my-foobar" phase="capture" original-target="internal-trigger-3" indexes="" original-indexes=""/>
-                                    <event type="DOMActivate" target="my-foobar" phase="bubbling" original-target="internal-trigger-3" indexes="" original-indexes=""/>
-                                    <event type="xforms-enabled" target="my-foobar" phase="bubbling" original-target="internal-group" indexes="" original-indexes=""/>
-                                    <event type="xforms-enabled" target="my-foobar" phase="capture" original-target="internal-trigger-1" indexes="" original-indexes=""/>
-                                    <event type="xforms-enabled" target="my-foobar" phase="bubbling" original-target="internal-trigger-1" indexes="" original-indexes=""/>
-                                    <event type="xforms-enabled" target="my-foobar" phase="capture" original-target="internal-trigger-2" indexes="" original-indexes=""/>
-                                    <event type="xforms-enabled" target="my-foobar" phase="bubbling" original-target="internal-trigger-2" indexes="" original-indexes=""/>
-                                    <event type="xforms-enabled" target="my-foobar" phase="capture" original-target="internal-trigger-3" indexes="" original-indexes=""/>
-                                    <event type="xforms-enabled" target="my-foobar" phase="bubbling" original-target="internal-trigger-3" indexes="" original-indexes=""/>
                                 </events>
                             </instance>
                         </instances>
@@ -1469,12 +1456,7 @@
                             <instance id="events" model-id="my-bar-1$model">
                                 <events>
                                     <event type="xforms-enabled" target="my-bar-1" phase="target" original-target="my-bar-1" indexes="" original-indexes=""/>
-                                    <event type="xforms-enabled" target="my-bar-1" phase="bubbling" original-target="bar-group" indexes="" original-indexes=""/>
-                                    <event type="xforms-enabled" target="my-bar-1" phase="bubbling" original-target="input1" indexes="" original-indexes=""/>
-                                    <event type="xforms-enabled" target="my-bar-1" phase="bubbling" original-target="input2" indexes="" original-indexes=""/>
                                     <event type="my-event" target="my-bar-1" phase="target" original-target="my-bar-1" indexes="" original-indexes=""/>
-                                    <event type="xforms-value-changed" target="my-bar-1" phase="bubbling" original-target="input1" indexes="" original-indexes=""/>
-                                    <event type="xforms-value-changed" target="my-bar-1" phase="bubbling" original-target="input2" indexes="" original-indexes=""/>
                                 </events>
                             </instance>
                             <instance id="instance" model-id="my-bar-2$model">
@@ -1486,12 +1468,7 @@
                             <instance id="events" model-id="my-bar-2$model">
                                 <events>
                                     <event type="xforms-enabled" target="my-bar-2" phase="target" original-target="my-bar-2" indexes="" original-indexes=""/>
-                                    <event type="xforms-enabled" target="my-bar-2" phase="bubbling" original-target="bar-group" indexes="" original-indexes=""/>
-                                    <event type="xforms-enabled" target="my-bar-2" phase="bubbling" original-target="input1" indexes="" original-indexes=""/>
-                                    <event type="xforms-enabled" target="my-bar-2" phase="bubbling" original-target="input2" indexes="" original-indexes=""/>
                                     <event type="my-event" target="my-bar-2" phase="target" original-target="my-bar-2" indexes="" original-indexes=""/>
-                                    <event type="xforms-value-changed" target="my-bar-2" phase="bubbling" original-target="input1" indexes="" original-indexes=""/>
-                                    <event type="xforms-value-changed" target="my-bar-2" phase="bubbling" original-target="input2" indexes="" original-indexes=""/>
                                 </events>
                             </instance>
                         </instances>

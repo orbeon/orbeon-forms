@@ -381,14 +381,14 @@ object ClientEvents {
         // o the the target is still live
         // o that the target is not a non-relevant or readonly control
         def checkEventTarget(event: XFormsEvent): Boolean = {
-            val eventTarget = event.getTargetObject
+            val eventTarget = event.targetObject
             val newReference = doc.getObjectByEffectiveId(eventTarget.getEffectiveId)
 
             def warn(condition: String) = {
                 implicit val CurrentLogger = doc.getIndentedLogger
                 debug("ignoring invalid client event on " + condition, Seq(
                     "control id" → eventTarget.getEffectiveId,
-                    "event name" → event.getName)
+                    "event name" → event.name)
                 )
                 false
             }
@@ -443,9 +443,9 @@ object ClientEvents {
                 Dispatch.dispatchEvent(event)
 
         implicit val CurrentLogger = doc.getIndentedLogger(LOGGING_CATEGORY)
-        val target = event.getTargetObject
+        val target = event.targetObject
         val targetEffectiveId = target.getEffectiveId
-        val eventName = event.getName
+        val eventName = event.name
 
         withDebug("handling external event", Seq("target id" → targetEffectiveId, "event name" → eventName)) {
 

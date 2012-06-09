@@ -149,7 +149,7 @@ public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
     public void performTargetAction(XFormsEvent event) {
         super.performTargetAction(event);
 
-        if (XFormsEvents.XXFORMS_DIALOG_OPEN.equals(event.getName())) {
+        if (XFormsEvents.XXFORMS_DIALOG_OPEN.equals(event.name())) {
             // Open the dialog
 
             final XXFormsDialogOpenEvent dialogOpenEvent = (XXFormsDialogOpenEvent) event;
@@ -167,7 +167,7 @@ public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
                 // Partial refresh
                 containingDocument().getControls().doPartialRefresh(this);
             }
-        } else if (XFormsEvents.XXFORMS_DIALOG_CLOSE.equals(event.getName())) {
+        } else if (XFormsEvents.XXFORMS_DIALOG_CLOSE.equals(event.name())) {
             // Close the dialog
 
             final XXFormsDialogControlLocal localForUpdate = (XXFormsDialogControlLocal) getLocalForUpdate();
@@ -184,12 +184,12 @@ public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
 
     @Override
     public void performDefaultAction(XFormsEvent event) {
-        if (XFormsEvents.XXFORMS_DIALOG_CLOSE.equals(event.getName())) {
+        if (XFormsEvents.XXFORMS_DIALOG_CLOSE.equals(event.name())) {
             // If the dialog is closed and the focus is within the dialog, remove the focus
             // NOTE: Ideally, we should get back to the control that had focus before the dialog opened, if possible.
             if (! isVisible() && Focus.isFocusWithinContainer(this))
                 Focus.removeFocus(containingDocument());
-        } else if (XFormsEvents.XXFORMS_DIALOG_OPEN.equals(event.getName())) {
+        } else if (XFormsEvents.XXFORMS_DIALOG_OPEN.equals(event.name())) {
             // If the dialog is open and the focus has not been set within the dialog, attempt to set the focus within
             if (isVisible() && ! Focus.isFocusWithinContainer(this))
                 Dispatch.dispatchEvent(new XFormsFocusEvent(containingDocument(), this));

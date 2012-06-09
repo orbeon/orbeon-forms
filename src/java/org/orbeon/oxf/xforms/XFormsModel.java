@@ -415,7 +415,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
     }
 
     public void performDefaultAction(XFormsEvent event) {
-        final String eventName = event.getName();
+        final String eventName = event.name();
         if (XFormsEvents.XFORMS_MODEL_CONSTRUCT.equals(eventName)) {
             // 4.2.1 The xforms-model-construct Event
             // Bubbles: Yes / Cancelable: No / Context Info: None

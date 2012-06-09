@@ -33,8 +33,8 @@ public class XXFormsDndEvent extends XFormsEvent {
 
         // Store as attributes so we can test for this event by using xxforms:context
         if (parameters != null) {
-            setAttributeAsString(DND_START_ATTRIBUTE, parameters.get(DND_START_ATTRIBUTE));
-            setAttributeAsString(DND_END_ATTRIBUTE, parameters.get(DND_END_ATTRIBUTE));
+            setCustomAsString(DND_START_ATTRIBUTE, parameters.get(DND_START_ATTRIBUTE));
+            setCustomAsString(DND_END_ATTRIBUTE, parameters.get(DND_END_ATTRIBUTE));
         }
     }
 

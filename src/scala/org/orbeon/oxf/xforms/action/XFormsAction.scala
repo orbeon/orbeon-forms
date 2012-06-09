@@ -93,7 +93,7 @@ abstract class XFormsAction {
                     new SequenceExtent(Array[Item](StringValue.makeStringValue(currentContextInfo.getStringValue)))
             }
 
-            event.setAttribute(name, value)
+            event.setCustom(name, value)
         }
     }
 }

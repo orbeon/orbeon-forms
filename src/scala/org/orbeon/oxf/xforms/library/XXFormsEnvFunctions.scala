@@ -18,7 +18,7 @@ import org.orbeon.saxon.expr.StaticProperty._
 import org.orbeon.saxon.`type`.BuiltInAtomicType._
 import org.orbeon.oxf.xforms.function.xxforms._
 import org.orbeon.oxf.xml.OrbeonFunctionLibrary
-import org.orbeon.oxf.xforms.function.If
+import org.orbeon.oxf.xforms.function.{Event, If}
 
 /*
  * Orbeon extension functions that depend on the XForms environment.
@@ -31,7 +31,8 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
     Namespace(XXFormsEnvFunctionsNS) {
     
         // xxforms:event()
-        Fun("event", classOf[XXFormsEvent], 0, 1, Type.NODE_TYPE, ALLOWS_ZERO_OR_MORE,
+        // NOTE: This is deprecated and just points to the event() function.
+        Fun("event", classOf[Event], 0, 1, Type.NODE_TYPE, ALLOWS_ZERO_OR_MORE,
             Arg(STRING, EXACTLY_ONE)
         )
     

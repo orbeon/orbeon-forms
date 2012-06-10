@@ -82,7 +82,7 @@
                         </xforms:group>
 
                         <!-- Listen to activations on grid cells -->
-                        <xforms:action ev:event="DOMActivate">
+                        <xforms:action ev:event="DOMActivate" xxforms:phantom="true">
                             <xforms:var name="control-element" value="xxforms:control-element(xxforms:event('xxforms:effective-targetid'))"/>
                             <xforms:action if="tokenize($control-element/@class, '\s+') = 'xforms-activable'">
                                 <xforms:var name="th-column" value="count($control-element/preceding-sibling::*[@xxforms:element = 'xh:th']) + 1"/>

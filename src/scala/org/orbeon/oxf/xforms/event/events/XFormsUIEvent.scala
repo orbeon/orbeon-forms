@@ -16,8 +16,7 @@ package org.orbeon.oxf.xforms.event.events
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.event.XFormsEvent
-import collection.JavaConverters._
-import org.orbeon.saxon.om.{ListIterator, EmptyIterator, SequenceIterator}
+import org.orbeon.saxon.om.SequenceIterator
 import XFormsUIEvent._
 
 /**
@@ -39,15 +38,15 @@ abstract class XFormsUIEvent(
     def this(containingDocument: XFormsContainingDocument, eventName: String, targetControl: XFormsControl) =
         this(containingDocument, eventName, targetControl, true, false)
 
-    override def getAttribute(name: String): SequenceIterator =
-        XFormsEvent.attribute(this, name, Deprecated, StandardAttributes) getOrElse super.getAttribute(name)
+    override def isDeprecated(name: String) = Deprecated.get(name) orElse super.isDeprecated(name)
+    override def getStandardAttribute(name: String) = StandardAttributes.get(name) orElse super.getStandardAttribute(name)
 }
 
-object XFormsUIEvent {
+private object XFormsUIEvent {
 
     import XFormsEvent._
     
-    private val Deprecated = Map(
+    val Deprecated = Map(
         "target-ref"        → "xxforms:binding",
         "alert"             → "xxforms:alert",
         "label"             → "xxforms:label",
@@ -55,9 +54,10 @@ object XFormsUIEvent {
         "help"              → "xxforms:help"
     )
     
-    private val StandardAttributes = Map[String, XFormsUIEvent ⇒ SequenceIterator](
+    val StandardAttributes = Map[String, XFormsUIEvent ⇒ SequenceIterator](
         "target-ref"                    → binding,
         xxformsName("binding")          → binding,
+        xxformsName("control-position") → controlPosition,
         "label"                         → label,
         xxformsName("label")            → label,
         "help"                          → help,
@@ -65,29 +65,19 @@ object XFormsUIEvent {
         "hint"                          → hint,
         xxformsName("hint")             → hint,
         "alert"                         → alert,
-        xxformsName("alert")            → alert,
-        xxformsName("control-position") → controlPosition
+        xxformsName("alert")            → alert
     )
 
-    private def binding(e: XFormsUIEvent) = new ListIterator(e.targetControl.binding.asJava)
+    def binding(e: XFormsUIEvent) = listIterator(e.targetControl.binding)
 
-    private def controlPosition(e: XFormsUIEvent) = {
+    def controlPosition(e: XFormsUIEvent) = {
         val controlStaticPosition = e.targetControl.container.getPartAnalysis.getControlPosition(e.targetControl.getPrefixedId)
-        if (controlStaticPosition >= 0)
-            longIterator(controlStaticPosition)
-        else
-            EmptyIterator.getInstance
+        longIterator(controlStaticPosition, controlStaticPosition >= 0)
     }
 
-    private def label(e: XFormsUIEvent) =
-        Option(e.targetControl.getLabel) map (stringIterator(_)) getOrElse EmptyIterator.getInstance
+    def label(e: XFormsUIEvent) = stringIterator(e.targetControl.getLabel)
+    def help(e: XFormsUIEvent)  = stringIterator(e.targetControl.getHelp)
+    def hint(e: XFormsUIEvent)  = stringIterator(e.targetControl.getHint)
+    def alert(e: XFormsUIEvent) = stringIterator(e.targetControl.getAlert)
 
-    private def help(e: XFormsUIEvent) =
-        Option(e.targetControl.getHelp) map (stringIterator(_)) getOrElse EmptyIterator.getInstance
-
-    private def hint(e: XFormsUIEvent) =
-        Option(e.targetControl.getHint) map (stringIterator(_)) getOrElse EmptyIterator.getInstance
-
-    private def alert(e: XFormsUIEvent) =
-        Option(e.targetControl.getAlert) map (stringIterator(_)) getOrElse EmptyIterator.getInstance
 }

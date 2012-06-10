@@ -15,14 +15,12 @@ package org.orbeon.oxf.xforms.event.events
 
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.event.{XFormsEvents, XFormsEvent, XFormsEventTarget}
-import org.orbeon.saxon.om.SingletonIterator
-import org.orbeon.saxon.value.Int64Value
+import XFormsEvent._
 
 class XXFormsSetindexEvent(containingDocument: XFormsContainingDocument, targetObject: XFormsEventTarget, val index: Int)
     extends XFormsEvent(containingDocument, XFormsEvents.XXFORMS_SETINDEX, targetObject, true, false) {
 
-    override def getAttribute(name: String) = name match {
-        case "index" ⇒ SingletonIterator.makeIterator(new Int64Value(index))
-        case other ⇒ super.getAttribute(other)
-    }
+    override def getStandardAttribute(name: String) =
+        Map("index" → ((e: this.type) ⇒ longIterator(index))).get(name) orElse
+            super.getStandardAttribute(name)
 }

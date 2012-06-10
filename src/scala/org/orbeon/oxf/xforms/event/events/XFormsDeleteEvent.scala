@@ -18,12 +18,10 @@ import org.orbeon.oxf.xforms.action.actions.XFormsDeleteAction
 import org.orbeon.oxf.xforms.event.XFormsEvent
 import org.orbeon.oxf.xforms.event.XFormsEventTarget
 import org.orbeon.oxf.xforms.event.XFormsEvents
-import org.orbeon.saxon.om.EmptyIterator
-import org.orbeon.saxon.om.ListIterator
-import org.orbeon.saxon.om.SingletonIterator
-import org.orbeon.saxon.value.Int64Value
 import java.util.{List ⇒ JList}
 import collection.JavaConverters._
+import org.orbeon.saxon.om.SequenceIterator
+import XFormsDeleteEvent._
 
 /**
  * 4.4.5 The xforms-insert and xforms-delete Events
@@ -38,17 +36,16 @@ class XFormsDeleteEvent(containingDocument: XFormsContainingDocument, targetObje
     def this(containingDocument: XFormsContainingDocument, targetObject: XFormsEventTarget) =
         this(containingDocument, targetObject, null, -1)
 
-    override def getAttribute(name: String) = name match {
-        case "deleted-nodes" ⇒
-            // "The instance data node deleted. Note that these nodes are no longer referenced by their parents."
-            new ListIterator(deleteInfos.asScala map (_.nodeInfo) asJava)
-        case "delete-location" ⇒
-            // "The delete location as defined by the delete action, or NaN if there is no delete location."
-            if (deleteIndex < 1)
-                EmptyIterator.getInstance
-            else
-                SingletonIterator.makeIterator(new Int64Value(deleteIndex))
-        case other ⇒
-            super.getAttribute(other)
-    }
+    override def getStandardAttribute(name: String) =
+        StandardAttributes.get(name) orElse super.getStandardAttribute(name)
+}
+
+private object XFormsDeleteEvent {
+
+    import XFormsEvent._
+
+    val StandardAttributes = Map[String, XFormsDeleteEvent ⇒ SequenceIterator](
+        "deleted-nodes"   → (e ⇒ listIterator(e.deleteInfos.asScala map (_.nodeInfo))),
+        "delete-location" → (e ⇒ longIterator(e.deleteIndex, e.deleteIndex > 0))
+    )
 }

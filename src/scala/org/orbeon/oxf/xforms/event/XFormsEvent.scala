@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.event
 
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsContainingDocument
-import org.orbeon.oxf.xforms.XFormsUtils
+import org.orbeon.oxf.xforms.XFormsUtils._
 import org.orbeon.oxf.xml.XMLUtils.buildExplodedQName
 import org.orbeon.oxf.xml.dom4j.LocationData
 import org.orbeon.saxon.om._
@@ -55,8 +55,30 @@ abstract class XFormsEvent(
     def setCustomAsString(name: String, value: String): Unit =
         setCustom(name, new SequenceExtent(Array[Item](StringValue.makeStringValue(value))))
 
-    def getAttribute(name: String): SequenceIterator =
-        attribute(this, name, Deprecated, StandardAttributes) getOrElse EmptyIterator.getInstance
+    // These two methods can be overridden by subclasses
+    def isDeprecated(name: String) = Deprecated.get(name)
+    def getStandardAttribute(name: String): Option[this.type ⇒ SequenceIterator] = StandardAttributes.get(name)
+
+    // This method is overridden by legacy event classes (remove when those have been rewritten)
+    def getAttribute(name: String): SequenceIterator = {
+
+        // Deprecation warning if needed
+        isDeprecated(name) foreach { newName ⇒
+            indentedLogger.logWarning("", "event('" + name + "') is deprecated. Use event('" + newName + "') instead.")
+        }
+
+        // "If the event context information does not contain the property indicated by the string argument, then an
+        // empty node-set is returned."
+        def default = {
+            indentedLogger.logWarning("", "Unsupported event context information for event('" + name + "').")
+            EmptyIterator.getInstance
+        }
+
+        // Try custom attributes first, then standard attributes
+        custom.get(name) map (_.iterate()) orElse
+            (getStandardAttribute(name) map (_(self))) getOrElse
+                default
+    }
 
     def getAttributeAsString(name: String): String =
         Option(getAttribute(name).next()) map (_.getStringValue) orNull
@@ -83,30 +105,16 @@ object XFormsEvent {
     object Target   extends Phase("target")
     object Bubbling extends Phase("bubbling")
 
-    def stringIterator(s: String)   = SingletonIterator.makeIterator(StringValue.makeStringValue(s))
-    def booleanIterator(b: Boolean) = SingletonIterator.makeIterator(BooleanValue.get(b))
-    def longIterator(l: Long)       = SingletonIterator.makeIterator(new Int64Value(l))
+    import SingletonIterator.makeIterator
+    import StringValue.makeStringValue
+
+    def emptyIterator = EmptyIterator.getInstance
+    def stringIterator (s: String,    cond: ⇒ Boolean = true) = if ((s ne null) && cond) makeIterator(makeStringValue(s)) else emptyIterator
+    def booleanIterator(b: Boolean,   cond: ⇒ Boolean = true) = if (cond) makeIterator(BooleanValue.get(b)) else emptyIterator
+    def longIterator   (l: Long,      cond: ⇒ Boolean = true) = if (cond) makeIterator(new Int64Value(l)) else emptyIterator
+    def listIterator   (s: Seq[Item], cond: ⇒ Boolean = true) = if (cond) new ListIterator(s.asJava) else emptyIterator
+
     def xxformsName(name: String)   = buildExplodedQName(XXFORMS_NAMESPACE_URI, name)
-
-    def attribute[A <: XFormsEvent](event: A, name: String, deprecated: Map[String, String], standard: Map[String, A ⇒ SequenceIterator]): Option[SequenceIterator] = {
-
-        // Deprecation warning if needed
-        deprecated.get(name) foreach { newName ⇒
-            event.indentedLogger.logWarning("", "event('" + name + "') is deprecated. Use event('" + newName + "') instead.")
-        }
-
-        def default = {
-            // "If the event context information does not contain the property indicated by the string argument, then an
-            // empty node-set is returned."
-            event.indentedLogger.logWarning("", "Unsupported event context information for event('" + name + "').")
-            None
-        }
-
-        // Try custom attributes first, then standard attributes
-        event.custom.get(name) map (_.iterate()) orElse
-            (standard.get(name) map (_(event))) orElse
-            default
-    }
     
     private val Deprecated = Map(
         "target"            → "xxforms:targetid",
@@ -133,21 +141,21 @@ object XFormsEvent {
     )
 
     private def repeatIndexes(e: XFormsEvent) = {
-        val parts = XFormsUtils.getEffectiveIdSuffixParts(e.targetObject.getEffectiveId)
-        new ListIterator(parts.toList map (index ⇒ StringValue.makeStringValue(index.toString)) asJava)
+        val parts = getEffectiveIdSuffixParts(e.targetObject.getEffectiveId)
+        listIterator(parts.toList map (index ⇒ StringValue.makeStringValue(index.toString)))
     }
 
     private def repeatAncestors(e: XFormsEvent) =
-        if (XFormsUtils.hasEffectiveIdSuffix(e.targetObject.getEffectiveId)) {
+        if (hasEffectiveIdSuffix(e.targetObject.getEffectiveId)) {
             // There is a suffix so compute
-            val ancestorRepeats = e.containingDocument.getStaticOps.getAncestorRepeats(XFormsUtils.getPrefixedId(e.targetObject.getEffectiveId), null)
-            new ListIterator(ancestorRepeats map (prefixedId ⇒ StringValue.makeStringValue(XFormsUtils.getStaticIdFromId(prefixedId))) asJava)
+            val ancestorRepeats = e.containingDocument.getStaticOps.getAncestorRepeats(getPrefixedId(e.targetObject.getEffectiveId), null)
+            listIterator(ancestorRepeats map (prefixedId ⇒ StringValue.makeStringValue(getStaticIdFromId(prefixedId))))
         } else
             // No suffix
-            EmptyIterator.getInstance
+            emptyIterator
 
     private def targetPrefixes(e: XFormsEvent) = {
-        val parts = XFormsUtils.getEffectiveIdPrefixParts(e.targetObject.getEffectiveId)
-        new ListIterator(parts.toList map (StringValue.makeStringValue(_)) asJava)
+        val parts = getEffectiveIdPrefixParts(e.targetObject.getEffectiveId)
+        listIterator(parts.toList map (StringValue.makeStringValue(_)))
     }
 }

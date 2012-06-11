@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <!--
   Copyright (C) 2010 Orbeon, Inc.
 
@@ -12,27 +11,23 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xbl:xbl xmlns:xhtml="http://www.w3.org/1999/xhtml"
-         xmlns:xforms="http://www.w3.org/2002/xforms"
+<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
          xmlns:ev="http://www.w3.org/2001/xml-events"
-         xmlns:xi="http://www.w3.org/2001/XInclude"
-         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
-         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
          xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
          xmlns:saxon="http://saxon.sf.net/"
          xmlns:oxf="http://www.orbeon.com/oxf/processors"
          xmlns:xbl="http://www.w3.org/ns/xbl"
-         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
-
-         script-type="application/xhtml+xml">
+         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
 
     <xbl:script type="text/javascript" src="/ops/yui/element/element-min.js"/>
     <xbl:script type="text/javascript" src="/ops/yui/button/button-min.js"/>
     <xbl:script type="text/javascript" src="/xbl/orbeon/button/button.js"/>
 
-    <xbl:binding id="fr-button" element="fr|button" xxbl:mode="binding handlers">
+    <xbl:binding id="fr-button" element="fr|button" xxbl:mode="binding">
         <xbl:resources>
             <xbl:style src="/ops/yui/button/assets/skins/sam/button.css"/>
             <xbl:style>
@@ -57,30 +52,32 @@
             </xbl:style>
         </xbl:resources>
         <xbl:template xxbl:transform="oxf:unsafe-xslt">
-            <xforms:group appearance="xxforms:internal" xsl:version="2.0">
-                <xxforms:variable name="class-avt" xxbl:scope="outer" xbl:attr="xbl:text=class"/>
-                <xxforms:variable name="class"><xxforms:sequence select="xxforms:evaluate-avt($class-avt)" xxbl:scope="outer"/></xxforms:variable>
-                <xhtml:span class="yui-button yui-push-button{{if ($class = '') then '' else concat(' ', $class)}}" id="container">
-                    <xhtml:span class="first-child">
+            <xf:group appearance="xxf:internal" xsl:version="2.0">
+                <!-- Propagate @class with AVT to span (Q: do we need to?) -->
+                <xf:var name="class-avt" xxbl:scope="outer" xbl:attr="xbl:text=class"/>
+                <xf:var name="class"><xxf:sequence value="xxf:evaluate-avt($class-avt)" xxbl:scope="outer"/></xf:var>
+                <xh:span class="yui-button yui-push-button{{if ($class = '') then '' else concat(' ', $class)}}" id="container">
+                    <xh:span class="first-child">
+                        <!-- Store @tabindex into hidden span -->
                         <xsl:variable name="tabindex" select="/fr:button/@tabindex"/>
                         <xsl:if test="/fr:button/@tabindex">
-                            <xhtml:span class="fr-button-tabindex" style="display: none">
+                            <xh:span class="fr-button-tabindex" style="display: none">
                                 <xsl:value-of select="/fr:button/@tabindex"/>
-                            </xhtml:span>
+                            </xh:span>
                         </xsl:if>
-                        <!-- Bind trigger so it can handle read-only -->
-                        <xforms:trigger xbl:attr="xxforms:modal" id="trigger">
+                        <!-- Bind trigger if needed so it can handle read-only -->
+                        <xf:trigger xbl:attr="xxf:modal" id="trigger" xxbl:scope="outer">
                             <xsl:if test="exists(/fr:button/(@ref, @bind))">
-                                <xsl:attribute name="ref">xxforms:binding('fr-button')</xsl:attribute>
+                                <xsl:attribute name="ref">.</xsl:attribute>
                             </xsl:if>
-                            <xbl:content includes=":root > xforms|label, :root > xforms|help, :root > xforms|hint"/>
-                            <xxforms:script ev:event="xforms-enabled xxforms-iteration-moved" ev:target="#observer">YAHOO.xbl.fr.Button.instance(this).enabled();</xxforms:script>
-                            <xxforms:script ev:event="xforms-readonly" ev:target="#observer">YAHOO.xbl.fr.Button.instance(this).readonly();</xxforms:script>
-                            <xxforms:script ev:event="xforms-readwrite" ev:target="#observer">YAHOO.xbl.fr.Button.instance(this).readwrite();</xxforms:script>
-                        </xforms:trigger>
-                    </xhtml:span>
-                </xhtml:span>
-            </xforms:group>
+                            <xbl:content includes=":root > xf|label, :root > xf|help, :root > xf|hint"/>
+                            <xxf:script ev:event="xforms-enabled xxforms-iteration-moved" ev:target="#observer">YAHOO.xbl.fr.Button.instance(this).enabled();</xxf:script>
+                            <xxf:script ev:event="xforms-readonly" ev:target="#observer">YAHOO.xbl.fr.Button.instance(this).readonly();</xxf:script>
+                            <xxf:script ev:event="xforms-readwrite" ev:target="#observer">YAHOO.xbl.fr.Button.instance(this).readwrite();</xxf:script>
+                        </xf:trigger>
+                    </xh:span>
+                </xh:span>
+            </xf:group>
         </xbl:template>
     </xbl:binding>
 </xbl:xbl>

@@ -31,7 +31,7 @@ object ToolboxOps {
             <xforms:label ref=""/>
             <xforms:hint ref=""/>
             <xforms:help ref=""/>
-            <xforms:alert ref="$fr-resources/detail/labels/alert"/>
+            <xforms:alert ref=""/>
         </template>
 
     // Insert a new control in a cell

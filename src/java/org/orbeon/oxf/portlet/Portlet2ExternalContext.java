@@ -501,7 +501,7 @@ public class Portlet2ExternalContext implements ExternalContext {
         }
 
         public Map<String, String[]> getRedirectParameters() {
-            return redirectParameters;
+            return redirectParameters != null ? redirectParameters : Collections.<String, String[]>emptyMap();
         }
 
         public StringBuilderWriter getStringBuilderWriter() {

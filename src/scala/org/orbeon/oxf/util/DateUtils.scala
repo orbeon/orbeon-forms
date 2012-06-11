@@ -25,7 +25,7 @@ object DateUtils {
 
     // ISO 8601 xs:dateTime formats with timezone, which we should always use when serializing a date
     // From the doc: "DateTimeFormat is thread-safe and immutable, and the formatters it returns are as well."
-    val DateTime = ISODateTimeFormat.dateTime().withZoneUTC()
+    val DateTime = ISODateTimeFormat.dateTime.withZoneUTC
 
     // RFC 1123 format
     // RFC 2616 says: "The first format is preferred as an Internet standard and represents a fixed-length subset of

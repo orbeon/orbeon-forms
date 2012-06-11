@@ -38,11 +38,6 @@
                                                                                                        /apps/fr/style/form-runner-base.css
                                                                                                        /apps/fr/style/form-runner-html.css
                                                                                                        /apps/fr/style/form-runner-orbeon.css"/>
-    <property as="xs:string"  name="oxf.fr.css.uri.orbeon.*"                                    value="/ops/yui/reset-fonts-grids/reset-fonts-grids.css
-                                                                                                       /ops/yui/datatable/assets/skins/sam/datatable.css
-                                                                                                       /apps/fr/style/form-runner-base.css
-                                                                                                       /apps/fr/style/form-runner-html.css
-                                                                                                       /apps/fr/style/form-runner-orbeon.css"/>
     <property as="xs:string"  name="oxf.fr.authentication.method"                               value=""/>                      <!-- "container" or "header" or empty -->
     <property as="xs:string"  name="oxf.fr.authentication.header.username"                      value="My-Username-Header"/>    <!-- with Liferay: Orbeon-Liferay-User-Email or Orbeon-Liferay-User-Full-Name are also possible -->
     <property as="xs:string"  name="oxf.fr.authentication.header.roles"                         value="My-Roles-Header"/>
@@ -62,7 +57,7 @@
     <property as="xs:boolean" name="oxf.fr.detail.ajax.section.collapse.*.*"                    value="true"/>
     <property as="xs:boolean" name="oxf.fr.detail.ajax.section.animate.*.*"                     value="true"/>
     <property as="xs:boolean" name="oxf.fr.detail.hints.inline.*.*"                             value="true"/>
-    <property as="xs:integer" name="oxf.fr.detail.toc.*.*"                                      value="3"/>
+    <property as="xs:integer" name="oxf.fr.detail.toc.*.*"                                      value="-1"/> <!-- TOC disabled by default -->
     <property as="xs:string"  name="oxf.fr.detail.error-summary.*.*"                            value="bottom"/>
     <property as="xs:boolean" name="oxf.fr.detail.new.accept-post.*.*"                          value="false"/>
     <property as="xs:boolean" name="oxf.fr.detail.new.service.enable.*.*"                       value="false"/>
@@ -174,6 +169,5 @@
 
     <!-- FR/FB examples bundled with Orbeon -->
     <property as="xs:string"  name="oxf.fr.detail.buttons.orbeon.w4"                            value="pdf"/>
-    <property as="xs:integer" name="oxf.fr.detail.toc.orbeon.w4"                                value="-1"/>
 
 </properties>

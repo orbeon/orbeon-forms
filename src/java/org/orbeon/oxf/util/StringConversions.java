@@ -99,50 +99,18 @@ public class StringConversions {
     }
 
     public static void addValueToObjectArrayMap(Map<String, Object[]> map, String name, Object value) {
-        final Object[] currentValue = map.get(name);
-        if (currentValue == null) {
-            map.put(name, new Object[] { value });
-        } else {
-            final Object[] newValue = new Object[currentValue.length + 1];
-            System.arraycopy(currentValue, 0, newValue, 0, currentValue.length);
-            newValue[currentValue.length] = value;
-            map.put(name, newValue);
-        }
+        map.put(name, ArrayUtils.add(map.get(name), value));
     }
 
     public static void addValuesToObjectArrayMap(Map<String, Object[]> map, String name, Object[] values) {
-        final Object[] currentValue = map.get(name);
-        if (currentValue == null) {
-            map.put(name, values);
-        } else {
-            final Object[] newValues = new Object[currentValue.length + values.length];
-            System.arraycopy(currentValue, 0, newValues, 0, currentValue.length);
-            System.arraycopy(values, 0, newValues, currentValue.length, values.length);
-            map.put(name, newValues);
-        }
+        map.put(name, ArrayUtils.addAll(map.get(name), values));
     }
 
     public static void addValueToStringArrayMap(Map<String, String[]> map, String name, String value) {
-        final String[] currentValue = map.get(name);
-        if (currentValue == null) {
-            map.put(name, new String[] { value });
-        } else {
-            final String[] newValue = new String[currentValue.length + 1];
-            System.arraycopy(currentValue, 0, newValue, 0, currentValue.length);
-            newValue[currentValue.length] = value;
-            map.put(name, newValue);
-        }
+        map.put(name, (String[])ArrayUtils.add(map.get(name), value));
     }
 
     public static void addValuesToStringArrayMap(Map<String, String[]> map, String name, String[] values) {
-        final String[] currentValue = map.get(name);
-        if (currentValue == null) {
-            map.put(name, values);
-        } else {
-            final String[] newValues = new String[currentValue.length + values.length];
-            System.arraycopy(currentValue, 0, newValues, 0, currentValue.length);
-            System.arraycopy(values, 0, newValues, currentValue.length, values.length);
-            map.put(name, newValues);
-        }
+        map.put(name, (String[])ArrayUtils.addAll(map.get(name), values));
     }
 }

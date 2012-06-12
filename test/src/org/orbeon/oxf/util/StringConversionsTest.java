@@ -8,7 +8,7 @@ import java.util.Map;
 
 import org.junit.Test;
 
-public class StringConversionTest
+public class StringConversionsTest
 {
     @Test
     public void testAddValueToStringArrayMap() {

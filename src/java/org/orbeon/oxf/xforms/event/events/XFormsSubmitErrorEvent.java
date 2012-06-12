@@ -18,6 +18,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.util.ConnectionResult;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
@@ -96,7 +97,7 @@ public class XFormsSubmitErrorEvent extends XFormsSubmitResponseEvent {
                     InputStream is = null;
                     try {
                         is = new URL(tempURI).openStream();
-                        final DocumentInfo responseBody = TransformerUtils.readTinyTree(containingDocument.getStaticState().xpathConfiguration(),
+                        final DocumentInfo responseBody = TransformerUtils.readTinyTree(XPathCache.getGlobalConfiguration(),
                                 is, connectionResult.resourceURI, false, true);
                         setBodyDocument(responseBody);
                         return;

@@ -164,7 +164,7 @@ case class BindingContext(
     // NOTE: This is as of 2009-09-17 used only to determine the submission instance based on a submission node.
     def instanceOrNull =
         Option(getSingleItem) collect
-            { case node: NodeInfo ⇒ model.getContainingDocument.getInstanceForNode(node) } orNull
+            { case node: NodeInfo ⇒ model.containingDocument.getInstanceForNode(node) } orNull
 
     class AncestorIterator(includeSelf: Boolean) extends Iterator[BindingContext] {
         private var _next = if (includeSelf) self else parent

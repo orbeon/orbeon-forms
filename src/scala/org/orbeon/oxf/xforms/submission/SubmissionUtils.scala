@@ -56,5 +56,5 @@ object SubmissionUtils {
             Connection.Method.GET.name,
             URLFactory.createURL(resolvedURL),
             null, null, null, null,
-            XFormsProperties.getForwardSubmissionHeaders(model.getContainingDocument))
+            XFormsProperties.getForwardSubmissionHeaders(model.containingDocument))
 }

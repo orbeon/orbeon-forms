@@ -98,7 +98,7 @@ public class XFormsModelBinds {
 
         this.indentedLogger = model.getIndentedLogger();
         this.container = model.container();
-        this.containingDocument = model.getContainingDocument();
+        this.containingDocument = model.containingDocument;
         this.dependencies = this.containingDocument.getXPathDependencies();
 
         this.staticModel = model.getStaticModel();
@@ -822,7 +822,7 @@ public class XFormsModelBinds {
                     typeValid = isOptionalAndEmpty || XMLUtils.isWellFormedXML(nodeValue);
                 } else if (typeLocalname.equals("xpath2")) {
                     // xxforms:xpath2 type
-                    typeValid = isOptionalAndEmpty || XFormsUtils.isXPath2Expression(containingDocument.getStaticState().xpathConfiguration(), nodeValue, bind.staticBind.namespaceMapping());
+                    typeValid = isOptionalAndEmpty || XFormsUtils.isXPath2Expression(XPathCache.getGlobalConfiguration(), nodeValue, bind.staticBind.namespaceMapping());
                 } else {
                     throw new ValidationException("Invalid schema type '" + bind.staticBind.getType() + "'", bind.staticBind.locationData());
 

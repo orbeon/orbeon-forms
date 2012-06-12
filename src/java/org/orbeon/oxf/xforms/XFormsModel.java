@@ -91,7 +91,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
     private final XFormsContextStack contextStack;    // context stack for evaluation, used by binds, submissions, event handlers
 
     // Containing document
-    private final XFormsContainingDocument containingDocument;
+    public final XFormsContainingDocument containingDocument;
 
     public XFormsModel(XBLContainer container, String effectiveId, Model staticModel) {
 
@@ -196,10 +196,6 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
     public XBLContainer container() {
         return container;
-    }
-
-    public XFormsContainingDocument getContainingDocument() {
-        return containingDocument;
     }
 
     public Model getStaticModel() {
@@ -700,7 +696,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
                 if (!instance.readonly()) {
                     instanceDocument = TransformerUtils.readDom4j(connectionResult.getResponseInputStream(), connectionResult.resourceURI, false, true);
                 } else {
-                    instanceDocument = TransformerUtils.readTinyTree(containingDocument.getStaticState().xpathConfiguration(),
+                    instanceDocument = TransformerUtils.readTinyTree(XPathCache.getGlobalConfiguration(),
                             connectionResult.getResponseInputStream(), connectionResult.resourceURI, false, true);
                 }
             } finally {
@@ -720,7 +716,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
                         absoluteURLString, instance.credentials(),
                         XFormsProperties.getForwardSubmissionHeaders(containingDocument));
             } else {
-                instanceDocument = containingDocument.getURIResolver().readAsTinyTree(containingDocument.getStaticState().xpathConfiguration(),
+                instanceDocument = containingDocument.getURIResolver().readAsTinyTree(XPathCache.getGlobalConfiguration(),
                         absoluteURLString, instance.credentials(),
                         XFormsProperties.getForwardSubmissionHeaders(containingDocument));
             }

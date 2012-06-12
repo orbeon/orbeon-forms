@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms
 
 import java.util.Set
 import org.orbeon.saxon.dom4j.DocumentWrapper
-import org.orbeon.oxf.util.{IndentedLogger, XPathCache}
+import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xml.dom4j.LocationData
 import org.orbeon.oxf.xml.XMLUtils
 import state.AnnotatedTemplate
@@ -25,7 +25,6 @@ trait XFormsStaticState extends XMLUtils.DebugXML  {
     def locationData: LocationData
     def getIndentedLogger: IndentedLogger
 
-    def xpathConfiguration = XPathCache.getGlobalConfiguration
     def documentWrapper: DocumentWrapper        // TODO: get rid of this or clarify use
 
     def digest: String

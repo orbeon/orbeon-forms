@@ -1000,8 +1000,6 @@ public class URLGenerator extends ProcessorImpl {
      */
         private static class SystemResourceHandler implements ResourceHandler {
         private Config config;
-        private String resourceManagerKey;
-        private InputStream inputStream;
 
         public SystemResourceHandler(Config config) {
             this.config = config;

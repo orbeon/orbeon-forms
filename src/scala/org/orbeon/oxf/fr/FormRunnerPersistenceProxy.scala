@@ -28,6 +28,7 @@ import org.orbeon.scaxon.XML._
 import javax.xml.transform.stream.StreamResult
 import org.orbeon.oxf.xforms.action.XFormsAPI
 import org.orbeon.oxf.externalcontext.URLRewriter
+import collection.JavaConverters._
 import org.orbeon.oxf.util.{URLRewriterUtils, XPathCache, NetUtils}
 
 /**
@@ -38,11 +39,13 @@ import org.orbeon.oxf.util.{URLRewriterUtils, XPathCache, NetUtils}
  */
 class FormRunnerPersistenceProxy extends ProcessorImpl {
 
-    private val FormPath = """/fr/service/persistence(/crud/([^/]+)/([^/]+)/form/([^/]+))""".r
-    private val DataPath = """/fr/service/persistence(/crud/([^/]+)/([^/]+)/data/([^/]+)/([^/]+))""".r
+    private val FormPath           = """/fr/service/persistence(/crud/([^/]+)/([^/]+)/form/([^/]+))""".r
+    private val DataPath           = """/fr/service/persistence(/crud/([^/]+)/([^/]+)/data/([^/]+)/([^/]+))""".r
     private val DataCollectionPath = """/fr/service/persistence(/crud/([^/]+)/([^/]+)/data/)""".r
-    private val SearchPath = """/fr/service/persistence(/search/([^/]+)/([^/]+))""".r
+    private val SearchPath         = """/fr/service/persistence(/search/([^/]+)/([^/]+))""".r
     private val FormDefinitionPath = """/fr/service/persistence/form""".r
+
+    private val ParametersToForward = Set("document")
 
     // Start the processor
     override def start(pipelineContext: PipelineContext) {
@@ -54,11 +57,11 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
     def proxyRequest(request: Request, response: Response) {
         val incomingPath = request.getRequestPath
         incomingPath match {
-            case FormPath(path, app, form, _) ⇒ proxyRequest(request, response, app, form, "form", path)
-            case DataPath(path, app, form, _, _) ⇒ proxyRequest(request, response, app, form, "data", path)
+            case FormPath(path, app, form, _)        ⇒ proxyRequest(request, response, app, form, "form", path)
+            case DataPath(path, app, form, _, _)     ⇒ proxyRequest(request, response, app, form, "data", path)
             case DataCollectionPath(path, app, form) ⇒ proxyRequest(request, response, app, form, "data", path)
-            case SearchPath(path, app, form) ⇒ proxyRequest(request, response, app, form, "data", path)
-            case FormDefinitionPath() ⇒ proxyFormDefinition(request, response)
+            case SearchPath(path, app, form)         ⇒ proxyRequest(request, response, app, form, "data", path)
+            case FormDefinitionPath()                ⇒ proxyFormDefinition(request, response)
             case _ ⇒ throw new OXFException("Unsupported path: " + incomingPath)
         }
     }
@@ -73,11 +76,14 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
             setHeader(capitalizeHeader(name), values mkString ",")
 
     // Proxy the request depending on app/form name and whether we are accessing form or data
-    private def proxyRequest(request: Request, response: Response, app: String, form: String, formOrData: String, path: String) {
+    private def proxyRequest(request: Request, response: Response, app: String, form: String, formOrData: String, path: String): Unit = {
+
+        def buildQueryString =
+            NetUtils.encodeQueryString(request.getParameterMap.asScala filter (entry ⇒ ParametersToForward(entry._1)) asJava)
 
         // Get persistence implementation target URL and configuration headers
         val (persistenceBaseURL, headers) = FormRunner.getPersistenceURLHeaders(app, form, formOrData)
-        val connection = proxyEstablishConnection(request, dropTrailingSlash(persistenceBaseURL) + path, headers)
+        val connection = proxyEstablishConnection(request, NetUtils.appendQueryString(dropTrailingSlash(persistenceBaseURL) + path, buildQueryString), headers)
         // Proxy status code
         response.setStatus(connection.getResponseCode)
         // Proxy incoming headers
@@ -135,7 +141,7 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
      * Proxies the request to every configured persistence layer to get the list of the forms,
      * and aggregates the results.
      */
-    private def proxyFormDefinition(request: Request, response: Response) {
+    private def proxyFormDefinition(request: Request, response: Response): Unit = {
         val propertySet = Properties.instance.getPropertySet
         val providers = {
             // All the oxf.fr.persistence.provider.*.*.form properties, removing the data-only mappings

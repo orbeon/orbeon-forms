@@ -28,13 +28,13 @@ import org.orbeon.saxon.dom4j.DocumentWrapper
 import org.orbeon.saxon.dom4j.TypedDocumentWrapper
 import javax.xml.transform.stream.StreamResult
 import scala.collection.JavaConverters._
-import org.orbeon.oxf.util.{XPathCache, IndentedLogger}
 import org.orbeon.oxf.util.DebugLogger._
 import org.orbeon.oxf.common.OXFException
 import state.InstanceState
 import org.orbeon.oxf.xforms.XFormsServerSharedInstancesCache.Loader
 import java.util.{List ⇒ JList}
 import org.orbeon.saxon.om.{VirtualNode, DocumentInfo, Item}
+import org.orbeon.oxf.util._
 
 // Caching information associated with an instance loaded with xxf:cache="true"
 case class InstanceCaching(
@@ -357,22 +357,6 @@ object XFormsInstance {
                 instanceState.modified))
     }
 
-    // Extract a document and adjust namespaces if requested
-    // NOTE: Should implement exactly as per XSLT 2.0
-    // NOTE: Should implement namespace fixup, the code below can break serialization
-    private def extractDocument(element: Element, excludeResultPrefixes: Set[String]): Document =
-        excludeResultPrefixes match {
-            case prefixes if prefixes("#all") ⇒
-                // Special #all
-                Dom4jUtils.createDocumentCopyElement(element)
-            case prefixes if prefixes.nonEmpty ⇒
-                // List of prefixes
-                Dom4jUtils.createDocumentCopyParentNamespaces(element, prefixes.asJava)
-            case _ ⇒
-                // No exclusion
-                Dom4jUtils.createDocumentCopyParentNamespaces(element)
-        }
-
     // Extract the document starting at the given root element
     // This always creates a copy of the original sub-tree
     //
@@ -382,7 +366,23 @@ object XFormsInstance {
 
         require(! (readonly && exposeXPathTypes), "can't expose XPath types on readonly content")
 
-        val document = extractDocument(element, excludeResultPrefixes)
+        // Extract a document and adjust namespaces if requested
+        // NOTE: Should implement exactly as per XSLT 2.0
+        // NOTE: Should implement namespace fixup, the code below can break serialization
+        def extractDocument =
+            excludeResultPrefixes match {
+                case prefixes if prefixes("#all") ⇒
+                    // Special #all
+                    Dom4jUtils.createDocumentCopyElement(element)
+                case prefixes if prefixes.nonEmpty ⇒
+                    // List of prefixes
+                    Dom4jUtils.createDocumentCopyParentNamespaces(element, prefixes.asJava)
+                case _ ⇒
+                    // No exclusion
+                    Dom4jUtils.createDocumentCopyParentNamespaces(element)
+            }
+
+        val document = extractDocument
         if (readonly)
             TransformerUtils.dom4jToTinyTree(XPathCache.getGlobalConfiguration, document, false)
         else

@@ -16,10 +16,11 @@ package org.orbeon.oxf.portlet
 import org.scalatest.junit.AssertionsForJUnit
 import org.junit.Test
 import collection.JavaConverters._
+import org.orbeon.oxf.portlet.liferay.LiferayURL
 
 class WSRP2UtilsTest extends AssertionsForJUnit {
 
-    @Test def decodeQueryStringTest() {
+    @Test def decodeQueryStringTest(): Unit = {
 
         val expected = Seq(
             """filename=data.html&orbeon.path=/fr/service/import-export/serve&uuid=""" →
@@ -38,5 +39,28 @@ class WSRP2UtilsTest extends AssertionsForJUnit {
             assert(extracted === decode(query))
             assert(extracted === decode(query.replaceAllLiterally("&", "&amp;")))
         }
+    }
+
+    @Test def moveResourceId(): Unit = {
+        val expected = Seq(
+            // No magic, no p_p_resource_id
+            "http://localhost:8080/my/path?p1=v11&p2=v21&p1=v12&p2=&p2=v23&p1=" →
+                "http://localhost:8080/my/path?p1=v11&p2=v21&p1=v12&p2=&p2=v23&p1=",
+            // No magic, but non-matching p_p_resource_id
+            "http://localhost:8080/my/path/p_p_resource_id?p1=v11&p2=v21&p1=v12&p2=&p2=v23&p1=&gotcha=p_p_resource_id" →
+                "http://localhost:8080/my/path/p_p_resource_id?p1=v11&p2=v21&p1=v12&p2=&p2=v23&p1=&gotcha=p_p_resource_id",
+            // p_p_resource_id with magic in the middle
+            "http://localhost:8080/my/path?p1=v11&p2=v21&p1=v12&p2=&p2=v23&p1=&p_p_resource_id=1b713b2e6d7fd45753f4b8a6270b776e.js" →
+                "http://localhost:8080/my/path?p1=v11&p2=v21&p1=v12&p_p_resource_id=1b713b2e6d7fd45753f4b8a6270b776e.js&p2=&p2=v23&p1=",
+            // Extra p_p_resource_id without magic gets ignored
+            "http://localhost:8080/my/path?p1=v11&p2=v21&p1=v12&p2=&p2=v23&p1=&p_p_resource_id=1b713b2e6d7fd45753f4b8a6270b776e.js" →
+                "http://localhost:8080/my/path?p1=v11&p2=v21&p1=v12&p_p_resource_id=1b713b2e6d7fd45753f4b8a6270b776e.js&p2=&p2=v23&p1=&p_p_resource_id=other-resource-id",
+            // Extra p_p_resource_id after gets ignored
+            "http://localhost:8080/my/path?p1=v11&p2=v21&p1=v12&p2=&p2=v23&p1=&p_p_resource_id=1b713b2e6d7fd45753f4b8a6270b776e.js" →
+                "http://localhost:8080/my/path?p1=v11&p2=v21&p1=v12&p_p_resource_id=other-resource-id&p2=&p2=v23&p1=&p_p_resource_id=1b713b2e6d7fd45753f4b8a6270b776e.js"
+        )
+
+        for ((expected, initial) ← expected)
+            assert(expected === LiferayURL.moveMagicResourceId(initial))
     }
 }

@@ -511,17 +511,16 @@
                     <fr:grid columns="1">
                         <fr:tr>
                             <fr:td>
-                                <xforms:textarea id="review-control" bind="review-bind" mediatype="text/html">
+                                <fr:tinymce id="review-control" bind="review-bind">
                                     <xforms:label ref="$form-resources/review/label"/>
                                     <xforms:hint ref="$form-resources/review/hint"/>
                                     <xforms:help ref="$form-resources/review/help"/>
                                     <xforms:alert ref="$form-resources/review/alert"/>
-                                </xforms:textarea>
+                                </fr:tinymce>
                             </fr:td>
                         </fr:tr>
                     </fr:grid>
                 </fr:section>
-
                 <fr:section id="notes-section" bind="notes-bind">
                     <xforms:label ref="$form-resources/notes/label"/>
                     <xforms:help ref="$form-resources/notes/help"/>

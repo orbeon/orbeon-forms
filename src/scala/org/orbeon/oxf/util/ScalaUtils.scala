@@ -16,6 +16,8 @@ package org.orbeon.oxf.util
 import java.security.MessageDigest
 import org.orbeon.oxf.common.OXFException
 import org.apache.log4j.Logger
+import java.net.URLEncoder.{encode ⇒ encodeURL}
+import java.net.URLDecoder.{decode ⇒ decodeURL}
 
 object ScalaUtils {
 
@@ -130,4 +132,40 @@ object ScalaUtils {
         case Some(list) ⇒ list split """\s+""" toSet
         case None ⇒ Set[String]()
     }
+
+    // Split a URL's query
+    def splitQuery(url: String): (String, Option[String]) = {
+        val index = url.indexOf('?')
+        if (index == -1)
+            (url, None)
+        else
+            (url.substring(0, index), Some(url.substring(index + 1)))
+    }
+
+    // Decode a query string into a sequence of pairs
+    // We assume that there are no spaces in the input query
+    def decodeSimpleQuery(queryOption: Option[String]): Seq[(String, String)] =
+        for {
+            query ← queryOption.toList
+            nameValue ← query.split('&').toList
+            if nameValue.nonEmpty
+            nameValueArray = nameValue.split('=')
+            if nameValueArray.size >= 1
+            encodedName = nameValueArray(0)
+            if encodedName.nonEmpty
+            decodedName = decodeURL(encodedName, "utf-8")
+            decodedValue = decodeURL(nameValueArray.lift(1) getOrElse "", "utf-8")
+        } yield
+            decodedName → decodedValue
+
+    // Get the first query parameter value for the given name
+    def getFirstQueryParameter(url: String, name: String) = {
+        val query = decodeSimpleQuery(splitQuery(url)._2)
+
+        query find (_._1 == name) map { case (k, v) ⇒ v }
+    }
+
+    // Encode a sequence of pairs to a query string
+    def encodeSimpleQuery(parameters: Seq[(String, String)]): String =
+        parameters map { case (name, value) ⇒ encodeURL(name, "utf-8") + '=' + encodeURL(value, "utf-8") } mkString "&"
 }

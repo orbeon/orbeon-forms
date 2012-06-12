@@ -18,5 +18,6 @@ YAHOO.xbl.fr.Tinymce.DefaultConfig = {
     entity_encoding:                        "raw",
     forced_root_block:                      'div',
     remove_redundant_brs:                   true,
-    verify_html:                            true
+    verify_html:                            true,
+    editor_css:                             ""      // don't let the editor load CSS because that fails in portlets
 };

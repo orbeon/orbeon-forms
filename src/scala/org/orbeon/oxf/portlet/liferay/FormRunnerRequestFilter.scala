@@ -11,7 +11,7 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.portlet
+package org.orbeon.oxf.portlet.liferay
 
 import com.liferay.portal.util.PortalUtil
 import com.liferay.portal.model.User
@@ -19,15 +19,16 @@ import scala.collection.JavaConversions._
 import javax.portlet.filter._
 import javax.portlet._
 import org.orbeon.oxf.fr.FormRunner
+import org.orbeon.oxf.portlet.RequestFilter
 
 /**
- * Custom context for Liferay.
+ * Custom request filter for Liferay.
  */
 class FormRunnerRequestFilter extends RequestFilter {
-    
+
     val prefix = "orbeon.liferay.user."
 
-    def amendRequest(portletRequest: PortletRequest): PortletRequest = {
+    def amendRequest(portletRequest: PortletRequest): PortletRequest =
         // NOTE: request.getRemoteUser() can be configured in liferay-portlet.xml with user-principal-strategy to
         // either userId (a number) or screenName (a string). It seems more reliable to use the API below to obtain the
         // user.
@@ -35,7 +36,6 @@ class FormRunnerRequestFilter extends RequestFilter {
             case user: User ⇒ amendRequest(portletRequest, user)
             case _ ⇒ portletRequest
         }
-    }
 
     def amendRequest(portletRequest: PortletRequest, user: User): PortletRequest = {
 
@@ -44,7 +44,6 @@ class FormRunnerRequestFilter extends RequestFilter {
         val headers = {
             // 1. Get Liferay user details/roles
             val liferayUserRolesHeaders =
-                (
                 for {
                     (name, value) ← Map(
                         "email" → user.getEmailAddress,
@@ -58,7 +57,7 @@ class FormRunnerRequestFilter extends RequestFilter {
                         case array: Array[String] ⇒ array
                         case value: String ⇒ Array(value)
                     }))
-                })
+                }
 
             // 2. Get Orbeon-* headers
 
@@ -81,18 +80,20 @@ class FormRunnerRequestFilter extends RequestFilter {
         trait CustomProperties extends PortletRequestWrapper {
             override def getPropertyNames =
                 headers.keysIterator ++ super.getPropertyNames
+
             override def getProperty(name: String) =
                 headers.get(name) map (_.head) getOrElse super.getProperty(name)
+
             override def getProperties(name: String) =
                 headers.get(name) map (n ⇒ asJavaEnumeration(n.iterator)) getOrElse super.getProperties(name)
         }
 
         portletRequest match {
-            case r: RenderRequest ⇒ new RenderRequestWrapper(r) with CustomProperties
-            case r: ActionRequest ⇒ new ActionRequestWrapper(r) with CustomProperties
+            case r: RenderRequest   ⇒ new RenderRequestWrapper(r)   with CustomProperties
+            case r: ActionRequest   ⇒ new ActionRequestWrapper(r)   with CustomProperties
             case r: ResourceRequest ⇒ new ResourceRequestWrapper(r) with CustomProperties
-            case r: EventRequest ⇒ new EventRequestWrapper(r) with CustomProperties
-            case r: PortletRequest ⇒ new PortletRequestWrapper(r) with CustomProperties
+            case r: EventRequest    ⇒ new EventRequestWrapper(r)    with CustomProperties
+            case r: PortletRequest  ⇒ new PortletRequestWrapper(r)  with CustomProperties
         }
     }
 }

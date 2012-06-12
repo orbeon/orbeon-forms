@@ -39,6 +39,28 @@
         </metadata>
         <xbl:resources>
             <xbl:style src="/xbl/orbeon/tinymce/tinymce.css"/>
+            <!-- Load theme CSS ahead of time because tinyMCE dynamic CSS loading fails in portlets.
+
+                 Say the CSS has the URL:
+
+                   http://localhost:9090/web/guest/orbeon-proxy?p_p_[...].css.
+
+                 A relative image URL in the CSS will resolve to this, which is wrong:
+
+                   http://localhost:9090/web/guest/img/icons.png.
+
+                 This happens because:
+
+                 - the relative URL is resolved by the browser
+                 - because the CSS is not processed by the XForms resource server
+                 - because the XForms resource server only processes combined resources
+                 - and here the resource is not combined because it is loaded dynamically by tinyMCE
+
+                 We could (should?) support processing any CSS file at some point.
+
+                 See also tinymce-config.js. -->
+            <xbl:style src="/xbl/orbeon/tinymce/jscripts/tiny_mce/themes/advanced/skins/thebigreason/ui.css"/>
+            <xbl:style src="/xbl/orbeon/tinymce/jscripts/tiny_mce/themes/advanced/skins/thebigreason/content.css"/>
         </xbl:resources>
         <xbl:implementation>
             <xforms:model id="tinymce-model">
@@ -64,7 +86,9 @@
                 <xxforms:script id="xf-rw" ev:event="xforms-readwrite">YAHOO.xbl.fr.Tinymce.instance(this).readwrite();</xxforms:script>
             </xforms:output>
 
-            <xhtml:a f:url-type="resource" style="display: none" href="/xbl/orbeon/tinymce/jscripts/tiny_mce.js" class="tinymce-base-url"/>
+            <!-- In portlet mode, we want the resource id to be processed into a base URL, and we use a magic value to
+                 indicate that. Search for 1b713b2e6d7fd45753f4b8a6270b776e in the code for more details. -->
+            <xhtml:a f:url-type="resource" style="display: none" href="/xbl/orbeon/tinymce/jscripts/tiny_mce/1b713b2e6d7fd45753f4b8a6270b776e.js" class="tinymce-base-url"/>
 
             <!--
                 div to be converted into a TinyMCE Editor instance.

@@ -33,8 +33,9 @@ import org.orbeon.oxf.xml.XMLConstants._
 import collection.JavaConverters._
 import org.orbeon.oxf.util.{SecureUtils, Multipart, NetUtils}
 import org.orbeon.oxf.xforms.{XFormsProperties, XFormsContainingDocument}
-import java.net.{URLDecoder, URLEncoder, URI}
+import java.net.{URLEncoder, URI}
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
+import org.orbeon.oxf.util.ScalaUtils._
 
 /**
  * Represents an xforms:upload control.
@@ -238,19 +239,11 @@ object XFormsUploadControl {
         NetUtils.appendQueryString(url.substring(0, url.indexOf('?')), filteredQuery)
     }
 
-    // Get a parameter value from the URL
-    def getParameter(url: String, name: String) = {
-        val uri = new URI(url)
-        val query = decodeSimpleQuery(Option(uri.getQuery))
-
-        query find (_._1 == name) map { case (k, v) ⇒ v }
-    }
-
     // For Java callers
-    def getParameterOrNull(url: String, name: String) = getParameter(url, name).orNull
+    def getParameterOrNull(url: String, name: String) = getFirstQueryParameter(url, name).orNull
 
     // Get the MAC from the URL
-    def getMAC(url: String) = getParameter(url, "mac")
+    def getMAC(url: String) = getFirstQueryParameter(url, "mac")
 
     // Check that the given URL as a correct MAC
     def verifyMAC(url: String) =
@@ -258,20 +251,6 @@ object XFormsUploadControl {
             case Some(mac) ⇒ hmac(removeMAC(url)) == mac
             case None      ⇒ false
         }
-
-    private def decodeSimpleQuery(queryOption: Option[String]): Seq[(String, String)] =
-        for {
-            query ← queryOption.toList
-            nameValue ← query.split('&').toList
-            if nameValue.nonEmpty
-            nameValueArray = nameValue.split('=')
-            if nameValueArray.size >= 2
-            val encodedName = nameValueArray(0)
-            if encodedName.nonEmpty
-            decodedName = URLDecoder.decode(encodedName, "utf-8")
-            decodedValue = URLDecoder.decode(nameValueArray(1), "utf-8")
-        } yield
-            decodedName → decodedValue
 
     /**
      * Handle a construct of the form:

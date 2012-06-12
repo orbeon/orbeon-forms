@@ -27,8 +27,8 @@ import org.orbeon.oxf.externalcontext.{AsyncExternalContext, AsyncRequest}
 import org.orbeon.oxf.util.{URLRewriterUtils, DynamicVariable}
 
 // For backward compatibility
-class OrbeonPortlet2 extends OrbeonPortlet
-class OrbeonPortletDelegate extends OrbeonPortlet
+class OrbeonPortlet2         extends OrbeonPortlet
+class OrbeonPortletDelegate  extends OrbeonPortlet
 class OrbeonPortlet2Delegate extends OrbeonPortlet
 
 /**

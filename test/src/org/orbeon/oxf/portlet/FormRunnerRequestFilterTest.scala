@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.portlet
 
+import liferay.FormRunnerRequestFilter
 import org.scalatest.junit.AssertionsForJUnit
 import org.orbeon.oxf.test.ResourceManagerTestBase
 import org.junit.Test
@@ -42,25 +43,25 @@ class FormRunnerRequestFilterTest extends ResourceManagerTestBase with Assertion
         }
 
         val mockRoleManager = mock[Role]
-        Mockito when mockRoleManager.getName thenReturn "manager"
+        Mockito when mockRoleManager.getName  thenReturn "manager"
 
         val mockRoleEmployee = mock[Role]
         Mockito when mockRoleEmployee.getName thenReturn "employee"
 
         val mockUser = mock[User]
         Mockito when mockUser.getEmailAddress thenReturn "test@orbeon.com"
-        Mockito when mockUser.getFullName thenReturn "John Smith"
-        Mockito when mockUser.getRoles thenReturn Arrays.asList(mockRoleManager, mockRoleEmployee)
+        Mockito when mockUser.getFullName     thenReturn "John Smith"
+        Mockito when mockUser.getRoles        thenReturn Arrays.asList(mockRoleManager, mockRoleEmployee)
 
         val amendedRequest = (new FormRunnerRequestFilter).amendRequest(mockRequest, mockUser)
 
         // NOTE: Use Seq or List but not Array for comparison, because Array's == doesn't work as expected in Scala
         val expectedProperties = initialProperties ++ Map(
-            "orbeon-liferay-user-email" → Seq("test@orbeon.com"),
+            "orbeon-liferay-user-email"     → Seq("test@orbeon.com"),
             "orbeon-liferay-user-full-name" → Seq("John Smith"),
-            "orbeon-liferay-user-roles" → Seq("manager", "employee"),
-            "orbeon-username" → Seq("test@orbeon.com"),
-            "orbeon-roles" → Seq("manager", "employee")
+            "orbeon-liferay-user-roles"     → Seq("manager", "employee"),
+            "orbeon-username"               → Seq("test@orbeon.com"),
+            "orbeon-roles"                  → Seq("manager", "employee")
         )
 
         val actualProperties = amendedRequest.getPropertyNames map (n ⇒ n → amendedRequest.getProperties(n).toList) toMap

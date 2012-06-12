@@ -38,7 +38,7 @@ public class Portlet2ExternalContext implements ExternalContext {
     static {
         try {
             final Class<? extends RequestFilter> customContextClass
-                    = (Class<? extends RequestFilter>) Class.forName("org.orbeon.oxf.portlet.FormRunnerRequestFilter");
+                    = (Class<? extends RequestFilter>) Class.forName("org.orbeon.oxf.portlet.liferay.FormRunnerRequestFilter");
             requestFilter = customContextClass.newInstance();
         } catch (Exception e) {
             // Silently ignore as this typically means that we are not in Liferay

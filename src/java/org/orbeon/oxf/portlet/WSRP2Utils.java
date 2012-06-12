@@ -15,6 +15,7 @@ package org.orbeon.oxf.portlet;
 
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.externalcontext.WSRPURLRewriter;
+import org.orbeon.oxf.portlet.liferay.LiferayURL;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.StringConversions;
 
@@ -210,6 +211,8 @@ public class WSRP2Utils {
                 // Could set it to FULL or PORTLET for resources such as images, JavaScript, etc., but NOT for e.g. /xforms-server
                 // Note that Liferay doesn't seem to do much with ResourceURL.FULL.
                 resourceURL.setCacheability(ResourceURL.PAGE);
+
+                return LiferayURL.moveMagicResourceId(baseURL.toString());
             } else if (baseURL instanceof PortletURL) {
 
                 final PortletURL portletURL = (PortletURL) baseURL;
@@ -231,13 +234,14 @@ public class WSRP2Utils {
                 // Simply set all navigation parameters, including orbeon.path
                 if (navigationParameters != null)
                     portletURL.setParameters(navigationParameters);
+
+                return baseURL.toString();
+            } else {
+                return baseURL.toString();
             }
 
             // TODO: wsrp-fragmentID
             // TODO: wsrp-secureURL
-
-            // Write resulting encoded PortletURL
-            return baseURL.toString();
         } catch (Exception e) {
             throw new OXFException(e);
         }

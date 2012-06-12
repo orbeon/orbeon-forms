@@ -75,7 +75,7 @@ public class StringConversions {
         if (in == null)
             return null;
 
-        final Map<String, Object[]> result = new HashMap<String, Object[]>();
+        final Map<String, Object[]> result = new LinkedHashMap<String, Object[]>(); // keep map in order
         for (Map.Entry<String, String[]> entry : in.entrySet()) {
             final Object[] values = stringArrayToObjectArray(entry.getValue());
             if (values != null && values.length > 0)

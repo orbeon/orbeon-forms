@@ -306,25 +306,6 @@ public class NetUtils {
         return parameters;
     }
 
-    public static Map<String, String> getCharsetHeaderCharsets(String header) {
-        if (header == null)
-            return null;
-        int semicolonIndex = header.indexOf(";");
-        final String charsets;
-        if (semicolonIndex == -1)
-            charsets = header.trim();
-        else
-            charsets = header.substring(0, semicolonIndex).trim();
-
-        final StringTokenizer st = new StringTokenizer(charsets, ",");
-        final Map<String, String> charsetsMap = new HashMap<String, String>();
-        while (st.hasMoreTokens()) {
-            charsetsMap.put(st.nextToken(), "");
-        }
-
-        return charsetsMap;
-    }
-
     public static String getContentTypeMediaType(String contentType) {
         if (contentType == null || contentType.equalsIgnoreCase("content/unknown"))
             return null;
@@ -525,35 +506,6 @@ public class NetUtils {
         return resolvedURIString;
     }
 
-    public static String headersToString(HttpServletRequest request) {
-        final StringBuilder sb = new StringBuilder();
-        for (Enumeration e = request.getHeaderNames(); e.hasMoreElements();) {
-            final String name = (String) e.nextElement();
-            sb.append(name);
-            sb.append("=");
-            for (Enumeration f = request.getHeaders(name); f.hasMoreElements();) {
-                final String value = (String) f.nextElement();
-                sb.append(value);
-                if (f.hasMoreElements())
-                    sb.append(",");
-            }
-            if (e.hasMoreElements())
-                    sb.append("|");
-        }
-        return sb.toString();
-    }
-
-   public static String readURIToLocalURI(String uri) throws URISyntaxException, IOException {
-       final URLConnection urlConnection = new URI(uri).toURL().openConnection();
-       InputStream inputStream = null;
-       try {
-           inputStream = urlConnection.getInputStream();
-           return inputStreamToAnyURI(inputStream, REQUEST_SCOPE);
-       } finally {
-           if (inputStream != null) inputStream.close();
-       }
-   }
-
     public static byte[] base64StringToByteArray(String base64String) {
         return Base64.decode(base64String);
     }
@@ -588,59 +540,11 @@ public class NetUtils {
         }
     }
 
-    /**
-     * Read a URI into a byte array.
-     *
-     * @param uri   URI to read
-     * @return      byte array
-     */
-    public static byte[] uriToByteArray(String uri) {
-        InputStream is = null;
-        try {
-            is = new URI(uri).toURL().openStream();
-            return inputStreamToByteArray(is);
-        } catch (Exception e) {
-            throw new OXFException(e);
-        } finally {
-            try {
-                if (is != null)
-                    is.close();
-            } catch (IOException e) {
-                throw new OXFException(e);
-            }
-        }
-    }
-
     public static InputStream uriToInputStream(String uri) throws Exception {
         return new URI(uri).toURL().openStream();
     }
 
-    /**
-     * Convert a URI to a FileItem.
-     *
-     * The implementation creates a temporary file. The PipelineContext is required so that the file can be deleted
-     * when no longer used.
-     */
-    public static FileItem anyURIToFileItem(String uri, int scope) {
-        InputStream inputStream = null;
-        try {
-            inputStream = new URI(uri).toURL().openStream();
-
-            // Get FileItem
-            return prepareFileItemFromInputStream(inputStream, scope);
-
-        } catch (Exception e) {
-            throw new OXFException(e);
-        } finally {
-            try {
-                if (inputStream != null)
-                    inputStream.close();
-            } catch (IOException e) {
-                throw new OXFException(e);
-            }
-        }
-    }
-
+    // NOTE: Used by create-test-data.xpl
     public static String createTemporaryFile(int scope) {
         return inputStreamToAnyURI(new InputStream() {
             @Override

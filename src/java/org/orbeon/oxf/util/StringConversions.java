@@ -15,6 +15,8 @@ package org.orbeon.oxf.util;
 
 import java.util.*;
 
+import org.apache.commons.lang.ArrayUtils;
+
 public class StringConversions {
 
     /**

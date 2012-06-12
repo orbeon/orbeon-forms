@@ -46,7 +46,6 @@ public class NetUtils {
     public static final int COPY_BUFFER_SIZE = 8192;
     public static final String STANDARD_PARAMETER_ENCODING = "utf-8";
 
-    private static final TimeZone gmtZone = TimeZone.getTimeZone("GMT");
     private static FileItemFactory fileItemFactory;
 
     public static final int REQUEST_SCOPE = 0;
@@ -63,10 +62,6 @@ public class NetUtils {
         final String token = "[^=&]";
         PATTERN_NO_AMP = Pattern.compile( "(" + token + "+)=(" + token + "*)(?:&|(?<!&)\\z)" );
         PATTERN_AMP = Pattern.compile( "(" + token + "+)=(" + token + "*)(?:&amp;|&|(?<!&amp;|&)\\z)" );
-    }
-
-    public static long getDateHeader(String stringValue) {
-        return DateUtils.parseRFC1123(stringValue);
     }
 
     /**
@@ -95,7 +90,7 @@ public class NetUtils {
             logger.debug("Found If-Modified-Since header");
         if (ifModifiedHeader != null) {
             try {
-                long dateTime = getDateHeader(ifModifiedHeader);
+                long dateTime = DateUtils.parseRFC1123(ifModifiedHeader);
                 if (lastModified <= (dateTime + 1000)) {
                     if (logger.isDebugEnabled())
                         logger.debug("Sending SC_NOT_MODIFIED response");

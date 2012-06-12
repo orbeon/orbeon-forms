@@ -257,7 +257,7 @@ public abstract class BaseSubmission implements Submission {
                 // Here we cause dispatch xforms-submit-error upon getting a non-success error code, even though the
                 // response has already been written out. This gives the form author a chance to do something in cases
                 // the response is buffered, for example do a sendError().
-                if (! XFormsSubmissionUtils.isSuccessCode(connectionResult.statusCode))
+                if (! NetUtils.isSuccessCode(connectionResult.statusCode))
                     throw new XFormsSubmissionException(submission, "xforms:submission for submission id: " + submission.getId() + ", error code received when submitting instance: " + connectionResult.statusCode, "processing submission response",
                             new XFormsSubmitErrorEvent(containingDocument, submission, XFormsSubmitErrorEvent.ErrorType.RESOURCE_ERROR, connectionResult));
 

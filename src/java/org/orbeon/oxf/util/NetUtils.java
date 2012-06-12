@@ -1011,4 +1011,9 @@ public class NetUtils {
     public static void debugLogRequestAsXML(final ExternalContext.Request request) {
         System.out.println(Dom4jUtils.domToPrettyString(RequestGenerator.readWholeRequestAsDOM4J(request, null)));
     }
+
+    public static boolean isSuccessCode(int code) {
+        // Accept any success code (in particular "201 Resource Created")
+        return code >= 200 && code < 300;
+    }
 }

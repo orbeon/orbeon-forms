@@ -33,6 +33,7 @@ import org.orbeon.oxf.xforms.model.DataModel;
 import org.orbeon.oxf.xforms.model.XFormsModelAction;
 import org.orbeon.oxf.xforms.state.InstanceState;
 import org.orbeon.oxf.xforms.submission.BaseSubmission;
+import org.orbeon.oxf.xforms.submission.SubmissionUtils;
 import org.orbeon.oxf.xforms.submission.XFormsModelSubmission;
 import org.orbeon.oxf.xforms.xbl.Scope;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
@@ -649,40 +650,9 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
     private final InstanceLoader INSTANCE_LOADER = new InstanceLoader();
 
-    // TODO: Use XFormsModelSubmission instead of duplicating code here
     private class InstanceLoader implements XFormsServerSharedInstancesCache.Loader {
-        public DocumentInfo load(String instanceSourceURI, boolean handleXInclude) {
-            final URL sourceURL;
-            try {
-                sourceURL = URLFactory.createURL(instanceSourceURI);
-            } catch (MalformedURLException e) {
-                throw new OXFException(e);
-            }
-
-            final ExternalContext externalContext = NetUtils.getExternalContext();
-            final ConnectionResult connectionResult = new Connection().open(externalContext,
-                    indentedLogger, BaseSubmission.isLogBody(), Connection.Method.GET.name(), sourceURL, null, null, null, null,
-                    XFormsProperties.getForwardSubmissionHeaders(containingDocument));
-
-            // Handle connection errors
-            if (connectionResult.statusCode != 200) {
-                connectionResult.close();
-                throw new OXFException("Got invalid return code while loading instance from URI: " + instanceSourceURI + ", " + connectionResult.statusCode);
-            }
-
-            try {
-                // Read result as a TinyTree
-                // NOTE: load() requires an immutable TinyTree
-
-                // TODO: Handle validating?
-                return TransformerUtils.readTinyTree(containingDocument.getStaticState().xpathConfiguration(),
-                        connectionResult.getResponseInputStream(), connectionResult.resourceURI, handleXInclude, true);
-            } catch (Exception e) {
-                throw new OXFException("Got exception while loading instance from URI: " + instanceSourceURI, e);
-            } finally {
-                // Clean-up
-                connectionResult.close();
-            }
+        public DocumentInfo load(String resolvedURL, boolean handleXInclude) {
+            return SubmissionUtils.readTinyTree(XFormsModel.this, resolvedURL, handleXInclude);
         }
     }
 

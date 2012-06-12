@@ -975,7 +975,7 @@ public class URLGenerator extends ProcessorImpl {
 
         private void checkStatusCode() throws IOException {
             final int statusCode = getConnectionStatusCode();
-            if (statusCode > 0 && (statusCode < 200 || statusCode >= 300))
+            if (statusCode > 0 && ! NetUtils.isSuccessCode(statusCode))
                 throw new ValidationException("Got non-success status code: " + statusCode, new LocationData(config.getURL().toExternalForm(), -1, -1));
         }
 

@@ -666,7 +666,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
             if (connectionResult.dontHandleResponse) {
                 // Always return a replacer even if it does nothing, this way we don't have to deal with null
                 replacer = new NoneReplacer(this, containingDocument);
-            } else if (XFormsSubmissionUtils.isSuccessCode(connectionResult.statusCode)) {
+            } else if (NetUtils.isSuccessCode(connectionResult.statusCode)) {
                 // Successful response
                 if (connectionResult.hasContent()) {
                     // There is a body
@@ -1069,7 +1069,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                                     documentToSubmit.getRootElement().getStringValue(),
                                     ExternalContext.Response.REWRITE_MODE_ABSOLUTE);
 
-                        messageBody = NetUtils.uriToByteArray(resolvedURI);
+                        messageBody = SubmissionUtils.readByteArray(model, resolvedURI);
                     }
                     defaultMediatypeForSerialization = "application/octet-stream";
                     queryString = null;

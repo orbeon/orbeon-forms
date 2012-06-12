@@ -54,7 +54,7 @@ public class AllReplacer extends BaseReplacer {
         // processing concludes after dispatching xforms-submit-error with appropriate context information, including an
         // error-type of resource-error"
         if (! p.isDeferredSubmissionSecondPassReplaceAll) {
-            if (XFormsSubmissionUtils.isSuccessCode(connectionResult.statusCode))
+            if (NetUtils.isSuccessCode(connectionResult.statusCode))
                 return submission.sendSubmitDone(connectionResult);
             else
                 // Here we dispatch xforms-submit-error upon getting a non-success error code, even though the response has

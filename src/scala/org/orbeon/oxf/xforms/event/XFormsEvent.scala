@@ -117,27 +117,27 @@ object XFormsEvent {
     def xxformsName(name: String)   = buildExplodedQName(XXFORMS_NAMESPACE_URI, name)
     
     private val Deprecated = Map(
-        "target"            → "xxforms:targetid",
-        "event"             → "xxforms:type",
-        "repeat-indexes"    → "xxforms:repeat-indexes"
+        "target"         → "xxforms:targetid",
+        "event"          → "xxforms:type",
+        "repeat-indexes" → "xxforms:repeat-indexes"
     )
     
     private val StandardAttributes = Map[String, XFormsEvent ⇒ SequenceIterator](
-        "target"                             → (e ⇒ stringIterator(e.targetObject.getId)),
-        xxformsName("target")                → (e ⇒ stringIterator(e.targetObject.getId)),
-        xxformsName("targetid")              → (e ⇒ stringIterator(e.targetObject.getId)),
-        xxformsName("effective-targetid")    → (e ⇒ stringIterator(e.targetObject.getEffectiveId)),
-        "event"                              → (e ⇒ stringIterator(e.name)),
-        xxformsName("type")                  → (e ⇒ stringIterator(e.name)),
-        xxformsName("bubbles")               → (e ⇒ booleanIterator(e.bubbles)),
-        xxformsName("cancelable")            → (e ⇒ booleanIterator(e.cancelable)),
-        xxformsName("phase")                 → (e ⇒ stringIterator(e.currentPhase.name)),
-        xxformsName("observerid")            → (e ⇒ stringIterator(e.currentObserver.getId)),
-        xxformsName("effective-observerid")  → (e ⇒ stringIterator(e.currentObserver.getEffectiveId)),
-        "repeat-indexes"                     → repeatIndexes,
-        xxformsName("repeat-indexes")        → repeatIndexes,
-        xxformsName("repeat-ancestors")      → repeatAncestors,
-        xxformsName("target-prefixes")       → targetPrefixes
+        "target"                            → (e ⇒ stringIterator(e.targetObject.getId)),
+        xxformsName("target")               → (e ⇒ stringIterator(e.targetObject.getId)),
+        xxformsName("targetid")             → (e ⇒ stringIterator(e.targetObject.getId)),
+        xxformsName("effective-targetid")   → (e ⇒ stringIterator(e.targetObject.getEffectiveId)),
+        "event"                             → (e ⇒ stringIterator(e.name)),
+        xxformsName("type")                 → (e ⇒ stringIterator(e.name)),
+        xxformsName("bubbles")              → (e ⇒ booleanIterator(e.bubbles)),
+        xxformsName("cancelable")           → (e ⇒ booleanIterator(e.cancelable)),
+        xxformsName("phase")                → (e ⇒ stringIterator(e.currentPhase.name)),
+        xxformsName("observerid")           → (e ⇒ stringIterator(e.currentObserver.getId)),
+        xxformsName("effective-observerid") → (e ⇒ stringIterator(e.currentObserver.getEffectiveId)),
+        "repeat-indexes"                    → repeatIndexes,
+        xxformsName("repeat-indexes")       → repeatIndexes,
+        xxformsName("repeat-ancestors")     → repeatAncestors,
+        xxformsName("target-prefixes")      → targetPrefixes
     )
 
     private def repeatIndexes(e: XFormsEvent) = {

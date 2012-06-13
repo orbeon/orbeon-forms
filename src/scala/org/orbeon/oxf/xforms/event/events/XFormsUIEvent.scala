@@ -47,11 +47,11 @@ private object XFormsUIEvent {
     import XFormsEvent._
     
     val Deprecated = Map(
-        "target-ref"        → "xxforms:binding",
-        "alert"             → "xxforms:alert",
-        "label"             → "xxforms:label",
-        "hint"              → "xxforms:hint",
-        "help"              → "xxforms:help"
+        "target-ref" → "xxforms:binding",
+        "alert"      → "xxforms:alert",
+        "label"      → "xxforms:label",
+        "hint"       → "xxforms:hint",
+        "help"       → "xxforms:help"
     )
     
     val StandardAttributes = Map[String, XFormsUIEvent ⇒ SequenceIterator](

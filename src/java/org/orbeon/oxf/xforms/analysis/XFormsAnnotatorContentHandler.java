@@ -204,7 +204,11 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
                 startElement(true, XFormsConstants.XXFORMS_NAMESPACE_URI, "text", "xxforms:text", attributes);
             } else if (("group".equals(localname) || "switch".equals(localname)) && isClosestXHTMLAncestorTableContainer()) {
                 // Closest xhtml:* ancestor is xhtml:table|xhtml:tbody|xhtml:thead|xhtml:tfoot|xhtml:tr
-                attributes = XMLUtils.addOrReplaceAttribute(attributes, "", "", XFormsConstants.APPEARANCE_QNAME.getName(), XFormsConstants.XXFORMS_SEPARATOR_APPEARANCE_QNAME.getQualifiedName());
+
+                // Append the new xxforms:separator appearance
+                final String existingAppearance = attributes.getValue("appearance");
+                attributes = XMLUtils.addOrReplaceAttribute(attributes, "", "", XFormsConstants.APPEARANCE_QNAME.getName(),
+                        (existingAppearance != null ? existingAppearance + " " : "") + XFormsConstants.XXFORMS_SEPARATOR_APPEARANCE_QNAME.getQualifiedName());
                 startElement(true, uri, localname, qName, attributes);
             } else if (isXForms && "repeat".equals(localname)) {
                 // Leave element untouched (except for the id attribute)

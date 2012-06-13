@@ -2769,4 +2769,45 @@
         </output>
     </test>
 
+    <test description="#308: Flattened group with appearance='xxforms:internal' shows in the markup" name="oxf:pipeline">
+        <!-- See: https://github.com/orbeon/orbeon-forms/issues/308 -->
+        <input name="config" href="wrap-xforms-init-allcontrols.xpl"/>
+        <input name="document">
+            <xhtml:html>
+                <xhtml:head>
+                    <xforms:model>
+                        <xforms:instance>
+                            <value xmlns=""/>
+                        </xforms:instance>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+                    <xhtml:table>
+                        <xf:repeat ref="." id="my-repeat">
+                            <xf:group appearance="xxforms:internal" class="MUST NOT APPEAR">
+                                <xhtml:tr>
+                                    <xhtml:td>Cat</xhtml:td>
+                                </xhtml:tr>
+                            </xf:group>
+                        </xf:repeat>
+                    </xhtml:table>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+           <controls>
+                <xhtml:tr id="repeat-begin-my-repeat" class="xforms-repeat-begin-end"/>
+                <xhtml:tr class="xforms-repeat-delimiter"/>
+                <xhtml:tr class="xforms-repeat-selected-item-1">
+                    <xhtml:td>Cat</xhtml:td>
+                </xhtml:tr>
+                <xhtml:tr class="xforms-repeat-delimiter"/>
+                <xhtml:tr class="xforms-repeat-template">
+                    <xhtml:td>Cat</xhtml:td>
+                </xhtml:tr>
+                <xhtml:tr id="repeat-end-my-repeat" class="xforms-repeat-begin-end"/>
+            </controls>
+        </output>
+    </test>
+
 </group>

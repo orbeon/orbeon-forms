@@ -369,9 +369,12 @@
                 <th>XML Element</th>
             </tr>
             <!-- Group so that if by any chance multiple location data for the same point occur, we show only one -->
+            <xsl:variable name="location-exceptions"
+                          select="$exceptions[location][1]/location[normalize-space(system-id) != '' and line castable as xs:integer and not(ends-with(system-id, '.java'))]"/>
             <xsl:choose>
-                <xsl:when test="$exceptions[location][1]/location[normalize-space(system-id) != '' and line castable as xs:integer and not(ends-with(system-id, '.java'))]">
-                    <xsl:for-each-group select="/exceptions/exception[location][1]/location[normalize-space(system-id) != '' and line castable as xs:integer and not(ends-with(system-id, '.java'))]"
+                <xsl:when test="$location-exceptions">
+                    <xsl:for-each-group
+                            select="$location-exceptions"
                             group-by="concat(system-id, '-', line, '-', column)">
                         <tr>
                             <td class="orbeon-error-panel-url-cell"><xsl:value-of select="system-id"/></td>
@@ -434,34 +437,34 @@
         <xsl:param name="exceptions" as="element(exception)*"/>
 
         <xsl:variable name="message" as="xs:string" select="/exceptions/exception[last()]/message"/>
-            <xsl:choose>
-                <xsl:when test="normalize-space($message) != ''">
-                    <xsl:choose>
-                        <xsl:when test="starts-with($message, 'Condition failed for every branch of choose') and contains($message, '/request/request-path,')">
-                            <!-- Handle specific message for PFC -->
-                            <xsl:text>Requested path doesn't match any existing page flow entry:</xsl:text>
-                            <xsl:variable name="parts1" select="tokenize(substring-after($message, '('), '\)[^\)]+\(')" as="xs:string*"/>
-                            <xsl:variable name="parts2" select="for $i in $parts1 return concat(if (contains($i, ',')) then 'Suffix: ' else 'Path: ', substring-before(substring-after($i, ''''), ''''))"/>
-                            <ul>
-                                <xsl:for-each select="$parts2">
-                                    <li>
-                                        <xsl:value-of select="."/>
-                                    </li>
-                                </xsl:for-each>
-                            </ul>
-                        </xsl:when>
-                        <xsl:otherwise>
-                            <!-- Handle any other message -->
-                            <xsl:call-template name="htmlize-line-breaks">
-                                <xsl:with-param name="message" select="$message"/>
-                            </xsl:call-template>
-                        </xsl:otherwise>
-                    </xsl:choose>
-                </xsl:when>
-                <xsl:otherwise>
-                    <i>[No error message provided.]</i>
-                </xsl:otherwise>
-            </xsl:choose>
+        <xsl:choose>
+            <xsl:when test="normalize-space($message) != ''">
+                <xsl:choose>
+                    <xsl:when test="starts-with($message, 'Condition failed for every branch of choose') and contains($message, '/request/request-path,')">
+                        <!-- Handle specific message for PFC -->
+                        <xsl:text>Requested path doesn't match any existing page flow entry:</xsl:text>
+                        <xsl:variable name="parts1" select="tokenize(substring-after($message, '('), '\)[^\)]+\(')" as="xs:string*"/>
+                        <xsl:variable name="parts2" select="for $i in $parts1 return concat(if (contains($i, ',')) then 'Suffix: ' else 'Path: ', substring-before(substring-after($i, ''''), ''''))"/>
+                        <ul>
+                            <xsl:for-each select="$parts2">
+                                <li>
+                                    <xsl:value-of select="."/>
+                                </li>
+                            </xsl:for-each>
+                        </ul>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <!-- Handle any other message -->
+                        <xsl:call-template name="htmlize-line-breaks">
+                            <xsl:with-param name="message" select="$message"/>
+                        </xsl:call-template>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:when>
+            <xsl:otherwise>
+                <i>[No error message provided.]</i>
+            </xsl:otherwise>
+        </xsl:choose>
     </xsl:template>
 
 </xsl:stylesheet>

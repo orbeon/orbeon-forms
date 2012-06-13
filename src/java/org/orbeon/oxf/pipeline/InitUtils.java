@@ -20,6 +20,7 @@ import org.dom4j.QName;
 import org.orbeon.oxf.cache.ObjectCache;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
+import org.orbeon.oxf.common.Errors;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.ProcessorDefinition;
@@ -43,7 +44,6 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Map;
-
 
 public class InitUtils {
 
@@ -108,11 +108,6 @@ public class InitUtils {
                         : " at " + locationData.toString();
                 logger.info("Resource not found" + ((resource != null) ? ": " + resource : "") + message);
             } else {
-                final String message = locationData == null
-                        ? "Exception with no location data"
-                        : "Exception at " + locationData.toString();
-                logger.error(message, throwable);
-                // Make sure the caller can do something about it, like trying to run an error page
                 throw new OXFException(e);
             }
         } finally {
@@ -130,7 +125,7 @@ public class InitUtils {
             try {
                 pipelineContext.destroy(success);
             } catch (Throwable f) {
-                logger.error("Exception while destroying context after exception", OXFException.getRootThrowable(f));
+                logger.debug("Exception while destroying context after exception" + Errors.format(f));
             }
         }
     }
@@ -180,7 +175,7 @@ public class InitUtils {
 
     /**
      * Run a processor based on definitions found in properties or the web app context. This is
-     * useful for listeners. If a definition is not found, no exception is thrown.
+     * useful for context/session listeners. If a definition is not found, no exception is thrown.
      *
      * @param servletContext            required ServletContext instance
      * @param session                   optional HttpSession object
@@ -197,13 +192,7 @@ public class InitUtils {
                            String uriNamePropertyPrefix, String processorInputProperty) throws Exception {
 
         // Make sure the Web app context is initialized
-        try {
-            JWebAppContext.instance(servletContext);
-        } catch (Throwable e) {
-            final Throwable rootThrowable = OXFException.getRootThrowable(e);
-            logger.error(logMessagePrefix + " - Error initializing the WebAppContext", rootThrowable);
-            throw new OXFException(rootThrowable);
-        }
+        JWebAppContext.instance(servletContext);
 
         // Log message if provided
         if (message != null)
@@ -247,7 +236,7 @@ public class InitUtils {
      */
     public static synchronized void initializeProcessorDefinitions() {
         if (!processorDefinitionsInitialized) {
-            synchronized (PipelineEngineImpl.class) {
+            synchronized (InitUtils.class) {
                 if (!processorDefinitionsInitialized) {
                     // Register initial processors with the default XML Processor Registry
                     Processor processorDefinitions = PipelineUtils.createURLGenerator(DEFAULT_PROLOGUE, true);

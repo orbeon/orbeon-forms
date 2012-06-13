@@ -21,6 +21,7 @@ import org.junit.Test;
 import org.junit.rules.TestName;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.orbeon.oxf.common.Errors;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.Version;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
@@ -128,13 +129,8 @@ public class ProcessorTest extends ResourceManagerTestBase {
                 parameters.add(new Object[] { description, processor, requestURL, domSerializers, expectedDocuments });
             }
             return parameters;
-        } catch (Exception e) {
-            System.err.println(currentTestError);
-            e.printStackTrace();
-            throw new OXFException(e);
         } catch (Throwable t) {
-            System.err.println(currentTestError);
-            t.printStackTrace();
+            System.err.println(currentTestError + Errors.format(t));
             throw new OXFException(currentTestError);
         }
     }

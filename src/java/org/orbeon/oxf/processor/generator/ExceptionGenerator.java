@@ -17,14 +17,14 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
-import org.orbeon.oxf.processor.*;
-import org.orbeon.oxf.util.StringBuilderWriter;
+import org.orbeon.oxf.processor.ProcessorImpl;
+import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
+import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.webapp.ProcessorService;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 
-import java.io.PrintWriter;
 import java.util.Iterator;
 import java.util.List;
 
@@ -33,10 +33,6 @@ import java.util.List;
  * throwable stored into the PipelineContext.
  */
 public class ExceptionGenerator extends ProcessorImpl {
-
-    private static final String ROOT_ELEMENT_NAME = "exceptions";
-    private static final String LOCATION_DATA_ELEMENT_NAME = "location";
-    private static final String EXCEPTION_ELEMENT_NAME = "exception";
 
     public ExceptionGenerator() {
         addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA));
@@ -51,13 +47,13 @@ public class ExceptionGenerator extends ProcessorImpl {
 
                 final ContentHandlerHelper helper = new ContentHandlerHelper(xmlReceiver);
                 helper.startDocument();
-                helper.startElement(ROOT_ELEMENT_NAME);
+                helper.startElement("exceptions");
 
                 // Write out document
                 try {
                     while (throwable != null) {
                         addThrowable(helper, throwable);
-                        throwable = OXFException.getNestedException(throwable);
+                        throwable = OXFException.getNestedThrowable(throwable);
                     }
                 } catch (Exception e) {
                     throw new OXFException(e);
@@ -72,7 +68,7 @@ public class ExceptionGenerator extends ProcessorImpl {
     }
 
     public static void addThrowable(ContentHandlerHelper helper, Throwable throwable) {
-        helper.startElement(EXCEPTION_ELEMENT_NAME);
+        helper.startElement("exception");
 
         helper.element("type", throwable.getClass().getName());
         helper.element("message", throwable instanceof ValidationException
@@ -81,28 +77,20 @@ public class ExceptionGenerator extends ProcessorImpl {
 
         addLocationData(helper, ValidationException.getAllLocationData(throwable));
 
-        final OXFException.StackTraceElement[] elements = OXFException.getStackTraceElements(throwable);
+        final StackTraceElement[] elements = throwable.getStackTrace();
 
-        if (elements != null) {
-            // We were able to get a structured stack trace
-            helper.startElement("stack-trace-elements");
-            for (int i = 0; i < elements.length; i++) {
-                final OXFException.StackTraceElement element = elements[i];
-                helper.startElement("element");
-                helper.element("class-name", element.getClassName());
-                helper.element("method-name", element.getMethodName());
-                helper.element("file-name", element.getFileName());
-                helper.element("line-number", element.getLineNumber());
-                helper.endElement();
-            }
+        // We were able to get a structured stack trace
+        helper.startElement("stack-trace-elements");
+        for (int i = 0; i < elements.length; i++) {
+            final StackTraceElement element = elements[i];
+            helper.startElement("element");
+            helper.element("class-name", element.getClassName());
+            helper.element("method-name", element.getMethodName());
+            helper.element("file-name", element.getFileName());
+            helper.element("line-number", element.getLineNumber());
             helper.endElement();
-        } else {
-            // Just output the String version of the stack trace
-            final StringBuilderWriter StringBuilderWriter = new StringBuilderWriter();
-            final PrintWriter printWriter = new PrintWriter(StringBuilderWriter);
-            throwable.printStackTrace(printWriter);
-            helper.element("stack-trace", StringBuilderWriter.toString());
         }
+        helper.endElement();
 
         helper.endElement();
     }
@@ -111,7 +99,7 @@ public class ExceptionGenerator extends ProcessorImpl {
         if (locationDataList != null) {
             for (Iterator i = locationDataList.iterator(); i.hasNext();) {
                 final LocationData locationData = (LocationData) i.next();
-                helper.startElement(LOCATION_DATA_ELEMENT_NAME);
+                helper.startElement("location");
                 helper.element("system-id", locationData.getSystemID());
                 helper.element("line", Integer.toString(locationData.getLine()));
                 helper.element("column", Integer.toString(locationData.getCol()));

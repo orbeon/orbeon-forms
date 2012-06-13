@@ -18,7 +18,6 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.generator.ExceptionGenerator;
-import org.orbeon.oxf.processor.impl.ProcessorOutputImpl;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.SAXStore;
 
@@ -53,7 +52,7 @@ public class ExceptionCatcher extends ProcessorImpl {
                     // Find the root throwable
                     Throwable innerMostThrowable = e; {
                         while (true) {
-                            Throwable candidate = OXFException.getNestedException(innerMostThrowable);
+                            Throwable candidate = OXFException.getNestedThrowable(innerMostThrowable);
                             if (candidate == null) break;
                             else innerMostThrowable = candidate;
                         }

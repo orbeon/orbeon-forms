@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.event.events;
 
 import org.apache.log4j.Level;
-import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.common.Errors;
 import org.orbeon.oxf.util.ConnectionResult;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.NetUtils;
@@ -30,7 +30,9 @@ import org.orbeon.saxon.om.SequenceIterator;
 import org.orbeon.saxon.om.SingletonIterator;
 import org.orbeon.saxon.value.StringValue;
 
-import java.io.*;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.net.URL;
 
 
@@ -41,8 +43,6 @@ import java.net.URL;
  * The default action for this event results in the following: None; notification event only.
  */
 public class XFormsSubmitErrorEvent extends XFormsSubmitResponseEvent {
-
-    private Throwable throwable;
 
     private DocumentInfo bodyDocument;
     private String bodyString;
@@ -142,18 +142,10 @@ public class XFormsSubmitErrorEvent extends XFormsSubmitResponseEvent {
     }
 
     public void setThrowable(Throwable throwable) {
-        this.throwable = throwable;
-
         if (errorType != ErrorType.VALIDATION_ERROR) {
             // Don't log validation errors as actual errors
-            indentedLogger().logError("xforms-submit-error", "setting throwable", "throwable", throwableToString(throwable));
+            indentedLogger().logError("xforms-submit-error", "setting throwable", "throwable", Errors.format(throwable));
         }
-    }
-
-    private static String throwableToString(Throwable throwable) {
-        final CharArrayWriter writer = new CharArrayWriter();
-        OXFException.getRootThrowable(throwable).printStackTrace(new PrintWriter(writer));
-        return writer.toString();
     }
 
     public DocumentInfo getBodyDocument() {

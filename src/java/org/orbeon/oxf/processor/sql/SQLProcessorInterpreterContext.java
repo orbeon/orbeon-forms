@@ -152,7 +152,6 @@ public class SQLProcessorInterpreterContext extends DatabaseContext {
                             SQLProcessor.logger.info("Using Oracle JBoss delegate.");
                         } catch (Throwable t) {
                             // Ignore
-                        	t.printStackTrace();
                         }
                     }
 

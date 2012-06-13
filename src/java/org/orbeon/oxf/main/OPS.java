@@ -18,14 +18,12 @@ import org.apache.log4j.Logger;
 import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
 import org.dom4j.QName;
+import org.orbeon.oxf.common.Errors;
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.common.Version;
 import org.orbeon.oxf.pipeline.CommandLineExternalContext;
 import org.orbeon.oxf.pipeline.InitUtils;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.pipeline.api.PipelineEngine;
-import org.orbeon.oxf.pipeline.api.PipelineEngineFactory;
 import org.orbeon.oxf.pipeline.api.ProcessorDefinition;
 import org.orbeon.oxf.processor.Processor;
 import org.orbeon.oxf.processor.ProcessorOutput;
@@ -38,7 +36,6 @@ import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.webapp.ProcessorService;
 import org.orbeon.oxf.xml.XMLConstants;
-import org.orbeon.oxf.xml.dom4j.LocationData;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -46,7 +43,6 @@ import javax.naming.NamingException;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -241,8 +237,8 @@ public class OPS {
 
             if (outputs == null) {
                 // No outputs to connect: just execute the pipeline
-                PipelineEngine pipelineEngine = PipelineEngineFactory.instance();
-                pipelineEngine.executePipeline(processorDefinition, new CommandLineExternalContext(), pipelineContext, logger);
+                InitUtils.initializeProcessorDefinitions();
+                InitUtils.runProcessor(InitUtils.createProcessor(processorDefinition), new CommandLineExternalContext(), pipelineContext, logger);
             } else {
                 // At least one output to connect...
                 InitUtils.initializeProcessorDefinitions();
@@ -269,12 +265,7 @@ public class OPS {
             }
         } catch (Exception e) {
             // 8. Display exceptions if needed
-            final LocationData locationData = ValidationException.getRootLocationData(e);
-            Throwable throwable = OXFException.getRootThrowable(e);
-            final String message = locationData == null
-                    ? "Exception with no location data"
-                    : "Exception at " + locationData.toString();
-            logger.error(message, throwable);
+            logger.error(Errors.format(e));
             System.exit(1);
         }
     }
@@ -285,8 +276,7 @@ public class OPS {
             orbeon.init();
             orbeon.start();
         } catch (Exception e) {
-            System.out.println(e.getMessage());
-            OXFException.getRootThrowable(e).printStackTrace();
+            logger.error(Errors.format(e));
             System.exit(1);
         }
     }

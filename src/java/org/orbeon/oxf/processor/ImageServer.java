@@ -25,6 +25,7 @@ import org.orbeon.oxf.cache.CacheKey;
 import org.orbeon.oxf.cache.InternalCacheKey;
 import org.orbeon.oxf.cache.ObjectCache;
 import org.orbeon.oxf.cache.SoftCacheImpl;
+import org.orbeon.oxf.common.Errors;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
@@ -283,7 +284,7 @@ public class ImageServer extends ProcessorImpl {
                         encoder.setJPEGEncodeParam(params);
                         encoder.encode(img2);
                     } catch (OXFException e) {
-                        logger.error(OXFException.getRootThrowable(e));
+                        logger.error(Errors.format(e));
                         imageResponse.setStatus(ExternalContext.SC_INTERNAL_SERVER_ERROR);
                         return;
                     } finally {

@@ -47,7 +47,7 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
     	return this.handlerContext;
     }
 
-    protected static void outputDisabledAttribute(AttributesImpl newAttributes) {
+    public static void outputDisabledAttribute(AttributesImpl newAttributes) {
         // @disabled="disabled"
         // HTML 4: @disabled supported on: input, button, select, optgroup, option, and textarea.
         newAttributes.addAttribute("", "disabled", "disabled", ContentHandlerHelper.CDATA, "disabled");
@@ -484,7 +484,7 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
         xmlReceiver.endElement(XMLConstants.XHTML_NAMESPACE_URI, elementName, labelQName);
     }
 
-    protected static void outputLabelText(XMLReceiver xmlReceiver, XFormsControl xformsControl, String value, String xhtmlPrefix, boolean mustOutputHTMLFragment) throws SAXException {
+    public static void outputLabelText(XMLReceiver xmlReceiver, XFormsControl xformsControl, String value, String xhtmlPrefix, boolean mustOutputHTMLFragment) throws SAXException {
         // Only output content when there value is non-empty
         if (value != null && !value.equals("")) {
             if (mustOutputHTMLFragment)

@@ -747,7 +747,7 @@
         <output name="response">
             <controls xmlns:xhtml="http://www.w3.org/1999/xhtml">
                 <xhtml:span id="my-new-trigger·1" class="xforms-control xforms-trigger xforms-trigger-appearance-full xforms-invalid xforms-required xforms-type-NCName xforms-repeat-selected-item-1">
-                    <xhtml:button id="my-new-trigger$$c·1" title="My hint" type="button">My label</xhtml:button>
+                    <xhtml:button id="my-new-trigger$$c·1" title="My hint" type="button" class="btn">My label</xhtml:button>
                     <xhtml:img class="xforms-help-image" src="/ops/images/xforms/help.png" title="" alt=""/>
                     <xhtml:span class="xforms-help">My help</xhtml:span>
                 </xhtml:span>
@@ -757,7 +757,7 @@
                     <xhtml:span class="xforms-help">My help</xhtml:span>
                 </xhtml:span>
                 <xhtml:span id="my-new-modal-trigger·1" class="xforms-control xforms-trigger xforms-trigger-appearance-full xforms-trigger-appearance-modal xforms-invalid xforms-required xforms-type-NCName xforms-repeat-selected-item-1">
-                    <xhtml:button id="my-new-modal-trigger$$c·1" title="My hint" type="button">My label</xhtml:button>
+                    <xhtml:button id="my-new-modal-trigger$$c·1" title="My hint" type="button" class="btn">My label</xhtml:button>
                     <xhtml:img class="xforms-help-image" src="/ops/images/xforms/help.png" title="" alt=""/>
                     <xhtml:span class="xforms-help">My help</xhtml:span>
                 </xhtml:span>
@@ -767,7 +767,7 @@
                     <xhtml:span class="xforms-help">My help</xhtml:span>
                 </xhtml:span>
                 <xhtml:span id="my-new-trigger" class="xforms-control xforms-trigger xforms-trigger-appearance-full xforms-repeat-template">
-                    <xhtml:button id="my-new-trigger$$c" type="button"/>
+                    <xhtml:button id="my-new-trigger$$c" type="button" class="btn"/>
                     <xhtml:img class="xforms-disabled xforms-help-image" src="/ops/images/xforms/help.png" title="" alt=""/>
                     <xhtml:span class="xforms-disabled xforms-help"/>
                 </xhtml:span>
@@ -777,7 +777,7 @@
                     <xhtml:span class="xforms-disabled xforms-help"/>
                 </xhtml:span>
                 <xhtml:span id="my-new-modal-trigger" class="xforms-control xforms-trigger xforms-trigger-appearance-full xforms-trigger-appearance-modal xforms-repeat-template">
-                    <xhtml:button id="my-new-modal-trigger$$c" type="button"/>
+                    <xhtml:button id="my-new-modal-trigger$$c" type="button" class="btn"/>
                     <xhtml:img class="xforms-disabled xforms-help-image" src="/ops/images/xforms/help.png" title="" alt=""/>
                     <xhtml:span class="xforms-disabled xforms-help"/>
                 </xhtml:span>
@@ -835,25 +835,25 @@
         </input>
         <output name="response">
             <controls>
-                <xhtml:button id="my-old-trigger·1" class="xforms-control xforms-trigger xforms-trigger-appearance-full xforms-invalid xforms-required xforms-type-NCName xforms-repeat-selected-item-1" title="My hint" type="button">My label</xhtml:button>
+                <xhtml:button id="my-old-trigger·1" class="xforms-control xforms-trigger xforms-trigger-appearance-full xforms-invalid xforms-required xforms-type-NCName btn xforms-repeat-selected-item-1" title="My hint" type="button">My label</xhtml:button>
                 <xhtml:img id="my-old-trigger$$i·1" class="xforms-help-image xforms-repeat-selected-item-1" src="/ops/images/xforms/help.png" title="" alt=""/>
                 <xhtml:span class="xforms-help xforms-repeat-selected-item-1" id="my-old-trigger$$p·1">My help</xhtml:span>
                 <xhtml:a id="my-old-minimal-trigger·1" class="xforms-control xforms-trigger xforms-trigger-appearance-minimal xforms-invalid xforms-required xforms-type-NCName xforms-repeat-selected-item-1" title="My hint" href="#">My label</xhtml:a>
                 <xhtml:img id="my-old-minimal-trigger$$i·1" class="xforms-help-image xforms-repeat-selected-item-1" src="/ops/images/xforms/help.png" title="" alt=""/>
                 <xhtml:span class="xforms-help xforms-repeat-selected-item-1" id="my-old-minimal-trigger$$p·1">My help</xhtml:span>
-                <xhtml:button id="my-new-modal-trigger·1" class="xforms-control xforms-trigger xforms-trigger-appearance-full xforms-trigger-appearance-modal xforms-invalid xforms-required xforms-type-NCName xforms-repeat-selected-item-1" title="My hint" type="button">My label</xhtml:button>
+                <xhtml:button id="my-new-modal-trigger·1" class="xforms-control xforms-trigger xforms-trigger-appearance-full xforms-trigger-appearance-modal xforms-invalid xforms-required xforms-type-NCName btn xforms-repeat-selected-item-1" title="My hint" type="button">My label</xhtml:button>
                 <xhtml:img id="my-new-modal-trigger$$i·1" class="xforms-help-image xforms-repeat-selected-item-1" src="/ops/images/xforms/help.png" title="" alt=""/>
                 <xhtml:span class="xforms-help xforms-repeat-selected-item-1" id="my-new-modal-trigger$$p·1">My help</xhtml:span>
                 <xhtml:a id="my-new-modal-minimal-trigger·1" class="xforms-control xforms-trigger xforms-trigger-appearance-minimal xforms-trigger-appearance-modal xforms-invalid xforms-required xforms-type-NCName xforms-repeat-selected-item-1" title="My hint" href="#">My label</xhtml:a>
                 <xhtml:img id="my-new-modal-minimal-trigger$$i·1" class="xforms-help-image xforms-repeat-selected-item-1" src="/ops/images/xforms/help.png" title="" alt=""/>
                 <xhtml:span class="xforms-help xforms-repeat-selected-item-1" id="my-new-modal-minimal-trigger$$p·1">My help</xhtml:span>
-                <xhtml:button id="my-old-trigger" class="xforms-control xforms-trigger xforms-trigger-appearance-full xforms-repeat-template" type="button"/>
+                <xhtml:button id="my-old-trigger" class="xforms-control xforms-trigger xforms-trigger-appearance-full btn xforms-repeat-template" type="button"/>
                 <xhtml:img id="my-old-trigger$$i" class="xforms-disabled xforms-help-image xforms-repeat-template" src="/ops/images/xforms/help.png" title="" alt=""/>
                 <xhtml:span class="xforms-disabled xforms-help xforms-repeat-template" id="my-old-trigger$$p"/>
                 <xhtml:a id="my-old-minimal-trigger" class="xforms-control xforms-trigger xforms-trigger-appearance-minimal xforms-repeat-template" href="#"/>
                 <xhtml:img id="my-old-minimal-trigger$$i" class="xforms-disabled xforms-help-image xforms-repeat-template" src="/ops/images/xforms/help.png" title="" alt=""/>
                 <xhtml:span class="xforms-disabled xforms-help xforms-repeat-template" id="my-old-minimal-trigger$$p"/>
-                <xhtml:button id="my-new-modal-trigger" class="xforms-control xforms-trigger xforms-trigger-appearance-full xforms-trigger-appearance-modal xforms-repeat-template" type="button"/>
+                <xhtml:button id="my-new-modal-trigger" class="xforms-control xforms-trigger xforms-trigger-appearance-full xforms-trigger-appearance-modal btn xforms-repeat-template" type="button"/>
                 <xhtml:img id="my-new-modal-trigger$$i" class="xforms-disabled xforms-help-image xforms-repeat-template" src="/ops/images/xforms/help.png" title="" alt=""/>
                 <xhtml:span class="xforms-disabled xforms-help xforms-repeat-template" id="my-new-modal-trigger$$p"/>
                 <xhtml:a id="my-new-modal-minimal-trigger" class="xforms-control xforms-trigger xforms-trigger-appearance-minimal xforms-trigger-appearance-modal xforms-repeat-template" href="#"/>

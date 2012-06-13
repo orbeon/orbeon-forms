@@ -31,7 +31,7 @@ trait ControlExtensionAttributesSupport {
 
     final def compareExtensionAttributes(other: XFormsControl): Boolean = {
         if (extensionAttributesValues ne null)
-            for ((currentName, currentValue) ←  extensionAttributesValues.asScala)
+            for ((currentName, currentValue) ← extensionAttributesValues.asScala)
                 if (currentValue != other.getExtensionAttributeValue(currentName))
                     return false
 

@@ -59,7 +59,7 @@ public class XFormsRepeatHandler extends XFormsControlLifecyleHandlerXML {
                 
                 reusableAttributes.clear();
                 reusableAttributes.addAttribute(XFormsConstants.XXFORMS_NAMESPACE_URI, "selected", XFormsConstants.XXFORMS_PREFIX + ":selected", ContentHandlerHelper.CDATA, isCurrentIterationSelected?"true":"false");
-            	contentHandler.startElement(XFormsConstants.XXFORMS_NAMESPACE_URI, "itteration", XFormsConstants.XXFORMS_PREFIX + ":itteration", reusableAttributes);
+            	contentHandler.startElement(XFormsConstants.XXFORMS_NAMESPACE_URI, "iteration", XFormsConstants.XXFORMS_PREFIX + ":iteration", reusableAttributes);
                 
                 // Apply the content of the body for this iteration
                 handlerContext.pushRepeatContext(false, i, isCurrentIterationSelected);
@@ -70,7 +70,7 @@ public class XFormsRepeatHandler extends XFormsControlLifecyleHandlerXML {
                 }
                 handlerContext.popRepeatContext();
                 
-                contentHandler.endElement(XFormsConstants.XXFORMS_NAMESPACE_URI, "itteration", XFormsConstants.XXFORMS_PREFIX + ":itteration");
+                contentHandler.endElement(XFormsConstants.XXFORMS_NAMESPACE_URI, "iteration", XFormsConstants.XXFORMS_PREFIX + ":iteration");
             }
         }
         	

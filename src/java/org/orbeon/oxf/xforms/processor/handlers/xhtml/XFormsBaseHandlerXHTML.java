@@ -215,42 +215,31 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
 
     protected StringBuilder appendControlUserClasses(Attributes controlAttributes, XFormsControl control, StringBuilder sb) {
         // @class
-        {
-            final String attributeValue = controlAttributes.getValue("class");
-            final String value;
-            if (attributeValue != null) {
+        final String attributeValue = controlAttributes.getValue("class");
+        final String value;
+        if (attributeValue != null) {
 
-                if (!XFormsUtils.maybeAVT(attributeValue)) {
-                    // Definitely not an AVT
-                    value = attributeValue;
+            if (!XFormsUtils.maybeAVT(attributeValue)) {
+                // Definitely not an AVT
+                value = attributeValue;
+            } else {
+                // Possible AVT
+                if (control != null) {
+                    // Ask the control if possible
+                    value = control.getExtensionAttributeValue(XFormsConstants.CLASS_QNAME);
                 } else {
-                    // Possible AVT
-                    if (control != null) {
-                        // Ask the control if possible
-                        value = control.getExtensionAttributeValue(XFormsConstants.CLASS_QNAME);
-                    } else {
-                        // Otherwise we can't compute it
-                        value = null;
-                    }
-                }
-
-                if (value != null) {
-                    if (sb.length() > 0)
-                        sb.append(' ');
-                    sb.append(value);
+                    // Otherwise we can't compute it
+                    value = null;
                 }
             }
-        }
-        // @xhtml:class
-        // TODO: Do we need to support this? Should just use @class
-        {
-            final String value = controlAttributes.getValue(XMLConstants.XHTML_NAMESPACE_URI, "class");
+
             if (value != null) {
                 if (sb.length() > 0)
                     sb.append(' ');
                 sb.append(value);
             }
         }
+
         return sb;
     }
 

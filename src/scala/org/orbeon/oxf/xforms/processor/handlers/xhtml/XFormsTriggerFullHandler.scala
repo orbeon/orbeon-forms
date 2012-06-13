@@ -27,6 +27,7 @@ import XFormsTriggerFullHandler._
 import org.dom4j.QName
 import org.orbeon.oxf.xforms.XFormsConstants._
 import scala.collection.JavaConverters._
+import java.lang.{StringBuilder ⇒ JStringBuilder}
 
 /**
  * Default full appearance (button).
@@ -117,7 +118,7 @@ class XFormsTriggerFullHandler extends XFormsTriggerHandler {
 
             // Analyze label value to find a nested image or text
             val (image, text) = {
-                val sb = new java.lang.StringBuilder(labelValue.length)
+                val sb = new JStringBuilder(labelValue.length)
                 var imageInfo: Option[(Option[String], Option[String], Option[String])] = None
 
                 XFormsUtils.streamHTMLFragment(new XMLReceiverAdapter {

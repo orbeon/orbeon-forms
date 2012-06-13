@@ -81,10 +81,9 @@ class XFormsTriggerFullHandler extends XFormsTriggerHandler {
             outputDisabledAttribute(containerAttributes)
 
         // Determine bootstrap classes, which go on the <button> element
-        // NOTE: It seems we don't need the disabled class: (if (disabled) List("disabled") else Nil) :::
+        // NOTE: It seems we don't need the .disabled class (if (disabled) List("disabled") else Nil).
         val bootstrapClasses =
-            "btn" ::
-            (getAppearances.asScala flatMap (appearance ⇒ BootstrapAppearances.get(appearance)) toList)
+            "btn" :: (getAppearances.asScala flatMap (appearance ⇒ BootstrapAppearances.get(appearance)) toList)
 
         // xhtml:button or xhtml:input
         val spanQName = XMLUtils.buildQName(xhtmlPrefix, elementName)
@@ -97,10 +96,9 @@ class XFormsTriggerFullHandler extends XFormsTriggerHandler {
         xmlReceiver.endElement(XHTML_NAMESPACE_URI, elementName, spanQName)
     }
 
-    // IE 6 does not support discriminating between multiple buttons: it sends them all, so we use
-    // "input" instead. The code below tries to output <input type="submit"> or <input type="image">
-    // depending on the content of the label. This has limitations: we can only handle text or a single
-    // image.
+    // IE 6 does not support discriminating between multiple buttons: it sends them all, so we use "input" instead. The
+    // code below tries to output <input type="submit"> or <input type="image"> depending on the content of the label.
+    // This has limitations: we can only handle text or a single image.
     private def getIE6LabelValue(
             triggerControl: XFormsTriggerControl,
             xhtmlPrefix: String,
@@ -150,8 +148,6 @@ class XFormsTriggerFullHandler extends XFormsTriggerHandler {
         } else
             ("submit", labelValue)
     }
-
-
 }
 
 private object XFormsTriggerFullHandler {

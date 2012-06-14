@@ -86,10 +86,8 @@
                                             if (xs:integer($digits-after-decimal) gt 0) then '.' else '',
                                             substring('0000000000', 1, xs:integer($digits-after-decimal)))"/>
 
-                        <!--<xforms:output value="$picture-string"/>-->
-
                         <!-- Access to XForms value and change event -->
-                        <!-- NEXT: Here it seems that if the value doesn't change, the xxforms:format doesn't run; this leads to a bug when the prefix changes and the amount stays the same -->
+                        <!-- TODO: Here it seems that if the value doesn't change, the xxforms:format doesn't run; this leads to a bug when the prefix changes and the amount stays the same -->
                         <!--
                             format:
                                 if the value is a decimal: prefix and space (if any prefix), then formatted decimal with grouping and decimal separator

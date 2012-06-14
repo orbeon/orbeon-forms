@@ -69,6 +69,7 @@ YAHOO.xbl.fr.Number.prototype = {
     focus: function() {
         this.hasFocus = true;
         this.visibleInputElement.value = this.numberToEditString(this.visibleInputElement.value);
+        ORBEON.xforms.Document.dispatchEvent(this.xformsInputElement.id, 'xforms-focus');
     },
 
     blur: function() {

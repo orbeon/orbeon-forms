@@ -17,7 +17,6 @@ ORBEON.xforms.XBL.declareClass(YAHOO.xbl.fr.Number, "xbl-fr-number");
 YAHOO.xbl.fr.Number.prototype = {
 
     xformsInputElement: null,
-    groupElement: null,
     visibleInputElement: null,
 
     prefixElement: null,
@@ -35,7 +34,6 @@ YAHOO.xbl.fr.Number.prototype = {
         // Get information from the DOM
 
         this.xformsInputElement = YAHOO.util.Dom.getElementsByClassName("xbl-fr-number-xforms-input", null, this.container)[0];
-        this.groupElement = YAHOO.util.Dom.getElementsByClassName("xforms-group", null, this.container)[0];
         this.visibleInputElement = YAHOO.util.Dom.getElementsByClassName("xbl-fr-number-visible-input", null, this.container)[0];
         this.hasFocus = false;
 
@@ -80,18 +78,18 @@ YAHOO.xbl.fr.Number.prototype = {
             // Update visible field
             self.update();
             // Update xforms-invalid-visited
-            if (YAHOO.util.Dom.hasClass(self.groupElement, "xforms-invalid"))
-                YAHOO.util.Dom.addClass(self.groupElement, "xforms-invalid-visited");
+            if (YAHOO.util.Dom.hasClass(self.container, "xforms-invalid"))
+                YAHOO.util.Dom.addClass(self.container, "xforms-invalid-visited");
         });
 
         var newValue = this.visibleInputElement.value;
         ORBEON.xforms.Document.setValue(this.xformsInputElement.id, newValue);
 
         // Update xforms-required-empty/xforms-required-filled and xforms-visited
-        ORBEON.xforms.Controls.updateRequiredEmpty(this.groupElement, newValue);
+        ORBEON.xforms.Controls.updateRequiredEmpty(this.container, newValue);
         // Make sure the field is known as visited
-        if (! YAHOO.util.Dom.hasClass(this.groupElement, "xforms-visited"))
-            YAHOO.util.Dom.addClass(this.groupElement, "xforms-visited");
+        if (! YAHOO.util.Dom.hasClass(this.container, "xforms-visited"))
+            YAHOO.util.Dom.addClass(this.container, "xforms-visited");
 
     },
 

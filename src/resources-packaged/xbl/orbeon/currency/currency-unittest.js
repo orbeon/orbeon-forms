@@ -11,7 +11,7 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
+(function() {
 
     var emptyInput = YAHOO.util.Dom.getElementsByClassName("xbl-fr-number-visible-input", null, "empty")[0];
     var valueInput = YAHOO.util.Dom.getElementsByClassName("xbl-fr-number-visible-input", null, "value")[0];
@@ -168,13 +168,11 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
         },
         testClasses: function() {
             var requiredEmptyControl = YAHOO.util.Dom.get("required-empty");
-            var requiredEmptyGroup = YAHOO.util.Dom.getElementsByClassName("xforms-group", null, requiredEmptyControl)[0];
-            var requiredEmptyInput = YAHOO.util.Dom.getElementsByClassName("xbl-fr-number-visible-input", null, requiredEmptyGroup)[0];
+            var requiredEmptyInput = YAHOO.util.Dom.getElementsByClassName("xbl-fr-number-visible-input", null, requiredEmptyControl)[0];
             var emptyControl = YAHOO.util.Dom.get("empty");
             var emptyInput = YAHOO.util.Dom.getElementsByClassName("xbl-fr-number-visible-input", null, emptyControl)[0];
 
             var requiredFilledControl = YAHOO.util.Dom.get("required-filled");
-            var requiredFilledGroup = YAHOO.util.Dom.getElementsByClassName("xforms-group", null, requiredFilledControl)[0];
 
             function checkClasses(group, invalid, required, invalidVisited, requiredFilled, situation) {
                 YAHOO.util.Assert.areEqual(invalid, YAHOO.util.Dom.hasClass(group, "xforms-invalid"), situation + " for xforms-invalid");
@@ -184,15 +182,15 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
             }
 
             // Check classes with no change
-            checkClasses(requiredEmptyGroup, true, true, false, false, "initially empty");
-            checkClasses(requiredFilledGroup, false, true, false, true, "initially filled");
+            checkClasses(requiredEmptyControl, true, true, false, false, "initially empty");
+            checkClasses(requiredFilledControl, false, true, false, true, "initially filled");
             ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
                 requiredEmptyInput.focus();
                 requiredEmptyInput.blur();
                 emptyInput.focus();
             }, function() {
                 //  Check we now have the class xforms-invalid-visited
-                checkClasses(requiredEmptyGroup, true, true, true, false, "after visited empty");
+                checkClasses(requiredEmptyControl, true, true, true, false, "after visited empty");
                 ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
                     requiredEmptyInput.focus();
                     requiredEmptyInput.value = "42";
@@ -200,7 +198,7 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
                     emptyInput.focus();
                 }, function() {
                     // Check it is now marked valid and filled
-                    checkClasses(requiredEmptyGroup, false, true, false, true, "after filled empty");
+                    checkClasses(requiredEmptyControl, false, true, false, true, "after filled empty");
                 });
             });
         },
@@ -230,10 +228,5 @@ ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
         }
     }));
 
-    if (parent && parent.TestManager) {
-        parent.TestManager.load();
-    } else {
-        new YAHOO.tool.TestLogger();
-        YAHOO.tool.TestRunner.run();
-    }
-});
+    ORBEON.util.Test.onOrbeonLoadedRunTest();
+})();

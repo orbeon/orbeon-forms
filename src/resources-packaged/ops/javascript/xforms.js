@@ -2429,6 +2429,7 @@ ORBEON.xforms.Controls = {
     updateInvalidVisitedOnNextAjaxResponse: function(control) {
         if (! YAHOO.util.Dom.hasClass(control, "xforms-visited")) {
             ORBEON.xforms.Events.runOnNext(ORBEON.xforms.Events.ajaxResponseProcessedEvent, function() {
+                YAHOO.util.Dom.addClass(control, "xforms-visited");
                 if (YAHOO.util.Dom.hasClass(control, "xforms-invalid"))
                     YAHOO.util.Dom.addClass(control, "xforms-invalid-visited");
                 var alertElement = ORBEON.xforms.Controls.getControlLHHA(control, "alert");

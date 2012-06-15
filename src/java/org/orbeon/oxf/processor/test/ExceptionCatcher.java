@@ -52,7 +52,7 @@ public class ExceptionCatcher extends ProcessorImpl {
                     // Find the root throwable
                     Throwable innerMostThrowable = e; {
                         while (true) {
-                            Throwable candidate = Exceptions.getNestedThrowable(innerMostThrowable);
+                            Throwable candidate = Exceptions.getNestedThrowableOrNull(innerMostThrowable);
                             if (candidate == null) break;
                             else innerMostThrowable = candidate;
                         }

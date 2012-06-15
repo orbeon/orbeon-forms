@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010 Orbeon, Inc.
+ * Copyright (C) 2012 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -17,7 +17,7 @@ object Exceptions {
 
     // Returns the exception directly nested
     // This first tries reflection and then falls back to the standard getCause
-    def getNestedThrowable(t: Throwable): Throwable = {
+    def getNestedThrowable(t: Throwable): Option[Throwable] = {
 
         // Create a map of all classes and interfaces implemented by the throwable
         val throwableClasses = {
@@ -38,15 +38,16 @@ object Exceptions {
                 case _ ⇒ None
             }
 
-        // Try to find a match with getters, or else fallback to getCause
+        // Try to find a match
         Getters find
             { case (clazz, _)      ⇒ throwableClasses.contains(clazz) } flatMap
-            { case (clazz, getter) ⇒ invokeGetter(throwableClasses(clazz), getter) } getOrElse
-            t.getCause
+            { case (clazz, getter) ⇒ invokeGetter(throwableClasses(clazz), getter) }
     }
 
+    def getNestedThrowableOrNull(t: Throwable) = getNestedThrowable(t) orNull
+
     // Iterator down a throwable's causes
-    def causesIterator(t: Throwable) = Iterator.iterate(t)(getNestedThrowable(_)).takeWhile(_ ne null)
+    def causesIterator(t: Throwable) = Iterator.iterate(t)(getNestedThrowableOrNull(_)).takeWhile(_ ne null)
 
     // Get the root cause of the throwable
     def getRootThrowable(t: Throwable): Throwable = causesIterator(t).toList.lastOption.orNull

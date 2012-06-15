@@ -54,7 +54,7 @@ public class ExceptionGenerator extends ProcessorImpl {
                 try {
                     while (throwable != null) {
                         addThrowable(helper, throwable);
-                        throwable = Exceptions.getNestedThrowable(throwable);
+                        throwable = Exceptions.getNestedThrowableOrNull(throwable);
                     }
                 } catch (Exception e) {
                     throw new OXFException(e);

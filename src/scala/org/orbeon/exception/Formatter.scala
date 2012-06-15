@@ -18,7 +18,9 @@ import org.apache.commons.lang.StringUtils.isNotBlank
 import org.orbeon.oxf.xml.dom4j.{ExtendedLocationData, LocationData}
 import org.orbeon.oxf.common.ValidationException
 
-// Exception formatting
+// Exception formatter
+// This takes a Throwable and formats it into an ASCII table, including error message, application-specific traces,
+// and JVM stack traces.
 object Formatter {
 
     private val Width = 120
@@ -42,34 +44,33 @@ object Formatter {
 
         def formattedDropCaused(causedTrace: Option[List[String]], e: Error) = {
             val newTrace = e.stackTrace map (_.formatted(Width))
-            causedTrace match {
-                case Some(causedTrace) ⇒
-                    val commonSize = causedTrace zip newTrace takeWhile (pair ⇒ pair._1 == pair._2) size
-                    val toShow = newTrace drop commonSize
 
-                    def truncate(max: Int) =
-                        if (toShow.size <= max + max / 10) // give it 10% tolerance
-                            toShow
-                        else
-                            (toShow take max / 2) ::: List(DottedHr) ::: (toShow takeRight max / 2)
+            val commonSize =
+                causedTrace match {
+                    case Some(causedTrace) ⇒ causedTrace zip newTrace takeWhile (pair ⇒ pair._1 == pair._2) size
+                    case None ⇒ 0
+                }
 
-                    (newTrace, truncate(MaxStackLength))
-                case none ⇒
-                    (newTrace, newTrace)
-            }
+            (newTrace, newTrace drop commonSize)
         }
 
         def allFormattedJavaTraces: List[String] = {
+
+            def truncate(trace: List[String], max: Int) =
+                if (trace.size <= max + max / 10) // give it 10% tolerance
+                    trace
+                else
+                    (trace take max / 2) ::: List(DottedHr) ::: (trace takeRight max / 2)
 
             def nextTraces(causedTrace: Option[List[String]], rest: List[Error]): List[String] = rest headOption match {
                 case Some(error) ⇒
                     val (newTrace, newTraceCompact) = formattedDropCaused(causedTrace, error)
 
                     nextTraces(Some(newTrace), rest.tail) :::
-                            InnerHr ::
-                            withBorder("Exception: " + error.className, 120) ::
-                            InnerHr ::
-                            newTraceCompact.reverse
+                    InnerHr ::
+                    withBorder("Exception: " + error.className, 120) ::
+                    InnerHr ::
+                    truncate(newTraceCompact.reverse, MaxStackLength)
 
                 case None ⇒
                     Nil
@@ -80,16 +81,16 @@ object Formatter {
 
         val lines =
             OuterHr ::
-                    withBorder("An Error has Occurred in Orbeon Forms", Width) ::
-                    InnerHr ::
-                    withBorder(message, Width) ::
-                    InnerHr ::
-                    withBorder("Orbeon Forms Call Stack", Width) ::
-                    InnerHr ::
-                    (locations map (_.formatted(Width))) :::
-                    allFormattedJavaTraces :::
-                    OuterHr ::
-                    Nil
+            withBorder("An Error has Occurred in Orbeon Forms", Width) ::
+            InnerHr ::
+            withBorder(message, Width) ::
+            InnerHr ::
+            withBorder("Orbeon Forms Call Stack", Width) ::
+            InnerHr ::
+            (locations map (_.formatted(Width))) :::
+            allFormattedJavaTraces :::
+            OuterHr ::
+            Nil
 
         "\n" + (lines mkString "\n")
     }

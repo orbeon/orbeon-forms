@@ -37,7 +37,7 @@ public class ValidationException extends OXFException {
             Throwable currentThrowable = throwable;
             while (currentThrowable != null) {
                 exceptionChain.add(currentThrowable);
-                currentThrowable = Exceptions.getNestedThrowable(currentThrowable);
+                currentThrowable = Exceptions.getNestedThrowableOrNull(currentThrowable);
             }
             Collections.reverse(exceptionChain);
         }
@@ -66,7 +66,7 @@ public class ValidationException extends OXFException {
                 if (temp.getSystemID() != null || locationData == null || locationData.getSystemID() == null)
                     locationData = temp;
             }
-            final Throwable nested = Exceptions.getNestedThrowable(throwable);
+            final Throwable nested = Exceptions.getNestedThrowableOrNull(throwable);
             if (nested == null)
                 break;
             throwable = nested;

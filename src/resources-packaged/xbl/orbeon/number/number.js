@@ -67,6 +67,7 @@ YAHOO.xbl.fr.Number.prototype = {
     focus: function() {
         this.hasFocus = true;
         this.visibleInputElement.value = this.numberToEditString(this.visibleInputElement.value);
+        ORBEON.xforms.Globals.currentFocusControlId = this.container.id;
         ORBEON.xforms.Document.dispatchEvent(this.xformsInputElement.id, 'xforms-focus');
     },
 
@@ -85,12 +86,8 @@ YAHOO.xbl.fr.Number.prototype = {
         var newValue = this.visibleInputElement.value;
         ORBEON.xforms.Document.setValue(this.xformsInputElement.id, newValue);
 
-        // Update xforms-required-empty/xforms-required-filled and xforms-visited
-        ORBEON.xforms.Controls.updateRequiredEmpty(this.container, newValue);
         // Make sure the field is known as visited
-        if (! YAHOO.util.Dom.hasClass(this.container, "xforms-visited"))
-            YAHOO.util.Dom.addClass(this.container, "xforms-visited");
-
+        ORBEON.xforms.Controls.updateInvalidVisitedOnNextAjaxResponse(this.container);
     },
 
     setfocus: function() {

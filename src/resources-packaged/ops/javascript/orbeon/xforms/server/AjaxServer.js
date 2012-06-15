@@ -1434,15 +1434,6 @@
                                         if (typeof xformsValueChangedListener != "undefined") {
                                             xformsValueChangedListener(controlId, newControlValue);
                                         }
-
-                                        // Mark field field as visited when its value changes, unless the new value is given to us when the field becomes relevant
-                                        // This is a heuristic that works when a section is shown for the first time, but won't work in many cases. This will be changed
-                                        // by handling this on the server-side with custom MIPS.
-                                        if (YAHOO.util.Dom.hasClass(documentElement, "xforms-output") && relevant == null) {
-                                            YAHOO.util.Dom.addClass(documentElement, "xforms-visited");
-                                            if (YAHOO.util.Dom.hasClass(documentElement, "xforms-invalid"))
-                                                YAHOO.util.Dom.addClass(documentElement, "xforms-invalid-visited");
-                                        }
                                     }
 
                                     // Update the required-empty/required-full even if the required has not changed or

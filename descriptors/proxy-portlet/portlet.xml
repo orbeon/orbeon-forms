@@ -1,19 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <portlet-app version="2.0" xmlns="http://java.sun.com/xml/ns/portlet/portlet-app_2_0.xsd">
 
     <!-- Orbeon Forms proxy portlet (to access a remote Form Runner instance) -->
     <portlet>
         <portlet-name>orbeon-forms-proxy-portlet</portlet-name>
         <portlet-class>org.orbeon.oxf.portlet.OrbeonProxyPortlet</portlet-class>
-        <supports>
-            <mime-type>text/html</mime-type>
-            <portlet-mode>view</portlet-mode>
-            <portlet-mode>edit</portlet-mode>
-        </supports>
-
-        <portlet-info>
-            <title>Form Runner</title>
-        </portlet-info>
-
         <!-- Initialization parameters -->
         <init-param>
             <name>form-runner-url</name>
@@ -35,6 +26,17 @@
             <name>read-only</name>
             <value>false</value>
         </init-param>
+        
+        <supports>
+            <mime-type>text/html</mime-type>
+            <portlet-mode>view</portlet-mode>
+            <portlet-mode>edit</portlet-mode>
+        </supports>
+
+        <portlet-info>
+            <title>Form Runner</title>
+        </portlet-info>
+        
     </portlet>
 
 </portlet-app>

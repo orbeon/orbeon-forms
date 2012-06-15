@@ -26,8 +26,6 @@ import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.xml.sax.helpers.AttributesImpl;
 
-import java.util.Map;
-
 /**
  * Represents an extension xxforms:attribute control.
  */
@@ -38,7 +36,7 @@ public class XXFormsAttributeControl extends XFormsValueControl {
     private String attributeValue;
     private String forName;
 
-    public XXFormsAttributeControl(XBLContainer container, XFormsControl parent, Element element, String effectiveId, Map<String, String> state) {
+    public XXFormsAttributeControl(XBLContainer container, XFormsControl parent, Element element, String effectiveId) {
         super(container, parent, element, effectiveId);
 
         this.attributeControl = (AttributeControl) container.getPartAnalysis().getControlAnalysis(getPrefixedId());
@@ -76,17 +74,17 @@ public class XXFormsAttributeControl extends XFormsValueControl {
         // Rewrite URI attribute if needed
         final String rewrittenValue;
         if ("src".equals(attributeName)) {
-            rewrittenValue = XFormsUtils.resolveResourceURL(containingDocument(), getControlElement(), getExternalValue(), ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
+            rewrittenValue = XFormsUtils.resolveResourceURL(containingDocument(), element(), getExternalValue(), ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
         } else if ("href".equals(attributeName)) {
 
             final String urlType = attributeControl.urlType();
             if ("action".equals(urlType)) {
-                rewrittenValue = XFormsUtils.resolveActionURL(containingDocument(), getControlElement(), getExternalValue(), false);
+                rewrittenValue = XFormsUtils.resolveActionURL(containingDocument(), element(), getExternalValue(), false);
             } else if ("resource".equals(urlType)) {
-                rewrittenValue = XFormsUtils.resolveResourceURL(containingDocument(), getControlElement(), getExternalValue(), ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
+                rewrittenValue = XFormsUtils.resolveResourceURL(containingDocument(), element(), getExternalValue(), ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
             } else {
                 // Default is "render"
-                rewrittenValue = XFormsUtils.resolveRenderURL(containingDocument(), getControlElement(), getExternalValue(), false);
+                rewrittenValue = XFormsUtils.resolveRenderURL(containingDocument(), element(), getExternalValue(), false);
             }
 
         } else {
@@ -131,7 +129,7 @@ public class XXFormsAttributeControl extends XFormsValueControl {
     public String getNonRelevantEscapedExternalValue() {
         if ("img".equals(forName) && "src".equals(attributeName)) {
             // Return rewritten URL of dummy image URL
-            return XFormsUtils.resolveResourceURL(containingDocument(), getControlElement(), XFormsConstants.DUMMY_IMAGE_URI,
+            return XFormsUtils.resolveResourceURL(containingDocument(), element(), XFormsConstants.DUMMY_IMAGE_URI,
                     ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH);
         } else {
             return super.getNonRelevantEscapedExternalValue();

@@ -17,7 +17,6 @@ import controls._
 import org.dom4j._
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import java.util.{Map ⇒ JMap}
 import org.orbeon.oxf.xforms.action.XFormsActions
 
 /**
@@ -59,35 +58,35 @@ object XFormsControlFactory {
         CoreControls + XXFORMS_VARIABLE_QNAME + XXFORMS_VAR_QNAME +
         XFORMS_VARIABLE_QNAME + XFORMS_VAR_QNAME + EXFORMS_VARIABLE_QNAME
 
-    private type ControlFactory = (XBLContainer, XFormsControl, Element, String, JMap[String, String]) ⇒ XFormsControl
+    private type ControlFactory = (XBLContainer, XFormsControl, Element, String) ⇒ XFormsControl
 
-    private val variableFactory: ControlFactory = (new XFormsVariableControl(_, _, _, _, _))
+    private val variableFactory: ControlFactory = (new XFormsVariableControl(_, _, _, _))
 
     private val byQNameFactory = Map[QName, ControlFactory](
         // Root control
-        QName.get("root")               → (new XXFormsRootControl(_, _, _, _, _)),
-        XBL_TEMPLATE_QNAME              → (new XXFormsComponentRootControl(_, _, _, _, _)),
+        QName.get("root")               → (new XXFormsRootControl(_, _, _, _)),
+        XBL_TEMPLATE_QNAME              → (new XXFormsComponentRootControl(_, _, _, _)),
         // Built-in standard controls
-        XFORMS_CASE_QNAME               → (new XFormsCaseControl(_, _, _, _, _)),
-        XFORMS_GROUP_QNAME              → (new XFormsGroupControl(_, _, _, _, _)),
-        XFORMS_INPUT_QNAME              → (new XFormsInputControl(_, _, _, _, _)),
-        XFORMS_OUTPUT_QNAME             → (new XFormsOutputControl(_, _, _, _, _)),
-        XFORMS_RANGE_QNAME              → (new XFormsRangeControl(_, _, _, _, _)),
-        XFORMS_REPEAT_QNAME             → (new XFormsRepeatControl(_, _, _, _, _)),
-        XFORMS_REPEAT_ITERATION_QNAME   → (new XFormsRepeatIterationControl(_, _, _, _, _)),
-        XFORMS_SECRET_QNAME             → (new XFormsSecretControl(_, _, _, _, _)),
-        XFORMS_SELECT1_QNAME            → (new XFormsSelect1Control(_, _, _, _, _)),
-        XFORMS_SELECT_QNAME             → (new XFormsSelectControl(_, _, _, _, _)),
-        XFORMS_SUBMIT_QNAME             → (new XFormsSubmitControl(_, _, _, _, _)),
-        XFORMS_SWITCH_QNAME             → (new XFormsSwitchControl(_, _, _, _, _)),
-        XFORMS_TEXTAREA_QNAME           → (new XFormsTextareaControl(_, _, _, _, _)),
-        XFORMS_TRIGGER_QNAME            → (new XFormsTriggerControl(_, _, _, _, _)),
-        XFORMS_UPLOAD_QNAME             → (new XFormsUploadControl(_, _, _, _, _)),
+        XFORMS_CASE_QNAME               → (new XFormsCaseControl(_, _, _, _)),
+        XFORMS_GROUP_QNAME              → (new XFormsGroupControl(_, _, _, _)),
+        XFORMS_INPUT_QNAME              → (new XFormsInputControl(_, _, _, _)),
+        XFORMS_OUTPUT_QNAME             → (new XFormsOutputControl(_, _, _, _)),
+        XFORMS_RANGE_QNAME              → (new XFormsRangeControl(_, _, _, _)),
+        XFORMS_REPEAT_QNAME             → (new XFormsRepeatControl(_, _, _, _)),
+        XFORMS_REPEAT_ITERATION_QNAME   → (new XFormsRepeatIterationControl(_, _, _, _)),
+        XFORMS_SECRET_QNAME             → (new XFormsSecretControl(_, _, _, _)),
+        XFORMS_SELECT1_QNAME            → (new XFormsSelect1Control(_, _, _, _)),
+        XFORMS_SELECT_QNAME             → (new XFormsSelectControl(_, _, _, _)),
+        XFORMS_SUBMIT_QNAME             → (new XFormsSubmitControl(_, _, _, _)),
+        XFORMS_SWITCH_QNAME             → (new XFormsSwitchControl(_, _, _, _)),
+        XFORMS_TEXTAREA_QNAME           → (new XFormsTextareaControl(_, _, _, _)),
+        XFORMS_TRIGGER_QNAME            → (new XFormsTriggerControl(_, _, _, _)),
+        XFORMS_UPLOAD_QNAME             → (new XFormsUploadControl(_, _, _, _)),
         // Built-in extension controls
-        XXFORMS_DIALOG_QNAME            → (new XXFormsDialogControl(_, _, _, _, _)),
-        XXFORMS_ATTRIBUTE_QNAME         → (new XXFormsAttributeControl(_, _, _, _, _)),
-        XXFORMS_TEXT_QNAME              → (new XXFormsTextControl(_, _, _, _, _)),
-        XXFORMS_DYNAMIC_QNAME           → (new XXFormsDynamicControl(_, _, _, _, _)),
+        XXFORMS_DIALOG_QNAME            → (new XXFormsDialogControl(_, _, _, _)),
+        XXFORMS_ATTRIBUTE_QNAME         → (new XXFormsAttributeControl(_, _, _, _)),
+        XXFORMS_TEXT_QNAME              → (new XXFormsTextControl(_, _, _, _)),
+        XXFORMS_DYNAMIC_QNAME           → (new XXFormsDynamicControl(_, _, _, _)),
         XXFORMS_VARIABLE_QNAME          → variableFactory,
         XXFORMS_VAR_QNAME               → variableFactory,
         XFORMS_VARIABLE_QNAME           → variableFactory,
@@ -103,30 +102,29 @@ object XFormsControlFactory {
      * @param parent                parent control, null if none
      * @param element               element associated with the control
      * @param effectiveId           effective id of the control
-     * @param state                 initial state if needed, or null
      * @return                      control
      */
-    def createXFormsControl(container: XBLContainer, parent: XFormsControl, element: Element, effectiveId: String, state: JMap[String, String]) = {
+    def createXFormsControl(container: XBLContainer, parent: XFormsControl, element: Element, effectiveId: String) = {
 
         def isComponent = container.getContainingDocument.getStaticOps.isComponent(element.getQName)
 
         // Not all factories are simply indexed by QName, so compose those with factories for components and actions
         val componentFactory: PartialFunction[QName, ControlFactory] =
-            { case qName if isComponent ⇒ (new XFormsComponentControl(_, _, _, _, _)) }
+            { case qName if isComponent ⇒ (new XFormsComponentControl(_, _, _, _)) }
 
         val actionFactory: PartialFunction[QName, ControlFactory] =
-            { case qName if XFormsActions.isAction(qName) ⇒ (new XFormsActionControl(_, _, _, _, _)) }
+            { case qName if XFormsActions.isAction(qName) ⇒ (new XFormsActionControl(_, _, _, _)) }
 
         val make = byQNameFactory orElse componentFactory orElse actionFactory
 
         // Create the ElementAnalysis if possible
         make.lift(element.getQName) map
-            (_(container, parent, element, effectiveId, state)) orNull
+            (_(container, parent, element, effectiveId)) orNull
     }
 
     // TODO: Move this to ControlAnalysisFactory
     private def getQName(controlURI: String, controlName: String) = QName.get(controlName, Namespace.get("", controlURI))
     def isContainerControl(controlURI: String, controlName: String) = ContainerControls(getQName(controlURI, controlName))
-    def isCoreControl(controlURI: String, controlName: String) = CoreControls.contains(getQName(controlURI, controlName))
-    def isBuiltinControl(controlURI: String, controlName: String) = BuiltinControls.contains(getQName(controlURI, controlName))
+    def isCoreControl(controlURI: String, controlName: String)      = CoreControls.contains(getQName(controlURI, controlName))
+    def isBuiltinControl(controlURI: String, controlName: String)   = BuiltinControls.contains(getQName(controlURI, controlName))
 }

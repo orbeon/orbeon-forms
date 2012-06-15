@@ -76,11 +76,12 @@ object XFormsProtocols extends StandardTypes with StandardPrimitives with JavaLo
 
         def writes(output: Output, control: ControlState) = {
             write(output, control.effectiveId)
+            write(output, control.visited)
             write(output, control.keyValues)
         }
 
         def reads(input: Input) =
-            ControlState(read[String](input), read[Map[String, String]](input))
+            ControlState(read[String](input), read[Boolean](input), read[Map[String, String]](input))
     }
 
     implicit object InstanceCachingFormat extends Format[InstanceCaching] {

@@ -112,7 +112,7 @@ class XFormsRepeatHandler extends XFormsControlLifecyleHandler(true, true) { // 
                     outputInterceptor.flushCharacters(true, true)
             } catch {
                 case e: Exception ⇒
-                    throw ValidationException.wrapException(e, new ExtendedLocationData(repeatControl.getLocationData, "unrolling xforms:repeat control", repeatControl.getControlElement))
+                    throw ValidationException.wrapException(e, new ExtendedLocationData(repeatControl.getLocationData, "unrolling xforms:repeat control", repeatControl.element))
             }
             handlerContext.popRepeatContext()
         }

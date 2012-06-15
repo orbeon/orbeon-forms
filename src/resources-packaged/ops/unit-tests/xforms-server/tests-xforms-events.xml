@@ -1665,8 +1665,9 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
+                        <xxf:control id="my-dialog" visited="true"/>
                         <xxf:div id="my-dialog" visibility="hidden"/>
-                        <xxf:control id="input1" relevant="false"/>
+                        <xxf:control id="input1" visited="true" relevant="false"/>
                         <xxf:control id="input2" relevant="false"/>
                     </xxf:control-values>
                 </xxf:action>

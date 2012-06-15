@@ -25,7 +25,6 @@ import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.xml.sax.helpers.AttributesImpl
 import scala.Option
 import java.io.File
-import java.util.{Map ⇒ JMap}
 import org.orbeon.oxf.xforms.event.events._
 import XFormsUploadControl._
 import org.orbeon.oxf.xml.Dom4j
@@ -40,7 +39,7 @@ import org.orbeon.oxf.util.ScalaUtils._
 /**
  * Represents an xforms:upload control.
  */
-class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, element: Element, id: String, state: JMap[String, String])
+class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, element: Element, id: String)
         extends XFormsValueControl(container, parent, element, id)
         with FocusableTrait with FileMetadata {
 

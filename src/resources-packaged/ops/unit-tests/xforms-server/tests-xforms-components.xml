@@ -518,8 +518,8 @@
                         <xxf:control id="first-name-control" label="First name" alert="Invalid first name" required="true" valid="false"/>
                         <xxf:control id="note-control·1" label="Note" alert="Invalid note" required="true" valid="false"/>
                         <xxf:control id="note-control·2" label="Note" alert="Invalid note" required="true" valid="false"/>
-                        <xxf:control id="note-control·3" label="Note" alert="Invalid note" required="true" valid="false"/>
-                        <xxf:control id="last-name-control" label="Last name" alert="Invalid last name" required="true" valid="false"/>
+                        <xxf:control id="note-control·3" label="Note" alert="Invalid note" visited="true" required="true" valid="false"/>
+                        <xxf:control id="last-name-control" label="Last name" alert="Invalid last name" visited="true" required="true" valid="false"/>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>

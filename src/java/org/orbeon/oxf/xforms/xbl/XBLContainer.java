@@ -50,10 +50,6 @@ import java.util.*;
  */
 public class XBLContainer implements XFormsObjectResolver {
 
-    // PipelineContext attribute used during instance restoration
-    public static final String XFORMS_DYNAMIC_STATE_RESTORE_INSTANCES = "xforms-dynamic-state-instances";
-    protected static final String XFORMS_DYNAMIC_STATE_RESTORE_CONTROLS = "xforms-dynamic-state-controls";
-
     // Effective id of the control containing this container, e.g. "#document" for root container, "my-stuff$my-foo-bar.1-2", etc.
     private String effectiveId;
     // Prefixed id of the control containing this container, e.g. "#document" for root container, "my-stuff$my-foo-bar", etc.

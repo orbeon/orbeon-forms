@@ -24,7 +24,7 @@ class XXFormsControlElement extends XFormsFunction {
         Option(if (argument.length == 0) xpathContext.getContextItem else argument(0).evaluateItem(xpathContext)) map
             (item ⇒ resolveOrFindByEffectiveId(xpathContext, item.getStringValue)) flatMap {
                 case control: XFormsControl ⇒
-                    Some(getContainingDocument(xpathContext).getStaticState.documentWrapper.wrap(control.getControlElement))
+                    Some(getContainingDocument(xpathContext).getStaticState.documentWrapper.wrap(control.element))
                 case _ ⇒
                     None
             } orNull

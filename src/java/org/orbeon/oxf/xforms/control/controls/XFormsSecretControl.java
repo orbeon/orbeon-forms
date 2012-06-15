@@ -21,8 +21,6 @@ import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 
-import java.util.Map;
-
 /**
  * Represents an xforms:secret control.
  */
@@ -35,7 +33,7 @@ public class XFormsSecretControl extends XFormsValueControl implements Focusable
             XFormsConstants.XXFORMS_AUTOCOMPLETE_QNAME
     };
 
-    public XFormsSecretControl(XBLContainer container, XFormsControl parent, Element element, String id, Map<String, String> state) {
+    public XFormsSecretControl(XBLContainer container, XFormsControl parent, Element element, String id) {
         super(container, parent, element, id);
     }
 

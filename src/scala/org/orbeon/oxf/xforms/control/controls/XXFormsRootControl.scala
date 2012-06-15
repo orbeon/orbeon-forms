@@ -27,7 +27,7 @@ import collection.JavaConverters._
 
 // Control at the root of the control tree
 // NOTE: This is also the root of a dynamic sub-tree, in which case the control is a child of xxf:dynamic
-class XXFormsRootControl(container: XBLContainer, parent: XFormsControl, element: Element, effectiveId: String, state: JMap[String, String])
+class XXFormsRootControl(container: XBLContainer, parent: XFormsControl, element: Element, effectiveId: String)
     extends XFormsNoSingleNodeContainerControl(container, parent, element, effectiveId) {
 
     // If we are really at the root, register to ControlTree. This so that the tree is made available during

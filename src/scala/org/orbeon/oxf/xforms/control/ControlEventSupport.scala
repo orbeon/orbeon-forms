@@ -51,9 +51,13 @@ trait ControlEventSupport {
             }
 
             // Focus on current control if possible
-            if (XFormsEvents.XFORMS_FOCUS == event.name)
+            if (event.isInstanceOf[XFormsFocusEvent])
                 setFocus()
 
+        case _: DOMFocusOutEvent ⇒
+            // Mark control visited upon focus out event
+            // This applies to any control, including grouping controls
+            self.visited = true
         case _: XFormsHelpEvent ⇒
             containingDocument.setClientHelpEffectiveControlId(getEffectiveId)
         case ev: XXFormsBindingErrorEvent ⇒

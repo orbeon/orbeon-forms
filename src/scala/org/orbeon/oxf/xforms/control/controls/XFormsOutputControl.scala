@@ -40,7 +40,7 @@ import collection.JavaConverters._
 /**
  * Represents an xforms:output control.
  */
-class XFormsOutputControl(container: XBLContainer, parent: XFormsControl, element: Element, id: String, state: JMap[String, String])
+class XFormsOutputControl(container: XBLContainer, parent: XFormsControl, element: Element, id: String)
         extends XFormsValueControl(container, parent, element, id) with FileMetadata {
 
     def supportedFileMetadata = Seq("mediatype", "filename")
@@ -145,7 +145,7 @@ class XFormsOutputControl(container: XBLContainer, parent: XFormsControl, elemen
                 // xs:anyURI type (the default)
                 if (! urlNorewrite) {
                     // Resolve xml:base and try to obtain a path which is an absolute path without the context
-                    val rebasedURI = XFormsUtils.resolveXMLBase(containingDocument, getControlElement, internalValue)
+                    val rebasedURI = XFormsUtils.resolveXMLBase(containingDocument, element, internalValue)
                     val servletRewriter = new ServletURLRewriter(NetUtils.getExternalContext.getRequest)
                     val resolvedURI = servletRewriter.rewriteResourceURL(rebasedURI.toString, URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT)
                     val lastModified = NetUtils.getLastModifiedIfFast(resolvedURI)
@@ -175,7 +175,7 @@ class XFormsOutputControl(container: XBLContainer, parent: XFormsControl, elemen
                 // External value is not blank, rewrite as absolute path. Two cases:
                 // o URL is proxied:        /xforms-server/dynamic/27bf...  => [/context]/xforms-server/dynamic/27bf...
                 // o URL is default value:  /ops/images/xforms/spacer.gif   => [/context][/version]/ops/images/xforms/spacer.gif
-                XFormsUtils.resolveResourceURL(containingDocument, getControlElement, externalValue, URLRewriter.REWRITE_MODE_ABSOLUTE_PATH)
+                XFormsUtils.resolveResourceURL(containingDocument, element, externalValue, URLRewriter.REWRITE_MODE_ABSOLUTE_PATH)
             } else
                 // Empty value, return as is
                 externalValue
@@ -189,7 +189,7 @@ class XFormsOutputControl(container: XBLContainer, parent: XFormsControl, elemen
     override def getNonRelevantEscapedExternalValue =
         if ((mediatypeAttribute ne null) && mediatypeAttribute.startsWith("image/"))
             // Return rewritten URL of dummy image URL
-            XFormsUtils.resolveResourceURL(containingDocument, getControlElement, DUMMY_IMAGE_URI, URLRewriter.REWRITE_MODE_ABSOLUTE_PATH)
+            XFormsUtils.resolveResourceURL(containingDocument, element, DUMMY_IMAGE_URI, URLRewriter.REWRITE_MODE_ABSOLUTE_PATH)
         else
             super.getNonRelevantEscapedExternalValue
 

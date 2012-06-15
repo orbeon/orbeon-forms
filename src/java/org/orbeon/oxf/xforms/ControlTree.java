@@ -91,7 +91,7 @@ public class ControlTree implements ExternalCopyable {
         indentedLogger.startHandleOperation("controls", "building");
 
         // Visit the static tree of controls to create the actual tree of controls
-        Controls.createTree(containingDocument, controlIndex, containingDocument.getSerializedControlStatesMap());
+        Controls.createTree(containingDocument, controlIndex);
 
         // Evaluate all controls
         final Collection<XFormsControl> allControls = controlIndex.getEffectiveIdsToControls().values();

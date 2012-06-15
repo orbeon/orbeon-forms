@@ -42,7 +42,7 @@ import org.orbeon.oxf.xforms.BindingContext
 import collection.mutable.{ArrayBuffer, LinkedHashMap}
 
 // Represents an xforms:repeat container control.
-class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, element: Element, effectiveId: String, state: JMap[String, String])
+class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, element: Element, effectiveId: String)
         extends XFormsNoSingleNodeContainerControl(container, parent, element, effectiveId)
         with NoLHHATrait {
 
@@ -55,13 +55,14 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
     // Restore state if needed
     @transient
     private var restoredState =
-        if (state ne null) {
-            // NOTE: Don't use setIndex() as we don't want to cause initialLocal != currentLocal
-            val local = getCurrentLocal.asInstanceOf[XFormsRepeatControlLocal]
-            local.index = state.get("index").toInt
-            true
-        } else
-            false
+        stateToRestore match {
+            case Some(state) ⇒
+                // NOTE: Don't use setIndex() as we don't want to cause initialLocal != currentLocal
+                val local = getCurrentLocal.asInstanceOf[XFormsRepeatControlLocal]
+                local.index = state.keyValues("index").toInt
+                true
+            case None ⇒ false
+        }
 
     // The repeat's sequence binding
     override def binding = Option(bindingContext) filter (_.isNewBind) map (_.nodeset.asScala) getOrElse Seq()
@@ -229,7 +230,7 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
     }
 
     def isDnD = {
-        val dndAttribute = getControlElement.attributeValue(XXFORMS_DND_QNAME)
+        val dndAttribute = element.attributeValue(XXFORMS_DND_QNAME)
         dndAttribute != null && dndAttribute != "none"
     }
 

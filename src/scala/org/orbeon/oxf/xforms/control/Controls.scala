@@ -21,17 +21,17 @@ import xbl.XBLContainer
 import org.orbeon.oxf.xforms.BindingContext
 import org.orbeon.saxon.om.Item
 import collection.JavaConverters._
-import java.util.{Map ⇒ JMap, List ⇒ JList}
+import java.util.{List ⇒ JList}
 
 object Controls {
 
     // Create the entire tree of control from the root
-    def createTree(containingDocument: XFormsContainingDocument, controlIndex: ControlIndex, state: JMap[String, JMap[String, String]]) = {
+    def createTree(containingDocument: XFormsContainingDocument, controlIndex: ControlIndex) = {
 
         val bindingContext = containingDocument.getContextStack.resetBindingContext()
         val rootControl = containingDocument.getStaticState.topLevelPart.getTopLevelControls.head
 
-        buildTree(controlIndex, containingDocument, bindingContext, None, rootControl, Seq(), Option(state))
+        buildTree(controlIndex, containingDocument, bindingContext, None, rootControl, Seq())
     }
 
     def logXML(control: Option[XFormsControl], message: String): Unit =
@@ -67,8 +67,7 @@ object Controls {
             bindingContext,
             Some(repeatControl),
             repeatControl.staticControl.iteration.get,
-            idSuffix,
-            None
+            idSuffix
         ).get.asInstanceOf[XFormsRepeatIterationControl] // we "know" this, right?
     }
 
@@ -88,8 +87,7 @@ object Controls {
             bindingContext,
             Some(containerControl),
             rootAnalysis,
-            idSuffix,
-            None
+            idSuffix
         )
     }
 
@@ -100,8 +98,7 @@ object Controls {
             bindingContext: BindingContext,
             parentOption: Option[XFormsControl],
             staticElement: ElementAnalysis,
-            idSuffix: Seq[Int],
-            stateMap: Option[JMap[String, JMap[String, String]]]): Option[XFormsControl] = {
+            idSuffix: Seq[Int]): Option[XFormsControl] = {
 
         // Determine effective id
         val effectiveId =
@@ -110,14 +107,11 @@ object Controls {
             else
                 staticElement.prefixedId + REPEAT_HIERARCHY_SEPARATOR_1 + (idSuffix mkString REPEAT_HIERARCHY_SEPARATOR_2_STRING)
 
-        // This is used only during state deserialization
-        val stateToRestore = stateMap map (_.get(effectiveId))
-
         // Instantiate the control
         // TODO LATER: controls must take ElementAnalysis, not Element
 
         // NOTE: If we are unable to create a control (case of Model at least), this has no effect
-        Option(XFormsControlFactory.createXFormsControl(container, parentOption.orNull, staticElement.element, effectiveId, stateToRestore.orNull)) map {
+        Option(XFormsControlFactory.createXFormsControl(container, parentOption.orNull, staticElement.element, effectiveId)) map {
             control ⇒
                 // Determine binding
                 control.evaluateBinding(bindingContext, update = false)
@@ -126,7 +120,7 @@ object Controls {
                 controlIndex.indexControl(control)
 
                 // Build the control's children if any
-                control.buildChildren(buildTree(controlIndex, _, _, Some(control), _, _, stateMap), idSuffix)
+                control.buildChildren(buildTree(controlIndex, _, _, Some(control), _, _), idSuffix)
 
                 control
         }

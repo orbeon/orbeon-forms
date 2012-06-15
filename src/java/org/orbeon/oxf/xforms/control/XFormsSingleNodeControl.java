@@ -370,7 +370,7 @@ public abstract class XFormsSingleNodeControl extends XFormsControl {
 
     public boolean hasStaticReadonlyAppearance() {
         return XFormsProperties.isStaticReadonlyAppearance(containingDocument())
-                    || XFormsProperties.READONLY_APPEARANCE_STATIC_VALUE.equals(getControlElement().attributeValue(XFormsConstants.XXFORMS_READONLY_APPEARANCE_ATTRIBUTE_QNAME));
+                    || XFormsProperties.READONLY_APPEARANCE_STATIC_VALUE.equals(element().attributeValue(XFormsConstants.XXFORMS_READONLY_APPEARANCE_ATTRIBUTE_QNAME));
     }
 
     @Override

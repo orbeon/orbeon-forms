@@ -28,8 +28,10 @@ import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.ValueRepresentation;
-import org.orbeon.saxon.value.*;
+import org.orbeon.saxon.value.CalendarValue;
+import org.orbeon.saxon.value.DateValue;
 import org.orbeon.saxon.value.StringValue;
+import org.orbeon.saxon.value.TimeValue;
 import scala.Tuple3;
 
 import java.util.*;
@@ -51,7 +53,7 @@ public class XFormsInputControl extends XFormsValueControl implements FocusableT
     private final String format;
     private final String unformat;
 
-    public XFormsInputControl(XBLContainer container, XFormsControl parent, Element element, String id, Map<String, String> state) {
+    public XFormsInputControl(XBLContainer container, XFormsControl parent, Element element, String id) {
         super(container, parent, element, id);
         if (element != null) { // can be null in some unit tests only
             this.format = element.attributeValue(new QName("format", XFormsConstants.XXFORMS_NAMESPACE));

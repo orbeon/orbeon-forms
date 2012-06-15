@@ -35,8 +35,8 @@ import java.util.*;
  */
 public class XFormsSelectControl extends XFormsSelect1Control {
 
-    public XFormsSelectControl(XBLContainer container, XFormsControl parent, Element element, String id, Map<String, String> state) {
-        super(container, parent, element, id, state);
+    public XFormsSelectControl(XBLContainer container, XFormsControl parent, Element element, String id) {
+        super(container, parent, element, id);
     }
 
     /**

@@ -21,8 +21,6 @@ import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.xml.sax.helpers.AttributesImpl;
 
-import java.util.Map;
-
 /**
  * Represents an extension xxforms:text control. This control is used to produce plain text child of xhtml:title, for
  * example. It is based on xforms:output.
@@ -31,8 +29,8 @@ public class XXFormsTextControl extends XFormsOutputControl {
 
     private String forAttribute;
 
-    public XXFormsTextControl(XBLContainer container, XFormsControl parent, Element element, String effectiveId, Map<String, String> state) {
-        super(container, parent, element, effectiveId, state);
+    public XXFormsTextControl(XBLContainer container, XFormsControl parent, Element element, String effectiveId) {
+        super(container, parent, element, effectiveId);
 
         // Remember attributes
         this.forAttribute = element.attributeValue(XFormsConstants.FOR_QNAME);

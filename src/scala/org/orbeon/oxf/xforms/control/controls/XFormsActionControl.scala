@@ -15,7 +15,6 @@ package org.orbeon.oxf.xforms.control.controls
 
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.dom4j.Element
-import java.util.{Map ⇒ JMap}
 import org.orbeon.oxf.xforms.event.XFormsEventHandler
 import org.orbeon.oxf.xforms.BindingContext
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
@@ -23,7 +22,7 @@ import collection.Seq
 import org.orbeon.oxf.xforms.control.{XFormsContainerControl, XFormsControl}
 
 
-class XFormsActionControl(container: XBLContainer, parent: XFormsControl, element: Element, effectiveId: String, state: JMap[String, String])
+class XFormsActionControl(container: XBLContainer, parent: XFormsControl, element: Element, effectiveId: String)
     extends XFormsControl(container, parent, element, effectiveId) with XFormsEventHandler {
 
     // Tell the parent about us if the parent is not a container

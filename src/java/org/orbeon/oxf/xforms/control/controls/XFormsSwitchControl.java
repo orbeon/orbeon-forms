@@ -23,6 +23,7 @@ import org.orbeon.oxf.xforms.control.XFormsValueContainerControl;
 import org.orbeon.oxf.xforms.event.Dispatch;
 import org.orbeon.oxf.xforms.event.events.XFormsDeselectEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsSelectEvent;
+import org.orbeon.oxf.xforms.state.ControlState;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
@@ -46,17 +47,20 @@ public class XFormsSwitchControl extends XFormsValueContainerControl {
         private String selectedCaseControlId;
     }
 
-    public XFormsSwitchControl(XBLContainer container, XFormsControl parent, Element element, String effectiveId, Map<String, String> state) {
+    public XFormsSwitchControl(XBLContainer container, XFormsControl parent, Element element, String effectiveId) {
         super(container, parent, element, effectiveId);
 
         // Initial local state
         setLocal(new XFormsSwitchControlLocal());
 
         // Restore state if needed
+        final ControlState state = stateToRestoreJava();
         if (state != null) {
+            final Map<String, String> keyValues = state.keyValuesJava();
+
             // NOTE: Don't use getLocalForUpdate() as we don't want to cause initialLocal != currentLocal
             final XFormsSwitchControlLocal local = (XFormsSwitchControlLocal) getCurrentLocal();
-            local.selectedCaseControlId = state.get("case-id");
+            local.selectedCaseControlId = keyValues.get("case-id");
 
             // Indicate that deserialized state must be used
             restoredState = true;
@@ -159,7 +163,7 @@ public class XFormsSwitchControl extends XFormsValueContainerControl {
 
     private String findDefaultSelectedCaseId() {
         // TODO: Use ElementAnalysis instead
-        final List<Element> caseElements = Dom4jUtils.elements(getControlElement(), XFormsConstants.XFORMS_CASE_QNAME);
+        final List<Element> caseElements = Dom4jUtils.elements(element(), XFormsConstants.XFORMS_CASE_QNAME);
         for (final Element caseElement: caseElements) {
             if (XFormsCaseControl.isDefaultSelected(caseElement)) {
                 // Found first case with selected="true"
@@ -288,7 +292,7 @@ public class XFormsSwitchControl extends XFormsValueContainerControl {
 
     // NOTE: Duplicated in XXFormsDialogControl
     public boolean isXForms11Switch() {
-        final String localXForms11Switch = getControlElement().attributeValue(XFormsConstants.XXFORMS_XFORMS11_SWITCH_QNAME);
+        final String localXForms11Switch = element().attributeValue(XFormsConstants.XXFORMS_XFORMS11_SWITCH_QNAME);
         if (localXForms11Switch != null)
             return Boolean.parseBoolean(localXForms11Switch);
         else

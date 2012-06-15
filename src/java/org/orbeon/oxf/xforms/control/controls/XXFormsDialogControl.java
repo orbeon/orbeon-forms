@@ -25,6 +25,7 @@ import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.event.events.XFormsFocusEvent;
 import org.orbeon.oxf.xforms.event.events.XXFormsDialogOpenEvent;
+import org.orbeon.oxf.xforms.state.ControlState;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.xml.sax.helpers.AttributesImpl;
@@ -66,7 +67,7 @@ public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
         }
     }
 
-    public XXFormsDialogControl(XBLContainer container, XFormsControl parent, Element element, String effectiveId, Map<String, String> state) {
+    public XXFormsDialogControl(XBLContainer container, XFormsControl parent, Element element, String effectiveId) {
         super(container, parent, element, effectiveId);
 
         // NOTE: attributes logic duplicated in XXFormsDialogHandler
@@ -84,12 +85,14 @@ public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
         setLocal(new XXFormsDialogControlLocal(initiallyVisible));
 
         // Restore state if needed
+        final ControlState state = stateToRestoreJava();
         if (state != null) {
+            final Map<String, String> keyValues = state.keyValuesJava();
             // NOTE: Don't use getLocalForUpdate() as we don't want to cause initialLocal != currentLocal
-            final String visibleString = state.get("visible");
+            final String visibleString = keyValues.get("visible");
             setLocal(new XXFormsDialogControlLocal("true".equals(visibleString),
-                     "true".equals(state.get("constrain")),
-                     state.get("neighbor")));
+                     "true".equals(keyValues.get("constrain")),
+                     keyValues.get("neighbor")));
         }
     }
 
@@ -107,18 +110,6 @@ public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
     @Override
     public Tuple3<String, String, String> getJavaScriptInitialization() {
         return getCommonJavaScriptInitialization();
-    }
-
-    public String getLevel() {
-        return level;
-    }
-
-    public boolean isClose() {
-        return close;
-    }
-
-    public boolean isDraggable() {
-        return draggable;
     }
 
     public boolean isVisible() {
@@ -139,10 +130,6 @@ public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
     public boolean isConstrainToViewport() {
         final XXFormsDialogControlLocal local = (XXFormsDialogControlLocal) getCurrentLocal();
         return local.constrainToViewport;
-    }
-
-    public boolean isInitiallyVisible() {
-        return initiallyVisible;
     }
 
     @Override
@@ -281,7 +268,7 @@ public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
 
     // NOTE: Duplicated in XFormsSwitchControl
     public boolean isXForms11Switch() {
-        final String localXForms11Switch = getControlElement().attributeValue(XFormsConstants.XXFORMS_XFORMS11_SWITCH_QNAME);
+        final String localXForms11Switch = element().attributeValue(XFormsConstants.XXFORMS_XFORMS11_SWITCH_QNAME);
         if (localXForms11Switch != null)
             return Boolean.parseBoolean(localXForms11Switch);
         else

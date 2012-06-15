@@ -23,7 +23,6 @@ import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -49,7 +48,7 @@ public class XFormsGroupControl extends XFormsValueContainerControl {
             return null;
     }
 
-    public XFormsGroupControl(XBLContainer container, XFormsControl parent, Element element, String effectiveId, Map<String, String> state) {
+    public XFormsGroupControl(XBLContainer container, XFormsControl parent, Element element, String effectiveId) {
         super(container, parent, element, effectiveId);
 
         // TODO: every control should point to its static analysis

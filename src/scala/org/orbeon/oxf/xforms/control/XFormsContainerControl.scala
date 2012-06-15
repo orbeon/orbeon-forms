@@ -65,7 +65,7 @@ trait XFormsContainerControl extends XFormsControl {
             cloned._children = new ArrayBuffer[XFormsControl](_children.size)
             for (currentChildControl ← _children) {
                 val currentChildClone = currentChildControl.getBackCopy.asInstanceOf[XFormsControl]
-                currentChildClone.setParent(cloned)
+                currentChildClone.parent = null // cloned control doesn't need a parent
                 cloned._children += currentChildClone
             }
         }

@@ -111,7 +111,7 @@ public class XFormsItemUtils {
         contextStack.setBinding(select1Control.getBindingContext());
 
         final boolean isEncryptItemValues = select1Control.isEncryptItemValues();
-        Dom4jUtils.visitSubtree(select1Control.getControlElement(), new Dom4jUtils.VisitorListener() {
+        Dom4jUtils.visitSubtree(select1Control.element(), new Dom4jUtils.VisitorListener() {
 
             private ItemContainer currentContainer = result;
 

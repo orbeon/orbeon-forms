@@ -47,9 +47,9 @@ import org.orbeon.oxf.xforms.model.DataModel
  */
 class XFormsControl(
         val container: XBLContainer,
-        var parent: XFormsControl,
+        var parent: XFormsControl,      // var just so we can null it upon clone
         val element: Element,
-        var effectiveId: String)
+        var effectiveId: String)        // var because can be updated upon iteration change
     extends ControlXPathSupport
     with ControlAjaxSupport
     with ControlLHHASupport
@@ -62,14 +62,36 @@ class XFormsControl(
     with XFormsEventObserver
     with ExternalCopyable {
 
+    require(container ne null)
+
+    final val containingDocument = container.getContainingDocument
+
     // Static information (never changes for the lifetime of the containing document)
     // TODO: Pass staticControl during construction (find which callers don't pass the necessary information)
-    private val _staticControl = Option(container) map (_.getPartAnalysis.getControlAnalysis(XFormsUtils.getPrefixedId(effectiveId))) orNull
-    def staticControl = _staticControl
-    final val containingDocument = Option(container) map (_.getContainingDocument) orNull
+    private val _staticControl   = Option(container.getPartAnalysis.getControlAnalysis(XFormsUtils.getPrefixedId(effectiveId))) orNull
+    def staticControl            = _staticControl
 
     final val prefixedId = Option(staticControl) map (_.prefixedId) getOrElse XFormsUtils.getPrefixedId(effectiveId)
-    final val _element = Option(staticControl) map (_.element) getOrElse element
+
+    final def stateToRestore     = Option(containingDocument.getRestoringDynamicState) flatMap (_.controls.get(effectiveId))
+    final def stateToRestoreJava = stateToRestore.orNull
+
+    // Whether the control has been visited
+    private var _visited = stateToRestore match {
+        case Some(state) ⇒ state.visited
+        case None ⇒ false
+    }
+
+    def visited = _visited
+    def visited_=(visited: Boolean) =
+        if (visited != _visited) {
+            // This mutation requires a clone. We could use XFormsControlLocal but that is more complex. In addition, most
+            // non-trivial forms e.g. Form Runner will require a clone anyway as other stuff takes place upon focus out,
+            // such as updating the error summary. What should be implemented is a better diff mechanism, for example lazy
+            // copy of control properties upon mutation, rather than the current XFormsControlLocal/full clone alternative.
+            containingDocument.getControls.cloneInitialStateIfNeeded()
+            _visited = visited
+        }
 
     parent match {
         case container: XFormsContainerControl ⇒ container.addChild(this)
@@ -79,13 +101,8 @@ class XFormsControl(
     final def getId = staticControl.staticId
     final def getPrefixedId = prefixedId
 
-    def scope = staticControl.scope
-
-    final def getName = staticControl.localName
-    final def getControlElement = element
-
-    // For cloning only!
-    final def setParent(parent: XFormsControl) = this.parent = parent
+    final def scope = staticControl.scope
+    final def localName = staticControl.localName
 
     def getContextStack = container.getContextStack
     final def getIndentedLogger = containingDocument.getControls.getIndentedLogger
@@ -167,29 +184,30 @@ class XFormsControl(
 
     def getJavaScriptInitialization: (String, String, String) = null
 
-    def getCommonJavaScriptInitialization = {
+    final def getCommonJavaScriptInitialization = {
         val appearances = getAppearances
         // First appearance only (should probably handle all of them, but historically only one appearance was handled)
         val firstAppearance = if (! appearances.isEmpty) Some(Dom4jUtils.qNameToExplodedQName(appearances.iterator.next)) else None
-        (getName, firstAppearance orElse mediatype orNull, getEffectiveId)
+        (localName, firstAppearance orElse mediatype orNull, getEffectiveId)
     }
 
     // Compare this control with another control, as far as the comparison is relevant for the external world.
-    def equalsExternal(other: XFormsControl): Boolean = {
-        if (other eq null)
-            return false
-
-        if (this eq other)
-            return true
-
-        compareRelevance(other) && compareLHHA(other) && compareExtensionAttributes(other)
-    }
+    def equalsExternal(other: XFormsControl) =
+        other match {
+            case other if this eq other ⇒ true
+            case other: XFormsControl ⇒
+                visited == other.visited &&
+                isRelevant == other.isRelevant &&
+                compareLHHA(other) &&
+                compareExtensionAttributes(other)
+            case _ ⇒ false
+        }
 
     final def evaluate() {
         try evaluateImpl()
         catch {
             case e: ValidationException ⇒ {
-                throw ValidationException.wrapException(e, new ExtendedLocationData(getLocationData, "evaluating control", getControlElement, "element", Dom4jUtils.elementToDebugString(getControlElement)))
+                throw ValidationException.wrapException(e, new ExtendedLocationData(getLocationData, "evaluating control", element, "element", Dom4jUtils.elementToDebugString(element)))
             }
         }
     }
@@ -206,7 +224,7 @@ class XFormsControl(
     def evaluateImpl() {
         // TODO: these should be evaluated lazily
         // Evaluate standard extension attributes
-        evaluateExtensionAttributes(AjaxSupport.STANDARD_EXTENSION_ATTRIBUTES)
+        evaluateExtensionAttributes(AjaxSupport.StandardExtensionAttributes)
 
         // Evaluate custom extension attributes
         Option(getExtensionAttributes) foreach

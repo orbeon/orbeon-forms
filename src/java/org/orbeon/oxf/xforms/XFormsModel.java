@@ -18,7 +18,6 @@ import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.*;
@@ -389,8 +388,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
     public void restoreInstances() {
 
         // Find serialized instances from context
-        final List<InstanceState> instanceStates =
-            (List<InstanceState>) PipelineContext.get().getAttribute(XBLContainer.XFORMS_DYNAMIC_STATE_RESTORE_INSTANCES);
+        final List<InstanceState> instanceStates = containingDocument.getRestoringDynamicState().instancesJava();
 
         // Get instances from dynamic state first
         if (instanceStates != null) {

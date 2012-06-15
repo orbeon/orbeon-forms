@@ -903,7 +903,7 @@ public class XFormsUtils {
             if (element.getQName().equals(XFormsConstants.XFORMS_OUTPUT_QNAME)) {
                 // This is an xforms:output nested among other markup
 
-                final XFormsOutputControl outputControl = new XFormsOutputControl(container, null, element, null, null) {
+                final XFormsOutputControl outputControl = new XFormsOutputControl(container, null, element, null) {
                     // Override this as super.getContextStack() gets the containingDocument's stack, and here we need whatever is the current stack
                     // Probably need to modify super.getContextStack() at some point to NOT use the containingDocument's stack
                     @Override

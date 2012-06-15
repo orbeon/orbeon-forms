@@ -22,7 +22,6 @@ import org.orbeon.saxon.om._
 import org.orbeon.saxon.value.EmptySequence
 import org.orbeon.saxon.value.Value
 import XFormsVariableControl._
-import java.util.Map
 import org.orbeon.oxf.xforms.control.{NoLHHATrait, XFormsControl, XFormsSingleNodeControl}
 import org.orbeon.oxf.xforms.{BindingContext, Variable, XFormsUtils}
 
@@ -31,7 +30,7 @@ import org.orbeon.oxf.xforms.{BindingContext, Variable, XFormsUtils}
  *
  * Some of the logic is similar to what is in XFormsValueControl, except this works with ValueRepresentation.
  */
-class XFormsVariableControl(container: XBLContainer, parent: XFormsControl, element: Element, effectiveId: String, state: Map[String, String])
+class XFormsVariableControl(container: XBLContainer, parent: XFormsControl, element: Element, effectiveId: String)
         extends XFormsSingleNodeControl(container, parent, element, effectiveId) with NoLHHATrait {
 
     // Actual variable name/value representation

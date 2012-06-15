@@ -20,7 +20,6 @@ import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.ContentHandlerHelper
 import org.xml.sax.helpers.AttributesImpl
-import java.util.Map
 import org.orbeon.oxf.xforms.event.XFormsEvents
 import org.orbeon.oxf.xforms.analysis.controls.RepeatIterationControl
 import org.orbeon.oxf.xforms.control.{NoLHHATrait, XFormsControl, XFormsSingleNodeContainerControl}
@@ -34,7 +33,7 @@ import scala.collection.JavaConverters._
  *
  * TODO: Use inheritance to make this a single-node control that doesn't hold a value.
  */
-class XFormsRepeatIterationControl(container: XBLContainer, parent: XFormsControl, element: Element, effectiveId: String, state: Map[String, String])
+class XFormsRepeatIterationControl(container: XBLContainer, parent: XFormsControl, element: Element, effectiveId: String)
         extends XFormsSingleNodeContainerControl(container, parent, element, effectiveId)
         with NoLHHATrait {
 

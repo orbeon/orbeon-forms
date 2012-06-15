@@ -45,6 +45,14 @@
                                             <data type="string"/>
                                         </attribute>
                                         <optional>
+                                            <attribute name="visited">
+                                                <choice>
+                                                    <value>true</value>
+                                                    <value>false</value>
+                                                </choice>
+                                            </attribute>
+                                        </optional>
+                                        <optional>
                                             <attribute name="hint"/>
                                         </optional>
                                         <optional>
@@ -193,7 +201,10 @@
                                         <!-- For dialog constraining to viewport -->
                                         <optional>
                                             <attribute name="constrain">
-                                                <data type="boolean"/>
+                                                <choice>
+                                                    <value>true</value>
+                                                    <value>false</value>
+                                                </choice>
                                             </attribute>
                                         </optional>
                                     </element>

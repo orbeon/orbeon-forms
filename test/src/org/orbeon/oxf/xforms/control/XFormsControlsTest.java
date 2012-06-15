@@ -15,7 +15,11 @@ package org.orbeon.oxf.xforms.control;
 
 import org.dom4j.QName;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.orbeon.oxf.test.ResourceManagerTestBase;
+import org.orbeon.oxf.xforms.PartAnalysis;
+import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis;
 import org.orbeon.oxf.xforms.control.controls.XFormsInputControl;
 import org.xml.sax.helpers.AttributesImpl;
 
@@ -26,11 +30,28 @@ import static junit.framework.Assert.assertEquals;
 
 public class XFormsControlsTest extends ResourceManagerTestBase {
 
+    // Mock just what's needed to make XFormsInputControl as used below happy
+    private XFormsContainingDocument getContainingDocument(String id) {
+        final XFormsContainingDocument doc = Mockito.mock(XFormsContainingDocument.class);
+        Mockito.when(doc.getContainingDocument()).thenReturn(doc);
+
+        final ElementAnalysis elementAnalysis = Mockito.mock(ElementAnalysis.class);
+        Mockito.when(elementAnalysis.staticId()).thenReturn(id);
+        Mockito.when(elementAnalysis.prefixedId()).thenReturn(id);
+
+        final PartAnalysis partAnalysis = Mockito.mock(PartAnalysis.class);
+        Mockito.when(partAnalysis.getControlAnalysis(Mockito.anyString())).thenReturn(elementAnalysis);
+
+        Mockito.when(doc.getPartAnalysis()).thenReturn(partAnalysis);
+
+        return doc;
+    }
+
     @Test
     public void testDiffCustomMIPsChanges() {
 
         final AttributesImpl attributes = new AttributesImpl();
-        final XFormsSingleNodeControl control1 = new XFormsInputControl(null, null, null, "input-1", null) {
+        final XFormsSingleNodeControl control1 = new XFormsInputControl(getContainingDocument("input-1"), null, null, "input-1") {
 
             private Map<String, String> customMIPs = new LinkedHashMap<String, String>();
             {
@@ -46,7 +67,7 @@ public class XFormsControlsTest extends ResourceManagerTestBase {
             }
         };
 
-        final XFormsSingleNodeControl control2 = new XFormsInputControl(null, null, null, "input-2", null) {
+        final XFormsSingleNodeControl control2 = new XFormsInputControl(getContainingDocument("input-2"), null, null, "input-2") {
             private Map<String, String> customMIPs = new LinkedHashMap<String, String>();
             {
                 // leave as is
@@ -73,7 +94,7 @@ public class XFormsControlsTest extends ResourceManagerTestBase {
 
         final AttributesImpl attributes = new AttributesImpl();
 
-        final XFormsSingleNodeControl control2 = new XFormsInputControl(null, null, null, "input-1", null) {
+        final XFormsSingleNodeControl control2 = new XFormsInputControl(getContainingDocument("input-1"), null, null, "input-1") {
             private Map<String, String> customMIPs = new LinkedHashMap<String, String>();
             {
                 customMIPs.put("name1", "value1");
@@ -96,21 +117,21 @@ public class XFormsControlsTest extends ResourceManagerTestBase {
     public void testDiffClassAVT() {
         final AttributesImpl attributes = new AttributesImpl();
 
-        final XFormsSingleNodeControl control1 = new XFormsInputControl(null, null, null, "input-1", null) {
+        final XFormsSingleNodeControl control1 = new XFormsInputControl(getContainingDocument("input-1"), null, null, "input-1") {
             @Override
             public String getExtensionAttributeValue(QName attributeName) {
                 return "foo bar gaga";
             }
         };
 
-        final XFormsSingleNodeControl control2 = new XFormsInputControl(null, null, null, "input-2", null) {
+        final XFormsSingleNodeControl control2 = new XFormsInputControl(getContainingDocument("input-2"), null, null, "input-2") {
             @Override
             public String getExtensionAttributeValue(QName attributeName) {
                 return "bar toto";
             }
         };
 
-        AjaxSupport.addAjaxClass(attributes, false, control1, control2);
+        AjaxSupport.addAjaxClasses(attributes, false, control1, control2);
         assertEquals("-foo -gaga +toto", attributes.getValue("class"));
     }
 
@@ -118,14 +139,14 @@ public class XFormsControlsTest extends ResourceManagerTestBase {
     public void testDiffClassAVTNew() {
         final AttributesImpl attributes = new AttributesImpl();
 
-        final XFormsSingleNodeControl control2 = new XFormsInputControl(null, null, null, "input-1", null) {
+        final XFormsSingleNodeControl control2 = new XFormsInputControl(getContainingDocument("input-1"), null, null, "input-1") {
             @Override
             public String getExtensionAttributeValue(QName attributeName) {
                 return "foo bar";
             }
         };
 
-        AjaxSupport.addAjaxClass(attributes, false, null, control2);
+        AjaxSupport.addAjaxClasses(attributes, false, null, control2);
         assertEquals("foo bar", attributes.getValue("class"));
     }
 

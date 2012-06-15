@@ -21,7 +21,6 @@ import org.orbeon.oxf.xforms.StaticStateGlobalOps;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis;
-import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis;
 import org.orbeon.oxf.xforms.control.*;
 import org.orbeon.oxf.xforms.processor.handlers.HandlerContext;
 import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler;
@@ -67,6 +66,11 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
                         sb.append(' ');
                     sb.append("xforms-disabled");
                 }
+                if (control.visited()) {
+                    if (sb.length() > 0)
+                        sb.append(' ');
+                    sb.append("xforms-visited");
+                }
                 if (control instanceof XFormsSingleNodeControl) {
                     // TODO: inherit from this method instead rather than using instanceof
                     final XFormsSingleNodeControl singleNodeControl = (XFormsSingleNodeControl) control;
@@ -74,6 +78,10 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
                         if (sb.length() > 0)
                             sb.append(' ');
                         sb.append("xforms-invalid");
+                        // Combined class for IE6
+                        if (control.visited()) {
+                            sb.append(" xforms-invalid-visited");
+                        }
                     }
                     if (singleNodeControl.isReadonly()) {
                         if (sb.length() > 0)
@@ -86,6 +94,7 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
                         sb.append("xforms-required");
                         if (control instanceof XFormsValueControl) {
                             // NOTE: Test above excludes xforms:group
+                            // Combined class for IE6
                             if (isEmpty(control))
                                 sb.append(" xforms-required-empty");
                             else
@@ -331,6 +340,10 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
                     classes.append(' ');
                 if (control instanceof XFormsSingleNodeControl && !((XFormsSingleNodeControl) control).isValid()) {
                     classes.append("xforms-alert-active");
+                    // Combined class for IE6
+                    if (control.visited()) {
+                        classes.append(" xforms-alert-active-visited");
+                    }
                 } else {
                     classes.append("xforms-alert-inactive");
                 }

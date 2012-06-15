@@ -51,10 +51,10 @@ public class ControlIndex {
 
         // Remember by control type (for certain controls we know we need)
         if (mustMapControl(control)) {
-            Map<String, XFormsControl> controlsMap = controlTypes.get(control.getName());
+            Map<String, XFormsControl> controlsMap = controlTypes.get(control.localName());
             if (controlsMap == null) {
                 controlsMap = new LinkedHashMap<String, XFormsControl>(); // need for order here!
-                controlTypes.put(control.getName(), controlsMap);
+                controlTypes.put(control.localName(), controlsMap);
             }
 
             controlsMap.put(control.getEffectiveId(), control);
@@ -80,7 +80,7 @@ public class ControlIndex {
         // Remove by control type (for certain controls we know we need)
         if (mustMapControl(control)) {
             if (controlTypes != null) {
-                final Map controlsMap = controlTypes.get(control.getName());
+                final Map controlsMap = controlTypes.get(control.localName());
                 if (controlsMap != null) {
                     controlsMap.remove(control.getEffectiveId());
                 }

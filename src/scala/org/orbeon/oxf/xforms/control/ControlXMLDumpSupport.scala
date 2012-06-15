@@ -33,7 +33,7 @@ trait ControlXMLDumpSupport extends DebugXML{
             case _ ⇒ throw new IllegalStateException
         }
 
-        helper.startElement(getName, Array(
+        helper.startElement(localName, Array(
             "id", getId,
             "effectiveId", effectiveId,
             "isRelevant", isRelevant.toString,

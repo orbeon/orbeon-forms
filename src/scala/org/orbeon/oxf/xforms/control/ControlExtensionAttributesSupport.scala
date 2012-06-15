@@ -39,9 +39,8 @@ trait ControlExtensionAttributesSupport {
     }
 
     final def evaluateExtensionAttributes(attributeQNames: Array[QName]) {
-        val controlElement = getControlElement
         for (avtAttributeQName ← attributeQNames) {
-            val attributeValue = controlElement.attributeValue(avtAttributeQName)
+            val attributeValue = element.attributeValue(avtAttributeQName)
             if (attributeValue ne null) {
                 // NOTE: This can return null if there is no context
                 val resolvedValue = evaluateAvt(attributeValue)

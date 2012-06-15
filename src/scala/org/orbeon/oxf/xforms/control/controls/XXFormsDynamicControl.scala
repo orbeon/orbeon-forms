@@ -55,7 +55,7 @@ import org.orbeon.saxon.om.{VirtualNode, NodeInfo}
  *
  * In the future the hope is to make any change fully incremental.
  */
-class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, element: Element, effectiveId: String, state: JMap[String, String])
+class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, element: Element, effectiveId: String)
     extends XFormsSingleNodeContainerControl(container, parent, element, effectiveId) {
 
     class Nested(val container: XBLContainer, val partAnalysis: PartAnalysisImpl, val template: SAXStore, val outerListener: JEventListener)

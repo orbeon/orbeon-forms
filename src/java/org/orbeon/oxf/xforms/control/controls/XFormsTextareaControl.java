@@ -27,8 +27,6 @@ import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import scala.Tuple3;
 
-import java.util.Map;
-
 /**
  * Represents an xforms:textarea control.
  */
@@ -41,7 +39,7 @@ public class XFormsTextareaControl extends XFormsValueControl implements Focusab
             XFormsConstants.XXFORMS_ROWS_QNAME
     };
 
-    public XFormsTextareaControl(XBLContainer container, XFormsControl parent, Element element, String id, Map<String, String> state) {
+    public XFormsTextareaControl(XBLContainer container, XFormsControl parent, Element element, String id) {
         super(container, parent, element, id);
     }
 

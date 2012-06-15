@@ -26,14 +26,12 @@ import org.orbeon.oxf.xforms.event.events.XFormsSubmitEvent;
 import org.orbeon.oxf.xforms.submission.XFormsModelSubmission;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 
-import java.util.Map;
-
 /**
  * Represents an xforms:submit control.
  */
 public class XFormsSubmitControl extends XFormsTriggerControl {
-    public XFormsSubmitControl(XBLContainer container, XFormsControl parent, Element element, String id, Map<String, String> state) {
-        super(container, parent, element, id, state);
+    public XFormsSubmitControl(XBLContainer container, XFormsControl parent, Element element, String id) {
+        super(container, parent, element, id);
     }
 
     @Override
@@ -42,7 +40,7 @@ public class XFormsSubmitControl extends XFormsTriggerControl {
         if (XFormsEvents.DOM_ACTIVATE.equals(event.name())) {
 
             // Find submission id
-            final String submissionId =  getControlElement().attributeValue(XFormsConstants.SUBMISSION_QNAME);
+            final String submissionId =  element().attributeValue(XFormsConstants.SUBMISSION_QNAME);
             if (submissionId == null)
                 throw new ValidationException("xforms:submit requires a submission attribute.", getLocationData());
 

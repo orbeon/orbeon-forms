@@ -21,8 +21,6 @@ import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.XMLConstants;
 import scala.Tuple3;
 
-import java.util.Map;
-
 /**
  * Represents an xforms:range control.
  */
@@ -32,7 +30,7 @@ public class XFormsRangeControl extends XFormsValueControl {
     private String end;
     private String step;
 
-    public XFormsRangeControl(XBLContainer container, XFormsControl parent, Element element, String id, Map<String, String> state) {
+    public XFormsRangeControl(XBLContainer container, XFormsControl parent, Element element, String id) {
         super(container, parent, element, id);
         this.start = element.attributeValue("start");
         this.end = element.attributeValue("end");

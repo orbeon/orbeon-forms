@@ -17,9 +17,8 @@ import org.dom4j.Element
 import org.orbeon.oxf.xforms.analysis.controls.ComponentControl
 import org.orbeon.oxf.xforms.event.XFormsEvents
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import java.util.Map
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
-import org.orbeon.oxf.xforms.{BindingContext}
+import org.orbeon.oxf.xforms.BindingContext
 import scala.collection.JavaConverters._
 
 /**
@@ -31,7 +30,7 @@ import scala.collection.JavaConverters._
  * o HOWEVER this might still be all right for models within xbl:implementation if any
  * o event dispatching
  */
-class XFormsComponentControl(container: XBLContainer, parent: XFormsControl, element: Element, effectiveId: String, state: Map[String, String])
+class XFormsComponentControl(container: XBLContainer, parent: XFormsControl, element: Element, effectiveId: String)
         extends XFormsSingleNodeContainerControl(container, parent, element, effectiveId) {
 
     private var _nestedContainer: Option[XBLContainer] = None

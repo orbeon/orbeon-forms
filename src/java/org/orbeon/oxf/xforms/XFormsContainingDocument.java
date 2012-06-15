@@ -330,6 +330,9 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         indentedLogger.endHandleOperation();
     }
 
+    // ThreadLocal for dynamic state restoration
+    private static ThreadLocal<DynamicState.InstancesControls> threadLocal = new ThreadLocal<DynamicState.InstancesControls>();
+
     private void restoreDynamicState(final DynamicState dynamicState) {
 
         this.uuid = dynamicState.uuid();
@@ -361,48 +364,37 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         XFormsAPI.withContainingDocumentJava(this, new Runnable() {
             public void run() {
 
-                // TODO: don't use PipelineContext: use other ThreadLocal
-                final PipelineContext pipelineContext = PipelineContext.get();
-
-                // Restore models state
-                {
-                    // Store instances state in PipelineContext for use down the line
-                    pipelineContext.setAttribute(XFORMS_DYNAMIC_STATE_RESTORE_INSTANCES, dynamicState.decodeInstancesJava());
-
+                threadLocal.set(dynamicState.decodeInstancesControls());
+                try {
+                    // Restore models state
                     // Create XForms controls and models
                     createControlsAndModels();
 
                     // Restore top-level models state, including instances
                     restoreModelsState();
-                }
 
-                // Restore controls state
-                {
+                    // Restore controls state
                     // Store serialized control state for retrieval later
-                    pipelineContext.setAttribute(XFORMS_DYNAMIC_STATE_RESTORE_CONTROLS, dynamicState.decodeControlsJava());
                     xformsControls.restoreControls();
-                    pipelineContext.setAttribute(XFORMS_DYNAMIC_STATE_RESTORE_CONTROLS, null);
 
                     // Once the control tree is rebuilt, restore focus if needed
                     if (dynamicState.decodeFocusedControlJava() != null)
                         xformsControls.setFocusedControl(xformsControls.getCurrentControlTree().getControl(dynamicState.decodeFocusedControlJava()));
+                } finally {
+                    // Indicate that instance restoration process is over
+                    threadLocal.remove();
                 }
-
-                // Indicate that instance restoration process is over
-                pipelineContext.setAttribute(XFORMS_DYNAMIC_STATE_RESTORE_INSTANCES, null);
             }
         });
     }
 
     // Whether the containing document is in a phase of restoring the dynamic state.
     public boolean isRestoringDynamicState() {
-        // TODO: don't use PipelineContext: use other ThreadLocal
-        return PipelineContext.get().getAttribute(XFormsContainingDocument.XFORMS_DYNAMIC_STATE_RESTORE_INSTANCES) != null;
+        return threadLocal.get() != null;
     }
 
-    public Map<String, Map<String, String>> getSerializedControlStatesMap() {
-        // TODO: don't use PipelineContext: use other ThreadLocal
-        return (Map<String, Map<String, String>>) PipelineContext.get().getAttribute(XFormsContainingDocument.XFORMS_DYNAMIC_STATE_RESTORE_CONTROLS);
+    public DynamicState.InstancesControls getRestoringDynamicState() {
+        return threadLocal.get();
     }
 
     public PartAnalysis getPartAnalysis() {

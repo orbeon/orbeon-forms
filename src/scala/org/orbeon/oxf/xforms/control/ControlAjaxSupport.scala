@@ -17,7 +17,7 @@ import org.dom4j.QName
 import org.orbeon.oxf.xforms._
 import org.xml.sax.helpers.AttributesImpl
 import scala.Option
-import org.orbeon.oxf.xforms.XFormsConstants.LHHA
+import org.orbeon.oxf.xforms.XFormsConstants._
 import collection.mutable.LinkedHashSet
 import org.apache.commons.lang.StringUtils
 import AjaxSupport._
@@ -45,10 +45,9 @@ trait ControlAjaxSupport {
         attributesImpl.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, XFormsUtils.namespaceId(containingDocument, getEffectiveId))
 
         // Class attribute
-        added |= addAjaxClass(attributesImpl, isNewlyVisibleSubtree, other, this)
+        added |= addAjaxClasses(attributesImpl, isNewlyVisibleSubtree, other, this)
 
         // Label, help, hint, alert, etc.
-
         def addAjaxLHHA() = {
             var added = false
 
@@ -66,6 +65,13 @@ trait ControlAjaxSupport {
         }
 
         added |= addAjaxLHHA()
+
+        // Visited
+        if ((Option(other) map (_.visited) getOrElse false) != visited) {
+            XMLUtils.addOrAppendToAttribute(attributesImpl, "visited", visited.toString)
+            added |= true
+        }
+
         // Output control-specific attributes
         added |= addAjaxCustomAttributes(attributesImpl, isNewlyVisibleSubtree, other)
 
@@ -101,18 +107,18 @@ trait ControlAjaxSupport {
 
         // By default, diff only attributes in the xxforms:* namespace
         val extensionAttributes = getExtensionAttributes
-        (extensionAttributes ne null) && addAttributesDiffs(extensionAttributes, XFormsConstants.XXFORMS_NAMESPACE_URI)
+        (extensionAttributes ne null) && addAttributesDiffs(extensionAttributes, XXFORMS_NAMESPACE_URI)
     }
 
     final def addAjaxStandardAttributes(originalControl: XFormsSingleNodeControl, ch: ContentHandlerHelper, isNewRepeatIteration: Boolean) {
-        val extensionAttributes = STANDARD_EXTENSION_ATTRIBUTES
+        val extensionAttributes = StandardExtensionAttributes
 
         if (extensionAttributes ne null) {
             val control2 = this
 
             for {
                 avtAttributeQName ← extensionAttributes
-                if avtAttributeQName != XFormsConstants.CLASS_QNAME
+                if avtAttributeQName != CLASS_QNAME
                 value1 = if (originalControl eq null) null else originalControl.getExtensionAttributeValue(avtAttributeQName)
                 value2 = control2.getExtensionAttributeValue(avtAttributeQName)
                 if value1 != value2
@@ -122,7 +128,7 @@ trait ControlAjaxSupport {
                 attributesImpl.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, XFormsUtils.namespaceId(containingDocument, control2.getEffectiveId))
                 addAttributeIfNeeded(attributesImpl, "for", control2.getEffectiveId, isNewRepeatIteration, false)
                 addAttributeIfNeeded(attributesImpl, "name", avtAttributeQName.getName, isNewRepeatIteration, false)
-                ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "attribute", attributesImpl)
+                ch.startElement("xxf", XXFORMS_NAMESPACE_URI, "attribute", attributesImpl)
                 ch.text(attributeValue)
                 ch.endElement()
             }
@@ -133,12 +139,12 @@ trait ControlAjaxSupport {
 // NOTE: Use name different from trait so that the Java compiler is happy
 object AjaxSupport {
 
-    val STANDARD_EXTENSION_ATTRIBUTES = Array(XFormsConstants.STYLE_QNAME, XFormsConstants.CLASS_QNAME)
+    val StandardExtensionAttributes = Array(STYLE_QNAME, CLASS_QNAME)
 
-    def addAjaxClass(attributesImpl: AttributesImpl, newlyVisibleSubtree: Boolean, control1: XFormsControl, control2: XFormsControl): Boolean = {
+    def addAjaxClasses(attributesImpl: AttributesImpl, newlyVisibleSubtree: Boolean, control1: XFormsControl, control2: XFormsControl): Boolean = {
         var added = false
-        val class1 = Option(control1) flatMap (control ⇒ Option(control.getExtensionAttributeValue(XFormsConstants.CLASS_QNAME)))
-        val class2 = Option(control2.getExtensionAttributeValue(XFormsConstants.CLASS_QNAME))
+        val class1 = Option(control1) flatMap (control ⇒ Option(control.getExtensionAttributeValue(CLASS_QNAME)))
+        val class2 = Option(control2.getExtensionAttributeValue(CLASS_QNAME))
 
         if (newlyVisibleSubtree || class1 != class2) {
 

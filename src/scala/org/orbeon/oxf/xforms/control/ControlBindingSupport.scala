@@ -128,7 +128,7 @@ trait ControlBindingSupport {
             onBindingUpdate(oldBinding, bindingContext)
     }
 
-    def onCreate() = _wasRelevant = false
+    def onCreate() = { _wasRelevant = false; visited = false }
     def onDestroy() = ()
     def onBindingUpdate(oldBinding: BindingContext, newBinding: BindingContext) = ()
 
@@ -142,7 +142,4 @@ trait ControlBindingSupport {
         _wasRelevant = _isRelevant
         result
     }
-
-    final def compareRelevance(other: XFormsControl) =
-        _isRelevant == other._isRelevant
 }

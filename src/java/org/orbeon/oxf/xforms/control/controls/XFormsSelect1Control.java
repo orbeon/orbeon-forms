@@ -41,7 +41,6 @@ import scala.Tuple3;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -56,7 +55,7 @@ public class XFormsSelect1Control extends XFormsValueControl implements Focusabl
 
     private XFormsControl.ControlProperty<Itemset> itemsetProperty = new MutableItemsetProperty(this);
 
-    public XFormsSelect1Control(XBLContainer container, XFormsControl parent, Element element, String id, Map<String, String> state) {
+    public XFormsSelect1Control(XBLContainer container, XFormsControl parent, Element element, String id) {
         super(container, parent, element, id);
     }
 
@@ -164,7 +163,7 @@ public class XFormsSelect1Control extends XFormsValueControl implements Focusabl
                 return itemsetProperty.value();
             }
         } catch (Exception e) {
-            throw ValidationException.wrapException(e, new ExtendedLocationData(getLocationData(), "evaluating itemset", getControlElement()));
+            throw ValidationException.wrapException(e, new ExtendedLocationData(getLocationData(), "evaluating itemset", element()));
         }
     }
 

@@ -50,7 +50,7 @@ case class DynamicState(
     def decodeAnnotatedTemplate = annotatedTemplate map (AnnotatedTemplate(_))
     def decodeLastAjaxResponse = fromByteSeq[Option[SAXStore]](lastAjaxResponse)
     def decodeInstances = fromByteSeq[List[InstanceState]](instances)
-    def decodeControls = fromByteSeq[List[ControlState]](controls) map (c ⇒ (c.effectiveId, c.keyValues))
+    def decodeControls = fromByteSeq[List[ControlState]](controls)
 
     // For Java callers
     def decodeDeploymentTypeJava = deploymentType.orNull
@@ -64,7 +64,13 @@ case class DynamicState(
     def decodeAnnotatedTemplateJava = decodeAnnotatedTemplate.orNull
     def decodeLastAjaxResponseJava = decodeLastAjaxResponse.orNull
     def decodeInstancesJava = decodeInstances.asJava
-    def decodeControlsJava = decodeControls.toMap mapValues (_.asJava) asJava
+    def decodeControlsJava = decodeControls.asJava
+
+    case class InstancesControls(instances: List[InstanceState], controls: Map[String, ControlState]) {
+        def instancesJava = instances.asJava
+    }
+
+    def decodeInstancesControls = InstancesControls(decodeInstances, decodeControls map (c ⇒ (c.effectiveId, c)) toMap)
     
     // For tests only
     def copyUpdateSequence(sequence: Int) = copy(sequence = sequence)
@@ -141,7 +147,7 @@ case class DynamicState(
             if (controls.nonEmpty) {
                 val controlsElement = rootElement.addElement("controls")
                 controls foreach {
-                    case (effectiveId, keyValues) ⇒
+                    case ControlState(effectiveId, _, keyValues) ⇒
                         val controlElement = controlsElement.addElement("control")
                         controlElement.addAttribute("effective-id", effectiveId)
                         for ((k, v) ← keyValues)
@@ -187,7 +193,9 @@ case class DynamicState(
 }
 
 // Minimal immutable representation of a serialized control
-case class ControlState(effectiveId: String, keyValues: Map[String, String])
+case class ControlState(effectiveId: String, visited: Boolean, keyValues: Map[String, String]) {
+    def keyValuesJava = keyValues.asJava
+}
 
 // Minimal immutable representation of a serialized instance
 // If there is caching information, don't include the actual content
@@ -224,7 +232,7 @@ object DynamicState {
                 override def startVisitControl(control: XFormsControl) = {
                     if (control.isRelevant) { // don't serialize anything for non-relevant controls
                         Option(control.serializeLocal.asScala) filter (_.nonEmpty) foreach {
-                            nameValues ⇒ result += ControlState(control.getEffectiveId, nameValues.toMap)
+                            nameValues ⇒ result += ControlState(control.getEffectiveId, control.visited, nameValues.toMap)
                         }
                     }
                     true

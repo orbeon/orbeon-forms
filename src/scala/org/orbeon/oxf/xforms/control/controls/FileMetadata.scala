@@ -31,6 +31,7 @@ trait FileMetadata extends XFormsValueControl {
     self: XFormsControl ⇒
 
     // Children elements
+    // TODO: Don't deal with elements here, this should be part of the ElementAnalysis
     private val mediatypeElement = Option(self.element.element(XFORMS_MEDIATYPE_QNAME))
     private val filenameElement  = Option(self.element.element(XFORMS_FILENAME_QNAME))
     private val sizeElement      = Option(self.element.element(XXFORMS_SIZE_QNAME))

@@ -80,7 +80,7 @@ class XFormsRepeatHandler extends XFormsControlLifecyleHandler(true, true) { // 
             if (classes.nonEmpty) {
                 if (sb.nonEmpty)
                     sb += ' '
-                sb append classes
+                sb append classes // use append until Scala ++= is optimized
             }
         }
 

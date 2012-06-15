@@ -568,6 +568,7 @@
     </target>
 
     <target name="proxy-portlet-war" depends="jars" description="Create proxy portlet WAR file">
+    	<mkdir dir="${build.distrib.dir}"/>
         <war destfile="${build.distrib.dir}/${versioned-proxy-portlet-name}.war">
             <webinf dir="descriptors/proxy-portlet"/>
             <lib dir="${build.lib.dir}">

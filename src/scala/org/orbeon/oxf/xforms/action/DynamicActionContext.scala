@@ -22,6 +22,8 @@ case class DynamicActionContext(
       analysis: ElementAnalysis,
       overriddenContext: Option[Item]) {
 
+    def actionName = analysis.localName
     def element = analysis.element
     def scope = analysis.scope
+    def containingDocument = interpreter.containingDocument
 }

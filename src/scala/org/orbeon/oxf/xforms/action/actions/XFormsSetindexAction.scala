@@ -24,6 +24,34 @@ import org.orbeon.oxf.xforms.event.Dispatch
 /**
  * 9.3.7 The setindex Element
  */
+class XFormsSetindexAction extends XFormsAction {
+
+    override def execute(context: DynamicActionContext) {
+
+        val interpreter = context.interpreter
+        val element = context.analysis.element
+
+        // Get the repeat static id
+        val repeatStaticId =
+            resolveStringAVT(context, "repeat") getOrElse
+                (throw new OXFException("Cannot resolve mandatory '" + "repeat" + "' attribute on " + context.actionName + " action."))
+
+        // Determine the index
+        val index = {
+
+            val indexXPath = element.attributeValue("index")
+            val contextStack = interpreter.actionXPathContext
+            val indexString = interpreter.evaluateStringExpression(element, contextStack.getCurrentNodeset, contextStack.getCurrentPosition, "number(" + indexXPath + ")")
+
+            try indexString.toInt
+            catch { case _ ⇒ return } // "If the index evaluates to NaN the action has no effect."
+        }
+
+        // Execute
+        XFormsSetindexAction.executeSetindexAction(interpreter, element, repeatStaticId, index)
+    }
+}
+
 object XFormsSetindexAction {
     
     def executeSetindexAction(interpreter: XFormsActionInterpreter, actionElement: Element, repeatStaticId: String, index: Int) = {
@@ -63,39 +91,5 @@ object XFormsSetindexAction {
                 
                 -1
         }
-    }
-}
-
-class XFormsSetindexAction extends XFormsAction {
-    
-    override def execute(actionContext: DynamicActionContext) {
-        
-        val interpreter = actionContext.interpreter
-        val element = actionContext.analysis.element
-        
-        // Get the repeat static id
-        val repeatStaticId = {
-            // Check presence of mandatory attribute
-            val repeatAttribute = Option(element.attributeValue("repeat")) getOrElse
-                (throw new OXFException("Missing mandatory 'repeat' attribute on xforms:setindex element."))
-
-            // Resolve AVT but return if we can't evaluate it (if no XPath context)
-            Option(interpreter.resolveAVTProvideValue(element, repeatAttribute)) getOrElse
-                (return)
-        }
-        
-        // Determine the index
-        val index = {
-
-            val indexXPath = element.attributeValue("index")
-            val contextStack = interpreter.actionXPathContext
-            val indexString = interpreter.evaluateStringExpression(element, contextStack.getCurrentNodeset, contextStack.getCurrentPosition, "number(" + indexXPath + ")")
-
-            try indexString.toInt
-            catch { case _ ⇒ return } // "If the index evaluates to NaN the action has no effect."
-        }
-        
-        // Execute
-        XFormsSetindexAction.executeSetindexAction(interpreter, element, repeatStaticId, index)
     }
 }

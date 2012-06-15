@@ -394,10 +394,14 @@ public class XFormsActionInterpreter {
      * Find an effective object based on either the xxforms:repeat-indexes attribute, or on the current repeat indexes.
      *
      * @param actionElement         current action element
-     * @param targetStaticId        static id of the target to resolve
+     * @param targetStaticId        static id or absolute id of the target to resolve
      * @return                      effective control if found
      */
     public Object resolveEffectiveControl(Element actionElement, String targetStaticId) {
+
+        // If the id passed is an effective id, just use it
+        if (XFormsUtils.isEffectiveId(targetStaticId))
+            return containingDocument().getObjectByEffectiveId(targetStaticId);
 
         final XBLContainer resolutionScopeContainer = findResolutionScopeContainer(actionElement);
 

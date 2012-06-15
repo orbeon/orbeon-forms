@@ -55,6 +55,7 @@ object XFormsActions {
         xxformsQName("invalidate-instance")     → new XXFormsInvalidateInstanceAction,
         xxformsQName("invalidate-instances")    → new XXFormsInvalidateInstancesAction,
         xxformsQName("join-submissions")        → new XXFormsJoinSubmissions,
+        xxformsQName("setvisited")              → new XXFormsSetvisitedAction,
     
         // xbl:handler as action container working like xforms:action
         XBL_HANDLER_QNAME                       → new XFormsActionAction

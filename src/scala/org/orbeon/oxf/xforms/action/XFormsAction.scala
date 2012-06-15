@@ -25,6 +25,9 @@ import org.dom4j.Element
 import org.orbeon.saxon.om.Item
 import scala.collection.JavaConverters._
 import org.orbeon.oxf.xforms.xbl.Scope
+import org.orbeon.oxf.xforms.control.XFormsControl
+import org.orbeon.oxf.util.DebugLogger._
+import scala.Some
 
 abstract class XFormsAction {
 
@@ -96,4 +99,48 @@ abstract class XFormsAction {
             event.setCustom(name, value)
         }
     }
+
+    // Resolve a control given the name of an AVT
+    def resolveControl(context: DynamicActionContext, attName: String): Option[XFormsControl] = {
+
+        val interpreter = context.interpreter
+        val element = context.element
+
+        resolveStringAVT(context, "control") match {
+            case Some(resolvedAvt) ⇒
+
+                val controlObject = interpreter.resolveEffectiveControl(element, resolvedAvt)
+
+                Option(controlObject) match {
+                    case Some(control: XFormsControl) ⇒ Some(control)
+                    case _ ⇒
+                        implicit val indentedLogger = interpreter.indentedLogger
+                        debug(
+                            "attribute does not refer to an existing control",
+                            Seq("attribute"      → attName,
+                                "value"          → element.attributeValue("control"),
+                                "resolved value" → resolvedAvt)
+                        )
+                        None
+                }
+
+            case None ⇒
+                // This can happen if the attribute is missing or if the AVT cannot be evaluated due to an empty context
+                throw new OXFException("Cannot resolve mandatory '" + attName + "' attribute on " + context.actionName + " action.")
+        }
+    }
+
+    // Resolve an optional boolean AVT
+    // Return None if there is no attribute or if the AVT cannot be evaluated
+    def resolveStringAVT(context: DynamicActionContext, att: String) =
+        Option(context.element.attributeValue(att)) flatMap
+            (avt ⇒ Option(context.interpreter.resolveAVTProvideValue(context.element, avt)))
+
+    // Resolve an optional boolean AVT
+    def resolveBooleanAVT(context: DynamicActionContext, att: String, default: Boolean) =
+        resolveStringAVT(context, att) map (_ == "true") getOrElse default
+
+    def synchronizeAndRefreshIfNeeded(context: DynamicActionContext): Unit =
+        if (context.interpreter.isDeferredUpdates(context.element))
+            context.containingDocument.synchronizeAndRefresh()
 }

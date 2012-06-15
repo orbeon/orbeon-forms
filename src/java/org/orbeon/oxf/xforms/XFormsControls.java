@@ -431,13 +431,13 @@ public class XFormsControls implements XFormsObjectResolver {
         final Controls.BindingUpdater updater = updateSubtreeBindings(containerControl);
 
         // Evaluate the controls
-        Controls.visitControls(containerControl, true, new Controls.XFormsControlVisitorAdapter() {
+        Controls.visitControls((XFormsControl) containerControl, new Controls.XFormsControlVisitorAdapter() {
             @Override
             public boolean startVisitControl(XFormsControl control) {
                 control.evaluate();
                 return true;
             }
-        });
+        }, true, true);
 
         if (currentControlTree.isAllowSendingRefreshEvents()) {
             // There are potentially event handlers for UI events, so do the whole processing
@@ -477,14 +477,14 @@ public class XFormsControls implements XFormsObjectResolver {
 
         final List<String> eventsToDispatch = new ArrayList<String>();
 
-        Controls.visitControls(containerControl, true, new Controls.XFormsControlVisitorAdapter() {
+        Controls.visitControls((XFormsControl) containerControl, new Controls.XFormsControlVisitorAdapter() {
             public boolean startVisitControl(XFormsControl control) {
                 if (XFormsControl.controlSupportsRefreshEvents(control)) {// test here to make smaller list
                     eventsToDispatch.add(control.getEffectiveId());
                 }
                 return true;
             }
-        });
+        }, true, true);
 
         return eventsToDispatch;
     }

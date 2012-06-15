@@ -447,9 +447,8 @@ public class XBLContainer implements XFormsObjectResolver {
 
         // Handle "absolute ids" of format "/foo/bar.1-2"
         // NOTE: Experimental, definitive format TBD
-        if (targetStaticId.startsWith("/")) {
+        if (XFormsUtils.isAbsoluteId(targetStaticId))
             return containingDocument.getObjectByEffectiveId(XFormsUtils.absoluteIdToEffectiveId(targetStaticId));
-        }
 
         // Make sure the static id passed is actually a static id
         if (!XFormsUtils.isStaticId(targetStaticId))

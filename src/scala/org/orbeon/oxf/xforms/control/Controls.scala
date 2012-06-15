@@ -224,7 +224,7 @@ object Controls {
         val xpathDependencies = containerControl.containingDocument.getXPathDependencies
         xpathDependencies.bindingUpdateStart()
         val updater = new BindingUpdater(containerControl.containingDocument, containerControl.parent.bindingContextForChild)
-        visitControls(containerControl, true, updater)
+        visitControls(containerControl, updater, includeCurrent = true, recurse = true)
         xpathDependencies.bindingUpdateDone()
         updater
     }
@@ -383,21 +383,29 @@ object Controls {
         visitSiblings(listener, tree.getChildren.asScala)
 
     // Visit all the descendant controls of the given container control
-    def visitControls(containerControl: XFormsContainerControl, includeCurrent: Boolean, listener: XFormsControlVisitorListener) {
-        // Container itself
-        if (includeCurrent)
-            if (! listener.startVisitControl(containerControl))
-                return
+    def visitControls(control: XFormsControl, listener: XFormsControlVisitorListener, includeCurrent: Boolean, recurse: Boolean): Unit =
+        control match {
+            case containerControl: XFormsContainerControl ⇒
+                // Container itself
+                if (includeCurrent)
+                    if (! listener.startVisitControl(containerControl))
+                        return
 
-        // Children
-        visitSiblings(listener, containerControl.children)
+                // Children
+                if (recurse)
+                    visitSiblings(listener, containerControl.children)
 
-        // Container itself
-        if (includeCurrent)
-            listener.endVisitControl(containerControl)
-    }
+                // Container itself
+                if (includeCurrent)
+                    listener.endVisitControl(containerControl)
+            case control ⇒
+                if (includeCurrent) {
+                    listener.startVisitControl(control)
+                    listener.endVisitControl(control)
+                }
+        }
 
-    def visitSiblings(listener: XFormsControlVisitorListener, children: Seq[XFormsControl]): Unit =
+    private def visitSiblings(listener: XFormsControlVisitorListener, children: Seq[XFormsControl]): Unit =
         for (currentControl ← children) {
             if (listener.startVisitControl(currentControl)) {
                 currentControl match {

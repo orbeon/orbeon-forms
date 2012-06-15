@@ -1261,11 +1261,17 @@ public class XFormsUtils {
     }
 
     /**
+     * Whether the id is an absolute id.
+     */
+    public static boolean isAbsoluteId(String id) {
+        return id.startsWith("/");
+    }
+
+    /**
      * Convert an absolute id to an effective id.
      */
     public static String absoluteIdToEffectiveId(String absoluteId) {
-        assert absoluteId.startsWith("/");
-
+        assert isAbsoluteId(absoluteId);
         return absoluteId.substring(1).replace('/', '$');
     }
 

@@ -190,7 +190,7 @@ public class ControlTree implements ExternalCopyable {
 
         // Gather ids of controls to handle
         final List<String> controlsEffectiveIds = new ArrayList<String>();
-        Controls.visitControls(removedControl, includeCurrent, new Controls.XFormsControlVisitorAdapter() {
+        Controls.visitControls((XFormsControl) removedControl, new Controls.XFormsControlVisitorAdapter() {
             @Override
             public boolean startVisitControl(XFormsControl control) {
                 // Don't handle container controls here
@@ -204,7 +204,7 @@ public class ControlTree implements ExternalCopyable {
                 if (control instanceof XFormsContainerControl)
                     controlsEffectiveIds.add(control.getEffectiveId());
             }
-        });
+        }, includeCurrent, true);
 
         // Dispatch events
         for (final String effectiveId : controlsEffectiveIds) {
@@ -361,13 +361,13 @@ public class ControlTree implements ExternalCopyable {
 
         // Gather all control ids and controls
         final Map<String, XFormsControl> effectiveIdsToControls = new LinkedHashMap<String, XFormsControl>();
-        Controls.visitControls(containerControl, includeCurrent, new Controls.XFormsControlVisitorAdapter() {
+        Controls.visitControls((XFormsControl) containerControl, new Controls.XFormsControlVisitorAdapter() {
             @Override
             public boolean startVisitControl(XFormsControl control) {
                 effectiveIdsToControls.put(control.getEffectiveId(), control);
                 return true;
             }
-        });
+        }, includeCurrent, true);
 
         // Evaluate controls, passing directly all the controls
         ControlIndex.evaluateAll(indentedLogger, effectiveIdsToControls.values());
@@ -393,13 +393,13 @@ public class ControlTree implements ExternalCopyable {
      * @param includeCurrent    whether to index the container control itself
      */
     public void indexSubtree(XFormsContainerControl containerControl, boolean includeCurrent) {
-        Controls.visitControls(containerControl, includeCurrent, new Controls.XFormsControlVisitorAdapter() {
+        Controls.visitControls((XFormsControl) containerControl, new Controls.XFormsControlVisitorAdapter() {
             public boolean startVisitControl(XFormsControl control) {
                 // Index control
                 controlIndex.indexControl(control);
                 return true;
             }
-        });
+        }, includeCurrent, true);
     }
 
     /**
@@ -409,13 +409,13 @@ public class ControlTree implements ExternalCopyable {
      * @param includeCurrent    whether to index the container control itself
      */
     public void deindexSubtree(XFormsContainerControl containerControl, boolean includeCurrent) {
-        Controls.visitControls(containerControl, includeCurrent, new Controls.XFormsControlVisitorAdapter() {
+        Controls.visitControls((XFormsControl) containerControl, new Controls.XFormsControlVisitorAdapter() {
             public boolean startVisitControl(XFormsControl control) {
                 // Deindex control
                 controlIndex.deindexControl(control);
                 return true;
             }
-        });
+        }, includeCurrent, true);
     }
 
     public boolean isBindingsDirty() {

@@ -23,7 +23,6 @@ import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.xml.sax.helpers.AttributesImpl
-import scala.Option
 import java.io.File
 import org.orbeon.oxf.xforms.event.events._
 import XFormsUploadControl._

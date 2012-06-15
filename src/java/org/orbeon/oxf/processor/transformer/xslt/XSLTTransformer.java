@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.processor.transformer.xslt;
 
+import org.orbeon.exception.Exceptions;
 import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.dom4j.Node;
@@ -498,7 +499,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                     }
                 } catch (Exception e) {
 
-                    final Throwable rootCause = ValidationException.getRootThrowable(e);
+                    final Throwable rootCause = Exceptions.getRootThrowable(e);
                     if (rootCause instanceof TransformerException) {
                         final TransformerException transformerException = (TransformerException) rootCause;
 

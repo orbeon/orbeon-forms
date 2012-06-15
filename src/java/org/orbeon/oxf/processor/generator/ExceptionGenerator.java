@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.processor.generator;
 
+import org.orbeon.exception.Exceptions;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
@@ -53,7 +54,7 @@ public class ExceptionGenerator extends ProcessorImpl {
                 try {
                     while (throwable != null) {
                         addThrowable(helper, throwable);
-                        throwable = OXFException.getNestedThrowable(throwable);
+                        throwable = Exceptions.getNestedThrowable(throwable);
                     }
                 } catch (Exception e) {
                     throw new OXFException(e);

@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms;
 
+import org.orbeon.exception.Exceptions;
 import org.apache.log4j.Logger;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
@@ -480,7 +481,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
     private boolean isIgnorableXPathError(Throwable t) {
         if (XFormsProperties.isIgnoreDynamicMIPXPathErrors(containingDocument)) {
-            final Throwable root = OXFException.getRootThrowable(t);
+            final Throwable root = Exceptions.getRootThrowable(t);
             return (root instanceof XPathException) && ! ((XPathException) root).isStaticError();
         } else
             return false;

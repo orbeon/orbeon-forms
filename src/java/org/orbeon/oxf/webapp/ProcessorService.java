@@ -14,7 +14,7 @@
 package org.orbeon.oxf.webapp;
 
 import org.apache.log4j.Logger;
-import org.orbeon.oxf.common.Errors;
+import org.orbeon.exception.Formatter;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.InitUtils;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
@@ -22,18 +22,13 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.ProcessorDefinition;
 import org.orbeon.oxf.processor.Processor;
 import org.orbeon.oxf.properties.Properties;
-import org.orbeon.oxf.resources.ClassLoaderResourceManagerImpl;
-import org.orbeon.oxf.resources.ResourceManager;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.task.TaskScheduler;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.io.Reader;
-import java.util.HashMap;
 
 public class ProcessorService {
 
@@ -102,7 +97,7 @@ public class ProcessorService {
             // Something bad happened
 
             // Log first
-            logger.error(Errors.format(e));
+            logger.error(Formatter.format(e));
 
             // Try to start the error pipeline if the response has not been committed yet
             try {
@@ -144,7 +139,7 @@ public class ProcessorService {
                 InitUtils.runProcessor(errorProcessor, externalContext, pipelineContext, logger);
             } catch (Throwable e) {
                 // Something bad happened
-                logger.error(Errors.format(e));
+                logger.error(Formatter.format(e));
                 serviceStaticError(externalContext, throwable);
             }
         } else {
@@ -172,7 +167,7 @@ public class ProcessorService {
         if (showExceptions()) {
             // Show details if allowed
             sb.append("<pre>");
-            sb.append(Errors.format(throwable));
+            sb.append(Formatter.format(throwable));
             sb.append("</pre>");
         } else {
             sb.append("<p>An error has occurred while processing the request.</p>");

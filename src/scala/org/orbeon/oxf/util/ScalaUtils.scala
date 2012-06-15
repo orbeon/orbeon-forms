@@ -13,8 +13,8 @@
  */
 package org.orbeon.oxf.util
 
+import org.orbeon.exception._
 import java.security.MessageDigest
-import org.orbeon.oxf.common.{OXFException, Errors}
 import org.apache.log4j.Logger
 import java.net.URLEncoder.{encode ⇒ encodeURL}
 import java.net.URLDecoder.{decode ⇒ decodeURL}
@@ -103,8 +103,8 @@ object ScalaUtils {
         try body
         catch {
             case e: Exception ⇒
-                logger.error("Exception when running " + action + '\n' + Errors.format(e))
-                throw newException(OXFException.getRootThrowable(e))
+                logger.error("Exception when running " + action + '\n' + Formatter.format(e))
+                throw newException(Exceptions.getRootThrowable(e))
         }
 
     def digest(algorithm: String, data: Traversable[String]) = {

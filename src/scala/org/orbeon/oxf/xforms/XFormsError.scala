@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms
 
+import org.orbeon.exception.Exceptions
 import action.XFormsAPI._
 import event.XFormsEventTarget
 import model.DataModel.Reason
@@ -57,7 +58,7 @@ object XFormsError {
 
     object ServerError {
         def apply(t: Throwable): ServerError = {
-            val root = OXFException.getRootThrowable(t)
+            val root = Exceptions.getRootThrowable(t)
             ServerError(StringUtils.trimToEmpty(root.getMessage), Option(ValidationException.getRootLocationData(t)), Some(root.getClass.getName))
         }
     }

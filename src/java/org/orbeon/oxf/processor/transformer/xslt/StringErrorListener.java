@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.processor.transformer.xslt;
 
+import org.orbeon.exception.Exceptions;
 import org.apache.log4j.Logger;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
@@ -148,7 +149,7 @@ public class StringErrorListener implements ErrorListener {
         if (extendedLocationData != null) {
             return "at " + extendedLocationData.toString();
         } else  if (te.getException() instanceof OXFException) {
-            final Throwable t = OXFException.getRootThrowable(te.getException());
+            final Throwable t = Exceptions.getRootThrowable(te.getException());
             // TODO: check this, should maybe look for root validation data?
             if (t instanceof ValidationException)
                 return ((ValidationException) t).getLocationData().toString();
@@ -175,7 +176,7 @@ public class StringErrorListener implements ErrorListener {
                 if (!message.equals("")) {
                     message += ": ";
                 }
-                message += OXFException.getRootThrowable(e).getMessage();
+                message += Exceptions.getRootThrowable(e).getMessage();
             }
             if (e instanceof TransformerException) {
                 e = ((TransformerException) e).getException();

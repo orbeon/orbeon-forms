@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.pipeline;
 
+import org.orbeon.exception.*;
 import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.dom4j.Element;
@@ -20,7 +21,6 @@ import org.dom4j.QName;
 import org.orbeon.oxf.cache.ObjectCache;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.common.Errors;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.ProcessorDefinition;
@@ -87,7 +87,7 @@ public class InitUtils {
             processor.start(pipelineContext);
             success = true;
         } catch (Throwable e) {
-            final Throwable throwable = OXFException.getRootThrowable(e);
+            final Throwable throwable = Exceptions.getRootThrowable(e);
             final LocationData locationData = ValidationException.getRootLocationData(e);
             if (throwable instanceof HttpStatusCodeException) {
                 // Special exception used to set an error status code
@@ -125,7 +125,7 @@ public class InitUtils {
             try {
                 pipelineContext.destroy(success);
             } catch (Throwable f) {
-                logger.debug("Exception while destroying context after exception" + Errors.format(f));
+                logger.debug("Exception while destroying context after exception" + Formatter.format(f));
             }
         }
     }

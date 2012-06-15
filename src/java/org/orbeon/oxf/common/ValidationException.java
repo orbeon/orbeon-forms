@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.common;
 
+import org.orbeon.exception.Exceptions;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.xml.sax.SAXParseException;
 
@@ -36,7 +37,7 @@ public class ValidationException extends OXFException {
             Throwable currentThrowable = throwable;
             while (currentThrowable != null) {
                 exceptionChain.add(currentThrowable);
-                currentThrowable = OXFException.getNestedThrowable(currentThrowable);
+                currentThrowable = Exceptions.getNestedThrowable(currentThrowable);
             }
             Collections.reverse(exceptionChain);
         }
@@ -65,7 +66,7 @@ public class ValidationException extends OXFException {
                 if (temp.getSystemID() != null || locationData == null || locationData.getSystemID() == null)
                     locationData = temp;
             }
-            final Throwable nested = OXFException.getNestedThrowable(throwable);
+            final Throwable nested = Exceptions.getNestedThrowable(throwable);
             if (nested == null)
                 break;
             throwable = nested;

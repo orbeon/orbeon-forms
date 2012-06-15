@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.test;
 
+import org.orbeon.exception.*;
 import org.apache.commons.lang.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.Element;
@@ -21,7 +22,6 @@ import org.junit.Test;
 import org.junit.rules.TestName;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import org.orbeon.oxf.common.Errors;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.Version;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
@@ -129,7 +129,7 @@ public class ProcessorTest extends ResourceManagerTestBase {
             }
             return parameters;
         } catch (Throwable t) {
-            System.err.println(currentTestError + Errors.format(t));
+            System.err.println(currentTestError + Formatter.format(t));
             throw new OXFException(currentTestError);
         }
     }
@@ -167,7 +167,7 @@ public class ProcessorTest extends ResourceManagerTestBase {
         // Check exception
         if (runner.getException() != null) {
             System.err.println(description);
-            throw OXFException.getRootThrowable(runner.getException());
+            throw Exceptions.getRootThrowable(runner.getException());
         }
 
         // Check if got expected result

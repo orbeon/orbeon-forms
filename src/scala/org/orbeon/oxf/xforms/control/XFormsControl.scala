@@ -30,7 +30,6 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData
 import org.orbeon.oxf.xml.dom4j.LocationData
 import org.xml.sax.Attributes
-import scala.Option
 import scala.collection.Seq
 import scala.collection.JavaConverters._
 import org.orbeon.oxf.xforms.BindingContext

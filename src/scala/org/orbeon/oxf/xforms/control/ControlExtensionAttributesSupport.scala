@@ -17,7 +17,6 @@ import org.dom4j.QName
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xml.ContentHandlerHelper
 import org.xml.sax.helpers.AttributesImpl
-import scala.Option
 import scala.collection.JavaConverters._
 import java.util.{Map ⇒ JMap, HashMap ⇒ JHashMap}
 

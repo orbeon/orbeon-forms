@@ -11,39 +11,28 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.common
+package org.orbeon.exception
 
 import collection.JavaConverters._
-import collection.mutable.ListBuffer
 import org.apache.commons.lang.StringUtils.isNotBlank
 import org.orbeon.oxf.xml.dom4j.{ExtendedLocationData, LocationData}
+import org.orbeon.oxf.common.ValidationException
 
 // Exception formatting
-object Errors {
+object Formatter {
 
     private val Width = 120
     private val MaxStackLength = 40
 
-    private val OuterHr  = '+' + "-" * (Width - 2) + '+'
-    private val InnerHr  = withBorder("-" * (Width - 2))
+    private val OuterHr = '+' + "-" * (Width - 2) + '+'
+    private val InnerHr = withBorder("-" * (Width - 2))
     private val DottedHr = withBorder("---8<-----" * ((Width - 2 + 9) / 10), Width)
 
     // Nicely format an exception into a String printable in a log file
     def format(throwable: Throwable): String = {
 
         // All nested errors from caused to cause
-        val errors = {
-            var currentThrowable = throwable
-
-            val result = ListBuffer[Error]()
-
-            while (currentThrowable ne null) {
-                result += Error(currentThrowable)
-                currentThrowable = OXFException.getNestedThrowable(currentThrowable)
-            }
-
-            result.toList
-        }
+        val errors = Exceptions.causesIterator(throwable) map (Error(_)) toList
 
         // Top-level message
         val message = errors.last.message getOrElse "[No error message provided.]"
@@ -51,11 +40,8 @@ object Errors {
         val firstThrowableWithLocation = errors find (_.location.nonEmpty)
         val locations = firstThrowableWithLocation.toList flatMap (_.location)
 
-        def formattedJavaTrace(e: Error) =
-            e.stackTrace map (_.formatted(Width))
-
         def formattedDropCaused(causedTrace: Option[List[String]], e: Error) = {
-            val newTrace = formattedJavaTrace(e)
+            val newTrace = e.stackTrace map (_.formatted(Width))
             causedTrace match {
                 case Some(causedTrace) ⇒
                     val commonSize = causedTrace zip newTrace takeWhile (pair ⇒ pair._1 == pair._2) size
@@ -80,10 +66,10 @@ object Errors {
                     val (newTrace, newTraceCompact) = formattedDropCaused(causedTrace, error)
 
                     nextTraces(Some(newTrace), rest.tail) :::
-                    InnerHr ::
-                    withBorder("Exception: " + error.className, 120) ::
-                    InnerHr ::
-                    newTraceCompact.reverse
+                            InnerHr ::
+                            withBorder("Exception: " + error.className, 120) ::
+                            InnerHr ::
+                            newTraceCompact.reverse
 
                 case None ⇒
                     Nil
@@ -94,16 +80,16 @@ object Errors {
 
         val lines =
             OuterHr ::
-            withBorder("An Error has Occurred in Orbeon Forms", Width) ::
-            InnerHr ::
-            withBorder(message, Width) ::
-            InnerHr ::
-            withBorder("Orbeon Forms Call Stack", Width) ::
-            InnerHr ::
-            (locations map (_.formatted(Width))) :::
-            allFormattedJavaTraces :::
-            OuterHr ::
-            Nil
+                    withBorder("An Error has Occurred in Orbeon Forms", Width) ::
+                    InnerHr ::
+                    withBorder(message, Width) ::
+                    InnerHr ::
+                    withBorder("Orbeon Forms Call Stack", Width) ::
+                    InnerHr ::
+                    (locations map (_.formatted(Width))) :::
+                    allFormattedJavaTraces :::
+                    OuterHr ::
+                    Nil
 
         "\n" + (lines mkString "\n")
     }
@@ -145,7 +131,7 @@ object Errors {
         // Create from LocationData
         def apply(locationData: LocationData): Option[SourceLocation] =
 
-            if (isNotBlank(locationData.getSystemID) && ! locationData.getSystemID.endsWith(".java")) {
+            if (isNotBlank(locationData.getSystemID) && !locationData.getSystemID.endsWith(".java")) {
                 val (description, params) =
                     locationData match {
                         case extended: ExtendedLocationData ⇒
@@ -159,7 +145,7 @@ object Errors {
 
         private def arrayToTuples(a: Array[String]): List[(String, String)] = Option(a) match {
             case Some(a) ⇒ a.grouped(2) map (sub ⇒ (sub(0), sub(1))) filter (_._2 ne null) toList
-            case None    ⇒ Nil
+            case None ⇒ Nil
         }
     }
 
@@ -183,5 +169,5 @@ object Errors {
     private def withBorder(s: String, width: Int): String = s split "\n" map (line ⇒ withBorder(padded(Some(line), width - 2))) mkString "\n"
     private def withBorder(s: String): String = '|' + s + '|'
     private def padded(s: Option[String], len: Int): String = s.getOrElse("").padTo(len, ' ').substring(0, len)
-    private def paddedInt(i: Option[Int],    len: Int): String = padded(Some(i.getOrElse("").toString.reverse), len).reverse
+    private def paddedInt(i: Option[Int], len: Int): String = padded(Some(i.getOrElse("").toString.reverse), len).reverse
 }

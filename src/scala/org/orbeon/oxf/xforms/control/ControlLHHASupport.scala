@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms.control
 
 import org.orbeon.oxf.xforms._
-import scala.Option
 import XFormsControl._
 import org.orbeon.oxf.xforms.XFormsConstants.LHHA
 import LHHASupport._

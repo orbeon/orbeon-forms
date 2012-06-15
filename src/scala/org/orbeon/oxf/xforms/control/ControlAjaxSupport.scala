@@ -16,7 +16,6 @@ package org.orbeon.oxf.xforms.control
 import org.dom4j.QName
 import org.orbeon.oxf.xforms._
 import org.xml.sax.helpers.AttributesImpl
-import scala.Option
 import org.orbeon.oxf.xforms.XFormsConstants._
 import collection.mutable.LinkedHashSet
 import org.apache.commons.lang.StringUtils

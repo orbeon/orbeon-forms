@@ -15,7 +15,7 @@ package org.orbeon.oxf.util;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.orbeon.oxf.common.Errors;
+import org.orbeon.exception.Formatter;
 
 import java.util.Stack;
 
@@ -154,7 +154,7 @@ public class IndentedLogger {
     }
 
     public void logDebug(String type, String message, Throwable throwable) {
-        log(Level.DEBUG, indentation.indentation, type, message, "throwable", Errors.format(throwable));
+        log(Level.DEBUG, indentation.indentation, type, message, "throwable", Formatter.format(throwable));
     }
 
     public void logWarning(String type, String message, String... parameters) {
@@ -170,11 +170,11 @@ public class IndentedLogger {
     }
 
     public void logInfo(String type, String message, Throwable throwable) {
-        log(Level.INFO, indentation.indentation, type, message, "throwable", Errors.format(throwable));
+        log(Level.INFO, indentation.indentation, type, message, "throwable", Formatter.format(throwable));
     }
 
     public void logWarning(String type, String message, Throwable throwable) {
-        log(Level.WARN, indentation.indentation, type, message, "throwable", Errors.format(throwable));
+        log(Level.WARN, indentation.indentation, type, message, "throwable", Formatter.format(throwable));
     }
 
     public void logError(String type, String message, String... parameters) {
@@ -182,7 +182,7 @@ public class IndentedLogger {
     }
 
     public void logError(String type, String message, Throwable throwable) {
-        log(Level.ERROR, indentation.indentation, type, message, "throwable", Errors.format(throwable));
+        log(Level.ERROR, indentation.indentation, type, message, "throwable", Formatter.format(throwable));
     }
 
     private void log(Level level, int indentLevel, String type, String message, String... parameters) {

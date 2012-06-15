@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.processor.test;
 
-import org.orbeon.oxf.common.OXFException;
+import org.orbeon.exception.Exceptions;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.*;
@@ -52,7 +52,7 @@ public class ExceptionCatcher extends ProcessorImpl {
                     // Find the root throwable
                     Throwable innerMostThrowable = e; {
                         while (true) {
-                            Throwable candidate = OXFException.getNestedThrowable(innerMostThrowable);
+                            Throwable candidate = Exceptions.getNestedThrowable(innerMostThrowable);
                             if (candidate == null) break;
                             else innerMostThrowable = candidate;
                         }

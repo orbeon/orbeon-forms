@@ -157,27 +157,18 @@ object Dispatch {
             case _ ⇒ throw new IllegalArgumentException // this must not happen with the current class hierarchy
         }
 
-        // Iterator over a target's ancestor observers
-        class ObserverIterator(start: XFormsEventObserver) extends Iterator[XFormsEventObserver] {
-            private var _next = start
-
-            def hasNext = _next ne null
-
-            def next() = {
-                val result = _next
-                _next = _next.parentEventObserver
-                result
-            }
-        }
-
         // TODO: Since we are looking at handlers here, we could collect them so we don't have to collect them again later?
         def hasPhantomHandler(observer: XFormsEventObserver) =
             handlersForObserver(observer) exists (_.isPhantom)
 
+        // Iterator over a target's ancestor observers
+        val allObserversIterator =
+            Iterator.iterate(targetObserver)(_.parentEventObserver) takeWhile (_ ne null)
+
         // Iterator over all the observers we need to handle
         val targetScope = targetObject.scope
         val observerIterator =
-            new ObserverIterator(targetObserver) filter (observer ⇒ observer.scope == targetScope || hasPhantomHandler(observer))
+            allObserversIterator filter (observer ⇒ observer.scope == targetScope || hasPhantomHandler(observer))
 
         observerIterator.toList.ensuring(_.head eq targetObject)
     }

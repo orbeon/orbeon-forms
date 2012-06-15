@@ -18,7 +18,6 @@ import control.Controls.AncestorIterator
 import event.events._
 import event.{EventListener, XFormsEvent, XFormsEventObserver, XFormsEvents}
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatIterationControl
-import scala.Option
 import java.util.{Set ⇒ JSet}
 import scala.collection.JavaConverters._
 

@@ -3,7 +3,7 @@
 	<classpathentry kind="src" path="src/java"/>
 	<classpathentry kind="src" path="src/scala"/>
 	<classpathentry kind="con" path="org.scala-ide.sdt.launching.SCALA_CONTAINER"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/WebSphere Application Server v6.1 JRE"/>
 	<classpathentry kind="lib" path="lib/activation-1.1.1.jar"/>
 	<classpathentry kind="lib" path="lib/ant-1_6_5.jar"/>
 	<classpathentry kind="lib" path="lib/ant-jsch-1_6_5.jar"/>
@@ -75,8 +75,8 @@
 	<classpathentry kind="lib" path="lib/jms-api-1_1.jar"/>
 	<classpathentry kind="lib" path="lib/jsch-0.1.42.jar"/>
 	<classpathentry kind="lib" path="lib/jtidy-8.0-20060801.131059-3.jar"/>
-	<classpathentry kind="lib" path="lib/junit-4.8.2.jar"/>
-	<classpathentry kind="lib" path="lib/junit-dep-4.8.2.jar"/>
+	<classpathentry kind="lib" path="lib/junit-4.11-SNAPSHOT.jar"/>
+	<classpathentry kind="lib" path="lib/junit-dep-4.11-SNAPSHOT.jar"/>
 	<classpathentry kind="lib" path="lib/log4j-1_2_15.jar"/>
 	<classpathentry kind="lib" path="lib/looks-1_1_2.jar"/>
 	<classpathentry kind="lib" path="lib/mail-1_3_2.jar"/>
@@ -114,7 +114,6 @@
 	<classpathentry kind="lib" path="lib/mongo-casbah-core_2.8.1-2.1.2.jar"/>
 	<classpathentry kind="lib" path="lib/mongo-casbah-gridfs_2.8.1-2.1.2.jar"/>
 	<classpathentry kind="lib" path="lib/mongo-casbah-query_2.8.1-2.1.2.jar"/>
-	<classpathentry kind="lib" path="lib/mongo-joda-time-1.6.2.jar"/>
 	<classpathentry kind="lib" path="lib/mongo-scalaj-collection_2.8.0-1.0.jar"/>
 	<classpathentry kind="lib" path="lib/mongo-time_2.8.1-0.3.jar"/>
 	<classpathentry kind="lib" path="lib/batic-dependency-xmlgraphics-commons-1.4.jar"/>
@@ -122,7 +121,7 @@
 	<classpathentry kind="lib" path="lib/ehcache-core-2.4.4.jar"/>
 	<classpathentry kind="lib" path="lib/fop-1_0.jar"/>
 	<classpathentry kind="lib" path="lib/saxon-9-1-0-8_orbeon_20110613.jar"/>
-	<classpathentry kind="lib" path="lib/scala-compiler-2.9.1.jar"/>
-	<classpathentry kind="lib" path="lib/scala-library-2.9.1.jar"/>
+	<classpathentry kind="lib" path="lib/scala-compiler-2.9.2.jar"/>
+	<classpathentry kind="lib" path="lib/scala-library-2.9.2.jar"/>
 	<classpathentry kind="output" path="build/orbeon-war/WEB-INF/classes"/>
 </classpath>

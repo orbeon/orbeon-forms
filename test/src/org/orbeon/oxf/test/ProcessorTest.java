@@ -44,7 +44,6 @@ import static org.junit.Assert.fail;
 @RunWith(Parameterized.class)
 public class ProcessorTest extends ResourceManagerTestBase {
 
-    private static final int THREAD_COUNT = 1;
     private static final String TEST_CONFIG = "oxf.test.config";
 
     @Test
@@ -162,47 +161,31 @@ public class ProcessorTest extends ResourceManagerTestBase {
      */
     private void test() throws Throwable {
 
-        // Create threads
-        TestThread[] threads = new TestThread[THREAD_COUNT];
-        for (int t = 0; t < THREAD_COUNT; t++)
-            threads[t] = new TestThread("Thread#" + t);
+        TestRunner runner = new TestRunner();
+        runner.run();
 
-        // Start threads
-        for (int i = 0; i < THREAD_COUNT; i++) {
-            threads[i].start();
+        // Check exception
+        if (runner.getException() != null) {
+            System.err.println(description);
+            throw OXFException.getRootThrowable(runner.getException());
         }
 
-        // Wait for all threads
-        for (int i = 0; i < THREAD_COUNT; i++) {
-            threads[i].join();
-
-            // Check exception
-            if (threads[i].getException() != null) {
-                System.err.println(description);
-                throw OXFException.getRootThrowable(threads[i].getException());
-            }
-
-            // Check if got expected result
-            if (!threads[i].isExpectedEqualsActual()) {
-                System.err.println(description);
-                System.err.println("\nExpected data:\n" + threads[i].getExpectedDataStringFormatted());
-                System.err.println("\nActual data:\n" + threads[i].getActualDataStringFormatted());
-                fail();
-            }
+        // Check if got expected result
+        if (! runner.isExpectedEqualsActual()) {
+            System.err.println(description);
+            System.err.println("\nExpected data:\n" + runner.getExpectedDataStringFormatted());
+            System.err.println("\nActual data:\n" + runner.getActualDataStringFormatted());
+            fail();
         }
     }
 
-    class TestThread extends Thread {
+    class TestRunner implements Runnable {
 
         private Throwable exception;
         private boolean expectedEqualsActual = true;
 
         private String expectedDataStringFormatted;
         private String actualDataStringFormatted;
-
-        public TestThread(String name) {
-            super(name);
-        }
 
         public void run() {
             try {

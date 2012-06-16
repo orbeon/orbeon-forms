@@ -44,6 +44,6 @@ private object XXFormsActionErrorEvent {
         "line"      →  (e ⇒ stringIterator(e.rootLocationData.getLine.toString, e.rootLocationData ne null)),
         "column"    →  (e ⇒ stringIterator(e.rootLocationData.getCol.toString,  e.rootLocationData ne null)),
         "message"   →  (e ⇒ stringIterator(Exceptions.getRootThrowable(e.throwable).getMessage)),
-        "throwable" →  (e ⇒ stringIterator(Formatter.format(e.throwable)))
+        "throwable" →  (e ⇒ stringIterator(OrbeonFormatter.format(e.throwable)))
     )
 }

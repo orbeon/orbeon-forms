@@ -125,7 +125,7 @@ public class InitUtils {
             try {
                 pipelineContext.destroy(success);
             } catch (Throwable f) {
-                logger.debug("Exception while destroying context after exception" + Formatter.format(f));
+                logger.debug("Exception while destroying context after exception" + OrbeonFormatter.format(f));
             }
         }
     }

@@ -14,7 +14,7 @@
 package org.orbeon.oxf.webapp;
 
 import org.apache.log4j.Logger;
-import org.orbeon.exception.Formatter;
+import org.orbeon.exception.OrbeonFormatter;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.InitUtils;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
@@ -97,7 +97,7 @@ public class ProcessorService {
             // Something bad happened
 
             // Log first
-            logger.error(Formatter.format(e));
+            logger.error(OrbeonFormatter.format(e));
 
             // Try to start the error pipeline if the response has not been committed yet
             try {
@@ -139,7 +139,7 @@ public class ProcessorService {
                 InitUtils.runProcessor(errorProcessor, externalContext, pipelineContext, logger);
             } catch (Throwable e) {
                 // Something bad happened
-                logger.error(Formatter.format(e));
+                logger.error(OrbeonFormatter.format(e));
                 serviceStaticError(externalContext, throwable);
             }
         } else {
@@ -167,7 +167,7 @@ public class ProcessorService {
         if (showExceptions()) {
             // Show details if allowed
             sb.append("<pre>");
-            sb.append(Formatter.format(throwable));
+            sb.append(OrbeonFormatter.format(throwable));
             sb.append("</pre>");
         } else {
             sb.append("<p>An error has occurred while processing the request.</p>");

@@ -21,7 +21,7 @@ import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.Node;
-import org.orbeon.exception.Formatter;
+import org.orbeon.exception.OrbeonFormatter;
 import org.orbeon.oxf.cache.CacheKey;
 import org.orbeon.oxf.cache.InternalCacheKey;
 import org.orbeon.oxf.cache.ObjectCache;
@@ -284,7 +284,7 @@ public class ImageServer extends ProcessorImpl {
                         encoder.setJPEGEncodeParam(params);
                         encoder.encode(img2);
                     } catch (OXFException e) {
-                        logger.error(Formatter.format(e));
+                        logger.error(OrbeonFormatter.format(e));
                         imageResponse.setStatus(ExternalContext.SC_INTERNAL_SERVER_ERROR);
                         return;
                     } finally {

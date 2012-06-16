@@ -13,22 +13,20 @@
  */
 package org.orbeon.exception
 
-import collection.JavaConverters._
-import org.apache.commons.lang.StringUtils.isNotBlank
-import org.orbeon.oxf.xml.dom4j.{ExtendedLocationData, LocationData}
-import org.orbeon.oxf.common.ValidationException
-
 // Exception formatter
 // This takes a Throwable and formats it into an ASCII table, including error message, application-specific traces,
 // and JVM stack traces.
-object Formatter {
+trait Formatter {
 
-    private val Width = 120
-    private val MaxStackLength = 40
+    def Width: Int
+    def MaxStackLength: Int
 
-    private val OuterHr = '+' + "-" * (Width - 2) + '+'
-    private val InnerHr = withBorder("-" * (Width - 2))
-    private val DottedHr = withBorder("---8<-----" * ((Width - 2 + 9) / 10), Width)
+    def getThrowableMessage(t: Throwable): Option[String]
+    def getAllLocationData(t: Throwable): List[SourceLocation]
+
+    private lazy val OuterHr = '+' + "-" * (Width - 2) + '+'
+    private lazy val InnerHr = withBorder("-" * (Width - 2))
+    private lazy val DottedHr = withBorder("---8<-----" * ((Width - 2 + 9) / 10), Width)
 
     // Nicely format an exception into a String printable in a log file
     def format(throwable: Throwable): String = {
@@ -102,18 +100,13 @@ object Formatter {
         // Create from Throwable
         def apply(throwable: Throwable): Error =
             Error(throwable.getClass.getName,
-                Option(getThrowableMessage(throwable)) filter (isNotBlank(_)),
-                ValidationException.getAllLocationData(throwable).asScala.toList flatMap (SourceLocation(_)),
+                getThrowableMessage(throwable) filter (! isBlank(_)),
+                getAllLocationData(throwable),
                 throwable.getStackTrace.reverseIterator map (JavaStackEntry(_)) toList)
-
-        private def getThrowableMessage(throwable: Throwable) = throwable match {
-            case ve: ValidationException ⇒ ve.getSimpleMessage
-            case t ⇒ t.getMessage
-        }
     }
 
     // A source location in a file
-    private case class SourceLocation(file: String, line: Option[Int], col: Option[Int], description: Option[String], params: List[(String, String)]) {
+    case class SourceLocation(file: String, line: Option[Int], col: Option[Int], description: Option[String], params: List[(String, String)]) {
 
         require(file ne null)
 
@@ -125,28 +118,6 @@ object Formatter {
             val remainder = (fixed.foldLeft(0)(_ + _.size)) + fixed.size + 2
 
             ("" :: padded(Some(file), width - remainder) :: fixed ::: "" :: Nil) mkString "|"
-        }
-    }
-
-    private object SourceLocation {
-        // Create from LocationData
-        def apply(locationData: LocationData): Option[SourceLocation] =
-
-            if (isNotBlank(locationData.getSystemID) && !locationData.getSystemID.endsWith(".java")) {
-                val (description, params) =
-                    locationData match {
-                        case extended: ExtendedLocationData ⇒
-                            (Option(extended.getDescription), arrayToTuples(extended.getParameters))
-                        case _ ⇒ (None, Nil)
-                    }
-
-                Some(SourceLocation(locationData.getSystemID, filterLineCol(locationData.getLine), filterLineCol(locationData.getCol), description, params))
-            } else
-                None
-
-        private def arrayToTuples(a: Array[String]): List[(String, String)] = Option(a) match {
-            case Some(a) ⇒ a.grouped(2) map (sub ⇒ (sub(0), sub(1))) filter (_._2 ne null) toList
-            case None ⇒ Nil
         }
     }
 
@@ -166,7 +137,19 @@ object Formatter {
             JavaStackEntry(element.getClassName, element.getMethodName, Option(element.getFileName), filterLineCol(element.getLineNumber))
     }
 
-    private def filterLineCol(i: Int) = Option(i) filter (_ > -1)
+    private def isBlank(s: String): Boolean = {
+        if ((s eq null) || (! s.nonEmpty))
+            return true
+
+        for (c ← s)
+            if (! Character.isWhitespace(c))
+                return false
+
+        true
+    }
+
+    def filterLineCol(i: Int) = Option(i) filter (_ > -1)
+
     private def withBorder(s: String, width: Int): String = s split "\n" map (line ⇒ withBorder(padded(Some(line), width - 2))) mkString "\n"
     private def withBorder(s: String): String = '|' + s + '|'
     private def padded(s: Option[String], len: Int): String = s.getOrElse("").padTo(len, ' ').substring(0, len)

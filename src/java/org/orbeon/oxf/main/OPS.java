@@ -18,7 +18,7 @@ import org.apache.log4j.Logger;
 import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
 import org.dom4j.QName;
-import org.orbeon.exception.Formatter;
+import org.orbeon.exception.OrbeonFormatter;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.Version;
 import org.orbeon.oxf.pipeline.CommandLineExternalContext;
@@ -265,7 +265,7 @@ public class OPS {
             }
         } catch (Exception e) {
             // 8. Display exceptions if needed
-            logger.error(Formatter.format(e));
+            logger.error(OrbeonFormatter.format(e));
             System.exit(1);
         }
     }
@@ -276,7 +276,7 @@ public class OPS {
             orbeon.init();
             orbeon.start();
         } catch (Exception e) {
-            logger.error(Formatter.format(e));
+            logger.error(OrbeonFormatter.format(e));
             System.exit(1);
         }
     }

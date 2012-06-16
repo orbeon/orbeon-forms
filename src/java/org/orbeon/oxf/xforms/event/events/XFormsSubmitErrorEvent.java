@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.event.events;
 
 import org.apache.log4j.Level;
-import org.orbeon.exception.Formatter;
+import org.orbeon.exception.OrbeonFormatter;
 import org.orbeon.oxf.util.ConnectionResult;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.NetUtils;
@@ -144,7 +144,7 @@ public class XFormsSubmitErrorEvent extends XFormsSubmitResponseEvent {
     public void setThrowable(Throwable throwable) {
         if (errorType != ErrorType.VALIDATION_ERROR) {
             // Don't log validation errors as actual errors
-            indentedLogger().logError("xforms-submit-error", "setting throwable", "throwable", Formatter.format(throwable));
+            indentedLogger().logError("xforms-submit-error", "setting throwable", "throwable", OrbeonFormatter.format(throwable));
         }
     }
 

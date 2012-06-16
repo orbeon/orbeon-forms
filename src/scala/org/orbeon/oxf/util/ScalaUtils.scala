@@ -103,7 +103,7 @@ object ScalaUtils {
         try body
         catch {
             case e: Exception ⇒
-                logger.error("Exception when running " + action + '\n' + Formatter.format(e))
+                logger.error("Exception when running " + action + '\n' + OrbeonFormatter.format(e))
                 throw newException(Exceptions.getRootThrowable(e))
         }
 

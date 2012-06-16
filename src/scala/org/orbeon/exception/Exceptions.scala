@@ -13,6 +13,8 @@
  */
 package org.orbeon.exception
 
+// Exceptions utilities
+// Uses reflection to find nested causes when exceptions don't support Java's getCuase
 object Exceptions {
 
     // Returns the exception directly nested
@@ -44,13 +46,16 @@ object Exceptions {
             { case (clazz, getter) ⇒ invokeGetter(throwableClasses(clazz), getter) }
     }
 
+    // Typically for Java callers
     def getNestedThrowableOrNull(t: Throwable) = getNestedThrowable(t) orNull
 
     // Iterator down a throwable's causes
-    def causesIterator(t: Throwable) = Iterator.iterate(t)(getNestedThrowableOrNull(_)).takeWhile(_ ne null)
+    def causesIterator(t: Throwable): Iterator[Throwable] =
+        Iterator.iterate(t)(getNestedThrowableOrNull(_)).takeWhile(_ ne null)
 
     // Get the root cause of the throwable
-    def getRootThrowable(t: Throwable): Throwable = causesIterator(t).toList.lastOption.orNull
+    def getRootThrowable(t: Throwable): Throwable =
+        causesIterator(t).toList.lastOption.orNull
 
     val Getters = Seq(
         "javax.xml.transform.TransformerException"              → "getException",

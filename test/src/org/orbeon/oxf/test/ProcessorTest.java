@@ -129,7 +129,7 @@ public class ProcessorTest extends ResourceManagerTestBase {
             }
             return parameters;
         } catch (Throwable t) {
-            System.err.println(currentTestError + Formatter.format(t));
+            System.err.println(currentTestError + OrbeonFormatter.format(t));
             throw new OXFException(currentTestError);
         }
     }

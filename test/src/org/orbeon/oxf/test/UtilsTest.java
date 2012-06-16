@@ -17,7 +17,7 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import org.dom4j.Document;
 import org.dom4j.Element;
-import org.orbeon.exception.Formatter;
+import org.orbeon.exception.OrbeonFormatter;
 import org.orbeon.oxf.resources.ResourceManager;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.util.NumberUtils;
@@ -132,7 +132,7 @@ public class UtilsTest extends TestCase {
             });
             transformer.transform(source, saxResult);
         } catch (Exception e) {
-            System.err.println(Formatter.format(e));
+            System.err.println(OrbeonFormatter.format(e));
             fail(e.toString());
         }
     }

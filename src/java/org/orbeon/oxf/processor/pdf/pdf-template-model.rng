@@ -29,6 +29,25 @@
                     <data type="anyURI"/>
                 </attribute>
             </element>
+            <zeroOrMore>
+                <element name="substitution-font">
+                    <attribute name="font-family">
+                        <choice>
+                            <data type="string"/>
+                            <ref name="avt"/>
+                        </choice>
+                    </attribute>
+                    <optional>
+                        <attribute>
+                            <name>embed</name>
+                            <choice>
+                                <value>true</value>
+                                <value>false</value>
+                            </choice>
+                        </attribute>
+                    </optional>
+                </element>
+            </zeroOrMore>
             <ref name="components"/>
         </element>
     </start>
@@ -296,6 +315,15 @@
                 <choice>
                     <data type="decimal"/>
                     <ref name="avt"/>
+                </choice>
+            </attribute>
+        </optional>
+        <optional>
+            <attribute>
+                <name>embed</name>
+                <choice>
+                    <value>true</value>
+                    <value>false</value>
                 </choice>
             </attribute>
         </optional>

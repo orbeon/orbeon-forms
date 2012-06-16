@@ -48,7 +48,7 @@ public abstract class HttpBinarySerializer extends HttpSerializerBase {
     /**
      * This must be overridden by subclasses.
      */
-    protected abstract void readInput(PipelineContext context, ProcessorInput input, Config config, OutputStream outputStream);
+    protected abstract void readInput(PipelineContext context, ProcessorInput input, HttpSerializerBase.Config config, OutputStream outputStream);
 
     /**
      * This method is use when the legacy serializer is used in the new converter mode. In this

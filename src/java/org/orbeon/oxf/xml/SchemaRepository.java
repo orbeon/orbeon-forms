@@ -132,7 +132,7 @@ public class SchemaRepository {
         // Test processor schema
         SCHEMAS.put(TestScriptProcessor.TEST_NAMESPACE_URI, PROCESSORS_SCHEMA_PATH + "test/test-processor-config.rng");
 
-        SCHEMAS.put(PDFTemplateProcessor.PDF_TEMPLATE_MODEL_NAMESPACE_URI, PROCESSORS_SCHEMA_PATH + "pdf/pdf-template-model.rng");
+        SCHEMAS.put(PDFTemplateProcessor.PDFTemplateModelNamespaceURI(), PROCESSORS_SCHEMA_PATH + "pdf/pdf-template-model.rng");
 
         SCHEMAS.put(XFormsConstants.XFORMS_NAMESPACE_URI + "/controls", "schemas/xforms-controls.rng");
         SCHEMAS.put(XFormsConstants.XFORMS_NAMESPACE_URI + "/model", "schemas/xforms-1_0.xsd");

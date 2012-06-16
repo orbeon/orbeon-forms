@@ -101,12 +101,16 @@
 
             <xsl:variable name="pdfFormats" select="formRunner:getPDFFormats()"/>
 
+            <xsl:for-each select="tokenize(xpl:property('oxf.fr.pdf.template.font.paths'), '\s+')">
+                <substitution-font font-family="{.}" embed="true"/>
+            </xsl:for-each>
+
             <xsl:for-each select="//*[@id = 'fr-form-group']//*[fr:classes(.) = $is-a-control-classes and not(fr:classes(.) = $is-not-a-control-classes)]">
 
                 <xsl:variable name="control" select="."/>
                 <xsl:variable name="static-id" select="xformsUtils:getStaticIdFromId(@id)"/>
                 <xsl:variable name="iterations" select="tokenize(xformsUtils:getEffectiveIdSuffix(@id), '-')"/>
-                
+
                 <xsl:variable name="ancestor-static-ids" select="ancestor::*[fr:is-container(.)]/fr:container-static-id(.)"/>
                 <xsl:variable name="effective-id" select="replace(string-join((for $id in ($ancestor-static-ids, $static-id) return controlOps:controlName($id), $iterations), '$'), '·', '\$')"/>
 

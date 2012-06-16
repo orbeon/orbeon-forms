@@ -251,7 +251,7 @@ public abstract class HttpSerializerBase extends CachedSerializer {
     /**
      * Represent the complete serializer configuration.
      */
-    protected static class Config {
+    public static class Config {
         // HTTP-specific configuration
         public int statusCode = DEFAULT_STATUS_CODE;
         public int errorCode = DEFAULT_ERROR_CODE;

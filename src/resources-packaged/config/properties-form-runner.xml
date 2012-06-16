@@ -168,7 +168,4 @@
     <!-- Save button validates by default -->
     <property as="xs:boolean" name="oxf.fr.detail.save.validate.*.*"                            value="true"/>
 
-    <!-- FR/FB examples bundled with Orbeon -->
-    <property as="xs:string"  name="oxf.fr.detail.buttons.orbeon.w4"                            value="pdf"/>
-
 </properties>

@@ -156,7 +156,6 @@
     </inspection_tool>
     <inspection_tool class="PointlessBooleanExpressionJS" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="PostfixMethodCall" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="RedundantCast" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="ReturnFromFinallyBlock" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="ScalaAbstractValueInTrait" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="ScalaUnitMethodDefinedWithEqualsSign" enabled="false" level="WARNING" enabled_by_default="false" />

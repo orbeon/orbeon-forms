@@ -2428,14 +2428,15 @@ ORBEON.xforms.Controls = {
      */
     updateInvalidVisitedOnNextAjaxResponse: function(control) {
         if (! YAHOO.util.Dom.hasClass(control, "xforms-visited")) {
-            ORBEON.xforms.Events.runOnNext(ORBEON.xforms.Events.ajaxResponseProcessedEvent, function() {
+            var formId = $(control).closest('form')[0].id;
+            ORBEON.xforms.server.AjaxServer.nextAjaxResponse(formId).then(function() {
                 YAHOO.util.Dom.addClass(control, "xforms-visited");
                 if (YAHOO.util.Dom.hasClass(control, "xforms-invalid"))
                     YAHOO.util.Dom.addClass(control, "xforms-invalid-visited");
                 var alertElement = ORBEON.xforms.Controls.getControlLHHA(control, "alert");
                 if (alertElement != null && YAHOO.util.Dom.hasClass(alertElement, "xforms-alert-active"))
                     YAHOO.util.Dom.addClass(alertElement, "xforms-alert-active-visited");
-            }, null, false);
+            });
         }
     },
 

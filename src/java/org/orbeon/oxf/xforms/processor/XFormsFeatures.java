@@ -109,24 +109,25 @@ public class XFormsFeatures {
             // Underscore library
             new ResourceConfig("/ops/javascript/underscore/underscore.js", "/ops/javascript/underscore/underscore-min.js"),
             // XForms client
-            new ResourceConfig("/ops/javascript/xforms.js",                                     "/ops/javascript/xforms-min.js"),
-            new ResourceConfig("/ops/javascript/fquery.js",                                     "/ops/javascript/fquery-min.js"),
-            new ResourceConfig("/ops/javascript/orbeon/util/ExecutionQueue.js",                 "/ops/javascript/orbeon/util/ExecutionQueue-min.js"),
-            new ResourceConfig("/ops/javascript/orbeon/xforms/server/Server.js",                "/ops/javascript/orbeon/xforms/server/Server-min.js"),
-            new ResourceConfig("/ops/javascript/orbeon/xforms/server/AjaxServer.js",            "/ops/javascript/orbeon/xforms/server/AjaxServer-min.js"),
-            new ResourceConfig("/ops/javascript/orbeon/xforms/server/UploadServer.js",          "/ops/javascript/orbeon/xforms/server/UploadServer-min.js"),
-            new ResourceConfig("/ops/javascript/orbeon/xforms/LoadingIndicator.js",             "/ops/javascript/orbeon/xforms/LoadingIndicator-min.js"),
-            new ResourceConfig("/ops/javascript/orbeon/xforms/Form.js",                         "/ops/javascript/orbeon/xforms/Form-min.js"),
-            new ResourceConfig("/ops/javascript/orbeon/xforms/Page.js",                         "/ops/javascript/orbeon/xforms/Page-min.js"),
-            new ResourceConfig("/ops/javascript/orbeon/xforms/control/Control.js",              "/ops/javascript/orbeon/xforms/control/Control-min.js"),
-            new ResourceConfig("/ops/javascript/orbeon/xforms/control/CalendarResources.js",    "/ops/javascript/orbeon/xforms/control/CalendarResources-min.js"),
-            new ResourceConfig("/ops/javascript/orbeon/xforms/control/Calendar.js",             "/ops/javascript/orbeon/xforms/control/Calendar-min.js"),
-            new ResourceConfig("/ops/javascript/orbeon/xforms/control/Upload.js",               "/ops/javascript/orbeon/xforms/control/Upload-min.js"),
-            new ResourceConfig("/ops/javascript/orbeon/xforms/control/RTEConfig.js",            "/ops/javascript/orbeon/xforms/control/RTEConfig-min.js"),
-            new ResourceConfig("/ops/javascript/orbeon/xforms/control/RTE.js",                  "/ops/javascript/orbeon/xforms/control/RTE-min.js"),
-            new ResourceConfig("/ops/javascript/orbeon/xforms/control/Tree.js",                 "/ops/javascript/orbeon/xforms/control/Tree-min.js"),
-            new ResourceConfig("/ops/javascript/orbeon/xforms/action/Message.js",               "/ops/javascript/orbeon/xforms/action/Message-min.js"),
-            new ResourceConfig("/ops/javascript/orbeon/xforms/control/Placeholder.js",          "/ops/javascript/orbeon/xforms/control/Placeholder-min.js") {
+            new ResourceConfig("/ops/javascript/xforms.js",                                             "/ops/javascript/xforms-min.js"),
+            new ResourceConfig("/ops/javascript/fquery.js",                                             "/ops/javascript/fquery-min.js"),
+            new ResourceConfig("/ops/javascript/orbeon/util/ExecutionQueue.js",                         "/ops/javascript/orbeon/util/ExecutionQueue-min.js"),
+            new ResourceConfig("/ops/javascript/orbeon/xforms/server/Server.js",                        "/ops/javascript/orbeon/xforms/server/Server-min.js"),
+            new ResourceConfig("/ops/javascript/orbeon/xforms/server/AjaxServer.js",                    "/ops/javascript/orbeon/xforms/server/AjaxServer-min.js"),
+            new ResourceConfig("/ops/javascript/orbeon/xforms/server/AjaxServer/nextAjaxResponse.js",   "/ops/javascript/orbeon/xforms/server/AjaxServer/nextAjaxResponse-min.js"),
+            new ResourceConfig("/ops/javascript/orbeon/xforms/server/UploadServer.js",                  "/ops/javascript/orbeon/xforms/server/UploadServer-min.js"),
+            new ResourceConfig("/ops/javascript/orbeon/xforms/LoadingIndicator.js",                     "/ops/javascript/orbeon/xforms/LoadingIndicator-min.js"),
+            new ResourceConfig("/ops/javascript/orbeon/xforms/Form.js",                                 "/ops/javascript/orbeon/xforms/Form-min.js"),
+            new ResourceConfig("/ops/javascript/orbeon/xforms/Page.js",                                 "/ops/javascript/orbeon/xforms/Page-min.js"),
+            new ResourceConfig("/ops/javascript/orbeon/xforms/control/Control.js",                      "/ops/javascript/orbeon/xforms/control/Control-min.js"),
+            new ResourceConfig("/ops/javascript/orbeon/xforms/control/CalendarResources.js",            "/ops/javascript/orbeon/xforms/control/CalendarResources-min.js"),
+            new ResourceConfig("/ops/javascript/orbeon/xforms/control/Calendar.js",                     "/ops/javascript/orbeon/xforms/control/Calendar-min.js"),
+            new ResourceConfig("/ops/javascript/orbeon/xforms/control/Upload.js",                       "/ops/javascript/orbeon/xforms/control/Upload-min.js"),
+            new ResourceConfig("/ops/javascript/orbeon/xforms/control/RTEConfig.js",                    "/ops/javascript/orbeon/xforms/control/RTEConfig-min.js"),
+            new ResourceConfig("/ops/javascript/orbeon/xforms/control/RTE.js",                          "/ops/javascript/orbeon/xforms/control/RTE-min.js"),
+            new ResourceConfig("/ops/javascript/orbeon/xforms/control/Tree.js",                         "/ops/javascript/orbeon/xforms/control/Tree-min.js"),
+            new ResourceConfig("/ops/javascript/orbeon/xforms/action/Message.js",                       "/ops/javascript/orbeon/xforms/action/Message-min.js"),
+            new ResourceConfig("/ops/javascript/orbeon/xforms/control/Placeholder.js",                  "/ops/javascript/orbeon/xforms/control/Placeholder-min.js") {
                 @Override
                 public boolean isInUse(StaticStateGlobalOps staticStateGlobalOps) {
                     return staticStateGlobalOps == null || staticStateGlobalOps.hasInputPlaceholder();

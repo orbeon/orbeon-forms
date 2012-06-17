@@ -1,14 +1,11 @@
-<?xml version="1.0" ?>
-<portlet-app>
+<?xml version="1.0" encoding="UTF-8"?>
+<portlet-app version="2.0" xmlns="http://java.sun.com/xml/ns/portlet/portlet-app_2_0.xsd">
 
     <!-- Orbeon Forms portlet (for Orbeon Forms running directly within a portlet) -->
     <portlet>
         <portlet-name>orbeon-forms-portlet</portlet-name>
         <portlet-class>org.orbeon.oxf.portlet.OrbeonPortlet2Delegate</portlet-class>
-        <supports>
-            <mime-type>text/html</mime-type>
-            <portlet-mode>view</portlet-mode>
-        </supports>
+        <!-- Initialization parameters -->
         <init-param>
             <name>oxf.main-processor.name</name>
             <value>{http://www.orbeon.com/oxf/processors}pipeline</value>
@@ -25,6 +22,12 @@
             <name>oxf.error-processor.input.config</name>
             <value>oxf:/config/error.xpl</value>
         </init-param>
+        
+        <supports>
+            <mime-type>text/html</mime-type>
+            <portlet-mode>view</portlet-mode>
+        </supports>
+        
         <portlet-info>
             <title>Orbeon Forms Portlet</title>
         </portlet-info>
@@ -34,10 +37,7 @@
     <portlet>
         <portlet-name>orbeon-filter-sample-portlet</portlet-name>
         <portlet-class>org.orbeon.oxf.portlet.OrbeonPortletFilterSample</portlet-class>
-        <supports>
-            <mime-type>text/html</mime-type>
-            <portlet-mode>view</portlet-mode>
-        </supports>
+        <!-- Initialization parameters -->
         <init-param>
             <name>oxf.main-processor.name</name>
             <value>{http://www.orbeon.com/oxf/processors}pipeline</value>
@@ -54,6 +54,10 @@
             <name>oxf.error-processor.input.config</name>
             <value>oxf:/config/error.xpl</value>
         </init-param>
+        <supports>
+            <mime-type>text/html</mime-type>
+            <portlet-mode>view</portlet-mode>
+        </supports>
         <portlet-info>
             <title>Orbeon Forms Filter Sample Portlet</title>
         </portlet-info>

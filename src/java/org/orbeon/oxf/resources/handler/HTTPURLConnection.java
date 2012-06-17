@@ -104,7 +104,7 @@ public class HTTPURLConnection extends URLConnection {
 
                 sslcontext.init(null, new TrustManager[] {KeyStoreTrustManager.apply(is, keyStorePassword)}, null);
             } else {
-                sslcontext = SSLContext.getDefault();
+            	sslcontext = SSLContext.getInstance("Default");
             }
         } catch (Exception e) {
             throw new OXFException(e);

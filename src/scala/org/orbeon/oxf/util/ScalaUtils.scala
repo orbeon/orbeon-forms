@@ -116,8 +116,8 @@ object ScalaUtils {
         SecureUtils.byteArrayToHex(messageDigest.digest())
     }
 
-    def dropTrailingSlash(s: String) = if (s.isEmpty || s.last != '/') s else s.init
-    def dropStartingSlash(s: String) = if (s.isEmpty || s.head != '/') s else s.tail
+    def dropTrailingSlash(s: String) = if (s.size == 0 || s.last != '/') s else s.init
+    def dropStartingSlash(s: String) = if (s.size == 0 || s.head != '/') s else s.tail
     def capitalizeHeader(s: String) = s split '-' map (_.capitalize) mkString "-"
 
     // Shortcut for "not implemented yet" (something like this is planned for Scala post-2.9.1)

@@ -167,9 +167,9 @@ public class XQueryProcessor extends ProcessorImpl {
                         while (rs.next()) {
                             for (i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
                                 helper.startElement("result");
-                                SQLXML sqlxml = rs.getSQLXML(i);
+                                String sqlxml = rs.getString(i);
                                 if (sqlxml != null) {
-                                    XMLUtils.parseDocumentFragment(sqlxml.getString(), xmlReceiver);
+                                    XMLUtils.parseDocumentFragment(sqlxml, xmlReceiver);
                                 }
                             }
                             helper.endElement();

@@ -40,6 +40,11 @@ import java.io.OutputStream
 import java.util.{List ⇒ JList}
 import PDFTemplateProcessor._
 import scala.collection.JavaConverters._
+import ScalaUtils._
+import java.net.URLDecoder.{decode ⇒ decodeURL}
+import DebugLogger._
+import org.orbeon.exception.OrbeonFormatter
+
 /**
  * The PDF Template processor reads a PDF template and performs textual annotations on it.
  */
@@ -58,35 +63,30 @@ class PDFTemplateProcessor extends HttpBinarySerializer {// TODO: HttpBinarySeri
         val instanceDocument = readInputAsDOM4J(pipelineContext, input)
         val instanceDocumentInfo = new DocumentWrapper(instanceDocument, null, XPathCache.getGlobalConfiguration)
 
-        try {
-            // Create PDF reader
-            val templateReader = {
-                val templateHref = templateRoot.attributeValue("href")
-                Option(ProcessorImpl.getProcessorInputSchemeInputName(templateHref)) match {
-                    case Some(inputName) ⇒
-                        val os = new ByteArrayOutputStream
-                        readInputAsSAX(pipelineContext, inputName, new BinaryTextXMLReceiver(null, os, true, false, null, false, false, null, false))
-                        new PdfReader(os.toByteArray)
-                    case None ⇒
-                        new PdfReader(URLFactory.createURL(templateHref))
-                }
+        // Create PDF reader
+        val templateReader = {
+            val templateHref = templateRoot.attributeValue("href")
+            Option(ProcessorImpl.getProcessorInputSchemeInputName(templateHref)) match {
+                case Some(inputName) ⇒
+                    val os = new ByteArrayOutputStream
+                    readInputAsSAX(pipelineContext, inputName, new BinaryTextXMLReceiver(null, os, true, false, null, false, false, null, false))
+                    new PdfReader(os.toByteArray)
+                case None ⇒
+                    new PdfReader(URLFactory.createURL(templateHref))
             }
+        }
 
-            val showGrid = templateRoot.attributeValue("show-grid") == "true"
-            val stamper = new PdfStamper(templateReader, outputStream)
+        useAndClose(new PdfStamper(templateReader, outputStream)) { stamper ⇒
+
             stamper.setFormFlattening(true)
-
-            // Add substitution fonts for fields
-            val fields = stamper.getAcroFields
-            for (element ← Dom4jUtils.elements(configRoot, "substitution-font").asScala)
-                fields.addSubstitutionFont(BaseFont.createFont(element.attributeValue("font-family"), BaseFont.IDENTITY_H, embedCode(element.attributeValue("embed") == "true")))
 
             // Initial context
             val initialContext =
                 ElementContext(
                     pipelineContext,
+                    new IndentedLogger(Logger, ""),
                     null,
-                    fields,
+                    stamper.getAcroFields,
                     0,
                     0,
                     -1,
@@ -100,6 +100,21 @@ class PDFTemplateProcessor extends HttpBinarySerializer {// TODO: HttpBinarySeri
                     14,
                     15.9f)
 
+            // Add substitution fonts for Acrobat fields
+            for (element ← Dom4jUtils.elements(configRoot, "substitution-font").asScala) {
+                val fontFamilyOrPath = decodeURL(element.attributeValue("font-family"), "utf-8")
+                val embed            = embedCode(element.attributeValue("embed") == "true")
+
+                try initialContext.acroFields.addSubstitutionFont(BaseFont.createFont(fontFamilyOrPath, BaseFont.IDENTITY_H, embed))
+                catch {
+                    case e: Exception ⇒
+                        warn("could not load font", Seq(
+                            "font-family" → fontFamilyOrPath,
+                            "embed"       → embed.toString,
+                            "throwable"   → OrbeonFormatter.format(e)))(initialContext.logger)
+                }
+            }
+
             // Iterate through template pages
             for (pageNumber ← 1 to templateReader.getNumberOfPages) {
 
@@ -110,7 +125,6 @@ class PDFTemplateProcessor extends HttpBinarySerializer {// TODO: HttpBinarySeri
                     "page-number" → new Int64Value(pageNumber),
                     "page-width"  → new FloatValue(pageSize.getWidth),
                     "page-height" → new FloatValue(pageSize.getHeight)
-
                 )
 
                 // Context for the page
@@ -124,34 +138,37 @@ class PDFTemplateProcessor extends HttpBinarySerializer {// TODO: HttpBinarySeri
                 handleElements(pageContext, Dom4jUtils.elements(configRoot).asScala)
 
                 // Handle preview grid (NOTE: This can be heavy in memory)
-                if (showGrid)
+                if (templateRoot.attributeValue("show-grid") == "true")
                     stampGrid(pageContext)
             }
-            stamper.close() // no document.close() ?
+
+            // no document.close() ?
         }
     }
 
-    def handleElements(context: ElementContext, statements: Seq[Element]): Unit =  {
+    // How to handle known elements
+    val Handlers = Map[String, ElementContext ⇒ Unit](
+        "group"   → handleGroup,
+        "repeat"  → handleRepeat,
+        "field"   → handleField,
+        "barcode" → handleBarcode,
+        "image"   → handleImage
+    )
 
+    def handleElements(context: ElementContext, statements: Seq[Element]): Unit =
         // Iterate through statements
         for (element ← statements) {
 
+            // Context for this element
             val newContext = context.copy(element = element)
 
             // Check whether this statement applies to the current page
-            val elementPage = newContext.att("page")
-            if (! ((elementPage ne null) && newContext.pageNumber.toString != elementPage)) {
-                element.getName match {
-                    case "group"   ⇒ handleGroup(newContext)
-                    case "repeat"  ⇒ handleRepeat(newContext)
-                    case "field"   ⇒ handleField(newContext)
-                    case "barcode" ⇒ handleBarcode(newContext)
-                    case "image"   ⇒ handleImage(newContext)
-                    case _ ⇒ // NOP
-                }
-            }
+            def hasPageNumber = newContext.att("page") ne null
+            def pageNumberMatches = Option(newContext.att("page")) exists (_.toInt == newContext.pageNumber)
+
+            if (! hasPageNumber || pageNumberMatches)
+                Handlers.get(element.getName) foreach (_.apply(newContext))
         }
-    }
 
     def handleGroup(context: ElementContext): Unit = {
 
@@ -272,7 +289,7 @@ class PDFTemplateProcessor extends HttpBinarySerializer {// TODO: HttpBinarySeri
                     Image.getInstance(os.toByteArray)
                 case None ⇒
                     val url = URLFactory.createURL(hrefAttribute)
-                    val connectionResult = (new Connection).open(NetUtils.getExternalContext, new IndentedLogger(Logger, ""), false, Connection.Method.GET.name, url, null, null, null, null, Connection.getForwardHeaders)
+                    val connectionResult = (new Connection).open(NetUtils.getExternalContext, context.logger, false, Connection.Method.GET.name, url, null, null, null, null, Connection.getForwardHeaders)
                     if (connectionResult.statusCode != 200) {
                         connectionResult.close()
                         throw new OXFException("Got invalid return code while loading image: " + url.toExternalForm + ", " + connectionResult.statusCode)
@@ -380,6 +397,7 @@ object PDFTemplateProcessor {
 
     case class ElementContext(
         pipelineContext: PipelineContext,
+        logger: IndentedLogger,
         contentByte: PdfContentByte,
         acroFields: AcroFields,
         pageWidth: Float,

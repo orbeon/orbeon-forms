@@ -128,7 +128,7 @@
             <xforms:instance id="fr-settings-instance">
                 <settings>
                     <lang>en</lang>
-                    <page-size>doc</page-size>
+                    <page-size>doc2</page-size>
                 </settings>
             </xforms:instance>
 
@@ -228,7 +228,7 @@
             <xsl:attribute name="class" select="string-join((tokenize(@class, '\s+'), 'xforms-disable-hint-as-tooltip'), ' ')"/>
 
 
-            <xhtml:div id="doc" class="fr-doc">
+            <xhtml:div id="doc2" class="fr-doc">
                 <!-- Expose resources variables -->
                 <xxforms:variable name="fr-resources" select="instance('fr-fr-resources')/resource[@xml:lang = instance('fr-settings-instance')/lang]"/>
                 <xxforms:variable name="form-resources" select="instance('fr-form-resources')/resource[@xml:lang = instance('fr-settings-instance')/lang]"/>

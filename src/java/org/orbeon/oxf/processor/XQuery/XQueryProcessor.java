@@ -167,6 +167,9 @@ public class XQueryProcessor extends ProcessorImpl {
                         while (rs.next()) {
                             for (i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
                                 helper.startElement("result");
+                                // This used to use SQLXML.getString() but "The behavior of this method is the same as
+                                // ResultSet.getString() when the designated column of the ResultSet has a
+                                // type java.sql.Types of SQLXML." For 1.5 compatibility we use getString() instead.
                                 String sqlxml = rs.getString(i);
                                 if (sqlxml != null) {
                                     XMLUtils.parseDocumentFragment(sqlxml, xmlReceiver);

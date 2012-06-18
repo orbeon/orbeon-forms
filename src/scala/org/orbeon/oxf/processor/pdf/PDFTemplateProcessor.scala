@@ -212,9 +212,9 @@ class PDFTemplateProcessor extends HttpBinarySerializer {// TODO: HttpBinarySeri
             context.acroFields.setField(fieldName, text)
         } else {
             // Overlay text
-            val leftPosition   = context.resolveAVT(Option(context.att("left")) getOrElse context.att("left-position"))
-            val topPosition    = context.resolveAVT(Option(context.att("top")) getOrElse context.att("top-position"))
-            val size           = context.resolveAVT(context.att("size"))
+            val leftPosition   = context.resolveAVT("left", "left-position")
+            val topPosition    = context.resolveAVT("top", "top-position")
+            val size           = context.resolveAVT("size")
             val value          = Option(context.att("value")) getOrElse context.att("ref")
             val fontAttributes = context.getFontAttributes
 
@@ -228,10 +228,9 @@ class PDFTemplateProcessor extends HttpBinarySerializer {// TODO: HttpBinarySeri
             val yPosition = context.pageHeight - (topPosition.toFloat + context.offsetY)
 
             // Get value from instance
-            val text = context.evaluateAsString(value)
-            if (text != null) {
+            Option(context.evaluateAsString(value)) foreach { text ⇒
                 // Iterate over characters and print them
-                val len = math.min(text.length, if ((size != null)) size.toInt else Integer.MAX_VALUE)
+                val len = math.min(text.length, Option(size) map (_.toInt) getOrElse Integer.MAX_VALUE)
                 for (j ←  0 to len - 1)
                     context.contentByte.showTextAligned(PdfContentByte.ALIGN_CENTER, text.substring(j, j + 1), xPosition + j.toFloat * fontAttributes.fontPitch, yPosition, 0)
             }
@@ -241,14 +240,11 @@ class PDFTemplateProcessor extends HttpBinarySerializer {// TODO: HttpBinarySeri
     }
 
     def handleBarcode(context: ElementContext): Unit =  {
-        val leftPosition   = context.resolveAVT(context.att("left"))
-        val topPosition    = context.resolveAVT(context.att("top"))
-
         val value          = Option(context.att("value")) getOrElse context.att("ref")
         val barcodeType    = Option(context.att("type")) getOrElse "CODE39"
         val height         = Option(context.att("height")) map (_.toFloat) getOrElse 10.0f
-        val xPosition      = leftPosition.toFloat + context.offsetX
-        val yPosition      = context.pageHeight - topPosition.toFloat + context.offsetY
+        val xPosition      = context.resolveAVT("left").toFloat + context.offsetX
+        val yPosition      = context.pageHeight - context.resolveAVT("top").toFloat + context.offsetY
         val text           = context.evaluateAsString(value)
 
         val fontAttributes = context.getFontAttributes
@@ -290,12 +286,12 @@ class PDFTemplateProcessor extends HttpBinarySerializer {// TODO: HttpBinarySeri
                     Image.getInstance(URLFactory.createURL(tempURLString))
             }
         }
+
         Option(context.att("acro-field-name")) match {
             case Some(fieldNameStr) ⇒
                 // Acrobat field
                 val fieldName = context.evaluateAsString(fieldNameStr)
-                val positions = context.acroFields.getFieldPositions(fieldName)
-                if (positions != null) {
+                Option(context.acroFields.getFieldPositions(fieldName)) foreach { positions ⇒
                     val rectangle = new Rectangle(positions(1), positions(2), positions(3), positions(4))
                     image.scaleToFit(rectangle.getWidth, rectangle.getHeight)
                     val yPosition = positions(2) + rectangle.getHeight - image.getScaledHeight
@@ -304,21 +300,18 @@ class PDFTemplateProcessor extends HttpBinarySerializer {// TODO: HttpBinarySeri
                 }
             case None ⇒
                 // By position
-                val leftPosition          = context.resolveAVT(context.att("left"))
-                val topPosition           = context.resolveAVT(context.att("top"))
-                val xPosition             = leftPosition.toFloat + context.offsetX
-                val yPosition             = context.pageHeight - (topPosition.toFloat + context.offsetY)
-                val scalePercent          = context.resolveAVT(context.att("scale-percent"))
-                val dpi                   = context.resolveAVT(context.att("dpi"))
+                val xPosition = context.resolveAVT("left").toFloat + context.offsetX
+                val yPosition = context.pageHeight - (context.resolveAVT("top").toFloat + context.offsetY)
 
                 image.setAbsolutePosition(xPosition, yPosition)
-                if (scalePercent ne null)
-                    image.scalePercent(scalePercent.toFloat)
+                Option(context.resolveAVT("scale-percent")) foreach
+                    (scalePercent ⇒ image.scalePercent(scalePercent.toFloat))
 
-                if (dpi ne null) {
+                Option(context.resolveAVT("dpi")) foreach { dpi ⇒
                     val dpiInt = dpi.toInt
                     image.setDpi(dpiInt, dpiInt)
                 }
+
                 context.contentByte.addImage(image)
         }
     }
@@ -409,11 +402,11 @@ object PDFTemplateProcessor {
         def att(name: String) = element.attributeValue(name)
 
         def resolveFloat(name: String, offset: Float, default: Float) =
-            Option(resolveAVT(att(name))) map
+            Option(resolveAVT(name)) map
                 (offset + _.toFloat) getOrElse default
 
         def resolveString(name: String, current: String) =
-            Option(resolveAVT(att(name))) map
+            Option(resolveAVT(name)) map
                 identity getOrElse current
 
         def evaluateSingle(xpath: String): NodeInfo = {
@@ -431,25 +424,16 @@ object PDFTemplateProcessor {
             XPathCache.evaluateAsString(contextSeq.asJava, contextPosition, xpath, namespaceMapping, jVariables, functionLibrary, null, null, element.getData.asInstanceOf[LocationData])
         }
 
-        def resolveAVT(attributeValue: String) =
-            Option(attributeValue) map
+        def resolveAVT(attributeName: String, otherAttributeName: String = null) =
+            Option(att(attributeName)) orElse Option(Option(otherAttributeName) map (att(_)) orNull) map
                 (XPathCache.evaluateAsAvt(contextItem, _, new NamespaceMapping(Dom4jUtils.getNamespaceContextNoDefault(element)), jVariables, functionLibrary, null, null, element.getData.asInstanceOf[LocationData])) orNull
 
         def getFontAttributes = {
-            val newFontPitch =
-                Option(element.attributeValue("font-pitch")) orElse
-                    Option(element.attributeValue("spacing")) map
-                        (resolveAVT(_).toFloat) getOrElse fontPitch
+            val newFontPitch  = Option(resolveAVT("font-pitch", "spacing")) map (_.toFloat) getOrElse fontPitch
+            val newFontFamily = Option(resolveAVT("font-family"))                           getOrElse fontFamily
+            val newFontSize   = Option(resolveAVT("font-size"))             map (_.toFloat) getOrElse fontSize
 
-            val newFontFamily =
-                Option(element.attributeValue("font-family")) map
-                    (resolveAVT(_)) getOrElse fontFamily
-
-            val newFontSize =
-                Option(element.attributeValue("font-size")) map
-                    (resolveAVT(_).toFloat) getOrElse fontSize
-
-            FontAttributes(newFontPitch, newFontFamily, newFontSize, element.attributeValue("embed") == "true")
+            FontAttributes(newFontPitch, newFontFamily, newFontSize, att("embed") == "true")
         }
     }
 }

@@ -34,7 +34,6 @@ import org.xhtmlrenderer.resource.ImageResource;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

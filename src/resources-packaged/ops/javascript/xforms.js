@@ -963,8 +963,6 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                 this.clientEventsFilter = new ORBEON.util.Property("client.events.filter", "");
                 this.resourcesVersioned = new ORBEON.util.Property("oxf.resources.versioned", false);
                 this.resourcesVersionNumber = new ORBEON.util.Property("oxf.resources.version-number", "");
-                this.newXHTMLLayout = new ORBEON.util.Property("new-xhtml-layout", false);
-                this.xhtmlLayout = new ORBEON.util.Property("xhtml-layout", "nospan");
                 this.retryDelayIncrement = new ORBEON.util.Property("retry.delay-increment", 5000);
                 this.retryMaxDelay = new ORBEON.util.Property("retry.max-delay", 30000);
                 this.useARIA = new ORBEON.util.Property("use-aria", false);
@@ -979,11 +977,6 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                 if (typeof console != "undefined") {
                     console.log(message); // Normal use; do not remove
                 }
-            },
-
-            isNewXHTMLLayout: function() {
-                return ORBEON.util.Properties.newXHTMLLayout.get()
-                    || ORBEON.util.Properties.xhtmlLayout.get() != "nospan";
             },
 
             hideModalProgressPanel: function() {
@@ -1646,9 +1639,7 @@ ORBEON.xforms.Controls = {
                 || YAHOO.util.Dom.hasClass(control, "xforms-input-appearance-minimal")
                 || YAHOO.util.Dom.hasClass(control, "xforms-input-appearance-compact")) {
             // Drop-down and list
-            var options = ORBEON.util.Utils.isNewXHTMLLayout()
-                          ? control.getElementsByTagName("select")[0].options
-                          : control.options;
+            var options = control.getElementsByTagName("select")[0].options;
             var selectValue = "";
             for (var optionIndex = 0; optionIndex < options.length; optionIndex++) {
                 var option = options[optionIndex];
@@ -1678,9 +1669,7 @@ ORBEON.xforms.Controls = {
             } else if (YAHOO.util.Dom.hasClass(control, "xforms-mediatype-text-html")) {
                 return control.innerHTML;
             } else {
-                var spanWithValue = ORBEON.util.Utils.isNewXHTMLLayout()
-                    ? control.getElementsByTagName("span")[0]
-                    : control;
+                var spanWithValue = control.getElementsByTagName("span")[0];
                 return ORBEON.util.Dom.getStringValue(spanWithValue);
             }
         } else if (YAHOO.util.Dom.hasClass(control, "xforms-select-appearance-xxforms-tree")
@@ -1730,14 +1719,10 @@ ORBEON.xforms.Controls = {
         } else if (YAHOO.util.Dom.hasClass(control, "xforms-output") || isStaticReadonly) {
             // XForms output or "static readonly" mode
             if (YAHOO.util.Dom.hasClass(control, "xforms-mediatype-image")) {
-                var image = ORBEON.util.Utils.isNewXHTMLLayout()
-                    ? YAHOO.util.Dom.getElementsByClassName("xforms-output-output", null, control)[0]
-                    : ORBEON.util.Dom.getChildElementByIndex(control, 0);
+                var image = YAHOO.util.Dom.getElementsByClassName("xforms-output-output", null, control)[0];
                 image.src = newControlValue;
             } else {
-                var output = ORBEON.util.Utils.isNewXHTMLLayout()
-                        ? YAHOO.util.Dom.getElementsByClassName("xforms-output-output", null, control)[0]
-                        : control;
+                var output = YAHOO.util.Dom.getElementsByClassName("xforms-output-output", null, control)[0];
                 if (YAHOO.util.Dom.hasClass(control, "xforms-mediatype-text-html")) {
                     output.innerHTML = newControlValue;
                 } else {
@@ -1861,7 +1846,7 @@ ORBEON.xforms.Controls = {
                 || YAHOO.util.Dom.hasClass(control, "xforms-input-appearance-minimal")) {
             // Handle lists and comboboxes
             var selectedValues = YAHOO.util.Dom.hasClass(control, "xforms-select-appearance-compact")  ? newControlValue.split(" ") : new Array(newControlValue);
-            var select = ORBEON.util.Utils.isNewXHTMLLayout() ? control.getElementsByTagName("select")[0] : control;
+            var select = control.getElementsByTagName("select")[0];
             var options = select.options;
             if (options != null) {
                 for (var optionIndex = 0; optionIndex < options.length; optionIndex++) {
@@ -1962,12 +1947,11 @@ ORBEON.xforms.Controls = {
      */
     getControlLHHA: function(control, lhhaType) {
 
-        // For new layout, try to look for label under the control element
-        if (ORBEON.util.Utils.isNewXHTMLLayout()) {
-            var lhhaElements = YAHOO.util.Dom.getElementsByClassName("xforms-" + lhhaType, null, control);
-            if (lhhaElements.length > 0) return lhhaElements[0];
-        }
-        // If old layout, or we couldn't find the element, look by ID
+        // Try to look for label under the control element
+        var lhhaElements = YAHOO.util.Dom.getElementsByClassName("xforms-" + lhhaType, null, control);
+        if (lhhaElements.length > 0) return lhhaElements[0];
+
+        // If we couldn't find the element, look by id
         var lhhaElementId = ORBEON.util.Utils.appendToEffectiveId(control.id, ORBEON.xforms.Controls._classNameToId[lhhaType]);
         return ORBEON.util.Dom.get(lhhaElementId);
     },
@@ -2017,14 +2001,9 @@ ORBEON.xforms.Controls = {
     getLabelMessage: function(control) {
         if (YAHOO.util.Dom.hasClass(control, "xforms-trigger")
                 || YAHOO.util.Dom.hasClass(control, "xforms-submit")) {
-            if (ORBEON.util.Utils.isNewXHTMLLayout()) {
-                // Element is "label" and "control" at the same time so use "control"
-                var labelElement = ORBEON.xforms.Controls.getControlLHHA(control, "control");
-                return labelElement.innerHTML;
-            } else {
-                // Element is either <button> or <a>
-                return control.innerHTML;
-            }
+            // Element is "label" and "control" at the same time so use "control"
+            var labelElement = ORBEON.xforms.Controls.getControlLHHA(control, "control");
+            return labelElement.innerHTML;
         } else if (YAHOO.util.Dom.hasClass(control, "xforms-dialog")) {
             // Dialog
             var labelDiv = ORBEON.util.Dom.getChildElementByIndex(control, 0);
@@ -2043,13 +2022,8 @@ ORBEON.xforms.Controls = {
     setLabelMessage: function(control, message) {
         if (YAHOO.util.Dom.hasClass(control, "xforms-trigger")
                 || YAHOO.util.Dom.hasClass(control, "xforms-submit")) {
-            if (ORBEON.util.Utils.isNewXHTMLLayout()) {
-                // Element is "label" and "control" at the same time so use "control"
-                ORBEON.xforms.Controls._setMessage(control, "control", message);
-            } else {
-                // Element is either <button> or <a>
-                control.innerHTML = message;
-            }
+            // Element is "label" and "control" at the same time so use "control"
+            ORBEON.xforms.Controls._setMessage(control, "control", message);
         } else if (YAHOO.util.Dom.hasClass(control, "xforms-dialog")) {
             // Dialog
             var labelDiv = ORBEON.util.Dom.getChildElementByIndex(control, 0);
@@ -2221,8 +2195,7 @@ ORBEON.xforms.Controls = {
                 || YAHOO.util.Dom.hasClass(control, "xforms-input-appearance-minimal")
                 || YAHOO.util.Dom.hasClass(control, "xforms-input-appearance-compact")) {
             // Lists
-            var select = ORBEON.util.Utils.isNewXHTMLLayout()
-                ? control.getElementsByTagName("select")[0] : control;
+            var select = control.getElementsByTagName("select")[0];
             ORBEON.xforms.Controls.setDisabledOnFormElement(select, isReadonly);
         } else if (YAHOO.util.Dom.hasClass(control, "xforms-output")
                 || YAHOO.util.Dom.hasClass(control, "xforms-group")) {
@@ -2238,8 +2211,7 @@ ORBEON.xforms.Controls = {
                     YAHOO.util.Dom.getElementsByClassName("xforms-upload-select", null, control)[0], isReadonly);
         } else if (YAHOO.util.Dom.hasClass(control, "xforms-textarea")) {
             // Textarea
-            var textarea = ORBEON.util.Utils.isNewXHTMLLayout()
-                ? control.getElementsByTagName("textarea")[0] : control;
+            var textarea = control.getElementsByTagName("textarea")[0];
             ORBEON.xforms.Controls.setDisabledOnFormElement(textarea, isReadonly);
         } else if ((YAHOO.util.Dom.hasClass(control, "xforms-trigger")
                 && ! YAHOO.util.Dom.hasClass(control, "xforms-trigger-appearance-minimal"))
@@ -2601,7 +2573,7 @@ ORBEON.xforms.Controls = {
 
         // Show and reposition dialog when needed
         if (showAndRepositionPanel) {
-            var controlContainer = ORBEON.util.Utils.isNewXHTMLLayout() ? control : control.parentNode;
+            var controlContainer = control;
             var helpImage = ORBEON.util.Dom.getChildElementByClass(controlContainer, "xforms-help-image");
             ORBEON.xforms.Globals.formHelpPanel[form.id].element.style.display = "block";
             ORBEON.xforms.Globals.formHelpPanel[form.id].cfg.setProperty("context", [helpImage, "bl", "tl"]);
@@ -3022,9 +2994,7 @@ ORBEON.xforms.Events = {
 
                 if (YAHOO.util.Dom.hasClass(target, "xforms-select1-appearance-compact")) {
                     // For select1 list, make sure we have exactly one value selected
-                    var select = ORBEON.util.Utils.isNewXHTMLLayout()
-                                  ? ORBEON.util.Dom.getElementByTagName(target, "select")
-                                  : target;
+                    var select = ORBEON.util.Dom.getElementByTagName(target, "select");
                     if (select.value == "") {
                         // Stop end-user from deselecting last selected value
                         select.options[0].selected = true;
@@ -3474,9 +3444,7 @@ ORBEON.xforms.Events = {
 
     sliderValueChange: function(offset) {
         // Notify server that value changed
-        var rangeControl = ORBEON.util.Dom.get(this.id);
-        if (ORBEON.util.Utils.isNewXHTMLLayout())
-            rangeControl = rangeControl.parentNode;
+        var rangeControl = ORBEON.util.Dom.get(this.id).parentNode;
 
         var value = offset / 200;
         var event = new ORBEON.xforms.server.AjaxServer.Event(null, rangeControl.id, String(value), "xxforms-value");
@@ -3604,8 +3572,7 @@ ORBEON.xforms.Events = {
             ? object : object.node;
 
         var yuiTree = this;
-        var control = document.getElementById(yuiTree.id);
-        if (ORBEON.util.Utils.isNewXHTMLLayout()) control = control.parentNode;
+        var control = document.getElementById(yuiTree.id).parentNode;
         var allowMultipleSelection = YAHOO.util.Dom.hasClass(control, "xforms-select");
         if (allowMultipleSelection) {
             // If checked uncheck, if unchecked check
@@ -4507,12 +4474,7 @@ ORBEON.xforms.Init = {
         ORBEON.xforms.ServerValueStore.set(range.id, 0);
 
         // In both cases the background <div> element must already have an id
-        var backgroundDiv;
-        if (ORBEON.util.Utils.isNewXHTMLLayout()) {
-            backgroundDiv = YAHOO.util.Dom.getElementsByClassName("xforms-range-background", "div", range)[0];
-        } else {
-            backgroundDiv = range;
-        }
+        var backgroundDiv = YAHOO.util.Dom.getElementsByClassName("xforms-range-background", "div", range)[0];
 
         var thumbDiv = YAHOO.util.Dom.getElementsByClassName("xforms-range-thumb", "div", range)[0];
         thumbDiv.id = ORBEON.util.Utils.appendToEffectiveId(range.id, "$$thumb");
@@ -4598,8 +4560,7 @@ ORBEON.xforms.Init = {
      */
     _list: function(list) {
         var value = "";
-        if (ORBEON.util.Utils.isNewXHTMLLayout())
-            list = ORBEON.util.Dom.getElementByTagName(list, "select");
+        list = ORBEON.util.Dom.getElementByTagName(list, "select");
         for (var i = 0; i < list.options.length; i++) {
             var option = list.options[i];
             if (option.selected) {

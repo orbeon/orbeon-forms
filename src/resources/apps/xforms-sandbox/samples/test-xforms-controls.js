@@ -106,9 +106,7 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
 
     getSelect: function(controlId) {
         var control = YAHOO.util.Dom.get(controlId);
-        return ORBEON.util.Utils.isNewXHTMLLayout()
-            ? control.getElementsByTagName("select")[0]
-            : control;
+        return control.getElementsByTagName("select")[0];
     },
 
     testAddToItemset: function() {
@@ -183,12 +181,12 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
     testClasses: function() {
         function checkColors(firstColor, secondColor) {
             var radioContainer = YAHOO.util.Dom.get("flavor-select1-full" + XFORMS_SEPARATOR_1 + "1");
-            if (ORBEON.util.Utils.isNewXHTMLLayout()) radioContainer = YAHOO.util.Dom.getFirstChild(radioContainer);
+            radioContainer = YAHOO.util.Dom.getFirstChild(radioContainer);
             var radios = YAHOO.util.Dom.getChildren(radioContainer);
             YAHOO.util.Assert.isTrue(YAHOO.util.Dom.hasClass(radios[0], firstColor), "radio has " + firstColor + " class");
             YAHOO.util.Assert.isTrue(YAHOO.util.Dom.hasClass(radios[1], secondColor), "radio has " + secondColor + " class");
             var checkboxContainer = YAHOO.util.Dom.get("flavor-select-full" + XFORMS_SEPARATOR_1 + "1");
-            if (ORBEON.util.Utils.isNewXHTMLLayout()) checkboxContainer = YAHOO.util.Dom.getFirstChild(checkboxContainer);
+            checkboxContainer = YAHOO.util.Dom.getFirstChild(checkboxContainer);
             var checkboxes = YAHOO.util.Dom.getChildren(checkboxContainer);
             YAHOO.util.Assert.isTrue(YAHOO.util.Dom.hasClass(checkboxes[0], firstColor), "check box has " + firstColor + " class");
             YAHOO.util.Assert.isTrue(YAHOO.util.Dom.hasClass(checkboxes[1], secondColor), "check box has " + secondColor + " class");
@@ -345,8 +343,7 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
                 ORBEON.xforms.Document.setValue("repeat-shown", "true");
             }, function() {
                 var trigger = YAHOO.util.Dom.get(this.triggerId);
-                var link = ORBEON.util.Utils.isNewXHTMLLayout()
-                    ? YAHOO.util.Dom.getFirstChild(trigger) : trigger;
+                var link = YAHOO.util.Dom.getFirstChild(trigger);
                 YAHOO.util.Assert.areEqual("a", link.tagName.toLowerCase());
                 YAHOO.util.Assert.areEqual("Label", link.innerHTML);
             });

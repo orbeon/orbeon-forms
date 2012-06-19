@@ -28,13 +28,9 @@ public abstract class XFormsOutputHandler extends XFormsControlLifecyleHandler {
     }
 
     protected AttributesImpl getContainerAttributes(String uri, String localname, Attributes attributes, String effectiveId, XFormsSingleNodeControl outputControl) {
-
+        // Add custom class
         final AttributesImpl containerAttributes = super.getContainerAttributes(uri, localname, attributes, effectiveId, outputControl, true);
-        if (handlerContext.isSpanHTMLLayout()) {
-            // Add custom class
-            containerAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-output-output");
-        }
-
+        containerAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-output-output");
         return containerAttributes;
     }
 }

@@ -105,7 +105,7 @@ public abstract class XFormsBaseHandlerXML extends XFormsBaseHandler {
     }
 
     // TODO: implement label hint and alert for XML content
-    protected void handleLabelHintHelpAlert(String controlEffectiveId, String forEffectiveId, LHHAC lhhaType, XFormsControl control, boolean isTemplate, boolean addIds) throws SAXException {
+    protected void handleLabelHintHelpAlert(String controlEffectiveId, String forEffectiveId, LHHAC lhhaType, XFormsControl control, boolean isTemplate) throws SAXException {
 
         // NOTE: We used to not handle alerts and help in read-only mode. We now prefer to controls this with CSS.
         final boolean isHint = lhhaType == LHHAC.HINT;

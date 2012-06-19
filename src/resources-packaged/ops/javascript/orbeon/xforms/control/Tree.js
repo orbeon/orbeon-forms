@@ -40,8 +40,7 @@
         var controlId = container.id;
         var allowMultipleSelection = YD.hasClass(container, "xforms-select");
         var showToolTip = YD.hasClass(container, "xforms-show-tooltip");
-        if (ORBEON.util.Utils.isNewXHTMLLayout())
-            container = container.getElementsByTagName("div")[0];
+        container = container.getElementsByTagName("div")[0];
         // Save in the control if it allows multiple selection
         container.xformsAllowMultipleSelection = allowMultipleSelection;
         // Parse data put by the server in the div
@@ -90,7 +89,7 @@
             yuiTree.subscribe("collapseComplete", function() { addTreeToolTip(); });
         }
         // Show the tree now that it has been built
-        YD.removeClass(ORBEON.util.Utils.isNewXHTMLLayout() ? container.parentNode : container, "xforms-initially-hidden");
+        YD.removeClass(container.parentNode, "xforms-initially-hidden");
     };
 
     Tree.prototype.addToTree = function (treeDiv, nodeInfoArray, treeNode) {
@@ -248,9 +247,7 @@
         yuiRoot.expand();
 
         // Re-populate the tree
-        var treeDiv = this.container;
-        if (ORBEON.util.Utils.isNewXHTMLLayout())
-            treeDiv = treeDiv.getElementsByTagName("div")[0];
+        var treeDiv = this.container.getElementsByTagName("div")[0];
         this.initTreeDivFromArray(treeDiv, yuiTree, itemset);
 
         // Expand nodes corresponding to values that were previously expanded

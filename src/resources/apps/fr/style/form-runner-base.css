@@ -361,15 +361,10 @@ button.xforms-trigger, input.xforms-trigger, .xforms-trigger button, .xforms-tri
 /* NOTE: This doesn't work well with IE 6/7, see below hand-tuned widths for IE */
 .fr-grid .xforms-input input,
 .fr-grid .xforms-upload input,
-.xforms-layout-nospan   .fr-grid .xforms-textarea, .xforms-layout-nospan .fr-grid .xforms-textarea textarea,    /* In nospan mode, the textarea can be either on its own (regular textarea) or inside a span (RTE) */
 .xforms-layout-span     .fr-grid .xforms-textarea textarea,
-.xforms-layout-nospan   .fr-grid .xforms-secret,
 .xforms-layout-span     .fr-grid .xforms-secret input,
-.xforms-layout-nospan   .fr-grid .xforms-select1-appearance-minimal,
 .xforms-layout-span     .fr-grid .xforms-select1-appearance-minimal select,
-.xforms-layout-nospan   .fr-grid .xforms-select1-appearance-compact,
 .xforms-layout-span     .fr-grid .xforms-select1-appearance-compact select,
-.xforms-layout-nospan   .fr-grid .xforms-select-appearance-compact,
 .xforms-layout-span     .fr-grid .xforms-select-appearance-compact select {
     width: 100%;
     -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;

@@ -114,7 +114,6 @@
 
     <property as="xs:string"  name="oxf.xforms.client.events.mode"                          value="default"/>   <!-- default | deferred -->
     <property as="xs:string"  name="oxf.xforms.client.events.filter"                        value=""/>
-    <property as="xs:string"  name="oxf.xforms.xhtml-layout"                                value="span"/>      <!-- span | nospan (nospan is deprecated since 2012-03-30) -->
     <property as="xs:integer" name="oxf.xforms.retry.delay-increment"                       value="5000"/>
     <property as="xs:integer" name="oxf.xforms.retry.max-delay"                             value="30000"/>
     <property as="xs:boolean" name="oxf.xforms.use-aria"                                    value="false"/>

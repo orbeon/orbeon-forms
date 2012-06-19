@@ -451,7 +451,7 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
         final AttributesImpl newAttribute;
         if (addIds && targetControlEffectiveId != null) {
             // Add or replace existing id attribute
-            // NOTE: addIds == true in nospan mode OR for external LHHA
+            // NOTE: addIds == true for external LHHA
             newAttribute = XMLUtils.addOrReplaceAttribute(attributes, "", "", "id", getLHHACId(handlerContext.getContainingDocument(), targetControlEffectiveId, LHHAC_CODES.get(lhha)));
         } else {
             // Remove existing id attribute if any

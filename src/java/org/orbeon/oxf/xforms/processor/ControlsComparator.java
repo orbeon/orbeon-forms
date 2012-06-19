@@ -45,8 +45,6 @@ public class ControlsComparator {
     private final Set<String> valueChangeControlIds;
     private final boolean isTestMode;
 
-    public final boolean isSpanHTMLLayout;
-
     private final AttributesImpl attributesImpl = new AttributesImpl();
 
     private ContentHandlerHelper ch;
@@ -62,7 +60,6 @@ public class ControlsComparator {
         this.valueChangeControlIds = valueChangeControlIds;
         this.isTestMode = isTestMode;
 
-        this.isSpanHTMLLayout = XFormsProperties.isSpanHTMLLayout(containingDocument);
         this.fullUpdateThreshold = XFormsProperties.getAjaxFullUpdateThreshold(containingDocument);
     }
 
@@ -302,7 +299,7 @@ public class ControlsComparator {
         // o the control supports full Ajax updates
         // o there is a mark for the given control
         //
-        if (! withinFullUpdate() && (isSpanHTMLLayout || control instanceof XXFormsDynamicControl) && control.supportFullAjaxUpdates()) {
+        if (! withinFullUpdate() && (control instanceof XXFormsDynamicControl) && control.supportFullAjaxUpdates()) {
             return containingDocument.getStaticOps().getMark(control.getPrefixedId());
         } else {
             return null;

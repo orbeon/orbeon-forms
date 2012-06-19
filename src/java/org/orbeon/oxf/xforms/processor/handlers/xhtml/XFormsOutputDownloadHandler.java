@@ -43,8 +43,6 @@ public class XFormsOutputDownloadHandler extends XFormsOutputHandler {
 
         final AttributesImpl containerAttributes = getContainerAttributes(uri, localname, attributes, effectiveId, outputControl);
 
-        if (!handlerContext.isSpanHTMLLayout())
-            xmlReceiver.startElement(XMLConstants.XHTML_NAMESPACE_URI, getContainingElementName(), getContainingElementQName(), containerAttributes);
         {
             final AttributesImpl aAttributes = getAnchorAttributes(outputControl, containerAttributes);
 
@@ -60,33 +58,30 @@ public class XFormsOutputDownloadHandler extends XFormsOutputHandler {
             }
             xmlReceiver.endElement(XMLConstants.XHTML_NAMESPACE_URI, "a", aQName);
         }
-        if (!handlerContext.isSpanHTMLLayout())
-            xmlReceiver.endElement(XMLConstants.XHTML_NAMESPACE_URI, getContainingElementName(), getContainingElementQName());
     }
 
     private AttributesImpl getAnchorAttributes(XFormsOutputControl outputControl, AttributesImpl containerAttributes) {
-        final AttributesImpl aAttributes = handlerContext.isSpanHTMLLayout() ? containerAttributes : new AttributesImpl();
         final String hrefValue = XFormsOutputControl.getExternalValueOrDefault(outputControl, null);
 
         if (hrefValue == null || hrefValue.trim().equals("")) {
             // No URL so make sure a click doesn't cause navigation, and add class
-            aAttributes.addAttribute("", "href", "href", ContentHandlerHelper.CDATA, "#");
-            XMLUtils.addOrAppendToAttribute(aAttributes, "class", "xforms-readonly");
+            containerAttributes.addAttribute("", "href", "href", ContentHandlerHelper.CDATA, "#");
+            XMLUtils.addOrAppendToAttribute(containerAttributes, "class", "xforms-readonly");
         } else {
             // URL value
-            aAttributes.addAttribute("", "href", "href", ContentHandlerHelper.CDATA, hrefValue);
+            containerAttributes.addAttribute("", "href", "href", ContentHandlerHelper.CDATA, hrefValue);
         }
 
         // Add _blank target in order to prevent:
         // 1. The browser replacing the current page, and
         // 2. The browser displaying the "Are you sure you want to navigate away from this page?" warning dialog
         // This, as of 2009-05, seems to be how most sites handle this
-        aAttributes.addAttribute("", "target", "target", ContentHandlerHelper.CDATA, "_blank");
+        containerAttributes.addAttribute("", "target", "target", ContentHandlerHelper.CDATA, "_blank");
 
         // Output xxforms:* extension attributes
         if (outputControl != null)
-            outputControl.addExtensionAttributes(aAttributes, XFormsConstants.XXFORMS_NAMESPACE_URI);
+            outputControl.addExtensionAttributes(containerAttributes, XFormsConstants.XXFORMS_NAMESPACE_URI);
 
-        return aAttributes;
+        return containerAttributes;
     }
 }

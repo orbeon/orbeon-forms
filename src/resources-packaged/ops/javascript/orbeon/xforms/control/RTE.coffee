@@ -31,22 +31,8 @@ class RTE extends Control
     init: (container) ->
         super container
 
-        if Utils.isNewXHTMLLayout()
-            # In span mode, get textarea under container and keep current structure
-            textarea = @container.getElementsByTagName("textarea")[0]
-        else
-            # In nospan mode, insert newly created container
-            textarea = @container
-            @container = document.createElement "span"
-            YD.insertAfter @container, textarea
-            @container.appendChild textarea
-            # Move classes on the container created by YUI
-            @container.className = textarea.className
-            textarea.className = ""
-            # Move the id to the container, and add -textarea to the id of the textarea
-            containerId = textarea.id
-            textarea.id = textarea.id + "-textarea"
-            @container.id = containerId
+        # In span mode, get textarea under container and keep current structure
+        textarea = @container.getElementsByTagName("textarea")[0]
         # Make sure that textarea is not disabled unless readonly, otherwise RTE renders it in read-only mode
         textarea.disabled = YD.hasClass @container, "xforms-readonly"
         # Create RTE object

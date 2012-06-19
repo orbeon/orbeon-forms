@@ -60,9 +60,7 @@
                     
                     getSelect: function(controlId) {
 					        var control = YAHOO.util.Dom.get(controlId);
-					        return ORBEON.util.Utils.isNewXHTMLLayout()
-					            ? control.getElementsByTagName("select")[0]
-					            : control;
+					        return control.getElementsByTagName("select")[0];
 					},
 					
 					testSelect1HTMLInLabels: function() {

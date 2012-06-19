@@ -62,18 +62,10 @@ html body .xforms-form .xforms-disabled a,
  * deselected controls by tabbing. This is a CSS alternative to using the disabled attribute on the controls, which
  * doesn't require us to update disabled attributes on controls during the life of the page.
  */
-    /* Disabled in nospan mode */
-    html body .xforms-form input.xforms-disabled,
-    html body .xforms-form select.xforms-disabled,
-    html body .xforms-form button.xforms-disabled,
     /* Disabled in span mode */
     html body .xforms-form .xforms-disabled input,
     html body .xforms-form .xforms-disabled select,
     html body .xforms-form .xforms-disabled button,
-    /* Deselected in nospan mode */
-    html body .xforms-form input.xforms-case-deselected,
-    html body .xforms-form select.xforms-case-deselected,
-    html body .xforms-form button.xforms-case-deselected,
     /* Deselected in span mode */
     html body .xforms-form .xforms-case-deselected input,
     html body .xforms-form .xforms-case-deselected select,

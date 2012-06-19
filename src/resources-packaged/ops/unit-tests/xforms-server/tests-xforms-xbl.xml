@@ -3480,9 +3480,11 @@
         </input>
         <output name="response">
             <controls>
-                <xh:span id="my-foo$foo-group" class="xforms-group">
-                    <xh:span id="my-foo$my-output" class="xforms-control xforms-output">Hello</xh:span>
-                </xh:span>
+                <xhtml:span id="my-foo$foo-group" class="xforms-group">
+                    <xhtml:span id="my-foo$my-output" class="xforms-control xforms-output">
+                        <xhtml:span id="my-foo$my-output$$c" class="xforms-output-output">Hello</xhtml:span>
+                    </xhtml:span>
+                </xhtml:span>
             </controls>
         </output>
     </test>
@@ -4318,7 +4320,7 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:control id="my-dynamic$my-bar" class="xforms-update-full"/>
-                        <xxf:inner-html id="my-dynamic$my-bar">&lt;input id="my-dynamic$my-bar$input1$xforms-input-1" type="text" name="my-dynamic$my-bar$input1$xforms-input-1" value="41" class="xforms-input-input"&gt;&lt;/input&gt;&lt;input id="my-dynamic$my-bar$input2$xforms-input-1" type="text" name="my-dynamic$my-bar$input2$xforms-input-1" value="42" class="xforms-input-input"&gt;&lt;/input&gt;</xxf:inner-html>
+                        <xxf:inner-html id="my-dynamic$my-bar">&lt;span id="my-dynamic$my-bar$input1" class="xforms-control xforms-input"&gt;&lt;input id="my-dynamic$my-bar$input1$xforms-input-1" type="text" name="my-dynamic$my-bar$input1$xforms-input-1" value="41" class="xforms-input-input"&gt;&lt;/input&gt;&lt;/span&gt;&lt;span id="my-dynamic$my-bar$input2" class="xforms-control xforms-input"&gt;&lt;input id="my-dynamic$my-bar$input2$xforms-input-1" type="text" name="my-dynamic$my-bar$input2$xforms-input-1" value="42" class="xforms-input-input"&gt;&lt;/input&gt;&lt;/span&gt;</xxf:inner-html>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>

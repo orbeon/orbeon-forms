@@ -39,8 +39,6 @@ public class XFormsOutputImageHandler extends XFormsOutputHandler {
 
         final AttributesImpl containerAttributes = getContainerAttributes(uri, localname, attributes, effectiveId, outputControl);
 
-        if (!handlerContext.isSpanHTMLLayout())
-            contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, getContainingElementName(), getContainingElementQName(), containerAttributes);
         {
             final AttributesImpl imgAttributes = getImgAttributes(outputControl, mediatypeValue, containerAttributes);
 
@@ -51,16 +49,13 @@ public class XFormsOutputImageHandler extends XFormsOutputHandler {
             contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "img", imgQName, imgAttributes);
             contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "img", imgQName);
         }
-        if (!handlerContext.isSpanHTMLLayout())
-            contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, getContainingElementName(), getContainingElementQName());
     }
 
     private AttributesImpl getImgAttributes(XFormsOutputControl outputControl, String mediatypeValue, AttributesImpl newAttributes) {
-        final AttributesImpl imgAttributes = handlerContext.isSpanHTMLLayout() ? newAttributes : new AttributesImpl();
         // @src="..."
         // NOTE: If producing a template, or if the image URL is blank, we point to an existing dummy image
         final String srcValue = XFormsOutputControl.getExternalValueOrDefault(outputControl, mediatypeValue);
-        imgAttributes.addAttribute("", "src", "src", ContentHandlerHelper.CDATA, srcValue != null ? srcValue : XFormsConstants.DUMMY_IMAGE_URI);
-        return imgAttributes;
+        newAttributes.addAttribute("", "src", "src", ContentHandlerHelper.CDATA, srcValue != null ? srcValue : XFormsConstants.DUMMY_IMAGE_URI);
+        return newAttributes;
     }
 }

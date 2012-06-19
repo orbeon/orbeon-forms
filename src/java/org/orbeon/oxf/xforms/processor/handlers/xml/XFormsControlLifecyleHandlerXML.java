@@ -131,22 +131,22 @@ public class XFormsControlLifecyleHandlerXML extends XFormsBaseHandlerXML {
 
     protected void handleLabel() throws SAXException {
         // May be overridden by subclasses
-        handleLabelHintHelpAlert(getEffectiveId(), getForEffectiveId(), LHHAC.LABEL, getControl(), isTemplate(), !handlerContext.isSpanHTMLLayout());
+        handleLabelHintHelpAlert(getEffectiveId(), getForEffectiveId(), LHHAC.LABEL, getControl(), isTemplate());
     }
 
     protected void handleAlert() throws SAXException {
         // May be overridden by subclasses
-        handleLabelHintHelpAlert(getEffectiveId(), getForEffectiveId(), LHHAC.ALERT, getControl(), isTemplate(), !handlerContext.isSpanHTMLLayout());
+        handleLabelHintHelpAlert(getEffectiveId(), getForEffectiveId(), LHHAC.ALERT, getControl(), isTemplate());
     }
 
     protected void handleHint() throws SAXException {
         // May be overridden by subclasses
-        handleLabelHintHelpAlert(getEffectiveId(), getForEffectiveId(), LHHAC.HINT, getControl(), isTemplate(), !handlerContext.isSpanHTMLLayout());
+        handleLabelHintHelpAlert(getEffectiveId(), getForEffectiveId(), LHHAC.HINT, getControl(), isTemplate());
     }
 
     protected void handleHelp() throws SAXException {
         // May be overridden by subclasses
-        handleLabelHintHelpAlert(getEffectiveId(), getForEffectiveId(), LHHAC.HELP, getControl(), isTemplate(), !handlerContext.isSpanHTMLLayout());
+        handleLabelHintHelpAlert(getEffectiveId(), getForEffectiveId(), LHHAC.HELP, getControl(), isTemplate());
     }
 
     protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String effectiveId, XFormsControl control) throws SAXException {
@@ -179,5 +179,4 @@ public class XFormsControlLifecyleHandlerXML extends XFormsBaseHandlerXML {
     public String getForEffectiveId() {
         return getEffectiveId();
     }
-
 }

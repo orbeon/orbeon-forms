@@ -5366,7 +5366,7 @@
                      xmlns:xh="http://www.w3.org/1999/xhtml"
                      xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                 <xh:head>
-                    <xf:model xxf:xhtml-layout="span" xxf:xpath-analysis="true">
+                    <xf:model xxf:xpath-analysis="true">
                         <xf:instance>
                             <first-name/>
                         </xf:instance>

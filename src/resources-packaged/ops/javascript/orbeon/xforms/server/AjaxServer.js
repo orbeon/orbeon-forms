@@ -923,9 +923,7 @@
                                             || YAHOO.util.Dom.hasClass(documentElement, "xforms-select1-appearance-minimal")) {
 
                                         // Case of list / combobox
-                                        var select = ORBEON.util.Utils.isNewXHTMLLayout()
-                                            ? documentElement.getElementsByTagName("select")[0]
-                                            : documentElement;
+                                        var select = documentElement.getElementsByTagName("select")[0];
                                         var options = select.options;
 
                                         // Remember selected values
@@ -993,9 +991,7 @@
                                             var selectOpeningTag = select.outerHTML.substring(0, select.outerHTML.indexOf(">") + 1);
                                             select.outerHTML = selectOpeningTag + sb.join("") + "</select>";
                                             // Get again control, as it has been re-created
-                                            select = ORBEON.util.Dom.get(controlId);
-                                            if (ORBEON.util.Utils.isNewXHTMLLayout())
-                                                select = documentElement.getElementsByTagName("select")[0];
+                                            select = documentElement.getElementsByTagName("select")[0];
                                         } else {
                                             // Version for compliant browsers
                                             select.innerHTML = sb.join("");
@@ -1021,9 +1017,7 @@
 
                                         // Get the span that contains the one span per checkbox/radio
                                         // This is the first span that has no class on it (we don't want to get a span for label, hint, help, alert)
-                                        var spanContainer = ORBEON.util.Utils.isNewXHTMLLayout()
-                                            ? _.detect(documentElement.getElementsByTagName("span"), function(span) { return span.className == ""; })
-                                            : documentElement;
+                                        var spanContainer = _.detect(documentElement.getElementsByTagName("span"), function(span) { return span.className == ""; });
 
                                         // Remove spans and store current checked value
                                         var valueToChecked = {};
@@ -1208,27 +1202,21 @@
                                             })();
 
                                             function insertIntoDocument(nodes) {
-                                                if (ORBEON.util.Utils.isNewXHTMLLayout()) {
-                                                    var childElements = YAHOO.util.Dom.getChildren(documentElement);
-                                                    // New markup: insert after "last label" (we remembered the position of the label after which there is real content)
-                                                    if (childElements.length == 0) {
-                                                        for (var nodeIndex = 0; nodeIndex < nodes.length; nodeIndex++)
-                                                            documentElement.appendChild(nodes[nodeIndex]);
-                                                    } else if (lastLabelPosition == -1) {
-                                                        // Insert before everything else
-                                                        var firstChild = childElements[0];
-                                                        for (var nodeIndex = 0; nodeIndex < nodes.length; nodeIndex++)
-                                                            YAHOO.util.Dom.insertBefore(nodes[nodeIndex], firstChild);
-                                                    } else {
-                                                        // Insert after a LHHA
-                                                        var lhha = childElements[lastLabelPosition];
-                                                        for (var nodeIndex = nodes.length - 1; nodeIndex >= 0; nodeIndex--)
-                                                            YAHOO.util.Dom.insertAfter(nodes[nodeIndex], lhha);
-                                                    }
-                                                } else {
-                                                    // Old markup: insert in container, which will be empty
+                                                var childElements = YAHOO.util.Dom.getChildren(documentElement);
+                                                // Insert after "last label" (we remembered the position of the label after which there is real content)
+                                                if (childElements.length == 0) {
                                                     for (var nodeIndex = 0; nodeIndex < nodes.length; nodeIndex++)
                                                         documentElement.appendChild(nodes[nodeIndex]);
+                                                } else if (lastLabelPosition == -1) {
+                                                    // Insert before everything else
+                                                    var firstChild = childElements[0];
+                                                    for (var nodeIndex = 0; nodeIndex < nodes.length; nodeIndex++)
+                                                        YAHOO.util.Dom.insertBefore(nodes[nodeIndex], firstChild);
+                                                } else {
+                                                    // Insert after a LHHA
+                                                    var lhha = childElements[lastLabelPosition];
+                                                    for (var nodeIndex = nodes.length - 1; nodeIndex >= 0; nodeIndex--)
+                                                        YAHOO.util.Dom.insertAfter(nodes[nodeIndex], lhha);
                                                 }
                                             }
 

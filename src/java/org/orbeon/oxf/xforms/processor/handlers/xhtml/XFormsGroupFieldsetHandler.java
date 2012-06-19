@@ -27,30 +27,18 @@ import org.xml.sax.SAXException;
 
 public class XFormsGroupFieldsetHandler extends XFormsGroupHandler {
 
-    private static final String ENCLOSING_ELEMENT_NAME = "fieldset";
-
     @Override
     protected String getContainingElementName() {
-        return ENCLOSING_ELEMENT_NAME;
+        return "fieldset";
     }
 
     @Override
     public void handleControlStart(String uri, String localname, String qName, Attributes attributes, final String effectiveId, XFormsControl control) throws SAXException {
 
         final XFormsGroupControl groupControl = (XFormsGroupControl) control;
-
-        final String groupElementName = getContainingElementName();
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
-        final String groupElementQName = XMLUtils.buildQName(xhtmlPrefix, groupElementName);
-
         final ElementHandlerController controller = handlerContext.getController();
-
         final ContentHandler contentHandler = controller.getOutput();
-
-        // Start xhtml:fieldset element if needed
-        if (!handlerContext.isSpanHTMLLayout())
-            contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, groupElementName, groupElementQName,
-                    getContainerAttributes(uri, localname, attributes, effectiveId, groupControl, false));
 
         // Output an xhtml:legend element if and only if there is an xforms:label element. This help with
         // styling in particular.
@@ -72,20 +60,6 @@ public class XFormsGroupFieldsetHandler extends XFormsGroupHandler {
             }
             contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "legend", legendQName);
         }
-    }
-
-    @Override
-    public void handleControlEnd(String uri, String localname, String qName, Attributes attributes, String effectiveId, XFormsControl control) throws SAXException {
-
-        final ElementHandlerController controller = handlerContext.getController();
-
-        // Close xhtml:span
-        final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
-        final String groupElementName = getContainingElementName();
-        final String groupElementQName = XMLUtils.buildQName(xhtmlPrefix, groupElementName);
-
-        if (!handlerContext.isSpanHTMLLayout())
-            controller.getOutput().endElement(XMLConstants.XHTML_NAMESPACE_URI, groupElementName, groupElementQName);
     }
 
     @Override

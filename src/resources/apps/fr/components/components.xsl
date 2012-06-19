@@ -228,15 +228,14 @@
                       xxforms:noscript="{$is-noscript}"
                       xxforms:noscript-support="{$is-noscript-support}"
                       xxforms:xforms11-switch="false"
-                      xxforms:xpath-analysis="true"
-                      xxforms:xhtml-layout="span">
+                      xxforms:xpath-analysis="true">
 
             <!-- Don't enable client events filtering for FB -->
             <xsl:if test="$is-form-builder">
                 <xsl:attribute name="xxforms:client.events.filter"/>
             </xsl:if>
             <!-- Override if specified -->
-            <xsl:copy-of select="@xxforms:xhtml-layout | @xxforms:xpath-analysis"/>
+            <xsl:copy-of select="@xxforms:xpath-analysis"/>
 
             <!-- Parameters passed to this page -->
             <!-- NOTE: the <document> element may be modified, so we don't set this as read-only -->

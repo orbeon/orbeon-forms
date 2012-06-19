@@ -29,7 +29,6 @@
 
       xxforms:external-events="show-fb-test-dialog"
       xxforms:noscript-support="false"
-      xxforms:xhtml-layout="span"
       xxforms:xpath-analysis="false"
 
       id="fr-form-model">

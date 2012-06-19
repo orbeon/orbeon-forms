@@ -55,21 +55,6 @@ public class XFormsGroupDefaultHandler extends XFormsGroupHandler {
     }
 
     public void handleControlStart(String uri, String localname, String qName, Attributes attributes, final String effectiveId, XFormsControl control) throws SAXException {
-        if (!handlerContext.isSpanHTMLLayout()) {
-            // Open containing element
-            final ElementHandlerController controller = handlerContext.getController();
-            controller.getOutput().startElement(XMLConstants.XHTML_NAMESPACE_URI, getContainingElementName(), getContainingElementQName(),
-                    getContainerAttributes(uri, localname, attributes, effectiveId, control, false));
-        }
-    }
-
-    @Override
-    public void handleControlEnd(String uri, String localname, String qName, Attributes attributes, String effectiveId, XFormsControl control) throws SAXException {
-        if (!handlerContext.isSpanHTMLLayout()) {
-            // Close containing element
-            final ElementHandlerController controller = handlerContext.getController();
-            controller.getOutput().endElement(XMLConstants.XHTML_NAMESPACE_URI, getContainingElementName(), getContainingElementQName());
-        }
     }
 
     @Override
@@ -82,6 +67,6 @@ public class XFormsGroupDefaultHandler extends XFormsGroupHandler {
         reusableAttributes.clear();
         reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, getLabelClasses(groupControl));
         outputLabelFor(handlerContext, reusableAttributes, effectiveId, effectiveId, LHHAC.LABEL, handlerContext.getLabelElementName(),
-                getLabelValue(groupControl), groupControl != null && groupControl.isHTMLLabel(), !handlerContext.isSpanHTMLLayout());
+                getLabelValue(groupControl), groupControl != null && groupControl.isHTMLLabel(), false);
     }
 }

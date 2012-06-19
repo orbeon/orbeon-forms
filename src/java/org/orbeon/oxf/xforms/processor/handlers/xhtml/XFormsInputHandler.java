@@ -136,9 +136,6 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
 
             final AttributesImpl containerAttributes = getContainerAttributes(uri, localname, attributes, effectiveId, inputControl, false);
 
-            if (!handlerContext.isSpanHTMLLayout())
-                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, enclosingElementLocalname, enclosingElementQName, containerAttributes);
-
             {
                 // Create xhtml:input
                 {
@@ -255,20 +252,16 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
                             final String formattedValue = inputControl.getReadonlyValueUseFormat();
                             final String outputValue = (formattedValue != null) ? formattedValue : inputControl.getExternalValue();
 
-                            if (handlerContext.isSpanHTMLLayout())
-                                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, enclosingElementLocalname, enclosingElementQName, containerAttributes);
+                            contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, enclosingElementLocalname, enclosingElementQName, containerAttributes);
 
                             if (outputValue != null)
                                 contentHandler.characters(outputValue.toCharArray(), 0, outputValue.length());
 
-                            if (handlerContext.isSpanHTMLLayout())
-                                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, enclosingElementLocalname, enclosingElementQName);
+                            contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, enclosingElementLocalname, enclosingElementQName);
                         }
                     }
                 }
             }
-            if (!handlerContext.isSpanHTMLLayout())
-                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, enclosingElementLocalname, enclosingElementQName);
         }
     }
 

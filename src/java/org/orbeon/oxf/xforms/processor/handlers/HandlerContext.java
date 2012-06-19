@@ -50,7 +50,6 @@ public class HandlerContext {
     private final String alertElementName;
 
     public final boolean isNoscript;
-    public final boolean isSpanHTMLLayout;
 
     // UA information
     private boolean processedUserAgent;
@@ -77,7 +76,6 @@ public class HandlerContext {
         this.alertElementName = XFormsProperties.getAlertElementName(containingDocument);
 
         this.isNoscript = containingDocument.getStaticState().isNoscript();
-        this.isSpanHTMLLayout = XFormsProperties.isSpanHTMLLayout(containingDocument);
 
         // Top-level part is containing document
         this.partAnalysisStack = new Stack<PartAnalysis>();
@@ -142,10 +140,6 @@ public class HandlerContext {
 
     final public boolean isNoScript() {
         return isNoscript;
-    }
-
-    final public boolean isSpanHTMLLayout() {
-        return isSpanHTMLLayout;
     }
 
     public String findXHTMLPrefix() {

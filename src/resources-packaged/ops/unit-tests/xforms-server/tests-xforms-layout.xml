@@ -32,7 +32,7 @@
         <input name="document">
             <xhtml:html xmlns:xs="http://www.w3.org/2001/XMLSchema">
                 <xhtml:head>
-                    <xforms:model id="main-model" xxforms:xhtml-layout="span">
+                    <xforms:model id="main-model">
                         <xforms:instance id="tests">
                             <instance>
                                 <default>Hello!</default>
@@ -148,133 +148,12 @@
         </output>
     </test>
 
-    <test description="Old layout for xforms:input" name="oxf:pipeline">
-        <input name="config" href="wrap-xforms-controls.xpl"/>
-        <input name="document">
-            <xhtml:html xmlns:xs="http://www.w3.org/2001/XMLSchema">
-                <xhtml:head>
-                    <xforms:model id="main-model" xxforms:xhtml-layout="nospan">
-                        <xforms:instance id="tests">
-                            <instance>
-                                <default>Hello!</default>
-                                <boolean>true</boolean>
-                            </instance>
-                        </xforms:instance>
-                        <xforms:bind nodeset="default" type="xs:NCName" required="true()"/>
-                        <xforms:bind nodeset="boolean" type="xs:boolean" required="true()"/>
-                    </xforms:model>
-                </xhtml:head>
-                <xhtml:body>
-                    <xforms:repeat id="my-repeat" nodeset=".">
-                        <!-- Nested LHHA -->
-                        <xforms:input id="my-old-input" ref="default">
-                            <xforms:label>My label</xforms:label>
-                            <xforms:hint>My hint</xforms:hint>
-                            <xforms:help>My help</xforms:help>
-                            <xforms:alert>My alert</xforms:alert>
-                        </xforms:input>
-                        <xforms:input id="my-old-boolean-input" ref="boolean">
-                            <xforms:label>My label</xforms:label>
-                            <xforms:hint>My hint</xforms:hint>
-                            <xforms:help>My help</xforms:help>
-                            <xforms:alert>My alert</xforms:alert>
-                        </xforms:input>
-                        <!-- External LHHA -->
-                        <xforms:label for="my-old-input-2">My label</xforms:label>
-                        <xforms:hint for="my-old-input-2">My hint</xforms:hint>
-                        <xforms:input id="my-old-input-2" ref="default"/>
-                        <xforms:help for="my-old-input-2">My help</xforms:help>
-                        <xforms:alert for="my-old-input-2">My alert</xforms:alert>
-
-                        <xforms:label for="my-old-boolean-input-2">My label</xforms:label>
-                        <xforms:hint for="my-old-boolean-input-2">My hint</xforms:hint>
-                        <xforms:input id="my-old-boolean-input-2" ref="boolean"/>
-                        <xforms:help for="my-old-boolean-input-2">My help</xforms:help>
-                        <xforms:alert for="my-old-boolean-input-2">My alert</xforms:alert>
-                    </xforms:repeat>
-                </xhtml:body>
-            </xhtml:html>
-        </input>
-        <output name="response">
-            <controls xmlns:xhtml="http://www.w3.org/1999/xhtml">
-                <xhtml:label class="xforms-label xforms-repeat-selected-item-1" id="my-old-input$$l·1" for="my-old-input$xforms-input-1·1">My label</xhtml:label>
-                <xhtml:span id="my-old-input·1" class="xforms-control xforms-input xforms-invalid xforms-required xforms-required-filled xforms-type-NCName xforms-repeat-selected-item-1">
-                    <xhtml:input id="my-old-input$xforms-input-1·1" type="text" name="my-old-input$xforms-input-1·1" value="Hello!" class="xforms-input-input xforms-type-NCName"/>
-                </xhtml:span>
-                <xhtml:img id="my-old-input$$i·1" class="xforms-help-image xforms-repeat-selected-item-1" src="/ops/images/xforms/help.png" title="" alt=""/>
-                <xhtml:span class="xforms-help xforms-repeat-selected-item-1" id="my-old-input$$p·1">My help</xhtml:span>
-                <xhtml:span class="xforms-alert-active xforms-alert xforms-repeat-selected-item-1" id="my-old-input$$a·1">My alert</xhtml:span>
-                <xhtml:span class="xforms-hint xforms-repeat-selected-item-1" id="my-old-input$$t·1">My hint</xhtml:span>
-                <xhtml:label class="xforms-label xforms-repeat-selected-item-1" id="my-old-boolean-input$$l·1" for="my-old-boolean-input$$e0·1">My label</xhtml:label>
-                <xhtml:span id="my-old-boolean-input·1" class="xforms-control xforms-input xforms-incremental xforms-required xforms-required-filled xforms-type-boolean xforms-repeat-selected-item-1">
-                    <xhtml:span class="xforms-selected">
-                        <xhtml:input id="my-old-boolean-input$$e0·1" type="checkbox" name="my-old-boolean-input·1" value="true" checked="checked"/>
-                    </xhtml:span>
-                </xhtml:span>
-                <xhtml:img id="my-old-boolean-input$$i·1" class="xforms-help-image xforms-repeat-selected-item-1" src="/ops/images/xforms/help.png" title="" alt=""/>
-                <xhtml:span class="xforms-help xforms-repeat-selected-item-1" id="my-old-boolean-input$$p·1">My help</xhtml:span>
-                <xhtml:span class="xforms-alert-inactive xforms-alert xforms-repeat-selected-item-1" id="my-old-boolean-input$$a·1">My alert</xhtml:span>
-                <xhtml:span class="xforms-hint xforms-repeat-selected-item-1" id="my-old-boolean-input$$t·1">My hint</xhtml:span>
-                <xhtml:label class="xforms-label xforms-repeat-selected-item-1" id="my-old-input-2$$l·1" for="my-old-input-2$xforms-input-1·1">My label</xhtml:label>
-                <xhtml:span class="xforms-hint xforms-repeat-selected-item-1" id="my-old-input-2$$t·1">My hint</xhtml:span>
-                <xhtml:span id="my-old-input-2·1" class="xforms-control xforms-input xforms-invalid xforms-required xforms-required-filled xforms-type-NCName xforms-repeat-selected-item-1">
-                    <xhtml:input id="my-old-input-2$xforms-input-1·1" type="text" name="my-old-input-2$xforms-input-1·1" value="Hello!" class="xforms-input-input xforms-type-NCName"/>
-                </xhtml:span>
-                <xhtml:img id="my-old-input-2$$i·1" class="xforms-help-image xforms-repeat-selected-item-1" src="/ops/images/xforms/help.png" title="" alt=""/>
-                <xhtml:span class="xforms-help xforms-repeat-selected-item-1" id="my-old-input-2$$p·1">My help</xhtml:span>
-                <xhtml:span class="xforms-alert-active xforms-alert xforms-repeat-selected-item-1" id="my-old-input-2$$a·1">My alert</xhtml:span>
-                <xhtml:label class="xforms-label xforms-repeat-selected-item-1" id="my-old-boolean-input-2$$l·1" for="my-old-boolean-input-2$$e0·1">My label</xhtml:label>
-                <xhtml:span class="xforms-hint xforms-repeat-selected-item-1" id="my-old-boolean-input-2$$t·1">My hint</xhtml:span>
-                <xhtml:span id="my-old-boolean-input-2·1" class="xforms-control xforms-input xforms-incremental xforms-required xforms-required-filled xforms-type-boolean xforms-repeat-selected-item-1">
-                    <xhtml:span class="xforms-selected">
-                        <xhtml:input id="my-old-boolean-input-2$$e0·1" type="checkbox" name="my-old-boolean-input-2·1" value="true" checked="checked"/>
-                    </xhtml:span>
-                </xhtml:span>
-                <xhtml:img id="my-old-boolean-input-2$$i·1" class="xforms-help-image xforms-repeat-selected-item-1" src="/ops/images/xforms/help.png" title="" alt=""/>
-                <xhtml:span class="xforms-help xforms-repeat-selected-item-1" id="my-old-boolean-input-2$$p·1">My help</xhtml:span>
-                <xhtml:span class="xforms-alert-inactive xforms-alert xforms-repeat-selected-item-1" id="my-old-boolean-input-2$$a·1">My alert</xhtml:span>
-                <xhtml:label class="xforms-label xforms-repeat-template" id="my-old-input$$l" for="my-old-input$xforms-input-1"/>
-                <xhtml:span id="my-old-input" class="xforms-control xforms-input xforms-repeat-template">
-                    <xhtml:input id="my-old-input$xforms-input-1" type="text" name="my-old-input$xforms-input-1" value="" class="xforms-input-input"/>
-                </xhtml:span>
-                <xhtml:img id="my-old-input$$i" class="xforms-disabled xforms-help-image xforms-repeat-template" src="/ops/images/xforms/help.png" title="" alt=""/>
-                <xhtml:span class="xforms-disabled xforms-help xforms-repeat-template" id="my-old-input$$p"/>
-                <xhtml:span class="xforms-alert-inactive xforms-alert xforms-repeat-template" id="my-old-input$$a"/>
-                <xhtml:span class="xforms-hint xforms-repeat-template" id="my-old-input$$t"/>
-                <xhtml:label class="xforms-label xforms-repeat-template" id="my-old-boolean-input$$l" for="my-old-boolean-input$xforms-input-1"/>
-                <xhtml:span id="my-old-boolean-input" class="xforms-control xforms-input xforms-repeat-template">
-                    <xhtml:input id="my-old-boolean-input$xforms-input-1" type="text" name="my-old-boolean-input$xforms-input-1" value="" class="xforms-input-input"/>
-                </xhtml:span>
-                <xhtml:img id="my-old-boolean-input$$i" class="xforms-disabled xforms-help-image xforms-repeat-template" src="/ops/images/xforms/help.png" title="" alt=""/>
-                <xhtml:span class="xforms-disabled xforms-help xforms-repeat-template" id="my-old-boolean-input$$p"/>
-                <xhtml:span class="xforms-alert-inactive xforms-alert xforms-repeat-template" id="my-old-boolean-input$$a"/>
-                <xhtml:span class="xforms-hint xforms-repeat-template" id="my-old-boolean-input$$t"/>
-                <xhtml:label class="xforms-label xforms-repeat-template" id="my-old-input-2$$l" for="my-old-input-2$xforms-input-1"/>
-                <xhtml:span class="xforms-hint xforms-repeat-template" id="my-old-input-2$$t"/>
-                <xhtml:span id="my-old-input-2" class="xforms-control xforms-input xforms-repeat-template">
-                    <xhtml:input id="my-old-input-2$xforms-input-1" type="text" name="my-old-input-2$xforms-input-1" value="" class="xforms-input-input"/>
-                </xhtml:span>
-                <xhtml:img id="my-old-input-2$$i" class="xforms-disabled xforms-help-image xforms-repeat-template" src="/ops/images/xforms/help.png" title="" alt=""/>
-                <xhtml:span class="xforms-disabled xforms-help xforms-repeat-template" id="my-old-input-2$$p"/>
-                <xhtml:span class="xforms-alert-inactive xforms-alert xforms-repeat-template" id="my-old-input-2$$a"/>
-                <xhtml:label class="xforms-label xforms-repeat-template" id="my-old-boolean-input-2$$l" for="my-old-boolean-input-2$xforms-input-1"/>
-                <xhtml:span class="xforms-hint xforms-repeat-template" id="my-old-boolean-input-2$$t"/>
-                <xhtml:span id="my-old-boolean-input-2" class="xforms-control xforms-input xforms-repeat-template">
-                    <xhtml:input id="my-old-boolean-input-2$xforms-input-1" type="text" name="my-old-boolean-input-2$xforms-input-1" value="" class="xforms-input-input"/>
-                </xhtml:span>
-                <xhtml:img id="my-old-boolean-input-2$$i" class="xforms-disabled xforms-help-image xforms-repeat-template" src="/ops/images/xforms/help.png" title="" alt=""/>
-                <xhtml:span class="xforms-disabled xforms-help xforms-repeat-template" id="my-old-boolean-input-2$$p"/>
-                <xhtml:span class="xforms-alert-inactive xforms-alert xforms-repeat-template" id="my-old-boolean-input-2$$a"/>
-            </controls>
-        </output>
-    </test>
-
     <test description="New layout for xforms:select1[@appearance = 'minimal']" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-controls.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xs="http://www.w3.org/2001/XMLSchema">
                 <xhtml:head>
-                    <xforms:model id="main-model" xxforms:xhtml-layout="span" xxforms:encrypt-item-values="false">
+                    <xforms:model id="main-model" xxforms:encrypt-item-values="false">
                         <xforms:instance id="tests">
                             <instance>apple</instance>
                         </xforms:instance>
@@ -329,68 +208,12 @@
         </output>
     </test>
 
-    <test description="Old layout for xforms:select1[@appearance = 'minimal']" name="oxf:pipeline">
-        <input name="config" href="wrap-xforms-controls.xpl"/>
-        <input name="document">
-            <xhtml:html xmlns:xs="http://www.w3.org/2001/XMLSchema">
-                <xhtml:head>
-                    <xforms:model id="main-model" xxforms:xhtml-layout="nospan" xxforms:encrypt-item-values="false">
-                        <xforms:instance id="tests">
-                            <instance>apple</instance>
-                        </xforms:instance>
-                        <xforms:bind nodeset="." type="xs:NCName" required="true()"/>
-                    </xforms:model>
-                </xhtml:head>
-                <xhtml:body>
-                    <xforms:repeat id="my-repeat" nodeset=".">
-                        <xforms:select1 id="my-old-select1" ref="." appearance="minimal">
-                            <xforms:label>My label</xforms:label>
-                            <xforms:hint>My hint</xforms:hint>
-                            <xforms:help>My help</xforms:help>
-                            <xforms:alert>My alert</xforms:alert>
-                            <xforms:item>
-                                <xforms:label>Apple</xforms:label>
-                                <xforms:value>apple</xforms:value>
-                            </xforms:item>
-                            <xforms:item>
-                                <xforms:label>Orange</xforms:label>
-                                <xforms:value>orange</xforms:value>
-                            </xforms:item>
-                        </xforms:select1>
-                    </xforms:repeat>
-                </xhtml:body>
-            </xhtml:html>
-        </input>
-        <output name="response">
-            <controls xmlns:xhtml="http://www.w3.org/1999/xhtml">
-                <xhtml:label class="xforms-label xforms-repeat-selected-item-1" id="my-old-select1$$l·1" for="my-old-select1·1">My label</xhtml:label>
-                <xhtml:select id="my-old-select1·1" class="xforms-control xforms-select1 xforms-incremental xforms-select1-appearance-minimal xforms-required xforms-required-filled xforms-type-NCName xforms-repeat-selected-item-1" name="my-old-select1·1">
-                    <xhtml:option value="apple" selected="selected">Apple</xhtml:option>
-                    <xhtml:option value="orange">Orange</xhtml:option>
-                </xhtml:select>
-                <xhtml:img id="my-old-select1$$i·1" class="xforms-help-image xforms-repeat-selected-item-1" src="/ops/images/xforms/help.png" title="" alt=""/>
-                <xhtml:span class="xforms-help xforms-repeat-selected-item-1" id="my-old-select1$$p·1">My help</xhtml:span>
-                <xhtml:span class="xforms-alert-inactive xforms-alert xforms-repeat-selected-item-1" id="my-old-select1$$a·1">My alert</xhtml:span>
-                <xhtml:span class="xforms-hint xforms-repeat-selected-item-1" id="my-old-select1$$t·1">My hint</xhtml:span>
-                <xhtml:label class="xforms-label xforms-repeat-template" id="my-old-select1$$l" for="my-old-select1"/>
-                <xhtml:select id="my-old-select1" class="xforms-control xforms-select1 xforms-incremental xforms-select1-appearance-minimal xforms-repeat-template" name="my-old-select1">
-                    <xhtml:option value="apple">Apple</xhtml:option>
-                    <xhtml:option value="orange">Orange</xhtml:option>
-                </xhtml:select>
-                <xhtml:img id="my-old-select1$$i" class="xforms-disabled xforms-help-image xforms-repeat-template" src="/ops/images/xforms/help.png" title="" alt=""/>
-                <xhtml:span class="xforms-disabled xforms-help xforms-repeat-template" id="my-old-select1$$p"/>
-                <xhtml:span class="xforms-alert-inactive xforms-alert xforms-repeat-template" id="my-old-select1$$a"/>
-                <xhtml:span class="xforms-hint xforms-repeat-template" id="my-old-select1$$t"/>
-            </controls>
-        </output>
-    </test>
-
     <test description="New layout for xforms:output" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-controls.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xs="http://www.w3.org/2001/XMLSchema">
                 <xhtml:head>
-                    <xforms:model id="main-model" xxforms:xhtml-layout="span">
+                    <xforms:model id="main-model">
                         <xforms:instance id="tests">
                             <instance>Hello!</instance>
                         </xforms:instance>
@@ -431,54 +254,12 @@
         </output>
     </test>
 
-    <test description="Old layout for xforms:output" name="oxf:pipeline">
-        <input name="config" href="wrap-xforms-controls.xpl"/>
-        <input name="document">
-            <xhtml:html xmlns:xs="http://www.w3.org/2001/XMLSchema">
-                <xhtml:head>
-                    <xforms:model id="main-model" xxforms:xhtml-layout="nospan">
-                        <xforms:instance id="tests">
-                            <instance>Hello!</instance>
-                        </xforms:instance>
-                        <xforms:bind nodeset="." type="xs:NCName" required="true()"/>
-                    </xforms:model>
-                </xhtml:head>
-                <xhtml:body>
-                    <xforms:repeat id="my-repeat" nodeset=".">
-                        <xforms:output id="my-old-output" ref=".">
-                            <xforms:label>My label</xforms:label>
-                            <xforms:hint>My hint</xforms:hint>
-                            <xforms:help>My help</xforms:help>
-                            <xforms:alert>My alert</xforms:alert>
-                        </xforms:output>
-                    </xforms:repeat>
-                </xhtml:body>
-            </xhtml:html>
-        </input>
-        <output name="response">
-            <controls xmlns:xhtml="http://www.w3.org/1999/xhtml">
-                <xhtml:label class="xforms-label xforms-repeat-selected-item-1" id="my-old-output$$l·1" for="my-old-output·1">My label</xhtml:label>
-                <xhtml:span id="my-old-output·1" class="xforms-control xforms-output xforms-invalid xforms-required xforms-required-filled xforms-type-NCName xforms-repeat-selected-item-1">Hello!</xhtml:span>
-                <xhtml:img id="my-old-output$$i·1" class="xforms-help-image xforms-repeat-selected-item-1" src="/ops/images/xforms/help.png" title="" alt=""/>
-                <xhtml:span class="xforms-help xforms-repeat-selected-item-1" id="my-old-output$$p·1">My help</xhtml:span>
-                <xhtml:span class="xforms-alert-active xforms-alert xforms-repeat-selected-item-1" id="my-old-output$$a·1">My alert</xhtml:span>
-                <xhtml:span class="xforms-hint xforms-repeat-selected-item-1" id="my-old-output$$t·1">My hint</xhtml:span>
-                <xhtml:label class="xforms-label xforms-repeat-template" id="my-old-output$$l" for="my-old-output"/>
-                <xhtml:span id="my-old-output" class="xforms-control xforms-output xforms-repeat-template"/>
-                <xhtml:img id="my-old-output$$i" class="xforms-disabled xforms-help-image xforms-repeat-template" src="/ops/images/xforms/help.png" title="" alt=""/>
-                <xhtml:span class="xforms-disabled xforms-help xforms-repeat-template" id="my-old-output$$p"/>
-                <xhtml:span class="xforms-alert-inactive xforms-alert xforms-repeat-template" id="my-old-output$$a"/>
-                <xhtml:span class="xforms-hint xforms-repeat-template" id="my-old-output$$t"/>
-            </controls>
-        </output>
-    </test>
-
     <test description="New layout for xforms:group" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-controls.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                 <xhtml:head>
-                    <xforms:model id="main-model" xxforms:xhtml-layout="span">
+                    <xforms:model id="main-model">
                         <xforms:instance id="tests">
                             <instance>Hello!</instance>
                         </xforms:instance>
@@ -595,118 +376,12 @@
         </output>
     </test>
 
-    <test description="Old layout for xforms:group" name="oxf:pipeline">
-        <input name="config" href="wrap-xforms-controls.xpl"/>
-        <input name="document">
-            <xhtml:html xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
-                <xhtml:head>
-                    <xforms:model id="main-model" xxforms:xhtml-layout="nospan">
-                        <xforms:instance id="tests">
-                            <instance>Hello!</instance>
-                        </xforms:instance>
-                        <xforms:bind nodeset="." type="xs:NCName" required="true()"/>
-                    </xforms:model>
-                </xhtml:head>
-                <xhtml:body>
-                    <xforms:repeat id="my-repeat" nodeset=".">
-                        <xforms:group id="my-new-group" ref=".">
-                            <xforms:label>My label</xforms:label>
-                            <xforms:hint>My hint</xforms:hint>
-                            <xforms:help>My help</xforms:help>
-                            <xforms:alert>My alert</xforms:alert>
-                            <xforms:output id="my-new-output-1" value="'Hello!'"/>
-                        </xforms:group>
-                        <xforms:group id="my-new-internal-group" ref="." appearance="xxforms:internal">
-                            <xforms:label>My label</xforms:label>
-                            <xforms:hint>My hint</xforms:hint>
-                            <xforms:help>My help</xforms:help>
-                            <xforms:alert>My alert</xforms:alert>
-                            <xforms:output id="my-new-output-2" value="'Hello!'"/>
-                        </xforms:group>
-                        <xforms:group id="my-new-fieldset-group" ref="." appearance="xxforms:fieldset">
-                            <xforms:label>My label</xforms:label>
-                            <xforms:hint>My hint</xforms:hint>
-                            <xforms:help>My help</xforms:help>
-                            <xforms:alert>My alert</xforms:alert>
-                            <xforms:output id="my-new-output-3" value="'Hello!'"/>
-                        </xforms:group>
-                        <xhtml:table>
-                            <xforms:group id="my-new-table-group" ref=".">
-                                <xforms:label>My label</xforms:label>
-                                <xforms:hint>My hint</xforms:hint>
-                                <xforms:help>My help</xforms:help>
-                                <xforms:alert>My alert</xforms:alert>
-                                <xhtml:tr>
-                                    <xhtml:td><xforms:output id="my-new-output-4" value="'Hello!'"/></xhtml:td>
-                                </xhtml:tr>
-                            </xforms:group>
-                        </xhtml:table>
-                    </xforms:repeat>
-                </xhtml:body>
-            </xhtml:html>
-        </input>
-        <output name="response">
-            <controls xmlns:xhtml="http://www.w3.org/1999/xhtml">
-                <xhtml:label class="xforms-label xforms-repeat-selected-item-1" id="my-new-group$$l·1" for="my-new-group·1">My label</xhtml:label>
-                <xhtml:span id="my-new-group·1" class="xforms-group xforms-invalid xforms-required xforms-repeat-selected-item-1">
-                    <xhtml:span id="my-new-output-1·1" class="xforms-control xforms-output">Hello!</xhtml:span>
-                </xhtml:span>
-                <xhtml:img id="my-new-group$$i·1" class="xforms-help-image xforms-repeat-selected-item-1" src="/ops/images/xforms/help.png" title="" alt=""/>
-                <xhtml:span class="xforms-help xforms-repeat-selected-item-1" id="my-new-group$$p·1">My help</xhtml:span>
-                <xhtml:span class="xforms-alert-active xforms-alert xforms-repeat-selected-item-1" id="my-new-group$$a·1">My alert</xhtml:span>
-                <xhtml:span class="xforms-hint xforms-repeat-selected-item-1" id="my-new-group$$t·1">My hint</xhtml:span>
-                <xhtml:span id="my-new-output-2·1" class="xforms-control xforms-output xforms-repeat-selected-item-1">Hello!</xhtml:span>
-                <xhtml:fieldset id="my-new-fieldset-group·1" class="xforms-group xforms-group-appearance-xxforms-fieldset xforms-invalid xforms-required xforms-repeat-selected-item-1">
-                    <xhtml:legend class="xforms-label" id="my-new-fieldset-group$$l·1">My label</xhtml:legend>
-                    <xhtml:span id="my-new-output-3·1" class="xforms-control xforms-output">Hello!</xhtml:span>
-                </xhtml:fieldset>
-                <xhtml:img id="my-new-fieldset-group$$i·1" class="xforms-help-image xforms-repeat-selected-item-1" src="/ops/images/xforms/help.png" title="" alt=""/>
-                <xhtml:span class="xforms-help xforms-repeat-selected-item-1" id="my-new-fieldset-group$$p·1">My help</xhtml:span>
-                <xhtml:span class="xforms-alert-active xforms-alert xforms-repeat-selected-item-1" id="my-new-fieldset-group$$a·1">My alert</xhtml:span>
-                <xhtml:span class="xforms-hint xforms-repeat-selected-item-1" id="my-new-fieldset-group$$t·1">My hint</xhtml:span>
-                <xhtml:tr id="group-begin-my-new-table-group·1" class="xforms-group-begin-end xforms-invalid xforms-required"/>
-                <xhtml:tr class="xforms-invalid xforms-required">
-                    <xhtml:td>
-                        <xhtml:span id="my-new-output-4·1" class="xforms-control xforms-output">Hello!</xhtml:span>
-                    </xhtml:td>
-                </xhtml:tr>
-                <xhtml:tr id="group-end-my-new-table-group·1" class="xforms-group-begin-end"/>
-                <xhtml:label class="xforms-label xforms-repeat-template" id="my-new-group$$l" for="my-new-group"/>
-                <xhtml:span id="my-new-group" class="xforms-group xforms-repeat-template">
-                    <xhtml:span id="my-new-output-1" class="xforms-control xforms-output"/>
-                </xhtml:span>
-                <xhtml:img id="my-new-group$$i" class="xforms-disabled xforms-help-image xforms-repeat-template" src="/ops/images/xforms/help.png" title="" alt=""/>
-                <xhtml:span class="xforms-disabled xforms-help xforms-repeat-template" id="my-new-group$$p"/>
-                <xhtml:span class="xforms-alert-inactive xforms-alert xforms-repeat-template" id="my-new-group$$a"/>
-                <xhtml:span class="xforms-hint xforms-repeat-template" id="my-new-group$$t"/>
-                <xhtml:span id="my-new-output-2" class="xforms-control xforms-output xforms-repeat-template"/>
-                <xhtml:fieldset id="my-new-fieldset-group" class="xforms-group xforms-group-appearance-xxforms-fieldset xforms-repeat-template">
-                    <xhtml:legend class="xforms-label" id="my-new-fieldset-group$$l"/>
-                    <xhtml:span id="my-new-output-3" class="xforms-control xforms-output"/>
-                </xhtml:fieldset>
-                <xhtml:img id="my-new-fieldset-group$$i" class="xforms-disabled xforms-help-image xforms-repeat-template" src="/ops/images/xforms/help.png" title="" alt=""/>
-                <xhtml:span class="xforms-disabled xforms-help xforms-repeat-template" id="my-new-fieldset-group$$p"/>
-                <xhtml:span class="xforms-alert-inactive xforms-alert xforms-repeat-template" id="my-new-fieldset-group$$a"/>
-                <xhtml:span class="xforms-hint xforms-repeat-template" id="my-new-fieldset-group$$t"/>
-                <xhtml:table class="xforms-repeat-template">
-                    <xhtml:tr id="group-begin-my-new-table-group" class="xforms-group-begin-end"/>
-                    <xhtml:tr>
-                        <xhtml:td>
-                            <xhtml:span id="my-new-output-4" class="xforms-control xforms-output"/>
-                        </xhtml:td>
-                    </xhtml:tr>
-                    <xhtml:tr id="group-end-my-new-table-group" class="xforms-group-begin-end"/>
-                </xhtml:table>
-            </controls>
-        </output>
-    </test>
-
     <test description="New layout for xforms:trigger" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-controls.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xs="http://www.w3.org/2001/XMLSchema">
                 <xhtml:head>
-                    <xforms:model id="main-model" xxforms:xhtml-layout="span">
+                    <xforms:model id="main-model">
                         <xforms:instance id="tests">
                             <instance>Hello!</instance>
                         </xforms:instance>
@@ -790,85 +465,12 @@
         </output>
     </test>
 
-    <test description="Old layout for xforms:trigger" name="oxf:pipeline">
-        <input name="config" href="wrap-xforms-controls.xpl"/>
-        <input name="document">
-            <xhtml:html xmlns:xs="http://www.w3.org/2001/XMLSchema">
-                <xhtml:head>
-                    <xforms:model id="main-model" xxforms:xhtml-layout="nospan">
-                        <xforms:instance id="tests">
-                            <instance>Hello!</instance>
-                        </xforms:instance>
-                        <xforms:bind nodeset="." type="xs:NCName" required="true()"/>
-                    </xforms:model>
-                </xhtml:head>
-                <xhtml:body>
-                    <xforms:repeat id="my-repeat" nodeset=".">
-                        <xforms:trigger id="my-old-trigger" ref=".">
-                            <xforms:label>My label</xforms:label>
-                            <xforms:hint>My hint</xforms:hint>
-                            <xforms:help>My help</xforms:help>
-                            <xforms:alert>My alert</xforms:alert>
-                        </xforms:trigger>
-                        <xforms:trigger id="my-old-minimal-trigger" ref="." appearance="minimal">
-                            <xforms:label>My label</xforms:label>
-                            <xforms:hint>My hint</xforms:hint>
-                            <xforms:help>My help</xforms:help>
-                            <xforms:alert>My alert</xforms:alert>
-                        </xforms:trigger>
-                        <!-- xxforms:modal -->
-                        <xforms:trigger id="my-new-modal-trigger" ref="." xxforms:modal="true">
-                            <xforms:label>My label</xforms:label>
-                            <xforms:hint>My hint</xforms:hint>
-                            <xforms:help>My help</xforms:help>
-                            <xforms:alert>My alert</xforms:alert>
-                        </xforms:trigger>
-                        <xforms:trigger id="my-new-modal-minimal-trigger" ref="." appearance="minimal" xxforms:modal="true">
-                            <xforms:label>My label</xforms:label>
-                            <xforms:hint>My hint</xforms:hint>
-                            <xforms:help>My help</xforms:help>
-                            <xforms:alert>My alert</xforms:alert>
-                        </xforms:trigger>
-                    </xforms:repeat>
-                </xhtml:body>
-            </xhtml:html>
-        </input>
-        <output name="response">
-            <controls>
-                <xhtml:button id="my-old-trigger·1" class="xforms-control xforms-trigger xforms-trigger-appearance-full xforms-invalid xforms-required xforms-type-NCName btn xforms-repeat-selected-item-1" title="My hint" type="button">My label</xhtml:button>
-                <xhtml:img id="my-old-trigger$$i·1" class="xforms-help-image xforms-repeat-selected-item-1" src="/ops/images/xforms/help.png" title="" alt=""/>
-                <xhtml:span class="xforms-help xforms-repeat-selected-item-1" id="my-old-trigger$$p·1">My help</xhtml:span>
-                <xhtml:a id="my-old-minimal-trigger·1" class="xforms-control xforms-trigger xforms-trigger-appearance-minimal xforms-invalid xforms-required xforms-type-NCName xforms-repeat-selected-item-1" title="My hint" href="#">My label</xhtml:a>
-                <xhtml:img id="my-old-minimal-trigger$$i·1" class="xforms-help-image xforms-repeat-selected-item-1" src="/ops/images/xforms/help.png" title="" alt=""/>
-                <xhtml:span class="xforms-help xforms-repeat-selected-item-1" id="my-old-minimal-trigger$$p·1">My help</xhtml:span>
-                <xhtml:button id="my-new-modal-trigger·1" class="xforms-control xforms-trigger xforms-trigger-appearance-full xforms-trigger-appearance-modal xforms-invalid xforms-required xforms-type-NCName btn xforms-repeat-selected-item-1" title="My hint" type="button">My label</xhtml:button>
-                <xhtml:img id="my-new-modal-trigger$$i·1" class="xforms-help-image xforms-repeat-selected-item-1" src="/ops/images/xforms/help.png" title="" alt=""/>
-                <xhtml:span class="xforms-help xforms-repeat-selected-item-1" id="my-new-modal-trigger$$p·1">My help</xhtml:span>
-                <xhtml:a id="my-new-modal-minimal-trigger·1" class="xforms-control xforms-trigger xforms-trigger-appearance-minimal xforms-trigger-appearance-modal xforms-invalid xforms-required xforms-type-NCName xforms-repeat-selected-item-1" title="My hint" href="#">My label</xhtml:a>
-                <xhtml:img id="my-new-modal-minimal-trigger$$i·1" class="xforms-help-image xforms-repeat-selected-item-1" src="/ops/images/xforms/help.png" title="" alt=""/>
-                <xhtml:span class="xforms-help xforms-repeat-selected-item-1" id="my-new-modal-minimal-trigger$$p·1">My help</xhtml:span>
-                <xhtml:button id="my-old-trigger" class="xforms-control xforms-trigger xforms-trigger-appearance-full btn xforms-repeat-template" type="button"/>
-                <xhtml:img id="my-old-trigger$$i" class="xforms-disabled xforms-help-image xforms-repeat-template" src="/ops/images/xforms/help.png" title="" alt=""/>
-                <xhtml:span class="xforms-disabled xforms-help xforms-repeat-template" id="my-old-trigger$$p"/>
-                <xhtml:a id="my-old-minimal-trigger" class="xforms-control xforms-trigger xforms-trigger-appearance-minimal xforms-repeat-template" href="#"/>
-                <xhtml:img id="my-old-minimal-trigger$$i" class="xforms-disabled xforms-help-image xforms-repeat-template" src="/ops/images/xforms/help.png" title="" alt=""/>
-                <xhtml:span class="xforms-disabled xforms-help xforms-repeat-template" id="my-old-minimal-trigger$$p"/>
-                <xhtml:button id="my-new-modal-trigger" class="xforms-control xforms-trigger xforms-trigger-appearance-full xforms-trigger-appearance-modal btn xforms-repeat-template" type="button"/>
-                <xhtml:img id="my-new-modal-trigger$$i" class="xforms-disabled xforms-help-image xforms-repeat-template" src="/ops/images/xforms/help.png" title="" alt=""/>
-                <xhtml:span class="xforms-disabled xforms-help xforms-repeat-template" id="my-new-modal-trigger$$p"/>
-                <xhtml:a id="my-new-modal-minimal-trigger" class="xforms-control xforms-trigger xforms-trigger-appearance-minimal xforms-trigger-appearance-modal xforms-repeat-template" href="#"/>
-                <xhtml:img id="my-new-modal-minimal-trigger$$i" class="xforms-disabled xforms-help-image xforms-repeat-template" src="/ops/images/xforms/help.png" title="" alt=""/>
-                <xhtml:span class="xforms-disabled xforms-help xforms-repeat-template" id="my-new-modal-minimal-trigger$$p"/>
-            </controls>
-        </output>
-    </test>
-
     <test description="New layout for xforms:range" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-controls.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xs="http://www.w3.org/2001/XMLSchema">
                 <xhtml:head>
-                    <xforms:model id="main-model" xxforms:xhtml-layout="span">
+                    <xforms:model id="main-model">
                         <xforms:instance id="tests">
                             <instance>Hello!</instance>
                         </xforms:instance>
@@ -913,58 +515,12 @@
         </output>
     </test>
 
-    <test description="Old layout for xforms:range" name="oxf:pipeline">
-        <input name="config" href="wrap-xforms-controls.xpl"/>
-        <input name="document">
-            <xhtml:html xmlns:xs="http://www.w3.org/2001/XMLSchema">
-                <xhtml:head>
-                    <xforms:model id="main-model" xxforms:xhtml-layout="nospan">
-                        <xforms:instance id="tests">
-                            <instance>Hello!</instance>
-                        </xforms:instance>
-                        <xforms:bind nodeset="." type="xs:NCName" required="true()"/>
-                    </xforms:model>
-                </xhtml:head>
-                <xhtml:body>
-                    <xforms:repeat id="my-repeat" nodeset=".">
-                        <xforms:range id="my-old-range" ref=".">
-                            <xforms:label>My label</xforms:label>
-                            <xforms:hint>My hint</xforms:hint>
-                            <xforms:help>My help</xforms:help>
-                            <xforms:alert>My alert</xforms:alert>
-                        </xforms:range>
-                    </xforms:repeat>
-                </xhtml:body>
-            </xhtml:html>
-        </input>
-        <output name="response">
-            <controls xmlns:xhtml="http://www.w3.org/1999/xhtml">
-                <xhtml:label class="xforms-label xforms-repeat-selected-item-1" id="my-old-range$$l·1" for="my-old-range·1">My label</xhtml:label>
-                <xhtml:div id="my-old-range·1" class="xforms-control xforms-range xforms-invalid xforms-required xforms-required-filled xforms-type-NCName xforms-range-background xforms-repeat-selected-item-1">
-                    <xhtml:div class="xforms-range-thumb"/>
-                </xhtml:div>
-                <xhtml:img id="my-old-range$$i·1" class="xforms-help-image xforms-repeat-selected-item-1" src="/ops/images/xforms/help.png" title="" alt=""/>
-                <xhtml:span class="xforms-help xforms-repeat-selected-item-1" id="my-old-range$$p·1">My help</xhtml:span>
-                <xhtml:span class="xforms-alert-active xforms-alert xforms-repeat-selected-item-1" id="my-old-range$$a·1">My alert</xhtml:span>
-                <xhtml:span class="xforms-hint xforms-repeat-selected-item-1" id="my-old-range$$t·1">My hint</xhtml:span>
-                <xhtml:label class="xforms-label xforms-repeat-template" id="my-old-range$$l" for="my-old-range"/>
-                <xhtml:div id="my-old-range" class="xforms-control xforms-range xforms-range-background xforms-repeat-template">
-                    <xhtml:div class="xforms-range-thumb"/>
-                </xhtml:div>
-                <xhtml:img id="my-old-range$$i" class="xforms-disabled xforms-help-image xforms-repeat-template" src="/ops/images/xforms/help.png" title="" alt=""/>
-                <xhtml:span class="xforms-disabled xforms-help xforms-repeat-template" id="my-old-range$$p"/>
-                <xhtml:span class="xforms-alert-inactive xforms-alert xforms-repeat-template" id="my-old-range$$a"/>
-                <xhtml:span class="xforms-hint xforms-repeat-template" id="my-old-range$$t"/>
-            </controls>
-        </output>
-    </test>
-
     <test description="New layout for xforms:select[not(@appearance) or @appearance = 'compact']" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-controls.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xs="http://www.w3.org/2001/XMLSchema">
                 <xhtml:head>
-                    <xforms:model id="main-model" xxforms:xhtml-layout="span" xxforms:encrypt-item-values="false">
+                    <xforms:model id="main-model" xxforms:encrypt-item-values="false">
                         <xforms:instance id="tests">
                             <instance>apple</instance>
                         </xforms:instance>
@@ -1055,100 +611,12 @@
         </output>
     </test>
 
-    <test description="Old layout for xforms:select[not(@appearance) or @appearance = 'compact']" name="oxf:pipeline">
-        <input name="config" href="wrap-xforms-controls.xpl"/>
-        <input name="document">
-            <xhtml:html xmlns:xs="http://www.w3.org/2001/XMLSchema">
-                <xhtml:head>
-                    <xforms:model id="main-model" xxforms:xhtml-layout="nospan" xxforms:encrypt-item-values="false">
-                        <xforms:instance id="tests">
-                            <instance>apple</instance>
-                        </xforms:instance>
-                        <xforms:bind nodeset="." type="xs:NCName" required="true()"/>
-                    </xforms:model>
-                </xhtml:head>
-                <xhtml:body>
-                    <xforms:repeat id="my-repeat" nodeset=".">
-                        <xforms:select id="my-new-select" ref=".">
-                            <xforms:label>My label</xforms:label>
-                            <xforms:hint>My hint</xforms:hint>
-                            <xforms:help>My help</xforms:help>
-                            <xforms:alert>My alert</xforms:alert>
-                            <xforms:item>
-                                <xforms:label>Apple</xforms:label>
-                                <xforms:value>apple</xforms:value>
-                            </xforms:item>
-                            <xforms:item>
-                                <xforms:label>Orange</xforms:label>
-                                <xforms:value>orange</xforms:value>
-                            </xforms:item>
-                        </xforms:select>
-                        <xforms:select id="my-new-compact-select" ref="." appearance="compact">
-                            <xforms:label>My label</xforms:label>
-                            <xforms:hint>My hint</xforms:hint>
-                            <xforms:help>My help</xforms:help>
-                            <xforms:alert>My alert</xforms:alert>
-                            <xforms:item>
-                                <xforms:label>Apple</xforms:label>
-                                <xforms:value>apple</xforms:value>
-                            </xforms:item>
-                            <xforms:item>
-                                <xforms:label>Orange</xforms:label>
-                                <xforms:value>orange</xforms:value>
-                            </xforms:item>
-                        </xforms:select>
-                    </xforms:repeat>
-                </xhtml:body>
-            </xhtml:html>
-        </input>
-        <output name="response">
-            <controls xmlns:xhtml="http://www.w3.org/1999/xhtml">
-                <xhtml:label class="xforms-label xforms-repeat-selected-item-1" id="my-new-select$$l·1" for="my-new-select·1">My label</xhtml:label>
-                <xhtml:select id="my-new-select·1" class="xforms-control xforms-select xforms-incremental xforms-select-appearance-compact xforms-required xforms-required-filled xforms-type-NCName xforms-repeat-selected-item-1" name="my-new-select·1" multiple="multiple">
-                    <xhtml:option value="apple" selected="selected">Apple</xhtml:option>
-                    <xhtml:option value="orange">Orange</xhtml:option>
-                </xhtml:select>
-                <xhtml:img id="my-new-select$$i·1" class="xforms-help-image xforms-repeat-selected-item-1" src="/ops/images/xforms/help.png" title="" alt=""/>
-                <xhtml:span class="xforms-help xforms-repeat-selected-item-1" id="my-new-select$$p·1">My help</xhtml:span>
-                <xhtml:span class="xforms-alert-inactive xforms-alert xforms-repeat-selected-item-1" id="my-new-select$$a·1">My alert</xhtml:span>
-                <xhtml:span class="xforms-hint xforms-repeat-selected-item-1" id="my-new-select$$t·1">My hint</xhtml:span>
-                <xhtml:label class="xforms-label xforms-repeat-selected-item-1" id="my-new-compact-select$$l·1" for="my-new-compact-select·1">My label</xhtml:label>
-                <xhtml:select id="my-new-compact-select·1" class="xforms-control xforms-select xforms-incremental xforms-select-appearance-compact xforms-required xforms-required-filled xforms-type-NCName xforms-repeat-selected-item-1" name="my-new-compact-select·1" multiple="multiple">
-                    <xhtml:option value="apple" selected="selected">Apple</xhtml:option>
-                    <xhtml:option value="orange">Orange</xhtml:option>
-                </xhtml:select>
-                <xhtml:img id="my-new-compact-select$$i·1" class="xforms-help-image xforms-repeat-selected-item-1" src="/ops/images/xforms/help.png" title="" alt=""/>
-                <xhtml:span class="xforms-help xforms-repeat-selected-item-1" id="my-new-compact-select$$p·1">My help</xhtml:span>
-                <xhtml:span class="xforms-alert-inactive xforms-alert xforms-repeat-selected-item-1" id="my-new-compact-select$$a·1">My alert</xhtml:span>
-                <xhtml:span class="xforms-hint xforms-repeat-selected-item-1" id="my-new-compact-select$$t·1">My hint</xhtml:span>
-                <xhtml:label class="xforms-label xforms-repeat-template" id="my-new-select$$l" for="my-new-select"/>
-                <xhtml:select id="my-new-select" class="xforms-control xforms-select xforms-incremental xforms-select-appearance-compact xforms-repeat-template" name="my-new-select" multiple="multiple">
-                    <xhtml:option value="apple">Apple</xhtml:option>
-                    <xhtml:option value="orange">Orange</xhtml:option>
-                </xhtml:select>
-                <xhtml:img id="my-new-select$$i" class="xforms-disabled xforms-help-image xforms-repeat-template" src="/ops/images/xforms/help.png" title="" alt=""/>
-                <xhtml:span class="xforms-disabled xforms-help xforms-repeat-template" id="my-new-select$$p"/>
-                <xhtml:span class="xforms-alert-inactive xforms-alert xforms-repeat-template" id="my-new-select$$a"/>
-                <xhtml:span class="xforms-hint xforms-repeat-template" id="my-new-select$$t"/>
-                <xhtml:label class="xforms-label xforms-repeat-template" id="my-new-compact-select$$l" for="my-new-compact-select"/>
-                <xhtml:select id="my-new-compact-select" class="xforms-control xforms-select xforms-incremental xforms-select-appearance-compact xforms-repeat-template" name="my-new-compact-select" multiple="multiple">
-                    <xhtml:option value="apple">Apple</xhtml:option>
-                    <xhtml:option value="orange">Orange</xhtml:option>
-                </xhtml:select>
-                <xhtml:img id="my-new-compact-select$$i" class="xforms-disabled xforms-help-image xforms-repeat-template" src="/ops/images/xforms/help.png" title="" alt=""/>
-                <xhtml:span class="xforms-disabled xforms-help xforms-repeat-template" id="my-new-compact-select$$p"/>
-                <xhtml:span class="xforms-alert-inactive xforms-alert xforms-repeat-template" id="my-new-compact-select$$a"/>
-                <xhtml:span class="xforms-hint xforms-repeat-template" id="my-new-compact-select$$t"/>
-            </controls>
-        </output>
-    </test>
-
     <test description="New layout for xforms:upload" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-controls.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xs="http://www.w3.org/2001/XMLSchema">
                 <xhtml:head>
-                    <xforms:model id="main-model" xxforms:xhtml-layout="span">
+                    <xforms:model id="main-model">
                         <xforms:instance id="tests">
                             <instance>
                                 <default xsi:type="xs:anyURI"/>
@@ -1241,100 +709,6 @@
                 <xhtml:img id="my-new-upload-2$$i" class="xforms-disabled xforms-help-image xforms-repeat-template" src="/ops/images/xforms/help.png" title="" alt=""/>
                 <xhtml:span class="xforms-disabled xforms-help xforms-repeat-template" id="my-new-upload-2$$p"/>
                 <xhtml:span class="xforms-alert-inactive xforms-alert xforms-repeat-template" id="my-new-upload-2$$a"/>
-            </controls>
-        </output>
-    </test>
-
-    <test description="Old layout for xforms:upload" name="oxf:pipeline">
-        <input name="config" href="wrap-xforms-controls.xpl"/>
-        <input name="document">
-            <xhtml:html xmlns:xs="http://www.w3.org/2001/XMLSchema">
-                <xhtml:head>
-                    <xforms:model id="main-model" xxforms:xhtml-layout="nospan">
-                        <xforms:instance id="tests">
-                            <instance>
-                                <default xsi:type="xs:anyURI"/>
-                            </instance>
-                        </xforms:instance>
-                    </xforms:model>
-                </xhtml:head>
-                <xhtml:body>
-                    <xforms:repeat id="my-repeat" nodeset=".">
-                        <!-- Nested LHHA -->
-                        <xforms:upload id="my-old-upload" ref="default">
-                            <xforms:label>My label</xforms:label>
-                            <xforms:hint>My hint</xforms:hint>
-                            <xforms:help>My help</xforms:help>
-                            <xforms:alert>My alert</xforms:alert>
-                        </xforms:upload>
-                        <!-- External LHHA -->
-                        <xforms:label for="my-old-upload-2">My label</xforms:label>
-                        <xforms:hint for="my-old-upload-2">My hint</xforms:hint>
-                        <xforms:upload id="my-old-upload-2" ref="default"/>
-                        <xforms:help for="my-old-upload-2">My help</xforms:help>
-                        <xforms:alert for="my-old-upload-2">My alert</xforms:alert>
-                    </xforms:repeat>
-                </xhtml:body>
-            </xhtml:html>
-        </input>
-        <output name="response">
-            <controls xmlns:xhtml="http://www.w3.org/1999/xhtml">
-                <xhtml:label class="xforms-label xforms-repeat-selected-item-1" id="my-old-upload$$l·1" for="my-old-upload$xforms-input·1">My label</xhtml:label>
-                <xhtml:span id="my-old-upload·1" class="xforms-control xforms-upload xforms-type-anyURI xforms-upload-state-empty xforms-repeat-selected-item-1">
-                    <xhtml:input class="xforms-upload-select" type="file" id="my-old-upload$xforms-input·1" name="my-old-upload·1" unselectable="on"/>
-                    <xhtml:span class="xforms-upload-info">
-                        <xhtml:span class="xforms-upload-filename"/>
-                        <xhtml:span class="xforms-upload-mediatype"/>
-                        <xhtml:span class="xforms-upload-size"/>
-                        <xhtml:img class="xforms-upload-remove" src="/ops/images/xforms/remove.gif" alt="Remove File" title="Remove File"/>
-                    </xhtml:span>
-                </xhtml:span>
-                <xhtml:img id="my-old-upload$$i·1" class="xforms-help-image xforms-repeat-selected-item-1" src="/ops/images/xforms/help.png" title="" alt=""/>
-                <xhtml:span class="xforms-help xforms-repeat-selected-item-1" id="my-old-upload$$p·1">My help</xhtml:span>
-                <xhtml:span class="xforms-alert-inactive xforms-alert xforms-repeat-selected-item-1" id="my-old-upload$$a·1">My alert</xhtml:span>
-                <xhtml:span class="xforms-hint xforms-repeat-selected-item-1" id="my-old-upload$$t·1">My hint</xhtml:span>
-                <xhtml:label class="xforms-label xforms-repeat-selected-item-1" id="my-old-upload-2$$l·1" for="my-old-upload-2$xforms-input·1">My label</xhtml:label>
-                <xhtml:span class="xforms-hint xforms-repeat-selected-item-1" id="my-old-upload-2$$t·1">My hint</xhtml:span>
-                <xhtml:span id="my-old-upload-2·1" class="xforms-control xforms-upload xforms-type-anyURI xforms-upload-state-empty xforms-repeat-selected-item-1">
-                    <xhtml:input class="xforms-upload-select" type="file" id="my-old-upload-2$xforms-input·1" name="my-old-upload-2·1" unselectable="on"/>
-                    <xhtml:span class="xforms-upload-info">
-                        <xhtml:span class="xforms-upload-filename"/>
-                        <xhtml:span class="xforms-upload-mediatype"/>
-                        <xhtml:span class="xforms-upload-size"/>
-                        <xhtml:img class="xforms-upload-remove" src="/ops/images/xforms/remove.gif" alt="Remove File" title="Remove File"/>
-                    </xhtml:span>
-                </xhtml:span>
-                <xhtml:img id="my-old-upload-2$$i·1" class="xforms-help-image xforms-repeat-selected-item-1" src="/ops/images/xforms/help.png" title="" alt=""/>
-                <xhtml:span class="xforms-help xforms-repeat-selected-item-1" id="my-old-upload-2$$p·1">My help</xhtml:span>
-                <xhtml:span class="xforms-alert-inactive xforms-alert xforms-repeat-selected-item-1" id="my-old-upload-2$$a·1">My alert</xhtml:span>
-                <xhtml:label class="xforms-label xforms-repeat-template" id="my-old-upload$$l" for="my-old-upload$xforms-input"/>
-                <xhtml:span id="my-old-upload" class="xforms-control xforms-upload xforms-upload-state-empty xforms-repeat-template">
-                    <xhtml:input class="xforms-upload-select" type="file" id="my-old-upload$xforms-input" name="my-old-upload" unselectable="on"/>
-                    <xhtml:span class="xforms-upload-info">
-                        <xhtml:span class="xforms-upload-filename"/>
-                        <xhtml:span class="xforms-upload-mediatype"/>
-                        <xhtml:span class="xforms-upload-size"/>
-                        <xhtml:img class="xforms-upload-remove" src="/ops/images/xforms/remove.gif" alt="Remove File" title="Remove File"/>
-                    </xhtml:span>
-                </xhtml:span>
-                <xhtml:img id="my-old-upload$$i" class="xforms-disabled xforms-help-image xforms-repeat-template" src="/ops/images/xforms/help.png" title="" alt=""/>
-                <xhtml:span class="xforms-disabled xforms-help xforms-repeat-template" id="my-old-upload$$p"/>
-                <xhtml:span class="xforms-alert-inactive xforms-alert xforms-repeat-template" id="my-old-upload$$a"/>
-                <xhtml:span class="xforms-hint xforms-repeat-template" id="my-old-upload$$t"/>
-                <xhtml:label class="xforms-label xforms-repeat-template" id="my-old-upload-2$$l" for="my-old-upload-2$xforms-input"/>
-                <xhtml:span class="xforms-hint xforms-repeat-template" id="my-old-upload-2$$t"/>
-                <xhtml:span id="my-old-upload-2" class="xforms-control xforms-upload xforms-upload-state-empty xforms-repeat-template">
-                    <xhtml:input class="xforms-upload-select" type="file" id="my-old-upload-2$xforms-input" name="my-old-upload-2" unselectable="on"/>
-                    <xhtml:span class="xforms-upload-info">
-                        <xhtml:span class="xforms-upload-filename"/>
-                        <xhtml:span class="xforms-upload-mediatype"/>
-                        <xhtml:span class="xforms-upload-size"/>
-                        <xhtml:img class="xforms-upload-remove" src="/ops/images/xforms/remove.gif" alt="Remove File" title="Remove File"/>
-                    </xhtml:span>
-                </xhtml:span>
-                <xhtml:img id="my-old-upload-2$$i" class="xforms-disabled xforms-help-image xforms-repeat-template" src="/ops/images/xforms/help.png" title="" alt=""/>
-                <xhtml:span class="xforms-disabled xforms-help xforms-repeat-template" id="my-old-upload-2$$p"/>
-                <xhtml:span class="xforms-alert-inactive xforms-alert xforms-repeat-template" id="my-old-upload-2$$a"/>
             </controls>
         </output>
     </test>
@@ -1467,7 +841,7 @@
         <input name="document">
             <xhtml:html xmlns:xs="http://www.w3.org/2001/XMLSchema">
                 <xhtml:head>
-                    <xforms:model id="main-model" xxforms:xhtml-layout="span">
+                    <xforms:model id="main-model">
                         <xforms:instance id="tests">
                             <instance>
                                 <default>Hello!</default>
@@ -1505,7 +879,7 @@
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                 <xhtml:head>
-                    <xforms:model id="model" xxforms:encrypt-item-values="false" xxforms:xhtml-layout="span">
+                    <xforms:model id="model" xxforms:encrypt-item-values="false">
                         <xforms:instance id="selection">
                             <value/>
                         </xforms:instance>
@@ -1560,7 +934,7 @@
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                 <xhtml:head>
-                    <xforms:model id="model" xxforms:encrypt-item-values="false" xxforms:xhtml-layout="span">
+                    <xforms:model id="model" xxforms:encrypt-item-values="false">
                         <xforms:instance id="selection">
                             <value/>
                         </xforms:instance>
@@ -1623,9 +997,9 @@
             </xhtml:html>
         </input>
         <output name="response">
-            <controls xmlns:xhtml="http://www.w3.org/1999/xhtml">
+            <controls>
                 <xhtml:span id="my-output" class="xforms-control xforms-output xforms-mediatype-image xforms-disabled">
-                    <xhtml:img src="/ops/images/xforms/spacer.gif"/>
+                    <xhtml:img id="my-output$$c" class="xforms-output-output" src="/ops/images/xforms/spacer.gif"/>
                 </xhtml:span>
             </controls>
         </output>
@@ -1832,7 +1206,7 @@
         <input name="document">
             <xhtml:html xmlns:xs="http://www.w3.org/2001/XMLSchema">
                 <xhtml:head>
-                    <xforms:model id="main-model" xxforms:xhtml-layout="span" xxforms:encrypt-item-values="false">
+                    <xforms:model id="main-model" xxforms:encrypt-item-values="false">
                         <xforms:instance id="tests">
                             <instance>apple</instance>
                         </xforms:instance>
@@ -1903,84 +1277,12 @@
         </output>
     </test>
 
-    <test description="Old layout for xforms:select1[@appearance = 'full']" name="oxf:pipeline">
-        <input name="config" href="wrap-xforms-controls.xpl"/>
-        <input name="document">
-            <xhtml:html xmlns:xs="http://www.w3.org/2001/XMLSchema">
-                <xhtml:head>
-                    <xforms:model id="main-model" xxforms:xhtml-layout="nospan" xxforms:encrypt-item-values="false">
-                        <xforms:instance id="tests">
-                            <instance>apple</instance>
-                        </xforms:instance>
-                        <xforms:bind nodeset="." type="xs:NCName" required="true()"/>
-                    </xforms:model>
-                </xhtml:head>
-                <xhtml:body>
-                    <xforms:repeat id="my-repeat" nodeset=".">
-                        <xforms:select1 id="my-new-select1" ref="." appearance="full">
-                            <xforms:label>My label</xforms:label>
-                            <xforms:hint>My hint</xforms:hint>
-                            <xforms:help>My help</xforms:help>
-                            <xforms:alert>My alert</xforms:alert>
-                            <xforms:item>
-                                <xforms:label>Apple</xforms:label>
-                                <xforms:value>apple</xforms:value>
-                            </xforms:item>
-                            <xforms:item>
-                                <xforms:label>Orange</xforms:label>
-                                <xforms:value>orange</xforms:value>
-                            </xforms:item>
-                        </xforms:select1>
-                    </xforms:repeat>
-                </xhtml:body>
-            </xhtml:html>
-        </input>
-        <output name="response">
-            <controls xmlns:xhtml="http://www.w3.org/1999/xhtml">
-                <xhtml:label class="xforms-label xforms-repeat-selected-item-1" id="my-new-select1$$l·1">My label</xhtml:label>
-                <xhtml:span id="my-new-select1·1" class="xforms-control xforms-select1 xforms-incremental xforms-select1-appearance-full xforms-required xforms-required-filled xforms-type-NCName xforms-repeat-selected-item-1">
-                    <xhtml:span class="xforms-selected">
-                        <xhtml:label for="my-new-select1$$e0·1">
-                            <xhtml:input id="my-new-select1$$e0·1" type="radio" name="my-new-select1·1" value="apple" checked="checked"/>Apple
-                        </xhtml:label>
-                    </xhtml:span>
-                    <xhtml:span class="xforms-deselected">
-                        <xhtml:label for="my-new-select1$$e1·1">
-                            <xhtml:input id="my-new-select1$$e1·1" type="radio" name="my-new-select1·1" value="orange"/>Orange
-                        </xhtml:label>
-                    </xhtml:span>
-                </xhtml:span>
-                <xhtml:img id="my-new-select1$$i·1" class="xforms-help-image xforms-repeat-selected-item-1" src="/ops/images/xforms/help.png" title="" alt=""/>
-                <xhtml:span class="xforms-help xforms-repeat-selected-item-1" id="my-new-select1$$p·1">My help</xhtml:span>
-                <xhtml:span class="xforms-alert-inactive xforms-alert xforms-repeat-selected-item-1" id="my-new-select1$$a·1">My alert</xhtml:span>
-                <xhtml:span class="xforms-hint xforms-repeat-selected-item-1" id="my-new-select1$$t·1">My hint</xhtml:span>
-                <xhtml:label class="xforms-label xforms-repeat-template" id="my-new-select1$$l"/>
-                <xhtml:span id="my-new-select1" class="xforms-control xforms-select1 xforms-incremental xforms-select1-appearance-full xforms-repeat-template">
-                    <xhtml:span class="xforms-deselected">
-                        <xhtml:label for="my-new-select1$$e0">
-                            <xhtml:input id="my-new-select1$$e0" type="radio" name="my-new-select1" value="apple"/>Apple
-                        </xhtml:label>
-                    </xhtml:span>
-                    <xhtml:span class="xforms-deselected">
-                        <xhtml:label for="my-new-select1$$e1">
-                            <xhtml:input id="my-new-select1$$e1" type="radio" name="my-new-select1" value="orange"/>Orange
-                        </xhtml:label>
-                    </xhtml:span>
-                </xhtml:span>
-                <xhtml:img id="my-new-select1$$i" class="xforms-disabled xforms-help-image xforms-repeat-template" src="/ops/images/xforms/help.png" title="" alt=""/>
-                <xhtml:span class="xforms-disabled xforms-help xforms-repeat-template" id="my-new-select1$$p"/>
-                <xhtml:span class="xforms-alert-inactive xforms-alert xforms-repeat-template" id="my-new-select1$$a"/>
-                <xhtml:span class="xforms-hint xforms-repeat-template" id="my-new-select1$$t"/>
-            </controls>
-        </output>
-    </test>
-
     <test description="Placement of HTML @disabled attribute with non-relevant, readonly, and case visibility" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-controls.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xs="http://www.w3.org/2001/XMLSchema">
                 <xhtml:head>
-                    <xforms:model id="main-model" xxforms:xhtml-layout="nospan" xxforms:encrypt-item-values="false">
+                    <xforms:model id="main-model" xxforms:encrypt-item-values="false">
                         <xforms:instance id="tests">
                             <instance>
                                 <default/>
@@ -2129,15 +1431,15 @@
             </xh:html>
         </input>
         <output name="response">
-            <controls xmlns:xhtml="http://www.w3.org/1999/xhtml">
-                <xh:label xmlns:xh="http://www.w3.org/1999/xhtml" class="xforms-label" id="xf-1$$l" for="xf-1$xforms-input-1">Foo
-                    <xh:br clear="none"/>Bar
-                </xh:label>
-                <xh:span xmlns:xh="http://www.w3.org/1999/xhtml" id="xf-1" class="xforms-control xforms-input">
-                    <xh:input id="xf-1$xforms-input-1" type="text" name="xf-1$xforms-input-1" value="" class="xforms-input-input"/>
-                </xh:span>
-                <xh:img xmlns:xh="http://www.w3.org/1999/xhtml" id="xf-1$$i" class="xforms-help-image" src="/ops/images/xforms/help.png" title="" alt=""></xh:img>
-                <xh:span xmlns:xh="http://www.w3.org/1999/xhtml" class="xforms-help" id="xf-1$$p">Foo&lt;div&gt;&lt;/div&gt;Bar</xh:span>
+            <controls>
+                <xhtml:span id="xf-1" class="xforms-control xforms-input">
+                    <xhtml:label class="xforms-label" for="xf-1$xforms-input-1">Foo
+                        <xhtml:br clear="none"/>Bar
+                    </xhtml:label>
+                    <xhtml:input id="xf-1$xforms-input-1" type="text" name="xf-1$xforms-input-1" value="" class="xforms-input-input"/>
+                    <xhtml:img class="xforms-help-image" src="/ops/images/xforms/help.png" title="" alt=""/>
+                    <xhtml:span class="xforms-help">Foo&lt;div&gt;&lt;/div&gt;Bar</xhtml:span>
+                </xhtml:span>
             </controls>
         </output>
     </test>
@@ -2160,12 +1462,14 @@
             </xh:html>
         </input>
         <output name="response">
-            <controls xmlns:xhtml="http://www.w3.org/1999/xhtml">
-                <xh:div xmlns:xh="http://www.w3.org/1999/xhtml" id="my-output" class="xforms-control xforms-output xforms-mediatype-text-html xforms-mediatype-text">
-                    <xh:div>
-                        <xh:p>Hello!</xh:p>
-                    </xh:div>
-                </xh:div>
+            <controls>
+                <xhtml:div id="my-output" class="xforms-control xforms-output xforms-mediatype-text-html xforms-mediatype-text">
+                    <xhtml:div id="my-output$$c" class="xforms-output-output">
+                        <xhtml:div>
+                            <xhtml:p>Hello!</xhtml:p>
+                        </xhtml:div>
+                    </xhtml:div>
+                </xhtml:div>
             </controls>
         </output>
     </test>
@@ -2176,7 +1480,7 @@
         <input name="document">
             <xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms">
                 <xh:head>
-                    <xf:model xxforms:xhtml-layout="span" xxforms:encrypt-item-values="false">
+                    <xf:model xxforms:encrypt-item-values="false">
                         <xf:instance xmlns="">
                             <Testcase>
                                 <myvalue/>
@@ -2517,7 +1821,7 @@
         <input name="document">
             <xhtml:html>
                 <xhtml:head>
-                    <xforms:model id="model" xxforms:xhtml-layout="span">
+                    <xforms:model id="model">
                         <xforms:instance id="instance">
                             <lists>
                                 <list>
@@ -2585,7 +1889,7 @@
         <input name="document">
             <xhtml:html>
                 <xhtml:head>
-                    <xforms:model id="model" xxforms:xhtml-layout="span" xxforms:noscript="false">
+                    <xforms:model id="model" xxforms:noscript="false">
                         <xforms:instance id="instance">
                             <instance/>
                         </xforms:instance>
@@ -2629,7 +1933,7 @@
         <input name="document">
             <xhtml:html>
                 <xhtml:head>
-                    <xforms:model id="model" xxforms:xhtml-layout="span" xxforms:noscript="true">
+                    <xforms:model id="model" xxforms:noscript="true">
                         <xforms:instance id="instance">
                             <instance/>
                         </xforms:instance>
@@ -2667,7 +1971,7 @@
         <input name="document">
             <xhtml:html>
                 <xhtml:head>
-                    <xforms:model id="model" xxforms:xhtml-layout="span">
+                    <xforms:model id="model">
                         <xforms:instance id="instance">
                             <instance>
                                 <default/>
@@ -2731,7 +2035,7 @@
         <input name="document">
             <xhtml:html>
                 <xhtml:head>
-                    <xforms:model xxforms:xhtml-layout="span">
+                    <xforms:model>
                         <xforms:instance>
                             <value>
                                 <span xmlns="">

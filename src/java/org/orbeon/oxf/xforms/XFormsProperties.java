@@ -113,15 +113,11 @@ public class XFormsProperties {
 
     private static final String ASYNC_SUBMISSION_POLL_DELAY = "submission-poll-delay";
 
-    public static final String NEW_XHTML_LAYOUT = "new-xhtml-layout";   // deprecated
-    public static final String XHTML_LAYOUT = "xhtml-layout";
     public static final String RETRY_DELAY_INCREMENT = "retry.delay-increment";
     public static final String RETRY_MAX_DELAY = "retry.max-delay";
     public static final String USE_ARIA = "use-aria";
 
     public static final String XFORMS11_SWITCH_PROPERTY = "xforms11-switch";
-
-    public enum XHTMLLayout { NOSPAN, SPAN }
 
     public static final String ENCRYPT_ITEM_VALUES_PROPERTY = "encrypt-item-values";
     public static final String XPATH_ANALYSIS_PROPERTY = "xpath-analysis";
@@ -225,8 +221,6 @@ public class XFormsProperties {
             new PropertyDefinition(CACHE_DOCUMENT_PROPERTY, CACHE_DOCUMENT_DEFAULT, false),
 
             // Properties to propagate to the client
-            new PropertyDefinition(NEW_XHTML_LAYOUT, false, true),
-            new PropertyDefinition(XHTML_LAYOUT, XHTMLLayout.NOSPAN.toString().toLowerCase(), true),
             new PropertyDefinition(RETRY_DELAY_INCREMENT, 5000, true),
             new PropertyDefinition(RETRY_MAX_DELAY, 30000, true),
             new PropertyDefinition(USE_ARIA, false, true),
@@ -479,12 +473,6 @@ public class XFormsProperties {
 
     public static boolean isIgnoreDynamicMIPXPathErrors(XFormsContainingDocument containingDocument) {
         return getBooleanProperty(containingDocument, IGNORE_DYNAMIC_MIP_XPATH_ERRORS_PROPERTY);
-    }
-
-    public static boolean isSpanHTMLLayout(XFormsContainingDocument containingDocument) {
-        // Check both properties for backward compatibility
-        final String value = getStringProperty(containingDocument, XHTML_LAYOUT);
-        return XHTMLLayout.SPAN.toString().toLowerCase().equals(value) || getBooleanProperty(containingDocument, NEW_XHTML_LAYOUT);
     }
 
     public static boolean isReadonly(XFormsContainingDocument containingDocument) {

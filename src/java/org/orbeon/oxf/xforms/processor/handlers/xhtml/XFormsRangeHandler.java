@@ -40,15 +40,6 @@ public class XFormsRangeHandler extends XFormsControlLifecyleHandler {
         return ENCLOSING_ELEMENT_NAME;
     }
 
-    @Override
-    protected void addCustomClasses(StringBuilder classes, XFormsControl control) {
-        if (!handlerContext.isSpanHTMLLayout()) {
-            if (classes.length() > 0)
-                classes.append(' ');
-            classes.append(RANGE_BACKGROUND_CLASS);
-        }
-    }
-
     protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String effectiveId, XFormsControl control) throws SAXException {
 
         final XFormsRangeControl rangeControl = (XFormsRangeControl) control;
@@ -77,11 +68,9 @@ public class XFormsRangeHandler extends XFormsControlLifecyleHandler {
     }
 
     protected AttributesImpl getBackgroundAttributes(String uri, String localname, Attributes attributes, String effectiveId, XFormsRangeControl xformsControl) {
+        // Add custom class
         final AttributesImpl containerAttributes = getContainerAttributes(uri, localname, attributes, effectiveId, xformsControl, true);
-        if (handlerContext.isSpanHTMLLayout()) {
-            // Add custom class (added in addCustomClasses() for old layout)
-            containerAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, RANGE_BACKGROUND_CLASS);
-        }
+        containerAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, RANGE_BACKGROUND_CLASS);
         return containerAttributes;
     }
 }

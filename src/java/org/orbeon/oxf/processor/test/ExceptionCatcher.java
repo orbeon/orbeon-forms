@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.processor.test;
 
-import org.orbeon.exception.Exceptions;
+import org.orbeon.errorified.Exceptions;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.*;

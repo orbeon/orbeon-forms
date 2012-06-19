@@ -17,6 +17,7 @@ import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.xml.dom4j.{ExtendedLocationData, LocationData}
 import org.apache.commons.lang.StringUtils._
 import collection.JavaConverters._
+import org.orbeon.errorified._
 
 // Orbeon-specific exception formatter
 object OrbeonFormatter extends Formatter {
@@ -24,13 +25,13 @@ object OrbeonFormatter extends Formatter {
     val Width = 120
     val MaxStackLength = 40
 
-    def getThrowableMessage(throwable: Throwable): Option[String] =
+    override def getThrowableMessage(throwable: Throwable): Option[String] =
         throwable match {
             case ve: ValidationException ⇒ Option(ve.getSimpleMessage)
             case t ⇒ Option(t.getMessage)
         }
 
-    def getAllLocationData(t: Throwable): List[SourceLocation] =
+    override def getAllLocationData(t: Throwable): List[SourceLocation] =
         ValidationException.getAllLocationData(t).asScala.toList flatMap (sourceLocation(_))
 
     // Create SourceLocation from LocationData

@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms
 
-import org.orbeon.exception.Exceptions
+import org.orbeon.errorified.Exceptions
 import action.XFormsAPI._
 import event.XFormsEventTarget
 import model.DataModel.Reason

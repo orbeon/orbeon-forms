@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.common;
 
-import org.orbeon.exception.Exceptions;
+import org.orbeon.errorified.Exceptions;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.xml.sax.SAXParseException;
 

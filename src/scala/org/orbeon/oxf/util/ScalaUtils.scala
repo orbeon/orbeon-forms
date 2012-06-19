@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.util
 
+import org.orbeon.errorified.Exceptions
 import org.orbeon.exception._
 import java.security.MessageDigest
 import org.apache.log4j.Logger

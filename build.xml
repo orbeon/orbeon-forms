@@ -59,6 +59,9 @@
     </taskdef>
 
     <fileset id="war.libs" dir="${lib.dir}">
+
+        <include name="orbeon-errorified-20120619.jar"/>
+
         <include name="dom4j-1_6_1.jar"/>
         <include name="log4j-1_2_15.jar"/>
         <include name="jaxen-1_1_beta_9.jar"/>
@@ -645,6 +648,7 @@
                 <pathelement location="lib/commons-fileupload-1.2.2.jar"/>
                 <pathelement location="lib/log4j-1_2_15.jar"/>
                 <pathelement location="lib/scala-library-2.9.2.jar"/>
+                <pathelement location="lib/orbeon-errorified-20120619.jar"/>
             </classpath>
         </taskdef>
 

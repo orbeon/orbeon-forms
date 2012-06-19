@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.test;
 
+import org.orbeon.errorified.Exceptions;
 import org.orbeon.exception.*;
 import org.apache.commons.lang.StringUtils;
 import org.dom4j.Document;

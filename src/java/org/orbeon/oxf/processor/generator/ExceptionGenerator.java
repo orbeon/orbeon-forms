@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.processor.generator;
 
-import org.orbeon.exception.Exceptions;
+import org.orbeon.errorified.Exceptions;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;

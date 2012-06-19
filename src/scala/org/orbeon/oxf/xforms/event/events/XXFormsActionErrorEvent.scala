@@ -20,6 +20,7 @@ import org.orbeon.oxf.xforms.event.{XFormsEvent, XFormsEventTarget, XFormsEvents
 import org.orbeon.saxon.om.SequenceIterator
 import XXFormsActionErrorEvent._
 import org.orbeon.oxf.common.ValidationException
+import org.orbeon.errorified.Exceptions
 
 class XXFormsActionErrorEvent(containingDocument: XFormsContainingDocument, target: XFormsEventTarget, val throwable: Throwable)
     extends XFormsEvent(containingDocument, XFormsEvents.XXFORMS_ACTION_ERROR, target, bubbles = true, cancelable = false) {

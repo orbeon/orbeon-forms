@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.processor.transformer.xslt;
 
-import org.orbeon.exception.Exceptions;
+import org.orbeon.errorified.Exceptions;
 import org.apache.log4j.Logger;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;

@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.pipeline;
 
+import org.orbeon.errorified.Exceptions;
 import org.orbeon.exception.*;
 import org.apache.log4j.Logger;
 import org.dom4j.Document;

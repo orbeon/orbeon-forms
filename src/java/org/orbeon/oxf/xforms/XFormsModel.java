@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms;
 
-import org.orbeon.exception.Exceptions;
+import org.orbeon.errorified.Exceptions;
 import org.apache.log4j.Logger;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;

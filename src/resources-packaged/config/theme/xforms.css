@@ -420,7 +420,7 @@ a.xforms-readonly, .xforms-trigger-readonly a { color: gray; cursor: default }
 div.xforms-modal-progress { width: 40px; height: 40px; background-image: url(../../ops/images/xforms/processing.gif) }
 
 .xforms-error-panel .bd {
-    background-image: url(../../apps/fr/style/images/pixelmixer/warning_64.png);
+    background-image: url(../../ops/images/xforms/warning_64.png);
     background-position: 20px 20px;
     background-repeat: no-repeat;
     padding: 10px 20px 10px 110px !important; /* Override padding defined by YUI */

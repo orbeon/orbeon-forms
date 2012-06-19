@@ -59,8 +59,7 @@
     <p:processor name="oxf:html-converter">
         <p:input name="config">
             <config>
-                <public-doctype>-//W3C//DTD HTML 4.01 Transitional//EN</public-doctype>
-                <version>4.01</version>
+                <version>5.0</version>
                 <encoding>utf-8</encoding>
             </config>
         </p:input>

@@ -183,8 +183,7 @@
                             <p:processor name="oxf:html-converter">
                                 <p:input name="config">
                                     <config>
-                                        <public-doctype>-//W3C//DTD HTML 4.01//EN</public-doctype>
-                                        <version>4.01</version>
+                                        <version>5.0</version>
                                         <encoding>utf-8</encoding>
                                         <indent>true</indent>
                                         <indent-amount>0</indent-amount>
@@ -234,8 +233,7 @@
                             <p:processor name="oxf:identity">
                                 <p:input name="data">
                                     <config>
-                                        <public-doctype>-//W3C//DTD HTML 4.01//EN</public-doctype>
-                                        <version>4.01</version>
+                                        <version>5.0</version>
                                         <encoding>utf-8</encoding>
                                         <indent>true</indent>
                                         <indent-amount>0</indent-amount>
@@ -277,8 +275,7 @@
             <p:processor name="oxf:html-converter">
                 <p:input name="config">
                     <config>
-                        <public-doctype>-//W3C//DTD HTML 4.01//EN</public-doctype>
-                        <version>4.01</version>
+                        <version>5.0</version>
                         <encoding>utf-8</encoding>
                         <indent>true</indent>
                         <indent-amount>0</indent-amount>

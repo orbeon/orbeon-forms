@@ -24,6 +24,7 @@ import org.orbeon.oxf.xforms.control.XFormsControl.{ImmutableControlProperty, Mu
 import org.xml.sax.helpers.AttributesImpl
 import org.orbeon.oxf.xforms.control.{AjaxSupport, XFormsControl, XFormsValueControl}
 import org.orbeon.oxf.xforms.event.Dispatch
+import org.orbeon.oxf.xforms.control.controls.FileMetadata._
 
 // This trait is used by controls that support nested file metadata such as "filename"
 trait FileMetadata extends XFormsValueControl {
@@ -36,9 +37,10 @@ trait FileMetadata extends XFormsValueControl {
     private val filenameElement  = Option(self.element.element(XFORMS_FILENAME_QNAME))
     private val sizeElement      = Option(self.element.element(XXFORMS_SIZE_QNAME))
 
-    private class FileMetadataProperty(evaluate: FileMetadata ⇒ String) extends MutableControlProperty[String] {
+    private class FileMetadataProperty(evaluator: Evaluator) extends MutableControlProperty[String] {
 
-        protected def evaluateValue() = evaluate(self)
+        protected def evaluateValue() = evaluator.evaluate(self)
+        override protected def nonRelevantValue = evaluator.default
 
         protected def isRelevant = self.isRelevant
         protected def wasRelevant = self.wasRelevant
@@ -51,7 +53,7 @@ trait FileMetadata extends XFormsValueControl {
 
     // Supported file metadata properties
     private var props: Map[String, ControlProperty[String]] =
-        supportedFileMetadata map (name ⇒ name → new FileMetadataProperty(FileMetadata.Evaluators(name))) toMap
+        supportedFileMetadata map (name ⇒ name → new FileMetadataProperty(Evaluators(name))) toMap
 
     // Properties to support
     def supportedFileMetadata: Seq[String]
@@ -70,8 +72,8 @@ trait FileMetadata extends XFormsValueControl {
     def fileSize             = props("size")     .value
 
     // "Instant" evaluators which go straight to the bound nodes if possible
-    def boundFileMediatype  = FileMetadata.Evaluators("mediatype")(self)
-    def boundFilename       = FileMetadata.Evaluators("filename")(self)
+    def boundFileMediatype  = Evaluators("mediatype").evaluate(self)
+    def boundFilename       = Evaluators("filename").evaluate(self)
 
     // Setters
     def setFileMediatype(mediatype: String): Unit =
@@ -108,7 +110,7 @@ trait FileMetadata extends XFormsValueControl {
 
         // Add attributes for each property with a different value
         props foreach
-            { case (name, prop) ⇒ addAtt(name, _.props(name).value) }
+            { case (name, _) ⇒ addAtt(name, _.props(name).value) }
 
         added
     }
@@ -143,15 +145,17 @@ trait FileMetadata extends XFormsValueControl {
 
 object FileMetadata {
 
-    // How to evaluate each property
-    private val Evaluators = Map[String, FileMetadata ⇒ String](
-        "state"              → (m ⇒ if (StringUtils.isBlank(m.getValue)) "empty" else "file"),
-        "mediatype"          → (m ⇒ m.mediatypeElement map (childMetadataValue(m, _)) orNull),
-        "filename"           → (m ⇒ m.filenameElement  map (childMetadataValue(m, _)) orNull),
-        "size"               → (m ⇒ m.sizeElement      map (childMetadataValue(m, _)) orNull),
-        "progress-state"     → (m ⇒ progress(m) map (_.state.toString.toLowerCase) orNull),
-        "progress-received"  → (m ⇒ progress(m) map (_.receivedSize.toString) orNull),
-        "progress-expected"  → (m ⇒ progress(m) flatMap (_.expectedSize) map (_.toString) orNull)
+    case class Evaluator(evaluate: FileMetadata ⇒ String, default: String)
+
+    // How to evaluate each property and default values used when control is non-relevant
+    private val Evaluators = Map[String, Evaluator](
+        "state"              → Evaluator(m ⇒ if (StringUtils.isBlank(m.getValue)) "empty" else "file", "empty"),
+        "mediatype"          → Evaluator(m ⇒ m.mediatypeElement map (childMetadataValue(m, _)) orNull, null),
+        "filename"           → Evaluator(m ⇒ m.filenameElement  map (childMetadataValue(m, _)) orNull, null),
+        "size"               → Evaluator(m ⇒ m.sizeElement      map (childMetadataValue(m, _)) orNull, null),
+        "progress-state"     → Evaluator(m ⇒ progress(m) map (_.state.toString.toLowerCase) orNull, null),
+        "progress-received"  → Evaluator(m ⇒ progress(m) map (_.receivedSize.toString) orNull, null),
+        "progress-expected"  → Evaluator(m ⇒ progress(m) flatMap (_.expectedSize) map (_.toString) orNull, null)
     )
 
     // All possible property names

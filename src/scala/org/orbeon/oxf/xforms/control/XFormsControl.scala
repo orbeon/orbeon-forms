@@ -354,6 +354,7 @@ object XFormsControl {
         protected def notifyOptimized()
 
         protected def evaluateValue(): T
+        protected def nonRelevantValue: T = null
 
         def value(): T = {// NOTE: making this method final produces an AbstractMethodError with Java 5 (ok with Java 6)
             if (! isEvaluated) {
@@ -361,9 +362,11 @@ object XFormsControl {
                     if (isRelevant) {
                         notifyCompute()
                         evaluateValue()
-                    } else
+                    } else {
                         // NOTE: if the control is not relevant, nobody should ask about this in the first place
-                        null
+                        // In practice, this can be called as of 2012-06-20
+                        nonRelevantValue
+                    }
                 isEvaluated = true
             } else if (isOptimized) {
                 // This is only for statistics: if the value was not re-evaluated because of the dependency engine

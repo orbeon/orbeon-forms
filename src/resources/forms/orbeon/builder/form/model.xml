@@ -33,9 +33,8 @@
 
       id="fr-form-model">
 
-    <!-- Variable pointing to the current language -->
+    <!-- Public variable pointing to the current language -->
     <xforms:var name="fb-lang" value="instance('fb-language-instance')"/>
-    <xforms:var name="form-resources" model="fr-resources-model" value="$fr-form-resources" as="element(resource)?"/>
 
     <xforms:var name="is-pe" value="xpl:isPE()" as="xs:boolean"/>
 
@@ -111,6 +110,7 @@
             value="xxforms:instance('fr-language-instance')"/>
 
         <!-- Set initial form and first section titles on template -->
+        <xforms:var name="form-resources" model="fr-resources-model" value="$fr-form-resources"/>
         <xforms:setvalue
             ref="fbf:metadataInstanceRoot($template)/title"
             value="$form-resources/template/untitled-form"/>
@@ -295,9 +295,9 @@
     <xforms:instance id="fr-form-resources" src="oxf:/forms/orbeon/builder/form/resources.xml"
                      xxforms:readonly="true" xxforms:cache="true"/>
 
-    <!-- Instance containing the current language -->
+    <!-- Instance containing the current language of the form being edited -->
     <xforms:instance id="fb-language-instance">
-        <language/>
+        <lang/>
     </xforms:instance>
 
     <!-- Store user-agent details -->
@@ -332,6 +332,7 @@
             <!-- Currently selected cell td id -->
             <selected-cell/>
 
+            <!-- TODO: move to dialog-language.xml -->
             <new-language/>
             <new-language-trigger/>
 
@@ -341,8 +342,8 @@
             <control-trigger/>
 
             <!-- Number of open dialogs -->
+            <!-- TODO: could use a native function for this -->
             <dialogs-open>0</dialogs-open>
-            <!--<focus>0</focus>-->
         </variables>
     </xforms:instance>
 

@@ -11,10 +11,20 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xs="http://www.w3.org/2001/XMLSchema"
-    xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:exforms="http://www.exforms.org/exf/1-0"
-    xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude"
-    xmlns:xxi="http://orbeon.org/oxf/xml/xinclude" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xbl="http://www.w3.org/ns/xbl">
+<xsl:stylesheet
+        version="2.0"
+        xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns:xforms="http://www.w3.org/2002/xforms"
+        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+        xmlns:exforms="http://www.exforms.org/exf/1-0"
+        xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:xi="http://www.w3.org/2001/XInclude"
+        xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+        xmlns:ev="http://www.w3.org/2001/xml-events"
+        xmlns:xbl="http://www.w3.org/ns/xbl"
+        xmlns:formRunner="java:org.orbeon.oxf.fr.FormRunner">
 
     <xsl:template match="xhtml:body//fr:view" name="fr-view">
 
@@ -335,11 +345,11 @@
     <xsl:template match="fr:language-selector">
         <!-- Switch language -->
         <xhtml:div class="fr-language-choice">
-            <xxforms:variable name="default-language" select="xxforms:instance('fr-default-language-instance')"/>
             <!-- Put default language first, then other languages -->
-            <xxforms:variable name="available-languages" as="xs:string*"
-                select="(xxforms:instance('fr-form-resources')/resource[@xml:lang = $default-language]/@xml:lang,
-                                        xxforms:instance('fr-form-resources')/resource[not(@xml:lang = $default-language)]/@xml:lang)"/>
+            <xxforms:variable
+                name="available-languages"
+                model="fr-resources-model"
+                value="formRunner:getFormLangSelection($app, $form, xxforms:instance('fr-form-resources')/resource/@xml:lang/string())"/>
 
             <!-- Don't display language selector if there is only one language -->
             <!-- NOTE: Resolve model here, as for now model within XBL component won't resolve -->

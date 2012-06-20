@@ -55,4 +55,7 @@
     <!-- Form Builder summary page  -->
     <property as="xs:string"  name="oxf.fr.summary.buttons.orbeon.builder"           value="new edit delete"/>
 
+    <!-- Available languages -->
+    <property as="xs:string" name="oxf.fr.available-languages.orbeon.builder"        value="en fr"/>
+
 </properties>

@@ -1625,7 +1625,7 @@
             <delete-action>Etes-vous sûr de vouloir supprimer l'action</delete-action>
             <controls-will-be-deleted>{0,choice,0#Aucun contrôle ne sera supprimé.|1#1 contrôle sera supprimé.|1&lt;{0,number,integer} contrôles seront supprimés.}</controls-will-be-deleted>
             <publish-form>Etes-vous sûr de vouloir publier ce formulaire ? Ceci remplacera le formulaire déjà publié sous les propriétés suivantes :</publish-form>
-            <publish-success>Le formulaire a été publié avec succès. {0,choice,0#Aucun attachment n'a|1#1 attachment a|1&lt;{0,number,integer} attachements ont} été publiés.</publish-success>
+            <publish-success>Le formulaire a été publié avec succès. {0,choice,0#Aucun fichier joint n''a été publié|1#1 fichier joint a été publié|1&lt;{0,number,integer} fichiers joints ont été publiés}.</publish-success>
             <publish-error>Une erreur s'est produite durant la publication du formulaire.</publish-error>
             <metadata-edit-title>Métadonnées</metadata-edit-title>
             <new-metadata-output>Veuillez fournir un nom d'application et un nom de formulaire (vous pouvez les changer plus tard):</new-metadata-output>

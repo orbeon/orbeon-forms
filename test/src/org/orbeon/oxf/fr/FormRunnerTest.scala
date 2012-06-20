@@ -20,10 +20,12 @@ import org.orbeon.oxf.test.DocumentTestBase
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.XML._
 import FormRunner._
+import org.orbeon.oxf.util.NetUtils
+import collection.JavaConverters._
 
 class FormRunnerTest extends DocumentTestBase with AssertionsForJUnit {
 
-    @Test def persistenceHeaders() {
+    @Test def persistenceHeaders(): Unit = {
 
         val obf = getPersistenceHeadersAsXML("cities", "form1", "form")
         assert(TransformerUtils.tinyTreeToString(obf) ===
@@ -34,7 +36,7 @@ class FormRunnerTest extends DocumentTestBase with AssertionsForJUnit {
             """<headers><header><name>Orbeon-City-Uri</name><value>http://en.wikipedia.org/wiki/S%C3%A3o_Paulo</value></header><header><name>Orbeon-City-Name</name><value>São Paulo</value></header><header><name>Orbeon-Population</name><value>11244369</value></header></headers>""")
     }
 
-    @Test def formBuilderPermissions() {
+    @Test def formBuilderPermissions(): Unit = {
 
         val frRoles: NodeInfo =
             <roles>
@@ -74,5 +76,48 @@ class FormRunnerTest extends DocumentTestBase with AssertionsForJUnit {
         // Empty roles
         val emptyRoles: NodeInfo = <roles/>
         assert(getFormBuilderPermissions(emptyRoles, Set("some")) === Map())
+    }
+    
+    @Test def language(): Unit = {
+        
+        import FormRunner._
+        
+        val app  = "acme"
+        val form = "order"
+        
+        // oxf.fr.default-language not set so "en" is the default
+        assert("en" === getDefaultLang(app, form))
+        
+        // oxf.fr.available-languages not set so all languages are allowed
+        assert(isAllowedLang(app, form)("en"))
+        assert(isAllowedLang(app, form)("foo"))
+        
+        // Requested language
+        assert(Some("en") === findRequestedLang(app, form, null))
+        assert(Some("en") === findRequestedLang(app, form, "   "))
+        
+        assert(Some("es") === findRequestedLang(app, form, "es"))
+        assert(Some("en") === findRequestedLang(app, form, "en"))
+        
+        NetUtils.getExternalContext.getRequest.getSession(true).getAttributesMap.put("fr-language", "fr")
+        
+        assert(Some("fr") === findRequestedLang(app, form, null))
+        assert(Some("it") === findRequestedLang(app, form, "it"))
+        
+        // Language selector
+        assert(Seq("en", "fr", "it") === getFormLangSelection(app, form, Seq("fr", "it", "en").asJava).asScala)
+        assert(Seq("fr", "it", "es") === getFormLangSelection(app, form, Seq("fr", "it", "es").asJava).asScala)
+        assert(Seq.empty[String]     === getFormLangSelection(app, form, Seq.empty[String].asJava).asScala)
+
+        // Select form language
+        assert("it" === selectFormLang(app, form, "it", Seq("fr", "it", "en").asJava))
+        assert("en" === selectFormLang(app, form, "zh", Seq("fr", "it", "en").asJava))
+        assert("fr" === selectFormLang(app, form, "zh", Seq("fr", "it", "es").asJava))
+        assert(null eq  selectFormLang(app, form, "fr", Seq.empty[String].asJava))
+
+        // Select Form Runner language
+        assert("it" === selectFormRunnerLang(app, form, "it", Seq("fr", "it", "en").asJava))
+        assert("en" === selectFormRunnerLang(app, form, "zh", Seq("fr", "it", "en").asJava))
+        assert("fr" === selectFormRunnerLang(app, form, "zh", Seq("fr", "it", "es").asJava))
     }
 }

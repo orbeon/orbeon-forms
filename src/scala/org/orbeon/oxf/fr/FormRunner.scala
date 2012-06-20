@@ -19,13 +19,15 @@ import org.orbeon.scaxon.XML._
 import scala.collection.JavaConverters._
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.ScalaUtils._
-import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.saxon.om.{Item, NodeInfo}
 import org.orbeon.oxf.pipeline.InitUtils
 import org.orbeon.oxf.xforms.function.xxforms.{XXFormsProperty, XXFormsPropertiesStartsWith}
-import java.util.{Map ⇒ JMap}
+import java.util.{Map ⇒ JMap, List ⇒ JList}
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
 import org.orbeon.oxf.xforms.function.Random
 import org.orbeon.oxf.util.{SecureUtils, NetUtils, XPathCache}
+import org.apache.commons.lang.StringUtils
+import org.orbeon.oxf.pipeline.api.ExternalContext.Request
 
 object FormRunner {
 
@@ -41,6 +43,8 @@ object FormRunner {
 
     val NameValueMatch = "([^=]+)=([^=]+)".r
 
+    private def properties = Properties.instance.getPropertySet
+
     type UserRoles = {
         def getRemoteUser(): String
         def isUserInRole(role: String): Boolean
@@ -51,7 +55,7 @@ object FormRunner {
      */
     def getUserRoles(userRoles: UserRoles, getHeader: String ⇒ Option[Array[String]]): (Option[String], Option[Array[String]]) = {
 
-        val propertySet = Properties.instance.getPropertySet
+        val propertySet = properties
         propertySet.getString(methodPropertyName, "container") match {
             case "container" ⇒
 
@@ -123,24 +127,21 @@ object FormRunner {
         require(augmentString(form).nonEmpty)
         require(Set("form", "data")(formOrData))
 
-        val propertySet = Properties.instance.getPropertySet
-
         // Find provider
         val provider = {
             val providerProperty = Seq("oxf.fr.persistence.provider", app, form, formOrData) mkString "."
-            propertySet.getString(providerProperty)
+            properties.getString(providerProperty)
         }
 
         getPersistenceURLHeadersFromProvider(provider)
     }
 
     def getPersistenceURLHeadersFromProvider(provider: String) = {
-        val propertySet = Properties.instance.getPropertySet
 
         // Find provider URI
         def findProviderURL = {
             val uriProperty = Seq("oxf.fr.persistence", provider, "uri") mkString "."
-            propertySet.getStringOrURIAsString(uriProperty)
+            properties.getStringOrURIAsString(uriProperty)
         }
 
         val propertyPrefix = "oxf.fr.persistence." + provider
@@ -148,11 +149,11 @@ object FormRunner {
         // Build headers map
         val headers = (
             for {
-                propertyName ← propertySet.getPropertiesStartsWith(propertyPrefix).asScala
+                propertyName ← properties.getPropertiesStartsWith(propertyPrefix).asScala
                 lowerSuffix = propertyName.substring(propertyPrefix.length + 1)
                 if lowerSuffix != "uri"
                 headerName = "Orbeon-" + capitalizeHeader(lowerSuffix)
-                headerValue = propertySet.getObject(propertyName).toString
+                headerValue = properties.getObject(propertyName).toString
             } yield
                 headerName → headerValue) toMap
 
@@ -329,4 +330,79 @@ object FormRunner {
 
     // For a given attachment path, return the filename
     def getAttachmentPathFilename(path: String): String = path.split('/').last
+
+    // List of available languages for the given form
+    // Empty if the form doesn't have resources
+    // If all of the form's resources are filtered via property, return the first language of the form, if any.
+    def getFormLangSelection(app: String, form: String, formLanguages: JList[String]): JList[String] = {
+
+        val allowedFormLanguages = formLanguages.asScala.toList filter isAllowedLang(app, form)
+        val defaultLanguage = getDefaultLang(app, form)
+
+        val withDefaultPrepended =
+            if (allowedFormLanguages contains defaultLanguage)
+                defaultLanguage :: (allowedFormLanguages filterNot (_ == defaultLanguage))
+            else
+                allowedFormLanguages
+
+        withDefaultPrepended.asJava
+    }
+
+    // Find the best match for the current form language
+    // Can be null (empty sequence) if there are no resources (or no allowed resources) in the form
+    def selectFormLang(app: String, form: String, requestedLang: String, formLangs: JList[String]): String = {
+
+        val availableFormLangs  = getFormLangSelection(app, form, formLangs).asScala.toList
+        val actualRequestedLang = findRequestedLang(app, form, requestedLang) filter isAllowedLang(app, form)
+
+        selectLang(app, form, actualRequestedLang, availableFormLangs).orNull
+    }
+
+    // Get the Form Runner language
+    // If possible, try to match the form language, otherwise
+    def selectFormRunnerLang(app: String, form: String, formLang: String, formRunnerLangs: JList[String]): String =
+        selectLang(app, form, Option(formLang), formRunnerLangs.asScala.toList).orNull
+
+    // Get the default language for the given app/form
+    // If none is configured, return the global default "en"
+    // Public for unit tests
+    def getDefaultLang(app: String, form: String): String =
+        Option(properties.getString(Seq("oxf.fr.default-language", app, form) mkString ".")) getOrElse "en"
+
+    // Return a predicate telling whether a language is allowed for the given form, based on properties
+    // Public for unit tests
+    def isAllowedLang(app: String, form: String): String ⇒ Boolean = {
+        val set = stringOptionToSet(Option(properties.getString(Seq("oxf.fr.available-languages", app, form) mkString ".")))
+        // If none specified via property or property contains a wildcard, all languages are considered available
+        if (set.isEmpty || set("*")) (_ ⇒ true) else set
+    }
+
+    // The requested language, trying a few things in order (given parameter, request, session, default)
+    // Public for unit tests
+    def findRequestedLang(app: String, form: String, requestedLang: String): Option[String] = {
+        val request = NetUtils.getExternalContext.getRequest
+
+        def fromRequest = Option(request.getParameterMap.get("fr-language")) flatMap (_.lift(0)) map (_.toString)
+        def fromSession = stringFromSession(request, "fr-language")
+
+        Option(StringUtils.trimToNull(requestedLang)) orElse
+            fromRequest orElse
+            fromSession orElse
+            Option(getDefaultLang(app, form))
+    }
+
+    private def selectLang(app: String, form: String, requestedLang: Option[String], availableLangs: List[String]) = {
+        def matchingLanguage = availableLangs intersect requestedLang.toList headOption
+        def defaultLanguage  = availableLangs intersect List(getDefaultLang(app, form)) headOption
+        def firstLanguage    = availableLangs headOption
+
+        matchingLanguage orElse defaultLanguage orElse firstLanguage
+    }
+
+    private def stringFromSession(request: Request, name: String) =
+        Option(request.getSession(false)) flatMap
+            (s ⇒ Option(s.getAttributesMap.get("fr-language"))) map {
+                case item: Item ⇒ item.getStringValue
+                case other ⇒ other.toString
+            }
 }

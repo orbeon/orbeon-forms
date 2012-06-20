@@ -80,8 +80,6 @@ class FormRunnerTest extends DocumentTestBase with AssertionsForJUnit {
     
     @Test def language(): Unit = {
         
-        import FormRunner._
-        
         val app  = "acme"
         val form = "order"
         

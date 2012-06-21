@@ -1,272 +1,412 @@
-/**
- * Copyright (C) 2010 Orbeon, Inc.
- *
- * This program is free software; you can redistribute it and/or modify it under the terms of the
- * GNU Lesser General Public License as published by the Free Software Foundation; either version
- * 2.1 of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Lesser General Public License for more details.
- *
- * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
- */
-
-/*
-    Alternate shades of blue:
-
-    #004B92
-    #2647A0
-    #146EB4
-*/
-
-/* ***** Colors, fonts, etc. **************************************************************************************** */
-
-/* TODO: repeats and dialogs still have colors and fonts settings in form-runner-base.css */
-
+html,
+body {
+  background-color: #f3f3f3;
+}
+.fr-body {
+  border: 1px solid #DDD;
+  -webkit-border-radius: 6px;
+  -moz-border-radius: 6px;
+  border-radius: 6px;
+  -webkit-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  -moz-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  margin-top: 40px;
+  background-color: white;
+}
+.fr-header .container {
+  position: relative;
+}
+.fr-header .fr-logo {
+  position: absolute;
+  top: 6px;
+  background-image: url('orbeon-navbar-logo.png');
+  width: 24px;
+  height: 27px;
+}
+.fr-header h1 {
+  position: absolute;
+  top: 9px;
+  left: 35px;
+  margin: 0;
+  font-weight: normal;
+  font-size: 20px;
+  line-height: 20px;
+  color: #ddd;
+}
 /* ***** Headings (titles and sections) ***************************************************************************** */
+.xforms-form h2,
+.xforms-form h3 {
+  background-image: -webkit-linear-gradient(top, #ffffff, #eeeeee);
+  margin: 1em 0;
+  /*color: #004B92;*/
 
-.xforms-form h1, .xforms-form h2, .xforms-form h3 {
-	margin: 1em 0;
-    color: #004B92;
 }
+.xforms-form h2,
+.xforms-form h3,
+.xforms-form h4,
+.xforms-form h5,
+.xforms-form h6 {
+  text-align: left;
+  font-weight: normal;
+  clear: left;
+  padding: 0;
+  color: #555;
+  /* Lighter grey to compensate for larger title font */
 
-.xforms-form h1, .xforms-form h2, .xforms-form h3, .xforms-form h4, .xforms-form h5, .xforms-form h6 {
-    text-align: left;
-    font-weight: normal;
-    clear: left;
-    padding: 0;
 }
-
-.xforms-form h1 { font-size: 20pt }
-
 .xforms-form h2 {
-    font-size: 13pt;
-    margin: 1em 0 .5em 0;
+  font-size: 20px;
+  margin: .5em 0 .5em 0;
 }
+.xforms-form h2 .fr-section-label {
+  border-bottom: 2px solid #eee;
+  /* Line under title */
 
-.xforms-form h3, .xforms-form h4 {
-    font-size: 110%;
-    line-height: 135%;
-    margin: 1em 0 1em 0;
+  display: block;
+  /* So the line expands all the way to the right */
+
 }
-
+.xforms-form h3,
+.xforms-form h4 {
+  font-size: 110%;
+  line-height: 135%;
+  margin: 1em 0 1em 0;
+}
 /* ***** Other ****************************************************************************************************** */
-
-.fr-top, .fr-footer { background-repeat: no-repeat; clear: both }
-.fr-shadow { height: 10px; _height: 5px; font-size: 0; clear: both; } /* Clear is necessary because the previous block contains floated elements */
-.fr-footer { min-height: 10px } /* help display background image */
+select,
+textarea,
+input {
+  background-image: url(field.png);
+  background-repeat: repeat-x;
+}
+.table th {
+  background-color: #EEE;
+}
+.fr-top,
+.fr-footer {
+  background-repeat: no-repeat;
+  clear: both;
+}
+.fr-shadow {
+  height: 10px;
+  _height: 5px;
+  font-size: 0;
+  clear: both;
+}
+/* Clear is necessary because the previous block contains floated elements */
+.fr-footer {
+  min-height: 10px;
+}
+/* help display background image */
 /* IE 6 HACK in all the lines below: don't use the PNG background image as it doesn't show properly */
-#doc .fr-shadow { background-image: url(top-750.png); _background-image: none }
-#doc4 .fr-shadow { background-image: url(top-974.png); _background-image: none }
-#doc-fb .fr-shadow { background-image: url(top-974.png); _background-image: none }
-
-#doc .fr-footer { background-image: url(bottom-750.png); _background-image: none }
-#doc4 .fr-footer { background-image: url(bottom-974.png); _background-image: none }
-#doc-fb .fr-footer { background-image: url(bottom-974.png); _background-image: none }
-
+/*#doc .fr-shadow { background-image: url(top-750.png); _background-image: none }*/
+/*#doc4 .fr-shadow { background-image: url(top-974.png); _background-image: none }*/
+/*#doc-fb .fr-shadow { background-image: url(top-974.png); _background-image: none }*/
+/*#doc .fr-footer { background-image: url(bottom-750.png); _background-image: none }*/
+/*#doc4 .fr-footer { background-image: url(bottom-974.png); _background-image: none }*/
+/*#doc-fb .fr-footer { background-image: url(bottom-974.png); _background-image: none }*/
 /* Put margins here as they are not needed */
-#fr-form-group { margin: .5em 1em .5em }
-
+/*#fr-form-group { margin: .5em 1em .5em }*/
 .fr-orbeon-version {
-    text-align: center;
-    font-size: smaller;
-    padding: 10px;
-    color: #6E6E6E;
+  text-align: center;
+  font-size: smaller;
+  padding: 10px;
+  color: #6E6E6E;
 }
-
-.fr-container {
-    background-color: white;
-}
-
 .fr-separator {
-    background-color: #9999CC;
-    height: 4px;    /* size in em seems to cause issues in Firefox as not all separators appear the same height */
-    font-size: 0;   /* help IE */
-}
+  /*background-color: #9999CC;*/
 
+  height: 4px;
+  /* size in em seems to cause issues in Firefox as not all separators appear the same height */
+
+  font-size: 0;
+  /* help IE */
+
+}
 .fr-bottom {
-    background: #F8F8F8 url(logo-bg.gif) repeat-x top;
-    padding: 1em;
+  padding: 1em;
 }
-
 .yui-skin-sam .yui-button button {
-    *height: 2em;   /* IE doesn't honor the min-height provided by YUI */
-}
+  *height: 2em;
+  /* IE doesn't honor the min-height provided by YUI */
 
+}
 /* Apply YUI SAM skin style for <input> buttons under IE 6 (other browsers use <button>) */
 .yui-skin-sam .xforms-noscript .yui-button input {
-    color: #000000;
-    font-size: 93%;
-    line-height: 2;
-    min-height: 2em;
-    padding: 0 10px;
-
-    background-color: transparent;
-    cursor: pointer;
-    border: medium none;
-    display: block;
-    margin: 0;
+  color: #000000;
+  font-size: 93%;
+  line-height: 2;
+  min-height: 2em;
+  padding: 0 10px;
+  background-color: transparent;
+  cursor: pointer;
+  border: medium none;
+  display: block;
+  margin: 0;
 }
-
 .fr-explanation .xforms-output {
-    display: block;
-    font-style: italic;
-    padding: 1em;
-    background-color: #f8f8f8
+  display: block;
+  font-style: italic;
+  padding: 1em;
+  background-color: #f8f8f8;
 }
-
 .xforms-alert-active {
-    font-weight: bold;
-    font-size: smaller;
-    color: #DF731B;
-    border-radius: 3px; -moz-border-radius: 2px; -webkit-border-radius: 3px; -ms-border-radius: 2px /* radius appears differently w/ Safari 3.1 vs. Firefox 3.0b4*/
+  font-weight: bold;
+  font-size: smaller;
+  color: #b94a48;
+  border-radius: 3px;
+  -moz-border-radius: 2px;
+  -webkit-border-radius: 3px;
+  -ms-border-radius: 2px /* radius appears differently w/ Safari 3.1 vs. Firefox 3.0b4*/
+;
 }
-
 .xforms-hint {
-    display: block;
-    clear: both;
-    font-size: smaller;
-    margin-top: .2em;
-    margin-left: 0;/* used to have margin here but with new colors no margin seems better */
-    width: 100%;
-    color: #6E6E6E;
-    font-style: italic
+  display: block;
+  clear: both;
+  font-size: smaller;
+  margin-top: .2em;
+  margin-left: 0;
+  /* used to have margin here but with new colors no margin seems better */
+
+  width: 100%;
+  color: #6E6E6E;
+  font-style: italic;
 }
-
-.xforms-label {
-    font-style: normal;
+.xforms-noscript .xforms-help-panel .xforms-help-group {
+  list-style-type: square;
 }
-
-.xforms-noscript .xforms-help-panel .xforms-help-group { list-style-type: square }
-
 /* Metadata */
-.fr-header { margin-top: .5em }
-.fr-logo { display: block; float: left }
-.fr-language-choice, .fr-noscript-choice, .fr-goto-content, .fr-doc-links { color: gray; font-size: 85%; float: right; margin-top: .2em; text-align: right }
-.fr-language-choice a, .fr-noscript-choice a, .fr-goto-content a, .fr-doc-links a { color: #6E6E6E }
-.fr-goto-content { border: 2px solid #888888; padding: .5em; float: left; margin-left: 1em }
-
+.fr-language-choice,
+.fr-noscript-choice,
+.fr-goto-content,
+.fr-doc-links {
+  color: gray;
+  font-size: 85%;
+  float: right;
+  margin-top: .2em;
+  text-align: right;
+}
+.fr-language-choice a,
+.fr-noscript-choice a,
+.fr-goto-content a,
+.fr-doc-links a {
+  color: #6e6e6e;
+}
+.fr-goto-content {
+  border: 2px solid #888888;
+  padding: .5em;
+  float: left;
+  margin-left: 1em;
+}
 /* Make button appear the same color as a link */
-.xforms-trigger-appearance-xxforms-minimal, .xforms-trigger-appearance-xxforms-minimal button, .xforms-trigger-appearance-xxforms-minimal input {
-    color: #6E6E6E;
+.xforms-trigger-appearance-xxforms-minimal,
+.xforms-trigger-appearance-xxforms-minimal button,
+.xforms-trigger-appearance-xxforms-minimal input {
+  color: #6E6E6E;
 }
-
 /* But force minimal buttons color within heading */
-h1 .xforms-trigger-appearance-xxforms-minimal, h2 .xforms-trigger-appearance-xxforms-minimal, h3 .xforms-trigger-appearance-xxforms-minimal,
-h1 .xforms-trigger-appearance-xxforms-minimal button, h2 .xforms-trigger-appearance-xxforms-minimal button, h3 .xforms-trigger-appearance-xxforms-minimal button,
-h1 .xforms-trigger-appearance-xxforms-minimal input, h2 .xforms-trigger-appearance-xxforms-minimal input, h3 .xforms-trigger-appearance-xxforms-minimal input {
-    color: #004B92;
+h1 .xforms-trigger-appearance-xxforms-minimal,
+h2 .xforms-trigger-appearance-xxforms-minimal,
+h3 .xforms-trigger-appearance-xxforms-minimal,
+h1 .xforms-trigger-appearance-xxforms-minimal button,
+h2 .xforms-trigger-appearance-xxforms-minimal button,
+h3 .xforms-trigger-appearance-xxforms-minimal button,
+h1 .xforms-trigger-appearance-xxforms-minimal input,
+h2 .xforms-trigger-appearance-xxforms-minimal input,
+h3 .xforms-trigger-appearance-xxforms-minimal input {
+  color: #004B92;
 }
-
 /* Set input/textarea controls background */
-.xforms-input input, .xforms-textarea textarea, .xforms-secret input, .xbl-component .xbl-html-input {
-    background-image: url(field.png);
-    background-repeat: repeat-x;
-    border: 1px solid #ccc;
-    padding: 0
-}
-
 /* Add a star before the label of required fields, but only in new/edit modes */
 /* NOTE: This only works in span layout (the default in FR since 2011-07-28) */
 /* NOTE: Also cover Form Builder classes here instead of form-builder.css, so we don't miss changes done here */
-.fr-mode-new .xforms-required .xforms-label, .fr-mode-edit .xforms-required .xforms-label, .fr-mode-test .xforms-required .xforms-label,
-        .fr-mode-new .fb-required-true .xforms-label, .fr-mode-edit .fb-required-true .xforms-label {
-    background-image: url(asterisk.png);
-    background-position: 0 2px;             /* Lower the star, so it doesn't sit "too high" relative to the text of the label */
-    background-repeat: no-repeat;
-    padding-left: 12px;
-}
+.fr-mode-new .xforms-required .xforms-label,
+.fr-mode-edit .xforms-required .xforms-label,
+.fr-mode-test .xforms-required .xforms-label,
+.fr-mode-new .fb-required-true .xforms-label,
+.fr-mode-edit .fb-required-true .xforms-label {
+  background-image: url(asterisk.png);
+  background-position: 0 2px;
+  /* Lower the star, so it doesn't sit "too high" relative to the text of the label */
 
+  background-repeat: no-repeat;
+  padding-left: 12px;
+}
 /* Colored border for invalid fields */
 /* NOTE: We don't use this style for required fields, as we are now using an asterisk next to the label */
-.xforms-invalid-visited .xforms-input-input, textarea.xforms-invalid-visited { border-color: #DF731B }
-
+.xforms-invalid-visited .xforms-input-input,
+textarea.xforms-invalid-visited {
+  border-color: #b94a48;
+}
 /* Upload control information */
-.xforms-upload-info { background-color: transparent }
-
+.xforms-upload-info {
+  background-color: transparent;
+}
 /* Metadata */
 .fr-top {
-    background: url("../../../ops/yui/assets/skins/sam/sprite.png") repeat-x scroll left -1400px;
-    background-color: #004B92;
-    padding: .5em;
+  /*background: url("../../../ops/yui/assets/skins/sam/sprite.png") repeat-x scroll left -1400px;*/
+
+  /*background-color: #004B92;*/
+
+  padding: .5em;
 }
 .fr-separator {
-    background-color: #004B92;
-}
-.fr-top .fr-form-title, .fr-top .fr-form-description {
-    color: white;
-}
+  /*background-color: #004B92;*/
 
-.fr-top .fr-form-title {
 }
-
+.fr-top .fr-form-title,
 .fr-top .fr-form-description {
-    font-size: 8pt;
+  /*color: white;*/
+
 }
-
+.fr-top .fr-form-description {
+  font-size: 8pt;
+}
 /* Table of contents */
-.fr-toc { color: #004B92; padding: 0 1em 0 1em }
-.fr-toc a { text-decoration: none }
-
+.fr-toc {
+  color: #004B92;
+  padding: 0 1em 0 1em;
+}
+.fr-toc a {
+  text-decoration: none;
+}
 /* Error summary */
 .fr-view .xbl-fr-error-summary .fr-error-title {
-    font-size: smaller;
-    font-weight: bold;
-    background-color: #DF731B;
-    color: white;
-    border-radius: 3px; -moz-border-radius: 2px; -webkit-border-radius: 3px; -ms-border-radius: 2px /* radius appears differently w/ Safari 3.1 vs. Firefox 3.0b4*/
+  font-size: smaller;
+  font-weight: bold;
+  background-color: #b94a48;
+  color: white;
+  border-radius: 3px;
+  -moz-border-radius: 2px;
+  -webkit-border-radius: 3px;
+  -ms-border-radius: 2px /* radius appears differently w/ Safari 3.1 vs. Firefox 3.0b4*/
+;
 }
-.fr-view .xbl-fr-error-summary .fr-error-label, .xbl-fr-error-summary .fr-error-row { font-weight: bold }
-.fr-view .xbl-fr-error-summary .fr-error-alert { color: #DF731B } /* override default of XBL component */
-
+.fr-view .xbl-fr-error-summary .fr-error-label,
+.xbl-fr-error-summary .fr-error-row {
+  font-weight: bold;
+}
+.fr-view .xbl-fr-error-summary .fr-error-alert {
+  color: #b94a48;
+}
+/* override default of XBL component */
 /* Section */
-.fr-section-title { border-bottom: 1px solid #004B92 }
-.fr-section-title a { text-decoration: none }
-.fr-section-title .fr-section-open-close { border-bottom: white }
-.fr-section-title, .fr-section-title .xforms-label { font-weight: normal }
-.fr-section-title .fr-section-arrow { float: left; display: block; height: 1.5em; background-color: white }
+.fr-section-title a {
+  text-decoration: none;
+  color: inherit;
+}
+.fr-section-title .fr-section-open-close {
+  border-bottom: #ffffff;
+}
+.fr-section-title,
+.fr-section-title .xforms-label {
+  font-weight: normal;
+}
+.fr-section-title .fr-section-arrow {
+  float: left;
+  display: block;
+  height: 1.5em;
+  background-color: #ffffff;
+}
 .fr-section-title .xforms-trigger-appearance-xxforms-minimal,
-    .fr-section-title .xforms-trigger-appearance-xxforms-minimal button,
-    .fr-section-title .xforms-trigger-appearance-xxforms-minimal input { text-decoration: none }
-
+.fr-section-title .xforms-trigger-appearance-xxforms-minimal button,
+.fr-section-title .xforms-trigger-appearance-xxforms-minimal input {
+  text-decoration: none;
+}
+.fr-section-opened,
+.fr-section-closed {
+  padding-left: 20px;
+  background-repeat: no-repeat;
+  background-position: 5px 50%;
+  cursor: pointer;
+}
+.fr-section-opened {
+  background-image: url('arrow-down.png');
+}
+.fr-section-closed {
+  background-image: url('arrow-right.png');
+}
 /* Add background to static read-only fields and special output fields */
-.xforms-static, .fr-static { min-height: 1em }
-.fr-mode-view .fr-grid-content { margin-bottom: 1em; background-color: #E8F2FF }
-.fr-mode-view .fr-repeat .fr-grid-content { background-color: transparent; margin-bottom: 0 }
-.fr-mode-view #fr-form-group { margin-top: 1em }
-
+.xforms-static,
+.fr-static {
+  min-height: 1em;
+}
+.fr-mode-view .fr-grid-content {
+  margin-bottom: 1em;
+  background-color: #e8f2ff;
+}
+.fr-mode-view .fr-repeat .fr-grid-content {
+  background-color: transparent;
+  margin-bottom: 0;
+}
+.fr-mode-view #fr-form-group {
+  margin-top: 1em;
+}
 /* Messages area */
 .fr-messages {
-    display: block;
-    padding: 1em;
-    margin-bottom: 1em;
-    background-color: white;
-    border: 1px solid #DDDDDD;
-    float: left;
+  display: block;
+  padding: 1em;
+  margin-bottom: 1em;
+  background-color: white;
+  border: 1px solid #DDDDDD;
+  float: left;
 }
-
 .fr-messages p {
-    margin: 0;
+  margin: 0;
 }
-
-.fr-messages .fr-message-success { text-align: center; color: green }
-
-.fr-messages p a { color: white }
+.table th {
+  text-align: center;
+}
+.fr-messages .fr-message-success {
+  text-align: center;
+  color: #008000;
+}
+.fr-messages p a {
+  color: #ffffff;
+}
 
 /* ***** Print and PDF ********************************************************************************************** */
-
 /* This is also used for PDF generation */
 @media print {
-    html, html body { background-color: white; background-image: none }
-    /*html body #fr-form-group h2 { font-family: "Arial Unicode MS" }*/
-    html { font-family: "Arial Unicode MS" }
-    .fr-separator { background-color: black; height: 2px }
-    h1, h2, h3 { color: black }
-    a, .xforms-trigger-appearance-xxforms-minimal { color: black; text-decoration: none }
-    .fr-top .fr-form-title, .fr-toc { color: black }
-    .fr-section-container div.fr-collapsible { color: black }
-    .fr-container { border: none }
-    .fr-top, .fr-bottom { background: none }
-    .xforms-required label { background-image: none; padding-left: 0 }
+  html,
+  html body {
+    background-color: white;
+    background-image: none;
+  }
+  /*html body #fr-form-group h2 { font-family: "Arial Unicode MS" }*/
+  html {
+    font-family: "Arial Unicode MS";
+  }
+  .fr-separator {
+    background-color: black;
+    height: 2px;
+  }
+  h1,
+  h2,
+  h3 {
+    color: #000000;
+  }
+  a,
+  .xforms-trigger-appearance-xxforms-minimal {
+    color: black;
+    text-decoration: none;
+  }
+  .fr-top .fr-form-title,
+  .fr-toc {
+    color: #000000;
+  }
+  .fr-section-container div.fr-collapsible {
+    color: #000000;
+  }
+  .fr-container {
+    border: none;
+  }
+  .fr-top,
+  .fr-bottom {
+    background: none;
+  }
+  .xforms-required label {
+    background-image: none;
+    padding-left: 0;
+  }
 }

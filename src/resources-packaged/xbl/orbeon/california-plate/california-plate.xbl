@@ -87,17 +87,11 @@
                     </xforms:group>
 
                     <xforms:group class="fr-component-group">
-                        <xhtml:table class="fr-plate-table">
-                            <xhtml:tr>
-                                <xhtml:td>
-                                    <xhtml:span class="fr-plate-span">
-                                        <xforms:repeat ref="instance()/c[normalize-space(.) != '']">
-                                            <xhtml:img src="/xbl/orbeon/california-plate/images/_{if (string-to-codepoints(upper-case(.)) = string-to-codepoints('ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789')) then upper-case(.) else '_'}_small.gif"/>
-                                        </xforms:repeat>
-                                    </xhtml:span>
-                                </xhtml:td>
-                            </xhtml:tr>
-                        </xhtml:table>
+                        <xhtml:span class="fr-plate-characters">
+                            <xforms:repeat ref="instance()/c[normalize-space(.) != '']">
+                                <xhtml:img src="/xbl/orbeon/california-plate/images/_{if (string-to-codepoints(upper-case(.)) = string-to-codepoints('ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789')) then upper-case(.) else '_'}_small.gif"/>
+                            </xforms:repeat>
+                        </xhtml:span>
                     </xforms:group>
 
                     <!-- Stop propagation of all UI events -->

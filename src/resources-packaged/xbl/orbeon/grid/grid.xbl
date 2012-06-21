@@ -26,7 +26,6 @@
          xmlns:oxf="http://www.orbeon.com/oxf/processors"
          xmlns:exf="http://www.exforms.org/exf/1-0"
          xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-         xmlns:xformsUtils="java:org.orbeon.oxf.xforms.XFormsUtils"
          xmlns:gridOps="java:org.orbeon.oxf.fb.GridOps"
          xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps"
 
@@ -96,358 +95,347 @@
 
                         <xxf:var name="max-columns" value="xxforms:property('oxf.fb.grid.max-columns')"/>
 
-                        <!-- Use AVTs to set the style on the div depending on the number of columns in first row -->
-                        <xh:div class="{if ($is-repeat) then 'yui-dt' else ()}">
-                            <xh:div class="yui-dt-hd">
-                                <!-- Grid table -->
-                                <xh:table class="{'fr-grid',
-                                                  @class,
-                                                  if ($is-repeat) then ('yui-dt-table', 'fr-repeat', 'fr-repeat-table', if ($static-row-count le 1) then 'fr-repeat-single-row' else 'fr-repeat-multiple-rows') else 'fr-norepeat',
-                                                  if ($is-editable) then 'fr-editable' else ()}">
+                        <!-- Grid table -->
+                        <xh:table class="{'fr-grid',
+                                          @class,
+                                          if ($is-repeat) then ('table', 'table-bordered', 'table-condensed', 'fr-repeat', 'fr-repeat-table', if ($static-row-count le 1) then 'fr-repeat-single-row' else 'fr-repeat-multiple-rows') else 'fr-norepeat',
+                                          if ($is-editable) then 'fr-editable' else ()}">
 
-                                    <!-- If editable, add top row to manipulate grid -->
-                                    <xsl:if test="$is-editable">
-                                        <xxf:var name="columns" value="{$static-col-count}"/>
-                                        <xh:thead>
-                                            <xh:tr>
-                                                <!-- Top left corner td -->
-                                                <xh:td class="fb-grid-top-left-td">
-                                                    <!-- Until we implement the new selection system allowing moving stuff around freely, don't allow deleting the last grid in a section -->
-                                                    <xf:trigger appearance="minimal" id="delete-grid-trigger" ref="$grid[not(gridOps:isLastGridInSection(.))]">
-                                                        <xf:label><xh:img src="/apps/fr/style/images/silk/bin.png" alt="{{$fb-resources/delete-grid-icon/label}}" title="{{$fb-resources/delete-grid-icon/label}}"/></xf:label>
-                                                        <xf:action ev:event="DOMActivate">
+                            <!-- If editable, add top row to manipulate grid -->
+                            <xsl:if test="$is-editable">
+                                <xxf:var name="columns" value="{$static-col-count}"/>
+                                <xh:thead>
+                                    <xh:tr>
+                                        <!-- Top left corner td -->
+                                        <xh:td class="fb-grid-top-left-td">
+                                            <!-- Until we implement the new selection system allowing moving stuff around freely, don't allow deleting the last grid in a section -->
+                                            <xf:trigger appearance="minimal" id="delete-grid-trigger" ref="$grid[not(gridOps:isLastGridInSection(.))]">
+                                                <xf:label><xh:img src="/apps/fr/style/images/silk/bin.png" alt="{{$fb-resources/delete-grid-icon/label}}" title="{{$fb-resources/delete-grid-icon/label}}"/></xf:label>
+                                                <xf:action ev:event="DOMActivate">
 
-                                                            <xxf:var name="count" value="count($grid/*:tr/*:td[*])"/>
+                                                    <xxf:var name="count" value="count($grid/*:tr/*:td[*])"/>
 
-                                                            <!-- Ask confirmation -->
-                                                            <xf:dispatch if="$count > 0" name="fr-show" targetid="{{xformsUtils:effectiveIdToAbsoluteId('dialog-confirmation')}}">
-                                                                <xxf:context name="message"
-                                                                     value="concat($fb-resources/messages/delete-grid, ' ',
-                                                                                xxf:format-message($fb-resources/messages/controls-will-be-deleted, $count))"/>
-                                                                <xxf:context name="positive-targetid" value="xxf:absolute-id('delete-grid-trigger')"/>
-                                                            </xf:dispatch>
-                                                            <!-- We are automatically confirmed-->
-                                                            <xf:dispatch if="$count = 0" name="fr-positive" targetid="delete-grid-trigger"/>
-                                                        </xf:action>
-                                                        <xf:action ev:event="fr-positive" type="xpath">
-                                                            gridOps:deleteGrid($grid)
+                                                    <!-- Ask confirmation -->
+                                                    <xf:dispatch if="$count > 0" name="fr-show" targetid="fb-form-editor$dialog-confirmation">
+                                                        <xxf:context name="message"
+                                                             value="concat($fb-resources/messages/delete-grid, ' ',
+                                                                        xxf:format-message($fb-resources/messages/controls-will-be-deleted, $count))"/>
+                                                        <xxf:context name="positive-targetid" value="xxf:effective-id('delete-grid-trigger')"/>
+                                                    </xf:dispatch>
+                                                    <!-- We are automatically confirmed-->
+                                                    <xf:dispatch if="$count = 0" name="fr-positive" target="delete-grid-trigger"/>
+                                                </xf:action>
+                                                <xf:action ev:event="fr-positive" type="xpath">
+                                                    gridOps:deleteGrid($grid)
+                                                </xf:action>
+                                            </xf:trigger>
+                                        </xh:td>
+                                        <xsl:if test="$is-repeat">
+                                            <!-- Column for repeat add/remove -->
+                                            <xh:td class="fb-grid-top-left-td"/>
+                                        </xsl:if>
+                                        <!-- Column icons -->
+                                        <xsl:for-each select="*:tr[1]/*:td">
+                                            <xsl:variable name="static-col-pos" select="position()"/>
+                                            <xxf:var name="first-row-td" value="$grid/*:tr[1]/*:td[{$static-col-pos}]"/>
+                                            <xxf:var name="column-number" value="position()"/>
+
+                                            <xh:td class="fb-grid-column-toolbar-td">
+                                                <!-- Insert column to the left -->
+                                                <xh:div class="fb-insert-left">
+                                                    <xf:trigger appearance="minimal" ref="$grid[$columns lt $max-columns]">
+                                                        <xf:label><xh:img src="/apps/fr/style/images/silk/bullet_arrow_left.png" alt="{{$fb-resources/insert-column-left-icon/label}}" title="{{$fb-resources/insert-column-left-icon/label}}"/></xf:label>
+                                                        <xf:action ev:event="DOMActivate" type="xpath">
+                                                            gridOps:insertColLeft($first-row-td)
                                                         </xf:action>
                                                     </xf:trigger>
-                                                </xh:td>
+                                                </xh:div>
+                                                <!-- Insert column to the right -->
+                                                <xh:div class="fb-insert-right">
+                                                    <xf:trigger appearance="minimal" ref="$grid[$columns lt $max-columns]">
+                                                        <xf:label><xh:img src="/apps/fr/style/images/silk/bullet_arrow_right.png" alt="{{$fb-resources/insert-column-right-icon/label}}" title="{{$fb-resources/insert-column-right-icon/label}}"/></xf:label>
+                                                        <xf:action ev:event="DOMActivate" type="xpath">
+                                                            gridOps:insertColRight($first-row-td)
+                                                        </xf:action>
+                                                    </xf:trigger>
+                                                </xh:div>
+                                                <!-- Delete column -->
+                                                <xf:trigger appearance="minimal" ref="$grid[$columns gt 1]" id="delete-col-{$static-col-pos}-trigger">
+                                                    <xf:label><xh:img src="/apps/fr/style/images/silk/bin.png" alt="{{$fb-resources/delete-column-icon/label}}" title="{{$fb-resources/delete-column-icon/label}}"/></xf:label>
+                                                    <xf:action ev:event="DOMActivate">
+
+                                                        <xxf:var name="count" value="gridOps:controlsInCol($first-row-td)"/>
+
+                                                        <!-- Ask confirmation -->
+                                                        <xf:dispatch if="$count > 0" name="fr-show" targetid="fb-form-editor$dialog-confirmation">
+                                                            <xxf:context name="message"
+                                                                 value="concat($fb-resources/messages/delete-column, ' ',
+                                                                                xxf:format-message($fb-resources/messages/controls-will-be-deleted, $count))"/>
+                                                            <xxf:context name="positive-targetid" value="xxf:effective-id('delete-col-{$static-col-pos}-trigger')"/>
+                                                        </xf:dispatch>
+                                                        <!-- We are automatically confirmed-->
+                                                        <xf:dispatch if="$count = 0" name="fr-positive" target="delete-col-{$static-col-pos}-trigger"/>
+                                                    </xf:action>
+                                                    <xf:action ev:event="fr-positive" type="xpath">
+                                                        gridOps:deleteCol($first-row-td)
+                                                    </xf:action>
+                                                </xf:trigger>
+                                            </xh:td>
+                                        </xsl:for-each>
+                                    </xh:tr>
+                                </xh:thead>
+                            </xsl:if>
+
+                            <!-- If repeat, add buttons and headers-->
+                            <xsl:if test="$is-repeat">
+                                <xh:thead class="yui-dt-hd">
+                                    <!-- Row with column headers -->
+                                    <xh:tr class="fr-dt-master-row">
+                                        <xsl:if test="$is-editable">
+                                            <xh:td class="fb-grid-top-left-td">
                                                 <xsl:if test="$is-repeat">
-                                                    <!-- Column for repeat add/remove -->
-                                                    <xh:td class="fb-grid-top-left-td"/>
+                                                    <!-- Grid properties -->
+                                                    <xf:trigger appearance="minimal" id="grid-details-trigger">
+                                                        <xf:label><xh:img src="/apps/fr/style/images/silk/cog.png" alt="{{$fb-resources/grid-details-icon/label}}" title="{{$fb-resources/grid-details-icon/label}}"/></xf:label>
+                                                        <xf:dispatch ev:event="DOMActivate" name="fb-show-dialog" target="fb-form-editor$dialog-grid-details">
+                                                            <xxf:context name="grid" select="$grid"/>
+                                                        </xf:dispatch>
+                                                    </xf:trigger>
                                                 </xsl:if>
-                                                <!-- Column icons -->
-                                                <xsl:for-each select="*:tr[1]/*:td">
-                                                    <xsl:variable name="static-col-pos" select="position()"/>
-                                                    <xxf:var name="first-row-td" value="$grid/*:tr[1]/*:td[{$static-col-pos}]"/>
-                                                    <xxf:var name="column-number" value="position()"/>
-
-                                                    <xh:td class="fb-grid-column-toolbar-td">
-                                                        <!-- Insert column to the left -->
-                                                        <xh:div class="fb-insert-left">
-                                                            <xf:trigger appearance="minimal" ref="$grid[$columns lt $max-columns]">
-                                                                <xf:label><xh:img src="/apps/fr/style/images/silk/bullet_arrow_left.png" alt="{{$fb-resources/insert-column-left-icon/label}}" title="{{$fb-resources/insert-column-left-icon/label}}"/></xf:label>
-                                                                <xf:action ev:event="DOMActivate" type="xpath">
-                                                                    gridOps:insertColLeft($first-row-td)
-                                                                </xf:action>
-                                                            </xf:trigger>
-                                                        </xh:div>
-                                                        <!-- Insert column to the right -->
-                                                        <xh:div class="fb-insert-right">
-                                                            <xf:trigger appearance="minimal" ref="$grid[$columns lt $max-columns]">
-                                                                <xf:label><xh:img src="/apps/fr/style/images/silk/bullet_arrow_right.png" alt="{{$fb-resources/insert-column-right-icon/label}}" title="{{$fb-resources/insert-column-right-icon/label}}"/></xf:label>
-                                                                <xf:action ev:event="DOMActivate" type="xpath">
-                                                                    gridOps:insertColRight($first-row-td)
-                                                                </xf:action>
-                                                            </xf:trigger>
-                                                        </xh:div>
-                                                        <!-- Delete column -->
-                                                        <xf:trigger appearance="minimal" ref="$grid[$columns gt 1]" id="delete-col-{$static-col-pos}-trigger">
-                                                            <xf:label><xh:img src="/apps/fr/style/images/silk/bin.png" alt="{{$fb-resources/delete-column-icon/label}}" title="{{$fb-resources/delete-column-icon/label}}"/></xf:label>
-                                                            <xf:action ev:event="DOMActivate">
-
-                                                                <xxf:var name="count" value="gridOps:controlsInCol($first-row-td)"/>
-
-                                                                <!-- Ask confirmation -->
-                                                                <xf:dispatch if="$count > 0" name="fr-show" targetid="{{xformsUtils:effectiveIdToAbsoluteId('dialog-confirmation')}}">
-                                                                    <xxf:context name="message"
-                                                                         value="concat($fb-resources/messages/delete-column, ' ',
-                                                                                        xxf:format-message($fb-resources/messages/controls-will-be-deleted, $count))"/>
-                                                                    <xxf:context name="positive-targetid" value="xxf:absolute-id('delete-col-{$static-col-pos}-trigger')"/>
-                                                                </xf:dispatch>
-                                                                <!-- We are automatically confirmed-->
-                                                                <xf:dispatch if="$count = 0" name="fr-positive" targetid="delete-col-{$static-col-pos}-trigger"/>
-                                                            </xf:action>
-                                                            <xf:action ev:event="fr-positive" type="xpath">
-                                                                gridOps:deleteCol($first-row-td)
-                                                            </xf:action>
-                                                        </xf:trigger>
-                                                    </xh:td>
-                                                </xsl:for-each>
-                                            </xh:tr>
-                                        </xh:thead>
-                                    </xsl:if>
-
-                                    <!-- If repeat, add buttons and headers-->
-                                    <xsl:if test="$is-repeat">
-                                        <xh:thead class="yui-dt-hd">
-                                            <!-- Row with column headers -->
-                                            <xh:tr class="fr-dt-master-row">
-                                                <xsl:if test="$is-editable">
-                                                    <xh:td class="fb-grid-top-left-td">
-                                                        <xsl:if test="$is-repeat">
-                                                            <!-- Grid properties -->
-                                                            <xf:trigger appearance="minimal" id="grid-details-trigger">
-                                                                <xf:label><xh:img src="/apps/fr/style/images/silk/cog.png" alt="{{$fb-resources/grid-details-icon/label}}" title="{{$fb-resources/grid-details-icon/label}}"/></xf:label>
-                                                                <xf:dispatch ev:event="DOMActivate" name="fb-show-dialog" targetid="{{xformsUtils:effectiveIdToAbsoluteId('dialog-grid-details')}}">
-                                                                    <xxf:context name="grid" select="$grid"/>
-                                                                </xf:dispatch>
-                                                            </xf:trigger>
-                                                        </xsl:if>
-                                                    </xh:td>
-                                                </xsl:if>
-                                                <xsl:if test="not($readonly)">
-                                                    <!--<xf:group ref="$grid[not(exf:readonly(.))]">-->
-                                                    <xf:group ref=".">
-                                                        <xh:th class="fr-repeat-column fr-repeat-column-trigger">
-                                                            <xh:div class="yui-dt-liner">
-                                                                <xxf:var name="can-add" as="boolean"
-                                                                         value="{if ($max-occurs = 'unbounded') then 'true()'
-                                                                                   else concat('count($repeat-sequence) lt ', $max-occurs)}"/>
-                                                                <xf:trigger appearance="minimal" ref="$repeat-context[$can-add]">
-                                                                    <!-- TODO: i18n of alt/title -->
-                                                                    <xf:label><xh:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/plus_16.png" alt="Add" title="Add"/></xf:label>
-                                                                    <xf:insert ev:event="DOMActivate"
-                                                                               context="$repeat-context"
-                                                                               ref="$repeat-sequence"
-                                                                               origin="$repeat-origin"
-                                                                               at="$repeat-index"/>
-                                                                </xf:trigger>
-                                                                <xf:group ref="$repeat-context[not($can-add)]">
-                                                                    <xh:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/plus_16g.png" alt=""/>
-                                                                </xf:group>
-                                                            </xh:div>
-                                                        </xh:th>
+                                            </xh:td>
+                                        </xsl:if>
+                                        <xsl:if test="not($readonly)">
+                                            <!--<xf:group ref="$grid[not(exf:readonly(.))]">-->
+                                            <xf:group ref=".">
+                                                <xh:th class="fr-repeat-column fr-repeat-column-trigger">
+                                                    <xxf:var name="can-add" as="boolean"
+                                                             value="{if ($max-occurs = 'unbounded') then 'true()'
+                                                                       else concat('count($repeat-sequence) lt ', $max-occurs)}"/>
+                                                    <xf:trigger appearance="minimal" ref="$repeat-context[$can-add]">
+                                                        <!-- TODO: i18n of alt/title -->
+                                                        <xf:label><xh:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/plus_16.png" alt="Add" title="Add"/></xf:label>
+                                                        <xf:insert ev:event="DOMActivate"
+                                                                   context="$repeat-context"
+                                                                   ref="$repeat-sequence"
+                                                                   origin="$repeat-origin"
+                                                                   at="$repeat-index"/>
+                                                    </xf:trigger>
+                                                    <xf:group ref="$repeat-context[not($can-add)]">
+                                                        <xh:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/plus_16g.png" alt=""/>
+                                                    </xf:group>
+                                                </xh:th>
+                                            </xf:group>
+                                        </xsl:if>
+                                        <xsl:for-each select="$grid-rows[1]/*:td">
+                                            <xsl:variable name="control" select="*[1]"/>
+                                            <xh:th class="fr-grid-th{if ($is-editable) then ' xforms-activable' else ''}">
+                                                <xsl:if test="$is-editable"><xsl:attribute name="xxf:control">true</xsl:attribute></xsl:if>
+                                                <xsl:copy-of select="@colspan"/>
+                                                <xsl:if test="$lhh-in-header and empty($control/self::xf:trigger)">
+                                                    <!-- NOTE: At this time, assume that XPath expressions on LHH elements are not relative to their enclosing control. -->
+                                                    <xf:group xxbl:scope="outer">
+                                                        <xsl:for-each select="$control/(xf:label | xf:help | xf:hint)">
+                                                            <xsl:copy>
+                                                                <!-- TODO: Once labels outside repeats are supported (http://goo.gl/tSz4i), uncomment the repeat and change the group to be internal -->
+                                                                <!--<xsl:attribute name="for" select="$control/@id"/>-->
+                                                                <xsl:copy-of select="@* | node()"/>
+                                                            </xsl:copy>
+                                                        </xsl:for-each>
                                                     </xf:group>
                                                 </xsl:if>
-                                                <xsl:for-each select="$grid-rows[1]/*:td">
-                                                    <xsl:variable name="control" select="*[1]"/>
-                                                    <xh:th class="fr-grid-th{if ($is-editable) then ' xforms-activable' else ''}">
-                                                        <xsl:if test="$is-editable"><xsl:attribute name="xxf:control">true</xsl:attribute></xsl:if>
-                                                        <xsl:copy-of select="@colspan"/>
-                                                        <xh:div class="yui-dt-liner">
-                                                            <xsl:if test="$lhh-in-header and empty($control/self::xf:trigger)">
-                                                                <!-- NOTE: At this time, assume that XPath expressions on LHH elements are not relative to their enclosing control. -->
-                                                                <xf:group xxbl:scope="outer">
-                                                                    <xsl:for-each select="$control/(xf:label | xf:help | xf:hint)">
-                                                                        <xsl:copy>
-                                                                            <!-- TODO: Once labels outside repeats are supported (http://goo.gl/tSz4i), uncomment the repeat and change the group to be internal -->
-                                                                            <!--<xsl:attribute name="for" select="$control/@id"/>-->
-                                                                            <xsl:copy-of select="@* | node()"/>
-                                                                        </xsl:copy>
-                                                                    </xsl:for-each>
-                                                                </xf:group>
-                                                            </xsl:if>
-                                                        </xh:div>
-                                                    </xh:th>
-                                                </xsl:for-each>
-                                            </xh:tr>
-                                            <!-- Optional row(s) shown before the repeated rows -->
-                                            <!--<xsl:for-each select="fr:header">-->
-                                                <!--<xsl:apply-templates select="xh:tr" mode="prepend-td"/>-->
-                                                <!--<xsl:apply-templates select="fr:tr" mode="prepend-td"/>-->
-                                            <!--</xsl:for-each>-->
-                                        </xh:thead>
-                                    </xsl:if>
+                                            </xh:th>
+                                        </xsl:for-each>
+                                    </xh:tr>
+                                    <!-- Optional row(s) shown before the repeated rows -->
+                                    <!--<xsl:for-each select="fr:header">-->
+                                        <!--<xsl:apply-templates select="xh:tr" mode="prepend-td"/>-->
+                                        <!--<xsl:apply-templates select="fr:tr" mode="prepend-td"/>-->
+                                    <!--</xsl:for-each>-->
+                                </xh:thead>
+                            </xsl:if>
 
-                                    <xh:tbody class="yui-dt-data">
-                                        <!-- Iterate over table rows -->
+                            <xh:tbody class="yui-dt-data">
+                                <!-- Iterate over table rows -->
 
-                                        <!-- Row group -->
-                                        <xsl:variable name="content">
-                                            <xsl:choose>
-                                                <xsl:when test="$is-editable or $is-repeat">
-                                                    <xsl:for-each select="$grid-rows">
-                                                        <xsl:variable name="static-row-pos" select="position()"/>
-                                                        <xh:tr>
+                                <!-- Row group -->
+                                <xsl:variable name="content">
+                                    <xsl:choose>
+                                        <xsl:when test="$is-editable or $is-repeat">
+                                            <xsl:for-each select="$grid-rows">
+                                                <xsl:variable name="static-row-pos" select="position()"/>
+                                                <xh:tr>
+                                                    <xsl:choose>
+                                                        <xsl:when test="$is-repeat">
+                                                            <xsl:attribute name="class">
+                                                                <xsl:value-of select="'fr-grid-tr', @class"/>
+                                                                <xsl:text> {if (xxf:repeat-position() mod 2 = 1) then 'yui-dt-even' else 'yui-dt-odd'}</xsl:text>
+                                                                <xsl:if test="$static-row-pos = 1">{if (xxf:repeat-position() = 1) then ' yui-dt-first' else ()}</xsl:if>
+                                                            </xsl:attribute>
+                                                        </xsl:when>
+                                                        <xsl:otherwise>
+                                                            <xsl:attribute name="class"><xsl:value-of select="'fr-grid-tr', @class"/></xsl:attribute>
+                                                        </xsl:otherwise>
+                                                    </xsl:choose>
+                                                    <xsl:copy-of select="@* except @class"/>
+
+                                                    <xsl:if test="$is-editable">
+                                                        <xxf:var name="tr" value="$grid/*:tr[{$static-row-pos}]"/>
+                                                        <xh:td>
+                                                            <xh:div class="fb-grid-row-icons">
+                                                                <!-- Insert row above -->
+                                                                <xh:div>
+                                                                    <xf:trigger appearance="minimal">
+                                                                        <xf:label><xh:img src="/apps/fr/style/images/silk/bullet_arrow_top.png" alt="{{$fb-resources/insert-row-above-icon/label}}" title="{{$fb-resources/insert-row-above-icon/label}}"/></xf:label>
+                                                                        <xf:action ev:event="DOMActivate" type="xpath">
+                                                                            gridOps:insertRowAbove($tr)
+                                                                        </xf:action>
+                                                                    </xf:trigger>
+                                                                </xh:div>
+                                                                <!-- Delete row -->
+                                                                <xf:trigger appearance="minimal" ref="$grid[count($grid/*:tr) gt 1]" id="delete-row-{$static-row-pos}-trigger">
+                                                                    <xf:label><xh:img src="/apps/fr/style/images/silk/bin.png" alt="{{$fb-resources/delete-row-icon/label}}" title="{{$fb-resources/delete-row-icon/label}}"/></xf:label>
+                                                                    <xf:action ev:event="DOMActivate">
+
+                                                                        <xxf:var name="count" value="count($tr/*[*])"/>
+
+                                                                        <!-- Ask confirmation -->
+                                                                        <xf:dispatch if="$count > 0" name="fr-show" targetid="fb-form-editor$dialog-confirmation">
+                                                                            <xxf:context name="message"
+                                                                                 value="concat($fb-resources/messages/delete-row, ' ',
+                                                                                                xxf:format-message($fb-resources/messages/controls-will-be-deleted, $count))"/>
+                                                                            <xxf:context name="positive-targetid" value="xxf:effective-id('delete-row-{$static-row-pos}-trigger')"/>
+                                                                        </xf:dispatch>
+                                                                        <!-- We are automatically confirmed-->
+                                                                        <xf:dispatch if="$count = 0" name="fr-positive" target="delete-row-{$static-row-pos}-trigger"/>
+                                                                    </xf:action>
+                                                                    <xf:action ev:event="fr-positive" type="xpath">
+                                                                        gridOps:deleteRow($tr)
+                                                                    </xf:action>
+                                                                </xf:trigger>
+                                                                <!-- Insert row below -->
+                                                                <xh:div>
+                                                                    <xf:trigger appearance="minimal">
+                                                                        <xf:label><xh:img src="/apps/fr/style/images/silk/bullet_arrow_bottom.png" alt="{{$fb-resources/insert-row-below-icon/label}}" title="{{$fb-resources/insert-row-below-icon/label}}"/></xf:label>
+                                                                        <xf:action ev:event="DOMActivate" type="xpath">
+                                                                            gridOps:insertRowBelow($tr)
+                                                                        </xf:action>
+                                                                    </xf:trigger>
+                                                                </xh:div>
+                                                            </xh:div>
+                                                        </xh:td>
+                                                    </xsl:if>
+                                                    <xsl:if test="$is-repeat">
+                                                        <xsl:if test="not($readonly) and $static-row-pos = 1">
+                                                            <xf:group ref=".">
+                                                                <xh:td class="fr-repeat-column fr-repeat-column-trigger" rowspan="{$static-row-count}">
+                                                                    <!-- Remove trigger -->
+                                                                    <xxf:var name="can-remove"
+                                                                             value="{if ($remove-constraint) then concat($remove-constraint, ' and ') else ''} {concat('count($repeat-sequence) gt ', $min-occurs)}"/>
+                                                                    <xf:trigger appearance="minimal" ref="$repeat-context[$can-remove]">
+                                                                        <!-- TODO: i18n of alt/title -->
+                                                                        <xf:label><xh:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/delete_16.png" alt="Remove" title="Remove"/></xf:label>
+                                                                        <!--/apps/fr/style/images/silk/bin.png-->
+                                                                        <xf:delete ev:event="DOMActivate" ref="$repeat-sequence" at="$repeat-index"/>
+                                                                    </xf:trigger>
+                                                                    <xf:group ref="$repeat-context[not($can-remove)]">
+                                                                        <xh:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/delete_16g.png" alt=""/>
+                                                                    </xf:group>
+                                                                </xh:td>
+                                                            </xf:group>
+                                                        </xsl:if>
+                                                    </xsl:if>
+
+                                                    <!-- Iterate over table cells -->
+                                                    <xsl:for-each select="*:td">
+                                                        <xsl:variable name="static-col-pos" select="position()"/>
+                                                        <xsl:variable name="control" select="*[1]" as="element()?"/>
+                                                        <xsl:variable name="has-control" select="exists($control)"/>
+                                                        <!-- NOTE: Not all controls with fr-attachment require a separate upload button.
+                                                             For example, fr:attachment and fr:image-attachment already provide an upload
+                                                             button. So for now, we have only xforms:output with an image mediatype. -->
+                                                        <xsl:variable name="has-upload" select="exists($control/self::xforms:output[starts-with(@mediatype, 'image/')])"/>
+
+                                                        <xsl:if test="$is-editable">
+                                                            <!-- Point to this td -->
+                                                            <xxf:variable name="td" value="$grid/*:tr[{$static-row-pos}]/*:td[{$static-col-pos}]" as="element()"/>
+                                                            <!-- Point to the contained control -->
+                                                            <xxf:variable name="control" value="$td/*[1]" as="element()?"/>
+                                                        </xsl:if>
+
+                                                        <xh:td>
                                                             <xsl:choose>
-                                                                <xsl:when test="$is-repeat">
-                                                                    <xsl:attribute name="class">
-                                                                        <xsl:value-of select="'fr-grid-tr', @class"/>
-                                                                        <xsl:text> {if (xxf:repeat-position() mod 2 = 1) then 'yui-dt-even' else 'yui-dt-odd'}</xsl:text>
-                                                                        <xsl:if test="$static-row-pos = 1">{if (xxf:repeat-position() = 1) then ' yui-dt-first' else ()}</xsl:if>
-                                                                    </xsl:attribute>
+                                                                <xsl:when test="$is-editable">
+                                                                    <xsl:attribute name="xxf:control">true</xsl:attribute>
+                                                                    <xsl:attribute name="class"><xsl:value-of select="'xforms-activable', 'fr-grid-td', @class"/>{if (xxf:get-variable('fr-form-model', 'selected-cell') = $td/@id) then ' fb-selected' else ''}</xsl:attribute>
                                                                 </xsl:when>
                                                                 <xsl:otherwise>
-                                                                    <xsl:attribute name="class"><xsl:value-of select="'fr-grid-tr', @class"/></xsl:attribute>
+                                                                    <xsl:attribute name="class"><xsl:value-of select="'fr-grid-td', @class"/></xsl:attribute>
                                                                 </xsl:otherwise>
                                                             </xsl:choose>
-                                                            <xsl:copy-of select="@* except @class"/>
-
-                                                            <xsl:if test="$is-editable">
-                                                                <xxf:var name="tr" value="$grid/*:tr[{$static-row-pos}]"/>
-                                                                <xh:td>
-                                                                    <xh:div class="fb-grid-row-icons">
-                                                                        <!-- Insert row above -->
-                                                                        <xh:div>
-                                                                            <xf:trigger appearance="minimal">
-                                                                                <xf:label><xh:img src="/apps/fr/style/images/silk/bullet_arrow_top.png" alt="{{$fb-resources/insert-row-above-icon/label}}" title="{{$fb-resources/insert-row-above-icon/label}}"/></xf:label>
-                                                                                <xf:action ev:event="DOMActivate" type="xpath">
-                                                                                    gridOps:insertRowAbove($tr)
-                                                                                </xf:action>
-                                                                            </xf:trigger>
-                                                                        </xh:div>
-                                                                        <!-- Delete row -->
-                                                                        <xf:trigger appearance="minimal" ref="$grid[count($grid/*:tr) gt 1]" id="delete-row-{$static-row-pos}-trigger">
-                                                                            <xf:label><xh:img src="/apps/fr/style/images/silk/bin.png" alt="{{$fb-resources/delete-row-icon/label}}" title="{{$fb-resources/delete-row-icon/label}}"/></xf:label>
-                                                                            <xf:action ev:event="DOMActivate">
-
-                                                                                <xxf:var name="count" value="count($tr/*[*])"/>
-
-                                                                                <!-- Ask confirmation -->
-                                                                                <xf:dispatch if="$count > 0" name="fr-show" targetid="{{xformsUtils:effectiveIdToAbsoluteId('dialog-confirmation')}}">
-                                                                                    <xxf:context name="message"
-                                                                                         value="concat($fb-resources/messages/delete-row, ' ',
-                                                                                                        xxf:format-message($fb-resources/messages/controls-will-be-deleted, $count))"/>
-                                                                                    <xxf:context name="positive-targetid" value="xxf:absolute-id('delete-row-{$static-row-pos}-trigger')"/>
-                                                                                </xf:dispatch>
-                                                                                <!-- We are automatically confirmed-->
-                                                                                <xf:dispatch if="$count = 0" name="fr-positive" targetid="delete-row-{$static-row-pos}-trigger"/>
-                                                                            </xf:action>
-                                                                            <xf:action ev:event="fr-positive" type="xpath">
-                                                                                gridOps:deleteRow($tr)
-                                                                            </xf:action>
-                                                                        </xf:trigger>
-                                                                        <!-- Insert row below -->
-                                                                        <xh:div>
-                                                                            <xf:trigger appearance="minimal">
-                                                                                <xf:label><xh:img src="/apps/fr/style/images/silk/bullet_arrow_bottom.png" alt="{{$fb-resources/insert-row-below-icon/label}}" title="{{$fb-resources/insert-row-below-icon/label}}"/></xf:label>
-                                                                                <xf:action ev:event="DOMActivate" type="xpath">
-                                                                                    gridOps:insertRowBelow($tr)
-                                                                                </xf:action>
-                                                                            </xf:trigger>
-                                                                        </xh:div>
-                                                                    </xh:div>
-                                                                </xh:td>
-                                                            </xsl:if>
-                                                            <xsl:if test="$is-repeat">
-                                                                <xsl:if test="not($readonly) and $static-row-pos = 1">
-                                                                    <xf:group ref=".">
-                                                                        <xh:td class="fr-repeat-column fr-repeat-column-trigger" rowspan="{$static-row-count}">
-                                                                            <xh:div class="yui-dt-liner">
-                                                                                <!-- Remove trigger -->
-                                                                                <xxf:var name="can-remove"
-                                                                                         value="{if ($remove-constraint) then concat($remove-constraint, ' and ') else ''} {concat('count($repeat-sequence) gt ', $min-occurs)}"/>
-                                                                                <xf:trigger appearance="minimal" ref="$repeat-context[$can-remove]">
-                                                                                    <!-- TODO: i18n of alt/title -->
-                                                                                    <xf:label><xh:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/delete_16.png" alt="Remove" title="Remove"/></xf:label>
-                                                                                    <!--/apps/fr/style/images/silk/bin.png-->
-                                                                                    <xf:delete ev:event="DOMActivate" ref="$repeat-sequence" at="$repeat-index"/>
-                                                                                </xf:trigger>
-                                                                                <xf:group ref="$repeat-context[not($can-remove)]">
-                                                                                    <xh:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/delete_16g.png" alt=""/>
-                                                                                </xf:group>
-                                                                            </xh:div>
-                                                                        </xh:td>
+                                                            <xsl:copy-of select="@* except (@class, @xxf:control)"/>
+                                                            <!-- NOTE: Add itemset or upload classes to allow the client to decide whether to place the itemset editor or the upload button -->
+                                                            <xh:div class="{('fr-grid-content', if ($has-upload) then 'fb-upload' else ())}{
+                                                                    if ($is-editable) then '{if (exists($control) and controlOps:hasEditor($control, ''static-itemset'')) then '' fb-itemset'' else ''''}' else ''}">
+                                                                <!-- Optimization: don't generate a group for empty cells -->
+                                                                <xsl:if test="$has-control">
+                                                                    <xf:group xxbl:scope="outer" appearance="xxf:internal">
+                                                                        <!-- If the label, help, and hint are shown in the table header, don't put them in the cell -->
+                                                                        <xsl:for-each select="$control">
+                                                                            <xsl:copy>
+                                                                                <xsl:variable name="lhh" select="xf:label | xf:help | xf:hint"/>
+                                                                                <xsl:variable name="nodes" select="@* | node()"/>
+                                                                                <xsl:copy-of select="if ($lhh-in-header and empty($control/self::xf:trigger)) then ($nodes except $lhh) else $nodes"/>
+                                                                            </xsl:copy>
+                                                                        </xsl:for-each>
                                                                     </xf:group>
                                                                 </xsl:if>
-                                                            </xsl:if>
-
-                                                            <!-- Iterate over table cells -->
-                                                            <xsl:for-each select="*:td">
-                                                                <xsl:variable name="static-col-pos" select="position()"/>
-                                                                <xsl:variable name="control" select="*[1]" as="element()?"/>
-                                                                <xsl:variable name="has-control" select="exists($control)"/>
-                                                                <!-- NOTE: Not all controls with fr-attachment require a separate upload button.
-                                                                     For example, fr:attachment and fr:image-attachment already provide an upload
-                                                                     button. So for now, we have only xforms:output with an image mediatype. -->
-                                                                <xsl:variable name="has-upload" select="exists($control/self::xforms:output[starts-with(@mediatype, 'image/')])"/>
-
-                                                                <xsl:if test="$is-editable">
-                                                                    <!-- Point to this td -->
-                                                                    <xxf:variable name="td" value="$grid/*:tr[{$static-row-pos}]/*:td[{$static-col-pos}]" as="element()"/>
-                                                                    <!-- Point to the contained control -->
-                                                                    <xxf:variable name="control" value="$td/*[1]" as="element()?"/>
-                                                                </xsl:if>
-
-                                                                <xh:td>
-                                                                    <xsl:choose>
-                                                                        <xsl:when test="$is-editable">
-                                                                            <xsl:attribute name="xxf:control">true</xsl:attribute>
-                                                                            <xsl:attribute name="class"><xsl:value-of select="'xforms-activable', 'fr-grid-td', @class"/>{if (xxf:get-variable('fr-form-model', 'selected-cell') = $td/@id) then ' fb-selected' else ''}</xsl:attribute>
-                                                                        </xsl:when>
-                                                                        <xsl:otherwise>
-                                                                            <xsl:attribute name="class"><xsl:value-of select="'fr-grid-td', @class"/></xsl:attribute>
-                                                                        </xsl:otherwise>
-                                                                    </xsl:choose>
-                                                                    <xsl:copy-of select="@* except (@class, @xxf:control)"/>
-                                                                    <!-- NOTE: Add itemset or upload classes to allow the client to decide whether to place the itemset editor or the upload button -->
-                                                                    <xh:div class="{('fr-grid-content', if ($has-upload) then 'fb-upload' else ())}{
-                                                                            if ($is-editable) then '{if (exists($control) and controlOps:hasEditor($control, ''static-itemset'')) then '' fb-itemset'' else ''''}' else ''}">
-                                                                        <!-- Optimization: don't generate a group for empty cells -->
-                                                                        <xsl:if test="$has-control">
-                                                                            <xf:group xxbl:scope="outer" appearance="xxf:internal">
-                                                                                <!-- If the label, help, and hint are shown in the table header, don't put them in the cell -->
-                                                                                <xsl:for-each select="$control">
-                                                                                    <xsl:copy>
-                                                                                        <xsl:variable name="lhh" select="xf:label | xf:help | xf:hint"/>
-                                                                                        <xsl:variable name="nodes" select="@* | node()"/>
-                                                                                        <xsl:copy-of select="if ($lhh-in-header and empty($control/self::xf:trigger)) then ($nodes except $lhh) else $nodes"/>
-                                                                                    </xsl:copy>
-                                                                                </xsl:for-each>
-                                                                            </xf:group>
-                                                                        </xsl:if>
-                                                                    </xh:div>
-                                                                </xh:td>
-                                                            </xsl:for-each>
-                                                        </xh:tr>
+                                                            </xh:div>
+                                                        </xh:td>
                                                     </xsl:for-each>
-                                                </xsl:when>
-                                                <xsl:otherwise>
-                                                    <!-- Apply everything and annotate tr/td. This also enables nested groups/variables. -->
-                                                    <!-- TODO: Should support groups/vars or similar mechanism generally, also with repeats and editable modes. Maybe a "visible" predicate on tr/td? -->
-                                                    <xf:group xxbl:scope="outer" appearance="xxf:internal">
-                                                        <xsl:apply-templates select="*"/>
-                                                    </xf:group>
-                                                </xsl:otherwise>
-                                            </xsl:choose>
-                                        </xsl:variable>
+                                                </xh:tr>
+                                            </xsl:for-each>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <!-- Apply everything and annotate tr/td. This also enables nested groups/variables. -->
+                                            <!-- TODO: Should support groups/vars or similar mechanism generally, also with repeats and editable modes. Maybe a "visible" predicate on tr/td? -->
+                                            <xf:group xxbl:scope="outer" appearance="xxf:internal">
+                                                <xsl:apply-templates select="*"/>
+                                            </xf:group>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
+                                </xsl:variable>
 
-                                        <xsl:choose>
-                                            <xsl:when test="$is-repeat">
-                                                <!-- Enclose within repeat -->
-                                                <xf:repeat ref="{$repeat-expression}" id="{$repeat-id}" xxbl:scope="outer">
-                                                    <xf:group appearance="xxforms:internal" xxbl:scope="inner">
-                                                        <xsl:copy-of select="$content"/>
-                                                    </xf:group>
-                                                </xf:repeat>
-                                            </xsl:when>
-                                            <xsl:otherwise>
-                                                <!-- Only one instance of the content -->
+                                <xsl:choose>
+                                    <xsl:when test="$is-repeat">
+                                        <!-- Enclose within repeat -->
+                                        <xf:repeat ref="{$repeat-expression}" id="{$repeat-id}" xxbl:scope="outer">
+                                            <xf:group appearance="xxforms:internal" xxbl:scope="inner" id="my-group">
                                                 <xsl:copy-of select="$content"/>
-                                            </xsl:otherwise>
-                                        </xsl:choose>
+                                            </xf:group>
+                                        </xf:repeat>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <!-- Only one instance of the content -->
+                                        <xsl:copy-of select="$content"/>
+                                    </xsl:otherwise>
+                                </xsl:choose>
 
-                                        <!-- IE hack so that the bottom border shows up -->
-                                        <!--<xh:tr>-->
-                                            <!--<xh:td colspan="4"/>-->
-                                        <!--</xh:tr>-->
-                                    </xh:tbody>
+                                <!-- IE hack so that the bottom border shows up -->
+                                <!--<xh:tr>-->
+                                    <!--<xh:td colspan="4"/>-->
+                                <!--</xh:tr>-->
+                            </xh:tbody>
 
-                                    <!--<xsl:if test="fr:footer">-->
-                                        <!--<xhtml:tfoot>-->
-                                            <!--&lt;!&ndash; Optional row(s) shown after the repeated rows &ndash;&gt;-->
-                                            <!--<xsl:for-each select="fr:footer">-->
-                                                <!--<xsl:apply-templates select="xhtml:tr" mode="prepend-td"/>-->
-                                                <!--<xsl:apply-templates select="fr:tr" mode="prepend-td"/>-->
-                                            <!--</xsl:for-each>-->
-                                        <!--</xhtml:tfoot>-->
-                                    <!--</xsl:if>-->
-                                </xh:table>
-                            </xh:div>
-                        </xh:div>
+                            <!--<xsl:if test="fr:footer">-->
+                                <!--<xhtml:tfoot>-->
+                                    <!--&lt;!&ndash; Optional row(s) shown after the repeated rows &ndash;&gt;-->
+                                    <!--<xsl:for-each select="fr:footer">-->
+                                        <!--<xsl:apply-templates select="xhtml:tr" mode="prepend-td"/>-->
+                                        <!--<xsl:apply-templates select="fr:tr" mode="prepend-td"/>-->
+                                    <!--</xsl:for-each>-->
+                                <!--</xhtml:tfoot>-->
+                            <!--</xsl:if>-->
+                        </xh:table>
                     </xf:group>
                 </xsl:template>
 

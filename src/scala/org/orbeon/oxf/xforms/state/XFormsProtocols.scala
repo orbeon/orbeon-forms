@@ -151,8 +151,7 @@ object XFormsProtocols extends StandardTypes with StandardPrimitives with JavaLo
     
     implicit object PathMatcherFormat extends Format[PathMatcher] {
         def writes(output: Output, value: PathMatcher) {
-            write(output, value.pathInfo)
-            write(output, Option(value.matcher))
+            write(output, value.regexp)
             write(output, Option(value.mimeType))
             write(output, value.versioned)
         }
@@ -160,7 +159,6 @@ object XFormsProtocols extends StandardTypes with StandardPrimitives with JavaLo
         def reads(in: Input) =
             new PathMatcher(
                 read[String](in),
-                read[Option[QName]](in).orNull,
                 read[Option[String]](in).orNull,
                 read[Boolean](in)
             )

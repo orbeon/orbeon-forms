@@ -12,14 +12,12 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <schema targetNamespace="http://www.orbeon.com/oxf/controller" 
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-        xmlns:xu="http://www.xmldb.org/xupdate" 
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xmlns="http://www.w3.org/2001/XMLSchema" 
         xmlns:c="http://www.orbeon.com/oxf/controller" 
         elementFormDefault="qualified" 
         attributeFormDefault="unqualified" 
         xsi:schemaLocation="http://www.w3.org/2001/XMLSchema http://www.w3.org/2001/XMLSchema.xsd">
-    <import namespace="http://www.xmldb.org/xupdate" schemaLocation="xupdate.xsd"/> 
     <element name="config">
         <complexType>
             <sequence>
@@ -28,6 +26,7 @@
                         <attributeGroup ref="c:path"/>
                         <attribute name="mime-type" type="string" use="optional"/>
                         <attribute name="versioned" type="boolean" use="optional"/>
+                        <attribute name="id" type="string" use="optional"/>
                     </complexType>
                 </element>
                 <element name="page" minOccurs="0" maxOccurs="unbounded">
@@ -64,16 +63,6 @@
                                                 <attribute name="trace" type="string" use="optional"/>
                                                 <attribute name="transform" type="QName" use="optional"/>
                                                 <attribute name="instance-passing" type="string" use="optional"/>
-<!--                                                <complexContent>-->
-<!--                                                    <extension base="xu:InstructionsContainer">-->
-<!--                                                        <attribute name="page" type="string" use="optional"/>-->
-<!--                                                        <attribute name="id" type="string" use="optional"/>-->
-<!--                                                        <attribute name="when" type="string" use="optional" default="true()"/>-->
-<!--                                                        <attribute name="trace" type="string" use="optional"/>-->
-<!--                                                        <attribute name="transform" type="QName" use="optional"/>-->
-<!--                                                        <attribute name="instance-passing" type="c:instance-passing-type" use="optional"/>-->
-<!--                                                     </extension> -->
-<!--                                                 </complexContent> -->
                                             </complexType>
                                             <!-- 2/27/2004 d: result-page-id-ref keyref below -->
                                         </element>
@@ -93,7 +82,6 @@
                             </element>
                         </sequence>
                         <attributeGroup ref="c:path"/>
-                        <attribute name="xforms" type="string" use="optional"/>
                         <attribute name="default-submission" type="string" use="optional"/>
                         <attribute name="model" type="string" use="optional"/>
                         <attribute name="view" type="string" use="optional"/>
@@ -138,7 +126,7 @@
             <selector xpath="c:not-found-handler"/>
             <field xpath="@page"/>
         </keyref>
-        <!-- 2/26/2004 d: 'path-info' atrib of the set of 'files' and set of -->
+        <!-- 2/26/2004 d: 'path-info' attrib of the set of 'files' and set of -->
         <!-- page elements must be unique across the union of the two sets.  -->
         <!-- However since the schema spec says we can only use a limited    -->
         <!-- xpath expression in selector we go ahead and specify uniqueness -->

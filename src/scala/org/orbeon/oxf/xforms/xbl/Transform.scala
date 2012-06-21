@@ -53,14 +53,14 @@ object Transform {
         // NOTE: We don't create and connect the pipeline here because we don't yet have the data input. Ideally we
         // should have something similar to what the pipeline processor does, with the ability to dynamically connect
         // pipeline inputs and inputs while still allowing caching of the pipeline itself.
-        val domGeneratorConfig = PipelineUtils.createDOMGenerator(
+        val domGenerator = PipelineUtils.createDOMGenerator(
             Dom4jUtils.createDocumentCopyParentNamespaces(transform),
             "xbl-transform-config",
             lastModified,
             Dom4jUtils.makeSystemId(transform)
         )
 
-        (pipelineConfig, domGeneratorConfig)
+        (pipelineConfig, domGenerator)
     }
 
     // Run a transformation created above on a bound element

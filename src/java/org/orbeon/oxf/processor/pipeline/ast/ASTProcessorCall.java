@@ -21,20 +21,8 @@ import java.util.List;
 
 public class ASTProcessorCall extends ASTStatement {
 
-    public ASTProcessorCall() {
-    }
-
     public ASTProcessorCall(QName name) {
         this.name = name;
-    }
-
-    public ASTProcessorCall(String uri) {
-        this.uri = uri;
-    }
-
-    public ASTProcessorCall(QName name, String uri) {
-        this.name = name;
-        this.uri = uri;
     }
 
     public ASTProcessorCall(Processor processor) {
@@ -44,10 +32,8 @@ public class ASTProcessorCall extends ASTStatement {
     private List inputs = new ArrayList();
     private List outputs = new ArrayList();
     private QName name;
-    private String uri;
     private Processor processor;
     private String id;
-    private String encapsulation;
 
     public void addInput(ASTInput input) {
         inputs.add(input);
@@ -73,28 +59,12 @@ public class ASTProcessorCall extends ASTStatement {
         this.name = name;
     }
 
-    public String getURI() {
-        return uri;
-    }
-
-    public void setURI(String uri) {
-        this.uri = uri;
-    }
-
     public String getId() {
         return id;
     }
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public String getEncapsulation() {
-        return encapsulation;
-    }
-
-    public void setEncapsulation(String encapsulation) {
-        this.encapsulation = encapsulation;
     }
 
     public Processor getProcessor() {

@@ -43,7 +43,6 @@
         <application id="sandbox-transformations/xpl" label="XPL Sandbox"/>
         <application id="sandbox-transformations/xquery" label="XQuery Sandbox"/>
         <application id="sandbox-transformations/xslt" label="XSLT Sandbox"/>
-        <application id="sandbox-transformations/xupdate" label="XUpdate Sandbox"/>
     </section>
     <section label="Query &amp; Transformation">
         <application id="xquery-the-web" label="XQuery the Web"/>

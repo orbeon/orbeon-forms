@@ -15,14 +15,14 @@
 package org.orbeon.oxf.xforms.processor
 
 import java.io._
-import org.orbeon.oxf.resources.ResourceManagerWrapper
-import org.orbeon.oxf.processor.PageFlowControllerProcessor
 import java.util.{List ⇒ JList}
-import org.orbeon.oxf.util._
 import org.orbeon.oxf.common.Version
-import scala.collection.JavaConversions._
-import org.orbeon.oxf.pipeline.api.{PipelineContext, ExternalContext}
 import org.orbeon.oxf.externalcontext.URLRewriter
+import org.orbeon.oxf.pipeline.api.{PipelineContext, ExternalContext}
+import org.orbeon.oxf.processor.PageFlowControllerProcessor
+import org.orbeon.oxf.resources.ResourceManagerWrapper
+import org.orbeon.oxf.util._
+import scala.collection.JavaConversions._
 
 object XFormsResourceRewriter {
     /**
@@ -52,9 +52,9 @@ object XFormsResourceRewriter {
         val pipelineContext = PipelineContext.get
 
         // Create matcher that matches all paths in case resources are versioned
-        if (pipelineContext.getAttribute(PageFlowControllerProcessor.PATH_MATCHERS) eq null) {
+        if (pipelineContext.getAttribute(PageFlowControllerProcessor.PathMatchers) eq null) {
             val matchAllPathMatcher = URLRewriterUtils.getMatchAllPathMatcher
-            pipelineContext.setAttribute(PageFlowControllerProcessor.PATH_MATCHERS, matchAllPathMatcher)
+            pipelineContext.setAttribute(PageFlowControllerProcessor.PathMatchers, matchAllPathMatcher)
         }
 
         // Output Orbeon Forms version

@@ -14,16 +14,14 @@
 package org.orbeon.oxf.util;
 
 import org.apache.commons.lang.StringUtils;
-import org.dom4j.Element;
-import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.Version;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.processor.PageFlowControllerProcessor;
+import org.orbeon.oxf.processor.Perl5MatchProcessor;
 import org.orbeon.oxf.properties.Properties;
 import org.orbeon.oxf.servlet.OrbeonXFormsFilter;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -61,7 +59,7 @@ public class URLRewriterUtils {
     public static final List<URLRewriterUtils.PathMatcher> MATCH_ALL_PATH_MATCHERS;
 
     static {
-        MATCH_ALL_PATH_MATCHER = new URLRewriterUtils.PathMatcher("/*", null, null, true);
+        MATCH_ALL_PATH_MATCHER = new URLRewriterUtils.PathMatcher("/.*", null, true);
         MATCH_ALL_PATH_MATCHERS = Collections.singletonList(URLRewriterUtils.MATCH_ALL_PATH_MATCHER);
     }
 
@@ -402,97 +400,28 @@ public class URLRewriterUtils {
     }
 
     public static class PathMatcher {
-        public final String pathInfo;
-        public final QName matcher;
+        public final String regexp;
         public final String mimeType;
         public final boolean versioned;
 
         /**
          * Construct from parameters.
          *
-         * @param pathInfo      path to match on
-         * @param matcher       type of matcher, or null for basic matching rules
-         * @param mimeType      mediatype
-         * @param versioned     whether the resource is versioned
+         * @param regexp    regexp pattern to match
+         * @param mimeType  mediatype
+         * @param versioned the resource is versioned
          */
-        public PathMatcher(String pathInfo, QName matcher, String mimeType, boolean versioned) {
-            this.pathInfo = pathInfo;
-            this.matcher = matcher;
+        public PathMatcher(String regexp, String mimeType, boolean versioned) {
+            this.regexp = regexp;
             this.mimeType = mimeType;
             this.versioned = versioned;
-        }
-
-        /**
-         * Construct from a serialized element.
-         *
-         * @param element   element containing serialized parameters
-         */
-        public PathMatcher(Element element) {
-            this.pathInfo = element.attributeValue("path");
-            final String matcherAttribute = element.attributeValue("matcher");
-            this.matcher = (matcherAttribute != null) ? Dom4jUtils.explodedQNameToQName(matcherAttribute) : null;
-            this.mimeType = element.attributeValue("type");
-            this.versioned = "true".equals(element.attributeValue("versioned"));
-        }
-
-        /**
-         * Serialize to an element.
-         *
-         * @return  element containing serialized parameters
-         */
-        public Element toXML() {
-            final Element matcherElement = Dom4jUtils.createElement("matcher");
-
-            matcherElement.addAttribute("path", pathInfo);
-            if (matcher != null)
-                matcherElement.addAttribute("matcher", Dom4jUtils.qNameToExplodedQName(matcher));
-            matcherElement.addAttribute("type", mimeType);
-            if (versioned)
-                matcherElement.addAttribute("versioned", Boolean.toString(versioned));
-
-            return matcherElement;
         }
     }
     
     public static boolean isVersionedURL(String absolutePathNoContext, List<URLRewriterUtils.PathMatcher> pathMatchers) {
         for (final URLRewriterUtils.PathMatcher pathMatcher : pathMatchers) {
-
-            final boolean isMatch;
-            if (pathMatcher.matcher == null) {
-                // There is no matcher, use basic rules
-
-                if (pathMatcher.pathInfo.startsWith("*")) {
-                    // Extension match
-                    isMatch = absolutePathNoContext.endsWith(pathMatcher.pathInfo.substring(1));
-                } else if (pathMatcher.pathInfo.endsWith("*")) {
-                    // Partial match
-                    isMatch = absolutePathNoContext.startsWith(pathMatcher.pathInfo.substring(0, pathMatcher.pathInfo.length() - 1));
-                } else {
-                    // Exact match
-                    isMatch = absolutePathNoContext.equals(pathMatcher.pathInfo);
-                }
-            } else {
-                // Use matcher
-
-                // Instantiate matcher processor to parallel what's done in the Page Flow
-                final ProcessorFactory processorFactory = ProcessorFactoryRegistry.lookup(pathMatcher.matcher);
-                if (processorFactory == null)
-                    throw new OXFException("Cannot find processor factory with name '"
-                            + pathMatcher.matcher.getNamespacePrefix() + ":" + pathMatcher.matcher.getName() + "'");
-
-                final Processor processor = processorFactory.createInstance();
-                if (processor instanceof MatchProcessor) {
-                    final MatchProcessor matcherProcessor = (MatchProcessor) processor;
-
-                    // Perform the test
-                    isMatch = matcherProcessor.match(pathMatcher.pathInfo, absolutePathNoContext).matches;
-                } else {
-                    throw new OXFException("Matcher processor is not an instance of MatchProcessor'"
-                            + pathMatcher.matcher.getNamespacePrefix() + ":" + pathMatcher.matcher.getName() + "'");
-                }
-            }
-            
-            if (isMatch)
+            final Perl5MatchProcessor matcherProcessor = new Perl5MatchProcessor();
+            if (matcherProcessor.match(pathMatcher.regexp, absolutePathNoContext).matches)
                 return true;
         }
         
@@ -500,7 +429,7 @@ public class URLRewriterUtils {
     }
     
     public static List<URLRewriterUtils.PathMatcher> getPathMatchers() {
-        final List<URLRewriterUtils.PathMatcher> pathMatchers = (List<URLRewriterUtils.PathMatcher>) PipelineContext.get().getAttribute(PageFlowControllerProcessor.PATH_MATCHERS);
+        final List<URLRewriterUtils.PathMatcher> pathMatchers = (List<URLRewriterUtils.PathMatcher>) PipelineContext.get().getAttribute(PageFlowControllerProcessor.PathMatchers());
         return (pathMatchers != null) ? pathMatchers : URLRewriterUtils.EMPTY_PATH_MATCHER_LIST;
     }
 
@@ -511,5 +440,102 @@ public class URLRewriterUtils {
                 return URLRewriterUtils.getPathMatchers();
             }
         };
+    }
+
+    /*
+     * Copyright 2000-2005 The Apache Software Foundation
+     *
+     * Licensed under the Apache License, Version 2.0 (the "License");
+     * you may not use this file except in compliance with the License.
+     * You may obtain a copy of the License at
+     *
+     *     http://www.apache.org/licenses/LICENSE-2.0
+     *
+     * Unless required by applicable law or agreed to in writing, software
+     * distributed under the License is distributed on an "AS IS" BASIS,
+     * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     * See the License for the specific language governing permissions and
+     * limitations under the License.
+     */
+    public static String globToPerl5(char[] pattern) {
+        int ch;
+        StringBuffer buffer;
+
+        buffer = new StringBuffer(2 * pattern.length);
+        boolean inCharSet = false;
+
+        boolean questionMatchesZero = false;
+        boolean starCannotMatchNull = false;
+
+        for (ch = 0; ch < pattern.length; ch++) {
+            switch (pattern[ch]) {
+                case '*':
+                    if (inCharSet)
+                        buffer.append('*');
+                    else {
+                        if (starCannotMatchNull)
+                            buffer.append(".+");
+                        else
+                            buffer.append(".*");
+                    }
+                    break;
+                case '?':
+                    if (inCharSet)
+                        buffer.append('?');
+                    else {
+                        if (questionMatchesZero)
+                            buffer.append(".?");
+                        else
+                            buffer.append('.');
+                    }
+                    break;
+                case '[':
+                    inCharSet = true;
+                    buffer.append(pattern[ch]);
+
+                    if (ch + 1 < pattern.length) {
+                        switch (pattern[ch + 1]) {
+                            case '!':
+                            case '^':
+                                buffer.append('^');
+                                ++ch;
+                                continue;
+                            case ']':
+                                buffer.append(']');
+                                ++ch;
+                                continue;
+                        }
+                    }
+                    break;
+                case ']':
+                    inCharSet = false;
+                    buffer.append(pattern[ch]);
+                    break;
+                case '\\':
+                    buffer.append('\\');
+                    if (ch == pattern.length - 1) {
+                        buffer.append('\\');
+                    } else if (__isGlobMetaCharacter(pattern[ch + 1]))
+                        buffer.append(pattern[++ch]);
+                    else
+                        buffer.append('\\');
+                    break;
+                default:
+                    if (!inCharSet && __isPerl5MetaCharacter(pattern[ch]))
+                        buffer.append('\\');
+                    buffer.append(pattern[ch]);
+                    break;
+            }
+        }
+
+        return buffer.toString();
+    }
+
+    private static boolean __isPerl5MetaCharacter(char ch) {
+        return ("'*?+[]()|^$.{}\\".indexOf(ch) >= 0);
+    }
+
+    private static boolean __isGlobMetaCharacter(char ch) {
+        return ("*?[]".indexOf(ch) >= 0);
     }
 }

@@ -20,34 +20,26 @@ import org.dom4j.Element;
 import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.pipeline.PipelineConfig;
 import org.orbeon.oxf.processor.pipeline.PipelineProcessor;
 import org.orbeon.oxf.processor.pipeline.ast.*;
 import org.orbeon.oxf.processor.serializer.legacy.HTMLSerializer;
 import org.orbeon.oxf.resources.URLFactory;
-import org.orbeon.oxf.transformer.xupdate.XUpdateConstants;
 import org.orbeon.oxf.util.LoggerFactory;
-import org.orbeon.oxf.util.URLRewriterUtils;
-import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xml.NamespaceMapping;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.*;
 
 import java.net.MalformedURLException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-public class PageFlowControllerProcessor extends ProcessorImpl {
+public abstract class PageFlowControllerProcessorBase extends ProcessorImpl {
 
-    static private Logger logger = LoggerFactory.createLogger(PageFlowControllerProcessor.class);
+    public static Logger logger = LoggerFactory.createLogger(PageFlowControllerProcessor.class);
 
-    public final static String INPUT_CONTROLLER = "controller";
-    public final static String CONTROLLER_NAMESPACE_URI = "http://www.orbeon.com/oxf/controller";
-    private final static Document TRUE_DOCUMENT = new NonLazyUserDataDocument();
-    private final static Document FALSE_DOCUMENT = new NonLazyUserDataDocument();
-    private final static NamespaceMapping NAMESPACES_WITH_XSI_AND_XSLT;
-    public final static String EXTRACT_INSTANCE_XPATH
-            = "/*/*[local-name() = 'instance' and namespace-uri() = '" + XFormsConstants.XFORMS_NAMESPACE_URI + "']/*[1]";
+    public final static NamespaceMapping NAMESPACES_WITH_XSI_AND_XSLT;
 
     // External resources
     private final static String REVERSE_SETVALUES_XSL = "oxf:/ops/pfc/setvalue-reverse.xsl";
@@ -58,30 +50,9 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
     private final static String INSTANCE_PASSING_REDIRECT = "redirect";
     private final static String INSTANCE_PASSING_FORWARD = "forward";
     private final static String INSTANCE_PASSING_REDIRECT_PORTAL = "redirect-exit-portal";
-    private final static String DEFAULT_INSTANCE_PASSING = INSTANCE_PASSING_REDIRECT;
-
-    // Attributes
-    private final static String VERSIONED_ATTRIBUTE = "versioned";
-
-    // Properties
-    private static final String INSTANCE_PASSING_PROPERTY_NAME = "instance-passing";
-    private static final String EPILOGUE_PROPERTY_NAME = "epilogue";
-    private static final String NOT_FOUND_PROPERTY_NAME = "not-found";
-    private static final String XFORMS_SUBMISSION_MODEL_PROPERTY_NAME = "xforms-submission-model";
-
-    public static final String XFORMS_SUBMISSION_PATH_PROPERTY_NAME = "xforms-submission-path";
-    public static final String XFORMS_SUBMISSION_PATH_DEFAULT_VALUE = "/xforms-server-submit";
-    public static final String PATH_MATCHERS = "path-matchers"; // used by PageFlowController
+    public final static String DEFAULT_INSTANCE_PASSING = INSTANCE_PASSING_REDIRECT;
 
     static {
-        Element trueConfigElement = new NonLazyUserDataElement( "config");
-        trueConfigElement.setText("true");
-        TRUE_DOCUMENT.setRootElement(trueConfigElement);
-
-        Element falseConfigElement = new NonLazyUserDataElement("config");
-        falseConfigElement.setText("false");
-        FALSE_DOCUMENT.setRootElement(falseConfigElement);
-
         final Map<String, String> mapping = new HashMap<String, String>();
         mapping.put(XMLConstants.XSI_PREFIX, XMLConstants.XSI_URI);
         mapping.put(XMLConstants.XSLT_PREFIX, XMLConstants.XSLT_NAMESPACE_URI);
@@ -89,391 +60,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
         NAMESPACES_WITH_XSI_AND_XSLT = new NamespaceMapping(mapping);
     }
 
-    public PageFlowControllerProcessor() {
-        addInputInfo(new ProcessorInputOutputInfo(INPUT_CONTROLLER, CONTROLLER_NAMESPACE_URI));
-    }
-
-    public void start(PipelineContext pipelineContext) {
-        final PageFlow pageFlow = (PageFlow) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_CONTROLLER), new CacheableInputReader() {
-            public Object read(final PipelineContext context, ProcessorInput input) {
-                final Document controllerDocument = readInputAsDOM4J(context, INPUT_CONTROLLER);
-                final Object controllerValidity = getInputValidity(context, getInputByName(INPUT_CONTROLLER));
-                final StepProcessorContext stepProcessorContext = new StepProcessorContext(controllerValidity);
-                LocationData locationData = (LocationData) controllerDocument.getRootElement().getData();
-                final String controllerContext = locationData == null ? null : locationData.getSystemID();
-
-                // Get global "parameters" of the controller, fall back to properties
-                final String globalInstancePassing; {
-                    final String attributeValue = controllerDocument.getRootElement().attributeValue(INSTANCE_PASSING_PROPERTY_NAME);
-                    globalInstancePassing = attributeValue != null ? attributeValue
-                            : getPropertySet().getString(INSTANCE_PASSING_PROPERTY_NAME, DEFAULT_INSTANCE_PASSING);
-                }
-                final boolean globalIsVersioned; {
-                    final String attributeValue = controllerDocument.getRootElement().attributeValue(VERSIONED_ATTRIBUTE);
-                    // NOTE: We use a global property, not an oxf:page-flow scoped one
-                    globalIsVersioned = attributeValue != null ? Boolean.valueOf(attributeValue) : URLRewriterUtils.isResourcesVersioned();
-                }
-                final String epilogueURL;
-                final Element epilogueElement;
-                {
-                    epilogueElement = controllerDocument.getRootElement().element("epilogue");
-                    epilogueURL = epilogueElement != null ? epilogueElement.attributeValue("url")
-                        : getPropertySet().getString(EPILOGUE_PROPERTY_NAME);
-                }
-                final String notFoundPipeline = getPropertySet().getString(NOT_FOUND_PROPERTY_NAME);
-                final String notFoundPageId;
-                {
-                    final Element notFoundHandlerElement = controllerDocument.getRootElement().element("not-found-handler");
-                    notFoundPageId = notFoundHandlerElement != null ? notFoundHandlerElement.attributeValue("page") : null;
-                }
-//                final String errorPageId; {
-//                    Element errorHandlerElement = controllerDocument.getRootElement().element("error-handler");
-//                    errorPageId = errorHandlerElement != null ? errorHandlerElement.attributeValue("page") : null;
-//                }
-
-                final List<URLRewriterUtils.PathMatcher> pathMatchers = new ArrayList<URLRewriterUtils.PathMatcher>();
-
-                // XForms Submission page
-                {
-                    final String xformsSubmissionPath = getPropertySet().getString(XFORMS_SUBMISSION_PATH_PROPERTY_NAME, XFORMS_SUBMISSION_PATH_DEFAULT_VALUE);
-                    final String xformsSubmissionModel = getPropertySet().getStringOrURIAsString(XFORMS_SUBMISSION_MODEL_PROPERTY_NAME);
-                    if ((xformsSubmissionPath == null && xformsSubmissionModel != null) || (xformsSubmissionPath != null && xformsSubmissionModel == null)) {
-                        throw new OXFException("Only one of properties " + XFORMS_SUBMISSION_PATH_PROPERTY_NAME + " and " + XFORMS_SUBMISSION_MODEL_PROPERTY_NAME + " is set.");
-                    }
-                    if (xformsSubmissionPath != null) {
-                        final Element firstPageElement = controllerDocument.getRootElement().element("page");
-                        if (firstPageElement != null) {
-                            final List<Element> allElements = Dom4jUtils.elements(controllerDocument.getRootElement());
-                            final int firstPageElementIndex = allElements.indexOf(firstPageElement);
-                            final Element newElement = Dom4jUtils.createElement("page", CONTROLLER_NAMESPACE_URI);
-                            newElement.addAttribute("path-info", xformsSubmissionPath);
-                            newElement.addAttribute("model", xformsSubmissionModel);
-                            allElements.add(firstPageElementIndex, newElement);
-                        }
-                    }
-                }
-
-                // Go through all pages to get mapping
-                final Map<String, Element> pageIdToPageElement = new HashMap<String, Element>();
-                final Map<String, String> pageIdToPathInfo = new HashMap<String, String>();
-                final Map<String, String> pageIdToXFormsModel = new HashMap<String, String>();
-                final Map<String, Document> pageIdToSetvaluesDocument = new HashMap<String, Document>();
-                final int pageCount = controllerDocument.getRootElement().elements("page").size();
-
-                for (Object o: controllerDocument.getRootElement().elements("page")) {
-                    Element pageElement = (Element) o;
-                    String pathInfo = pageElement.attributeValue("path-info");
-                    String xformsModel = pageElement.attributeValue("xforms");
-                    String id = pageElement.attributeValue("id");
-                    if (id != null) {
-                        pageIdToPageElement.put(id, pageElement);
-                        pageIdToPathInfo.put(id, pathInfo);
-                        if (xformsModel != null)
-                            pageIdToXFormsModel.put(id, xformsModel);
-
-                        final Document setvaluesDocument = getSetValuesDocument(pageElement);
-                        if (setvaluesDocument != null) {
-                            pageIdToSetvaluesDocument.put(id, setvaluesDocument);
-                        }
-                    }
-                }
-
-                ASTPipeline astPipeline = new ASTPipeline() {{
-
-                    setValidity(controllerValidity);
-
-                    // Generate request path
-                    final ASTOutput request = new ASTOutput("data", "request");
-                    addStatement(new ASTProcessorCall(XMLConstants.REQUEST_PROCESSOR_QNAME) {{
-                        final Document config;
-                        try {
-                            config = Dom4jUtils.readDom4j("<config><include>/request/request-path</include><include>/request/method</include></config>");
-                        } catch (Exception e) {
-                            throw new OXFException(e);
-                        }
-                        addInput(new ASTInput("config", config));
-                        addOutput(request);
-                    }});
-
-                    // Dummy matcher output
-                    final ASTOutput dummyMatcherOutput = new ASTOutput("data", "dummy-matcher");
-                    addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
-                        addInput(new ASTInput("data", Dom4jUtils.NULL_DOCUMENT));
-                        addOutput(dummyMatcherOutput);
-                    }});
-
-                    // Is the previous <files> or <page> using simple matching
-                    boolean previousIsSimple = true;
-                    boolean previousIsFile = false;
-                    boolean isFirst = true;
-                    ASTChoose currentChoose = null;
-                    int matcherCount = 0;
-
-                    final ASTOutput epilogueData = new ASTOutput(null, "html");
-                    final ASTOutput epilogueModelData = new ASTOutput(null, "epilogue-model-data");
-                    final ASTOutput epilogueInstance = new ASTOutput(null, "epilogue-instance");
-                    for (Object o: controllerDocument.getRootElement().elements()) {
-                        Element element = (Element) o;
-                        if ("files".equals(element.getName()) || "page".equals(element.getName())) {
-
-                            // Extract matcher URI or QName
-                            // URI is supported for backward compatibility only. We use a poor
-                            // heuristic to detect whether a QName is present.
-                            final String matcherURI;
-                            final QName matcherQName;
-                            {
-                                final String matcherAttribute = element.attributeValue("matcher");
-                                if (matcherAttribute != null && matcherAttribute.indexOf(':') != -1) {
-                                    matcherQName = Dom4jUtils.extractAttributeValueQName(element, "matcher");
-                                    matcherURI = null;
-                                } else {
-                                    matcherQName = null;
-                                    matcherURI = matcherAttribute;
-                                }
-                            }
-
-                            final String mimeType = element.attributeValue("mime-type");
-                            final String pathInfo = element.attributeValue("path-info");
-
-                            final boolean currentIsFile = "files".equals(element.getName());
-                            final boolean currentFileIsVersioned;
-                            if (currentIsFile) {
-                                // If this is a file, then check "versioned" property, local and then global
-                                final String currentIsVersionedAttribute = element.attributeValue(VERSIONED_ATTRIBUTE);
-                                currentFileIsVersioned = (currentIsVersionedAttribute != null) ? "true".equals(currentIsVersionedAttribute) : globalIsVersioned;
-                            } else {
-                                currentFileIsVersioned = false;
-                            }
-
-                            // Remember this FilesInfo if needed
-                            if (currentFileIsVersioned) {
-                                pathMatchers.add(new URLRewriterUtils.PathMatcher(pathInfo, matcherQName, mimeType, true));
-                            }
-
-                            // Can we just add this condition to the previous "when" statement?
-                            boolean canAddToPreviousWhen =
-                                    previousIsFile && currentIsFile &&
-                                            previousIsSimple && matcherURI == null && matcherQName == null && mimeType == null;
-
-                            // Create <p:when>
-                            ASTWhen when;
-                            final ASTOutput matcherOutput;
-                            if (matcherURI == null && matcherQName == null) {
-                                // There is no matcher, use basic rules
-
-                                matcherOutput = dummyMatcherOutput;
-
-                                // Add <p:choose> / <p:otherwise> when necessary
-                                if (!previousIsSimple) {
-                                    // Add a <p:otherwise><p:choose ref="request">
-                                    previousIsSimple = mimeType == null;
-                                    ASTWhen otherwise = new ASTWhen();
-                                    currentChoose.getWhen().add(otherwise);
-                                    currentChoose = new ASTChoose(new ASTHrefId(request));
-                                    otherwise.getStatements().add(currentChoose);
-                                } else if (isFirst) {
-                                    // Add a <p:choose ref="request">
-                                    isFirst = false;
-                                    currentChoose = new ASTChoose(new ASTHrefId(request));
-                                    addStatement(currentChoose);
-                                }
-
-                                // Compute test
-                                final String test;
-                                if (pathInfo.startsWith("*")) {
-                                    // Extension match
-                                    test = "ends-with(/request/request-path, '"
-                                            + pathInfo.substring(1)
-                                            + "' )";
-                                } else if (pathInfo.endsWith("*")) {
-                                    // Partial match
-                                    final int len = pathInfo.length() - 1;
-                                    test = "starts-with(/request/request-path, '"
-                                            + pathInfo.substring(0, len)
-                                            + "' )";
-                                } else {
-                                    // Exact match
-                                    test = "(/request/request-path = '" + pathInfo + "')";
-                                }
-
-                                // Add <p:when>
-                                when = new ASTWhen(test);
-                            } else {
-                                // Use matcher
-
-                                previousIsSimple = false;
-
-                                // List if statements where we add the new <p:choose>
-                                List<ASTStatement> statements;
-                                if (isFirst) {
-                                    isFirst = false;
-                                    statements = getStatements();
-                                } else {
-                                    ASTWhen otherwise = new ASTWhen();
-                                    currentChoose.getWhen().add(otherwise);
-                                    statements = otherwise.getStatements();
-                                }
-
-                                // Execute regexp
-                                final ASTOutput realMatcherOutput = new ASTOutput("data", "matcher-" + (++matcherCount));
-                                matcherOutput = realMatcherOutput;
-                                statements.add(new ASTProcessorCall(matcherQName, matcherURI) {{
-                                    Document config = new NonLazyUserDataDocument(new NonLazyUserDataElement("regexp"));
-                                    config.getRootElement().addText(pathInfo);
-                                    addInput(new ASTInput("config", config));
-                                    addInput(new ASTInput("data", new ASTHrefXPointer(new ASTHrefId(request), "/request/request-path")));
-                                    addOutput(realMatcherOutput);
-                                }});
-
-                                // Add <p:choose>
-                                currentChoose = new ASTChoose(new ASTHrefId(matcherOutput));
-                                statements.add(currentChoose);
-                                when = new ASTWhen("/result/matches = 'true'");
-                            }
-
-                            if (canAddToPreviousWhen) {
-                                // Do not create new "when", add current condition to previous "when"
-                                final ASTWhen previousWhen = currentChoose.getWhen().get(currentChoose.getWhen().size() - 1);
-                                previousWhen.setTest(previousWhen.getTest() + " or " + when.getTest());
-                            } else {
-                                // Create new "when"
-                                currentChoose.getWhen().add(when);
-                                if (currentIsFile) {
-                                    // Handle file
-                                    previousIsFile = true;
-
-                                    // For files, enforce GET method
-                                    if (matcherURI == null && matcherQName == null)// TODO: should do this when we have matchers as well, but the condition applies to the #matcher-* input
-                                        when.setTest("/request/method = 'GET' and (" + when.getTest() + ")");
-
-                                    handleFile(when, request, mimeType, epilogueData, epilogueModelData, epilogueInstance);
-                                } else if ("page".equals(element.getName())) {
-                                    // Handle page
-                                    previousIsFile = false;
-                                    // Get unique page number
-                                    int pageNumber = element.getParent().elements().indexOf(element);
-                                    handlePage(stepProcessorContext, controllerContext, when.getStatements(), element,
-                                            pageNumber, matcherOutput, epilogueData, epilogueModelData,
-                                            epilogueInstance, pageIdToPathInfo, pageIdToXFormsModel, pageIdToSetvaluesDocument,
-                                            globalInstancePassing);
-                                }
-                            }
-                        }
-                    }
-
-                    // Create "not found" page
-                    if (notFoundPipeline != null || notFoundPageId != null) {
-
-                        // Determine where we insert out statements
-                        List<ASTStatement> statementsList;
-                        if (currentChoose == null) {
-                            statementsList = getStatements();
-                        } else {
-                            ASTWhen otherwise = new ASTWhen();
-                            currentChoose.getWhen().add(otherwise);
-                            statementsList = otherwise.getStatements();
-                        }
-
-                        if (notFoundPageId != null) {
-                            // Handle not-found page
-                            // FIXME: We do not support not-found pages with a matcher output for now.
-                            Element notFoundPageElement = pageIdToPageElement.get(notFoundPageId);
-                            if (notFoundPageElement == null)
-                                throw new OXFException("Cannot find \"not found\" page with id '" + notFoundPageId + "' in page flow");
-                            // Create an artificial page number (must be different from the other page numbers)
-                            handlePage(stepProcessorContext, controllerContext, statementsList, notFoundPageElement,
-                                    pageCount, dummyMatcherOutput, epilogueData, epilogueModelData,
-                                    epilogueInstance, pageIdToPathInfo, pageIdToXFormsModel, pageIdToSetvaluesDocument,
-                                    globalInstancePassing);
-                        } else {
-                            // [BACKWARD COMPATIBILITY] - Execute simple "not-found" page coming from properties
-                            final ASTOutput notFoundHTML = new ASTOutput(null, "not-found-html");
-                            statementsList.add(new StepProcessorCall(stepProcessorContext, controllerContext, notFoundPipeline, "not-found") {{
-                                addInput(new ASTInput("data", Dom4jUtils.NULL_DOCUMENT));
-                                addInput(new ASTInput("instance", Dom4jUtils.NULL_DOCUMENT));
-                                addInput(new ASTInput("xforms-model", Dom4jUtils.NULL_DOCUMENT));
-                                addInput(new ASTInput("matcher", Dom4jUtils.NULL_DOCUMENT));
-                                final ASTOutput dataOutput = new ASTOutput("data", notFoundHTML);
-                                dataOutput.setLocationData(new ExtendedLocationData((LocationData) controllerDocument.getRootElement().getData(),
-                                        "executing not found pipeline", new String[] { "pipeline", notFoundPipeline}, true)); // use root element location data
-                                addOutput(dataOutput);
-                            }});
-
-                            // There is no model data to send to the epilogue
-                            statementsList.add(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
-                                addInput(new ASTInput("data", Dom4jUtils.NULL_DOCUMENT));
-                                addOutput(new ASTOutput("data", epilogueModelData));
-                            }});
-
-                            // Send not-found through epilogue
-                            handleEpilogue(controllerContext, statementsList, epilogueURL, epilogueElement, notFoundHTML, epilogueModelData, epilogueInstance, 404);
-
-                            // Notify final epilogue that there is nothing to send
-                            statementsList.add(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
-                                addInput(new ASTInput("data", Dom4jUtils.NULL_DOCUMENT));
-                                addOutput(new ASTOutput("data", epilogueData));
-                            }});
-                            statementsList.add(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
-                                addInput(new ASTInput("data", Dom4jUtils.NULL_DOCUMENT));
-                                addOutput(new ASTOutput("data", epilogueInstance));
-                            }});
-                        }
-                    }
-
-                    // Handle view, if there was one
-                    addStatement(new ASTChoose(new ASTHrefId(epilogueData)) {{
-                        addWhen(new ASTWhen("not(/*/@xsi:nil = 'true')") {{
-                            setNamespaces(NAMESPACES_WITH_XSI_AND_XSLT);
-                            handleEpilogue(controllerContext, getStatements(), epilogueURL, epilogueElement,
-                                    epilogueData, epilogueModelData, epilogueInstance, 200);
-                        }});
-                        addWhen(new ASTWhen() {{
-                            // Make sure we execute the model if there is a model but no view
-                            addStatement(new ASTProcessorCall(XMLConstants.NULL_SERIALIZER_PROCESSOR_QNAME) {{
-                                addInput(new ASTInput("data", new ASTHrefId(epilogueModelData)));
-                            }});
-                        }});
-                    }});
-                }};
-
-                // For debugging
-                if (logger.isDebugEnabled()) {
-                    ASTDocumentHandler astDocumentHandler = new ASTDocumentHandler();
-                    astPipeline.walk(astDocumentHandler);
-                    logger.debug("Page Flow Controller pipeline:\n"
-                            + Dom4jUtils.domToString(astDocumentHandler.getDocument()));
-                }
-
-                return new PageFlow(new PipelineProcessor(astPipeline), Collections.unmodifiableList(pathMatchers));
-            }
-        });
-
-        // If required, store information about resources to rewrite in the pipeline context for downstream use, e.g. by
-        // oxf:xhtml-rewrite. This allows consumers who would like to rewrite resources into versioned resources to
-        // actually know what a "resource" is.
-        final List<URLRewriterUtils.PathMatcher> pathMatchers = pageFlow.getPathMatchers();
-        if (pathMatchers != null && pathMatchers.size() > 0) {
-            final List<URLRewriterUtils.PathMatcher> existingPathMatchers = (List<URLRewriterUtils.PathMatcher>) pipelineContext.getAttribute(PATH_MATCHERS);
-            if (existingPathMatchers == null) {
-                // Set if we are the first
-                pipelineContext.setAttribute(PATH_MATCHERS, pathMatchers);
-            } else {
-                // Add if we come after others (in case of nested page flows)
-                final List<URLRewriterUtils.PathMatcher> allMatchers = new ArrayList<URLRewriterUtils.PathMatcher>() {{
-                    addAll(existingPathMatchers);
-                    addAll(pathMatchers);
-                }};
-                pipelineContext.setAttribute(PATH_MATCHERS, Collections.unmodifiableList(allMatchers));
-            }
-        }
-
-        // Launch pipeline
-        final PipelineProcessor pipelineProcessor = pageFlow.getPipelineProcessor();
-        pipelineProcessor.reset(pipelineContext);
-        pipelineProcessor.start(pipelineContext);
-    }
-
-    private static void handleEpilogue(final String controllerContext, List<ASTStatement> statements, final String epilogueURL, final Element epilogueElement,
+    protected static void handleEpilogue(final String controllerContext, List<ASTStatement> statements, final String epilogueURL, final Element epilogueElement,
                                        final ASTOutput epilogueData, final ASTOutput epilogueModelData, final ASTOutput epilogueInstance,
                                        final int defaultStatusCode) {
         // Send result through epilogue
@@ -519,7 +106,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
         }
     }
 
-    private Document getSetValuesDocument(final Element pageElement) {
+    public Document getSetValuesDocument(final Element pageElement) {
         final List paramElements = pageElement.elements("param");
         final List setValueElements = pageElement.elements("setvalue");
         final Document setvaluesDocument;
@@ -549,12 +136,11 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
     /**
      * Handle <page>
      */
-    private void handlePage(final StepProcessorContext stepProcessorContext, final String controllerContext,
-                            List<ASTStatement> statementsList, final Element pageElement, final int pageNumber,
-                            final ASTOutput matcherOutput,
+    protected void handlePage(final StepProcessorContext stepProcessorContext, final String urlBase,
+                            List<ASTStatement> statementsList, final Element pageElement,
+                            final String matcherOutputOrParamId,
                             final ASTOutput viewData, final ASTOutput epilogueModelData, final ASTOutput viewInstance,
                             final Map<String, String> pageIdToPathInfo,
-                            final Map<String, String> pageIdToXFormsModel,
                             final Map<String, Document> pageIdToSetvaluesDocument,
                             final String instancePassing) {
 
@@ -575,7 +161,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
             statementsList.add(new ASTProcessorCall(XMLConstants.URL_GENERATOR_PROCESSOR_QNAME) {{
                 final String url;
                 try {
-                    url = URLFactory.createURL(controllerContext, defaultSubmissionAttribute).toExternalForm();
+                    url = URLFactory.createURL(urlBase, defaultSubmissionAttribute).toExternalForm();
                 } catch (MalformedURLException e) {
                     throw new OXFException(e);
                 }
@@ -590,7 +176,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
         // XForms Input
         final ASTOutput isRedirect = new ASTOutput(null, "is-redirect");
 
-        // Always hook up XForms or XML submission
+        // Always hook up XML submission
         final ASTOutput xformedInstance = new ASTOutput("instance", "xformed-instance");
         {
             final LocationData locDat = Dom4jUtils.getLocationData();
@@ -602,7 +188,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
             addInput(new ASTInput("config", new ASTHrefURL(XFORMS_XML_SUBMISSION_XPL)));
             if (setvaluesDocument != null) {
                 addInput(new ASTInput("setvalues", setvaluesDocument));
-                addInput(new ASTInput("matcher-result", new ASTHrefId(matcherOutput)));
+                addInput(new ASTInput("matcher-result", new ASTHrefId(matcherOutputOrParamId)));
             } else {
                 addInput(new ASTInput("setvalues", Dom4jUtils.NULL_DOCUMENT));
                 addInput(new ASTInput("matcher-result", Dom4jUtils.NULL_DOCUMENT));
@@ -679,14 +265,14 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                                     actionElement.elements("result").size() > 1;
 
                     final ASTOutput internalActionData = actionAttribute == null ? null :
-                            new ASTOutput(null, "internal-action-data-" + pageNumber + "-" + actionNumber[0]);
+                            new ASTOutput(null, "internal-action-data-" + actionNumber[0]);
                     if (actionAttribute != null) {
                         // TODO: handle passing and modifications of action data in model, and view, and pass to instance
-                        addStatement(new StepProcessorCall(stepProcessorContext, controllerContext, actionAttribute, "action") {{
+                        addStatement(new StepProcessorCall(stepProcessorContext, urlBase, actionAttribute, "action") {{
                             addInput(new ASTInput("data", Dom4jUtils.NULL_DOCUMENT));
                             addInput(new ASTInput("instance", new ASTHrefId(xformedInstance)));
                             addInput(new ASTInput("xforms-model", Dom4jUtils.NULL_DOCUMENT));
-                            addInput(new ASTInput("matcher", new ASTHrefId(matcherOutput)));
+                            addInput(new ASTInput("matcher", new ASTHrefId(matcherOutputOrParamId)));
                             final ASTOutput dataOutput = new ASTOutput("data", internalActionData);
                             final String[] locationParams =
                                     new String[]{"pipeline", actionAttribute, "page id", pageElement.attributeValue("id"), "when", whenAttribute};
@@ -739,10 +325,9 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                                                 new String[]{"page id", pageElement.attributeValue("id"), "when", resultWhenAttribute};
                                         setLocationData(new ExtendedLocationData((LocationData) resultElement.getData(), "executing result", resultElement, locationParams, true));
                                     }
-                                    executeResult(stepProcessorContext, controllerContext, this, pageIdToXFormsModel,
-                                            pageIdToPathInfo, pageIdToSetvaluesDocument,
-                                            xformedInstance, resultElement, internalActionData,
-                                            isRedirect, xupdatedInstance, instancePassing);
+                                    executeResult(this, pageIdToPathInfo, pageIdToSetvaluesDocument,
+                                        xformedInstance, resultElement, internalActionData,
+                                        isRedirect, xupdatedInstance, instancePassing);
                                 }});
                             }
 
@@ -766,9 +351,8 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
 
                         // If we are not performing tests on the result from the action
                         final Element resultElement = actionElement.element("result");
-                        executeResult(stepProcessorContext, controllerContext, this, pageIdToXFormsModel,
-                                pageIdToPathInfo, pageIdToSetvaluesDocument, xformedInstance, resultElement,
-                                internalActionData, isRedirect, xupdatedInstance, instancePassing);
+                        executeResult(this, pageIdToPathInfo, pageIdToSetvaluesDocument, xformedInstance, resultElement,
+                            internalActionData, isRedirect, xupdatedInstance, instancePassing);
                     }
                 }});
             }
@@ -806,11 +390,11 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                 final ASTOutput modelInstance = new ASTOutput(null, "model-instance");
                 if (modelAttribute != null) {
                     // There is a model
-                    addStatement(new StepProcessorCall(stepProcessorContext, controllerContext, modelAttribute, "model") {{
+                    addStatement(new StepProcessorCall(stepProcessorContext, urlBase, modelAttribute, "model") {{
                         addInput(new ASTInput("data", new ASTHrefId(actionData)));
                         addInput(new ASTInput("instance", new ASTHrefId(xupdatedInstance)));
                         addInput(new ASTInput("xforms-model", Dom4jUtils.NULL_DOCUMENT));
-                        addInput(new ASTInput("matcher", new ASTHrefId(matcherOutput)));
+                        addInput(new ASTInput("matcher", new ASTHrefId(matcherOutputOrParamId)));
                         final String[] locationParams =
                                 new String[] { "page id", pageElement.attributeValue("id"), "model", modelAttribute };
                         {
@@ -840,11 +424,11 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                 // Handle page view
                 if (viewAttribute != null) {
                     // There is a view
-                    addStatement(new StepProcessorCall(stepProcessorContext, controllerContext, viewAttribute, "view") {{
+                    addStatement(new StepProcessorCall(stepProcessorContext, urlBase, viewAttribute, "view") {{
                         addInput(new ASTInput("data", new ASTHrefId(modelData)));
                         addInput(new ASTInput("instance", new ASTHrefId(modelInstance)));
                         addInput(new ASTInput("xforms-model", Dom4jUtils.NULL_DOCUMENT));
-                        addInput(new ASTInput("matcher", new ASTHrefId(matcherOutput)));
+                        addInput(new ASTInput("matcher", new ASTHrefId(matcherOutputOrParamId)));
                         final String[] locationParams =
                                 new String[] { "page id", pageElement.attributeValue("id"), "view", viewAttribute };
                         {
@@ -922,9 +506,9 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
         }});
     }
 
-    private void executeResult(StepProcessorContext stepProcessorContext, final String controllerContext, ASTWhen when,
-                               final Map<String, String> pageIdToXFormsModel, final Map<String, String> pageIdToPathInfo, final Map<String, Document> pageIdToSetvaluesDocument,
-                               final ASTOutput paramedInstance, final Element resultElement,
+    private void executeResult(ASTWhen when,
+                               final Map<String, String> pageIdToPathInfo, final Map<String, Document> pageIdToSetvaluesDocument,
+                               final ASTOutput instanceToUpdate, final Element resultElement,
                                final ASTOutput actionData, final ASTOutput redirect, final ASTOutput xupdatedInstance,
                                String instancePassing) {
 
@@ -932,43 +516,6 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
         final String resultPageId = resultElement == null ? null : resultElement.attributeValue("page");
         Attribute instancePassingAttribute = resultElement == null ? null : resultElement.attribute("instance-passing");
         final String _instancePassing = instancePassingAttribute == null ? instancePassing : instancePassingAttribute.getValue();
-        final String otherXForms = pageIdToXFormsModel.get(resultPageId);
-
-        // Whether we use the legacy XUpdate transformation
-        final boolean useLegacyTransformation =
-            (resultElement != null && !resultElement.elements().isEmpty() && resultElement.attribute("transform") == null);
-
-        // Whether we use the destination page's instance
-        final boolean useCurrentPageInstance = resultPageId == null || otherXForms == null || !useLegacyTransformation;
-
-        final ASTOutput instanceToUpdate;
-        if (useCurrentPageInstance) {
-            // We use the current page's submitted instance, if any.
-            instanceToUpdate = paramedInstance;
-        } else {
-            // DEPRECATED: We use the resulting page's instance if possible (deprecated since xforms attribute on <page> is deprecated)
-            instanceToUpdate = new ASTOutput("data", "other-page-instance");
-            // Run the other page's XForms model
-            final ASTOutput otherPageXFormsModel = new ASTOutput("data", "other-page-model");
-            when.addStatement(new StepProcessorCall(stepProcessorContext, controllerContext, otherXForms, "xforms-model") {{
-                addInput(new ASTInput("data", Dom4jUtils.NULL_DOCUMENT));
-                addInput(new ASTInput("instance", Dom4jUtils.NULL_DOCUMENT));
-                addInput(new ASTInput("xforms-model", Dom4jUtils.NULL_DOCUMENT));
-                addInput(new ASTInput("matcher", Dom4jUtils.NULL_DOCUMENT));
-                final ASTOutput dataOutput = new ASTOutput("data", otherPageXFormsModel);
-                final String[] locationParams =
-                            new String[] { "result page id", resultPageId, "result page XForms model", otherXForms };
-                dataOutput.setLocationData(new ExtendedLocationData((LocationData) resultElement.getData(),
-                        "reading other page XForms model data output", resultElement, locationParams, true));
-                addOutput(dataOutput);
-                setLocationData(new ExtendedLocationData((LocationData) resultElement.getData(),
-                        "executing other page XForms model", resultElement, locationParams, true));
-            }});
-            when.addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
-                addInput(new ASTInput("data", new ASTHrefXPointer(new ASTHrefId(otherPageXFormsModel), EXTRACT_INSTANCE_XPATH)));
-                addOutput(new ASTOutput("data", instanceToUpdate));
-            }});
-        }
 
         // Create resulting instance
         final ASTOutput internalXUpdatedInstance;
@@ -985,7 +532,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
             final String resultTraceAttribute = resultElement.attributeValue("trace");
             when.addStatement(new ASTProcessorCall(transformQName) {{
                 addInput(new ASTInput("config", transformConfig));// transform
-                addInput(new ASTInput("instance", new ASTHrefId(paramedInstance)));// source-instance
+                addInput(new ASTInput("instance", new ASTHrefId(instanceToUpdate)));// source-instance
                 addInput(new ASTInput("data", new ASTHrefId(instanceToUpdate)));// destination-instance
                 //addInput(new ASTInput("request-instance", new ASTHrefId(requestInstance)));// params-instance TODO
                 if (actionData != null)
@@ -993,29 +540,6 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                 else
                     addInput(new ASTInput("action",  Dom4jUtils.NULL_DOCUMENT));// action
                 addOutput(new ASTOutput("data", internalXUpdatedInstance) {{ setDebug(resultTraceAttribute);}});// updated-instance
-            }});
-
-        } else if (resultElement != null && !resultElement.elements().isEmpty()) {
-            // Legacy transform mechanism (built-in XUpdate)
-            internalXUpdatedInstance = new ASTOutput("data", "internal-xupdated-instance");
-            isTransformedInstance = true;
-
-            // Create XUpdate config
-            // The code in this branch should be equivalent to the previous code doing the same
-            // thing, except it will add the default namespace as well. I think there should be
-            // the default namespace as well.
-            final Document xupdateConfig = Dom4jUtils.createDocumentCopyParentNamespaces(resultElement);
-            xupdateConfig.getRootElement().setQName(new QName("modifications", XUpdateConstants.XUPDATE_NAMESPACE));
-
-            // Run XUpdate
-            final String resultTraceAttribute = resultElement.attributeValue("trace");
-            when.addStatement(new ASTProcessorCall(XMLConstants.XUPDATE_PROCESSOR_QNAME) {{
-                addInput(new ASTInput("config", xupdateConfig));
-                addInput(new ASTInput("data", new ASTHrefId(instanceToUpdate)));
-                addInput(new ASTInput("instance", new ASTHrefId(paramedInstance)));
-                if (actionData != null)
-                    addInput(new ASTInput("action", new ASTHrefId(actionData)));
-                addOutput(new ASTOutput("data", internalXUpdatedInstance) {{ setDebug(resultTraceAttribute);}});
             }});
         } else {
             internalXUpdatedInstance = instanceToUpdate;
@@ -1120,54 +644,14 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
     }
 
     /**
-     * Handle <files>
-     */
-    private void handleFile(ASTWhen when, final ASTOutput request, final String mimeType,
-                            final ASTOutput epilogueData, final ASTOutput epilogueModelData,
-                            final ASTOutput epilogueInstance) {
-        when.addStatement(new ASTProcessorCall(XMLConstants.RESOURCE_SERVER_PROCESSOR_QNAME) {{
-
-            addInput(new ASTInput("config", new ASTHrefAggregate("path", new ASTHrefXPointer(new ASTHrefId(request), "string(/request/request-path)"))));
-
-            if (mimeType == null) {
-                addInput(new ASTInput(ResourceServer.MIMETYPE_INPUT, new ASTHrefURL("oxf:/oxf/mime-types.xml")));
-            } else {
-                final Document mimeTypeConfig = new NonLazyUserDataDocument(new NonLazyUserDataElement("mime-types") {{
-                    add(new NonLazyUserDataElement("mime-type") {{
-                        add(new NonLazyUserDataElement("name") {{
-                            addText(mimeType);
-                        }});
-                        add(new NonLazyUserDataElement("pattern") {{
-                            addText("*");
-                        }});
-                    }});
-                }});
-                addInput(new ASTInput(ResourceServer.MIMETYPE_INPUT, mimeTypeConfig));
-            }
-        }});
-        when.addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
-            addInput(new ASTInput("data", Dom4jUtils.NULL_DOCUMENT));
-            addOutput(new ASTOutput("data", epilogueData));
-        }});
-        when.addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
-            addInput(new ASTInput("data", Dom4jUtils.NULL_DOCUMENT));
-            addOutput(new ASTOutput("data", epilogueModelData));
-        }});
-        when.addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
-            addInput(new ASTInput("data", Dom4jUtils.NULL_DOCUMENT));
-            addOutput(new ASTOutput("data", epilogueInstance));
-        }});
-    }
-
-    /**
      * Creates a single StepProcessor. This should be called only once for a given Page Flow
      * configuration. Then the same StepProcessor should be used for each step.
      */
-    private static class StepProcessorContext {
+    public static class StepProcessorContext {
 
         private PipelineConfig pipelineConfig;
 
-        private StepProcessorContext(final Object controllerValidity) {
+        public StepProcessorContext(final Object controllerValidity) {
             this.pipelineConfig = PipelineProcessor.createConfigFromAST(new ASTPipeline()  {{
                 setValidity(controllerValidity);
 
@@ -1454,24 +938,6 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
             } catch (MalformedURLException e) {
                 throw new OXFException(e);
             }
-        }
-    }
-
-    private static class PageFlow {
-        private PipelineProcessor pipelineProcessor;
-        private List<URLRewriterUtils.PathMatcher> pathMatchers;
-
-        public PageFlow(PipelineProcessor pipelineProcessor, List<URLRewriterUtils.PathMatcher> pathMatchers) {
-            this.pipelineProcessor = pipelineProcessor;
-            this.pathMatchers = pathMatchers;
-        }
-
-        public PipelineProcessor getPipelineProcessor() {
-            return pipelineProcessor;
-        }
-
-        public List<URLRewriterUtils.PathMatcher> getPathMatchers() {
-            return pathMatchers;
         }
     }
 }

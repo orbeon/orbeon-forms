@@ -21,6 +21,10 @@ public class ASTHrefId extends ASTHref {
     public ASTHrefId() {
     }
 
+    public ASTHrefId(String id) {
+        this.id = id;
+    }
+
     public ASTHrefId(ASTOutput output) {
         this.id = output.getId();
     }

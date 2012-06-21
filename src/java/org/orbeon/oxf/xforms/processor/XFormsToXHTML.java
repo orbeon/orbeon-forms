@@ -188,7 +188,7 @@ public class XFormsToXHTML extends ProcessorImpl {
                     public void foundInCache() {
                         cachedStatus[0] = true;
                     }
-                }, false);
+                });
 
             TEST_STATE = DO_TEST_STATE ? stage2CacheableState : null;
 

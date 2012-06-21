@@ -43,18 +43,16 @@ import java.util.*;
  * <li>Call createInput and createOutput methods to connect the pipeline
  * processor to its config in any order. No verification is done at
  * this point.
- * <li>refreshSocketInfo() can be called at any point. If the config is set,
- * it will read the config and update the socket info.
- * <li>ASTWhen start() is called, the processor is really executed: each
+ * <li>When start() is called, the processor is really executed: each
  * processor at the end of the pipeline is started and the outputs
  * of those processors is stored in the SAXStore.
- * <li>ASTWhen a read() is called on an output: if the processors has not
+ * <li>When a read() is called on an output: if the processors has not
  * been started yet, the start method is called. Then the
  * corresponding SAXStore is replayed.
  * </ol>
  * <p/>
  * <b>Threading</b>
- * <p>This processor is not only not thread safe, but it can't even be
+ * <p>This processor is not only NOT thread safe, but it can't even be
  * reused: if there is one data output (with a 1 cardinality), one can't call
  * read multiple times and get the same result. Only the first call to read
  * on the data output will succeed.
@@ -196,28 +194,17 @@ public class PipelineProcessor extends ProcessorImpl {
                 ASTProcessorCall processorCall = (ASTProcessorCall) statement;
 
                 final LocationData processorLocationData = processorCall.getLocationData();
-                final String processorNameOrURI = (processorCall.getName() != null ? Dom4jUtils.qNameToExplodedQName(processorCall.getName()) : processorCall.getURI());
+                final String processorNameOrURI = Dom4jUtils.qNameToExplodedQName(processorCall.getName());
 
-                if (processorCall.getEncapsulation() == null) {
-                    // Direct call
-                    if (processorCall.getProcessor() == null) {
-                        ProcessorFactory processorFactory = ProcessorFactoryRegistry.lookup(processorCall.getName());
-                        if (processorFactory == null)
-                            processorFactory = ProcessorFactoryRegistry.lookup(processorCall.getURI());
-                        if (processorFactory == null) {
-                            throw new ValidationException("Cannot find processor factory with name \"" + processorNameOrURI + "\"", processorLocationData);
-                        }
-                        processor = processorFactory.createInstance();
-                    } else {
-                        processor = processorCall.getProcessor();
+                // Direct call
+                if (processorCall.getProcessor() == null) {
+                    ProcessorFactory processorFactory = ProcessorFactoryRegistry.lookup(processorCall.getName());
+                    if (processorFactory == null) {
+                        throw new ValidationException("Cannot find processor factory with name \"" + processorNameOrURI + "\"", processorLocationData);
                     }
-                } else if ("ejb".equals(processorCall.getEncapsulation())) {
-                    // Call through EJB proxy
-                    ProxyProcessor proxyProcessor = new ProxyProcessor();
-                    proxyProcessor.setJNDIName(processorCall.getURI());
-                    proxyProcessor.setInputs(processorCall.getInputs());
-                    proxyProcessor.setOutputs(processorCall.getOutputs());
-                    processor = proxyProcessor.createInstance();
+                    processor = processorFactory.createInstance();
+                } else {
+                    processor = processorCall.getProcessor();
                 }
 
                 // Set info on processor
@@ -301,7 +288,7 @@ public class PipelineProcessor extends ProcessorImpl {
                                 final ProcessorFactory processorFactory = ProcessorFactoryRegistry.lookup(transform);
                                 if (processorFactory == null) {
                                     throw new ValidationException("Cannot find processor factory with JNDI name \""
-                                            + processorCall.getURI() + "\"", inputLocationData);
+                                            + transform.getQualifiedName() + "\"", inputLocationData);
                                 }
                                 transformProcessor = processorFactory.createInstance();
                             }

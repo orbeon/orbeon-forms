@@ -179,7 +179,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         // Initialize request information
         {
             initializeRequestInformation();
-            this.versionedPathMatchers = (List<URLRewriterUtils.PathMatcher>) PipelineContext.get().getAttribute(PageFlowControllerProcessor.PATH_MATCHERS);
+            this.versionedPathMatchers = (List<URLRewriterUtils.PathMatcher>) PipelineContext.get().getAttribute(PageFlowControllerProcessor.PathMatchers());
             if (this.versionedPathMatchers == null)
                 this.versionedPathMatchers = Collections.emptyList();
         }

@@ -65,7 +65,6 @@ public class XMLConstants {
     public final static QName XFORMS_INPUT_PROCESSOR_QNAME = new QName("xforms-input", OXF_PROCESSORS_NAMESPACE);
     public final static QName XFORMS_SUBMISSION_PROCESSOR_QNAME = new QName("xforms-submission", OXF_PROCESSORS_NAMESPACE);
     public final static QName XFORMS_OUTPUT_PROCESSOR_QNAME = new QName("xforms-output", OXF_PROCESSORS_NAMESPACE);
-    public final static QName XUPDATE_PROCESSOR_QNAME = new QName("xupdate", OXF_PROCESSORS_NAMESPACE);
     public final static QName UNSAFE_XSLT_PROCESSOR_QNAME = new QName("unsafe-xslt", OXF_PROCESSORS_NAMESPACE);
     public final static QName XSLT_PROCESSOR_QNAME = new QName("xslt", OXF_PROCESSORS_NAMESPACE);
     public final static QName XSLT10_PROCESSOR_QNAME = new QName("xslt-1.0", OXF_PROCESSORS_NAMESPACE);

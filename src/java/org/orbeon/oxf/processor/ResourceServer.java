@@ -25,6 +25,7 @@ import org.orbeon.oxf.util.UserAgent;
 import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.script.CoffeeScriptCompiler;
 import org.orbeon.oxf.xml.ForwardingXMLReceiver;
+import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.w3c.dom.Node;
 import org.xml.sax.Attributes;
@@ -55,14 +56,12 @@ public class ResourceServer extends ProcessorImpl {
     }
 
     public void start(PipelineContext context) {
-        final ExternalContext externalContext = (ExternalContext) context.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
-        final ExternalContext.Response response = externalContext.getResponse();
 
         final MimeTypeConfig mimeTypeConfig = (MimeTypeConfig) readCacheInputAsObject(context, getInputByName(MIMETYPE_INPUT), new CacheableInputReader() {
             public Object read(PipelineContext context, ProcessorInput input) {
-                final MimeTypesContentHandler ch = new MimeTypesContentHandler();
-                readInputAsSAX(context, input, ch);
-                return ch.getMimeTypes();
+            final MimeTypesContentHandler ch = new MimeTypesContentHandler();
+            readInputAsSAX(context, input, ch);
+            return ch.getMimeTypes();
             }
         });
 
@@ -82,119 +81,133 @@ public class ResourceServer extends ProcessorImpl {
                     throw new OXFException("Missing configuration.");
             }
 
-            // Remove version from the path if it is versioned
-            final List<URLRewriterUtils.PathMatcher> pathMatchers = URLRewriterUtils.getPathMatchers();
-            final boolean isVersioned = URLRewriterUtils.isVersionedURL(urlString, pathMatchers);
-            urlString = URLRewriterUtils.decodeResourceURI(urlString, isVersioned);
-
-            // Use the default protocol to read the file as a resource
-            if (!urlString.startsWith("oxf:"))
-                urlString = "oxf:" + urlString;
-
-            InputStream urlConnectionInputStream = null;
-            try {
-                // Open resource and set headers
-                try {
-                    final URL newURL = URLFactory.createURL(urlString);
-
-                    URLConnection urlConnection = null;
-                    int length = -1;
-                    long lastModified = -1;
-                    {
-                        final String urlPath = newURL.getPath();
-                        if (newURL.getProtocol().equals("oxf")) {
-
-                            // IE 6 hack for PNG images
-                            if (UserAgent.isIE6OrEarlier(externalContext.getRequest())) {
-                                if (urlPath.endsWith(".png")) {
-                                    // Case of a PNG image served to IE 6 or earlier: check if there is a .gif instead
-                                    urlString = "oxf:" + urlPath.substring(0, urlPath.length() - 3) + "gif";
-                                    final URL gifURL = URLFactory.createURL(urlString);
-                                    try {
-                                        // Try to get InputStream
-                                        final URLConnection gifURLConnection = gifURL.openConnection();
-                                        urlConnectionInputStream = gifURLConnection.getInputStream();
-                                        // If we get to here, we were successful
-                                        urlConnection = gifURLConnection;
-                                    } catch (ResourceNotFoundException e) {
-                                        // GIF doesn't exist
-                                        // NOTE: Exception throwing / catching is expensive so we hope this doesn't happen too often
-                                    }
-                                }
-                            }
-
-                            // When no using combined/minimized resources (i.e. typically in development), compile CoffeeScript on the fly, if we find one
-                            if (! XFormsProperties.isCombinedResources() && ! XFormsProperties.isMinimalResources() && urlPath.endsWith(".js")) {
-                                final String coffeePath = urlPath.substring(0, urlPath.length() - 2) + "coffee";
-                                if (ResourceManagerWrapper.instance().exists(coffeePath)) {
-                                    // Open URL for CoffeeScript file
-                                    final URL coffeeURL = URLFactory.createURL("oxf:" + coffeePath);
-                                    urlConnection = coffeeURL.openConnection();
-                                    length = 0; // Unknown length, as it is not just the length of the compiled code
-                                    lastModified = NetUtils.getLastModified(urlConnection);
-                                    // Read CoffeeScript as a string; CoffeeScript is always UTF-8
-                                    Reader coffeeReader = new InputStreamReader(urlConnection.getInputStream(), Charset.forName("UTF-8"));
-                                    final String coffeeString = NetUtils.readStreamAsString(coffeeReader);
-                                    // TODO: do we need to handle compilation errors?
-                                    String javascriptString = CoffeeScriptCompiler.compile(coffeeString, coffeePath, 0);
-                                    urlConnectionInputStream = new ByteArrayInputStream(javascriptString.getBytes("UTF-8"));
-                                }
-                            }
-                        }
-                    }
-
-                    // Open the connection, if not node already
-                    if (urlConnection == null) {
-                        urlConnection = newURL.openConnection();
-                        urlConnectionInputStream = urlConnection.getInputStream();
-                    }
-                    // Get length and last modified, if not done already
-                    if (length == -1) length = urlConnection.getContentLength();
-                    if (lastModified == -1) lastModified = NetUtils.getLastModified(urlConnection);
-
-                    // Set Last-Modified, required for caching and conditional get
-                    if (isVersioned) {
-                        // Use expiration far in the future
-                        response.setResourceCaching(lastModified, lastModified + ONE_YEAR_IN_MILLISECONDS);
-                    } else {
-                        // Use standard expiration policy
-                        response.setResourceCaching(lastModified, 0);
-                    }
-
-                    // Check If-Modified-Since and don't return content if condition is met
-                    if (!response.checkIfModifiedSince(lastModified, false)) {
-                        response.setStatus(ExternalContext.SC_NOT_MODIFIED);
-                        return;
-                    }
-
-                    // Lookup and set the content type
-                    final String contentType = mimeTypeConfig.getMimeType(urlString);
-                    if (contentType != null)
-                        response.setContentType(contentType);
-
-                    if (length > 0)
-                        response.setContentLength(length);
-
-                } catch (IOException e) {
-                    response.setStatus(ExternalContext.SC_NOT_FOUND);
-                    return;
-                } catch (ResourceNotFoundException e) {
-                    // Note: we should really not get this exception here, but an IOException
-                    // However we do actually get it, and so do the same we do for IOException.
-                    response.setStatus(ExternalContext.SC_NOT_FOUND);
-                    return;
-                }
-                // Copy stream to output
-                NetUtils.copyStream(urlConnectionInputStream, response.getOutputStream());
-            } finally {
-                // Make sure the stream is closed in all cases so as to not lock the file on disk
-                if (urlConnectionInputStream != null) {
-                    urlConnectionInputStream.close();
-                }
-            }
+            serveResource(mimeTypeConfig, urlString);
         } catch (Exception e) {
             throw new OXFException(e);
         }
+    }
+
+    public static void serveResource(MimeTypeConfig mimeTypeConfig, String urlString) throws IOException {
+
+        final ExternalContext externalContext = NetUtils.getExternalContext();
+        final ExternalContext.Response response = externalContext.getResponse();
+
+        // Remove version from the path if it is versioned
+        final List<URLRewriterUtils.PathMatcher> pathMatchers = URLRewriterUtils.getPathMatchers();
+        final boolean isVersioned = URLRewriterUtils.isVersionedURL(urlString, pathMatchers);
+        urlString = URLRewriterUtils.decodeResourceURI(urlString, isVersioned);
+
+        // Use the default protocol to read the file as a resource
+        if (!urlString.startsWith("oxf:"))
+            urlString = "oxf:" + urlString;
+
+        InputStream urlConnectionInputStream = null;
+        try {
+            // Open resource and set headers
+            try {
+                final URL newURL = URLFactory.createURL(urlString);
+
+                URLConnection urlConnection = null;
+                int length = -1;
+                long lastModified = -1;
+                {
+                    final String urlPath = newURL.getPath();
+                    if (newURL.getProtocol().equals("oxf")) {
+
+                        // IE 6 hack for PNG images
+                        if (UserAgent.isIE6OrEarlier(externalContext.getRequest())) {
+                            if (urlPath.endsWith(".png")) {
+                                // Case of a PNG image served to IE 6 or earlier: check if there is a .gif instead
+                                urlString = "oxf:" + urlPath.substring(0, urlPath.length() - 3) + "gif";
+                                final URL gifURL = URLFactory.createURL(urlString);
+                                try {
+                                    // Try to get InputStream
+                                    final URLConnection gifURLConnection = gifURL.openConnection();
+                                    urlConnectionInputStream = gifURLConnection.getInputStream();
+                                    // If we get to here, we were successful
+                                    urlConnection = gifURLConnection;
+                                } catch (ResourceNotFoundException e) {
+                                    // GIF doesn't exist
+                                    // NOTE: Exception throwing / catching is expensive so we hope this doesn't happen too often
+                                }
+                            }
+                        }
+
+                        // When no using combined/minimized resources (i.e. typically in development), compile CoffeeScript on the fly, if we find one
+                        if (! XFormsProperties.isCombinedResources() && ! XFormsProperties.isMinimalResources() && urlPath.endsWith(".js")) {
+                            final String coffeePath = urlPath.substring(0, urlPath.length() - 2) + "coffee";
+                            if (ResourceManagerWrapper.instance().exists(coffeePath)) {
+                                // Open URL for CoffeeScript file
+                                final URL coffeeURL = URLFactory.createURL("oxf:" + coffeePath);
+                                urlConnection = coffeeURL.openConnection();
+                                length = 0; // Unknown length, as it is not just the length of the compiled code
+                                lastModified = NetUtils.getLastModified(urlConnection);
+                                // Read CoffeeScript as a string; CoffeeScript is always UTF-8
+                                Reader coffeeReader = new InputStreamReader(urlConnection.getInputStream(), Charset.forName("UTF-8"));
+                                final String coffeeString = NetUtils.readStreamAsString(coffeeReader);
+                                // TODO: do we need to handle compilation errors?
+                                String javascriptString = CoffeeScriptCompiler.compile(coffeeString, coffeePath, 0);
+                                urlConnectionInputStream = new ByteArrayInputStream(javascriptString.getBytes("UTF-8"));
+                            }
+                        }
+                    }
+                }
+
+                // Open the connection, if not node already
+                if (urlConnection == null) {
+                    urlConnection = newURL.openConnection();
+                    urlConnectionInputStream = urlConnection.getInputStream();
+                }
+                // Get length and last modified, if not done already
+                if (length == -1) length = urlConnection.getContentLength();
+                if (lastModified == -1) lastModified = NetUtils.getLastModified(urlConnection);
+
+                // Set Last-Modified, required for caching and conditional get
+                if (isVersioned) {
+                    // Use expiration far in the future
+                    response.setResourceCaching(lastModified, lastModified + ONE_YEAR_IN_MILLISECONDS);
+                } else {
+                    // Use standard expiration policy
+                    response.setResourceCaching(lastModified, 0);
+                }
+
+                // Check If-Modified-Since and don't return content if condition is met
+                if (!response.checkIfModifiedSince(lastModified, false)) {
+                    response.setStatus(ExternalContext.SC_NOT_MODIFIED);
+                    return;
+                }
+
+                // Lookup and set the content type
+                final String contentType = mimeTypeConfig.getMimeType(urlString);
+                if (contentType != null)
+                    response.setContentType(contentType);
+
+                if (length > 0)
+                    response.setContentLength(length);
+
+            } catch (IOException e) {
+                response.setStatus(ExternalContext.SC_NOT_FOUND);
+                return;
+            } catch (ResourceNotFoundException e) {
+                // Note: we should really not get this exception here, but an IOException
+                // However we do actually get it, and so do the same we do for IOException.
+                response.setStatus(ExternalContext.SC_NOT_FOUND);
+                return;
+            }
+            // Copy stream to output
+            NetUtils.copyStream(urlConnectionInputStream, response.getOutputStream());
+        } finally {
+            // Make sure the stream is closed in all cases so as to not lock the file on disk
+            if (urlConnectionInputStream != null) {
+                urlConnectionInputStream.close();
+            }
+        }
+    }
+
+    public static MimeTypeConfig readMimeTypeConfig() {
+        final MimeTypesContentHandler ch = new MimeTypesContentHandler();
+        XMLUtils.urlToSAX("oxf:/oxf/mime-types.xml", ch, XMLUtils.ParserConfiguration.PLAIN, false);
+        return ch.getMimeTypes();
     }
 
     private static class MimeTypesContentHandler extends ForwardingXMLReceiver {

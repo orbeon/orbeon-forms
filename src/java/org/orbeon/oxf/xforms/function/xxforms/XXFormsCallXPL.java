@@ -147,7 +147,6 @@ public class XXFormsCallXPL extends XFormsFunction {
                 processor = InitUtils.createProcessor(processorDefinition);
             }
 
-            // Try to obtain an existing PipelineContext, otherwise create a new one
             final PipelineContext pipelineContext = PipelineContext.get();
             processor.reset(pipelineContext);
 

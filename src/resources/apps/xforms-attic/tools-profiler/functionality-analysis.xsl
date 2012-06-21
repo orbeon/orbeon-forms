@@ -29,7 +29,6 @@
             <xsl:variable name="functionalities-ungrouped" as="element(functionality)*">
                 <xsl:for-each select="$top-calls">
                     <functionality name="{if (starts-with(@method, 'org.orbeon.saxon')) then 'Saxon (XSLT, XPath in XForms, ...)'
-                        else if (starts-with(@method, 'org.orbeon.oxf.transformer.xupdate')) then 'XUpdate'
                         else if (starts-with(@method, 'org.orbeon.oxf.xforms')) then 'XForms'
                         else if (starts-with(@method, 'org.orbeon.oxf.cache')) then 'OPS cache'
                         else if (starts-with(@method, 'org.orbeon.oxf.processor.serializer')) then 'Serialization'

@@ -46,8 +46,6 @@ public class ASTDocumentHandler implements ASTHandler {
         currentElement = currentElement.addElement(new QName("processor", PipelineProcessor.PIPELINE_NAMESPACE));
         if (processorCall.getName() != null) {
             currentElement.addAttribute("name", processorCall.getName().getQualifiedName());
-        } else if (processorCall.getURI() != null) {
-            currentElement.addAttribute("uri", processorCall.getURI());
         } else {
             currentElement.addAttribute("class", processorCall.getProcessor().getClass().getName());
         }

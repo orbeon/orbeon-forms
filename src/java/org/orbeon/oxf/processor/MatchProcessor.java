@@ -48,25 +48,7 @@ public abstract class MatchProcessor extends ProcessorImpl {
                     final Result result = match(regexp, text);
 
                     // Output result
-                    xmlReceiver.startDocument();
-                    xmlReceiver.startElement("", "result", "result", XMLUtils.EMPTY_ATTRIBUTES);
-
-                    // <matches>
-                    xmlReceiver.startElement("", "matches", "matches", XMLUtils.EMPTY_ATTRIBUTES);
-                    final String matches = Boolean.toString(result.matches);
-                    xmlReceiver.characters(matches.toCharArray(), 0, matches.length());
-                    xmlReceiver.endElement("", "matches", "matches");
-
-                    // <group>
-                    for (final String group: result.groups) {
-                        xmlReceiver.startElement("", "group", "group", XMLUtils.EMPTY_ATTRIBUTES);
-                        if (group != null)
-                            xmlReceiver.characters(group.toCharArray(), 0, group.length());
-                        xmlReceiver.endElement("", "group", "group");
-                    }
-
-                    xmlReceiver.endElement("", "result", "result");
-                    xmlReceiver.endDocument();
+                    writeXML(xmlReceiver, result.matches, result.groups);
                 } catch (SAXException e) {
                     throw new OXFException(e);
                 }
@@ -74,6 +56,29 @@ public abstract class MatchProcessor extends ProcessorImpl {
         };
         addOutput(name, output);
         return output;
+    }
+
+    public static void writeXML(XMLReceiver xmlReceiver, boolean matches, List<String> groups) throws SAXException {
+        // Output result
+        xmlReceiver.startDocument();
+        xmlReceiver.startElement("", "result", "result", XMLUtils.EMPTY_ATTRIBUTES);
+
+        // <matches>
+        xmlReceiver.startElement("", "matches", "matches", XMLUtils.EMPTY_ATTRIBUTES);
+        final String matchesString = Boolean.toString(matches);
+        xmlReceiver.characters(matchesString.toCharArray(), 0, matchesString.length());
+        xmlReceiver.endElement("", "matches", "matches");
+
+        // <group>
+        for (final String group: groups) {
+            xmlReceiver.startElement("", "group", "group", XMLUtils.EMPTY_ATTRIBUTES);
+            if (group != null)
+                xmlReceiver.characters(group.toCharArray(), 0, group.length());
+            xmlReceiver.endElement("", "group", "group");
+        }
+
+        xmlReceiver.endElement("", "result", "result");
+        xmlReceiver.endDocument();
     }
 
     public static class Result {

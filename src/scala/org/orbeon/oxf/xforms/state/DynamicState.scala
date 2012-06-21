@@ -100,13 +100,6 @@ case class DynamicState(
         rootElement.addAttribute("container-type", containerType.orNull)
         rootElement.addAttribute("container-namespace", containerNamespace.orNull)
 
-        // Remember versioned paths
-        if (decodePathMatchers.nonEmpty) {
-            val matchersElement = rootElement.addElement("matchers")
-            for (matcher ← decodePathMatchers)
-                matchersElement.add(matcher.toXML)
-        }
-
         // Add upload information
         if (decodePendingUploads.nonEmpty)
             rootElement.addAttribute("pending-uploads", decodePendingUploads mkString " ")

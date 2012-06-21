@@ -328,11 +328,7 @@ public abstract class ProcessorImpl implements Processor {
      * @return        The object returned by the reader (either directly returned,
      *                or from the cache)
      */
-    public Object readCacheInputAsObject(PipelineContext pipelineContext, ProcessorInput input, CacheableInputReader reader) {
-        return readCacheInputAsObject(pipelineContext, input, reader, false);
-    }
-
-    public Object readCacheInputAsObject(PipelineContext pipelineContext, ProcessorInput input, CacheableInputReader reader, boolean logCache) {
+    public <T> T readCacheInputAsObject(PipelineContext pipelineContext, ProcessorInput input, CacheableInputReader<T> reader) {
 
         // Get associated output
         final ProcessorOutput output = input.getOutput();
@@ -357,14 +353,14 @@ public abstract class ProcessorImpl implements Processor {
                     logger.debug("Cache " + debugInfo + ": source cacheable and found for key '" + keyValidity.key + "'. FOUND object: " + inputObject);
 
                 reader.foundInCache();
-                return inputObject;
+                return (T) inputObject;
             }
         }
 
         if (logger.isDebugEnabled())
             logger.debug("Cache " + debugInfo + ": READING.");
 
-        final Object result = reader.read(pipelineContext, input);
+        final T result = reader.read(pipelineContext, input);
 
         // Cache new result if possible, asking again for KeyValidity if needed
         if (keyValidity == null || keyValidity.key == null || keyValidity.validity == null)

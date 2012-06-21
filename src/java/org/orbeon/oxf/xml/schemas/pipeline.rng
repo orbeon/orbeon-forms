@@ -76,9 +76,6 @@
                 <attribute name="id"/>
             </optional>
             <optional>
-                <attribute name="encapsulation"/>
-            </optional>
-            <optional>
                 <!-- Because of XInclude -->
                 <attribute name="xml:base">
                     <data type="anyURI"/>

@@ -121,11 +121,10 @@ public class PipelineReader extends ProcessorImpl {
             final Element element = (Element) i.next();
             if (element.getName().equals("processor")) {
                 // Processor
-                ASTProcessorCall processorCall = new ASTProcessorCall(XMLProcessorRegistry.extractProcessorQName(element), element.attributeValue("uri")); {
+                ASTProcessorCall processorCall = new ASTProcessorCall(XMLProcessorRegistry.extractProcessorQName(element)); {
                     result.add(processorCall);
                     processorCall.setNode(element);
                     processorCall.setId(element.attributeValue("id"));
-                    processorCall.setEncapsulation(element.attributeValue("encapsulation"));
 
                     // Inputs/outputs
                     for (Iterator j = element.elementIterator(); j.hasNext();) {

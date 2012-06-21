@@ -63,9 +63,9 @@ case class AbstractBinding(
 
     // A transform cannot be reused, so this creates a new one when called, based on the config
     def newTransform(boundElement: Element) = transformConfig map {
-        case (pipelineConfig, domGeneratorConfig) ⇒
+        case (pipelineConfig, domGenerator) ⇒
             // Run the transformation
-            val generatedDocument = Transform.transformBoundElement(pipelineConfig, domGeneratorConfig, boundElement)
+            val generatedDocument = Transform.transformBoundElement(pipelineConfig, domGenerator, boundElement)
 
             // Repackage the result
             val generatedRootElement = generatedDocument.getRootElement.detach.asInstanceOf[Element]

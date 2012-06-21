@@ -76,7 +76,6 @@
                             </xsl:choose>
                         </xsl:if>
                     </xhtml:div>
-                    <xhtml:div id="hd" class="fr-shadow">&#160;</xhtml:div>
                     <xhtml:div id="bd" class="fr-container">
                         <xhtml:div id="yui-main">
                             <xhtml:div class="yui-b">

@@ -25,7 +25,7 @@
         <xh:html>
             <xh:head>
                 <xh:title>Not Found</xh:title>
-
+        
                 <!-- Form Runner CSS stylesheets -->
                 <xsl:for-each select="$css-uri">
                     <xh:link rel="stylesheet" href="{.}" type="text/css" media="all"/>
@@ -40,7 +40,6 @@
                                 <xh:img src="/apps/fr/style/orbeon-logo-trimmed-transparent-30.png" alt="Logo"/>
                             </xh:div>
                         </xh:div>
-                        <xh:div id="hd" class="fr-shadow">&#160;</xh:div>
                         <xh:div id="bd" class="fr-container">
                             <xh:div id="yui-main">
                                 <xh:div class="yui-b">

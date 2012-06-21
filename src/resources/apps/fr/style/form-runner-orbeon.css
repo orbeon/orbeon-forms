@@ -87,21 +87,12 @@ input {
   background-repeat: no-repeat;
   clear: both;
 }
-.fr-shadow {
-  height: 10px;
-  _height: 5px;
-  font-size: 0;
-  clear: both;
-}
 /* Clear is necessary because the previous block contains floated elements */
 .fr-footer {
   min-height: 10px;
 }
 /* help display background image */
 /* IE 6 HACK in all the lines below: don't use the PNG background image as it doesn't show properly */
-/*#doc .fr-shadow { background-image: url(top-750.png); _background-image: none }*/
-/*#doc4 .fr-shadow { background-image: url(top-974.png); _background-image: none }*/
-/*#doc-fb .fr-shadow { background-image: url(top-974.png); _background-image: none }*/
 /*#doc .fr-footer { background-image: url(bottom-750.png); _background-image: none }*/
 /*#doc4 .fr-footer { background-image: url(bottom-974.png); _background-image: none }*/
 /*#doc-fb .fr-footer { background-image: url(bottom-974.png); _background-image: none }*/

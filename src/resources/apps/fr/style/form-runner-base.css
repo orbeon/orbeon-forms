@@ -503,7 +503,6 @@ pre.xforms-textarea, span.xforms-textarea pre { white-space: -moz-pre-wrap; whit
     /* Don't hide as there is no script running */
     html body form.xforms-initially-hidden { display: block }
     .fr-header { display: none }
-    .fr-shadow { display: none }
     .fr-bottom { display: none }
     .fr-status-icons { display: none }
     .fr-footer { display: none }

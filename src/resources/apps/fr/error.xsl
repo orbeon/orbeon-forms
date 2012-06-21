@@ -39,7 +39,6 @@
                         <img src="/apps/fr/style/orbeon-logo-trimmed-transparent-30.png" alt="Logo"/>
                     </div>
                 </div>
-                <div id="hd" class="fr-shadow">&#160;</div>
                 <div id="bd" class="fr-container">
                     <div id="yui-main">
                         <div class="yui-b">

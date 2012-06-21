@@ -1,0 +1,31 @@
+// Copyright (C) 2012 Orbeon, Inc.
+//
+// This program is free software; you can redistribute it and/or modify it under the terms of the
+// GNU Lesser General Public License as published by the Free Software Foundation; either version
+// 2.1 of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+// without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU Lesser General Public License for more details.
+//
+// The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+
+#fr-view {
+
+    select,
+    textarea,
+    input {
+        margin-bottom: 0;           // Override default 9px bottom margin added by Bootstrap
+        color: black;               // Make text inside the fields stand out, as this is the most important information
+    }
+
+    select,
+    input[type="file"] {
+        height: auto;
+        line-height: auto;
+    }
+
+    .fr-grid tr th label {
+        margin: 0;                  //  No margin on label inside table headers as they are not next to a control
+    }
+}

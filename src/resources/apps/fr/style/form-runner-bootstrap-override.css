@@ -1,0 +1,14 @@
+#fr-view select,
+#fr-view textarea,
+#fr-view input {
+  margin-bottom: 0;
+  color: black;
+}
+#fr-view select,
+#fr-view input[type="file"] {
+  height: auto;
+  line-height: auto;
+}
+#fr-view .fr-grid tr th label {
+  margin: 0;
+}

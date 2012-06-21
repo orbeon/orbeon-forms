@@ -625,7 +625,23 @@
                             </xsl:for-each>
                         </fr:buttons>
                     </xsl:variable>
-                    <xsl:apply-templates select="$default-buttons/node()"/>
+                    <xsl:variable name="buttons">
+                        <xsl:apply-templates select="$default-buttons/node()"/>
+                    </xsl:variable>
+                    <!-- Make the last button in the list the primary one -->
+                    <xsl:for-each select="$buttons/node()">
+                        <xsl:choose>
+                            <xsl:when test="self::xforms:trigger and empty(following-sibling::xforms:trigger)">
+                                <xsl:copy>
+                                    <xsl:attribute name="appearance">xxforms:primary</xsl:attribute>
+                                    <xsl:copy-of select="@* | node()"/>
+                                </xsl:copy>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:copy-of select="."/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:for-each>
                 </xsl:otherwise>
             </xsl:choose>
         </xhtml:div>

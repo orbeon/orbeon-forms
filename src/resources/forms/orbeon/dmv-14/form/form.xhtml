@@ -142,7 +142,6 @@
                 </xforms:bind>
                 <xforms:bind id="mailing-address-bind" ref="mailing-address" name="mailing-address">
                     <xforms:bind id="mailing-address-different-bind" ref="mailing-address-different" type="xforms:boolean"/>
-                    <xforms:bind ref="* except mailing-address-different" relevant="../mailing-address-different = 'true'"/>
                     <xforms:bind id="icon-3-bind" ref="icon-3" type="xs:anyURI"/>
                     <xforms:bind id="mailing-street-name-1-bind" ref="mailing-street-name-1"
                                  name="mailing-street-name-1"
@@ -174,11 +173,11 @@
                         <xforms:bind id="plate-number-bind" ref="plate-number" name="plate-number"
                                      type="dmv:plate-number"
                                      required="true()"
-                                     
+
                                      readonly="false()"
                                      calculate="upper-case(.)"/>
                         <xforms:bind id="vin-bind" ref="vin" name="vin" type="dmv:vin" required="true()"
-                                     
+
                                      readonly="false()"
                                      calculate="upper-case(.)"/>
                     </xforms:bind>
@@ -189,7 +188,6 @@
                 <xforms:bind id="trailer-coach-vessel-bind" ref="trailer-coach-vessel"
                              name="trailer-coach-vessel">
                     <xforms:bind id="has-trailer-coach-vessel-bind" ref="has-trailer-coach-vessel" type="xforms:boolean"/>
-                    <xforms:bind ref="* except has-trailer-coach-vessel" relevant="../has-trailer-coach-vessel = 'true'"/>
                     <xforms:bind id="vehicle-street-name-1-bind" ref="vehicle-street-name-1"
                                  name="vehicle-street-name-1"
                                  type="dmv:street-name-1"
@@ -428,12 +426,11 @@
                             <alert>The value of this field is incorrect</alert>
                         </residence-zip>
                         <voter-address-change>
-                            <label>Voter Change of Address</label>
                             <hint/>
                             <help/>
                             <alert>The value of this field is incorrect</alert>
                             <item>
-                                <label>Mark this box if you do not want to change your voting address</label>
+                                <label>Don't change my voting address</label>
                                 <value>true</value>
                             </item>
                         </voter-address-change>
@@ -483,12 +480,11 @@
                             <alert>The value of this field is incorrect</alert>
                         </residence-address>
                         <mailing-address-different>
-                            <label>Mailing address is different from residence address</label>
                             <hint/>
                             <help/>
                             <alert>The value of this field is incorrect</alert>
                             <item>
-                                <label>Mark this box if mailing address is different from residence address</label>
+                                <label>My mailing address is different from my residence address</label>
                                 <value>true</value>
                             </item>
                         </mailing-address-different>
@@ -505,12 +501,11 @@
                             <alert>The value of this field is incorrect</alert>
                         </vehicles>
                          <has-trailer-coach-vessel>
-                            <label>Location is different from residence address</label>
                             <hint/>
                             <help/>
                             <alert>The value of this field is incorrect</alert>
                             <item>
-                                <label>Mark this box if location is different from residence address</label>
+                                <label>Its location is different from my residence address</label>
                                 <value>true</value>
                             </item>
                         </has-trailer-coach-vessel>
@@ -751,7 +746,7 @@
                     <fr:grid>
                         <xhtml:tr>
                             <xhtml:td>
-                                <xforms:input id="last-name-control" class="fr-summary fr-search fr-width-10em"
+                                <xforms:input id="last-name-control" class="fr-summary fr-search fr-width-15em"
                                               bind="last-name-bind">
                                     <xforms:label ref="$form-resources/last-name/label"/>
                                     <xforms:hint ref="$form-resources/last-name/hint"/>
@@ -760,7 +755,7 @@
                                 </xforms:input>
                             </xhtml:td>
                             <xhtml:td>
-                                <xforms:input id="first-name-control" class="fr-summary fr-search fr-width-10em"
+                                <xforms:input id="first-name-control" class="fr-summary fr-search fr-width-15em"
                                               bind="first-name-bind">
                                     <xforms:label ref="$form-resources/first-name/label"/>
                                     <xforms:hint ref="$form-resources/first-name/hint"/>
@@ -776,7 +771,7 @@
                                     <xforms:alert ref="$form-resources/initial/alert"/>
                                 </xforms:input>
                             </xhtml:td>
-                            <xhtml:td rowspan="2">
+                            <xhtml:td rowspan="2" style="width: 120px">
                                 <xforms:output xmlns="http://orbeon.org/oxf/xml/form-builder"
                                                xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
                                                xmlns:xbl="http://www.w3.org/ns/xbl"
@@ -795,7 +790,7 @@
                         </xhtml:tr>
                         <xhtml:tr>
                             <xhtml:td>
-                                <xforms:input id="driver-license-number-control" class="fr-summary fr-search fr-width-10em"
+                                <xforms:input id="driver-license-number-control" class="fr-summary fr-search fr-width-15em"
                                               bind="driver-license-number-bind">
                                     <xforms:label ref="$form-resources/driver-license-number/label"/>
                                     <xforms:hint ref="$form-resources/driver-license-number/hint"/>
@@ -811,14 +806,6 @@
                                     <xforms:alert ref="$fr-resources/detail/labels/alert"/>
                                 </xforms:input>
                             </xhtml:td>
-                            <xhtml:td/>
-                        </xhtml:tr>
-                    </fr:grid>
-                    <!--</fr:section>-->
-                <!--<fr:section id="voter-address-change-section" bind="voter-address-change-bind">-->
-                    <!--<xforms:label ref="$form-resources/voter-address-change/label"/>-->
-                    <fr:grid>
-                        <xhtml:tr>
                             <xhtml:td>
                                 <xforms:select appearance="full" id="voter-address-change-control"
                                                bind="voter-address-change-bind">
@@ -831,6 +818,15 @@
                                         <xforms:value ref="value"/>
                                     </xforms:itemset>
                                 </xforms:select>
+                            </xhtml:td>
+                        </xhtml:tr>
+                    </fr:grid>
+                    <!--</fr:section>-->
+                <!--<fr:section id="voter-address-change-section" bind="voter-address-change-bind">-->
+                    <!--<xforms:label ref="$form-resources/voter-address-change/label"/>-->
+                    <fr:grid>
+                        <xhtml:tr>
+                            <xhtml:td>
                             </xhtml:td>
                         </xhtml:tr>
                     </fr:grid>
@@ -849,7 +845,7 @@
                                 </xforms:input>
                             </xhtml:td>
                             <xhtml:td>
-                                <xforms:input id="residence-street-name-1-control" bind="residence-street-name-1-bind">
+                                <xforms:input id="residence-street-name-1-control" bind="residence-street-name-1-bind" class="fr-width-15em">
                                     <xforms:label ref="$form-resources/residence-street-name-1/label"/>
                                     <xforms:hint ref="$form-resources/residence-street-name-1/hint"/>
                                     <xforms:help ref="$form-resources/residence-street-name-1/help"/>
@@ -857,14 +853,14 @@
                                 </xforms:input>
                             </xhtml:td>
                             <xhtml:td>
-                                <xforms:input id="residence-street-name-2-control" bind="residence-street-name-2-bind">
+                                <xforms:input id="residence-street-name-2-control" bind="residence-street-name-2-bind" class="fr-width-15em">
                                     <xforms:label ref="$form-resources/residence-street-name-2/label"/>
                                     <xforms:hint ref="$form-resources/residence-street-name-2/hint"/>
                                     <xforms:help ref="$form-resources/residence-street-name-2/help"/>
                                     <xforms:alert ref="$form-resources/residence-street-name-2/alert"/>
                                 </xforms:input>
                             </xhtml:td>
-                            <xhtml:td rowspan="3">
+                            <xhtml:td rowspan="3" style="width: 120px">
                                 <xforms:output xmlns="http://orbeon.org/oxf/xml/form-builder"
                                                xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
                                                xmlns:xbl="http://www.w3.org/ns/xbl"
@@ -891,7 +887,7 @@
                                 </xforms:input>
                             </xhtml:td>
                             <xhtml:td>
-                                <xforms:input id="residence-city-control" class="fr-width-10em" bind="residence-city-bind">
+                                <xforms:input id="residence-city-control" class="fr-width-15em" bind="residence-city-bind">
                                     <xforms:label ref="$form-resources/residence-city/label"/>
                                     <xforms:hint ref="$form-resources/residence-city/hint"/>
                                     <xforms:help ref="$form-resources/residence-city/help"/>
@@ -937,79 +933,88 @@
                             </xhtml:td>
                         </xhtml:tr>
                     </fr:grid>
-                    <fr:grid>
-                        <xhtml:tr>
-                            <xhtml:td>
-                                <xforms:input id="mailing-street-number-control" class="fr-width-5em"
-                                              bind="mailing-street-number-bind">
-                                    <xforms:label ref="$form-resources/mailing-street-number/label"/>
-                                    <xforms:hint ref="$form-resources/mailing-street-number/hint"/>
-                                    <xforms:help ref="$form-resources/mailing-street-number/help"/>
-                                    <xforms:alert ref="$form-resources/mailing-street-number/alert"/>
-                                </xforms:input>
-                            </xhtml:td>
-                            <xhtml:td>
-                                <xforms:input id="mailing-street-name-1-control" bind="mailing-street-name-1-bind">
-                                    <xforms:label ref="$form-resources/mailing-street-name-1/label"/>
-                                    <xforms:hint ref="$form-resources/mailing-street-name-1/hint"/>
-                                    <xforms:help ref="$form-resources/mailing-street-name-1/help"/>
-                                    <xforms:alert ref="$form-resources/mailing-street-name-1/alert"/>
-                                </xforms:input>
-                            </xhtml:td>
-                            <xhtml:td>
-                                <xforms:input id="mailing-street-name-2-control" bind="mailing-street-name-2-bind">
-                                    <xforms:label ref="$form-resources/mailing-street-name-2/label"/>
-                                    <xforms:hint ref="$form-resources/mailing-street-name-2/hint"/>
-                                    <xforms:help ref="$form-resources/mailing-street-name-2/help"/>
-                                    <xforms:alert ref="$form-resources/mailing-street-name-2/alert"/>
-                                </xforms:input>
-                            </xhtml:td>
-                            <xhtml:td rowspan="3">
-                                <xforms:output id="icon-3-control" mediatype="image/*" class="fr-attachment"
-                                               bind="icon-3-bind">
-                                    <xforms:label ref="$form-resources/icon-3/label"/>
-                                    <xforms:help ref="$form-resources/icon-3/help"/>
-                                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
-                                </xforms:output>
-                            </xhtml:td>
-                        </xhtml:tr>
-                        <xhtml:tr>
-                            <xhtml:td>
-                                <xforms:input id="mailing-apt-control" class="fr-width-5em" bind="mailing-apt-bind">
-                                    <xforms:label ref="$form-resources/mailing-apt/label"/>
-                                    <xforms:hint ref="$form-resources/mailing-apt/hint"/>
-                                    <xforms:help ref="$form-resources/mailing-apt/help"/>
-                                    <xforms:alert ref="$form-resources/mailing-apt/alert"/>
-                                </xforms:input>
-                            </xhtml:td>
-                            <xhtml:td>
-                                <xforms:input id="mailing-city-control" class="fr-width-10em" bind="mailing-city-bind">
-                                    <xforms:label ref="$form-resources/mailing-city/label"/>
-                                    <xforms:hint ref="$form-resources/mailing-city/hint"/>
-                                    <xforms:help ref="$form-resources/mailing-city/help"/>
-                                    <xforms:alert ref="$form-resources/mailing-city/alert"/>
-                                </xforms:input>
-                            </xhtml:td>
-                            <xhtml:td>
-                                <fr:us-state class="fr-width-10em" id="mailing-state-control" bind="mailing-state-bind">
-                                    <xforms:label ref="$form-resources/mailing-state/label"/>
-                                    <xforms:hint ref="$form-resources/mailing-state/hint"/>
-                                    <xforms:help ref="$form-resources/mailing-state/help"/>
-                                    <xforms:alert ref="$form-resources/mailing-state/alert"/>
-                                    <xforms:itemset ref="$form-resources/mailing-state/item">
-                                        <xforms:label ref="label"/>
-                                        <xforms:value ref="value"/>
-                                    </xforms:itemset>
-                                </fr:us-state>
-                                <xforms:input id="mailing-zip-control" class="fr-width-5em" bind="mailing-zip-bind">
-                                    <xforms:label ref="$form-resources/mailing-zip/label"/>
-                                    <xforms:hint ref="$form-resources/mailing-zip/hint"/>
-                                    <xforms:help ref="$form-resources/mailing-zip/help"/>
-                                    <xforms:alert ref="$form-resources/mailing-zip/alert"/>
-                                </xforms:input>
-                            </xhtml:td>
-                        </xhtml:tr>
-                    </fr:grid>
+                    <!--
+                        TODO: We should support relevance expression on fr:grid
+                        Using a group is a workaround
+                        Making the components inside the grid non-relevant has the following downsides
+                            In Form Builder, the rule needs to be duplicated for every control
+                            The grid still takes space on the page, even if the controls don't show
+                    -->
+                    <xforms:group ref=".[mailing-address-different = 'true']">
+                        <fr:grid>
+                            <xhtml:tr>
+                                <xhtml:td>
+                                    <xforms:input id="mailing-street-number-control" class="fr-width-5em"
+                                                  bind="mailing-street-number-bind">
+                                        <xforms:label ref="$form-resources/mailing-street-number/label"/>
+                                        <xforms:hint ref="$form-resources/mailing-street-number/hint"/>
+                                        <xforms:help ref="$form-resources/mailing-street-number/help"/>
+                                        <xforms:alert ref="$form-resources/mailing-street-number/alert"/>
+                                    </xforms:input>
+                                </xhtml:td>
+                                <xhtml:td>
+                                    <xforms:input id="mailing-street-name-1-control" bind="mailing-street-name-1-bind">
+                                        <xforms:label ref="$form-resources/mailing-street-name-1/label"/>
+                                        <xforms:hint ref="$form-resources/mailing-street-name-1/hint"/>
+                                        <xforms:help ref="$form-resources/mailing-street-name-1/help"/>
+                                        <xforms:alert ref="$form-resources/mailing-street-name-1/alert"/>
+                                    </xforms:input>
+                                </xhtml:td>
+                                <xhtml:td>
+                                    <xforms:input id="mailing-street-name-2-control" bind="mailing-street-name-2-bind">
+                                        <xforms:label ref="$form-resources/mailing-street-name-2/label"/>
+                                        <xforms:hint ref="$form-resources/mailing-street-name-2/hint"/>
+                                        <xforms:help ref="$form-resources/mailing-street-name-2/help"/>
+                                        <xforms:alert ref="$form-resources/mailing-street-name-2/alert"/>
+                                    </xforms:input>
+                                </xhtml:td>
+                                <xhtml:td rowspan="3" style="width: 120px">
+                                    <xforms:output id="icon-3-control" mediatype="image/*" class="fr-attachment"
+                                                   bind="icon-3-bind">
+                                        <xforms:label ref="$form-resources/icon-3/label"/>
+                                        <xforms:help ref="$form-resources/icon-3/help"/>
+                                        <xforms:alert ref="$fr-resources/detail/labels/alert"/>
+                                    </xforms:output>
+                                </xhtml:td>
+                            </xhtml:tr>
+                            <xhtml:tr>
+                                <xhtml:td>
+                                    <xforms:input id="mailing-apt-control" class="fr-width-5em" bind="mailing-apt-bind">
+                                        <xforms:label ref="$form-resources/mailing-apt/label"/>
+                                        <xforms:hint ref="$form-resources/mailing-apt/hint"/>
+                                        <xforms:help ref="$form-resources/mailing-apt/help"/>
+                                        <xforms:alert ref="$form-resources/mailing-apt/alert"/>
+                                    </xforms:input>
+                                </xhtml:td>
+                                <xhtml:td>
+                                    <xforms:input id="mailing-city-control" class="fr-width-15em" bind="mailing-city-bind">
+                                        <xforms:label ref="$form-resources/mailing-city/label"/>
+                                        <xforms:hint ref="$form-resources/mailing-city/hint"/>
+                                        <xforms:help ref="$form-resources/mailing-city/help"/>
+                                        <xforms:alert ref="$form-resources/mailing-city/alert"/>
+                                    </xforms:input>
+                                </xhtml:td>
+                                <xhtml:td>
+                                    <fr:us-state class="fr-width-10em" id="mailing-state-control" bind="mailing-state-bind">
+                                        <xforms:label ref="$form-resources/mailing-state/label"/>
+                                        <xforms:hint ref="$form-resources/mailing-state/hint"/>
+                                        <xforms:help ref="$form-resources/mailing-state/help"/>
+                                        <xforms:alert ref="$form-resources/mailing-state/alert"/>
+                                        <xforms:itemset ref="$form-resources/mailing-state/item">
+                                            <xforms:label ref="label"/>
+                                            <xforms:value ref="value"/>
+                                        </xforms:itemset>
+                                    </fr:us-state>
+                                    <xforms:input id="mailing-zip-control" class="fr-width-5em" bind="mailing-zip-bind">
+                                        <xforms:label ref="$form-resources/mailing-zip/label"/>
+                                        <xforms:hint ref="$form-resources/mailing-zip/hint"/>
+                                        <xforms:help ref="$form-resources/mailing-zip/help"/>
+                                        <xforms:alert ref="$form-resources/mailing-zip/alert"/>
+                                    </xforms:input>
+                                </xhtml:td>
+                            </xhtml:tr>
+                        </fr:grid>
+                    </xforms:group>
                     <xforms:label ref="$form-resources/mailing-address/label"/>
                 </fr:section>
                 <fr:section id="vehicles-section" bind="vehicles-bind">
@@ -1020,7 +1025,7 @@
                              origin="instance('vehicle-template')">
                         <xhtml:tr>
                             <xhtml:td>
-                                <xforms:input id="plate-number-control" class="fr-width-10em" bind="plate-number-bind">
+                                <xforms:input id="plate-number-control" class="fr-width-15em" bind="plate-number-bind">
                                     <xforms:label ref="$form-resources/plate-number/label"/>
                                     <xforms:hint ref="$form-resources/plate-number/hint"/>
                                     <xforms:help ref="$form-resources/plate-number/help"/>
@@ -1054,9 +1059,6 @@
                             </xhtml:td>
                         </xhtml:tr>
                     </fr:grid>
-                    <!--</fr:section>-->
-                <!--<fr:section id="leased-vehicles-section" bind="leased-vehicles-bind">-->
-                    <!--<xforms:label ref="$form-resources/leased-vehicles/label"/>-->
                     <fr:grid>
                         <xhtml:tr>
                             <xhtml:td>
@@ -1089,56 +1091,59 @@
                             </xhtml:td>
                         </xhtml:tr>
                     </fr:grid>
-                    <fr:grid>
-                        <xhtml:tr>
-                            <xhtml:td>
-                                <xforms:input id="vehicle-street-number-control" class="fr-width-5em"
-                                              bind="vehicle-street-number-bind">
-                                    <xforms:label ref="$form-resources/vehicle-street-number/label"/>
-                                    <xforms:hint ref="$form-resources/vehicle-street-number/hint"/>
-                                    <xforms:help ref="$form-resources/vehicle-street-number/help"/>
-                                    <xforms:alert ref="$form-resources/vehicle-street-number/alert"/>
-                                </xforms:input>
-                            </xhtml:td>
-                            <xhtml:td>
-                                <xforms:input id="vehicle-street-name-1-control" bind="vehicle-street-name-1-bind">
-                                    <xforms:label ref="$form-resources/vehicle-street-name-1/label"/>
-                                    <xforms:hint ref="$form-resources/vehicle-street-name-1/hint"/>
-                                    <xforms:help ref="$form-resources/vehicle-street-name-1/help"/>
-                                    <xforms:alert ref="$form-resources/vehicle-street-name-1/alert"/>
-                                </xforms:input>
-                            </xhtml:td>
-                            <xhtml:td>
-                                <xforms:input id="vehicle-street-name-2-control" bind="vehicle-street-name-2-bind">
-                                    <xforms:label ref="$form-resources/vehicle-street-name-2/label"/>
-                                    <xforms:hint ref="$form-resources/vehicle-street-name-2/hint"/>
-                                    <xforms:help ref="$form-resources/vehicle-street-name-2/help"/>
-                                    <xforms:alert ref="$form-resources/vehicle-street-name-2/alert"/>
-                                </xforms:input>
-                            </xhtml:td>
-                            <xhtml:td/>
-                        </xhtml:tr>
-                        <xhtml:tr>
-                            <xhtml:td>
-                                <xforms:input id="vehicle-city-control" class="fr-width-10em" bind="vehicle-city-bind">
-                                    <xforms:label ref="$form-resources/vehicle-city/label"/>
-                                    <xforms:hint ref="$form-resources/vehicle-city/hint"/>
-                                    <xforms:help ref="$form-resources/vehicle-city/help"/>
-                                    <xforms:alert ref="$form-resources/vehicle-city/alert"/>
-                                </xforms:input>
-                            </xhtml:td>
-                            <xhtml:td>
-                                <xforms:input id="vehicle-county-control" bind="vehicle-county-bind">
-                                    <xforms:label ref="$form-resources/vehicle-county/label"/>
-                                    <xforms:hint ref="$form-resources/vehicle-county/hint"/>
-                                    <xforms:help ref="$form-resources/vehicle-county/help"/>
-                                    <xforms:alert ref="$form-resources/vehicle-county/alert"/>
-                                </xforms:input>
-                            </xhtml:td>
-                            <xhtml:td/>
-                            <xhtml:td/>
-                        </xhtml:tr>
-                    </fr:grid>
+                    <!-- See comment above for a similar group for mailing-address-different -->
+                    <xforms:group ref=".[has-trailer-coach-vessel = 'true']">
+                        <fr:grid>
+                            <xhtml:tr>
+                                <xhtml:td>
+                                    <xforms:input id="vehicle-street-number-control" class="fr-width-5em"
+                                                  bind="vehicle-street-number-bind">
+                                        <xforms:label ref="$form-resources/vehicle-street-number/label"/>
+                                        <xforms:hint ref="$form-resources/vehicle-street-number/hint"/>
+                                        <xforms:help ref="$form-resources/vehicle-street-number/help"/>
+                                        <xforms:alert ref="$form-resources/vehicle-street-number/alert"/>
+                                    </xforms:input>
+                                </xhtml:td>
+                                <xhtml:td>
+                                    <xforms:input id="vehicle-street-name-1-control" bind="vehicle-street-name-1-bind">
+                                        <xforms:label ref="$form-resources/vehicle-street-name-1/label"/>
+                                        <xforms:hint ref="$form-resources/vehicle-street-name-1/hint"/>
+                                        <xforms:help ref="$form-resources/vehicle-street-name-1/help"/>
+                                        <xforms:alert ref="$form-resources/vehicle-street-name-1/alert"/>
+                                    </xforms:input>
+                                </xhtml:td>
+                                <xhtml:td>
+                                    <xforms:input id="vehicle-street-name-2-control" bind="vehicle-street-name-2-bind">
+                                        <xforms:label ref="$form-resources/vehicle-street-name-2/label"/>
+                                        <xforms:hint ref="$form-resources/vehicle-street-name-2/hint"/>
+                                        <xforms:help ref="$form-resources/vehicle-street-name-2/help"/>
+                                        <xforms:alert ref="$form-resources/vehicle-street-name-2/alert"/>
+                                    </xforms:input>
+                                </xhtml:td>
+                                <xhtml:td/>
+                            </xhtml:tr>
+                            <xhtml:tr>
+                                <xhtml:td>
+                                    <xforms:input id="vehicle-city-control" class="fr-width-15em" bind="vehicle-city-bind">
+                                        <xforms:label ref="$form-resources/vehicle-city/label"/>
+                                        <xforms:hint ref="$form-resources/vehicle-city/hint"/>
+                                        <xforms:help ref="$form-resources/vehicle-city/help"/>
+                                        <xforms:alert ref="$form-resources/vehicle-city/alert"/>
+                                    </xforms:input>
+                                </xhtml:td>
+                                <xhtml:td>
+                                    <xforms:input id="vehicle-county-control" bind="vehicle-county-bind">
+                                        <xforms:label ref="$form-resources/vehicle-county/label"/>
+                                        <xforms:hint ref="$form-resources/vehicle-county/hint"/>
+                                        <xforms:help ref="$form-resources/vehicle-county/help"/>
+                                        <xforms:alert ref="$form-resources/vehicle-county/alert"/>
+                                    </xforms:input>
+                                </xhtml:td>
+                                <xhtml:td/>
+                                <xhtml:td/>
+                            </xhtml:tr>
+                        </fr:grid>
+                    </xforms:group>
                 </fr:section>
                 <fr:section id="old-address-section" bind="old-address-bind">
                     <xforms:label ref="$form-resources/old-address/label"/>
@@ -1153,7 +1158,7 @@
                                 </xforms:input>
                             </xhtml:td>
                             <xhtml:td>
-                                <xforms:input id="old-city-control" class="fr-width-10em" bind="old-city-bind">
+                                <xforms:input id="old-city-control" class="fr-width-15em" bind="old-city-bind">
                                     <xforms:label ref="$form-resources/old-city/label"/>
                                     <xforms:hint ref="$form-resources/old-city/hint"/>
                                     <xforms:help ref="$form-resources/old-city/help"/>

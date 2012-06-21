@@ -359,27 +359,6 @@ a.xforms-readonly, .xforms-trigger-readonly a { color: gray; cursor: default }
 
 /* ***** Orbeon buttons ********************************************************************************************* */
 
-.xforms-trigger-appearance-full button,
-.xforms-mock-button {                                           /* Mock button can used in cases where we want to show a block with the
-                                                                   appearance of a button, without it being an actual button; this is used
-                                                                   by Form Builder and the style is here to avoid CSS duplication */
-    font-size: 93%;
-    -khtml-border-radius: 4px;
-    -webkit-border-radius: 4px;
-    background: #DDD url(../../ops/yui/assets/skins/sam/sprite.png) repeat-x 0 0;
-    border-color: #BBB #BBB #999;
-    border-radius: 4px;
-    border-style: solid;
-    border-width: 1px;
-    cursor: pointer;
-    display: inline-block;
-    margin: 0;
-    overflow: visible;
-    padding: 3px 9px 3px 9px;
-    text-shadow: 0 1px #F0F0F0;
-    color: #333;
-}
-
 .xforms-trigger-appearance-full button:hover,
 .xforms-trigger-appearance-full button:focus {
     background-position: 0 -6px;

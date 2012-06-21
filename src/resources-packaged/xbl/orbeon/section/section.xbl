@@ -35,14 +35,20 @@
 
         <xbl:handlers>
             <xbl:handler event="fr-expand" phase="target">
-                <xforms:toggle case="case-button-open"/>
-                <xforms:toggle case="case-open"/>
+                <xf:setvalue ref="instance('open')">true</xf:setvalue>
             </xbl:handler>
             <xbl:handler event="fr-collapse" phase="target">
-                <xforms:toggle case="case-button-closed"/>
-                <xforms:toggle case="case-closed"/>
+                <xf:setvalue ref="instance('open')">false</xf:setvalue>
             </xbl:handler>
         </xbl:handlers>
+
+        <xbl:implementation>
+            <xforms:model id="model">
+                <xforms:instance id="open">
+                    <open/>
+                </xforms:instance>
+            </xforms:model>
+        </xbl:implementation>
 
         <xbl:template xxbl:transform="oxf:xslt">
             <xsl:transform version="2.0">
@@ -65,8 +71,17 @@
 
                         <xf:group xxbl:scope="inner" appearance="xxf:internal">
 
+
                             <!-- Q: Is this the best way to get access to Form Runner resources? -->
                             <xxf:var name="fr-resources"><xxf:sequence value="$fr-resources" xxbl:scope="outer"/></xxf:var>
+
+                            <!-- Whether the section is open, initialized from XSLT variable -->
+                            <xf:var name="open" value="instance('open') = 'true'">
+                                <!-- TODO: get rid of the toggle once we have a data-bound switch -->
+                                <xforms:toggle ev:event="xforms-value-changed" case="case-{{if (. = 'true') then 'open' else 'closed'}}"/>
+                            </xf:var>
+
+                            <xf:setvalue ev:event="xforms-enabled" ref="instance('open')" value="'{$open}'"/>
 
                             <!-- Section title area: open/close button, title, help -->
                             <xsl:element name="{if ($ancestor-sections = 0) then 'xhtml:h2' else 'xhtml:h3'}">
@@ -75,37 +90,17 @@
                                 <!-- Open/close button -->
                                 <xforms:group appearance="xxforms:internal">
                                     <xsl:if test="$collapse">
-                                        <xforms:switch id="switch-button" xxforms:readonly-appearance="dynamic" class="fr-section-arrow">
-                                            <xforms:case id="case-button-closed" selected="{not($open)}">
-                                                <!-- "+" trigger -->
-                                                <xforms:trigger appearance="minimal" id="button-open" class="fr-section-open-close">
-                                                    <xforms:label>
-                                                        <xhtml:img width="12" height="12" src="/apps/fr/style/images/mozilla/arrow-rit-hov.gif" alt="" title="{{$fr-resources/components/labels/open-section}}"/>
-                                                    </xforms:label>
-                                                </xforms:trigger>
-                                            </xforms:case>
-                                            <xforms:case id="case-button-open" selected="{$open}">
-                                                <!-- "-" trigger -->
-                                                <xforms:trigger appearance="minimal" id="button-close" class="fr-section-open-close">
-                                                    <xforms:label>
-                                                        <xhtml:img width="12" height="12" src="/apps/fr/style/images/mozilla/arrow-dn-hov.gif" alt="" title="{{$fr-resources/components/labels/close-section}}"/>
-                                                    </xforms:label>
-                                                </xforms:trigger>
-                                            </xforms:case>
-                                        </xforms:switch>
 
                                         <!-- Handle DOMActivate event to open/close the switches -->
                                         <xforms:action ev:event="DOMActivate">
                                             <xxforms:variable name="expand" select="xxforms:case('switch') = 'case-closed'" as="xs:boolean"/>
                                             <xforms:action if="$expand">
                                                 <!-- Expand -->
-                                                <xforms:toggle case="case-open"/>
-                                                <xforms:toggle case="case-button-open"/>
+                                                <xf:setvalue ref="instance('open')">true</xf:setvalue>
                                             </xforms:action>
                                             <xforms:action if="not($expand)">
                                                 <!-- Collapse -->
-                                                <xforms:toggle case="case-closed"/>
-                                                <xforms:toggle case="case-button-closed"/>
+                                                <xf:setvalue ref="instance('open')">false</xf:setvalue>
                                             </xforms:action>
                                         </xforms:action>
                                     </xsl:if>
@@ -115,26 +110,18 @@
                                         <xsl:when test="$collapse">
                                             <!-- Set the section id to this trigger: this id matching is needed for noscript help -->
                                             <!-- TODO: check noscript help now that we have changed to XBL -->
-                                            <xforms:trigger appearance="minimal" class="fr-section-label" xxbl:scope="outer">
-                                                <xsl:apply-templates select="xforms:label | xforms:help | xforms:alert"/>
+                                            <xforms:trigger appearance="minimal" class="fr-section-label fr-section-{{if ($open) then 'opened' else 'closed'}}">
+                                                <xbl:content includes=":root > xforms|label, :root > xforms|help, :root > xforms|hint, :root > xforms|alert"/>
                                             </xforms:trigger>
                                         </xsl:when>
                                         <xsl:otherwise>
                                             <!-- Set the section id to this output: this id matching is needed for noscript help -->
                                             <!-- TODO: check noscript help now that we have changed to XBL -->
-                                            <xforms:output appearance="minimal" value="''" xxbl:scope="outer">
-                                                <xsl:apply-templates select="xforms:label | xforms:help | xforms:alert"/>
+                                            <xforms:output appearance="minimal" value="''">
+                                                <xbl:content includes=":root > xforms|label, :root > xforms|help, :root > xforms|hint, :root > xforms|alert"/>
                                             </xforms:output>
                                         </xsl:otherwise>
                                     </xsl:choose>
-
-                                    <!-- This is here for legacy Form Builder section handling during edit mode -->
-                                    <xsl:if test="fr:buttons">
-                                        <xforms:group class="fr-section-buttons" xxbl:scope="outer">
-                                            <xforms:action ev:event="#all" ev:propagate="stop"/>
-                                            <xsl:apply-templates select="fr:buttons/node()"/>
-                                        </xforms:group>
-                                    </xsl:if>
 
                                 </xforms:group>
 

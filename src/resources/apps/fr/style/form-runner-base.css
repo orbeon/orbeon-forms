@@ -15,7 +15,7 @@
 /* NOTE: IE em factor: 0.9759 */
 
 /* ***** Utilities ************************************************************************************************** */
-
+form.xforms-layout-span { float: none }
 .fr-clear { clear: both }
 
 .fr-layout-table { padding: 0; margin: 0 }
@@ -148,7 +148,7 @@ button.xforms-trigger, input.xforms-trigger, .xforms-trigger button, .xforms-tri
 
 #fr-form-group {
     display: block;
-    margin: .5em 1em 1em;
+    /*margin: .5em 1em 1em;*/
 }
 
 /* Language and mode selectors */
@@ -167,7 +167,7 @@ button.xforms-trigger, input.xforms-trigger, .xforms-trigger button, .xforms-tri
 
 .fr-top .fr-logo img { margin-right: 1em }
 .fr-top .fr-form-title {
-    margin: 0;
+    margin: 0 0 0 19px;
     padding: 0;
     -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
 }
@@ -268,7 +268,7 @@ button.xforms-trigger, input.xforms-trigger, .xforms-trigger button, .xforms-tri
     word-wrap: break-word;
 }
 
-.fr-repeat-table .fr-repeat-column-trigger { width: 24px; text-align: center }
+.fr-repeat-table .fr-repeat-column-trigger { width: 16px; text-align: center }
 .yui-skin-sam .fr-repeat-table .fr-repeat-column-trigger { vertical-align: middle } /* override YUI */
 .fr-repeat-table .fr-repeat-column-trigger img { margin: 0; display: block }
 .fr-repeat-table .fr-repeat-column-trigger span img { *margin-left: 0px } /* IE buttons depress; is there a way to remove their 1px 3px padding? */
@@ -302,7 +302,8 @@ button.xforms-trigger, input.xforms-trigger, .xforms-trigger button, .xforms-tri
 
 .fr-section-container .fr-section-content {
     display: block;
-    margin-left: 22px;
+    margin-left: 22px;                          /* To be aligned with the start of the text of the titles */
+    margin-right: 22px;                         /* To have the same margin on both side, especially visible with tables */
     margin-bottom: .25em;
 }
 
@@ -325,7 +326,6 @@ button.xforms-trigger, input.xforms-trigger, .xforms-trigger button, .xforms-tri
     clear: both;
     margin: 0 0 .5em;
 }
-.fr-grid tr th { text-align: left }
 
 /* Cell content */
 .fr-grid-content {
@@ -377,10 +377,10 @@ button.xforms-trigger, input.xforms-trigger, .xforms-trigger button, .xforms-tri
 
 /* Checkboxes and radio buttons */
 .xforms-select1-appearance-full span.xforms-deselected, .xforms-select1-appearance-full span.xforms-selected { display: block; clear: both }
-.xforms-select1-appearance-full span label { margin-left: .5em; margin-right: 1em }
+.xforms-select1-appearance-full span label { margin-right: 1em }
 
 .xforms-select-appearance-full span.xforms-deselected, .xforms-select-appearance-full span.xforms-selected { display: block; clear: both }
-.xforms-select-appearance-full span label { margin-left: .5em; margin-right: 1em }
+.xforms-select-appearance-full span label { margin-right: 1em }
 
 .xforms-select-appearance-full span label, .xforms-select1-appearance-full span label {
     display: block;

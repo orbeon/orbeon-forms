@@ -13,10 +13,13 @@
  */
 /* ***** Basic HTML settings **************************************************************************************** */
 
-html { overflow: scroll; background-color: #DDD }/* TODO: add comment about why this is useful (if is actually is) */
+html {
+    overflow: scroll;               /* TODO: add comment about why this is useful (if is actually is) */
+    /*background-color: #DDD */
+}
 
 body {
-    background-color: #DDD;
+    /*background-color: #DDD;*/
     text-align: left /* Not sure why the YUI resets this to center */
 }
 
@@ -26,10 +29,11 @@ b { font-weight: bold }
 th, td {border: 0; padding: 0 }
 
 body, body table, textarea.xforms-textarea, pre.xforms-textarea, span.xforms-textarea pre, button {
-    font-family: "Lucida Grande", Tahoma, Arial, Verdana, sans-serif;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    color: #333;
 }
 
-a { color: #004B92 }
+/*a { color: #004B92 }*/
 hr { border: 1px solid #eee }
 
 /* Some definitions from YUI base-min.css */

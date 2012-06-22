@@ -57,8 +57,8 @@ public class ResourceServer extends ProcessorImpl {
 
     public void start(PipelineContext context) {
 
-        final MimeTypeConfig mimeTypeConfig = (MimeTypeConfig) readCacheInputAsObject(context, getInputByName(MIMETYPE_INPUT), new CacheableInputReader() {
-            public Object read(PipelineContext context, ProcessorInput input) {
+        final MimeTypeConfig mimeTypeConfig = readCacheInputAsObject(context, getInputByName(MIMETYPE_INPUT), new CacheableInputReader<MimeTypeConfig>() {
+            public MimeTypeConfig read(PipelineContext context, ProcessorInput input) {
             final MimeTypesContentHandler ch = new MimeTypesContentHandler();
             readInputAsSAX(context, input, ch);
             return ch.getMimeTypes();

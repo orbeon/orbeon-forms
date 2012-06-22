@@ -214,9 +214,9 @@ public class ScopeGenerator extends ScopeProcessorBase {
     }
 
     protected Mapping readMapping(PipelineContext pipelineContext) {
-        return (Mapping) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_MAPPING),
-            new CacheableInputReader() {
-                public Object read(PipelineContext context, ProcessorInput input) {
+        return readCacheInputAsObject(pipelineContext, getInputByName(INPUT_MAPPING),
+            new CacheableInputReader<Mapping>() {
+                public Mapping read(PipelineContext context, ProcessorInput input) {
                     try {
                         Document mappingDocument = readInputAsDOM4J(context, input);
                         Mapping mapping = new Mapping();

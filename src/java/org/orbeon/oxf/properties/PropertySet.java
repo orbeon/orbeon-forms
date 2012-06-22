@@ -70,19 +70,19 @@ public class PropertySet {
     }
 
     /**
-     * Return a Map<String, Object> of property names to property objects.
-     *
-     * @return Map
+     * Return an unmodifiable Map<String, Boolean> of all Boolean properties.
      */
-    public Map<String, Object> getObjectMap() {
+    public Map<String, Boolean> getBooleanProperties() {
         if (size() > 0) {
-            final Map<String, Object> result = new HashMap<String, Object>();
-            for (String key: keySet()) {
-                result.put(key, getObject(key));
+            final Map<String, Boolean> result = new HashMap<String, Boolean>();
+            for (String key : keySet()) {
+                final Object o = getObject(key);
+                if (o instanceof Boolean)
+                    result.put(key, (Boolean) o);
             }
-            return result;
+            return Collections.unmodifiableMap(result);
         } else {
-            return null;
+            return Collections.emptyMap();
         }
     }
 

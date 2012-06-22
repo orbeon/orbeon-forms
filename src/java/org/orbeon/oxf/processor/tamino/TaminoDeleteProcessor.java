@@ -40,8 +40,8 @@ public class TaminoDeleteProcessor extends TaminoProcessor {
     public void start(PipelineContext context) {
         try {
             // Read configuration
-            Config config = (Config) readCacheInputAsObject(context, getInputByName(INPUT_CONFIG), new CacheableInputReader() {
-                public Object read(org.orbeon.oxf.pipeline.api.PipelineContext context, ProcessorInput input) {
+            Config config = readCacheInputAsObject(context, getInputByName(INPUT_CONFIG), new CacheableInputReader<Config>() {
+                public Config read(org.orbeon.oxf.pipeline.api.PipelineContext context, ProcessorInput input) {
                     return readConfig(readInputAsDOM4J(context, INPUT_CONFIG));
                 }
             });

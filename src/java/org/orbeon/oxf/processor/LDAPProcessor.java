@@ -63,8 +63,8 @@ public class LDAPProcessor extends ProcessorImpl {
             public void readImpl(PipelineContext context, XMLReceiver xmlReceiver) {
                 try {
                     // Read configuration
-                    Config config = (Config) readCacheInputAsObject(context, getInputByName(INPUT_CONFIG), new CacheableInputReader() {
-                        public Object read(org.orbeon.oxf.pipeline.api.PipelineContext context, ProcessorInput input) {
+                    Config config = readCacheInputAsObject(context, getInputByName(INPUT_CONFIG), new CacheableInputReader<Config>() {
+                        public Config read(PipelineContext context, ProcessorInput input) {
                             Config config = new Config();
                             Document doc = readInputAsDOM4J(context, input);
 
@@ -108,8 +108,8 @@ public class LDAPProcessor extends ProcessorImpl {
                         }
                     });
 
-                    Command command = (Command) readCacheInputAsObject(context, getInputByName(INPUT_FILTER), new CacheableInputReader() {
-                        public Object read(PipelineContext context, ProcessorInput input) {
+                    Command command = readCacheInputAsObject(context, getInputByName(INPUT_FILTER), new CacheableInputReader<Command>() {
+                        public Command read(PipelineContext context, ProcessorInput input) {
                             Command command;
                             Document filterDoc = readInputAsDOM4J(context, input);
                             String filterNodeName = filterDoc.getRootElement().getName();

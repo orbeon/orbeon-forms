@@ -199,8 +199,8 @@ public class FileSerializer extends ProcessorImpl {
     public void start(PipelineContext context) {
         try {
             // Read config
-            final Config config = (Config) readCacheInputAsObject(context, getInputByName(INPUT_CONFIG), new CacheableInputReader() {
-                public Object read(PipelineContext context, ProcessorInput input) {
+            final Config config = readCacheInputAsObject(context, getInputByName(INPUT_CONFIG), new CacheableInputReader<Config>() {
+                public Config read(PipelineContext context, ProcessorInput input) {
                     return new Config(readInputAsDOM4J(context, input));
                 }
             });
@@ -355,8 +355,8 @@ public class FileSerializer extends ProcessorImpl {
 
     protected Config getConfig(PipelineContext pipelineContext) {
         // Read config
-        return (Config) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_CONFIG), new CacheableInputReader() {
-            public Object read(PipelineContext context, ProcessorInput input) {
+        return readCacheInputAsObject(pipelineContext, getInputByName(INPUT_CONFIG), new CacheableInputReader<Config>() {
+            public Config read(PipelineContext context, ProcessorInput input) {
                 return new Config(readInputAsDOM4J(context, input));
             }
         });

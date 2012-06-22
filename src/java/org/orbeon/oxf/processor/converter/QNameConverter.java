@@ -47,8 +47,8 @@ public class QNameConverter extends ProcessorImpl {
             public void readImpl(PipelineContext context, XMLReceiver xmlReceiver) {
 
                 // Read config input
-                final Config config = (Config) readCacheInputAsObject(context, getInputByName(INPUT_CONFIG), new CacheableInputReader() {
-                    public Object read(org.orbeon.oxf.pipeline.api.PipelineContext context, ProcessorInput input) {
+                final Config config = readCacheInputAsObject(context, getInputByName(INPUT_CONFIG), new CacheableInputReader<Config>() {
+                    public Config read(org.orbeon.oxf.pipeline.api.PipelineContext context, ProcessorInput input) {
                         Config result = new Config();
 
                         Element configElement = readInputAsDOM4J(context, input).getRootElement();

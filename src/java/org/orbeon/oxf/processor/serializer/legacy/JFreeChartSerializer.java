@@ -32,6 +32,7 @@ import org.jfree.ui.RectangleEdge;
 import org.jfree.ui.RectangleInsets;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.processor.CacheableInputReader;
 import org.orbeon.oxf.processor.ProcessorInput;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.xml.XPathUtils;
@@ -65,12 +66,12 @@ public class JFreeChartSerializer extends HttpBinarySerializer {
 
     protected void readInput(PipelineContext pipelineContext, ProcessorInput input, Config config, OutputStream outputStream) {
         try {
-            ChartConfig chartConfig = (ChartConfig) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_CHART),
-                    new org.orbeon.oxf.processor.CacheableInputReader() {
-                        public Object read(org.orbeon.oxf.pipeline.api.PipelineContext context, org.orbeon.oxf.processor.ProcessorInput input) {
-                            return createChartConfig(context, input);
-                        }
-                    });
+            ChartConfig chartConfig = readCacheInputAsObject(pipelineContext, getInputByName(INPUT_CHART),
+                new CacheableInputReader<ChartConfig>() {
+                    public ChartConfig read(org.orbeon.oxf.pipeline.api.PipelineContext context, org.orbeon.oxf.processor.ProcessorInput input) {
+                        return createChartConfig(context, input);
+                    }
+                });
             Document data = readInputAsDOM4J(pipelineContext, (input != null) ? input : getInputByName(INPUT_DATA));
 
             Dataset ds;

@@ -57,39 +57,39 @@ public class BeanGenerator extends ProcessorImpl {
     }
 
     protected Config getConfig(PipelineContext context) {
-        return (Config) readCacheInputAsObject(context, getInputByName(INPUT_CONFIG),
-                new CacheableInputReader() {
-                    public Object read(PipelineContext context, ProcessorInput input) {
-                        Document dom = readInputAsDOM4J(context, input);
-                        try {
-                            Config config2 = new Config();
-                            for (Iterator i = XPathUtils.selectIterator(dom, "/config/attribute"); i.hasNext();) {
-                                Element el = (Element) i.next();
-                                config2.addAttribute(el.getTextTrim());
-                            }
-
-                            for (Iterator i = XPathUtils.selectIterator(dom, "/config/source"); i.hasNext();) {
-                                String s = ((Element) i.next()).getTextTrim();
-                                if (s.equalsIgnoreCase("request"))
-                                    config2.addSource(Config.REQUEST);
-                                else if (s.equalsIgnoreCase("session"))
-                                    config2.addSource(Config.SESSION);
-                                else
-                                    throw new OXFException("Wrong source type: must be either request or session");
-                            }
-                            return config2;
-                        } catch (Exception e) {
-                            throw new OXFException(e);
+        return readCacheInputAsObject(context, getInputByName(INPUT_CONFIG),
+            new CacheableInputReader<Config>() {
+                public Config read(PipelineContext context, ProcessorInput input) {
+                    Document dom = readInputAsDOM4J(context, input);
+                    try {
+                        Config config2 = new Config();
+                        for (Iterator i = XPathUtils.selectIterator(dom, "/config/attribute"); i.hasNext();) {
+                            Element el = (Element) i.next();
+                            config2.addAttribute(el.getTextTrim());
                         }
+
+                        for (Iterator i = XPathUtils.selectIterator(dom, "/config/source"); i.hasNext();) {
+                            String s = ((Element) i.next()).getTextTrim();
+                            if (s.equalsIgnoreCase("request"))
+                                config2.addSource(Config.REQUEST);
+                            else if (s.equalsIgnoreCase("session"))
+                                config2.addSource(Config.SESSION);
+                            else
+                                throw new OXFException("Wrong source type: must be either request or session");
+                        }
+                        return config2;
+                    } catch (Exception e) {
+                        throw new OXFException(e);
                     }
-                });
+                }
+            });
     }
 
     protected Mapping getMapping(PipelineContext context) {
-        return (Mapping) readCacheInputAsObject(context, getInputByName(INPUT_MAPPING),
-                new CacheableInputReader() {
-                    public Object read(PipelineContext context, ProcessorInput input) {
-                        try {
+        return readCacheInputAsObject(context, getInputByName(INPUT_MAPPING),
+            new CacheableInputReader<Mapping>() {
+                public Mapping read(PipelineContext context, ProcessorInput input) {
+                    try {
 //                            TransformerHandler identity = TransformerUtils.getXMLIdentityTransformerHandler();
 //                            Result result = new StreamResult();
 //                            identity.setResult(result);
@@ -97,17 +97,17 @@ public class BeanGenerator extends ProcessorImpl {
 //                            readInputAsSAX(context, input, identity);
 //                            logger.warn(result.toString());
 
-                            Document dom = readInputAsDOM4J(context, input);
+                        Document dom = readInputAsDOM4J(context, input);
 
-                            Mapping mapping = new Mapping();
-                            mapping.loadMapping(new InputSource(new StringReader(Dom4jUtils.domToString(dom))));
+                        Mapping mapping = new Mapping();
+                        mapping.loadMapping(new InputSource(new StringReader(Dom4jUtils.domToString(dom))));
 
-                            return mapping;
-                        } catch (Exception e) {
-                            throw new OXFException(e);
-                        }
+                        return mapping;
+                    } catch (Exception e) {
+                        throw new OXFException(e);
                     }
-                });
+                }
+            });
     }
 
     protected void readBean(PipelineContext context, Config config, Mapping mapping, XMLReceiver xmlReceiver) {

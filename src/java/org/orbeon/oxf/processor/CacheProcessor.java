@@ -94,9 +94,8 @@ public class CacheProcessor extends ProcessorImpl {
         if (state.keyDigest == null) {
 
             // Get a digest of the key input, if possible from cache
-            state.keyDigest = (String) readCacheInputAsObject
-                    (context, getInputByName(INPUT_KEY), new CacheableInputReader() {
-                public Object read(PipelineContext context, ProcessorInput input) {
+            state.keyDigest = readCacheInputAsObject(context, getInputByName(INPUT_KEY), new CacheableInputReader<String>() {
+                public String read(PipelineContext context, ProcessorInput input) {
                     XMLUtils.DigestContentHandler digestContentHandler = new XMLUtils.DigestContentHandler("MD5");
                     readInputAsSAX(context, input, digestContentHandler);
                     return new String(digestContentHandler.getResult());
@@ -104,9 +103,8 @@ public class CacheProcessor extends ProcessorImpl {
             });
 
             // Get validity based on date in validity input, if possible from cache
-            CachedValidity validity =  (CachedValidity) readCacheInputAsObject
-                    (context, getInputByName(INPUT_VALIDITY), new CacheableInputReader() {
-                public Object read(PipelineContext context, ProcessorInput input) {
+            CachedValidity validity =  readCacheInputAsObject(context, getInputByName(INPUT_VALIDITY), new CacheableInputReader<CachedValidity>() {
+                public CachedValidity read(PipelineContext context, ProcessorInput input) {
                     final StringBuilder validityBuffer = new StringBuilder();
                     final CachedValidity cachedValidity = new CachedValidity();
                     readInputAsSAX(context, input, new XMLReceiverAdapter() {

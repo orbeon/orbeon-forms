@@ -86,8 +86,8 @@ public class DirectoryScannerProcessor extends ProcessorImpl {
             public void readImpl(PipelineContext context, XMLReceiver xmlReceiver) {
 
                 // Read config
-                final Config config = (Config) readCacheInputAsObject(context, getInputByName(INPUT_CONFIG), new CacheableInputReader() {
-                    public Object read(PipelineContext context, ProcessorInput input) {
+                final Config config = readCacheInputAsObject(context, getInputByName(INPUT_CONFIG), new CacheableInputReader<Config>() {
+                    public Config read(PipelineContext context, ProcessorInput input) {
 
                         final Document configNode = readInputAsDOM4J(context, input);
                         final Config config = new Config();

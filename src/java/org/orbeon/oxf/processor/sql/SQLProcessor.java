@@ -114,8 +114,8 @@ public class SQLProcessor extends ProcessorImpl {
     protected void execute(final PipelineContext context, XMLReceiver xmlReceiver) {
         try {
             // Cache, read and interpret the config input
-            Config config = (Config) readCacheInputAsObject(context, getInputByName(INPUT_CONFIG), new CacheableInputReader() {
-                public Object read(PipelineContext context, ProcessorInput input) {
+            Config config = readCacheInputAsObject(context, getInputByName(INPUT_CONFIG), new CacheableInputReader<Config>() {
+                public Config read(PipelineContext context, ProcessorInput input) {
                     // Read the config input document
                     Node config = readInputAsDOM4J(context, input);
                     Document configDocument = config.getDocument();

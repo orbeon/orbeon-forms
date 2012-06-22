@@ -128,10 +128,10 @@ public class MSVValidationProcessor extends ProcessorImpl {
                     final Document configDoc = readCacheInputAsDOM4J(context, INPUT_CONFIG);
                     final boolean decorateOutput = Boolean.valueOf(XPathUtils.selectStringValueNormalize(configDoc, "/config/decorate")).booleanValue();
 
-                    final Schema schema = (Schema) readCacheInputAsObject(context,
+                    final Schema schema = readCacheInputAsObject(context,
                             getInputByName(INPUT_SCHEMA),
-                            new CacheableInputReader() {
-                                public Object read(org.orbeon.oxf.pipeline.api.PipelineContext context, ProcessorInput input) {
+                            new CacheableInputReader<Schema>() {
+                                public Schema read(org.orbeon.oxf.pipeline.api.PipelineContext context, ProcessorInput input) {
                                     try {
                                         long time = 0;
                                         if (logger.isDebugEnabled()) {

@@ -70,17 +70,16 @@ public class XIncludeProcessor extends ProcessorImpl {
                 // Read attributes input only if connected (just in case, for backward compatibility, although it shouldn't happen)
                 if (getConnectedInputs().get(INPUT_ATTRIBUTES) != null) {
                     // Read input as an attribute Map and cache it
-                    configurationAttributes = (Map<String, Boolean>) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_ATTRIBUTES), new CacheableInputReader() {
-                        public Object read(PipelineContext context, ProcessorInput input) {
+                    configurationAttributes = readCacheInputAsObject(pipelineContext, getInputByName(INPUT_ATTRIBUTES), new CacheableInputReader<Map<String, Boolean>>() {
+                        public Map<String, Boolean> read(PipelineContext context, ProcessorInput input) {
                             final Document preferencesDocument = readInputAsDOM4J(context, input);
                             final PropertyStore propertyStore = new PropertyStore(preferencesDocument);
                             final PropertySet propertySet = propertyStore.getGlobalPropertySet();
-                            return propertySet.getObjectMap();
+                            return propertySet.getBooleanProperties();
                         }
                     });
-                } else  {
+                } else
                     configurationAttributes = Collections.emptyMap();
-                }
 
                 // URL resolver is initialized with a parser configuration which can be configured to support external entities or not.
                 final XMLUtils.ParserConfiguration parserConfiguration = new XMLUtils.ParserConfiguration(false, false, !Boolean.FALSE.equals(configurationAttributes.get("external-entities")));
@@ -110,8 +109,8 @@ public class XIncludeProcessor extends ProcessorImpl {
                 // Try to cache URI references
                 // NOTE: Always be careful not to cache refs to TransformerURIResolver. We seem to be fine here.
                 final boolean[] wasRead = { false };
-                readCacheInputAsObject(pipelineContext, getInputByName(INPUT_CONFIG), new CacheableInputReader() {
-                    public Object read(PipelineContext context, ProcessorInput input) {
+                readCacheInputAsObject(pipelineContext, getInputByName(INPUT_CONFIG), new CacheableInputReader<URIReferences>() {
+                    public URIReferences read(PipelineContext context, ProcessorInput input) {
                         final URIReferences uriReferences = new URIReferences();
 
                         final SAXStore saxStore = new SAXStore();

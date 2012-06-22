@@ -30,8 +30,8 @@ public class ScopeSerializer extends ScopeProcessorBase {
 
     public void start(PipelineContext context) {
         // Read data input into a ScopeStore
-        final ScopeStore store = (ScopeStore) readCacheInputAsObject(context, getInputByName(INPUT_DATA), new CacheableInputReader() {
-            public Object read(PipelineContext context, ProcessorInput input) {
+        final ScopeStore store = readCacheInputAsObject(context, getInputByName(INPUT_DATA), new CacheableInputReader<ScopeStore>() {
+            public ScopeStore read(PipelineContext context, ProcessorInput input) {
                 final SAXStore saxStore = new SAXStore();
                 readInputAsSAX(context, input, saxStore);
                 return new ScopeStore(saxStore, getInputKey(context, input), getInputValidity(context, input));

@@ -114,8 +114,8 @@ public class ExecuteProcessor extends ProcessorImpl {
     public void doIt(PipelineContext pipelineContext, String outputName, XMLReceiver xmlReceiver) {
         try {
             // Read config
-            final Config config = (Config) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_CONFIG), new CacheableInputReader() {
-                public Object read(PipelineContext context, ProcessorInput input) {
+            final Config config = readCacheInputAsObject(pipelineContext, getInputByName(INPUT_CONFIG), new CacheableInputReader<Config>() {
+                public Config read(PipelineContext context, ProcessorInput input) {
                     return new Config(readInputAsDOM4J(context, input));
                 }
             });

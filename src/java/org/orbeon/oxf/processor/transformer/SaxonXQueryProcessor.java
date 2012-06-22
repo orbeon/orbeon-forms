@@ -34,6 +34,7 @@ import org.orbeon.saxon.query.XQueryExpression;
 
 import javax.xml.transform.URIResolver;
 import javax.xml.transform.sax.SAXResult;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -83,30 +84,25 @@ public class SaxonXQueryProcessor extends ProcessorImpl {
 //                        config.setURIResolver(uriResolver);
 
                         // Read attributes
-                        Map<String, Object> attributes = null;
+                        final Map<String, Boolean> attributesFromProperties;
                         {
                             // Read attributes input only if connected
                             if (getConnectedInputs().get(INPUT_ATTRIBUTES) != null) {
                                 // Read input as an attribute Map and cache it
-                                attributes = (Map<String, Object>) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_ATTRIBUTES), new CacheableInputReader() {
-                                    public Object read(PipelineContext context, ProcessorInput input) {
+                                attributesFromProperties = readCacheInputAsObject(pipelineContext, getInputByName(INPUT_ATTRIBUTES), new CacheableInputReader<Map<String, Boolean>>() {
+                                    public Map<String, Boolean> read(PipelineContext context, ProcessorInput input) {
                                         final Document preferencesDocument = readInputAsDOM4J(context, input);
                                         final PropertyStore propertyStore = new PropertyStore(preferencesDocument);
                                         final PropertySet propertySet = propertyStore.getGlobalPropertySet();
-                                        return propertySet.getObjectMap();
+                                        return propertySet.getBooleanProperties();
                                     }
                                 });
-                            }
+                            } else
+                                attributesFromProperties = Collections.emptyMap();
                         }
                         // Set configuration attributes if any
-                        if (attributes != null) {
-                            for (Map.Entry<String, Object> entry: attributes.entrySet()) {
-                                final String key = entry.getKey();
-                                final Object value = entry.getValue();
-
-                                configuration.setConfigurationProperty(key, value);
-                            }
-                        }
+                        for (Map.Entry<String, Boolean> entry: attributesFromProperties.entrySet())
+                            configuration.setConfigurationProperty(entry.getKey(), entry.getValue());
                     }
 
                     // Create static context
@@ -114,8 +110,8 @@ public class SaxonXQueryProcessor extends ProcessorImpl {
 
                     // Create XQuery expression (depends on config input and static context)
                     // TODO: caching of query must also depend on attributes input
-                    XQueryExpression xqueryExpression = (XQueryExpression) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_CONFIG), new CacheableInputReader() {
-                        public Object read(PipelineContext context, ProcessorInput input) {
+                    XQueryExpression xqueryExpression = readCacheInputAsObject(pipelineContext, getInputByName(INPUT_CONFIG), new CacheableInputReader<XQueryExpression>() {
+                        public XQueryExpression read(PipelineContext context, ProcessorInput input) {
 
                             try {
 

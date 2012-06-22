@@ -45,8 +45,8 @@ public class URLSerializer extends ProcessorImpl {
     public void start(PipelineContext pipelineContext) {
         try {
             // Create the URL from the configuration
-            final URL url = (URL) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_CONFIG), new CacheableInputReader() {
-                public Object read(PipelineContext context, ProcessorInput input) {
+            final URL url = readCacheInputAsObject(pipelineContext, getInputByName(INPUT_CONFIG), new CacheableInputReader<URL>() {
+                public URL read(PipelineContext context, ProcessorInput input) {
                     try {
                         final Document configDocument = readInputAsDOM4J(context, input);
                         final String urlString = XPathUtils.selectStringValueNormalize(configDocument, "/config/url");

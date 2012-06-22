@@ -63,8 +63,8 @@ public class XPathProcessor extends ProcessorImpl {
         final ProcessorOutput output = new CacheableTransformerOutputImpl(XPathProcessor.this, name) {
             public void readImpl(PipelineContext context, XMLReceiver xmlReceiver) {
 
-               Config config = (Config) readCacheInputAsObject(context, getInputByName(INPUT_CONFIG), new CacheableInputReader() {
-                    public Object read(PipelineContext context, final ProcessorInput input) {
+               Config config = readCacheInputAsObject(context, getInputByName(INPUT_CONFIG), new CacheableInputReader<Config>() {
+                    public Config read(PipelineContext context, final ProcessorInput input) {
                         final Document config = readInputAsDOM4J(context, INPUT_CONFIG);
 
                         // Get declared namespaces

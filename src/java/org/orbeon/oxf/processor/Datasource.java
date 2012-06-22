@@ -101,8 +101,8 @@ public class Datasource {
      * @return Datasource object
      */
     public static Datasource getDatasource(PipelineContext pipelineContext, final ProcessorImpl processorImpl, final ProcessorInput datasourceInput) {
-        return (Datasource) processorImpl.readCacheInputAsObject(pipelineContext, datasourceInput, new CacheableInputReader() {
-            public Object read(PipelineContext context, ProcessorInput input) {
+        return processorImpl.readCacheInputAsObject(pipelineContext, datasourceInput, new CacheableInputReader<Datasource>() {
+            public Datasource read(PipelineContext context, ProcessorInput input) {
                 return new Datasource(processorImpl, processorImpl.readInputAsDOM4J(context, datasourceInput));
             }
         });

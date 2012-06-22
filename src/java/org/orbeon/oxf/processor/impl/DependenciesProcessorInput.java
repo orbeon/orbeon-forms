@@ -33,9 +33,9 @@ public abstract class DependenciesProcessorInput extends DelegatingProcessorInpu
                     @Override
                     protected void readImpl(PipelineContext pipelineContext, final XMLReceiver xmlReceiver) {
                         final boolean[] foundInCache = new boolean[] { false };
-                        readCacheInputAsObject(pipelineContext, getInputByName(INPUT_CONFIG), new CacheableInputReader() {
+                        readCacheInputAsObject(pipelineContext, getInputByName(INPUT_CONFIG), new CacheableInputReader<URIProcessorOutputImpl.URIReferences>() {
                             @Override
-                            public Object read(PipelineContext pipelineContext, ProcessorInput processorInput) {
+                            public URIProcessorOutputImpl.URIReferences read(PipelineContext pipelineContext, ProcessorInput processorInput) {
                                 // Read the input directly into the output
                                 readInputAsSAX(pipelineContext, processorInput, xmlReceiver);
 

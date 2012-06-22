@@ -102,8 +102,8 @@ public class ImageServer extends ProcessorImpl {
 
         try {
             // Read global configuration
-            final Config config = (ImageServer.Config) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_CONFIG), new CacheableInputReader() {
-                public Object read(PipelineContext pipelineContext, ProcessorInput processorInput) {
+            final Config config = readCacheInputAsObject(pipelineContext, getInputByName(INPUT_CONFIG), new CacheableInputReader<Config>() {
+                public Config read(PipelineContext pipelineContext, ProcessorInput processorInput) {
 
                     final Document configDocument = readInputAsDOM4J(pipelineContext, processorInput);
                     final Config result = new Config();
@@ -138,8 +138,8 @@ public class ImageServer extends ProcessorImpl {
             });
 
             // Read image configuration
-            final ImageConfig imageConfig = (ImageServer.ImageConfig) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_IMAGE), new CacheableInputReader() {
-                public Object read(PipelineContext pipelineContext, ProcessorInput processorInput) {
+            final ImageConfig imageConfig = readCacheInputAsObject(pipelineContext, getInputByName(INPUT_IMAGE), new CacheableInputReader<ImageConfig>() {
+                public ImageConfig read(PipelineContext pipelineContext, ProcessorInput processorInput) {
 
                     final Document imageConfigDocument = readCacheInputAsDOM4J(pipelineContext, INPUT_IMAGE);
                     final ImageConfig result = new ImageConfig();

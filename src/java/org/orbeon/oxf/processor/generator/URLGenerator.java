@@ -308,122 +308,122 @@ public class URLGenerator extends ProcessorImpl {
 
                 // Read config input into a URL, cache if possible
                 final ConfigURIReferences configURIReferences = URLGenerator.this.localConfigURIReferences != null ? localConfigURIReferences :
-                        (ConfigURIReferences) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_CONFIG), new CacheableInputReader() {
-                            public Object read(PipelineContext context, ProcessorInput input) {
-                                final Element configElement = readInputAsDOM4J(context, input).getRootElement();
+                    readCacheInputAsObject(pipelineContext, getInputByName(INPUT_CONFIG), new CacheableInputReader<ConfigURIReferences>() {
+                        public ConfigURIReferences read(PipelineContext context, ProcessorInput input) {
+                            final Element configElement = readInputAsDOM4J(context, input).getRootElement();
 
-                                // Processor location data
-                                final LocationData locationData = URLGenerator.this.getLocationData();
+                            // Processor location data
+                            final LocationData locationData = URLGenerator.this.getLocationData();
 
-                                // Shortcut if the url is direct child of config
-                                {
-                                    final String url = configElement.getTextTrim();
-                                    if (url != null && !url.equals("")) {
-                                        try {
-                                            // Legacy, don't even care about handling relative URLs
-                                            return new ConfigURIReferences(new Config(URLFactory.createURL(url)));
-                                        } catch (MalformedURLException e) {
-                                            throw new ValidationException(e, locationData);
-                                        }
+                            // Shortcut if the url is direct child of config
+                            {
+                                final String url = configElement.getTextTrim();
+                                if (url != null && !url.equals("")) {
+                                    try {
+                                        // Legacy, don't even care about handling relative URLs
+                                        return new ConfigURIReferences(new Config(URLFactory.createURL(url)));
+                                    } catch (MalformedURLException e) {
+                                        throw new ValidationException(e, locationData);
                                     }
-                                }
-
-                                // We have the /config/url syntax
-                                final String url = XPathUtils.selectStringValueNormalize(configElement, "/config/url");
-                                if (url == null) {
-                                    throw new ValidationException("URL generator found null URL for config:\n" + Dom4jUtils.domToString(configElement), locationData);
-                                }
-
-                                // Get content-type
-                                final String contentType = XPathUtils.selectStringValueNormalize(configElement, "/config/content-type");
-                                final boolean forceContentType = ProcessorUtils.selectBooleanValue(configElement, "/config/force-content-type", DEFAULT_FORCE_CONTENT_TYPE);
-                                if (forceContentType && (contentType == null || contentType.equals("")))
-                                    throw new ValidationException("The force-content-type element requires a content-type element.", locationData);
-
-                                // Get encoding
-                                final String encoding = XPathUtils.selectStringValueNormalize(configElement, "/config/encoding");
-                                final boolean forceEncoding = ProcessorUtils.selectBooleanValue(configElement, "/config/force-encoding", DEFAULT_FORCE_ENCODING);
-                                final boolean ignoreConnectionEncoding = ProcessorUtils.selectBooleanValue(configElement, "/config/ignore-connection-encoding", DEFAULT_IGNORE_CONNECTION_ENCODING);
-                                if (forceEncoding && (encoding == null || encoding.equals("")))
-                                    throw new ValidationException("The force-encoding element requires an encoding element.", locationData);
-
-                                // Get headers
-                                Map<String, String[]> headerNameValues = null;
-                                for (Object o: configElement.selectNodes("/config/header")) {
-                                    final Element currentHeaderElement = (Element) o;
-                                    final String currentHeaderName = currentHeaderElement.element("name").getStringValue();
-                                    final String currentHeaderValue = currentHeaderElement.element("value").getStringValue();
-
-                                    if (headerNameValues == null) {
-                                        // Lazily create collections
-                                        headerNameValues = new LinkedHashMap<String, String[]>();
-                                    }
-
-                                    headerNameValues.put(currentHeaderName, new String[]{currentHeaderValue});
-                                }
-
-                                final String forwardHeaders; {
-                                    // Get from configuration first, otherwise use global default
-                                    final org.dom4j.Node configForwardHeaders = XPathUtils.selectSingleNode(configElement, "/config/forward-headers");
-                                    forwardHeaders = configForwardHeaders != null ? XPathUtils.selectStringValue(configForwardHeaders, ".") : Connection.getForwardHeaders();
-                                }
-
-                                // Validation setting: local, then properties, then hard-coded default
-                                final boolean defaultValidating = getPropertySet().getBoolean(VALIDATING_PROPERTY, DEFAULT_VALIDATING);
-                                final boolean validating = ProcessorUtils.selectBooleanValue(configElement, "/config/validating", defaultValidating);
-
-                                // XInclude handling
-                                final boolean defaultHandleXInclude = getPropertySet().getBoolean(HANDLE_XINCLUDE_PROPERTY, DEFAULT_HANDLE_XINCLUDE);
-                                final boolean handleXInclude = ProcessorUtils.selectBooleanValue(configElement, "/config/handle-xinclude", defaultHandleXInclude);
-
-                                // External entities
-                                final boolean externalEntities = ProcessorUtils.selectBooleanValue(configElement, "/config/external-entities", DEFAULT_EXTERNAL_ENTITIES);
-
-                                final boolean defaultHandleLexical = getPropertySet().getBoolean(HANDLE_LEXICAL_PROPERTY, DEFAULT_HANDLE_LEXICAL);
-                                final boolean handleLexical = ProcessorUtils.selectBooleanValue(configElement, "/config/handle-lexical", defaultHandleLexical);
-
-                                // Output mode
-                                final String mode = XPathUtils.selectStringValueNormalize(configElement, "/config/mode");
-
-                                // Cache control
-                                final boolean cacheUseLocalCache = ProcessorUtils.selectBooleanValue(configElement, "/config/cache-control/use-local-cache", DEFAULT_CACHE_USE_LOCAL_CACHE);
-                                final boolean enableConditionalGET = ProcessorUtils.selectBooleanValue(configElement, "/config/cache-control/conditional-get", DEFAULT_ENABLE_CONDITIONAL_GET);
-
-                                // Authentication
-                                final org.dom4j.Node configAuthentication = XPathUtils.selectSingleNode(configElement, "/config/authentication");
-                                final String username = configAuthentication == null ? null : XPathUtils.selectStringValue(configAuthentication, "username");
-                                final String password = configAuthentication == null ? null : XPathUtils.selectStringValue(configAuthentication, "password");
-                                final boolean preemptiveAuthentication = ProcessorUtils.selectBooleanValue(configElement, "/config/authentication/preemptive", DEFAULT_PREEMPTIVE_AUTHENTICATION);
-                                final String domain = configAuthentication == null ? null : XPathUtils.selectStringValue(configAuthentication, "domain");
-
-                                // Get Tidy config (will only apply if content-type is text/html)
-                                final TidyConfig tidyConfig = new TidyConfig(XPathUtils.selectSingleNode(configElement, "/config/tidy-options"));
-
-                                // Create configuration object
-                                try {
-                                    // Use location data if present so that relative URLs can be supported
-                                    // NOTE: We check whether there is a protocol, because we have
-                                    // some Java location data which are NOT to be interpreted as
-                                    // base URIs
-                                    final URL fullURL = (locationData != null && locationData.getSystemID() != null && NetUtils.urlHasProtocol(locationData.getSystemID()))
-                                            ? URLFactory.createURL(locationData.getSystemID(), url)
-                                            : URLFactory.createURL(url);
-
-                                    // Create configuration
-                                    final Config config = new Config(fullURL, contentType, forceContentType, encoding, forceEncoding,
-                                            ignoreConnectionEncoding, new XMLUtils.ParserConfiguration(validating, handleXInclude, externalEntities), handleLexical, mode,
-                                            headerNameValues, forwardHeaders,
-                                            cacheUseLocalCache, enableConditionalGET,
-                                            username, password, preemptiveAuthentication, domain,
-                                            tidyConfig);
-                                    if (logger.isDebugEnabled())
-                                        logger.debug("Read configuration: " + config.toString());
-                                    return new ConfigURIReferences(config);
-                                } catch (MalformedURLException e) {
-                                    throw new ValidationException(e, locationData);
                                 }
                             }
-                        });
+
+                            // We have the /config/url syntax
+                            final String url = XPathUtils.selectStringValueNormalize(configElement, "/config/url");
+                            if (url == null) {
+                                throw new ValidationException("URL generator found null URL for config:\n" + Dom4jUtils.domToString(configElement), locationData);
+                            }
+
+                            // Get content-type
+                            final String contentType = XPathUtils.selectStringValueNormalize(configElement, "/config/content-type");
+                            final boolean forceContentType = ProcessorUtils.selectBooleanValue(configElement, "/config/force-content-type", DEFAULT_FORCE_CONTENT_TYPE);
+                            if (forceContentType && (contentType == null || contentType.equals("")))
+                                throw new ValidationException("The force-content-type element requires a content-type element.", locationData);
+
+                            // Get encoding
+                            final String encoding = XPathUtils.selectStringValueNormalize(configElement, "/config/encoding");
+                            final boolean forceEncoding = ProcessorUtils.selectBooleanValue(configElement, "/config/force-encoding", DEFAULT_FORCE_ENCODING);
+                            final boolean ignoreConnectionEncoding = ProcessorUtils.selectBooleanValue(configElement, "/config/ignore-connection-encoding", DEFAULT_IGNORE_CONNECTION_ENCODING);
+                            if (forceEncoding && (encoding == null || encoding.equals("")))
+                                throw new ValidationException("The force-encoding element requires an encoding element.", locationData);
+
+                            // Get headers
+                            Map<String, String[]> headerNameValues = null;
+                            for (Object o: configElement.selectNodes("/config/header")) {
+                                final Element currentHeaderElement = (Element) o;
+                                final String currentHeaderName = currentHeaderElement.element("name").getStringValue();
+                                final String currentHeaderValue = currentHeaderElement.element("value").getStringValue();
+
+                                if (headerNameValues == null) {
+                                    // Lazily create collections
+                                    headerNameValues = new LinkedHashMap<String, String[]>();
+                                }
+
+                                headerNameValues.put(currentHeaderName, new String[]{currentHeaderValue});
+                            }
+
+                            final String forwardHeaders; {
+                                // Get from configuration first, otherwise use global default
+                                final org.dom4j.Node configForwardHeaders = XPathUtils.selectSingleNode(configElement, "/config/forward-headers");
+                                forwardHeaders = configForwardHeaders != null ? XPathUtils.selectStringValue(configForwardHeaders, ".") : Connection.getForwardHeaders();
+                            }
+
+                            // Validation setting: local, then properties, then hard-coded default
+                            final boolean defaultValidating = getPropertySet().getBoolean(VALIDATING_PROPERTY, DEFAULT_VALIDATING);
+                            final boolean validating = ProcessorUtils.selectBooleanValue(configElement, "/config/validating", defaultValidating);
+
+                            // XInclude handling
+                            final boolean defaultHandleXInclude = getPropertySet().getBoolean(HANDLE_XINCLUDE_PROPERTY, DEFAULT_HANDLE_XINCLUDE);
+                            final boolean handleXInclude = ProcessorUtils.selectBooleanValue(configElement, "/config/handle-xinclude", defaultHandleXInclude);
+
+                            // External entities
+                            final boolean externalEntities = ProcessorUtils.selectBooleanValue(configElement, "/config/external-entities", DEFAULT_EXTERNAL_ENTITIES);
+
+                            final boolean defaultHandleLexical = getPropertySet().getBoolean(HANDLE_LEXICAL_PROPERTY, DEFAULT_HANDLE_LEXICAL);
+                            final boolean handleLexical = ProcessorUtils.selectBooleanValue(configElement, "/config/handle-lexical", defaultHandleLexical);
+
+                            // Output mode
+                            final String mode = XPathUtils.selectStringValueNormalize(configElement, "/config/mode");
+
+                            // Cache control
+                            final boolean cacheUseLocalCache = ProcessorUtils.selectBooleanValue(configElement, "/config/cache-control/use-local-cache", DEFAULT_CACHE_USE_LOCAL_CACHE);
+                            final boolean enableConditionalGET = ProcessorUtils.selectBooleanValue(configElement, "/config/cache-control/conditional-get", DEFAULT_ENABLE_CONDITIONAL_GET);
+
+                            // Authentication
+                            final org.dom4j.Node configAuthentication = XPathUtils.selectSingleNode(configElement, "/config/authentication");
+                            final String username = configAuthentication == null ? null : XPathUtils.selectStringValue(configAuthentication, "username");
+                            final String password = configAuthentication == null ? null : XPathUtils.selectStringValue(configAuthentication, "password");
+                            final boolean preemptiveAuthentication = ProcessorUtils.selectBooleanValue(configElement, "/config/authentication/preemptive", DEFAULT_PREEMPTIVE_AUTHENTICATION);
+                            final String domain = configAuthentication == null ? null : XPathUtils.selectStringValue(configAuthentication, "domain");
+
+                            // Get Tidy config (will only apply if content-type is text/html)
+                            final TidyConfig tidyConfig = new TidyConfig(XPathUtils.selectSingleNode(configElement, "/config/tidy-options"));
+
+                            // Create configuration object
+                            try {
+                                // Use location data if present so that relative URLs can be supported
+                                // NOTE: We check whether there is a protocol, because we have
+                                // some Java location data which are NOT to be interpreted as
+                                // base URIs
+                                final URL fullURL = (locationData != null && locationData.getSystemID() != null && NetUtils.urlHasProtocol(locationData.getSystemID()))
+                                        ? URLFactory.createURL(locationData.getSystemID(), url)
+                                        : URLFactory.createURL(url);
+
+                                // Create configuration
+                                final Config config = new Config(fullURL, contentType, forceContentType, encoding, forceEncoding,
+                                        ignoreConnectionEncoding, new XMLUtils.ParserConfiguration(validating, handleXInclude, externalEntities), handleLexical, mode,
+                                        headerNameValues, forwardHeaders,
+                                        cacheUseLocalCache, enableConditionalGET,
+                                        username, password, preemptiveAuthentication, domain,
+                                        tidyConfig);
+                                if (logger.isDebugEnabled())
+                                    logger.debug("Read configuration: " + config.toString());
+                                return new ConfigURIReferences(config);
+                            } catch (MalformedURLException e) {
+                                throw new ValidationException(e, locationData);
+                            }
+                        }
+                    });
                 try {
                     // Never accept a null URL
                     if (configURIReferences.config.getURL() == null)

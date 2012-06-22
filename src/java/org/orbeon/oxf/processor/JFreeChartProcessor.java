@@ -201,13 +201,13 @@ public class JFreeChartProcessor extends JFreeChartSerializer {
     }
 
     protected JFreeChartSerializer.ChartConfig readChartConfig(PipelineContext context) {
-        return (JFreeChartSerializer.ChartConfig) readCacheInputAsObject(context, getInputByName(INPUT_CHART),
-                new CacheableInputReader() {
-                    public Object read(org.orbeon.oxf.pipeline.api.PipelineContext context, ProcessorInput input) {
-                        return createChartConfig(context, input);
-                    }
+        return readCacheInputAsObject(context, getInputByName(INPUT_CHART),
+            new CacheableInputReader<ChartConfig>() {
+                public ChartConfig read(org.orbeon.oxf.pipeline.api.PipelineContext context, ProcessorInput input) {
+                    return createChartConfig(context, input);
+                }
 
-                });
+            });
     }
 
 

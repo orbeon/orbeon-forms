@@ -296,24 +296,24 @@ public abstract class ProcessorImpl implements Processor {
 
 
     public Document readCacheInputAsDOM(PipelineContext context, String inputName) {
-        return (Document) readCacheInputAsObject(context, getInputByName(inputName), new CacheableInputReader() {
-            public Object read(PipelineContext context, ProcessorInput input) {
+        return readCacheInputAsObject(context, getInputByName(inputName), new CacheableInputReader<Document>() {
+            public Document read(PipelineContext context, ProcessorInput input) {
                 return readInputAsDOM(context, input);
             }
         });
     }
 
     public org.dom4j.Document readCacheInputAsDOM4J(PipelineContext context, String inputName) {
-        return (org.dom4j.Document) readCacheInputAsObject(context, getInputByName(inputName), new CacheableInputReader() {
-            public Object read(PipelineContext context, ProcessorInput input) {
+        return readCacheInputAsObject(context, getInputByName(inputName), new CacheableInputReader<org.dom4j.Document>() {
+            public org.dom4j.Document read(PipelineContext context, ProcessorInput input) {
                 return readInputAsDOM4J(context, input);
             }
         });
     }
 
     public DocumentInfo readCacheInputAsTinyTree(PipelineContext pipelineContext, final Configuration configuration, String inputName) {
-        return (DocumentInfo) readCacheInputAsObject(pipelineContext, getInputByName(inputName), new CacheableInputReader() {
-            public Object read(PipelineContext context, ProcessorInput input) {
+        return readCacheInputAsObject(pipelineContext, getInputByName(inputName), new CacheableInputReader<DocumentInfo>() {
+            public DocumentInfo read(PipelineContext context, ProcessorInput input) {
                 return readInputAsTinyTree(context, configuration, input);
             }
         });

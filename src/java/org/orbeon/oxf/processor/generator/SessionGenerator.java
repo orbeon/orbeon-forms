@@ -41,22 +41,22 @@ public class SessionGenerator extends ProcessorImpl {
         final ProcessorOutput output = new ProcessorOutputImpl(SessionGenerator.this, name) {
             public void readImpl(PipelineContext context, final XMLReceiver xmlReceiver) {
                 try {
-                    String key = (String) readCacheInputAsObject(context, getInputByName(INPUT_CONFIG),
-                            new CacheableInputReader() {
-                                public Object read(org.orbeon.oxf.pipeline.api.PipelineContext context, ProcessorInput input) {
-                                    Document dom = readInputAsDOM4J(context, input);
-                                    try {
-                                        String key = XPathUtils.selectStringValueNormalize(dom, "/key");
-                                        if (key == null)
-                                            throw new ValidationException("Config input must contain a key element",
-                                                    (LocationData) dom.getRootElement().getData());
-                                        else
-                                            return key;
-                                    } catch (Exception e) {
-                                        throw new OXFException(e);
-                                    }
+                    String key = readCacheInputAsObject(context, getInputByName(INPUT_CONFIG),
+                        new CacheableInputReader<String>() {
+                            public String read(org.orbeon.oxf.pipeline.api.PipelineContext context, ProcessorInput input) {
+                                Document dom = readInputAsDOM4J(context, input);
+                                try {
+                                    String key = XPathUtils.selectStringValueNormalize(dom, "/key");
+                                    if (key == null)
+                                        throw new ValidationException("Config input must contain a key element",
+                                                (LocationData) dom.getRootElement().getData());
+                                    else
+                                        return key;
+                                } catch (Exception e) {
+                                    throw new OXFException(e);
                                 }
-                            });
+                            }
+                        });
                     ExternalContext externalContext = (ExternalContext) context.getAttribute(org.orbeon.oxf.pipeline.api.PipelineContext.EXTERNAL_CONTEXT);
 
                     // If there is a session, try to read the object

@@ -52,8 +52,8 @@ public class TaminoQueryProcessor extends TaminoProcessor {
             public void readImpl(PipelineContext context, XMLReceiver xmlReceiver) {
                 try {
                     // Read configuration
-                    final Config config = (Config) readCacheInputAsObject(context, getInputByName(INPUT_CONFIG), new CacheableInputReader() {
-                        public Object read(PipelineContext context, ProcessorInput input) {
+                    final Config config = readCacheInputAsObject(context, getInputByName(INPUT_CONFIG), new CacheableInputReader<Config>() {
+                        public Config read(PipelineContext context, ProcessorInput input) {
                             return readConfig(readInputAsDOM4J(context, INPUT_CONFIG));
                         }
                     });

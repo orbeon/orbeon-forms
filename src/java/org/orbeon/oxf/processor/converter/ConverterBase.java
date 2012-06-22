@@ -52,9 +52,9 @@ public abstract class ConverterBase extends ProcessorImpl {
     protected abstract String getConfigSchemaNamespaceURI();
 
     protected Config readConfig(PipelineContext pipelineContext) {
-        return (Config) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_CONFIG),
-            new CacheableInputReader() {
-                public Object read(PipelineContext pipelineContext, ProcessorInput input) {
+        return readCacheInputAsObject(pipelineContext, getInputByName(INPUT_CONFIG),
+            new CacheableInputReader<Config>() {
+                public Config read(PipelineContext pipelineContext, ProcessorInput input) {
                     final Element configElement = readInputAsDOM4J(pipelineContext, input).getRootElement();
                     try {
                         final Config config = new Config();

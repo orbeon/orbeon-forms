@@ -156,9 +156,9 @@ public class XFormsToXHTML extends ProcessorImpl {
         if (TEST_STATE == null) {
 
             // Read and try to cache the complete XForms+XHTML document with annotations
-            stage2CacheableState = (Stage2CacheableState) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_ANNOTATED_DOCUMENT),
-                new CacheableInputReader() {
-                    public Object read(PipelineContext pipelineContext, ProcessorInput processorInput) {
+            stage2CacheableState = readCacheInputAsObject(pipelineContext, getInputByName(INPUT_ANNOTATED_DOCUMENT),
+                new CacheableInputReader<Stage2CacheableState>() {
+                    public Stage2CacheableState read(PipelineContext pipelineContext, ProcessorInput processorInput) {
 
                         // Compute annotated XForms document + static state document
                         final Stage1CacheableState stage1CacheableState = new Stage1CacheableState();

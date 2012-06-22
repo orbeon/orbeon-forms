@@ -600,12 +600,12 @@ public class PipelineProcessor extends ProcessorImpl {
         // 1) The config is provided to us as an AST
         // 2) We need to read the config input
         final PipelineConfig config = configFromAST != null ? configFromAST :
-                (PipelineConfig) readCacheInputAsObject(context, getInputByName(INPUT_CONFIG),
-                        new CacheableInputReader() {
-                            public Object read(final PipelineContext context, final ProcessorInput input) {
-                                return readPipelineConfig(context, input);
-                            }
-                        });
+            readCacheInputAsObject(context, getInputByName(INPUT_CONFIG),
+                new CacheableInputReader<PipelineConfig>() {
+                    public PipelineConfig read(final PipelineContext context, final ProcessorInput input) {
+                        return readPipelineConfig(context, input);
+                    }
+                });
 
         // Reset processors
         state.childProcessors = config.getProcessors();

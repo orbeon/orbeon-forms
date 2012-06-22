@@ -193,8 +193,8 @@ public class FileSerializer extends ProcessorImpl {
     public void start(PipelineContext context) {
         try {
             // Read config
-            final Config config = (Config) readCacheInputAsObject(context, getInputByName(INPUT_CONFIG), new CacheableInputReader() {
-                public Object read(PipelineContext context, ProcessorInput input) {
+            final Config config = readCacheInputAsObject(context, getInputByName(INPUT_CONFIG), new CacheableInputReader<Config>() {
+                public Config read(PipelineContext context, ProcessorInput input) {
                     return new Config(readInputAsDOM4J(context, input));
                 }
             });
@@ -262,8 +262,8 @@ public class FileSerializer extends ProcessorImpl {
                 // If caching of the data is enabled, use the caching API
                 // We return a ResultStore
                 final boolean[] read = new boolean[1];
-                ResultStore filter = (ResultStore) readCacheInputAsObject(context, dataInput, new CacheableInputReader() {
-                    public Object read(PipelineContext context, ProcessorInput input) {
+                ResultStore filter = readCacheInputAsObject(context, dataInput, new CacheableInputReader<ResultStore>() {
+                    public ResultStore read(PipelineContext context, ProcessorInput input) {
                         read[0] = true;
                         if (logger.isDebugEnabled())
                             logger.debug("Output not cached");

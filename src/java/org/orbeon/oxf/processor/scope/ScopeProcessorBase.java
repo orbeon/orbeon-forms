@@ -33,8 +33,8 @@ public abstract class ScopeProcessorBase extends ProcessorImpl {
     public static final String SCOPE_CONFIG_NAMESPACE_URI = "http://orbeon.org/oxf/schemas/scope-config";
 
     protected ContextConfig readConfig(PipelineContext context) {
-        return (ContextConfig) readCacheInputAsObject(context, getInputByName(ProcessorImpl.INPUT_CONFIG), new CacheableInputReader() {
-            public Object read(PipelineContext context, ProcessorInput input) {
+        return readCacheInputAsObject(context, getInputByName(ProcessorImpl.INPUT_CONFIG), new CacheableInputReader<ContextConfig>() {
+            public ContextConfig read(PipelineContext context, ProcessorInput input) {
                 final Element rootElement = readInputAsDOM4J(context, input).getRootElement();
                 final String contextName = rootElement.element("scope").getStringValue();
                 final Element sessionScopeElement = rootElement.element("session-scope");

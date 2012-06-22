@@ -133,8 +133,8 @@ public abstract class HttpSerializerBase extends CachedSerializer {
                     // If local caching of the data is enabled, use the caching API
                     // We return a ResultStore
                     final boolean[] read = new boolean[1];
-                    final ExtendedResultStoreOutputStream resultStore = (ExtendedResultStoreOutputStream) readCacheInputAsObject(pipelineContext, dataInput, new CacheableInputReader() {
-                        public Object read(PipelineContext pipelineContext, ProcessorInput input) {
+                    final ExtendedResultStoreOutputStream resultStore = readCacheInputAsObject(pipelineContext, dataInput, new CacheableInputReader<ExtendedResultStoreOutputStream>() {
+                        public ExtendedResultStoreOutputStream read(PipelineContext pipelineContext, ProcessorInput input) {
                             read[0] = true;
                             if (logger.isDebugEnabled())
                                 logger.debug("Output not cached");
@@ -187,9 +187,9 @@ public abstract class HttpSerializerBase extends CachedSerializer {
     }
 
     protected Config readConfig(PipelineContext context) {
-        return (Config) readCacheInputAsObject(context, getInputByName(INPUT_CONFIG),
-                new CacheableInputReader() {
-                    public Object read(PipelineContext context, ProcessorInput input) {
+        return readCacheInputAsObject(context, getInputByName(INPUT_CONFIG),
+                new CacheableInputReader<Config>() {
+                    public Config read(PipelineContext context, ProcessorInput input) {
                         Element configElement = readInputAsDOM4J(context, input).getRootElement();
                         try {
                             String contentType = XPathUtils.selectStringValueNormalize(configElement, "/config/content-type");

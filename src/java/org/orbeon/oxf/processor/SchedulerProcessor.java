@@ -46,8 +46,8 @@ public class SchedulerProcessor extends ProcessorImpl {
 
     public void start(PipelineContext context) {
         try {
-            List configs = (List) readCacheInputAsObject(context, getInputByName(INPUT_CONFIG), new CacheableInputReader() {
-                public Object read(PipelineContext context, ProcessorInput input) {
+            List configs = readCacheInputAsObject(context, getInputByName(INPUT_CONFIG), new CacheableInputReader<List>() {
+                public List read(PipelineContext context, ProcessorInput input) {
                     List configs = new ArrayList();
                     Document document = readInputAsDOM4J(context, input);
 

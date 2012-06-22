@@ -43,8 +43,8 @@ public class ToXMLConverter extends ProcessorImpl {
             public void readImpl(PipelineContext pipelineContext, XMLReceiver xmlReceiver) {
 
                 // Read config input
-                final XMLUtils.ParserConfiguration config = (XMLUtils.ParserConfiguration) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_CONFIG), new CacheableInputReader() {
-                    public Object read(org.orbeon.oxf.pipeline.api.PipelineContext context, ProcessorInput input) {
+                final XMLUtils.ParserConfiguration config = readCacheInputAsObject(pipelineContext, getInputByName(INPUT_CONFIG), new CacheableInputReader<XMLUtils.ParserConfiguration>() {
+                    public XMLUtils.ParserConfiguration read(org.orbeon.oxf.pipeline.api.PipelineContext context, ProcessorInput input) {
 
                         final Element configElement = readInputAsDOM4J(context, input).getRootElement();
 

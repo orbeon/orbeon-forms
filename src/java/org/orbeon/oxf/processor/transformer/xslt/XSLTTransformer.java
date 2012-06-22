@@ -129,33 +129,34 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                     }
 
                     // Get transformer attributes if any
-                    Map<String, Boolean> attributes = null;
-                    {
-                        // Read attributes input only if connected
-                        if (getConnectedInputs().get(INPUT_ATTRIBUTES) != null) {
-                            // Read input as an attribute Map and cache it
-                            attributes = (Map<String, Boolean>) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_ATTRIBUTES), new CacheableInputReader() {
-                                public Object read(PipelineContext context, ProcessorInput input) {
-                                    final Document preferencesDocument = readInputAsDOM4J(context, input);
-                                    final PropertyStore propertyStore = new PropertyStore(preferencesDocument);
-                                    final PropertySet propertySet = propertyStore.getGlobalPropertySet();
-                                    return propertySet.getObjectMap();
-                                }
-                            });
-                        }
-                    }
+                    final Map<String, Boolean> attributesFromProperties;
+                    // Read attributes input only if connected
+                    if (getConnectedInputs().get(INPUT_ATTRIBUTES) != null) {
+                        // Read input as an attribute Map and cache it
+                        attributesFromProperties = readCacheInputAsObject(pipelineContext, getInputByName(INPUT_ATTRIBUTES), new CacheableInputReader<Map<String, Boolean>>() {
+                            public Map<String, Boolean> read(PipelineContext context, ProcessorInput input) {
+                                final Document preferencesDocument = readInputAsDOM4J(context, input);
+                                final PropertyStore propertyStore = new PropertyStore(preferencesDocument);
+                                final PropertySet propertySet = propertyStore.getGlobalPropertySet();
+                                return propertySet.getBooleanProperties();
+                            }
+                        });
+                    } else
+                        attributesFromProperties = Collections.emptyMap();
 
                     // Output location mode
                     final String outputLocationMode = getPropertySet().getString(OUTPUT_LOCATION_MODE_PROPERTY, OUTPUT_LOCATION_MODE_DEFAULT);
                     final boolean isDumbOutputLocation = OUTPUT_LOCATION_DUMB.equals(outputLocationMode);
                     final boolean isSmartOutputLocation = OUTPUT_LOCATION_SMART.equals(outputLocationMode);
+                    final Map<String, Boolean> attributes;
                     if (isSmartOutputLocation) {
                         // Create new HashMap as we don't want to change the one in cache
-                        attributes = (attributes == null) ? new HashMap<String, Boolean>() : new HashMap<String, Boolean>(attributes);
+                        attributes = new HashMap<String, Boolean>(attributesFromProperties);
                         // Set attributes for Saxon source location
                         attributes.put(FeatureKeys.LINE_NUMBERING, Boolean.TRUE);
                         attributes.put(FeatureKeys.COMPILE_WITH_TRACING, Boolean.TRUE);
-                    }
+                    } else
+                        attributes = attributesFromProperties;
 
                     // Create transformer if we did not find one in cache
                     if (templatesInfo == null) {

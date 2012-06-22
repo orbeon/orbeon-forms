@@ -158,8 +158,8 @@ public class JavaProcessor extends ProcessorImpl {
         try {
             // Read config input into a String, cache if possible
             ProcessorInput input = getInputByName(INPUT_CONFIG);
-            final Config config = (Config) readCacheInputAsObject(context, input, new CacheableInputReader() {
-                public Object read(PipelineContext context, ProcessorInput input) {
+            final Config config = readCacheInputAsObject(context, input, new CacheableInputReader<Config>() {
+                public Config read(PipelineContext context, ProcessorInput input) {
                     Document configDocument = readInputAsDOM4J(context, INPUT_CONFIG);
                     Element configElement = configDocument.getRootElement();
                     Config config = new Config();

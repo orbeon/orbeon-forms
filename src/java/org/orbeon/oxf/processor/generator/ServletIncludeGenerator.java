@@ -52,8 +52,8 @@ public class ServletIncludeGenerator extends ProcessorImpl {
             public void readImpl(PipelineContext context, XMLReceiver xmlReceiver) {
 
                 // Read config
-                final Config config = (Config) readCacheInputAsObject(context, getInputByName(INPUT_CONFIG), new CacheableInputReader() {
-                    public Object read(PipelineContext context, ProcessorInput input) {
+                final Config config = readCacheInputAsObject(context, getInputByName(INPUT_CONFIG), new CacheableInputReader<Config>() {
+                    public Config read(PipelineContext context, ProcessorInput input) {
                         Document configNode = readInputAsDOM4J(context, input);
                         String servletName = XPathUtils.selectStringValueNormalize(configNode, "/config/servlet-name");
                         String path = XPathUtils.selectStringValueNormalize(configNode, "/config/path");

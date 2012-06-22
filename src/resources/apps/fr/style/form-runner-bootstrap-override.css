@@ -12,3 +12,6 @@
 #fr-view .fr-grid tr th label {
   margin: 0;
 }
+#fr-view table th {
+  font-weight: normal;
+}

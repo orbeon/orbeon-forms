@@ -29,9 +29,6 @@ html { overflow: hidden }
 h1.fr-form-title {
     clear: none;
     color: #004B92;
-    float: left;
-    /*font-size: 197%;*/
-    /*font-style: normal;*/
     margin: 0 0 0 2em;
     padding: 0;
 }
@@ -182,6 +179,10 @@ h1.fr-form-title {
 /* ***** Top ******************************************************************************************************** */
 
 /* Title and description */
+.fb-top h1 {
+    font-size: 25px;    /* Make title larger than what it is in Form Runner (overrides 20px) */
+    line-height: 45px;  /* Make line higher to compensate for larger font (overrides 40px) */
+}
 .fr-top .xbl-fr-inplace-input .xforms-label { display: none }
 .fr-top .xbl-fr-inplace-input .fr-inplace-cancel a { color: white }
 .fr-top .xbl-fr-inplace-input .fr-inplace-content .xforms-output { color: white }
@@ -514,7 +515,6 @@ html.accordion-menu-js dd.a-m-d-anim {
 #fb-layout .yui-layout-unit-top .fr-logo          { padding: 0 0 0 1em }
 #fb-layout .yui-layout-unit-left .yui-layout-bd   { border-right: 2px solid #ccc; background-color: #E8F2FF }
 #fb-layout .yui-layout-unit-bottom .yui-layout-bd { border-top: 2px solid #004B92; background-color: #E8F2FF }
-#top1 { padding: 0.4em .5em 0 .5em }
 
 /* Always show vertical scrollbar so that there is no reflow of the left panel when it becomes shorter/taller */
 .yui-layout .yui-layout-unit-left div.yui-layout-bd {

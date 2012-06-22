@@ -1,3 +1,10 @@
+form.xforms-layout-span {
+  float: none;
+  margin: 0;
+}
+a {
+  text-decoration: underline;
+}
 #fr-view select,
 #fr-view textarea,
 #fr-view input {

@@ -40,7 +40,10 @@
             <!-- Just to set the context -->
 
             <xforms:group id="fr-view" class="fr-view{concat(' fr-mode-', $mode)}">
-                <xhtml:div class="fr-header navbar navbar-fixed-top">
+                <!-- Don't use fixed navbar in Form Builder, as Form Builder has its own fixed navbar at the top of viewport -->
+                <xsl:variable name="header-classes" as="xs:string*" select="('fr-header', 'navbar',
+                    if ($is-form-builder) then () else 'navbar-fixed-top')"/>
+                <xhtml:div class="{string-join($header-classes, ' ')}">
                     <xhtml:div class="navbar-inner">
                         <xhtml:div class="container">
                             <xsl:if test="not($mode = ('email')) and not($hide-header)">

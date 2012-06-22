@@ -13,9 +13,6 @@
  */
 /* NOTE: IE em factor: 0.9759 */
 /* ***** Utilities ************************************************************************************************** */
-form.xforms-layout-span {
-  float: none;
-}
 .fr-clear {
   clear: both;
 }
@@ -236,9 +233,6 @@ input.xforms-trigger,
 .fr-noscript-choice,
 .fr-doc-links {
   margin-right: 1em;
-}
-.fr-language-choice {
-  margin-right: 0;
 }
 .fr-doc-links {
   float: right;

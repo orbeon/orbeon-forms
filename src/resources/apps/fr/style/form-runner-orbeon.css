@@ -12,25 +12,20 @@ body {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   background-color: white;
 }
-.fr-header .container {
+.fr-header .container,
+.fb-top .container {
   position: relative;
 }
-.fr-header .fr-logo {
-  position: absolute;
-  top: 6px;
-  background-image: url('orbeon-navbar-logo.png');
-  width: 24px;
-  height: 27px;
-}
-.fr-header h1 {
-  position: absolute;
-  top: 9px;
-  left: 35px;
-  margin: 0;
+.fr-header h1,
+.fb-top h1 {
+  display: inline;
+  margin: 0 0 0 .5em;
   font-weight: normal;
   font-size: 20px;
-  line-height: 20px;
+  line-height: 40px;
+  vertical-align: middle;
   color: #ddd;
+  font-family: "Lucida Grande", Tahoma, Arial, Verdana, sans-serif;
 }
 /* ***** Headings (titles and sections) ***************************************************************************** */
 .xforms-form h2,

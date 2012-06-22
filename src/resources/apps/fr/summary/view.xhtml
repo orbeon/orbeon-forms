@@ -368,7 +368,7 @@
                             <xforms:case id="search-free">
                                 <table class="fr-layout-table">
                                     <tr>
-                                        <td>
+                                        <td class="fr-search-options-td">
                                             <!-- Search field -->
                                             <xforms:input ref="instance('fr-search-instance')/query" class="fr-search-input"/>
                                         </td>
@@ -400,7 +400,6 @@
                             <!-- Search options -->
                             <xforms:case id="search-options">
                                 <xhtml:div class="fr-search-options-div">
-                                    <xhtml:div class="fr-search-options-title">Search Options</xhtml:div>
                                     <!-- Special form builder search: use input or select1 for app/form name -->
                                     <xforms:group ref=".[$is-form-builder and $has-roles]">
                                         <div class="fr-summary-search-item">
@@ -765,19 +764,6 @@
                     <!-- Directly iterate over the tokenized property -->
                     <xforms:repeat ref="tokenize(xxforms:property(string-join(('oxf.fr.summary.buttons', $app, $form), '.')), '\s+')">
                         <xhtml:span class="fr-button">
-                            <!-- New button -->
-                            <xforms:group ref="if (. = 'new') then instance('fr-summary-triggers-instance')/new else ()">
-                                <xforms:trigger ref=".">
-                                    <xforms:label>
-                                        <!--<xhtml:img src="/apps/fr/style/add.gif" alt=""/>-->
-                                        <xhtml:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/plus_16.png" alt=""/>
-                                        <xhtml:span><xforms:output ref="$fr-resources/summary/labels/new-form"/></xhtml:span>
-                                    </xforms:label>
-                                    <!-- TODO: add hints to buttons -->
-                                    <!--<xforms:hint>Create a new form</xforms:hint>-->
-                                    <xforms:dispatch ev:event="DOMActivate" targetid="fr-form-model" name="fr-summary-create"/>
-                                </xforms:trigger>
-                            </xforms:group>
                             <!-- Print/review button -->
                             <xforms:group ref="if (. = ('print', 'review')) then instance('fr-summary-triggers-instance')/view else ()">
                                 <xforms:trigger ref=".">
@@ -835,6 +821,19 @@
                                         <xhtml:span><xforms:output ref="$fr-resources/summary/labels/import-forms"/></xhtml:span>
                                     </xforms:label>
                                     <xforms:load ev:event="DOMActivate" resource="/fr/{$app}/{$form}/import"/>
+                                </xforms:trigger>
+                            </xforms:group>
+                            <!-- New button -->
+                            <xforms:group ref="if (. = 'new') then instance('fr-summary-triggers-instance')/new else ()">
+                                <xforms:trigger ref="." appearance="xxforms:primary">
+                                    <xforms:label>
+                                        <!--<xhtml:img src="/apps/fr/style/add.gif" alt=""/>-->
+                                        <xhtml:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/plus_16.png" alt=""/>
+                                        <xhtml:span><xforms:output ref="$fr-resources/summary/labels/new-form"/></xhtml:span>
+                                    </xforms:label>
+                                    <!-- TODO: add hints to buttons -->
+                                    <!--<xforms:hint>Create a new form</xforms:hint>-->
+                                    <xforms:dispatch ev:event="DOMActivate" targetid="fr-form-model" name="fr-summary-create"/>
                                 </xforms:trigger>
                             </xforms:group>
                         </xhtml:span>

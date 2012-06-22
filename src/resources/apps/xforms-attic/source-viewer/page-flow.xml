@@ -11,12 +11,10 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<config xmlns="http://www.orbeon.com/oxf/controller"
-        xmlns:oxf="http://www.orbeon.com/oxf/processors"
-        xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+<config xmlns="http://www.orbeon.com/oxf/controller">
 
     <!-- Download a given file -->
-    <page id="download" path-info="/source-viewer/service/download/([^/]+)/(.+)" matcher="oxf:perl5-matcher"
+    <page id="download" path-info="/source-viewer/service/download/([^/]+)/(.+)" matcher="regexp"
             default-submission="default-submission.xml"
             model="download-model.xpl">
         <setvalue ref="/form/application-id" matcher-group="1"/>
@@ -40,7 +38,7 @@
     </page>
 
     <!-- Display the source for an individual file -->
-    <page id="goto-source" path-info="/source-viewer/([^/]+)/(.+)" matcher="oxf:perl5-matcher"
+    <page id="goto-source" path-info="/source-viewer/([^/]+)/(.+)" matcher="regexp"
             default-submission="default-submission.xml"
             view="view.xhtml">
         <setvalue ref="/form/application-id" matcher-group="1"/>
@@ -48,7 +46,7 @@
     </page>
 
     <!-- Produce the list of source files -->
-    <page id="summary" path-info="/source-viewer/(.+)/" matcher="oxf:perl5-matcher"
+    <page id="summary" path-info="/source-viewer/(.+)/" matcher="regexp"
             default-submission="default-submission.xml"
             view="view.xhtml">
         <setvalue ref="/form/application-id" matcher-group="1"/>

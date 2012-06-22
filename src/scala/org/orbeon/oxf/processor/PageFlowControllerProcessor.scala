@@ -18,7 +18,7 @@ import PageFlowControllerProcessorBase._
 import collection.JavaConverters._
 import java.util.regex.Pattern
 import java.util.{List ⇒ JList, Map ⇒ JMap}
-import org.dom4j.{Document, Element}
+import org.dom4j.{QName, Document, Element}
 import org.orbeon.errorified.Exceptions._
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.pipeline.api.ExternalContext.Request
@@ -38,7 +38,8 @@ import org.orbeon.oxf.webapp.HttpStatusCodeException
 import org.orbeon.oxf.xml.Dom4j
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml.XMLUtils.DigestContentHandler
-import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, LocationData}
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils._
+import org.orbeon.oxf.xml.dom4j.LocationData
 
 class PageFlowControllerProcessor extends PageFlowControllerProcessorBase {
 
@@ -71,7 +72,7 @@ class PageFlowControllerProcessor extends PageFlowControllerProcessorBase {
 
                  // Prepend a page for submissions
                 val submissionPage = {
-                     val submissionPath  = getPropertySet.getString(SubmissionPathPropertyName, SubmissionPathDefault)
+                    val submissionPath  = getPropertySet.getString(SubmissionPathPropertyName, SubmissionPathDefault)
                     val submissionModel = getPropertySet.getStringOrURIAsString(SubmissionModelPropertyName)
                     if ((submissionPath eq null) && (submissionModel ne null) || (submissionPath ne null) && (submissionModel eq null))
                         throw new OXFException("Only one of properties " + SubmissionPathPropertyName + " and " + SubmissionModelPropertyName + " is set.")
@@ -119,7 +120,7 @@ class PageFlowControllerProcessor extends PageFlowControllerProcessorBase {
                     if (logger.isDebugEnabled) {
                         val astDocumentHandler = new ASTDocumentHandler
                         ast.walk(astDocumentHandler)
-                        debug("Created PFC pipeline", Seq("path" → page.path, "pipeline" → ('\n' + Dom4jUtils.domToString(astDocumentHandler.getDocument))))
+                        debug("Created PFC pipeline", Seq("path" → page.path, "pipeline" → ('\n' + domToString(astDocumentHandler.getDocument))))
                     }
 
                     PipelineProcessor.createConfigFromAST(ast)
@@ -309,7 +310,7 @@ object PageFlowControllerProcessor {
             // Provide matches input using a digest, because that's equivalent to how the PFC was working when the
             // matches were depending on oxf:request. If we don't do this, then
             val matchesProcessor =
-                new DigestedProcessor(MatchProcessor.writeXML(_, matchResult.matches, matchResult.groupsWithNulls.asJava))
+                new DigestedProcessor(RegexpProcessor.writeXML(_, matchResult.matches, matchResult.groupsWithNulls))
 
             // Connect matches input and start pipeline
             PipelineUtils.connect(matchesProcessor, "data", pipeline, "matches")
@@ -335,14 +336,13 @@ object PageFlowControllerProcessor {
     def idAtt(e: Element) = att(e, "id")
     def getPath(e: Element) = att(e, "path-info") orElse att(e, "path") ensuring (_.isDefined) get
 
+    // Support "regexp" and "oxf:perl5-matcher" for backward compatibility
+    val RegexpQNames = Set(new QName("regexp"), new QName("perl5-matcher", OXF_PROCESSORS_NAMESPACE))
+
     def getMatcher(e: Element, path: String) = {
-        val matcherQName = Dom4jUtils.extractAttributeValueQName(e, "matcher")
-
         // Convert glob expression if needed
-        val regexp = if (matcherQName == PERL5_PROCESSOR_QNAME) path else globToPerl5(path.toCharArray)
-
+        val regexp = if (RegexpQNames(extractAttributeValueQName(e, "matcher"))) path else globToRegexp(path.toCharArray)
         Matcher(Pattern.compile(regexp))
-
     }
 }
 

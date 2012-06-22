@@ -81,7 +81,6 @@ public class XMLConstants {
     public final static QName XINCLUDE_PROCESSOR_QNAME = new QName("xinclude", OXF_PROCESSORS_NAMESPACE);
     public final static QName SAX_DEBUGGER_PROCESSOR_QNAME = new QName("sax-debugger", OXF_PROCESSORS_NAMESPACE);
     public final static QName DEBUG_PROCESSOR_QNAME = new QName("debug", OXF_PROCESSORS_NAMESPACE);
-    public final static QName PERL5_PROCESSOR_QNAME = new QName("perl5-matcher", OXF_PROCESSORS_NAMESPACE);
 
     public final static QName XS_STRING_QNAME = new QName("string", XSD_NAMESPACE);
     public final static QName XS_BOOLEAN_QNAME = new QName("boolean", XSD_NAMESPACE);

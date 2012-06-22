@@ -12,14 +12,13 @@
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
 <config xmlns="http://www.orbeon.com/oxf/controller"
-    xmlns:oxf="http://www.orbeon.com/oxf/processors"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform" instance-passing="forward">
 
     <page path-info="/xforms-sandbox/" view="upload-view.xhtml"/>
     <page path-info="/xforms-sandbox/run" view="upload-action.xpl"/>
-    <page path-info="/xforms-sandbox/sample/xbl/(.+)" matcher="oxf:perl5-matcher"
+    <page path-info="/xforms-sandbox/sample/xbl/(.+)" matcher="regexp"
         view="/xbl/${1}.xhtml"/>
-    <page path-info="/xforms-sandbox/sample/(.+)" matcher="oxf:perl5-matcher"
+    <page path-info="/xforms-sandbox/sample/(.+)" matcher="regexp"
         view="samples/${1}.xhtml"/>
     <page path-info="/xforms-sandbox/service/get-files" model="get-files.xpl"/>
     <page path-info="/xforms-sandbox/service/css-after-5-seconds"
@@ -38,7 +37,7 @@
             parameter="sortOrder"/>
     </page>
 
-    <page path-info="/xforms-sandbox/service/(.+)" matcher="oxf:perl5-matcher"
+    <page path-info="/xforms-sandbox/service/(.+)" matcher="regexp"
         view="services/${1}.xpl"/>
 
     <epilogue url="oxf:/config/epilogue.xpl"/>

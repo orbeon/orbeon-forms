@@ -11,25 +11,24 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<config xmlns="http://www.orbeon.com/oxf/controller"
-        xmlns:oxf="http://www.orbeon.com/oxf/processors">
+<config xmlns="http://www.orbeon.com/oxf/controller">
 
     <!-- Files to serve directly (and exclude files under /[app]/service/) -->
-    <files path-info="(?!/(xforms-server|([^/]+)/service/)).+\.(gif|css|pdf|json|js|png|jpg|xsd|htc|ico|swf|html|htm|txt)" matcher="oxf:perl5-matcher"/>
+    <files path-info="(?!/(xforms-server|([^/]+)/service/)).+\.(gif|css|pdf|json|js|png|jpg|xsd|htc|ico|swf|html|htm|txt)" matcher="regexp"/>
     <!-- Also exclude .xml files handled by Form Runner -->
-    <files path-info="(?!/(xforms-server|fr|([^/]+)/service)/).+\.xml" matcher="oxf:perl5-matcher" mime-type="application/xml"/>
+    <files path-info="(?!/(xforms-server|fr|([^/]+)/service)/).+\.xml" matcher="regexp" mime-type="application/xml"/>
     <!-- For the following we override the standard mediatype to help browsers -->
-    <files path-info="(?!/([^/]+)/service/).+\.(java|xq)" matcher="oxf:perl5-matcher" mime-type="text/plain"/>
-    <files path-info="(?!/([^/]+)/service/).+\.jar" matcher="oxf:perl5-matcher" mime-type="application/zip"/>
+    <files path-info="(?!/([^/]+)/service/).+\.(java|xq)" matcher="regexp" mime-type="text/plain"/>
+    <files path-info="(?!/([^/]+)/service/).+\.jar" matcher="regexp" mime-type="application/zip"/>
 
     <!-- XForms server entry point -->
-    <page id="xforms-server" path-info="/xforms-server.*" matcher="oxf:perl5-matcher" model="/ops/xforms/xforms-server.xpl"/>
+    <page id="xforms-server" path-info="/xforms-server.*" matcher="regexp" model="/ops/xforms/xforms-server.xpl"/>
 
     <!-- Home / welcome application -->
     <page id="home" path-info="/" model="apps/home/page-flow.xml"/>
 
     <!-- Dispatch request to a specific application -->
-    <page id="apps" path-info="/([^/]+)/.*" matcher="oxf:perl5-matcher" model="apps/${1}/page-flow.xml"/>
+    <page id="apps" path-info="/([^/]+)/.*" matcher="regexp" model="apps/${1}/page-flow.xml"/>
 
     <!-- "Not Found" page displayed when no page matches the request path -->
     <page id="not-found" path-info="/not-found" view="/config/not-found.xhtml"/>

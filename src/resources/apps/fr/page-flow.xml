@@ -11,28 +11,27 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<config xmlns="http://www.orbeon.com/oxf/controller"
-        xmlns:oxf="http://www.orbeon.com/oxf/processors">
+<config xmlns="http://www.orbeon.com/oxf/controller">
 
     <!-- ==== Entry point for persistence services ================================================================= -->
 
-    <page path-info="/fr/service/persistence/.*" matcher="oxf:perl5-matcher" model="persistence/proxy.xpl"/>
+    <page path-info="/fr/service/persistence/.*" matcher="regexp" model="persistence/proxy.xpl"/>
 
     <!-- ==== Built-in eXist-based persistence services ============================================================ -->
 
     <!-- Create, Read, Update and Delete operations (id provided) -->
-    <page path-info="/fr/service/exist/crud/([^/]+/[^/]+/(form/[^/]+|data/([^/]+/[^/]+)?))" matcher="oxf:perl5-matcher"
+    <page path-info="/fr/service/exist/crud/([^/]+/[^/]+/(form/[^/]+|data/([^/]+/[^/]+)?))" matcher="regexp"
           model="persistence/exist/crud.xpl"/>
 
     <!-- Search -->
-    <page path-info="/fr/service/exist/search/([^/]+)/([^/]+)" matcher="oxf:perl5-matcher"
+    <page path-info="/fr/service/exist/search/([^/]+)/([^/]+)" matcher="regexp"
           view="persistence/exist/search.xpl">
         <setvalue ref="/*/app" matcher-group="1"/>
         <setvalue ref="/*/form" matcher-group="2"/>
     </page>
 
     <!-- List deployed forms for a given application -->
-    <page path-info="/fr/service/exist/list/([^/]+)" matcher="oxf:perl5-matcher"
+    <page path-info="/fr/service/exist/list/([^/]+)" matcher="regexp"
           default-submission="persistence/exist/list-submission.xml"
           view="persistence/exist/list.xpl">
         <setvalue ref="/*/app" matcher-group="1"/>
@@ -44,18 +43,18 @@
     <!-- ==== Built-in Oracle-based persistence services =========================================================== -->
 
     <!-- Create, Read, Update and Delete operations (id provided) -->
-    <page path-info="/fr/service/oracle/crud/([^/]+/[^/]+/(form/[^/]+|data/([^/]+/[^/]+)?))" matcher="oxf:perl5-matcher"
+    <page path-info="/fr/service/oracle/crud/([^/]+/[^/]+/(form/[^/]+|data/([^/]+/[^/]+)?))" matcher="regexp"
           model="persistence/oracle/crud.xpl"/>
 
     <!-- Search -->
-    <page path-info="/fr/service/oracle/search/([^/]+)/([^/]+)" matcher="oxf:perl5-matcher"
+    <page path-info="/fr/service/oracle/search/([^/]+)/([^/]+)" matcher="regexp"
           view="persistence/oracle/search.xpl">
         <setvalue ref="/*/app" matcher-group="1"/>
         <setvalue ref="/*/form" matcher-group="2"/>
     </page>
 
     <!-- List deployed forms for a given application -->
-    <page path-info="/fr/service/oracle/list/([^/]+)" matcher="oxf:perl5-matcher"
+    <page path-info="/fr/service/oracle/list/([^/]+)" matcher="regexp"
           default-submission="persistence/oracle/list-submission.xml"
           view="persistence/oracle/list.xpl">
         <setvalue ref="/*/app" matcher-group="1"/>
@@ -67,18 +66,18 @@
     <!-- ==== Custom MySQL-based persistence services =========================================================== -->
 
     <!-- Create, Read, Update and Delete operations (id provided) -->
-    <page path-info="/fr/service/mysql/crud/([^/]+/[^/]+/(form/[^/]+|data/([^/]+/[^/]+)?))" matcher="oxf:perl5-matcher"
+    <page path-info="/fr/service/mysql/crud/([^/]+/[^/]+/(form/[^/]+|data/([^/]+/[^/]+)?))" matcher="regexp"
           model="persistence/mysql/crud.xpl"/>
 
     <!-- Search -->
-    <page path-info="/fr/service/mysql/search/([^/]+)/([^/]+)" matcher="oxf:perl5-matcher"
+    <page path-info="/fr/service/mysql/search/([^/]+)/([^/]+)" matcher="regexp"
           view="persistence/mysql/search.xpl">
         <setvalue ref="/*/app" matcher-group="1"/>
         <setvalue ref="/*/form" matcher-group="2"/>
     </page>
 
     <!-- List deployed forms for a given application -->
-    <page path-info="/fr/service/mysql/list/([^/]+)" matcher="oxf:perl5-matcher"
+    <page path-info="/fr/service/mysql/list/([^/]+)" matcher="regexp"
           default-submission="persistence/mysql/list-submission.xml"
           view="persistence/mysql/list.xpl">
         <setvalue ref="/*/app" matcher-group="1"/>
@@ -90,7 +89,7 @@
     <!-- ==== Built-in resource manager-based persistence services ================================================= -->
 
     <!-- Create, Read, Update and Delete operations (id provided) -->
-    <page path-info="/fr/service/resource/crud/([^/]+/[^/]+/(form/[^/]+|data/[^/]+/[^/]+))" matcher="oxf:perl5-matcher"
+    <page path-info="/fr/service/resource/crud/([^/]+/[^/]+/(form/[^/]+|data/[^/]+/[^/]+))" matcher="regexp"
           model="persistence/resource/crud.xpl">
     </page>
 
@@ -100,7 +99,7 @@
     <!-- ==== Internationalization ================================================================================= -->
 
     <!-- Service putting together Form Runner resources -->
-    <page path-info="/fr/service/i18n/fr-resources/([^/]+)/([^/]+)" matcher="oxf:perl5-matcher"
+    <page path-info="/fr/service/i18n/fr-resources/([^/]+)/([^/]+)" matcher="regexp"
           view="i18n/fr-resources.xpl"
           default-submission="request-parameters.xml">
         <setvalue ref="/*/app" matcher-group="1"/>
@@ -110,16 +109,16 @@
     <!-- ==== Other services ======================================================================================= -->
 
     <!-- Email document -->
-    <page path-info="/fr/service/([^/]+)/([^/]+)/(email)(/([^/]+))?" matcher="oxf:perl5-matcher"
+    <page path-info="/fr/service/([^/]+)/([^/]+)/(email)(/([^/]+))?" matcher="regexp"
           view="email/email-form.xpl"/>
 
     <!-- Create PDF directly from an XForms engine live document -->
-    <page path-info="/fr/service/([^/]+)/([^/]+)/(pdf)/([^/]+)/([A-Z0-9\-]+)\.pdf" matcher="oxf:perl5-matcher"
+    <page path-info="/fr/service/([^/]+)/([^/]+)/(pdf)/([^/]+)/([A-Z0-9\-]+)\.pdf" matcher="regexp"
           view="print/pdf-instant-view.xpl">
     </page>
 
     <!-- Create PDF from a stored document -->
-    <page path-info="/fr/service/([^/]+)/([^/]+)/(pdf)(/([^/]+))?" matcher="oxf:perl5-matcher"
+    <page path-info="/fr/service/([^/]+)/([^/]+)/(pdf)(/([^/]+))?" matcher="regexp"
           view="print/print-form.xpl"/>
 
     <!-- Generate HTML to be saved -->
@@ -133,44 +132,44 @@
     </page>
 
     <!-- Validate a collection of form data -->
-    <page path-info="/fr/service/([^/]+)/([^/]+)/(validate)" matcher="oxf:perl5-matcher" view="import/validate.xpl"/>
+    <page path-info="/fr/service/([^/]+)/([^/]+)/(validate)" matcher="regexp" view="import/validate.xpl"/>
 
     <!-- Import a collection of form data -->
-    <page path-info="/fr/service/([^/]+)/([^/]+)/(import)" matcher="oxf:perl5-matcher" view="import/import.xpl"/>
+    <page path-info="/fr/service/([^/]+)/([^/]+)/(import)" matcher="regexp" view="import/import.xpl"/>
 
     <!-- Generate a schema for a form -->
-    <page path-info="/fr/service/[^/]+/[^/]+/schema" matcher="oxf:perl5-matcher" view="import/import.xpl"/>
+    <page path-info="/fr/service/[^/]+/[^/]+/schema" matcher="regexp" view="import/import.xpl"/>
 
     <!-- ==== Custom services and pages ============================================================================ -->
 
     <!-- Custom persistence implementation provided by the application -->
-    <page path-info="/fr/service/custom/([^/]+)/crud/[^/]+/[^/]+/(form/[^/]+|data/[^/]+/[^/]+)" matcher="oxf:perl5-matcher"
+    <page path-info="/fr/service/custom/([^/]+)/crud/[^/]+/[^/]+/(form/[^/]+|data/[^/]+/[^/]+)" matcher="regexp"
           model="/forms/${1}/service/crud.xpl">
     </page>
 
-    <page path-info="/fr/service/custom/([^/]+)/search/[^/]+/[^/]+" matcher="oxf:perl5-matcher"
+    <page path-info="/fr/service/custom/([^/]+)/search/[^/]+/[^/]+" matcher="regexp"
           view="/forms/${1}/service/search.xpl">
     </page>
 
     <!-- Custom services provided by the application -->
-    <page path-info="/fr/service/custom/([^/]+)/([^/]+)" matcher="oxf:perl5-matcher"
+    <page path-info="/fr/service/custom/([^/]+)/([^/]+)" matcher="regexp"
           view="/forms/${1}/service/${2}.xpl"/>
 
     <!-- Custom services provided by Form Builder -->
     <!-- NOTE: This shouldn't be here, but this service uses its own serialization -->
-    <page path-info="/fr/service/custom/([^/]+)/([^/]+)/toolbox" matcher="oxf:perl5-matcher"
+    <page path-info="/fr/service/custom/([^/]+)/([^/]+)/toolbox" matcher="regexp"
           model="/forms/${1}/${2}/service/toolbox.xpl"/>
 
     <!-- Custom services provided by the form -->
-    <page path-info="/fr/service/custom/([^/]+)/([^/]+)/([^/]+)" matcher="oxf:perl5-matcher"
+    <page path-info="/fr/service/custom/([^/]+)/([^/]+)/([^/]+)" matcher="regexp"
           view="/forms/${1}/${2}/service/${3}.xpl"/>
 
     <!-- Custom pages provided by the application -->
-    <page path-info="/fr/page/custom/([^/]+)/([^/]+)" matcher="oxf:perl5-matcher"
+    <page path-info="/fr/page/custom/([^/]+)/([^/]+)" matcher="regexp"
           view="/forms/${1}/page/${2}.xhtml"/>
 
     <!-- Custom pages provided by the form -->
-    <page path-info="/fr/page/custom/([^/]+)/([^/]+)/([^/]+)" matcher="oxf:perl5-matcher"
+    <page path-info="/fr/page/custom/([^/]+)/([^/]+)/([^/]+)" matcher="regexp"
           view="/forms/${1}/${2}/page/${3}.xhtml"/>
 
     <!-- ==== Pages ================================================================================================ -->
@@ -178,14 +177,14 @@
     <!-- NOTE: Put those here as some URLs starting with /fr/service or /fr/page can erroneously match on those -->
 
     <!-- Home page -->
-    <page path-info="/fr/?" matcher="oxf:perl5-matcher" model="home/home.xhtml" view="html-view.xpl" default-submission="request-parameters.xml">
+    <page path-info="/fr/?" matcher="regexp" model="home/home.xhtml" view="html-view.xpl" default-submission="request-parameters.xml">
         <setvalue ref="/*/app">*</setvalue>
         <setvalue ref="/*/form">*</setvalue>
     </page>
 
     <!-- Summary -->
     <page id="summary"
-          path-info="/fr/([^/]+)/([^/]+)(/summary)" matcher="oxf:perl5-matcher"
+          path-info="/fr/([^/]+)/([^/]+)(/summary)" matcher="regexp"
           default-submission="request-parameters.xml"
           model="summary/view.xhtml" view="html-view.xpl">
         <setvalue ref="/*/app" matcher-group="1"/>
@@ -193,20 +192,20 @@
         <setvalue ref="/*/mode">summary</setvalue>
     </page>
 
-    <page path-info="/fr/unauthorized" view="unauthorized.xhtml" matcher="oxf:perl5-matcher"/>
+    <page path-info="/fr/unauthorized" view="unauthorized.xhtml" matcher="regexp"/>
 
     <!-- New, edit or view document (supports POST of XML, or GET)  -->
-    <page path-info="/fr/([^/]+)/([^/]+)/(new|edit|view)(/([^/]+))?" matcher="oxf:perl5-matcher"
+    <page path-info="/fr/([^/]+)/([^/]+)/(new|edit|view)(/([^/]+))?" matcher="regexp"
           model="detail/detail-model.xpl" view="html-view.xpl">
     </page>
 
     <!-- View document as PDF (supports POST of XML, or GET) -->
-    <page path-info="/fr/([^/]+)/([^/]+)/(pdf)(/([^/]+))?" matcher="oxf:perl5-matcher"
+    <page path-info="/fr/([^/]+)/([^/]+)/(pdf)(/([^/]+))?" matcher="regexp"
           model="detail/detail-model.xpl" view="print/pdf-view.xpl">
     </page>
 
     <!-- Test form by retrieving form from the database first -->
-    <page path-info="/fr/([^/]+)/([^/]+)/(test)/([^/]+)" matcher="oxf:perl5-matcher"
+    <page path-info="/fr/([^/]+)/([^/]+)/(test)/([^/]+)" matcher="regexp"
           default-submission="request-parameters.xml"
           model="test-model.xpl" view="html-view.xpl">
         <setvalue ref="/*/app" matcher-group="1"/>
@@ -216,7 +215,7 @@
     </page>
 
     <!-- Test form "inline" (when being edited) with new empty document -->
-    <page path-info="/fr/([^/]+)/([^/]+)/(test)" matcher="oxf:perl5-matcher"
+    <page path-info="/fr/([^/]+)/([^/]+)/(test)" matcher="regexp"
           model="inline-test-model.xpl" view="html-view.xpl">
         <setvalue ref="/*/app" matcher-group="1"/>
         <setvalue ref="/*/form" matcher-group="2"/>
@@ -224,7 +223,7 @@
     </page>
 
     <!-- Import page  -->
-    <page path-info="/fr/([^/]+)/([^/]+)/(import)" matcher="oxf:perl5-matcher"
+    <page path-info="/fr/([^/]+)/([^/]+)/(import)" matcher="regexp"
           default-submission="request-parameters.xml" model="import/import.xhtml" view="html-view.xpl">
         <setvalue ref="/*/app" matcher-group="1"/>
         <setvalue ref="/*/form" matcher-group="2"/>

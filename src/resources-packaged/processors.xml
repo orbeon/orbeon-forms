@@ -82,11 +82,15 @@
     </processor>
 
     <processor name="oxf:perl5-matcher">
-        <class name="org.orbeon.oxf.processor.Perl5MatchProcessor"/>
+        <class name="org.orbeon.oxf.processor.RegexpProcessor"/>
+    </processor>
+
+    <processor name="oxf:regexp">
+        <class name="org.orbeon.oxf.processor.RegexpProcessor"/>
     </processor>
 
     <processor name="oxf:glob-matcher">
-        <class name="org.orbeon.oxf.processor.GlobMatchProcessor"/>
+        <class name="org.orbeon.oxf.processor.GlobProcessor"/>
     </processor>
 
     <processor name="oxf:debug">

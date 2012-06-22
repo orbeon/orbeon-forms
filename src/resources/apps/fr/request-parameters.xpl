@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <!--
     Copyright (C) 2008 Orbeon, Inc.
 
@@ -35,7 +34,7 @@
         </p:input>
         <p:output name="data" id="request"/>
     </p:processor>
-    <p:processor name="oxf:perl5-matcher">
+    <p:processor name="oxf:regexp">
         <p:input name="config"><config>/fr/(service/)?([^/]+)/([^/]+)/(new|edit|view|pdf|email|validate|import)(/([^/]+))?(/([A-Z0-9\-]+)\.pdf)?</config></p:input>
         <p:input name="data" href="#request#xpointer(/request/request-path)"/>
         <p:output name="data" id="matcher-groups"/>

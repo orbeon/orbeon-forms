@@ -97,7 +97,6 @@
         <include name="axis_1_2_1-jaxrpc.jar"/>
         <include name="axis_1_2_1-saaj.jar"/>
         <include name="axis_1_2_1-wsdl4j-1.5.1.jar"/>
-        <include name="jakarta-oro-2_0_8_orbeon.jar"/>
 
         <include name="msv-20081113_orbeon_20081209.jar"/>
         <include name="msv-isorelax-20070407.jar"/>

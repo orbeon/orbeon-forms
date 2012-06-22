@@ -15,21 +15,13 @@ package org.orbeon.oxf.util;
 
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.hssf.util.Region;
-import org.orbeon.oro.text.regex.*;
-import org.orbeon.oxf.common.OXFException;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class XLSUtils {
 
-    private static Pattern FORMAT_XPATH;
-
-    static {
-        try {
-            Perl5Compiler compiler = new Perl5Compiler();
-            FORMAT_XPATH = compiler.compile("\"([^\"]+)\"$");
-        } catch (MalformedPatternException e) {
-            throw new OXFException(e);
-        }
-    }
+    private static Pattern FORMAT_XPATH = Pattern.compile("\"([^\"]+)\"$");
 
     public interface Handler {
         public void cell(HSSFCell cell, String sourceXPath, String targetXPath);
@@ -51,7 +43,6 @@ public class XLSUtils {
     }
 
     private static void walk(boolean[][] merged, HSSFDataFormat dataFormat, HSSFRow row, Handler handler) {
-        final PatternMatcher matcher = new Perl5Matcher();
         if (row != null) {
             for (int cellNum = 0; cellNum <= row.getLastCellNum(); cellNum++) {
                 HSSFCell cell = row.getCell((short) cellNum);
@@ -59,9 +50,10 @@ public class XLSUtils {
                     short dataFormatId = cell.getCellStyle().getDataFormat();
                     if (dataFormatId > 0) {
                         String format = dataFormat.getFormat(dataFormatId);
-                        if (matcher.contains(format, FORMAT_XPATH)) {
+                        final Matcher matcher = FORMAT_XPATH.matcher(format);
+                        if (matcher.find()) {
                             // Found XPath expression
-                            String xpath = matcher.getMatch().group(1);
+                            String xpath = matcher.group(1);
                             int separtorPosition = xpath.indexOf('|');
                             String sourceXPath = separtorPosition == -1 ? xpath : xpath.substring(0, separtorPosition);
                             String targetXPath = separtorPosition == -1 ? null : xpath.substring(separtorPosition + 1);

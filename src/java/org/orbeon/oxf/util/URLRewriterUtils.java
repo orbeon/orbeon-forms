@@ -19,7 +19,7 @@ import org.orbeon.oxf.common.Version;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.PageFlowControllerProcessor;
-import org.orbeon.oxf.processor.Perl5MatchProcessor;
+import org.orbeon.oxf.processor.RegexpProcessor;
 import org.orbeon.oxf.properties.Properties;
 import org.orbeon.oxf.servlet.OrbeonXFormsFilter;
 
@@ -299,7 +299,7 @@ public class URLRewriterUtils {
     public static boolean isPlatformPath(String absolutePathNoContext) {
         final String regexp = Properties.instance().getPropertySet().getString(REWRITING_PLATFORM_PATHS_PROPERTY, null);
         // TODO: do not compile the regexp every time
-        return regexp != null && new Perl5MatchProcessor().match(regexp, absolutePathNoContext).matches;
+        return regexp != null && new RegexpProcessor().regexpMatch(regexp, absolutePathNoContext).matches();
     }
 
     /**
@@ -311,7 +311,7 @@ public class URLRewriterUtils {
     public static boolean isNonPlatformPathAppPath(String absolutePathNoContext) {
         final String regexp = Properties.instance().getPropertySet().getString(REWRITING_APP_PATHS_PROPERTY, null);
         // TODO: do not compile the regexp every time
-        return regexp != null && new Perl5MatchProcessor().match(regexp, absolutePathNoContext).matches;
+        return regexp != null && new RegexpProcessor().regexpMatch(regexp, absolutePathNoContext).matches();
     }
 
     /**
@@ -420,8 +420,8 @@ public class URLRewriterUtils {
     
     public static boolean isVersionedURL(String absolutePathNoContext, List<URLRewriterUtils.PathMatcher> pathMatchers) {
         for (final URLRewriterUtils.PathMatcher pathMatcher : pathMatchers) {
-            final Perl5MatchProcessor matcherProcessor = new Perl5MatchProcessor();
-            if (matcherProcessor.match(pathMatcher.regexp, absolutePathNoContext).matches)
+            final RegexpProcessor regexpProcessor = new RegexpProcessor();
+            if (regexpProcessor.regexpMatch(pathMatcher.regexp, absolutePathNoContext).matches())
                 return true;
         }
         
@@ -457,7 +457,7 @@ public class URLRewriterUtils {
      * See the License for the specific language governing permissions and
      * limitations under the License.
      */
-    public static String globToPerl5(char[] pattern) {
+    public static String globToRegexp(char[] pattern) {
         int ch;
         StringBuffer buffer;
 

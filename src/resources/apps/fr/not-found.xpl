@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <!--
     Copyright (C) 2009 Orbeon, Inc.
 
@@ -13,15 +12,11 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
-        xmlns:xs="http://www.w3.org/2001/XMLSchema"
-        xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml"
-        xmlns:oxf="http://www.orbeon.com/oxf/processors"
-        xmlns:xi="http://www.w3.org/2001/XInclude"
-        xmlns:xxi="http://orbeon.org/oxf/xml/xinclude">
+          xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
     <p:param type="output" name="data"/>
 
+    <!-- Keep this as a pipeline so we can use oxf:unsafe-xslt -->
     <p:processor name="oxf:unsafe-xslt">
         <p:input name="config" href="not-found.xsl"/>
         <p:input name="data"><dummy/></p:input>

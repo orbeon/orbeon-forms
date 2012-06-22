@@ -17,7 +17,6 @@ import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.dom4j.Document;
 import org.dom4j.Element;
-import org.orbeon.oro.text.regex.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorInput;
@@ -34,10 +33,12 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class XLSSerializer extends HttpBinarySerializer {
 
-    private static Pattern FORMAT_XPATH;
+    private static Pattern FORMAT_XPATH = Pattern.compile("^(.*)\"([^\"]+)\"$");
 
     public static String DEFAULT_CONTENT_TYPE = "application/vnd.ms-excel";
     public static final String TO_XLS_CONVERTER_CONFIG_NAMESPACE_URI = "http://www.orbeon.com/oxf/converter/to-xls";
@@ -50,22 +51,12 @@ public class XLSSerializer extends HttpBinarySerializer {
         return TO_XLS_CONVERTER_CONFIG_NAMESPACE_URI;
     }
 
-    static {
-        try {
-            Perl5Compiler compiler = new Perl5Compiler();
-            FORMAT_XPATH = compiler.compile("^(.*)\"([^\"]+)\"$");
-        } catch (MalformedPatternException e) {
-            throw new OXFException(e);
-        }
-    }
-
     public XLSSerializer() {
         addInputInfo(new ProcessorInputOutputInfo(INPUT_DATA));
     }
 
     protected void readInput(final PipelineContext pipelineContext, ProcessorInput input, Config config, OutputStream outputStream) {
         try {
-            final PatternMatcher matcher = new Perl5Matcher();
             Document dataDocument = readInputAsDOM4J(pipelineContext, INPUT_DATA);
             final DocumentWrapper wrapper = new DocumentWrapper(dataDocument, null, XPathCache.getGlobalConfiguration());
 
@@ -129,9 +120,10 @@ public class XLSSerializer extends HttpBinarySerializer {
                             HSSFCell cell = newRow.getCell(m);
                             if (cell != null) {
                                 String currentFormat = dataFormat.getFormat(cell.getCellStyle().getDataFormat());
-                                if (matcher.contains(currentFormat, FORMAT_XPATH)) {
-                                    String newFormat = matcher.getMatch().group(1) + "\""
-                                            + forEach + "[" + (k - rowNum + 1) + "]/" + matcher.getMatch().group(2) + "\"";
+                                final Matcher matcher = FORMAT_XPATH.matcher(currentFormat);
+                                if (matcher.find()) {
+                                    String newFormat = matcher.group(1) + "\""
+                                            + forEach + "[" + (k - rowNum + 1) + "]/" + matcher.group(2) + "\"";
                                     cell.getCellStyle().setDataFormat(dataFormat.getFormat(newFormat));
                                 }
                             }

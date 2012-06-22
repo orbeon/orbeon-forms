@@ -16,8 +16,6 @@ package org.orbeon.oxf.processor.pipeline;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.Node;
-import org.orbeon.oro.text.regex.*;
-import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorImpl;
@@ -30,6 +28,8 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class PipelineReader extends ProcessorImpl {
 
@@ -49,25 +49,20 @@ public class PipelineReader extends ProcessorImpl {
         PREFIXES.put("p", PipelineProcessor.PIPELINE_NAMESPACE_URI);
 
         // Used for regexp pattern initialization
-        Perl5Compiler compiler = new Perl5Compiler();
         String SEPARATOR_REGEXP = "[ \\t]*";
         String IDENTIFIER_REGEXP = "[_A-Za-z][_A-Za-z\\-0-9.]*";
 
         // Initialize regexp patterns
-        try {
-            IDENTIFIER = compiler.compile("^" + IDENTIFIER_REGEXP + "$");
-            END = compiler.compile("^" + SEPARATOR_REGEXP + "$");
-            ID_REFERENCE = compiler.compile("^" + SEPARATOR_REGEXP + "#(" + IDENTIFIER_REGEXP + ")");
-            FUNCTION_CALL = compiler.compile("^" + SEPARATOR_REGEXP + "(" + IDENTIFIER_REGEXP + ")" + SEPARATOR_REGEXP + "\\(");
-            ROOT_ELEMENT_WITHOUT_NS = compiler.compile("^" + SEPARATOR_REGEXP + "'(" + IDENTIFIER_REGEXP + ")'");
-            ROOT_ELEMENT_WITH_NS = compiler.compile("^" + SEPARATOR_REGEXP + "'(" + IDENTIFIER_REGEXP + ":" + IDENTIFIER_REGEXP + ")'");
-            FUNCTION_END = compiler.compile("^" + SEPARATOR_REGEXP + "\\)");
-            FUNCTION_PARAMETER = compiler.compile("^" + SEPARATOR_REGEXP + ",");
-            URL = compiler.compile("^" + SEPARATOR_REGEXP + "([^ \\t,\\)#]+)");
-            XPOINTER = compiler.compile("^#xpointer\\(");
-        } catch (MalformedPatternException e) {
-            throw new OXFException(e);
-        }
+        IDENTIFIER = Pattern.compile("^" + IDENTIFIER_REGEXP + "$");
+        END = Pattern.compile("^" + SEPARATOR_REGEXP + "$");
+        ID_REFERENCE = Pattern.compile("^" + SEPARATOR_REGEXP + "#(" + IDENTIFIER_REGEXP + ")");
+        FUNCTION_CALL = Pattern.compile("^" + SEPARATOR_REGEXP + "(" + IDENTIFIER_REGEXP + ")" + SEPARATOR_REGEXP + "\\(");
+        ROOT_ELEMENT_WITHOUT_NS = Pattern.compile("^" + SEPARATOR_REGEXP + "'(" + IDENTIFIER_REGEXP + ")'");
+        ROOT_ELEMENT_WITH_NS = Pattern.compile("^" + SEPARATOR_REGEXP + "'(" + IDENTIFIER_REGEXP + ":" + IDENTIFIER_REGEXP + ")'");
+        FUNCTION_END = Pattern.compile("^" + SEPARATOR_REGEXP + "\\)");
+        FUNCTION_PARAMETER = Pattern.compile("^" + SEPARATOR_REGEXP + ",");
+        URL = Pattern.compile("^" + SEPARATOR_REGEXP + "([^ \\t,\\)#]+)");
+        XPOINTER = Pattern.compile("^#xpointer\\(");
     }
 
     private ASTPipeline pipeline; // TODO Bug no instance variables
@@ -116,7 +111,6 @@ public class PipelineReader extends ProcessorImpl {
     private static List<ASTStatement> readStatements(Element containerElement) {
 
         List<ASTStatement> result = new ArrayList<ASTStatement>();
-        PatternMatcher matcher = new Perl5Matcher();
         for (Iterator i = containerElement.elementIterator(); i.hasNext();) {
             final Element element = (Element) i.next();
             if (element.getName().equals("processor")) {
@@ -157,7 +151,7 @@ public class PipelineReader extends ProcessorImpl {
                                 processorCall.addOutput(output);
                                 String id = inputOutputElement.attributeValue("id");
                                 if (id != null) {
-                                    if (! matcher.contains(id, IDENTIFIER))
+                                    if (! IDENTIFIER.matcher(id).find())
                                         throw new ValidationException("Invalid identifier '" + id
                                                 + "' in 'id' attribute",
                                                 (LocationData) (inputOutputElement).getData());
@@ -165,7 +159,7 @@ public class PipelineReader extends ProcessorImpl {
                                 }
                                 String ref = inputOutputElement.attributeValue("ref");
                                 if (ref != null) {
-                                    if (! matcher.contains(ref, IDENTIFIER))
+                                    if (! IDENTIFIER.matcher(ref).find())
                                         throw new ValidationException("Invalid identifier '" + ref
                                                 + "' in 'id' attribute",
                                                 (LocationData) (inputOutputElement).getData());
@@ -227,8 +221,7 @@ public class PipelineReader extends ProcessorImpl {
         HrefResult result = readHrefWorker(locationData, href);
 
         // Make sure that everything was consumed
-        PatternMatcher matcher = new Perl5Matcher();
-        if (! matcher.contains(result.rest, END))
+        if (! END.matcher(result.rest).find())
             throw new ValidationException("Can't parse \"" + result.rest + "\" in href", locationData);
         return result.astHref;
     }
@@ -236,83 +229,103 @@ public class PipelineReader extends ProcessorImpl {
     private static HrefResult readHrefWorker(LocationData locationData, String href) {
 
         HrefResult result = new HrefResult();
-        PatternMatcher matcher = new Perl5Matcher();
+        Matcher matcher = null;
 
         if (href == null) {
             // href="..." is not always mandatory
-        } else if (matcher.contains(href, ID_REFERENCE)) {
-            // Reference to an id
-            String id = matcher.getMatch().group(1);
-            ASTHrefId hrefId = new ASTHrefId();
-            hrefId.setId(id);
-            result.astHref = hrefId;
-            result.rest = href.substring(matcher.getMatch().endOffset(0));
-        } else if (matcher.contains(href, FUNCTION_CALL)) {
-            // Try to parse this as a "function call"
+        } else {
+            matcher = ID_REFERENCE.matcher(href);
+            if (matcher.find()) {
+                // Reference to an id
+                String id = matcher.group(1);
+                ASTHrefId hrefId = new ASTHrefId();
+                hrefId.setId(id);
+                result.astHref = hrefId;
+                result.rest = href.substring(matcher.end(0));
+            } else {
+                matcher = FUNCTION_CALL.matcher(href);
+                if (matcher.find()) {
+                    // Try to parse this as a "function call"
 
-            // Parse function name ("aggregate")
-            String functionName = matcher.getMatch().group(1);
-            if ("aggregate".equals(functionName)) {
-                href = href.substring(matcher.getMatch().endOffset(0));
+                    // Parse function name ("aggregate")
+                    final String functionName = matcher.group(1);
+                    if ("aggregate".equals(functionName)) {
+                        href = href.substring(matcher.end(0));
 
-                // Parse first argument (root element)
-                if (!matcher.contains(href, ROOT_ELEMENT_WITHOUT_NS))
-                    if (!matcher.contains(href, ROOT_ELEMENT_WITH_NS))
-                        throw new ValidationException("Invalid element name in \"" + href + "\"", locationData);
-                String rootElementName = matcher.getMatch().group(1);
-                href = href.substring(matcher.getMatch().endOffset(0));
+                        // Parse first argument (root element)
 
-                // Parse parameters
-                List<ASTHref> hrefParameters = new ArrayList<ASTHref>();
-                while (true) {
-                    if (matcher.contains(href, FUNCTION_END)) {
-                        // We are at the end of the function call
-                        ASTHrefAggregate hrefAggregate = new ASTHrefAggregate();
-                        hrefAggregate.setRoot(rootElementName);
-                        hrefAggregate.setHrefs(hrefParameters);
-                        result.rest = href.substring(matcher.getMatch().endOffset(0));
-                        result.astHref = hrefAggregate;
-                        break;
-                    } else if (matcher.contains(href, FUNCTION_PARAMETER)) {
-                        // We've got an other parameter
-                        href = href.substring(matcher.getMatch().endOffset(0));
-                        HrefResult parameterResult = readHrefWorker(locationData, href);
-                        hrefParameters.add(parameterResult.astHref);
-                        href = parameterResult.rest;
+                        matcher = ROOT_ELEMENT_WITHOUT_NS.matcher(href);
+                        if (!matcher.find()) {
+                            matcher = ROOT_ELEMENT_WITH_NS.matcher(href);
+                            if (!matcher.find())
+                                throw new ValidationException("Invalid element name in \"" + href + "\"", locationData);
+                        }
+
+                        final String rootElementName = matcher.group(1);
+                        href = href.substring(matcher.end(0));
+
+                        // Parse parameters
+                        List<ASTHref> hrefParameters = new ArrayList<ASTHref>();
+                        while (true) {
+                            matcher = FUNCTION_END.matcher(href);
+                            if (matcher.find()) {
+                                // We are at the end of the function call
+                                ASTHrefAggregate hrefAggregate = new ASTHrefAggregate();
+                                hrefAggregate.setRoot(rootElementName);
+                                hrefAggregate.setHrefs(hrefParameters);
+                                result.rest = href.substring(matcher.end(0));
+                                result.astHref = hrefAggregate;
+                                break;
+                            } else {
+                                matcher = FUNCTION_PARAMETER.matcher(href);
+                                if (matcher.find()) {
+                                    // We've got an other parameter
+                                    href = href.substring(matcher.end(0));
+                                    HrefResult parameterResult = readHrefWorker(locationData, href);
+                                    hrefParameters.add(parameterResult.astHref);
+                                    href = parameterResult.rest;
+                                } else {
+                                    throw new ValidationException("Can't find \")\" or other href parameter in \""
+                                        + href + "\"", locationData);
+                                }
+                            }
+                        }
+                    } else if ("current".equals(functionName)) {
+                        href = href.substring(matcher.end(0));
+                        matcher = FUNCTION_END.matcher(href);
+                        if (!matcher.find())
+                            throw new ValidationException("Expected ')' in current() function call", locationData);
+                        ASTHrefId hrefId = new ASTHrefId();
+                        hrefId.setId(AbstractForEachProcessor.FOR_EACH_CURRENT_INPUT);
+                        result.astHref = hrefId;
+                        result.rest = href.substring(matcher.end(0));
                     } else {
-                        throw new ValidationException("Can't find \")\" or other href parameter in \""
-                            + href + "\"", locationData);
+                        throw new ValidationException("Unsupported function \"" + functionName + "\"", locationData);
+                    }
+                } else {
+                    matcher = URL.matcher(href);
+                    if (matcher.find()) {
+                        // URL
+                        ASTHrefURL hrefURL = new ASTHrefURL();
+                        hrefURL.setURL(matcher.group(1));
+                        result.astHref = hrefURL;
+                        result.rest = href.substring(matcher.end(0));
+                    } else {
+                        throw new ValidationException("Can't find id, URL or function call in \"" +
+                                href + "\"", locationData);
                     }
                 }
-            } else if ("current".equals(functionName)) {
-                href = href.substring(matcher.getMatch().endOffset(0));
-                if (!matcher.contains(href, FUNCTION_END))
-                    throw new ValidationException("Expected ')' in current() function call", locationData);
-                ASTHrefId hrefId = new ASTHrefId();
-                hrefId.setId(AbstractForEachProcessor.FOR_EACH_CURRENT_INPUT);
-                result.astHref = hrefId;
-                result.rest = href.substring(matcher.getMatch().endOffset(0));
-            } else {
-                throw new ValidationException("Unsupported function \"" + functionName + "\"", locationData);
             }
-        } else if (matcher.contains(href, URL)) {
-            // URL
-            ASTHrefURL hrefURL = new ASTHrefURL();
-            hrefURL.setURL(matcher.getMatch().group(1));
-            result.astHref = hrefURL;
-            result.rest = href.substring(matcher.getMatch().endOffset(0));
-        } else {
-            throw new ValidationException("Can't find id, URL or function call in \"" +
-                    href + "\"", locationData);
         }
 
         // Handle optional XPointer expression
-        if (matcher.contains(result.rest, XPOINTER)) {
+        matcher = XPOINTER.matcher(result.rest);
+        if (matcher.find()) {
             int parenthesisDepth = 0;
             boolean inString = false;
             char quoteType = 0;
 
-            String rest = result.rest.substring(matcher.getMatch().endOffset(0));
+            String rest = result.rest.substring(matcher.end(0));
             StringBuilder xpath = new StringBuilder();
 
             while(true) {

@@ -106,17 +106,6 @@
 .fr-summary-search p {
   margin-bottom: 0;
 }
-.fr-summary-search .fr-search-options-div {
-  float: left;
-  border: 1px solid #99C;
-  padding: .5em 1em 1em 1em;
-  background: #f8f8f8 url(logo-bg.gif) repeat-x scroll center top;
-  -moz-box-sizing: border-box;
-  -webkit-box-sizing: border-box;
-  box-sizing: border-box;
-  width: 100%;
-  *width: auto;
-}
 .fr-summary-search .fr-search-options-title {
   font-weight: bold;
   padding: .2em 0 1em 0;

@@ -39,207 +39,207 @@
         <xsl:for-each select="$view">
             <!-- Just to set the context -->
 
-            <xforms:group id="fr-view" class="fr-view">
-                <xhtml:div
-                    id="{if ($width = '750px') then 'doc' else if ($width = '950px') then 'doc2' else if ($width = '1154px') then 'doc-fb' else if ($width = '100%') then 'doc3' else 'doc4'}"
-                    class="{if (fr:left) then 'yui-t2 ' else ''}{concat(' fr-mode-', $mode)}">
-                    <!-- Header -->
-                    <xhtml:div class="fr-header">
-                        <xsl:if test="not($mode = ('email')) and not($hide-header)">
-                            <xsl:choose>
-                                <xsl:when test="fr:header">
-                                    <!-- Custom header -->
-                                    <xforms:group model="fr-form-model" context="instance('fr-form-instance')">
-                                        <xsl:apply-templates select="fr:header/node()"/>
-                                    </xforms:group>
-                                </xsl:when>
-                                <xsl:when test="$mode = 'view'">
-                                    <!-- View header -->
-                                    <xsl:variable name="default-objects" as="element()+">
-                                        <fr:logo/>
-                                    </xsl:variable>
-
-                                    <xsl:apply-templates select="$default-objects"/>
-                                </xsl:when>
-                                <xsl:otherwise>
-                                    <!-- Standard header -->
-                                    <xsl:variable name="default-objects" as="element()+">
-                                        <fr:logo/>
-                                        <fr:language-selector/>
-                                        <fr:noscript-selector/>
-                                        <fr:form-builder-doc/>
-                                        <fr:goto-content/>
-                                    </xsl:variable>
-
-                                    <xsl:apply-templates select="$default-objects"/>
-                                </xsl:otherwise>
-                            </xsl:choose>
-                        </xsl:if>
-                    </xhtml:div>
-                    <xhtml:div id="bd" class="fr-container">
-                        <xhtml:div id="yui-main">
-                            <xhtml:div class="yui-b">
-                                <!-- Top -->
-                                <xhtml:div class="yui-g fr-top">
-                                    <xsl:choose>
-                                        <xsl:when test="fr:top">
-                                            <!-- Custom top -->
-                                            <xsl:apply-templates select="fr:top/node()"/>
-                                        </xsl:when>
-                                        <xsl:when test="not($hide-top)">
-                                            <!-- Standard top -->
-
-                                            <xsl:variable name="default-objects" as="element()+">
-                                                <fr:title/>
-                                                <fr:description/>
-                                            </xsl:variable>
-
-                                            <xsl:apply-templates select="$default-objects"/>
-
-                                        </xsl:when>
-                                    </xsl:choose>
-                                </xhtml:div>
-                                <xhtml:div class="yui-g fr-separator">&#160;</xhtml:div>
-                                <!-- Body -->
-                                <xhtml:div class="yui-g fr-body">
-
-                                    <!-- Optional message (mostly for view mode) -->
-                                    <xsl:if test="$is-show-explanation and $mode = ('view')">
-                                        <xsl:call-template name="fr-explanation"/>
-                                    </xsl:if>
-
-                                    <!-- Table of contents -->
-                                    <xsl:call-template name="fr-toc"/>
-
-                                    <!-- Error summary (if at top) -->
-                                    <xsl:if test="$error-summary-top">
-                                        <xsl:call-template name="fr-error-summary">
-                                            <xsl:with-param name="position" select="'top'"/>
-                                        </xsl:call-template>
-                                    </xsl:if>
-
-                                    <!-- Form content. Set context on form instance and define this group as #fr-form-group as observers will refer to it. -->
-                                    <xforms:group id="fr-form-group" model="fr-form-model" ref="instance('fr-form-instance')">
-                                        <!-- Anchor for navigation -->
-                                        <xhtml:a name="fr-form"/>
-                                        <!-- Main form content -->
-                                        <xsl:apply-templates select="$body/node()">
-                                            <!-- Dialogs are handled later -->
-                                            <xsl:with-param name="include-dialogs" select="false()" tunnel="yes" as="xs:boolean"/>
-                                        </xsl:apply-templates>
-                                        <!-- Captcha -->
-                                        <xforms:group appearance="xxforms:internal"  model="fr-persistence-model">
-                                            <xxforms:variable name="captcha" model="fr-persistence-model" select="instance('fr-persistence-instance')/captcha"/>
-                                            <xxforms:variable name="mode" select="xxforms:instance('fr-parameters-instance')/mode"/>
-                                            <xsl:if test="$has-captcha">
-                                                <xforms:group ref=".[$mode = ('new', 'edit') and not(property('xxforms:noscript')) and $captcha = 'false']" class="fr-captcha">
-                                                    <!-- Captcha component: either reCAPTCHA or SimpleCaptcha -->
-                                                    <xforms:group appearance="xxforms:internal">
-                                                        <!-- Success: remember the captcha passed, which also influences validity -->
-                                                        <xforms:action ev:event="fr-verify-done">
-                                                            <xforms:setvalue ref="$captcha">true</xforms:setvalue>
-                                                            <xforms:revalidate model="fr-persistence-model"/>
-                                                            <xforms:refresh/>
-                                                        </xforms:action>
-                                                        <!-- Failure: load another challenge (supported by reCAPTCHA; SimpleCaptcha won't do anything) -->
-                                                        <xforms:dispatch ev:event="fr-verify-error" if="event('fr-error-code') != 'empty'" target="captcha" name="fr-reload"/>
-                                                        <xsl:if test="$captcha = 'reCAPTCHA'">
-                                                            <fr:recaptcha id="captcha" theme="clean"/>
-                                                        </xsl:if>
-                                                        <xsl:if test="$captcha = 'SimpleCaptcha'">
-                                                            <fr:simple-captcha id="captcha"/>
-                                                        </xsl:if>
-                                                    </xforms:group>
-                                                    <!-- Non-visible output bound to captcha node to influence form validity -->
-                                                    <xhtml:span style="display: none">
-                                                        <xforms:output ref="$captcha">
-                                                            <!-- Focus from error summary proxies to captcha -->
-                                                            <xforms:setfocus ev:event="xforms-focus" control="captcha"/>
-                                                            <xforms:label ref="$fr-resources/detail/labels/captcha-label"/>
-                                                            <xforms:alert ref="$fr-resources/detail/labels/captcha-help"/>
-                                                        </xforms:output>
-                                                    </xhtml:span>
-                                                </xforms:group>
-                                            </xsl:if>
+            <xforms:group id="fr-view" class="fr-view{concat(' fr-mode-', $mode)}">
+                <xhtml:div class="fr-header navbar navbar-fixed-top">
+                    <xhtml:div class="navbar-inner">
+                        <xhtml:div class="container">
+                            <xsl:if test="not($mode = ('email')) and not($hide-header)">
+                                <xsl:choose>
+                                    <xsl:when test="fr:header">
+                                        <!-- Custom header -->
+                                        <xforms:group model="fr-form-model" context="instance('fr-form-instance')">
+                                            <xsl:apply-templates select="fr:header/node()"/>
                                         </xforms:group>
-                                    </xforms:group>
+                                    </xsl:when>
+                                    <xsl:when test="$mode = 'view'">
+                                        <!-- View header -->
+                                        <xsl:variable name="default-objects" as="element()+">
+                                            <fr:logo/>
+                                            <fr:title/>
+                                        </xsl:variable>
 
-                                    <!-- Error summary (if at bottom) -->
-                                    <!-- If we configuration tells us the bottom error summary should not be shown, still include it but hide it with 'display: none'.
-                                         This is necessary because the persistence model relies on the error summary to know if the data is valid. -->
-                                    <xhtml:div>
-                                        <xsl:if test="not($error-summary-bottom)">
-                                            <xsl:attribute name="style">display: none</xsl:attribute>
-                                        </xsl:if>
-                                        <xsl:call-template name="fr-error-summary">
-                                            <xsl:with-param name="position" select="'bottom'"/>
-                                        </xsl:call-template>
-                                    </xhtml:div>
-                                </xhtml:div>
-                                <!-- Noscript help section (shown only in edit mode) -->
-                                <xsl:if test="$is-noscript and $mode = ('edit', 'new')">
-                                    <!-- Only display this section if there is at least one non-empty nested help text -->
-                                    <xforms:group
-                                        ref=".[normalize-space(string-join(({string-join(($body//(fr:section | xforms:*)[@id]/xforms:help/@ref), ',')}), ''))]">
-                                        <xhtml:div class="yui-g fr-separator">&#160;</xhtml:div>
-                                        <xhtml:div class="xforms-help-panel">
-                                            <xhtml:h2>
-                                                <xforms:output value="$fr-resources/summary/titles/help"/>
-                                            </xhtml:h2>
-                                            <xhtml:ul>
-                                                <xsl:apply-templates select="$body/*" mode="noscript-help"/>
-                                            </xhtml:ul>
-                                        </xhtml:div>
-                                    </xforms:group>
+                                        <xsl:apply-templates select="$default-objects"/>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <!-- Standard header -->
+                                        <xsl:variable name="default-objects" as="element()+">
+                                            <fr:logo/>
+                                            <fr:title/>
+                                            <fr:language-selector/>
+                                            <fr:noscript-selector/>
+                                            <fr:form-builder-doc/>
+                                            <fr:goto-content/>
+                                        </xsl:variable>
+
+                                        <xsl:apply-templates select="$default-objects"/>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </xsl:if>
+                        </xhtml:div>
+                    </xhtml:div>
+                </xhtml:div>
+                <xhtml:div id="{if ($width = '750px') then 'doc' else if ($width = '950px') then 'doc2' else if ($width = '1154px') then 'doc-fb' else if ($width = '100%') then 'doc3' else 'doc4'}"
+                           class="fr-container{if (fr:left) then ' yui-t2 ' else ''}">
+                    <xhtml:div id="yui-main">
+                        <xhtml:div class="yui-b">
+                            <!-- Top -->
+                            <xhtml:div class="yui-g fr-top">
+                                <xsl:choose>
+                                    <xsl:when test="fr:top">
+                                        <!-- Custom top -->
+                                        <xsl:apply-templates select="fr:top/node()"/>
+                                    </xsl:when>
+                                    <xsl:when test="not($hide-top)">
+                                        <!-- Standard top -->
+
+                                        <xsl:variable name="default-objects" as="element()+">
+                                            <fr:description/>
+                                        </xsl:variable>
+
+                                        <xsl:apply-templates select="$default-objects"/>
+
+                                    </xsl:when>
+                                </xsl:choose>
+                            </xhtml:div>
+                            <!-- Body -->
+                            <xhtml:div class="yui-g fr-body">
+
+                                <!-- Optional message (mostly for view mode) -->
+                                <xsl:if test="$is-show-explanation and $mode = ('view')">
+                                    <xsl:call-template name="fr-explanation"/>
                                 </xsl:if>
-                                <!-- Buttons and status section -->
-                                <xhtml:div class="yui-g fr-separator">&#160;</xhtml:div>
-                                <xhtml:div class="yui-g fr-bottom">
-                                    <xsl:choose>
-                                        <xsl:when test="fr:bottom">
-                                            <!-- Custom bottom -->
-                                            <xforms:group model="fr-form-model" context="instance('fr-form-instance')">
-                                                <xsl:apply-templates select="fr:bottom/node()"/>
+
+                                <!-- Table of contents -->
+                                <xsl:call-template name="fr-toc"/>
+
+                                <!-- Error summary (if at top) -->
+                                <xsl:if test="$error-summary-top">
+                                    <xsl:call-template name="fr-error-summary">
+                                        <xsl:with-param name="position" select="'top'"/>
+                                    </xsl:call-template>
+                                </xsl:if>
+
+                                <!-- Form content. Set context on form instance and define this group as #fr-form-group as observers will refer to it. -->
+                                <xforms:group id="fr-form-group" model="fr-form-model" ref="instance('fr-form-instance')">
+                                    <!-- Anchor for navigation -->
+                                    <xhtml:a name="fr-form"/>
+                                    <!-- Main form content -->
+                                    <xsl:apply-templates select="$body/node()">
+                                        <!-- Dialogs are handled later -->
+                                        <xsl:with-param name="include-dialogs" select="false()" tunnel="yes" as="xs:boolean"/>
+                                    </xsl:apply-templates>
+                                    <!-- Captcha -->
+                                    <xforms:group appearance="xxforms:internal"  model="fr-persistence-model">
+                                        <xxforms:variable name="captcha" model="fr-persistence-model" select="instance('fr-persistence-instance')/captcha"/>
+                                        <xxforms:variable name="mode" select="xxforms:instance('fr-parameters-instance')/mode"/>
+                                        <xsl:if test="$has-captcha">
+                                            <xforms:group ref=".[$mode = ('new', 'edit') and not(property('xxforms:noscript')) and $captcha = 'false']" class="fr-captcha">
+                                                <!-- Captcha component: either reCAPTCHA or SimpleCaptcha -->
+                                                <xforms:group appearance="xxforms:internal">
+                                                    <!-- Success: remember the captcha passed, which also influences validity -->
+                                                    <xforms:action ev:event="fr-verify-done">
+                                                        <xforms:setvalue ref="$captcha">true</xforms:setvalue>
+                                                        <xforms:revalidate model="fr-persistence-model"/>
+                                                        <xforms:refresh/>
+                                                    </xforms:action>
+                                                    <!-- Failure: load another challenge (supported by reCAPTCHA; SimpleCaptcha won't do anything) -->
+                                                    <xforms:dispatch ev:event="fr-verify-error" if="event('fr-error-code') != 'empty'" target="captcha" name="fr-reload"/>
+                                                    <xsl:if test="$captcha = 'reCAPTCHA'">
+                                                        <fr:recaptcha id="captcha" theme="clean"/>
+                                                    </xsl:if>
+                                                    <xsl:if test="$captcha = 'SimpleCaptcha'">
+                                                        <fr:simple-captcha id="captcha"/>
+                                                    </xsl:if>
+                                                </xforms:group>
+                                                <!-- Non-visible output bound to captcha node to influence form validity -->
+                                                <xhtml:span style="display: none">
+                                                    <xforms:output ref="$captcha">
+                                                        <!-- Focus from error summary proxies to captcha -->
+                                                        <xforms:setfocus ev:event="xforms-focus" control="captcha"/>
+                                                        <xforms:label ref="$fr-resources/detail/labels/captcha-label"/>
+                                                        <xforms:alert ref="$fr-resources/detail/labels/captcha-help"/>
+                                                    </xforms:output>
+                                                </xhtml:span>
                                             </xforms:group>
-                                        </xsl:when>
-                                        <xsl:otherwise>
-                                            <!-- Standard bottom -->
-                                            <!-- NOTE: Call instead of apply so that current context is kept -->
-                                            <xsl:call-template name="fr:messages"/>
-                                            <xsl:call-template name="fr:status-icons"/>
-                                            <xsl:if test="not($hide-buttons-bar)">
-                                                <xsl:call-template name="fr:buttons-bar"/>
-                                            </xsl:if>
-                                        </xsl:otherwise>
-                                    </xsl:choose>
+                                        </xsl:if>
+                                    </xforms:group>
+                                </xforms:group>
+
+                                <!-- Error summary (if at bottom) -->
+                                <!-- If we configuration tells us the bottom error summary should not be shown, still include it but hide it with 'display: none'.
+                                     This is necessary because the persistence model relies on the error summary to know if the data is valid. -->
+                                <xhtml:div>
+                                    <xsl:if test="not($error-summary-bottom)">
+                                        <xsl:attribute name="style">display: none</xsl:attribute>
+                                    </xsl:if>
+                                    <xsl:call-template name="fr-error-summary">
+                                        <xsl:with-param name="position" select="'bottom'"/>
+                                    </xsl:call-template>
                                 </xhtml:div>
+                            </xhtml:div>
+                            <!-- Noscript help section (shown only in edit mode) -->
+                            <xsl:if test="$is-noscript and $mode = ('edit', 'new')">
+                                <!-- Only display this section if there is at least one non-empty nested help text -->
+                                <xforms:group
+                                    ref=".[normalize-space(string-join(({string-join(($body//(fr:section | xforms:*)[@id]/xforms:help/@ref), ',')}), ''))]">
+                                    <xhtml:div class="yui-g fr-separator">&#160;</xhtml:div>
+                                    <xhtml:div class="xforms-help-panel">
+                                        <xhtml:h2>
+                                            <xforms:output value="$fr-resources/summary/titles/help"/>
+                                        </xhtml:h2>
+                                        <xhtml:ul>
+                                            <xsl:apply-templates select="$body/*" mode="noscript-help"/>
+                                        </xhtml:ul>
+                                    </xhtml:div>
+                                </xforms:group>
+                            </xsl:if>
+                            <!-- Buttons and status section -->
+                            <xhtml:div class="yui-g fr-separator">&#160;</xhtml:div>
+                            <xhtml:div class="yui-g fr-bottom">
+                                <xsl:choose>
+                                    <xsl:when test="fr:bottom">
+                                        <!-- Custom bottom -->
+                                        <xforms:group model="fr-form-model" context="instance('fr-form-instance')">
+                                            <xsl:apply-templates select="fr:bottom/node()"/>
+                                        </xforms:group>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <!-- Standard bottom -->
+                                        <!-- NOTE: Call instead of apply so that current context is kept -->
+                                        <xsl:call-template name="fr:messages"/>
+                                        <xsl:call-template name="fr:status-icons"/>
+                                        <xsl:if test="not($hide-buttons-bar)">
+                                            <xsl:call-template name="fr:buttons-bar"/>
+                                        </xsl:if>
+                                    </xsl:otherwise>
+                                </xsl:choose>
                             </xhtml:div>
                         </xhtml:div>
-                        <!-- Optional left bar -->
-                        <xsl:if test="fr:left">
-                            <xhtml:div class="yui-b">
-                                <xhtml:div class="fr-left">
-                                    <xsl:apply-templates select="fr:left/node()"/>
-                                </xhtml:div>
+                    </xhtml:div>
+                    <!-- Optional left bar -->
+                    <xsl:if test="fr:left">
+                        <xhtml:div class="yui-b">
+                            <xhtml:div class="fr-left">
+                                <xsl:apply-templates select="fr:left/node()"/>
                             </xhtml:div>
-                        </xsl:if>
-                    </xhtml:div>
-                    <xhtml:div id="ft" class="fr-footer">
-                        <xsl:if test="not($hide-footer)">
-                            <xsl:choose>
-                                <xsl:when test="fr:footer">
-                                    <xsl:apply-templates select="fr:footer/node()"/>
-                                </xsl:when>
-                                <xsl:otherwise>
-                                    <xsl:variable name="default-objects" as="element()+">
-                                        <fr:version/>
-                                    </xsl:variable>
+                        </xhtml:div>
+                    </xsl:if>
+                </xhtml:div>
+                <xhtml:div class="fr-footer">
+                    <xsl:if test="not($hide-footer)">
+                        <xsl:choose>
+                            <xsl:when test="fr:footer">
+                                <xsl:apply-templates select="fr:footer/node()"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:variable name="default-objects" as="element()+">
+                                    <fr:version/>
+                                </xsl:variable>
 
-                                    <xsl:apply-templates select="$default-objects"/>
-                                </xsl:otherwise>
-                            </xsl:choose>
-                        </xsl:if>
-                    </xhtml:div>
+                                <xsl:apply-templates select="$default-objects"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:if>
                 </xhtml:div>
             </xforms:group>
 
@@ -363,7 +363,7 @@
 
     <xsl:template match="fr:noscript-selector">
         <!-- Switch script/noscript -->
-        <xsl:if test="$mode = 'edit' and not($has-noscript-link = false()) and not($is-form-builder) and $is-noscript-support">
+        <xsl:if test="$mode = ('edit', 'new') and not($has-noscript-link = false()) and not($is-form-builder) and $is-noscript-support">
             <xhtml:div class="fr-noscript-choice">
                 <xforms:group appearance="xxforms:internal">
                     <xforms:group ref=".[not(property('xxforms:noscript'))]">

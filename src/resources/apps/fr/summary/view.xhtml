@@ -548,34 +548,34 @@
                         <xforms:var name="show-last-modified" value="xxforms:property(string-join(('oxf.fr.summary.show-last-modified', $app, $form), '.'))"/>
 
                         <div class="fr-summary-table-div">
-                            <fr:datatable scrollable="horizontal" width="940px">
+                            <xhtml:table scrollable="horizontal" width="940px" class="table table-bordered table-condensed">
                                 <!-- scrollable="horizontal" width="940px" -->
-                                <thead>
-                                    <tr>
-                                        <th fr:sortable="false" class="fr-summary-repeat-selection-checkbox"/>
-                                        <th fr:sortable="false" class="fr-summary-repeat-column-number" fr:resizeable="true">
+                                <xhtml:thead>
+                                    <xhtml:tr>
+                                        <xhtml:th class="fr-summary-repeat-selection-checkbox"/>
+                                        <xhtml:th fr:sortable="false" class="fr-summary-repeat-column-number" fr:resizeable="true">
                                             <xforms:output value="$fr-resources/summary/titles/row-number"/>
-                                        </th>
+                                        </xhtml:th>
                                         <xforms:repeat ref="if ($show-created) then . else ()">
-                                            <th fr:sortable="false" fr:resizeable="true">
+                                            <xhtml:th fr:sortable="false" fr:resizeable="true">
                                                 <xforms:output value="$fr-resources/summary/titles/created"/>
-                                            </th>
+                                            </xhtml:th>
                                         </xforms:repeat>
                                         <xforms:repeat ref="if ($show-last-modified) then . else ()">
-                                            <th fr:sortable="false" fr:resizeable="true">
+                                            <xhtml:th fr:sortable="false" fr:resizeable="true">
                                                 <xforms:output value="$fr-resources/summary/titles/last-modified"/>
-                                            </th>
+                                            </xhtml:th>
                                         </xforms:repeat>
                                         <!-- Iterate through specially marked controls and derive resource id then resource -->
                                         <xforms:repeat ref="instance('fr-search-instance')/query[@summary-field = 'true']" id="fr-summary-repeat-column-number">
-                                            <th fr:sortable="false" fr:resizeable="true">
+                                            <xhtml:th fr:sortable="false" fr:resizeable="true">
                                                 <!-- Output showing as the header of the column -->
                                                 <xforms:output value="formRunner:summaryLanguage(@name, $form-resources, @inline-label)"/>
-                                            </th>
+                                            </xhtml:th>
                                         </xforms:repeat>
-                                    </tr>
-                                </thead>
-                                <tbody>
+                                    </xhtml:tr>
+                                </xhtml:thead>
+                                <xhtml:tbody>
                                     <xforms:repeat ref="document" id="documents-repeat">
                                         <!-- 1-based position in the current page -->
                                         <xforms:var name="position" value="position()" as="xs:integer"/>
@@ -588,16 +588,16 @@
                                         <xforms:var name="edit-view" value="if ($operations = ('*', 'update')) then 'edit' else if ($operations = 'read') then 'view' else ''"/>
                                         <xforms:var name="document-href" value="concat('/fr/', $app, '/', $form, '/', $edit-view, '/',
                                                 $document-name, if (property('xxforms:noscript')) then '?fr-noscript=true' else '')"/>
-                                        <tr class="{if (tokenize(instance('fr-selection-instance'), '\s+') = $document-name) then 'fr-summary-row-selected' else 'fr-summary-row-not-selected'}">
-                                            <td class="fr-summary-repeat-selection-checkbox">
+                                        <xhtml:tr class="{if (tokenize(instance('fr-selection-instance'), '\s+') = $document-name) then 'fr-summary-row-selected' else 'fr-summary-row-not-selected'}">
+                                            <xhtml:td class="fr-summary-repeat-selection-checkbox">
                                                 <xforms:select appearance="full" ref="instance('fr-selection-instance')" id="document-selection">
                                                     <xforms:item>
                                                         <xforms:label/>
                                                         <xforms:value value="$document-name"/>
                                                     </xforms:item>
                                                 </xforms:select>
-                                            </td>
-                                            <td class="fr-summary-repeat-column-number">
+                                            </xhtml:td>
+                                            <xhtml:td class="fr-summary-repeat-column-number">
                                                 <xforms:group ref=".[$edit-view != '']">
                                                     <xhtml:a href="{$document-href}" target="_blank">
                                                         <xforms:output value="$document-number"/>
@@ -606,10 +606,10 @@
                                                 <xforms:group ref=".[$edit-view = '']">
                                                     <xforms:output value="$document-number"/>
                                                 </xforms:group>
-                                            </td>
+                                            </xhtml:td>
                                             <xforms:repeat ref="if ($show-created) then @created else ()">
                                                 <xforms:var name="created" value="if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), $fr-resources/summary/formats/save-datetime, xxforms:instance('fr-language-instance'), (), ()) else ."/>
-                                                <td>
+                                                <xhtml:td>
                                                     <xforms:group ref=".[$edit-view != '']">
                                                         <xhtml:a href="{$document-href}" target="_blank">
                                                             <xforms:output value="$created"/>
@@ -618,11 +618,11 @@
                                                     <xforms:group ref=".[$edit-view = '']">
                                                         <xforms:output value="$created"/>
                                                     </xforms:group>
-                                                </td>
+                                                </xhtml:td>
                                             </xforms:repeat>
                                             <xforms:repeat ref="if ($show-last-modified) then @last-modified else ()">
                                                 <xforms:var name="last-modified" value="if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), $fr-resources/summary/formats/save-datetime, xxforms:instance('fr-language-instance'), (), ()) else ."/>
-                                                <td>
+                                                <xhtml:td>
                                                     <xforms:group ref=".[$edit-view != '']">
                                                         <xhtml:a href="{$document-href}" target="_blank">
                                                             <xforms:output value="$last-modified"/>
@@ -631,12 +631,12 @@
                                                     <xforms:group ref=".[$edit-view = '']">
                                                         <xforms:output value="$last-modified"/>
                                                     </xforms:group>
-                                                </td>
+                                                </xhtml:td>
                                             </xforms:repeat>
                                             <!-- One column for each detail -->
                                             <xforms:var name="positions" value="instance('fr-search-instance')/query[@name and @summary-field = 'true']/(count(preceding-sibling::query[@name]) + 1)"/>
                                             <xforms:repeat ref="details/detail[position() = $positions]" id="document-details-repeat">
-                                                <td>
+                                                <xhtml:td>
                                                     <!-- NOTE: Doing everything in a single big output XPath expression has the benefit of producing much less markup -->
                                                     <xforms:var name="detail" value="
                                                         for $detail-position in position() return
@@ -678,19 +678,19 @@
                                                     <xforms:group ref=".[$edit-view = '']">
                                                         <xforms:output value="$detail"/>
                                                     </xforms:group>
-                                                </td>
+                                                </xhtml:td>
                                             </xforms:repeat>
-                                        </tr>
+                                        </xhtml:tr>
                                     </xforms:repeat>
                                     <xforms:group ref=".[not(document)]">
-                                        <tr>
-                                            <td colspan="{4 + count(instance('fr-search-instance')/*[@summary-field = 'true'])}">
+                                        <xhtml:tr>
+                                            <xhtml:td colspan="{4 + count(instance('fr-search-instance')/*[@summary-field = 'true'])}">
                                                 <xforms:output id="fr-no-form-data" mediatype="text/html" value="saxon:serialize($fr-resources/summary/messages/no-form-found/node(), 'html')"/>
-                                            </td>
-                                        </tr>
+                                            </xhtml:td>
+                                        </xhtml:tr>
                                     </xforms:group>
-                                </tbody>
-                            </fr:datatable>
+                                </xhtml:tbody>
+                            </xhtml:table>
                         </div>
 
                         <div class="fr-paging-buttons">

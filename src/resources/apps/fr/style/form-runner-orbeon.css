@@ -3,14 +3,13 @@ body {
   background-color: #f3f3f3;
 }
 .fr-body {
-  border: 1px solid #DDD;
+  *border: 1px solid #DDD;
   -webkit-border-radius: 6px;
   -moz-border-radius: 6px;
   border-radius: 6px;
-  -webkit-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-  -moz-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-  margin-top: 40px;
+  -webkit-box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  -moz-box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   background-color: white;
 }
 .fr-header .container {
@@ -87,12 +86,10 @@ input {
   background-repeat: no-repeat;
   clear: both;
 }
-/* Clear is necessary because the previous block contains floated elements */
 .fr-footer {
   min-height: 10px;
 }
 /* help display background image */
-/* IE 6 HACK in all the lines below: don't use the PNG background image as it doesn't show properly */
 /*#doc .fr-footer { background-image: url(bottom-750.png); _background-image: none }*/
 /*#doc4 .fr-footer { background-image: url(bottom-974.png); _background-image: none }*/
 /*#doc-fb .fr-footer { background-image: url(bottom-974.png); _background-image: none }*/
@@ -151,7 +148,8 @@ input {
   -ms-border-radius: 2px /* radius appears differently w/ Safari 3.1 vs. Firefox 3.0b4*/
 ;
 }
-.xforms-hint {
+.xforms-hint,
+.fr-form-description {
   display: block;
   clear: both;
   font-size: smaller;
@@ -235,23 +233,7 @@ textarea.xforms-invalid-visited {
 }
 /* Metadata */
 .fr-top {
-  /*background: url("../../../ops/yui/assets/skins/sam/sprite.png") repeat-x scroll left -1400px;*/
-
-  /*background-color: #004B92;*/
-
-  padding: .5em;
-}
-.fr-separator {
-  /*background-color: #004B92;*/
-
-}
-.fr-top .fr-form-title,
-.fr-top .fr-form-description {
-  /*color: white;*/
-
-}
-.fr-top .fr-form-description {
-  font-size: 8pt;
+  padding: 1em .5em .5em .5em;
 }
 /* Table of contents */
 .fr-toc {

@@ -231,12 +231,13 @@
         <setvalue ref="/*/mode" matcher-group="3"/>
     </page>
 
-    <!-- "Not Found" page displayed when no page matches the request path -->
-    <page id="not-found" path-info="/not-found" view="/apps/fr/not-found.xpl"/>
+    <!-- ==== Epilogue and handlers ================================================================================ -->
 
-    <!-- ==== Standard epilogue ==================================================================================== -->
+    <page id="not-found" path-info="/not-found" view="/apps/fr/not-found.xpl"/>
+    <page id="error" path-info="/error" model="/config/error.xpl"/>
 
     <epilogue url="oxf:/config/epilogue.xpl"/>
     <not-found-handler page="not-found"/>
+    <error-handler page="error"/>
 
 </config>

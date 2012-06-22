@@ -13,12 +13,12 @@
  */
 package org.orbeon.oxf.pipeline;
 
-import org.orbeon.errorified.Exceptions;
-import org.orbeon.exception.*;
 import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.QName;
+import org.orbeon.errorified.Exceptions;
+import org.orbeon.exception.OrbeonFormatter;
 import org.orbeon.oxf.cache.ObjectCache;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
@@ -31,6 +31,7 @@ import org.orbeon.oxf.properties.Properties;
 import org.orbeon.oxf.resources.ResourceNotFoundException;
 import org.orbeon.oxf.util.AttributesToMap;
 import org.orbeon.oxf.util.PipelineUtils;
+import org.orbeon.oxf.webapp.HttpStatusCodeException;
 import org.orbeon.oxf.webapp.JWebAppContext;
 import org.orbeon.oxf.webapp.WebAppExternalContext;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
@@ -93,7 +94,7 @@ public class InitUtils {
             if (throwable instanceof HttpStatusCodeException) {
                 // Special exception used to set an error status code
                 // TODO: HttpStatusCodeException should support an optional message
-                externalContext.getResponse().sendError(((HttpStatusCodeException) throwable).code);
+                externalContext.getResponse().sendError(((HttpStatusCodeException) throwable).code());
                 final String message = locationData == null
                         ? "HttpStatusCodeException with no location data"
                         : "HttpStatusCodeException at " + locationData.toString();
@@ -420,14 +421,6 @@ public class InitUtils {
                     httpServletRequest.setAttribute(s, o);
                 }
             });
-        }
-    }
-
-    private static class HttpStatusCodeException extends RuntimeException {
-        public final int code;
-
-        public HttpStatusCodeException(int code) {
-            this.code = code;
         }
     }
 

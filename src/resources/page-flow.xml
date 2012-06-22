@@ -14,6 +14,8 @@
 <config xmlns="http://www.orbeon.com/oxf/controller"
         xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
+    <!-- ==== Files ================================================================================================ -->
+
     <!-- Files to serve directly (and exclude files under /[app]/service/) -->
     <files path-info="(?!/([^/]+)/service/).+\.(gif|css|pdf|json|js|png|jpg|xsd|htc|ico|swf|html|htm|txt)" matcher="oxf:perl5-matcher"/>
     <!-- Also exclude .xml files handled by Form Runner -->
@@ -21,6 +23,8 @@
     <!-- For the following we override the standard mediatype to help browsers -->
     <files path-info="(?!/([^/]+)/service/).+\.(java|xq)" matcher="oxf:perl5-matcher" mime-type="text/plain"/>
     <files path-info="(?!/([^/]+)/service/).+\.jar" matcher="oxf:perl5-matcher" mime-type="application/zip"/>
+
+    <!-- ==== Pages ================================================================================================ -->
 
     <!-- Redirect to the Home application -->
     <page id="root" path-info="/(welcome/?)?" matcher="oxf:perl5-matcher">
@@ -33,10 +37,14 @@
     <!-- Dispatch request to a specific application -->
     <page id="apps" path-info="/([^/]+)/.*" matcher="oxf:perl5-matcher" model="apps/${1}/page-flow.xml"/>
 
-    <!-- "Not Found" page displayed when no page matches the request path -->
+    <!-- ==== Epilogue and handlers ================================================================================ -->
+
     <page id="not-found" path-info="/not-found" view="/config/not-found.xhtml"/>
+    <page id="error" path-info="/error" model="/config/error.xpl"/>
 
     <epilogue url="/config/epilogue.xpl"/>
     <not-found-handler page="not-found"/>
+    <error-handler page="error"/>
+
     
 </config>

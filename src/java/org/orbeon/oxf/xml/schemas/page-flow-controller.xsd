@@ -75,7 +75,7 @@
                                     <selector xpath="c:result"/>
                                     <field xpath="@when"/>
                                 </unique>
-                                <!-- 2/26/2004 d: 'when' atrib of the        -->
+                                <!-- 2/26/2004 d: 'when' attrib of the        -->
                                 <!-- results in the sequence must be unique  -->
                                 <!-- across the result elements in the       -->
                                 <!-- sequence.                               -->
@@ -91,7 +91,7 @@
                         <selector xpath="c:action"/>
                         <field xpath="@when"/>
                     </unique>
-                    <!-- 2/26/2004 d: 'when' atrib of the actions in the     -->
+                    <!-- 2/26/2004 d: 'when' attrib of the actions in the     -->
                     <!-- in the sequence must be unique across the action    -->
                     <!-- elements in the sequence.                           -->
                 </element>
@@ -101,6 +101,11 @@
                     </complexType>
                 </element>
                 <element name="not-found-handler" minOccurs="0">
+                    <complexType>
+                        <attribute name="page" type="string"/>
+                    </complexType>
+                </element>
+                <element name="error-handler" minOccurs="0">
                     <complexType>
                         <attribute name="page" type="string"/>
                     </complexType>

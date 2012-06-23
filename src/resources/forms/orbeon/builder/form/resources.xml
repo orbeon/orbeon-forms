@@ -918,13 +918,13 @@
             <label>Changer PDF</label>
         </change-pdf>
         <upload-pdf>
-            <label>Attacher PDF</label>
+            <label>Joindre PDF</label>
         </upload-pdf>
         <change-css>
             <label>Changer CSS</label>
         </change-css>
         <upload-css>
-            <label>Attacher CSS</label>
+            <label>Joindre CSS</label>
         </upload-css>
         <show-source>
             <label>Voir source</label>
@@ -1352,7 +1352,7 @@
             <label>Visualisation du code source</label>
         </dialog-view-source>
         <dialog-upload-pdf>
-            <label>Attacher un fichier PDF</label>
+            <label>Joindre un fichier PDF</label>
             <upload-pdf>
                 <label>Fichier PDF</label>
             </upload-pdf>

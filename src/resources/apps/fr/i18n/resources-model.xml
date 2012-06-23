@@ -61,8 +61,6 @@
                         $lang,
                         xxf:instance('fr-form-resources')/resource/@xml:lang/string())"/>
 
-        <xf:message level="xxf:log-debug">XXX $lang: <xf:output value="$lang"/></xf:message>
-
         <!-- Find Form Runner language -->
         <xf:setvalue
             ref="$fr-lang"
@@ -71,8 +69,6 @@
                         $form,
                         $lang,
                         instance('fr-fr-resources')/resource/@xml:lang/string())"/>
-
-        <xf:message level="xxf:log-debug">XXX $fr-lang: <xf:output value="$fr-lang"/></xf:message>
 
         <!-- Save current form language into the session -->
         <xf:insert context="." origin="xxf:set-session-attribute('fr-language', string($lang))"/>

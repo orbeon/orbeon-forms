@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.control.controls;
 
 import org.dom4j.Element;
 import org.dom4j.QName;
-import org.orbeon.oxf.processor.RegexpProcessor;
+import org.orbeon.oxf.processor.RegexpMatcher;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis;
@@ -34,6 +34,7 @@ import org.orbeon.saxon.value.TimeValue;
 import scala.Tuple3;
 
 import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * Represents an xforms:input control.
@@ -158,15 +159,13 @@ public class XFormsInputControl extends XFormsValueControl implements FocusableT
                 if ( "date".equals(typeName)) {
                     // Date input
                     externalValue = externalValue.trim();
-                    final RegexpProcessor matcher = new RegexpProcessor();
                     // TODO: like on client, must handle oxf.xforms.format.input.date
-                    externalValue = parse(matcher, DATE_PARSE_PATTERNS, externalValue);
+                    externalValue = parse(DATE_PARSE_PATTERNS, externalValue);
                 } else if ("time".equals(typeName)) {
                     // Time input
                     externalValue = externalValue.trim();
-                    final RegexpProcessor matcher = new RegexpProcessor();
                     // TODO: like on client, must handle oxf.xforms.format.input.time
-                    externalValue = parse(matcher, TIME_PARSE_PATTERNS, externalValue);
+                    externalValue = parse(TIME_PARSE_PATTERNS, externalValue);
                 } else if ("dateTime".equals(typeName)) {
                     // Date + time input
                     externalValue = externalValue.trim();
@@ -181,8 +180,7 @@ public class XFormsInputControl extends XFormsValueControl implements FocusableT
                         externalValue = "";
                     } else {
                         // Parse and recombine with 'T' separator (result may be invalid dateTime, of course!)
-                        final RegexpProcessor matcher = new RegexpProcessor();
-                        externalValue = parse(matcher, DATE_PARSE_PATTERNS, datePart) + 'T' + parse(matcher, TIME_PARSE_PATTERNS, timePart);
+                        externalValue = parse(DATE_PARSE_PATTERNS, datePart) + 'T' + parse(TIME_PARSE_PATTERNS, timePart);
                     }
                 } else {
                     externalValue = convertFromExternalValueUseUnformat(externalValue);
@@ -224,9 +222,9 @@ public class XFormsInputControl extends XFormsValueControl implements FocusableT
         }
     }
 
-    private static String parse(RegexpProcessor matcher, ParsePattern[] patterns, String value) {
+    private static String parse(ParsePattern[] patterns, String value) {
         for (final ParsePattern currentPattern : patterns) {
-            final RegexpProcessor.MatchResult result = matcher.regexpMatch(currentPattern.getRe(), value);
+            final RegexpMatcher.MatchResult result = RegexpMatcher.jMatchResult(currentPattern.getPattern(), value);
             if (result.matches()) {
                 // Pattern matches
                 return currentPattern.handle(result);
@@ -238,8 +236,8 @@ public class XFormsInputControl extends XFormsValueControl implements FocusableT
     }
 
     private interface ParsePattern {
-        public String getRe();
-        public String handle(RegexpProcessor.MatchResult result);
+        public Pattern getPattern();
+        public String handle(RegexpMatcher.MatchResult result);
     }
 
     // See also patterns on xforms.js
@@ -258,10 +256,9 @@ public class XFormsInputControl extends XFormsValueControl implements FocusableT
 
             // mm/dd/yyyy (American style)
             new ParsePattern() {
-                public String getRe() {
-                    return "^(\\d{1,2})\\/(\\d{1,2})\\/(\\d{2,4})$";
-                }
-                public String handle(RegexpProcessor.MatchResult result) {
+                final Pattern pattern = Pattern.compile("^(\\d{1,2})\\/(\\d{1,2})\\/(\\d{2,4})$");
+                public Pattern getPattern() { return pattern; }
+                public String handle(RegexpMatcher.MatchResult result) {
 
                     final String year = result.group(2);
                     final String month = result.group(0);
@@ -273,10 +270,9 @@ public class XFormsInputControl extends XFormsValueControl implements FocusableT
             },
             // mm/dd (American style without year)
             new ParsePattern() {
-                public String getRe() {
-                    return "^(\\d{1,2})\\/(\\d{1,2})$";
-                }
-                public String handle(RegexpProcessor.MatchResult result) {
+                final Pattern pattern = Pattern.compile("^(\\d{1,2})\\/(\\d{1,2})$");
+                public Pattern getPattern() { return pattern; }
+                public String handle(RegexpMatcher.MatchResult result) {
 
                     final String year = Integer.toString(new GregorianCalendar().get(Calendar.YEAR));// current year
                     final String month = result.group(0);
@@ -287,10 +283,9 @@ public class XFormsInputControl extends XFormsValueControl implements FocusableT
             },
             // dd.mm.yyyy (Swiss style)
             new ParsePattern() {
-                public String getRe() {
-                    return "^(\\d{1,2})\\.(\\d{1,2})\\.(\\d{2,4})$";
-                }
-                public String handle(RegexpProcessor.MatchResult result) {
+                final Pattern pattern = Pattern.compile("^(\\d{1,2})\\.(\\d{1,2})\\.(\\d{2,4})$");
+                public Pattern getPattern() { return pattern; }
+                public String handle(RegexpMatcher.MatchResult result) {
 
                     final String year = result.group(2);
                     final String month = result.group(1);
@@ -302,10 +297,9 @@ public class XFormsInputControl extends XFormsValueControl implements FocusableT
             },
             // yyyy-mm-dd (ISO style)
             new ParsePattern() {
-                public String getRe() {
-                    return "(\\d{2,4})-(\\d{1,2})-(\\d{1,2})(Z|([+-]\\d{2}:\\d{2}))?";
-                }
-                public String handle(RegexpProcessor.MatchResult result) {
+                final Pattern pattern = Pattern.compile("(\\d{2,4})-(\\d{1,2})-(\\d{1,2})(Z|([+-]\\d{2}:\\d{2}))?");
+                public Pattern getPattern() { return pattern; }
+                public String handle(RegexpMatcher.MatchResult result) {
 
                     final String year = result.group(0);
                     final String month = result.group(1);
@@ -325,10 +319,9 @@ public class XFormsInputControl extends XFormsValueControl implements FocusableT
 
             // 12:34:56 p.m.
             new ParsePattern() {
-                public String getRe() {
-                    return "^(\\d{1,2}):(\\d{1,2}):(\\d{1,2}) ?(p|pm|p\\.m\\.)$";
-                }
-                public String handle(RegexpProcessor.MatchResult result) {
+                final Pattern pattern = Pattern.compile("^(\\d{1,2}):(\\d{1,2}):(\\d{1,2}) ?(p|pm|p\\.m\\.)$");
+                public Pattern getPattern() { return pattern; }
+                public String handle(RegexpMatcher.MatchResult result) {
                     byte hoursByte = Byte.parseByte(result.group(0));
                     if (hoursByte < 12) hoursByte += 12;
 
@@ -340,10 +333,9 @@ public class XFormsInputControl extends XFormsValueControl implements FocusableT
             },
             // 12:34 p.m.
             new ParsePattern() {
-                public String getRe() {
-                    return "^(\\d{1,2}):(\\d{1,2}) ?(p|pm|p\\.m\\.)$";
-                }
-                public String handle(RegexpProcessor.MatchResult result) {
+                final Pattern pattern = Pattern.compile("^(\\d{1,2}):(\\d{1,2}) ?(p|pm|p\\.m\\.)$");
+                public Pattern getPattern() { return pattern; }
+                public String handle(RegexpMatcher.MatchResult result) {
                     byte hoursByte = Byte.parseByte(result.group(0));
                     if (hoursByte < 12) hoursByte += 12;
 
@@ -354,10 +346,9 @@ public class XFormsInputControl extends XFormsValueControl implements FocusableT
             },
             // 12 p.m.
             new ParsePattern() {
-                public String getRe() {
-                    return "^(\\d{1,2}) ?(p|pm|p\\.m\\.)$";
-                }
-                public String handle(RegexpProcessor.MatchResult result) {
+                final Pattern pattern = Pattern.compile("^(\\d{1,2}) ?(p|pm|p\\.m\\.)$");
+                public Pattern getPattern() { return pattern; }
+                public String handle(RegexpMatcher.MatchResult result) {
                     byte hoursByte = Byte.parseByte(result.group(0));
                     if (hoursByte < 12) hoursByte += 12;
 
@@ -367,10 +358,9 @@ public class XFormsInputControl extends XFormsValueControl implements FocusableT
             },
             // 12:34:56 (a.m.)
             new ParsePattern() {
-                public String getRe() {
-                    return "^(\\d{1,2}):(\\d{1,2}):(\\d{1,2}) ?(a|am|a\\.m\\.)?$";
-                }
-                public String handle(RegexpProcessor.MatchResult result) {
+                final Pattern pattern = Pattern.compile("^(\\d{1,2}):(\\d{1,2}):(\\d{1,2}) ?(a|am|a\\.m\\.)?$");
+                public Pattern getPattern() { return pattern; }
+                public String handle(RegexpMatcher.MatchResult result) {
                     final String hours = result.group(0);
                     final String minutes = result.group(1);
                     final String seconds = result.group(2);
@@ -380,10 +370,9 @@ public class XFormsInputControl extends XFormsValueControl implements FocusableT
             },
             // 12:34 (a.m.)
             new ParsePattern() {
-                public String getRe() {
-                    return "^(\\d{1,2}):(\\d{1,2}) ?(a|am|a\\.m\\.)?$";
-                }
-                public String handle(RegexpProcessor.MatchResult result) {
+                final Pattern pattern = Pattern.compile("^(\\d{1,2}):(\\d{1,2}) ?(a|am|a\\.m\\.)?$");
+                public Pattern getPattern() { return pattern; }
+                public String handle(RegexpMatcher.MatchResult result) {
 
                     final String hours = result.group(0);
                     final String minutes = result.group(1);
@@ -393,10 +382,9 @@ public class XFormsInputControl extends XFormsValueControl implements FocusableT
             },
             // 12 (a.m.)
             new ParsePattern() {
-                public String getRe() {
-                    return "^(\\d{1,2}) ?(a|am|a\\.m\\.)?$";
-                }
-                public String handle(RegexpProcessor.MatchResult result) {
+                final Pattern pattern = Pattern.compile("^(\\d{1,2}) ?(a|am|a\\.m\\.)?$");
+                public Pattern getPattern() { return pattern; }
+                public String handle(RegexpMatcher.MatchResult result) {
 
                     final String hours = result.group(0);
                     final TimeValue value = new TimeValue(Byte.parseByte(hours), (byte) 0, (byte) 0, 0, CalendarValue.NO_TIMEZONE);
@@ -406,10 +394,9 @@ public class XFormsInputControl extends XFormsValueControl implements FocusableT
             // hhmmss
             /* TODO: JS code has this, need to implement same logic
             new ParsePattern() {
-                public String getRe() {
-                    return "^(\\d{1,6})$";
-                }
-                public String handle(RegexpProcessor.MatchResult result) {
+                final Pattern pattern = Pattern.compile("^(\\d{1,6})$");
+                public Pattern getPattern() { return pattern; }
+                public String handle(RegexpMatcher.MatchResult result) {
 
                     final String all = result.group(0);
 
@@ -535,13 +522,11 @@ public class XFormsInputControl extends XFormsValueControl implements FocusableT
     }
 
     public static String testParseTime(String value) {
-        final RegexpProcessor matcher = new RegexpProcessor();
-        return parse(matcher, XFormsInputControl.TIME_PARSE_PATTERNS, value);
+        return parse(XFormsInputControl.TIME_PARSE_PATTERNS, value);
     }
 
     public static String testParseDate(String value) {
-        final RegexpProcessor matcher = new RegexpProcessor();
-        return parse(matcher, XFormsInputControl.DATE_PARSE_PATTERNS, value);
+        return parse(XFormsInputControl.DATE_PARSE_PATTERNS, value);
     }
     
     public static class PlaceHolderInfo {

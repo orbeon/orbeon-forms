@@ -24,9 +24,9 @@ import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.pipeline.api.ExternalContext.Request
 import org.orbeon.oxf.pipeline.api.{XMLReceiver, PipelineContext}
 import org.orbeon.oxf.processor.PageFlowControllerProcessor.FileRoute
-import org.orbeon.oxf.processor.PageFlowControllerProcessor.MatchResult
 import org.orbeon.oxf.processor.PageFlowControllerProcessor.PageFlow
 import org.orbeon.oxf.processor.PageFlowControllerProcessor.PageRoute
+import org.orbeon.oxf.processor.RegexpMatcher.MatchResult
 import org.orbeon.oxf.processor.impl.{DigestState, DigestTransformerOutputImpl}
 import org.orbeon.oxf.processor.pipeline.ast._
 import org.orbeon.oxf.processor.pipeline.{PipelineConfig, PipelineProcessor}
@@ -77,7 +77,7 @@ class PageFlowControllerProcessor extends PageFlowControllerProcessorBase {
                     if ((submissionPath eq null) && (submissionModel ne null) || (submissionPath ne null) && (submissionModel eq null))
                         throw new OXFException("Only one of properties " + SubmissionPathPropertyName + " and " + SubmissionModelPropertyName + " is set.")
 
-                    PageElement(None, submissionPath, Matcher(Pattern.compile(submissionPath)), None, Some(submissionModel), None, configRoot)
+                    PageElement(None, submissionPath, Pattern.compile(submissionPath), None, Some(submissionModel), None, configRoot)
                 }
 
                 val routeElements: Seq[RouteElement] =
@@ -192,7 +192,7 @@ class PageFlowControllerProcessor extends PageFlowControllerProcessorBase {
 
         // Run the first matching entry if any, otherwise attempt to run the "not found" route
         var matchResult: MatchResult = null
-        pageFlow.routes find { route ⇒ matchResult = route.routeElement.matcher.result(path); matchResult.matches } match {
+        pageFlow.routes find { route ⇒ matchResult = MatchResult(route.routeElement.pattern, path); matchResult.matches } match {
             case Some(route) ⇒
                 // Run the given route
                 try route.run(pipelineContext, request, matchResult)
@@ -266,15 +266,15 @@ object PageFlowControllerProcessor {
     val SubmissionPathDefault       = "/xforms-server-submit"
 
     // Route elements
-    sealed trait RouteElement { def path: String; def matcher: Matcher; def id: Option[String] }
-    case class FileElement(id: Option[String], path: String, matcher: Matcher, mimeType: Option[String], versioned: Boolean) extends RouteElement
-    case class PageElement(id: Option[String], path: String, matcher: Matcher, defaultSubmission: Option[String], model: Option[String], view: Option[String], element: Element) extends RouteElement
+    sealed trait RouteElement { def path: String; def pattern: Pattern; def id: Option[String] }
+    case class FileElement(id: Option[String], path: String, pattern: Pattern, mimeType: Option[String], versioned: Boolean) extends RouteElement
+    case class PageElement(id: Option[String], path: String, pattern: Pattern, defaultSubmission: Option[String], model: Option[String], view: Option[String], element: Element) extends RouteElement
 
     object FileElement {
         // id?, path-info?, matcher?, mime-type?, versioned?
         def apply(e: Element, defaultVersioned: Boolean): FileElement = {
             val path = getPath(e)
-            FileElement(idAtt(e), path, getMatcher(e, path), att(e, "mime-type"), att(e, "versioned") map (_ == "true") getOrElse defaultVersioned)
+            FileElement(idAtt(e), path, compilePattern(e, path), att(e, "mime-type"), att(e, "versioned") map (_ == "true") getOrElse defaultVersioned)
         }
     }
 
@@ -282,7 +282,7 @@ object PageFlowControllerProcessor {
         // id?, path-info, matcher?, default-submission?, model?, view?
         def apply(e: Element): PageElement = {
             val path = getPath(e)
-            PageElement(idAtt(e), path, getMatcher(e, path), att(e, "default-submission"), att(e, "model"), att(e, "view"), e)
+            PageElement(idAtt(e), path, compilePattern(e, path), att(e, "default-submission"), att(e, "model"), att(e, "view"), e)
         }
     }
 
@@ -309,8 +309,7 @@ object PageFlowControllerProcessor {
 
             // Provide matches input using a digest, because that's equivalent to how the PFC was working when the
             // matches were depending on oxf:request. If we don't do this, then
-            val matchesProcessor =
-                new DigestedProcessor(RegexpProcessor.writeXML(_, matchResult.matches, matchResult.groupsWithNulls))
+            val matchesProcessor = new DigestedProcessor(RegexpMatcher.writeXML(_, matchResult))
 
             // Connect matches input and start pipeline
             PipelineUtils.connect(matchesProcessor, "data", pipeline, "matches")
@@ -321,15 +320,6 @@ object PageFlowControllerProcessor {
         }
     }
 
-    case class Matcher(pattern: Pattern) {
-        def result(s: String) = {
-            val matcher = pattern.matcher(s)
-            val matches = matcher.matches
-            MatchResult(matches, if (matches) (1 to matcher.groupCount) map matcher.group else Seq())
-        }
-    }
-
-    case class MatchResult(matches: Boolean, groupsWithNulls: Seq[String] = Seq())
     case class PageFlow(routes: Seq[Route], notFoundRoute: Option[PageRoute], errorRoute: Option[PageRoute], pathMatchers: Seq[PathMatcher], file: Option[String])
 
     def att(e: Element, name: String) = Option(e.attributeValue(name))
@@ -339,11 +329,9 @@ object PageFlowControllerProcessor {
     // Support "regexp" and "oxf:perl5-matcher" for backward compatibility
     val RegexpQNames = Set(new QName("regexp"), new QName("perl5-matcher", OXF_PROCESSORS_NAMESPACE))
 
-    def getMatcher(e: Element, path: String) = {
-        // Convert glob expression if needed
-        val regexp = if (RegexpQNames(extractAttributeValueQName(e, "matcher"))) path else globToRegexp(path.toCharArray)
-        Matcher(Pattern.compile(regexp))
-    }
+    // Compile and convert glob expression if needed
+    def compilePattern(e: Element, path: String) =
+        RegexpMatcher.compilePattern(path, ! RegexpQNames(extractAttributeValueQName(e, "matcher")))
 }
 
 // This processor provides digest-based caching based on any content

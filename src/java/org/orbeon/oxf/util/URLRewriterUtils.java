@@ -19,7 +19,7 @@ import org.orbeon.oxf.common.Version;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.PageFlowControllerProcessor;
-import org.orbeon.oxf.processor.RegexpProcessor;
+import org.orbeon.oxf.processor.RegexpMatcher;
 import org.orbeon.oxf.properties.Properties;
 import org.orbeon.oxf.servlet.OrbeonXFormsFilter;
 
@@ -29,6 +29,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.regex.Pattern;
 
 /**
  * Utility class to rewrite URLs.
@@ -299,7 +300,7 @@ public class URLRewriterUtils {
     public static boolean isPlatformPath(String absolutePathNoContext) {
         final String regexp = Properties.instance().getPropertySet().getString(REWRITING_PLATFORM_PATHS_PROPERTY, null);
         // TODO: do not compile the regexp every time
-        return regexp != null && new RegexpProcessor().regexpMatch(regexp, absolutePathNoContext).matches();
+        return regexp != null && RegexpMatcher.jMatchResult(Pattern.compile(regexp), absolutePathNoContext).matches();
     }
 
     /**
@@ -311,7 +312,7 @@ public class URLRewriterUtils {
     public static boolean isNonPlatformPathAppPath(String absolutePathNoContext) {
         final String regexp = Properties.instance().getPropertySet().getString(REWRITING_APP_PATHS_PROPERTY, null);
         // TODO: do not compile the regexp every time
-        return regexp != null && new RegexpProcessor().regexpMatch(regexp, absolutePathNoContext).matches();
+        return regexp != null && RegexpMatcher.jMatchResult(Pattern.compile(regexp), absolutePathNoContext).matches();
     }
 
     /**
@@ -404,6 +405,8 @@ public class URLRewriterUtils {
         public final String mimeType;
         public final boolean versioned;
 
+        public final Pattern pattern;
+
         /**
          * Construct from parameters.
          *
@@ -415,13 +418,14 @@ public class URLRewriterUtils {
             this.regexp = regexp;
             this.mimeType = mimeType;
             this.versioned = versioned;
+
+            this.pattern = Pattern.compile(regexp);
         }
     }
     
     public static boolean isVersionedURL(String absolutePathNoContext, List<URLRewriterUtils.PathMatcher> pathMatchers) {
         for (final URLRewriterUtils.PathMatcher pathMatcher : pathMatchers) {
-            final RegexpProcessor regexpProcessor = new RegexpProcessor();
-            if (regexpProcessor.regexpMatch(pathMatcher.regexp, absolutePathNoContext).matches())
+            if (RegexpMatcher.jMatchResult(pathMatcher.pattern, absolutePathNoContext).matches())
                 return true;
         }
         

@@ -14,12 +14,13 @@
 package org.orbeon.oxf.processor
 
 import ProcessorImpl._
-import RegexpProcessor._
+import RegexpMatcher._
 import java.util.regex.Pattern
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.pipeline.api.XMLReceiver
 import org.orbeon.oxf.processor.impl.CacheableTransformerOutputImpl
 import org.orbeon.oxf.xml.XMLUtils
+import org.orbeon.oxf.util.URLRewriterUtils.globToRegexp
 
 class RegexpProcessor extends ProcessorImpl {
 
@@ -36,41 +37,33 @@ class RegexpProcessor extends ProcessorImpl {
                 val data   = readInputAsDOM4J(pipelineContext, INPUT_DATA)
                 val config = readInputAsDOM4J(pipelineContext, INPUT_CONFIG)
 
-                val text   = data.selectObject("string(*)").asInstanceOf[String]
-                val regexp = config.selectObject("string(*)").asInstanceOf[String]
+                val text   = data.getRootElement.getStringValue
+                val regexp = config.getRootElement.getStringValue
 
-                // Compute result
-                val result = regexpMatch(regexp, text)
-
-                // Output result
-                writeXML(xmlReceiver, result.matches, result.groups)
+                // Compute and output result
+                writeXML(xmlReceiver, regexpMatch(regexp, text))
             }
         })
 
-    def regexpMatch(regexp: String, text: String): MatchResult = {
-        val pattern = Pattern.compile(regexp)
-        val matcher = pattern.matcher(text)
-
-        val matches = matcher.matches
-        MatchResult(matches, if (matches) (1 to matcher.groupCount) map matcher.group else Seq())
-    }
+    def regexpMatch(regexp: String, text: String): MatchResult =
+        MatchResult(compilePattern(regexp, glob = false), text)
 }
 
-object RegexpProcessor {
+object RegexpMatcher {
 
-    def writeXML(xmlReceiver: XMLReceiver, matches: Boolean, groups: Seq[String]) {
+    def writeXML(xmlReceiver: XMLReceiver, result: MatchResult): Unit = {
 
         xmlReceiver.startDocument()
         xmlReceiver.startElement("", "result", "result", XMLUtils.EMPTY_ATTRIBUTES)
 
         // <matches>
         xmlReceiver.startElement("", "matches", "matches", XMLUtils.EMPTY_ATTRIBUTES)
-        val matchesString = matches.toString
+        val matchesString = result.matches.toString
         xmlReceiver.characters(matchesString.toCharArray, 0, matchesString.length)
         xmlReceiver.endElement("", "matches", "matches")
 
         // <group>
-        for (group ← groups) {
+        for (group ← result.groupsWithNulls) {
             xmlReceiver.startElement("", "group", "group", XMLUtils.EMPTY_ATTRIBUTES)
             if (group ne null)
                 xmlReceiver.characters(group.toCharArray, 0, group.length)
@@ -81,7 +74,21 @@ object RegexpProcessor {
         xmlReceiver.endDocument()
     }
 
-    case class MatchResult(matches: Boolean, groups: Seq[String]) {
-        def group(i: Int) = groups(i)
+    def compilePattern(path: String, glob: Boolean = false) =
+        Pattern.compile(if (glob) globToRegexp(path.toCharArray) else path)
+
+    case class MatchResult(matches: Boolean, groupsWithNulls: Seq[String] = Seq()) {
+        def group(i: Int) = groupsWithNulls(i)
     }
+
+    object MatchResult {
+        def apply(pattern: Pattern, s: String): MatchResult = {
+            val matcher = pattern.matcher(s)
+            val matches = matcher.matches
+            MatchResult(matches, if (matches) (1 to matcher.groupCount) map matcher.group else Seq())
+        }
+    }
+
+    // For Java callers
+    def jMatchResult(pattern: Pattern, s: String) = MatchResult(pattern, s)
 }

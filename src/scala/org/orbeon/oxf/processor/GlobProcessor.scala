@@ -13,9 +13,10 @@
  */
 package org.orbeon.oxf.processor
 
-import org.orbeon.oxf.util.URLRewriterUtils
+import org.orbeon.oxf.processor.RegexpMatcher._
+
 
 class GlobProcessor extends RegexpProcessor {
     override def regexpMatch(regexp: String, text: String) =
-        super.regexpMatch(URLRewriterUtils.globToRegexp(regexp.toCharArray), text)
+        MatchResult(compilePattern(regexp, glob = true), text)
 }

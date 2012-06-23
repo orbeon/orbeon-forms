@@ -29,7 +29,7 @@
         </p:input>
         <p:output name="data" id="request"/>
     </p:processor>
-    <!--<p:processor name="oxf:perl5-matcher">-->
+    <!--<p:processor name="oxf:regexp">-->
         <!--<p:input name="config"><config>/fr/service/components/([^/]+)/([^/]+)</config></p:input>-->
         <!--<p:input name="data" href="#request#xpointer(/request/request-path)"/>-->
         <!--<p:output name="data" id="matcher-groups"/>-->

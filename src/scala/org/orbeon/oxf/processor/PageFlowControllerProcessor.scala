@@ -14,7 +14,7 @@
 package org.orbeon.oxf.processor
 
 import PageFlowControllerProcessor._
-import PageFlowControllerProcessorBase._
+import PageFlowControllerBuilder._
 import collection.JavaConverters._
 import java.util.regex.Pattern
 import java.util.{List ⇒ JList, Map ⇒ JMap}
@@ -33,7 +33,7 @@ import org.orbeon.oxf.processor.pipeline.{PipelineConfig, PipelineProcessor}
 import org.orbeon.oxf.resources.ResourceNotFoundException
 import org.orbeon.oxf.util.DebugLogger._
 import org.orbeon.oxf.util.URLRewriterUtils._
-import org.orbeon.oxf.util.{IndentedLogger, PipelineUtils, NetUtils}
+import org.orbeon.oxf.util.{LoggerFactory, IndentedLogger, PipelineUtils, NetUtils}
 import org.orbeon.oxf.webapp.HttpStatusCodeException
 import org.orbeon.oxf.xml.Dom4j
 import org.orbeon.oxf.xml.XMLConstants._
@@ -41,13 +41,14 @@ import org.orbeon.oxf.xml.XMLUtils.DigestContentHandler
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils._
 import org.orbeon.oxf.xml.dom4j.LocationData
 
-class PageFlowControllerProcessor extends PageFlowControllerProcessorBase {
+// Orbeon Forms application controller
+class PageFlowControllerProcessor extends ProcessorImpl {
 
     addInputInfo(new ProcessorInputOutputInfo(ControllerInput, ControllerNamespaceURI))
 
     override def start(pipelineContext: PipelineContext) {
 
-        implicit val logger = new IndentedLogger(PageFlowControllerProcessorBase.logger, "")
+        implicit val logger = new IndentedLogger(Logger, "")
 
         // Get or compile page flow
         val pageFlow = readCacheInputAsObject(pipelineContext, getInputByName(ControllerInput), new CacheableInputReader[PageFlow] {
@@ -128,6 +129,7 @@ class PageFlowControllerProcessor extends PageFlowControllerProcessorBase {
         }
     }
 
+    // Compile a controller file
     def compile(configRoot: Element, controllerValidity: AnyRef)(implicit logger: IndentedLogger) = {
         // Controller format:
         //
@@ -181,7 +183,7 @@ class PageFlowControllerProcessor extends PageFlowControllerProcessorBase {
 
         // Compile the pipeline for the given page element
         def compile(page: PageElement) = {
-            val ast = createPipelineConfig(
+            val ast = createPipelineAST(
                 page.element,
                 controllerValidity,
                 stepProcessorContext,
@@ -218,7 +220,7 @@ class PageFlowControllerProcessor extends PageFlowControllerProcessorBase {
         PageFlow(routes, handler(Set("not-found-handler")), handler(Set("error-handler")), pathMatchers, Option(urlBase))
     }
 
-    def createPipelineConfig(
+    def createPipelineAST(
             element: Element,
             controllerValidity: AnyRef,
             stepProcessorContext: StepProcessorContext,
@@ -232,23 +234,23 @@ class PageFlowControllerProcessor extends PageFlowControllerProcessorBase {
 
             setValidity(controllerValidity)
 
-            // Add an input for matcher information
+            // The pipeline has an input with matcher results
             val matcherParam = addParam(new ASTParam(ASTParam.INPUT, "matches"))
 
             val epilogueData = new ASTOutput(null, "html")
             val epilogueModelData = new ASTOutput(null, "epilogue-model-data")
             val epilogueInstance = new ASTOutput(null, "epilogue-instance")
 
-            // Handle page
+            // Page
             handlePage(stepProcessorContext, urlBase, getStatements, element,
                     matcherParam.getName, epilogueData, epilogueModelData,
                     epilogueInstance, pageIdToPathInfo, pageIdToSetvaluesDocument,
                     globalInstancePassing)
 
-            // Handle view, if there was one
+            // Epilogue
             addStatement(new ASTChoose(new ASTHrefId(epilogueData)) {
                 addWhen(new ASTWhen("not(/*/@xsi:nil = 'true')") {
-                    setNamespaces(PageFlowControllerProcessorBase.NAMESPACES_WITH_XSI_AND_XSLT)
+                    setNamespaces(PageFlowControllerBuilder.NAMESPACES_WITH_XSI_AND_XSLT)
                     handleEpilogue(urlBase, getStatements, epilogueURL, epilogueElement,
                             epilogueData, epilogueModelData, epilogueInstance, 200)
                 })
@@ -263,6 +265,8 @@ class PageFlowControllerProcessor extends PageFlowControllerProcessorBase {
 }
 
 object PageFlowControllerProcessor {
+
+    val Logger = LoggerFactory.createLogger(classOf[PageFlowControllerProcessor])
 
     val ControllerInput = "controller"
     val ControllerNamespaceURI = "http://www.orbeon.com/oxf/controller"

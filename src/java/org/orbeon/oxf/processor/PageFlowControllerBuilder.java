@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.processor;
 
-import org.apache.log4j.Logger;
 import org.dom4j.Attribute;
 import org.dom4j.Document;
 import org.dom4j.Element;
@@ -25,7 +24,6 @@ import org.orbeon.oxf.processor.pipeline.PipelineProcessor;
 import org.orbeon.oxf.processor.pipeline.ast.*;
 import org.orbeon.oxf.processor.serializer.legacy.HTMLSerializer;
 import org.orbeon.oxf.resources.URLFactory;
-import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.xml.NamespaceMapping;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.*;
@@ -35,9 +33,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public abstract class PageFlowControllerProcessorBase extends ProcessorImpl {
-
-    public static Logger logger = LoggerFactory.createLogger(PageFlowControllerProcessor.class);
+// PageFlowControllerProcessor code that hasn't been migrated to Scala yet
+public class PageFlowControllerBuilder {
 
     public final static NamespaceMapping NAMESPACES_WITH_XSI_AND_XSLT;
 
@@ -50,6 +47,7 @@ public abstract class PageFlowControllerProcessorBase extends ProcessorImpl {
     private final static String INSTANCE_PASSING_REDIRECT = "redirect";
     private final static String INSTANCE_PASSING_FORWARD = "forward";
     private final static String INSTANCE_PASSING_REDIRECT_PORTAL = "redirect-exit-portal";
+
     public final static String DEFAULT_INSTANCE_PASSING = INSTANCE_PASSING_REDIRECT;
 
     static {
@@ -60,9 +58,9 @@ public abstract class PageFlowControllerProcessorBase extends ProcessorImpl {
         NAMESPACES_WITH_XSI_AND_XSLT = new NamespaceMapping(mapping);
     }
 
-    protected static void handleEpilogue(final String controllerContext, List<ASTStatement> statements, final String epilogueURL, final Element epilogueElement,
-                                       final ASTOutput epilogueData, final ASTOutput epilogueModelData, final ASTOutput epilogueInstance,
-                                       final int defaultStatusCode) {
+    public static void handleEpilogue(final String controllerContext, List<ASTStatement> statements, final String epilogueURL, final Element epilogueElement,
+            final ASTOutput epilogueData, final ASTOutput epilogueModelData, final ASTOutput epilogueInstance,
+            final int defaultStatusCode) {
         // Send result through epilogue
         if (epilogueURL == null) {
             // Run HTML serializer
@@ -106,7 +104,7 @@ public abstract class PageFlowControllerProcessorBase extends ProcessorImpl {
         }
     }
 
-    protected static Document getSetValuesDocument(final Element pageElement) {
+    public static Document getSetValuesDocument(final Element pageElement) {
         final List paramElements = pageElement.elements("param");
         final List setValueElements = pageElement.elements("setvalue");
         final Document setvaluesDocument;
@@ -136,13 +134,13 @@ public abstract class PageFlowControllerProcessorBase extends ProcessorImpl {
     /**
      * Handle <page>
      */
-    protected static void handlePage(final StepProcessorContext stepProcessorContext, final String urlBase,
-                            List<ASTStatement> statementsList, final Element pageElement,
-                            final String matcherOutputOrParamId,
-                            final ASTOutput viewData, final ASTOutput epilogueModelData, final ASTOutput viewInstance,
-                            final Map<String, String> pageIdToPathInfo,
-                            final Map<String, Document> pageIdToSetvaluesDocument,
-                            final String instancePassing) {
+    public static void handlePage(final StepProcessorContext stepProcessorContext, final String urlBase,
+            List<ASTStatement> statementsList, final Element pageElement,
+            final String matcherOutputOrParamId,
+            final ASTOutput viewData, final ASTOutput epilogueModelData, final ASTOutput viewInstance,
+            final Map<String, String> pageIdToPathInfo,
+            final Map<String, Document> pageIdToSetvaluesDocument,
+            final String instancePassing) {
 
         // Get page attributes
         final String modelAttribute = pageElement.attributeValue("model");
@@ -507,10 +505,10 @@ public abstract class PageFlowControllerProcessorBase extends ProcessorImpl {
     }
 
     private static void executeResult(ASTWhen when,
-                               final Map<String, String> pageIdToPathInfo, final Map<String, Document> pageIdToSetvaluesDocument,
-                               final ASTOutput instanceToUpdate, final Element resultElement,
-                               final ASTOutput actionData, final ASTOutput redirect, final ASTOutput xupdatedInstance,
-                               String instancePassing) {
+            final Map<String, String> pageIdToPathInfo, final Map<String, Document> pageIdToSetvaluesDocument,
+            final ASTOutput instanceToUpdate, final Element resultElement,
+            final ASTOutput actionData, final ASTOutput redirect, final ASTOutput xupdatedInstance,
+            String instancePassing) {
 
         // Instance to update: either current, or instance from other page
         final String resultPageId = resultElement == null ? null : resultElement.attributeValue("page");
@@ -941,4 +939,3 @@ public abstract class PageFlowControllerProcessorBase extends ProcessorImpl {
         }
     }
 }
-`

@@ -179,7 +179,7 @@ public class Portlet2ExternalContext implements ExternalContext {
         }
 
         public String getMethod() {
-            return (clientDataRequest != null) ? clientDataRequest.getMethod() : "get";
+            return (clientDataRequest != null) ? clientDataRequest.getMethod() : "GET";
         }
 
         public synchronized Map<String, Object[]> getParameterMap() {

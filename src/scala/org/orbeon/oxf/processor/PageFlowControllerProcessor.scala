@@ -49,100 +49,16 @@ class PageFlowControllerProcessor extends PageFlowControllerProcessorBase {
 
         implicit val logger = new IndentedLogger(PageFlowControllerProcessorBase.logger, "")
 
+        // Get or compile page flow
         val pageFlow = readCacheInputAsObject(pipelineContext, getInputByName(ControllerInput), new CacheableInputReader[PageFlow] {
             def read(context: PipelineContext, input: ProcessorInput) = {
-
                 val configRoot = readInputAsDOM4J(pipelineContext, ControllerInput).getRootElement
                 val controllerValidity  = ProcessorImpl.getInputValidity(pipelineContext, getInputByName(ControllerInput))
-                val stepProcessorContext = new StepProcessorContext(controllerValidity)
-                val locationData = configRoot.getData.asInstanceOf[LocationData]
-                val urlBase = Option(locationData) map (_.getSystemID) orNull
-
-                val globalInstancePassing =
-                    att(configRoot, InstancePassingPropertyName) getOrElse getPropertySet.getString(InstancePassingPropertyName, DEFAULT_INSTANCE_PASSING)
-
-                // NOTE: We use a global property, not an oxf:page-flow scoped one
-                val defaultVersioned =
-                    att(configRoot, "versioned") map (_.toBoolean) getOrElse isResourcesVersioned
-
-                val epilogueElement = configRoot.element("epilogue")
-                val epilogueURL     = Option(epilogueElement) flatMap (att(_, "url")) getOrElse getPropertySet.getString(EpiloguePropertyName)
-
-                val topLevelElements = Dom4j.elements(configRoot)
-
-                 // Prepend a page for submissions
-                val submissionPage = {
-                    val submissionPath  = getPropertySet.getString(SubmissionPathPropertyName, SubmissionPathDefault)
-                    val submissionModel = getPropertySet.getStringOrURIAsString(SubmissionModelPropertyName)
-                    if ((submissionPath eq null) && (submissionModel ne null) || (submissionPath ne null) && (submissionModel eq null))
-                        throw new OXFException("Only one of properties " + SubmissionPathPropertyName + " and " + SubmissionModelPropertyName + " is set.")
-
-                    PageElement(None, submissionPath, Pattern.compile(submissionPath), None, Some(submissionModel), None, configRoot)
-                }
-
-                val routeElements: Seq[RouteElement] =
-                    submissionPage +: (
-                        for (e ← topLevelElements filter (e ⇒ Set("files", "page")(e.getName)))
-                        yield e.getName match {
-                            case "files" ⇒ FileElement(e, defaultVersioned)
-                            case "page"  ⇒ PageElement(e)
-                        }
-                    )
-
-                val pagesElementsWithIds = routeElements collect { case page: PageElement if page.id.isDefined ⇒ page }
-                val pathIdToPath              = pagesElementsWithIds map (p ⇒ p.id.get → p.path) toMap
-                val pageIdToSetvaluesDocument = pagesElementsWithIds map (p ⇒ p.id.get → getSetValuesDocument(p.element)) filter (_._2 ne null) toMap
-
-                val pathMatchers =
-                    routeElements collect
-                    { case files: FileElement if files.versioned ⇒ files } map
-                    (f ⇒ new PathMatcher(f.path, f.mimeType.orNull, f.versioned))
-
-
-                // Input format:
-                // - files*, page*, epilogue, not-found-handler
-                // - files: path-info, matcher, mime-type, versioned
-                // - page: path-info, matcher, default-submission, model, view, id
-
-                def newPipelineConfig(page: PageElement) = {
-                    val ast = createPipelineConfig(
-                        page.element,
-                        controllerValidity,
-                        stepProcessorContext,
-                        urlBase,
-                        globalInstancePassing,
-                        epilogueURL,
-                        epilogueElement,
-                        pathIdToPath.asJava,
-                        pageIdToSetvaluesDocument.asJava)
-
-                    // For debugging
-                    if (logger.isDebugEnabled) {
-                        val astDocumentHandler = new ASTDocumentHandler
-                        ast.walk(astDocumentHandler)
-                        debug("Created PFC pipeline", Seq("path" → page.path, "pipeline" → ('\n' + domToString(astDocumentHandler.getDocument))))
-                    }
-
-                    PipelineProcessor.createConfigFromAST(ast)
-                }
-
-                // All routes
-                val routes: Seq[Route] =
-                    for (e ← routeElements)
-                    yield e match {
-                        case files: FileElement ⇒ FileRoute(files)
-                        case page: PageElement  ⇒ PageRoute(page, newPipelineConfig(page))
-                    }
-
-                // Find a handler route
-                def handler(elementNames: Set[String]) =
-                    topLevelElements find (e ⇒ elementNames(e.getName)) flatMap (att(_, "page")) flatMap
-                        { pageId ⇒ routes collectFirst { case page: PageRoute if page.routeElement.id == Some(pageId) ⇒ page } }
-
-                PageFlow(routes, handler(Set("not-found-handler")), handler(Set("error-handler")), pathMatchers, Option(urlBase))
+                compile(configRoot, controllerValidity)
             }
         })
 
+        // Run it
         val externalContext = NetUtils.getExternalContext
         val request = externalContext.getRequest
         val path = request.getRequestPath
@@ -172,7 +88,7 @@ class PageFlowControllerProcessor extends PageFlowControllerProcessorBase {
                 // Run the error route
                 error("error caught", logParams)
                 externalContext.getResponse.setStatus(500)
-                errorRoute.run(pipelineContext, request, MatchResult(matches = false))
+                errorRoute.process(pipelineContext, request, MatchResult(matches = false))
             case None ⇒
                 // We don't have an error route so throw instead
                 throw t
@@ -183,19 +99,22 @@ class PageFlowControllerProcessor extends PageFlowControllerProcessorBase {
                 // Run the not found route
                 info("page not found", logParams)
                 externalContext.getResponse.setStatus(404)
-                try notFoundRoute.run(pipelineContext, request, MatchResult(matches = false))
+                try notFoundRoute.process(pipelineContext, request, MatchResult(matches = false))
                 catch { case t ⇒ runErrorRoute(t) }
             case None ⇒
                 // We don't have a not found route so throw instead
                 runErrorRoute(t getOrElse new HttpStatusCodeException(404))
         }
 
-        // Run the first matching entry if any, otherwise attempt to run the "not found" route
+        // Run the first matching entry if any
         var matchResult: MatchResult = null
         pageFlow.routes find { route ⇒ matchResult = MatchResult(route.routeElement.pattern, path); matchResult.matches } match {
-            case Some(route) ⇒
-                // Run the given route
-                try route.run(pipelineContext, request, matchResult)
+            case Some(route: FileRoute) ⇒
+                // Run the given route and let the caller handle errors
+                route.process(pipelineContext, request, matchResult)
+            case Some(route: PageRoute) ⇒
+                // Run the given route and handle "not found" and error conditions
+                try route.process(pipelineContext, request, matchResult)
                 catch { case t ⇒
                     getRootThrowable(t) match {
                         case e: HttpStatusCodeException if e.code == 404 ⇒ runNotFoundRoute(Some(t))
@@ -203,8 +122,100 @@ class PageFlowControllerProcessor extends PageFlowControllerProcessorBase {
                         case e                                           ⇒ runErrorRoute(t)
                     }
                 }
-            case None ⇒ runNotFoundRoute(None)
+            case None ⇒
+                // Handle "not found"
+                runNotFoundRoute(None)
         }
+    }
+
+    def compile(configRoot: Element, controllerValidity: AnyRef)(implicit logger: IndentedLogger) = {
+        // Controller format:
+        //
+        // - config: files*, page*, epilogue?, not-found-handler?, error-handler?
+        // - files:  @id?, @path-info, @matcher?, @mime-type?, @versioned?
+        // - page:   @id?, @path-info, @matcher?, @default-submission?, @model?, @view?
+
+        val stepProcessorContext = new StepProcessorContext(controllerValidity)
+        val locationData = configRoot.getData.asInstanceOf[LocationData]
+        val urlBase = Option(locationData) map (_.getSystemID) orNull
+
+        val globalInstancePassing =
+            att(configRoot, InstancePassingPropertyName) getOrElse getPropertySet.getString(InstancePassingPropertyName, DEFAULT_INSTANCE_PASSING)
+
+        // NOTE: We use a global property, not an oxf:page-flow scoped one
+        val defaultVersioned =
+            att(configRoot, "versioned") map (_.toBoolean) getOrElse isResourcesVersioned
+
+        val epilogueElement = configRoot.element("epilogue")
+        val epilogueURL     = Option(epilogueElement) flatMap (att(_, "url")) getOrElse getPropertySet.getString(EpiloguePropertyName)
+
+        val topLevelElements = Dom4j.elements(configRoot)
+
+         // Prepend a page for submissions
+        val submissionPage = {
+            val submissionPath  = getPropertySet.getString(SubmissionPathPropertyName, SubmissionPathDefault)
+            val submissionModel = getPropertySet.getStringOrURIAsString(SubmissionModelPropertyName)
+            if ((submissionPath eq null) && (submissionModel ne null) || (submissionPath ne null) && (submissionModel eq null))
+                throw new OXFException("Only one of properties " + SubmissionPathPropertyName + " and " + SubmissionModelPropertyName + " is set.")
+
+            PageElement(None, submissionPath, Pattern.compile(submissionPath), None, Some(submissionModel), None, configRoot)
+        }
+
+        val routeElements: Seq[RouteElement] =
+            submissionPage +: (
+                for (e ← topLevelElements filter (e ⇒ Set("files", "page")(e.getName)))
+                yield e.getName match {
+                    case "files" ⇒ FileElement(e, defaultVersioned)
+                    case "page"  ⇒ PageElement(e)
+                }
+            )
+
+        val pagesElementsWithIds = routeElements collect { case page: PageElement if page.id.isDefined ⇒ page }
+        val pathIdToPath              = pagesElementsWithIds map (p ⇒ p.id.get → p.path) toMap
+        val pageIdToSetvaluesDocument = pagesElementsWithIds map (p ⇒ p.id.get → getSetValuesDocument(p.element)) filter (_._2 ne null) toMap
+
+        val pathMatchers =
+            routeElements collect
+            { case files: FileElement if files.versioned ⇒ files } map
+            (f ⇒ new PathMatcher(f.path, f.mimeType.orNull, f.versioned))
+
+        // Compile the pipeline for the given page element
+        def compile(page: PageElement) = {
+            val ast = createPipelineConfig(
+                page.element,
+                controllerValidity,
+                stepProcessorContext,
+                urlBase,
+                globalInstancePassing,
+                epilogueURL,
+                epilogueElement,
+                pathIdToPath.asJava,
+                pageIdToSetvaluesDocument.asJava)
+
+            // For debugging
+            if (logger.isDebugEnabled) {
+                val astDocumentHandler = new ASTDocumentHandler
+                ast.walk(astDocumentHandler)
+                debug("Created PFC pipeline", Seq("path" → page.path, "pipeline" → ('\n' + domToString(astDocumentHandler.getDocument))))
+            }
+
+            PipelineProcessor.createConfigFromAST(ast)
+        }
+
+        // All routes
+        val routes: Seq[Route] =
+            for (e ← routeElements)
+            yield e match {
+                case files: FileElement ⇒ FileRoute(files)
+                case page: PageElement  ⇒ PageRoute(page, compile)
+            }
+
+        // Find a handler route
+        def handler(elementNames: Set[String]) =
+            topLevelElements find (e ⇒ elementNames(e.getName)) flatMap (att(_, "page")) flatMap
+                { pageId ⇒ routes collectFirst { case page: PageRoute if page.routeElement.id == Some(pageId) ⇒ page } }
+
+        PageFlow(routes, handler(Set("not-found-handler")), handler(Set("error-handler")), pathMatchers, Option(urlBase))
     }
 
     def createPipelineConfig(
@@ -238,7 +249,7 @@ class PageFlowControllerProcessor extends PageFlowControllerProcessorBase {
             addStatement(new ASTChoose(new ASTHrefId(epilogueData)) {
                 addWhen(new ASTWhen("not(/*/@xsi:nil = 'true')") {
                     setNamespaces(PageFlowControllerProcessorBase.NAMESPACES_WITH_XSI_AND_XSLT)
-                    PageFlowControllerProcessorBase.handleEpilogue(urlBase, getStatements, epilogueURL, epilogueElement,
+                    handleEpilogue(urlBase, getStatements, epilogueURL, epilogueElement,
                             epilogueData, epilogueModelData, epilogueInstance, 200)
                 })
                 addWhen(new ASTWhen() {
@@ -290,19 +301,23 @@ object PageFlowControllerProcessor {
     lazy val MimeTypes = ResourceServer.readMimeTypeConfig
 
     // Routes
-    sealed trait Route { def routeElement: RouteElement; def run(pipelineContext: PipelineContext, request: Request, matchResult: MatchResult) }
+    sealed trait Route { def routeElement: RouteElement; def process(pipelineContext: PipelineContext, request: Request, matchResult: MatchResult) }
 
     case class FileRoute(routeElement: FileElement) extends Route {
         // Serve a file by path
-        def run(pipelineContext: PipelineContext, request: Request, matchResult: MatchResult) = {
-            // TODO: only for GET
-            ResourceServer.serveResource(MimeTypes, request.getRequestPath)
-        }
+        def process(pipelineContext: PipelineContext, request: Request, matchResult: MatchResult) =
+            if (request.getMethod == "GET")
+                ResourceServer.serveResource(MimeTypes, request.getRequestPath)
+            else
+                throw new HttpStatusCodeException(403)
     }
 
-    case class PageRoute(routeElement: PageElement, pipelineConfig: PipelineConfig) extends Route {
+    case class PageRoute(routeElement: PageElement, compile: PageElement ⇒ PipelineConfig) extends Route {
+
+        lazy val pipelineConfig = compile(routeElement)
+
         // Run a page
-        def run(pipelineContext: PipelineContext, request: Request, matchResult: MatchResult) = {
+        def process(pipelineContext: PipelineContext, request: Request, matchResult: MatchResult) = {
 
             // PipelineConfig is reusable, but PipelineProcessor is not
             val pipeline = new PipelineProcessor(pipelineConfig)

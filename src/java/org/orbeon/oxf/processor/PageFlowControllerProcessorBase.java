@@ -106,7 +106,7 @@ public abstract class PageFlowControllerProcessorBase extends ProcessorImpl {
         }
     }
 
-    public Document getSetValuesDocument(final Element pageElement) {
+    protected static Document getSetValuesDocument(final Element pageElement) {
         final List paramElements = pageElement.elements("param");
         final List setValueElements = pageElement.elements("setvalue");
         final Document setvaluesDocument;
@@ -136,7 +136,7 @@ public abstract class PageFlowControllerProcessorBase extends ProcessorImpl {
     /**
      * Handle <page>
      */
-    protected void handlePage(final StepProcessorContext stepProcessorContext, final String urlBase,
+    protected static void handlePage(final StepProcessorContext stepProcessorContext, final String urlBase,
                             List<ASTStatement> statementsList, final Element pageElement,
                             final String matcherOutputOrParamId,
                             final ASTOutput viewData, final ASTOutput epilogueModelData, final ASTOutput viewInstance,
@@ -506,7 +506,7 @@ public abstract class PageFlowControllerProcessorBase extends ProcessorImpl {
         }});
     }
 
-    private void executeResult(ASTWhen when,
+    private static void executeResult(ASTWhen when,
                                final Map<String, String> pageIdToPathInfo, final Map<String, Document> pageIdToSetvaluesDocument,
                                final ASTOutput instanceToUpdate, final Element resultElement,
                                final ASTOutput actionData, final ASTOutput redirect, final ASTOutput xupdatedInstance,
@@ -941,3 +941,4 @@ public abstract class PageFlowControllerProcessorBase extends ProcessorImpl {
         }
     }
 }
+`

@@ -111,7 +111,7 @@ public class XFormsServer extends ProcessorImpl {
         final boolean isRetries = true;
         final long requestSequenceNumber = XFormsStateManager.getRequestSequence(requestDocument);
 
-        final boolean isAjaxRequest = request.getMethod() != null && request.getMethod().equalsIgnoreCase("post") && XMLUtils.isXMLMediatype(NetUtils.getContentTypeMediaType(request.getContentType()));
+        final boolean isAjaxRequest = request.getMethod() != null && request.getMethod().equals("POST") && XMLUtils.isXMLMediatype(NetUtils.getContentTypeMediaType(request.getContentType()));
 
         final boolean isIgnoreSequenceNumber = !isAjaxRequest;
 

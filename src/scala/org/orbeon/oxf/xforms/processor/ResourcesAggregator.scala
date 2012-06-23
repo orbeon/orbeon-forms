@@ -79,7 +79,7 @@ class ResourcesAggregator extends ProcessorImpl {
 
                         // In this mode, resources are described in JSON within a <div>
                         val request = NetUtils.getExternalContext.getRequest
-                        val isAsyncPortletLoad = request.getContainerType == "portlet" && XFormsProperties.isAsyncPortletLoad && request.getMethod == "get" // limited to GET for now
+                        val isAsyncPortletLoad = request.getContainerType == "portlet" && XFormsProperties.isAsyncPortletLoad && request.getMethod == "GET" // limited to GET for now
                         val isMinimal = XFormsProperties.isMinimalResources
                         val isCacheCombinedResources = XFormsProperties.isCacheCombinedResources
                         val asyncPortletLoadScripts = if (isAsyncPortletLoad) XFormsFeatures.getAsyncPortletLoadScripts map (_.getResourcePath(isMinimal)) else Array.empty[String]

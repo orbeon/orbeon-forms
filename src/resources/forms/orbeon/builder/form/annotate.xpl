@@ -111,13 +111,13 @@
                     </xforms:group>
                 </xsl:template>
 
-                <!-- fr:section → fb:section/(@edit-ref, @xxf:update) -->
+                <!-- fr:section → fr:section/(@edit-ref, @xxf:update) -->
                 <xsl:template match="xhtml:body//fr:section">
-                    <xsl:element name="fb:{local-name()}">
+                    <xsl:copy>
                         <xsl:attribute name="edit-ref"/>
                         <xsl:attribute name="xxforms:update" select="'full'"/>
                         <xsl:apply-templates select="@* | node()"/>
-                    </xsl:element>
+                    </xsl:copy>
                 </xsl:template>
 
                 <!-- fr:grid → fr:grid/@edit-ref -->

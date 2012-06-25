@@ -77,7 +77,7 @@
                 </xsl:template>
 
                 <!-- Remove @edit-ref and @xxf:update, fb:view → fr:view, fb:section → fr:section -->
-                <xsl:template match="xhtml:body//fb:view | xhtml:body//fb:section | xhtml:body//fr:grid">
+                <xsl:template match="xhtml:body//fb:view | xhtml:body//fr:section | xhtml:body//fr:grid">
                     <xsl:element name="fr:{local-name()}">
                         <xsl:apply-templates select="@* except (@edit-ref, @xxforms:update) | node()"/>
                     </xsl:element>

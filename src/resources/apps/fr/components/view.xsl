@@ -40,49 +40,49 @@
             <!-- Just to set the context -->
 
             <xforms:group id="fr-view" class="fr-view{concat(' fr-mode-', $mode)}">
-                <!-- Don't use fixed navbar in Form Builder, as Form Builder has its own fixed navbar at the top of viewport -->
-                <xsl:variable name="header-classes" as="xs:string*" select="('fr-header', 'navbar',
-                    if ($is-form-builder) then () else 'navbar-fixed-top')"/>
-                <xhtml:div class="{string-join($header-classes, ' ')}">
-                    <xhtml:div class="navbar-inner">
-                        <xhtml:div class="container">
-                            <xsl:if test="not($mode = ('email')) and not($hide-header)">
-                                <xsl:choose>
-                                    <xsl:when test="fr:header">
-                                        <!-- Custom header -->
-                                        <xforms:group model="fr-form-model" context="instance('fr-form-instance')">
-                                            <xsl:apply-templates select="fr:header/node()"/>
-                                        </xforms:group>
-                                    </xsl:when>
-                                    <xsl:when test="$mode = 'view'">
-                                        <!-- View header -->
-                                        <xsl:variable name="default-objects" as="element()+">
-                                            <fr:logo/>
-                                            <fr:title/>
-                                        </xsl:variable>
-
-                                        <xsl:apply-templates select="$default-objects"/>
-                                    </xsl:when>
-                                    <xsl:otherwise>
-                                        <!-- Standard header -->
-                                        <xsl:variable name="default-objects" as="element()+">
-                                            <fr:logo/>
-                                            <fr:title/>
-                                            <fr:language-selector/>
-                                            <fr:noscript-selector/>
-                                            <fr:form-builder-doc/>
-                                            <fr:goto-content/>
-                                        </xsl:variable>
-
-                                        <xsl:apply-templates select="$default-objects"/>
-                                    </xsl:otherwise>
-                                </xsl:choose>
-                            </xsl:if>
-                        </xhtml:div>
-                    </xhtml:div>
-                </xhtml:div>
                 <xhtml:div id="{if ($width = '750px') then 'doc' else if ($width = '950px') then 'doc2' else if ($width = '1154px') then 'doc-fb' else if ($width = '100%') then 'doc3' else 'doc4'}"
                            class="fr-container{if (fr:left) then ' yui-t2 ' else ''}">
+                    <!-- Don't use fixed navbar in Form Builder, as Form Builder has its own fixed navbar at the top of viewport -->
+                    <xsl:variable name="header-classes" as="xs:string*" select="('fr-header', 'navbar',
+                        if ($is-form-builder) then () else 'navbar-fixed-top')"/>
+                    <xhtml:div class="{string-join($header-classes, ' ')}">
+                        <xhtml:div class="navbar-inner">
+                            <xhtml:div class="container">
+                                <xsl:if test="not($mode = ('email')) and not($hide-header)">
+                                    <xsl:choose>
+                                        <xsl:when test="fr:header">
+                                            <!-- Custom header -->
+                                            <xforms:group model="fr-form-model" context="instance('fr-form-instance')">
+                                                <xsl:apply-templates select="fr:header/node()"/>
+                                            </xforms:group>
+                                        </xsl:when>
+                                        <xsl:when test="$mode = 'view'">
+                                            <!-- View header -->
+                                            <xsl:variable name="default-objects" as="element()+">
+                                                <fr:logo/>
+                                                <fr:title/>
+                                            </xsl:variable>
+    
+                                            <xsl:apply-templates select="$default-objects"/>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <!-- Standard header -->
+                                            <xsl:variable name="default-objects" as="element()+">
+                                                <fr:logo/>
+                                                <fr:title/>
+                                                <fr:language-selector/>
+                                                <fr:noscript-selector/>
+                                                <fr:form-builder-doc/>
+                                                <fr:goto-content/>
+                                            </xsl:variable>
+    
+                                            <xsl:apply-templates select="$default-objects"/>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
+                                </xsl:if>
+                            </xhtml:div>
+                        </xhtml:div>
+                    </xhtml:div>
                     <xhtml:div id="yui-main">
                         <xhtml:div class="yui-b">
                             <!-- Top -->

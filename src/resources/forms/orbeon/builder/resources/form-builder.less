@@ -12,6 +12,9 @@
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 
+@darkBlue: #004B92;
+@lightBlue: #DEF;
+
 /* Overwrite definition in form-runner-orbeon.css if any */
 html { overflow: hidden }
 
@@ -28,7 +31,7 @@ html { overflow: hidden }
 /* This is for the form builder title at the top */
 .fb-top h1.fr-form-title {
     clear: none;
-    color: #004B92;
+    color: @darkBlue;
     margin: 0 0 0 2em;
     padding: 0;
 }
@@ -47,10 +50,10 @@ html { overflow: hidden }
     padding-bottom: 1.5em /* with Firefox and Safari, scrollable content appears otherwise clipped a little (because content gets out of the box?) */
 }
 
-#fb-toolbox .bd { background: url("../images/light-blue-gradient.png")
-                  repeat-x #E8F2FF; padding: .5em; }                                /* Body background*/
+#fb-toolbox .bd { background: @lightBlue; padding: .5em; }                                /* Body background*/
 #fb-toolbox .fb-tool { margin: 0 0 0 .7em }
 #fb-toolbox .fb-tool .xforms-trigger button     {
+    padding: 2px 0 2px 0;
     border: none; background: none; box-shadow: none;                               /* Remove button default styling */
     font-size: 85%;                                                                 /* Smaller text next icon */
 }
@@ -186,7 +189,7 @@ html { overflow: hidden }
 .fr-top .xbl-fr-inplace-input .xforms-label { display: none }
 .fr-top .xbl-fr-inplace-input .fr-inplace-cancel a { color: white }
 .fr-top .xbl-fr-inplace-input .fr-inplace-content .xforms-output { color: white }
-.fr-top .xbl-fr-inplace-input .fr-inplace-content .xforms-output:hover { color: #004B92 }
+.fr-top .xbl-fr-inplace-input .fr-inplace-content .xforms-output:hover { color: @darkBlue }
 .fr-top .xbl-fr-inplace-input .fr-inplace-content .xforms-input input { color: #6E6E6E }
 .fr-top .xbl-fr-inplace-input .fr-inplace-buttons .xforms-trigger-appearance-minimal { color: white }
 
@@ -218,15 +221,15 @@ html { overflow: hidden }
 
 /* Highlighting of in-place outputs depending on hovering */
 .fr-inplace-content .xforms-output:hover { background-color: #FFFF88 }
-#fb-details-group .fb-top-level-content:hover .fr-section-title .fr-inplace-content .xforms-output { background-color: #FFFFDD; color: #004B92 }
-#fb-details-group .fb-top-level-content:hover .fr-section-title .fr-inplace-content .xforms-output:hover { background-color: #FFFF88; color: #004B92 }
+#fb-details-group .fb-top-level-content:hover .fr-section-title .fr-inplace-content .xforms-output { background-color: #FFFFDD; color: @darkBlue }
+#fb-details-group .fb-top-level-content:hover .fr-section-title .fr-inplace-content .xforms-output:hover { background-color: #FFFF88; color: @darkBlue }
 
 /* In-place editing for metadata section */
 .fr-top .xbl-fr-inplace-input { display: block }
 .fr-top .xbl-fr-inplace-input .xforms-input input { width: 100% }
 
 /* In-place editing for section titles */
-.fr-section-title .fr-inplace-content .xforms-output { color: #004B92 }
+.fr-section-title .fr-inplace-content .xforms-output { color: @darkBlue }
 #fb-details-group .fr-section-title { display: block }
 
 /* Only show buttons when in edit mode or when hovering over the title */
@@ -257,12 +260,12 @@ html { overflow: hidden }
 /* Highlighting of top-level blocks (sections, ...) */
 .fb-top-level-content { padding-left: .5em; margin-bottom: .5em; border-left: 0 solid transparent }
 .fb-top-level-content:hover { border-left: 0 solid #ccc }
-.fr-section-container .xforms-repeat-selected-item-1 { border-left: 0 solid #004B92}
+.fr-section-container .xforms-repeat-selected-item-1 { border-left: 0 solid @darkBlue}
 
 /* Highlighting of section content (grids, ...) */
 .fb-section-content { display: block; padding-left: .5em; margin-bottom: .5em; border-left: 0 solid transparent }
 .fb-section-content:hover { border-left: 0 solid #ccc}
-.fr-section-container .xforms-repeat-selected-item-2 { border-left: 0 solid #004B92}
+.fr-section-container .xforms-repeat-selected-item-2 { border-left: 0 solid @darkBlue}
 
 /* Control editor */
 .fb-edit-label .xforms-label { display: none }
@@ -300,7 +303,7 @@ a.xforms-help-image .fb-control-help { vertical-align: baseline; }
 
 .fr-grid-td { border: 1px solid transparent }
 .fr-editable .fr-grid-tr { height: 60px }   /* Enough space to hold row icons so that hovering doesn't cause the row to expand */
-.fr-grid.fr-editable.fr-norepeat:hover .fr-grid-td { border: 1px solid #ccc} /* Only for grid which is not a repeat, e.g. no highlighting in itemset editor */
+.fr-grid.fr-editable.fr-norepeat:hover .fr-grid-td { border: 1px solid @lightBlue} /* Only for grid which is not a repeat, e.g. no highlighting in itemset editor */
 
 .fb-grid-cell-icons, .fb-grid-control-icons, .fb-grid-row-icons { display: block; width: 16px; min-height: 4em; height: auto !important; height: 4em; text-align: center }/* IE HACK for min-height */
 
@@ -337,7 +340,7 @@ a.xforms-help-image .fb-control-help { vertical-align: baseline; }
 .fr-grid .fr-grid-content .xforms-trigger .xforms-mock-button input,                /* Override margin set in form-runner-base.css for buttons in noscript (rendered as input) */
 .fr-grid .fr-grid-content .xforms-trigger .fb-mock-link input
     { margin: 0 }
-.fb-mock-link { color: #004B92; text-decoration: underline }                        /* Simulate  styling of a link */
+.fb-mock-link { color: @darkBlue; text-decoration: underline }                        /* Simulate  styling of a link */
 .xforms-mock-button .xforms-label { margin: 0 }                                     /* Override margin set in form-runner-base.css for regular labels */
 .fb-label-hint-placeholder .fb-mock-link { color: #bbb; text-decoration: none }     /* When placeholder shown, don't underline and use grey color, to make it clear this is a placeholder */
 .fb-mock-link:hover { background-color: #ffffd3 }                                   /* Simulated link get yellow background on mouse over to suggest it can be edited */
@@ -358,8 +361,9 @@ a.xforms-help-image .fb-control-help { vertical-align: baseline; }
 .fb-grid-column-toolbar-td.fb-hover a                                               /* Show them when the mouse is in a cell of the same column; style.coffee adds the .fb-hover */
     { display: block }
 
-.fb-selected {                                                                      /* Selected cell */
-    background-color: #cdf; }                                                       /* Darker "blue" than the one used for alternating rows */
+.fb-selected {                                                                      // Selected cell in grids
+    box-shadow: 0 0 10px @darkBlue;                                                 // Highlight current cell with "halo"
+}
 
 /* Grid content */
 /* Margin leaves space for the icons to the left and right of the control */
@@ -513,10 +517,11 @@ html.accordion-menu-js dd.a-m-d-anim {
     .fr-container { top: 10px }         // Override 40px in form-runner-base.css as we don't leave as much as space at the top since the navbar isn't fixed
     .navbar { margin-bottom: 0 }        // Override 18px in bootstrap.css as the content below the navbar (.fr-top) already as its own padding
     .yui-layout-bd { border: none }
-    .yui-layout-unit-top .yui-layout-bd    { border-bottom: 2px solid #004B92; background-color: #E8F2FF } /* Top section */
+    .yui-layout-unit-center  .yui-layout-bd { box-shadow: 0 0 10px @darkBlue; }
+    .yui-layout-unit-top .yui-layout-bd    { background-color: @lightBlue } /* Top section */
     .yui-layout-unit-top .fr-logo          { padding: 0 0 0 1em }
-    .yui-layout-unit-left .yui-layout-bd   { border-right: 2px solid #ccc; background-color: #E8F2FF }
-    .yui-layout-unit-bottom .yui-layout-bd { border-top: 2px solid #004B92; background-color: #E8F2FF }
+    .yui-layout-unit-left .yui-layout-bd   { background-color: @lightBlue }
+    .yui-layout-unit-bottom .yui-layout-bd { background-color: @lightBlue }
 }
 
 

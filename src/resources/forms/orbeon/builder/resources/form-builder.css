@@ -40,7 +40,7 @@ html {
 /* This is for the form builder title at the top */
 .fb-top h1.fr-form-title {
   clear: none;
-  color: #004B92;
+  color: #004b92;
   margin: 0 0 0 2em;
   padding: 0;
 }
@@ -57,7 +57,7 @@ html {
 ;
 }
 #fb-toolbox .bd {
-  background: url("../images/light-blue-gradient.png") repeat-x #e8f2ff;
+  background: #ddeeff;
   padding: .5em;
 }
 /* Body background*/
@@ -65,6 +65,7 @@ html {
   margin: 0 0 0 0.7em;
 }
 #fb-toolbox .fb-tool .xforms-trigger button {
+  padding: 2px 0 2px 0;
   border: none;
   background: none;
   box-shadow: none;
@@ -564,7 +565,7 @@ a.xforms-help-image .fb-control-help {
 }
 /* Enough space to hold row icons so that hovering doesn't cause the row to expand */
 .fr-grid.fr-editable.fr-norepeat:hover .fr-grid-td {
-  border: 1px solid #cccccc;
+  border: 1px solid #ddeeff;
 }
 /* Only for grid which is not a repeat, e.g. no highlighting in itemset editor */
 .fb-grid-cell-icons,
@@ -661,7 +662,7 @@ a.xforms-help-image .fb-control-help {
   margin: 0;
 }
 .fb-mock-link {
-  color: #004B92;
+  color: #004b92;
   text-decoration: underline;
 }
 /* Simulate  styling of a link */
@@ -710,11 +711,8 @@ a.xforms-help-image .fb-control-help {
   display: block;
 }
 .fb-selected {
-  /* Selected cell */
-
-  background-color: #cdf;
+  box-shadow: 0 0 10px #004b92;
 }
-/* Darker "blue" than the one used for alternating rows */
 /* Grid content */
 /* Margin leaves space for the icons to the left and right of the control */
 .fr-grid-content {
@@ -958,20 +956,20 @@ html.accordion-menu-js dd.a-m-d-anim {
 #fb-layout .yui-layout-bd {
   border: none;
 }
+#fb-layout .yui-layout-unit-center .yui-layout-bd {
+  box-shadow: 0 0 10px #004b92;
+}
 #fb-layout .yui-layout-unit-top .yui-layout-bd {
-  border-bottom: 2px solid #004B92;
-  background-color: #e8f2ff;
+  background-color: #ddeeff;
 }
 #fb-layout .yui-layout-unit-top .fr-logo {
   padding: 0 0 0 1em;
 }
 #fb-layout .yui-layout-unit-left .yui-layout-bd {
-  border-right: 2px solid #ccc;
-  background-color: #e8f2ff;
+  background-color: #ddeeff;
 }
 #fb-layout .yui-layout-unit-bottom .yui-layout-bd {
-  border-top: 2px solid #004B92;
-  background-color: #e8f2ff;
+  background-color: #ddeeff;
 }
 /* Always show vertical scrollbar so that there is no reflow of the left panel when it becomes shorter/taller */
 .yui-layout .yui-layout-unit-left div.yui-layout-bd {

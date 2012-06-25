@@ -510,7 +510,8 @@ html.accordion-menu-js dd.a-m-d-anim {
 .fr-bottom, .fb-bottom { padding: .8em }
 
 #fb-layout {
-    .fr-container { top: 10px }         // Overrides 40px in form-runner-base.css as we don't leave as much as space at the top since the navbar isn't fixed
+    .fr-container { top: 10px }         // Override 40px in form-runner-base.css as we don't leave as much as space at the top since the navbar isn't fixed
+    .navbar { margin-bottom: 0 }        // Override 18px in bootstrap.css as the content below the navbar (.fr-top) already as its own padding
     .yui-layout-bd { border: none }
     .yui-layout-unit-top .yui-layout-bd    { border-bottom: 2px solid #004B92; background-color: #E8F2FF } /* Top section */
     .yui-layout-unit-top .fr-logo          { padding: 0 0 0 1em }

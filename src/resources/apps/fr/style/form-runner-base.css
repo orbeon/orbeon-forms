@@ -256,8 +256,8 @@ input.xforms-trigger,
 .fr-top {
   display: block;
 }
-.fr-top .fr-logo img {
-  margin-right: 1em;
+.fr-logo img {
+  max-height: 35px;
 }
 .fr-top .fr-form-title {
   margin: 0 0 0 19px;

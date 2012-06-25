@@ -302,7 +302,8 @@
 
     <xsl:template match="fr:title">
         <xhtml:h1 class="fr-form-title">
-            <xforms:output value="$title"/>
+            <!-- Q: Why do we need @ref here? -->
+            <xforms:output value="{if (exists(@ref)) then @ref else '$title'}"/>
         </xhtml:h1>
     </xsl:template>
 
@@ -324,10 +325,10 @@
 
             <!-- If image comes from resources, use an img tag so we can serve GIF for IE6 -->
             <xxforms:variable name="is-logo-in-resources" select="starts-with($logo-uri, 'oxf:')"/>
-            <xforms:group ref=".[$is-logo-in-resources]">
+            <xforms:group ref=".[$is-logo-in-resources]" class="fr-logo">
                 <xhtml:img class="fr-logo" src="{{substring-after($logo-uri, 'oxf:')}}" alt=""/>
             </xforms:group>
-            <xforms:group ref=".[exists($logo-uri) and not($is-logo-in-resources)]">
+            <xforms:group ref=".[exists($logo-uri) and not($is-logo-in-resources)]" class="fr-logo">
                 <xforms:output class="fr-logo" value="$logo-uri" mediatype="image/*"/>
             </xforms:group>
         </xsl:if>

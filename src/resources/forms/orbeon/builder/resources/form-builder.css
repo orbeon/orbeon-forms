@@ -26,7 +26,7 @@ html { overflow: hidden }
 .fb-hide-alert .xforms-alert { display: none }
 
 /* This is for the form builder title at the top */
-h1.fr-form-title {
+.fb-top h1.fr-form-title {
     clear: none;
     color: #004B92;
     margin: 0 0 0 2em;

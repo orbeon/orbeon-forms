@@ -193,18 +193,8 @@
                 <fr:view>
                     <xf:label>Orbeon Form Builder</xf:label>
                     <fr:header>
-                        <!-- Logo -->
-                        <xf:group id="fb-logo-group" class="fr-logo">
-                            <xf:label ref="$form-resources/logo/label" class="fr-hidden"/>
-                            <fr:image-attachment bind="logo-bind" class="fr-attachment">
-                                <!-- Only show hint if there is no attachment -->
-                                <xf:hint ref="$form-resources/logo/hint[not(normalize-space(context()))]"/>
-                                <!-- Store all the details -->
-                                <xf:filename ref="@filename"/>
-                                <xf:mediatype ref="@mediatype"/>
-                                <xxf:size ref="@size"/>
-                            </fr:image-attachment>
-                        </xf:group>
+                        <fr:logo ref="xxf:bind('logo-bind')"/>
+                        <fr:title ref="xxf:bind('title-bind')"/>
 
                         <!-- Form settings -->
                         <xf:trigger appearance="minimal" id="fb-form-settings-trigger">
@@ -216,6 +206,7 @@
                                     <xxf:context name="form" value="xxf:bind('form-name-bind')"/>
                                     <xxf:context name="title" value="xxf:bind('title-bind')"/>
                                     <xxf:context name="description" value="xxf:bind('description-bind')"/>
+                                    <xxf:context name="logo" value="xxf:bind('logo-bind')"/>
                                     <xxf:context name="mode" value="'edit'"/>
                                 </xf:dispatch>
                             </xf:action>
@@ -284,17 +275,7 @@
 
                     </fr:header>
                     <fr:top>
-                        <!-- Form title and description -->
-                        <fr:inplace-input id="title-control" bind="title-bind" class="fr-summary fr-search fb-title-control fr-form-title">
-                            <xf:label ref="$form-resources/title/label"/>
-                            <xf:hint ref="$form-resources/title/hint"/>
-                            <xf:alert ref="$form-resources/title/alert"/>
-                        </fr:inplace-input>
-                        <fr:inplace-input id="description-control" bind="description-bind" class="fr-summary fr-search fb-description-control fr-form-description">
-                            <xf:label ref="$form-resources/description/label"/>
-                            <xf:hint ref="$form-resources/description/hint"/>
-                        </fr:inplace-input>
-                        <xh:div class="fr-clear"/>
+                        <fr:description ref="xxf:bind('description-bind')"/>
                     </fr:top>
                     <fr:bottom>
                         <xh:div class="fr-buttons">

@@ -39,6 +39,11 @@
                     ref="mode"
                     value="event('mode')"/>
 
+                <xf:setvalue ref="logo" value="event('logo')"/>
+                <xf:setvalue ref="logo/@filename" value="event('logo')/@filename"/>
+                <xf:setvalue ref="logo/@mediatype" value="event('logo')/@mediatype"/>
+                <xf:setvalue ref="logo/@size" value="event('logo')/@size"/>
+
                 <xxf:show dialog="dialog"/>
             </xbl:handler>
         </xbl:handlers>
@@ -49,7 +54,7 @@
                         <app/>
                         <form/>
                         <title/>
-                        <description/>
+                        <logo filename="" mediatype="" size=""/>
                         <mode/>
                     </instance>
                 </xf:instance>
@@ -106,78 +111,110 @@
                     </xf:group>
                     <xh:img src="/forms/orbeon/builder/images/label_64.png" alt=""/>
                     <xh:div class="fb-dialog-form-settings-fields">
-                        <!-- Application name -->
 
-                        <!-- Use an input if app name is a wildcard -->
-                        <xf:var name="is-input" value="xxf:instance('fr-permissions')/app[@name = '*']" as="xs:boolean"/>
-                        <xf:group ref=".[$is-input]">
-                            <xf:input ref="app" id="fb-application-name-input" tabindex="1" xxf:autocomplete="off">
-                                <xf:label ref="$resources/application-name/label"/>
-                                <xf:hint ref="$resources/application-name/hint"/>
-                                <xf:alert ref="$resources/application-name/alert"/>
+                        <xh:div>
+
+                            <!-- Application name -->
+                            <!-- Use an input if app name is a wildcard -->
+                            <xf:var name="is-input" value="xxf:instance('fr-permissions')/app[@name = '*']" as="xs:boolean"/>
+                            <xf:group ref=".[$is-input]">
+                                <xf:input ref="app" id="fb-application-name-input" tabindex="1" xxf:autocomplete="off">
+                                    <xf:label ref="$resources/application-name/label"/>
+                                    <xf:hint ref="$resources/application-name/hint"/>
+                                    <xf:alert ref="$resources/application-name/alert"/>
+                                </xf:input>
+                            </xf:group>
+                            <!-- Otherwise list apps allowed -->
+                            <xf:group ref=".[not($is-input)]">
+                                <xf:select1 ref="app">
+                                    <xf:label ref="$resources/application-name/label"/>
+                                    <xf:itemset model="fr-roles-model" ref="xxf:instance('fr-permissions')/app">
+                                        <xf:label ref="@name"/>
+                                        <xf:value ref="@name"/>
+                                    </xf:itemset>
+                                </xf:select1>
+                            </xf:group>
+
+                            <!-- Logo -->
+                            <xf:group ref=".[$is-form-settings]">
+                                <xf:label ref="$resources/logo/label" class="fr-hidden"/>
+                                <fr:image-attachment ref="logo" class="fr-attachment">
+                                    <!-- Only show hint if there is no attachment -->
+                                    <xf:hint ref="$resources/logo/hint[not(normalize-space(context()))]"/>
+                                    <!-- Store all the details -->
+                                    <xf:filename ref="@filename"/>
+                                    <xf:mediatype ref="@mediatype"/>
+                                    <xxf:size ref="@size"/>
+                                </fr:image-attachment>
+                            </xf:group>
+
+                        </xh:div>
+
+                        <xh:div>
+
+                            <!-- Form name -->
+                            <xf:input ref="form" id="fb-form-name-input" tabindex="2" xxf:autocomplete="off">
+                                <xf:label ref="$resources/form-name/label"/>
+                                <xf:hint ref="$resources/form-name/hint"/>
+                                <xf:alert ref="$resources/form-name/alert"/>
                             </xf:input>
-                        </xf:group>
-                        <!-- Otherwise list apps allowed -->
-                        <xf:group ref=".[not($is-input)]">
-                            <xf:select1 ref="app">
-                                <xf:label ref="$resources/application-name/label"/>
-                                <xf:itemset model="fr-roles-model" ref="xxf:instance('fr-permissions')/app">
-                                    <xf:label ref="@name"/>
-                                    <xf:value ref="@name"/>
-                                </xf:itemset>
-                            </xf:select1>
-                        </xf:group>
 
-                        <!-- Form name -->
-                        <xf:input ref="form" id="fb-form-name-input" tabindex="2" xxf:autocomplete="off">
-                            <xf:label ref="$resources/form-name/label"/>
-                            <xf:hint ref="$resources/form-name/hint"/>
-                            <xf:alert ref="$resources/form-name/alert"/>
-                        </xf:input>
+                            <!-- Title -->
+                            <xf:input ref="title" id="fb-title-input" tabindex="3" xxf:autocomplete="off">
+                                <xf:label ref="$resources/title/label"/>
+                                <xf:hint ref="$resources/title/hint"/>
+                                <xf:alert ref="$resources/title/alert"/>
+                            </xf:input>
 
-                        <!-- Title -->
-                        <xf:input ref="title" id="fb-title-input" tabindex="3" xxf:autocomplete="off">
-                            <xf:label ref="$resources/title/label"/>
-                            <xf:hint ref="$resources/title/hint"/>
-                            <xf:alert ref="$resources/title/alert"/>
-                        </xf:input>
+                            <!-- Description -->
+                            <xf:textarea ref="description" tabindex="4">
+                                <xf:label ref="$resources/description/label"/>
+                                <xf:hint ref="$resources/description/hint"/>
+                                <xf:alert ref="$resources/description/alert"/>
+                            </xf:textarea>
 
-                        <!-- Description -->
-                        <xf:textarea ref="description" tabindex="4">
-                            <xf:label ref="$resources/description/label"/>
-                            <xf:hint ref="$resources/description/hint"/>
-                            <xf:alert ref="$resources/description/alert"/>
-                        </xf:textarea>
+                        </xh:div>
 
-                        <!-- Stats -->
-                        <xf:group ref=".[$is-form-settings]" class="fb-dialog-form-settings-stats">
-                            <xf:label value="$resources/dialog-form-settings/stats"/>
+                        <xh:div>
 
-                            <xf:var name="labels"
-                                    value="$resources/dialog-form-settings/(sections, repeats, grids, section-templates, controls, all)"/>
-                            <xf:var name="counts"
-                                    value="(containerOps:countSections($body),
-                                            containerOps:countRepeats($body),
-                                            containerOps:countGrids($body),
-                                            containerOps:countSectionTemplates($body),
-                                            containerOps:countAllNonContainers($body),
-                                            containerOps:countAllControls($body))"/>
+                            <!-- Stats -->
+                            <xf:group ref=".[$is-form-settings]" class="fb-dialog-form-settings-stats">
+                                <xf:label value="$resources/dialog-form-settings/stats"/>
+                                <xf:var name="labels"
+                                        value="$resources/dialog-form-settings/(sections, repeats, grids, section-templates, controls, all)"/>
+                                <xf:var name="counts"
+                                        value="(containerOps:countSections($body),
+                                                containerOps:countRepeats($body),
+                                                containerOps:countGrids($body),
+                                                containerOps:countSectionTemplates($body),
+                                                containerOps:countAllNonContainers($body),
+                                                containerOps:countAllControls($body))"/>
+                                <xh:table>
+                                    <xf:repeat ref="1 to count($labels)">
+                                        <xf:var name="i" value="position()"/>
+                                        <xh:tr>
+                                            <xh:th><xf:output value="$labels[$i]"/></xh:th>
+                                            <xh:td><xf:output value="$counts[$i]"/></xh:td>
+                                        </xh:tr>
+                                    </xf:repeat>
+                                </xh:table>
+                            </xf:group>
 
-                            <xh:table>
-                                <xf:repeat ref="1 to count($labels)">
-                                    <xf:var name="i" value="position()"/>
-                                    <xh:tr>
-                                        <xh:th><xf:output value="$labels[$i]"/></xh:th>
-                                        <xh:td><xf:output value="$counts[$i]"/></xh:td>
-                                    </xh:tr>
-                                </xf:repeat>
-                            </xh:table>
+                            <!-- Form description -->
+                            <xf:group ref=".[$is-form-settings]">
+                                <xf:textarea ref="description">
+                                    <xf:label ref="$resources/description/label"/>
+                                    <xf:hint ref="$resources/description/hint"/>
+                                    <xf:alert ref="$resources/description/alert"/>
+                                </xf:textarea>
+                            </xf:group>
 
-                        </xf:group>
+                        </xh:div>
+
                     </xh:div>
 
                     <xh:div class="fr-dialog-buttons">
-                        <xf:trigger id="fb-metadata-continue-trigger" tabindex="3">
+                        <xf:trigger id="fb-metadata-continue-trigger" appearance="xxf:primary" tabindex="3">
                             <xf:label value="$resources/(if ($is-new-form) then continue else apply)/label"/>
                         </xf:trigger>
                         <xf:output value="$resources/or/label"/>
@@ -203,6 +240,7 @@
                             <xxf:context name="form"        value="instance()/form"/>
                             <xxf:context name="title"       value="instance()/title"/>
                             <xxf:context name="description" value="instance()/description"/>
+                            <xxf:context name="logo" value="instance()/logo"/>
                             <xxf:context name="mode"        value="instance()/mode"/>
                         </xf:dispatch>
 

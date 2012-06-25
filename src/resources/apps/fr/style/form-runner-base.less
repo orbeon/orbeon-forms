@@ -166,7 +166,11 @@ button.xforms-trigger, input.xforms-trigger, .xforms-trigger button, .xforms-tri
 /* Top area */
 .fr-top { display: block }
 
-.fr-top .fr-logo img { margin-right: 1em }
+.fr-logo img {
+    max-height: 35px;           // If logo is larger, resize it to make it fit in 40px height navbar
+                                // TODO: This should be done on the server-side when the image is first attached
+}
+
 .fr-top .fr-form-title {
     margin: 0 0 0 19px;
     padding: 0;

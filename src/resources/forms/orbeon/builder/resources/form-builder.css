@@ -952,6 +952,9 @@ html.accordion-menu-js dd.a-m-d-anim {
 #fb-layout .fr-container {
   top: 10px;
 }
+#fb-layout .navbar {
+  margin-bottom: 0;
+}
 #fb-layout .yui-layout-bd {
   border: none;
 }

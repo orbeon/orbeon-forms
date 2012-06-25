@@ -159,9 +159,6 @@
                             </xf:trigger>
                         </xf:group>
 
-                        <!-- "Save" from Form Runner -->
-                        <fr:save-button/>
-
                         <!-- Save as -->
                         <xf:trigger id="fr-save-as-button" ref="instance('fb-triggers-instance')/save-as">
                             <xf:label>
@@ -177,6 +174,10 @@
                                 </xf:dispatch>
                             </xf:action>
                         </xf:trigger>
+
+                        <!-- "Save" from Form Runner -->
+                        <fr:save-button appearance="xxforms:primary"/>
+
                     </xh:div>
 
                     <div class="fr-clear"/>

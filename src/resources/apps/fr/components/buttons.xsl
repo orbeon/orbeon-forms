@@ -28,6 +28,7 @@
         <!-- Display a "refresh" button only in noscript mode -->
         <xforms:group ref=".[property('xxforms:noscript')]">
             <xforms:trigger id="fr-refresh-button">
+                <xsl:copy-of select="@appearance"/>
                 <xforms:label>
                     <xhtml:img width="11" height="16" src="/apps/fr/style/images/silk/arrow_refresh.png" alt="{{$fr-resources/summary/labels/refresh}}"/>
                 </xforms:label>
@@ -40,6 +41,7 @@
 
     <xsl:template match="fr:close-button">
         <xforms:trigger id="fr-back-button" model="fr-persistence-model" ref="instance('fr-triggers-instance')/other">
+            <xsl:copy-of select="@appearance"/>
             <xforms:label>
                 <xhtml:img width="11" height="16" src="/apps/fr/style/close.gif" alt=""/>
                 <xhtml:span><xforms:output value="$fr-resources/detail/labels/close"/></xhtml:span>
@@ -72,6 +74,7 @@
 
     <xsl:template match="fr:clear-button">
         <xforms:trigger id="fr-clear-button" model="fr-persistence-model" ref="instance('fr-triggers-instance')/other">
+            <xsl:copy-of select="@appearance"/>
             <xforms:label><xhtml:img width="16" height="16" src="/apps/fr/style/clear.gif" alt=""/>
                 <xhtml:span><xforms:output value="$fr-resources/detail/labels/clear"/></xhtml:span>
             </xforms:label>
@@ -106,6 +109,7 @@
                 model="fr-persistence-model"
                 ref="instance('fr-triggers-instance')/strict-submit"
                 href="/fr/service/{$app}/{$form}/pdf/{{xxforms:instance('fr-parameters-instance')/document}}/{{xxforms:document-id()}}.pdf">
+            <xsl:copy-of select="@appearance"/>
             <xforms:label>
                 <xhtml:img width="16" height="16" src="/apps/fr/style/pdf.png" alt=""/>
                 <xhtml:span><xforms:output value="$fr-resources/detail/labels/print-pdf"/></xhtml:span>
@@ -115,6 +119,7 @@
 
     <xsl:template match="fr:save-button">
         <xforms:trigger id="fr-save-button" xxforms:modal="true" model="fr-persistence-model" ref="instance('fr-triggers-instance')/save">
+            <xsl:copy-of select="@appearance"/>
             <xforms:label>
                 <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/database_save.png" alt=""/>
                 <xhtml:span><xforms:output value="$fr-resources/detail/labels/save-document"/></xhtml:span>
@@ -133,6 +138,7 @@
 
     <xsl:template match="fr:submit-button">
         <xforms:trigger xxforms:modal="true" id="fr-submit-button" model="fr-persistence-model" ref="instance('fr-triggers-instance')/submit">
+            <xsl:copy-of select="@appearance"/>
             <xforms:label>
                 <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/application_go.png" alt=""/>
                 <xhtml:span><xforms:output value="$fr-resources/detail/labels/submit-document"/></xhtml:span>
@@ -142,6 +148,7 @@
 
     <xsl:template match="fr:workflow-review-button">
         <xforms:trigger xxforms:modal="true" id="fr-workflow-review-button" model="fr-persistence-model" ref="instance('fr-triggers-instance')/workflow-review">
+            <xsl:copy-of select="@appearance"/>
             <xforms:label>
                 <xhtml:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/right_16.png" alt=""/>
                 <xhtml:span><xforms:output value="$fr-resources/detail/labels/workflow-review"/></xhtml:span>
@@ -151,6 +158,7 @@
 
     <xsl:template match="fr:workflow-edit-button">
         <xforms:trigger xxforms:modal="true" id="fr-workflow-edit-button" model="fr-persistence-model" ref="instance('fr-triggers-instance')/workflow-edit">
+            <xsl:copy-of select="@appearance"/>
             <xforms:label>
                 <xhtml:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/left_16.png" alt=""/>
                 <xhtml:span><xforms:output value="$fr-resources/detail/labels/workflow-edit"/></xhtml:span>
@@ -160,6 +168,7 @@
 
     <xsl:template match="fr:workflow-send-button">
         <xforms:trigger xxforms:modal="true" id="fr-workflow-send-button" model="fr-persistence-model" ref="instance('fr-triggers-instance')/workflow-send">
+            <xsl:copy-of select="@appearance"/>
             <xforms:label>
                 <xhtml:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/right_16.png" alt=""/>
                 <xhtml:span><xforms:output value="$fr-resources/detail/labels/workflow-send"/></xhtml:span>
@@ -171,6 +180,7 @@
         <!-- Don't show this button in noscript mode -->
         <!-- TODO: bind to strict-submit, but maybe fr-email-service-submission should check validity instead -->
         <xforms:trigger xxforms:modal="true" id="fr-email-button" model="fr-persistence-model" ref="instance('fr-triggers-instance')/strict-submit">
+            <xsl:copy-of select="@appearance"/>
             <xforms:label>
                 <!--<xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/email.png" alt=""/>-->
                 <xhtml:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/letter_16.png" alt=""/>
@@ -185,6 +195,7 @@
     <xsl:template match="fr:collapse-all-button">
         <xsl:if test="$is-section-collapse">
             <xforms:trigger id="fr-collapse-all-button" model="fr-persistence-model" ref="instance('fr-triggers-instance')/other">
+                <xsl:copy-of select="@appearance"/>
                 <xforms:label>
                     <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/arrow_in.png" alt="{{$fr-resources/detail/labels/collapse-all}}"/>
                 </xforms:label>
@@ -196,6 +207,7 @@
     <xsl:template match="fr:expand-all-button">
         <xsl:if test="$is-section-collapse">
             <xforms:trigger id="fr-expand-all-button" model="fr-persistence-model" ref="instance('fr-triggers-instance')/other">
+                <xsl:copy-of select="@appearance"/>
                 <xforms:label>
                     <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/arrow_out.png" alt="{{$fr-resources/detail/labels/expand-all}}"/>
                 </xforms:label>

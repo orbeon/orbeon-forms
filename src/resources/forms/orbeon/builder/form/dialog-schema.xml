@@ -25,7 +25,7 @@
       id="fb-schema-upload-dialog" level="modal" class="fr-dialog">
 
     <xforms:label ref="$form-resources/dialog-upload-schema/label"/>
-    
+
     <xforms:var name="instance" value="instance('fb-schema-upload-instance')"/>
     <xhtml:div>
         <xforms:group>
@@ -129,7 +129,7 @@
     </xhtml:div>
     <xhtml:div class="fr-dialog-buttons">
         <xforms:group appearance="xxforms:internal">
-            <xforms:trigger class="fr-inplace-rename" id="fb-edit-schema-trigger">
+            <xforms:trigger class="fr-inplace-rename" id="fb-edit-schema-trigger" appearance="xxforms:primary">
                 <xforms:label ref="$form-resources/apply/label"/>
 
                 <xforms:action ev:event="DOMActivate">

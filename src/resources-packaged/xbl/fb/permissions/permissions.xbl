@@ -223,7 +223,7 @@
                     <xhtml:div class="fr-dialog-buttons">
                         <xforms:group appearance="xxforms:internal" id="triggers">
                             <xhtml:span>
-                                <xforms:trigger class="fr-inplace-rename" ref="$ui/apply-trigger" id="save-trigger">
+                                <xforms:trigger class="fr-inplace-rename" ref="$ui/apply-trigger" id="save-trigger" appearance="xxforms:primary">
                                     <xforms:label ref="$resources/apply/label"/>
                                 </xforms:trigger>
                                 <xforms:output value="$resources/or/label"/>

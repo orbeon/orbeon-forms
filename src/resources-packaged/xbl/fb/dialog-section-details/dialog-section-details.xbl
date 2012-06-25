@@ -44,17 +44,17 @@
             </xbl:handler>
         </xbl:handlers>
         <xbl:implementation>
-            
+
             <xf:model id="model">
-        
+
                 <xf:instance id="local">
                     <local relevant=""><!-- TODO: Relevance must be handled automatically by the XForms engine! -->
                         <original-control-name/>
                         <control-name/>
-                        
+
                         <control-xpath/>         <!-- XPath expression to node might be editable if using custom XML -->
                         <is-custom-instance/>
-                        
+
                         <relevant/>
                         <readonly/>
 
@@ -67,7 +67,7 @@
                 <!-- Enable/disable trigger -->
                 <xf:setvalue ev:observer="local" ref="save-trigger" ev:event="xxforms-invalid">disabled</xf:setvalue>
                 <xf:setvalue ev:observer="local" ref="save-trigger" ev:event="xxforms-valid">enabled</xf:setvalue>
-                
+
                 <!-- NOTE: We use normalize-space() to make sure there is no leading/trailing space -->
                 <xf:bind ref="control-name"
                          type="xs:NCName"
@@ -81,7 +81,7 @@
                          fb:warning="not(normalize-space() and dataModel:isAllowedValueBindingExpression(../original-control-name, .))"/>
                 <xf:bind ref="relevant | readonly" type="xxf:xpath2" required="false()"/>
                 <xf:bind ref="save-trigger" readonly=". = 'disabled'"/>
-        
+
             </xf:model>
         </xbl:implementation>
         <xbl:template>
@@ -97,7 +97,7 @@
 
                 <!-- Show dialog -->
                 <xf:action ev:event="xxforms-dialog-open" ev:observer="dialog">
-            
+
                     <xf:setvalue ref="$local/control-xpath" value="dataModel:getBindRefOrEmpty($form, $local/control-name)"/>
                     <xf:setvalue ref="$local/is-custom-instance" value="dataModel:isCustomInstance()"/>
                     
@@ -105,7 +105,7 @@
                     <xf:setvalue ref="$local/readonly" value="controlOps:getMipOrEmpty($form, $local/original-control-name, 'readonly')"/>
 
                     <xf:setvalue ref="$local/control-names" value="string-join(controlOps:getAllControlNamesXPath($body), ' ')"/>
-                    
+
                 </xf:action>
 
                 <!-- Close dialog upon cancel -->
@@ -113,10 +113,10 @@
 
                 <!-- Save data upon close -->
                 <xf:action ev:event="DOMActivate" ev:observer="dialog" if="event('xxf:targetid') != 'cancel-trigger' and $local/save-trigger = 'enabled'">
-            
+
                     <xf:var name="old-name" value="$local/original-control-name/string()"/>
                     <xf:var name="new-name" value="$local/control-name/string()"/>
-                                
+
                     <xf:action type="xpath">
                         controlOps:findRenameControl($form, $old-name, $new-name),
                         controlOps:updateMip($form, $new-name, 'relevant', $local/relevant),
@@ -127,7 +127,7 @@
                         dataModel:setBindRef($form, $new-name, $local/control-xpath)
                     </xf:action>
                     <!-- No classes for sections for now -->
-                    
+
                     <xxf:hide dialog="dialog"/>
                 </xf:action>
 
@@ -181,7 +181,7 @@
                         </xh:div>
                         <xh:div class="fr-dialog-buttons">
                             <xf:group id="triggers">
-                                <xf:trigger class="fr-inplace-rename" ref="save-trigger" id="save-trigger">
+                                <xf:trigger class="fr-inplace-rename" ref="save-trigger" id="save-trigger" appearance="xxf:primary">
                                     <xf:label ref="$resources/apply/label"/>
                                 </xf:trigger>
                                 <xf:output value="$resources/or/label"/>

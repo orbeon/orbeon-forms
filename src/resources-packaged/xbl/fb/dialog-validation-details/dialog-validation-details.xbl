@@ -294,7 +294,7 @@
                         </xhtml:div>
 
                         <xhtml:div class="fr-dialog-buttons">
-                            <xforms:trigger ref="save-trigger" class="fr-inplace-rename">
+                            <xforms:trigger ref="save-trigger" class="fr-inplace-rename" appearance="xxforms:primary">
                                 <xforms:label ref="$resources/apply/label"/>
                                 <!-- Close and save upon DOMActivate -->
                                 <xforms:dispatch ev:event="DOMActivate" name="xxforms-dialog-close" target="dialog">

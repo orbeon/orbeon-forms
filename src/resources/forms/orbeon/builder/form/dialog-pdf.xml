@@ -38,7 +38,7 @@
         </xh:div>
     </xh:div>
     <xh:div class="fr-dialog-buttons">
-        <xf:trigger>
+        <xf:trigger appearance="xxf:primary">
             <xf:label ref="$form-resources/apply/label"/>
             <!-- Commit PDF information -->
             <xf:action ev:event="DOMActivate">
@@ -60,7 +60,7 @@
 
     <!-- Hide dialog for any button -->
     <xxf:hide ev:event="DOMActivate" dialog="fb-pdf-upload-dialog"/>
-    
+
     <!-- Local model -->
     <xf:model id="fb-pdf-upload-model">
 

@@ -34,7 +34,7 @@
     </xhtml:div>
     <xhtml:div class="fr-dialog-buttons">
         <xhtml:span>
-            <xforms:trigger class="fr-inplace-rename" ref="save-trigger">
+            <xforms:trigger class="fr-inplace-rename" ref="save-trigger" appearance="xxforms:primary">
                 <xforms:label ref="$form-resources/apply/label"/>
                 <xforms:action ev:event="DOMActivate">
                     <!-- Parse the XML, annotate and save it -->

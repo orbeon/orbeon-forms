@@ -122,7 +122,7 @@
                             </fr:grid>
                         </xforms:group>
                         <xhtml:div class="fr-dialog-buttons">
-                            <xforms:trigger ref="$local/triggers/(if (xxforms:valid($local, true())) then enabled else disabled)" class="fr-inplace-rename" id="save-trigger">
+                            <xforms:trigger ref="$local/triggers/(if (xxforms:valid($local, true())) then enabled else disabled)" class="fr-inplace-rename" id="save-trigger" appearance="xxforms:primary">
                                 <xforms:label ref="$resources/apply/label"/>
                             </xforms:trigger>
                             <xforms:output value="$resources/or/label"/>

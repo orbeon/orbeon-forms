@@ -206,7 +206,7 @@
                         </xh:div>
                         <xh:div class="fr-dialog-buttons">
                             <xf:group id="triggers">
-                                <xf:trigger class="fr-inplace-rename" ref="save-trigger" id="save-trigger">
+                                <xf:trigger class="fr-inplace-rename" ref="save-trigger" id="save-trigger" appearance="xxf:primary">
                                     <xf:label ref="$resources/apply/label"/>
                                 </xf:trigger>
                                 <xf:output value="$resources/or/label"/>

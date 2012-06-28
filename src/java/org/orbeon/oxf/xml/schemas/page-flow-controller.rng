@@ -32,7 +32,12 @@
                         <ref name="route-attributes"/>
                         <ref name="versioned-attribute"/>
                         <optional>
-                            <attribute name="mime-type"/>
+                            <attribute>
+                                <choice>
+                                    <name>mediatype</name>
+                                    <name>mime-type</name>
+                                </choice>
+                            </attribute>
                         </optional>
                     </element>
                 </zeroOrMore>

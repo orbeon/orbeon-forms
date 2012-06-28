@@ -134,7 +134,7 @@ object ScalaUtils {
         case None ⇒ Set[String]()
     }
 
-    // Split a URL's query
+    // Split a URL into a path and query part
     def splitQuery(url: String): (String, Option[String]) = {
         val index = url.indexOf('?')
         if (index == -1)

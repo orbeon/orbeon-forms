@@ -81,20 +81,19 @@ public class ResourceServer extends ProcessorImpl {
                     throw new OXFException("Missing configuration.");
             }
 
-            serveResource(mimeTypeConfig, urlString);
+            final List<URLRewriterUtils.PathMatcher> pathMatchers = URLRewriterUtils.getPathMatchers();
+            serveResource(mimeTypeConfig, urlString, URLRewriterUtils.isVersionedURL(urlString, pathMatchers));
         } catch (Exception e) {
             throw new OXFException(e);
         }
     }
 
-    public static void serveResource(MimeTypeConfig mimeTypeConfig, String urlString) throws IOException {
+    public static void serveResource(MimeTypeConfig mimeTypeConfig, String urlString, boolean isVersioned) throws IOException {
 
         final ExternalContext externalContext = NetUtils.getExternalContext();
         final ExternalContext.Response response = externalContext.getResponse();
 
         // Remove version from the path if it is versioned
-        final List<URLRewriterUtils.PathMatcher> pathMatchers = URLRewriterUtils.getPathMatchers();
-        final boolean isVersioned = URLRewriterUtils.isVersionedURL(urlString, pathMatchers);
         urlString = URLRewriterUtils.decodeResourceURI(urlString, isVersioned);
 
         // Use the default protocol to read the file as a resource

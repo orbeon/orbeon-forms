@@ -33,7 +33,7 @@ import org.orbeon.oxf.resources.ResourceNotFoundException
 import org.orbeon.oxf.util.DebugLogger._
 import org.orbeon.oxf.util.URLRewriterUtils._
 import org.orbeon.oxf.util.{LoggerFactory, IndentedLogger, PipelineUtils, NetUtils}
-import org.orbeon.oxf.webapp.HttpStatusCodeException
+import org.orbeon.oxf.webapp.{HttpRedirectException, HttpStatusCodeException}
 import org.orbeon.oxf.xml.Dom4j
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml.XMLUtils.DigestContentHandler
@@ -118,6 +118,7 @@ class PageFlowControllerProcessor extends ProcessorImpl {
                 try route.process(pipelineContext, request, matchResult)
                 catch { case t ⇒
                     getRootThrowable(t) match {
+                        case e: HttpRedirectException                    ⇒ externalContext.getResponse.sendRedirect(e.path, e.jParameters.orNull, e.serverSide, e.exitPortal)
                         case e: HttpStatusCodeException if e.code == 404 ⇒ runNotFoundRoute(Some(t))
                         case e: ResourceNotFoundException                ⇒ runNotFoundRoute(Some(t))
                         case e                                           ⇒ runErrorRoute(t)
@@ -134,7 +135,7 @@ class PageFlowControllerProcessor extends ProcessorImpl {
         // Controller format:
         //
         // - config: files*, page*, epilogue?, not-found-handler?, error-handler?
-        // - files:  @id?, (@path|@path-info), @matcher?, @mime-type?, @versioned?
+        // - files:  @id?, (@path|@path-info), @matcher?, (@mediatype|@mime-type)?, @versioned?
         // - page:   @id?, (@path|@path-info), @matcher?, @default-submission?, @model?, @view?
 
         val stepProcessorContext = new StepProcessorContext(controllerValidity)
@@ -310,7 +311,7 @@ object PageFlowControllerProcessor {
                 idAtt(e),
                 path,
                 compilePattern(e, path, defaultMatcher),
-                att(e, "mime-type"),
+                att(e, "mediatype") orElse att(e, "mime-type"), // @mime-type for backward compatibility
                 att(e, "versioned") map (_ == "true") getOrElse defaultVersioned)
         }
     }
@@ -341,7 +342,7 @@ object PageFlowControllerProcessor {
         // Serve a file by path
         def process(pipelineContext: PipelineContext, request: Request, matchResult: MatchResult) =
             if (request.getMethod == "GET")
-                ResourceServer.serveResource(MimeTypes, request.getRequestPath)
+                ResourceServer.serveResource(MimeTypes, request.getRequestPath, routeElement.versioned)
             else
                 unauthorized()
     }

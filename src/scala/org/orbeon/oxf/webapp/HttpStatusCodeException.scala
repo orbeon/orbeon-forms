@@ -13,4 +13,15 @@
  */
 package org.orbeon.oxf.webapp
 
-case class HttpStatusCodeException(code: Int) extends RuntimeException
+import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.NetUtils
+
+trait HttpStatusCode extends RuntimeException { def code: Int }
+
+case class HttpStatusCodeException(code: Int) extends HttpStatusCode
+
+case class HttpRedirectException(location: String, serverSide: Boolean = false, exitPortal: Boolean = false) extends HttpStatusCode {
+    val code = 302
+    def path = splitQuery(location)._1
+    def jParameters = splitQuery(location)._2 map (NetUtils.decodeQueryString(_, false))
+}

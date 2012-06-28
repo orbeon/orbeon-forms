@@ -18,10 +18,10 @@
     <!-- Files to serve directly (and exclude files under /[app]/service/) -->
     <files path="(?!/([^/]+)/service/).+\.(gif|css|pdf|json|js|png|jpg|xsd|htc|ico|swf|html|htm|txt)"/>
     <!-- Also exclude .xml files handled by Form Runner -->
-    <files path="(?!/(fr|([^/]+)/service)/).+\.xml"  mime-type="application/xml"/>
+    <files path="(?!/(fr|([^/]+)/service)/).+\.xml"  mediatype="application/xml"/>
     <!-- For the following we override the standard mediatype to help browsers -->
-    <files path="(?!/([^/]+)/service/).+\.(java|xq)" mime-type="text/plain"/>
-    <files path="(?!/([^/]+)/service/).+\.jar"       mime-type="application/zip"/>
+    <files path="(?!/([^/]+)/service/).+\.(java|xq)" mediatype="text/plain"/>
+    <files path="(?!/([^/]+)/service/).+\.jar"       mediatype="application/zip"/>
 
     <!-- ==== Pages ================================================================================================ -->
 

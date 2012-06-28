@@ -19,7 +19,6 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ResourceServer;
-import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.Caches;
@@ -190,7 +189,7 @@ public class XFormsResourceServer extends ProcessorImpl {
             }
 
             // Get last modified date
-            final long combinedLastModified = computeCombinedLastModified(resources, isMinimal);
+            final long combinedLastModified = XFormsResourceRewriter.computeCombinedLastModified(resources, isMinimal);
 
             // If conditional get and date ok, send not modified
 
@@ -217,7 +216,7 @@ public class XFormsResourceServer extends ProcessorImpl {
                     final boolean isDebugEnabled = indentedLogger.isDebugEnabled();
                     if (XFormsProperties.isCacheCombinedResources()) {
                         // Caching requested
-                        final File resourceFile = cacheResources(resources, requestPath, combinedLastModified, isCSS, isMinimal);
+                        final File resourceFile = XFormsResourceRewriter.cacheResources(resources, requestPath, combinedLastModified, isCSS, isMinimal);
                         if (resourceFile != null) {
                             // Caching could take place, send out cached result
                             if (isDebugEnabled)
@@ -252,78 +251,6 @@ public class XFormsResourceServer extends ProcessorImpl {
                     }
                 }
             }
-        }
-    }
-
-    /**
-     * Compute the last modification date of the given resources.
-     *
-     * @param resources     list of XFormsFeatures.ResourceConfig to consider
-     * @param isMinimal     whether to use minimal resources
-     * @return              last modification date
-     */
-    public static long computeCombinedLastModified(List<XFormsFeatures.ResourceConfig> resources, boolean isMinimal) {
-        long combinedLastModified = 0;
-        for (final XFormsFeatures.ResourceConfig resource: resources) {
-            final long lastModified = ResourceManagerWrapper.instance().lastModified(resource.getResourcePath(isMinimal), false);
-            if (lastModified > combinedLastModified)
-                combinedLastModified = lastModified;
-        }
-        return combinedLastModified;
-    }
-
-    /**
-     * Try to cache the combined resources on disk.
-     *
-     * @param resources             list of XFormsFeatures.ResourceConfig to consider
-     * @param resourcePath          path to store the cached resource to
-     * @param combinedLastModified  last modification date of the resources to combine
-     * @param isCSS                 whether to generate CSS or JavaScript resources
-     * @param isMinimal             whether to use minimal resources
-     * @return                      File pointing to the generated resource, null if caching could not take place
-     */
-    public static File cacheResources(List<XFormsFeatures.ResourceConfig> resources,
-                                      String resourcePath, long combinedLastModified,
-                                      boolean isCSS, boolean isMinimal) {
-        try {
-            final IndentedLogger indentedLogger = getIndentedLogger();
-
-            final File resourceFile;
-            final String realPath = ResourceManagerWrapper.instance().getRealPath(resourcePath);
-            final boolean isDebugEnabled = indentedLogger.isDebugEnabled();
-            if (realPath != null) {
-                // We hope to be able to cache as a resource
-                resourceFile = new File(realPath);
-                if (resourceFile.exists()) {
-                    // Resources exist, generate if needed
-                    final long resourceLastModified = resourceFile.lastModified();
-                    if (resourceLastModified < combinedLastModified) {
-                        // Resource is out of date, generate
-                        if (isDebugEnabled)
-                            indentedLogger.logDebug("resources", "cached combined resources out of date, saving", "resource path", resourcePath);
-                        final FileOutputStream fos = new FileOutputStream(resourceFile);
-                        XFormsResourceRewriter.generate(indentedLogger, resources, fos, isCSS, isMinimal);
-                    } else {
-                        if (isDebugEnabled)
-                            indentedLogger.logDebug("resources", "cached combined resources exist and are up-to-date", "resource path", resourcePath);
-                    }
-                } else {
-                    // Resource doesn't exist, generate
-                    if (isDebugEnabled)
-                        indentedLogger.logDebug("resources", "cached combined resources don't exist, saving", "resource path", resourcePath);
-                    resourceFile.getParentFile().mkdirs();
-                    resourceFile.createNewFile();
-                    final FileOutputStream fos = new FileOutputStream(resourceFile);
-                    XFormsResourceRewriter.generate(indentedLogger, resources, fos, isCSS, isMinimal);
-                }
-            } else {
-                if (isDebugEnabled)
-                    indentedLogger.logDebug("resources", "unable to locate real path for cached combined resources, not saving", "resource path", resourcePath);
-                resourceFile = null;
-            }
-            return resourceFile;
-        } catch (Exception e) {
-            throw new OXFException(e);
         }
     }
 

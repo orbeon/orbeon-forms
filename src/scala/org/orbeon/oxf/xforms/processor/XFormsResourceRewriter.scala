@@ -14,6 +14,8 @@
 
 package org.orbeon.oxf.xforms.processor
 
+import org.orbeon.oxf.util._
+import ScalaUtils._
 import java.io._
 import java.util.{List ⇒ JList}
 import org.orbeon.oxf.common.Version
@@ -22,19 +24,21 @@ import org.orbeon.oxf.pipeline.api.{PipelineContext, ExternalContext}
 import org.orbeon.oxf.processor.PageFlowControllerProcessor
 import org.orbeon.oxf.resources.ResourceManagerWrapper
 import org.orbeon.oxf.util._
-import scala.collection.JavaConversions._
+import org.orbeon.oxf.xforms.processor.XFormsFeatures.ResourceConfig
+import scala.collection.JavaConverters._
+import DebugLogger._
 
 object XFormsResourceRewriter {
     /**
      * Generate the resources into the given OutputStream. The stream is flushed and closed when done.
      *
      * @param logger                logger
-     * @param resources             list of XFormsFeatures.ResourceConfig to consider
+     * @param resources             list of ResourceConfig to consider
      * @param os                    OutputStream to write to
      * @param isCSS                 whether to generate CSS or JavaScript resources
      * @param isMinimal             whether to use minimal resources
      */
-    def generate(logger: IndentedLogger, resources: JList[XFormsFeatures.ResourceConfig], os: OutputStream, isCSS: Boolean, isMinimal: Boolean): Unit = {
+    def generate(logger: IndentedLogger, resources: JList[ResourceConfig], os: OutputStream, isCSS: Boolean, isMinimal: Boolean): Unit = {
         if (isCSS)
             generateCSS(logger, resources, os, isMinimal)
         else
@@ -44,7 +48,7 @@ object XFormsResourceRewriter {
         os.close()
     }
 
-    private def generateCSS(logger: IndentedLogger, resources: JList[XFormsFeatures.ResourceConfig], os: OutputStream, isMinimal: Boolean): Unit = {
+    private def generateCSS(logger: IndentedLogger, resources: JList[ResourceConfig], os: OutputStream, isMinimal: Boolean): Unit = {
 
         val response = NetUtils.getExternalContext.getResponse
         val outputWriter = new OutputStreamWriter(os, "utf-8")
@@ -60,14 +64,19 @@ object XFormsResourceRewriter {
         // Output Orbeon Forms version
         outputWriter.write("/* This file was produced by " + Version.getVersionString + " */\n")
 
-        for (resource ← resources) {
+        for (resource ← resources.asScala) {
             val resourcePath = resource.getResourcePath(isMinimal)
 
             // Read CSS into a string
             val originalCSS = {
                 val sbw = new StringBuilderWriter
-                val is = ResourceManagerWrapper.instance.getContentAsStream(resourcePath)
-                ScalaUtils.copyReader(new InputStreamReader(is, "utf-8"), sbw)
+                try useAndClose(ResourceManagerWrapper.instance.getContentAsStream(resourcePath)) { is ⇒
+                    if (! isMinimal)
+                        sbw.write("/* Original CSS path: " + resourcePath + " */\n")
+                    copyReader(new InputStreamReader(is, "utf-8"), sbw)
+                } catch {
+                    case _ ⇒ logger.logWarning("resources", "could not aggregate CSS file", "path", resourcePath)
+                }
                 sbw.toString
             }
 
@@ -107,17 +116,66 @@ object XFormsResourceRewriter {
         r.replaceAllIn(css, e ⇒ (if (namespace.size == 0) e.group(1) else rewriteSelector(e.group(1))) + rewriteBlock(e.group(2)))
     }
 
-    private def generateJS(logger: IndentedLogger, resources: JList[XFormsFeatures.ResourceConfig], os: OutputStream, isMinimal: Boolean): Unit = {
+    private def generateJS(logger: IndentedLogger, resources: JList[ResourceConfig], os: OutputStream, isMinimal: Boolean): Unit = {
         // Output Orbeon Forms version
         val outputWriter = new OutputStreamWriter(os, "utf-8")
         outputWriter.write("// This file was produced by " + Version.getVersionString + "\n")
         outputWriter.flush()
 
-        for (resourceConfig ← resources) {
-            ScalaUtils.useAndClose(ResourceManagerWrapper.instance.getContentAsStream(resourceConfig.getResourcePath(isMinimal))) { is ⇒
+        for (resourceConfig ← resources.asScala) {
+            useAndClose(ResourceManagerWrapper.instance.getContentAsStream(resourceConfig.getResourcePath(isMinimal))) { is ⇒
                 NetUtils.copyStream(is, os)
             }
             os.write('\n')
+        }
+    }
+
+    // Compute the last modification date of the given resources.
+    def computeCombinedLastModified(resources: JList[ResourceConfig], isMinimal: Boolean): Long = {
+
+        val rm = ResourceManagerWrapper.instance
+
+        // NOTE: Actual aggregation will log missing files so we ignore them here
+        def lastModified(r: ResourceConfig) =
+            try rm.lastModified(r.getResourcePath(isMinimal), false)
+            catch { case _ ⇒ 0L }
+
+        if (resources.isEmpty) 0L else resources.asScala map lastModified max
+    }
+
+    def cacheResources(resources: JList[ResourceConfig], resourcePath: String, combinedLastModified: Long, isCSS: Boolean, isMinimal: Boolean): File = {
+
+        implicit val indentedLogger = XFormsResourceServer.getIndentedLogger
+        val rm = ResourceManagerWrapper.instance
+        
+        Option(rm.getRealPath(resourcePath)) match {
+            case Some(realPath) ⇒
+                // We hope to be able to cache as a resource
+                def logParameters = Seq("resource path" → resourcePath, "real path" → realPath)
+
+                val resourceFile = new File(realPath)
+                if (resourceFile.exists) {
+                    // Resources exist, generate if needed
+                    val resourceLastModified = resourceFile.lastModified
+                    if (resourceLastModified < combinedLastModified) {
+                        // Resource is out of date, generate
+                        debug("cached combined resources out of date, saving", logParameters)
+                        val fos = new FileOutputStream(resourceFile)
+                        generate(indentedLogger, resources, fos, isCSS, isMinimal)
+                    } else
+                        debug("cached combined resources exist and are up-to-date", logParameters)
+                } else {
+                    // Resource doesn't exist, generate
+                    debug("cached combined resources don't exist, saving", logParameters)
+                    resourceFile.getParentFile.mkdirs()
+                    resourceFile.createNewFile()
+                    val fos = new FileOutputStream(resourceFile)
+                    generate(indentedLogger, resources, fos, isCSS, isMinimal)
+                }
+                resourceFile
+            case None ⇒
+                debug("unable to locate real path for cached combined resources, not saving", Seq("resource path" → resourcePath))
+                null
         }
     }
 }

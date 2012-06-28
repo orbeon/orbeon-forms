@@ -299,8 +299,8 @@ object ResourcesAggregator {
 
                 assert(resourcesConfig.head.getResourcePath(false) == resources.head) // set order is tricky so make sure order is kept
 
-                val combinedLastModified = XFormsResourceServer.computeCombinedLastModified(resourcesConfig, false)
-                XFormsResourceServer.cacheResources(resourcesConfig, path, combinedLastModified, isCSS, false)
+                val combinedLastModified = XFormsResourceRewriter.computeCombinedLastModified(resourcesConfig, false)
+                XFormsResourceRewriter.cacheResources(resourcesConfig, path, combinedLastModified, isCSS, false)
             }
 
             Some(result)

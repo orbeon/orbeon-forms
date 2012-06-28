@@ -252,7 +252,7 @@ class PageFlowControllerProcessor extends ProcessorImpl {
                 addWhen(new ASTWhen("not(/*/@xsi:nil = 'true')") {
                     setNamespaces(PageFlowControllerBuilder.NAMESPACES_WITH_XSI_AND_XSLT)
                     handleEpilogue(urlBase, getStatements, epilogueURL, epilogueElement,
-                            epilogueData, epilogueModelData, epilogueInstance, 200)
+                            epilogueData, epilogueModelData, epilogueInstance)
                 })
                 addWhen(new ASTWhen() {
                     // Make sure we execute the model if there is a model but no view

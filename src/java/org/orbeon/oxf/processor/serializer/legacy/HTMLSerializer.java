@@ -13,7 +13,9 @@
  */
 package org.orbeon.oxf.processor.serializer.legacy;
 
-import org.orbeon.oxf.pipeline.api.*;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInput;
 import org.orbeon.oxf.xml.TransformerUtils;
@@ -26,10 +28,6 @@ public class HTMLSerializer extends HttpTextSerializer {
 
     public static final String DEFAULT_CONTENT_TYPE = "text/html";
     public static final String DEFAULT_METHOD = "html";
-
-    public static final String DEFAULT_PUBLIC_DOCTYPE = "-//W3C//DTD HTML 4.01 Transitional//EN";
-    public static final String DEFAULT_SYSTEM_DOCTYPE = null;
-    public static final String DEFAULT_VERSION = "4.01";
 
     protected void readInput(PipelineContext context, ProcessorInput input, Config config, Writer writer) {
 

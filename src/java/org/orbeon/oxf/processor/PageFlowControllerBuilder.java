@@ -59,11 +59,9 @@ public class PageFlowControllerBuilder {
     }
 
     public static void handleEpilogue(final String controllerContext, List<ASTStatement> statements, final String epilogueURL, final Element epilogueElement,
-            final ASTOutput epilogueData, final ASTOutput epilogueModelData, final ASTOutput epilogueInstance,
-            final int defaultStatusCode) {
-        // Send result through epilogue
+            final ASTOutput epilogueData, final ASTOutput epilogueModelData, final ASTOutput epilogueInstance) {
         if (epilogueURL == null) {
-            // Run HTML serializer
+            // Run HTML serializer if no epilogue is specified
             statements.add(new ASTChoose(new ASTHrefId(epilogueData)) {{
                 addWhen(new ASTWhen("not(/*/@xsi:nil = 'true')") {{
                     setNamespaces(NAMESPACES_WITH_XSI_AND_XSLT);
@@ -71,13 +69,8 @@ public class PageFlowControllerBuilder {
                     addStatement(new ASTProcessorCall(XMLConstants.HTML_SERIALIZER_PROCESSOR_QNAME) {{
                         Document config = new NonLazyUserDataDocument(new NonLazyUserDataElement("config"));
                         Element rootElement = config.getRootElement();
-                        rootElement.addElement("status-code").addText(Integer.toString(defaultStatusCode));
-                        if (HTMLSerializer.DEFAULT_PUBLIC_DOCTYPE != null)
-                            rootElement.addElement("public-doctype").addText(HTMLSerializer.DEFAULT_PUBLIC_DOCTYPE);
-                        if (HTMLSerializer.DEFAULT_SYSTEM_DOCTYPE != null)
-                            rootElement.addElement("system-doctype").addText(HTMLSerializer.DEFAULT_SYSTEM_DOCTYPE);
-                        if (HTMLSerializer.DEFAULT_VERSION != null)
-                            rootElement.addElement("version").addText(HTMLSerializer.DEFAULT_VERSION);
+                        rootElement.addElement("version").addText("5.0");
+                        rootElement.addElement("encoding").addText("utf-8");
                         addInput(new ASTInput("config", config));
                         addInput(new ASTInput("data", new ASTHrefId(epilogueData)));
                         //setLocationData(TODO);
@@ -86,6 +79,7 @@ public class PageFlowControllerBuilder {
                 addWhen(new ASTWhen());
             }});
         } else {
+            // Send result through epilogue
             statements.add(new ASTProcessorCall(XMLConstants.PIPELINE_PROCESSOR_QNAME) {{
                 final String url;
                 try {

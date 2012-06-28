@@ -11,17 +11,17 @@
   
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<config xmlns="http://www.orbeon.com/oxf/controller">
+<controller xmlns="http://www.orbeon.com/oxf/controller" matcher="regexp">
 
-    <page path-info="/sandbox-transformations/([^/]+)/" matcher="regexp"
+    <page path="/sandbox-transformations/([^/]+)/"
           default-submission="parameters.xml" view="view.xhtml">
         <setvalue ref="/*/name" matcher-group="1"/>
     </page>
 
-    <page path-info="/sandbox-transformations/([^/]+)/run" matcher="regexp" view="${1}/run.xpl"/>
-    <page path-info="/sandbox-transformations/([^/]+)/input" matcher="regexp" view="${1}/input.xml"/>
-    <page path-info="/sandbox-transformations/([^/]+)/transformation" matcher="regexp" view="${1}/transformation.xml"/>
+    <page path="/sandbox-transformations/([^/]+)/run" view="${1}/run.xpl"/>
+    <page path="/sandbox-transformations/([^/]+)/input" view="${1}/input.xml"/>
+    <page path="/sandbox-transformations/([^/]+)/transformation" view="${1}/transformation.xml"/>
 
     <epilogue url="oxf:/config/epilogue.xpl"/>
 
-</config>
+</controller>

@@ -11,12 +11,12 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<config xmlns="http://www.orbeon.com/oxf/controller"
+<controller xmlns="http://www.orbeon.com/oxf/controller"
         xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
-    <page path-info="/xforms-upload/" view="view.xhtml"/>
-    <page path-info="/xforms-upload/test" model="test.xpl"/>
+    <page path="/xforms-upload/" view="view.xhtml"/>
+    <service path="/xforms-upload/test" model="test.xpl"/>
 
     <epilogue url="oxf:/config/epilogue.xpl"/>
 
-</config>
+</controller>

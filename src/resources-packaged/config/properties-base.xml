@@ -93,8 +93,8 @@
     <property as="xs:integer" processor-name="oxf:request"   name="max-upload-size"          value="100000000"/>
     <property as="xs:integer" processor-name="oxf:request"   name="max-upload-memory-size"   value="10240"/>
     <property as="xs:string"  processor-name="oxf:page-flow" name="instance-passing"         value="redirect"/>
-    <property as="xs:string"  processor-name="oxf:page-flow" name="xforms-submission-path"   value="/xforms-server-submit"/>
-    <property as="xs:anyURI"  processor-name="oxf:page-flow" name="xforms-submission-model"  value="oxf:/ops/xforms/xforms-server-submit.xpl"/>
+    <property as="xs:string"  processor-name="oxf:page-flow" name="submission-path"          value="/xforms-server-submit"/>
+    <property as="xs:anyURI"  processor-name="oxf:page-flow" name="submission-model"         value="oxf:/ops/xforms/xforms-server-submit.xpl"/>
     <property as="xs:boolean" processor-name="oxf:sql"       name="legacy-implicit-prefixes" value="false"/>
 
     <property as="xs:QName"   processor-name="oxf:xml-converter"  name="default-method" value="oxf:org.orbeon.saxon.event.XML1252Emitter"/>

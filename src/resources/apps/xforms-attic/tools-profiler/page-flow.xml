@@ -11,15 +11,15 @@
   
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<config xmlns="http://www.orbeon.com/oxf/controller">
+<controller xmlns="http://www.orbeon.com/oxf/controller">
 
-    <page path-info="/tools-profiler/" view="view.xhtml"/>
-    <page path-info="/tools-profiler/hotspots-data" view="hotspots-model.xpl"/>
-    <page path-info="/tools-profiler/hotspots" model="hotspots-model.xpl" view="hotspots-view.xsl"/>
-    <page path-info="/tools-profiler/functionality" model="functionality-model.xpl" view="functionality-view.xsl"/>
+    <page path="/tools-profiler/" view="view.xhtml"/>
+    <page path="/tools-profiler/hotspots-data" view="hotspots-model.xpl"/>
+    <page path="/tools-profiler/hotspots" model="hotspots-model.xpl" view="hotspots-view.xsl"/>
+    <page path="/tools-profiler/functionality" model="functionality-model.xpl" view="functionality-view.xsl"/>
 
-    <page path-info="/tools-profiler/xpl/" model="xpl/model.xpl" view="xpl/view.xhtml"/>
+    <page path="/tools-profiler/xpl/" model="xpl/model.xpl" view="xpl/view.xhtml"/>
 
     <epilogue url="oxf:/config/epilogue.xpl"/>
 
-</config>
+</controller>

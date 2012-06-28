@@ -11,20 +11,20 @@
   
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<config xmlns="http://www.orbeon.com/oxf/controller">
+<controller xmlns="http://www.orbeon.com/oxf/controller">
 
     <!-- Query edition page -->
-    <page path-info="/xquery-the-web/" view="view.xhtml"/>
+    <page path="/xquery-the-web/" view="view.xhtml"/>
 
     <!-- Query execution -->
-    <page path-info="/xquery-the-web/query" default-submission="parameters.xml" model="xquery-the-web.xpl">
+    <service path="/xquery-the-web/query" default-submission="parameters.xml" model="xquery-the-web.xpl">
         <setvalue ref="/*/url" parameter="url"/>
         <setvalue ref="/*/xquery-type" parameter="xquery-type"/>
         <setvalue ref="/*/xquery-url" parameter="xquery-url"/>
         <setvalue ref="/*/xquery" parameter="xquery"/>
         <setvalue ref="/*/output" parameter="output"/>
-    </page>
+    </service>
     
     <epilogue url="oxf:/config/epilogue.xpl"/>
 
-</config>
+</controller>

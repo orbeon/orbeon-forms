@@ -11,13 +11,13 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<config xmlns="http://www.orbeon.com/oxf/controller">
+<controller xmlns="http://www.orbeon.com/oxf/controller">
 
-    <page path-info="/xforms-controls/" model="/forms/orbeon/controls/form/form.xhtml" view="view.xsl"/>
+    <page path="/xforms-controls/" model="/forms/orbeon/controls/form/form.xhtml" view="view.xsl"/>
 
-    <page path-info="/xforms-controls/services/update-countries" view="services/update-countries.xpl"/>
-    <page path-info="/xforms-controls/services/countries" view="services/countries.xpl"/>
+    <service path="/xforms-controls/services/update-countries" view="services/update-countries.xpl"/>
+    <service path="/xforms-controls/services/countries" view="services/countries.xpl"/>
 
     <epilogue url="oxf:/config/epilogue.xpl"/>
 
-</config>
+</controller>

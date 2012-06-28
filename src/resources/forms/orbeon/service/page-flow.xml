@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <!--
     Copyright (C) 2008 Orbeon, Inc.
 
@@ -12,15 +11,15 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<config xmlns="http://www.orbeon.com/oxf/controller"
+<controller xmlns="http://www.orbeon.com/oxf/controller"
         xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
     <!-- Test echo service -->
-    <page path-info="/fr/service/custom/orbeon/echo" view="echo.xpl"/>
+    <service path="/fr/service/custom/orbeon/echo" view="echo.xpl"/>
 
     <!-- Database service -->
-    <page path-info="/fr/service/custom/orbeon/database" view="database.xpl"/>
+    <service path="/fr/service/custom/orbeon/database" view="database.xpl"/>
 
     <epilogue url="/config/epilogue.xpl"/>
 
-</config>
+</controller>

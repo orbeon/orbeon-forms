@@ -11,16 +11,16 @@
   
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<config xmlns="http://www.orbeon.com/oxf/controller">
+<controller xmlns="http://www.orbeon.com/oxf/controller">
 
     <!-- XHTML+XForms page -->
-    <page path-info="/xforms-sql-address-book/" view="view.xhtml"/>
+    <page path="/xforms-sql-address-book/" view="view.xhtml"/>
 
     <!-- Services -->
-    <page path-info="/xforms-sql-address-book/add" model="service-add.xpl"/>
-    <page path-info="/xforms-sql-address-book/delete" model="service-delete.xpl"/>
-    <page path-info="/xforms-sql-address-book/get" view="service-get.xpl"/>
+    <service path="/xforms-sql-address-book/add" model="service-add.xpl"/>
+    <service path="/xforms-sql-address-book/delete" model="service-delete.xpl"/>
+    <service path="/xforms-sql-address-book/get" view="service-get.xpl"/>
 
     <epilogue url="oxf:/config/epilogue.xpl"/>
 
-</config>
+</controller>

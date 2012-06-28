@@ -11,20 +11,20 @@
   
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<config xmlns="http://www.orbeon.com/oxf/controller">
+<controller xmlns="http://www.orbeon.com/oxf/controller">
 
     <!-- Main page -->
-    <page path-info="/xforms-cart/" view="view.xhtml"/>
+    <page path="/xforms-cart/" view="view.xhtml"/>
 
     <!-- Services -->
-    <page path-info="/xforms-cart/get" model="get.xpl"/>
-    <page path-info="/xforms-cart/add">
+    <page path="/xforms-cart/get" model="get.xpl"/>
+    <page path="/xforms-cart/add">
         <action action="add.xpl"/>
     </page>
-    <page path-info="/xforms-cart/clear">
+    <page path="/xforms-cart/clear">
         <action action="clear.xpl"/>
     </page>
 
     <epilogue url="oxf:/config/epilogue.xpl"/>
 
-</config>
+</controller>

@@ -1,0 +1,254 @@
+<!--
+  Copyright (C) 2012 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<grammar xmlns="http://relaxng.org/ns/structure/1.0"
+         datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes"
+         xmlns:c="http://www.orbeon.com/oxf/controller">
+
+    <start>
+        <element>
+            <choice>
+                <name>c:config</name>
+                <name>c:controller</name>
+            </choice>
+
+            <ref name="common-attributes"/>
+            <ref name="root-attributes"/>
+
+            <!-- Routes -->
+            <interleave>
+                <zeroOrMore>
+                    <element name="c:files">
+                        <ref name="route-attributes"/>
+                        <ref name="versioned-attribute"/>
+                        <optional>
+                            <attribute name="mime-type"/>
+                        </optional>
+                    </element>
+                </zeroOrMore>
+                <zeroOrMore>
+                    <element>
+                        <choice>
+                            <name>c:page</name>
+                            <name>c:service</name>
+                        </choice>
+                        <ref name="route-attributes"/>
+                        <ref name="visibility-attribute"/>
+                        <optional>
+                            <attribute name="default-submission"/>
+                        </optional>
+                        <optional>
+                            <attribute name="model"/>
+                        </optional>
+                        <optional>
+                            <attribute name="view"/>
+                        </optional>
+
+                        <zeroOrMore>
+                            <element name="c:setvalue">
+                                <ref name="common-attributes"/>
+                                <attribute name="ref"/>
+                                <optional>
+                                    <attribute name="parameter"/>
+                                </optional>
+                                <optional>
+                                    <attribute name="matcher-group"/>
+                                </optional>
+                                <optional>
+                                    <attribute name="value"/>
+                                </optional>
+                                <data type="string"/>
+                            </element>
+                        </zeroOrMore>
+                        <zeroOrMore>
+                            <element name="c:action">
+                                <ref name="common-attributes"/>
+                                <optional>
+                                    <attribute name="when"/>
+                                </optional>
+                                <optional>
+                                    <attribute name="action"/>
+                                </optional>
+                                <zeroOrMore>
+                                    <element name="c:result">
+                                        <ref name="common-attributes"/>
+                                        <optional>
+                                            <attribute name="when"/>
+                                        </optional>
+                                        <optional>
+                                            <attribute name="page"/>
+                                        </optional>
+                                        <optional>
+                                            <attribute name="trace"/>
+                                        </optional>
+                                        <optional>
+                                            <attribute name="transform">
+                                                <data type="QName"/>
+                                            </attribute>
+                                        </optional>
+                                        <ref name="instance-passing-attribute"/>
+                                        <!-- Inline response document -->
+                                        <optional>
+                                            <ref name="anyElement"/>
+                                        </optional>
+
+                                    </element>
+                                </zeroOrMore>
+                            </element>
+                        </zeroOrMore>
+                    </element>
+                </zeroOrMore>
+            </interleave>
+
+            <!-- Handlers -->
+            <interleave>
+                <optional>
+                    <element name="c:not-found-handler">
+                        <ref name="common-attributes"/>
+                        <attribute name="page"/>
+                    </element>
+                </optional>
+                <optional>
+                    <element name="c:error-handler">
+                        <ref name="common-attributes"/>
+                        <attribute name="page"/>
+                    </element>
+                </optional>
+                <optional>
+                    <element name="c:epilogue">
+                        <ref name="common-attributes"/>
+                        <attribute name="url">
+                            <data type="anyURI"/>
+                        </attribute>
+                    </element>
+                </optional>
+            </interleave>
+
+        </element>
+    </start>
+
+    <define name="common-attributes">
+        <optional>
+            <attribute name="id"/>
+        </optional>
+        <ref name="anyAttributeOtherNS"/>
+    </define>
+
+    <define name="root-attributes">
+        <ref name="common-attributes"/>
+        <ref name="matcher-attribute"/>
+        <ref name="visibility-attribute"/>
+        <ref name="instance-passing-attribute"/>
+        <ref name="versioned-attribute"/>
+        <optional>
+            <attribute name="submission-path"/>
+        </optional>
+        <optional>
+            <attribute name="submission-model">
+                <data type="anyURI"/>
+            </attribute>
+        </optional>
+        <optional>
+            <attribute name="epilogue">
+                <data type="anyURI"/>
+            </attribute>
+        </optional>
+    </define>
+
+    <define name="route-attributes">
+        <ref name="common-attributes"/>
+        <choice>
+            <attribute name="path"/>
+            <attribute name="path-info"/>
+        </choice>
+        <ref name="matcher-attribute"/>
+    </define>
+
+    <define name="matcher-attribute">
+        <optional>
+            <attribute name="matcher">
+                <choice>
+                    <value>regexp</value>
+                    <value>glob</value>
+                    <value>oxf:perl5-matcher</value>
+                    <value>oxf:glob-matcher</value>
+                </choice>
+            </attribute>
+        </optional>
+    </define>
+
+    <define name="versioned-attribute">
+        <optional>
+            <attribute name="versioned">
+                <choice>
+                    <value>true</value>
+                    <value>false</value>
+                </choice>
+            </attribute>
+        </optional>
+    </define>
+
+    <define name="instance-passing-attribute">
+        <optional>
+            <attribute name="instance-passing">
+                <choice>
+                    <value>redirect</value>
+                    <value>forward</value>
+                    <value>redirect-exit-portal</value>
+                </choice>
+            </attribute>
+        </optional>
+    </define>
+
+    <define name="visibility-attribute">
+        <optional>
+            <attribute name="visibility">
+                <choice>
+                    <value>public</value>
+                    <value>private</value>
+                </choice>
+            </attribute>
+        </optional>
+    </define>
+
+    <define name="anyAttributeOtherNS">
+        <!-- Can contain any number of extra attributes in any non-null namespace which is not the p: namespace -->
+        <zeroOrMore>
+            <attribute>
+                <anyName>
+                    <except>
+                        <nsName ns=""/>
+                        <nsName ns="http://www.orbeon.com/oxf/controller"/>
+                        <nsName ns="http://www.w3.org/XML/1998/namespace"/>
+                    </except>
+                </anyName>
+            </attribute>
+        </zeroOrMore>
+    </define>
+
+    <define name="anyElement">
+        <element>
+            <anyName/>
+            <zeroOrMore>
+                <choice>
+                    <attribute>
+                        <anyName/>
+                    </attribute>
+                    <text/>
+                    <ref name="anyElement"/>
+                </choice>
+            </zeroOrMore>
+        </element>
+    </define>
+
+</grammar>

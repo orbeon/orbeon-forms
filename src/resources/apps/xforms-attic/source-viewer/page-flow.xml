@@ -11,10 +11,10 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<config xmlns="http://www.orbeon.com/oxf/controller">
+<controller xmlns="http://www.orbeon.com/oxf/controller" matcher="regexp">
 
     <!-- Download a given file -->
-    <page id="download" path-info="/source-viewer/service/download/([^/]+)/(.+)" matcher="regexp"
+    <page id="download" path="/source-viewer/service/download/([^/]+)/(.+)"
             default-submission="default-submission.xml"
             model="download-model.xpl">
         <setvalue ref="/form/application-id" matcher-group="1"/>
@@ -22,7 +22,7 @@
     </page>
 
     <!-- Format a file -->
-    <page id="get-source" path-info="/source-viewer/service/format"
+    <page id="get-source" path="/source-viewer/service/format"
             default-submission="default-submission.xml"
             model="format-source.xpl">
         <setvalue ref="/form/application-id" parameter="application-id"/>
@@ -31,14 +31,14 @@
     </page>
 
     <!-- Get a list of files -->
-    <page id="get-files" path-info="/source-viewer/service/get-files"
+    <page id="get-files" path="/source-viewer/service/get-files"
             default-submission="default-submission.xml"
             model="get-files.xpl">
         <setvalue ref="/form/application-id" parameter="application-id"/>
     </page>
 
     <!-- Display the source for an individual file -->
-    <page id="goto-source" path-info="/source-viewer/([^/]+)/(.+)" matcher="regexp"
+    <page id="goto-source" path="/source-viewer/([^/]+)/(.+)"
             default-submission="default-submission.xml"
             view="view.xhtml">
         <setvalue ref="/form/application-id" matcher-group="1"/>
@@ -46,7 +46,7 @@
     </page>
 
     <!-- Produce the list of source files -->
-    <page id="summary" path-info="/source-viewer/(.+)/" matcher="regexp"
+    <page id="summary" path="/source-viewer/(.+)/"
             default-submission="default-submission.xml"
             view="view.xhtml">
         <setvalue ref="/form/application-id" matcher-group="1"/>
@@ -54,4 +54,4 @@
 
     <epilogue url="oxf:/config/epilogue.xpl"/>
 
-</config>
+</controller>

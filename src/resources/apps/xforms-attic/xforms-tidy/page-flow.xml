@@ -11,11 +11,11 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<config xmlns="http://www.orbeon.com/oxf/controller">
+<controller xmlns="http://www.orbeon.com/oxf/controller">
 
-    <page path-info="/xforms-tidy/" view="view.xhtml"/>
-    <page path-info="/xforms-tidy/convert" model="convert.xpl"/>
+    <page path="/xforms-tidy/" view="view.xhtml"/>
+    <page path="/xforms-tidy/convert" model="convert.xpl"/>
 
     <epilogue url="oxf:/config/epilogue.xpl"/>
 
-</config>
+</controller>

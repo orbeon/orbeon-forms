@@ -11,13 +11,13 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<config xmlns="http://www.orbeon.com/oxf/controller">
+<controller xmlns="http://www.orbeon.com/oxf/controller">
 
-    <page id="home" path-info="/java-authentication/" model="model.xpl" view="view.xhtml"/>
+    <page id="home" path="/java-authentication/" model="model.xpl" view="view.xhtml"/>
 
-    <page path-info="/java-authentication/login" view="login.xhtml"/>
-    <page path-info="/java-authentication/login-error" view="login-error.xhtml"/>
-    <page path-info="/java-authentication/logout">
+    <page path="/java-authentication/login" view="login.xhtml"/>
+    <page path="/java-authentication/login-error" view="login-error.xhtml"/>
+    <page path="/java-authentication/logout">
         <action action="logout.xpl">
             <result page="home"/>
         </action>
@@ -25,4 +25,4 @@
 
     <epilogue url="/config/epilogue.xpl"/>
 
-</config>
+</controller>

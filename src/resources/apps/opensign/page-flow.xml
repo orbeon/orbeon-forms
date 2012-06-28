@@ -11,11 +11,11 @@
   
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<config xmlns="http://www.orbeon.com/oxf/controller">
+<controller xmlns="http://www.orbeon.com/oxf/controller">
 
-    <page path-info="/opensign/" view="sign.xhtml"/>
-    <page path-info="/opensign/verify" model="verify.xpl"/>
+    <page path="/opensign/" view="sign.xhtml"/>
+    <page path="/opensign/verify" model="verify.xpl"/>
 
     <epilogue url="oxf:/config/epilogue.xpl"/>
 
-</config>
+</controller>

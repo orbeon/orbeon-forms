@@ -22,7 +22,6 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.processor.pipeline.PipelineConfig;
 import org.orbeon.oxf.processor.pipeline.PipelineProcessor;
 import org.orbeon.oxf.processor.pipeline.ast.*;
-import org.orbeon.oxf.processor.serializer.legacy.HTMLSerializer;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.xml.NamespaceMapping;
 import org.orbeon.oxf.xml.XMLConstants;
@@ -44,11 +43,9 @@ public class PageFlowControllerBuilder {
     private final static String XFORMS_XML_SUBMISSION_XPL = "oxf:/ops/pfc/xforms-xml-submission.xpl";
 
     // Instance passing configuration
-    private final static String INSTANCE_PASSING_REDIRECT = "redirect";
-    private final static String INSTANCE_PASSING_FORWARD = "forward";
-    private final static String INSTANCE_PASSING_REDIRECT_PORTAL = "redirect-exit-portal";
-
-    public final static String DEFAULT_INSTANCE_PASSING = INSTANCE_PASSING_REDIRECT;
+    public final static String INSTANCE_PASSING_REDIRECT = "redirect";
+    public final static String INSTANCE_PASSING_FORWARD = "forward";
+    public final static String INSTANCE_PASSING_REDIRECT_PORTAL = "redirect-exit-portal";
 
     static {
         final Map<String, String> mapping = new HashMap<String, String>();
@@ -99,19 +96,11 @@ public class PageFlowControllerBuilder {
     }
 
     public static Document getSetValuesDocument(final Element pageElement) {
-        final List paramElements = pageElement.elements("param");
         final List setValueElements = pageElement.elements("setvalue");
         final Document setvaluesDocument;
-        if (!paramElements.isEmpty() || !setValueElements.isEmpty()) {
+        if (!setValueElements.isEmpty()) {
             // Create document with setvalues
             setvaluesDocument = new NonLazyUserDataDocument(new NonLazyUserDataElement("params"));
-            // Deprecated <param> elements
-            if (!paramElements.isEmpty()) {
-                for (Object paramElement1: paramElements) {
-                    final Element paramElement = (Element) paramElement1;
-                    setvaluesDocument.getRootElement().add((Element) paramElement.clone());
-                }
-            }
             // New <setvalue> elements
             if (!setValueElements.isEmpty()) {
                 for (Object setValueElement1: setValueElements) {
@@ -233,7 +222,14 @@ public class PageFlowControllerBuilder {
                 // Get info about action
                 actionNumber[0]++;
                 final Element actionElement = (Element) actionElement1;
-                final String whenAttribute = actionElement.attributeValue("when");
+                final String whenAttribute; {
+                    // NOTE: Prior to 2012-06-27, the XSD schema would put a default value of true()
+                    final String tempWhen = actionElement.attributeValue("when");
+                    if (tempWhen == null)
+                        whenAttribute = "true()";
+                    else
+                        whenAttribute = tempWhen;
+                };
                 final String actionAttribute = actionElement.attributeValue("action");
 
                 // Execute action
@@ -292,21 +288,21 @@ public class PageFlowControllerBuilder {
                         }});
                     }
 
-                    // Choose result
-                    if (actionElement.elements("result").size() > 1
-                            || (actionElement.element("result") != null
-                            && actionElement.element("result").attributeValue("when") != null)) {
-
-                        // Help diagnose missing action/@action
-                        if (internalActionData == null) {
-                            throw new OXFException("Found <result when=\"...\"> but <action> element is missing an action attribute.");
-                        }
+                    if (actionElement.elements("result").size() > 0 && internalActionData != null) {
+                        // At least one result testing on action
 
                         // Test based on action
                         addStatement(new ASTChoose(new ASTHrefId(internalActionData)) {{
                             for (Object o: actionElement.elements("result")) {
                                 final Element resultElement = (Element) o;
-                                final String resultWhenAttribute = resultElement.attributeValue("when");
+                                final String resultWhenAttribute; {
+                                    // NOTE: Prior to 2012-06-27, the XSD schema would put a default value of true()
+                                    final String tempWhen = resultElement.attributeValue("when");
+                                    if (tempWhen == null)
+                                        resultWhenAttribute = "true()";
+                                    else
+                                        resultWhenAttribute = tempWhen;
+                                };
 
                                 // Execute result
                                 addWhen(new ASTWhen() {{
@@ -340,8 +336,7 @@ public class PageFlowControllerBuilder {
                         }});
 
                     } else {
-
-                        // If we are not performing tests on the result from the action
+                        // No result or result not depending on action
                         final Element resultElement = actionElement.element("result");
                         executeResult(this, pageIdToPathInfo, pageIdToSetvaluesDocument, xformedInstance, resultElement,
                             internalActionData, isRedirect, xupdatedInstance, instancePassing);

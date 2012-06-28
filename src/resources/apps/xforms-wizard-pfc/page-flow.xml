@@ -11,16 +11,16 @@
   
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<config xmlns="http://www.orbeon.com/oxf/controller"
+<controller xmlns="http://www.orbeon.com/oxf/controller"
         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
         xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
     <!-- The 4 steps (4 pages) of the wizard -->
-    <page path-info="/xforms-wizard-pfc/"          view="step1-firstname.xhtml"  default-submission="initial-instance.xml"/>
-    <page path-info="/xforms-wizard-pfc/lastname"  view="step2-lastname.xhtml"/>
-    <page path-info="/xforms-wizard-pfc/age"       view="step3-age.xhtml"/>
-    <page path-info="/xforms-wizard-pfc/summary"   view="step4-summary.xhtml"/>
+    <page path="/xforms-wizard-pfc/"          view="step1-firstname.xhtml"  default-submission="initial-instance.xml"/>
+    <page path="/xforms-wizard-pfc/lastname"  view="step2-lastname.xhtml"/>
+    <page path="/xforms-wizard-pfc/age"       view="step3-age.xhtml"/>
+    <page path="/xforms-wizard-pfc/summary"   view="step4-summary.xhtml"/>
 
     <epilogue url="oxf:/config/epilogue.xpl"/>
 
-</config>
+</controller>

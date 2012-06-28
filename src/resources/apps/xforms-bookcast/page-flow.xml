@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <!--
     Copyright (C) 2007 Orbeon, Inc.
 
@@ -12,14 +11,14 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<config xmlns="http://www.orbeon.com/oxf/controller">
+<controller xmlns="http://www.orbeon.com/oxf/controller">
 
     <!-- Bookcast application's main page -->
-    <page path-info="/xforms-bookcast/" view="view.xhtml"/>
+    <page path="/xforms-bookcast/" view="view.xhtml"/>
 
     <!-- Bookcast application Atom feed -->
-    <page path-info="/xforms-bookcast/atom" model="atom.xpl" view="atom.xsl"/>
+    <page path="/xforms-bookcast/atom" model="atom.xpl" view="atom.xsl"/>
 
     <epilogue url="oxf:/config/epilogue.xpl"/>
 
-</config>
+</controller>

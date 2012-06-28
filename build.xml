@@ -360,15 +360,8 @@
         </javac>
     </target>
 
-    <target name="transform" depends="prepare">
-        <property name="xsd-prefix" value="/org/orbeon/oxf/xml/schemas/page-flow-controller"/>
-        <xslt style="src/xslt/page-flow-controller-xsd.xslt"
-              in="${java-src.dir}${xsd-prefix}.xsd"
-              out="${build.classes.dir}${xsd-prefix}-runtime.xsd"/>
-    </target>
-
     <!-- JARs -->
-    <target name="jars" depends="classes, transform, orbeon-minify-js">
+    <target name="jars" depends="classes, orbeon-minify-js">
         <jar destfile="${jar.file}" compress="false">
             <fileset dir="${java-src.dir}">
                 <include name="**/*.xml"/>

@@ -20,12 +20,11 @@ import java.util.regex.Pattern
 import java.util.{List ⇒ JList, Map ⇒ JMap}
 import org.dom4j.{QName, Document, Element}
 import org.orbeon.errorified.Exceptions._
-import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.pipeline.api.ExternalContext.Request
 import org.orbeon.oxf.pipeline.api.{XMLReceiver, PipelineContext}
 import org.orbeon.oxf.processor.PageFlowControllerProcessor.FileRoute
 import org.orbeon.oxf.processor.PageFlowControllerProcessor.PageFlow
-import org.orbeon.oxf.processor.PageFlowControllerProcessor.PageRoute
+import org.orbeon.oxf.processor.PageFlowControllerProcessor.PageOrServiceRoute
 import org.orbeon.oxf.processor.RegexpMatcher.MatchResult
 import org.orbeon.oxf.processor.impl.{DigestState, DigestTransformerOutputImpl}
 import org.orbeon.oxf.processor.pipeline.ast._
@@ -40,6 +39,7 @@ import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml.XMLUtils.DigestContentHandler
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils._
 import org.orbeon.oxf.xml.dom4j.LocationData
+import org.orbeon.exception.OrbeonFormatter
 
 // Orbeon Forms application controller
 class PageFlowControllerProcessor extends ProcessorImpl {
@@ -89,6 +89,7 @@ class PageFlowControllerProcessor extends ProcessorImpl {
                 // Run the error route
                 error("error caught", logParams)
                 externalContext.getResponse.setStatus(500)
+                error(OrbeonFormatter.format(t))
                 errorRoute.process(pipelineContext, request, MatchResult(matches = false))
             case None ⇒
                 // We don't have an error route so throw instead
@@ -108,12 +109,11 @@ class PageFlowControllerProcessor extends ProcessorImpl {
         }
 
         // Run the first matching entry if any
-        var matchResult: MatchResult = null
-        pageFlow.routes find { route ⇒ matchResult = MatchResult(route.routeElement.pattern, path); matchResult.matches } match {
-            case Some(route: FileRoute) ⇒
+        pageFlow.routes.iterator map (route ⇒ route → MatchResult(route.routeElement.pattern, path)) find (_._2.matches) match {
+            case Some((route: FileRoute, matchResult)) ⇒
                 // Run the given route and let the caller handle errors
                 route.process(pipelineContext, request, matchResult)
-            case Some(route: PageRoute) ⇒
+            case Some((route: PageOrServiceRoute, matchResult)) ⇒
                 // Run the given route and handle "not found" and error conditions
                 try route.process(pipelineContext, request, matchResult)
                 catch { case t ⇒
@@ -134,45 +134,55 @@ class PageFlowControllerProcessor extends ProcessorImpl {
         // Controller format:
         //
         // - config: files*, page*, epilogue?, not-found-handler?, error-handler?
-        // - files:  @id?, @path-info, @matcher?, @mime-type?, @versioned?
-        // - page:   @id?, @path-info, @matcher?, @default-submission?, @model?, @view?
+        // - files:  @id?, (@path|@path-info), @matcher?, @mime-type?, @versioned?
+        // - page:   @id?, (@path|@path-info), @matcher?, @default-submission?, @model?, @view?
 
         val stepProcessorContext = new StepProcessorContext(controllerValidity)
         val locationData = configRoot.getData.asInstanceOf[LocationData]
         val urlBase = Option(locationData) map (_.getSystemID) orNull
 
-        val globalInstancePassing =
-            att(configRoot, InstancePassingPropertyName) getOrElse getPropertySet.getString(InstancePassingPropertyName, DEFAULT_INSTANCE_PASSING)
+        // Gather properties
+        val properties = getPropertySet
+
+        def controllerProperty(name: String, default: Option[String] = None) =
+            att(configRoot, name) orElse Option(properties.getStringOrURIAsString(name, default.orNull))
+
+        def controllerPropertyQName(name: String, default: Option[QName] = None) =
+            Option(extractAttributeValueQName(configRoot, name)) orElse Option(properties.getQName(name, default.orNull))
+
+        val controllerMatcher          = controllerPropertyQName(MatcherProperty, Some(DefaultMatcher)).get
+        val controllerPublicVisibility = controllerProperty(VisibilityProperty, Some(DefaultVisibility)).get == "public"
+        val controllerInstancePassing  = controllerProperty(InstancePassingProperty, Some(DefaultInstancePassing)).get
 
         // NOTE: We use a global property, not an oxf:page-flow scoped one
-        val defaultVersioned =
+        val controllerVersioned =
             att(configRoot, "versioned") map (_.toBoolean) getOrElse isResourcesVersioned
 
+        // NOTE: We support a null epilogue value and the pipeline then uses a plain HTML serializer
         val epilogueElement = configRoot.element("epilogue")
-        val epilogueURL     = Option(epilogueElement) flatMap (att(_, "url")) getOrElse getPropertySet.getString(EpiloguePropertyName)
+        val epilogueURL     = Option(epilogueElement) flatMap (att(_, "url")) orElse controllerProperty(EpilogueProperty) get
 
         val topLevelElements = Dom4j.elements(configRoot)
 
-         // Prepend a page for submissions
-        val submissionPage = {
-            val submissionPath  = getPropertySet.getString(SubmissionPathPropertyName, SubmissionPathDefault)
-            val submissionModel = getPropertySet.getStringOrURIAsString(SubmissionModelPropertyName)
-            if ((submissionPath eq null) && (submissionModel ne null) || (submissionPath ne null) && (submissionModel eq null))
-                throw new OXFException("Only one of properties " + SubmissionPathPropertyName + " and " + SubmissionModelPropertyName + " is set.")
-
-            PageElement(None, submissionPath, Pattern.compile(submissionPath), None, Some(submissionModel), None, configRoot)
-        }
+         // Prepend a synthetic page for submissions if configured
+        val syntheticPages =
+            (controllerProperty(SubmissionPathProperty), controllerProperty(SubmissionModelProperty)) match {
+                case (Some(submissionPath), submissionModel @ Some(_)) ⇒
+                    Seq(PageOrServiceElement(None, submissionPath, Pattern.compile(submissionPath), true, None, submissionModel, None, configRoot))
+                case _ ⇒
+                    Seq()
+            }
 
         val routeElements: Seq[RouteElement] =
-            submissionPage +: (
-                for (e ← topLevelElements filter (e ⇒ Set("files", "page")(e.getName)))
+            syntheticPages ++ (
+                for (e ← topLevelElements filter (e ⇒ Set("files", "page", "service")(e.getName)))
                 yield e.getName match {
-                    case "files" ⇒ FileElement(e, defaultVersioned)
-                    case "page"  ⇒ PageElement(e)
+                    case "files" ⇒ FileElement(e, controllerMatcher, controllerVersioned)
+                    case "page" | "service" ⇒ PageOrServiceElement(e, controllerMatcher, controllerPublicVisibility)
                 }
             )
 
-        val pagesElementsWithIds = routeElements collect { case page: PageElement if page.id.isDefined ⇒ page }
+        val pagesElementsWithIds = routeElements collect { case page: PageOrServiceElement if page.id.isDefined ⇒ page }
         val pathIdToPath              = pagesElementsWithIds map (p ⇒ p.id.get → p.path) toMap
         val pageIdToSetvaluesDocument = pagesElementsWithIds map (p ⇒ p.id.get → getSetValuesDocument(p.element)) filter (_._2 ne null) toMap
 
@@ -182,13 +192,13 @@ class PageFlowControllerProcessor extends ProcessorImpl {
             (f ⇒ new PathMatcher(f.path, f.mimeType.orNull, f.versioned))
 
         // Compile the pipeline for the given page element
-        def compile(page: PageElement) = {
+        def compile(page: PageOrServiceElement) = {
             val ast = createPipelineAST(
                 page.element,
                 controllerValidity,
                 stepProcessorContext,
                 urlBase,
-                globalInstancePassing,
+                controllerInstancePassing,
                 epilogueURL,
                 epilogueElement,
                 pathIdToPath.asJava,
@@ -208,14 +218,14 @@ class PageFlowControllerProcessor extends ProcessorImpl {
         val routes: Seq[Route] =
             for (e ← routeElements)
             yield e match {
-                case files: FileElement ⇒ FileRoute(files)
-                case page: PageElement  ⇒ PageRoute(page, compile)
+                case files: FileElement         ⇒ FileRoute(files)
+                case page: PageOrServiceElement ⇒ PageOrServiceRoute(page, compile)
             }
 
         // Find a handler route
         def handler(elementNames: Set[String]) =
             topLevelElements find (e ⇒ elementNames(e.getName)) flatMap (att(_, "page")) flatMap
-                { pageId ⇒ routes collectFirst { case page: PageRoute if page.routeElement.id == Some(pageId) ⇒ page } }
+                { pageId ⇒ routes collectFirst { case page: PageOrServiceRoute if page.routeElement.id == Some(pageId) ⇒ page } }
 
         PageFlow(routes, handler(Set("not-found-handler")), handler(Set("error-handler")), pathMatchers, Option(urlBase))
     }
@@ -272,32 +282,52 @@ object PageFlowControllerProcessor {
     val ControllerNamespaceURI = "http://www.orbeon.com/oxf/controller"
 
     // Properties
-    val InstancePassingPropertyName = "instance-passing"
-    val EpiloguePropertyName        = "epilogue"
-    val PathMatchers                = "path-matchers"
+    val MatcherProperty         = "matcher"
+    val VisibilityProperty      = "visibility"
+    val InstancePassingProperty = "instance-passing"
+    val SubmissionModelProperty = "submission-model"
+    val SubmissionPathProperty  = "submission-path"
+    val EpilogueProperty        = "epilogue"
 
-    val SubmissionModelPropertyName = "xforms-submission-model"
-    val SubmissionPathPropertyName  = "xforms-submission-path"
-    val SubmissionPathDefault       = "/xforms-server-submit"
+    val DefaultMatcher          = new QName("glob")
+    val DefaultVisibility       = "private"
+    val DefaultInstancePassing  = INSTANCE_PASSING_REDIRECT
+
+    def isPublic(s: String) = s == "public"
+
+    val PathMatchers            = "path-matchers"
 
     // Route elements
     sealed trait RouteElement { def path: String; def pattern: Pattern; def id: Option[String] }
     case class FileElement(id: Option[String], path: String, pattern: Pattern, mimeType: Option[String], versioned: Boolean) extends RouteElement
-    case class PageElement(id: Option[String], path: String, pattern: Pattern, defaultSubmission: Option[String], model: Option[String], view: Option[String], element: Element) extends RouteElement
+    case class PageOrServiceElement(id: Option[String], path: String, pattern: Pattern, public: Boolean, defaultSubmission: Option[String], model: Option[String], view: Option[String], element: Element) extends RouteElement
 
     object FileElement {
         // id?, path-info?, matcher?, mime-type?, versioned?
-        def apply(e: Element, defaultVersioned: Boolean): FileElement = {
+        def apply(e: Element, defaultMatcher: QName, defaultVersioned: Boolean): FileElement = {
             val path = getPath(e)
-            FileElement(idAtt(e), path, compilePattern(e, path), att(e, "mime-type"), att(e, "versioned") map (_ == "true") getOrElse defaultVersioned)
+            FileElement(
+                idAtt(e),
+                path,
+                compilePattern(e, path, defaultMatcher),
+                att(e, "mime-type"),
+                att(e, "versioned") map (_ == "true") getOrElse defaultVersioned)
         }
     }
 
-    object PageElement {
+    object PageOrServiceElement {
         // id?, path-info, matcher?, default-submission?, model?, view?
-        def apply(e: Element): PageElement = {
+        def apply(e: Element, defaultMatcher: QName, defaultPublic: Boolean): PageOrServiceElement = {
             val path = getPath(e)
-            PageElement(idAtt(e), path, compilePattern(e, path), att(e, "default-submission"), att(e, "model"), att(e, "view"), e)
+            PageOrServiceElement(
+                idAtt(e),
+                path,
+                compilePattern(e, path, defaultMatcher),
+                att(e, VisibilityProperty) map (isPublic(_)) getOrElse (e.getName == "page"), // public by default for pages
+                att(e, "default-submission"),
+                att(e, "model"),
+                att(e, "view"),
+                e)
         }
     }
 
@@ -313,15 +343,18 @@ object PageFlowControllerProcessor {
             if (request.getMethod == "GET")
                 ResourceServer.serveResource(MimeTypes, request.getRequestPath)
             else
-                throw new HttpStatusCodeException(403)
+                unauthorized()
     }
 
-    case class PageRoute(routeElement: PageElement, compile: PageElement ⇒ PipelineConfig) extends Route {
+    case class PageOrServiceRoute(routeElement: PageOrServiceElement, compile: PageOrServiceElement ⇒ PipelineConfig) extends Route {
 
+        // Compile pipeline lazily
         lazy val pipelineConfig = compile(routeElement)
 
         // Run a page
         def process(pipelineContext: PipelineContext, request: Request, matchResult: MatchResult) = {
+
+            //checkAccess(request)
 
             // PipelineConfig is reusable, but PipelineProcessor is not
             val pipeline = new PipelineProcessor(pipelineConfig)
@@ -337,20 +370,35 @@ object PageFlowControllerProcessor {
             pipeline.reset(pipelineContext)
             pipeline.start(pipelineContext)
         }
+
+        def checkAccess(request: Request) =
+            if (! routeElement.public && ! authorizedRequest(request))
+                unauthorized()
+
+        def authorizedRequest(request: Request) =
+            token(request) exists (authorizedToken(_))
+
+        def token(request: Request) =
+            (Option(request.getHeaderValuesMap.get("orbeon-token")) flatten) headOption
+
+        def authorizedToken(token: String) = false // TODO
     }
 
-    case class PageFlow(routes: Seq[Route], notFoundRoute: Option[PageRoute], errorRoute: Option[PageRoute], pathMatchers: Seq[PathMatcher], file: Option[String])
+    def unauthorized() = throw new HttpStatusCodeException(403)
+
+    case class PageFlow(routes: Seq[Route], notFoundRoute: Option[PageOrServiceRoute], errorRoute: Option[PageOrServiceRoute], pathMatchers: Seq[PathMatcher], file: Option[String])
 
     def att(e: Element, name: String) = Option(e.attributeValue(name))
     def idAtt(e: Element) = att(e, "id")
-    def getPath(e: Element) = att(e, "path-info") orElse att(e, "path") ensuring (_.isDefined) get
+    // @path-info for backward compatibility
+    def getPath(e: Element) = att(e, "path") orElse att(e, "path-info") ensuring (_.isDefined) get
 
     // Support "regexp" and "oxf:perl5-matcher" for backward compatibility
     val RegexpQNames = Set(new QName("regexp"), new QName("perl5-matcher", OXF_PROCESSORS_NAMESPACE))
 
     // Compile and convert glob expression if needed
-    def compilePattern(e: Element, path: String) =
-        RegexpMatcher.compilePattern(path, ! RegexpQNames(extractAttributeValueQName(e, "matcher")))
+    def compilePattern(e: Element, path: String, default: QName) =
+        RegexpMatcher.compilePattern(path, glob = ! RegexpQNames(Option(extractAttributeValueQName(e, MatcherProperty)) getOrElse default))
 }
 
 // This processor provides digest-based caching based on any content

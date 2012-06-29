@@ -46,14 +46,18 @@
             <!--
                 Ok this is tricky:
 
-                * At this point fr-form-model has already been recalculated
-                * fr-form-model may use us (through $fr-roles) using xforms:bind/@calculate or other MIPs
-                * But we just set the value of all-roles here
-                * So we must recalculate/revalidate fr-form-model after setting roles here
+                - At this point fr-form-model has already been recalculated
+                - fr-form-model may use us (through $fr-roles) using xforms:bind/@calculate or other MIPs
+                - But we just set the value of all-roles here
+                - So we must recalculate/revalidate fr-form-model after setting roles here
+                - NOTE: We now also use xxforms:defaults="true" so that xxforms:default can evaluate properly. Note that
+                  in case the form data is loaded from the persistence layer in "edit" mode, loading occurs after the
+                  recalculate below so the initial values if any will not be taken into account, by design. But in case
+                  of "new", they will be.
 
             -->
             <xforms:action if="instance('fr-permissions')/@all-roles != ''">
-                <xforms:recalculate model="fr-form-model"/>
+                <xforms:recalculate model="fr-form-model" xxforms:defaults="true"/>
                 <xforms:revalidate model="fr-form-model"/>
             </xforms:action>
         </xforms:action>

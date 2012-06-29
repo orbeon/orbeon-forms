@@ -278,7 +278,12 @@ object ToolboxOps {
 
         // The grid template
         val gridTemplate: NodeInfo =
-            <fr:grid edit-ref="" id={gridId(newGridName)} repeat="true" bind={bindId(newGridName)} origin={makeInstanceExpression(templateInstanceId)}
+            <fr:grid edit-ref=""
+                     id={gridId(newGridName)}
+                     repeat="true"
+                     bind={bindId(newGridName)}
+                     origin={makeInstanceExpression(templateInstanceId)}
+                     min="1"
                      xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
                      xmlns:xhtml="http://www.w3.org/1999/xhtml">
                 <xhtml:tr>

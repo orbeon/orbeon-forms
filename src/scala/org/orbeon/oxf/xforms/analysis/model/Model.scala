@@ -213,7 +213,7 @@ class BindTree(model: Model, bindElements: Seq[Element]) {
     val bindsByName = new LinkedHashMap[String, Bind]
 
     // Types of binds we have
-    var hasInitialValueBind = false
+    var hasDefaultValueBind = false
     var hasCalculateBind = false
     var hasTypeBind = false
     var hasRequiredBind = false
@@ -394,7 +394,7 @@ class BindTree(model: Model, bindElements: Seq[Element]) {
         def getMIP(mipName: String) = if (mipName == TYPE) typeMIP else allMIPNameToXPathMIP.get(mipName)
 
         // For Java callers (can return null)
-        def getInitialValue = getMIPExpressionOrNull(InitialValue.name)
+        def getDefaultValue = getMIPExpressionOrNull(Default.name)
         def getCalculate = getMIPExpressionOrNull(Calculate.name)
         def getRelevant = getMIPExpressionOrNull(Relevant.name)
         def getReadonly = getMIPExpressionOrNull(Readonly.name)
@@ -414,7 +414,7 @@ class BindTree(model: Model, bindElements: Seq[Element]) {
         def hasMIPs = hasCalculateComputedMIPs || hasValidateMIPs || hasCustomMIPs
 
         // Globally remember if we have seen these categories of binds
-        bindTree.hasInitialValueBind ||= getInitialValue ne null
+        bindTree.hasDefaultValueBind ||= getDefaultValue ne null
         bindTree.hasCalculateBind ||= getCalculate ne null
         bindTree.hasTypeBind ||= getType ne null
         bindTree.hasRequiredBind ||= getRequired ne null
@@ -578,7 +578,7 @@ trait ModelBinds {
     def bindsById = bindTree.bindsById
     def jBindsByName = bindTree.bindsByName.asJava
 
-    def hasInitialValueBind = bindTree.hasInitialValueBind
+    def hasDefaultValueBind = bindTree.hasDefaultValueBind
     def hasCalculateBind = bindTree.hasCalculateBind
     def hasTypeBind = bindTree.hasTypeBind
     def hasRequiredBind = bindTree.hasRequiredBind
@@ -625,12 +625,12 @@ object Model {
     case object Required     extends MIP with BooleanMIP with ComputedMIP with ValidateMIP { val name = "required" }
     case object Constraint   extends MIP with BooleanMIP with ValidateMIP { val name = "constraint" }
     case object Calculate    extends MIP with StringMIP  with ComputedMIP { val name = "calculate" }
-    case object InitialValue extends MIP with StringMIP  with ComputedMIP { val name = "initial-value"; override def qName = XXFORMS_DEFAULT_QNAME }
+    case object Default      extends MIP with StringMIP  with ComputedMIP { val name = "default"; override val qName = XXFORMS_DEFAULT_QNAME }
     case object Type         extends MIP with ValidateMIP { val name = "type" }
 
     case class Custom(override val name: String) extends MIP with XPathMIP
 
-    val AllMIPs                 = Set[MIP](Relevant, Readonly, Required, Constraint, Calculate, InitialValue, Type)
+    val AllMIPs                 = Set[MIP](Relevant, Readonly, Required, Constraint, Calculate, Default, Type)
     val AllMIPsByName           = AllMIPs map (mip ⇒ mip.name → mip) toMap
     val AllMIPNames             = AllMIPs map (_.name)
     val MIPNameToAttributeQName = AllMIPs map (m ⇒ m.name → m.qName) toMap
@@ -647,18 +647,18 @@ object Model {
     def buildCustomMIPName(qualifiedName: String) = qualifiedName.replace(':', '-')
 
     // Constants for Java callers
-    val RELEVANT = Relevant.name
-    val READONLY = Readonly.name
-    val REQUIRED = Required.name
+    val RELEVANT   = Relevant.name
+    val READONLY   = Readonly.name
+    val REQUIRED   = Required.name
     val CONSTRAINT = Constraint.name
-    val CALCULATE = Calculate.name
-    val INITIAL_VALUE = InitialValue.name
-    val TYPE = Type.name
+    val CALCULATE  = Calculate.name
+    val DEFAULT    = Default.name
+    val TYPE       = Type.name
 
     // MIP default values for Java callers
     val DEFAULT_RELEVANT = true
     val DEFAULT_READONLY = false
     val DEFAULT_REQUIRED = false
-    val DEFAULT_VALID = true
+    val DEFAULT_VALID    = true
 }
 

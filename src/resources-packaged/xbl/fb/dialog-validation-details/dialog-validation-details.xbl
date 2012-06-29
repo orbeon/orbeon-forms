@@ -55,7 +55,7 @@
                         <relevant/>
                         <readonly/>
 
-                        <initial-value/>
+                        <default/>
                         <calculate/>
                         <schema-type/>
                         <help/>
@@ -70,7 +70,7 @@
                 <xforms:setvalue ev:event="xxforms-valid" ev:observer="local" ref="save-trigger">enabled</xforms:setvalue>
 
                 <xforms:bind ref="required" readonly="../schema-type != ''"/>
-                <xforms:bind ref="relevant | readonly | constraint | initial-value | calculate" type="xxforms:xpath2" required="false()"/>
+                <xforms:bind ref="relevant | readonly | constraint | default | calculate" type="xxforms:xpath2" required="false()"/>
                 <xforms:bind ref="save-trigger" readonly=". = 'disabled'"/>
 
             </xforms:model>
@@ -120,7 +120,7 @@
                     <xforms:setvalue ref="$local/relevant"   value="controlOps:getMipOrEmpty($form, fbf:controlId($local/control-name), 'relevant')"/>
                     <xforms:setvalue ref="$local/readonly"   value="controlOps:getMipOrEmpty($form, fbf:controlId($local/control-name), 'readonly')"/>
                     <xforms:setvalue ref="$local/calculate"  value="controlOps:getMipOrEmpty($form, fbf:controlId($local/control-name), 'calculate')"/>
-                    <xforms:setvalue ref="$local/initial-value"    value="controlOps:getMipOrEmpty($form, fbf:controlId($local/control-name), 'initial-value')"/>
+                    <xforms:setvalue ref="$local/default"    value="controlOps:getMipOrEmpty($form, fbf:controlId($local/control-name), 'default')"/>
 
                 </xforms:action>
 
@@ -154,7 +154,7 @@
                             (: "required" MIP :)
                             controlOps:updateMip($form, $control-name, 'required', for $v in $local/required/string() return if ($v = 'true') then 'true()' else ''),
                             (: All other MIPs :)
-                            for $mip in ('constraint', 'relevant', 'readonly', 'calculate', 'initial-value') return
+                            for $mip in ('constraint', 'relevant', 'readonly', 'calculate', 'default') return
                                 controlOps:updateMip($form, $control-name, $mip, $local/*[name() = $mip])
                         )
                     </xforms:action>
@@ -254,13 +254,13 @@
                                         <xforms:hint ref="$resources/dialog-validation-details/readonly/hint"/>
                                     </xforms:input>
 
-                                    <xforms:input ref="initial-value" incremental="true">
+                                    <xforms:input ref="default" incremental="true">
                                         <xforms:label>
                                             <xhtml:img src="/apps/fr/style/images/silk/flag_yellow.png" alt="" title=""/>
-                                            <xhtml:span><xforms:output value="$resources/dialog-validation-details/initial-value/label"/></xhtml:span>
+                                            <xhtml:span><xforms:output value="$resources/dialog-validation-details/default/label"/></xhtml:span>
                                         </xforms:label>
-                                        <xforms:alert ref="$resources/dialog-validation-details/initial-value/alert"/>
-                                        <xforms:hint ref="$resources/dialog-validation-details/initial-value/hint"/>
+                                        <xforms:alert ref="$resources/dialog-validation-details/default/alert"/>
+                                        <xforms:hint ref="$resources/dialog-validation-details/default/hint"/>
                                     </xforms:input>
 
                                     <xforms:input ref="calculate" incremental="true">

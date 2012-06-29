@@ -36,13 +36,13 @@ public class XFormsRecalculateAction extends XFormsAction {
         final XFormsModel model = actionInterpreter.actionXPathContext().getCurrentModel();
 
         // @xxforms:defaults
-        final boolean applyInitialValues; {
-            final String applyInitialValuesString = actionInterpreter.resolveAVT(actionElement, XFormsConstants.XXFORMS_DEFAULTS_QNAME);
-            applyInitialValues = Boolean.parseBoolean(applyInitialValuesString);
+        final boolean applyDefaults; {
+            final String defaultsString = actionInterpreter.resolveAVT(actionElement, XFormsConstants.XXFORMS_DEFAULTS_QNAME);
+            applyDefaults = Boolean.parseBoolean(defaultsString);
         }
 
         // Because of inter-model dependencies, we consider for now that the action must force the operation
         model.getDeferredActionContext().recalculate = true;
-        Dispatch.dispatchEvent(new XFormsRecalculateEvent(containingDocument, model, applyInitialValues));
+        Dispatch.dispatchEvent(new XFormsRecalculateEvent(containingDocument, model, applyDefaults));
     }
 }

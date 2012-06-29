@@ -159,9 +159,9 @@ public class XFormsModelBinds {
     /**
      * Apply calculate binds.
      *
-     * @param applyInitialValues    whether to apply initial values (@xxforms:default="...")
+     * @param applyDefaults    whether to apply initial values (@xxforms:default="...")
      */
-    public void applyCalculateBinds(boolean applyInitialValues) {
+    public void applyCalculateBinds(boolean applyDefaults) {
 
         if (!staticModel.hasCalculateComputedCustomBind()) {
             // We can skip this
@@ -175,13 +175,13 @@ public class XFormsModelBinds {
             {
                 // 1. Evaluate initial values and calculate before the rest
 
-                if (isFirstCalculate || applyInitialValues) {
+                if (isFirstCalculate || applyDefaults) {
                     // Handle default values first
-                    if (staticModel.hasInitialValueBind())
+                    if (staticModel.hasDefaultValueBind())
                         iterateBinds(new BindRunner() {
                             public void applyBind(Bind bind, int position) {
-                                if (bind.staticBind.getInitialValue() != null &&  dependencies.requireModelMIPUpdate(staticModel, bind.staticBind, Model.INITIAL_VALUE()))
-                                    handleInitialValueDefaultBind(bind, position);
+                                if (bind.staticBind.getDefaultValue() != null &&  dependencies.requireModelMIPUpdate(staticModel, bind.staticBind, Model.DEFAULT()))
+                                    handleDefaultValueBind(bind, position);
                             }
                         });
                     // This will be false from now on as we have done our first handling of calculate binds
@@ -372,13 +372,13 @@ public class XFormsModelBinds {
 
     private String evaluateXXFormsDefaultBind(Bind bind, int position) {
         // Handle xxforms:default MIP
-        if (bind.staticBind.getInitialValue() != null) {
+        if (bind.staticBind.getDefaultValue() != null) {
             // Compute default value
             try {
                 final NodeInfo currentNodeInfo = (NodeInfo) bind.nodeset.get(position - 1);
-                return evaluateStringExpression(bind.nodeset, position, bind, bind.staticBind.getInitialValue(), getVariables(currentNodeInfo));
+                return evaluateStringExpression(bind.nodeset, position, bind, bind.staticBind.getDefaultValue(), getVariables(currentNodeInfo));
             } catch (Exception e) {
-                handleMIPXPathException(e, bind, bind.staticBind.getInitialValue(), "evaluating XForms default bind");
+                handleMIPXPathException(e, bind, bind.staticBind.getDefaultValue(), "evaluating XForms default bind");
                 return null;
             }
         } else {
@@ -386,7 +386,7 @@ public class XFormsModelBinds {
         }
     }
 
-    private void handleInitialValueDefaultBind(Bind bind, int position) {
+    private void handleDefaultValueBind(Bind bind, int position) {
 
         final String stringResult = evaluateXXFormsDefaultBind(bind, position);
         if (stringResult != null) {

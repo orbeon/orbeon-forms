@@ -226,7 +226,7 @@
                                     </returnable-instances>
                                 </analysis>
                             </binding>
-                            <mip name="initial-value" expression="42">
+                            <mip name="default" expression="42">
                                 <analysis expression="xs:string((42)[1])" analyzed="true"/>
                             </mip>
                         </bind>
@@ -479,7 +479,7 @@
                                         </returnable-instances>
                                     </analysis>
                                 </binding>
-                                <mip name="initial-value" expression="concat(../a, ../c)">
+                                <mip name="default" expression="concat(../a, ../c)">
                                     <analysis expression="xs:string((concat(../a, ../c))[1])" analyzed="true">
                                         <value-dependent>
                                             <path>instance('i2')/a</path>

@@ -26,18 +26,18 @@ import org.orbeon.oxf.xforms.event.XFormsEvents;
  */
 public class XFormsRecalculateEvent extends XFormsEvent {
 
-    private final boolean applyInitialValues;
+    private final boolean applyDefaults;
 
     public XFormsRecalculateEvent(XFormsContainingDocument containingDocument, XFormsEventTarget targetObject) {
         this(containingDocument, targetObject, false);
     }
 
-    public XFormsRecalculateEvent(XFormsContainingDocument containingDocument, XFormsEventTarget targetObject, boolean applyInitialValues) {
+    public XFormsRecalculateEvent(XFormsContainingDocument containingDocument, XFormsEventTarget targetObject, boolean applyDefaults) {
         super(containingDocument, XFormsEvents.XFORMS_RECALCULATE, targetObject, true, true);
-        this.applyInitialValues = applyInitialValues;
+        this.applyDefaults = applyDefaults;
     }
 
-    public boolean isApplyInitialValues() {
-        return applyInitialValues;
+    public boolean isApplyDefaults() {
+        return applyDefaults;
     }
 }

@@ -431,7 +431,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
             // 4.3.6 The xforms-recalculate Event
             // Bubbles: Yes / Cancelable: Yes / Context Info: None
             final XFormsRecalculateEvent recalculateEvent = (XFormsRecalculateEvent) event;
-            doRecalculate(recalculateEvent.isApplyInitialValues());
+            doRecalculate(recalculateEvent.isApplyDefaults());
         } else if (XFormsEvents.XFORMS_REVALIDATE.equals(eventName)) {
             // 4.3.5 The xforms-revalidate Event
             // Bubbles: Yes / Cancelable: Yes / Context Info: None
@@ -760,7 +760,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         containingDocument.getXPathDependencies().rebuildDone(staticModel);
     }
 
-    public void doRecalculate(boolean applyInitialValues) {
+    public void doRecalculate(boolean applyDefaults) {
 
         // Recalculate only if needed
         if (deferredActionContext.recalculate) {
@@ -773,7 +773,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
             if (hasInstancesAndBinds()) {
                 // Apply calculate binds
-                binds.applyCalculateBinds(applyInitialValues);
+                binds.applyCalculateBinds(applyDefaults);
             }
 
             // "Actions that directly invoke rebuild, recalculate, revalidate, or refresh always

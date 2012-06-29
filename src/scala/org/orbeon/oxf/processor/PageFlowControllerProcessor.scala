@@ -377,7 +377,7 @@ object PageFlowControllerProcessor {
                 unauthorized()
 
         def authorizedRequest(request: Request) =
-            token(request) exists (authorizedToken(_))
+            token(request) exists authorizedToken
 
         def token(request: Request) =
             (Option(request.getHeaderValuesMap.get("orbeon-token")) flatten) headOption

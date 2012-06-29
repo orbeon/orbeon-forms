@@ -113,6 +113,7 @@ public class XFormsFeatures {
             new ResourceConfig("/ops/javascript/orbeon/util/fQuery.js",                                 "/ops/javascript/orbeon/util/fQuery-min.js"),
             new ResourceConfig("/ops/javascript/orbeon/util/String.js",                                 "/ops/javascript/orbeon/util/String-min.js"),
             new ResourceConfig("/ops/javascript/orbeon/util/ExecutionQueue.js",                         "/ops/javascript/orbeon/util/ExecutionQueue-min.js"),
+            new ResourceConfig("/ops/javascript/orbeon/util/FiniteStateMachine.js",                     "/ops/javascript/orbeon/util/FiniteStateMachine-min.js"),
             new ResourceConfig("/ops/javascript/orbeon/xforms/server/Server.js",                        "/ops/javascript/orbeon/xforms/server/Server-min.js"),
             new ResourceConfig("/ops/javascript/orbeon/xforms/server/AjaxServer.js",                    "/ops/javascript/orbeon/xforms/server/AjaxServer-min.js"),
             new ResourceConfig("/ops/javascript/orbeon/xforms/server/AjaxServer/AjaxServerEvent.js",    "/ops/javascript/orbeon/xforms/server/AjaxServer/AjaxServerEvent-min.js"),

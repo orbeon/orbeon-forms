@@ -180,7 +180,7 @@ public class XFormsModelBinds {
                     if (staticModel.hasDefaultValueBind())
                         iterateBinds(new BindRunner() {
                             public void applyBind(Bind bind, int position) {
-                                if (bind.staticBind.getDefaultValue() != null &&  dependencies.requireModelMIPUpdate(staticModel, bind.staticBind, Model.DEFAULT()))
+                                if (bind.staticBind.getDefaultValue() != null && dependencies.requireModelMIPUpdate(staticModel, bind.staticBind, Model.DEFAULT()))
                                     handleDefaultValueBind(bind, position);
                             }
                         });

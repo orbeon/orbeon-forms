@@ -33,15 +33,12 @@ abstract class XPathAnalysis extends DebugXML  {
 
     def returnableInstances = returnablePaths.keys
 
-    // Return true if any path matches
+    // For all those, return true if any path matches
     // NOTE: For now just check exact paths. Later must be smarter?
-    def intersectsBinding(touchedPaths: MapSet[String, String]) = valueDependentPaths intersects touchedPaths
 
-    // Return true if any path matches
-    // NOTE: For now just check exact paths. Later must be smarter?
-    def intersectsValue(touchedPaths: MapSet[String, String]) = intersectsBinding(touchedPaths) || (returnablePaths intersects touchedPaths)
-
-    def intersectsModels(touchedModels: collection.Set[String]) = dependentModels exists (touchedModels contains _)
+    def intersectsBinding(touchedPaths:  MapSet[String, String]) = valueDependentPaths intersects touchedPaths
+    def intersectsModels (touchedModels: collection.Set[String]) = dependentModels exists (touchedModels contains _)
+    def intersectsValue  (touchedPaths:  MapSet[String, String]) = intersectsBinding(touchedPaths) || (returnablePaths intersects touchedPaths)
 
     // Combine this analysis with another one and return a new analysis
     def combine(other: XPathAnalysis): XPathAnalysis

@@ -6584,7 +6584,7 @@
         <!-- See: http://forge.ow2.org/tracker/index.php?func=detail&aid=315919&group_id=168&atid=350207 -->
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+            <xh:html>
                 <xh:head>
                     <xf:model xxf:xpath-analysis="true" id="model">
                         <xf:instance id="instance">
@@ -6663,6 +6663,57 @@
                     </value>
                 </output>
             </request>
+        </output>
+    </test>
+
+    <test description="#336: XPath dependencies not picked up with inter-model recalculate" name="oxf:pipeline">
+        <!-- See: https://github.com/orbeon/orbeon-forms/issues/336 -->
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="model1" xxf:xpath-analysis="true">
+                        <xf:instance id="instance1">
+                            <roles1 xmlns=""/>
+                        </xf:instance>
+                        <xf:action ev:event="xforms-model-construct-done">
+                            <xf:setvalue ref=".">a b c</xf:setvalue>
+                            <xf:recalculate model="model2"/>
+                        </xf:action>
+                    </xf:model>
+                    <xf:model id="model2">
+                        <xf:instance id="instance2">
+                            <roles2 xmlns=""/>
+                        </xf:instance>
+                        <xf:var name="roles" value="xxf:instance('instance1')"/>
+                        <xf:bind ref="." calculate="$roles" id="roles-bind"/>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:output bind="roles-bind" id="my-output"/>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response>
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance1" model-id="model1">
+                                <roles1>a b c</roles1>
+                            </instance>
+                            <instance id="instance2" model-id="model2">
+                                <roles2>a b c</roles2>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="my-output" readonly="true">a b c</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
         </output>
     </test>
 

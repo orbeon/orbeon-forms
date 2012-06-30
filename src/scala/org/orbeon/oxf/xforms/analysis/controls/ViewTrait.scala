@@ -13,7 +13,10 @@
  */
 package org.orbeon.oxf.xforms.analysis.controls
 
-import org.orbeon.oxf.xforms.analysis.SimpleElementAnalysis
+import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, SimpleElementAnalysis}
+import ElementAnalysis._
+import org.orbeon.oxf.xforms.XFormsConstants._
+import org.orbeon.oxf.xforms.event.XFormsEvents._
 
 /**
  * Handle aspects of an element that are specific to the view.
@@ -22,6 +25,9 @@ trait ViewTrait extends SimpleElementAnalysis with AppearanceTrait {
 
     // Index of the element in the view
     val index: Int = staticStateContext.index
+
+    // By default, external events are keypress plus those specifically allowed by the form author
+    def externalEvents = attSet(element, XXFORMS_EXTERNAL_EVENTS_QNAME) ++ Set(KEYPRESS)
 
     // In the view, in-scope model variables are always first in scope
     override protected def getRootVariables =

@@ -221,8 +221,6 @@ class XFormsOutputControl(container: XBLContainer, parent: XFormsControl, elemen
         updateFileMetadataCopy(cloned)
         cloned
     }
-
-    override def getAllowedExternalEvents = AllowedExternalEvents.asJava
 }
 
 object XFormsOutputControl {
@@ -239,5 +237,4 @@ object XFormsOutputControl {
             null
 
     val DownloadAppearanceExtensionAttributes = Array(XXFORMS_TARGET_QNAME)
-    val AllowedExternalEvents = Set(XFORMS_HELP, DOM_ACTIVATE)
 }

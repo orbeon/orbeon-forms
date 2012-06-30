@@ -17,11 +17,7 @@ import org.dom4j.Element;
 import org.orbeon.oxf.xforms.control.FocusableTrait;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
-import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
-
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Represents an xforms:trigger control.
@@ -52,19 +48,6 @@ public class XFormsTriggerControl extends XFormsSingleNodeControl implements Foc
         //
         // So we keep the control relevant in this case.
         return super.computeRelevant();
-    }
-
-    private static final Set<String> ALLOWED_EXTERNAL_EVENTS = new HashSet<String>();
-    static {
-        ALLOWED_EXTERNAL_EVENTS.add(XFormsEvents.XFORMS_FOCUS);
-        ALLOWED_EXTERNAL_EVENTS.add(XFormsEvents.XFORMS_HELP);
-        ALLOWED_EXTERNAL_EVENTS.add(XFormsEvents.DOM_ACTIVATE);
-        ALLOWED_EXTERNAL_EVENTS.add(XFormsEvents.XXFORMS_VALUE_OR_ACTIVATE);// for noscript mode
-    }
-
-    @Override
-    public Set<String> getAllowedExternalEvents() {
-        return ALLOWED_EXTERNAL_EVENTS;
     }
 
     @Override

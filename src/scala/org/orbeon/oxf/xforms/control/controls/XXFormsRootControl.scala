@@ -13,17 +13,15 @@
  */
 package org.orbeon.oxf.xforms.control.controls
 
-import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xforms.control.{XFormsControl, XFormsNoSingleNodeContainerControl}
-import org.dom4j.Element
-import java.util.{Map ⇒ JMap}
-import org.orbeon.oxf.xforms.event.events.XXFormsLoadEvent
-import org.orbeon.oxf.util.NetUtils
 import java.io.IOException
+import java.util.{Map ⇒ JMap}
+import org.dom4j.Element
 import org.orbeon.oxf.common.ValidationException
+import org.orbeon.oxf.util.NetUtils
+import org.orbeon.oxf.xforms.control.{XFormsControl, XFormsNoSingleNodeContainerControl}
 import org.orbeon.oxf.xforms.event.XFormsEvent
-import org.orbeon.oxf.xforms.event.XFormsEvents._
-import collection.JavaConverters._
+import org.orbeon.oxf.xforms.event.events.XXFormsLoadEvent
+import org.orbeon.oxf.xforms.xbl.XBLContainer
 
 // Control at the root of the control tree
 // NOTE: This is also the root of a dynamic sub-tree, in which case the control is a child of xxf:dynamic
@@ -59,12 +57,7 @@ class XXFormsRootControl(container: XBLContainer, parent: XFormsControl, element
             super.performDefaultAction(event)
     }
 
-    override protected def getAllowedExternalEvents = XXFormsRootControl.AllowedExternalEvents
 
     // FIXME: Support refresh events? Simply enabling below doesn't seem to work for enabled/disabled.
     //override def supportsRefreshEvents = true
-}
-
-object XXFormsRootControl {
-    val AllowedExternalEvents = Set(KEYPRESS, XXFORMS_LOAD, XXFORMS_POLL).asJava
 }

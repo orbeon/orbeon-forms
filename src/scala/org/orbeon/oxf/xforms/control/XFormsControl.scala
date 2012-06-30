@@ -61,14 +61,16 @@ class XFormsControl(
     with XFormsEventObserver
     with ExternalCopyable {
 
+    // Type of the associated static control
+    type Control <: ElementAnalysis // TODO: Use more specific to represent controls. Note that those can also be actions.
+
     require(container ne null)
 
     final val containingDocument = container.getContainingDocument
 
     // Static information (never changes for the lifetime of the containing document)
     // TODO: Pass staticControl during construction (find which callers don't pass the necessary information)
-    private val _staticControl   = Option(container.getPartAnalysis.getControlAnalysis(XFormsUtils.getPrefixedId(effectiveId))) orNull
-    def staticControl            = _staticControl
+    final val staticControl: Control = Option(container.getPartAnalysis.getControlAnalysis(XFormsUtils.getPrefixedId(effectiveId))).orNull.asInstanceOf[Control]
 
     final val prefixedId = Option(staticControl) map (_.prefixedId) getOrElse XFormsUtils.getPrefixedId(effectiveId)
 

@@ -37,6 +37,8 @@ class XFormsRepeatIterationControl(container: XBLContainer, parent: XFormsContro
         extends XFormsSingleNodeContainerControl(container, parent, element, effectiveId)
         with NoLHHATrait {
 
+    override type Control = RepeatIterationControl
+
     // Initialize based on the effective id
     private var _iterationIndex = XFormsUtils.getEffectiveIdSuffixParts(effectiveId).lastOption getOrElse -1
     def iterationIndex = _iterationIndex
@@ -53,17 +55,14 @@ class XFormsRepeatIterationControl(container: XBLContainer, parent: XFormsContro
     // Whether this iteration is the repeat's current iteration
     def isCurrentIteration = iterationIndex == repeat.getIndex
 
-    // Des not support refresh events for now (could make sense though)
-    override def staticControl = super.staticControl.asInstanceOf[RepeatIterationControl]
-
     // This iteration's parent repeat control
     def repeat = parent.asInstanceOf[XFormsRepeatControl]
 
+    // Does not support refresh events for now (could make sense though)
     override def supportsRefreshEvents = false
     override def isStaticReadonly = false
     override def getType = null
 
-    override val getAllowedExternalEvents = Set(XFormsEvents.XXFORMS_REPEAT_ACTIVATE).asJava
     override def supportFullAjaxUpdates = false
 
     // Update this control's effective id and its descendants based on the parent's effective id.

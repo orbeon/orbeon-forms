@@ -37,4 +37,6 @@ class ComponentControl(staticStateContext: StaticStateContext, element: Element,
     // If control does not have an XPath binding, return one anyway so that controls w/o their own binding also get updated.
     override protected def computeBindingAnalysis =
         if (binding.abstractBinding.modeBinding) super.computeBindingAnalysis else getContextAnalysis
+
+    override def externalEvents = super.externalEvents ++ binding.abstractBinding.allowedExternalEvents
 }

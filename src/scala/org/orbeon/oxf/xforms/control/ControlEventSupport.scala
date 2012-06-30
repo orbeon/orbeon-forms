@@ -16,10 +16,10 @@ package org.orbeon.oxf.xforms.control
 import org.orbeon.oxf.xforms._
 import control.Controls.AncestorIterator
 import event.events._
-import event.{EventListener, XFormsEvent, XFormsEventObserver, XFormsEvents}
+import event.{EventListener, XFormsEvent, XFormsEventObserver}
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatIterationControl
-import java.util.{Set ⇒ JSet}
-import scala.collection.JavaConverters._
+import java.util.{Set ⇒ JSet, Collections ⇒ JCollections }
+import org.orbeon.oxf.xforms.analysis.controls.ViewTrait
 
 trait ControlEventSupport {
 
@@ -69,10 +69,10 @@ trait ControlEventSupport {
     def performTargetAction(event: XFormsEvent) = ()
 
     // Check whether this concrete control supports receiving the external event specified
-    final def allowExternalEvent(eventName: String) =
-        getAllowedExternalEvents.contains(eventName) || Set(XFormsEvents.KEYPRESS)(eventName)
-
-    protected def getAllowedExternalEvents: JSet[String] = Set.empty[String].asJava
+    final def allowExternalEvent(eventName: String) = staticControl match {
+        case viewTrait: ViewTrait ⇒ viewTrait.externalEvents(eventName)
+        case _ ⇒ false
+    }
 
     // TODO LATER: should probably return true because most controls could then dispatch relevance events
     def supportsRefreshEvents = false

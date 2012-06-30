@@ -20,7 +20,6 @@ import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.analysis.XPathDependencies
 import org.orbeon.oxf.xforms.control._
-import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.xml.sax.helpers.AttributesImpl
 import java.io.File
@@ -28,7 +27,6 @@ import org.orbeon.oxf.xforms.event.events._
 import XFormsUploadControl._
 import org.orbeon.oxf.xml.Dom4j
 import org.orbeon.oxf.xml.XMLConstants._
-import collection.JavaConverters._
 import org.orbeon.oxf.util.{SecureUtils, Multipart, NetUtils}
 import org.orbeon.oxf.xforms.{XFormsProperties, XFormsContainingDocument}
 import java.net.{URLEncoder, URI}
@@ -195,8 +193,6 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
         updateFileMetadataCopy(cloned)
         cloned
     }
-
-    override def getAllowedExternalEvents = AllowedExternalEvents.asJava
 }
 
 object XFormsUploadControl {
@@ -293,15 +289,4 @@ object XFormsUploadControl {
             if size != "0" || filename != ""
         } yield
             (name, value, filename, mediatype, size)
-
-    val AllowedExternalEvents = Set(
-        XFORMS_FOCUS,
-        XFORMS_HELP,
-        XFORMS_SELECT,
-        XXFORMS_VALUE,
-        // NOTE: xxforms-upload-done is a trusted server event so doesn't need to be listed here
-        XXFORMS_UPLOAD_START,
-        XXFORMS_UPLOAD_CANCEL,
-        XXFORMS_UPLOAD_PROGRESS
-    )
 }

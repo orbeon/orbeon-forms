@@ -13,22 +13,22 @@
  */
 package org.orbeon.oxf.xforms.control
 
+import collection.JavaConverters._
+import java.util.{Collections ⇒ JCollections}
 import org.dom4j.Element
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.xforms.XFormsProperties
 import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.analysis.XPathDependencies
 import org.orbeon.oxf.xforms.event.XFormsEvent
-import org.orbeon.oxf.xforms.event.XFormsEvents
 import org.orbeon.oxf.xforms.event.events.XXFormsValue
 import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.oxf.xforms.xbl.XBLContainer
+import org.orbeon.oxf.xml.XMLConstants._
+import org.orbeon.oxf.xml.{ContentHandlerHelper, NamespaceMapping}
 import org.orbeon.saxon.om.Item
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.saxon.value._
-import collection.JavaConverters._
-import java.util.{Collections ⇒ JCollections, Set ⇒ JSet}
-import org.orbeon.oxf.xml.{ContentHandlerHelper, NamespaceMapping, XMLConstants}
 
 /**
  * Base class for all controls that hold a value.
@@ -124,7 +124,7 @@ abstract class XFormsValueControl(container: XBLContainer, parent: XFormsControl
         val boundItem: Item = getBoundItem
         if (! boundItem.isInstanceOf[NodeInfo])// this should not happen
             throw new OXFException("Control is no longer bound to a node. Cannot set external value.")
-        DataModel.jSetValueIfChanged(containingDocument, getIndentedLogger, this, getLocationData, boundItem.asInstanceOf[NodeInfo], value, "client", false)
+        DataModel.jSetValueIfChanged(containingDocument, getIndentedLogger, this, getLocationData, boundItem.asInstanceOf[NodeInfo], value, "client", isCalculate = false)
 
         // NOTE: We do *not* call evaluate() here, as that will break the difference engine. doSetValue() above marks
         // the controls as dirty, and they will be evaluated when necessary later.
@@ -144,7 +144,7 @@ abstract class XFormsValueControl(container: XBLContainer, parent: XFormsControl
                     (outputFormat ⇒ evaluateAsString(
                         StringValue.makeStringValue(getValue),
                         outputFormat,
-                        XFormsValueControl.FORMAT_NAMESPACE_MAPPING,
+                        XFormsValueControl.FormatNamespaceMapping,
                         getContextStack.getCurrentVariables)) orNull
         else
             // Format value according to format attribute
@@ -207,9 +207,6 @@ abstract class XFormsValueControl(container: XBLContainer, parent: XFormsControl
         super.equalsExternal(other)
     }
 
-    override def getAllowedExternalEvents: JSet[String] =
-        XFormsValueControl.ALLOWED_EXTERNAL_EVENTS
-
     override def performDefaultAction(event: XFormsEvent): Unit = event match {
         case xxformsValue: XXFormsValue ⇒ storeExternalValue(xxformsValue.getNewValue)
         case _ ⇒ super.performDefaultAction(event)
@@ -223,12 +220,5 @@ abstract class XFormsValueControl(container: XBLContainer, parent: XFormsControl
 
 object XFormsValueControl {
     // Assume xs: prefix for default formats
-    val FORMAT_NAMESPACE_MAPPING = new NamespaceMapping(Map(XMLConstants.XSD_PREFIX → XMLConstants.XSD_URI).asJava)
-
-    private final val ALLOWED_EXTERNAL_EVENTS = Set(
-        XFormsEvents.XFORMS_FOCUS,
-        XFormsEvents.XFORMS_HELP,
-        XFormsEvents.DOM_ACTIVATE,
-        XFormsEvents.XXFORMS_VALUE,
-        XFormsEvents.XXFORMS_VALUE_OR_ACTIVATE).asJava// for noscript mode
+    val FormatNamespaceMapping = new NamespaceMapping(Map(XSD_PREFIX → XSD_URI).asJava)
 }

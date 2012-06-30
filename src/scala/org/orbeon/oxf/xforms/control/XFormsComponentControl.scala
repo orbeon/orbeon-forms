@@ -33,6 +33,8 @@ import scala.collection.JavaConverters._
 class XFormsComponentControl(container: XBLContainer, parent: XFormsControl, element: Element, effectiveId: String)
         extends XFormsSingleNodeContainerControl(container, parent, element, effectiveId) {
 
+    override type Control = ComponentControl
+
     private var _nestedContainer: Option[XBLContainer] = None
     def nestedContainer = _nestedContainer.get
 
@@ -57,8 +59,6 @@ class XFormsComponentControl(container: XBLContainer, parent: XFormsControl, ele
         nestedContainer.destroy()
         _nestedContainer = None
     }
-
-    override def staticControl = super.staticControl.asInstanceOf[ComponentControl]
 
     // Only handle binding if we support modeBinding
     override protected def pushBindingImpl(parentContext: BindingContext): BindingContext = {
@@ -128,7 +128,4 @@ class XFormsComponentControl(container: XBLContainer, parent: XFormsControl, ele
     // Simply delegate but switch the container
     override def buildChildren(buildTree: (XBLContainer, BindingContext, ElementAnalysis, Seq[Int]) ⇒ Option[XFormsControl], idSuffix: Seq[Int]) =
         Controls.buildChildren(this, staticControl.children, (_, bindingContext, staticElement, idSuffix) ⇒ buildTree(nestedContainer, bindingContext, staticElement, idSuffix), idSuffix)
-
-    override def getAllowedExternalEvents =
-        staticControl.binding.abstractBinding.allowedExternalEvents.asJava
 }

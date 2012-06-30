@@ -14,9 +14,11 @@
 package org.orbeon.oxf.xforms.analysis.controls
 
 import org.dom4j.Element
-import org.orbeon.oxf.xforms.xbl.Scope
 import org.orbeon.oxf.xforms.XFormsConstants.XBL_XBL_QNAME
-import org.orbeon.oxf.xforms.analysis.{ChildrenBuilderTrait, StaticStateContext}
+import org.orbeon.oxf.xforms.analysis.ChildrenBuilderTrait
+import org.orbeon.oxf.xforms.analysis.StaticStateContext
+import org.orbeon.oxf.xforms.event.XFormsEvents._
+import org.orbeon.oxf.xforms.xbl.Scope
 
 /**
  * Single root container for the entire controls hierarchy.
@@ -34,4 +36,6 @@ class RootControl(staticStateContext: StaticStateContext, element: Element, scop
     override def findRelevantChildrenElements =
         super.findRelevantChildrenElements filterNot
             { case (e, _) ⇒ e.getQName == XBL_XBL_QNAME }
+
+    override def externalEvents = super.externalEvents ++ Set(XXFORMS_LOAD, XXFORMS_POLL)
 }

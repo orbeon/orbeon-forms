@@ -21,7 +21,7 @@ import org.orbeon.oxf.xforms._
 import analysis.controls.{RepeatIterationControl, RepeatControl}
 import analysis.ElementAnalysis
 import control._
-import event.{Dispatch, XFormsEvent, XFormsEvents}
+import event.{Dispatch, XFormsEvent}
 import org.orbeon.oxf.xforms.action.actions.XFormsDeleteAction
 import org.orbeon.oxf.xforms.action.actions.XFormsInsertAction
 import org.orbeon.oxf.xforms.event.events.XXFormsDndEvent
@@ -45,6 +45,8 @@ import collection.mutable.{ArrayBuffer, LinkedHashMap}
 class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, element: Element, effectiveId: String)
         extends XFormsNoSingleNodeContainerControl(container, parent, element, effectiveId)
         with NoLHHATrait {
+
+    override type Control = RepeatControl
 
     // TODO: this must be handled following the same pattern as usual refresh events
     private var refreshInfo: RefreshInfo = null
@@ -72,9 +74,7 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
     private val startIndex = Option(startIndexString) map (_.toInt) getOrElse  1
     def getStartIndex = startIndex
 
-    override def staticControl = super.staticControl.asInstanceOf[RepeatControl]
     override def supportsRefreshEvents = true
-    override val getAllowedExternalEvents = Set(XFormsEvents.XXFORMS_DND).asJava
     override def children = super.children.asInstanceOf[Seq[XFormsRepeatIterationControl]]
 
     // If there is DnD, must tell the client to perform initialization

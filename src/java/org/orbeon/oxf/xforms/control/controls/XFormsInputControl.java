@@ -82,7 +82,7 @@ public class XFormsInputControl extends XFormsValueControl implements FocusableT
 
     @Override
     public Tuple3<String, String, String> getJavaScriptInitialization() {
-        final PlaceHolderInfo placeHolderInfo = getPlaceholderInfo(staticControl(), this);
+        final PlaceHolderInfo placeHolderInfo = getPlaceholderInfo((ElementAnalysis) staticControl(), this);
         if (placeHolderInfo != null) {
             // Control name becomes "label" or "hint". This is a special case as even non-external labels and hints can
             // have the placeholder appearance, and those are not really controls.
@@ -499,7 +499,7 @@ public class XFormsInputControl extends XFormsValueControl implements FocusableT
                             + XFormsProperties.getTypeInputFormat(containingDocument(), valueType)
                             + "', 'en', (), ()) else $v";
 
-            return evaluateAsString(boundItem, xpathExpression, XFormsValueControl.FORMAT_NAMESPACE_MAPPING(), variables);
+            return evaluateAsString(boundItem, xpathExpression, XFormsValueControl.FormatNamespaceMapping(), variables);
         }
     }
 

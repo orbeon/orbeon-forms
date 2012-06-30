@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.xbl;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.analysis.controls.ComponentControl;
 import org.orbeon.oxf.xforms.analysis.model.Model;
 import org.orbeon.oxf.xforms.control.XFormsComponentControl;
 import org.orbeon.oxf.xforms.control.XFormsContainerControl;
@@ -86,7 +87,7 @@ public class XBLContainer implements XFormsObjectResolver {
      * @return                   new XFormsContainer
      */
     public XBLContainer createChildContainer(XFormsComponentControl associatedControl) {
-        return new XBLContainer(associatedControl, this, associatedControl.staticControl().binding().innerScope());
+        return new XBLContainer(associatedControl, this, ((ComponentControl) associatedControl.staticControl()).binding().innerScope());
     }
 
     public XBLContainer createChildContainer(XFormsControl associatedControl, final PartAnalysis partAnalysis) {

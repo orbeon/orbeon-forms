@@ -221,6 +221,7 @@ public class XFormsConstants {
     public static final QName XXFORMS_ROWS_QNAME = new QName("rows", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_GROUP_QNAME = new QName("group", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_ELEMENT_QNAME = new QName("element", XXFORMS_NAMESPACE);
+    public static final QName XXFORMS_EXTERNAL_EVENTS_QNAME = new QName(XFormsProperties.EXTERNAL_EVENTS_PROPERTY, XXFORMS_NAMESPACE);
 
     public static final String VALID_ATTRIBUTE_NAME = "valid";
     public static final String RELEVANT_ATTRIBUTE_NAME = "relevant";

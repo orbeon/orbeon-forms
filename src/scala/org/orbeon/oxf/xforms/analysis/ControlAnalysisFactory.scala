@@ -21,21 +21,53 @@ import org.dom4j.{QName, Element}
 import org.orbeon.oxf.xforms.action.XFormsActions
 import scala.PartialFunction
 import org.orbeon.oxf.xforms.xbl.Scope
+import org.orbeon.oxf.xforms.event.XFormsEvents._
 
 object ControlAnalysisFactory {
 
     // Control factories
     type ControlFactory = (StaticStateContext, Element,  Option[ElementAnalysis], Option[ElementAnalysis], Scope) ⇒ ElementAnalysis
 
-    // NOTE: Not all controls need separate classes, so for now we use generic ones like e.g. CoreControl instead of InputControl
-    private val ValueControl: ControlFactory =     (new CoreControl(_, _, _, _, _) with ValueTrait with ChildrenBuilderTrait with ChildrenLHHAAndActionsTrait)
-    private val TriggerControl: ControlFactory =   (new CoreControl(_, _, _, _, _) with SingleNodeTrait with TriggerAppearanceTrait with ChildrenBuilderTrait with ChildrenLHHAAndActionsTrait)
-    private val SelectionControl: ControlFactory = (new CoreControl(_, _, _, _, _) with ValueTrait with SelectionControl with ChildrenBuilderTrait with ChildrenLHHAAndActionsTrait)
-    private val VariableControl: ControlFactory =  (new VariableControl(_, _, _, _, _) with ChildrenActionsTrait)
-    private val LHHAControl: ControlFactory =      (new LHHAAnalysis(_, _, _, _, _))
+    private val VariableControl: ControlFactory = (new VariableControl(_, _, _, _, _) with ChildrenActionsTrait)
+    private val LHHAControl: ControlFactory     = (new LHHAAnalysis(_, _, _, _, _))
 
-    private val SingleNodeContainerControl: ControlFactory   = (new ContainerControl(_, _, _, _, _) with SingleNodeTrait with LHHATrait with ChildrenBuilderTrait)
-    private val NoSingleNodeContainerControl: ControlFactory = (new ContainerControl(_, _, _, _, _) with SingleNodeTrait with LHHATrait with ChildrenBuilderTrait)
+    private val TriggerControlExternalEvents = Set(XFORMS_FOCUS, XFORMS_HELP, DOM_ACTIVATE, XXFORMS_VALUE_OR_ACTIVATE)
+    private val ValueControlExternalEvents   = TriggerControlExternalEvents + XXFORMS_VALUE
+
+    private val ValueControl: ControlFactory =
+        (new CoreControl(_, _, _, _, _) with ValueTrait with ChildrenBuilderTrait with ChildrenLHHAAndActionsTrait
+            { override val externalEvents = super.externalEvents ++ ValueControlExternalEvents })
+
+    private val SelectionControl: ControlFactory =
+        (new CoreControl(_, _, _, _, _) with ValueTrait with SelectionControl with ChildrenBuilderTrait with ChildrenLHHAAndActionsTrait
+            { override val externalEvents = super.externalEvents ++ ValueControlExternalEvents })
+
+    private val TriggerControl: ControlFactory =
+        (new CoreControl(_, _, _, _, _) with SingleNodeTrait with TriggerAppearanceTrait with ChildrenBuilderTrait with ChildrenLHHAAndActionsTrait
+            { override val externalEvents = super.externalEvents ++ TriggerControlExternalEvents })
+
+    // NOTE: xxforms-upload-done is a trusted server event so doesn't need to be listed here
+    private val UploadControl: ControlFactory =
+        (new CoreControl(_, _, _, _, _) with ValueTrait with ChildrenBuilderTrait with ChildrenLHHAAndActionsTrait
+            { override val externalEvents = super.externalEvents ++
+                Set(XFORMS_FOCUS,
+                    XFORMS_HELP,
+                    XFORMS_SELECT,
+                    XXFORMS_VALUE,
+                    XXFORMS_UPLOAD_START,
+                    XXFORMS_UPLOAD_CANCEL,
+                    XXFORMS_UPLOAD_PROGRESS) })
+
+    private val GroupControl: ControlFactory =
+        (new ContainerControl(_, _, _, _, _) with SingleNodeTrait with LHHATrait with ChildrenBuilderTrait
+            { override val externalEvents = super.externalEvents + DOM_ACTIVATE }) // allow DOMActivate on group
+
+    private val DialogControl: ControlFactory =
+        (new ContainerControl(_, _, _, _, _) with SingleNodeTrait with LHHATrait with ChildrenBuilderTrait
+            { override val externalEvents = super.externalEvents + XXFORMS_DIALOG_CLOSE }) // allow xxforms-dialog-close on dialog
+
+    private val SwitchControl: ControlFactory = (new ContainerControl(_, _, _, _, _) with SingleNodeTrait with LHHATrait with ChildrenBuilderTrait)
+    private val CaseControl: ControlFactory   = (new ContainerControl(_, _, _, _, _) with SingleNodeTrait with LHHATrait with ChildrenBuilderTrait)
 
     // Variable factories indexed by QName
     // NOTE: We have all these QNames for historical reasons (XForms 2 is picking <xforms:var>)
@@ -50,7 +82,7 @@ object ControlAnalysisFactory {
         XFORMS_INPUT_QNAME            → ValueControl,
         XFORMS_SECRET_QNAME           → ValueControl,
         XFORMS_TEXTAREA_QNAME         → ValueControl,
-        XFORMS_UPLOAD_QNAME           → ValueControl,
+        XFORMS_UPLOAD_QNAME           → UploadControl,
         XFORMS_RANGE_QNAME            → ValueControl,
         XXFORMS_TEXT_QNAME            → ValueControl,
         XFORMS_OUTPUT_QNAME           → (new OutputControl(_, _, _, _, _)),
@@ -63,10 +95,10 @@ object ControlAnalysisFactory {
         // Attributes
         XXFORMS_ATTRIBUTE_QNAME       → (new AttributeControl(_, _, _, _, _)),
         // Container controls
-        XFORMS_GROUP_QNAME            → SingleNodeContainerControl,
-        XFORMS_SWITCH_QNAME           → SingleNodeContainerControl,
-        XFORMS_CASE_QNAME             → NoSingleNodeContainerControl,
-        XXFORMS_DIALOG_QNAME          → NoSingleNodeContainerControl,
+        XFORMS_GROUP_QNAME            → GroupControl,
+        XFORMS_SWITCH_QNAME           → SwitchControl,
+        XFORMS_CASE_QNAME             → CaseControl,
+        XXFORMS_DIALOG_QNAME          → DialogControl,
         // Dynamic control
         XXFORMS_DYNAMIC_QNAME         → (new ContainerControl(_, _, _, _, _) with SingleNodeTrait),
         // Repeat control

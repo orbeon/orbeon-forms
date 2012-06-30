@@ -33,6 +33,8 @@ import org.orbeon.oxf.xforms.{BindingContext, Variable, XFormsUtils}
 class XFormsVariableControl(container: XBLContainer, parent: XFormsControl, element: Element, effectiveId: String)
         extends XFormsSingleNodeControl(container, parent, element, effectiveId) with NoLHHATrait {
 
+    override type Control = VariableControl
+
     // Actual variable name/value representation
     private val variable = new Variable(staticControl.asInstanceOf[VariableAnalysisTrait], container.getContextStack)
 
@@ -47,7 +49,6 @@ class XFormsVariableControl(container: XBLContainer, parent: XFormsControl, elem
     final def getValue = _value
     def getVariableName = variable.getVariableName
 
-    override def staticControl = super.staticControl.asInstanceOf[VariableControl]
     override def bindingContextForFollowing = _bindingContextForFollowing
     override def bindingContextForChild = _bindingContextForChild
     override def supportAjaxUpdates = false
@@ -70,9 +71,8 @@ class XFormsVariableControl(container: XBLContainer, parent: XFormsControl, elem
         // NOTE: The following should be reasonably cheap, in case the variable had not been made dirty. It would be
         // nice to keep _bindingContextForChild/_bindingContextForFollowing if no reevaluation is needed, but then we
         // must make sure the chain of contexts is correct.
-        val staticVariable = staticControl
-        _bindingContextForChild = bindingContext.pushVariable(staticVariable.element, staticVariable.name, getValue, staticVariable.scope)
-        _bindingContextForFollowing = bindingContext.parent.pushVariable(staticVariable.element, staticVariable.name, getValue, staticVariable.scope)
+        _bindingContextForChild = bindingContext.pushVariable(staticControl.element, staticControl.name, getValue, staticControl.scope)
+        _bindingContextForFollowing = bindingContext.parent.pushVariable(staticControl.element, staticControl.name, getValue, staticControl.scope)
     }
 
     override def markDirtyImpl(xpathDependencies: XPathDependencies) {

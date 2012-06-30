@@ -16,8 +16,12 @@ package org.orbeon.oxf.xforms.analysis.controls
 import org.dom4j.Element
 import org.orbeon.oxf.xforms.xbl.Scope
 import org.orbeon.oxf.xforms.analysis.{ChildrenBuilderTrait, ElementAnalysis, StaticStateContext}
+import org.orbeon.oxf.xforms.event.XFormsEvents._
 
 class RepeatIterationControl (staticStateContext: StaticStateContext, element: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], scope: Scope)
     extends ContainerControl(staticStateContext, element, parent, preceding, scope)
     with SingleNodeTrait
-    with ChildrenBuilderTrait
+    with ChildrenBuilderTrait {
+
+    override val externalEvents = super.externalEvents + XXFORMS_REPEAT_ACTIVATE
+}

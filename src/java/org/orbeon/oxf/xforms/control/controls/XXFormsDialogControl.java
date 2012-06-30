@@ -32,9 +32,7 @@ import org.xml.sax.helpers.AttributesImpl;
 import scala.Tuple3;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Represents an extension xxforms:dialog control.
@@ -218,17 +216,6 @@ public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
 //            }
 //        }
 //    }
-
-    // Only allow xxforms-dialog-close from client
-    private static final Set<String> ALLOWED_EXTERNAL_EVENTS = new HashSet<String>();
-    static {
-        ALLOWED_EXTERNAL_EVENTS.add(XFormsEvents.XXFORMS_DIALOG_CLOSE);
-    }
-
-    @Override
-    public Set<String> getAllowedExternalEvents() {
-        return ALLOWED_EXTERNAL_EVENTS;
-    }
 
     @Override
     public boolean equalsExternal(XFormsControl other) {

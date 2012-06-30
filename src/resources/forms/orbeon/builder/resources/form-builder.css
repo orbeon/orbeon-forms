@@ -64,6 +64,9 @@ html {
 #fb-toolbox .fb-tool {
   margin: 0 0 0 0.7em;
 }
+#fb-toolbox .fb-tool .xforms-trigger {
+  display: block;
+}
 #fb-toolbox .fb-tool .xforms-trigger button {
   padding: 2px 0 2px 0;
   border: none;

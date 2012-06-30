@@ -684,7 +684,7 @@
                         <xxf:attribute id="my-autocomplete$external-value" for="my-autocomplete$external-value" name="style">display: none</xxf:attribute>
                     </xxf:control-values>
                     <xxf:script name="xf_586bd855f1f823eb047ce1f64fc89bcd15e36a85" target-id="my-autocomplete$component-inner-group" observer-id="my-autocomplete$component-inner-group"/>
-                    <xxf:script name="xf_8ba62560f51cbde692a8536df3e54bb1c2eba121" target-id="my-autocomplete$show-suggestions-button$trigger" observer-id="my-autocomplete$show-suggestions-button$trigger"/>
+                    <xxf:script name="xf_8ba62560f51cbde692a8536df3e54bb1c2eba121" target-id="my-autocomplete$show-suggestions-button$xf-91" observer-id="my-autocomplete$show-suggestions-button$xf-91"/>
                     <xxf:focus control-id="my-autocomplete$search"/>
                 </xxf:action>
             </xxf:event-response>

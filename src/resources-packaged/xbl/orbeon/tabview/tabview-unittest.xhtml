@@ -25,11 +25,12 @@
         <xforms:model id="my-model">
             <xforms:instance id="instance">
                 <instance>
-                    <input/>
                     <tab relevant="false" readonly="false" mip=""/>
-                    <tab relevant="true" readonly="false" mip="xxx"/>
                     <tab relevant="true" readonly="false" mip=""/>
-                    <tab relevant="true" readonly="true" mip=""/>
+                    <tab relevant="true" readonly="false" mip=""/>
+                    <tab relevant="true" readonly="true" mip="">
+                        <input/>
+                    </tab>
                 </instance>
             </xforms:instance>
             <xforms:bind ref="tab">
@@ -70,9 +71,13 @@
                     <xforms:dispatch ev:event="DOMActivate" target="tab-{$position}" name="fr-toggle"/>
                 </fr:button>
             </xforms:repeat>
-            <fr:button id="focus">
+            <fr:button id="focus1">
                 <xforms:label>Focus on input in 4th tab</xforms:label>
                 <xforms:setfocus ev:event="DOMActivate" control="my-input"/>
+            </fr:button>
+            <fr:button id="focus2">
+                <xforms:label>Focus on 4th tab</xforms:label>
+                <xforms:setfocus ev:event="DOMActivate" control="tab-4"/>
             </fr:button>
         </xhtml:fieldset>
 
@@ -107,7 +112,7 @@
             <fr:tab ref="tab[4]/@mip" id="tab-4">
                 <fr:label>Fourth</fr:label>
                 Content of fourth tab.
-                <xforms:input ref="input" id="my-input"/>
+                <xforms:input ref="../input" id="my-input"/>
             </fr:tab>
         </fr:tabview>
     </xhtml:body>

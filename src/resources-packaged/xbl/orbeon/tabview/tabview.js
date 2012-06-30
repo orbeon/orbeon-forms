@@ -31,17 +31,15 @@ YAHOO.xbl.fr.TabView.prototype = {
      * a tab received the fr-toggle event.
      */
     activeTabChange: function(event) {
-        var tabView = this;
+        var yuiTabView = this.yuiTabView;
 
-        var OrderEnum = { PREV: 0, NEXT: 1 };
-        function changeTab(order, index) {
-            // Click button to inform XForms about the tab change
-            var trigger = $(tabView.container).find('.fr-tabview-' + (order == OrderEnum.PREV ? 'deselect' : 'select'))[index];
-            $(trigger).find('button')[0].click();
+        function changeTab(eventName, index) {
+            // Directly dispatch the event to the tab element
+            ORBEON.xforms.Document.dispatchEvent(yuiTabView.getTab(index).get('contentEl').id, eventName);
         }
 
-        changeTab(OrderEnum.PREV, tabView.yuiTabView.getTabIndex(event.prevValue));
-        changeTab(OrderEnum.NEXT, tabView.yuiTabView.getTabIndex(event.newValue));
+        changeTab("fr-deselect", yuiTabView.getTabIndex(event.prevValue));
+        changeTab("fr-select", yuiTabView.getTabIndex(event.newValue));
     },
 
     /**
@@ -58,17 +56,17 @@ YAHOO.xbl.fr.TabView.prototype = {
      * Respond to fr-toggle event.
      */
     toggle: function(groupElement) {
-        var tabIndex = this.getElementIndex(groupElement.parentNode);
+        var tabIndex = this.getElementIndex(groupElement);
         this.yuiTabView.set("activeTab", this.yuiTabView.getTab(tabIndex), false);
     },
 
     readonly: function(groupElement) {
-        var tabIndex = this.getElementIndex(groupElement.parentNode);
+        var tabIndex = this.getElementIndex(groupElement);
         this.yuiTabView.getTab(tabIndex).set("disabled", true);
     },
 
     readwrite: function(groupElement) {
-        var tabIndex = this.getElementIndex(groupElement.parentNode);
+        var tabIndex = this.getElementIndex(groupElement);
         this.yuiTabView.getTab(tabIndex).set("disabled", false);
     }
 };

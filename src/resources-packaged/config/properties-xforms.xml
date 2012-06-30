@@ -140,8 +140,6 @@
 
     <property as="xs:boolean" name="oxf.xforms.xbl.fr.accordion.open-closes-others"         value="false"/>
 
-    <property as="xs:boolean" name="oxf.xforms.xbl.fr.tabview.tab-changes-context"          value="true"/>
-
     <property as="xs:integer" name="oxf.xforms.xbl.fr.expandable-output.max-characters"     value="60"/>
     <property as="xs:integer" name="oxf.xforms.xbl.fr.expandable-output.tolerance"          value="20"/>
 

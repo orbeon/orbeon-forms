@@ -41,6 +41,7 @@ object GridOps {
 
     // Predicates
     val IsRepeat: NodeInfo ⇒ Boolean = node ⇒ IsGrid(node) && node.attValue("repeat") == "true"
+    def isRepeat(node: NodeInfo) = IsRepeat(node) // for Java callers
 
     // Find the first enclosing repeated grid or legacy repeat if any
     def findContainingRepeat(descendantOrSelf: NodeInfo, includeSelf: Boolean = false) =

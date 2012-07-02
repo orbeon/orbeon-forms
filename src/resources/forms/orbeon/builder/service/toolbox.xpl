@@ -76,13 +76,13 @@
     </p:processor>
 
     <!-- Convert templates to XBL -->
-    <p:processor name="oxf:xslt">
+    <p:processor name="oxf:unsafe-xslt">
         <p:input name="config" href="form-to-xbl.xsl"/>
         <p:input name="data" href="#global-template-form"/>
         <p:input name="parameters" href="#global-parameters"/>
         <p:output name="data" id="global-template-xbl"/>
     </p:processor>
-    <p:processor name="oxf:xslt">
+    <p:processor name="oxf:unsafe-xslt">
         <p:input name="config" href="form-to-xbl.xsl"/>
         <p:input name="data" href="#custom-template-form"/>
         <p:input name="parameters" href="#parameters"/>

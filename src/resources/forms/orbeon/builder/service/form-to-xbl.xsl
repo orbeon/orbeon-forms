@@ -25,6 +25,9 @@
         xmlns:xbl="http://www.w3.org/ns/xbl"
         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
         xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+        xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderFunctions"
+        xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps"
+        xmlns:gridOps="java:org.orbeon.oxf.fb.GridOps"
         xmlns:exf="http://www.exforms.org/exf/1-0">
 
     <xsl:import href="oxf:/oxf/xslt/utils/copy-modes.xsl"/>
@@ -119,6 +122,8 @@
     <!-- Generate one component per section -->
     <xsl:template match="/xhtml:html/xhtml:body//fr:section">
 
+        <!-- ==== Section information ============================================================================== -->
+
         <xsl:variable name="fr-section" select="." as="element(fr:section)"/>
 
         <!-- TODO: for now consider any component in the "fr" namespace, but need to do better -->
@@ -132,6 +137,7 @@
 
         <!-- Section instance data element -->
         <!-- NOTE: could also gather ancestor-or-self::xforms:bind/@ref and evaluate expression to be more generic -->
+        <!-- TODO: What do do with custom data model? -->
         <xsl:variable name="section-data" select="$fr-form-instance/*/*[name() = $section-name]" as="element()"/>
 
         <!-- NOTE: We should make component ids and names unique, as shown in the commented-out code below. The issue is
@@ -142,6 +148,13 @@
         <!--<xsl:variable name="component-id" select="concat(doc('input:parameters')/*/app, '-',  $section-id)" as="xs:string"/>-->
 
         <!-- Figure out which actions and services are used by the component -->
+
+        <!-- ==== Repeats ========================================================================================== -->
+
+        <xsl:variable name="repeat-ids" select="$fr-section//*[gridOps:isRepeat(.)]/fbf:templateId(controlOps:controlName(@id))"/>
+        <xsl:variable name="repeat-templates" select="$fr-form-model/xforms:instance[@id = $repeat-ids]" as="element()*"/>
+
+        <!-- ==== Actions and services ============================================================================= -->
 
         <!-- Controls under this section which are the source or destination of an action or both -->
         <xsl:variable name="action-controls" select="$fr-section//*[@id = ($all-action-sources, $all-action-destinations)]"/>
@@ -205,6 +218,11 @@
                     <xforms:instance id="fr-form-template">
                         <xsl:copy-of select="$section-data"/>
                     </xforms:instance>
+
+                    <!-- Repeat templates if any -->
+                    <xforms:bind>
+                        <xsl:copy-of select="$repeat-templates"/>
+                    </xforms:bind>
 
                     <!-- Section constraints -->
                     <xforms:bind>

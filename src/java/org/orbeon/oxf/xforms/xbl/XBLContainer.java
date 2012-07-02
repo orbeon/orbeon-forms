@@ -264,7 +264,7 @@ public class XBLContainer implements XFormsObjectResolver {
      * @return
      */
     public boolean containsBind(String bindId) {
-        for (final Model model : getPartAnalysis().getModelsForScope(innerScope())) {
+        for (final Model model : getPartAnalysis().jGetModelsForScope(innerScope())) {
             if (model.containsBind(bindId))
                 return true;
         }
@@ -276,7 +276,7 @@ public class XBLContainer implements XFormsObjectResolver {
      */
     public void addAllModels() {
         // Iterate through all models and finds the one that apply to this container
-        for (final Model model: getPartAnalysis().getModelsForScope(innerScope())) {
+        for (final Model model: getPartAnalysis().jGetModelsForScope(innerScope())) {
             // Find model's effective id, e.g. if container's effective id is foo$bar.1-2 and models static id is
             // my-model => foo$bar$my-model.1-2
             final String modelEffectiveId = model.prefixedId() + XFormsUtils.getEffectiveIdSuffixWithSeparator(effectiveId);

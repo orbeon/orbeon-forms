@@ -375,7 +375,7 @@ public class XFormsToXHTML extends ProcessorImpl {
         // Add static instance source dependencies for top-level models
         // TODO: check all models/instances
         final PartAnalysis topLevelPart = containingDocument.getStaticState().topLevelPart();
-        for (final Model model : topLevelPart.getModelsForScope(topLevelPart.startScope())) {
+        for (final Model model : topLevelPart.jGetModelsForScope(topLevelPart.startScope())) {
             for (final Instance instance: model.instancesMap().values()) {
                 if (instance.dependencyURL().isDefined()) {
 

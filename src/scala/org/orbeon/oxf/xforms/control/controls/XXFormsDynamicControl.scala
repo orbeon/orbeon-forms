@@ -219,7 +219,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
             getIndentedLogger,
             InstanceMirror.toOuterInstanceNode(docWrapper, partAnalysis))
 
-        partAnalysis.getModelsForScope(partAnalysis.startScope).asScala foreach {
+        partAnalysis.getModelsForScope(partAnalysis.startScope) foreach {
             _.instances.values filter (_.useInlineContent) foreach { instance ⇒
                 val innerInstance = childContainer.findInstance(instance.staticId)
                 InstanceMirror.addListener(innerInstance, innerListener)

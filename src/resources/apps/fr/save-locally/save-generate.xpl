@@ -12,7 +12,10 @@
     <p:processor name="oxf:request">
         <p:input name="config">
             <config>
-                <include>/request/request-url</include>
+                <include>/request/scheme</include>
+                <include>/request/server-name</include>
+                <include>/request/server-port</include>
+                <include>/request/context</include>
             </config>
         </p:input>
         <p:output name="data" id="request"/>
@@ -31,11 +34,10 @@
                         <body>
                             <!-- Get values from input documents -->
                             <xsl:variable name="request" as="element(request)" select="doc('input:request')/request"/>
-                            <xsl:variable name="request-url" as="element(request-url)" select="$request/request-url"/>
                             <xsl:variable name="parameters" as="element(request)" select="doc('input:parameters')/request"/>
                             <xsl:variable name="app" as="xs:string" select="$parameters/app"/>
                             <xsl:variable name="form" as="xs:string" select="$parameters/form"/>
-                            <xsl:variable name="context" as="xs:string" select="substring-before($request-url, '/xforms-server')"/>
+                            <xsl:variable name="context" as="xs:string" select="$request/context"/>
                             <xsl:variable name="resource" as="element(resource)" select="doc('input:fr-current-resources')/resource"/>
 
                             <div style="text-align: center">
@@ -44,7 +46,7 @@
                                         <xsl:value-of select="$resource/detail/messages/saved-locally-open"/>
                                     </p>
                                     <!-- Form we produce -->
-                                    <form name="form1" method="post" action="{$context}/fr/{$app}/{$form}/edit" id="form">
+                                    <form name="form1" method="post" action="/fr/{$app}/{$form}/edit" id="form">
                                         <input type="hidden" name="fr-form-data" value="{saxon:string-to-base64Binary(saxon:serialize(/*, 'xml'), 'UTF8')}"/>
                                         <input type="submit" value="Open"/>
                                     </form>
@@ -58,6 +60,12 @@
         <p:output name="data" id="html"/>
     </p:processor>
 
+    <!-- Rewrite URLs -->
+    <p:processor name="oxf:html-rewrite" >
+        <p:input name="data" href="#html"/>
+        <p:output name="data" id="rewritten-html"/>
+    </p:processor>
+
     <!-- Serialize to XML -->
     <p:processor name="oxf:xml-converter">
         <p:input name="config">
@@ -67,7 +75,7 @@
                 <standalone>true</standalone>
             </config>
         </p:input>
-        <p:input name="data" href="#html"/>
+        <p:input name="data" href="#rewritten-html"/>
         <p:output name="data" id="converted"/>
     </p:processor>
 

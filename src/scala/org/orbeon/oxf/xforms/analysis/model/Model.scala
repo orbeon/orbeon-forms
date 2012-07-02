@@ -108,11 +108,10 @@ trait ModelInstances {
 
     // General info about instances
     lazy val hasInstances = instances.nonEmpty
+    lazy val defaultInstance = instances.headOption map (_._2)
     lazy val defaultInstanceStaticId = instances.headOption map (_._1) orNull
     lazy val defaultInstancePrefixedId = Option(if (hasInstances) scope.fullPrefix + defaultInstanceStaticId else null)
     // TODO: instances on which MIPs depend
-
-    def getDefaultInstance = if (instances.nonEmpty) instances.head._2 else null
 
     def instancesToXML(helper: ContentHandlerHelper): Unit = {
         // Output instances information

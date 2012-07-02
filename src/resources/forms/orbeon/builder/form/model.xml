@@ -138,7 +138,7 @@
             value="$resources/resource[1]/@xml:lang"/>
 
         <!-- Check permissions if there are roles -->
-        <xforms:var name="has-roles" value="not(xxforms:instance('fr-roles-instance')/has-roles = 'false')" as="xs:boolean"/>
+        <xforms:var name="has-roles" value="not(xxforms:instance('fr-permissions')/@has-roles = 'false')" as="xs:boolean"/>
         <xforms:action if="$has-roles">
             <xforms:action if="xxforms:instance('fr-parameters-instance')/mode = 'new'">
                 <!-- New form: set default value for app and form if needed -->

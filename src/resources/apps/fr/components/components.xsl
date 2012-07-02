@@ -157,6 +157,7 @@
 
             <!-- Script to enable scrolling within iframes with Firefox >= 4, due to this bug:
                  https://bugzilla.mozilla.org/show_bug.cgi?id=638598 -->
+            <!-- TODO XXX: form-runner.js -->
             <xsl:if test="$has-toc and not($is-noscript)">
                 <xhtml:script type="text/javascript">
                     <![CDATA[
@@ -323,10 +324,6 @@
         <xi:include href="oxf:/apps/fr/includes/persistence/persistence-model.xml" xxi:omit-xml-base="true"/>
         <!-- This model handles navigation functionality -->
         <xi:include href="oxf:/apps/fr/includes/navigation-model.xml" xxi:omit-xml-base="true"/>
-        <!-- This model handles import/export -->
-        <xsl:if test="$buttons = ('save-locally')">
-            <xi:include href="oxf:/apps/fr/import-export/import-export-model.xml" xxi:omit-xml-base="true"/>
-        </xsl:if>
         <xsl:if test="$has-alfresco">
             <!-- This model handles Alfresco integration -->
             <xi:include href="oxf:/apps/fr/alfresco/alfresco-model.xml" xxi:omit-xml-base="true"/>

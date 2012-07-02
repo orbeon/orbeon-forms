@@ -437,8 +437,12 @@
             <!-- Copy custom dialogs under fr:dialogs only (other dialogs will be left in place) -->
             <xsl:apply-templates select=".//fr:dialogs//xxforms:dialog"/>
 
+            <!-- This model handles import/export -->
+            <xsl:if test="$buttons = ('save-locally')">
+                <xi:include href="oxf:/apps/fr/save-locally/save-locally-dialog.xml" xxi:omit-xml-base="true"/>
+            </xsl:if>
+
             <!-- Misc standard dialogs -->
-            <xi:include href="oxf:/apps/fr/import-export/import-export-dialog.xml" xxi:omit-xml-base="true"/>
             <xi:include href="oxf:/apps/fr/includes/clear-dialog.xhtml" xxi:omit-xml-base="true"/>
             <xi:include href="oxf:/apps/fr/includes/submission-dialog.xhtml" xxi:omit-xml-base="true"/>
 

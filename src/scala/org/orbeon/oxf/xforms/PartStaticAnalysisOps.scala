@@ -15,7 +15,6 @@ package org.orbeon.oxf.xforms
 
 import analysis.ElementAnalysis
 import analysis.model.Model
-import java.util.{List ⇒ JList}
 import org.dom4j.Element
 import org.orbeon.oxf.xml.NamespaceMapping
 import xbl.Scope
@@ -30,8 +29,6 @@ trait PartStaticAnalysisOps {
     def getModelByInstancePrefixedId(prefixedId: String): Model
     def getModelByScopeAndBind(scope: Scope, bindStaticId: String): Model
     def findInstancePrefixedId(startScope: Scope, instanceStaticId: String): String
-
-    def getModelsForScope(scope: Scope): JList[Model]
     
     def getControlAnalysis(prefixedId: String): ElementAnalysis
     def scopeForPrefixedId(prefixedId: String): Scope

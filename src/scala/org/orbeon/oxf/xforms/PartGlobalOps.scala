@@ -15,13 +15,14 @@ package org.orbeon.oxf.xforms
 
 import analysis.controls._
 import analysis.ElementAnalysis
-import analysis.model.Instance
+import org.orbeon.oxf.xforms.analysis.model.{Model, Instance}
 import event.EventHandler
 import org.dom4j.{Element, QName}
 import java.util.{List ⇒ JList, Collection ⇒ JCollection}
 import org.orbeon.oxf.xml.SAXStore
 import xbl.{Scope, XBLBindings, ConcreteBinding}
 import org.apache.commons.lang.StringUtils
+import collection.JavaConverters._
 
 trait PartGlobalOps {
 
@@ -29,6 +30,8 @@ trait PartGlobalOps {
     def getMark(prefixedId: String): SAXStore#Mark
 
     // Models
+    def getModelsForScope(scope: Scope): Seq[Model]
+    def jGetModelsForScope(scope: Scope) = getModelsForScope(scope).asJava
     def getInstances(modelPrefixedId: String): JCollection[Instance]
 
     // Controls

@@ -156,7 +156,7 @@
                 </explanation>
             </view>
         </detail>
-        <import-export>
+        <save-locally>
             <dialog-title>Save Locally</dialog-title>
             <dialog-body>
                 <div>
@@ -176,7 +176,7 @@
                     </p>
                 </div>
             </dialog-body>
-        </import-export>
+        </save-locally>
         <home>
             <title>Forms Home</title>
         </home>
@@ -325,7 +325,7 @@
                 </explanation>
             </view>
         </detail>
-        <import-export>
+        <save-locally>
             <dialog-title>Sauvegarder Localement</dialog-title>
             <dialog-body>
                 <div>
@@ -346,7 +346,7 @@
                     </p>
                 </div>
             </dialog-body>
-        </import-export>
+        </save-locally>
     </resource>
     <resource xml:lang="es">
         <components>
@@ -491,7 +491,7 @@
                 </explanation>
             </view>
         </detail>
-        <import-export>
+        <save-locally>
             <dialog-title>Guardar</dialog-title>
             <dialog-body>
                 <div>
@@ -509,7 +509,7 @@
                     </p>
                 </div>
             </dialog-body>
-        </import-export>
+        </save-locally>
     </resource>
     <resource xml:lang="no">
         <components>
@@ -660,7 +660,7 @@
                 </explanation>
             </view>
         </detail>
-        <import-export>
+        <save-locally>
             <dialog-title>Lagre</dialog-title>
             <dialog-body>
                 <div>
@@ -676,7 +676,7 @@
                     </p>
                 </div>
             </dialog-body>
-        </import-export>
+        </save-locally>
 
     </resource>
     <resource xml:lang="ru">
@@ -823,7 +823,7 @@
                 </explanation>
             </view>
         </detail>
-        <import-export>
+        <save-locally>
             <dialog-title>Сохранить</dialog-title>
             <dialog-body>
                 <div>
@@ -838,6 +838,6 @@
                     </p>
                 </div>
             </dialog-body>
-        </import-export>
+        </save-locally>
     </resource>
 </resources>

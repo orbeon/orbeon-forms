@@ -17,6 +17,7 @@ import analysis.controls.RepeatControl
 import collection.mutable.LinkedHashSet
 import collection.JavaConverters._
 import org.dom4j.QName
+import org.orbeon.oxf.xforms.xbl.Scope
 
 // Global operations on parts including top-level part and descendant parts
 class StaticStateGlobalOps(topLevelPart: PartAnalysis) extends PartGlobalOps {
@@ -53,6 +54,9 @@ class StaticStateGlobalOps(topLevelPart: PartAnalysis) extends PartGlobalOps {
     private def collectInPartsReverse[T](get: PartAnalysis ⇒ Traversable[T]) =
         parts.reverse flatMap (part ⇒ get(part))
 
+
+    // Models
+    def getModelsForScope(scope: Scope) = collectInParts(_.getModelsForScope(scope))
     def getInstances(modelPrefixedId: String) = collectInPartsJ(_.getInstances(modelPrefixedId)).asJava
 
     def containingScope(prefixedId: String) = findInParts(_.containingScope(prefixedId)).orNull

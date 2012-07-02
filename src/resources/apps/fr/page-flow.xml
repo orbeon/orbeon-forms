@@ -15,7 +15,7 @@
 
     <!-- ==== Entry point for persistence services ================================================================= -->
 
-    <page path="/fr/service/persistence/.*" model="persistence/proxy.xpl"/>
+    <service path="/fr/service/persistence/.*" model="persistence/proxy.xpl"/>
 
     <!-- ==== Built-in eXist-based persistence services ============================================================ -->
 
@@ -122,11 +122,11 @@
              view="print/print-form.xpl"/>
 
     <!-- Generate HTML to be saved -->
-    <page path="/fr/service/import-export/save-generate" view="import-export/save-generate.xpl"/>
+    <page path="/fr/service/save-locally/save-generate" view="save-locally/save-generate.xpl"/>
 
     <!-- Serve document previously produced -->
-    <service path="/fr/service/import-export/serve" model="import-export/serve.xpl"
-             default-submission="import-export/serve-instance.xml">
+    <service path="/fr/service/save-locally/serve" model="save-locally/serve.xpl"
+             default-submission="save-locally/serve-instance.xml">
         <setvalue ref="/instance/uuid" parameter="uuid"/>
         <setvalue ref="/instance/filename" parameter="filename"/>
     </service>

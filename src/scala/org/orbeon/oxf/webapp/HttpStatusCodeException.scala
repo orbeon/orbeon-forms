@@ -18,7 +18,7 @@ import org.orbeon.oxf.util.NetUtils
 
 trait HttpStatusCode extends RuntimeException { def code: Int }
 
-case class HttpStatusCodeException(code: Int) extends HttpStatusCode
+case class HttpStatusCodeException(code: Int, resource: Option[String] = None) extends HttpStatusCode
 
 case class HttpRedirectException(location: String, serverSide: Boolean = false, exitPortal: Boolean = false) extends HttpStatusCode {
     val code = 302

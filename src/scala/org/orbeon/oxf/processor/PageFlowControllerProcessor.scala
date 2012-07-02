@@ -96,16 +96,25 @@ class PageFlowControllerProcessor extends ProcessorImpl {
                 throw t
         }
 
-        def runNotFoundRoute(t: Option[Throwable]) = pageFlow.notFoundRoute match {
-            case Some(notFoundRoute) ⇒
-                // Run the not found route
-                info("page not found", logParams)
-                externalContext.getResponse.setStatus(404)
-                try notFoundRoute.process(pipelineContext, request, MatchResult(matches = false))
-                catch { case t ⇒ runErrorRoute(t) }
-            case None ⇒
-                // We don't have a not found route so throw instead
-                runErrorRoute(t getOrElse new HttpStatusCodeException(404))
+        def runNotFoundRoute(t: Option[Throwable]) = {
+
+            def rootResource = t map getRootThrowable collect {
+                case e: ResourceNotFoundException ⇒ e.resource
+                case HttpStatusCodeException(_, Some(resource)) ⇒ resource
+            }
+
+            info("not found", logParams ++ (rootResource.toList map ("resource" → _)))
+
+            pageFlow.notFoundRoute match {
+                case Some(notFoundRoute) ⇒
+                    // Run the not found route
+                    externalContext.getResponse.setStatus(404)
+                    try notFoundRoute.process(pipelineContext, request, MatchResult(matches = false))
+                    catch { case t ⇒ runErrorRoute(t) }
+                case None ⇒
+                    // We don't have a not found route so throw instead
+                    runErrorRoute(t getOrElse new HttpStatusCodeException(404))
+            }
         }
 
         // Run the first matching entry if any

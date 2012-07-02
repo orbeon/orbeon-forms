@@ -31,9 +31,5 @@ public class ResourceNotFoundException extends OXFException {
     public ResourceNotFoundException(String resource) {
         this(resource, null);
     }
-
-    public ResourceNotFoundException(Exception exception) {
-        this(exception.getMessage(), exception);
-    }
 }
 

@@ -423,13 +423,4 @@ public class InitUtils {
             });
         }
     }
-
-    /**
-     * Interrupt current processing and send an error code to the client.
-     *
-     * This assumes that the response has not yet been committed.
-     */
-    public static void sendError(int code) {
-        throw new HttpStatusCodeException(code);
-    }
 }

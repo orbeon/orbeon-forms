@@ -28,6 +28,7 @@ import org.orbeon.oxf.xforms.function.Random
 import org.orbeon.oxf.util.{SecureUtils, NetUtils, XPathCache}
 import org.apache.commons.lang.StringUtils
 import org.orbeon.oxf.pipeline.api.ExternalContext.Request
+import org.orbeon.oxf.webapp.HttpStatusCodeException
 
 object FormRunner {
 
@@ -257,7 +258,8 @@ object FormRunner {
 
     // Interrupt current processing and send an error code to the client.
     // NOTE: This could be done through ExternalContext
-    def sendError(code: Int) = InitUtils.sendError(code)
+    def sendError(code: Int) = throw new HttpStatusCodeException(code)
+    def sendError(code: Int, resource: String) = throw new HttpStatusCodeException(code, Option(resource))
 
     // Return mappings (formatName → expression) for all PDF formats in the properties
     def getPDFFormats = {

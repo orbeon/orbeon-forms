@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms.control.controls
 
 import java.io.IOException
-import java.util.{Map ⇒ JMap}
 import org.dom4j.Element
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.util.NetUtils
@@ -56,7 +55,6 @@ class XXFormsRootControl(container: XBLContainer, parent: XFormsControl, element
         case _ ⇒
             super.performDefaultAction(event)
     }
-
 
     // FIXME: Support refresh events? Simply enabling below doesn't seem to work for enabled/disabled.
     //override def supportsRefreshEvents = true

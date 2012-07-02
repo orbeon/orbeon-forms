@@ -23,7 +23,7 @@ ORBEON.util.FiniteStateMachine =
                     elts = _.filter elts, (e) -> matchState transition.from, $ e                                        # Filter elements that are in the 'from' state
                     if transition.conditions                                                                            # Filter elements that match all the conditions
                         elts = _.filter elts, (e) ->
-                            _.all transition.conditions, (c) -> c $ e
+                            _.all transition.conditions, (c) -> conditions[c] $ e
                     _.each elts, (element) ->
                         f$.data 'state', transition.to, $ element                                                       # Change state before running action, so if action trigger an event, that event runs against the new state
                         _.each transition.actions, (action) -> actions[action] $ element                                # Run all the actions on the elements

@@ -301,7 +301,10 @@ a.xforms-help-image .fb-control-help { vertical-align: baseline; }
 .fr-editable .fr-grid-tr { height: 60px }   /* Enough space to hold row icons so that hovering doesn't cause the row to expand */
 .fr-grid.fr-editable.fr-norepeat:hover .fr-grid-td { border: 1px solid #ccc} /* Only for grid which is not a repeat, e.g. no highlighting in itemset editor */
 
-.fb-grid-cell-icons, .fb-grid-control-icons, .fb-grid-row-icons { display: block; width: 16px; min-height: 4em; height: auto !important; height: 4em; text-align: center }/* IE HACK for min-height */
+.fb-grid-cell-icons, .fb-grid-control-icons, .fb-grid-row-icons {
+    display: block; width: 16px;
+    height: 60px;
+    text-align: center }
 
 /* Grid icons and hovering */
 .fb-grid-top-left-td { text-align: center; width: 24px }
@@ -380,7 +383,7 @@ a.xforms-help-image .fb-control-help { vertical-align: baseline; }
 /* Even if the label or hint is empty, we still want space for 1 line to be reserved. */
 .fr-grid-content .xforms-label, .fr-grid-content .xforms-hint,  /* In regular grid content */
 .fr-grid-th .xforms-label, .fr-grid-th .xforms-hint             /* In grid header, for the repeat single line */
-    { min-height: 1.321em }
+    { height: 1.5em }
 
 /* Show disabled hints, which are hints that don't contain any text, as we want them to show since use them as placeholders containers */
 #fr-view                                    /* Use an id to override the #fr-view .xforms-disabled { display: none } in form-runner-base.css */

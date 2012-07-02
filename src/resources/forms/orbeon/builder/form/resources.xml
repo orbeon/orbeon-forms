@@ -443,11 +443,11 @@
                 <alert>Incorrect XPath expression</alert>
                 <hint>Boolean XPath expression</hint>
             </readonly>
-            <initial-value>
+            <default>
                 <label>Initial Value</label>
                 <alert>Incorrect XPath expression</alert>
                 <hint>XPath expression</hint>
-            </initial-value>
+            </default>
             <calculate>
                 <label>Calculated Value</label>
                 <alert>Incorrect XPath expression</alert>
@@ -1256,11 +1256,11 @@
                 <alert>Expression XPath incorrecte</alert>
                 <hint>Expression XPath booléenne</hint>
             </readonly>
-            <initial-value>
+            <default>
                 <label>Valeur initiale</label>
                 <alert>Expression XPath incorrecte</alert>
                 <hint>Expression XPath</hint>
-            </initial-value>
+            </default>
             <calculate>
                 <label>Valeur calculée</label>
                 <alert>Expression XPath incorrecte</alert>
@@ -2071,11 +2071,11 @@
                 <alert>Galt XPath-uttrykk</alert>
                 <hint>Boolsk XPath-uttrykk</hint>
             </readonly>
-            <initial-value>
+            <default>
                 <label>Forhåndsutfylt verdi</label>
                 <alert>Galt XPath-uttrykk</alert>
                 <hint>XPath-uttrykk</hint>
-            </initial-value>
+            </default>
             <calculate>
                 <label>Utregnet verdi</label>
                 <alert>Galt XPath-uttrykk</alert>
@@ -2885,11 +2885,11 @@
                 <alert>Некорректное выражение XPath</alert>
                 <hint>Булево выражение XPath</hint>
             </readonly>
-            <initial-value>
+            <default>
                 <label>Начальное значение</label>
                 <alert>Некорректное выражение XPath</alert>
                 <hint>Булево выражение XPath</hint>
-            </initial-value>
+            </default>
             <calculate>
                 <label>Вычисляемое значение</label>
                 <alert>Некорректное выражение XPath</alert>

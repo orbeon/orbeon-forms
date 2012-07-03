@@ -1275,6 +1275,13 @@ public class XFormsUtils {
         return absoluteId.substring(1).replace('/', '$');
     }
 
+    /**
+     * Convert an effective id to an absolute id.
+     */
+    public static String effectiveIdToAbsoluteId(String effectiveId) {
+        return "/" + effectiveId.replace('$', '/');
+    }
+
     public static boolean isTopLevelId(String id) {
         // NOTE: Top-level id if static id == prefixed id
         return id.equals(XFormsUtils.getStaticIdFromId(id));

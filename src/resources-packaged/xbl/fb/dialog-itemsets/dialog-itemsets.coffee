@@ -13,7 +13,7 @@
 Document = ORBEON.xforms.Document
 
 $ ->
-    $('#fb-form-editor\\$dialog-itemsets\\$dialog').on 'change', '.fb-itemset-label-input', (event) ->
+    $('#dialog-itemsets\\$dialog').on 'change', '.fb-itemset-label-input', (event) ->
         label = $(event.target)                                             # User changed the label
         value = label.closest('tr').find('.fb-itemset-value-input')[0]      # Get corresponding value
         if $.trim(Document.getValue(value)) == ''                           # If user didn't already provide a value

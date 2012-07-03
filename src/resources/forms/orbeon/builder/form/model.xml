@@ -191,7 +191,7 @@
     <xforms:action ev:event="xforms-ready">
         <!-- Open form settings if mode is "new" -->
         <xforms:var name="is-new" value="xxforms:instance('fr-parameters-instance')/mode = 'new'" as="xs:boolean"/>
-        <xforms:dispatch if="$is-new" ev:event="DOMActivate" name="fb-show-dialog" targetid="fb-form-editor$dialog-form-settings">
+        <xforms:dispatch if="$is-new" ev:event="DOMActivate" name="fb-show-dialog" targetid="dialog-form-settings">
             <xxforms:context name="mode" value="'new'"/>
         </xforms:dispatch>
     </xforms:action>

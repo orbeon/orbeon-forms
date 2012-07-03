@@ -26,6 +26,7 @@
          xmlns:oxf="http://www.orbeon.com/oxf/processors"
          xmlns:exf="http://www.exforms.org/exf/1-0"
          xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+         xmlns:xformsUtils="java:org.orbeon.oxf.xforms.XFormsUtils"
          xmlns:sectionOps="java:org.orbeon.oxf.fb.SectionOps"
 
          xmlns:xhtml="http://www.w3.org/1999/xhtml"
@@ -124,11 +125,11 @@
                                         <xforms:trigger appearance="minimal" id="delete-section-trigger">
                                             <xforms:label><xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/bin.png" alt="{{$fb-resources/delete-section-icon/label}}" title="{{$fb-resources/delete-section-icon/label}}"/></xforms:label>
                                             <!-- Ask confirmation -->
-                                            <xf:dispatch ev:event="DOMActivate" name="fr-show" targetid="fb-form-editor$dialog-confirmation">
+                                            <xf:dispatch ev:event="DOMActivate" name="fr-show" targetid="{{xformsUtils:effectiveIdToAbsoluteId('dialog-confirmation')}}">
                                                 <xxf:context name="message"
                                                      value="concat($fb-resources/messages/delete-section, ' ',
                                                                         xxforms:format-message($fb-resources/messages/controls-will-be-deleted, count($section//*:grid//*:td[*])))"/>
-                                                <xxf:context name="positive-targetid" value="xxf:effective-id('delete-section-trigger')"/>
+                                                <xxf:context name="positive-targetid" value="xxf:absolute-id('delete-section-trigger')"/>
                                             </xf:dispatch>
                                             <xf:action ev:event="fr-positive" type="xpath">
                                                 sectionOps:deleteSection($section)
@@ -138,7 +139,7 @@
                                         <xforms:trigger appearance="minimal">
                                             <xforms:label><xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/cog.png" alt="{{$fb-resources/section-details-icon/label}}" title="{{$fb-resources/section-details-icon/label}}"/></xforms:label>
                                             <!-- Show section details dialog -->
-                                            <xf:dispatch ev:event="DOMActivate" name="fb-show-dialog" target="fb-form-editor$dialog-section-details">
+                                            <xf:dispatch ev:event="DOMActivate" name="fb-show-dialog" targetid="{{xformsUtils:effectiveIdToAbsoluteId('dialog-section-details')}}">
                                                 <xxf:context name="section" value="$section"/>
                                             </xf:dispatch>
                                         </xforms:trigger>
@@ -177,7 +178,7 @@
                                         <!-- Edit help for section -->
                                         <xforms:trigger appearance="minimal" class="fb-edit-section-help-trigger" id="fb-edit-section-help-trigger">
                                             <xforms:label><xhtml:img alt="{{$fb-resources/help-icon/label}}" title="{{$fb-resources/help-icon/label}}" src="/ops/images/xforms/help.png"/></xforms:label>
-                                            <xf:dispatch ev:event="DOMActivate" name="fb-show-dialog" target="fb-form-editor$dialog-help">
+                                            <xf:dispatch ev:event="DOMActivate" name="fb-show-dialog" targetid="{{xformsUtils:effectiveIdToAbsoluteId('dialog-help')}}">
                                                 <xxf:context name="control-id" value="$section/@id"/>
                                             </xf:dispatch>
                                         </xforms:trigger>

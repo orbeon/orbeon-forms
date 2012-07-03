@@ -165,7 +165,7 @@
                             </xf:label>
                             <xf:action ev:event="DOMActivate">
                                 <!-- Open the dialog in "save-as" mode -->
-                                <xf:dispatch name="fb-show-dialog" targetid="fb-form-editor$dialog-form-settings">
+                                <xf:dispatch name="fb-show-dialog" targetid="dialog-form-settings">
                                     <xxf:context name="mode" value="'save-as'"/>
                                 </xf:dispatch>
                             </xf:action>
@@ -204,7 +204,7 @@
                             <xf:label><xh:img src="/apps/fr/style/images/silk/cog.png" alt="" title="{$form-resources/dialog-form-settings/open/label}"/></xf:label>
                             <xf:action ev:event="DOMActivate">
                                 <!-- Open the dialog in "edit" mode -->
-                                <xf:dispatch name="fb-show-dialog" targetid="fb-form-editor$dialog-form-settings">
+                                <xf:dispatch name="fb-show-dialog" targetid="dialog-form-settings">
                                     <xxf:context name="app" value="xxf:bind('application-name-bind')"/>
                                     <xxf:context name="form" value="xxf:bind('form-name-bind')"/>
                                     <xxf:context name="mode" value="'edit'"/>
@@ -373,8 +373,66 @@
                             </xf:switch>
                         </xf:group>
 
-                        <!-- Component holding some common form edition functions -->
-                        <fb:form-editor ref="instance('fb-form-instance')" id="fb-form-editor"/>
+
+                        <!-- Some common form edition functions -->
+                        <xf:group ref="instance('fb-form-instance')" appearance="xxf:internal">
+
+                            <!-- Don't let any event go out from within this group -->
+                            <!-- Q: Do we still need this? -->
+                            <xf:action ev:event="#all" ev:propagate="stop"/>
+
+                            <!-- Form settings dialog -->
+                            <fb:dialog-form-settings id="dialog-form-settings" resources-ref="$form-resources" fr-resources-ref="$fr-resources" body-ref="$body">
+                                <!-- Update app/form name if changed -->
+                                <xf:action
+                                        ev:event="fb-update-metadata"
+                                        if="xxf:bind('application-name-bind') != event('app') or xxf:bind('form-name-bind') != event('form')">
+                                    <!-- Copy data to main instance -->
+                                    <xf:setvalue ref="xxf:bind('application-name-bind')" value="event('app')"/>
+                                    <xf:setvalue ref="xxf:bind('form-name-bind')" value="event('form')"/>
+                                    <!-- Refresh components -->
+                                    <!-- De-annotate the form, as it will be re-annotated once the toolbox is loaded -->
+                                    <xf:dispatch targetid="fr-form-model" name="fr-data-save-prepare"/>
+                                    <xf:send submission="fb-load-toolbox">
+                                        <xxf:context name="app" value="event('app')"/>
+                                    </xf:send>
+                                </xf:action>
+                                <!-- "Save as" -->
+                                <xf:action
+                                        ev:event="fb-update-metadata"
+                                        if="event('mode') = 'save-as'">
+                                    <!-- Create new document id -->
+                                    <xf:setvalue ref="xxf:instance('fr-parameters-instance')/document" value="digest(string(random(true())), 'MD5', 'hex')"/>
+                                    <!-- Actually save -->
+                                    <xf:dispatch name="fr-save-action" target="fr-persistence-model">
+                                        <xxf:context name="fr:check-data-valid" value="true()"/>
+                                    </xf:dispatch>
+                                    <!-- Change URL to have new document id -->
+                                    <xxf:script>
+                                        <!-- If browser supporting the HTML5 history API (http://goo.gl/Ootqu) -->
+                                        if (history &amp;&amp; history.replaceState)
+                                            history.replaceState(null, "", ORBEON.xforms.Document.getValue("fr-parameters-instance-document"));
+                                    </xxf:script>
+                                </xf:action>
+                            </fb:dialog-form-settings>
+
+                            <!-- Other dialogs -->
+                            <xf:var name="binding" value="."/>
+
+                            <fb:dialog-control-details     id="dialog-control-details"    form-ref="$binding" resources-ref="$form-resources"/>
+                            <fb:dialog-validation-details  id="dialog-validation-details" form-ref="$binding" resources-ref="$form-resources" components-ref="instance('fb-components-instance')"/>
+                            <fb:dialog-grid-details        id="dialog-grid-details"       form-ref="$binding" resources-ref="$form-resources" components-ref="instance('fb-components-instance')"/>
+                            <fb:dialog-section-details     id="dialog-section-details"    form-ref="$binding" resources-ref="$form-resources" components-ref="instance('fb-components-instance')"/>
+                            <fb:dialog-help                id="dialog-help"               form-ref="$binding" resources-ref="$form-resources" components-ref="instance('fb-components-instance')"/>
+                            <fb:dialog-itemsets            id="dialog-itemsets"           resources-ref="$form-resources"/>
+
+                            <fr:alert-dialog id="dialog-confirmation">
+                                <fr:label ref="$form-resources/dialog-confirmation/label"/>
+                                <fr:negative-choice/>
+                                <fr:positive-choice/>
+                            </fr:alert-dialog>
+
+                        </xf:group>
 
                         <xf:group id="fb-details-group">
                             <!-- Don't leak events -->
@@ -405,9 +463,9 @@
                                         <xxf:var name="confirm" value="gridOps:expandCellTouchesControl($td)" xmlns:gridOps="java:org.orbeon.oxf.fb.GridOps"/>
 
                                         <!-- Ask confirmation -->
-                                        <xf:dispatch if="$confirm" name="fr-show" targetid="fb-form-editor$dialog-confirmation">
+                                        <xf:dispatch if="$confirm" name="fr-show" targetid="dialog-confirmation">
                                             <xxf:context name="message" value="$fb-resources/messages/expand-cell"/>
-                                            <xxf:context name="positive-targetid" value="xxf:effective-id('fb-expand-trigger')"/>
+                                            <xxf:context name="positive-targetid" value="xxf:absolute-id('fb-expand-trigger')"/>
                                         </xf:dispatch>
                                         <xf:action if="not($confirm)">
                                             <!-- We are automatically confirmed as there is no control to delete -->
@@ -437,7 +495,7 @@
                                 <!-- Edit details for any control -->
                                 <xf:trigger appearance="minimal" id="fb-edit-details-trigger">
                                     <xf:label><xh:img alt="{$fb-resources/control-details-icon/label}" title="{$fb-resources/control-details-icon/label}" src="/apps/fr/style/images/silk/cog.png"/></xf:label>
-                                    <xf:dispatch ev:event="DOMActivate" name="fb-show-dialog" targetid="fb-form-editor$dialog-control-details">
+                                    <xf:dispatch ev:event="DOMActivate" name="fb-show-dialog" targetid="dialog-control-details">
                                         <xxf:context name="control-id" value="$control/@id"/>
                                     </xf:dispatch>
                                 </xf:trigger>
@@ -445,7 +503,7 @@
                                 <!-- Edit validation for any control -->
                                 <xf:trigger appearance="minimal" id="fb-edit-validation-trigger">
                                     <xf:label><xh:img class="fb-control-alert" alt="{$fb-resources/validation-settings-icon/label}" title="{$fb-resources/validation-settings-icon/label}" src="/apps/fr/style/images/silk/exclamation.png"/></xf:label>
-                                    <xf:dispatch ev:event="DOMActivate" name="fb-show-dialog" targetid="fb-form-editor$dialog-validation-details">
+                                    <xf:dispatch ev:event="DOMActivate" name="fb-show-dialog" targetid="dialog-validation-details">
                                         <xxf:context name="control-id" value="$control/@id"/>
                                     </xf:dispatch>
                                 </xf:trigger>
@@ -473,7 +531,7 @@
                                     <xh:img src="/apps/fr/style/images/silk/text_list_bullets.png" alt=""/>
                                     <xh:span><xf:output value="$fb-resources/edit-items/label"/></xh:span>
                                 </xf:label>
-                                <xf:dispatch ev:event="DOMActivate" name="fb-show-dialog" targetid="fb-form-editor$dialog-itemsets">
+                                <xf:dispatch ev:event="DOMActivate" name="fb-show-dialog" targetid="dialog-itemsets">
                                     <xxf:context name="control-id" value="$control/@id"/>
                                     <xxf:context name="control-type" value="$control/local-name()"/>
                                 </xf:dispatch>

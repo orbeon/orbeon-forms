@@ -220,9 +220,7 @@
                     </xforms:instance>
 
                     <!-- Repeat templates if any -->
-                    <xforms:bind>
-                        <xsl:copy-of select="$repeat-templates"/>
-                    </xforms:bind>
+                    <xsl:copy-of select="$repeat-templates"/>
 
                     <!-- Section constraints -->
                     <xforms:bind>

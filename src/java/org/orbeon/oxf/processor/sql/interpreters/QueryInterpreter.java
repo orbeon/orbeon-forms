@@ -484,11 +484,11 @@ public class QueryInterpreter extends SQLProcessor.InterpreterContentHandler {
                                         // For now, only support passing a string from the input document
 
                                         String sqlType = parameter.getSqlType();
-                                        if (sqlType != null && !SQL_TYPE_CLOB.equals(sqlType))
+                                        if (sqlType != null && !(SQL_TYPE_BLOB.equals(sqlType) || SQL_TYPE_CLOB.equals(sqlType)))
                                             throw new OXFException("Invalid sql-type attribute: " + sqlType);
 
                                         if (select == null)
-                                            throw new UnsupportedOperationException("Setting BLOB requires a select attribute.");
+                                            throw new UnsupportedOperationException("Setting CLOB/BLOB requires a select attribute.");
 
                                         // Base64
                                         XPathContentHandler xpathContentHandler = getInterpreterContext().getXPathContentHandler();

@@ -39,35 +39,35 @@
 
                 <!-- Form settings dialog -->
                 <fb:dialog-form-settings id="dialog-form-settings" resources-ref="$form-resources" fr-resources-ref="$fr-resources" body-ref="$body">
-                    <xf:action ev:event="fb-update-metadata">
+                    <!-- Update app/form name if changed -->
+                    <xf:action
+                            ev:event="fb-update-metadata"
+                            if="xxf:bind('application-name-bind') != event('app') or xxf:bind('form-name-bind') != event('form')">
                         <!-- Copy data to main instance -->
                         <xf:setvalue ref="xxf:bind('application-name-bind')" value="event('app')"/>
                         <xf:setvalue ref="xxf:bind('form-name-bind')" value="event('form')"/>
                         <!-- Refresh components -->
+                        <!-- De-annotate the form, as it will be re-annotated once the toolbox is loaded -->
                         <xf:dispatch targetid="fr-form-model" name="fr-data-save-prepare"/>
                         <xf:send submission="fb-load-toolbox">
                             <xxf:context name="app" value="event('app')"/>
                         </xf:send>
-                        <!-- Additional handling for save as -->
-                        <xf:action if="event('mode') = 'save-as'">
-                            <!-- Create new document id -->
-                            <xf:setvalue ref="xxf:instance('fr-parameters-instance')/document" value="digest(string(random(true())), 'MD5', 'hex')"/>
-                            <!-- Actually save -->
-                            <xf:dispatch name="fr-save-action" target="fr-persistence-model">
-                                <xxf:context name="fr:check-data-valid" value="true()"/>
-                            </xf:dispatch>
-                            <!-- Change URL to have new document id -->
-                            <xxf:script>
-                                <!-- If browser supporting the HTML5 history API (http://goo.gl/Ootqu) -->
-                                if (history &amp;&amp; history.replaceState)
-                                    history.replaceState(null, "", ORBEON.xforms.Document.getValue("fr-parameters-instance-document"));
-                            </xxf:script>
-                        </xf:action>
-                        <!-- Redo layout -->
+                    </xf:action>
+                    <!-- "Save as" -->
+                    <xf:action
+                            ev:event="fb-update-metadata"
+                            if="event('mode') = 'save-as'">
+                        <!-- Create new document id -->
+                        <xf:setvalue ref="xxf:instance('fr-parameters-instance')/document" value="digest(string(random(true())), 'MD5', 'hex')"/>
+                        <!-- Actually save -->
+                        <xf:dispatch name="fr-save-action" target="fr-persistence-model">
+                            <xxf:context name="fr:check-data-valid" value="true()"/>
+                        </xf:dispatch>
+                        <!-- Change URL to have new document id -->
                         <xxf:script>
-                            var layout = YAHOO.widget.Layout.getLayoutById("fb-layout");
-                            layout.set('height', YAHOO.util.Dom.getViewportHeight());
-                            layout.set('width', YAHOO.util.Dom.getViewportWidth());
+                            <!-- If browser supporting the HTML5 history API (http://goo.gl/Ootqu) -->
+                            if (history &amp;&amp; history.replaceState)
+                                history.replaceState(null, "", ORBEON.xforms.Document.getValue("fr-parameters-instance-document"));
                         </xxf:script>
                     </xf:action>
                 </fb:dialog-form-settings>

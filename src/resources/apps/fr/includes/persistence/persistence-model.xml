@@ -723,7 +723,8 @@
     </xforms:action>
 
     <!-- React to instance mutation events -->
-    <xforms:action ev:observer="fr-form-instance" ev:event="xforms-insert xforms-delete xxforms-value-changed">
+    <!-- NOTE: We check the standard fr-form-instance, but also fb-form-instance, which is where Form Builder really does its work  -->
+    <xforms:action ev:observer="fr-form-instance fb-form-instance" ev:event="xforms-insert xforms-delete xxforms-value-changed">
         <!-- In 'new' and 'edit' modes only, mark status as dirty if data changes -->
         <xforms:setvalue if="$mode = ('new', 'edit')" ref="instance('fr-persistence-instance')/data-status">dirty</xforms:setvalue>
     </xforms:action>

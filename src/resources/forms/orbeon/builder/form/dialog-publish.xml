@@ -154,15 +154,12 @@
             <xf:setvalue ref="instance('fb-publish-instance')/attachments" value="0"/>
             <xf:setvalue ref="instance('fb-publish-instance')/response"/>
 
-            <!-- Copy de-annotated form locally -->
-            <xf:dispatch targetid="fr-form-model" name="fr-data-save-prepare"/>
-
             <!-- Make sure XBL bindings for section templates are present -->
             <xf:insert ref="instance('fb-form-to-publish-instance')"
                            origin="xxf:call-xpl('oxf:/forms/orbeon/builder/form/add-template-bindings.xpl',
-                                                    ('data', 'bindings'),
-                                                    (xxf:instance('fr-form-instance'), xxf:instance('fb-components-instance')),
-                                                    'data')"/>
+                                    ('data', 'bindings'),
+                                    (xxf:call-xpl('oxf:/forms/orbeon/builder/form/deannotate.xpl', 'data', xxf:instance('fb-form-instance'), 'data'), xxf:instance('fb-components-instance')),
+                                    'data')"/>
 
             <!-- Publish attachments if any -->
             <xf:var name="fb-app"      model="fr-persistence-model" value="$app"/>

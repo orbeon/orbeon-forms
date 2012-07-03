@@ -313,18 +313,14 @@
     <xforms:submission
             id="fb-test-form-submission"
             ref="xxforms:call-xpl('oxf:/forms/orbeon/builder/form/add-template-bindings.xpl',
-                                  ('data', 'bindings'),
-                                  (xxforms:instance('fr-form-instance'), xxforms:instance('fb-components-instance')),
-                                  'data')"
+                  ('data', 'bindings'),
+                  (xxforms:call-xpl('oxf:/forms/orbeon/builder/form/deannotate.xpl', 'data', instance('fb-form-instance'), 'data'), xxforms:instance('fb-components-instance')),
+                  'data')"
             method="post"
             replace="all"
             resource="/fr/orbeon/builder/test"
             xxforms:target="fb-test-iframe"
-            xxforms:show-progress="false">
-
-        <!-- Make sure de-annotated form is up to date first -->
-        <xforms:dispatch ev:event="xforms-submit" targetid="fr-form-model" name="fr-data-save-prepare"/>
-    </xforms:submission>
+            xxforms:show-progress="false"/>
 
     <!-- Global variables -->
     <xforms:instance id="fb-variables">

@@ -530,22 +530,25 @@
         <!-- Handle "control visited" events on #fr-form-group -->
         <!-- NOTE: We used to only handle events coming from controls bound to "fr-form-instance" instance, but this
              doesn't work with "section templates". We now use the observer mechanism of fr:error-summary -->
-        <fr:error-summary id="error-summary-control-{$position}" observer="fr-form-group" model="fr-error-summary-model"
-            errors-count-ref="errors-count" visible-errors-count-ref="visible-errors-count" valid-ref="valid">
-            <fr:label>
-                <xforms:output value="$fr-resources/errors/summary-title"/>
-            </fr:label>
-            <xsl:if test="$position = 'bottom'">
-                <fr:header>
-                    <xhtml:div class="fr-separator">&#160;</xhtml:div>
-                </fr:header>
-            </xsl:if>
-            <xsl:if test="$position = 'top'">
-                <fr:footer>
-                    <xhtml:div class="fr-separator">&#160;</xhtml:div>
-                </fr:footer>
-            </xsl:if>
-        </fr:error-summary>
+        <xsl:if test="not($is-form-builder)">
+            <!-- For form builder we disable the error summary and say that the form is always valid -->
+            <fr:error-summary id="error-summary-control-{$position}" observer="fr-form-group" model="fr-error-summary-model"
+                errors-count-ref="errors-count" visible-errors-count-ref="visible-errors-count" valid-ref="valid">
+                <fr:label>
+                    <xforms:output value="$fr-resources/errors/summary-title"/>
+                </fr:label>
+                <xsl:if test="$position = 'bottom'">
+                    <fr:header>
+                        <xhtml:div class="fr-separator">&#160;</xhtml:div>
+                    </fr:header>
+                </xsl:if>
+                <xsl:if test="$position = 'top'">
+                    <fr:footer>
+                        <xhtml:div class="fr-separator">&#160;</xhtml:div>
+                    </fr:footer>
+                </xsl:if>
+            </fr:error-summary>
+        </xsl:if>
 
     </xsl:template>
 

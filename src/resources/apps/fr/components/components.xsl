@@ -282,10 +282,21 @@
         <xforms:model id="fr-error-summary-model">
             <xforms:instance id="fr-error-summary-instance">
                 <error-summary>
-                    <valid/>
-                    <errors-count/>
-                    <visible-errors-count/>
-                    <trigger/>
+                    <xsl:choose>
+                        <!-- For form builder we disable the error summary and say that the form is always valid -->
+                        <xsl:when test="$is-form-builder">
+                            <valid>true</valid>
+                            <errors-count>0</errors-count>
+                            <visible-errors-count>0</visible-errors-count>
+                            <trigger/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <valid/>
+                            <errors-count/>
+                            <visible-errors-count/>
+                            <trigger/>
+                        </xsl:otherwise>
+                    </xsl:choose>
                 </error-summary>
             </xforms:instance>
             <xforms:bind nodeset="trigger" readonly="not(../valid = 'true')"/>

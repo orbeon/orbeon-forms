@@ -41,11 +41,10 @@ import java.util.List;
  *
  */
 public class ValueOfCopyOfInterpreter extends SQLProcessor.InterpreterContentHandler {
-    final DocumentWrapper wrapper;
+    DocumentWrapper wrapper = null;
 
     public ValueOfCopyOfInterpreter(SQLProcessorInterpreterContext interpreterContext) {
         super(interpreterContext, false);
-        this.wrapper = new DocumentWrapper(interpreterContext.getCurrentNode().getDocument(), null, XPathCache.getGlobalConfiguration());
     }
 
     public void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {
@@ -72,6 +71,8 @@ public class ValueOfCopyOfInterpreter extends SQLProcessor.InterpreterContentHan
             // Interpret expression
             Object result = XPathUtils.selectObjectValue(interpreterContext.getCurrentNode(), selectString,
                     interpreterContext.getPrefixesMap(), variableContext, interpreterContext.getFunctionContext());
+            if (wrapper == null)
+                wrapper = new DocumentWrapper(interpreterContext.getCurrentNode().getDocument(), null, XPathCache.getGlobalConfiguration());
 
             if ("value-of".equals(localname) || "copy-of".equals(localname)) {
                 // Case of Number and String

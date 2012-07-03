@@ -42,9 +42,8 @@
     <property as="xs:boolean" name="oxf.fb.menu.schema"                              value="true"/>
     <property as="xs:boolean" name="oxf.fb.menu.pdf"                                 value="true"/>
     <property as="xs:boolean" name="oxf.fb.menu.edit-source"                         value="true"/>
-    <property as="xs:boolean" name="oxf.fb.menu.view-source"                         value="false"/>
     <property as="xs:boolean" name="oxf.fb.menu.css"                                 value="false"/>
-    <property as="xs:boolean" name="oxf.fb.menu.custom-xml"                          value="true"/>
+    <property as="xs:boolean" name="oxf.fb.menu.custom-xml"                          value="false"/>
     <property as="xs:boolean" name="oxf.fb.menu.permissions"                         value="true"/>
     <property as="xs:boolean" name="oxf.fb.metadata.logo"                            value="true"/>
     <property as="xs:integer" name="oxf.fb.grid.max-columns"                         value="4"/>

@@ -31,7 +31,7 @@
                             xmlns:ev="http://www.w3.org/2001/xml-events"
                             xmlns:dataModel="java:org.orbeon.oxf.fb.DataModel">
 
-                <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
+                <xsl:import href="oxf:/oxf/xslt/utils/copy-modes.xsl"/>
 
                 <xsl:variable name="model" select="/*/xhtml:head/xforms:model[@id = 'fr-form-model']"/>
 
@@ -58,6 +58,17 @@
                         <xsl:attribute name="fb:readonly" select="'true'"/><!-- so we remember to set the value back -->
                         <xsl:apply-templates select="@* except @xxforms:readonly | node()"/>
                     </xsl:copy>
+                </xsl:template>
+
+                <!-- Update namespace on observers on FB actions so that they don't run at design time -->
+                <xsl:template match="xforms:action[ends-with(@id, '-binding')]">
+                    <xsl:copy>
+                        <xsl:apply-templates select="@* | node()" mode="update-observers"/>
+                    </xsl:copy>
+                </xsl:template>
+
+                <xsl:template match="@ev:observer | @observer" mode="update-observers">
+                    <xsl:attribute name="fb:{local-name()}" select="."/>
                 </xsl:template>
 
                 <!-- fr:view → xf:group -->

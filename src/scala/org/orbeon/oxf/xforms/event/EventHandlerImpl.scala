@@ -50,11 +50,12 @@ class EventHandlerImpl(
 
     self ⇒
 
-    // NOTE: We use attribute local names so that we can catch names in the ev:*, xbl:*, or default namespace
-    private def att(name: String): String = element.attributeValue(name)
-    private def attOption(name: String): Option[String] = Option(att(name))
+    // NOTE: We check attributes in the ev:* or no namespace. We don't need to handle attributes in the xbl:* namespace.
+    private def att(name: QName): String = element.attributeValue(name)
+    private def attOption(name: QName): Option[String] = Option(att(name))
+    private def att(name1: QName, name2: QName) =  attOption(name1) orElse attOption(name2) orNull
 
-    val eventNames = attSet(element, XML_EVENTS_EV_EVENT_ATTRIBUTE_QNAME.getName)
+    val eventNames = attSet(element, XML_EVENTS_EV_EVENT_ATTRIBUTE_QNAME) ++ attSet(element, XML_EVENTS_EVENT_ATTRIBUTE_QNAME)
 
     // NOTE: If #all is present, ignore all other specific events
     val (actualEventNames, isAllEvents) =
@@ -63,18 +64,20 @@ class EventHandlerImpl(
         else
             (eventNames, false)
 
-    private val phaseAtt = att(XML_EVENTS_EV_PHASE_ATTRIBUTE_QNAME.getName) // Q: is this going to be eliminated as a field?
+     // Q: is this going to be eliminated as a field?
+    private val phaseAtt = att(XML_EVENTS_EV_PHASE_ATTRIBUTE_QNAME, XML_EVENTS_PHASE_ATTRIBUTE_QNAME)
 
-    val isCapturePhaseOnly = phaseAtt == "capture"
-    val isTargetPhase = (phaseAtt eq null) || Set("target", "default")(phaseAtt)
-    val isBubblingPhase = (phaseAtt eq null) || Set("bubbling", "default")(phaseAtt)
-    val isPropagate = att(XML_EVENTS_EV_PROPAGATE_ATTRIBUTE_QNAME.getName) != "stop"                    // "true" means "continue", "false" means "stop"
-    val isPerformDefaultAction = att(XML_EVENTS_EV_DEFAULT_ACTION_ATTRIBUTE_QNAME.getName) != "cancel"  // "true" means "perform", "false" means "cancel"
+    val isCapturePhaseOnly     = phaseAtt == "capture"
+    val isTargetPhase          = (phaseAtt eq null) || Set("target", "default")(phaseAtt)
+    val isBubblingPhase        = (phaseAtt eq null) || Set("bubbling", "default")(phaseAtt)
+    // "true" means "continue", "false" means "stop"
+    val isPropagate            = att(XML_EVENTS_EV_PROPAGATE_ATTRIBUTE_QNAME, XML_EVENTS_PROPAGATE_ATTRIBUTE_QNAME) != "stop"
+    // "true" means "perform", "false" means "cancel"
+    val isPerformDefaultAction = att(XML_EVENTS_EV_DEFAULT_ACTION_ATTRIBUTE_QNAME, XML_EVENTS_DEFAULT_ACTION_ATTRIBUTE_QNAME) != "cancel"
 
-    val keyModifiers = attOption(XXFORMS_EVENTS_MODIFIERS_ATTRIBUTE_QNAME.getName)
-    val keyText = attOption(XXFORMS_EVENTS_TEXT_ATTRIBUTE_QNAME.getName)
-
-    val isPhantom = att(XXFORMS_EVENTS_PHANTOM_ATTRIBUTE_QNAME.getName) == "true"
+    val keyModifiers = attOption(XXFORMS_EVENTS_MODIFIERS_ATTRIBUTE_QNAME)
+    val keyText      = attOption(XXFORMS_EVENTS_TEXT_ATTRIBUTE_QNAME)
+    val isPhantom    = att(XXFORMS_EVENTS_PHANTOM_ATTRIBUTE_QNAME) == "true"
 
     assert(! (isPhantom && isWithinRepeat), "phantom observers are not supported within repeats at this time")
 
@@ -104,17 +107,13 @@ class EventHandlerImpl(
         // Extract unique prefixed ids given an attribute name
         // NOTE: Supporting space-separated observer/target ids is an extension, which may make it into XML Events 2
         // TODO: error or warn if scope.prefixedIdForStaticId(id) eq null? or just ignore?
-        def prefixedIds(name: String) = attSet(element, name) collect {
+        def prefixedIds(name: QName) = attSet(element, name) collect {
             case id if id.startsWith("#") ⇒ id
             case id if scope.prefixedIdForStaticId(id) ne null ⇒ scope.prefixedIdForStaticId(id)
         }
 
-        def prefixedIdsByQName(name: QName) = attSet(element, name) collect {
-            case id if id.startsWith("#") ⇒ id
-            case id if scope.prefixedIdForStaticId(id) ne null ⇒ scope.prefixedIdForStaticId(id)
-        }
-
-        val observersPrefixedIds = prefixedIds(XML_EVENTS_EV_OBSERVER_ATTRIBUTE_QNAME.getName)
+        // Support `ev:observer` and plain `observer`
+        val observersPrefixedIds = prefixedIds(XML_EVENTS_EV_OBSERVER_ATTRIBUTE_QNAME) ++ prefixedIds(XML_EVENTS_OBSERVER_ATTRIBUTE_QNAME)
         
         // Handle backward compatibility for <dispatch ev:event="…" ev:target="…" name="…" target="…">. In this case,
         // if the user didn't specify the `targetid` attribute, the meaning of the `target` attribute in no namespace is
@@ -122,9 +121,9 @@ class EventHandlerImpl(
         // XML Events target, the attribute must be qualified as `ev:target`.
         val targetsPrefixedIds = 
             if (XFormsActions.isDispatchAction(element.getQName) && (element.attribute(TARGET_QNAME) ne null) && (element.attribute(TARGETID_QNAME) eq null))
-                prefixedIdsByQName(XML_EVENTS_EV_TARGET_ATTRIBUTE_QNAME)
+                prefixedIds(XML_EVENTS_EV_TARGET_ATTRIBUTE_QNAME)
             else
-                prefixedIds(XML_EVENTS_EV_TARGET_ATTRIBUTE_QNAME.getName)
+                prefixedIds(XML_EVENTS_EV_TARGET_ATTRIBUTE_QNAME) ++ prefixedIds(XML_EVENTS_TARGET_ATTRIBUTE_QNAME)
 
         _observersPrefixedIds = {
             // Special observer id indicating that the observer is the preceding sibling control

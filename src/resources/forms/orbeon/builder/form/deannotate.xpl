@@ -26,11 +26,12 @@
                             xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
                             xmlns:xhtml="http://www.w3.org/1999/xhtml"
                             xmlns:xforms="http://www.w3.org/2002/xforms"
+                            xmlns:ev="http://www.w3.org/2001/xml-events"
                             xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
                             xmlns:xbl="http://www.w3.org/ns/xbl"
                             xmlns:dataModel="java:org.orbeon.oxf.fb.DataModel">
 
-                <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
+                <xsl:import href="oxf:/oxf/xslt/utils/copy-modes.xsl"/>
 
                 <xsl:variable name="metadata"
                               select="/*/xhtml:head/xforms:model[@id = 'fr-form-model']/xforms:instance[@id = 'fr-form-metadata']/*"/>
@@ -53,6 +54,17 @@
                         <xsl:attribute name="xxforms:readonly" select="'true'"/>
                         <xsl:apply-templates select="@* except @fb:readonly | node()"/>
                     </xsl:copy>
+                </xsl:template>
+
+                <!-- Restore namespace on observers on FB actions  -->
+                <xsl:template match="xforms:action[ends-with(@id, '-binding')]">
+                    <xsl:copy>
+                        <xsl:apply-templates select="@* | node()" mode="update-observers"/>
+                    </xsl:copy>
+                </xsl:template>
+
+                <xsl:template match="@fb:observer" mode="update-observers">
+                    <xsl:attribute name="ev:{local-name()}" select="."/>
                 </xsl:template>
 
                 <!-- xf:group → fr:view -->

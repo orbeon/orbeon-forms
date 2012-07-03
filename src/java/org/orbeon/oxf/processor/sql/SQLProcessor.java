@@ -206,7 +206,7 @@ public class SQLProcessor extends ProcessorImpl {
                 // Just use an empty document
                 data = Dom4jUtils.NULL_DOCUMENT;
             } else {
-                // There is a data input connected and there are some XPath epxressions operating on it
+                // There is a data input connected and there are some XPath expressions operating on it
                 boolean useXPathContentHandler = false;
                 if (config.xpathExpressions.size() > 0) {
                     // Create XPath content handler

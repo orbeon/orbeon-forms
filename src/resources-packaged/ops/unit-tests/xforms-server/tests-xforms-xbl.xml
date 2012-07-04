@@ -4327,6 +4327,70 @@
         </output>
     </test>
 
+    <test description="#342: Instance replacement in edited form adds more than one root element" name="oxf:pipeline">
+        <!-- See: https://github.com/orbeon/orbeon-forms/issues/342 -->
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="instance">
+                            <xh:html>
+                                <xh:head>
+                                    <xf:model id="model">
+                                        <xf:instance id="instance">
+                                            <foo/>
+                                        </xf:instance>
+                                    </xf:model>
+                                </xh:head>
+                                <xh:body>
+                                    <xf:group id="my-group">
+                                        <xf:insert ev:event="xforms-enabled" ref="instance()" origin="xf:element('bar')"/>
+                                    </xf:group>
+                                </xh:body>
+                            </xh:html>
+                        </xf:instance>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xxf:dynamic ref="." id="my-dynamic"/>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response>
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <xh:html>
+                                    <xh:head>
+                                        <xf:model id="model" xxforms:state-handling="client">
+                                            <xf:instance id="instance">
+                                                <bar/>
+                                            </xf:instance>
+                                        </xf:model>
+                                    </xh:head>
+                                    <xh:body>
+                                        <xf:group id="my-group">
+                                            <xf:insert ev:event="xforms-enabled" ref="instance()" origin="xf:element('bar')"/>
+                                        </xf:group>
+                                    </xh:body>
+                                </xh:html>
+                            </instance>
+                            <instance id="instance" model-id="my-dynamic$model">
+                                <bar/>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
     <!--
 
     TODO: more XBL ids tests:

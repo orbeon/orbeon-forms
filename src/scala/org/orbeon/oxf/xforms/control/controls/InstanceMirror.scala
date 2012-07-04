@@ -16,7 +16,8 @@ package org.orbeon.oxf.xforms.control.controls
 import org.w3c.dom.Node.{ELEMENT_NODE, ATTRIBUTE_NODE, TEXT_NODE}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xforms._
-import action.actions.{XFormsDeleteAction, XFormsInsertAction}
+import action.actions.XFormsDeleteAction.doDelete
+import action.actions.XFormsInsertAction.doInsert
 import collection.JavaConverters._
 import event.events.{XFormsDeleteEvent, XFormsInsertEvent, XXFormsValueChanged}
 import event.XFormsEvents._
@@ -24,7 +25,7 @@ import model.DataModel
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.saxon.dom4j.DocumentWrapper
 import org.orbeon.saxon.value.StringValue
-import java.util.{Collections ⇒ JCollections, List ⇒ JList}
+import java.util.{List ⇒ JList}
 import org.orbeon.oxf.util.IndentedLogger
 import java.lang.{IllegalStateException, IllegalArgumentException}
 import org.dom4j._
@@ -33,7 +34,7 @@ import org.orbeon.oxf.common.OXFException
 import XXFormsDynamicControl._
 import scala.None
 import org.orbeon.oxf.xforms.event.{ListenersTrait, EventListener ⇒ JEventListener}
-import org.orbeon.saxon.om.{VirtualNode, DocumentInfo, NodeInfo, Navigator}
+import org.orbeon.saxon.om._
 
 // Logic to mirror mutations between an outer and an inner instance
 object InstanceMirror {
@@ -144,11 +145,28 @@ object InstanceMirror {
                 case Some(insertNode) ⇒
                     insert.getPosition match {
                         case "into" ⇒
-                            XFormsInsertAction.doInsert(containingDocument, indentedLogger, "after", null,
+                            doInsert(containingDocument, indentedLogger, "after", null,
                                 insertNode, insert.getOriginItems, -1, doClone = true, doDispatch = false)
                         case position @ ("before" | "after") ⇒
-                            XFormsInsertAction.doInsert(containingDocument, indentedLogger, position, JCollections.singletonList(insertNode),
-                                null, insert.getOriginItems, 1, doClone = true, doDispatch = false)
+
+                            def containsRootElement(items: Seq[Item]) =
+                                items collect { case node: NodeInfo ⇒ node } exists (node ⇒ node == node.rootElement)
+
+                            if (containsRootElement(insert.getInsertedItems.asScala)) {
+                                // If the inserted items contain the root element it means the root element was replaced, so
+                                // remove it first
+
+                                assert(insert.getInsertedItems.size == 1)
+
+                                val parent = insertNode.parentOption.get
+                                doDelete(containingDocument, indentedLogger, Seq(insertNode).asJava, - 1, doDispatch = false)
+                                doInsert(containingDocument, indentedLogger, position, null,
+                                    parent, insert.getOriginItems, 1, doClone = true, doDispatch = false)
+                            } else {
+                                // Not replacing the root element
+                                doInsert(containingDocument, indentedLogger, position, Seq(insertNode).asJava,
+                                    null, insert.getOriginItems, 1, doClone = true, doDispatch = false)
+                            }
                         case _ ⇒ throw new IllegalStateException
                     }
                     true
@@ -176,7 +194,7 @@ object InstanceMirror {
 
                                     body(newParentNode) match {
                                         case Some(nodeToRemove: Node) ⇒
-                                            XFormsDeleteAction.doDelete(containingDocument, indentedLogger, JCollections.singletonList(docWrapper.wrap(nodeToRemove)), -1, doDispatch = false)
+                                            doDelete(containingDocument, indentedLogger, Seq(docWrapper.wrap(nodeToRemove)).asJava, -1, doDispatch = false)
                                             true
                                         case _ ⇒ false
                                     }

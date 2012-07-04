@@ -20,7 +20,6 @@ import org.orbeon.oxf.util.XPathCache
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import collection.JavaConverters._
 import org.orbeon.oxf.xforms.{XFormsStaticStateImpl, XFormsInstance}
-import java.util.Collections
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.xml.{TransformerUtils, NamespaceMapping}
 import org.orbeon.saxon.dom4j.DocumentWrapper
@@ -39,7 +38,7 @@ object XML {
 
     // Convenience methods for the XPath API
     def evalOne(item: Item, expr: String, namespaces: NamespaceMapping = XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING, variables: Map[String, ValueRepresentation] = null)(implicit library: FunctionLibrary = null) =
-        XPathCache.evaluaSingleteKeepItems(Collections.singletonList(item), 1, expr, namespaces, if (variables eq null) null else variables.asJava, library, null, null, null)
+        XPathCache.evaluaSingleteKeepItems(Seq(item).asJava, 1, expr, namespaces, if (variables eq null) null else variables.asJava, library, null, null, null)
 
     def eval(item: Item, expr: String, namespaces: NamespaceMapping = XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING, variables: Map[String, ValueRepresentation] = null)(implicit library: FunctionLibrary = null) =
         XPathCache.evaluate(item, expr, namespaces, if (variables eq null) null else variables.asJava, library, null, null, null)

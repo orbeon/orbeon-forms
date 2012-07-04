@@ -148,7 +148,7 @@ abstract class XFormsValueControl(container: XBLContainer, parent: XFormsControl
                         getContextStack.getCurrentVariables)) orNull
         else
             // Format value according to format attribute
-            evaluateAsString(format, JCollections.singletonList[Item](StringValue.makeStringValue(getValue)), 1)
+            evaluateAsString(format, Seq[Item](StringValue.makeStringValue(getValue)).asJava, 1)
     }
 
     /**

@@ -220,7 +220,7 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
             destinationPosition,
             destinationNodeset,
             insertContextNodeInfo,
-            Collections.singletonList(deletedNodeInfo),
+            Seq(deletedNodeInfo).asJava,
             actualDestinationIndex,
             false,
             true
@@ -272,7 +272,7 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
                 currentControlTree.initializeSubTree(newIteration, true)
 
             // This will dispatch xforms-enabled/xforms-disabled/xxforms-nodeset-changed/xxforms-index-changed events if needed
-            containingDocument.getControls.getCurrentControlTree.dispatchRefreshEvents(Collections.singletonList(getEffectiveId))
+            containingDocument.getControls.getCurrentControlTree.dispatchRefreshEvents(Seq(getEffectiveId).asJava)
 
             // Handle focus changes
             Focus.updateFocusWithEvents(focusedBefore, partialFocusRepeatOption)

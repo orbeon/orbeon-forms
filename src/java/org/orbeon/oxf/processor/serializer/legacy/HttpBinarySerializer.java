@@ -23,6 +23,7 @@ import org.orbeon.oxf.processor.impl.CacheableTransformerOutputImpl;
 import org.orbeon.oxf.processor.serializer.HttpSerializerBase;
 import org.orbeon.oxf.util.ContentHandlerOutputStream;
 
+import java.io.IOException;
 import java.io.OutputStream;
 
 /**
@@ -30,19 +31,21 @@ import java.io.OutputStream;
  */
 public abstract class HttpBinarySerializer extends HttpSerializerBase {
 
-    protected final void readInput(PipelineContext pipelineContext, ExternalContext.Response response, ProcessorInput input, Object _config, OutputStream outputStream) {
+    protected final void readInput(PipelineContext pipelineContext, ExternalContext.Response response, ProcessorInput input, Object _config) {
 
         Config config = (Config) _config;
 
         // Set content type
-        if (response != null) {
-            String contentType = getContentType(config, null, getDefaultContentType());
-            if (contentType != null)
-                response.setContentType(contentType);
-        }
+        String contentType = getContentType(config, null, getDefaultContentType());
+        if (contentType != null)
+            response.setContentType(contentType);
 
         // Read input into an OutputStream
-        readInput(pipelineContext, input, (Config) config, outputStream);
+        try {
+            readInput(pipelineContext, input, (Config) config, response.getOutputStream());
+        } catch (IOException e) {
+            throw new OXFException(e);
+        }
     }
 
     /**

@@ -176,7 +176,7 @@ public class XFormsToXHTML extends ProcessorImpl {
                         // NOTE: Create document here so we can do appropriate analysis of caching dependencies
                         final XFormsURIResolver uriResolver = new XFormsURIResolver(XFormsToXHTML.this, processorOutput,
                                 pipelineContext, INPUT_ANNOTATED_DOCUMENT, XMLUtils.ParserConfiguration.PLAIN);
-                        containingDocument[0] = new XFormsContainingDocument(staticState[0], stage2CacheableState.template, uriResolver, getResponse(xmlReceiver, externalContext));
+                        containingDocument[0] = new XFormsContainingDocument(staticState[0], stage2CacheableState.template, uriResolver, PipelineResponse.getResponse(xmlReceiver, externalContext));
 
                         // Gather set caching dependencies
                         gatherInputDependencies(containingDocument[0], indentedLogger, stage1CacheableState);
@@ -229,7 +229,7 @@ public class XFormsToXHTML extends ProcessorImpl {
                 }
 
                 final XFormsURIResolver uriResolver = new XFormsURIResolver(XFormsToXHTML.this, processorOutput, pipelineContext, INPUT_ANNOTATED_DOCUMENT, XMLUtils.ParserConfiguration.PLAIN);
-                containingDocument[0] = new XFormsContainingDocument(staticState, stage2CacheableState.template, uriResolver, getResponse(xmlReceiver, externalContext));
+                containingDocument[0] = new XFormsContainingDocument(staticState, stage2CacheableState.template, uriResolver, PipelineResponse.getResponse(xmlReceiver, externalContext));
             } else {
                 assert !cachedStatus[0];
                 indentedLogger.logDebug("", "annotated document and static state digest not obtained from cache.");
@@ -515,19 +515,5 @@ public class XFormsToXHTML extends ProcessorImpl {
                                          final XMLReceiver xmlReceiver) throws SAXException {
         // Output XML response
         XFormsServer.outputAjaxResponse(containingDocument, indentedLogger, null, null, null, null, xmlReceiver, false, true);
-    }
-
-    /*
-     * Create a response that writes to the receiver.
-     *
-     * As of 2011-08-09 this response is used with replace="all" by:
-     *
-     * - RequestDispatcherSubmission and LocalPortletSubmission
-     * - AllReplacer
-     *
-     * This can be used upon form initialization, or during the 2nd pass of a 2-pass submission.
-     */
-    public static ExternalContext.Response getResponse(XMLReceiver xmlReceiver, final ExternalContext externalContext) {
-        return PipelineResponse.getResponse(xmlReceiver, externalContext);
     }
 }

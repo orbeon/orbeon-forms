@@ -20,8 +20,6 @@ import org.orbeon.oxf.processor.ProcessorInput;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.xml.TransformerUtils;
 
-import java.io.OutputStream;
-
 public abstract class CachedSerializer extends ProcessorImpl {
 
     public static final String SERIALIZER_CONFIG_NAMESPACE_URI = "http://www.orbeon.com/oxf/serializer";
@@ -45,7 +43,6 @@ public abstract class CachedSerializer extends ProcessorImpl {
      * @param response      response to use only to set some headers; should be used carefully
      * @param input         processor input being read
      * @param config        current serializer configuration
-     * @param outputStream  OutputStream to write to; do not use the response parameter
      */
-    protected abstract void readInput(PipelineContext context, ExternalContext.Response response, ProcessorInput input, Object config, OutputStream outputStream);
+    protected abstract void readInput(PipelineContext context, ExternalContext.Response response, ProcessorInput input, Object config);
 }

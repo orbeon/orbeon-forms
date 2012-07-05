@@ -143,11 +143,17 @@ public abstract class HttpSerializerBase extends CachedSerializer {
                                 // NOTE: readInput will call response.setContentType(), so we intercept and save the set contentType
                                 // Other headers are set above
                                 readInput(pipelineContext, new ResponseWrapper(response) {
+                                    @Override
                                     public void setContentType(String contentType) {
                                         resultStoreOutputStream.setContentType(contentType);
                                         super.setContentType(contentType);
                                     }
-                                }, input, config, resultStoreOutputStream);
+
+                                    @Override
+                                    public OutputStream getOutputStream() {
+                                        return resultStoreOutputStream;
+                                    }
+                                }, input, config);
                                 resultStoreOutputStream.close();
                                 return resultStoreOutputStream;
                             } catch (IOException e) {
@@ -173,7 +179,7 @@ public abstract class HttpSerializerBase extends CachedSerializer {
                     }
                 } else {
                     // Local caching is not enabled, just read the input
-                    readInput(pipelineContext, response, dataInput, config, httpOutputStream);
+                    readInput(pipelineContext, response, dataInput, config);
                     httpOutputStream.close();
                 }
             } catch (java.net.SocketException e) {

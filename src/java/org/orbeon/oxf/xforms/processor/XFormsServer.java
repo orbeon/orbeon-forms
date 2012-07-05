@@ -145,7 +145,7 @@ public class XFormsServer extends ProcessorImpl {
         final List<Element> serverEventsElements = Dom4jUtils.elements(requestDocument.getRootElement(), XFormsConstants.XXFORMS_SERVER_EVENTS_QNAME);
 
         // Find an output stream for xforms:submission[@replace = 'all']
-        final ExternalContext.Response response = XFormsToXHTML.getResponse(xmlReceiver, externalContext);
+        final ExternalContext.Response response = PipelineResponse.getResponse(xmlReceiver, externalContext);
 
         // Get containing document from the incoming request
         // IMPORTANT: We now have a lock associated with the document

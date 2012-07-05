@@ -25,10 +25,7 @@ import org.orbeon.oxf.xml.XMLConstants;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
-import java.io.Writer;
+import java.io.*;
 
 /**
  * Legacy HTTP text serializer. This is deprecated by HttpSerializer.
@@ -37,22 +34,22 @@ public abstract class HttpTextSerializer extends HttpSerializerBase {
 
     private static final String DEFAULT_TEXT_DOCUMENT_ELEMENT = "document";
 
-    protected final void readInput(PipelineContext pipelineContext, ExternalContext.Response response, ProcessorInput input, Object _config, OutputStream outputStream) {
+    protected final void readInput(PipelineContext pipelineContext, ExternalContext.Response response, ProcessorInput input, Object _config) {
         Config config = (Config) _config;
 
         String encoding = getEncoding(config, null, DEFAULT_ENCODING);
-        if (response != null) {
-            // Set content-type and encoding
-            String contentType = getContentType(config, null, getDefaultContentType());
-            if (contentType != null)
-                response.setContentType(contentType + "; charset=" + encoding);
-        }
+        // Set content-type and encoding
+        String contentType = getContentType(config, null, getDefaultContentType());
+        if (contentType != null)
+            response.setContentType(contentType + "; charset=" + encoding);
 
         // Read input into a Writer
         try {
-            Writer writer = new OutputStreamWriter(outputStream, encoding);
+            Writer writer = new OutputStreamWriter(response.getOutputStream(), encoding);
             readInput(pipelineContext, input, config, writer);
         } catch (UnsupportedEncodingException e) {
+            throw new OXFException(e);
+        } catch (IOException e) {
             throw new OXFException(e);
         }
     }

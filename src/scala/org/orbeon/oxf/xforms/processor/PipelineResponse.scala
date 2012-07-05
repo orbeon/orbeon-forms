@@ -20,7 +20,17 @@ import org.orbeon.oxf.pipeline.api.{ExternalContext, XMLReceiver}
 import org.orbeon.oxf.externalcontext.ResponseAdapter
 
 object PipelineResponse {
-    def getResponse(xmlReceiver: XMLReceiver, externalContext: ExternalContext): ExternalContext.Response = {
+    /*
+     * Create a response that writes to the receiver.
+     *
+     * As of 2011-08-09 this response is used with replace="all" by:
+     *
+     * - RequestDispatcherSubmission and LocalPortletSubmission
+     * - AllReplacer
+     *
+     * This can be used upon form initialization, or during the 2nd pass of a 2-pass submission.
+     */
+    def getResponse(xmlReceiver: XMLReceiver, externalContext: ExternalContext): ExternalContext.Response =
         if (xmlReceiver ne null) {
             new ResponseAdapter {
 
@@ -35,13 +45,11 @@ object PipelineResponse {
                 // Return this just because Tomcat 5.5, when doing a servlet forward, may ask for one, just to close it!
                 override def getWriter = printWriter
 
-                override def setContentType(contentType: String) {
+                override def setContentType(contentType: String): Unit =
                     setHeader("Content-Type", contentType)
-                }
 
-                override def setContentLength(len: Int) {
+                override def setContentLength(len: Int): Unit =
                     setHeader("Content-Length", Integer.toString(len))
-                }
 
                 override def setStatus(status: Int) {
                     // See: http://wiki.orbeon.com/forms/projects/xforms/better-error-handling-for-replace-all-submission
@@ -60,9 +68,8 @@ object PipelineResponse {
                 override def getNativeResponse = externalContext.getResponse.getNativeResponse
                 override def getNamespacePrefix = originalResponse.getNamespacePrefix
 
-                override def setTitle(title: String): Unit = {
+                override def setTitle(title: String): Unit =
                     originalResponse.setTitle(title)
-                }
 
                 override def rewriteResourceURL(urlString: String, rewriteMode: Int) =
                     originalResponse.rewriteResourceURL(urlString, rewriteMode)
@@ -82,5 +89,4 @@ object PipelineResponse {
         } else {
             externalContext.getResponse
         }
-    }
 }

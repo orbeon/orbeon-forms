@@ -69,7 +69,7 @@ class PDFTemplateProcessor extends HttpBinarySerializer {// TODO: HttpBinarySeri
             Option(ProcessorImpl.getProcessorInputSchemeInputName(templateHref)) match {
                 case Some(inputName) ⇒
                     val os = new ByteArrayOutputStream
-                    readInputAsSAX(pipelineContext, inputName, new BinaryTextXMLReceiver(null, os, true, false, null, false, false, null, false))
+                    readInputAsSAX(pipelineContext, inputName, new BinaryTextXMLReceiver(os))
                     new PdfReader(os.toByteArray)
                 case None ⇒
                     new PdfReader(URLFactory.createURL(templateHref))
@@ -285,7 +285,7 @@ class PDFTemplateProcessor extends HttpBinarySerializer {// TODO: HttpBinarySeri
             Option(ProcessorImpl.getProcessorInputSchemeInputName(hrefAttribute)) match {
                 case Some(inputName) ⇒
                     val os = new ByteArrayOutputStream
-                    readInputAsSAX(context.pipelineContext, inputName, new BinaryTextXMLReceiver(null, os, true, false, null, false, false, null, false))
+                    readInputAsSAX(context.pipelineContext, inputName, new BinaryTextXMLReceiver(os))
                     Image.getInstance(os.toByteArray)
                 case None ⇒
                     val url = URLFactory.createURL(hrefAttribute)

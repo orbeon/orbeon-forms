@@ -54,7 +54,7 @@ public class UnzipProcessor extends ProcessorImpl {
                     {
                         final FileItem fileItem = NetUtils.prepareFileItem(NetUtils.REQUEST_SCOPE);
                         final OutputStream fileOutputStream = fileItem.getOutputStream();
-                        readInputAsSAX(context, getInputByName(INPUT_DATA), new BinaryTextXMLReceiver(null, fileOutputStream, true, false, null, false, false, null, false));
+                        readInputAsSAX(context, getInputByName(INPUT_DATA), new BinaryTextXMLReceiver(fileOutputStream));
                         temporaryZipFile = ((DiskFileItem) fileItem).getStoreLocation();
                     }
 

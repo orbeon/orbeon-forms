@@ -93,7 +93,8 @@ object XML {
         if (uri eq null) "" else uri
     }
 
-    private def parseQName(lexicalQName: String) = {
+    // Parse the given qualified name and return the separated prefix and local name
+    def parseQName(lexicalQName: String) = {
         val checker = Name10Checker.getInstance
         val parts = checker.getQNameParts(lexicalQName)
 

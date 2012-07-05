@@ -45,7 +45,7 @@ public class AllReplacer extends BaseReplacer {
 
         final ReplaceAllResponse replaceAllResponse = new ReplaceAllResponse(containingDocument.getResponse());
         replace(connectionResult, replaceAllResponse);
-        // Update status code if it was updated
+        // Update status code if it was updated on the response
         if (replaceAllResponse.getStatus() > 0)
             connectionResult.statusCode = replaceAllResponse.getStatus();
 
@@ -72,7 +72,7 @@ public class AllReplacer extends BaseReplacer {
     public static void replace(ConnectionResult connectionResult, final ExternalContext.Response response) throws IOException {
 
         if (response == null)
-            return; // can be null for some unit tests
+            return; // can be null for some unit tests only :(
 
         // Set content-type
         response.setContentType(connectionResult.getResponseContentType());

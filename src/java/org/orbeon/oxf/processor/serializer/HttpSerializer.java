@@ -28,18 +28,18 @@ public class HttpSerializer extends HttpSerializerBase {
     public static final String HTTP_SERIALIZER_CONFIG_NAMESPACE_URI = "http://www.orbeon.com/oxf/http-serializer";
 
     protected String getDefaultContentType() {
-        return BinaryTextXMLReceiver.DEFAULT_BINARY_CONTENT_TYPE;
+        return BinaryTextXMLReceiver.DefaultBinaryContentType();
     }
 
     protected String getConfigSchemaNamespaceURI() {
         return HTTP_SERIALIZER_CONFIG_NAMESPACE_URI;
     }
 
-    protected void readInput(PipelineContext context, ExternalContext.Response response, ProcessorInput input, Object config, final OutputStream outputStream) {
+    protected void readInput(PipelineContext context, ExternalContext.Response response, ProcessorInput input, Object config) {
         try {
             final Config httpConfig = (Config) config;
 
-            readInputAsSAX(context, input, new BinaryTextXMLReceiver(response, outputStream, true,
+            readInputAsSAX(context, input, new BinaryTextXMLReceiver(response, null, true,
                     httpConfig.forceContentType, httpConfig.contentType, httpConfig.ignoreDocumentContentType,
                     httpConfig.forceEncoding, httpConfig.encoding, httpConfig.ignoreDocumentEncoding));
 

@@ -304,7 +304,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         // NOTE: We shouldn't even be called if the parent control is not relevant.
         if (container.isRelevant()) {
             for (final XFormsInstance currentInstance: instances) {
-                if (currentInstance.documentInfo().isSameNodeInfo(documentInfo))
+                if (currentInstance != null && currentInstance.documentInfo().isSameNodeInfo(documentInfo))
                     return currentInstance;
             }
         }

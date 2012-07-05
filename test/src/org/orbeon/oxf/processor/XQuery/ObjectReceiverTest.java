@@ -32,12 +32,9 @@ import static junit.framework.Assert.assertNull;
 public class ObjectReceiverTest extends ObjectReceiver {
 
     public String publicString;
-    String string;
-    private String privateString;
     public int intValue = -1;
     public boolean booleanValue = false;
     public URI uri;
-
 
     class Foo extends ObjectReceiver {
         public String string;
@@ -181,30 +178,28 @@ public class ObjectReceiverTest extends ObjectReceiver {
     }
 
     @Test
-        public void repeatableInt() throws IOException, SAXException {
-            XMLReader reader = XMLReaderFactory.createXMLReader();
-            reader.setContentHandler(this);
-            reader.parse(new InputSource(new StringReader("<foo><repeatableInt>10</repeatableInt><repeatableInt>-3</repeatableInt></foo>")));
-            assertNotNull(foo.repeatableInt);
-            assertEquals(2, foo.repeatableInt.size());
-            Integer integer = foo.repeatableInt.get(0);
-            assertEquals(integer, new Integer(10));
-            integer = foo.repeatableInt.get(1);
-            assertEquals(integer, new Integer(-3));
-        }
+    public void repeatableInt() throws IOException, SAXException {
+        XMLReader reader = XMLReaderFactory.createXMLReader();
+        reader.setContentHandler(this);
+        reader.parse(new InputSource(new StringReader("<foo><repeatableInt>10</repeatableInt><repeatableInt>-3</repeatableInt></foo>")));
+        assertNotNull(foo.repeatableInt);
+        assertEquals(2, foo.repeatableInt.size());
+        Integer integer = foo.repeatableInt.get(0);
+        assertEquals(integer, new Integer(10));
+        integer = foo.repeatableInt.get(1);
+        assertEquals(integer, new Integer(-3));
+    }
 
     @Test
-        public void repeatableBar() throws IOException, SAXException {
-            XMLReader reader = XMLReaderFactory.createXMLReader();
-            reader.setContentHandler(this);
-            reader.parse(new InputSource(new StringReader("<foo><repeatableBar><string>A string</string></repeatableBar><repeatableBar/></foo>")));
-            assertNotNull(foo.repeatableBar);
-            assertEquals(2, foo.repeatableBar.size());
-            Foo.Bar bar = foo.repeatableBar.get(0);
-            assertEquals(bar.string, "A string");
-            bar = foo.repeatableBar.get(1);
-            assertNull(bar.string);
-        }
-
-
+    public void repeatableBar() throws IOException, SAXException {
+        XMLReader reader = XMLReaderFactory.createXMLReader();
+        reader.setContentHandler(this);
+        reader.parse(new InputSource(new StringReader("<foo><repeatableBar><string>A string</string></repeatableBar><repeatableBar/></foo>")));
+        assertNotNull(foo.repeatableBar);
+        assertEquals(2, foo.repeatableBar.size());
+        Foo.Bar bar = foo.repeatableBar.get(0);
+        assertEquals(bar.string, "A string");
+        bar = foo.repeatableBar.get(1);
+        assertNull(bar.string);
+    }
 }

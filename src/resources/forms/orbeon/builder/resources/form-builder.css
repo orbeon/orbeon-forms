@@ -746,7 +746,7 @@ a.xforms-help-image .fb-control-help {
 .fr-grid-content .xforms-hint,
 .fr-grid-th .xforms-label,
 .fr-grid-th .xforms-hint {
-  min-height: 1.321em;
+  min-height: 1.5em;
 }
 /* NOTE: Was changed to 1.5 at some point, check it too small */
 #fr-view .fr-grid .xforms-hint.xforms-disabled {

@@ -307,11 +307,9 @@ a.xforms-help-image .fb-control-help { vertical-align: baseline; }
 .fr-grid.fr-editable.fr-norepeat:hover .fr-grid-td { border: 1px solid @lightBlue} /* Only for grid which is not a repeat, e.g. no highlighting in itemset editor */
 
 .fb-grid-cell-icons, .fb-grid-control-icons, .fb-grid-row-icons {
-    display: block;
-    width: 16px;
+    display: block; width: 16px;
     height: 60px;
-    text-align: center;
-}
+    text-align: center }
 
 /* Grid icons and hovering */
 .fb-grid-top-left-td { text-align: center; width: 24px }
@@ -391,8 +389,12 @@ a.xforms-help-image .fb-control-help { vertical-align: baseline; }
 /* Even if the label or hint is empty, we still want space for 1 line to be reserved. */
 .fr-grid-content .xforms-label, .fr-grid-content .xforms-hint,  /* In regular grid content */
 .fr-grid-th .xforms-label, .fr-grid-th .xforms-hint             /* In grid header, for the repeat single line */
+<<<<<<< HEAD
     { min-height: 1.321em }                                     /* NOTE: Was changed to 1.5 at some point, check it too small */
 
+=======
+    { min-height: 1.5em }
+>>>>>>> 0f35914... Fix #324 Hovering over cells cause content to shift
 
 #fr-view {                                                                                                              // Show disabled hints, i.e. hints with no text, to reserve space for the placeholder
     .fr-grid .xforms-hint.xforms-disabled {                                                                             // Override the #fr-view .xforms-disabled { display: none } in form-runner-base.less

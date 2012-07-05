@@ -749,13 +749,10 @@ a.xforms-help-image .fb-control-help {
 .fr-grid-th .xforms-hint {
   min-height: 1.321em;
 }
-/* Show disabled hints, which are hints that don't contain any text, as we want them to show since use them as placeholders containers */
-/* Use an id to override the #fr-view .xforms-disabled { display: none } in form-runner-base.css */
-.fr-grid .xforms-hint.xforms-disabled {
+#fr-view .fr-grid .xforms-hint.xforms-disabled {
   display: block;
   position: static;
 }
-/* The position: static overrides the position: absolute; top: -10000px; left: -10000px in xforms.css. */
 /* Styling of the repeat grid to look the same as it does at runtime */
 /* Everything is scoped to .fr-view so not to impact repeats outside of the form itself, e.g. in the itemset editor  */
 .fr-view .fr-grid.fr-repeat.fr-editable {

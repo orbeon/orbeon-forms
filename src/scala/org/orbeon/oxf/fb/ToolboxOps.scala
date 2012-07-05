@@ -200,7 +200,7 @@ object ToolboxOps {
 
         // NOTE: use xxforms:update="full" so that xxf:dynamic can better update top-level XBL controls
         val sectionTemplate: NodeInfo =
-            <fb:section id={controlId(newSectionName)} bind={bindId(newSectionName)} edit-ref="" xxforms:update="full"
+            <fr:section id={controlId(newSectionName)} bind={bindId(newSectionName)} edit-ref="" xxforms:update="full"
                         xmlns:xhtml="http://www.w3.org/1999/xhtml"
                         xmlns:xforms="http://www.w3.org/2002/xforms"
                         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
@@ -214,7 +214,7 @@ object ToolboxOps {
                             <xhtml:td id={nextId(inDoc, "tmp", useInstance = false)}/>
                         </xhtml:tr>
                     </fr:grid>
-            }</fb:section>
+            }</fr:section>
 
         val newSectionElement = insert(into = into, after = after.toSeq, origin = sectionTemplate).head
 

@@ -222,39 +222,14 @@ html { overflow: hidden }
 
 /* Highlighting of in-place outputs depending on hovering */
 .fr-inplace-content .xforms-output:hover { background-color: #FFFF88 }
-#fb-details-group .fb-top-level-content:hover .fr-section-title .fr-inplace-content .xforms-output { background-color: #FFFFDD; color: @darkBlue }
-#fb-details-group .fb-top-level-content:hover .fr-section-title .fr-inplace-content .xforms-output:hover { background-color: #FFFF88; color: @darkBlue }
 
 /* In-place editing for metadata section */
 .fr-top .xbl-fr-inplace-input { display: block }
 .fr-top .xbl-fr-inplace-input .xforms-input input { width: 100% }
 
-/* In-place editing for section titles */
-.fr-section-title .fr-inplace-content .xforms-output { color: @darkBlue }
-#fb-details-group .fr-section-title { display: block }
-
-/* Only show buttons when in edit mode or when hovering over the title */
-#fb-details-group .fr-section-title .fr-section-buttons { display: none }
-#fb-details-group .fr-section-title:hover .fr-section-buttons { display: inline-block }
-
-/* Make section title open/close button, title text, and title icons top aligned */
-#fb-details-group .fr-section-title .xforms-switch { vertical-align: top }
-
-#fb-details-group .fr-section-title .fr-section-buttons {
-    margin-left: .5em;
-    margin-right: .5em;
-    background-color: lightyellow;
-    border: 1px solid yellow;
-    vertical-align: top;
+h2 {
+    height: 36px;                                                                                                       // So the title takes space even when empty; 36px is line-height in bootstrap.css
 }
-#fb-details-group .fr-section-title .fr-inplace-buttons img { vertical-align: baseline }
-#fb-details-group .fr-section-title .fr-inplace-buttons button { vertical-align: middle }
-#fb-details-group .fr-section-title .fr-inplace-content { vertical-align: middle; font-size: 100% }
-#fb-details-group .fr-section-title .fr-inplace-content .xforms-label { display: none }
-#fb-details-group .fr-section-title .xforms-input input { width: 37em }/* try to make editable title as wide as possible */
-
-/* Make section title alert look nicer */
-#fb-details-group .fr-section-title .xforms-alert-active { font-size: 10px }
 
 /* ***** Misc ******************************************************************************************************* */
 

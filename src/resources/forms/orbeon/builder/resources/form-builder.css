@@ -435,7 +435,7 @@ html {
 .fr-top .xbl-fr-inplace-input .xforms-input input {
   width: 100%;
 }
-h2 {
+h2 .fr-section-label {
   height: 36px;
 }
 /* ***** Misc ******************************************************************************************************* */

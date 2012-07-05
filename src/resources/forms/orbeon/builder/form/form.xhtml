@@ -103,6 +103,12 @@
 
                     <fr:status-icons/>
 
+                    <!-- XPath errors in edited form -->
+                    <xf:output
+                        class="fb-xpath-errors"
+                        ref="instance('fb-variables')/xpath-errors[xs:integer(.) gt 0]"
+                        value="xxf:format-message($form-resources/messages/xpath-errors, xs:integer(.))"/>
+
                     <xh:div class="fr-buttons">
                         <!-- Back/Close -->
                         <fr:close-button/>

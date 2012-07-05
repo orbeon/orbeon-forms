@@ -503,6 +503,12 @@ html.accordion-menu-js dd.a-m-d-anim {
     background-color: green;
 }
 
+.fb-xpath-errors {
+    display: block;
+    float: left;
+    color: orange;
+}
+
 /* ***** YUI Layout ************************************************************************************************* */
 
 #fr-view { margin-left: 0 }

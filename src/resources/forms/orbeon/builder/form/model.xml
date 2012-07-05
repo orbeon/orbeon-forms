@@ -340,40 +340,58 @@
             <!-- Number of open dialogs -->
             <!-- TODO: could use a native function for this -->
             <dialogs-open>0</dialogs-open>
+
+            <!-- XPath errors -->
+            <rr>calculate</rr>
+            <calculate-errors>0</calculate-errors>
+            <validate-errors>0</validate-errors>
+            <xpath-errors>0</xpath-errors>
         </variables>
     </xforms:instance>
-
-    <xforms:bind ref="instance('fb-variables')">
-        <xforms:bind ref="new-language-trigger" readonly="normalize-space(../new-language) = ''"/>
-    </xforms:bind>
 
     <xforms:var name="variables" value="instance('fb-variables')"/>
     <xforms:var name="selected-cell" value="$variables/selected-cell"/>
 
-    <xforms:setvalue ev:event="xxforms-dialog-open" ev:observer="#document"
-                     ref="instance('fb-variables')/dialogs-open" value="xs:integer(.) + 1"/>
-
-    <xforms:setvalue ev:event="xxforms-dialog-close" ev:observer="#document"
-                     ref="instance('fb-variables')/dialogs-open" value="xs:integer(.) - 1"/>
-
-    <!--<xforms:setvalue ev:event="DOMFocusIn" ev:observer="fb-details-group"-->
-                     <!--ref="instance('fb-variables')/focus" value="xs:integer(.) + 1"/>-->
-
-    <!--<xforms:setvalue ev:event="DOMFocusOut" ev:observer="fb-details-group"-->
-                     <!--ref="instance('fb-variables')/focus" value="xs:integer(.) - 1"/>-->
-
-    <!--<xforms:message level="xxforms:log-info" ev:event="DOMFocusIn" ev:observer="fb-section-content-group"-->
-                     <!--value="concat('xxx in ', xxforms:event('xxforms:effective-targetid'))"/>-->
-
-    <!--<xforms:message level="xxforms:log-info" ev:event="DOMFocusOut" ev:observer="fb-section-content-group"-->
-                     <!--value="concat('xxx out ', xxforms:event('xxforms:effective-targetid'))"/>-->
-
-    <xforms:bind ref="instance('fb-variables')">
+    <xforms:bind ref="$variables">
+        <!-- TODO: move to dialog-language.xml -->
+        <xforms:bind ref="new-language-trigger" readonly="normalize-space(../new-language) = ''"/>
         <!-- Make buttons readonly depending on whether items can be inserted -->
         <xforms:bind ref="section-trigger"  readonly="$current-td/ancestor::xbl:binding or not(toolboxOps:canInsertSection($body))"/>
         <xforms:bind ref="grid-trigger"     readonly="$current-td/ancestor::xbl:binding or not(toolboxOps:canInsertGrid($body))"/>
         <xforms:bind ref="control-trigger"  readonly="$current-td/ancestor::xbl:binding or not(toolboxOps:canInsertControl($body))"/>
+        <!-- Sum calculate and validate MIP error counts -->
+        <xforms:bind ref="xpath-errors" calculate="../calculate-errors + ../validate-errors"/>
     </xforms:bind>
+
+    <!-- These actions track MIP XPath errors in the edited form's model. We keep track of XPath errors occurring on
+         revalidate and recalculate independently, which should be reliable given that the edit form doesn't enable
+         XPath dependencies. -->
+    <xforms:action ev:event="fb-construct" context="$variables">
+        <xforms:setvalue ref="rr">calculate</xforms:setvalue>
+        <xforms:setvalue ref="calculate-errors">0</xforms:setvalue>
+        <xforms:setvalue ref="validate-errors">0</xforms:setvalue>
+    </xforms:action>
+
+    <xforms:action ev:event="fb-recalculate" context="$variables">
+        <xforms:setvalue ref="rr">calculate</xforms:setvalue>
+        <xforms:setvalue ref="calculate-errors">0</xforms:setvalue>
+    </xforms:action>
+
+    <xforms:action ev:event="fb-revalidate" context="$variables">
+        <xforms:setvalue ref="rr">validate</xforms:setvalue>
+        <xforms:setvalue ref="validate-errors">0</xforms:setvalue>
+    </xforms:action>
+
+    <xforms:action ev:event="fb-xpath-error" context="$variables">
+        <xforms:setvalue ref="if (rr = 'calculate') then calculate-errors else validate-errors" value=". + 1"/>
+    </xforms:action>
+
+    <!-- These actions track how many dialogs are open at a given time -->
+    <xforms:setvalue ev:event="xxforms-dialog-open" ev:observer="#document"
+        ref="$variables/dialogs-open" value="xs:integer(.) + 1"/>
+
+    <xforms:setvalue ev:event="xxforms-dialog-close" ev:observer="#document"
+        ref="$variables/dialogs-open" value="xs:integer(.) - 1"/>
 
     <!-- Schema upload dialog -->
     <xforms:instance id="fb-schema-upload-instance">

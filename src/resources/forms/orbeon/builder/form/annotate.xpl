@@ -73,7 +73,7 @@
 
                 <!-- fr:view → xf:group -->
                 <xsl:template match="xhtml:body//fr:view">
-                    <xforms:group class="fb-view">
+                    <xforms:group class="fb-annotation">
                         <!-- NOTE: We don't copy the view label anymore as it's unneeded -->
 
                         <!-- Scope $lang which is the language of the form being edited -->
@@ -131,6 +131,30 @@
                 <!-- Convert MIP names -->
                 <xsl:template match="xforms:bind/@relevant | xforms:bind/@readonly | xforms:bind/@required | xforms:bind/@constraint | xforms:bind/@calculate | xforms:bind/@xxforms:default">
                     <xsl:attribute name="fb:{local-name()}" select="."/>
+                </xsl:template>
+
+                <!-- Add model actions -->
+                <xsl:template match="xhtml:head/xforms:model[@id = 'fr-form-model']">
+                    <xsl:copy>
+                        <xsl:apply-templates select="@* | node()"/>
+
+                        <!-- Upon model creation, recalculation and revalidation, notify Form Builder -->
+                        <xforms:action ev:event="xforms-model-construct" ev:target="#observer" class="fb-annotation">
+                            <xforms:dispatch name="fb-construct" targetid="/fr-form-model"/>
+                        </xforms:action>
+                        <xforms:action ev:event="xforms-recalculate" ev:target="#observer" class="fb-annotation">
+                            <xforms:dispatch name="fb-recalculate" targetid="/fr-form-model"/>
+                        </xforms:action>
+                        <xforms:action ev:event="xforms-revalidate" ev:target="#observer" class="fb-annotation">
+                            <xforms:dispatch name="fb-revalidate" targetid="/fr-form-model"/>
+                        </xforms:action>
+                        <!-- Upon MIP XPath error, notify Form Builder and cancel the default error behavior (which
+                             otherwise can open an error dialog at inopportune times.) -->
+                        <xforms:action ev:event="xxforms-xpath-error" ev:target="#observer" class="fb-annotation" ev:defaultAction="cancel">
+                            <xforms:dispatch name="fb-xpath-error" targetid="/fr-form-model"/>
+                        </xforms:action>
+
+                    </xsl:copy>
                 </xsl:template>
 
                 <!-- TODO: convert legacy fr:repeat -->

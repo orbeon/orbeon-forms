@@ -68,7 +68,7 @@
                 </xsl:template>
 
                 <!-- xf:group → fr:view -->
-                <xsl:template match="xforms:group[tokenize(@class, '\s+') = 'fb-view']">
+                <xsl:template match="xforms:group[tokenize(@class, '\s+') = 'fb-annotation']">
                     <fr:view>
                         <fr:body>
                             <xsl:apply-templates select="xforms:group[tokenize(@class, '\s+') = 'fb-body']/node()"/>
@@ -95,6 +95,9 @@
                 <xsl:template match="xforms:bind/@fb:default">
                     <xsl:attribute name="xxforms:{local-name()}" select="."/>
                 </xsl:template>
+
+                <!-- Remove model actions -->
+                <xsl:template match="xhtml:head/xforms:model[@id = 'fr-form-model']/*[tokenize(@class, '\s+') = 'fb-annotation']"/>
 
                 <!-- Remove automatic grid and td ids -->
                 <xsl:template match="xhtml:body//fr:grid/@id[starts-with(., 'tmp-') and ends-with(., '-tmp')]"/>

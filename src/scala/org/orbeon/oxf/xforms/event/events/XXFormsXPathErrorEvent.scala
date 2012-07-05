@@ -21,4 +21,4 @@ class XXFormsXPathErrorEvent(
        target: XFormsEventTarget,
        val errorString: String,
        val throwable: Throwable)
-    extends XFormsEvent(containingDocument, XFormsEvents.XXFORMS_XPATH_ERROR, target, true, true)
+    extends XFormsEvent(containingDocument, XFormsEvents.XXFORMS_XPATH_ERROR, target, bubbles = true, cancelable = true)

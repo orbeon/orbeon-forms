@@ -189,7 +189,7 @@ class EventHandlerImpl(
                     case Some(concreteHandler) ⇒
                         val handlerContainer = concreteHandler.container
                         val handlerEffectiveId = concreteHandler.getEffectiveId
-                        val stack =  new XFormsContextStack(handlerContainer, concreteHandler.getBindingContext(containingDocument))
+                        val stack = new XFormsContextStack(handlerContainer, concreteHandler.getBindingContext(containingDocument))
 
                         (handlerContainer, handlerEffectiveId, stack)
                     case None ⇒ return

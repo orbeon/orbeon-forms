@@ -158,6 +158,9 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
         // Create context stack
         this.contextStack = new XFormsContextStack(this);
+
+        // Temporarily initialize the evaluation context to an empty context, so that handlers upon xforms-model-construct can work
+        this.defaultEvaluationContext = XFormsContextStack.emptyContext(null, container, this);
     }
 
     // Evaluate all top-level variables

@@ -156,14 +156,21 @@ public class XFormsContextStack {
                     model.getDefaultInstance().getLocationData(), false, defaultNode, container.innerScope());
         } else {
             // Push empty context
-            final List<Item> defaultContext = DEFAULT_CONTEXT;
-            this.head = new BindingContext(parentBindingContext, model, null, defaultContext, defaultContext.size(), null, true, null,
-                    (model != null) ? model.getLocationData() : null, false, null, container.innerScope());
+            this.head = emptyContext(parentBindingContext, container, model);
         }
 
         // Add model variables for default model
         if (model != null)
             scopeModelVariables(model);
+    }
+
+    /**
+     * Return an empty context for the given model (which can be null).
+     */
+    public static BindingContext emptyContext(BindingContext parentBindingContext, XBLContainer container, XFormsModel model) {
+        final List<Item> defaultContext = DEFAULT_CONTEXT;
+        return new BindingContext(parentBindingContext, model, null, defaultContext, defaultContext.size(), null, true, null,
+                (model != null) ? model.getLocationData() : null, false, null, container.innerScope());
     }
 
     private void scopeModelVariables(XFormsModel model) {

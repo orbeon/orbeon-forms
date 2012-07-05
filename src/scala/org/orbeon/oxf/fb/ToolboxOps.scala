@@ -221,12 +221,7 @@ object ToolboxOps {
         // Create and insert holders
         val resourceHolder = {
 
-            val findUntitledSectionMessage = {
-                val fbResources = asNodeInfo(model("fr-resources-model").get.getVariable("fr-form-resources"))
-                evalOne(fbResources, "template/untitled-section/string()")
-            }
-
-            val elementContent = Seq(elementInfo("label", findUntitledSectionMessage), elementInfo("help"))
+            val elementContent = Seq(elementInfo("label"), elementInfo("help"))
             elementInfo(newSectionName, elementContent)
         }
 

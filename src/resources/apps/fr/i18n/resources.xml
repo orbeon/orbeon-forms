@@ -21,10 +21,11 @@
             </labels>
         </components>
         <errors>
-            <summary-title>Your Form Contains the Following Errors</summary-title>
-            <some>Errors on Form</some>
-            <none>No Errors on Form</none>
-            <unsaved>Unsaved Changes</unsaved>
+            <!-- Used by error summary -->
+            <summary-title>Your form contains the following errors</summary-title>
+            <some>Errors on form</some>
+            <none>No errors on form</none>
+            <unsaved>Unsaved changes</unsaved>
         </errors>
         <email>
             <subject>Orbeon Forms: Confirmation</subject>
@@ -98,10 +99,11 @@
         <detail>
             <messages>
                 <save-success>Document saved successfully!</save-success>
-                <form-validation-error>Document not saved: please check for errors in your form before saving again.</form-validation-error>
-                <upload-in-progress>Please retry once the file upload has completed or has been canceled.</upload-in-progress>
-                <database-error>Error communicating with the database: please contact your system administrator.</database-error>
+                <form-validation-error>There are validation errors. Please retry once all fields have been properly filled-out.</form-validation-error>
+                <upload-in-progress>There are file uploads in progress. Please retry once the file upload has completed or has been canceled.</upload-in-progress>
+                <database-error>There was an error communicating with the database. Please contact the application administrator.</database-error>
                 <clear-confirm-message>Are you sure you want to clear all the fields on this page? Your data will be lost if you haven't saved it.</clear-confirm-message>
+                <error-dialog-title>Unable to complete action</error-dialog-title>
                 <submit-dialog-title>Form Submitted</submit-dialog-title>
                 <submit-dialog-message>Your information has been submitted, thank you.</submit-dialog-message>
                 <buttons-message/>
@@ -266,10 +268,11 @@
         <detail>
             <messages>
                 <save-success>Document enregistré avec succès!</save-success>
-                <form-validation-error>Document non enregistré: veuillez vérifier que le formulaire ne contienne pas d'erreurs.</form-validation-error>
-                <upload-in-progress>Veuillez ressayer une fois que le téléchargement du fichier est terminé ou a été annulé.</upload-in-progress>
-                <database-error>Erreur de base de données: veuillez contacter votre administrateur système.</database-error>
+                <form-validation-error>Le document contient des erreurs de validation. Veuillez ressayer la sauvegarde après les avoir corrigées.</form-validation-error>
+                <upload-in-progress>Des téléchargement de fichiers sont en cours. Veuillez ressayer une fois que les transferts sont terminés ou annulés.</upload-in-progress>
+                <database-error>Une erreur s'est produite en contactant la base de données. Veuillez contacter votre l'administrateur de l'application.</database-error>
                 <clear-confirm-message>Êtes-vous sûr de vouloir effacer tous les champs de cette page? Vos données seront perdues si vous ne les avez pas enregistrées.</clear-confirm-message>
+                <error-dialog-title>L'opération n'a pas pu être effectuée</error-dialog-title>
                 <submit-dialog-title>Formulaire envoyé</submit-dialog-title>
                 <submit-dialog-message>Merci, vos informations ont été envoyées.</submit-dialog-message>
                 <buttons-message/>
@@ -433,10 +436,11 @@
         <detail>
             <messages>
                 <save-success>Documento guardado correctamente!</save-success>
-                <form-validation-error>Documento no guardado: por favor, compruebe si existen errores en su formulario antes de grabar de nuevo.</form-validation-error>
+                <form-validation-error>Documento no guardado. Por favor, compruebe si existen errores en su formulario antes de grabar de nuevo.</form-validation-error>
                 <upload-in-progress>[Please retry once the file upload has completed or has been canceled.]</upload-in-progress>
-                <database-error>Documento no guardado: por favor, contacte al administrador del sistema.</database-error>
+                <database-error>Documento no guardado. Por favor, contacte al administrador del sistema.</database-error>
                 <clear-confirm-message>¿Está seguro de que desea borrar todos los campos de esta página? Sus datos se perderán si no ha guardado.</clear-confirm-message>
+                <error-dialog-title>[Unable to Complete Action]</error-dialog-title>
                 <submit-dialog-title>Su formulario ha sido enviado</submit-dialog-title>
                 <submit-dialog-message>Su información ha sido enviada. Gracias</submit-dialog-message>
                 <buttons-message/>
@@ -597,10 +601,11 @@
         <detail>
             <messages>
                 <save-success>Skjemaet er lagret!</save-success>
-                <form-validation-error>Skjemaet er ikke innsendt: Vennligst rett opp feilene i skjemaet før du sender inn på nytt.</form-validation-error>
+                <form-validation-error>Skjemaet er ikke innsendt. Vennligst rett opp feilene i skjemaet før du sender inn på nytt.</form-validation-error>
                 <upload-in-progress>[Please retry once the file upload has completed or has been canceled.]</upload-in-progress>
-                <database-error>Feil i kommunikasjon med tjener: Vennligst kontakt din systemadministrator.</database-error>
+                <database-error>Feil i kommunikasjon med tjener. Vennligst kontakt din systemadministrator.</database-error>
                 <clear-confirm-message>Er du sikker på at du vil slette innholdet i alle felter på siden? Innholdet vil bli tapt.</clear-confirm-message>
+                <error-dialog-title>[Unable to Complete Action]</error-dialog-title>
                 <submit-dialog-title>Skjemaet er innsendt</submit-dialog-title>
                 <submit-dialog-message>Takk, informasjonen er innsendt.</submit-dialog-message>
                 <buttons-message/>
@@ -688,7 +693,6 @@
             </labels>
         </components>
         <errors>
-            <summary-title>Форма содержит следующие ошибки</summary-title>
             <some>Есть ошибки</some>
             <none>Ошибок нет</none>
             <unsaved>Несохраненные изменения</unsaved>
@@ -769,6 +773,7 @@
                 <upload-in-progress>Повторите попытку после окончания загрузки файла.</upload-in-progress>
                 <database-error>Нет соединения с базой данных. Свяжитесь с системным администратором.</database-error>
                 <clear-confirm-message>Вы уверены, что хотите очистить все поля? Несохраненные данные будут потеряны.</clear-confirm-message>
+                <error-dialog-title>[Unable to Complete Action]</error-dialog-title>
                 <submit-dialog-title>Форма отправлена</submit-dialog-title>
                 <submit-dialog-message>Информация успешно отправлена, спасибо!</submit-dialog-message>
                 <buttons-message/>

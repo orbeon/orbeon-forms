@@ -239,19 +239,17 @@ h1 .xforms-trigger-appearance-xxforms-minimal input, h2 .xforms-trigger-appearan
 /* Messages area */
 .fr-messages {
     display: block;
-    clear: both;
     padding: 1em;
     margin-bottom: 1em;
     background-color: white;
     border: 1px solid #DDDDDD;
+    float: left;
 }
 
 .fr-messages p {
     margin: 0;
 }
 
-.fr-messages .fr-message-fatal-error { text-align: center; color: red }
-.fr-messages .fr-message-validation-error { text-align: center; color: #DF731B }
 .fr-messages .fr-message-success { text-align: center; color: green }
 
 .fr-messages p a { color: white }

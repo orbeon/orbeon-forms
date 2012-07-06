@@ -104,7 +104,7 @@
 
     <!-- React to failed submission -->
     <xforms:action ev:event="xforms-submit-error">
-        <xforms:dispatch name="fr-submit-error" targetid="fr-persistence-model">
+        <xforms:dispatch name="fr-persistence-error" targetid="fr-persistence-model">
             <xxforms:context name="submission-id" select="event('xxforms:targetid')"/>
             <xxforms:context name="response-body" select="event('response-body')"/>
             <xxforms:context name="error-type" select="event('error-type')"/>

@@ -194,10 +194,7 @@ button.xforms-trigger, input.xforms-trigger, .xforms-trigger button, .xforms-tri
 
 /* Messages */
 .fr-message-success { color: green  }
-.fr-message-validation-error { color: #DF731B }
-.fr-message-fatal-error { color: red }
 .fr-unsaved-data { color: red }
-.fr-message-fatal-error .xforms-trigger { margin-left: .5em }
 
 /* Error summary */
 .xbl-fr-error-summary .fr-error-summary-body { padding: 0 10px; margin: 10px 0 0 }

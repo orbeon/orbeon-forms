@@ -491,14 +491,6 @@ html.accordion-menu-js dd.a-m-d-anim {
     border-radius: 3px; -moz-border-radius: 3px; -webkit-border-radius: 3px; -ms-border-radius: 3px
 }
 
-.fb-top .fr-messages .fr-message-validation-error {
-    background-color: #DF731B;
-}
-
-.fb-top .fr-messages .fr-message-fatal-error {
-    background-color: red;
-}
-
 .fb-top .fr-messages .fr-message-success {
     background-color: green;
 }

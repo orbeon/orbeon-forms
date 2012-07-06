@@ -32,6 +32,8 @@
     <xxforms:variable name="form" value="$parameters/form" as="xs:string"/>
     <xxforms:variable name="document" select="$parameters/document"/>
     <xxforms:variable name="mode" select="$parameters/mode"/>
+    
+    <xxforms:variable name="persistence-instance" value="instance('fr-persistence-instance')"/>
 
     <!-- Model initialization when we have a specific app and form -->
     <!-- TODO: Should not do this on summary page, for example -->
@@ -134,7 +136,7 @@
 
                 <!-- Set initial data as dirty, because this is the case typically of switching between script/noscript
                      mode, and we can't really know if the data is clean or dirty but would like to enable the save button -->
-                <xforms:setvalue if="$mode = 'edit'" ref="instance('fr-persistence-instance')/initial-data-status">dirty</xforms:setvalue>
+                <xforms:setvalue if="$mode = 'edit'" ref="$persistence-instance/initial-data-status">dirty</xforms:setvalue>
             </xforms:action>
 
             <!-- In 'new' mode only, after an external document has been set, recalculate defaults (and rebuild so the refs
@@ -161,10 +163,14 @@
             </xforms:message>
 
             <!-- Don't allow if the constraints are not satisfied:
+
                  - either we got a submit and passed
-                 - or we didn't get a submit, in which case we check that we have the proper id depending on the mode -->
+                 - or we didn't get a submit, in which case we check that we have the proper id depending on the mode
+
+                 NOTE: 403 applies well to the first condition. For the second condition, a 404 could also be possible.
+             -->
             <xforms:action if="($is-submit and not($pass-submit-check)) or (not($is-submit) and not($is-new-id and $mode = 'new' or $mode != 'new'))" type="xpath">
-                formRunner:sendError(401)
+                formRunner:sendError(403)
             </xforms:action>
         </xforms:action>
 
@@ -174,19 +180,13 @@
     </xforms:action>
 
     <xforms:action ev:event="xforms-ready">
-        <!-- In case there is an error, show it (error occurred when the controls are not yet ready) -->
-        <xforms:toggle if="instance('fr-persistence-instance')/is-error = 'true'" case="fr-message-fatal-error"/>
-
-        <!-- Set focus on first focusable control -->
-        <!--<xforms:setfocus control="fr-form-group"/>-->
-
         <!-- Force all this so we can safely set the data status -->
         <xforms:rebuild/>
         <xforms:recalculate/>
         <xforms:revalidate/>
         <xforms:refresh/>
         <!-- Set the initial data status -->
-        <xforms:setvalue ref="instance('fr-persistence-instance')/data-status" value="../initial-data-status"/>
+        <xforms:setvalue ref="$persistence-instance/data-status" value="../initial-data-status"/>
     </xforms:action>
 
     <!-- Clear operation -->
@@ -226,7 +226,7 @@
 
     <!-- Respond to save button activation -->
     <xforms:action ev:event="DOMActivate" ev:observer="fr-save-button">
-        <xforms:setvalue ref="instance('fr-persistence-instance')/submit-or-save-or-send">save</xforms:setvalue>
+        <xforms:setvalue ref="$persistence-instance/submit-or-save-or-send">save</xforms:setvalue>
         <xforms:dispatch name="fr-save-action" target="fr-persistence-model">
             <!-- Check validity based on property -->
             <xxforms:context
@@ -237,7 +237,7 @@
 
     <!-- Respond to submit button activation -->
     <xforms:action ev:event="DOMActivate" ev:observer="fr-submit-button">
-        <xforms:setvalue ref="instance('fr-persistence-instance')/submit-or-save-or-send">submit</xforms:setvalue>
+        <xforms:setvalue ref="$persistence-instance/submit-or-save-or-send">submit</xforms:setvalue>
         <xforms:dispatch name="fr-save-action" target="fr-persistence-model">
             <xxforms:context name="fr:check-data-valid" select="true()"/>
         </xforms:dispatch>
@@ -246,21 +246,21 @@
     <!-- Respond to workflow preview button activation -->
     <xforms:action ev:event="DOMActivate" ev:observer="fr-workflow-review-button">
 
-        <!-- TODO: Fix duplication of this code and code in fr-save-action -->
         <xxforms:variable name="validity-passed" select="xxforms:instance('fr-error-summary-instance')/valid = 'true'"/>
+
+        <!-- Show error if validation did not pass -->
         <xforms:action if="not($validity-passed)">
-            <!-- Data not valid: display error -->
-            <xforms:setvalue ref="xxforms:instance('fr-persistence-instance')/message"
-                             model="fr-resources-model" value="$fr-fr-resources/detail/messages/form-validation-error"/>
-            <xforms:toggle case="fr-message-validation-error"/>
-            <!-- Mark all active alerts as visited -->
-            <xforms:dispatch name="fr-visit-alerts" target="fr-persistence-model"/>
-            <!-- Open all sections -->
-            <xforms:dispatch name="fr-expand-all" target="fr-sections-model"/>
+            <xforms:dispatch name="fr-persistence-error" targetid="fr-persistence-model">
+                <xxforms:context name="error-type">validation-error</xxforms:context>
+            </xforms:dispatch>
         </xforms:action>
 
-        <!-- Display message if there is at least one upload in progress -->
-        <xforms:message if="$validity-passed and xxforms:pending-uploads() > 0" model="fr-resources-model" value="$fr-fr-resources/detail/messages/upload-in-progress"/>
+        <!-- Show error if there is at least one upload in progress -->
+        <xforms:action if="$validity-passed and xxforms:pending-uploads() > 0">
+            <xforms:dispatch name="fr-persistence-error" targetid="fr-persistence-model">
+                <xxforms:context name="error-type">xxforms-pending-uploads</xxforms:context>
+            </xforms:dispatch>
+        </xforms:action>
 
         <!-- Send -->
         <xforms:send if="$validity-passed and not(xxforms:pending-uploads() > 0)" submission="fr-workflow-review-submission"/>
@@ -275,7 +275,7 @@
 
     <!-- Respond to send button activation -->
     <xforms:action ev:event="DOMActivate" ev:observer="fr-workflow-send-button">
-        <xforms:setvalue ref="instance('fr-persistence-instance')/submit-or-save-or-send">send</xforms:setvalue>
+        <xforms:setvalue ref="$persistence-instance/submit-or-save-or-send">send</xforms:setvalue>
         <xforms:dispatch name="fr-save-action" target="fr-persistence-model">
             <xxforms:context name="fr:check-data-valid" select="true()"/>
         </xforms:dispatch>
@@ -289,7 +289,8 @@
                                                   (e.g. when doing an auto-save). -->
         <xxforms:variable name="check-data-valid" select="event('fr:check-data-valid')"/>
 
-        <xforms:setvalue ref="instance('fr-persistence-instance')/save-attempted">true</xforms:setvalue>
+        <xforms:setvalue ref="$persistence-instance/is-error">false</xforms:setvalue>
+        <xforms:setvalue ref="$persistence-instance/save-attempted">true</xforms:setvalue>
         <xforms:action if="$document != ''">
 
             <!-- Check validity of data before trying to save, because:
@@ -300,19 +301,19 @@
 
             <xxforms:variable name="validity-passed" select="not($check-data-valid) or (xxforms:instance('fr-error-summary-instance')/valid = 'true')" as="xs:boolean"/>
 
+            <!-- Show error if validation did not pass -->
             <xforms:action if="not($validity-passed)">
-                <!-- Data not valid: display error -->
-                <xforms:setvalue ref="xxforms:instance('fr-persistence-instance')/message"
-                                 model="fr-resources-model" value="$fr-fr-resources/detail/messages/form-validation-error"/>
-                <xforms:toggle case="fr-message-validation-error"/>
-                <!-- Mark all active alerts as visited -->
-                <xforms:dispatch name="fr-visit-alerts" target="fr-persistence-model"/>
-                <!-- Open all sections -->
-                <xforms:dispatch name="fr-expand-all" target="fr-sections-model"/>
+                <xforms:dispatch name="fr-persistence-error" targetid="fr-persistence-model">
+                    <xxforms:context name="error-type">validation-error</xxforms:context>
+                </xforms:dispatch>
             </xforms:action>
 
-            <!-- Display message if there is at least one upload in progress -->
-            <xforms:message if="$validity-passed and xxforms:pending-uploads() > 0" model="fr-resources-model" value="$fr-fr-resources/detail/messages/upload-in-progress"/>
+            <!-- Show error if there is at least one upload in progress -->
+            <xforms:action if="$validity-passed and xxforms:pending-uploads() > 0">
+                <xforms:dispatch name="fr-persistence-error" targetid="fr-persistence-model">
+                    <xxforms:context name="error-type">xxforms-pending-uploads</xxforms:context>
+                </xforms:dispatch>
+            </xforms:action>
 
             <!-- Actually save if we passed validation and there is no upload in progress -->
             <xforms:action if="$validity-passed and not(xxforms:pending-uploads() > 0)">
@@ -338,7 +339,7 @@
                     <!--xxx <xforms:output value="count($upload-holders)"/>-->
                 <!--</xforms:message>-->
                 
-                <xforms:action iterate="$upload-holders" if="instance('fr-persistence-instance')/is-error = 'false'">
+                <xforms:action iterate="$upload-holders" if="$persistence-instance/is-error = 'false'">
 
                     <xforms:var name="p" value="position()"/>
                     <xforms:var name="holder" value="."/>
@@ -361,11 +362,11 @@
                     </xforms:send>
 
                     <!-- Update the path -->
-                    <xforms:setvalue if="instance('fr-persistence-instance')/is-error = 'false'" ref="$holder" value="$resource"/>
+                    <xforms:setvalue if="$persistence-instance/is-error = 'false'" ref="$holder" value="$resource"/>
                     
                 </xforms:action>
 
-                <xforms:action if="instance('fr-persistence-instance')/is-error = 'false'">
+                <xforms:action if="$persistence-instance/is-error = 'false'">
 
                     <!-- Save XML document -->
                     <xforms:send submission="fr-create-update-submission" >
@@ -379,7 +380,7 @@
                 </xforms:action>
 
                 <!-- Notify that the data is saved -->
-                <xforms:dispatch if="instance('fr-persistence-instance')/is-error = 'false'" targetid="fr-form-model" name="fr-data-save-done">
+                <xforms:dispatch if="$persistence-instance/is-error = 'false'" targetid="fr-form-model" name="fr-data-save-done">
                     <xxforms:context name="before-urls" value="$before-urls"/>
                     <xxforms:context name="after-urls" value="$after-urls"/>
                 </xforms:dispatch>
@@ -469,7 +470,7 @@
         </save>
     </xforms:instance>
 
-    <xforms:bind nodeset="instance('fr-persistence-instance')">
+    <xforms:bind nodeset="$persistence-instance">
         <xforms:bind nodeset="data-safe" calculate="../data-status = 'clean' or ../data-safe-override = 'true'"/>
         <xforms:bind nodeset="captcha" constraint=". = 'true'"/>
     </xforms:bind>
@@ -508,13 +509,13 @@
 
         <!-- Condition for disabling strict Save button -->
         <xforms:bind nodeset="strict-save" readonly="not(property('xxforms:noscript'))
-            and (instance('fr-persistence-instance')/data-status = 'clean' or xxforms:instance('fr-error-summary-instance')/valid = 'false' or xxforms:pending-uploads() > 0)"/>
+            and ($persistence-instance/data-status = 'clean' or xxforms:instance('fr-error-summary-instance')/valid = 'false' or xxforms:pending-uploads() > 0)"/>
         <!-- Condition for disabling strict Submit button -->
         <xforms:bind nodeset="strict-submit" readonly="not(property('xxforms:noscript'))
             and (xxforms:instance('fr-error-summary-instance')/valid = 'false' or xxforms:pending-uploads() > 0)"/>
 
         <!-- Condition for disabling Publish button -->
-        <xforms:bind nodeset="publish" readonly="not(instance('fr-persistence-instance')/data-status = 'clean') or xxforms:instance('fr-error-summary-instance')/valid = 'false' or xxforms:pending-uploads() > 0"/>
+        <xforms:bind nodeset="publish" readonly="not($persistence-instance/data-status = 'clean') or xxforms:instance('fr-error-summary-instance')/valid = 'false' or xxforms:pending-uploads() > 0"/>
 
         <!-- Conditions for disabling workflow buttons -->
         <xforms:bind nodeset="workflow-review" readonly="exforms:readonly(../submit)"/>
@@ -528,7 +529,7 @@
 
     <!-- React to successful submission when saving/updating -->
     <xforms:action ev:event="xforms-submit-done" ev:target="fr-create-update-submission">
-        <xforms:setvalue ref="xxforms:instance('fr-persistence-instance')/message"
+        <xforms:setvalue ref="$persistence-instance/message"
                          model="fr-resources-model" value="$fr-fr-resources/detail/messages/save-success"/>
 
         <!-- Show success message -->
@@ -538,10 +539,10 @@
         <xforms:recalculate/>
         <xforms:refresh/>
 
-        <xforms:setvalue ref="instance('fr-persistence-instance')/data-status">clean</xforms:setvalue>
+        <xforms:setvalue ref="$persistence-instance/data-status">clean</xforms:setvalue>
 
         <!-- If the document was saved because of a "submit", handle the rest of the submission process in dialog -->
-        <xforms:action if="instance('fr-persistence-instance')/submit-or-save-or-send = 'submit'">
+        <xforms:action if="$persistence-instance/submit-or-save-or-send = 'submit'">
             <!-- Show the submission result dialog -->
             <xxforms:show dialog="fr-submission-result-dialog">
                 <xxforms:context name="fr:content" select="instance('fr-create-update-submission-response')"/>
@@ -549,7 +550,7 @@
         </xforms:action>
 
         <!-- If the document was saved because of a "send", handle the rest of the submission process -->
-        <xforms:action if="instance('fr-persistence-instance')/submit-or-save-or-send = 'send'">
+        <xforms:action if="$persistence-instance/submit-or-save-or-send = 'send'">
             <!-- TODO: move this to separate model (fr-send-model or fr-workflow-model) -->
 
             <xxforms:variable name="is-send-navigate" select="$workflow-success-uri != ''" as="xs:boolean"/>
@@ -567,7 +568,7 @@
             <xforms:message level="xxforms:log-debug">Creating PDF.</xforms:message>
             <xforms:send if="$is-create-pdf" submission="fr-pdf-service-submission"/>
 
-            <xforms:action if="instance('fr-persistence-instance')/is-error = 'false'">
+            <xforms:action if="$persistence-instance/is-error = 'false'">
                 <!-- Send to Alfresco if requested -->
                 <xforms:action if="$is-send-alfresco">
 
@@ -617,13 +618,13 @@
             </xforms:action>
 
             <!-- Send email if requested -->
-            <xforms:action if="instance('fr-persistence-instance')/is-error = 'false' and $is-send-email">
+            <xforms:action if="$persistence-instance/is-error = 'false' and $is-send-email">
                 <xforms:message level="xxforms:log-debug">Sending email...</xforms:message>
                 <xforms:send submission="fr-email-service-submission"/>
             </xforms:action>
 
             <!-- Navigate to the confirmation page if requested -->
-            <xforms:action if="instance('fr-persistence-instance')/is-error = 'false' and $is-send-navigate">
+            <xforms:action if="$persistence-instance/is-error = 'false' and $is-send-navigate">
                 <xforms:message level="xxforms:log-debug">Navigating to success page...</xforms:message>
                 <xforms:send submission="fr-workflow-send-submission"/>
             </xforms:action>
@@ -696,61 +697,61 @@
     <!-- React to failed submission -->
     <xforms:action ev:event="xforms-submit-error"
                    ev:target="fr-create-update-submission fr-create-update-attachment-submission fr-get-document-submission fr-pdf-service-submission fr-email-service-submission">
-        <xforms:dispatch name="fr-submit-error" targetid="fr-persistence-model">
+        <xforms:dispatch name="fr-persistence-error" targetid="fr-persistence-model">
             <xxforms:context name="submission-id" select="event('xxforms:targetid')"/>
             <xxforms:context name="response-body" select="event('response-body')"/>
             <xxforms:context name="error-type" select="event('error-type')"/>
         </xforms:dispatch>
     </xforms:action>
 
-    <xforms:action ev:event="fr-submit-error">
+    <xforms:action ev:event="fr-persistence-error">
         <!-- Remember there was an error -->
-        <xforms:setvalue ref="instance('fr-persistence-instance')/error" value="event('response-body')"/>
-        <xforms:setvalue ref="instance('fr-persistence-instance')/is-error">true</xforms:setvalue>
+        <xforms:setvalue ref="$persistence-instance/is-error">true</xforms:setvalue>
         <!-- Log error -->
-        <xforms:message level="xxforms:log-debug">Error with submission: <xforms:output value="event('submission-id')"/></xforms:message>
-        <xforms:message level="xxforms:log-debug"><xforms:output value="event('response-body')"/></xforms:message>
+        <xforms:message if="event('submission-id')" level="xxforms:log-debug">Error with submission: <xforms:output value="event('submission-id')"/></xforms:message>
+        <xforms:message if="event('response-body')" level="xxforms:log-debug"><xforms:output value="event('response-body')"/></xforms:message>
 
-        <!-- case validation-error => set error message and show validation error section in UI -->
+        <!-- case validation-error => update UI and open error dialog -->
         <xforms:action if="event('error-type') = 'validation-error'">
-            <xforms:setvalue ref="instance('fr-persistence-instance')/message"
-                             model="fr-resources-model" value="$fr-fr-resources/detail/messages/form-validation-error"/>
-            <xforms:toggle case="fr-message-validation-error"/>
             <!-- Mark all active alerts as visited -->
             <xforms:dispatch name="fr-visit-alerts" target="fr-persistence-model"/>
             <!-- Open all sections -->
             <xforms:dispatch name="fr-expand-all" target="fr-sections-model"/>
+            <!-- Open error dialog -->
+            <xforms:dispatch name="fr-show" targetid="fr-error-dialog">
+                <xxforms:context name="message" model="fr-resources-model" value="$fr-fr-resources/detail/messages/form-validation-error"/>
+            </xforms:dispatch>
         </xforms:action>
 
-        <!-- case xxforms-pending-uploads => display a modal message -->
+        <!-- case xxforms-pending-uploads => open error dialog -->
         <xforms:action if="event('error-type') = 'xxforms-pending-uploads'">
-            <xforms:message model="fr-resources-model" value="$fr-fr-resources/detail/messages/upload-in-progress"/>
+            <xforms:dispatch name="fr-show" targetid="fr-error-dialog">
+                <xxforms:context name="message" model="fr-resources-model" value="$fr-fr-resources/detail/messages/upload-in-progress"/>
+            </xforms:dispatch>
         </xforms:action>
 
-        <!-- case _ => set error message and show fatal error section in UI -->
+        <!-- case _ => send error submission or open error dialog -->
         <xforms:action if="not(event('error-type') = ('validation-error', 'xxforms-pending-uploads'))">
-            <xforms:setvalue ref="instance('fr-persistence-instance')/message"
-                             model="fr-resources-model" value="$fr-fr-resources/detail/messages/database-error"/>
-            <xforms:toggle case="fr-message-fatal-error"/>
-
             <!-- Call error submission if defined -->
             <xforms:send if="$workflow-error-uri != ''" submission="fr-workflow-error-submission"/>
-
+            <!-- Open error dialog -->
+            <xforms:dispatch if="$workflow-error-uri = ''" name="fr-show" targetid="fr-error-dialog">
+                <xxforms:context name="message" model="fr-resources-model" value="$fr-fr-resources/detail/messages/database-error"/>
+            </xforms:dispatch>
         </xforms:action>
+    </xforms:action>
+
+    <!-- Clear message -->
+    <xforms:action ev:observer="#document" ev:event="DOMFocusIn">
+        <xforms:toggle case="fr-message-none"/>
+        <xforms:setvalue ref="$persistence-instance/message"/>
     </xforms:action>
 
     <!-- React to instance mutation events -->
     <!-- NOTE: We check the standard fr-form-instance, but also fb-form-instance, which is where Form Builder really does its work  -->
     <xforms:action ev:observer="fr-form-instance fb-form-instance" ev:event="xforms-insert xforms-delete xxforms-value-changed">
         <!-- In 'new' and 'edit' modes only, mark status as dirty if data changes -->
-        <xforms:setvalue if="$mode = ('new', 'edit')" ref="instance('fr-persistence-instance')/data-status">dirty</xforms:setvalue>
-    </xforms:action>
-
-    <!-- Clear message upon DOMFocusIn on #fr-form-group -->
-    <xforms:action ev:observer="fr-view" ev:event="DOMFocusIn">
-        <xforms:toggle case="fr-message-none"/>
-        <xforms:setvalue ref="instance('fr-persistence-instance')/message"/>
-        <xforms:setvalue ref="instance('fr-persistence-instance')/error"/>
+        <xforms:setvalue if="$mode = ('new', 'edit')" ref="$persistence-instance/data-status">dirty</xforms:setvalue>
     </xforms:action>
 
 </xforms:model>

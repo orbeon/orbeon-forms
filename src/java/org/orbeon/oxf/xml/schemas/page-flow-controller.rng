@@ -130,6 +130,12 @@
                     </element>
                 </optional>
                 <optional>
+                    <element name="c:unauthorized-handler">
+                        <ref name="common-attributes"/>
+                        <attribute name="page"/>
+                    </element>
+                </optional>
+                <optional>
                     <element name="c:epilogue">
                         <ref name="common-attributes"/>
                         <attribute name="url">

@@ -117,6 +117,17 @@ class PageFlowControllerProcessor extends ProcessorImpl {
             }
         }
 
+        def runUnauthorizedRoute(t: Throwable, code: Int) = pageFlow.unauthorizedRoute match {
+            case Some(unauthorizedRoute) ⇒
+                // Run the error route
+                error("unauthorized", logParams)
+                externalContext.getResponse.setStatus(code)
+                unauthorizedRoute.process(pipelineContext, request, MatchResult(matches = false))
+            case None ⇒
+                // We don't have an unauthorized route so throw instead
+                throw t
+        }
+
         // Run the first matching entry if any
         pageFlow.routes.iterator map (route ⇒ route → MatchResult(route.routeElement.pattern, path)) find (_._2.matches) match {
             case Some((route: FileRoute, matchResult)) ⇒
@@ -127,10 +138,11 @@ class PageFlowControllerProcessor extends ProcessorImpl {
                 try route.process(pipelineContext, request, matchResult)
                 catch { case t ⇒
                     getRootThrowable(t) match {
-                        case e: HttpRedirectException                    ⇒ externalContext.getResponse.sendRedirect(e.path, e.jParameters.orNull, e.serverSide, e.exitPortal)
-                        case e: HttpStatusCodeException if e.code == 404 ⇒ runNotFoundRoute(Some(t))
-                        case e: ResourceNotFoundException                ⇒ runNotFoundRoute(Some(t))
-                        case e                                           ⇒ runErrorRoute(t)
+                        case e: HttpRedirectException                            ⇒ externalContext.getResponse.sendRedirect(e.path, e.jParameters.orNull, e.serverSide, e.exitPortal)
+                        case e: HttpStatusCodeException if Set(404)(e.code)      ⇒ runNotFoundRoute(Some(t))
+                        case e: HttpStatusCodeException if Set(401, 403)(e.code) ⇒ runUnauthorizedRoute(t ,e.code)
+                        case e: ResourceNotFoundException                        ⇒ runNotFoundRoute(Some(t))
+                        case e                                                   ⇒ runErrorRoute(t)
                     }
                 }
             case None ⇒
@@ -237,7 +249,7 @@ class PageFlowControllerProcessor extends ProcessorImpl {
             topLevelElements find (e ⇒ elementNames(e.getName)) flatMap (att(_, "page")) flatMap
                 { pageId ⇒ routes collectFirst { case page: PageOrServiceRoute if page.routeElement.id == Some(pageId) ⇒ page } }
 
-        PageFlow(routes, handler(Set("not-found-handler")), handler(Set("error-handler")), pathMatchers, Option(urlBase))
+        PageFlow(routes, handler(Set("not-found-handler")), handler(Set("unauthorized-handler")), handler(Set("error-handler")), pathMatchers, Option(urlBase))
     }
 
     def createPipelineAST(
@@ -396,7 +408,13 @@ object PageFlowControllerProcessor {
 
     def unauthorized() = throw new HttpStatusCodeException(403)
 
-    case class PageFlow(routes: Seq[Route], notFoundRoute: Option[PageOrServiceRoute], errorRoute: Option[PageOrServiceRoute], pathMatchers: Seq[PathMatcher], file: Option[String])
+    case class PageFlow(
+        routes: Seq[Route],
+        notFoundRoute: Option[PageOrServiceRoute],
+        unauthorizedRoute: Option[PageOrServiceRoute],
+        errorRoute: Option[PageOrServiceRoute],
+        pathMatchers: Seq[PathMatcher],
+        file: Option[String])
 
     def att(e: Element, name: String) = Option(e.attributeValue(name))
     def idAtt(e: Element) = att(e, "id")

@@ -87,7 +87,7 @@
 
             <!-- Global XForms variables -->
             <xxforms:variable name="metadata-lang" select="xxforms:instance('fr-language-instance')"/>
-            <xxforms:variable name="source-form-metadata" select="xxforms:instance('fr-source-form-instance')/xhtml:head/xforms:model/xforms:instance[@id = 'fr-form-metadata']/*"/>
+            <xxforms:variable name="source-form-metadata" select="xxforms:instance('fr-form-metadata')"/>
             <!-- Scope variable with Form Runner resources -->
             <xxforms:variable name="fr-resources" model="fr-resources-model" select="$fr-fr-resources" as="element(resource)?"/>
             <!-- Scope form resources -->

@@ -47,28 +47,8 @@
             <xforms:insert context="instance('fr-service-parameters')" origin="xxforms:element($parameter-name, $parameter-value)"/>
         </xforms:action>
 
-        <!-- Load current form configuration -->
-        <xxforms:variable name="source-form" select="if (exists(xxforms:get-request-attribute('fr-form-definition')))
-                                                        then xxforms:get-request-attribute('fr-form-definition')
-                                                        else xxforms:get-request-attribute('oxf.xforms.renderer.document')"/>
-        <xforms:action if="exists($source-form)">
-            <!-- Got it from the request -->
-            <xforms:message level="xxforms:log-debug">Got source form from request.</xforms:message>
-            <xforms:insert nodeset="instance('fr-source-form-instance')" origin="$source-form"/>
-        </xforms:action>
-        <xforms:action if="not(exists($source-form))">
-            <!-- Try submission -->
-            <xforms:message level="xxforms:log-debug">Could not get source form from request. Trying submission instead.</xforms:message>
-            <xforms:send submission="get-source-form-submission"/>
-        </xforms:action>
-
-        <!--  Send a "Not Found" error if the form definition is not found -->
-        <xforms:action if="empty(instance('fr-source-form-instance')/xhtml:head/xforms:model)" type="xpath">
-            formRunner:sendError(404)
-        </xforms:action>
-
         <!-- Compute authorized operations -->
-        <xxforms:variable name="metadata" select="instance('fr-source-form-instance')/xhtml:head/xforms:model/xforms:instance[@id = 'fr-form-metadata']/metadata treat as element()"/>
+        <xxforms:variable name="metadata" select="xxforms:instance('fr-form-metadata') treat as element()"/>
         <xforms:setvalue ref="instance('fr-authorized-operations')" value="string-join(formRunner:authorizedOperationsOnForm($metadata), ' ')"/>
         <!-- If user can't perform the required operations, deny access to this page -->
         <xxforms:variable name="mode" select="xxforms:instance('fr-parameters-instance')/mode treat as element()"/>
@@ -101,6 +81,10 @@
                 <xforms:message level="xxforms:log-debug">Loading new data from service</xforms:message>
                 <xforms:send submission="fr-get-instance-from-service"/>
             </xforms:action>
+
+            <!-- Keep initial data for clear button. We can argue if we would like instead to keep data submitted to
+                /new below. Would that break in case of switching modes (script/noscript)? Here seems to be a good start. -->
+            <xforms:insert ref="instance('fr-initial-instance')" origin="xxforms:instance('fr-form-instance')"/>
 
             <!-- Check the data submitted to the page.
 
@@ -191,13 +175,8 @@
 
     <!-- Clear operation -->
     <xforms:action ev:event="fr-clear">
-        <!-- Copy original instance -->
-        <xxforms:variable name="instance-element" as="element(xforms:instance)"
-                          select="instance('fr-source-form-instance')/xhtml:head/xforms:model[@id = 'fr-form-model']/xforms:instance[@id = 'fr-form-instance']"/>
         <!-- Case of inline template -->
-        <xforms:insert if="not($instance-element/@src)" nodeset="xxforms:instance('fr-form-instance')" origin="$instance-element/*"/>
-        <!-- Case of @src template -->
-        <xforms:insert if="$instance-element/@src" nodeset="xxforms:instance('fr-form-instance')" origin="doc($instance-element/@src)"/>
+        <xforms:insert nodeset="xxforms:instance('fr-form-instance')" origin="instance('fr-initial-instance')"/>
 
         <!-- Notify that the data is reset -->
         <xforms:dispatch targetid="fr-form-model" name="fr-data-reset"/>
@@ -417,18 +396,10 @@
             resource="/fr/service/persistence/crud/{$app}/{$form}/data/{$document}/data.xml"
             replace="instance" xxforms:instance="fr-form-instance"/>
 
-    <!-- Source form with metadata -->
-    <xforms:instance id="fr-source-form-instance" xxforms:readonly="false"><!-- Set to false so that xforms:insert works -->
+    <!-- Initial instance (to support clear) -->
+    <xforms:instance id="fr-initial-instance" xxforms:readonly="false"><!-- Set to false so that xforms:insert works -->
         <form xmlns=""/>
     </xforms:instance>
-
-    <!-- NOTE: use xxforms:cache="false" otherwise updates to the form won't work in the summary page -->
-    <!-- A solution for this might be for read-form.xpl, which is able to use conditional GET, to run always, or to
-         improve submissions to handle conditional GET as well when using caching. -->
-    <xforms:submission id="get-source-form-submission"
-            method="get" serialization="none"
-            resource="/fr/service/persistence/crud/{$app}/{$form}/form/form.xhtml"
-            replace="instance" instance="fr-source-form-instance" xxforms:readonly="true" xxforms:cache="false" xxforms:xinclude="true"/>
 
     <!-- Which operations the user can perform -->
     <xforms:instance id="fr-authorized-operations">
@@ -572,12 +543,9 @@
                 <!-- Send to Alfresco if requested -->
                 <xforms:action if="$is-send-alfresco">
 
-                    <!-- Form definition -->
-                    <xxforms:variable name="html" select="instance('fr-source-form-instance')" as="element(xhtml:html)"/>
-
                     <!-- Pass metadata with current language, or first language if current language is not found -->
-                    <xxforms:variable name="form-titles" select="$html/xhtml:head//xforms:instance[@id = 'fr-form-metadata']/*/title" as="xs:string"/>
-                    <xxforms:variable name="form-descriptions" select="$html/xhtml:head//xforms:instance[@id = 'fr-form-metadata']/*/description" as="xs:string"/>
+                    <xxforms:variable name="form-titles" select="xxforms:instance('fr-form-metadata')/title" as="xs:string"/>
+                    <xxforms:variable name="form-descriptions" select="xxforms:instance('fr-form-metadata')/description" as="xs:string"/>
                     <xxforms:variable name="form-title" select="($form-titles[@xml:lang = xxforms:instance('fr-language-instance')], $form-titles[1])[1]" as="xs:string"/>
                     <xxforms:variable name="form-description" select="($form-descriptions[@xml:lang = xxforms:instance('fr-language-instance')], $form-descriptions[1])[1]" as="xs:string"/>
 

@@ -22,7 +22,7 @@
       xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
       xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-      xmlns:form-runner="java:org.orbeon.oxf.fr.FormRunner"
+      xmlns:formRunner="java:org.orbeon.oxf.fr.FormRunner"
       xmlns="http://www.w3.org/1999/xhtml">
 
     <head>
@@ -44,38 +44,18 @@
             <xforms:var name="form-query" value="if ($app-query) then instance('fr-search-instance')/query[contains(@path, 'form-name') and @search-field = 'true'] else ()" as="element(query)?"/>
             <xforms:var name="initial-app-value" value="if ($app-query) then xxforms:instance('fr-permissions')/app[1][not(@name = '*')]/@name else ()" as="xs:string?"/>
 
-            <!-- Model initialization -->
-            <xforms:action ev:event="xforms-model-construct-done">
-                <!-- Query list of documents -->
-                <xforms:send submission="search-submission"/>
-            </xforms:action>
+            <!-- Source form -->
+            <xforms:instance id="fr-source-form-instance" xxforms:readonly="false"><!-- Set to false so that xforms:insert works -->
+                <form xmlns=""/>
+            </xforms:instance>
 
-            <!-- Model initialization after we got the source form -->
-            <xforms:action ev:event="get-source-form-submission-done">
-                <!-- Store resources from configuration instance -->
-                <xforms:var name="resources-instance" as="element(xforms:instance)"
-                            value="xxforms:instance('fr-source-form-instance')/xhtml:head/xforms:model/xforms:instance[@id = 'fr-form-resources']"/>
-                <xforms:action if="not($resources-instance/@src)">
-                    <!-- Copy inline instance -->
-                    <xforms:insert ref="instance('fr-form-resources')" origin="$resources-instance/*"/>
-                </xforms:action>
-                <xforms:action if="$resources-instance/@src">
-                    <!-- Dereference @src -->
-                    <xforms:insert ref="instance('fr-form-resources')" origin="doc($resources-instance/@src)"/>
-                </xforms:action>
-                <!-- Update to current language -->
-                <xforms:dispatch name="fr-update-language" targetid="fr-resources-model"/>
-
-                <!-- Set page size -->
-                <xforms:var name="page-size" value="instance('fr-search-instance')/page-size" as="element(page-size)"/>
-                <xforms:setvalue ref="$page-size" model="fr-persistence-model"
-                                 value="xxforms:property(string-join(('oxf.fr.summary.page-size', $app, $form), '.'))"/>
-
-                <!-- Rebuild resource variables after source form has been loaded, because resources model variables
-                     (e.g. $fr-form-resources) are used right after we are called. If you don't rebuild, control labels
-                     in structured search are not found. -->
-                <xforms:rebuild model="fr-resources-model"/>
-            </xforms:action>
+            <!-- NOTE: use xxforms:cache="false" otherwise updates to the form won't work in the summary page -->
+            <!-- A solution for this might be for read-form.xpl, which is able to use conditional GET, to run always, or to
+                 improve submissions to handle conditional GET as well when using caching. -->
+            <xforms:submission id="get-source-form-submission"
+                    method="get" serialization="none"
+                    resource="/fr/service/persistence/crud/{$app}/{$form}/form/form.xhtml"
+                    replace="instance" instance="fr-source-form-instance" xxforms:readonly="true" xxforms:cache="false" xxforms:xinclude="true"/>
 
             <!-- Standard Form Runner data instance -->
             <xforms:instance id="fr-form-instance">
@@ -210,13 +190,54 @@
                 <selection xmlns=""/>
             </xforms:instance>
 
-            <!-- Extract summary configuration information from the XHTML document -->
-            <xforms:action ev:event="xforms-submit-done" ev:observer="get-source-form-submission">
+            <!-- Model initialization -->
+            <xforms:action ev:event="xforms-model-construct-done">
 
-                <xforms:dispatch name="get-source-form-submission-done" targetid="fr-form-model"/>
+                <!-- Load source form -->
+                <xxforms:variable name="source-form" select="xxforms:get-request-attribute('fr-form-definition')"/>
+                <xforms:action if="exists($source-form)">
+                    <!-- Got it from the request -->
+                    <xforms:message level="xxforms:log-debug">Got source form from request.</xforms:message>
+                    <xforms:insert nodeset="instance('fr-source-form-instance')" origin="$source-form"/>
+                </xforms:action>
+                <xforms:action if="not(exists($source-form))">
+                    <!-- Try submission -->
+                    <xforms:message level="xxforms:log-debug">Could not get source form from request. Trying submission instead.</xforms:message>
+                    <xforms:send submission="get-source-form-submission"/>
+                </xforms:action>
+
+                <!-- Send a "Not Found" error if the form definition is not found -->
+                <xforms:action if="empty(instance('fr-source-form-instance')/xhtml:head/xforms:model)" type="xpath">
+                    formRunner:sendError(404)
+                </xforms:action>
+
+                <!-- Store resources from configuration instance -->
+                <xforms:var name="resources-instance" as="element(xforms:instance)"
+                            value="instance('fr-source-form-instance')/xhtml:head/xforms:model/xforms:instance[@id = 'fr-form-resources']"/>
+
+                <xforms:action if="not($resources-instance/@src)">
+                    <!-- Copy inline instance -->
+                    <xforms:insert ref="instance('fr-form-resources')" origin="$resources-instance/*"/>
+                </xforms:action>
+                <xforms:action if="$resources-instance/@src">
+                    <!-- Dereference @src -->
+                    <xforms:insert ref="instance('fr-form-resources')" origin="doc($resources-instance/@src)"/>
+                </xforms:action>
+                <!-- Update to current language -->
+                <xforms:dispatch name="fr-update-language" targetid="fr-resources-model"/>
+
+                <!-- Set page size -->
+                <xforms:var name="page-size" value="instance('fr-search-instance')/page-size" as="element(page-size)"/>
+                <xforms:setvalue ref="$page-size" model="fr-persistence-model"
+                                 value="xxforms:property(string-join(('oxf.fr.summary.page-size', $app, $form), '.'))"/>
+
+                <!-- Rebuild resource variables after source form has been loaded, because resources model variables
+                     (e.g. $fr-form-resources) are used right after we are called. If you don't rebuild, control labels
+                     in structured search are not found. -->
+                <xforms:rebuild model="fr-resources-model"/>
 
                 <xforms:var name="summary-elements" as="element()*"
-                            value="xxforms:instance('fr-source-form-instance')/xhtml:body//*[(@ref or @bind) and @class and tokenize(@class, '\s+') = ('fr-summary', 'fr-search')]"/>
+                            value="instance('fr-source-form-instance')/xhtml:body//*[(@ref or @bind) and @class and tokenize(@class, '\s+') = ('fr-summary', 'fr-search')]"/>
 
                 <!-- Extract fields which must appear in the summary -->
                 <xforms:insert context="instance('fr-configuration-instance')" ref="*" origin="$summary-elements"/>
@@ -256,7 +277,7 @@
                     </xforms:action>
                     <!-- Then, try binds -->
                     <xforms:action if="exists($bind-ancestor)">
-                        <xforms:var name="bind" value="xxforms:instance('fr-source-form-instance')/xhtml:head/xforms:model//xforms:bind[@id = $bind-ancestor]"/>
+                        <xforms:var name="bind" value="instance('fr-source-form-instance')/xhtml:head/xforms:model//xforms:bind[@id = $bind-ancestor]"/>
 
                         <!-- Set control name if not already done with @ref -->
                         <xforms:setvalue if="empty($path-ancestors)" ref="$query/@name" value="substring-before($bind-ancestor, '-bind')"/>
@@ -284,6 +305,10 @@
                     <xforms:setvalue ref="$query/@label"
                                      value="if ($label/@ref or $label/@bind) then $form-resources/*[local-name() = $query/@name]/label else $label"/>
                 </xforms:action>
+
+                <!-- Query initial list of documents -->
+                <xforms:send submission="search-submission"/>
+
             </xforms:action>
 
             <!-- Summary data -->

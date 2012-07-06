@@ -61,7 +61,9 @@
         </xforms:action>
 
         <!--  Send a "Not Found" error if the form definition is not found -->
-        <xforms:action if="empty(instance('fr-source-form-instance')/xhtml:head/xforms:model)" type="xpath">formRunner:sendError(404)</xforms:action>
+        <xforms:action if="empty(instance('fr-source-form-instance')/xhtml:head/xforms:model)" type="xpath">
+            formRunner:sendError(404)
+        </xforms:action>
 
         <!-- Compute authorized operations -->
         <xxforms:variable name="metadata" select="instance('fr-source-form-instance')/xhtml:head/xforms:model/xforms:instance[@id = 'fr-form-metadata']/metadata treat as element()"/>
@@ -70,14 +72,18 @@
         <xxforms:variable name="mode" select="xxforms:instance('fr-parameters-instance')/mode treat as element()"/>
         <xxforms:variable name="operations" select="tokenize(instance('fr-authorized-operations'), '\s')"/>
         <xxforms:variable name="unauthorized-access" select="
-            ($mode = 'summary' and not($operations = ('*', 'read', 'update', 'delete'))) or
+            ($mode = 'summary'         and not($operations = ('*', 'read', 'update', 'delete'))) or
             ($mode = ('new', 'import') and not($operations = ('*', 'create'))) or
-            ($mode = 'edit' and not($operations = ('*', 'update'))) or
-            ($mode = ('view', 'pdf') and not($operations = ('*', 'read')))"/>
-        <!-- Send an "Unauthorized" error if the user is unauthorized -->
-        <xforms:action if="$unauthorized-access" type="xpath">formRunner:sendError(401)</xforms:action>
+            ($mode = 'edit'            and not($operations = ('*', 'update'))) or
+            ($mode = ('view', 'pdf')   and not($operations = ('*', 'read')))"/>
 
-        <xforms:action if="$mode != 'summary'">
+        <!-- Send an "Unauthorized" error if the user is unauthorized -->
+        <xforms:action if="$unauthorized-access" type="xpath">
+            formRunner:sendError(401)
+        </xforms:action>
+
+        <!-- Handle loading of initial data for new/edit/view/pdf/email modes only -->
+        <xforms:action if="$mode = ('new', 'edit', 'view', 'pdf', 'email')">
 
             <xxforms:variable name="is-new-id" select="normalize-space($document) = ''"/>
             <xxforms:variable name="is-xml-submit" select="exists(xxforms:get-request-attribute('fr-form-data'))"/>
@@ -90,7 +96,7 @@
             <!-- Case of 'new' mode where we load the initial data via a service -->
             <xxforms:variable name="new-from-service" select="$mode = 'new' and xxforms:property(string-join(('oxf.fr.detail.new.service.enable', $app, $form), '.'))"/>
             <xforms:action if="$new-from-service">
-                <xforms:message level="xxforms:log-debug">Loading new document from service</xforms:message>
+                <xforms:message level="xxforms:log-debug">Loading new data from service</xforms:message>
                 <xforms:send submission="fr-get-instance-from-service"/>
             </xforms:action>
 
@@ -98,13 +104,13 @@
 
                  - 'new' mode:  check if we accept submitted data based on a property
                  - 'edit' mode: check based on a property, but let plain XML POSTs pass as that's used internally to switch modes
-                 - other modes: accept XML POSTs
+                 - 'view' mode: accept XML POSTs
 
                  In the future, we should enforce other cases by making sure that the data comes from Form Runner itself. -->
             <xxforms:variable name="pass-submit-check"
-                              select="$mode = 'new' and xxforms:property(string-join(('oxf.fr.detail.new.accept-post', $app, $form), '.'))
-                                   or $mode = 'edit' and ($is-xml-submit or xxforms:property(string-join(('oxf.fr.detail.edit.accept-post', $app, $form), '.')))
-                                   or not($mode = ('new', 'edit')) and $is-xml-submit"/>
+                              select="$mode = 'new'                    and xxforms:property(string-join(('oxf.fr.detail.new.accept-post', $app, $form), '.'))
+                                   or $mode = 'edit'                   and ($is-xml-submit or xxforms:property(string-join(('oxf.fr.detail.edit.accept-post', $app, $form), '.')))
+                                   or $mode = ('view', 'pdf', 'email') and $is-xml-submit"/>
 
             <!-- Case of data submitted to the page -->
             <xforms:action if="$is-submit and $pass-submit-check">
@@ -113,7 +119,7 @@
                 <xforms:action if="not($is-xml-submit)">
                     <xxforms:variable name="form-data" select="xxforms:get-request-parameter('fr-form-data')"/>
                     <xforms:action if="$form-data">
-                        <xforms:message level="xxforms:log-debug">Loading document submitted to the page as parameter</xforms:message>
+                        <xforms:message level="xxforms:log-debug">Loading data submitted to the page as parameter</xforms:message>
                         <xxforms:variable name="xml-data" select="saxon:parse(saxon:base64Binary-to-string(xs:base64Binary($form-data), 'UTF-8'))"/>
                         <xforms:insert nodeset="xxforms:instance('fr-form-instance')" origin="$xml-data"/>
                     </xforms:action>
@@ -121,7 +127,7 @@
 
                 <!-- Do we have data posted to this form as XML? -->
                 <xforms:action if="$is-xml-submit">
-                    <xforms:message level="xxforms:log-debug">Loading document submitted to the page as XML</xforms:message>
+                    <xforms:message level="xxforms:log-debug">Loading data submitted to the page as XML</xforms:message>
                     <xxforms:variable name="form-data" select="xxforms:get-request-attribute('fr-form-data')" as="document-node()?"/>
                     <xforms:insert nodeset="xxforms:instance('fr-form-instance')" origin="$form-data"/>
                 </xforms:action>
@@ -143,12 +149,23 @@
             <!-- Case of modes other than new where the data to be edited or viewed is loaded from the persistence layer -->
             <xforms:action if="$mode != 'new' and not($is-new-id) and not($is-submit)">
                 <!-- Load document with the provided id from persistence layer -->
-                <xforms:message level="xxforms:log-debug">Loading document by id from persistence layer: <xforms:output value="$document"/></xforms:message>
+                <xforms:message level="xxforms:log-debug">Loading data by id from persistence layer: <xforms:output value="$document"/></xforms:message>
                 <xforms:send submission="fr-get-document-submission"/>
             </xforms:action>
 
-            <!-- Otherwise, don't stay here if the constraints are not satisfied -->
-            <xforms:load if="($is-submit and not($pass-submit-check)) or (not($mode = ('new', 'test')) and $is-new-id and not($is-submit))" resource="/fr/unauthorized"/>
+            <xforms:message level="xxforms:log-debug">
+                $is-submit: <xforms:output value="$is-submit"/>
+                $pass-submit-check: <xforms:output value="$pass-submit-check"/>
+                $mode: <xforms:output value="$mode"/>
+                $is-new-id: <xforms:output value="$is-new-id"/>
+            </xforms:message>
+
+            <!-- Don't allow if the constraints are not satisfied:
+                 - either we got a submit and passed
+                 - or we didn't get a submit, in which case we check that we have the proper id depending on the mode -->
+            <xforms:action if="($is-submit and not($pass-submit-check)) or (not($is-submit) and not($is-new-id and $mode = 'new' or $mode != 'new'))" type="xpath">
+                formRunner:sendError(401)
+            </xforms:action>
         </xforms:action>
 
         <!-- Notify that the data is ready -->

@@ -54,7 +54,7 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
         val pageFlow = readCacheInputAsObject(pipelineContext, getInputByName(ControllerInput), new CacheableInputReader[PageFlow] {
             def read(context: PipelineContext, input: ProcessorInput) = {
                 val configRoot = readInputAsDOM4J(pipelineContext, ControllerInput).getRootElement
-                val controllerValidity  = ProcessorImpl.getInputValidity(pipelineContext, getInputByName(ControllerInput))
+                val controllerValidity = ProcessorImpl.getInputValidity(pipelineContext, getInputByName(ControllerInput))
                 compile(configRoot, controllerValidity)
             }
         })
@@ -155,7 +155,7 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
     def compile(configRoot: Element, controllerValidity: AnyRef)(implicit logger: IndentedLogger) = {
         // Controller format:
         //
-        // - config: files*, page*, epilogue?, not-found-handler?, error-handler?
+        // - config: files*, page*, epilogue?, not-found-handler?, unauthorized-handler?, error-handler?
         // - files:  @id?, (@path|@path-info), @matcher?, (@mediatype|@mime-type)?, @versioned?
         // - page:   @id?, (@path|@path-info), @matcher?, @default-submission?, @model?, @view?
 

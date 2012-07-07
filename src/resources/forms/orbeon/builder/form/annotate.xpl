@@ -139,20 +139,17 @@
                         <xsl:apply-templates select="@* | node()"/>
 
                         <!-- Upon model creation, recalculation and revalidation, notify Form Builder -->
-                        <xforms:action ev:event="xforms-model-construct" ev:target="#observer" class="fb-annotation">
-                            <xforms:dispatch name="fb-construct" targetid="/fr-form-model"/>
-                        </xforms:action>
-                        <xforms:action ev:event="xforms-recalculate" ev:target="#observer" class="fb-annotation">
-                            <xforms:dispatch name="fb-recalculate" targetid="/fr-form-model"/>
-                        </xforms:action>
-                        <xforms:action ev:event="xforms-revalidate" ev:target="#observer" class="fb-annotation">
-                            <xforms:dispatch name="fb-revalidate" targetid="/fr-form-model"/>
-                        </xforms:action>
-                        <!-- Upon MIP XPath error, notify Form Builder and cancel the default error behavior (which
-                             otherwise can open an error dialog at inopportune times.) -->
-                        <xforms:action ev:event="xxforms-xpath-error" ev:target="#observer" class="fb-annotation" ev:defaultAction="cancel">
-                            <xforms:dispatch name="fb-xpath-error" targetid="/fr-form-model"/>
-                        </xforms:action>
+                        <xsl:for-each select="('xforms-model-construct', 'xforms-recalculate', 'xforms-revalidate', 'xxforms-xpath-error')">
+                            <xforms:action ev:event="{.}" ev:target="#observer" class="fb-annotation">
+                                <!-- Upon MIP XPath error cancel the default error behavior (which otherwise can open an
+                                     error dialog at inopportune times.) -->
+                                <xsl:if test=". = 'xxforms-xpath-error'">
+                                    <xsl:attribute name="ev:defaultAction">cancel</xsl:attribute>
+                                </xsl:if>
+                                <!-- Dispatch custom event to FB model -->
+                                <xforms:dispatch name="fb-{.}" targetid="/fr-form-model"/>
+                            </xforms:action>
+                        </xsl:for-each>
 
                     </xsl:copy>
                 </xsl:template>

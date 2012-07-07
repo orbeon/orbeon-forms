@@ -366,23 +366,23 @@
     <!-- These actions track MIP XPath errors in the edited form's model. We keep track of XPath errors occurring on
          revalidate and recalculate independently, which should be reliable given that the edit form doesn't enable
          XPath dependencies. -->
-    <xforms:action ev:event="fb-construct" context="$variables">
+    <xforms:action ev:event="fb-xforms-model-construct" context="$variables">
         <xforms:setvalue ref="rr">calculate</xforms:setvalue>
         <xforms:setvalue ref="calculate-errors">0</xforms:setvalue>
         <xforms:setvalue ref="validate-errors">0</xforms:setvalue>
     </xforms:action>
 
-    <xforms:action ev:event="fb-recalculate" context="$variables">
+    <xforms:action ev:event="fb-xforms-recalculate" context="$variables">
         <xforms:setvalue ref="rr">calculate</xforms:setvalue>
         <xforms:setvalue ref="calculate-errors">0</xforms:setvalue>
     </xforms:action>
 
-    <xforms:action ev:event="fb-revalidate" context="$variables">
+    <xforms:action ev:event="fb-xforms-revalidate" context="$variables">
         <xforms:setvalue ref="rr">validate</xforms:setvalue>
         <xforms:setvalue ref="validate-errors">0</xforms:setvalue>
     </xforms:action>
 
-    <xforms:action ev:event="fb-xpath-error" context="$variables">
+    <xforms:action ev:event="fb-xxforms-xpath-error" context="$variables">
         <xforms:setvalue ref="if (rr = 'calculate') then calculate-errors else validate-errors" value=". + 1"/>
     </xforms:action>
 

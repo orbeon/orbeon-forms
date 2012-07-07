@@ -517,8 +517,10 @@ public class URLGenerator extends ProcessorImpl {
                                     configURIReferences.uriReferences = null;
                                 }
 
-                                // Cache the resource if requested
-                                if (isUseLocalCache) {
+                                // Cache the resource if requested but only if there is not a failure status code. It
+                                // seems reasonable to follow the semantic of the web and to never cache unsuccessful
+                                // responses.
+                                if (isUseLocalCache && ! handler.isFailureStatusCode()) {
                                     // Make sure SAXStore loses its reference on its output so that we don't clutter the cache
                                     ((SAXStore) output).setXMLReceiver(null);
                                     // Add to cache
@@ -627,7 +629,7 @@ public class URLGenerator extends ProcessorImpl {
                     try {
                         final Long validity;
                         if (handler == null) {
-                            // Dependency
+                            // Include dependency
 
                             // Create handler right here
                             handler = OXFHandler.PROTOCOL.equals(url.getProtocol())
@@ -720,6 +722,7 @@ public class URLGenerator extends ProcessorImpl {
         String getResourceMediaType() throws IOException;
         String getConnectionEncoding() throws IOException;
         int getConnectionStatusCode() throws IOException;
+        boolean isFailureStatusCode() throws IOException;
         void destroy() throws IOException;
         void readHTML(XMLReceiver xmlReceiver) throws IOException;
         void readText(ContentHandler output, String contentType, Long lastModified) throws IOException;
@@ -751,6 +754,10 @@ public class URLGenerator extends ProcessorImpl {
 
         public int getConnectionStatusCode() throws IOException {
             return -1;
+        }
+
+        public boolean isFailureStatusCode() throws IOException {
+            return false;
         }
 
         public Long getValidity() throws IOException {
@@ -864,12 +871,12 @@ public class URLGenerator extends ProcessorImpl {
 
         public Long getValidity() throws IOException {
             openConnection();
-            return connectionResult.getLastModified();
+            return isFailureStatusCode() ? null : connectionResult.getLastModified();
         }
 
         public Long getConditional(Long lastModified) throws IOException {
             openConnection(lastModified);
-            return connectionResult.getLastModified();
+            return getValidity();
         }
 
         public void destroy() throws IOException {
@@ -973,10 +980,15 @@ public class URLGenerator extends ProcessorImpl {
             }
         }
 
-        private void checkStatusCode() throws IOException {
+        public boolean isFailureStatusCode() throws IOException {
+            // NOTE: We accept -1 internally to indicate we don't have an actual status code
             final int statusCode = getConnectionStatusCode();
-            if (statusCode > 0 && ! NetUtils.isSuccessCode(statusCode))
-                throw new ValidationException("Got non-success status code: " + statusCode, new LocationData(config.getURL().toExternalForm(), -1, -1));
+            return statusCode > 0 && ! NetUtils.isSuccessCode(statusCode);
+        }
+
+        private void checkStatusCode() throws IOException {
+            if (isFailureStatusCode())
+                throw new ValidationException("Got failure status code: " + getConnectionStatusCode(), new LocationData(config.getURL().toExternalForm(), -1, -1));
         }
 
         public static void readHTML(InputStream is, TidyConfig tidyConfig, String encoding, XMLReceiver output) {
@@ -1020,6 +1032,10 @@ public class URLGenerator extends ProcessorImpl {
 
         public int getConnectionStatusCode() throws IOException {
             return -1;
+        }
+
+        public boolean isFailureStatusCode() throws IOException {
+            return false;
         }
 
         public Long getValidity() throws IOException {

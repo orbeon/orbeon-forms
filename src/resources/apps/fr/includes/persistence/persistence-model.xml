@@ -354,7 +354,7 @@
                     </xf:send>
 
                     <!-- If we were in new mode, now we must be in edit mode -->
-                    <xf:setvalue ref="$parameters/mode" value="'edit'"/>
+                    <xf:setvalue if="$persistence-instance/is-error = 'false'" ref="$parameters/mode" value="'edit'"/>
                 </xf:action>
 
                 <!-- Notify that the data is saved -->

@@ -134,7 +134,7 @@ public class LocalPortletSubmission extends BaseSubmission {
                 ConnectionResult connectionResult = null;
                 try {
                     connectionResult = openLocalConnection(newExternalContext, response,
-                        detailsLogger, p.isDeferredSubmissionSecondPassReplaceAll ? null : submission,
+                        detailsLogger, containingDocument,
                         p.actualHttpMethod, resolvedURI.toString(), sp.actualRequestMediatype, sp.messageBody,
                         sp.queryString, p.isReplaceAll, headersToForward, customHeaderNameValues, new SubmissionProcess() {
                             public void process(final ExternalContext.Request request, final ExternalContext.Response response) {

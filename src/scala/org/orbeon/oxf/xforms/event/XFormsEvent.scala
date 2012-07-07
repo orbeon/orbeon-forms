@@ -35,6 +35,7 @@ abstract class XFormsEvent(
 
     self ⇒
 
+    require(containingDocument ne null)
     require(targetObject ne null)
 
     private var _currentPhase: Phase = _

@@ -128,12 +128,12 @@ public abstract class BaseSubmission implements Submission {
     }
 
     /**
-     * Perform a local local submission.
+     * Perform a local (request dispatcher or portlet) submission.
      */
     protected ConnectionResult openLocalConnection(ExternalContext externalContext,
                                                    ExternalContext.Response response,
                                                    final IndentedLogger indentedLogger,
-                                                   XFormsModelSubmission xformsModelSubmission,
+                                                   XFormsContainingDocument containingDocument, // used in case we need to dispatch XFormsSubmitErrorEvent
                                                    String httpMethod, final String resource, String mediatype,
                                                    byte[] messageBody, String queryString,
                                                    final boolean isReplaceAll, String[] headerNames,
@@ -145,7 +145,6 @@ public abstract class BaseSubmission implements Submission {
         if (!resource.startsWith("/"))
             throw new OXFException("Action does not start with a '/': " + resource);
 
-        final XFormsContainingDocument containingDocument = (xformsModelSubmission != null) ? xformsModelSubmission.getContainingDocument() : null;
         try {
 
             // Case of empty body

@@ -155,14 +155,14 @@ public class RequestDispatcherSubmission extends BaseSubmission {
         final Callable<SubmissionResult> callable = new Callable<SubmissionResult>() {
             public SubmissionResult call() throws Exception {
 
-                // TODO: This refers to PropertyContext, XFormsContainingDocument, and Submission. FIXME!
+                // TODO: This refers to PropertyContext, XFormsContainingDocument, and Submission. Ok because async disabled for now.
 
                 // Open the connection
                 final boolean[] status = { false , false};
                 ConnectionResult connectionResult = null;
                 try {
                     connectionResult = openRequestDispatcherConnection(NetUtils.getExternalContext(),
-                        containingDocument, detailsLogger, p.isDeferredSubmissionSecondPassReplaceAll ? null : submission,
+                        containingDocument, detailsLogger,
                         p.actualHttpMethod, resolvedURI.toString(), submission.isURLNorewrite(), sp.actualRequestMediatype, sp.messageBody,
                         sp.queryString, p.isReplaceAll, headersToForward, customHeaderNameValues);
 
@@ -202,7 +202,6 @@ public class RequestDispatcherSubmission extends BaseSubmission {
     public ConnectionResult openRequestDispatcherConnection(ExternalContext externalContext,
                                                             XFormsContainingDocument containingDocument,
                                                             IndentedLogger indentedLogger,
-                                                            XFormsModelSubmission xformsModelSubmission,
                                                             String httpMethod, final String resource, boolean isNorewrite, String mediatype,
                                                             byte[] messageBody, String queryString,
                                                             final boolean isReplaceAll, String[] headerNames,
@@ -235,7 +234,7 @@ public class RequestDispatcherSubmission extends BaseSubmission {
 
         final ExternalContext.Response response = containingDocument.getResponse() != null ? containingDocument.getResponse() : externalContext.getResponse();
         return openLocalConnection(externalContext, response, indentedLogger,
-           xformsModelSubmission, httpMethod, effectiveResource, mediatype,
+           containingDocument, httpMethod, effectiveResource, mediatype,
            messageBody, queryString, isReplaceAll, headerNames, customHeaderNameValues, new SubmissionProcess() {
                public void process(ExternalContext.Request request, ExternalContext.Response response) {
                   try {

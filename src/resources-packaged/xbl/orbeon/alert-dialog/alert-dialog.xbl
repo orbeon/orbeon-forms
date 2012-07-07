@@ -143,7 +143,7 @@
                         </xforms:label>
                         <xsl:copy-of select="$content except $fr-label"/>
                         <!-- If a custom target is provided, dispatch to it -->
-                        <!-- NOTE: For now target must be an effective id -->
+                        <!-- NOTE: For now target must be an absolute or effective id -->
                         <xforms:action ev:event="DOMActivate">
                             <xforms:dispatch if="normalize-space($local/{$handler})" name="fr-{$handler}" targetid="{{$local/{$handler}}}" xxbl:scope="inner"/>
                         </xforms:action>

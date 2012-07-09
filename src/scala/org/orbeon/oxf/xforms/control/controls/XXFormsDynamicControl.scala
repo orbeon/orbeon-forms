@@ -24,7 +24,6 @@ import control.{XFormsComponentControl, XFormsSingleNodeContainerControl, XForms
 import event.XFormsEvents._
 import org.orbeon.saxon.dom4j.DocumentWrapper
 import org.orbeon.oxf.xml._
-import java.util.{Map ⇒ JMap}
 import org.orbeon.oxf.util.XPathCache
 import java.lang.IllegalArgumentException
 import org.dom4j._
@@ -262,7 +261,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
                     val staticComponent = _nested.get.partAnalysis.updateShadowTree(prefixedId, element)
 
                     // Create the new models and new concrete subtree rooted at xbl:template
-                    componentControl.createNestedContainer()
+                    componentControl.recreateNestedContainer()
 
                     val templateTree = staticComponent.children find (_.element.getQName == XBL_TEMPLATE_QNAME)
                     templateTree foreach

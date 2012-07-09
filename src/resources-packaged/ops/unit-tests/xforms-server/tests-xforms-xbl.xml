@@ -4391,6 +4391,100 @@
         </output>
     </test>
 
+     <test description="#360: xxf:dynamic NPE with update of XBL with models" name="oxf:pipeline">
+        <!-- See: https://github.com/orbeon/orbeon-forms/issues/360 -->
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="instance">
+                            <xh:html>
+                                <xh:head>
+                                    <xf:model id="model"/>
+                                    <xbl:xbl>
+                                        <xbl:binding id="fr-bar" element="fr|bar">
+                                            <xbl:implementation>
+                                                <xforms:model id="xbl-model">
+                                                    <xforms:instance id="xbl-instance"><value>42</value></xforms:instance>
+                                                </xforms:model>
+                                            </xbl:implementation>
+                                            <xbl:template>
+                                                <xbl:content/>
+                                                <xforms:output id="output1" value="instance()"/>
+                                            </xbl:template>
+                                        </xbl:binding>
+                                    </xbl:xbl>
+                                </xh:head>
+                                <xh:body>
+                                    <xf:group id="my-group">
+                                        <fr:bar id="my-bar" xxf:update="full"/>
+                                    </xf:group>
+                                </xh:body>
+                            </xh:html>
+                        </xf:instance>
+
+                        <xf:action ev:event="xforms-ready">
+                            <!-- Insert new control into XBL content -->
+                            <xf:insert context="//fr:bar" origin="xxf:element('xf:output', (xxf:attribute('id', 'output2'), xxf:attribute('value', '''Hello!''')))"/>
+                        </xf:action>
+
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:group id="my-group">
+                        <xxf:dynamic ref="instance()" id="my-dynamic"/>
+                    </xf:group>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <xh:html>
+                                    <xh:head>
+                                        <xf:model id="model" xxforms:state-handling="client"/>
+                                        <xbl:xbl>
+                                            <xbl:binding id="fr-bar" element="fr|bar">
+                                                <xbl:implementation>
+                                                    <xforms:model id="xbl-model" xxforms:state-handling="client">
+                                                        <xforms:instance id="xbl-instance">
+                                                            <value>42</value>
+                                                        </xforms:instance>
+                                                    </xforms:model>
+                                                </xbl:implementation>
+                                                <xbl:template>
+                                                    <xbl:content/>
+                                                    <xforms:output id="output1" value="instance()"/>
+                                                </xbl:template>
+                                            </xbl:binding>
+                                        </xbl:xbl>
+                                    </xh:head>
+                                    <xh:body>
+                                        <xf:group id="my-group">
+                                            <fr:bar id="my-bar" xxf:update="full">
+                                                <xf:output id="output2" value="'Hello!'"/>
+                                            </fr:bar>
+                                        </xf:group>
+                                    </xh:body>
+                                </xh:html>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="my-dynamic$my-bar" class="xforms-update-full"/>
+                        <xxf:inner-html id="my-dynamic$my-bar">&lt;span id="my-dynamic$my-bar$output2" class="xforms-control xforms-output"&gt;&lt;span id="my-dynamic$my-bar$output2$$c" class="xforms-output-output"&gt;Hello!&lt;/span&gt;&lt;/span&gt; &lt;span id="my-dynamic$my-bar$output1" class="xforms-control xforms-output"&gt;&lt;span id="my-dynamic$my-bar$output1$$c" class="xforms-output-output"&gt;42&lt;/span&gt;&lt;/span&gt;</xxf:inner-html>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
     <!--
 
     TODO: more XBL ids tests:

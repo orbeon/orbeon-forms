@@ -54,10 +54,16 @@ class XFormsComponentControl(container: XBLContainer, parent: XFormsControl, ele
         _nestedContainer = Some(newContainer)
     }
 
+    // Destroy container and models if any
     def destroyNestedContainer(): Unit = {
-        // Destroy container and models if any
         nestedContainer.destroy()
         _nestedContainer = None
+    }
+
+    def recreateNestedContainer(): Unit = {
+        createNestedContainer()
+        if (isRelevant)
+            initializeModels()
     }
 
     // Only handle binding if we support modeBinding
@@ -83,20 +89,17 @@ class XFormsComponentControl(container: XBLContainer, parent: XFormsControl, ele
 
     override def onCreate() {
         super.onCreate()
-
-        // Control is newly created
-
-        if (containingDocument.isRestoringDynamicState) {
-            // Restore models
+        if (containingDocument.isRestoringDynamicState)
             nestedContainer.restoreModelsState()
-        } else {
-            // Start models initialization
-            nestedContainer.initializeModels(Array[String](
-                XFormsEvents.XFORMS_MODEL_CONSTRUCT,
-                XFormsEvents.XFORMS_MODEL_CONSTRUCT_DONE
-            ))
-        }
+        else
+            initializeModels()
     }
+
+    private def initializeModels(): Unit =
+        nestedContainer.initializeModels(Array[String](
+            XFormsEvents.XFORMS_MODEL_CONSTRUCT,
+            XFormsEvents.XFORMS_MODEL_CONSTRUCT_DONE
+        ))
 
     override def onBindingUpdate(oldBinding: BindingContext, newBinding: BindingContext) {
         super.onBindingUpdate(oldBinding, newBinding)

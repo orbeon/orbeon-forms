@@ -4263,7 +4263,7 @@
                         </xf:instance>
 
                         <xf:action ev:event="xforms-ready">
-                            <!-- Insert new control -->
+                            <!-- Insert new control into XBL content -->
                             <xf:insert ref="//xf:input" origin="xxf:element('xf:input', (xxf:attribute('id', 'input2'), xxf:attribute('bind', 'bind2')))"/>
                         </xf:action>
 
@@ -4389,7 +4389,7 @@
         </output>
     </test>
 
-     <test description="#360: xxf:dynamic NPE with update of XBL with models" name="oxf:pipeline">
+    <test description="#360: xxf:dynamic NPE with update of XBL with models" name="oxf:pipeline">
         <!-- See: https://github.com/orbeon/orbeon-forms/issues/360 -->
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">

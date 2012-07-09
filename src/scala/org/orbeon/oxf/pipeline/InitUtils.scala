@@ -39,6 +39,7 @@ import org.orbeon.oxf.util.PipelineUtils
 import org.orbeon.oxf.webapp.{WebAppContext, HttpStatusCodeException, WebAppExternalContext}
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.oxf.util.ScalaUtils.nonEmptyOrNone
 
 object InitUtils {
 
@@ -64,17 +65,12 @@ object InitUtils {
         // Record start time for this request
         val tsBegin = if (logger.isInfoEnabled) System.currentTimeMillis else 0L
 
-        val request = externalContext.getRequest
-        val requestPath = if ((request != null)) request.getRequestPath else null
+        if (logger.isInfoEnabled)
+            nonEmptyOrNone(externalContext.getStartLoggerString) foreach logger.info
 
-        // Set ExternalContext
-        if (externalContext != null) {
-            if (logger.isInfoEnabled) {
-                val startLoggerString: String = externalContext.getStartLoggerString
-                if (startLoggerString != null && startLoggerString.length > 0) logger.info(startLoggerString)
-            }
-            pipelineContext.setAttribute(PipelineContext.EXTERNAL_CONTEXT, externalContext)
-        }
+        // Set ExternalContext into PipelineContext
+        pipelineContext.setAttribute(PipelineContext.EXTERNAL_CONTEXT, externalContext)
+
         var success = false
         try {
             // Set cache size
@@ -88,8 +84,6 @@ object InitUtils {
         } catch {
             case t: Throwable ⇒
                 val locationData = ValidationException.getRootLocationData(t)
-
-                // Special exception used to set an error status code
 
                 Exceptions.getRootThrowable(t) match {
                     case e: HttpStatusCodeException ⇒
@@ -108,7 +102,7 @@ object InitUtils {
         } finally {
             if (logger.isInfoEnabled) {
                 val timing = System.currentTimeMillis - tsBegin
-                val sb = new StringBuilder(Option(requestPath) getOrElse "Done running processor")
+                val sb = new StringBuilder(Option(externalContext.getRequest.getRequestPath) getOrElse "Done running processor")
                 sb.append(" - Timing: ")
                 sb.append(timing)
                 logger.info(sb.toString)

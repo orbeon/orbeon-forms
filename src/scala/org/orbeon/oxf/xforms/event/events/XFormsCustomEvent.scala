@@ -11,17 +11,19 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.xforms.event.events;
+package org.orbeon.oxf.xforms.event.events
 
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.event.XFormsEvent;
-import org.orbeon.oxf.xforms.event.XFormsEventTarget;
+import org.orbeon.oxf.xforms.XFormsContainingDocument
+import org.orbeon.oxf.xforms.event.XFormsEvent
+import org.orbeon.oxf.xforms.event.XFormsEventTarget
+import org.orbeon.saxon.om.EmptyIterator
 
 /**
- * Custom (i.e. non-XForms) event.
+ * Custom event.
  */
-public class XFormsCustomEvent extends XFormsEvent {
-    public XFormsCustomEvent(XFormsContainingDocument containingDocument, String eventName, XFormsEventTarget targetObject, boolean bubbles, boolean cancelable) {
-        super(containingDocument, eventName, targetObject, bubbles, cancelable);
-    }
+class XFormsCustomEvent(containingDocument: XFormsContainingDocument, eventName: String, targetObject: XFormsEventTarget, bubbles: Boolean, cancelable: Boolean)
+        extends XFormsEvent(containingDocument, eventName, targetObject, bubbles, cancelable) {
+
+    // Don't warn for unsupported attributes on custom events
+    override def default() = EmptyIterator.getInstance
 }

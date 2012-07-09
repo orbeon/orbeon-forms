@@ -56,28 +56,28 @@ abstract class XFormsEvent(
     def setCustomAsString(name: String, value: String): Unit =
         setCustom(name, new SequenceExtent(Array[Item](StringValue.makeStringValue(value))))
 
-    // These two methods can be overridden by subclasses
+    // These methods can be overridden by subclasses
     def isDeprecated(name: String) = Deprecated.get(name)
     def getStandardAttribute(name: String): Option[this.type ⇒ SequenceIterator] = StandardAttributes.get(name)
+
+    def default(): SequenceIterator = {
+        // "If the event context information does not contain the property indicated by the string argument, then an
+        // empty node-set is returned."
+        indentedLogger.logWarning("", "Unsupported event context information for event('" + name + "').")
+        EmptyIterator.getInstance
+    }
 
     // This method is overridden by legacy event classes (remove when those have been rewritten)
     def getAttribute(name: String): SequenceIterator = {
 
         // Deprecation warning if needed
-        isDeprecated(name) foreach { newName ⇒
+        def checkDeprecated() = isDeprecated(name) foreach { newName ⇒
             indentedLogger.logWarning("", "event('" + name + "') is deprecated. Use event('" + newName + "') instead.")
-        }
-
-        // "If the event context information does not contain the property indicated by the string argument, then an
-        // empty node-set is returned."
-        def default = {
-            indentedLogger.logWarning("", "Unsupported event context information for event('" + name + "').")
-            EmptyIterator.getInstance
         }
 
         // Try custom attributes first, then standard attributes
         custom.get(name) map (_.iterate()) orElse
-            (getStandardAttribute(name) map (_(self))) getOrElse
+            { checkDeprecated(); getStandardAttribute(name) map (_(self)) } getOrElse
                 default
     }
 
@@ -87,14 +87,8 @@ abstract class XFormsEvent(
     def indentedLogger = containingDocument.getIndentedLogger(XFormsEvents.LOGGING_CATEGORY)
     def locationData: LocationData = null
 
-    /**
-     * Whether this event matches filters placed on the given event handler.
-     *
-     * This is used e.g. for checking modifiers and text on keypress.
-     *
-     * @param handler   event handler to check
-     * @return          true iif the event matches the filter
-     */
+    // Whether this event matches filters placed on the given event handler.
+    // This is used for checking modifiers and text on keypress events.
     def matches(handler: EventHandler) = true
 }
 

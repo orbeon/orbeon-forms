@@ -46,6 +46,18 @@ object InitUtils {
     val PrologueProperty = "oxf.prologue"
     val DefaultPrologue = "oxf:/processors.xml"
 
+    // Run with a pipeline context and destroy the pipeline when done
+    def withPipelineContext[T](body: PipelineContext ⇒ T) = {
+        var success = false
+        val pipelineContext = new PipelineContext
+        try {
+            val result = body(pipelineContext)
+            success = true
+            result
+        } finally
+            pipelineContext.destroy(success)
+    }
+
     // Run a processor with an ExternalContext
     def runProcessor(processor: Processor, externalContext: ExternalContext, pipelineContext: PipelineContext, logger: Logger) {
 
@@ -140,16 +152,6 @@ object InitUtils {
         processor
     }
 
-    def withPipelineContext[T](body: PipelineContext ⇒ T) = {
-        var success = false
-        val pipelineContext = new PipelineContext
-        try {
-            body(pipelineContext)
-            success = true
-        } finally
-            pipelineContext.destroy(success)
-    }
-
     /**
      * Run a processor based on definitions found in properties or the web app context. This is
      * useful for context/session listeners. If a definition is not found, no exception is thrown.
@@ -182,13 +184,10 @@ object InitUtils {
             logger.info(logMessagePrefix + " - About to run processor: " + processorDefinition)
             val processor = createProcessor(processorDefinition)
             val externalContext = new WebAppExternalContext(WebAppContext.instance(servletContext), session)
-            var success = false
-            val pipelineContext = new PipelineContext
-            try {
+
+            withPipelineContext { pipelineContext ⇒
                 runProcessor(processor, externalContext, pipelineContext, logger)
-                success = true
-            } finally
-                pipelineContext.destroy(success)
+            }
         }
     }
 

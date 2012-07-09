@@ -103,6 +103,7 @@ public class AsynchronousSubmissionManager {
             public SubmissionResult call() throws Exception {
                 // Make sure an ExternalContext is scoped for the callable. We use the same external context as the caller,
                 // even though that can be a dangerous. Should we use AsyncExternalContext here?
+                // Candidate for Scala withPipelineContext
                 final PipelineContext pipelineContext = new PipelineContext();
                 pipelineContext.setAttribute(PipelineContext.EXTERNAL_CONTEXT, newExternalContext);
                 boolean success = false;

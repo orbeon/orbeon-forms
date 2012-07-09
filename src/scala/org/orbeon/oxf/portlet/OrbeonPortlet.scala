@@ -25,6 +25,7 @@ import org.orbeon.oxf.pipeline.api.{ExternalContext, PipelineContext}
 import org.orbeon.oxf.webapp.{ProcessorService, ServletPortlet, WebAppContext}
 import org.orbeon.oxf.externalcontext.{AsyncExternalContext, AsyncRequest}
 import org.orbeon.oxf.util.{URLRewriterUtils, DynamicVariable}
+import org.orbeon.oxf.pipeline.InitUtils.withPipelineContext
 
 // For backward compatibility
 class OrbeonPortlet2         extends OrbeonPortlet
@@ -124,11 +125,10 @@ class OrbeonPortlet extends GenericPortlet with ServletPortlet with BufferedPort
 
     private def asyncContext(request: PortletRequest): AsyncContext = {
         // Create a temporary Portlet2ExternalContext just so we can wrap its request into an AsyncRequest
-        val asyncRequest = {
-            val pipelineContext = new PipelineContext
-            try new AsyncRequest(new Portlet2ExternalContext(pipelineContext, webAppContext, request, true).getRequest)
-            finally pipelineContext.destroy(true)
-        }
+        val asyncRequest =
+            withPipelineContext { pipelineContext ⇒
+                new AsyncRequest(new Portlet2ExternalContext(pipelineContext, webAppContext, request, true).getRequest)
+            }
 
         // Prepare clean, async contexts
         val externalContext = new AsyncExternalContext(webAppContext, asyncRequest, new BufferedResponse(asyncRequest))

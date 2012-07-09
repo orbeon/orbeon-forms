@@ -83,6 +83,7 @@ public class PEVersion extends Version {
 
         // Execute pipeline
         final Document licenceDocument;
+        // Candidate for Scala withPipelineContext
         boolean success = false;
         final PipelineContext pipelineContext = new PipelineContext();
         try {

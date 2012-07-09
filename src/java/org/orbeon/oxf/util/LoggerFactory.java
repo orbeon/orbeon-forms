@@ -79,6 +79,7 @@ public class LoggerFactory {
                 final Processor urlGenerator = PipelineUtils.createURLGenerator(log4jConfigURL, true);
                 final DOMSerializer domSerializer = new DOMSerializer();
                 PipelineUtils.connect(urlGenerator, ProcessorImpl.OUTPUT_DATA, domSerializer, ProcessorImpl.INPUT_DATA);
+                // Candidate for Scala withPipelineContext
                 final PipelineContext pipelineContext = new PipelineContext();
                 boolean success = false;
                 final org.w3c.dom.Element element;

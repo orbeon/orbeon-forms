@@ -13,15 +13,15 @@
  */
 package org.orbeon.oxf.xforms.xbl
 
-import org.orbeon.scaxon.XML
-import org.orbeon.oxf.util.PipelineUtils
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
-import org.orbeon.oxf.processor.DOMSerializer
 import org.dom4j.{Document, Element, QName}
+import org.orbeon.oxf.pipeline.InitUtils.withPipelineContext
+import org.orbeon.oxf.processor.DOMSerializer
 import org.orbeon.oxf.processor.generator.DOMGenerator
-import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.pipeline.{PipelineConfig, PipelineProcessor, PipelineReader}
+import org.orbeon.oxf.util.PipelineUtils
 import org.orbeon.oxf.xml.XMLConstants
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils
+import org.orbeon.scaxon.XML
 
 object Transform {
 
@@ -82,19 +82,13 @@ object Transform {
         PipelineUtils.connect(pipeline, "data", domSerializerData, "data")
 
         // Run the transformation
-        val newPipelineContext = new PipelineContext
-        var success = false
-
-        try {
+        withPipelineContext { newPipelineContext ⇒
             pipeline.reset(newPipelineContext)
             domSerializerData.start(newPipelineContext)
 
             // Get the result, move its root element into a xbl:template and return it
-            val result = domSerializerData.getDocument(newPipelineContext)
-            success = true
-            result
-        } finally
-            newPipelineContext.destroy(success)
+            domSerializerData.getDocument(newPipelineContext)
+        }
     }
 
     // Create an XSLT pipeline to transform XBL source
@@ -145,18 +139,13 @@ object Transform {
         val (pipeline, domSerializerData) = createXSLTPipeline(path, transform, lastModified)
 
         // Run the transformation
-        val newPipelineContext = new PipelineContext
-        var success = false
-        try {
+        withPipelineContext { newPipelineContext ⇒
             pipeline.reset(newPipelineContext)
             domSerializerData.start(newPipelineContext)
 
             // Get the result, move its root element into a xbl:template and return it
-            val result = domSerializerData.getDocument(newPipelineContext)
-            success = true
-            result
-        } finally
-            newPipelineContext.destroy(success)
+            domSerializerData.getDocument(newPipelineContext)
+        }
     }
 
     // Transform an XBL document using XSLT if it is an XSLT document

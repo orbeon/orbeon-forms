@@ -14,16 +14,14 @@
 package org.orbeon.oxf.portlet
 
 import actors.Future
-import javax.portlet.{ResourceResponse, ResourceRequest, PortletRequest}
 import actors.Futures._
-import org.orbeon.oxf.externalcontext.WSRPURLRewriter
-import org.orbeon.oxf.xforms.processor.{ResourcesAggregator, XFormsFeatures}
-import org.orbeon.oxf.portlet.BufferedPortlet._
 import collection.mutable.LinkedHashSet
-import org.orbeon.oxf.pipeline.api.PipelineContext
+import javax.portlet.{ResourceResponse, ResourceRequest, PortletRequest}
+import org.orbeon.oxf.externalcontext.WSRPURLRewriter
+import org.orbeon.oxf.pipeline.InitUtils.withPipelineContext
+import org.orbeon.oxf.portlet.BufferedPortlet._
 import org.orbeon.oxf.util.URLRewriterUtils
-import java.util.{List ⇒ JList}
-import java.util.concurrent.Callable
+import org.orbeon.oxf.xforms.processor.{ResourcesAggregator, XFormsFeatures}
 
 // Support for asynchronous portlet content load
 trait AsyncPortlet extends BufferedPortlet {
@@ -73,9 +71,8 @@ trait AsyncPortlet extends BufferedPortlet {
         }
 
     // Return <div> used to load content asynchronously
-    private def renderDiv(request: PortletRequest): Content = {
-        val pipelineContext = new PipelineContext
-        try {
+    private def renderDiv(request: PortletRequest): Content =
+        withPipelineContext { pipelineContext ⇒
             // Create a request just so we can create a rewriter
             val ecRequest = new Portlet2ExternalContext(pipelineContext, null, request, false).getRequest
             // We know we want to rewrite all paths (no PFC will run here so we won't have anything better)
@@ -100,9 +97,7 @@ trait AsyncPortlet extends BufferedPortlet {
 
             Content(Left(sb.toString), Some("text/html"), None)
 
-        } finally
-            pipelineContext.destroy(true)
-    }
+        }
 
     private def getOrWaitFutureResponse(request: PortletRequest) =
         getFutureResponse(request) map { futureResponse ⇒

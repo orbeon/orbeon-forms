@@ -116,6 +116,7 @@ public class Properties {
                 }
 
                 // Initialize pipeline
+                // Candidate for Scala withPipelineContext
                 final PipelineContext pipelineContext = new PipelineContext();
                 boolean success = false;
                 try {

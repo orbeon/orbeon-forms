@@ -61,6 +61,7 @@ public class CallXSLT extends SimpleProcessor {
         final DOMSerializer domSerializerData = new DOMSerializer();
         PipelineUtils.connect(processor, "data", domSerializerData, "data");
 
+        // Candidate for Scala withPipelineContext
         boolean success = false;
         final PipelineContext newPipelineContext = new PipelineContext(); // here we decide to use our own PipelineContext
         try {

@@ -103,6 +103,7 @@ public class TestScriptProcessor extends ProcessorImpl {
         ensureOutputConnected(executionContext, outputName);
 
         // Tell output processor to read and cache value
+        // Candidate for Scala withPipelineContext
         final PipelineContext pipelineContext = new PipelineContext();
         boolean success = false;
         try {
@@ -136,6 +137,7 @@ public class TestScriptProcessor extends ProcessorImpl {
         if (outputName != null)
             ensureOutputConnected(executionContext, outputName);
 
+        // Candidate for Scala withPipelineContext
         final PipelineContext pipelineContext = new PipelineContext();
         boolean success = false;
         try {
@@ -204,6 +206,7 @@ public class TestScriptProcessor extends ProcessorImpl {
     }
 
     private void handleRunCommand(ExecutionContext executionContext, Element commandElement) {
+        // Candidate for Scala withPipelineContext
         final PipelineContext pipelineContext = new PipelineContext();
         boolean success = false;
         try {

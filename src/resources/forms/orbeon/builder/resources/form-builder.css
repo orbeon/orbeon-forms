@@ -690,12 +690,11 @@ a.xforms-help-image .fb-control-help {
 .fr-view .fr-grid.fr-editable .xforms-mock-button span:hover {
   background-color: #ffffd3;
 }
-/* Even if the label or hint is empty, we still want space for 1 line to be reserved. */
 .fr-grid-content .xforms-label,
 .fr-grid-content .xforms-hint,
 .fr-grid-th .xforms-label,
 .fr-grid-th .xforms-hint {
-  min-height: 1.5em;
+  min-height: 18px;
 }
 /* NOTE: Was changed to 1.5 at some point, check it too small */
 #fr-view .fr-grid .xforms-hint.xforms-disabled {

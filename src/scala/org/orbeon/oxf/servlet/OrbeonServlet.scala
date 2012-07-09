@@ -34,7 +34,7 @@ class OrbeonServletDelegate extends OrbeonServlet
  */
 class OrbeonServlet extends HttpServlet with ServletPortlet {
 
-    private implicit val logger = ProcessorService.logger
+    private implicit val logger = ProcessorService.Logger
 
     val HttpAcceptMethodsParam = "oxf.http.accept-methods"
     val DefaultMethods = "get post head"
@@ -71,6 +71,6 @@ class OrbeonServlet extends HttpServlet with ServletPortlet {
 
             val pipelineContext = new PipelineContext
             val externalContext = new ServletExternalContext(pipelineContext, webAppContext, request, response)
-            processorService.service(externalContext, pipelineContext)
+            processorService.service(pipelineContext, externalContext)
         }
 }

@@ -26,10 +26,9 @@ import org.orbeon.saxon.om.Item
 import scala.collection.JavaConverters._
 import org.orbeon.oxf.xforms.xbl.Scope
 import org.orbeon.oxf.xforms.control.XFormsControl
-import org.orbeon.oxf.util.DebugLogger._
-import scala.Some
+import org.orbeon.oxf.util.Logging
 
-abstract class XFormsAction {
+abstract class XFormsAction extends Logging {
 
     // Execute the action with the given context
     // By default, run the legacy execute()

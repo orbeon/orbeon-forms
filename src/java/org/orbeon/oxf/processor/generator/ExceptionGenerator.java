@@ -44,7 +44,7 @@ public class ExceptionGenerator extends ProcessorImpl {
         final ProcessorOutput output = new ProcessorOutputImpl(ExceptionGenerator.this, name) {
             public void readImpl(PipelineContext context, XMLReceiver xmlReceiver) {
                 // Get top throwable
-                Throwable throwable = (Throwable) context.getAttribute(ProcessorService.THROWABLE);
+                Throwable throwable = (Throwable) context.getAttribute(ProcessorService.Throwable());
 
                 final ContentHandlerHelper helper = new ContentHandlerHelper(xmlReceiver);
                 helper.startDocument();

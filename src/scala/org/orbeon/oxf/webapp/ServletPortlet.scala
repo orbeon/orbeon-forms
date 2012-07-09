@@ -22,6 +22,12 @@ import collection.JavaConverters._
 // Servlet/portlet helper for processor definitions and services
 trait ServletPortlet {
 
+    // Main and error processor property prefixes
+    private val MainProcessorPropertyPrefix       = "oxf.main-processor."
+    private val MainProcessorInputPropertyPrefix  = "oxf.main-processor.input."
+    private val ErrorProcessorPropertyPrefix      = "oxf.error-processor."
+    private val ErrorProcessorInputPropertyPrefix = "oxf.error-processor.input."
+
     def logPrefix: String
     def initParameters: Map[String, String]
 
@@ -38,15 +44,15 @@ trait ServletPortlet {
         _processorService = getProcessorService
 
         // Run listener if needed
-        processor foreach { case (processorPrefix, inputPrefix) ⇒ runListenerProcessor(_, _) }
-        logger.info(logPrefix + " initialized.")
+        processor foreach { case (processorPrefix, inputPrefix) ⇒ runInitDestroyListenerProcessor(_, _) }
+        Logger.info(logPrefix + " initialized.")
     }
 
     // Destroy the servlet or portlet
     def destroy(processor: Option[(String, String)]): Unit = {
         // Run listener if needed
-        processor foreach { case (processorPrefix, inputPrefix) ⇒ runListenerProcessor(_, _) }
-        logger.info(logPrefix + " destroyed.")
+        processor foreach { case (processorPrefix, inputPrefix) ⇒ runInitDestroyListenerProcessor(_, _) }
+        Logger.info(logPrefix + " destroyed.")
 
          // Clean-up
         _processorService.destroy()
@@ -54,24 +60,22 @@ trait ServletPortlet {
         _webAppContext = null
     }
 
-    private def runListenerProcessor(processorPrefix: String, inputPrefix: String): Unit = {
+    private def runInitDestroyListenerProcessor(processorPrefix: String, inputPrefix: String): Unit = {
         // Create and run processor if definition is found
         searchDefinition(processorPrefix, inputPrefix) foreach  { definition ⇒
-            logger.info(logPrefix + " - About to run processor: " +  definition.toString)
+            Logger.info(logPrefix + " - About to run processor: " +  definition.toString)
 
             val processor = createProcessor(definition)
             val externalContext = new WebAppExternalContext(webAppContext)
-            runProcessor(processor, externalContext, new PipelineContext, logger)
+            runProcessor(processor, externalContext, new PipelineContext, Logger)
         }
     }
 
     private def getProcessorService =
-        searchDefinition(MAIN_PROCESSOR_PROPERTY_PREFIX, MAIN_PROCESSOR_INPUT_PROPERTY_PREFIX) match {
+        searchDefinition(MainProcessorPropertyPrefix, MainProcessorInputPropertyPrefix) match {
             case Some(definition) ⇒
                 // Create and initialize service
-                val processorService = new ProcessorService
-                processorService.init(definition, searchDefinition(ERROR_PROCESSOR_PROPERTY_PREFIX, ERROR_PROCESSOR_INPUT_PROPERTY_PREFIX).orNull)
-                processorService
+                new ProcessorService(definition, searchDefinition(ErrorProcessorPropertyPrefix, ErrorProcessorInputPropertyPrefix).orNull)
             case _ ⇒
                 throw new OXFException("Unable to find main processor definition")
         }
@@ -79,12 +83,12 @@ trait ServletPortlet {
     // Search a processor definition in order from: servlet/portlet parameters, properties, context parameters
     private def searchDefinition(processorPrefix: String, inputPrefix: String) = {
         // All search functions
-        val functions: Seq[(String, String) ⇒ ProcessorDefinition] =
+        val functions: Seq[(String, String) ⇒ Option[ProcessorDefinition]] =
             Seq(getDefinitionFromMap(initParameters.asJava, _, _),
                 getDefinitionFromProperties _,
                 getDefinitionFromMap(webAppContext.initParameters.asJava, _, _))
 
         // Call functions until we find a result
-        functions map (_(processorPrefix, inputPrefix)) find (_ ne null)
+        functions flatMap (_(processorPrefix, inputPrefix)) headOption
     }
 }

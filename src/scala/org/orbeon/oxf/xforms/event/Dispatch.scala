@@ -16,11 +16,11 @@ package org.orbeon.oxf.xforms.event
 
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData
-import org.orbeon.oxf.util.DebugLogger._
+import org.orbeon.oxf.util.Logging
 import util.control.Breaks
 import org.orbeon.oxf.xforms.event.XFormsEvent._
 
-object Dispatch {
+object Dispatch extends Logging {
 
     private val propagateBreaks = new Breaks
     import propagateBreaks.{break, breakable}

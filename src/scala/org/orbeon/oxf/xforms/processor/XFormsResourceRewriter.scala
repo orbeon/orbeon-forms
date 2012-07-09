@@ -26,9 +26,8 @@ import org.orbeon.oxf.resources.ResourceManagerWrapper
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.processor.XFormsFeatures.ResourceConfig
 import scala.collection.JavaConverters._
-import DebugLogger._
 
-object XFormsResourceRewriter {
+object XFormsResourceRewriter extends Logging {
     /**
      * Generate the resources into the given OutputStream. The stream is flushed and closed when done.
      *

@@ -362,7 +362,7 @@ public class DelegationProcessor extends ProcessorImpl {
 
                                         if (service.type == ServiceDefinition.STATELESS_EJB_TYPE) {
                                             // Call EJB method
-                                            final Context jndiContext = (Context) context.getAttribute(ProcessorService.JNDI_CONTEXT);
+                                            final Context jndiContext = (Context) context.getAttribute(ProcessorService.JNDIContext());
                                             if (jndiContext == null)
                                                 throw new ValidationException("JNDI context not found in pipeline context.", new LocationData(locator));
                                             final Object home = jndiContext.lookup(service.jndiName);

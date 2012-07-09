@@ -26,14 +26,13 @@ import dom4j.{LocationSAXContentHandler, Dom4jUtils}
 import org.orbeon.oxf.pipeline.api._
 import org.dom4j.{Document, Element}
 import org.orbeon.oxf.xforms.state.XFormsStateManager
-import org.orbeon.oxf.util.{IndentedLogger, Multipart}
-import org.orbeon.oxf.util.DebugLogger._
+import org.orbeon.oxf.util.{IndentedLogger, Multipart, Logging}
 import XFormsEvents._
 import collection.JavaConverters._
 import org.orbeon.oxf.xforms.analysis.controls.RepeatControl
 
 // Process events sent by the client, including sorting, filtering, and security
-object ClientEvents {
+object ClientEvents extends Logging {
 
     private val EventParameters = List("dnd-start", "dnd-end", "modifiers", "text", "file", "filename", "content-type", "content-length")
     private val DummyEvent = List(new LocalEvent(Dom4jUtils.createElement("dummy"), false))
@@ -68,15 +67,15 @@ object ClientEvents {
             }
 
             // Decode global server events
-            val globalServerEvents: Seq[LocalEvent] = serverEvents.asScala flatMap (decodeServerEvents(_)) map (LocalEvent(_, true))
+            val globalServerEvents: Seq[LocalEvent] = serverEvents.asScala flatMap (decodeServerEvents(_)) map (LocalEvent(_, trusted = true))
 
             // Gather all events including decoding action server events
             globalServerEvents ++
                 (clientEventsAfterNoscript flatMap {
                     case element if element.attributeValue("name") == XXFORMS_SERVER_EVENTS ⇒
-                        decodeServerEvents(element) map (LocalEvent(_, true))
+                        decodeServerEvents(element) map (LocalEvent(_, trusted = true))
                     case element ⇒
-                        List(LocalEvent(element, false))
+                        List(LocalEvent(element, trusted = false))
                 })
         }
 

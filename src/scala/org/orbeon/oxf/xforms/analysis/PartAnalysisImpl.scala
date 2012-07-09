@@ -28,7 +28,7 @@ import collection.mutable.Buffer
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.xml.{NamespaceMapping, ContentHandlerHelper, XMLUtils}
 import xbl.Scope
-import org.orbeon.oxf.util.DebugLogger._
+import org.orbeon.oxf.util.Logging
 import org.orbeon.oxf.xforms.analysis.controls.{AttributeControl, LHHAAnalysis, RootControl}
 import org.orbeon.saxon.om.{VirtualNode, NodeInfo}
 
@@ -53,7 +53,8 @@ class PartAnalysisImpl(
     with PartModelAnalysis
     with PartEventHandlerAnalysis
     with PartControlsAnalysis
-    with PartXBLAnalysis {
+    with PartXBLAnalysis
+    with Logging {
 
     partAnalysis ⇒
 

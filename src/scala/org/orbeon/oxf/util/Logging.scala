@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2007 Orbeon, Inc.
+ * Copyright (C) 2012 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -14,7 +14,7 @@
 package org.orbeon.oxf.util
 
 // More Scala-friendly indented logger API
-object DebugLogger {
+trait Logging {
 
     // Error with optional parameters
     def error(message: ⇒ String, parameters: ⇒ Seq[(String, String)] = Seq())(implicit logger: IndentedLogger) =

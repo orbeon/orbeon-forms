@@ -20,14 +20,14 @@ import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.oxf.fr.FormRunner
 import org.orbeon.oxf.xforms.XFormsConstants.{XFORMS_NAMESPACE_URI, XBL_NAMESPACE_URI}
 import org.orbeon.oxf.xml.XMLConstants.{XHTML_NAMESPACE_URI, XSD_URI}
-import org.orbeon.oxf.util.DebugLogger._
+import org.orbeon.oxf.util.Logging
 import org.orbeon.oxf.util.{UserAgent, NetUtils}
 import org.orbeon.oxf.xforms.{XFormsModel, XFormsProperties}
 
 /**
  * Form Builder functions.
  */
-object FormBuilderFunctions {
+object FormBuilderFunctions extends Logging {
 
     implicit def logger = containingDocument.getIndentedLogger("form-builder")
 

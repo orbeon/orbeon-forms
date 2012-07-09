@@ -42,13 +42,12 @@ import PDFTemplateProcessor._
 import scala.collection.JavaConverters._
 import ScalaUtils._
 import java.net.URLDecoder.{decode ⇒ decodeURL}
-import DebugLogger._
 import org.orbeon.exception.OrbeonFormatter
 
 /**
  * The PDF Template processor reads a PDF template and performs textual annotations on it.
  */
-class PDFTemplateProcessor extends HttpBinarySerializer {// TODO: HttpBinarySerializer is deprecated
+class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: HttpBinarySerializer is deprecated
 
     addInputInfo(new ProcessorInputOutputInfo("model", PDFTemplateModelNamespaceURI))
     addInputInfo(new ProcessorInputOutputInfo("data"))

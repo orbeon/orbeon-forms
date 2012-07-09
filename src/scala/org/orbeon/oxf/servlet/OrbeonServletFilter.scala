@@ -27,7 +27,7 @@ class OrbeonServletFilterDelegate extends OrbeonServletFilter
 
 class OrbeonServletFilter extends Filter with ServletPortlet {
 
-    private implicit val logger = ProcessorService.logger
+    private implicit val logger = ProcessorService.Logger
 
     def logPrefix = "Servlet filter"
 
@@ -58,6 +58,6 @@ class OrbeonServletFilter extends Filter with ServletPortlet {
             val pipelineContext = new PipelineContext
             pipelineContext.setAttribute(ServletFilterGenerator.FILTER_CHAIN, chain)
             val externalContext = new ServletExternalContext(pipelineContext, webAppContext, request.asInstanceOf[HttpServletRequest], response.asInstanceOf[HttpServletResponse])
-            processorService.service(externalContext, pipelineContext)
+            processorService.service(pipelineContext, externalContext)
         }
 }

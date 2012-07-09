@@ -50,7 +50,7 @@ class OrbeonPortlet2Delegate extends OrbeonPortlet
 class OrbeonPortlet extends GenericPortlet with ServletPortlet with BufferedPortlet with AsyncPortlet {
 
     private def isAsyncPortletLoad = XFormsProperties.isAsyncPortletLoad
-    private implicit val logger = ProcessorService.logger
+    private implicit val logger = ProcessorService.Logger
 
     // For BufferedPortlet
     def title(request: RenderRequest) = getTitle(request)
@@ -138,7 +138,7 @@ class OrbeonPortlet extends GenericPortlet with ServletPortlet with BufferedPort
 
     // Call the Orbeon Forms pipeline processor service
     private def callService(context: AsyncContext): ContentOrRedirect = {
-        processorService.service(context.externalContext, context.pipelineContext getOrElse new PipelineContext)
+        processorService.service(context.pipelineContext getOrElse new PipelineContext, context.externalContext)
         bufferedResponseToResponse(context.externalContext.getResponse.asInstanceOf[BufferedResponse])
     }
 
@@ -146,7 +146,7 @@ class OrbeonPortlet extends GenericPortlet with ServletPortlet with BufferedPort
         // Process request
         val pipelineContext = new PipelineContext
         val externalContext = new Portlet2ExternalContext(pipelineContext, webAppContext, request, true)
-        processorService.service(externalContext, pipelineContext)
+        processorService.service(pipelineContext, externalContext)
 
         // Write out the response
         val directResponse = externalContext.getResponse.asInstanceOf[BufferedResponse]

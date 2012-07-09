@@ -30,7 +30,7 @@ class OrbeonServletContextListener extends ServletContextListener {
     private val DestroyProcessorPrefix  = "oxf.context-destroyed-processor."
     private val DestroyInputPrefix      = "oxf.context-destroyed-processor.input."
 
-    private implicit val logger = ProcessorService.logger
+    private implicit val logger = ProcessorService.Logger
 
     def logPrefix = "Context listener"
     def initParameters = Map()

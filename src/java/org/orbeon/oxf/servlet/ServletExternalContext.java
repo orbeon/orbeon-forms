@@ -23,7 +23,6 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.portlet.OrbeonPortletXFormsFilter;
 import org.orbeon.oxf.properties.Properties;
 import org.orbeon.oxf.util.*;
-import org.orbeon.oxf.webapp.ProcessorService;
 import org.orbeon.oxf.webapp.WebAppContext;
 
 import javax.servlet.ServletContext;
@@ -50,6 +49,8 @@ public class ServletExternalContext implements ExternalContext  {
     public static final String HTTP_PAGE_CACHE_HEADERS_PROPERTY     = "oxf.http.page.cache-headers";
     public static final String HTTP_RESOURCE_CACHE_HEADERS_DEFAULT  = "Cache-Control: public; Pragma:";
     public static final String HTTP_RESOURCE_CACHE_HEADERS_PROPERTY = "oxf.http.resource.cache-headers";
+
+    public static final String HTTP_FORCE_LAST_MODIFIED_PROPERTY    = "oxf.http.force-last-modified";
 
     public static final String SESSION_LISTENERS = "oxf.servlet.session-listeners";
 
@@ -481,7 +482,7 @@ public class ServletExternalContext implements ExternalContext  {
 
             // Check a special mode to make all pages appear static, unless the user is logged in (HACK)
             {
-                final Date forceLastModified = Properties.instance().getPropertySet().getDateTime(ProcessorService.HTTP_FORCE_LAST_MODIFIED_PROPERTY);
+                final Date forceLastModified = Properties.instance().getPropertySet().getDateTime(HTTP_FORCE_LAST_MODIFIED_PROPERTY);
                 if (forceLastModified != null) {
                     // The properties tell that we should override
                     if (request.getRemoteUser() == null) {
@@ -529,7 +530,7 @@ public class ServletExternalContext implements ExternalContext  {
         public boolean checkIfModifiedSince(long lastModified, boolean allowOverride) {
             // Check a special mode to make all pages appear static, unless the user is logged in (HACK)
             if (allowOverride) {
-                Date forceLastModified = Properties.instance().getPropertySet().getDateTime(ProcessorService.HTTP_FORCE_LAST_MODIFIED_PROPERTY);
+                Date forceLastModified = Properties.instance().getPropertySet().getDateTime(HTTP_FORCE_LAST_MODIFIED_PROPERTY);
                 if (forceLastModified != null) {
                     if (request.getRemoteUser() == null)
                         lastModified = forceLastModified.getTime();

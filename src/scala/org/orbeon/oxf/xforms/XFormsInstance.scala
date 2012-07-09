@@ -28,7 +28,6 @@ import org.orbeon.saxon.dom4j.DocumentWrapper
 import org.orbeon.saxon.dom4j.TypedDocumentWrapper
 import javax.xml.transform.stream.StreamResult
 import scala.collection.JavaConverters._
-import org.orbeon.oxf.util.DebugLogger._
 import org.orbeon.oxf.common.OXFException
 import state.InstanceState
 import org.orbeon.oxf.xforms.XFormsServerSharedInstancesCache.Loader
@@ -92,7 +91,8 @@ class XFormsInstance(
         private var _readonly: Boolean,                         // whether the instance is readonly (can change upon submission)
         private var _modified: Boolean)                         // whether the instance was modified
     extends ListenersTrait
-    with XFormsEventObserver {
+    with XFormsEventObserver
+    with Logging {
 
     require(! (_readonly && _documentInfo.isInstanceOf[VirtualNode]))
 
@@ -282,7 +282,7 @@ class XFormsInstance(
     }
 }
 
-object XFormsInstance {
+object XFormsInstance extends Logging {
 
     // Create an initial instance without caching information
     def apply(model: XFormsModel, instance: Instance, documentInfo: DocumentInfo) =

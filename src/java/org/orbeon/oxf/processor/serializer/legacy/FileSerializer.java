@@ -308,7 +308,7 @@ public class FileSerializer extends ProcessorImpl {
                 config.isIndent(), config.getIndentAmount());
 
         identity.setResult(new StreamResult(writer));
-        readInputAsSAX(context, input, new SerializerXMLReceiver(identity, writer, getPropertySet().getBoolean("serialize-xml-11", false).booleanValue()));
+        readInputAsSAX(context, input, new SerializerXMLReceiver(identity, writer, getPropertySet().getBoolean("serialize-xml-11", false)));
     }
 
     protected Writer getWriter(OutputStream outputStream, Config config) {

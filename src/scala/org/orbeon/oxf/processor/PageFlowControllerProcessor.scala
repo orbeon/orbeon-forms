@@ -30,7 +30,7 @@ import org.orbeon.oxf.processor.impl.{DigestState, DigestTransformerOutputImpl}
 import org.orbeon.oxf.processor.pipeline.ast._
 import org.orbeon.oxf.processor.pipeline.{PipelineConfig, PipelineProcessor}
 import org.orbeon.oxf.resources.ResourceNotFoundException
-import org.orbeon.oxf.util.DebugLogger._
+import org.orbeon.oxf.util.Logging
 import org.orbeon.oxf.util.URLRewriterUtils._
 import org.orbeon.oxf.util.{LoggerFactory, IndentedLogger, PipelineUtils, NetUtils}
 import org.orbeon.oxf.webapp.{HttpRedirectException, HttpStatusCodeException}
@@ -42,7 +42,7 @@ import org.orbeon.oxf.xml.dom4j.LocationData
 import org.orbeon.exception.OrbeonFormatter
 
 // Orbeon Forms application controller
-class PageFlowControllerProcessor extends ProcessorImpl {
+class PageFlowControllerProcessor extends ProcessorImpl with Logging {
 
     addInputInfo(new ProcessorInputOutputInfo(ControllerInput, ControllerNamespaceURI))
 
@@ -65,9 +65,7 @@ class PageFlowControllerProcessor extends ProcessorImpl {
         val path = request.getRequestPath
         val method = request.getMethod
 
-        lazy val logParams = Seq("controller" → pageFlow.file.orNull, "path" → path, "method" → method)
-
-        info("processing request", logParams)
+        lazy val logParams = Seq("controller" → pageFlow.file.orNull, "method" → method, "path" → path)
 
         // If required, store information about resources to rewrite in the pipeline context for downstream use, e.g. by
         // oxf:xhtml-rewrite. This allows consumers who would like to rewrite resources into versioned resources to
@@ -119,8 +117,8 @@ class PageFlowControllerProcessor extends ProcessorImpl {
 
         def runUnauthorizedRoute(t: Throwable, code: Int) = pageFlow.unauthorizedRoute match {
             case Some(unauthorizedRoute) ⇒
-                // Run the error route
-                error("unauthorized", logParams)
+                // Run the unauthorized route
+                info("unauthorized", logParams)
                 externalContext.getResponse.setStatus(code)
                 unauthorizedRoute.process(pipelineContext, request, MatchResult(matches = false))
             case None ⇒
@@ -132,8 +130,10 @@ class PageFlowControllerProcessor extends ProcessorImpl {
         pageFlow.routes.iterator map (route ⇒ route → MatchResult(route.routeElement.pattern, path)) find (_._2.matches) match {
             case Some((route: FileRoute, matchResult)) ⇒
                 // Run the given route and let the caller handle errors
+                debug("processing file", logParams)
                 route.process(pipelineContext, request, matchResult)
             case Some((route: PageOrServiceRoute, matchResult)) ⇒
+                debug("processing page/service", logParams)
                 // Run the given route and handle "not found" and error conditions
                 try route.process(pipelineContext, request, matchResult)
                 catch { case t ⇒

@@ -32,8 +32,7 @@ import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.saxon.om.Item
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.oxf.xforms.XFormsConstants._
-import org.orbeon.oxf.util.DebugLogger
-import DebugLogger._
+import org.orbeon.oxf.util.Logging
 
 import control.controls.XFormsRepeatControl._
 import java.util.{ArrayList, List ⇒ JList, Map ⇒ JMap, Collections}
@@ -44,7 +43,8 @@ import collection.mutable.{ArrayBuffer, LinkedHashMap}
 // Represents an xforms:repeat container control.
 class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, element: Element, effectiveId: String)
         extends XFormsNoSingleNodeContainerControl(container, parent, element, effectiveId)
-        with NoLHHATrait {
+        with NoLHHATrait
+        with Logging {
 
     override type Control = RepeatControl
 

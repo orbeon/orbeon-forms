@@ -31,7 +31,7 @@ import org.orbeon.oxf.xml.{SAXStore, TransformerUtils, XMLUtils}
 import org.orbeon.oxf.common.{OXFException, Version}
 import org.xml.sax.Attributes
 import collection.mutable.{LinkedHashSet, ArrayBuffer, LinkedHashMap}
-import org.orbeon.oxf.util.DebugLogger._
+import org.orbeon.oxf.util.Logging
 import org.dom4j._
 
 /**
@@ -47,7 +47,8 @@ import org.dom4j._
  *   o detect that situation (when is this possible?)
  *   o keep a single DOM
  */
-class XBLBindings(indentedLogger: IndentedLogger, partAnalysis: PartAnalysisImpl, var metadata: Metadata, inlineXBL: Seq[Element]) {
+class XBLBindings(indentedLogger: IndentedLogger, partAnalysis: PartAnalysisImpl, var metadata: Metadata, inlineXBL: Seq[Element])
+        extends Logging {
 
     private implicit val Logger = indentedLogger
 

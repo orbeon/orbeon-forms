@@ -229,7 +229,7 @@ public class OPS {
         } catch (NamingException e) {
             throw new OXFException(e);
         }
-        pipelineContext.setAttribute(ProcessorService.JNDI_CONTEXT, jndiContext);
+        pipelineContext.setAttribute(ProcessorService.JNDIContext(), jndiContext);
 
         try {
             // 7. Run the pipeline from the processor definition created earlier. An ExternalContext
@@ -237,11 +237,11 @@ public class OPS {
 
             if (outputs == null) {
                 // No outputs to connect: just execute the pipeline
-                InitUtils.initializeProcessorDefinitions();
+                InitUtils.processorDefinitions();
                 InitUtils.runProcessor(InitUtils.createProcessor(processorDefinition), new CommandLineExternalContext(), pipelineContext, logger);
             } else {
                 // At least one output to connect...
-                InitUtils.initializeProcessorDefinitions();
+                InitUtils.processorDefinitions();
                 Processor processor = createProcessor(processorDefinition);
                 processor.reset(pipelineContext);
                 // Loop over outputs

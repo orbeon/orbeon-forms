@@ -22,7 +22,7 @@ import analysis.{ElementAnalysis, StaticStateContext, SimpleElementAnalysis}
 import control.controls.XFormsRepeatControl
 import control.XFormsComponentControl
 import org.orbeon.oxf.xforms.XFormsConstants._
-import org.orbeon.oxf.util.DebugLogger._
+import org.orbeon.oxf.util.Logging
 
 import collection.JavaConverters._
 import org.dom4j.{QName, Element}
@@ -46,7 +46,8 @@ class EventHandlerImpl(
         parent,
         preceding,
         scope)
-    with EventHandler {
+    with EventHandler
+    with Logging {
 
     self ⇒
 
@@ -229,7 +230,7 @@ class EventHandlerImpl(
             event.matches(self)
 }
 
-object EventHandlerImpl {
+object EventHandlerImpl extends Logging {
     // Whether the element is an event handler (a known action element with @*:event)
     def isEventHandler(element: Element) =
         XFormsActions.isAction(element.getQName) && (element.attribute(XML_EVENTS_EV_EVENT_ATTRIBUTE_QNAME.getName) ne null)

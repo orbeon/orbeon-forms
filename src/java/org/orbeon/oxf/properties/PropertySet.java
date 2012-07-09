@@ -295,9 +295,9 @@ public class PropertySet {
         return (Boolean) getPropertyValue(name, XMLConstants.XS_BOOLEAN_QNAME);
     }
 
-    public Boolean getBoolean(String name, boolean defaultValue) {
+    public boolean getBoolean(String name, boolean defaultValue) {
         final Boolean result = getBoolean(name);
-        return (result == null) ? Boolean.valueOf(defaultValue) : result;
+        return (result == null) ? defaultValue : result;
     }
 
     public Date getDate(String name) {

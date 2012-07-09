@@ -139,7 +139,7 @@ public class LocalPortletSubmission extends BaseSubmission {
                         sp.queryString, p.isReplaceAll, headersToForward, customHeaderNameValues, new SubmissionProcess() {
                             public void process(final ExternalContext.Request request, final ExternalContext.Response response) {
                                 // Delegate to portlet
-                                currentPortlet.processorService().service(new ExternalContextWrapper(newExternalContext) {
+                                currentPortlet.processorService().service(new PipelineContext(), new ExternalContextWrapper(newExternalContext) {
                                     @Override
                                     public ExternalContext.Request getRequest() {
                                         return request;
@@ -149,7 +149,7 @@ public class LocalPortletSubmission extends BaseSubmission {
                                     public ExternalContext.Response getResponse() {
                                         return response;
                                     }
-                                }, new PipelineContext());
+                                });
                             }
                         }, true, false);
 

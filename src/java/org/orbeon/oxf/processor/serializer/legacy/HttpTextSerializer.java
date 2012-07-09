@@ -55,7 +55,7 @@ public abstract class HttpTextSerializer extends HttpSerializerBase {
     }
 
     protected boolean isSerializeXML11() {
-        return getPropertySet().getBoolean("serialize-xml-11", false).booleanValue();
+        return getPropertySet().getBoolean("serialize-xml-11", false);
     }
 
     /**

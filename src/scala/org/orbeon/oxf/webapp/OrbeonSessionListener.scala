@@ -34,7 +34,7 @@ class OrbeonSessionListener extends HttpSessionListener {
     private val DestroyProcessorPrefix  = "oxf.session-destroyed-processor."
     private val DestroyInputPrefix      = "oxf.session-destroyed-processor.input."
 
-    private implicit val logger = ProcessorService.logger
+    private implicit val logger = ProcessorService.Logger
 
     def logPrefix = "Session listener"
     def initParameters = Map()

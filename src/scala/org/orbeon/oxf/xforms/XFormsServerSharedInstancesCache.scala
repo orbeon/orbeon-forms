@@ -17,7 +17,6 @@ import analysis.model.Instance
 import org.orbeon.oxf.cache.InternalCacheKey
 import org.orbeon.oxf.cache.ObjectCache
 import org.orbeon.oxf.util.IndentedLogger
-import org.orbeon.oxf.util.DebugLogger._
 import org.orbeon.saxon.om.{VirtualNode, DocumentInfo}
 import XFormsInstance._
 

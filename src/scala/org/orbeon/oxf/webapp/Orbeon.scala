@@ -78,7 +78,7 @@ object Orbeon {
                 LoggerFactory.initLogger()
 
             // 5. Register processor definitions with the default XML Processor Registry
-            InitUtils.initializeProcessorDefinitions()
+            InitUtils.processorDefinitions
         } catch {
             case e: Exception ⇒ throw new OXFException(e)
         }

@@ -47,7 +47,7 @@ public class ProxyServiceBean extends SessionBeanAdapter {
             final PipelineContext pipelineContext = new PipelineContext();
             boolean success = false;
             try {
-                pipelineContext.setAttribute(ProcessorService.JNDI_CONTEXT, jndiContext);
+                pipelineContext.setAttribute(ProcessorService.JNDIContext(), jndiContext);
                 final Processor processor = ProcessorFactoryRegistry.lookup(jndiName).createInstance();
 
                 // Connect inputs

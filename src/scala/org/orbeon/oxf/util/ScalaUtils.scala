@@ -19,6 +19,7 @@ import java.security.MessageDigest
 import org.apache.log4j.Logger
 import java.net.URLEncoder.{encode ⇒ encodeURL}
 import java.net.URLDecoder.{decode ⇒ decodeURL}
+import org.apache.commons.lang.StringUtils.{isNotBlank, trimToEmpty}
 
 object ScalaUtils {
 
@@ -169,4 +170,7 @@ object ScalaUtils {
     // Encode a sequence of pairs to a query string
     def encodeSimpleQuery(parameters: Seq[(String, String)]): String =
         parameters map { case (name, value) ⇒ encodeURL(name, "utf-8") + '=' + encodeURL(value, "utf-8") } mkString "&"
+
+    // If the string is null or empty, return none, otherwise return the trimmed value
+    def nonEmptyOrNone(s: String) = Option(s) map trimToEmpty filter isNotBlank
 }

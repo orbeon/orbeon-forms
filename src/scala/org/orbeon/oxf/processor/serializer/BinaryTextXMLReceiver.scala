@@ -15,14 +15,16 @@ package org.orbeon.oxf.processor.serializer
 
 import BinaryTextXMLReceiver._
 import java.io._
-import org.apache.commons.lang.StringUtils.{isNotBlank, trimToEmpty}
+import org.apache.commons.lang.StringUtils.isNotBlank
 import org.dom4j.Namespace
 import org.dom4j.QName
 import org.orbeon.oxf.common.OXFException
+import org.orbeon.oxf.pipeline.api.ExternalContext.Response
 import org.orbeon.oxf.pipeline.api.{XMLReceiver, ExternalContext}
 import org.orbeon.oxf.util.Base64XMLReceiver
 import org.orbeon.oxf.util.DateUtils
 import org.orbeon.oxf.util.NetUtils.{getContentTypeMediaType, getContentTypeCharset}
+import org.orbeon.oxf.util.ScalaUtils.nonEmptyOrNone
 import org.orbeon.oxf.util.TextXMLReceiver
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml.XMLReceiverAdapter
@@ -30,7 +32,6 @@ import org.orbeon.oxf.xml.XMLUtils
 import org.orbeon.scaxon.XML
 import org.xml.sax.Attributes
 import scala.collection.mutable
-import org.orbeon.oxf.pipeline.api.ExternalContext.Response
 
 /**
  * ContentHandler able to serialize text or binary documents to an output stream.
@@ -72,11 +73,12 @@ class BinaryTextXMLReceiver(
             if (response ne null) Left(response) else Right(outputStream),
             closeStream,
             forceContentType,
-            Option(requestedContentType) map trimToEmpty filter isNotBlank,
+            nonEmptyOrNone(requestedContentType),
             ignoreDocumentContentType,
             forceEncoding,
-            Option(requestedEncoding) map trimToEmpty filter isNotBlank,
+            nonEmptyOrNone(requestedEncoding),
             ignoreDocumentEncoding)
+
 
     // Simple constructor to write to a stream and close it
     def this(outputStream: OutputStream) =
@@ -113,13 +115,13 @@ class BinaryTextXMLReceiver(
             response foreach { response ⇒
 
                 // This will override caching settings which may have taken place before
-                Option(attributes.getValue("last-modified")) map trimToEmpty filter isNotBlank foreach
+                nonEmptyOrNone(attributes.getValue("last-modified")) foreach
                     (validity ⇒ response.setPageCaching(DateUtils.parseRFC1123(validity)))
 
-                Option(attributes.getValue("filename")) map trimToEmpty filter isNotBlank foreach
+                nonEmptyOrNone(attributes.getValue("filename")) foreach
                     (fileName ⇒ response.setHeader("Content-Disposition", "attachment; filename=" + fileName))
 
-                Option(attributes.getValue("status-code")) map trimToEmpty filter isNotBlank foreach
+                nonEmptyOrNone(attributes.getValue("status-code")) foreach
                     (statusCode ⇒ response.setStatus(statusCode.toInt))
             }
 

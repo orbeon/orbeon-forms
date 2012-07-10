@@ -701,9 +701,9 @@
                             ev:event="fr-selection-changed"
                             context="instance('events')" ref="*"
                             origin="xxforms:element('event',
-                                    (xxforms:attribute('observer', event('xxforms:effective-observerid')),
+                                    (xxforms:attribute('observer', event('xxforms:absolute-observerid')),
                                      xxforms:attribute('type', event('xxforms:type')),
-                                     xxforms:attribute('target', event('xxforms:effective-targetid')),
+                                     xxforms:attribute('target', event('xxforms:absolute-targetid')),
                                      xxforms:attribute('index', event('index'))
                                      ))"/>
 
@@ -725,10 +725,10 @@
                             </instance>
                             <instance id="events" model-id="model">
                                 <events>
-                                    <event observer="my-datatable" type="fr-selection-changed" target="my-datatable" index="1"/>
-                                    <event observer="my-datatable" type="fr-selection-changed" target="my-datatable" index="3"/>
-                                    <event observer="my-datatable" type="fr-selection-changed" target="my-datatable" index="3"/>
-                                    <event observer="my-datatable" type="fr-selection-changed" target="my-datatable" index="2"/>
+                                    <event observer="/my-datatable" type="fr-selection-changed" target="/my-datatable" index="1"/>
+                                    <event observer="/my-datatable" type="fr-selection-changed" target="/my-datatable" index="3"/>
+                                    <event observer="/my-datatable" type="fr-selection-changed" target="/my-datatable" index="3"/>
+                                    <event observer="/my-datatable" type="fr-selection-changed" target="/my-datatable" index="2"/>
                                 </events>
                             </instance>
                             <instance id="datatable-instance" model-id="my-datatable$datatable-model">

@@ -11,7 +11,8 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<group description="XForms Repeat" xmlns:p="http://www.orbeon.com/oxf/pipeline"
+<group description="XForms Repeat"
+    xmlns:p="http://www.orbeon.com/oxf/pipeline"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
@@ -2900,9 +2901,9 @@
                                             <xforms:insert xxbl:scope="outer"
                                                context="instance('events')" ref="*"
                                                origin="xxforms:element('event',
-                                                        (xxforms:attribute('observer', event('xxforms:effective-observerid')),
+                                                        (xxforms:attribute('observer', event('xxforms:absolute-observerid')),
                                                          xxforms:attribute('type', event('xxforms:type')),
-                                                         xxforms:attribute('target', event('xxforms:effective-targetid'))
+                                                         xxforms:attribute('target', event('xxforms:absolute-targetid'))
                                                          ))"/>
 
                                         </xforms:action>
@@ -2932,8 +2933,8 @@
                         <instances>
                             <instance id="events" model-id="model">
                                 <events>
-                                    <event observer="my-bar-1$my-department-repeat" type="my-event" target="my-bar-1$my-department-repeat"/>
-                                    <event observer="my-bar-1$my-department-repeat" type="xforms-enabled" target="my-bar-1$my-department-repeat"/>
+                                    <event observer="/my-bar-1/my-department-repeat" type="my-event" target="/my-bar-1/my-department-repeat"/>
+                                    <event observer="/my-bar-1/my-department-repeat" type="xforms-enabled" target="/my-bar-1/my-department-repeat"/>
                                 </events>
                             </instance>
                         </instances>

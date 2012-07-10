@@ -17,6 +17,7 @@ import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsObject;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.Dispatch;
@@ -48,7 +49,7 @@ public class XFormsSendAction extends XFormsAction {
         }
 
         // Find actual target
-        final Object submission = actionInterpreter.resolveEffectiveObject(actionElement, resolvedSubmissionStaticId);
+        final XFormsObject submission = actionInterpreter.resolveObject(actionElement, resolvedSubmissionStaticId);
         if (submission instanceof XFormsModelSubmission) {
             // Dispatch event to submission object
             final XFormsEvent newEvent = new XFormsSubmitEvent(actionInterpreter.containingDocument(), (XFormsEventTarget) submission);

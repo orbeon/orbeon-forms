@@ -13,20 +13,20 @@
  */
 package org.orbeon.oxf.xforms.action
 
-import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.xforms.analysis.VariableAnalysis
-import org.orbeon.saxon.value.{StringValue, SequenceExtent}
-import org.orbeon.oxf.util.XPathCache
-import org.orbeon.oxf.xforms.XFormsContainingDocument
-import org.orbeon.oxf.xforms.XFormsConstants._
-import org.orbeon.oxf.xml.dom4j.{LocationData, Dom4jUtils ⇒ Dom4j}
-import org.orbeon.oxf.xforms.event.XFormsEvent
 import org.dom4j.Element
-import org.orbeon.saxon.om.Item
-import scala.collection.JavaConverters._
-import org.orbeon.oxf.xforms.xbl.Scope
-import org.orbeon.oxf.xforms.control.XFormsControl
+import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.Logging
+import org.orbeon.oxf.util.XPathCache
+import org.orbeon.oxf.xforms.XFormsConstants._
+import org.orbeon.oxf.xforms.XFormsContainingDocument
+import org.orbeon.oxf.xforms.analysis.VariableAnalysis
+import org.orbeon.oxf.xforms.control.XFormsControl
+import org.orbeon.oxf.xforms.event.XFormsEvent
+import org.orbeon.oxf.xforms.xbl.Scope
+import org.orbeon.oxf.xml.dom4j.{LocationData, Dom4jUtils ⇒ Dom4j}
+import org.orbeon.saxon.om.Item
+import org.orbeon.saxon.value.{StringValue, SequenceExtent}
+import scala.collection.JavaConverters._
 
 abstract class XFormsAction extends Logging {
 
@@ -108,7 +108,7 @@ abstract class XFormsAction extends Logging {
         resolveStringAVT(context, "control") match {
             case Some(resolvedAvt) ⇒
 
-                val controlObject = interpreter.resolveEffectiveControl(element, resolvedAvt)
+                val controlObject = interpreter.resolveObject(element, resolvedAvt)
 
                 Option(controlObject) match {
                     case Some(control: XFormsControl) ⇒ Some(control)

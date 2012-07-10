@@ -17,6 +17,7 @@ import org.dom4j.Element;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsObject;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.event.Dispatch;
@@ -46,7 +47,7 @@ public class XFormsSubmitControl extends XFormsTriggerControl {
 
             // Find submission object and dispatch submit event to it
 
-            final Object object = container().findScopeRoot(XFormsUtils.getPrefixedId(getEffectiveId())).resolveObjectById(getEffectiveId(), submissionId, null);
+            final XFormsObject object = container().findScopeRoot(XFormsUtils.getPrefixedId(getEffectiveId())).resolveObjectById(getEffectiveId(), submissionId, null);
             if (object instanceof XFormsModelSubmission) {
                 final XFormsModelSubmission submission = (XFormsModelSubmission) object;
                 Dispatch.dispatchEvent(new XFormsSubmitEvent(containingDocument(), submission));

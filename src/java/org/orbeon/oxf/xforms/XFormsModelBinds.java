@@ -26,7 +26,6 @@ import org.orbeon.oxf.xforms.event.Dispatch;
 import org.orbeon.oxf.xforms.event.events.XXFormsXPathErrorEvent;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.oxf.xforms.model.DataModel;
-import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.NamespaceMapping;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -61,7 +60,6 @@ public class XFormsModelBinds {
     private final Model staticModel;
 
     private final IndentedLogger indentedLogger;
-    private final XBLContainer container;
     private final XFormsContainingDocument containingDocument;  // current containing document
     private final XPathDependencies dependencies;
 
@@ -97,7 +95,6 @@ public class XFormsModelBinds {
         this.model = model;
 
         this.indentedLogger = model.getIndentedLogger();
-        this.container = model.container();
         this.containingDocument = model.containingDocument;
         this.dependencies = this.containingDocument.getXPathDependencies();
 
@@ -870,7 +867,7 @@ public class XFormsModelBinds {
         public void applyBind(Bind bind, int position);
     }
 
-    public class Bind {
+    public class Bind implements XFormsObject {
 
         public final BindTree.Bind staticBind;
         public final List<Item> nodeset;       // actual nodeset for this bind
@@ -978,6 +975,10 @@ public class XFormsModelBinds {
 
         public String getStaticId() {
             return staticBind.staticId();
+        }
+
+        public String getEffectiveId() {
+            return XFormsUtils.getRelatedEffectiveId(model.getEffectiveId(), getStaticId());
         }
 
         private QName evaluateTypeQName(Map<String, String> namespaceMap) {

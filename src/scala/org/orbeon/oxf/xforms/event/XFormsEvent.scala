@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.event
 
 import org.orbeon.oxf.xforms.XFormsConstants._
-import org.orbeon.oxf.xforms.XFormsContainingDocument
+import org.orbeon.oxf.xforms.{XFormsUtils, XFormsContainingDocument}
 import org.orbeon.oxf.xforms.XFormsUtils._
 import org.orbeon.oxf.xml.XMLUtils.buildExplodedQName
 import org.orbeon.oxf.xml.dom4j.LocationData
@@ -121,14 +121,14 @@ object XFormsEvent {
         "target"                            → (e ⇒ stringIterator(e.targetObject.getId)),
         xxformsName("target")               → (e ⇒ stringIterator(e.targetObject.getId)),
         xxformsName("targetid")             → (e ⇒ stringIterator(e.targetObject.getId)),
-        xxformsName("effective-targetid")   → (e ⇒ stringIterator(e.targetObject.getEffectiveId)),
+        xxformsName("absolute-targetid")    → (e ⇒ stringIterator(XFormsUtils.effectiveIdToAbsoluteId(e.targetObject.getEffectiveId))),
         "event"                             → (e ⇒ stringIterator(e.name)),
         xxformsName("type")                 → (e ⇒ stringIterator(e.name)),
         xxformsName("bubbles")              → (e ⇒ booleanIterator(e.bubbles)),
         xxformsName("cancelable")           → (e ⇒ booleanIterator(e.cancelable)),
         xxformsName("phase")                → (e ⇒ stringIterator(e.currentPhase.name)),
         xxformsName("observerid")           → (e ⇒ stringIterator(e.currentObserver.getId)),
-        xxformsName("effective-observerid") → (e ⇒ stringIterator(e.currentObserver.getEffectiveId)),
+        xxformsName("absolute-observerid")  → (e ⇒ stringIterator(XFormsUtils.effectiveIdToAbsoluteId(e.currentObserver.getEffectiveId))),
         "repeat-indexes"                    → repeatIndexes,
         xxformsName("repeat-indexes")       → repeatIndexes,
         xxformsName("repeat-ancestors")     → repeatAncestors,

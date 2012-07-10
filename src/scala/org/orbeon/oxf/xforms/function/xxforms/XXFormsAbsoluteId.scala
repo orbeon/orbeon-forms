@@ -15,8 +15,9 @@ package org.orbeon.oxf.xforms.function.xxforms
 
 import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.function.XFormsFunction
-import org.orbeon.saxon.expr.XPathContext
+import org.orbeon.saxon.expr.{Expression, XPathContext}
 import org.orbeon.saxon.value.StringValue
+import org.orbeon.oxf.xforms.event.XFormsEventTarget
 
 class XXFormsAbsoluteId extends XFormsFunction with ResolveIds {
     override def evaluateItem(xpathContext: XPathContext) =
@@ -25,4 +26,17 @@ class XXFormsAbsoluteId extends XFormsFunction with ResolveIds {
                 StringValue.makeStringValue(XFormsUtils.effectiveIdToAbsoluteId(effectiveId))
             case None ⇒ null
         }
+}
+
+trait ResolveIds extends XFormsFunction {
+    def resolveEffectiveId(staticIdExpr: Option[Expression], xpathContext: XPathContext) = staticIdExpr match {
+        case None ⇒
+            // If no argument is supplied, return the closest id (source id)
+            Option(getSourceEffectiveId(xpathContext))
+        case Some(expr) ⇒
+            // Otherwise resolve the static id passed against the source id
+            val staticId = expr.evaluateAsString(xpathContext).toString
+            Option(getXBLContainer(xpathContext).resolveObjectById(getSourceEffectiveId(xpathContext), staticId, null)) collect
+                { case target: XFormsEventTarget ⇒ target.getEffectiveId }
+    }
 }

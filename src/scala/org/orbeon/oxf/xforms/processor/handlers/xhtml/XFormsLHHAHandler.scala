@@ -44,11 +44,11 @@ class XFormsLHHAHandler extends XFormsBaseHandlerXHTML(false, false) {
                             if (! isTemplate) {
                                 Option(containingDocument.getControls.resolveObjectById(lhhaEffectiveId, targetControl.staticId, null)) match {
                                     case Some(control: XFormsControl) ⇒ Some(control)
-                                    case Some(otherControl) ⇒
+                                    case Some(otherObject) ⇒
                                         // TODO: Better/more consistent error handling
                                         containingDocument.getControls.getIndentedLogger.logWarning(
                                             "", "Object pointed by @for attribute is not a control",
-                                            "class", otherControl.getClass.getName)
+                                            "class", otherObject.getClass.getName)
                                         return
                                     case None ⇒
                                         // TODO: Better/more consistent error handling

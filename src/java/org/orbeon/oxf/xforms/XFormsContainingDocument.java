@@ -64,7 +64,7 @@ import java.util.concurrent.locks.Lock;
  * o Contains XForms controls
  * o Handles event handlers hierarchy
  */
-public class XFormsContainingDocument extends XBLContainer implements XFormsDocumentLifecycle, Cacheable {
+public class XFormsContainingDocument extends XBLContainer implements XFormsDocumentLifecycle, Cacheable, XFormsObject {
 
     // Special id name for the top-level containing document
     public static final String CONTAINING_DOCUMENT_PSEUDO_ID = "#document";
@@ -527,23 +527,25 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
      * @param effectiveId   effective id of the target
      * @return              object, or null if not found
      */
-    public Object getObjectByEffectiveId(String effectiveId) {
+    public XFormsObject getObjectByEffectiveId(String effectiveId) {
 
         // Search in parent (models and this)
         {
-            final Object resultObject = super.getObjectByEffectiveId(effectiveId);
+            final XFormsObject resultObject = super.getObjectByEffectiveId(effectiveId);
             if (resultObject != null)
                 return resultObject;
         }
 
         // Search in controls
         {
-            final Object resultObject = xformsControls.getObjectByEffectiveId(effectiveId);
+            final XFormsObject resultObject = xformsControls.getObjectByEffectiveId(effectiveId);
             if (resultObject != null)
                 return resultObject;
         }
 
         // Check container id
+        // TODO: This should no longer be needed since we have a root control, right? In which case, the document would
+        // no longer need to be an XFormsObject.
         if (effectiveId.equals(getEffectiveId()))
             return this;
 

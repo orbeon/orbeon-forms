@@ -16,11 +16,12 @@ package org.orbeon.oxf.xforms.event
 import org.orbeon.oxf.xforms.xbl.Scope
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.dom4j.LocationData
+import org.orbeon.oxf.xforms.XFormsObject
 
 /**
  * XFormsEventTarget is implemented by classes that support dispatching of events.
  */
-trait XFormsEventTarget {
+trait XFormsEventTarget extends XFormsObject {
     def scope: Scope
     def container: XBLContainer
 

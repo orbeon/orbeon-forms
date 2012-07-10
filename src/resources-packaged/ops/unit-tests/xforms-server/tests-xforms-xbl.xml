@@ -3621,9 +3621,9 @@
                     <xforms:model id="model">
                         <!-- Upon ready, simulate click on button + close dialog for both XBL controls -->
                         <xforms:action ev:event="xforms-ready">
-                            <xforms:dispatch name="DOMActivate" targetid="my-foo1$foo-trigger"/>
+                            <xforms:dispatch name="DOMActivate" targetid="/my-foo1/foo-trigger"/>
                             <xxforms:hide dialog="my-dialog"/>
-                            <xforms:dispatch name="DOMActivate" targetid="my-foo2$foo-trigger"/>
+                            <xforms:dispatch name="DOMActivate" targetid="/my-foo2/foo-trigger"/>
                             <xxforms:hide dialog="my-dialog"/>
                         </xforms:action>
                     </xforms:model>
@@ -3662,7 +3662,7 @@
                                     <xforms:label>Open me</xforms:label>
                                     <!-- Open global dialog upon click -->
                                     <xxforms:show ev:event="DOMActivate" dialog="my-dialog" xxbl:scope="outer">
-                                        <xxforms:context name="my-id" select="event('xxforms:effective-targetid')"/>
+                                        <xxforms:context name="my-id" select="event('xxforms:absolute-targetid')"/>
                                     </xxforms:show>
                                     <!-- Upon callback, store value received -->
                                     <xforms:setvalue ev:event="my-callback" ref="instance()" value="event('my-value')"/>

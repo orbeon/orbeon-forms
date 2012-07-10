@@ -23,7 +23,7 @@ public interface XFormsObjectResolver {
      * @param effectiveId   effective id of the target
      * @return              object, or null if not found
      */
-    public Object getObjectByEffectiveId(String effectiveId);
+    public XFormsObject getObjectByEffectiveId(String effectiveId);
 
     /**
      * Resolve an object. This optionally depends on a source control, and involves resolving whether the source is within a
@@ -34,5 +34,5 @@ public interface XFormsObjectResolver {
      * @param contextItem        context item, or null (used for bind resolution only)
      * @return                   object, or null if not found
      */
-    public Object resolveObjectById(String effectiveSourceId, String targetId, Item contextItem);
+    public XFormsObject resolveObjectById(String effectiveSourceId, String targetId, Item contextItem);
 }

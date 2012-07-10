@@ -292,7 +292,7 @@ public class XFormsContextStack {
             final boolean isNewModel;
             if (modelId != null) {
                 final XBLContainer resolutionScopeContainer = container.findScopeRoot(scope);
-                final Object o = resolutionScopeContainer.resolveObjectById(sourceEffectiveId, modelId, null);
+                final XFormsObject o = resolutionScopeContainer.resolveObjectById(sourceEffectiveId, modelId, null);
                 if (!(o instanceof XFormsModel)) {
                     // Invalid model id
 
@@ -325,7 +325,7 @@ public class XFormsContextStack {
 
                     // NOTE: For now, only the top-level models in a resolution scope are considered
                     final XBLContainer resolutionScopeContainer = container.findScopeRoot(scope);
-                    final Object o = resolutionScopeContainer.resolveObjectById(sourceEffectiveId, bindId, baseBindingContext.getSingleItem());
+                    final XFormsObject o = resolutionScopeContainer.resolveObjectById(sourceEffectiveId, bindId, baseBindingContext.getSingleItem());
                     if (o == null && resolutionScopeContainer.containsBind(bindId)) {
                         // The bind attribute was valid for this scope, but no runtime object was found for the bind
                         // This can happen e.g. if a nested bind is within a bind with an empty nodeset

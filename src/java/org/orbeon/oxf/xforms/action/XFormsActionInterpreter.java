@@ -22,7 +22,6 @@ import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis;
 import org.orbeon.oxf.xforms.analysis.controls.ActionTrait;
-import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.event.EventHandlerImpl;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventObserver;
@@ -393,30 +392,26 @@ public class XFormsActionInterpreter {
     /**
      * Find an effective object based on either the xxforms:repeat-indexes attribute, or on the current repeat indexes.
      *
-     * @param actionElement         current action element
-     * @param targetStaticId        static id or absolute id of the target to resolve
-     * @return                      effective control if found
+     * @param actionElement             current action element
+     * @param targetStaticOrAbsoluteId  static id or absolute id of the target to resolve
+     * @return                          effective control if found
      */
-    public Object resolveEffectiveControl(Element actionElement, String targetStaticId) {
-
-        // If the id passed is an effective id, just use it
-        if (XFormsUtils.isEffectiveId(targetStaticId))
-            return containingDocument().getObjectByEffectiveId(targetStaticId);
-
-        final XBLContainer resolutionScopeContainer = findResolutionScopeContainer(actionElement);
-
-        // Get indexes as space-separated list
-        final String repeatIndexes = resolveAVT(actionElement, XFormsConstants.XXFORMS_REPEAT_INDEXES_QNAME);
+    public XFormsObject resolveObject(Element actionElement, String targetStaticOrAbsoluteId) {
 
         // First resolve the object by static id
-        final Object result = resolutionScopeContainer.resolveObjectById(getSourceEffectiveId(actionElement), targetStaticId, null);
-        if (StringUtils.isBlank(repeatIndexes)) {
-            // Most common case: just return the resolved object
-            return result;
+        final XBLContainer resolutionScopeContainer = findResolutionScopeContainer(actionElement);
+        final XFormsObject result = resolutionScopeContainer.resolveObjectById(getSourceEffectiveId(actionElement), targetStaticOrAbsoluteId, null);
+
+        if (result == null) {
+            return null;
         } else {
-            // Extension: repeat indexes are provided
-            if (result instanceof XFormsControl) {
-                final XFormsControl tempControl = (XFormsControl) result;
+            // Get indexes as space-separated list
+            final String repeatIndexes = resolveAVT(actionElement, XFormsConstants.XXFORMS_REPEAT_INDEXES_QNAME);
+            if (StringUtils.isBlank(repeatIndexes)) {
+                // Most common case: just return the resolved object
+                return result;
+            } else {
+                // Extension: repeat indexes are provided
 
                 // Repeat indexes in current scope
                 final int[] containerParts = XFormsUtils.getEffectiveIdSuffixParts(resolutionScopeContainer.getEffectiveId());
@@ -424,11 +419,10 @@ public class XFormsActionInterpreter {
                 // Append new indexes
                 final int[] newSuffix = EventHandlerImpl.appendSuffixes(containerParts, repeatIndexes);
 
-                final String effectiveId = EventHandlerImpl.replaceIdSuffix(tempControl.getEffectiveId(), newSuffix);
+                final String effectiveId = EventHandlerImpl.replaceIdSuffix(result.getEffectiveId(), newSuffix);
 
                 return xformsControls.getObjectByEffectiveId(effectiveId);
-            } else
-                return null;
+            }
         }
     }
 
@@ -451,26 +445,6 @@ public class XFormsActionInterpreter {
     }
 
     /**
-     * Resolve an effective object.
-     *
-     * @param actionElement     current action element
-     * @param targetStaticId    target to resolve
-     * @return                  effective control if found
-     */
-    public Object resolveEffectiveObject(Element actionElement, String targetStaticId) {
-        // First try controls as we want to check on explicit repeat indexes first
-        final Object tempXFormsEventTarget = resolveEffectiveControl(actionElement, targetStaticId);
-        if (tempXFormsEventTarget != null) {
-            // Object with this id exists
-            return tempXFormsEventTarget;
-        } else {
-            // Otherwise, try container
-            final XBLContainer resolutionScopeContainer = findResolutionScopeContainer(actionElement);
-            return resolutionScopeContainer.resolveObjectById(getSourceEffectiveId(actionElement), targetStaticId, null);
-        }
-    }
-
-    /**
      * Search a model given a static id and/or the current action element.
      *
      * @param actionElement     current action element
@@ -481,7 +455,7 @@ public class XFormsActionInterpreter {
         final XFormsModel model;
         if (modelStaticId != null) {
             // Id is specified, resolve the effective object
-            final Object o = resolveEffectiveObject(actionElement, modelStaticId);
+            final XFormsObject o = resolveObject(actionElement, modelStaticId);
             if (!(o instanceof XFormsModel))
                 throw new ValidationException("Invalid model id: " + modelStaticId, (LocationData) actionElement.getData());
             model = (XFormsModel) o;
@@ -492,18 +466,6 @@ public class XFormsActionInterpreter {
         if (model == null)
             throw new ValidationException("Invalid model id: " + modelStaticId, (LocationData) actionElement.getData());
         return model;
-    }
-
-    /**
-     * Resolve an object by effective id if the id is not a static id, otherwise try to resolve by static id.
-     */
-    public Object resolveOrFindByEffectiveId(Element actionElement, String staticOrEffectiveId) {
-        if (XFormsUtils.isEffectiveId(staticOrEffectiveId)) {
-            // We allow the use of effective ids so that e.g. a global component such as the error summary can target a specific component
-            return _containingDocument.getObjectByEffectiveId(staticOrEffectiveId);
-        } else {
-            return resolveEffectiveObject(actionElement, staticOrEffectiveId);
-        }
     }
 
     public boolean isDeferredUpdates(Element actionElement) {

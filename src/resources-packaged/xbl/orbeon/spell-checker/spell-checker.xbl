@@ -101,7 +101,7 @@
                         </xforms:action>
                         <xxforms:show dialog="fr-spell-checking-dialog"/>
                         <xforms:setvalue ref="instance('fr-spell-checker-internal')/current-c-index">1</xforms:setvalue>
-                        <xforms:dispatch name="prepare-next-correction" target="fr-spell-checker-model"/>
+                        <xforms:dispatch name="prepare-next-correction" targetid="fr-spell-checker-model"/>
                     </xforms:action>
 
                     <!-- Prepare UI for the next correction -->
@@ -131,7 +131,7 @@
 
                     <!-- Send back result to the component that opened this dialog -->
                     <xforms:action ev:event="fr-spell-check-done">
-                        <xforms:dispatch if="exists(instance('fr-spell-checker-result')/*)" name="fr-spell-check-done" target="{instance('fr-spell-checker-internal')/callback-id}">
+                        <xforms:dispatch if="exists(instance('fr-spell-checker-result')/*)" name="fr-spell-check-done" targetid="{instance('fr-spell-checker-internal')/callback-id}">
                             <xxforms:context name="fr-text" select="string-join(instance('fr-spell-checker-result')/*/@current, '')"/>
                         </xforms:dispatch>
                         <xxforms:hide dialog="fr-spell-checking-dialog"/>
@@ -171,7 +171,7 @@
                                         <!-- Mark this correction as handled -->
                                         <xforms:insert context="$current-c" origin="xxforms:attribute('handled', 'true')"/>
                                         <!-- Move to the next correction -->
-                                        <xforms:dispatch name="prepare-next-correction" target="fr-spell-checker-model"/>
+                                        <xforms:dispatch name="prepare-next-correction" targetid="fr-spell-checker-model"/>
                                     </xforms:action>
                                 </fr:button>
                                 <!-- Ignore all -->
@@ -186,7 +186,7 @@
                                             <xforms:insert context="." origin="xxforms:attribute('handled', 'true')"/>
                                         </xforms:action>
                                         <!-- Move to the next correction -->
-                                        <xforms:dispatch name="prepare-next-correction" target="fr-spell-checker-model"/>
+                                        <xforms:dispatch name="prepare-next-correction" targetid="fr-spell-checker-model"/>
                                     </xforms:action>
                                 </fr:button>
                                 <xforms:group appearance="xxforms:internal">
@@ -202,7 +202,7 @@
                                             <!-- Mark correction as handled -->
                                             <xforms:insert context="$current-c" origin="xxforms:attribute('handled', 'true')"/>
                                             <!-- Move to the next correction -->
-                                            <xforms:dispatch name="prepare-next-correction" target="fr-spell-checker-model"/>
+                                            <xforms:dispatch name="prepare-next-correction" targetid="fr-spell-checker-model"/>
                                         </xforms:action>
                                     </fr:button>
                                     <!-- Change all -->
@@ -220,7 +220,7 @@
                                                 <xforms:insert context="." origin="xxforms:attribute('handled', 'true')"/>
                                             </xforms:action>
                                             <!-- Move to the next correction -->
-                                            <xforms:dispatch name="prepare-next-correction" target="fr-spell-checker-model"/>
+                                            <xforms:dispatch name="prepare-next-correction" targetid="fr-spell-checker-model"/>
                                         </xforms:action>
                                     </fr:button>
                                 </xforms:group>
@@ -230,7 +230,7 @@
                                         <xhtml:img alt="" src="/apps/fr/style/images/silk/cross.png"/>
                                         Done
                                     </xforms:label>
-                                    <xforms:dispatch ev:event="DOMActivate" name="fr-spell-check-done" target="fr-spell-checker-model"/>
+                                    <xforms:dispatch ev:event="DOMActivate" name="fr-spell-check-done" targetid="fr-spell-checker-model"/>
                                 </fr:button>
                             </xhtml:td>
                         </xhtml:tr>
@@ -262,7 +262,7 @@
                     Done spell checking.
                     <fr:button id="close-dialog">
                         <xforms:label>Done</xforms:label>
-                        <xforms:dispatch ev:event="DOMActivate" name="fr-spell-check-done" target="fr-spell-checker-model"/>
+                        <xforms:dispatch ev:event="DOMActivate" name="fr-spell-check-done" targetid="fr-spell-checker-model"/>
                     </fr:button>
                 </xforms:group>
             </xxforms:dialog>
@@ -282,9 +282,9 @@
                         <xsl:if test="exists(/fr:spell-checker/(@ref, @bind))"><xsl:attribute name="ref">$binding</xsl:attribute></xsl:if>
                         <xforms:label>Spell check</xforms:label>
                         <!-- Open dialog -->
-                        <xforms:dispatch ev:event="DOMActivate" target="fr-spell-checker-model" name="fr-spell-check" xxbl:scope="outer">
+                        <xforms:dispatch ev:event="DOMActivate" targetid="fr-spell-checker-model" name="fr-spell-check" xxbl:scope="outer">
                             <xxforms:context name="fr-text" select="$binding" xxbl:scope="inner"/>
-                            <xxforms:context name="fr-callback-id" select="event('xxforms:effective-targetid')"/>
+                            <xxforms:context name="fr-callback-id" select="event('xxforms:absolute-targetid')"/>
                         </xforms:dispatch>
                         <!-- Dialog is calling us back with the result -->
                         <xforms:setvalue ev:event="fr-spell-check-done" ref="$binding" value="event('fr-text')"/>

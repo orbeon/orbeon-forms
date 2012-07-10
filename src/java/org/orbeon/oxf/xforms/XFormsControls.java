@@ -245,7 +245,7 @@ public class XFormsControls implements XFormsObjectResolver {
      * @param effectiveId   effective id of the target
      * @return              object, or null if not found
      */
-    public Object getObjectByEffectiveId(String effectiveId) {
+    public XFormsObject getObjectByEffectiveId(String effectiveId) {
         return currentControlTree.getControl(effectiveId);
     }
 
@@ -258,7 +258,7 @@ public class XFormsControls implements XFormsObjectResolver {
      * @param contextItem               context item, or null (used for bind resolution only)
      * @return                          object, or null if not found
      */
-    public Object resolveObjectById(String sourceControlEffectiveId, String targetStaticId, Item contextItem) {
+    public XFormsObject resolveObjectById(String sourceControlEffectiveId, String targetStaticId, Item contextItem) {
         final String sourcePrefixedId = XFormsUtils.getPrefixedId(sourceControlEffectiveId);
         final Scope scope = containingDocument.getStaticOps().scopeForPrefixedId(sourcePrefixedId);
         final String targetPrefixedId = scope.prefixedIdForStaticId(targetStaticId);

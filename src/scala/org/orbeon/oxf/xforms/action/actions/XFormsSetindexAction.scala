@@ -62,7 +62,7 @@ object XFormsSetindexAction {
             interpreter.containingDocument.synchronizeAndRefresh()
         
         // Find repeat control
-        interpreter.resolveEffectiveControl(actionElement, repeatStaticId) match {
+        interpreter.resolveObject(actionElement, repeatStaticId) match {
             case control: XFormsControl ⇒
                 
                 val repeatControl = Some(control) collect { case repeat: XFormsRepeatControl ⇒ repeat }

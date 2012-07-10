@@ -208,7 +208,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
     /**
      * Get object with the id specified.
      */
-    public Object getObjectByEffectiveId(String effectiveId) {
+    public XFormsObject getObjectByEffectiveId(String effectiveId) {
 
         // If prefixes or suffixes don't match, object can't be found here
         if (!container().getFullPrefix().equals(XFormsUtils.getEffectiveIdPrefix(effectiveId))
@@ -229,9 +229,9 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
      * @param contextItem        context item, or null (used for bind resolution only)
      * @return                   object, or null if not found
      */
-    public Object resolveObjectById(String sourceEffectiveId, String targetStaticId, Item contextItem) {
+    public XFormsObject resolveObjectById(String sourceEffectiveId, String targetStaticId, Item contextItem) {
 
-        if (XFormsUtils.isEffectiveId(targetStaticId))
+        if (XFormsUtils.isEffectiveId(targetStaticId) || XFormsUtils.isAbsoluteId(targetStaticId))
             throw new OXFException("Target id must be static id: " + targetStaticId);
 
         // Check this id

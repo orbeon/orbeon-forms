@@ -73,7 +73,7 @@ class XFormsDispatchAction extends XFormsAction {
             // action."
 
             // Find actual target
-            actionInterpreter.resolveOrFindByEffectiveId(actionElement, resolvedNewEventTargetStaticId) match {
+            actionInterpreter.resolveObject(actionElement, resolvedNewEventTargetStaticId) match {
                 case xformsEventTarget: XFormsEventTarget ⇒
                     // Create and dispatch the event
                     val newEvent = createEvent(containingDocument, resolvedNewEventName, xformsEventTarget, newEventBubbles, newEventCancelable)

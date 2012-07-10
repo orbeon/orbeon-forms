@@ -64,7 +64,7 @@
                         <xforms:group ref=".[readonly = 'false']">
                             <fr:button class="fr-dialog-editor-positive" id="fr-dialog-editor-positive">
                                 <xforms:label>OK</xforms:label>
-                                <xforms:dispatch ev:event="DOMActivate" name="fr-edit-done" target="{callback-id}">
+                                <xforms:dispatch ev:event="DOMActivate" name="fr-edit-done" targetid="{callback-id}">
                                     <xxforms:context name="fr-text" select="text"/>
                                 </xforms:dispatch>
                             </fr:button>
@@ -93,11 +93,11 @@
                 <xforms:group ref="$binding" id="group-external">
                     <!-- Button to open dialog -->
                     <xforms:group appearance="xxforms:internal">
-                        <xforms:dispatch ev:event="DOMActivate" target="fr-dialog-editor-dialog" name="fr-edit" xxbl:scope="outer">
+                        <xforms:dispatch ev:event="DOMActivate" targetid="fr-dialog-editor-dialog" name="fr-edit" xxbl:scope="outer">
                             <xxforms:context name="fr-readonly" select="$readonly" xxbl:scope="inner"/>
                             <xxforms:context name="fr-label" select="xxforms:label('group-with-label')" xxbl:scope="inner"/>
                             <xxforms:context name="fr-text" select="$binding" xxbl:scope="inner"/>
-                            <xxforms:context name="fr-callback-id" select="event('xxforms:effective-targetid')"/>
+                            <xxforms:context name="fr-callback-id" select="event('xxforms:absolute-targetid')"/>
                         </xforms:dispatch>
                         <xforms:setvalue ev:event="fr-edit-done" ref="$binding" value="event('fr-text')"/>
                         <fr:button id="open" class="fr-dialog-editor-open-{if ($readonly) then 'view' else 'edit'}">

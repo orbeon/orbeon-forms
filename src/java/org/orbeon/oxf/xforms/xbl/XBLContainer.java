@@ -365,20 +365,20 @@ public class XBLContainer implements XFormsObjectResolver {
      * @param effectiveId   effective id of the target
      * @return              object, or null if not found
      */
-    public Object getObjectByEffectiveId(String effectiveId) {
+    public XFormsObject getObjectByEffectiveId(String effectiveId) {
 
         if (isRelevant()) {
             // Search in models
             for (final XFormsModel model: models) {
-                final Object resultObject = model.getObjectByEffectiveId(effectiveId);
+                final XFormsObject resultObject = model.getObjectByEffectiveId(effectiveId);
                 if (resultObject != null)
                     return resultObject;
             }
 
             // Search in children
             if (childrenXBLContainers != null) {
-                for (XBLContainer container: childrenXBLContainers.values()) {
-                    final Object resultObject = container.getObjectByEffectiveId(effectiveId);
+                for (XBLContainer container : childrenXBLContainers.values()) {
+                    final XFormsObject resultObject = container.getObjectByEffectiveId(effectiveId);
                     if (resultObject != null)
                         return resultObject;
                 }
@@ -430,7 +430,7 @@ public class XBLContainer implements XFormsObjectResolver {
         }
     }
 
-    public Object resolveObjectByIdInScope(String sourceEffectiveId, String targetStaticId, Item contextItem) {
+    public XFormsObject resolveObjectByIdInScope(String sourceEffectiveId, String targetStaticId, Item contextItem) {
         final String sourcePrefixedId = XFormsUtils.getPrefixedId(sourceEffectiveId);
         final XBLContainer resolutionScopeContainer = findScopeRoot(sourcePrefixedId);
         return resolutionScopeContainer.resolveObjectById(sourceEffectiveId, targetStaticId, contextItem);
@@ -439,21 +439,21 @@ public class XBLContainer implements XFormsObjectResolver {
     /**
      * Resolve an object in the scope of this container.
      *
-     * @param sourceEffectiveId effective id of the source (control, model, instance, submission, ...) (can be null only for absolute ids)
-     * @param targetStaticId    static id of the target
-     * @param contextItem       context item, or null (used for bind resolution only)
-     * @return                  object, or null if not found
+     * @param sourceEffectiveId         effective id of the source (control, model, instance, submission, ...) (can be null only for absolute ids)
+     * @param targetStaticOrAbsoluteId  static or absolute id of the target
+     * @param contextItem               context item, or null (used for bind resolution only)
+     * @return                          object, or null if not found
      */
-    public Object resolveObjectById(String sourceEffectiveId, String targetStaticId, Item contextItem) {
+    public XFormsObject resolveObjectById(String sourceEffectiveId, String targetStaticOrAbsoluteId, Item contextItem) {
 
         // Handle "absolute ids" of format "/foo/bar.1-2"
         // NOTE: Experimental, definitive format TBD
-        if (XFormsUtils.isAbsoluteId(targetStaticId))
-            return containingDocument.getObjectByEffectiveId(XFormsUtils.absoluteIdToEffectiveId(targetStaticId));
+        if (XFormsUtils.isAbsoluteId(targetStaticOrAbsoluteId))
+            return containingDocument.getObjectByEffectiveId(XFormsUtils.absoluteIdToEffectiveId(targetStaticOrAbsoluteId));
 
         // Make sure the static id passed is actually a static id
-        if (!XFormsUtils.isStaticId(targetStaticId))
-            throw new OXFException("Target id must be static id: " + targetStaticId);
+        if (!XFormsUtils.isStaticId(targetStaticOrAbsoluteId))
+            throw new OXFException("Target id must be static id: " + targetStaticOrAbsoluteId);
 
         if (sourceEffectiveId == null)
             throw new OXFException("Source id must be specified.");
@@ -462,12 +462,12 @@ public class XBLContainer implements XFormsObjectResolver {
         //    and return the control associated with the bound element.
         // TODO: should this use sourceControlEffectiveId?
         final String bindingId = containingDocument.getStaticOps().getBindingId(prefixedId);
-        if (targetStaticId.equals(bindingId))
+        if (targetStaticOrAbsoluteId.equals(bindingId))
             return containingDocument.getControls().getObjectByEffectiveId(effectiveId);
 
         // 2. Search in directly contained models
         // NOTE: As of 2011-11, models don't use sourceEffectiveId
-        final Object resultModelObject = searchContainedModels(sourceEffectiveId, targetStaticId, contextItem);
+        final XFormsObject resultModelObject = searchContainedModels(sourceEffectiveId, targetStaticOrAbsoluteId, contextItem);
         if (resultModelObject != null)
             return resultModelObject;
 
@@ -496,7 +496,7 @@ public class XBLContainer implements XFormsObjectResolver {
 
         // Resolve on controls
         final XFormsControls controls = containingDocument.getControls();
-        final XFormsControl result = (XFormsControl) controls.resolveObjectById(sourceControlEffectiveId, targetStaticId, contextItem);
+        final XFormsControl result = (XFormsControl) controls.resolveObjectById(sourceControlEffectiveId, targetStaticOrAbsoluteId, contextItem);
 
         // If result is provided, make sure it is within the resolution scope of this container
         if (result != null && !isEffectiveIdResolvableByThisContainer(result.getEffectiveId())) {
@@ -530,9 +530,9 @@ public class XBLContainer implements XFormsObjectResolver {
         return ((XFormsContainerControl) associatedControl).childrenJava();
     }
 
-    private Object searchContainedModels(String sourceEffectiveId, String targetStaticId, Item contextItem) {
+    private XFormsObject searchContainedModels(String sourceEffectiveId, String targetStaticId, Item contextItem) {
         for (final XFormsModel model: models) {
-            final Object resultObject = model.resolveObjectById(sourceEffectiveId, targetStaticId, contextItem);
+            final XFormsObject resultObject = model.resolveObjectById(sourceEffectiveId, targetStaticId, contextItem);
             if (resultObject != null)
                 return resultObject;
         }

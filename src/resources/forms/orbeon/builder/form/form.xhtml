@@ -25,6 +25,7 @@
       xmlns:xbl="http://www.w3.org/ns/xbl"
       xmlns:secure="java:org.orbeon.oxf.util.SecureUtils"
       xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps"
+      xmlns:sectionOps="java:org.orbeon.oxf.fb.SectionOps"
       xmlns:xformsUtils="java:org.orbeon.oxf.xforms.XFormsUtils">
     <xh:head>
         <!-- CSS -->
@@ -38,6 +39,7 @@
         <xh:script type="text/javascript" src="/forms/orbeon/builder/resources/grid/placeholders.js"/>
         <xh:script type="text/javascript" src="/forms/orbeon/builder/resources/grid/static-upload.js"/>
         <xh:script type="text/javascript" src="/forms/orbeon/builder/resources/grid/style.js"/>
+        <xh:script type="text/javascript" src="/forms/orbeon/builder/resources/section/action-icons.js"/>
         <xh:script type="text/javascript">
             var fbAccordionMenuOptions = {
                 dependent: false,
@@ -558,8 +560,72 @@
                             <xf:upload class="fb-static-upload" id="fb-static-upload-non-empty" ref="$bound-item[string(.) != ''], instance('fb-static-upload')/non-empty"/>
 
                         </xh:div>
+                        <xh:div class="fb-section-editor">
+                            <xf:var name="section" value="instance('fb-form-instance')/xhtml:body//fr:section[@id = instance('fb-variables')/selected-section]"/>
+                            <!-- Delete section -->
+                            <xf:trigger appearance="minimal" class="delete-section-trigger">
+                                <xf:label><xh:img width="16" height="16" src="/apps/fr/style/images/silk/bin.png" alt="{{$fb-resources/delete-section-icon/label}}" title="{{$fb-resources/delete-section-icon/label}}"/></xf:label>
+                                <!-- Ask confirmation -->
+                                <xf:dispatch ev:event="DOMActivate" name="fr-show" targetid="fb-form-editor$dialog-confirmation">
+                                    <xxf:context name="message"
+                                         value="concat($fb-resources/messages/delete-section, ' ',
+                                                            xxf:format-message($fb-resources/messages/controls-will-be-deleted, count($section//*:grid//*:td[*])))"/>
+                                    <xxf:context name="positive-targetid" value="xxf:effective-id('delete-section-trigger')"/>
+                                </xf:dispatch>
+                                <xf:action ev:event="fr-positive" type="xpath">
+                                    sectionOps:deleteSection($section)
+                                </xf:action>
+                            </xf:trigger>
+                            <!-- Edit details -->
+                            <xf:trigger appearance="minimal">
+                                <xf:label><xh:img width="16" height="16" src="/apps/fr/style/images/silk/cog.png" alt="{{$fb-resources/section-details-icon/label}}" title="{{$fb-resources/section-details-icon/label}}"/></xf:label>
+                                <!-- Show section details dialog -->
+                                <xf:dispatch ev:event="DOMActivate" name="fb-show-dialog" target="fb-form-editor$dialog-section-details">
+                                    <xxf:context name="section" value="$section"/>
+                                </xf:dispatch>
+                            </xf:trigger>
+                            <!-- Move up -->
+                            <xf:trigger appearance="minimal" ref="$section[sectionOps:canMoveUp(.)]">
+                                <xf:label><xh:img width="16" height="16" src="/apps/fr/style/images/silk/arrow_up.png" alt="{{$fb-resources/move-up-icon/label}}" title="{{$fb-resources/move-up-icon/label}}"/></xf:label>
+                                <!-- Move section up -->
+                                <xf:action ev:event="DOMActivate" type="xpath">
+                                    sectionOps:moveSectionUp($section)
+                                </xf:action>
+                            </xf:trigger>
+                            <!-- Move down -->
+                            <xf:trigger appearance="minimal" ref="$section[sectionOps:canMoveDown(.)]">
+                                <xf:label><xh:img width="16" height="16" src="/apps/fr/style/images/silk/arrow_down.png" alt="{{$fb-resources/move-down-icon/label}}" title="{{$fb-resources/move-down-icon/label}}"/></xf:label>
+                                <!-- Move section down -->
+                                <xf:action ev:event="DOMActivate" type="xpath">
+                                    sectionOps:moveSectionDown($section)
+                                </xf:action>
+                            </xf:trigger>
+                            <!-- Move right -->
+                            <xf:trigger appearance="minimal" ref="$section[sectionOps:canMoveRight(.)]">
+                                <xf:label><xh:img width="16" height="16" src="/apps/fr/style/images/silk/arrow_right.png" alt="{{$fb-resources/move-right-icon/label}}" title="{{$fb-resources/move-right-icon/label}}"/></xf:label>
+                                <!-- Move section right -->
+                                <xf:action ev:event="DOMActivate" type="xpath">
+                                    sectionOps:moveSectionRight($section)
+                                </xf:action>
+                            </xf:trigger>
+                            <!-- Move left -->
+                            <xf:trigger appearance="minimal" ref="$section[sectionOps:canMoveLeft(.)]">
+                                <xf:label><xh:img width="16" height="16" src="/apps/fr/style/images/silk/arrow_left.png" alt="{{$fb-resources/move-left-icon/label}}" title="{{$fb-resources/move-left-icon/label}}"/></xf:label>
+                                <!-- Move section left -->
+                                <xf:action ev:event="DOMActivate" type="xpath">
+                                    sectionOps:moveSectionLeft($section)
+                                </xf:action>
+                            </xf:trigger>
+                            <!-- Edit help for section -->
+                            <xf:trigger appearance="minimal" class="fb-edit-section-help-trigger" id="fb-edit-section-help-trigger">
+                                <xf:label><xh:img alt="{{$fb-resources/help-icon/label}}" title="{{$fb-resources/help-icon/label}}" src="/ops/images/xforms/help.png"/></xf:label>
+                                <xf:dispatch ev:event="DOMActivate" name="fb-show-dialog" target="fb-form-editor$dialog-help">
+                                    <xxf:context name="control-id" value="$section/@id"/>
+                                </xf:dispatch>
+                            </xf:trigger>
+                        </xh:div>
 
-                        <!--<fr:xforms-inspector xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>-->
+                        <fr:xforms-inspector xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>
 
                     </fr:body>
                 </fr:view>

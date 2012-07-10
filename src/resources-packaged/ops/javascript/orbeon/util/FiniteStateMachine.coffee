@@ -10,20 +10,33 @@
 #
 # The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 
-matchState = (states, element) ->
+elementStateMatches = (states, element) ->                                                                              # Case where state is per element
     state = f$.data 'state', element
     ((_.isUndefined state) and (_.contains states, 'initial')) or (_.contains states, state)
+globalState = 'initial'                                                                                                 # Case where we have just one global state
 
 ORBEON.util.FiniteStateMachine =
-    create: (events, elements, conditions, actions, transitions) ->
+    create: ({ events, elements, conditions, actions, transitions }) ->
         _.each transitions, (transition) ->
             _.each transition.events, (event) ->
                 events[event] (event) ->
-                    elts = elements[transition.elements] event                                                          # Get elements from event (e.g. editable inside cell for mouseover)
-                    elts = _.filter elts, (e) -> matchState transition.from, $ e                                        # Filter elements that are in the 'from' state
-                    if transition.conditions                                                                            # Filter elements that match all the conditions
-                        elts = _.filter elts, (e) ->
-                            _.all transition.conditions, (c) -> conditions[c] $ e
-                    _.each elts, (element) ->
-                        f$.data 'state', transition.to, $ element                                                       # Change state before running action, so if action trigger an event, that event runs against the new state
-                        _.each transition.actions, (action) -> actions[action] $ element                                # Run all the actions on the elements
+                    if transition.elements?                                                                             # State if per-element
+                        elementsFromEvent = elements[transition.elements]
+                        elts = elements[transition.elements] event                                                      # Get elements from event (e.g. editable inside cell for mouseover)
+                        if transition.from?                                                                             # Filter elements that are in the 'from' state
+                            elts = _.filter elts, (e) -> elementStateMatches transition.from, $ e
+                        if transition.conditions                                                                        # Filter elements that match all the conditions
+                            elts = _.filter elts, (e) ->
+                                _.all transition.conditions, (c) -> conditions[c] $ e
+                        _.each elts, (element) ->
+                            f$.data 'state', transition.to, $ element                                                   # Change state before running action, so if action trigger an event, that event runs against the new state
+                            _.each transition.actions, (action) -> actions[action] $ element                            # Run all the actions on the elements
+                    else                                                                                                # State is global (just one state)
+                        if not transition.from? or -1 != _.indexOf transition.from, globalState
+                            conditionsMet = true
+                            if transition.conditions
+                                _.each transition.conditions, (condition) ->
+                                    conditionsMet = false if not condition(event)
+                            if conditionsMet == true
+                                globalState = transition.to
+                                _.each transition.actions, (action) -> actions[action] event

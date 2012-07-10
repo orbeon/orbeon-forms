@@ -15,6 +15,7 @@ Controls = ORBEON.xforms.Controls
 Document = ORBEON.xforms.Document
 Event = YAHOO.util.Event
 Events = ORBEON.xforms.Events
+FSM = ORBEON.util.FiniteStateMachine
 OD = ORBEON.util.Dom
 YD = YAHOO.util.Dom
 
@@ -94,96 +95,95 @@ $ ->
         deferred
     editDoneCallbacks = $.Callbacks()
 
-    # Events
-    events =
-        mouseEntersGridTd: (f) -> Builder.mouseEntersGridTdEvent.subscribe ({gridTd}) -> f $ gridTd
-        mouseExistsGridTd: (f) -> Builder.mouseExitsGridTdEvent .subscribe ({gridTd}) -> f $ gridTd
-        controlAdded: (f) -> Builder.controlAdded.add (containerId) -> f $ document.getElementById containerId
-        ajaxResponse: (f) -> Events.ajaxResponseProcessedEvent.subscribe f
-        click: (f) -> ($ document).click ({target}) -> f $ target
-        enterKey: (f) -> ($ document).keypress ({target, which}) -> f $ target if which == 13
-        lostFocus: (f) -> ($ document).focusout ({target}) ->
-            f $ target if f$.is '.fb-edit-label, .fb-edit-hint', f$.parent $ target                                     # Make sure an editor got the focus. http://goo.gl/rkEAB
-        editDone: (f) -> editDoneCallbacks.add f
-
-    # Return elements, maybe relative to a node
-    elements = do ->
-        adjustContainerForRepeat = (container) ->
-            grid =  f$.closest '.fr-grid', container
-            if f$.is '.fr-repeat-single-row', grid
-                position = 1 + f$.length f$.prevAll container
-                thContainer = f$.nth position, f$.children f$.find 'tr.fr-dt-master-row', grid
-                f$.add thContainer, container
-            else container
-        elementsInContainerWithSelector = (container, selectors) -> f$.find (selectors.join ', '), adjustContainerForRepeat container
-        elementsInContainer: (container) -> elementsInContainerWithSelector container, anyEditableSelector
-        labelsInContainer: (container) ->
-            labelLikeEditables = _.pick editables, ['label', 'button', 'link']
-            elementsInContainerWithSelector container, _.pluck labelLikeEditables, 'selector'
-        elementClosest: (element) -> f$.closest (anyEditableSelector.join ', '), element
-        elementsAll: ->
-            selectors = _.map anyEditableSelector, (s) -> '.fr-editable ' + s
-            selectors = selectors.join ', '
-            $ selectors
-
-    # Conditions
-    conditions =
-        isEmpty: (element) -> (f$.text editableInitialValue element) == ''
-        isNonEmpty: (element) -> not conditions.isEmpty element
-        pointerInsideCell: do ->
-            currentCell = null
-            Builder.mouseEntersGridTdEvent.subscribe ({gridTd}) -> currentCell = gridTd
-            Builder.mouseExitsGridTdEvent.subscribe () -> currentCell = null
-            (element) -> currentCell? and f$.is '*', f$.closest currentCell, element
-        pointerOutsideCell: (element) -> not conditions.pointerInsideCell element
-        isNextSeqNo: (element) ->
-            storeSeqNo = parseInt (f$.data 'seqNo', element)
-            (currentSeqNo element) == storeSeqNo + 1
-
-    # Actions
-    actions =
-        removeFor: (element) -> f$.removeAttr 'for', element                                                            # So on click on the label, the focus isn't set on the input on click
-        showPlaceholder: (element) ->
-            f$.addClass 'fb-label-hint-placeholder', element
-            placeholderText = Controls.getCurrentValue _.first editablePlaceholderOutput element
-            f$.text placeholderText, editablePlaceholderContainer element
-        hidePlaceholder: (element) ->
-            f$.removeClass 'fb-label-hint-placeholder', element
-            f$.text '', editablePlaceholderContainer element
-        createMock: editableDo 'createMock'
-        removeMock: editableDo 'removeMock'
-        storeSeqNo: (element) -> f$.data 'seqNo', (currentSeqNo element), element
-        startEdit: (element) ->
-            Builder.beforeAddingEditorCallbacks.fire element
-            f$.removeClass 'fb-label-hint-placeholder', element
-            f$.removeClass 'xforms-disabled', element                                                                   # Remove disabled which we have on hint when their value is empty
-            input = editableEditInput element
-            f$.append input, f$.empty editablePlaceholderContainer element
-            f$.show input
-            htmlInput = f$.find 'input', input
-            saveButton = $ '#fr-save-button button'                                                                     # HACK: Focus on something else (we know we have a Save button in Form Builder)
-            (setFocus saveButton).then -> setFocus htmlInput
-        endEdit: (element) ->
-            input = editableEditInput element
-            f$.append input, $ '.fb-cell-editor'                                                                        # Move editor out of grid, so it doesn't get removed by HTML replacements
-            newValue = Controls.getCurrentValue input[0]
-            f$.text newValue, editableInitialValue element                                                              # Restore text under label/hint
-        fireEditDone: -> editDoneCallbacks.fire()
-
     # Finite state machine description
     # Diagram: https://docs.google.com/a/orbeon.com/drawings/d/1cJ0B3Tl7QRTMkVUbtlA55C0TUvRiOt5hzR8-dc-aBrk/edit
-    ORBEON.util.FiniteStateMachine.create events, elements, conditions, actions, [
-        { events: [ 'mouseEntersGridTd' ],      elements: 'elementsInContainer',  from: [ 'initial' ],                          conditions: [ 'isEmpty' ],                          to: 'placeholder',              actions: [ 'removeFor', 'createMock', 'showPlaceholder' ]   }
-        { events: [ 'mouseEntersGridTd' ],      elements: 'elementsInContainer',  from: [ 'initial' ],                          conditions: [ 'isNonEmpty' ],                       to: 'mock',                     actions: [ 'removeFor', 'createMock' ]                      }
-        { events: [ 'mouseExistsGridTd' ],      elements: 'elementsInContainer',  from: [ 'mock' ],                                                                                 to: 'initial',                  actions: [ 'removeMock' ]                                   }
-        { events: [ 'mouseExistsGridTd' ],      elements: 'elementsInContainer',  from: [ 'placeholder' ],                                                                          to: 'initial',                  actions: [ 'hidePlaceholder', 'removeMock'  ]               }
-        { events: [ 'click' ],                  elements: 'elementClosest',       from: [ 'placeholder', 'mock' ],                                                                  to: 'wait-xhr-to-edit',         actions: [ 'storeSeqNo' ]                                   }
-        { events: [ 'controlAdded' ],           elements: 'elementsAll',          from: [ 'edit' ],                                                                                 to: 'edit-done',                actions: [ 'endEdit', 'removeMock', 'fireEditDone' ]        }
-        { events: [ 'controlAdded' ],           elements: 'labelsInContainer',    from: [ 'initial' ],                                                                              to: 'edit',                     actions: [ 'removeFor', 'createMock', 'startEdit' ]         }
-        { events: [ 'ajaxResponse' ],           elements: 'elementsAll',          from: [ 'wait-xhr-to-edit' ],                 conditions: [ 'isNextSeqNo' ],                      to: 'edit',                     actions: [ 'startEdit' ]                                    }
-        { events: [ 'enterKey', 'lostFocus' ],  elements: 'elementClosest',       from: [ 'edit' ],                                                                                 to: 'edit-done',                actions: [ 'endEdit', 'removeMock', 'fireEditDone' ]        }
-        { events: [ 'editDone' ],               elements: 'elementsAll',          from: [ 'edit-done' ],                        conditions: [ 'pointerOutsideCell' ],               to: 'initial'                                                                               }
-        { events: [ 'editDone' ],               elements: 'elementsAll',          from: [ 'edit-done' ],                        conditions: [ 'pointerInsideCell', 'isEmpty' ],     to: 'placeholder-after-edit',   actions: [ 'storeSeqNo', 'createMock', 'showPlaceholder' ]  }
-        { events: [ 'editDone' ],               elements: 'elementsAll',          from: [ 'edit-done' ],                        conditions: [ 'pointerInsideCell', 'isNonEmpty' ],  to: 'mock',                     actions: [ 'createMock' ]                                   }
-        { events: [ 'ajaxResponse' ],           elements: 'elementsAll',          from: [ 'placeholder-after-edit' ],           conditions: [ 'isNextSeqNo' ],                      to: 'placeholder',              actions: [ 'showPlaceholder' ]                              }
-    ]
+    FSM.create
+
+        transitions: [
+            { events: [ 'mouseEntersGridTd' ],      elements: 'elementsInContainer',  from: [ 'initial' ],                          conditions: [ 'isEmpty' ],                          to: 'placeholder',              actions: [ 'removeFor', 'createMock', 'showPlaceholder' ]   }
+            { events: [ 'mouseEntersGridTd' ],      elements: 'elementsInContainer',  from: [ 'initial' ],                          conditions: [ 'isNonEmpty' ],                       to: 'mock',                     actions: [ 'removeFor', 'createMock' ]                      }
+            { events: [ 'mouseExistsGridTd' ],      elements: 'elementsInContainer',  from: [ 'mock' ],                                                                                 to: 'initial',                  actions: [ 'removeMock' ]                                   }
+            { events: [ 'mouseExistsGridTd' ],      elements: 'elementsInContainer',  from: [ 'placeholder' ],                                                                          to: 'initial',                  actions: [ 'hidePlaceholder', 'removeMock'  ]               }
+            { events: [ 'click' ],                  elements: 'elementClosest',       from: [ 'placeholder', 'mock' ],                                                                  to: 'wait-xhr-to-edit',         actions: [ 'storeSeqNo' ]                                   }
+            { events: [ 'controlAdded' ],           elements: 'elementsAll',          from: [ 'edit' ],                                                                                 to: 'edit-done',                actions: [ 'endEdit', 'removeMock', 'fireEditDone' ]        }
+            { events: [ 'controlAdded' ],           elements: 'labelsInContainer',    from: [ 'initial' ],                                                                              to: 'edit',                     actions: [ 'removeFor', 'createMock', 'startEdit' ]         }
+            { events: [ 'ajaxResponse' ],           elements: 'elementsAll',          from: [ 'wait-xhr-to-edit' ],                 conditions: [ 'isNextSeqNo' ],                      to: 'edit',                     actions: [ 'startEdit' ]                                    }
+            { events: [ 'enterKey', 'lostFocus' ],  elements: 'elementClosest',       from: [ 'edit' ],                                                                                 to: 'edit-done',                actions: [ 'endEdit', 'removeMock', 'fireEditDone' ]        }
+            { events: [ 'editDone' ],               elements: 'elementsAll',          from: [ 'edit-done' ],                        conditions: [ 'pointerOutsideCell' ],               to: 'initial'                                                                               }
+            { events: [ 'editDone' ],               elements: 'elementsAll',          from: [ 'edit-done' ],                        conditions: [ 'pointerInsideCell', 'isEmpty' ],     to: 'placeholder-after-edit',   actions: [ 'storeSeqNo', 'createMock', 'showPlaceholder' ]  }
+            { events: [ 'editDone' ],               elements: 'elementsAll',          from: [ 'edit-done' ],                        conditions: [ 'pointerInsideCell', 'isNonEmpty' ],  to: 'mock',                     actions: [ 'createMock' ]                                   }
+            { events: [ 'ajaxResponse' ],           elements: 'elementsAll',          from: [ 'placeholder-after-edit' ],           conditions: [ 'isNextSeqNo' ],                      to: 'placeholder',              actions: [ 'showPlaceholder' ]                              }
+        ]
+
+        events:
+            mouseEntersGridTd: (f) -> Builder.mouseEntersGridTdEvent.subscribe ({gridTd}) -> f $ gridTd
+            mouseExistsGridTd: (f) -> Builder.mouseExitsGridTdEvent .subscribe ({gridTd}) -> f $ gridTd
+            controlAdded: (f) -> Builder.controlAdded.add (containerId) -> f $ document.getElementById containerId
+            ajaxResponse: (f) -> Events.ajaxResponseProcessedEvent.subscribe f
+            click: (f) -> ($ document).click ({target}) -> f $ target
+            enterKey: (f) -> ($ document).keypress ({target, which}) -> f $ target if which == 13
+            lostFocus: (f) -> ($ document).focusout ({target}) ->
+                f $ target if f$.is '.fb-edit-label, .fb-edit-hint', f$.parent $ target                                 # Make sure an editor got the focus. http://goo.gl/rkEAB
+            editDone: (f) -> editDoneCallbacks.add f
+
+        elements: do ->
+            adjustContainerForRepeat = (container) ->
+                grid =  f$.closest '.fr-grid', container
+                if f$.is '.fr-repeat-single-row', grid
+                    position = 1 + f$.length f$.prevAll container
+                    thContainer = f$.nth position, f$.children f$.find 'tr.fr-dt-master-row', grid
+                    f$.add thContainer, container
+                else container
+            elementsInContainerWithSelector = (container, selectors) -> f$.find (selectors.join ', '), adjustContainerForRepeat container
+            elementsInContainer: (container) -> elementsInContainerWithSelector container, anyEditableSelector
+            labelsInContainer: (container) ->
+                labelLikeEditables = _.pick editables, ['label', 'button', 'link']
+                elementsInContainerWithSelector container, _.pluck labelLikeEditables, 'selector'
+            elementClosest: (element) -> f$.closest (anyEditableSelector.join ', '), element
+            elementsAll: ->
+                selectors = _.map anyEditableSelector, (s) -> '.fr-editable ' + s
+                selectors = selectors.join ', '
+                $ selectors
+
+        conditions:
+            isEmpty: (element) -> (f$.text editableInitialValue element) == ''
+            isNonEmpty: (element) -> not conditions.isEmpty element
+            pointerInsideCell: do ->
+                currentCell = null
+                Builder.mouseEntersGridTdEvent.subscribe ({gridTd}) -> currentCell = gridTd
+                Builder.mouseExitsGridTdEvent.subscribe () -> currentCell = null
+                (element) -> currentCell? and f$.is '*', f$.closest currentCell, element
+            pointerOutsideCell: (element) -> not conditions.pointerInsideCell element
+            isNextSeqNo: (element) ->
+                storeSeqNo = parseInt (f$.data 'seqNo', element)
+                (currentSeqNo element) == storeSeqNo + 1
+
+        actions:
+            removeFor: (element) -> f$.removeAttr 'for', element                                                        # So on click on the label, the focus isn't set on the input on click
+            showPlaceholder: (element) ->
+                f$.addClass 'fb-label-hint-placeholder', element
+                placeholderText = Controls.getCurrentValue _.first editablePlaceholderOutput element
+                f$.text placeholderText, editablePlaceholderContainer element
+            hidePlaceholder: (element) ->
+                f$.removeClass 'fb-label-hint-placeholder', element
+                f$.text '', editablePlaceholderContainer element
+            createMock: editableDo 'createMock'
+            removeMock: editableDo 'removeMock'
+            storeSeqNo: (element) -> f$.data 'seqNo', (currentSeqNo element), element
+            startEdit: (element) ->
+                Builder.beforeAddingEditorCallbacks.fire element
+                f$.removeClass 'fb-label-hint-placeholder', element
+                f$.removeClass 'xforms-disabled', element                                                               # Remove disabled which we have on hint when their value is empty
+                input = editableEditInput element
+                f$.append input, f$.empty editablePlaceholderContainer element
+                f$.show input
+                htmlInput = f$.find 'input', input
+                saveButton = $ '#fr-save-button button'                                                                 # HACK: Focus on something else (we know we have a Save button in Form Builder)
+                (setFocus saveButton).then -> setFocus htmlInput
+            endEdit: (element) ->
+                input = editableEditInput element
+                f$.append input, $ '.fb-cell-editor'                                                                    # Move editor out of grid, so it doesn't get removed by HTML replacements
+                newValue = Controls.getCurrentValue input[0]
+                f$.text newValue, editableInitialValue element                                                          # Restore text under label/hint
+            fireEditDone: -> editDoneCallbacks.fire()
+

@@ -22,6 +22,14 @@ html {
 .xforms-dialog fieldset {
   border: 1px solid #CCCCCC;
 }
+.fb-section-editor {
+  position: absolute;
+  display: none;
+  padding: 0 10px 20px 20px;
+}
+.fb-section-editor .xforms-trigger {
+  display: block;
+}
 .fb-ie-warning {
   margin: 1em;
   padding: .5em;

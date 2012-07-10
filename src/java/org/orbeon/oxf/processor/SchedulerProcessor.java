@@ -30,6 +30,7 @@ import org.orbeon.oxf.webapp.WebAppExternalContext;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 
+import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -133,7 +134,7 @@ public class SchedulerProcessor extends ProcessorImpl {
                         // - has visibility on the application context only
                         // - doesn't keep references to the current context
                         ProcessorTask task = new ProcessorTask(config.getName(), processor, config.isSynchro(),
-                                new WebAppExternalContext(externalContext.getWebAppContext(), null));
+                                new WebAppExternalContext(externalContext.getWebAppContext(), scala.Option.apply((HttpSession) null)));
                         task.setSchedule(config.getStartTime(), config.getInterval());
                         scheduler.schedule(task);
                         break;

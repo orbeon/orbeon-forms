@@ -84,9 +84,9 @@ trait ServletPortlet {
     private def searchDefinition(processorPrefix: String, inputPrefix: String) = {
         // All search functions
         val functions: Seq[(String, String) ⇒ Option[ProcessorDefinition]] =
-            Seq(getDefinitionFromMap(initParameters.asJava, _, _),
+            Seq(getDefinitionFromMap(initParameters, _, _),
                 getDefinitionFromProperties _,
-                getDefinitionFromMap(webAppContext.initParameters.asJava, _, _))
+                getDefinitionFromMap(webAppContext.initParameters, _, _))
 
         // Call functions until we find a result
         functions flatMap (_(processorPrefix, inputPrefix)) headOption

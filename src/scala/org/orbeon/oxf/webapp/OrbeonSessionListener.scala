@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.webapp
 
-import org.orbeon.oxf.pipeline.InitUtils
+import org.orbeon.oxf.pipeline.InitUtils.runWithServletContext
 import org.orbeon.oxf.servlet.ServletExternalContext
 import javax.servlet.http.HttpSessionEvent
 import javax.servlet.http.HttpSessionListener
@@ -43,7 +43,7 @@ class OrbeonSessionListener extends HttpSessionListener {
         withRootException("session creation", new ServletException(_)) {
             val httpSession = event.getSession
             val servletContext = httpSession.getServletContext
-            InitUtils.run(servletContext, httpSession, null, logger, logPrefix, "Session created.", InitProcessorPrefix, InitInputPrefix)
+            runWithServletContext(servletContext, Some(httpSession), logger, logPrefix, "Session created.", InitProcessorPrefix, InitInputPrefix)
         }
 
     def sessionDestroyed(event: HttpSessionEvent): Unit =
@@ -52,7 +52,7 @@ class OrbeonSessionListener extends HttpSessionListener {
             if (httpSession ne null) {
                 // Run processor
                 val servletContext = httpSession.getServletContext
-                InitUtils.run(servletContext, httpSession, null, logger, logPrefix, "Session destroyed.", DestroyProcessorPrefix, DestroyInputPrefix)
+                runWithServletContext(servletContext, Some(httpSession), logger, logPrefix, "Session destroyed.", DestroyProcessorPrefix, DestroyInputPrefix)
 
                 // Run listeners if any
                 // One rationale for running this after the processor is that the processor might add new listeners

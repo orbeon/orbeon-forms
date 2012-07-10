@@ -1,5 +1,3 @@
-package org.orbeon.oxf.webapp
-
 /**
  * Copyright (C) 2012 Orbeon, Inc.
  *
@@ -13,6 +11,7 @@ package org.orbeon.oxf.webapp
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
+package org.orbeon.oxf.webapp
 
 import org.orbeon.oxf.pipeline.api.ExternalContext
 import javax.servlet.http.HttpSession
@@ -23,11 +22,13 @@ import java.util.{Map ⇒ JMap}
 import org.orbeon.oxf.pipeline.api.ExternalContext.Session
 
 // External context which only exposes the web app, without request or response
-// Session is null when called from init()/destroy()/contextInitialized()/contextDestroyed()
-// Session is present when called from sessionCreated()/sessionDestroyed()
-class WebAppExternalContext(webAppContext: WebAppContext, httpSession: HttpSession = null) extends ExternalContext {
+// Session is None when called from init()/destroy()/contextInitialized()/contextDestroyed()
+// Session is Some(_) when called from sessionCreated()/sessionDestroyed()
+class WebAppExternalContext(webAppContext: WebAppContext, httpSession: Option[HttpSession] = None) extends ExternalContext {
 
-    private var session: SessionImpl = _
+    // Return null if we were not provided with a session. This allows detecting whether the session is available or not.
+    private lazy val session: Session = httpSession map (new SessionImpl(_)) orNull
+    def getSession(create: Boolean) = session
 
     def getWebAppContext = webAppContext
     def getNativeRequest = null
@@ -37,18 +38,6 @@ class WebAppExternalContext(webAppContext: WebAppContext, httpSession: HttpSessi
     def getRequest = null
     def getResponse = null
     def getRequestDispatcher(path: String, isContextRelative: Boolean): ExternalContext.RequestDispatcher = null
-
-    def getSession(create: Boolean): ExternalContext.Session = {
-
-        // Return null if we were not provided with a session. This allows detecting whether the session is available or not.
-        if (httpSession eq null)
-            return null
-
-        if (session eq null)
-            session = new SessionImpl(httpSession)
-
-        session
-    }
 
     def rewriteServiceURL(urlString: String, rewriteMode: Int) =
         URLRewriterUtils.rewriteServiceURL(getRequest, urlString, rewriteMode)

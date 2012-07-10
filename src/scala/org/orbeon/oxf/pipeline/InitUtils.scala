@@ -14,9 +14,7 @@
 package org.orbeon.oxf.pipeline
 
 import collection.JavaConverters._
-import java.util.Collections
-import java.util.Enumeration
-import java.util.Map
+import java.util.{Enumeration ⇒ JEnumeration}
 import javax.servlet.ServletContext
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpSession
@@ -36,16 +34,16 @@ import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.resources.ResourceNotFoundException
 import org.orbeon.oxf.util.AttributesToMap
 import org.orbeon.oxf.util.PipelineUtils
+import org.orbeon.oxf.util.ScalaUtils.nonEmptyOrNone
 import org.orbeon.oxf.webapp.{WebAppContext, HttpStatusCodeException, WebAppExternalContext}
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.oxf.util.ScalaUtils.nonEmptyOrNone
 
 object InitUtils {
 
     val CacheSizeProperty = "oxf.cache.size"
-    val PrologueProperty = "oxf.prologue"
-    val DefaultPrologue = "oxf:/processors.xml"
+    val PrologueProperty  = "oxf.prologue"
+    val DefaultPrologue   = "oxf:/processors.xml"
 
     // Run with a pipeline context and destroy the pipeline when done
     def withPipelineContext[T](body: PipelineContext ⇒ T) = {
@@ -102,10 +100,8 @@ object InitUtils {
         } finally {
             if (logger.isInfoEnabled) {
                 val timing = System.currentTimeMillis - tsBegin
-                val sb = new StringBuilder(Option(externalContext.getRequest.getRequestPath) getOrElse "Done running processor")
-                sb.append(" - Timing: ")
-                sb.append(timing)
-                logger.info(sb.toString)
+                val requestPath = Option(externalContext.getRequest) map (_.getRequestPath) getOrElse "Done running processor"
+                logger.info(requestPath  + " - Timing: " + timing)
             }
             try pipelineContext.destroy(success)
             catch {
@@ -117,49 +113,42 @@ object InitUtils {
 
     // Create a processor and connect its inputs to static URLs
     def createProcessor(processorDefinition: ProcessorDefinition): Processor = {
+        // Create the processor
         val processor = ProcessorFactoryRegistry.lookup(processorDefinition.getName).createInstance
 
-        for ((inputName, value) ← processorDefinition.getEntries.asScala)
+        // Connect its inputs based on the definition
+        for ((inputName, value) ← processorDefinition.getEntries.asScala) {
+
+            import DOMGenerator._
+            import ProcessorImpl.OUTPUT_DATA
+            import PipelineUtils._
+
+            def connectInput(file: Option[String], create: (String, Long, String) ⇒ DOMGenerator) =
+                connect(create("init input", ZeroValidity, file getOrElse DefaultContext), OUTPUT_DATA, processor, inputName)
+
             value match {
                 case url: String ⇒
-                    val urlGenerator = PipelineUtils.createURLGenerator(url)
-                    PipelineUtils.connect(urlGenerator, ProcessorImpl.OUTPUT_DATA, processor, inputName)
+                    val urlGenerator = createURLGenerator(url)
+                    connect(urlGenerator, OUTPUT_DATA, processor, inputName)
                 case element: Element ⇒
                     val locationData = ProcessorUtils.getElementLocationData(element)
-                    val file = Option(locationData) map (_.getSystemID) getOrElse DOMGenerator.DefaultContext
-                    val domGenerator = PipelineUtils.createDOMGenerator(element, "init input", DOMGenerator.ZeroValidity, file)
-                    PipelineUtils.connect(domGenerator, ProcessorImpl.OUTPUT_DATA, processor, inputName)
+                    connectInput(Option(locationData) map (_.getSystemID), createDOMGenerator(element, _, _, _))
                 case document: Document ⇒
                     val locationData = ProcessorUtils.getElementLocationData(document.getRootElement)
-                    val file = Option(locationData) map (_.getSystemID) getOrElse DOMGenerator.DefaultContext
-                    val domGenerator = PipelineUtils.createDOMGenerator(document, "init input", DOMGenerator.ZeroValidity, file)
-                    PipelineUtils.connect(domGenerator, ProcessorImpl.OUTPUT_DATA, processor, inputName)
+                    connectInput(Option(locationData) map (_.getSystemID), createDOMGenerator(document, _, _, _))
                 case nodeInfo: NodeInfo ⇒
-                    val nodeInfoSystemId: String = nodeInfo.getSystemId
-                    val systemId: String = if (nodeInfoSystemId == null) DOMGenerator.DefaultContext else nodeInfoSystemId
-                    val domGenerator: DOMGenerator = PipelineUtils.createDOMGenerator(nodeInfo, "init input", DOMGenerator.ZeroValidity, systemId)
-                    PipelineUtils.connect(domGenerator, ProcessorImpl.OUTPUT_DATA, processor, inputName)
-                case _ ⇒
-                    throw new IllegalStateException("Incorrect type in map.")
+                    connectInput(Option(nodeInfo.getSystemId), createDOMGenerator(nodeInfo, _, _, _))
+                case value ⇒
+                    throw new IllegalStateException("Incorrect type in processor definition: " + value.getClass)
             }
+        }
 
         processor
     }
 
-    /**
-     * Run a processor based on definitions found in properties or the web app context. This is
-     * useful for context/session listeners. If a definition is not found, no exception is thrown.
-     *
-     * @param servletContext            required ServletContext instance
-     * @param session                   optional HttpSession object
-     * @param localMap
-     * @param logger                    required logger
-     * @param logMessagePrefix          required prefix for log messages
-     * @param message                   optional message to display whether there is a processor to run or not
-     * @param uriNamePropertyPrefix     required prefix of the property or parameter containing the processor name
-     * @param processorInputProperty    required prefix of the properties or parameters containing processor input names
-     */
-    def run(servletContext: ServletContext, session: HttpSession, localMap: Map[String, String], logger: Logger, logMessagePrefix: String, message: String, uriNamePropertyPrefix: String, processorInputProperty: String) {
+     // Run a processor based on definitions found in properties or the web app context. This is
+     // useful for context/session listeners. Don't run if a definition is not found, no exception is thrown.
+    def runWithServletContext(servletContext: ServletContext, session: Option[HttpSession], logger: Logger, logMessagePrefix: String, message: String, uriNamePropertyPrefix: String, processorInputProperty: String): Unit = {
 
         require(servletContext ne null)
 
@@ -170,7 +159,6 @@ object InitUtils {
             logger.info(logMessagePrefix + " - " + message)
 
         val processorDefinitionOption =
-            Option(localMap) flatMap (getDefinitionFromMap(_, uriNamePropertyPrefix, processorInputProperty)) orElse
             getDefinitionFromProperties(uriNamePropertyPrefix, processorInputProperty) orElse
             getDefinitionFromServletContext(servletContext, uriNamePropertyPrefix, processorInputProperty)
 
@@ -210,53 +198,51 @@ object InitUtils {
         getDefinitionFromMap(new ServletContextInitMap(servletContext), uriNamePropertyPrefix, inputPropertyPrefix)
 
     def getDefinitionFromProperties(uriNamePropertyPrefix: String, inputPropertyPrefix: String) =
-        getDefinitionFromMap(new OXFPropertiesMap, uriNamePropertyPrefix, inputPropertyPrefix)
+        getDefinitionFromMap(PropertiesMap, uriNamePropertyPrefix, inputPropertyPrefix)
 
-    // Create a ProcessorDefinition from a Map. Only Map.get() and Map.keySet() are used.
+    // Create a ProcessorDefinition from a Map. Only Map.get() and Map.keySet() are used
     def getDefinitionFromMap(map: Map[String, String], uriNamePropertyPrefix: String, inputPropertyPrefix: String) =
-        Option(map.get(uriNamePropertyPrefix + "name")) map { processorName ⇒
+        map.get(uriNamePropertyPrefix + "name") map { processorName ⇒
             val processorDefinition = new ProcessorDefinition
             processorDefinition.setName(Dom4jUtils.explodedQNameToQName(processorName))
 
-            for ((name, value) ← map.asScala)
+            for ((name, value) ← map)
                 if (name.startsWith(inputPropertyPrefix))
                     processorDefinition.addInput(name.substring(inputPropertyPrefix.length), value)
 
             processorDefinition
         }
 
-    // Read-only view of the properties as a Map.
-    private class OXFPropertiesMap extends AttributesToMap[String](new AttributesToMap.Attributeable[String] {
-        def getAttribute(s: String) =
-            Option(Properties.instance.getPropertySet.getObject(s)) map (_.toString) orNull
+    // Read-only view of the properties as a Map
+    private object PropertiesMap extends Map[String, String] {
+        def get(key: String) = Option(Properties.instance.getPropertySet.getObject(key)) map (_.toString)
+        def iterator = Properties.instance.getPropertySet.keySet.asScala.toIterator map (key ⇒ key → this(key))
 
-        def getAttributeNames: Enumeration[String] =
-            Collections.enumeration(Properties.instance.getPropertySet.keySet)
+        def -(key: String) = Map() ++ this - key
+        def +[B1 >: String](kv: (String, B1)) = Map() ++ this + kv
+    }
 
-        def removeAttribute(s: String): Unit = throw new UnsupportedOperationException
-        def setAttribute(s: String, o: String): Unit = throw new UnsupportedOperationException
-    })
+    // Read-only view of the ServletContext initialization parameters as a Map
+    private class ServletContextInitMap(servletContext: ServletContext) extends Map[String, String] {
+        def get(key: String) = Option(servletContext.getInitParameter(key))
+        def iterator = servletContext.getInitParameterNames.asInstanceOf[JEnumeration[String]].asScala.toIterator map (key ⇒ key → this(key))
 
-    // Read-only view of the ServletContext initialization parameters as a Map.
-    private class ServletContextInitMap(servletContext: ServletContext) extends AttributesToMap[String](new AttributesToMap.Attributeable[String] {
-        def getAttribute(s: String) = servletContext.getInitParameter(s)
-        def getAttributeNames = servletContext.getInitParameterNames.asInstanceOf[Enumeration[String]]
-        def removeAttribute(s: String): Unit = throw new UnsupportedOperationException
-        def setAttribute(s: String, o: String): Unit = throw new UnsupportedOperationException
-    })
+        def -(key: String) = Map() ++ this - key
+        def +[B1 >: String](kv: (String, B1)) = Map() ++ this + kv
+    }
 
-    // View of the HttpSession properties as a Map.
+    // View of the HttpSession properties as a Map
     class SessionMap(httpSession: HttpSession) extends AttributesToMap[AnyRef](new AttributesToMap.Attributeable[AnyRef] {
         def getAttribute(s: String) = httpSession.getAttribute(s)
-        def getAttributeNames = httpSession.getAttributeNames.asInstanceOf[Enumeration[String]]
+        def getAttributeNames = httpSession.getAttributeNames.asInstanceOf[JEnumeration[String]]
         def removeAttribute(s: String): Unit = httpSession.removeAttribute(s)
         def setAttribute(s: String, o: AnyRef): Unit = httpSession.setAttribute(s, o)
     })
 
-    // View of the HttpServletRequest properties as a Map.
+    // View of the HttpServletRequest properties as a Map
     class RequestMap(httpServletRequest: HttpServletRequest) extends AttributesToMap[AnyRef](new AttributesToMap.Attributeable[AnyRef] {
         def getAttribute(s: String) = httpServletRequest.getAttribute(s)
-        def getAttributeNames = httpServletRequest.getAttributeNames.asInstanceOf[Enumeration[String]]
+        def getAttributeNames = httpServletRequest.getAttributeNames.asInstanceOf[JEnumeration[String]]
         def removeAttribute(s: String): Unit = httpServletRequest.removeAttribute(s)
         def setAttribute(s: String, o: AnyRef): Unit =  httpServletRequest.setAttribute(s, o)
     })

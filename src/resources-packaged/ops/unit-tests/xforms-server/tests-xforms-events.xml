@@ -104,9 +104,9 @@
                         <xforms:insert ev:event="#all"
                                        context="instance('events')" nodeset="*"
                                        origin="xxforms:element('event',
-                                                (xxforms:attribute('type', xxforms:event('xxforms:type')),
-                                                 xxforms:attribute('target', xxforms:event('xxforms:targetid')),
-                                                 xxforms:attribute('indexes', string-join(xxforms:event('xxforms:repeat-indexes'), ' '))))"/>
+                                                (xxforms:attribute('type', event('xxforms:type')),
+                                                 xxforms:attribute('target', event('xxforms:targetid')),
+                                                 xxforms:attribute('indexes', string-join(event('xxforms:repeat-indexes'), ' '))))"/>
 
                         <xforms:input id="my-input-1" ref="."/>
 
@@ -822,31 +822,31 @@
                         <xforms:insert ev:event="foo bar"
                                        context="instance('events')" nodeset="*"
                                        origin="xxforms:element('handler1-event',
-                                                (xxforms:attribute('type', xxforms:event('xxforms:type')),
-                                                 xxforms:attribute('target', xxforms:event('xxforms:targetid'))))"/>
+                                                (xxforms:attribute('type', event('xxforms:type')),
+                                                 xxforms:attribute('target', event('xxforms:targetid'))))"/>
 
                         <xforms:group id="group2">
                             <!-- Record only if target is observer -->
                             <xforms:insert ev:event="foo bar" ev:target="#observer"
                                            context="instance('events')" nodeset="*"
                                            origin="xxforms:element('handler2-event',
-                                                    (xxforms:attribute('type', xxforms:event('xxforms:type')),
-                                                     xxforms:attribute('target', xxforms:event('xxforms:targetid'))))"/>
+                                                    (xxforms:attribute('type', event('xxforms:type')),
+                                                     xxforms:attribute('target', event('xxforms:targetid'))))"/>
 
                             <!-- Record if target is observer OR group3 -->
                             <xforms:insert ev:event="foo bar" ev:target="#observer group3"
                                            context="instance('events')" nodeset="*"
                                            origin="xxforms:element('handler3-event',
-                                                    (xxforms:attribute('type', xxforms:event('xxforms:type')),
-                                                     xxforms:attribute('target', xxforms:event('xxforms:targetid'))))"/>
+                                                    (xxforms:attribute('type', event('xxforms:type')),
+                                                     xxforms:attribute('target', event('xxforms:targetid'))))"/>
 
                             <xforms:group id="group3">
                                 <!-- Record only if target is observer -->
                                 <xforms:insert ev:event="foo bar" ev:target="#observer"
                                                context="instance('events')" nodeset="*"
                                                origin="xxforms:element('handler4-event',
-                                                        (xxforms:attribute('type', xxforms:event('xxforms:type')),
-                                                         xxforms:attribute('target', xxforms:event('xxforms:targetid'))))"/>
+                                                        (xxforms:attribute('type', event('xxforms:type')),
+                                                         xxforms:attribute('target', event('xxforms:targetid'))))"/>
                             </xforms:group>
 
                         </xforms:group>
@@ -1069,53 +1069,53 @@
                         <xforms:insert ev:event="my-event" ev:phase="capture"
                                        context="instance('events')" nodeset="*"
                                        origin="xxforms:element('group1',
-                                                (xxforms:attribute('type', xxforms:event('xxforms:type')),
+                                                (xxforms:attribute('type', event('xxforms:type')),
                                                  xxforms:attribute('phase', event('xxforms:phase')),
-                                                 xxforms:attribute('target', xxforms:event('xxforms:targetid'))))"/>
+                                                 xxforms:attribute('target', event('xxforms:targetid'))))"/>
                         <xforms:insert ev:event="my-event" ev:phase="target"
                                        context="instance('events')" nodeset="*"
                                        origin="xxforms:element('group2',
-                                                (xxforms:attribute('type', xxforms:event('xxforms:type')),
+                                                (xxforms:attribute('type', event('xxforms:type')),
                                                  xxforms:attribute('phase', event('xxforms:phase')),
-                                                 xxforms:attribute('target', xxforms:event('xxforms:targetid'))))"/>
+                                                 xxforms:attribute('target', event('xxforms:targetid'))))"/>
                         <xforms:insert ev:event="my-event" ev:phase="bubbling"
                                        context="instance('events')" nodeset="*"
                                        origin="xxforms:element('group3',
-                                                (xxforms:attribute('type', xxforms:event('xxforms:type')),
+                                                (xxforms:attribute('type', event('xxforms:type')),
                                                  xxforms:attribute('phase', event('xxforms:phase')),
-                                                 xxforms:attribute('target', xxforms:event('xxforms:targetid'))))"/>
+                                                 xxforms:attribute('target', event('xxforms:targetid'))))"/>
                         <xforms:insert ev:event="my-event" ev:phase="default"
                                        context="instance('events')" nodeset="*"
                                        origin="xxforms:element('group4',
-                                                (xxforms:attribute('type', xxforms:event('xxforms:type')),
+                                                (xxforms:attribute('type', event('xxforms:type')),
                                                  xxforms:attribute('phase', event('xxforms:phase')),
-                                                 xxforms:attribute('target', xxforms:event('xxforms:targetid'))))"/>
+                                                 xxforms:attribute('target', event('xxforms:targetid'))))"/>
 
                         <xforms:input id="my-input" ref="name">
                             <xforms:insert ev:event="my-event" ev:phase="capture"
                                            context="instance('events')" nodeset="*"
                                            origin="xxforms:element('input1',
-                                                    (xxforms:attribute('type', xxforms:event('xxforms:type')),
+                                                    (xxforms:attribute('type', event('xxforms:type')),
                                                      xxforms:attribute('phase', event('xxforms:phase')),
-                                                     xxforms:attribute('target', xxforms:event('xxforms:targetid'))))"/>
+                                                     xxforms:attribute('target', event('xxforms:targetid'))))"/>
                             <xforms:insert ev:event="my-event" ev:phase="target"
                                            context="instance('events')" nodeset="*"
                                            origin="xxforms:element('input2',
-                                                    (xxforms:attribute('type', xxforms:event('xxforms:type')),
+                                                    (xxforms:attribute('type', event('xxforms:type')),
                                                      xxforms:attribute('phase', event('xxforms:phase')),
-                                                     xxforms:attribute('target', xxforms:event('xxforms:targetid'))))"/>
+                                                     xxforms:attribute('target', event('xxforms:targetid'))))"/>
                             <xforms:insert ev:event="my-event" ev:phase="bubbling"
                                            context="instance('events')" nodeset="*"
                                            origin="xxforms:element('input3',
-                                                    (xxforms:attribute('type', xxforms:event('xxforms:type')),
+                                                    (xxforms:attribute('type', event('xxforms:type')),
                                                      xxforms:attribute('phase', event('xxforms:phase')),
-                                                     xxforms:attribute('target', xxforms:event('xxforms:targetid'))))"/>
+                                                     xxforms:attribute('target', event('xxforms:targetid'))))"/>
                             <xforms:insert ev:event="my-event" ev:phase="default"
                                            context="instance('events')" nodeset="*"
                                            origin="xxforms:element('input4',
-                                                    (xxforms:attribute('type', xxforms:event('xxforms:type')),
+                                                    (xxforms:attribute('type', event('xxforms:type')),
                                                      xxforms:attribute('phase', event('xxforms:phase')),
-                                                     xxforms:attribute('target', xxforms:event('xxforms:targetid'))))"/>
+                                                     xxforms:attribute('target', event('xxforms:targetid'))))"/>
                         </xforms:input>
                     </xforms:group>
                 </xhtml:body>
@@ -1476,9 +1476,9 @@
                     <xforms:insert ev:event="#all"
                                    context="instance('events')" nodeset="*"
                                    origin="xxforms:element('event',
-                                            (xxforms:attribute('type', xxforms:event('xxforms:type')),
-                                             xxforms:attribute('target', xxforms:event('xxforms:targetid')),
-                                             xxforms:attribute('indexes', string-join(xxforms:event('xxforms:repeat-indexes'), ' '))))"/>
+                                            (xxforms:attribute('type', event('xxforms:type')),
+                                             xxforms:attribute('target', event('xxforms:targetid')),
+                                             xxforms:attribute('indexes', string-join(event('xxforms:repeat-indexes'), ' '))))"/>
 
                     <xforms:switch id="my-switch">
                         <xforms:case id="case1">
@@ -1552,9 +1552,9 @@
                     <xforms:insert ev:event="#all"
                                    context="instance('events')" nodeset="*"
                                    origin="xxforms:element('event',
-                                            (xxforms:attribute('type', xxforms:event('xxforms:type')),
-                                             xxforms:attribute('target', xxforms:event('xxforms:targetid')),
-                                             xxforms:attribute('indexes', string-join(xxforms:event('xxforms:repeat-indexes'), ' '))))"/>
+                                            (xxforms:attribute('type', event('xxforms:type')),
+                                             xxforms:attribute('target', event('xxforms:targetid')),
+                                             xxforms:attribute('indexes', string-join(event('xxforms:repeat-indexes'), ' '))))"/>
 
                     <xforms:switch id="my-switch">
                         <xforms:case id="case1">
@@ -1632,9 +1632,9 @@
                     <xforms:insert ev:event="xforms-enabled xforms-disabled xxforms-dialog-open xxforms-dialog-close"
                                    context="instance('events')" nodeset="*"
                                    origin="xxforms:element('event',
-                                            (xxforms:attribute('type', xxforms:event('xxforms:type')),
-                                             xxforms:attribute('target', xxforms:event('xxforms:targetid')),
-                                             xxforms:attribute('indexes', string-join(xxforms:event('xxforms:repeat-indexes'), ' '))))"/>
+                                            (xxforms:attribute('type', event('xxforms:type')),
+                                             xxforms:attribute('target', event('xxforms:targetid')),
+                                             xxforms:attribute('indexes', string-join(event('xxforms:repeat-indexes'), ' '))))"/>
 
                     <xxforms:dialog id="my-dialog">
                         <xforms:input id="input1" ref="value[1]"/>
@@ -1805,9 +1805,9 @@
                     <xforms:insert ev:event="#all"
                                    context="instance('events')" nodeset="*"
                                    origin="xxforms:element('event',
-                                            (xxforms:attribute('type', xxforms:event('xxforms:type')),
-                                             xxforms:attribute('target', xxforms:event('xxforms:targetid')),
-                                             xxforms:attribute('indexes', string-join(xxforms:event('xxforms:repeat-indexes'), ' '))))"/>
+                                            (xxforms:attribute('type', event('xxforms:type')),
+                                             xxforms:attribute('target', event('xxforms:targetid')),
+                                             xxforms:attribute('indexes', string-join(event('xxforms:repeat-indexes'), ' '))))"/>
 
                     <!-- 1. Bindings and values are evaluated -->
                     <xforms:group id="my-group">
@@ -1878,9 +1878,9 @@
                     <xforms:insert ev:event="#all"
                                    context="instance('events')" nodeset="*"
                                    origin="xxforms:element('event',
-                                            (xxforms:attribute('type', xxforms:event('xxforms:type')),
-                                             xxforms:attribute('target', xxforms:event('xxforms:targetid')),
-                                             xxforms:attribute('indexes', string-join(xxforms:event('xxforms:repeat-indexes'), ' '))))"/>
+                                            (xxforms:attribute('type', event('xxforms:type')),
+                                             xxforms:attribute('target', event('xxforms:targetid')),
+                                             xxforms:attribute('indexes', string-join(event('xxforms:repeat-indexes'), ' '))))"/>
 
                     <!-- 1. Bindings and values are evaluated -->
                     <xforms:group id="my-group">
@@ -1920,7 +1920,7 @@
                         <xxf:control id="my-input">43</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
-            </xxf:event-response>            
+            </xxf:event-response>
         </output>
     </test>
 
@@ -1947,9 +1947,9 @@
                     <xforms:insert ev:event="#all"
                                    model="events-model" context="." nodeset="*"
                                    origin="xxforms:element('event',
-                                            (xxforms:attribute('type', xxforms:event('xxforms:type')),
-                                             xxforms:attribute('target', xxforms:event('xxforms:targetid')),
-                                             xxforms:attribute('indexes', string-join(xxforms:event('xxforms:repeat-indexes'), ' '))))"/>
+                                            (xxforms:attribute('type', event('xxforms:type')),
+                                             xxforms:attribute('target', event('xxforms:targetid')),
+                                             xxforms:attribute('indexes', string-join(event('xxforms:repeat-indexes'), ' '))))"/>
 
                     <xforms:repeat nodeset="text" id="my-repeat">
                         <xforms:input ref="." id="my-input"/>

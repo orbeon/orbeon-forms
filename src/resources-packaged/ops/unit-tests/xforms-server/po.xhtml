@@ -96,9 +96,9 @@
         <xf:insert id="my-insert" ev:event="#all"
                        model="events-model" context="." nodeset="*"
                        origin="xxf:element('event',
-                                (xxf:attribute('type', xxf:event('xxf:type')),
-                                 xxf:attribute('target', xxf:event('xxf:targetid')),
-                                 xxf:attribute('indexes', string-join(xxf:event('xxf:repeat-indexes'), ' '))))"/>
+                                (xxf:attribute('type', event('xxf:type')),
+                                 xxf:attribute('target', event('xxf:targetid')),
+                                 xxf:attribute('indexes', string-join(event('xxf:repeat-indexes'), ' '))))"/>
 
         <xf:repeat id="item-repeat" ref="items/item">
             <xf:input id="name" ref="name"/>

@@ -54,9 +54,9 @@
                                     (xxforms:attribute('type', event('xxforms:type')),
                                      xxforms:attribute('target', event('xxforms:targetid')),
                                      xxforms:attribute('phase', 'bubbling'),
-                                     xxforms:attribute('original-target', xxforms:event('xxforms:targetid')),
+                                     xxforms:attribute('original-target', event('xxforms:targetid')),
                                      xxforms:attribute('indexes', string-join(event('xxforms:repeat-indexes'), ' ')),
-                                     xxforms:attribute('original-indexes', string-join(xxforms:event('xxforms:repeat-indexes'), ' '))))"/>
+                                     xxforms:attribute('original-indexes', string-join(event('xxforms:repeat-indexes'), ' '))))"/>
                     </xbl:handler>
                 </xbl:handlers>
 

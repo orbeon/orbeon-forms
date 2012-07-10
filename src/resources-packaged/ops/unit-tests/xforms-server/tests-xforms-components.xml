@@ -158,9 +158,9 @@
                             <!-- TEST: Event listener -->
                             <xforms:insert context="instance('events')" nodeset="*"
                                            origin="xxforms:element('event',
-                                                    (xxforms:attribute('type', xxforms:event('xxforms:type')),
-                                                     xxforms:attribute('target', xxforms:event('xxforms:targetid')),
-                                                     xxforms:attribute('indexes', string-join(xxforms:event('xxforms:repeat-indexes'), ' '))))"/>
+                                                    (xxforms:attribute('type', event('xxforms:type')),
+                                                     xxforms:attribute('target', event('xxforms:targetid')),
+                                                     xxforms:attribute('indexes', string-join(event('xxforms:repeat-indexes'), ' '))))"/>
 
                             <xforms:dispatch targetid="group2" name="my-event"/>
                         </xforms:action>
@@ -174,9 +174,9 @@
                                     <!-- TEST: Event listener -->
                                     <xforms:insert context="instance('events')" nodeset="*"
                                                    origin="xxforms:element('event',
-                                                            (xxforms:attribute('type', xxforms:event('xxforms:type')),
-                                                             xxforms:attribute('target', xxforms:event('xxforms:targetid')),
-                                                             xxforms:attribute('indexes', string-join(xxforms:event('xxforms:repeat-indexes'), ' '))))"/>
+                                                            (xxforms:attribute('type', event('xxforms:type')),
+                                                             xxforms:attribute('target', event('xxforms:targetid')),
+                                                             xxforms:attribute('indexes', string-join(event('xxforms:repeat-indexes'), ' '))))"/>
 
                                     <xforms:dispatch targetid="group3" name="my-event"/>
                                 </xforms:action>
@@ -191,9 +191,9 @@
                                     <!-- TEST: Event listener -->
                                     <xforms:insert context="instance('events')" nodeset="*"
                                                    origin="xxforms:element('event',
-                                                            (xxforms:attribute('type', xxforms:event('xxforms:type')),
-                                                             xxforms:attribute('target', xxforms:event('xxforms:targetid')),
-                                                             xxforms:attribute('indexes', string-join(xxforms:event('xxforms:repeat-indexes'), ' '))))"/>
+                                                            (xxforms:attribute('type', event('xxforms:type')),
+                                                             xxforms:attribute('target', event('xxforms:targetid')),
+                                                             xxforms:attribute('indexes', string-join(event('xxforms:repeat-indexes'), ' '))))"/>
 
                                     <xforms:dispatch targetid="group4" name="my-event"/>
                                 </xforms:action>
@@ -207,9 +207,9 @@
                             <!-- TEST: Event listener -->
                             <xforms:insert context="instance('events')" nodeset="*"
                                            origin="xxforms:element('event',
-                                                    (xxforms:attribute('type', xxforms:event('xxforms:type')),
-                                                     xxforms:attribute('target', xxforms:event('xxforms:targetid')),
-                                                     xxforms:attribute('indexes', string-join(xxforms:event('xxforms:repeat-indexes'), ' '))))"/>
+                                                    (xxforms:attribute('type', event('xxforms:type')),
+                                                     xxforms:attribute('target', event('xxforms:targetid')),
+                                                     xxforms:attribute('indexes', string-join(event('xxforms:repeat-indexes'), ' '))))"/>
                         </xforms:action>
                     </xforms:group>
                 </xhtml:body>

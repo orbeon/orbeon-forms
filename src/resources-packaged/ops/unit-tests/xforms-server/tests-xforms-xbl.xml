@@ -263,9 +263,9 @@
                                                    xxforms:phantom="true"
                                                    context="instance('events')" nodeset="*"
                                                    origin="xxforms:element('event',
-                                                            (xxforms:attribute('type', xxforms:event('xxforms:type')),
-                                                             xxforms:attribute('target', xxforms:event('xxforms:targetid')),
-                                                             xxforms:attribute('indexes', string-join(xxforms:event('xxforms:repeat-indexes'), ' '))))"/>
+                                                            (xxforms:attribute('type', event('xxforms:type')),
+                                                             xxforms:attribute('target', event('xxforms:targetid')),
+                                                             xxforms:attribute('indexes', string-join(event('xxforms:repeat-indexes'), ' '))))"/>
 
                                     <xforms:repeat nodeset="date" id="date-repeat">
                                         <fr:dropdown-date ref="." id="fr-dropdown-date">
@@ -893,9 +893,9 @@
                                                             (xxforms:attribute('type', event('xxforms:type')),
                                                              xxforms:attribute('target', event('xxforms:targetid')),
                                                              xxforms:attribute('phase', event('xxforms:phase')),
-                                                             xxforms:attribute('original-target', xxforms:event('xxforms:targetid')),
+                                                             xxforms:attribute('original-target', event('xxforms:targetid')),
                                                              xxforms:attribute('indexes', string-join(event('xxforms:repeat-indexes'), ' ')),
-                                                             xxforms:attribute('original-indexes', string-join(xxforms:event('xxforms:repeat-indexes'), ' '))))"/>
+                                                             xxforms:attribute('original-indexes', string-join(event('xxforms:repeat-indexes'), ' '))))"/>
 
                                     <xforms:insert ev:event="#all" ev:phase="capture"
                                                    context="instance('events')" nodeset="*"
@@ -903,9 +903,9 @@
                                                             (xxforms:attribute('type', event('xxforms:type')),
                                                              xxforms:attribute('target', event('xxforms:targetid')),
                                                              xxforms:attribute('phase', event('xxforms:phase')),
-                                                             xxforms:attribute('original-target', xxforms:event('xxforms:targetid')),
+                                                             xxforms:attribute('original-target', event('xxforms:targetid')),
                                                              xxforms:attribute('indexes', string-join(event('xxforms:repeat-indexes'), ' ')),
-                                                             xxforms:attribute('original-indexes', string-join(xxforms:event('xxforms:repeat-indexes'), ' '))))"/>
+                                                             xxforms:attribute('original-indexes', string-join(event('xxforms:repeat-indexes'), ' '))))"/>
 
                                     <fr:foobar id="my-foobar">
                                         <xforms:message ev:event="fr:my-event"><xforms:output value="concat('Got it: ', event('fr:my-context'))"/></xforms:message>
@@ -1398,9 +1398,9 @@
                                                             (xxforms:attribute('type', event('xxforms:type')),
                                                              xxforms:attribute('target', event('xxforms:targetid')),
                                                              xxforms:attribute('phase', event('xxforms:phase')),
-                                                             xxforms:attribute('original-target', xxforms:event('xxforms:targetid')),
+                                                             xxforms:attribute('original-target', event('xxforms:targetid')),
                                                              xxforms:attribute('indexes', string-join(event('xxforms:repeat-indexes'), ' ')),
-                                                             xxforms:attribute('original-indexes', string-join(xxforms:event('xxforms:repeat-indexes'), ' '))))"/>
+                                                             xxforms:attribute('original-indexes', string-join(event('xxforms:repeat-indexes'), ' '))))"/>
                                             </xbl:handler>
                                         </xbl:handlers>
 
@@ -1601,14 +1601,14 @@
                                         <xbl:handlers>
                                             <xbl:handler event="#all" xxbl:scope="outer">
                                                 <!-- TEST: Event listener -->
-                                                <xforms:insert if="not(xxforms:event('xxforms:type') = 'xxforms-index-changed')" context="xxforms:instance('events')" nodeset="*"
+                                                <xforms:insert if="not(event('xxforms:type') = 'xxforms-index-changed')" context="xxforms:instance('events')" nodeset="*"
                                                    origin="xxforms:element('event',
                                                             (xxforms:attribute('observer', event('xxforms:observerid')),
-                                                             xxforms:attribute('type', xxforms:event('xxforms:type')),
+                                                             xxforms:attribute('type', event('xxforms:type')),
                                                              xxforms:attribute('target', event('xxforms:targetid')),
                                                              xxforms:attribute('phase', event('xxforms:phase')),
-                                                             xxforms:attribute('original-target', xxforms:event('xxforms:targetid')),
-                                                             xxforms:attribute('indexes', string-join(xxforms:event('xxforms:repeat-indexes'), ' '))))"/>
+                                                             xxforms:attribute('original-target', event('xxforms:targetid')),
+                                                             xxforms:attribute('indexes', string-join(event('xxforms:repeat-indexes'), ' '))))"/>
                                             </xbl:handler>
                                             <xbl:handler event="up-value1" phase="target" xxbl:scope="outer">
                                                 <xforms:dispatch name="up-value2" targetid="level2-component">
@@ -1629,14 +1629,14 @@
                                         <xbl:handlers>
                                             <xbl:handler event="#all" xxbl:scope="outer">
                                                 <!-- TEST: Event listener -->
-                                                <xforms:insert if="not(xxforms:event('xxforms:type') = 'xxforms-index-changed')" context="xxforms:instance('events')" nodeset="*"
+                                                <xforms:insert if="not(event('xxforms:type') = 'xxforms-index-changed')" context="xxforms:instance('events')" nodeset="*"
                                                    origin="xxforms:element('event',
                                                             (xxforms:attribute('observer', event('xxforms:observerid')),
-                                                             xxforms:attribute('type', xxforms:event('xxforms:type')),
+                                                             xxforms:attribute('type', event('xxforms:type')),
                                                              xxforms:attribute('target', event('xxforms:targetid')),
                                                              xxforms:attribute('phase', event('xxforms:phase')),
-                                                             xxforms:attribute('original-target', xxforms:event('xxforms:targetid')),
-                                                             xxforms:attribute('indexes', string-join(xxforms:event('xxforms:repeat-indexes'), ' '))))"/>
+                                                             xxforms:attribute('original-target', event('xxforms:targetid')),
+                                                             xxforms:attribute('indexes', string-join(event('xxforms:repeat-indexes'), ' '))))"/>
                                             </xbl:handler>
                                             <xbl:handler event="up-value2" phase="target" xxbl:scope="outer">
                                                 <xforms:dispatch name="up-value3" targetid="level3-component">
@@ -1657,14 +1657,14 @@
                                         <xbl:handlers>
                                             <xbl:handler event="#all" xxbl:scope="outer">
                                                 <!-- TEST: Event listener -->
-                                                <xforms:insert if="not(xxforms:event('xxforms:type') = 'xxforms-index-changed')" context="xxforms:instance('events')" nodeset="*"
+                                                <xforms:insert if="not(event('xxforms:type') = 'xxforms-index-changed')" context="xxforms:instance('events')" nodeset="*"
                                                    origin="xxforms:element('event',
                                                             (xxforms:attribute('observer', event('xxforms:observerid')),
-                                                             xxforms:attribute('type', xxforms:event('xxforms:type')),
+                                                             xxforms:attribute('type', event('xxforms:type')),
                                                              xxforms:attribute('target', event('xxforms:targetid')),
                                                              xxforms:attribute('phase', event('xxforms:phase')),
-                                                             xxforms:attribute('original-target', xxforms:event('xxforms:targetid')),
-                                                             xxforms:attribute('indexes', string-join(xxforms:event('xxforms:repeat-indexes'), ' '))))"/>
+                                                             xxforms:attribute('original-target', event('xxforms:targetid')),
+                                                             xxforms:attribute('indexes', string-join(event('xxforms:repeat-indexes'), ' '))))"/>
                                             </xbl:handler>
                                             <xbl:handler event="up-value3" phase="target" xxbl:scope="outer">
                                                 <!-- Set title value -->
@@ -1688,14 +1688,14 @@
 
                                 <xforms:group context="instance('main-instance')" id="main-group">
                                     <!-- TEST: Event listener -->
-                                    <xforms:insert if="not(xxforms:event('xxforms:type') = 'xxforms-index-changed')" ev:event="#all" context="instance('events')" nodeset="*"
+                                    <xforms:insert if="not(event('xxforms:type') = 'xxforms-index-changed')" ev:event="#all" context="instance('events')" nodeset="*"
                                                    origin="xxforms:element('event',
                                                             (xxforms:attribute('observer', event('xxforms:observerid')),
-                                                             xxforms:attribute('type', xxforms:event('xxforms:type')),
+                                                             xxforms:attribute('type', event('xxforms:type')),
                                                              xxforms:attribute('target', event('xxforms:targetid')),
                                                              xxforms:attribute('phase', event('xxforms:phase')),
-                                                             xxforms:attribute('original-target', xxforms:event('xxforms:targetid')),
-                                                             xxforms:attribute('indexes', string-join(xxforms:event('xxforms:repeat-indexes'), ' '))))"/>
+                                                             xxforms:attribute('original-target', event('xxforms:targetid')),
+                                                             xxforms:attribute('indexes', string-join(event('xxforms:repeat-indexes'), ' '))))"/>
 
                                     <!-- Top-level component -->
                                     <fr:level1 id="level1-component"/>
@@ -2158,8 +2158,8 @@
 
                         <xforms:insert ev:event="my-event-1 my-event-2" context="instance('events')" nodeset="*"
                                        origin="xxforms:element('event',
-                                                (xxforms:attribute('type', xxforms:event('xxforms:type')),
-                                                 xxforms:attribute('target', xxforms:event('xxforms:targetid'))
+                                                (xxforms:attribute('type', event('xxforms:type')),
+                                                 xxforms:attribute('target', event('xxforms:targetid'))
                                                  ))"/>
 
                     </xforms:model>
@@ -2177,8 +2177,8 @@
                         <xforms:action ev:event="xforms-enabled xforms-disabled">
                             <xforms:insert context="instance('events')" nodeset="*"
                                            origin="xxforms:element('event',
-                                                    (xxforms:attribute('type', xxforms:event('xxforms:type')),
-                                                     xxforms:attribute('target', xxforms:event('xxforms:targetid'))
+                                                    (xxforms:attribute('type', event('xxforms:type')),
+                                                     xxforms:attribute('target', event('xxforms:targetid'))
                                                      ))"/>
                             <xforms:dispatch name="my-event-1" targetid="model"/>
                         </xforms:action>
@@ -2189,8 +2189,8 @@
                         <xforms:action ev:event="xforms-enabled xforms-disabled" id="my-event">
                             <xforms:insert context="instance('events')" nodeset="*"
                                            origin="xxforms:element('event',
-                                                    (xxforms:attribute('type', xxforms:event('xxforms:type')),
-                                                     xxforms:attribute('target', xxforms:event('xxforms:targetid'))
+                                                    (xxforms:attribute('type', event('xxforms:type')),
+                                                     xxforms:attribute('target', event('xxforms:targetid'))
                                                      ))"/>
                             <xforms:dispatch name="my-event-2" targetid="model"/>
                         </xforms:action>
@@ -3185,7 +3185,7 @@
                             <xbl:template>
                                 <xforms:group id="my-group">
                                     <xforms:message ev:event="xforms-enabled" id="my-message"
-                                                    level="xxforms:log-debug">Message: <xforms:output id="my-output" value="xxforms:event('xxforms:type')"/>.</xforms:message>
+                                                    level="xxforms:log-debug">Message: <xforms:output id="my-output" value="event('xxforms:type')"/>.</xforms:message>
                                 </xforms:group>
                             </xbl:template>
                         </xbl:binding>

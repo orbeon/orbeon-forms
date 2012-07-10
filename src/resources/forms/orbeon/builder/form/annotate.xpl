@@ -94,7 +94,7 @@
 
                         <!-- Listen to activations on grid cells -->
                         <xforms:action ev:event="DOMActivate" xxforms:phantom="true">
-                            <xforms:var name="control-element" value="xxforms:control-element(xxforms:event('xxforms:absolute-targetid'))"/>
+                            <xforms:var name="control-element" value="xxforms:control-element(event('xxforms:absolute-targetid'))"/>
                             <xforms:action if="tokenize($control-element/@class, '\s+') = 'xforms-activable'">
                                 <xforms:var name="th-column" value="count($control-element/preceding-sibling::*[@xxforms:element = 'xh:th']) + 1"/>
                                 <xforms:var name="new-selected-cell" value="if ($control-element/@xxforms:element = 'xh:th') then

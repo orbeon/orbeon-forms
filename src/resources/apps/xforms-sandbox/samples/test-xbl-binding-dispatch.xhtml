@@ -87,9 +87,9 @@
                            origin="xxforms:element('event',
                                     (xxforms:attribute('type', event('xxforms:type')),
                                      xxforms:attribute('target', event('xxforms:targetid')),
-                                     xxforms:attribute('original-target', xxforms:event('xxforms:targetid')),
+                                     xxforms:attribute('original-target', event('xxforms:targetid')),
                                      xxforms:attribute('indexes', string-join(event('xxforms:repeat-indexes'), ' ')),
-                                     xxforms:attribute('original-indexes', string-join(xxforms:event('xxforms:repeat-indexes'), ' '))))"/>
+                                     xxforms:attribute('original-indexes', string-join(event('xxforms:repeat-indexes'), ' '))))"/>
 
             <fr:foobar id="my-foobar">
                 <xforms:message ev:event="fr:my-event"><xforms:output value="concat('Got it: ', event('fr:my-context'))"/></xforms:message>

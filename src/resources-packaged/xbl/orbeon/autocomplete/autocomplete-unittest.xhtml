@@ -132,7 +132,7 @@
             </xhtml:div>
             <xhtml:div>
                 <xforms:group ref="instance('selected-countries')/static">
-                    <xforms:setvalue ev:event="xforms-invalid" ref="@effective-target-id" value="string-join((xxforms:event('xxforms:target-prefixes'), xxforms:event('xxforms:targetid')), '$')"/>
+                    <xforms:setvalue ev:event="xforms-invalid" ref="@effective-target-id" value="string-join((event('xxforms:target-prefixes'), event('xxforms:targetid')), '$')"/>
                     <fr:autocomplete ref="." id="static-autocomplete"
                                      dynamic-itemset="false" max-results-displayed="4" tabindex="1">
                         <xforms:label>Country code: </xforms:label>
@@ -184,7 +184,7 @@
             </xhtml:div>
             <xhtml:div>
                 <xforms:group ref="instance('selected-countries')/dynamic">
-                    <xforms:setvalue ev:event="xforms-invalid" ref="@effective-target-id" value="string-join((xxforms:event('xxforms:target-prefixes'), xxforms:event('xxforms:targetid')), '$')"/>
+                    <xforms:setvalue ev:event="xforms-invalid" ref="@effective-target-id" value="string-join((event('xxforms:target-prefixes'), event('xxforms:targetid')), '$')"/>
                     <fr:autocomplete ref="." id="dynamic-autocomplete" labelref="@label"
                                      dynamic-itemset="true">
                         <!-- React to user searching -->
@@ -256,7 +256,7 @@
             </xhtml:div>
             <xhtml:div>
                 <xforms:group ref="instance('selected-countries')/resource">
-                    <xforms:setvalue ev:event="xforms-invalid" ref="@effective-target-id" value="string-join((xxforms:event('xxforms:target-prefixes'), xxforms:event('xxforms:targetid')), '$')"/>
+                    <xforms:setvalue ev:event="xforms-invalid" ref="@effective-target-id" value="string-join((event('xxforms:target-prefixes'), event('xxforms:targetid')), '$')"/>
                     <fr:autocomplete ref="." labelref="@label" id="resource-autocomplete" resource="/xforms-controls/services/countries?country-name={$fr-search-value}" max-results-displayed="4">
                         <xforms:label>Country code: </xforms:label>
                         <xforms:itemset ref="/countries/country">

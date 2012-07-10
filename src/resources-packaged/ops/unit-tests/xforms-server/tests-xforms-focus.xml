@@ -262,8 +262,8 @@
                     <!-- Record focus events -->
                     <xf:insert ev:event="DOMFocusIn DOMFocusOut" model="events-model" context="." ref="*"
                         origin="xxf:element('event',
-                                (xxf:attribute('type', xxf:event('xxf:type')),
-                                 xxf:attribute('target', xxf:event('xxf:targetid'))))"/>
+                                (xxf:attribute('type', event('xxf:type')),
+                                 xxf:attribute('target', event('xxf:targetid'))))"/>
 
                     <xf:group id="my-group-1">
                         <xf:group id="my-group-11">
@@ -397,8 +397,8 @@
                     <!-- Record focus events -->
                     <xf:insert ev:event="DOMFocusIn DOMFocusOut" model="events-model" context="." ref="*"
                         origin="xxf:element('event',
-                                (xxf:attribute('type', xxf:event('xxf:type')),
-                                 xxf:attribute('target', xxf:event('xxf:targetid'))))"/>
+                                (xxf:attribute('type', event('xxf:type')),
+                                 xxf:attribute('target', event('xxf:targetid'))))"/>
 
                     <xf:group id="my-group-1">
                         <xf:group id="my-group-11">
@@ -516,8 +516,8 @@
                     <!-- Record focus events -->
                     <xf:insert ev:event="DOMFocusIn DOMFocusOut" model="events-model" context="." ref="*"
                         origin="xxf:element('event',
-                                (xxf:attribute('type', xxf:event('xxf:type')),
-                                 xxf:attribute('target', xxf:event('xxf:absolute-targetid'))))"/>
+                                (xxf:attribute('type', event('xxf:type')),
+                                 xxf:attribute('target', event('xxf:absolute-targetid'))))"/>
 
                     <xf:repeat id="my-repeat" ref="value">
                         <xf:input id="my-input" ref="."/>
@@ -611,8 +611,8 @@
                     <!-- Record focus events -->
                     <xf:insert ev:event="DOMFocusIn DOMFocusOut" model="events-model" context="." ref="*"
                         origin="xxf:element('event',
-                                (xxf:attribute('type', xxf:event('xxf:type')),
-                                 xxf:attribute('target', xxf:event('xxf:absolute-targetid'))))"/>
+                                (xxf:attribute('type', event('xxf:type')),
+                                 xxf:attribute('target', event('xxf:absolute-targetid'))))"/>
 
                     <xf:repeat id="my-repeat" ref="xxf:sort(value, @p, 'text', 'ascending')">
                         <xf:input id="my-input" ref="."/>
@@ -701,8 +701,8 @@
                     <!-- Record focus events -->
                     <xf:insert ev:event="DOMFocusIn DOMFocusOut" model="events-model" context="." ref="*"
                         origin="xxf:element('event',
-                                (xxf:attribute('type', xxf:event('xxf:type')),
-                                 xxf:attribute('target', xxf:event('xxf:absolute-targetid'))))"/>
+                                (xxf:attribute('type', event('xxf:type')),
+                                 xxf:attribute('target', event('xxf:absolute-targetid'))))"/>
 
                     <xf:repeat id="my-outer-repeat" ref="outer">
                         <xf:repeat id="my-inner-repeat" ref="inner">
@@ -807,8 +807,8 @@
                     <!-- Record focus events -->
                     <xf:insert ev:event="DOMFocusIn DOMFocusOut" model="events-model" context="." ref="*"
                         origin="xxf:element('event',
-                                (xxf:attribute('type', xxf:event('xxf:type')),
-                                 xxf:attribute('target', xxf:event('xxf:absolute-targetid'))))"/>
+                                (xxf:attribute('type', event('xxf:type')),
+                                 xxf:attribute('target', event('xxf:absolute-targetid'))))"/>
 
                     <xf:switch id="my-switch">
                         <xf:case id="case-1">
@@ -924,8 +924,8 @@
                     <!-- Record focus events -->
                     <xf:insert ev:event="DOMFocusIn DOMFocusOut" model="events-model" context="." ref="*"
                         origin="xxf:element('event',
-                                (xxf:attribute('type', xxf:event('xxf:type')),
-                                 xxf:attribute('target', xxf:event('xxf:absolute-targetid'))))"/>
+                                (xxf:attribute('type', event('xxf:type')),
+                                 xxf:attribute('target', event('xxf:absolute-targetid'))))"/>
 
                     <xf:input id="my-input-1" ref="value"/>
 
@@ -1057,8 +1057,8 @@
                     <!-- Record focus events -->
                     <xf:insert ev:event="DOMFocusIn DOMFocusOut" model="events-model" context="." ref="*"
                         origin="xxf:element('event',
-                                (xxf:attribute('type', xxf:event('xxf:type')),
-                                 xxf:attribute('target', xxf:event('xxf:absolute-targetid'))))"/>
+                                (xxf:attribute('type', event('xxf:type')),
+                                 xxf:attribute('target', event('xxf:absolute-targetid'))))"/>
 
                     <xf:input id="my-input-1" ref="."/>
 

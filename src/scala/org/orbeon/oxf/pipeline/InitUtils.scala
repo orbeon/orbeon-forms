@@ -102,7 +102,11 @@ object InitUtils {
         } finally {
             if (logger.isInfoEnabled) {
                 val timing = System.currentTimeMillis - tsBegin
-                val sb = new StringBuilder(Option(externalContext.getRequest.getRequestPath) getOrElse "Done running processor")
+                val sb = new StringBuilder(
+                  (for {
+                    req <- Option(externalContext.getRequest)
+                    rpath <- Option(req.getRequestPath)
+                  } yield rpath) getOrElse "Done running processor")
                 sb.append(" - Timing: ")
                 sb.append(timing)
                 logger.info(sb.toString)

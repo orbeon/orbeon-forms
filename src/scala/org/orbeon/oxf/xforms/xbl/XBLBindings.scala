@@ -277,7 +277,7 @@ class XBLBindings(indentedLogger: IndentedLogger, partAnalysis: PartAnalysisImpl
             val baseURI = XFormsUtils.resolveXMLBase(boundElement.orNull, null, ".").toString
     
             // Annotate tree
-            val fullAnnotatedTree = annotateShadowTree(rawTree, containerScope.fullPrefix, false)
+            val fullAnnotatedTree = annotateShadowTree(rawTree, containerScope.fullPrefix, hasFullUpdate = false)
     
             // Create transformer if compact tree is needed
             val (transformer, result) =

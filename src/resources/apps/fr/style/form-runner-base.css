@@ -264,8 +264,9 @@ button.xforms-trigger, input.xforms-trigger, .xforms-trigger button, .xforms-tri
 .fr-repeat-single-row td .xforms-hint { display: none }
 .fr-repeat-single-row .fr-grid-content { margin-top: .5em }     /* Because we don't show the label, add padding at top */
 /* But if there is a nested table, show those in the label in the column header of that table */
-.fr-repeat-table tr th .xforms-label { display: block }         /* Label in repet table header is block so yellow background in FB takes the whole width  */
+.fr-repeat-table tr th .xforms-label { display: block }         /* Label in repeat table header is block so yellow background in FB takes the whole width  */
 .fr-repeat-table tr th .xforms-help-image { margin-top: 0 }
+.yui-skin-sam .fr-repeat-table tr th { vertical-align: top } /* so that label+hint or label only -> labels appear aligned*/
 
 .yui-skin-sam .fr-repeat-column-trigger .yui-dt-liner { padding: 4px } /* override YUI */
 .yui-skin-sam .yui-dt .fr-repeat-table th .yui-dt-liner {

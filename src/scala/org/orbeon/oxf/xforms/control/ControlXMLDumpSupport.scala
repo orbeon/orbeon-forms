@@ -38,7 +38,7 @@ trait ControlXMLDumpSupport extends DebugXML{
             "effectiveId", effectiveId,
             "isRelevant", isRelevant.toString,
             "wasRelevant", wasRelevant.toString,
-            "binding-names", bindingContext.getNodeset.asScala map (itemToString(_)) mkString ("(", ", ", ")"),
+            "binding-names", bindingContext.getNodeset.asScala map itemToString mkString ("(", ", ", ")"),
             "binding-position", bindingContext.getPosition.toString
         ))
         content

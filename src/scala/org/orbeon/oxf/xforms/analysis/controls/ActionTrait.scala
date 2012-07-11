@@ -20,7 +20,7 @@ import org.dom4j.QName
 
 trait ActionTrait extends SimpleElementAnalysis {
 
-    private def find(qNames: Seq[QName]) = qNames map (element.attributeValue(_)) find (_ ne null)
+    private def find(qNames: Seq[QName]) = qNames map element.attributeValue find (_ ne null)
 
     val ifCondition     = find(Seq(IF_ATTRIBUTE_QNAME, EXFORMS_IF_ATTRIBUTE_QNAME))
     val whileCondition  = find(Seq(WHILE_ATTRIBUTE_QNAME, EXFORMS_WHILE_ATTRIBUTE_QNAME))

@@ -150,7 +150,7 @@ class OrbeonPortlet extends GenericPortlet with ServletPortlet with BufferedPort
 
         // Write out the response
         val directResponse = externalContext.getResponse.asInstanceOf[BufferedResponse]
-        Option(directResponse.getContentType) foreach (response.setContentType(_))
+        Option(directResponse.getContentType) foreach response.setContentType
         write(response, getResponseData(directResponse), Option(directResponse.getContentType))
     }
 

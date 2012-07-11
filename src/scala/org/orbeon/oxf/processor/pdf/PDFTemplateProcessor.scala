@@ -442,7 +442,7 @@ object PDFTemplateProcessor {
         }
 
         def resolveAVT(attributeName: String, otherAttributeName: String = null) =
-            Option(att(attributeName)) orElse Option(Option(otherAttributeName) map (att(_)) orNull) map
+            Option(att(attributeName)) orElse Option(Option(otherAttributeName) map att orNull) map
                 (XPathCache.evaluateAsAvt(contextItem, _, new NamespaceMapping(Dom4jUtils.getNamespaceContextNoDefault(element)), jVariables, functionLibrary, null, null, element.getData.asInstanceOf[LocationData])) orNull
 
         def getFontAttributes = {

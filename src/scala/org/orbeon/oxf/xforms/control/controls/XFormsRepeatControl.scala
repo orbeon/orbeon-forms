@@ -553,7 +553,7 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
         def indexOfItem(otherItem: Item) =
             nodeset2Scala indexWhere (XFormsUtils.compareItems(_, otherItem))
 
-        nodeset1.asScala map (indexOfItem(_)) toArray
+        nodeset1.asScala map indexOfItem toArray
     }
 
     // Serialize index

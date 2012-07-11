@@ -54,7 +54,7 @@ class XHTMLHeadHandler extends XHTMLHeadHandlerBase {
         ContentHandlerHelper.populateAttributes(attributesImpl, attributes)
         helper.startElement(xhtmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, elementName, attributesImpl)
         // output content only if present
-        content foreach (helper.text(_))
+        content foreach helper.text
         helper.endElement()
     }
 

@@ -378,7 +378,7 @@ object XML {
     implicit def elemToNodeInfoSeq(e: Elem): Seq[NodeInfo] = elemToDocumentInfo(e) \ *
 
     implicit def stringSeqToSequenceIterator(seq: Seq[String]): SequenceIterator =
-        new ListIterator(seq map (stringToStringValue(_)) asJava)
+        new ListIterator(seq map stringToStringValue asJava)
 
     implicit def itemSeqToSequenceIterator[T <: Item](seq: Seq[T]): SequenceIterator = new ListIterator(seq.asJava)
 

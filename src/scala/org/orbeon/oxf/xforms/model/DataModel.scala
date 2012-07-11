@@ -137,7 +137,7 @@ object DataModel {
 
         // Do not require RRR / mark the instance dirty if the value hasn't actually changed
         doUpdate &&
-            setValue(nodeInfo, newValue, () ⇒ onSuccess(oldValue), onError(_))
+            setValue(nodeInfo, newValue, () ⇒ onSuccess(oldValue), onError)
     }
 
     /**

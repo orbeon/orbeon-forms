@@ -36,7 +36,7 @@ class XXFormsCustomMIP extends XXFormsMIPFunction {
                 // Return the value or null
                 Option(InstanceData.getAllCustom(nodeInfo)) flatMap
                     (m ⇒ Option(m get name)) map
-                        (StringValue.makeStringValue(_)) orNull
+                        StringValue.makeStringValue orNull
             case _ ⇒
                 // $item is empty or its first item is not a node
                 null

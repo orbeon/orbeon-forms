@@ -105,7 +105,7 @@ object ContainerOps {
         controls flatMap controlElementsToDelete foreach (delete(_))
 
         // Adjust selected td if needed
-        newTdToSelect foreach (selectTd(_))
+        newTdToSelect foreach selectTd
     }
 
     // Find all siblings of the given element with the given name, excepting the given element

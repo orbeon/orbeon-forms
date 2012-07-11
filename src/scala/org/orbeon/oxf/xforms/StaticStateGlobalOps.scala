@@ -42,7 +42,7 @@ class StaticStateGlobalOps(topLevelPart: PartAnalysis) extends PartGlobalOps {
 
     // Exists in all parts
     private def existsInParts(p: PartAnalysis ⇒ Boolean) =
-        parts exists (p(_))
+        parts exists p
 
     // Collect in all parts
     private def collectInPartsJ[T](get: PartAnalysis ⇒ java.util.Collection[T]) =
@@ -119,7 +119,7 @@ class StaticStateGlobalOps(topLevelPart: PartAnalysis) extends PartGlobalOps {
     def getAncestorRepeats(startPrefixedId: String, endPrefixedId: Option[String] = None): Seq[String] =
         // If element analysis is found, find all its ancestor repeats until the root or until the end prefixed id is
         getControlAnalysisOption(startPrefixedId).toSeq flatMap
-            (RepeatControl.getAllAncestorRepeatsAcrossParts(_)) takeWhile
+            RepeatControl.getAllAncestorRepeatsAcrossParts takeWhile
                 (a ⇒ Some(a.prefixedId) != endPrefixedId) map
                     (_.prefixedId)
 

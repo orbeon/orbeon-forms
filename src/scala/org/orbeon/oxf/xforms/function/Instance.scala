@@ -31,7 +31,7 @@ class Instance extends XFormsFunction {
         // document element node) is returned for the default instance in the model that contains the current context
         // node."
 
-        val instanceId = argument.lift(0) map (_.evaluateAsString(xpathContext).toString.trim) filter (StringUtils.isNotBlank(_))
+        val instanceId = argument.lift(0) map (_.evaluateAsString(xpathContext).toString.trim) filter StringUtils.isNotBlank
 
         // Get model and instance with given id for that model only
 

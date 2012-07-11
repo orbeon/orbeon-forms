@@ -52,11 +52,11 @@ object Focus {
 
         // Focus out of the previous control and grouping controls we are leaving
         // Events are dispatched from leaf to root
-        (previousChain drop commonPrefix reverse) foreach (focusOut(_))
+        (previousChain drop commonPrefix reverse) foreach focusOut
 
         // Focus into the grouping controls we are entering and the current control
         // Events are dispatched from root to leaf
-        currentChain drop commonPrefix foreach (focusIn(_))
+        currentChain drop commonPrefix foreach focusIn
 
         true
     }
@@ -75,7 +75,7 @@ object Focus {
             // Called if the focus is fully removed
             // Focus out events have been dispatched up to the iteration already, so just dispatch from the repeat to the root
             def removeFocus() =
-                containersAndSelf(repeat) foreach (focusOut(_))
+                containersAndSelf(repeat) foreach focusOut
 
             // Called if the focus is changing to a new control
             // This will dispatch focus events from the new repeat iteration to the control
@@ -84,7 +84,7 @@ object Focus {
 
             updateFocus(focusedBefore, removeFocus _, focus)
         case None ⇒
-            updateFocus(focusedBefore, () ⇒ removeFocus(focusedBefore.containingDocument), focusWithEvents(_))
+            updateFocus(focusedBefore, () ⇒ removeFocus(focusedBefore.containingDocument), focusWithEvents)
     }
 
     // Update focus based on a previously focused control
@@ -161,7 +161,7 @@ object Focus {
 
         // Dispatch DOMFocusOut events to the given control and to its container ancestors
         def dispatchFocusOuts(control: XFormsControl) =
-            (containersAndSelf(control) takeWhile (isNotBoundary(_, boundary))) foreach (focusOut(_))
+            (containersAndSelf(control) takeWhile (isNotBoundary(_, boundary))) foreach focusOut
 
         // Dispatch focus out events if needed
         Option(doc.getControls.getFocusedControl) foreach { focused ⇒
@@ -179,7 +179,7 @@ object Focus {
 
         // Dispatch DOMFocusOut events to the given control and to its container ancestors
         def dispatchFocusIns(control: XFormsControl) =
-            (containersAndSelf(control) takeWhile (isNotBoundary(_, boundary)) reverse) foreach (focusIn(_))
+            (containersAndSelf(control) takeWhile (isNotBoundary(_, boundary)) reverse) foreach focusIn
 
         // Dispatch focus in events
         dispatchFocusIns(control)

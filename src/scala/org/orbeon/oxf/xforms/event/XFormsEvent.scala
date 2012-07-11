@@ -151,6 +151,6 @@ object XFormsEvent {
 
     private def targetPrefixes(e: XFormsEvent) = {
         val parts = getEffectiveIdPrefixParts(e.targetObject.getEffectiveId)
-        listIterator(parts.toList map (StringValue.makeStringValue(_)))
+        listIterator(parts.toList map StringValue.makeStringValue)
     }
 }

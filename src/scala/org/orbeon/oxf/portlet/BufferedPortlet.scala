@@ -93,15 +93,15 @@ trait BufferedPortlet {
 
     private def writeResponseWithParameters(request: RenderRequest, response: RenderResponse, contentResponse: Content) {
         // Set title and content type
-        contentResponse.title orElse Option(title(request)) foreach (response.setTitle(_))
-        contentResponse.contentType foreach (response.setContentType(_))
+        contentResponse.title orElse Option(title(request)) foreach response.setTitle
+        contentResponse.contentType foreach response.setContentType
 
         // Write response out directly
         write(response, contentResponse.body, contentResponse.contentType)
     }
 
     protected def write(response: MimeResponse, data: String Either Array[Byte], contentType: Option[String]): Unit =
-        contentType map (NetUtils.getContentTypeMediaType(_)) match {
+        contentType map NetUtils.getContentTypeMediaType match {
             case Some(mediatype) if XMLUtils.isTextOrJSONContentType(mediatype) || XMLUtils.isXMLMediatype(mediatype) ⇒
                 // Text/JSON/XML content type: rewrite response content
                 data match {

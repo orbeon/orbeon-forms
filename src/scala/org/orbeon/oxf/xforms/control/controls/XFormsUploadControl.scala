@@ -276,7 +276,7 @@ object XFormsUploadControl {
 
     private def iterateFileElement(filesElement: Element) =
         for {
-            parameterElement ← Option(filesElement).toIterator flatMap (Dom4j.elements(_))
+            parameterElement ← Option(filesElement).toIterator flatMap Dom4j.elements
 
             // Extract all parameters
             name = parameterElement.element("name").getTextTrim

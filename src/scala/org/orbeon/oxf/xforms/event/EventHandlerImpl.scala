@@ -304,7 +304,7 @@ object EventHandlerImpl extends Logging {
                         throw new IllegalStateException
 
                 // From there find the concrete object if it is an event handler (which it must be!)
-                val result = handlerEffectiveId map (containingDocument.getObjectByEffectiveId(_))
+                val result = handlerEffectiveId map containingDocument.getObjectByEffectiveId
 
                 // NOTE: The above is a lot of code for an apparently simple resolution. This stems from the fact that
                 // we allow listening on an element in a different XBL scope. This is not a good idea in the first

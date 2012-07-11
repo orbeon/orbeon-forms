@@ -238,7 +238,7 @@ class BindTree(model: Model, bindElements: Seq[Element]) {
 
     // Destroy the tree of binds
     def destroy(): Unit =
-        bindsById.values foreach (model.staticStateContext.partAnalysis.unmapScopeIds(_))
+        bindsById.values foreach model.staticStateContext.partAnalysis.unmapScopeIds
 
     // Add a new bind
     def addBind(rawBindElement: Element, parentId: String, precedingId: Option[String]): Unit = {

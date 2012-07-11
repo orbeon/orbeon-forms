@@ -73,7 +73,7 @@ trait PartEventHandlerAnalysis {
 
         val scriptMappings = {
             val scriptHandlers = controlTypes.get("script").toSeq flatMap (_.values)
-            scriptHandlers map (makeScript(_))
+            scriptHandlers map makeScript
         }
 
         // Index scripts by prefixed id

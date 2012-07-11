@@ -61,7 +61,7 @@ class XXFormsInstance extends XFormsFunction {
                     val startScope = startContainer.innerScope
 
                     val scopes    = Iterator.iterate(startScope)(_.parent) takeWhile (_ ne null)
-                    val instances = scopes flatMap (ops.getModelsForScope(_)) flatMap (_.instances.get(instanceId))
+                    val instances = scopes flatMap ops.getModelsForScope flatMap (_.instances.get(instanceId))
 
                     if (instances.hasNext) Some(EmptyIterator.getInstance) else None
                 }

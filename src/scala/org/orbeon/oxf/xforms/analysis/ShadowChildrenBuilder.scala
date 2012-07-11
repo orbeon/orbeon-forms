@@ -52,8 +52,8 @@ trait ShadowChildrenBuilder extends ChildrenBuilderTrait {
     private def directlyNestedHandlers =
         if (binding.abstractBinding.modeHandlers)
             Dom4j.elements(component.element) filter
-                (EventHandlerImpl.isEventHandler(_)) map
-                    (annotateChild(_))
+                EventHandlerImpl.isEventHandler map
+                    annotateChild
         else
             Seq()
 
@@ -62,7 +62,7 @@ trait ShadowChildrenBuilder extends ChildrenBuilderTrait {
         if (binding.abstractBinding.modeLHHA)
             Dom4j.elements(component.element) filter
                 (e ⇒ LHHA.isLHHA(e) && (e.attribute(FOR_QNAME) eq null)) map
-                    (annotateChild(_))
+                    annotateChild
         else
             Seq()
     

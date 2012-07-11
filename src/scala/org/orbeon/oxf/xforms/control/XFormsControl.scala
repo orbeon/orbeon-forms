@@ -228,8 +228,7 @@ class XFormsControl(
         evaluateExtensionAttributes(AjaxSupport.StandardExtensionAttributes)
 
         // Evaluate custom extension attributes
-        Option(getExtensionAttributes) foreach
-            (evaluateExtensionAttributes(_))
+        Option(getExtensionAttributes) foreach evaluateExtensionAttributes
     }
 
     /**

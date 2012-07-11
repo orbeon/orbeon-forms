@@ -128,7 +128,7 @@ class PartAnalysisImpl(
             throw new ValidationException("Unknown control: " + controlElement.getQualifiedName, locationData)
 
         // 3. Index new control
-        elementAnalysis foreach (index(_))
+        elementAnalysis foreach index
 
         elementAnalysis
     }

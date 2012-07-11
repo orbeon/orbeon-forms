@@ -103,7 +103,7 @@ object XFormsStaticStateImpl {
         val staticStateDocument = new StaticStateDocument(XFormsUtils.decodeXML(encodedState))
 
         // Restore template
-        val template = staticStateDocument.template map (AnnotatedTemplate(_))
+        val template = staticStateDocument.template map AnnotatedTemplate.apply
 
         // Restore metadata
         val metadata = Metadata(staticStateDocument, template)

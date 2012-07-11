@@ -70,7 +70,7 @@ object EhcacheStateStore extends XFormsStateStore {
                 val dynamicStateKey = if (isInitialState) getDynamicStateKey(documentUUID, true) else parts(1)
 
                 // Gather values from cache for both keys and return state only if both are non-null
-                Stream(parts(0), dynamicStateKey) map (findOne(_)) filter (_ ne null) match {
+                Stream(parts(0), dynamicStateKey) map findOne filter (_ ne null) match {
                     case Stream(staticState: String, dynamicState: DynamicState) ⇒
                         XFormsState(Some(parts(0)), staticState, dynamicState)
                     case _ ⇒ null

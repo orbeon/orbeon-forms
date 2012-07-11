@@ -33,7 +33,7 @@ class XXFormsExtractDocument extends XFormsFunction {
 
         val item                  = argument(0).evaluateItem(xpathContext)
         val excludeResultPrefixes = argument.lift(1) map (_.evaluateAsString(xpathContext).toString)
-        val readonly              = argument.lift(2) map (effectiveBooleanValue(_)) getOrElse false
+        val readonly              = argument.lift(2) map effectiveBooleanValue getOrElse false
 
         val rootElement =
             item match {

@@ -67,7 +67,7 @@ object ClientEvents extends Logging {
             }
 
             // Decode global server events
-            val globalServerEvents: Seq[LocalEvent] = serverEvents.asScala flatMap (decodeServerEvents(_)) map (LocalEvent(_, trusted = true))
+            val globalServerEvents: Seq[LocalEvent] = serverEvents.asScala flatMap decodeServerEvents map (LocalEvent(_, trusted = true))
 
             // Gather all events including decoding action server events
             globalServerEvents ++
@@ -166,7 +166,7 @@ object ClientEvents extends Logging {
         }
 
         // NOTE: map keys are not in predictable order, but map values preserve the order
-        val groups = eventElements groupBy (getEventCategory(_))
+        val groups = eventElements groupBy getEventCategory
 
         // Special handling of checkboxes blanking in noscript mode
         val blankEvents = {
@@ -189,7 +189,7 @@ object ClientEvents extends Logging {
             selectFullControls.asScala.keySet -- getValueChangeIds map
                 (selectFullControls.get(_).asInstanceOf[XFormsSelectControl]) filter
                     (control ⇒ control.isRelevant && ! control.isReadonly) map
-                        (createBlankingEvent(_)) toSeq
+                        createBlankingEvent toSeq
         }
 
         // Return all events by category in the order we defined the categories

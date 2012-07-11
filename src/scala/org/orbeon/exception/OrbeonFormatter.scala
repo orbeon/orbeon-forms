@@ -32,7 +32,7 @@ object OrbeonFormatter extends Formatter {
         }
 
     override def getAllLocationData(t: Throwable): List[SourceLocation] =
-        ValidationException.getAllLocationData(t).asScala.toList flatMap (sourceLocation(_))
+        ValidationException.getAllLocationData(t).asScala.toList flatMap sourceLocation
 
     // Create SourceLocation from LocationData
     private def sourceLocation(locationData: LocationData) =

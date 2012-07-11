@@ -152,7 +152,7 @@ class ResourcesAggregator extends ProcessorImpl {
 
                             def outputPreservedElement(e: HeadElement) = {
                                 helper.startElement(xhtmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, e.name, e.attributes)
-                                e.text foreach (helper.text(_))
+                                e.text foreach helper.text
                                 helper.endElement()
                             }
                             
@@ -203,14 +203,14 @@ class ResourcesAggregator extends ProcessorImpl {
                                 val outputCSSElement = outputElement(resource ⇒ Array("rel", "stylesheet", "href", resource, "type", "text/css", "media", "all"), "link") _
                                 aggregate(baselineCSS, outputCSSElement, isCacheCombinedResources, isCSS = true)
                                 aggregate(supplementalCSS -- baselineCSS, outputCSSElement, isCacheCombinedResources, isCSS = true)
-                                preservedCSS foreach (outputPreservedElement(_))
+                                preservedCSS foreach outputPreservedElement
                             }
 
                             def outputJS() = {
                                 val outputJSElement = outputElement(resource ⇒ Array("type", "text/javascript", "src", resource), "script") _
                                 aggregate(baselineJS -- asyncPortletLoadScripts, outputJSElement, isCacheCombinedResources, isCSS = false)
                                 aggregate(supplementalJS -- baselineJS -- asyncPortletLoadScripts, outputJSElement, isCacheCombinedResources, isCSS = false)
-                                preservedJS foreach (outputPreservedElement(_))
+                                preservedJS foreach outputPreservedElement
                             }
 
                             if (level == 2 && localname == "head") {

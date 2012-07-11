@@ -53,7 +53,7 @@ object RepeatControl {
             getAncestorRepeat(simpleElementAnalysis) orElse
                 (currentPart.parent map
                     (_.getControlAnalysis(currentPart.startScope.fullPrefix.init)) // .init removes the trailing '$'
-                        flatMap (getAncestorRepeatAcrossParts(_))) // recursively search ancestor parts
+                        flatMap getAncestorRepeatAcrossParts) // recursively search ancestor parts
         case _ ⇒ throw new IllegalArgumentException
     }
 

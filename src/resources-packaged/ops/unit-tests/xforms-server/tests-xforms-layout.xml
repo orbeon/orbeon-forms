@@ -1237,7 +1237,7 @@
             <controls xmlns:xhtml="http://www.w3.org/1999/xhtml">
                 <xhtml:span id="my-new-select1·1" class="xforms-control xforms-select1 xforms-incremental xforms-select1-appearance-full xforms-required xforms-required-filled xforms-type-NCName xforms-repeat-selected-item-1">
                     <xhtml:label class="xforms-label">My label</xhtml:label>
-                    <xhtml:span>
+                    <xhtml:span class="xforms-items">
                         <xhtml:span class="xforms-selected">
                             <xhtml:label for="my-new-select1$$e0·1">
                                 <xhtml:input id="my-new-select1$$e0·1" type="radio" name="my-new-select1·1" value="apple" checked="checked"/>Apple
@@ -1256,7 +1256,7 @@
                 </xhtml:span>
                 <xhtml:span id="my-new-select1" class="xforms-control xforms-select1 xforms-incremental xforms-select1-appearance-full xforms-repeat-template">
                     <xhtml:label class="xforms-label"/>
-                    <xhtml:span>
+                    <xhtml:span class="xforms-items">
                         <xhtml:span class="xforms-deselected">
                             <xhtml:label for="my-new-select1$$e0">
                                 <xhtml:input id="my-new-select1$$e0" type="radio" name="my-new-select1" value="apple"/>Apple

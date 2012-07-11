@@ -309,6 +309,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
         final XMLReceiver xmlReceiver = handlerContext.getController().getOutput();
         final SelectAppearanceTrait appearanceTrait = getAppearanceTrait();
         final AttributesImpl containerAttributes = getContainerAttributes(uri, localname, attributes, effectiveId, xformsControl, !(appearanceTrait != null && appearanceTrait.isFull()));
+        containerAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-items"); // to help with styling
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
 
         final String fullItemType = isMultiple ? "checkbox" : "radio";
@@ -323,7 +324,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
         final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");
         {
 
-            // Old layout always output container <span>/<fieldset>, and in new layout we only put it for select/select1
+            // Output container <span>/<fieldset> for select/select1
             final boolean outputContainerElement = !isBooleanInput;
             if (outputContainerElement)
                 xmlReceiver.startElement(XMLConstants.XHTML_NAMESPACE_URI, containingElementName, containingElementQName, containerAttributes);

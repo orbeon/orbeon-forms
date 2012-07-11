@@ -14,12 +14,13 @@
 package org.orbeon.oxf.xforms.control.controls;
 
 import org.dom4j.Element;
+import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.XFormsControl;
-import org.orbeon.oxf.xforms.control.XFormsValueContainerControl;
+import org.orbeon.oxf.xforms.control.XFormsSingleNodeContainerControl;
 import org.orbeon.oxf.xforms.event.Dispatch;
 import org.orbeon.oxf.xforms.event.events.XFormsDeselectEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsSelectEvent;
@@ -39,7 +40,7 @@ import java.util.Map;
  *
  * NOTE: This keep the "currently selected flag" for all children xforms:case.
  */
-public class XFormsSwitchControl extends XFormsValueContainerControl {
+public class XFormsSwitchControl extends XFormsSingleNodeContainerControl {
 
     private transient boolean restoredState;
 
@@ -297,5 +298,10 @@ public class XFormsSwitchControl extends XFormsValueContainerControl {
             return Boolean.parseBoolean(localXForms11Switch);
         else
             return XFormsProperties.isXForms11Switch(containingDocument());
+    }
+
+    @Override
+    public QName getType() {
+        return null;
     }
 }

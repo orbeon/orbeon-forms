@@ -455,7 +455,7 @@
         </output>
     </test>
 
-    <test description="Value change event on group" name="oxf:pipeline">
+    <test description="No more value change event on group" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html>
@@ -507,11 +507,6 @@
                                     <constant>constant</constant>
                                 </instance>
                             </instance>
-                            <instance id="events" model-id="model">
-                                <events>
-                                    <event type="xforms-value-changed" target="group-2"/>
-                                </events>
-                            </instance>
                         </instances>
                     </dynamic-state>
                 </xxf:dynamic-state>
@@ -522,7 +517,7 @@
         </output>
     </test>
 
-    <test description="Value change event on switch" name="oxf:pipeline">
+    <test description="No more value change event on switch" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html>
@@ -579,11 +574,6 @@
                                     <value>new</value>
                                     <constant>constant</constant>
                                 </instance>
-                            </instance>
-                            <instance id="events" model-id="model">
-                                <events>
-                                    <event type="xforms-value-changed" target="switch-2"/>
-                                </events>
                             </instance>
                         </instances>
                         <controls>

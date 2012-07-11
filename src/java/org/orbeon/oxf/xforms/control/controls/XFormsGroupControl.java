@@ -18,13 +18,13 @@ import org.dom4j.QName;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.analysis.controls.ContainerControl;
 import org.orbeon.oxf.xforms.control.XFormsControl;
-import org.orbeon.oxf.xforms.control.XFormsValueContainerControl;
+import org.orbeon.oxf.xforms.control.XFormsSingleNodeContainerControl;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 
 /**
  * Represents an xforms:group container control.
  */
-public class XFormsGroupControl extends XFormsValueContainerControl {
+public class XFormsGroupControl extends XFormsSingleNodeContainerControl {
 
     private ContainerControl containerControl;
 
@@ -61,5 +61,10 @@ public class XFormsGroupControl extends XFormsValueContainerControl {
     @Override
     public boolean supportAjaxUpdates() {
         return !getAppearances().contains(XFormsConstants.XXFORMS_INTERNAL_APPEARANCE_QNAME);
+    }
+
+    @Override
+    public QName getType() {
+        return null;
     }
 }

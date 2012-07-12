@@ -23,8 +23,8 @@
 package org.orbeon.oxf.xforms.msv;
 
 
-import com.sun.msv.grammar.xmlschema.KeyConstraint;
-import com.sun.msv.grammar.xmlschema.KeyRefConstraint;
+import org.orbeon.msv.grammar.xmlschema.KeyConstraint;
+import org.orbeon.msv.grammar.xmlschema.KeyRefConstraint;
 
 /**
  * Coordinator of FieldMatcher.
@@ -84,7 +84,7 @@ public class FieldsMatcher extends MatcherBundle {
                 return;
             }
 
-        if( com.sun.msv.driver.textui.Debug.debug )
+        if( org.orbeon.msv.driver.textui.Debug.debug )
             System.out.println("fields collected for "+selector.idConst.localName);
         
         KeyValue kv = new KeyValue(values, element);

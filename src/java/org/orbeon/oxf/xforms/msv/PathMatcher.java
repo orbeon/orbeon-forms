@@ -22,8 +22,8 @@
  */
 package org.orbeon.oxf.xforms.msv;
 
-import com.sun.msv.grammar.xmlschema.XPath;
-import org.relaxng.datatype.Datatype;
+import org.orbeon.msv.grammar.xmlschema.XPath;
+import org.orbeon.msv.relaxng.datatype.Datatype;
 
 /**
  * Base implementation of XPath matching engine.

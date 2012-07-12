@@ -13,11 +13,11 @@
  */
 package org.orbeon.oxf.processor.validation;
 
-import com.sun.msv.verifier.jarv.Const;
-import com.sun.msv.verifier.jarv.TheFactoryImpl;
+import org.orbeon.msv.verifier.jarv.Const;
+import org.orbeon.msv.verifier.jarv.TheFactoryImpl;
 import org.apache.log4j.Logger;
 import org.dom4j.Document;
-import org.iso_relax.verifier.*;
+import org.orbeon.msv.iso_relax.verifier.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;

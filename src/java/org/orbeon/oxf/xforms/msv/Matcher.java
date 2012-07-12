@@ -22,7 +22,7 @@
  */
 package org.orbeon.oxf.xforms.msv;
 
-import org.relaxng.datatype.Datatype;
+import org.orbeon.msv.relaxng.datatype.Datatype;
 
 /**
  * Base abstract implementation of XPath matcher.

@@ -22,8 +22,8 @@
  */
 package org.orbeon.oxf.xforms.msv;
 
-import com.sun.msv.grammar.xmlschema.Field;
-import org.relaxng.datatype.Datatype;
+import org.orbeon.msv.grammar.xmlschema.Field;
+import org.orbeon.msv.relaxng.datatype.Datatype;
 
 /**
  * XPath matcher that tests one field of a key.
@@ -67,7 +67,7 @@ public class FieldMatcher extends PathMatcher {
      * this method is called when the element matches the XPath.
      */
     protected void onElementMatched( final org.dom4j.Element elt )  {
-        if( com.sun.msv.driver.textui.Debug.debug )
+        if( org.orbeon.msv.driver.textui.Debug.debug )
             System.out.println("field match for "+ parent.selector.idConst.localName );
         
         // this field matches this element.
@@ -81,7 +81,7 @@ public class FieldMatcher extends PathMatcher {
      */
     protected void onAttributeMatched( final org.dom4j.Attribute att, Datatype type )  {
         
-        if( com.sun.msv.driver.textui.Debug.debug )
+        if( org.orbeon.msv.driver.textui.Debug.debug )
             System.out.println("field match for "+ parent.selector.idConst.localName );
         
         final String val = att.getValue();
@@ -127,7 +127,7 @@ public class FieldMatcher extends PathMatcher {
         if(type==null) {
             // this is possible only when we are recovering from errors.
             value = lexical;
-            if(com.sun.msv.driver.textui.Debug.debug)
+            if(org.orbeon.msv.driver.textui.Debug.debug)
                 System.out.println("no type info available");
         } else
             value = type.createValue(lexical,owner);

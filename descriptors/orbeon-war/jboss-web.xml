@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jboss-web>
-    <!--<class-loading java2ClassLoadingCompliance="false">-->
-        <!--<loader-repository>orbeon.war:loader=orbeon.war-->
-            <!--<loader-repository-config>java2ParentDelegation=false</loader-repository-config>-->
-        <!--</loader-repository>-->
-    <!--</class-loading>-->
+    <!-- Uncomment this for the SQL examples
     <resource-ref>
         <res-ref-name>jdbc/db</res-ref-name>
         <jndi-name>java:/my-database</jndi-name>
     </resource-ref>
+    -->
 </jboss-web>

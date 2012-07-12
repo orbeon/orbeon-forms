@@ -22,8 +22,8 @@
  */
 package org.orbeon.oxf.xforms.msv;
 
-import com.sun.msv.grammar.xmlschema.IdentityConstraint;
-import org.relaxng.datatype.Datatype;
+import org.orbeon.msv.grammar.xmlschema.IdentityConstraint;
+import org.orbeon.msv.relaxng.datatype.Datatype;
 
 /**
  * XPath matcher that tests the selector of an identity constraint.
@@ -32,7 +32,7 @@ import org.relaxng.datatype.Datatype;
  * XML Schema guarantees that we can see if an element has id constraints at the
  * startElement method.
  * 
- * This mathcer then monitor startElement/endElement and find matches to the
+ * This matcher then monitor startElement/endElement and find matches to the
  * specified XPath. Every time it finds a match ("target node" in XML Schema
  * terminology), it creates a FieldsMatcher.
  * 
@@ -54,7 +54,7 @@ public class SelectorMatcher extends PathMatcher {
         // register this scope as active.
         owner.pushActiveScope(idConst,this);
         
-        if(com.sun.msv.driver.textui.Debug.debug) {
+        if(org.orbeon.msv.driver.textui.Debug.debug) {
             System.out.println("new id scope is available for {"+idConst.localName+"}");
         }
         super.start( elt );
@@ -68,7 +68,7 @@ public class SelectorMatcher extends PathMatcher {
 
     
     protected void onElementMatched( final org.dom4j.Element elt ) {
-        if( com.sun.msv.driver.textui.Debug.debug )
+        if( org.orbeon.msv.driver.textui.Debug.debug )
             System.out.println("find a match for a selector: "+idConst.localName);
             
         // this element matches the path.

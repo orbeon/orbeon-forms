@@ -19,7 +19,6 @@
 
     <!-- set global build.root to be dir containing this file. -->
     <dirname property="build.root" file="${ant.file}"/>
-    <property name="lib.dir" location="lib"/>
     <property name="build.dir" location="build"/>
     <property name="war.dir" value="${build.dir}/${project.name}-war"/>
     <property name="war.inf" value="${war.dir}/WEB-INF"/>
@@ -35,16 +34,16 @@
     <!-- http://www.scala-lang.org/node/98 -->
     <taskdef resource="scala/tools/ant/antlib.xml">
         <classpath>
-            <pathelement location="${lib.dir}/scala-compiler-2.9.2.jar"/>
-            <pathelement location="${lib.dir}/scala-library-2.9.2.jar"/>
+            <pathelement location="lib/scala-compiler-2.9.2.jar"/>
+            <pathelement location="lib/scala-library-2.9.2.jar"/>
         </classpath>
     </taskdef>
 
     <!-- JUnit tasks -->
     <taskdef name="junit" classname="org.apache.tools.ant.taskdefs.optional.junit.JUnitTask">
         <classpath>
-            <pathelement location="${lib.dir}/junit-4.11-SNAPSHOT.jar"/>
-            <pathelement location="${lib.dir}/ant-junit-1.7.1.jar"/>
+            <pathelement location="lib/junit-4.11-SNAPSHOT.jar"/>
+            <pathelement location="lib/ant-junit-1.7.1.jar"/>
         </classpath>
     </taskdef>
 
@@ -52,24 +51,30 @@
     <!-- http://code.google.com/p/javaflight-code/wiki/YuiCompressorAntTask -->
     <taskdef name="yui-compressor" classname="net.noha.tools.ant.yuicompressor.tasks.YuiCompressorTask">
         <classpath>
-            <pathelement location="${lib.dir}/yui-compressor-ant-task-0.5.jar"/>
-            <pathelement location="${lib.dir}/jargs-1.0.jar"/>
-            <pathelement location="${lib.dir}/yuicompressor-2.4.2.jar"/>
+            <pathelement location="lib/yui-compressor-ant-task-0.5.jar"/>
+            <pathelement location="lib/jargs-1.0.jar"/>
+            <pathelement location="lib/yuicompressor-2.4.2.jar"/>
         </classpath>
     </taskdef>
 
-    <fileset id="war.libs" dir="${lib.dir}">
+     <taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask">
+         <classpath>
+            <pathelement location="lib/jarjar-1.3.jar"/>
+        </classpath>
+     </taskdef>
+
+    <fileset id="war.libs" dir="lib">
 
         <include name="orbeon-errorified-20120619.jar"/>
+
+        <!-- These JARs are checked in. They can be rebuilt with the jarjar target -->
+        <include name="xerces-2.11-orbeon.jar"/>
+        <include name="msv-20081113-orbeon.jar"/>
 
         <include name="dom4j-1_6_1.jar"/>
         <include name="log4j-1_2_15.jar"/>
         <include name="jaxen-1_1_beta_9.jar"/>
         <include name="saxpath-dev_orbeon.jar"/>
-
-        <include name="xerces-resolver-2_9_orbeon_20070711.jar"/>
-        <include name="xerces-serializer-2_9_orbeon_20070711.jar"/>
-        <include name="xerces-xercesImpl-2_9_orbeon_20070711.jar"/>
 
         <include name="commons-beanutils-1_5.jar"/>
         <include name="commons-cli-1_0.jar"/>
@@ -97,11 +102,6 @@
         <include name="axis_1_2_1-jaxrpc.jar"/>
         <include name="axis_1_2_1-saaj.jar"/>
         <include name="axis_1_2_1-wsdl4j-1.5.1.jar"/>
-
-        <include name="msv-20081113_orbeon_20081209.jar"/>
-        <include name="msv-isorelax-20070407.jar"/>
-        <include name="msv-xsdlib-20070407_orbeon_20100309.jar"/>
-        <include name="msv-relaxngDatatype-20070407.jar"/>
 
         <include name="hsqldb-1_8_0_7.jar"/>
         <include name="jfreechart-1.0.9.jar"/>
@@ -280,10 +280,41 @@
         </condition>
     </target>
 
+    <target name="jarjar" depends="prepare">
+        <!-- Xerces fat JAR -->
+        <jarjar jarfile="lib/xerces-2.11-orbeon.jar">
+            <zipfileset src="lib/src/xerces-resolver-2.11.jar">
+                <!-- Don't expose any services -->
+                <exclude name="META-INF/services/**"/>
+            </zipfileset>
+            <zipfileset src="lib/src/xerces-resolver-2.11.jar">
+                <!-- Don't expose any services -->
+                <exclude name="META-INF/services/**"/>
+            </zipfileset>
+            <zipfileset src="lib/src/xerces-xercesImpl-2.11.jar">
+                <!-- Don't expose any services -->
+                <exclude name="META-INF/services/**"/>
+            </zipfileset>
+            <rule pattern="org.apache.**" result="orbeon.apache.@1"/>
+        </jarjar>
+        <!-- MSV fat JAR -->
+        <jarjar jarfile="lib/msv-20081113-orbeon.jar">
+            <zipfileset src="lib/src/msv-20081113_orbeon_20081209.jar"/>
+            <zipfileset src="lib/src/msv-isorelax-20070407.jar"/>
+            <zipfileset src="lib/src/msv-relaxngDatatype-20070407.jar"/>
+            <zipfileset src="lib/src/msv-xsdlib-20070407_orbeon_20120712.jar"/>
+            <rule pattern="com.sun.msv.**"          result="org.orbeon.msv.@1"/>
+            <rule pattern="com.sun.xml.**"          result="org.orbeon.msv.xml.@1"/>
+            <rule pattern="org.iso_relax.**"        result="org.orbeon.msv.iso_relax.@1"/>
+            <rule pattern="jp.gr.xml.relax.**"      result="org.orbeon.msv.gr.xml.relax.@1"/>
+            <rule pattern="org.relaxng.datatype.**" result="org.orbeon.msv.relaxng.datatype.@1"/>
+        </jarjar>
+    </target>
+
     <!-- Set classpath to compile and run the application -->
     <target name="classpath" depends="prepare">
         <path id="class.path">
-            <fileset dir="${lib.dir}">
+            <fileset dir="lib">
                 <include name="**/*.jar"/>
             </fileset>
         </path>
@@ -293,7 +324,7 @@
         <path id="test.class.path">
             <pathelement location="${jar.file}"/>
             <pathelement location="${xforms-filter.jar.file}"/>
-            <fileset dir="${lib.dir}">
+            <fileset dir="lib">
                 <include name="**/*.jar"/>
             </fileset>
         </path>
@@ -399,8 +430,9 @@
           </fileset>
         </jar>
 
+        <property name="cli.jar.lib.dir" location="lib"/>
         <pathconvert dirsep="/" pathsep=" " property="cli.jar.mf.cp" refid="war.libs">
-          <map from="${lib.dir}" to="lib"/>
+          <map from="${cli.jar.lib.dir}" to="lib"/>
         </pathconvert>
 
         <basename file="${jar.file}" property="jar.name"/>
@@ -510,12 +542,12 @@
         <echo message="war.dir: ${war.dir}"/>
 
         <copy todir="${war.lib}">
-          <fileset refid="war.libs"/>
+            <fileset refid="war.libs"/>
         </copy>
         <!-- Make sure we remove PathMap from Saxon as we have our own implementation -->
         <delete file="${war.lib}/${saxon.jar}"/>
         <jar destfile="${war.lib}/${saxon.jar}">
-            <zipfileset src="${lib.dir}/${saxon.jar}" excludes="org/orbeon/saxon/expr/PathMap*.class"/>
+            <zipfileset src="lib/${saxon.jar}" excludes="org/orbeon/saxon/expr/PathMap*.class"/>
         </jar>
 
         <copy file="${jar.file}" todir="${war.lib}"/>
@@ -526,7 +558,7 @@
         <copy file="${form-builder.jar.file}" todir="${war.lib}"/>
 
         <copy todir="${war.inf}">
-            <fileset dir="${lib.dir}">
+            <fileset dir="lib">
                 <include name="commons-cli-1_0.jar"/>
             </fileset>
         </copy>
@@ -569,13 +601,13 @@
             <lib dir="${build.lib.dir}">
                 <include name="orbeon.jar"/>
                 <include name="orbeon-xforms-filter.jar"/>
+                <include name="xerces-2.11-orbeon.jar"/>
             </lib>
-            <lib dir="${lib.dir}">
+            <lib dir="lib">
                 <include name="scala-library-*.jar"/>
                 <include name="commons-fileupload-*.jar"/>
                 <include name="commons-lang-*.jar"/>
                 <include name="log4j-*.jar"/>
-                <include name="xerces-xercesImpl-2_9_orbeon_20070711.jar"/>
             </lib>
         </war>
     </target>
@@ -597,31 +629,6 @@
                 <exclude name="**/license.xml"/>
             </zipfileset>
         </zip>
-    </target>
-
-    <target name="orbeon-javadoc" depends="classpath">
-        <!-- packagenames="org.orbeon.*" sourcepath="${src.dir}" -->
-        <mkdir dir="${build.doc.dir}/javadoc"/>
-        <javadoc destdir="${build.doc.dir}/javadoc" classpathref="class.path">
-            <link href="http://java.sun.com/j2se/1.3/docs/api/"/>
-            <link href="http://xml.apache.org/xerces2-j/javadocs/api/"/>
-            <link href="http://jakarta.apache.org/tomcat/tomcat-4.0-doc/servletapi/"/>
-            <link href="http://dom4j.org/apidocs/"/>
-            <fileset dir="${java-src.dir}">
-                <include name="org/orbeon/oxf/processor/SimpleProcessor.java"/>
-                <include name="org/orbeon/oxf/processor/ProcessorInputOutputInfo.java"/>
-                <include name="org/orbeon/oxf/processor/Processor.java"/>
-                <include name="org/orbeon/oxf/processor/ProcessorImpl.java"/>
-                <include name="org/orbeon/oxf/common/*.java"/>
-                <include name="org/orbeon/oxf/pipeline/api/*.java"/>
-                <include name="org/orbeon/oxf/resources/ResourceManager.java"/>
-                <include name="org/orbeon/oxf/resources/*ResourceManagerImpl.java"/>
-                <exclude name="org/orbeon/oxf/resources/CacheResourceManagerImpl.java"/>
-                <include name="org/orbeon/oxf/resources/OXFProperties.java"/>
-                <include name="org/orbeon/oxf/xml/NamingConvention.java"/>
-                <include name="org/orbeon/oxf/xml/dom4j/LocationData.java"/>
-            </fileset>
-        </javadoc>
     </target>
 
     <target name="orbeon-minify-js" depends="init, classes">
@@ -817,7 +824,7 @@
         </zip>
     </target>
 
-    <target name="orbeon-dist-packages" depends="orbeon-dist-war, orbeon-javadoc, orbeon-src">
+    <target name="orbeon-dist-packages" depends="orbeon-dist-war, orbeon-src">
         <!-- Create temporary zip file -->
         <property name="tmp-zip" value="${build.distrib.dir}/${versioned-name}-tmp.zip"/>
         <zip zipfile="${tmp-zip}">
@@ -938,9 +945,7 @@
         <!-- http://exist-db.org/ant-tasks.html -->
         <typedef resource="org/exist/ant/antlib.xml" uri="http://exist-db.org/ant">
             <classpath>
-                <fileset dir="${lib.dir}">
-                    <include name="*.jar"/>
-                </fileset>
+                <path refid="class.path"/>
                 <fileset dir="${build.dir}/lib">
                     <include name="orbeon.jar"/>
                 </fileset>

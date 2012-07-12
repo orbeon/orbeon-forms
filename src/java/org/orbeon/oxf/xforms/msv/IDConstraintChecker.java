@@ -22,15 +22,15 @@
  */
 package org.orbeon.oxf.xforms.msv;
 
-import com.sun.msv.grammar.xmlschema.ElementDeclExp;
-import com.sun.msv.grammar.xmlschema.IdentityConstraint;
-import com.sun.msv.grammar.xmlschema.KeyRefConstraint;
-import com.sun.msv.util.LightStack;
-import com.sun.msv.util.StartTagInfo;
-import com.sun.msv.verifier.Acceptor;
+import org.orbeon.msv.grammar.xmlschema.ElementDeclExp;
+import org.orbeon.msv.grammar.xmlschema.IdentityConstraint;
+import org.orbeon.msv.grammar.xmlschema.KeyRefConstraint;
+import org.orbeon.msv.util.LightStack;
+import org.orbeon.msv.util.StartTagInfo;
+import org.orbeon.msv.verifier.Acceptor;
 import org.orbeon.oxf.xforms.ErrorInfo;
-import org.relaxng.datatype.Datatype;
-import org.relaxng.datatype.ValidationContext;
+import org.orbeon.msv.relaxng.datatype.Datatype;
+import org.orbeon.msv.relaxng.datatype.ValidationContext;
 
 /**
  * Verifier with XML Schema-related enforcement.
@@ -131,7 +131,7 @@ public class IDConstraintChecker implements ValidationContext {
         // keyref check
         java.util.Map.Entry[] scopes = (java.util.Map.Entry[])
             keyValues.entrySet().toArray(new java.util.Map.Entry[keyValues.size()]);
-        if(com.sun.msv.driver.textui.Debug.debug)
+        if(org.orbeon.msv.driver.textui.Debug.debug)
             System.out.println("key/keyref check: there are "+keyValues.size()+" scope(s)");
         
         for( int i=0; i<scopes.length; i++ ) {

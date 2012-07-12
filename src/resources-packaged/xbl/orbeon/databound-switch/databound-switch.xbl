@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <!--
   Copyright (C) 2010 Orbeon, Inc.
 
@@ -33,7 +32,9 @@
             <xforms:switch xbl:attr="model context ref bind" xxbl:scope="outer">
                 <!-- Toggle visible case upon initial display or value change -->
                 <!-- Here we assume that the case id matches the node value -->
-                <xforms:toggle ev:event="xforms-value-changed xforms-enabled" ev:target="#observer" case="{.}"/>
+                <xforms:var name="value" value="string()">
+                    <xforms:toggle ev:event="xforms-value-changed xforms-enabled" case="{$value}"/>
+                </xforms:var>
                 <!-- Include nested cases -->
                 <xbl:content includes=":root > xforms|case"/>
             </xforms:switch>

@@ -20,7 +20,7 @@
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
 
-    <xbl:binding element="fr|tutorial-davinci" id="fr-tutorial-davinci">
+    <xbl:binding element="fr|tutorial-davinci" id="fr-tutorial-davinci" xxbl:mode="binding lhha">
         <xbl:implementation>
             <!-- Local model -->
             <xforms:model>
@@ -30,30 +30,22 @@
             </xforms:model>
         </xbl:implementation>
         <xbl:template>
-            <!-- Outer group implementing the single-node binding -->
-            <xforms:group xbl:attr="model context ref bind" xxbl:scope="outer">
-                <!-- Copy LHHA elements if any -->
-                <xbl:content includes=":root > xforms|label, :root > xforms|help, :root > xforms|hint, :root > xforms|alert"/>
-                <!-- Inner group -->
-                <xforms:group xxbl:scope="inner">
-                    <!-- Variable pointing to external single-node binding -->
-                    <xxforms:variable name="binding" as="node()?">
-                        <xxforms:sequence select="." xxbl:scope="outer"/>
-                    </xxforms:variable>
-                    <!-- When the external single-node binding comes to life or its value changes, copy it to the
-                         local value after reversing it -->
-                    <xforms:group ref="$binding">
-                        <xforms:setvalue ev:event="xforms-enabled xforms-value-changed"
-                                         ref="instance()" value="codepoints-to-string(reverse(string-to-codepoints($binding)))"/>
-                    </xforms:group>
-                    <!-- Input points to the internal value -->
-                    <xforms:input ref="instance()">
-                        <!-- When the local value changes, copy it to the external single-node binding after reversing it -->
-                        <xforms:setvalue ev:event="xforms-value-changed"
-                                         ref="$binding" value="codepoints-to-string(reverse(string-to-codepoints(context())))"/>
-                    </xforms:input>
-                </xforms:group>
-            </xforms:group>
+            <!-- When the external single-node binding comes to life or its value changes, copy it to the
+                 local value after reversing it -->
+            <xforms:var name="value" value="xxforms:binding('fr-tutorial-davinci')/string()">
+                <xforms:setvalue
+                    ev:event="xforms-enabled xforms-value-changed"
+                    ref="instance()"
+                    value="codepoints-to-string(reverse(string-to-codepoints($value)))"/>
+            </xforms:var>
+            <!-- Input points to the internal value -->
+            <xforms:input ref="instance()">
+                <!-- When the local value changes, copy it to the external single-node binding after reversing it -->
+                <xforms:setvalue
+                    ev:event="xforms-value-changed"
+                    ref="xxforms:binding('fr-tutorial-davinci')"
+                    value="codepoints-to-string(reverse(string-to-codepoints(context())))"/>
+            </xforms:input>
         </xbl:template>
     </xbl:binding>
 </xbl:xbl>

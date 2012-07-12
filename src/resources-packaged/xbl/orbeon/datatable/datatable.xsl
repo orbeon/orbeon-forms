@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <!--
   Copyright (C) 2010 Orbeon, Inc.
 
@@ -881,37 +880,41 @@
             {@class}
             ">
             <xsl:apply-templates select="@*[name() != 'class']" mode="dynamic"/>
-            <xforms:group ref=".">
-                <xforms:action ev:event="xforms-enabled xforms-value-changed" xxbl:scope="inner">
-                    <!--<xforms:delete ref="$columnSet/column[@position = $position]"/>-->
+            <xforms:var name="value" value="string()">
+                <xforms:action ev:event="xforms-enabled xforms-value-changed">
                     <xsl:choose>
                         <xsl:when test="$is-internally-sorted">
-                            <xforms:insert context="$columnSet" ref="column"
+                            <xforms:insert
+                                xxbl:scope="inner"
+                                context="$columnSet" ref="column"
                                 origin="xxforms:element('column', (
-                                xxforms:attribute('position', $position),
-                                xxforms:attribute('nbColumns', 1),
-                                xxforms:attribute('index', $columnIndex),
-                                xxforms:attribute('sortKey', concat( '(',  $columnSet/(@ref, @nodeset)[1], ')[', $position , ']/', $columnSet/@sortKey)),
-                                xxforms:attribute('currentSortOrder', ''),
-                                xxforms:attribute('nextSortOrder', ''),
-                                xxforms:attribute('type', ''),
-                                xxforms:attribute('pathToFirstNode', ''),
-                                $columnSet/@fr:sortable,
-                                $columnSet/@fr:resizeable,
-                                $columnSet/@fr:sortType
-                                ))"
+                                    xxforms:attribute('position', $position),
+                                    xxforms:attribute('nbColumns', 1),
+                                    xxforms:attribute('index', $columnIndex),
+                                    xxforms:attribute('sortKey', concat( '(',  $columnSet/(@ref, @nodeset)[1], ')[', $position , ']/', $columnSet/@sortKey)),
+                                    xxforms:attribute('currentSortOrder', ''),
+                                    xxforms:attribute('nextSortOrder', ''),
+                                    xxforms:attribute('type', ''),
+                                    xxforms:attribute('pathToFirstNode', ''),
+                                    $columnSet/@fr:sortable,
+                                    $columnSet/@fr:resizeable,
+                                    $columnSet/@fr:sortType
+                                    ))"
                                 if="not($columnSet/column[@position = $position])
                                 "/>
                         </xsl:when>
                         <xsl:otherwise>
-                            <xforms:insert context="$columnSet" ref="column"
+                            <xforms:insert
+                                xxbl:scope="inner"
+                                context="$columnSet"
+                                ref="column"
                                 origin="xxforms:element('column', (
-                                xxforms:attribute('position', $position),
-                                xxforms:attribute('nbColumns', 1),
-                                xxforms:attribute('index', $columnIndex),
-                                $columnSet/@fr:sortable,
-                                $columnSet/@fr:resizeable,
-                                $columnSet/@fr:sortType
+                                    xxforms:attribute('position', $position),
+                                    xxforms:attribute('nbColumns', 1),
+                                    xxforms:attribute('index', $columnIndex),
+                                    $columnSet/@fr:sortable,
+                                    $columnSet/@fr:resizeable,
+                                    $columnSet/@fr:sortType
                                 ))"
                                 if="not($columnSet/column[@position = $position])
                                 "/>
@@ -919,7 +922,7 @@
                     </xsl:choose>
 
                 </xforms:action>
-            </xforms:group>
+            </xforms:var>
 
             <xforms:var name="columnDesc" value="$columnSet/column[@position = $position]" xxbl:scope="inner"/>
 

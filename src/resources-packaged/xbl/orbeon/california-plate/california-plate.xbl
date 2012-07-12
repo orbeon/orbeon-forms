@@ -15,8 +15,6 @@
          xmlns:xforms="http://www.w3.org/2002/xforms"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
          xmlns:ev="http://www.w3.org/2001/xml-events"
-         xmlns:xi="http://www.w3.org/2001/XInclude"
-         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
          xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
          xmlns:saxon="http://saxon.sf.net/"
@@ -26,7 +24,7 @@
     <!--
         Component to represent a California license plate.
      -->
-    <xbl:binding id="fr-california-plate-binding" element="fr|california-plate">
+    <xbl:binding id="fr-california-plate-binding" element="fr|california-plate" xxbl:mode="binding lhha">
 
         <!-- Orbeon Form Builder Component Metadata -->
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
@@ -60,44 +58,26 @@
             </xforms:model>
         </xbl:implementation>
         <xbl:template>
-            <!-- Local controls -->
-            <xforms:group xbl:attr="model context ref bind" xxbl:scope="outer">
-                <xbl:content includes=":root > xforms|label, :root > xforms|help, :root > xforms|hint, :root > xforms|alert"/>
+            <!-- React to enabled/value update -->
+            <xforms:var name="value" value="xxforms:binding('fr-california-plate-binding')/string()">
+                <xforms:action ev:event="xforms-value-changed xforms-enabled">
+                    <!-- Convert to codepoints with a max length of 7 and pad with spaces -->
+                    <xforms:var name="codepoints" value="subsequence(string-to-codepoints(concat($value, '       ')), 1, 7)" as="xs:integer*"/>
+                    <!-- Set values for current elements -->
+                    <xforms:action iterate="$codepoints">
+                        <xforms:var name="p" value="position()" as="xs:integer"/>
+                        <xforms:var name="c" value="." as="xs:integer"/>
+                        <xforms:setvalue ref="instance()/c[$p]" value="codepoints-to-string($c)"/>
+                    </xforms:action>
+                </xforms:action>
+            </xforms:var>
 
-                <!-- Inner group -->
-                <xforms:group appearance="xxforms:internal" xxbl:scope="inner">
-                    <!-- Variable pointing to external single-node binding -->
-                    <xxforms:variable name="result" as="node()?">
-                        <xxforms:sequence select="." xxbl:scope="outer"/>
-                    </xxforms:variable>
-
-                    <!-- React to update to bound node or control coming into existence -->
-                    <xforms:group ref="$result" appearance="xxforms:internal">
-                        <!-- Only set local values if the bound node is an xs:date -->
-                        <xforms:action ev:event="xforms-value-changed xforms-enabled">
-                            <!-- Convert to codepoints with a max length of 7 and pad with spaces -->
-                            <xxforms:variable name="codepoints" select="subsequence(string-to-codepoints(concat($result, '       ')), 1, 7)" as="xs:integer*"/>
-                            <!-- Set values for current elements -->
-                            <xforms:action iterate="$codepoints">
-                                <xxforms:variable name="p" select="position()" as="xs:integer"/>
-                                <xxforms:variable name="c" select="." as="xs:integer"/>
-                                <xforms:setvalue ref="instance()/c[$p]" value="codepoints-to-string($c)"/>
-                            </xforms:action>
-                        </xforms:action>
-                    </xforms:group>
-
-                    <xforms:group class="fr-component-group">
-                        <xhtml:span class="fr-plate-characters">
-                            <xforms:repeat ref="instance()/c[normalize-space(.) != '']">
-                                <xhtml:img src="/xbl/orbeon/california-plate/images/_{if (string-to-codepoints(upper-case(.)) = string-to-codepoints('ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789')) then upper-case(.) else '_'}_small.gif"/>
-                            </xforms:repeat>
-                        </xhtml:span>
-                    </xforms:group>
-
-                    <!-- Stop propagation of all UI events -->
-                    <xforms:action ev:event="#all" ev:propagate="stop"/>
-                </xforms:group>
-
+            <xforms:group class="fr-component-group">
+                <xhtml:span class="fr-plate-characters">
+                    <xforms:repeat ref="instance()/c[normalize-space(.) != '']">
+                        <xhtml:img src="/xbl/orbeon/california-plate/images/_{if (string-to-codepoints(upper-case(.)) = string-to-codepoints('ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789')) then upper-case(.) else '_'}_small.gif"/>
+                    </xforms:repeat>
+                </xhtml:span>
             </xforms:group>
         </xbl:template>
     </xbl:binding>

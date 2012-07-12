@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <!--
   Copyright (C) 2010 Orbeon, Inc.
 
@@ -16,8 +15,6 @@
          xmlns:xforms="http://www.w3.org/2002/xforms"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
          xmlns:ev="http://www.w3.org/2001/xml-events"
-         xmlns:xi="http://www.w3.org/2001/XInclude"
-         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
          xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
          xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
@@ -29,26 +26,21 @@
     <xbl:script type="text/javascript" src="/xbl/orbeon/code-mirror/CodeMirror-2.0/lib/codemirror.js"/>
     <xbl:script type="text/javascript" src="/xbl/orbeon/code-mirror/CodeMirror-2.0/mode/xml/xml.js"/>
     <xbl:script type="text/javascript" src="/xbl/orbeon/code-mirror/code-mirror.js"/>
-    <xbl:binding id="fr-code-mirror" element="fr|code-mirror">
+    <xbl:binding id="fr-code-mirror" element="fr|code-mirror" xxbl:mode="binding lhha">
         <xbl:resources>
             <xbl:style src="/xbl/orbeon/code-mirror/CodeMirror-2.0/lib/codemirror.css"/>
             <xbl:style src="/xbl/orbeon/code-mirror/CodeMirror-2.0/mode/xml/xml.css"/>
             <xbl:style src="/xbl/orbeon/code-mirror/code-mirror.css"/>
         </xbl:resources>
         <xbl:template>
-            <xforms:group appearance="xxforms:internal">
-                <xxforms:variable name="binding" as="node()?">
-                    <xxforms:sequence select="." xxbl:scope="outer" xbl:attr="model context ref bind"/>
-                </xxforms:variable>
-                <xforms:group id="outer" ref="$binding" class="xbl-fr-code-mirror-editor-outer">
-                    <xbl:content includes=":root > xforms|label, :root > xforms|alert, :root > xforms|help, :root > xforms|hint"/>
+            <xforms:group id="outer" class="xbl-fr-code-mirror-editor-outer">
+                <xforms:textarea ref="xxforms:binding('fr-code-mirror')" id="textarea">
                     <xxforms:script ev:event="xforms-enabled xxforms-iteration-moved" id="xf-init" ev:target="#observer">YAHOO.xbl.fr.CodeMirror.instance(this).init();</xxforms:script>
                     <xxforms:script ev:event="xforms-value-changed" id="xf-value-changed">YAHOO.xbl.fr.CodeMirror.instance(this).xformsValueChanged();</xxforms:script>
                     <xxforms:script ev:event="xforms-readonly" id="xf-readonly">YAHOO.xbl.fr.CodeMirror.instance(this).xformsReadonly();</xxforms:script>
                     <xxforms:script ev:event="xforms-readwrite" id="xf-readwrite">YAHOO.xbl.fr.CodeMirror.instance(this).xformsReadwrite();</xxforms:script>
-                    <xforms:textarea ref="$binding" id="textarea"/>
-                    <xhtml:span id="inner" class="xbl-fr-code-mirror-editor-inner"/>
-                </xforms:group>
+                </xforms:textarea>
+                <xhtml:span id="inner" class="xbl-fr-code-mirror-editor-inner"/>
             </xforms:group>
         </xbl:template>
     </xbl:binding>

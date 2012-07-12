@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <!--
   Copyright (C) 2009 Orbeon, Inc.
 
@@ -16,8 +15,6 @@
          xmlns:xforms="http://www.w3.org/2002/xforms"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
          xmlns:ev="http://www.w3.org/2001/xml-events"
-         xmlns:xi="http://www.w3.org/2001/XInclude"
-         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
          xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
          xmlns:saxon="http://saxon.sf.net/"
@@ -27,7 +24,7 @@
     <!--
         Component to represent a US currency with 3 digits after the decimal point (e.g. value is in thousands).
      -->
-    <xbl:binding id="fr-us-currency-thousands" element="fr|us-currency-thousands">
+    <xbl:binding id="fr-us-currency-thousands" element="fr|us-currency-thousands" xxbl:mode="binding lhha">
 
         <!-- Orbeon Form Builder Component Metadata -->
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
@@ -57,8 +54,8 @@
         </xbl:resources>
         <xbl:implementation>
             <!-- Local model -->
-            <xforms:model id="currency-model">
-                <xforms:instance id="currency-instance">
+            <xforms:model>
+                <xforms:instance>
                     <value/>
                 </xforms:instance>
                 <xforms:bind ref="." constraint="substring-after(., '$') castable as xs:decimal"/>
@@ -67,39 +64,24 @@
             </xforms:model>
         </xbl:implementation>
         <xbl:template>
-            <!-- Local controls -->
-            <xforms:group xbl:attr="model context ref bind" xxbl:scope="outer">
-                <xbl:content includes=":root > xforms|label, :root > xforms|help, :root > xforms|hint, :root > xforms|alert"/>
+            <!-- React to update to bound node -->
+            <xforms:var name="value" value="xxforms:binding('fr-us-currency-thousands')/string()">
+                <xforms:setvalue
+                    ev:event="xforms-value-changed xforms-enabled"
+                    ref="instance()"
+                    value="if ($value castable as xs:decimal) then format-number($value, '$ #.000') else $value"/>
+            </xforms:var>
 
-                <!-- Inner group -->
-                <xforms:group class="fr-component-group" xxbl:scope="inner">
-                    <!-- Variable pointing to external single-node binding -->
-                    <xxforms:variable name="result" as="node()?">
-                        <xxforms:sequence select="." xxbl:scope="outer"/>
-                    </xxforms:variable>
-
-                    <!-- React to update to bound node -->
-                    <xforms:group ref="$result" appearance="xxforms:internal">
-                        <!-- Only set local values if the bound node is an xs:decimal -->
-                        <xforms:action ev:event="xforms-value-changed xforms-enabled">
-                            <xforms:setvalue ref="instance('currency-instance')" value="if ($result castable as xs:decimal) then format-number($result, '$ #.000') else $result"/>
-                        </xforms:action>
-                    </xforms:group>
-
-                    <xforms:input ref="$result" id="currency-input" xbl:attr="navindex navindex=tabindex">
-                        <!-- React to update to local values -->
-                        <xforms:action ev:event="xforms-value-changed">
-                            <xxforms:variable name="currency-normalized" select="normalize-space(.)" as="xs:string"/>
-                            <xxforms:variable name="currency-no-dollar" select="if (starts-with($currency-normalized, '$')) then substring-after($currency-normalized, '$') else $currency-normalized" as="xs:string"/>
-                            <xforms:setvalue ref="$result" value="if ($currency-no-dollar castable as xs:decimal) then xs:decimal($currency-no-dollar) else $currency-no-dollar"/>
-                        </xforms:action>
-                    </xforms:input>
-
-                    <!-- Stop propagation of all UI events -->
-                    <xforms:action ev:event="#all" ev:propagate="stop"/>
-                </xforms:group>
-
-            </xforms:group>
+            <xforms:input ref="instance()" id="currency-input" xbl:attr="navindex navindex=tabindex">
+                <!-- React to update to local values -->
+                <xforms:action ev:event="xforms-value-changed">
+                    <xforms:var name="currency-normalized" value="normalize-space(.)"/>
+                    <xforms:var name="currency-no-dollar" value="if (starts-with($currency-normalized, '$')) then substring-after($currency-normalized, '$') else $currency-normalized"/>
+                    <xforms:setvalue
+                        ref="xxforms:binding('fr-us-currency-thousands')"
+                        value="if ($currency-no-dollar castable as xs:decimal) then xs:decimal($currency-no-dollar) else $currency-no-dollar"/>
+                </xforms:action>
+            </xforms:input>
         </xbl:template>
     </xbl:binding>
 

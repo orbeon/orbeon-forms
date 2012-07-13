@@ -1,5 +1,6 @@
 OD = ORBEON.xforms.Document
 FSM = ORBEON.util.FiniteStateMachine
+Events = ORBEON.xforms.Events
 
 $ ->
     sectionEditor = $ '.fb-section-editor'
@@ -29,6 +30,6 @@ $ ->
             hideEditor: -> sectionEditor.hide()
             wait: -> _.delay (-> waiting.fire()), 100
 
-    ($ document).on 'click', '.fb-section-editor', () ->
-        # Find id of the .xbl-fr-section for the current section
-        OD.dispatchEvent 'fb$section-1-section', 'fb-set-current-section'
+    Events.clickEvent.subscribe (event) ->
+        if f$.is '*', f$.closest '.fb-section-editor', $ event.target
+            OD.dispatchEvent currentSection[0].id, 'fb-set-current-section'

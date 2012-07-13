@@ -607,9 +607,8 @@
         value="lower-case(xxf:property(string-join(('oxf.fr.detail.send.success.method', $app, $form), '.')))"/>
 
     <!-- NOTE: keep non-relevant fields for now, as this is what's done for save/update. Should probably be configurable by the form author. -->
-    <!-- TODO: possibly: pass app/form name, e.g.: resource="{$workflow-success-uri}?fr-app={$app}&amp;fr-form={$form}" -->
     <xf:submission id="fr-workflow-send-submission"
-        resource="{concat($workflow-success-uri, if (contains($workflow-success-uri, '?')) then '&amp;' else '?', 'document=', $document)}"
+        resource="{formRunner:appendQueryString($workflow-success-uri, concat('app=', $app, '&amp;form=', $form, '&amp;document=', $document))}"
         relevant="{xxf:property(string-join(('oxf.fr.detail.send.success.prune', $app, $form), '.'))}"
         validate="false" method="{$workflow-success-method}"
         serialization="{if ($workflow-success-method = 'get') then 'none' else 'application/xml'}"

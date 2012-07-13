@@ -402,6 +402,9 @@ object FormRunner {
         resourceLabelOpt orElse inlineLabelOpt getOrElse '[' + name + ']'
     }
 
+    // Append a query string to a URL
+    def appendQueryString(urlString: String, queryString: String) = NetUtils.appendQueryString(urlString, queryString)
+
     private def selectLang(app: String, form: String, requestedLang: Option[String], availableLangs: List[String]) = {
         def matchingLanguage = availableLangs intersect requestedLang.toList headOption
         def defaultLanguage  = availableLangs intersect List(getDefaultLang(app, form)) headOption

@@ -20,7 +20,6 @@ import scala.collection.JavaConverters._
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.saxon.om.{Item, NodeInfo}
-import org.orbeon.oxf.pipeline.InitUtils
 import org.orbeon.oxf.xforms.function.xxforms.{XXFormsProperty, XXFormsPropertiesStartsWith}
 import java.util.{Map ⇒ JMap, List ⇒ JList}
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
@@ -28,11 +27,13 @@ import org.orbeon.oxf.xforms.function.Random
 import org.orbeon.oxf.util.{SecureUtils, NetUtils, XPathCache}
 import org.apache.commons.lang.StringUtils
 import org.orbeon.oxf.pipeline.api.ExternalContext.Request
+import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.webapp.HttpStatusCodeException
 
 object FormRunner {
 
     val NS = "http://orbeon.org/oxf/xml/form-runner"
+    val XF = XFORMS_NAMESPACE_URI
 
     val propertyPrefix = "oxf.fr.authentication."
 
@@ -391,6 +392,14 @@ object FormRunner {
             fromRequest orElse
             fromSession orElse
             Option(getDefaultLang(app, form))
+    }
+
+    // Get a field's label for the summary page
+    def summaryLanguage(name: String, resources: NodeInfo, inlineLabel: String): String = {
+        def resourceLabelOpt = resources \ name \ "label" map (_.getStringValue) headOption
+        def inlineLabelOpt   = nonEmptyOrNone(inlineLabel)
+
+        resourceLabelOpt orElse inlineLabelOpt getOrElse '[' + name + ']'
     }
 
     private def selectLang(app: String, form: String, requestedLang: Option[String], availableLangs: List[String]) = {

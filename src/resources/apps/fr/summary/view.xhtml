@@ -147,7 +147,7 @@
             </xforms:bind>
 
             <xforms:instance id="fr-search-template" xxforms:readonly="true">
-                <query xmlns="" name="" path="" label="" type="" control="" search-field="" summary-field="" match="substring"/>
+                <query xmlns="" name="" path="" inline-label="" type="" control="" search-field="" summary-field="" match="substring"/>
             </xforms:instance>
 
             <!-- Paging information -->
@@ -177,14 +177,6 @@
                 <xforms:bind ref="prev-trigger" readonly="../search-total = 0 or xs:integer(../page-number) le 1"/>
                 <xforms:bind ref="next-trigger" readonly="../search-total = 0 or xs:integer(../search-total) le xs:integer(../to)"/>
             </xforms:bind>
-
-            <xforms:instance id="fr-summary-headers-instance">
-                <dummy xmlns=""/>
-            </xforms:instance>
-
-            <xforms:instance id="fr-configuration-instance">
-                <configuration xmlns=""/>
-            </xforms:instance>
 
             <xforms:instance id="fr-selection-instance">
                 <selection xmlns=""/>
@@ -238,9 +230,6 @@
 
                 <xforms:var name="summary-elements" as="element()*"
                             value="instance('fr-source-form-instance')/xhtml:body//*[(@ref or @bind) and @class and tokenize(@class, '\s+') = ('fr-summary', 'fr-search')]"/>
-
-                <!-- Extract fields which must appear in the summary -->
-                <xforms:insert context="instance('fr-configuration-instance')" ref="*" origin="$summary-elements"/>
 
                 <xforms:var name="form-resources" model="fr-resources-model" value="$fr-form-resources" as="element(resource)?"/>
 
@@ -300,10 +289,11 @@
                     <!-- If control has labelref attribute, like the autocomplete, use value from labelref -->
                     <xforms:setvalue if="exists($control/@labelref)" ref="$query/@path" value="concat(., '/', $control/@labelref)"/>
 
-                    <!-- Compute label information -->
-                    <xforms:var name="label" value="$control/xforms:label" as="xs:element(xforms:label)*"/>
-                    <xforms:setvalue ref="$query/@label"
-                                     value="if ($label/@ref or $label/@bind) then $form-resources/*[local-name() = $query/@name]/label else $label"/>
+                    <!-- Store the inline label -->
+                    <xforms:setvalue
+                        ref="$query/@inline-label"
+                        value="normalize-space($control/xforms:label)"/>
+
                 </xforms:action>
 
                 <!-- Query initial list of documents -->
@@ -410,7 +400,7 @@
                                         <div class="fr-summary-search-item">
                                             <!-- Application -->
                                             <xforms:group ref="$app-query">
-                                                <xforms:var name="label" value="@label" as="xs:string"/>
+                                                <xforms:var name="label" value="formRunner:summaryLanguage(@name, $form-resources, @inline-label)"/>
                                                 <!-- Use an input if app name is a wildcard -->
                                                 <xforms:var name="is-input" value="xxforms:instance('fr-permissions')/app[@name = '*']" as="xs:boolean"/>
                                                 <xforms:input ref=".[$is-input]">
@@ -444,7 +434,7 @@
                                         <div class="fr-summary-search-item">
                                             <!-- Form -->
                                             <xforms:group ref="$form-query">
-                                                <xforms:var name="label" value="@label" as="xs:string"/>
+                                                <xforms:var name="label" value="formRunner:summaryLanguage(@name, $form-resources, @inline-label)"/>
                                                 <xforms:var name="current-app" value="xxforms:instance('fr-permissions')/app[@name = $app-query]"/>
                                                 <!-- Use an input if app name or form name is a wildcard -->
                                                 <xforms:var name="is-input" value="xxforms:instance('fr-permissions')/app/@name = '*' or $current-app/form[@name = '*']" as="xs:boolean"/>
@@ -479,28 +469,22 @@
                                     <xforms:repeat ref="instance('fr-search-instance')/query[@path and @search-field = 'true']" id="search-repeat">
                                         <xforms:var name="control-name" value="@name"/>
                                         <div class="fr-summary-search-item">
-                                            <xforms:var name="label" value="@label"/>
+                                            <xforms:var name="label" value="formRunner:summaryLanguage(@name, $form-resources, @inline-label)"/>
 
                                             <xforms:group ref=".[not($is-form-builder and $has-roles and (contains(@path, 'application-name') or contains(@path, 'form-name')))]">
                                                 <!-- Regular search field (exclude app/form name if we are Form Builder and we have roles) -->
 
                                                 <!-- input -->
                                                 <xforms:input ref=".[@control = ('input', 'inplace-input')]">
-                                                    <xforms:label>
-                                                        <xforms:output value="$label"/>
-                                                    </xforms:label>
+                                                    <xforms:label value="$label"/>
                                                 </xforms:input>
                                                 <!-- textarea -->
                                                 <xforms:input ref=".[@control = 'textarea']">
-                                                    <xforms:label>
-                                                        <xforms:output value="$label"/>
-                                                    </xforms:label>
+                                                    <xforms:label value="$label"/>
                                                 </xforms:input>
                                                 <!-- select1 -->
                                                 <xforms:select1 ref=".[@control = 'select1']">
-                                                    <xforms:label>
-                                                        <xforms:output value="$label"/>
-                                                    </xforms:label>
+                                                    <xforms:label value="$label"/>
                                                     <xforms:item>
                                                         <xforms:label ref="$fr-resources/summary/labels/any"/>
                                                         <xforms:value/>
@@ -577,24 +561,10 @@
                                             </th>
                                         </xforms:repeat>
                                         <!-- Iterate through specially marked controls and derive resource id then resource -->
-                                        <xforms:repeat ref="instance('fr-configuration-instance')/*[tokenize(@class, '\s+') = 'fr-summary']" id="fr-summary-repeat-column-number">
+                                        <xforms:repeat ref="instance('fr-search-instance')/query[@summary-field = 'true']" id="fr-summary-repeat-column-number">
                                             <th fr:sortable="false" fr:resizeable="true">
                                                 <!-- Output showing as the header of the column -->
-                                                <xforms:output value="
-                                                    for
-                                                        (: Current node is a control, such as xforms:input :)
-                                                        $control-info in .,
-                                                        (: Control has id='title-control', $resource-id = 'title' :)
-                                                        $resource-id in substring-before($control-info/@id, '-control'),
-                                                        (: Find resource for control id; will be empty string if node found :)
-                                                        $resource in ($form-resources/*[local-name() = $resource-id], '')[1]
-                                                    return
-                                                        (: If we found a resource, use its label :)
-                                                        if ($resource instance of element()) then $resource/label
-                                                        (: If no resource is found, try to use the inline label :)
-                                                        else if (normalize-space($control-info/xforms:label) != '') then $control-info/xforms:label
-                                                        (: If everything fails, display the name of the control between brakets :)
-                                                        else concat('[', $resource-id, ']')"/>
+                                                <xforms:output value="formRunner:summaryLanguage(@name, $form-resources, @inline-label)"/>
                                             </th>
                                         </xforms:repeat>
                                     </tr>
@@ -708,7 +678,7 @@
                                     </xforms:repeat>
                                     <xforms:group ref=".[not(document)]">
                                         <tr>
-                                            <td colspan="{4 + count(instance('fr-configuration-instance')/*[tokenize(@class, '\s+') = 'fr-summary'])}">
+                                            <td colspan="{4 + count(instance('fr-search-instance')/*[@summary-field = 'true'])}">
                                                 <xforms:output id="fr-no-form-data" mediatype="text/html" value="saxon:serialize($fr-resources/summary/messages/no-form-found/node(), 'html')"/>
                                             </td>
                                         </tr>

@@ -20,6 +20,7 @@ import org.orbeon.oxf.fb.FormBuilderFunctions._
 import org.orbeon.oxf.fb.ControlOps._
 import org.orbeon.oxf.fb.GridOps._
 import org.orbeon.oxf.fb.ContainerOps._
+import org.orbeon.oxf.xml.TransformerUtils
 
 /*
  * Form Builder: toolbox operations.
@@ -66,15 +67,10 @@ object ToolboxOps {
                 // Adjust bindings on newly inserted control
                 renameControlByElement(newControlElement, newControlName)
 
-                // Get control type
-                // TODO: for now assume a literal 'xs:' prefix (should resolve namespace)
-                val controlType = binding \ "*:metadata" \ "*:datatype" match {
-                    case Seq(datatype, _*) ⇒ datatype.stringValue
-                    case _ ⇒ "xs:string"
-                }
+                val metadata = binding \ "*:metadata"
 
                 // Data holder may contain file attributes
-                val instanceTemplate = binding \ "*:metadata" \ "*:templates" \ "*:instance"
+                val instanceTemplate = metadata \ "*:templates" \ "*:instance"
                 val dataHolder =
                     if (! instanceTemplate.isEmpty)
                         elementInfo(newControlName, (instanceTemplate.head \@ @*) ++ (instanceTemplate \ *))
@@ -99,9 +95,18 @@ object ToolboxOps {
                 delete(newControlElement \@ "ref")
                 ensureAttribute(newControlElement, "bind", bind \@ "id" stringValue)
 
-                // Set bind type if needed
-                if (controlType != "xs:string")
-                    insert(into = bind, origin = attributeInfo("type", controlType))
+                // Get control type
+                val typeFromDatatype = ("", "type") → ((metadata \ "*:datatype" map (_.stringValue) headOption) getOrElse "xs:string")
+                val bindAttributes = metadata \ "*:templates" \ "*:bind" \@ @* map (att ⇒ qname(att) →  att.stringValue)
+
+                val allBindAttributes =
+                    typeFromDatatype +: bindAttributes filterNot
+                    { case ((uri, local), value) ⇒ local == "type" && value == "xs:string" } map // TODO: assume literal 'xs:' prefix (should resolve namespace)
+                    { case (qname, value) ⇒ attributeInfo(qname, value) }
+
+                // Set bind attributes
+                if (allBindAttributes.nonEmpty)
+                    insert(into = bind, origin = allBindAttributes)
 
                 debugDumpDocument("insert new control", doc)
 

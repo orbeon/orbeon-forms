@@ -308,10 +308,12 @@ object XML {
         def \@(attName: String): Seq[NodeInfo] = seq flatMap (_ \@ attName)
         def \@(attName: QName): Seq[NodeInfo] = seq flatMap (_ \@ attName)
         def \@(attName: (String, String)): Seq[NodeInfo] = seq flatMap (_ \@ attName)
+        def \@(test: Test): Seq[NodeInfo] = seq flatMap (_ \@ test)
 
         def \\@(attName: String): Seq[NodeInfo] = seq flatMap (_ \\@ attName)
         def \\@(attName: QName): Seq[NodeInfo] = seq flatMap (_ \\@ attName)
         def \\@(attName: (String, String)): Seq[NodeInfo] = seq flatMap (_ \\@ attName)
+        def \\@(test: Test): Seq[NodeInfo] = seq flatMap (_ \\@ test)
 
         def att(attName: String) = \@(attName)
         def child(test: Test) = \(test)
@@ -383,6 +385,7 @@ object XML {
     implicit def itemSeqToSequenceIterator[T <: Item](seq: Seq[T]): SequenceIterator = new ListIterator(seq.asJava)
 
     implicit def stringToQName(s: String) = QName.get(s)
+    implicit def tupleToQName(name: (String, String)) = QName.get(name._2, "", name._1)
     def stringToStringValue(s: String) = StringValue.makeStringValue(s)
 
     implicit def saxonIteratorToItem(i: SequenceIterator): Item = i.next()

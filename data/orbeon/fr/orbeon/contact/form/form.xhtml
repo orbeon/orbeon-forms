@@ -37,7 +37,7 @@
                                  name="last-name"/>
                     <xforms:bind id="email-bind" nodeset="email" type="xforms:email" required="true()"
                                  name="email"/>
-                    <xforms:bind id="phone-bind" nodeset="phone" type="xforms:nonNegativeInteger" name="phone"/>
+                    <xforms:bind id="phone-bind" nodeset="phone" constraint=". = '' or matches(., '^\d{10}$')" name="phone"/>
                 </xforms:bind>
                 <xforms:bind id="message-bind" nodeset="message" name="message">
                     <xforms:bind id="order-number-bind" nodeset="order-number" type="xs:string"

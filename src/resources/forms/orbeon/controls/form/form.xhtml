@@ -142,7 +142,7 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                     <xforms:bind id="email-bind" nodeset="email" type="xforms:email" name="email"/>
                     <xforms:bind id="boolean-bind" nodeset="boolean" type="xforms:boolean" name="boolean"/>
                     <xforms:bind id="dollars-bind" nodeset="dollars" type="xforms:decimal" name="dollars"/>
-                    <xforms:bind id="us-phone-bind" nodeset="us-phone" type="xforms:nonNegativeInteger"
+                    <xforms:bind id="us-phone-bind" nodeset="us-phone" constraint=". = '' or matches(., '^\d{10}$')"
                                  name="us-phone"/>
                     <xforms:bind id="us-state-bind" nodeset="us-state" type="xforms:string"
                                  name="us-state"/>

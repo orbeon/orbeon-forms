@@ -2394,21 +2394,24 @@ ORBEON.xforms.Controls = {
     },
 
     /**
-     * On blur for a control: waits for the next Ajax response and if the control is invalid, add the class
-     * xforms-invalid-visited. The code also tried to find the label for this control and add the class
+     * Update the visited state of a control. The code also tried to find the label for this control and add the class
      * xforms-alert-active-visited when necessary.
      */
-    updateInvalidVisitedOnNextAjaxResponse: function(control) {
-        if (! YAHOO.util.Dom.hasClass(control, "xforms-visited")) {
-            var formId = $(control).closest('form')[0].id;
-            ORBEON.xforms.server.AjaxServer.nextAjaxResponse(formId).then(function() {
-                YAHOO.util.Dom.addClass(control, "xforms-visited");
-                if (YAHOO.util.Dom.hasClass(control, "xforms-invalid"))
-                    YAHOO.util.Dom.addClass(control, "xforms-invalid-visited");
-                var alertElement = ORBEON.xforms.Controls.getControlLHHA(control, "alert");
-                if (alertElement != null && YAHOO.util.Dom.hasClass(alertElement, "xforms-alert-active"))
-                    YAHOO.util.Dom.addClass(alertElement, "xforms-alert-active-visited");
-            });
+    updateVisited: function(control, newVisited) {
+        if (newVisited) {
+            YAHOO.util.Dom.addClass(control, "xforms-visited");
+            if (YAHOO.util.Dom.hasClass(control, "xforms-invalid"))
+                YAHOO.util.Dom.addClass(control, "xforms-invalid-visited");
+
+            var alertElement = ORBEON.xforms.Controls.getControlLHHA(control, "alert");
+            if (alertElement && YAHOO.util.Dom.hasClass(alertElement, "xforms-alert-active"))
+                YAHOO.util.Dom.addClass(alertElement, "xforms-alert-active-visited");
+        } else {
+            YAHOO.util.Dom.removeClass(control, "xforms-visited");
+            YAHOO.util.Dom.removeClass(control, "xforms-invalid-visited");
+            var alertElement = ORBEON.xforms.Controls.getControlLHHA(control, "alert");
+            if (alertElement)
+                YAHOO.util.Dom.removeClass(alertElement, "xforms-alert-active-visited");
         }
     },
 
@@ -2962,7 +2965,6 @@ ORBEON.xforms.Events = {
             var control = ORBEON.xforms.Events._findParentXFormsControl(target);
             if (control != null) {
                 ORBEON.xforms.Events.blurEvent.fire({control: control, target: target});
-                ORBEON.xforms.Controls.updateInvalidVisitedOnNextAjaxResponse(control);
 
                 if (!YAHOO.util.Dom.hasClass(control, "xforms-dialog")) {
                     // This is an event for an XForms control which is not a dialog
@@ -2982,7 +2984,6 @@ ORBEON.xforms.Events = {
     change: function(event) {
         var target = ORBEON.xforms.Events._findParentXFormsControl(YAHOO.util.Event.getTarget(event));
         if (target != null) {
-            ORBEON.xforms.Controls.updateInvalidVisitedOnNextAjaxResponse(target);
             if (YAHOO.util.Dom.hasClass(target, "xforms-upload")) {
                 // Dispatch change event to upload control
                 ORBEON.xforms.Page.getControl(target).change();
@@ -2999,7 +3000,7 @@ ORBEON.xforms.Events = {
                         // Stop end-user from deselecting last selected value
                         select.options[0].selected = true;
                     } else {
-                        // Unselect options other than the first one
+                        // Deselect options other than the first one
                         var foundSelected = false;
                         for (var optionIndex = 0; optionIndex < select.options.length; optionIndex++) {
                             var option = select.options[optionIndex];
@@ -3111,7 +3112,6 @@ ORBEON.xforms.Events = {
             if (YAHOO.util.Dom.hasClass(target, "xforms-incremental")) {
                 var event = new ORBEON.xforms.server.AjaxServer.Event(null, target.id, ORBEON.xforms.Controls.getCurrentValue(target), "xxforms-value");
                 ORBEON.xforms.server.AjaxServer.fireEvents([event], true);
-                ORBEON.xforms.Controls.updateInvalidVisitedOnNextAjaxResponse(target);
             }
 
             // Resize wide text area
@@ -3584,7 +3584,7 @@ ORBEON.xforms.Events = {
             // Call listener on check event
             node.onCheckClick();
         } else {
-            // Unselect the old node and select the new node
+            // Deselect the old node and select the new node
             var currentValue = ORBEON.xforms.Controls.getCurrentValue(control);
             var oldNode = yuiTree.getNodeByProperty("value", currentValue);
             if (oldNode != null)

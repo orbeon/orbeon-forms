@@ -1461,6 +1461,11 @@
                                             && progressState != "" && progressReceived != "" && progressExpected != "")
                                         ORBEON.xforms.Page.getControl(documentElement).progress(progressState, parseInt(progressReceived), parseInt(progressExpected));
 
+                                    // Handle visited flag
+                                    var newVisited = ORBEON.util.Dom.getAttribute(controlElement, "visited");
+                                    if (newVisited)
+                                        ORBEON.xforms.Controls.updateVisited(documentElement, newVisited == 'true');
+
                                     // Notification event if the type changed
                                     if (recreatedInput) Controls.typeChangedEvent.fire({control: documentElement});
                                 }

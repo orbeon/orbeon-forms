@@ -21,6 +21,7 @@
     xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
     xmlns:xforms="http://www.w3.org/2002/xforms"
     xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xbl="http://www.w3.org/ns/xbl"
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
@@ -1255,6 +1256,83 @@
                         <xxf:control id="my-select·1">1</xxf:control>
                         <xxf:itemset id="my-select·1">[{"label":"Apple","value":"1"}]</xxf:itemset>
                         <xxf:control id="my-output·1">1</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="#382: xforms:item/xforms:choices: ref and context attributes are ignored" name="oxf:pipeline" only="true">
+        <!-- See: https://github.com/orbeon/orbeon-forms/issues/382 -->
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <p:param name="response" type="output"/>
+
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="wrap-xforms-state.xpl"/>
+                    <p:input name="document">
+                        <xhtml:html xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+                            <xhtml:head>
+                                <xforms:model id="model" xxforms:encrypt-item-values="false">
+
+                                    <xforms:instance id="instance">
+                                        <value/>
+                                    </xforms:instance>
+
+                                    <xforms:instance id="itemset">
+                                        <items>
+                                            <item label="Encyclopedia" value="en1">
+                                                <item label="Science" value="sc1"/>
+                                                <item label="Culture" value="cu1">
+                                                    <item label="Art" value="ar1"/>
+                                                    <item label="Craft" value="cr1"/>
+                                                </item>
+                                            </item>
+                                            <item label="Encyclopedia" value="en2">
+                                                <item label="Science" value="sc2"/>
+                                                <item label="Culture" value="cu2">
+                                                    <item label="Art" value="ar2"/>
+                                                    <item label="Craft" value="cr2"/>
+                                                </item>
+                                            </item>
+                                        </items>
+                                    </xforms:instance>
+
+                                </xforms:model>
+                            </xhtml:head>
+                            <xhtml:body>
+
+                                <xforms:select1 id="my-select" ref=".">
+                                    <xforms:choices context="instance('itemset')/item[2]">
+                                        <xforms:itemset ref=".//item">
+                                            <xforms:label ref="@label"/>
+                                            <xforms:value ref="@value"/>
+                                        </xforms:itemset>
+                                    </xforms:choices>
+                                    <xforms:item ref="instance('itemset')/item[1]/item[2]/item[1]">
+                                        <xforms:label value="@label"/>
+                                        <xforms:value value="@value"/>
+                                    </xforms:item>
+                                </xforms:select1>
+
+                                <xforms:output id="my-output" value="string-join(xxforms:itemset('my-select', 'xml')//value/string(), ' - ')"/>
+
+                            </xhtml:body>
+                        </xhtml:html>
+                    </p:input>
+                    <p:output name="response" ref="response"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="response">
+            <xxf:event-response>
+                <xxf:dynamic-state>
+                    <dynamic-state/>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:itemset id="my-select">[{"label":"Science","value":"sc2"},{"label":"Culture","value":"cu2","children":[{"label":"Art","value":"ar2"},{"label":"Craft","value":"cr2"},{"label":"Art","value":"ar1"}]}]</xxf:itemset>
+                        <xxf:control id="my-output">sc2 - cu2 - ar2 - cr2 - ar1</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>

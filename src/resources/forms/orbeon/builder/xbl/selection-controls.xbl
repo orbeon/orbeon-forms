@@ -144,6 +144,7 @@
         </metadata>
     </xbl:binding>
 
+    <!-- Standard HTML control considered harmful as of 2012-07-16 (use fr:box-select instead)
     <xbl:binding id="fb-input-select-compact" element="xforms|select">
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Multi List Box</display-name>
@@ -169,6 +170,7 @@
             </template>
         </metadata>
     </xbl:binding>
+    -->
 
     <!-- Not considered useful as of 2012-04-12 as the trees are on-level only
     <xbl:binding id="fb-input-select1-tree" element="xforms|select1">

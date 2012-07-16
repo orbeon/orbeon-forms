@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <!--
   Copyright (C) 2009 Orbeon, Inc.
 
@@ -38,7 +37,7 @@
 
     <xbl:binding id="fb-input-select1-minimal" element="xforms|select1">
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
-            <display-name lang="en">Dropdown</display-name>
+            <display-name lang="en">Dropdown menu</display-name>
             <display-name lang="fr">Menu déroulant</display-name>
             <display-name lang="ru">Выпадающий список</display-name>
             <icon lang="en">
@@ -120,8 +119,8 @@
 
     <xbl:binding id="fb-input-select1-compact" element="xforms|select1">
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
-            <display-name lang="en">Single List Box</display-name>
-            <display-name lang="fr">Liste simple</display-name>
+            <display-name lang="en">Scrollable List</display-name>
+            <display-name lang="fr">Liste défilante</display-name>
             <display-name lang="ru">Один из контейнера</display-name>
             <icon lang="en">
                 <small-icon>/forms/orbeon/builder/images/listbox.png</small-icon>

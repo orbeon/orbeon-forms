@@ -46,7 +46,7 @@ public class XFormsControls implements XFormsObjectResolver {
 
     // Crude flag to indicate that something might have changed since the last request. This caches simples cases where
     // an incoming change on the document does not cause any change to the data or controls. In that case, the control
-    // trees need not be compared
+    // trees need not be compared. A general mechanism detecting mutations in the proper places would be better.
     private boolean dirtySinceLastRequest;
 
     // Whether we currently require a UI refresh

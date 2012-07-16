@@ -15,13 +15,12 @@
          xmlns:xforms="http://www.w3.org/2002/xforms"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
          xmlns:ev="http://www.w3.org/2001/xml-events"
-         xmlns:xi="http://www.w3.org/2001/XInclude"
-         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
          xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
          xmlns:saxon="http://saxon.sf.net/"
          xmlns:xbl="http://www.w3.org/ns/xbl"
-         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
+         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+         xmlns:xformsUtils="java:org.orbeon.oxf.xforms.XFormsUtils">
 
     <!--
         Component to represent a reusable error summary.
@@ -510,13 +509,13 @@ Inserting error information into error list:
                                     <xforms:repeat ref="$visible-errors" id="er">
                                         <xhtml:li>
                                             <!-- Clickable / linkable label -->
-                                            <xxforms:variable name="error" as="element(error)" select="."/>
-                                            <xxforms:variable name="has-label" as="xs:boolean" select="normalize-space(@label)"/>
-                                            <xxforms:variable name="effective-id" as="xs:string"
+                                            <xxforms:variable name="error" select="."/>
+                                            <xxforms:variable name="has-label" select="not(normalize-space(@label) = '')"/>
+                                            <xxforms:variable name="effective-id"
                                                     select="string-join(($error/@id, if (normalize-space($error/@indexes)) then string-join(tokenize($error/@indexes, '\s+'), '-') else ()), '·')"/>
 
                                             <xforms:group ref=".[$has-label and property('xxforms:noscript')]">
-                                                <!-- In noscript mode, use a plain link -->
+                                                <!-- In noscript mode, use a plain link to the effective id -->
                                                  <xhtml:a href="#{{$effective-id}}"><xforms:output value="$error/@label" class="fr-error-label"/></xhtml:a>
                                             </xforms:group>
                                             <!-- Otherwise use trigger -->
@@ -526,8 +525,8 @@ Inserting error information into error list:
                                             </xxforms:variable>
                                             <xforms:trigger ref=".[$has-label and not(property('xxforms:noscript'))]" appearance="minimal" class="fr-error-label">
                                                 <xforms:label value="normalize-space($error/@label)"/>
-                                                <!-- Set focus to control using effective id -->
-                                                <xforms:setfocus ev:event="DOMActivate" control="{{$effective-id-outer}}" xxbl:scope="outer"/>
+                                                <!-- Set focus to control using absolute id -->
+                                                <xforms:setfocus ev:event="DOMActivate" control="{{xformsUtils:effectiveIdToAbsoluteId($effective-id-outer)}}" xxbl:scope="outer"/>
                                             </xforms:trigger>
                                             <!-- Repeat indexes -->
                                             <xforms:output ref=".[string-length(@indexes) > 0]" class="fr-error-row"

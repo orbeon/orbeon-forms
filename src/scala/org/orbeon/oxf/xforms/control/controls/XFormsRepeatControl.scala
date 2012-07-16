@@ -38,7 +38,7 @@ import control.controls.XFormsRepeatControl._
 import java.util.{ArrayList, List ⇒ JList, Map ⇒ JMap, Collections}
 import collection.JavaConverters._
 import org.orbeon.oxf.xforms.BindingContext
-import collection.mutable.{ArrayBuffer, LinkedHashMap}
+import scala.collection.mutable.{ListBuffer, ArrayBuffer, LinkedHashMap}
 
 // Represents an xforms:repeat container control.
 class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, element: Element, effectiveId: String)
@@ -415,9 +415,9 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
                 // Iterate over new nodeset to move or add iterations
                 val newSize = newRepeatNodeset.size
                 val newChildren = new ArrayBuffer[XFormsControl](newSize)
-                val newIterations = new ArrayBuffer[XFormsRepeatIterationControl]
-                val movedIterationsOldPositions = new ArrayList[java.lang.Integer]
-                val movedIterationsNewPositions = new ArrayList[java.lang.Integer]
+                val newIterations = ListBuffer[XFormsRepeatIterationControl]()
+                val movedIterationsOldPositions = ListBuffer[Int]()
+                val movedIterationsNewPositions = ListBuffer[Int]()
 
                 for (repeatIndex ← 1 to newSize) {
                     val currentOldIndex = oldIndexes(repeatIndex - 1)
@@ -466,8 +466,8 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
                             updated = true
 
                             // Add information for moved iterations
-                            movedIterationsOldPositions.add(newIterationOldIndex)
-                            movedIterationsNewPositions.add(repeatIndex)
+                            movedIterationsOldPositions += newIterationOldIndex
+                            movedIterationsNewPositions += repeatIndex
                         } else {
                             // Iteration index stayed the same
 
@@ -483,7 +483,7 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
                 // Set the new children iterations
                 setChildren(newChildren)
 
-                (newIterations, movedIterationsOldPositions, movedIterationsNewPositions, partialFocusRepeatOption)
+                (newIterations, movedIterationsOldPositions.toList, movedIterationsNewPositions.toList, partialFocusRepeatOption)
             } else {
                 // New repeat nodeset is now empty
 
@@ -509,22 +509,21 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
                 clearChildren()
                 setIndexInternal(0)
 
-                (Seq.empty, Collections.emptyList[java.lang.Integer], Collections.emptyList[java.lang.Integer], None)
+                (Seq(), Seq(), Seq(), None)
             }
 
-        if (updated || oldRepeatIndex != getIndex) {
-            // Keep information available until refresh events are dispatched, which must happen soon after this method was called
-            refreshInfo = new RefreshInfo
-            if (updated) {
-                refreshInfo.isNodesetChanged = true
-                refreshInfo.newIterations = newIterations
-                refreshInfo.movedIterationsOldPositions = movedIterationsOldPositions
-                refreshInfo.movedIterationsNewPositions = movedIterationsNewPositions
-            }
-            refreshInfo.oldRepeatIndex = oldRepeatIndex
-        }
-        else
-            refreshInfo = null
+        // Keep information available until refresh events are dispatched, which must happen soon after this method was called
+        this.refreshInfo =
+            if (updated || oldRepeatIndex != getIndex)
+                RefreshInfo(
+                    updated,
+                    if (updated) newIterations else Seq(),
+                    if (updated) movedIterationsOldPositions else Seq(),
+                    if (updated) movedIterationsNewPositions else Seq(),
+                    oldRepeatIndex
+                )
+            else
+                null
 
         (newIterations, partialFocusRepeatOption)
     }
@@ -535,7 +534,7 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
             this.refreshInfo = null
             if (refreshInfo.isNodesetChanged) {
                 // Dispatch custom event to xforms:repeat to notify that the nodeset has changed
-                Dispatch.dispatchEvent(new XXFormsNodesetChangedEvent(containingDocument, this, refreshInfo.newIterations.asJava,
+                Dispatch.dispatchEvent(new XXFormsNodesetChangedEvent(containingDocument, this, refreshInfo.newIterations,
                     refreshInfo.movedIterationsOldPositions, refreshInfo.movedIterationsNewPositions))
             }
 
@@ -615,13 +614,13 @@ object XFormsRepeatControl {
         var index = -1
     }
 
-    private class RefreshInfo {
-        var isNodesetChanged: Boolean = false
-        var newIterations: Seq[XFormsRepeatIterationControl] = null
-        var movedIterationsOldPositions: JList[java.lang.Integer] = null
-        var movedIterationsNewPositions: JList[java.lang.Integer] = null
-        var oldRepeatIndex: Int = 0
-    }
+    case class RefreshInfo(
+        isNodesetChanged: Boolean,
+        newIterations: Seq[XFormsRepeatIterationControl],
+        movedIterationsOldPositions: Seq[Int],
+        movedIterationsNewPositions: Seq[Int],
+        oldRepeatIndex: Int
+    )
 
     // Find the initial repeat indexes for the given tree
     def findInitialIndexes(doc: XFormsContainingDocument, tree: ControlTree) =

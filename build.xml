@@ -601,9 +601,10 @@
             <lib dir="${build.lib.dir}">
                 <include name="orbeon.jar"/>
                 <include name="orbeon-xforms-filter.jar"/>
-                <include name="xerces-2.11-orbeon.jar"/>
             </lib>
             <lib dir="lib">
+                <include name="xerces-2.11-orbeon.jar"/>
+                <include name="orbeon-errorified-20120619.jar"/>
                 <include name="scala-library-*.jar"/>
                 <include name="commons-fileupload-*.jar"/>
                 <include name="commons-lang-*.jar"/>

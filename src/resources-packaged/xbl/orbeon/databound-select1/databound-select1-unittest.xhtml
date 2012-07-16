@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <!--
   Copyright (C) 2009 Orbeon, Inc.
 
@@ -24,7 +23,7 @@
 
     <xhtml:head>
         <xhtml:title>XBL - Data-bound drop-down</xhtml:title>
-        <xforms:model id="main-model">
+        <xforms:model id="main-model" xxforms:xpath-analysis="true">
             <xforms:instance id="main-instance">
                 <databound-select1>
                     <state>CA</state>
@@ -44,7 +43,7 @@
                 </xforms:itemset>
             </fr:databound-select1>
             <fr:databound-select1 ref="city" appearance="minimal"
-                                   resource="/xforms-sandbox/service/zip-cities?state-abbreviation={state}">
+                                  resource="/xforms-sandbox/service/zip-cities?state-abbreviation={../state}">
                 <xforms:label>City: </xforms:label>
                 <xforms:itemset ref="/cities/city">
                     <xforms:label ref="@name"/>
@@ -52,7 +51,7 @@
                 </xforms:itemset>
             </fr:databound-select1>
             <fr:databound-select1 ref="zip" appearance="minimal"
-                                   resource="/xforms-sandbox/service/zip-zips?state-abbreviation={state}&amp;city={city}">
+                                  resource="/xforms-sandbox/service/zip-zips?state-abbreviation={../state}&amp;city={../city}">
                 <xforms:label>Zip: </xforms:label>
                 <xforms:itemset ref="/zips/zip">
                     <xforms:label ref="@code"/>

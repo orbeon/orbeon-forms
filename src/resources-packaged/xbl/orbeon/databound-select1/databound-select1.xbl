@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <!--
   Copyright (C) 2009 Orbeon, Inc.
 
@@ -12,26 +11,23 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xbl:xbl xmlns:xhtml="http://www.w3.org/1999/xhtml"
-         xmlns:xforms="http://www.w3.org/2002/xforms"
+<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
          xmlns:ev="http://www.w3.org/2001/xml-events"
-         xmlns:xi="http://www.w3.org/2001/XInclude"
-         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
-         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
          xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
          xmlns:saxon="http://saxon.sf.net/"
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:exforms="http://www.exforms.org/exf/1-0"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
-         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-         xmlns:oxf="http://www.orbeon.com/oxf/processors"
-         script-type="application/xhtml+xml">
+         xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
-    <xbl:binding id="fr-databound-select1" element="fr|databound-select1">
+    <xbl:binding id="fr-databound-select1" element="fr|databound-select1" xxbl:mode="binding lhha">
         <fb:metadata>
-            <fb:display-name lang="en">Data Dropdown</fb:display-name>
+            <fb:display-name lang="en">Dynamic Data Dropdown</fb:display-name>
+            <fb:display-name lang="fr">Menu données dynamique</fb:display-name>
             <fb:display-name lang="ru">Список из веб-сервиса</fb:display-name>
             <fb:icon lang="en">
                 <fb:small-icon>/forms/orbeon/builder/images/dropdown.png</fb:small-icon>
@@ -40,7 +36,7 @@
             <fb:datatype>xforms:string</fb:datatype>
             <fb:editors static-itemset="false"/>
             <fb:template>
-                <fr:databound-select1 id="" appearance="minimal" ref="" resource="">
+                <fr:databound-select1 id="" appearance="minimal" ref="" resource="" xmlns:xforms="http://www.w3.org/2002/xforms">
                     <xforms:label ref=""/>
                     <xforms:hint ref=""/>
                     <xforms:help ref=""/>
@@ -52,26 +48,26 @@
                 </fr:databound-select1>
             </fb:template>
             <fb:control-details>
-                <xforms:input ref="@resource">
-                    <xforms:label lang="en">Resource URI</xforms:label>
-                    <xforms:label lang="fr">URI de la ressource</xforms:label>
-                    <xforms:label lang="ru">URI ресурса</xforms:label>
-                    <xforms:hint lang="en">HTTP URI returning data used to populate the dropdown</xforms:hint>
-                    <xforms:hint lang="fr">URI HTTP auquel réside le service</xforms:hint>
-                    <xforms:hint lang="ru">HTTP URI сервиса, данными из которого будет заполнен выпадающий список</xforms:hint>
-                </xforms:input>
-                <xforms:input ref="xforms:itemset/@ref">
-                    <xforms:label ref="$resources/dialog-actions/items/label"/>
-                    <xforms:hint ref="$resources/dialog-actions/items/hint"/>
-                </xforms:input>
-                <xforms:input ref="xforms:itemset/xforms:label/@ref">
-                    <xforms:label ref="$resources/dialog-actions/label/label"/>
-                    <xforms:hint ref="$resources/dialog-actions/label/hint"/>
-                </xforms:input>
-                <xforms:input ref="xforms:itemset/xforms:value/@ref">
-                    <xforms:label ref="$resources/dialog-actions/value/label"/>
-                    <xforms:hint ref="$resources/dialog-actions/value/hint"/>
-                </xforms:input>
+                <xf:input ref="@resource">
+                    <xf:label lang="en">Resource URL</xf:label>
+                    <xf:label lang="fr">URL de la ressource</xf:label>
+                    <xf:label lang="ru">URL ресурса</xf:label>
+                    <xf:hint lang="en">HTTP URL returning data used to populate the dropdown</xf:hint>
+                    <xf:hint lang="fr">URL HTTP auquel réside le service</xf:hint>
+                    <xf:hint lang="ru">HTTP URL сервиса, данными из которого будет заполнен выпадающий список</xf:hint>
+                </xf:input>
+                <xf:input ref="xf:itemset/@ref">
+                    <xf:label ref="$resources/dialog-actions/items/label"/>
+                    <xf:hint ref="$resources/dialog-actions/items/hint"/>
+                </xf:input>
+                <xf:input ref="xf:itemset/xf:label/@ref">
+                    <xf:label ref="$resources/dialog-actions/label/label"/>
+                    <xf:hint ref="$resources/dialog-actions/label/hint"/>
+                </xf:input>
+                <xf:input ref="xf:itemset/xf:value/@ref">
+                    <xf:label ref="$resources/dialog-actions/value/label"/>
+                    <xf:hint ref="$resources/dialog-actions/value/hint"/>
+                </xf:input>
             </fb:control-details>
         </fb:metadata>
         <xbl:resources>
@@ -80,60 +76,54 @@
             </xbl:style>
         </xbl:resources>
         <xbl:implementation>
-            <xforms:model id="xbl-model">
+            <xf:model id="xbl-model">
                 <!-- Contains the data from which the itemset is populated -->
-                <xforms:instance id="itemset"><dummy/></xforms:instance>
-                <xforms:instance id="resource"><resource/></xforms:instance>
+                <xf:instance id="itemset"><dummy/></xf:instance>
                 <!-- What do when doing a refresh -->
-                <xforms:submission id="get-itemset" method="get" resource="{instance('resource')}" replace="instance" serialization="none">
-                    <xforms:action ev:event="xforms-submit-error">
-                        <xforms:insert ref="instance('itemset')" origin="xxforms:element('dummy')"/>
-                    </xforms:action>
-                </xforms:submission>
-            </xforms:model>
+                <xf:submission id="get-itemset" method="get" resource="{event('resource')}" replace="instance" serialization="none">
+                    <xf:action ev:event="xforms-submit-error">
+                        <xf:insert ref="instance('itemset')" origin="xxf:element('dummy')"/>
+                    </xf:action>
+                </xf:submission>
+            </xf:model>
         </xbl:implementation>
-        <xbl:template xxbl:transform="oxf:unsafe-xslt">
-            <xforms:group appearance="xxforms:internal" xsl:version="2.0">
+        <xbl:template>
+            <!-- When the component is initialized or when resources URL changes, update our internal itemset -->
+            <xxf:variable name="resource-avt" xbl:attr="xbl:text=resource" xxbl:scope="outer"/>
+            <xxf:variable name="resource">
+                <xxf:sequence select="xxf:evaluate-avt($resource-avt)" xxbl:scope="outer"/>
+                <xf:action ev:event="xforms-enabled xforms-value-changed">
+                    <!-- Update itemset based on resource if not blank (can be blank e.g. in builder) -->
+                    <xf:send if="normalize-space($resource)" submission="get-itemset">
+                        <xxf:context name="resource" value="$resource"/>
+                    </xf:send>
+                    <!-- Get sequence of values in the new itemset -->
+                    <xxf:variable
+                        name="new-values"
+                        select="xxf:itemset('select', 'xml', false())//value/string()"/>
+                    <!-- If the current value is not in the new itemset, set it to blank -->
+                    <xf:setvalue
+                        if="not(xxf:binding('fr-databound-select1') = ($new-values, ''))"
+                        ref="xxf:binding('fr-databound-select1')"/>
+                </xf:action>
+            </xxf:variable>
 
-                <!-- Stop propagation of all UI events -->
-                <xforms:action ev:event="#all" ev:propagate="stop"/>
-
-                <!-- Node to which users bound this component -->
-                <xxforms:variable name="binding" as="node()?">
-                    <xxforms:sequence select="." xxbl:scope="outer" xbl:attr="model context ref bind"/>
-                </xxforms:variable>
-
-                <!-- When the component is initialized or when resources changes, update our internal itemset -->
-                <xxforms:variable name="resource-avt" xbl:attr="xbl:text=resource" xxbl:scope="outer"/>
-                <xxforms:variable name="resource" xbl:attr="xbl:text=resource">
-                    <xxforms:sequence select="xxforms:evaluate-avt($resource-avt)" xxbl:scope="outer"/>
-                    <xforms:action ev:event="xforms-enabled xforms-value-changed">
-                        <!-- Save resource in model, as it is used as an AVT by the submission -->
-                        <xforms:setvalue ref="instance('resource')" value="$resource"/>
-                        <!-- Update itemset based on resource -->
-                        <xforms:send submission="get-itemset"/>
-                        <!-- Get sequence of values in the new itemset -->
-                        <xxforms:variable name="ref"><xsl:value-of select="/*/xforms:itemset/(@ref, @nodeset)[1]"/></xxforms:variable>
-                        <xxforms:variable name="value"><xsl:value-of select="/*/xforms:itemset/xforms:value/(@value | @ref)"/></xxforms:variable>
-                        <xxforms:variable name="new-values" select="instance('itemset')/saxon:evaluate($ref)/saxon:evaluate($value)"/>
-                        <!-- If the current value is not in the new itemset, set it to blank -->
-                        <xforms:setvalue if="not($binding = ($new-values, ''))" ref="$binding"/>
-                    </xforms:action>
-                </xxforms:variable>
-
-                <!-- The concrete select1 -->
-                <xxforms:variable name="binding" xxbl:scope="outer"><xxforms:sequence select="$binding" xxbl:scope="inner"/></xxforms:variable>
-                <xforms:select1 ref="$binding" xxbl:scope="outer">
-                    <xbl:content includes=":root > xforms|label, :root > xforms|help, :root > xforms|hint, :root > xforms|alert"/>
-                    <!-- Blank item -->
-                    <xforms:item>
-                        <xforms:label/>
-                        <xforms:value/>
-                    </xforms:item>
+            <!-- The concrete select1 -->
+            <xf:select1 ref="xxf:binding('fr-databound-select1')" id="select">
+                <!-- Blank item -->
+                <xf:item>
+                    <xf:label/>
+                    <xf:value/>
+                </xf:item>
+                <!-- Make sure to restore the evaluation context to the local instance. We don't switch scopes or
+                     models here because the select1 is bound via the xxf:binding() function. So if we don't
+                     change the context explicitly, the itemset will evaluate in the wrong context (and fail to
+                     produce the correct result). -->
+                <xf:choices context="instance()">
                     <!-- Itemset unconventionally evaluates wrt inner scope -->
-                    <xbl:content includes=":root > xforms|itemset" xxbl:scope="inner"/>
-                </xforms:select1>
-            </xforms:group>
+                    <xbl:content includes=":root > xf|itemset, :root > xf|item, :root > xf|choices" xxbl:scope="inner"/>
+                </xf:choices>
+            </xf:select1>
         </xbl:template>
     </xbl:binding>
 </xbl:xbl>

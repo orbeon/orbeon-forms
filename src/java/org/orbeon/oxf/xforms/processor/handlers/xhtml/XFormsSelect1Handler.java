@@ -365,7 +365,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                                               ContentHandler contentHandler, String xhtmlPrefix, String spanQName,
                                               XFormsContainingDocument containingDocument,
                                               AttributesImpl reusableAttributes, Attributes attributes, String templateId,
-                                              String effectiveId, boolean isMultiple, String fullItemType) throws SAXException {
+                                              String itemName, boolean isMultiple, String fullItemType) throws SAXException {
         reusableAttributes.clear();
 //        reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, XFormsUtils.namespaceId(handlerContext.getContainingDocument(), templateId));
         // Client queries template by id without namespace, so output that. Not ideal as all ids should be namespaced.
@@ -374,9 +374,10 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
 
         contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, reusableAttributes);
         {
-            final String itemEffectiveId = "$xforms-item-effective-id$";
+            // Create separate id for select/select1
+            final String itemEffectiveId = "$xforms-item-id-select" + (isMultiple? "" : "1") + "$";
             handleItemFull(baseHandler, contentHandler, reusableAttributes, attributes,
-                    xhtmlPrefix, spanQName, containingDocument, null, effectiveId, itemEffectiveId, isMultiple, fullItemType,
+                    xhtmlPrefix, spanQName, containingDocument, null, itemName, itemEffectiveId, isMultiple, fullItemType,
                     new Item(isMultiple, false, null, // make sure the value "$xforms-template-value$" is not encrypted
                             new Item.Label("$xforms-template-label$", false), "$xforms-template-value$"), true);
         }
@@ -396,7 +397,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
     public static void handleItemFull(XFormsBaseHandlerXHTML baseHandler, ContentHandler contentHandler,
                                       AttributesImpl reusableAttributes, Attributes attributes, String xhtmlPrefix, String spanQName,
                                       XFormsContainingDocument containingDocument, XFormsValueControl xformsControl,
-                                      String effectiveId, String itemEffectiveId, boolean isMultiple, String type,
+                                      String itemName, String itemEffectiveId, boolean isMultiple, String type,
                                       Item item, boolean isFirst) throws SAXException {
 
         final HandlerContext handlerContext = baseHandler.getHandlerContext();
@@ -429,7 +430,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                 reusableAttributes.addAttribute("", "type", "type", ContentHandlerHelper.CDATA, type);
 
                 // Get group name from selection control if possible, otherwise use effective id
-                final String name = (!isMultiple && xformsControl instanceof XFormsSelect1Control) ? ((XFormsSelect1Control) xformsControl).getGroupName() : effectiveId;
+                final String name = (!isMultiple && xformsControl instanceof XFormsSelect1Control) ? ((XFormsSelect1Control) xformsControl).getGroupName() : itemName;
                 reusableAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, name);
 
                 reusableAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, item.getExternalValue());

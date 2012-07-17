@@ -1262,7 +1262,7 @@
         </output>
     </test>
 
-    <test description="#382: xforms:item/xforms:choices: ref and context attributes are ignored" name="oxf:pipeline" only="true">
+    <test description="#382: xforms:item/xforms:choices: ref and context attributes are ignored" name="oxf:pipeline">
         <!-- See: https://github.com/orbeon/orbeon-forms/issues/382 -->
         <input name="config">
             <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">

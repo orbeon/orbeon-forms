@@ -1010,7 +1010,8 @@
                                         //  </span>
 
                                         // Get template
-                                        var template = YAHOO.util.Dom.hasClass(documentElement, "xforms-select")
+                                        var isFull = YAHOO.util.Dom.hasClass(documentElement, "xforms-select");
+                                        var template = isFull
                                                 ? ORBEON.util.Dom.get("xforms-select-full-template")
                                                 : ORBEON.util.Dom.get("xforms-select1-full-template");
                                         template = ORBEON.util.Dom.getChildElementByIndex(template, 0);
@@ -1039,8 +1040,8 @@
                                             templateClone.innerHTML = new String(templateClone.innerHTML).replace(new RegExp("\\$xforms-template-label\\$", "g"), itemElement.label.replace(new RegExp("\\$", "g"), "$$$$"));
                                             ORBEON.util.Utils.stringReplace(templateClone, "$xforms-template-value$", itemElement.value);
                                             var itemEffectiveId = ORBEON.util.Utils.appendToEffectiveId(controlId, "$$e" + itemIndex);
-                                            ORBEON.util.Utils.stringReplace(templateClone, "$xforms-item-effective-id$", itemEffectiveId);
-                                            ORBEON.util.Utils.stringReplace(templateClone, "$xforms-effective-id$", controlId);
+                                            ORBEON.util.Utils.stringReplace(templateClone, isFull ? "$xforms-item-id-select$" : "$xforms-item-id-select1$", itemEffectiveId);
+                                            ORBEON.util.Utils.stringReplace(templateClone, "$xforms-item-name$", controlId);
                                             if (! YAHOO.lang.isUndefined(itemElement.attributes) && ! YAHOO.lang.isUndefined(itemElement.attributes["class"])) {
                                                 templateClone.className += " " + itemElement.attributes["class"];
                                             }
@@ -1284,8 +1285,8 @@
                                                 insertIntoDocument([booleanTemplateClone]);
                                                 ORBEON.util.Utils.stringReplace(booleanTemplateClone, "$xforms-template-value$", "true");
                                                 var booleanEffectiveId = ORBEON.util.Utils.appendToEffectiveId(controlId, "$$e0");
-                                                ORBEON.util.Utils.stringReplace(booleanTemplateClone, "$xforms-item-effective-id$", booleanEffectiveId);
-                                                ORBEON.util.Utils.stringReplace(booleanTemplateClone, "$xforms-effective-id$", controlId);
+                                                ORBEON.util.Utils.stringReplace(booleanTemplateClone, "$xforms-item-id-select$", booleanEffectiveId);
+                                                ORBEON.util.Utils.stringReplace(booleanTemplateClone, "$xforms-item-name$", controlId);
 
                                                 // Update classes
                                                 YAHOO.util.Dom.addClass(documentElement, "xforms-type-boolean");

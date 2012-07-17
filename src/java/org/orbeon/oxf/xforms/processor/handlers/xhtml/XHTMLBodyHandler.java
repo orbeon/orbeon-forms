@@ -201,19 +201,18 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
             // Templates
             {
                 final String spanQName = XMLUtils.buildQName(htmlPrefix, "span");
-                final String TEMPLATE_ID = "$xforms-effective-id$";
 
                 // HACK: We would be ok with just one template, but IE 6 doesn't allow setting the input/@type attribute properly
 
                 // xforms:select[@appearance = 'full'], xforms:input[@type = 'xs:boolean']
                 XFormsSelect1Handler.outputItemFullTemplate(this, xmlReceiver, htmlPrefix, spanQName,
                         containingDocument, reusableAttributes, attributes,
-                        "xforms-select-full-template", TEMPLATE_ID, true, "checkbox");
+                        "xforms-select-full-template", "$xforms-item-name$", true, "checkbox");
 
                 // xforms:select1[@appearance = 'full']
                 XFormsSelect1Handler.outputItemFullTemplate(this, xmlReceiver, htmlPrefix, spanQName,
                         containingDocument, reusableAttributes, attributes,
-                        "xforms-select1-full-template", TEMPLATE_ID, true, "radio");
+                        "xforms-select1-full-template", "$xforms-item-name$", false, "radio");
             }
 
         } else {

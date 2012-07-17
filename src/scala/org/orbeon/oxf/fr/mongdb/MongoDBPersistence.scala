@@ -40,25 +40,25 @@ import xml.{NodeSeq, Node, XML}
 class MongoDBPersistence extends HttpServlet {
 
     /*! MongoDB keys used for custom Orbeon fields */
-    private val DOCUMENT_ID_KEY = "_orbeon_document_id"
-    private val LAST_UPDATE_KEY = "_orbeon_last_update"
-    private val XML_KEY = "_orbeon_xml"
-    private val KEYWORDS_KEY = "_orbeon_keywords"
-    private val FORM_KEY = "_orbeon_form"
-    private val XHTML_KEY = "_orbeon_xhtml"
+    private val DocumentIdKey = "_orbeon_document_id"
+    private val LastUpdateKey = "_orbeon_last_update"
+    private val XMLKey        = "_orbeon_xml"
+    private val KeywordsKey   = "_orbeon_keywords"
+    private val FormKey       = "_orbeon_form"
+    private val XHTMLKey      = "_orbeon_xhtml"
 
     /*! Regexp matching a form data path */
-    private val DataPath = """.*/crud/([^/]+)/([^/]+)/data/([^/]+)/([^/]+)""".r
+    private val DataPath      = """.*/crud/([^/]+)/([^/]+)/data/([^/]+)/([^/]+)""".r
     /*! Regexp matching a form definition path */
-    private val FormPath = """.*/crud/([^/]+)/([^/]+)/form/([^/]+)""".r
+    private val FormPath      = """.*/crud/([^/]+)/([^/]+)/form/([^/]+)""".r
     /*! Regexp matching a search path */
-    private val SearchPath = """.*/search/([^/]+)/([^/]+)/?""".r
+    private val SearchPath    = """.*/search/([^/]+)/([^/]+)/?""".r
 
     /*!## Servlet PUT entry point
 
       Store form data, form definition, or attachment.
      */
-    override def doPut(req: HttpServletRequest, resp: HttpServletResponse) {
+    override def doPut(req: HttpServletRequest, resp: HttpServletResponse): Unit =
         req.getPathInfo match {
             case DataPath(app, form, documentId, "data.xml") ⇒
                 storeDocument(app, form, documentId, req.getInputStream)
@@ -71,13 +71,12 @@ class MongoDBPersistence extends HttpServlet {
 
             case _ ⇒ throw new ServletException
         }
-    }
 
     /*!## Servlet GET entry point
 
       Retrieve form data, form definition, or attachment.
      */
-    override def doGet(req: HttpServletRequest, resp: HttpServletResponse) {
+    override def doGet(req: HttpServletRequest, resp: HttpServletResponse): Unit =
         req.getPathInfo match {
             case DataPath(app, form, documentId, "data.xml") ⇒
                 retrieveDocument(app, form, documentId, resp)
@@ -89,27 +88,25 @@ class MongoDBPersistence extends HttpServlet {
                 retrieveFormAttachment(app, form, attachmentName, resp)
             case _ ⇒ throw new ServletException
         }
-    }
 
     /*!## Servlet POST entry point
 
       Perform a search based on an incoming search specification in XML, and return search results in XML.
      */
-    override def doPost(req: HttpServletRequest, resp: HttpServletResponse) {
+    override def doPost(req: HttpServletRequest, resp: HttpServletResponse): Unit =
         req.getPathInfo match {
             case SearchPath(app, form) ⇒
                 search(app, form, req, resp)
             case _ ⇒ throw new ServletException
         }
-    }
 
     /*!## Store an XML document */
-    def storeDocument(app: String, form: String, documentId: String, inputStream: InputStream) {
+    def storeDocument(app: String, form: String, documentId: String, inputStream: InputStream): Unit = {
 
         // Use MongoDB ObjectID as that can serve as timestamp for creation
         val builder = MongoDBObject.newBuilder
-        builder += (DOCUMENT_ID_KEY → documentId)
-        builder += (LAST_UPDATE_KEY → DateTimeValue.getCurrentDateTime(null).getCanonicalLexicalRepresentation.toString)
+        builder += (DocumentIdKey → documentId)
+        builder += (LastUpdateKey → DateTimeValue.getCurrentDateTime(null).getCanonicalLexicalRepresentation.toString)
 
         // Create one entry per leaf, XML doc and keywords
         val root = XML.load(inputStream)
@@ -122,21 +119,21 @@ class MongoDBPersistence extends HttpServlet {
                 keywords ++= text.split("""\s+""")
         }
 
-        builder += (XML_KEY → root.toString)
-        builder += (KEYWORDS_KEY → keywords.toArray)
+        builder += (XMLKey → root.toString)
+        builder += (KeywordsKey → keywords.toArray)
 
         // Create or update
         withCollection(app, form) {
-            _.update(MongoDBObject(DOCUMENT_ID_KEY → documentId), builder.result, upsert = true, multi = false)
+            _.update(MongoDBObject(DocumentIdKey → documentId), builder.result, upsert = true, multi = false)
         }
     }
 
     /*!## Retrieve an XML document */
-    def retrieveDocument(app: String, form: String, documentId: String, resp: HttpServletResponse) {
+    def retrieveDocument(app: String, form: String, documentId: String, resp: HttpServletResponse): Unit =
         withCollection(app, form) { coll ⇒
-            coll.findOne(MongoDBObject(DOCUMENT_ID_KEY → documentId)) match {
+            coll.findOne(MongoDBObject(DocumentIdKey → documentId)) match {
                 case Some(result: DBObject) ⇒
-                    result(XML_KEY) match {
+                    result(XMLKey) match {
                         case xml: String ⇒
                             resp.setContentType("application/xml")
                             useAndClose(new OutputStreamWriter(resp.getOutputStream)) {
@@ -147,20 +144,18 @@ class MongoDBPersistence extends HttpServlet {
                 case _ ⇒ resp.setStatus(404)
             }
         }
-    }
 
     /*!## Store an attachment */
-    def storeAttachment(app: String, form: String, documentId: String, name: String, req: HttpServletRequest) {
+    def storeAttachment(app: String, form: String, documentId: String, name: String, req: HttpServletRequest): Unit =
         withFS {
             _(req.getInputStream) { fh ⇒
                 fh.filename = Seq(app, form, documentId, name) mkString "/"
                 fh.contentType = Option(req.getContentType) getOrElse "application/octet-stream"
             }
         }
-    }
 
     /*!## Retrieve an attachment */
-    def retrieveAttachment(app: String, form: String, documentId: String, name: String, resp: HttpServletResponse) {
+    def retrieveAttachment(app: String, form: String, documentId: String, name: String, resp: HttpServletResponse): Unit =
         withFS {
             _.findOne(Seq(app, form, documentId, name) mkString "/") match {
                 case Some(dbFile) ⇒
@@ -169,33 +164,32 @@ class MongoDBPersistence extends HttpServlet {
                 case _ ⇒ resp.setStatus(404)
             }
         }
-    }
 
     /*!## Store an XHTML document */
-    def storeForm(app: String, form: String, inputStream: InputStream) {
+    def storeForm(app: String, form: String, inputStream: InputStream): Unit = {
 
         // Use MongoDB ObjectID as that can serve as timestamp for creation
         val builder = MongoDBObject.newBuilder
-        builder += (FORM_KEY → form)
-        builder += (LAST_UPDATE_KEY → DateTimeValue.getCurrentDateTime(null).getCanonicalLexicalRepresentation.toString)
+        builder += (FormKey → form)
+        builder += (LastUpdateKey → DateTimeValue.getCurrentDateTime(null).getCanonicalLexicalRepresentation.toString)
 
         //Load XML Doc, add to builder for storage
         val root = XML.load(inputStream)
 
-        builder += (XHTML_KEY → root.toString)
+        builder += (XHTMLKey → root.toString)
 
         // Create or update
         withCollection(app, form) {
-            _.update(MongoDBObject(FORM_KEY → form), builder.result, upsert = true, multi = false)
+            _.update(MongoDBObject(FormKey → form), builder.result, upsert = true, multi = false)
         }
     }
 
     /*!## Retrieve an XHTML document */
-    def retrieveForm(app: String, form: String, resp: HttpServletResponse) {
+    def retrieveForm(app: String, form: String, resp: HttpServletResponse): Unit =
         withCollection(app, form) { coll ⇒
-            coll.findOne(MongoDBObject(FORM_KEY → form)) match {
+            coll.findOne(MongoDBObject(FormKey → form)) match {
                 case Some(result: DBObject) ⇒
-                    result(XHTML_KEY) match {
+                    result(XHTMLKey) match {
                         case xml: String ⇒
                             resp.setContentType("application/xhtml+xml")
                             useAndClose(new OutputStreamWriter(resp.getOutputStream)) {
@@ -206,19 +200,17 @@ class MongoDBPersistence extends HttpServlet {
                 case _ ⇒ resp.setStatus(404)
             }
         }
-    }
 
-    def storeFormAttachment(app: String, form: String, name: String, req: HttpServletRequest) {
+    def storeFormAttachment(app: String, form: String, name: String, req: HttpServletRequest): Unit =
         withFS {
             _(req.getInputStream) { fh ⇒
                 fh.filename = Seq(app, form, "form", name) mkString "/"
                 fh.contentType = Option(req.getContentType) getOrElse "application/octet-stream"
             }
         }
-    }
 
     /*!## Retrieve an attachment */
-    def retrieveFormAttachment(app: String, form: String, name: String, resp: HttpServletResponse) {
+    def retrieveFormAttachment(app: String, form: String, name: String, resp: HttpServletResponse): Unit =
         withFS {
             _.findOne(Seq(app, form, "form", name) mkString "/") match {
                 case Some(dbFile) ⇒
@@ -227,10 +219,9 @@ class MongoDBPersistence extends HttpServlet {
                 case _ ⇒ resp.setStatus(404)
             }
         }
-    }
 
     /*!## Perform a search */
-    def search(app: String, form: String, req: HttpServletRequest, resp: HttpServletResponse) {
+    def search(app: String, form: String, req: HttpServletRequest, resp: HttpServletResponse): Unit = {
 
         def elemValue(n: Node) = n.text.trim
         def attValue(n: Node, name: String) = n.attribute(name).get.text
@@ -253,7 +244,7 @@ class MongoDBPersistence extends HttpServlet {
                     coll.find
                 } else if (fullQuery.nonEmpty) {
                     // Keyword search
-                    coll.find(MongoDBObject(KEYWORDS_KEY → fullQuery))
+                    coll.find(MongoDBObject(KeywordsKey → fullQuery))
                 } else {
                     // Structured search: gather all non-empty <query name="$NAME">$VALUE</query>
                     coll.find(MongoDBObject(searchElem.tail filter (elemValue(_) nonEmpty) map (e ⇒ (attValue(e, "name") → elemValue(e))) toList))
@@ -261,14 +252,14 @@ class MongoDBPersistence extends HttpServlet {
 
             // Run search with sorting/paging
             val resultsToSkip = (pageNumber - 1) * pageSize
-            val rows = find sort MongoDBObject(LAST_UPDATE_KEY → -1) skip resultsToSkip limit pageSize
+            val rows = find sort MongoDBObject(LastUpdateKey → -1) skip resultsToSkip limit pageSize
 
             // Create and output result
             val result =
                 <documents total={rows.size.toString} page-size={pageSize.toString} page-number={pageNumber.toString}>{
                     rows map { o ⇒
                         val created = DateTimeValue.fromJavaDate(new Date(o.get("_id").asInstanceOf[ObjectId].getTime)).getCanonicalLexicalRepresentation.toString
-                        <document created={created} last-modified={o.get(LAST_UPDATE_KEY).toString} name={o.get(DOCUMENT_ID_KEY).toString}>
+                        <document created={created} last-modified={o.get(LastUpdateKey).toString} name={o.get(DocumentIdKey).toString}>
                             <details>{
                                 searchElem.tail map { e ⇒
                                     <detail>{o.get(attValue(e, "name"))}</detail>
@@ -285,20 +276,15 @@ class MongoDBPersistence extends HttpServlet {
         }
     }
 
-    def withDB[T](t: (MongoDB) ⇒ T) {
+    def withDB[T](t: (MongoDB) ⇒ T): T = {
         val mongoConnection = MongoConnection()
-        try {
-            t(mongoConnection("orbeon"))
-        } finally {
-            mongoConnection.close()
-        }
+        try t(mongoConnection("orbeon"))
+        finally mongoConnection.close()
     }
 
-    def withCollection[T](app: String, form: String)(t: (MongoCollection) ⇒ T) {
+    def withCollection[T](app: String, form: String)(t: (MongoCollection) ⇒ T): T =
         withDB { db ⇒ t(db(app + '.' + form))}
-    }
 
-    def withFS[T](t: (GridFS) ⇒ T) {
+    def withFS[T](t: (GridFS) ⇒ T): T =
         withDB { db ⇒ t(GridFS(db))}
-    }
 }

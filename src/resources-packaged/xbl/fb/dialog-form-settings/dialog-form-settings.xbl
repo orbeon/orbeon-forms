@@ -54,6 +54,7 @@
                         <app/>
                         <form/>
                         <title/>
+                        <description/>
                         <logo filename="" mediatype="" size=""/>
                         <mode/>
                     </instance>
@@ -198,15 +199,6 @@
                                         </xh:tr>
                                     </xf:repeat>
                                 </xh:table>
-                            </xf:group>
-
-                            <!-- Form description -->
-                            <xf:group ref=".[$is-form-settings]">
-                                <xf:textarea ref="description">
-                                    <xf:label ref="$resources/description/label"/>
-                                    <xf:hint ref="$resources/description/hint"/>
-                                    <xf:alert ref="$resources/description/alert"/>
-                                </xf:textarea>
                             </xf:group>
 
                         </xh:div>

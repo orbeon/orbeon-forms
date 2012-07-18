@@ -68,6 +68,12 @@ object SectionOps {
     def canMoveLeft(container: NodeInfo) =
         findAncestorContainers(container).size >= 2
 
+    def canMoveClasses(container: NodeInfo) = {
+        val directionCheck = Map("up" → (canMoveUp _), "right" → (canMoveRight _), "down" → (canMoveDown _),  "left" → (canMoveLeft _))
+        val canDirections = directionCheck filter { case (_, check) ⇒ check(container) } map { case (direction, _) ⇒ direction }
+        canDirections map ( "fb-can-move-" ++ _) mkString " "
+    }
+
     private def precedingSection(container: NodeInfo) =
         container precedingSibling "*:section" headOption
 }

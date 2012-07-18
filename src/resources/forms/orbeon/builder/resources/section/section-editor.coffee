@@ -9,7 +9,7 @@ $ ->
 
     FSM.create
         transitions : [
-            { events: [ 'enterSection'                ], to: 'over',           actions: [ 'showEditor' ]   }
+            { events: [ 'enterSection'                ], to: 'over',           actions: [ 'updateTriggerRelevance', 'showEditor' ]   }
             { events: [ 'enterEditor'                 ], to: 'over'                                      }
             { events: [ 'leaveSection', 'leaveEditor' ], to: 'initial',        actions: [ 'wait' ]         }
             { events: [ 'waited'                      ], from: [ 'initial' ],  actions: [ 'hideEditor' ]   }
@@ -27,6 +27,12 @@ $ ->
                 sectionEditor.show()
                 offset.left -= sectionEditor.outerWidth()
                 sectionEditor.offset offset
+            updateTriggerRelevance: (section) ->
+                container = section.children '.fr-section-container'
+                _.each (['up', 'right', 'down', 'left']), (direction) ->
+                    relevant = container.hasClass ("fb-can-move-" + direction)
+                    trigger = sectionEditor.children ('.fb-section-move-' + direction)
+                    if relevant then trigger.show() else trigger.hide()
             hideEditor: -> sectionEditor.hide()
             wait: -> _.delay (-> waiting.fire()), 100
 

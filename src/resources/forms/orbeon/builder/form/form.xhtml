@@ -584,8 +584,15 @@
                                     <xxf:context name="section" value="$section"/>
                                 </xf:dispatch>
                             </xf:trigger>
+                            <!-- Edit help for section -->
+                            <xf:trigger appearance="minimal" class="fb-edit-section-help-trigger" id="fb-edit-section-help-trigger">
+                                <xf:label><xh:img alt="{{$fb-resources/help-icon/label}}" title="{{$fb-resources/help-icon/label}}" src="/ops/images/xforms/help.png"/></xf:label>
+                                <xf:dispatch ev:event="DOMActivate" name="fb-show-dialog" target="fb-form-editor$dialog-help">
+                                    <xxf:context name="control-id" value="$section/@id"/>
+                                </xf:dispatch>
+                            </xf:trigger>
                             <!-- Move up -->
-                            <xf:trigger appearance="minimal" ref="$section[sectionOps:canMoveUp(.)]">
+                            <xf:trigger appearance="minimal" class="fb-section-move-up">
                                 <xf:label><xh:img width="16" height="16" src="/apps/fr/style/images/silk/arrow_up.png" alt="{{$fb-resources/move-up-icon/label}}" title="{{$fb-resources/move-up-icon/label}}"/></xf:label>
                                 <!-- Move section up -->
                                 <xf:action ev:event="DOMActivate" type="xpath">
@@ -593,7 +600,7 @@
                                 </xf:action>
                             </xf:trigger>
                             <!-- Move down -->
-                            <xf:trigger appearance="minimal" ref="$section[sectionOps:canMoveDown(.)]">
+                            <xf:trigger appearance="minimal" class="fb-section-move-down">
                                 <xf:label><xh:img width="16" height="16" src="/apps/fr/style/images/silk/arrow_down.png" alt="{{$fb-resources/move-down-icon/label}}" title="{{$fb-resources/move-down-icon/label}}"/></xf:label>
                                 <!-- Move section down -->
                                 <xf:action ev:event="DOMActivate" type="xpath">
@@ -601,7 +608,7 @@
                                 </xf:action>
                             </xf:trigger>
                             <!-- Move right -->
-                            <xf:trigger appearance="minimal" ref="$section[sectionOps:canMoveRight(.)]">
+                            <xf:trigger appearance="minimal" class="fb-section-move-right">
                                 <xf:label><xh:img width="16" height="16" src="/apps/fr/style/images/silk/arrow_right.png" alt="{{$fb-resources/move-right-icon/label}}" title="{{$fb-resources/move-right-icon/label}}"/></xf:label>
                                 <!-- Move section right -->
                                 <xf:action ev:event="DOMActivate" type="xpath">
@@ -609,19 +616,12 @@
                                 </xf:action>
                             </xf:trigger>
                             <!-- Move left -->
-                            <xf:trigger appearance="minimal" ref="$section[sectionOps:canMoveLeft(.)]">
+                            <xf:trigger appearance="minimal" class="fb-section-move-left">
                                 <xf:label><xh:img width="16" height="16" src="/apps/fr/style/images/silk/arrow_left.png" alt="{{$fb-resources/move-left-icon/label}}" title="{{$fb-resources/move-left-icon/label}}"/></xf:label>
                                 <!-- Move section left -->
                                 <xf:action ev:event="DOMActivate" type="xpath">
                                     sectionOps:moveSectionLeft($section)
                                 </xf:action>
-                            </xf:trigger>
-                            <!-- Edit help for section -->
-                            <xf:trigger appearance="minimal" class="fb-edit-section-help-trigger" id="fb-edit-section-help-trigger">
-                                <xf:label><xh:img alt="{{$fb-resources/help-icon/label}}" title="{{$fb-resources/help-icon/label}}" src="/ops/images/xforms/help.png"/></xf:label>
-                                <xf:dispatch ev:event="DOMActivate" name="fb-show-dialog" target="fb-form-editor$dialog-help">
-                                    <xxf:context name="control-id" value="$section/@id"/>
-                                </xf:dispatch>
                             </xf:trigger>
                         </xh:div>
 

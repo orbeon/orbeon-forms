@@ -147,10 +147,6 @@ html body .xforms-form tr.xforms-disabled,
     display: inline;
 }
 
-.xforms-input {
-    cursor: pointer;
-}
-
 .xforms-trigger-appearance-minimal img, .xforms-submit-appearance-minimal img { border: 0 }
 
 .xforms-trigger-appearance-xxforms-minimal, .xforms-submit-appearance-xxforms-minimal,
@@ -214,7 +210,7 @@ button.xforms-trigger-appearance-xxforms-minimal::-moz-focus-inner, .xforms-trig
     color: #bbb;
 }
 
-.xforms-form .xforms-textarea, .xforms-form .xforms-textarea textarea {
+.xforms-form textarea.xforms-textarea, .xforms-form .xforms-textarea textarea {
     -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
     font-family: Arial,Helvetica,Geneva,sans-serif;
     -webkit-overflow-scrolling: touch; /* Only supported by iOS 5, but should be good too if it becomes supported in the future by browsers on OS X */

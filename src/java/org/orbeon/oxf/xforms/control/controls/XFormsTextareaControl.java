@@ -55,7 +55,7 @@ public class XFormsTextareaControl extends XFormsValueControl implements Focusab
         return hasInitialization ? getCommonJavaScriptInitialization() : null;
     }
 
-    // NOTE: textarea doesn't support maxlength natively (this is added in HTML 5), but this can be implemented in JavaScript
+    // NOTE: textarea doesn't support maxlength natively until HTML 5 (this can be implemented in JavaScript client-side for older browsers)
     public String getMaxlength() {
         return getExtensionAttributeValue(XFormsConstants.XXFORMS_MAXLENGTH_QNAME);
     }

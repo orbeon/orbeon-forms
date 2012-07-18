@@ -27,7 +27,7 @@ import org.orbeon.oxf.xforms.XFormsConstants._
 import collection.JavaConverters._
 import org.orbeon.saxon.dom4j.DocumentWrapper
 
-trait SelectionControl extends SimpleElementAnalysis with SelectAppearanceTrait {
+trait SelectionControlTrait extends SimpleElementAnalysis with SelectAppearanceTrait {
 
     // Try to figure out if we have dynamic items. This attempts to cover all cases, including
     // nested xforms:output controls. Check only under xforms:choices, xforms:item and xforms:itemset so that we
@@ -63,7 +63,7 @@ trait SelectionControl extends SimpleElementAnalysis with SelectAppearanceTrait 
 
         Dom4jUtils.visitSubtree(element, new Dom4jUtils.VisitorListener() {
 
-            val stack: Stack[SimpleElementAnalysis] = Stack(SelectionControl.this)
+            val stack: Stack[SimpleElementAnalysis] = Stack(SelectionControlTrait.this)
 
             def startElement(element: Element): Unit = {
 

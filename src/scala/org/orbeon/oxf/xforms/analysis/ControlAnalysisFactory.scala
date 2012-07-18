@@ -28,87 +28,95 @@ object ControlAnalysisFactory {
     // Control factories
     type ControlFactory = (StaticStateContext, Element,  Option[ElementAnalysis], Option[ElementAnalysis], Scope) ⇒ ElementAnalysis
 
-    private val VariableControl: ControlFactory = (new VariableControl(_, _, _, _, _) with ChildrenActionsTrait)
-    private val LHHAControl: ControlFactory     = (new LHHAAnalysis(_, _, _, _, _))
-
-    private val TriggerControlExternalEvents = Set(XFORMS_FOCUS, XFORMS_HELP, DOM_ACTIVATE, XXFORMS_VALUE_OR_ACTIVATE)
-    private val ValueControlExternalEvents   = TriggerControlExternalEvents + XXFORMS_VALUE
-
-    private val ValueControl: ControlFactory =
-        (new CoreControl(_, _, _, _, _) with ValueTrait with ChildrenBuilderTrait with ChildrenLHHAAndActionsTrait
-            { override val externalEvents = super.externalEvents ++ ValueControlExternalEvents })
-
-    private val SelectionControl: ControlFactory =
-        (new CoreControl(_, _, _, _, _) with ValueTrait with SelectionControl with ChildrenBuilderTrait with ChildrenLHHAAndActionsTrait
-            { override val externalEvents = super.externalEvents ++ ValueControlExternalEvents })
-
-    private val TriggerControl: ControlFactory =
-        (new CoreControl(_, _, _, _, _) with SingleNodeTrait with TriggerAppearanceTrait with ChildrenBuilderTrait with ChildrenLHHAAndActionsTrait
-            { override val externalEvents = super.externalEvents ++ TriggerControlExternalEvents })
-
+    private val TriggerExternalEvents = Set(XFORMS_FOCUS, XFORMS_HELP, DOM_ACTIVATE, XXFORMS_VALUE_OR_ACTIVATE)
+    private val ValueExternalEvents   = TriggerExternalEvents + XXFORMS_VALUE
     // NOTE: xxforms-upload-done is a trusted server event so doesn't need to be listed here
-    private val UploadControl: ControlFactory =
-        (new CoreControl(_, _, _, _, _) with ValueTrait with ChildrenBuilderTrait with ChildrenLHHAAndActionsTrait
-            { override val externalEvents = super.externalEvents ++
-                Set(XFORMS_FOCUS,
-                    XFORMS_HELP,
-                    XFORMS_SELECT,
-                    XXFORMS_VALUE,
-                    XXFORMS_UPLOAD_START,
-                    XXFORMS_UPLOAD_CANCEL,
-                    XXFORMS_UPLOAD_PROGRESS) })
+    private val UploadExternalEvents  = Set(XFORMS_SELECT, XXFORMS_UPLOAD_START, XXFORMS_UPLOAD_CANCEL, XXFORMS_UPLOAD_PROGRESS)
 
-    private val GroupControl: ControlFactory =
+    class ValueControl(staticStateContext: StaticStateContext, element: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], scope: Scope)
+            extends CoreControl(staticStateContext, element, parent, preceding, scope)
+            with ValueTrait
+            with ChildrenBuilderTrait
+            with ChildrenLHHAAndActionsTrait
+            with FormatTrait {
+        override protected def externalEventsDef = super.externalEventsDef ++ ValueExternalEvents
+        override val externalEvents = externalEventsDef
+    }
+
+    class SelectionControl(staticStateContext: StaticStateContext, element: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], scope: Scope)
+            extends ValueControl(staticStateContext, element, parent, preceding, scope)
+            with SelectionControlTrait
+
+    class TriggerControl(staticStateContext: StaticStateContext, element: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], scope: Scope)
+            extends CoreControl(staticStateContext, element, parent, preceding, scope)
+            with SingleNodeTrait
+            with TriggerAppearanceTrait
+            with ChildrenBuilderTrait
+            with ChildrenLHHAAndActionsTrait {
+        override protected def externalEventsDef = super.externalEventsDef ++ TriggerExternalEvents
+        override val externalEvents              = externalEventsDef
+    }
+
+    class UploadControl(staticStateContext: StaticStateContext, element: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], scope: Scope)
+            extends ValueControl(staticStateContext, element, parent, preceding, scope) {
+        override protected def externalEventsDef = super.externalEventsDef ++ UploadExternalEvents
+        override val externalEvents = externalEventsDef
+    }
+
+    private val VariableControlFactory: ControlFactory = (new VariableControl(_, _, _, _, _) with ChildrenActionsTrait)
+    private val LHHAControlFactory: ControlFactory     = (new LHHAAnalysis(_, _, _, _, _))
+    private val ValueControlFactory: ControlFactory    = (new ValueControl(_, _, _, _, _))
+    private val SwitchControlFactory: ControlFactory   = (new ContainerControl(_, _, _, _, _) with SingleNodeTrait with LHHATrait with ChildrenBuilderTrait)
+    private val CaseControlFactory: ControlFactory     = (new ContainerControl(_, _, _, _, _) with SingleNodeTrait with LHHATrait with ChildrenBuilderTrait)
+
+    private val GroupControlFactory: ControlFactory =
         (new ContainerControl(_, _, _, _, _) with SingleNodeTrait with LHHATrait with ChildrenBuilderTrait
             { override val externalEvents = super.externalEvents + DOM_ACTIVATE }) // allow DOMActivate on group
 
-    private val DialogControl: ControlFactory =
+    private val DialogControlFactory: ControlFactory =
         (new ContainerControl(_, _, _, _, _) with SingleNodeTrait with LHHATrait with ChildrenBuilderTrait
             { override val externalEvents = super.externalEvents + XXFORMS_DIALOG_CLOSE }) // allow xxforms-dialog-close on dialog
-
-    private val SwitchControl: ControlFactory = (new ContainerControl(_, _, _, _, _) with SingleNodeTrait with LHHATrait with ChildrenBuilderTrait)
-    private val CaseControl: ControlFactory   = (new ContainerControl(_, _, _, _, _) with SingleNodeTrait with LHHATrait with ChildrenBuilderTrait)
 
     // Variable factories indexed by QName
     // NOTE: We have all these QNames for historical reasons (XForms 2 is picking <xforms:var>)
     private val variableFactory =
         Seq(XXFORMS_VARIABLE_QNAME, XXFORMS_VAR_QNAME, XFORMS_VARIABLE_QNAME, XFORMS_VAR_QNAME, EXFORMS_VARIABLE_QNAME) map
-            (qName ⇒ qName → VariableControl) toMap
+            (qName ⇒ qName → VariableControlFactory) toMap
 
     // Other factories indexed by QName
     private val byQNameFactory = Map[QName, ControlFactory](
         XBL_TEMPLATE_QNAME            → (new ContainerControl(_, _, _, _, _) with ChildrenBuilderTrait),
         // Core value controls
-        XFORMS_INPUT_QNAME            → ValueControl,
-        XFORMS_SECRET_QNAME           → ValueControl,
-        XFORMS_TEXTAREA_QNAME         → ValueControl,
-        XFORMS_UPLOAD_QNAME           → UploadControl,
-        XFORMS_RANGE_QNAME            → ValueControl,
-        XXFORMS_TEXT_QNAME            → ValueControl,
+        XFORMS_INPUT_QNAME            → ValueControlFactory,
+        XFORMS_SECRET_QNAME           → ValueControlFactory,
+        XFORMS_TEXTAREA_QNAME         → ValueControlFactory,
+        XFORMS_UPLOAD_QNAME           → (new UploadControl(_, _, _, _, _)),
+        XFORMS_RANGE_QNAME            → ValueControlFactory,
+        XXFORMS_TEXT_QNAME            → ValueControlFactory,
         XFORMS_OUTPUT_QNAME           → (new OutputControl(_, _, _, _, _)),
         // Core controls
-        XFORMS_TRIGGER_QNAME          → TriggerControl,
-        XFORMS_SUBMIT_QNAME           → TriggerControl,
+        XFORMS_TRIGGER_QNAME          → (new TriggerControl(_, _, _, _, _)),
+        XFORMS_SUBMIT_QNAME           → (new TriggerControl(_, _, _, _, _)),
         // Selection controls
-        XFORMS_SELECT_QNAME           → SelectionControl,
-        XFORMS_SELECT1_QNAME          → SelectionControl,
+        XFORMS_SELECT_QNAME           → (new SelectionControl(_, _, _, _, _)),
+        XFORMS_SELECT1_QNAME          → (new SelectionControl(_, _, _, _, _)),
         // Attributes
         XXFORMS_ATTRIBUTE_QNAME       → (new AttributeControl(_, _, _, _, _)),
         // Container controls
-        XFORMS_GROUP_QNAME            → GroupControl,
-        XFORMS_SWITCH_QNAME           → SwitchControl,
-        XFORMS_CASE_QNAME             → CaseControl,
-        XXFORMS_DIALOG_QNAME          → DialogControl,
+        XFORMS_GROUP_QNAME            → GroupControlFactory,
+        XFORMS_SWITCH_QNAME           → SwitchControlFactory,
+        XFORMS_CASE_QNAME             → CaseControlFactory,
+        XXFORMS_DIALOG_QNAME          → DialogControlFactory,
         // Dynamic control
         XXFORMS_DYNAMIC_QNAME         → (new ContainerControl(_, _, _, _, _) with SingleNodeTrait),
         // Repeat control
         XFORMS_REPEAT_QNAME           → (new RepeatControl(_, _, _, _, _)),
         XFORMS_REPEAT_ITERATION_QNAME → (new RepeatIterationControl(_, _, _, _, _)),
         // LHHA
-        LABEL_QNAME                   → LHHAControl,
-        HELP_QNAME                    → LHHAControl,
-        HINT_QNAME                    → LHHAControl,
-        ALERT_QNAME                   → LHHAControl,
+        LABEL_QNAME                   → LHHAControlFactory,
+        HELP_QNAME                    → LHHAControlFactory,
+        HINT_QNAME                    → LHHAControlFactory,
+        ALERT_QNAME                   → LHHAControlFactory,
         // Model
         XFORMS_MODEL_QNAME            → (new Model(_, _, _, _, _)),
         XFORMS_SUBMISSION_QNAME       → (new Submission(_, _, _, _, _)),

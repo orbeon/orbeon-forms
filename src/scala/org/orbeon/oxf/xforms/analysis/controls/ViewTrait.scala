@@ -27,7 +27,8 @@ trait ViewTrait extends SimpleElementAnalysis with AppearanceTrait {
     val index: Int = staticStateContext.index
 
     // By default, external events are keypress plus those specifically allowed by the form author
-    def externalEvents = attSet(element, XXFORMS_EXTERNAL_EVENTS_QNAME) ++ Set(KEYPRESS)
+    protected def externalEventsDef = attSet(element, XXFORMS_EXTERNAL_EVENTS_QNAME) ++ Set(KEYPRESS)
+    def externalEvents              = externalEventsDef
 
     // In the view, in-scope model variables are always first in scope
     override protected def getRootVariables =

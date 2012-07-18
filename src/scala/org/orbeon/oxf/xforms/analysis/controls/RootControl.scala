@@ -37,5 +37,6 @@ class RootControl(staticStateContext: StaticStateContext, element: Element, scop
         super.findRelevantChildrenElements filterNot
             { case (e, _) ⇒ e.getQName == XBL_XBL_QNAME }
 
-    override def externalEvents = super.externalEvents ++ Set(XXFORMS_LOAD, XXFORMS_POLL)
+    override protected def externalEventsDef = super.externalEventsDef ++ Set(XXFORMS_LOAD, XXFORMS_POLL)
+    override val externalEvents              = externalEventsDef
 }

@@ -21,7 +21,7 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.util.SecureUtils;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.*;
-import org.orbeon.oxf.xforms.analysis.controls.SelectionControl;
+import org.orbeon.oxf.xforms.analysis.controls.SelectionControlTrait;
 import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control;
 import org.orbeon.oxf.xforms.itemset.Item.Label;
 import org.orbeon.oxf.xforms.xbl.Scope;
@@ -93,7 +93,7 @@ public class XFormsItemUtils {
      */
     public static Itemset evaluateItemset(final XFormsSelect1Control select1Control) {
 
-        final SelectionControl staticControl = (SelectionControl) select1Control.staticControl();
+        final SelectionControlTrait staticControl = (SelectionControlTrait) select1Control.staticControl();
 
         // Optimize static itemsets
         if (staticControl.hasStaticItemset())

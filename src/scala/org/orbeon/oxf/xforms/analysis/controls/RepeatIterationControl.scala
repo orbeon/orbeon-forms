@@ -23,5 +23,6 @@ class RepeatIterationControl (staticStateContext: StaticStateContext, element: E
     with SingleNodeTrait
     with ChildrenBuilderTrait {
 
-    override val externalEvents = super.externalEvents + XXFORMS_REPEAT_ACTIVATE
+    override protected def externalEventsDef = super.externalEventsDef + XXFORMS_REPEAT_ACTIVATE
+    override val externalEvents              = externalEventsDef
 }

@@ -21,7 +21,7 @@ import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.analysis.XPathDependencies;
-import org.orbeon.oxf.xforms.analysis.controls.SelectionControl;
+import org.orbeon.oxf.xforms.analysis.controls.SelectionControlTrait;
 import org.orbeon.oxf.xforms.control.FocusableTrait;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
@@ -68,8 +68,8 @@ public class XFormsSelect1Control extends XFormsValueControl implements Focusabl
             getItemset();
     }
 
-    public SelectionControl getSelectionControl() {
-        return (SelectionControl) super.staticControl();
+    public SelectionControlTrait getSelectionControl() {
+        return (SelectionControlTrait) super.staticControl();
     }
 
     @Override
@@ -131,7 +131,7 @@ public class XFormsSelect1Control extends XFormsValueControl implements Focusabl
         } else if (isStaticItemset(containingDocument, prefixedId)) {
             // Control is not there or is not relevant, so use static itemsets
             // NOTE: This way we output static itemsets during initialization as well, even for non-relevant controls
-            return ((SelectionControl) containingDocument.getStaticOps().getControlAnalysisOption(prefixedId).get()).evaluateStaticItemset();
+            return ((SelectionControlTrait) containingDocument.getStaticOps().getControlAnalysisOption(prefixedId).get()).evaluateStaticItemset();
         } else {
             // Not possible so return null
             return null;
@@ -175,7 +175,7 @@ public class XFormsSelect1Control extends XFormsValueControl implements Focusabl
      * @return                      true iif control has a static set of items
      */
     public static boolean isStaticItemset(XFormsContainingDocument containingDocument, String prefixedId) {
-        final SelectionControl analysis = containingDocument.getStaticOps().getSelect1Analysis(prefixedId);
+        final SelectionControlTrait analysis = containingDocument.getStaticOps().getSelect1Analysis(prefixedId);
         return analysis.hasStaticItemset();
     }
 

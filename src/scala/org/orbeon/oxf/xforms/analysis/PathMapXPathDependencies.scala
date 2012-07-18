@@ -445,7 +445,7 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
             case Some(result) ⇒ result // cached
             case None ⇒ // not cached
                 containingDocument.getStaticOps.getControlAnalysisOption(controlPrefixedId) match {
-                    case Some(control: SelectionControl) ⇒ // control found
+                    case Some(control: SelectionControlTrait) ⇒ // control found
                         val result = control.getItemsetAnalysis match {
                             case Some(analysis) if ! analysis.figuredOutDependencies ⇒ // dependencies are unknown
                                 itemsetUnknownDependencies += 1

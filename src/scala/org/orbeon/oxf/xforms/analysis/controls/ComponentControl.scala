@@ -17,6 +17,7 @@ class ComponentControl(staticStateContext: StaticStateContext, element: Element,
     def removeBinding(): Unit = {
 
         val part = staticStateContext.partAnalysis
+        assert(! part.isTopLevel)
 
         // Remove all descendants only, keeping the current control
         part.deindexTree(this, self = false)
@@ -28,8 +29,12 @@ class ComponentControl(staticStateContext: StaticStateContext, element: Element,
     }
 
     // Set the component's binding
-    def setBinding(element: Element): Unit =
-        _binding = staticStateContext.partAnalysis.xblBindings.processElementIfNeeded(element, prefixedId, locationData, scope)
+    def setBinding(element: Element): Unit = {
+        val part = staticStateContext.partAnalysis
+        assert(! part.isTopLevel)
+
+        _binding = part.xblBindings.processElementIfNeeded(element, prefixedId, locationData, scope)
+    }
 
     // Only support binding if the control defines it has a binding
     override def hasBinding = binding.abstractBinding.modeBinding && super.hasBinding
@@ -38,5 +43,7 @@ class ComponentControl(staticStateContext: StaticStateContext, element: Element,
     override protected def computeBindingAnalysis =
         if (binding.abstractBinding.modeBinding) super.computeBindingAnalysis else getContextAnalysis
 
-    override def externalEvents = super.externalEvents ++ binding.abstractBinding.allowedExternalEvents
+    // Leave as 'def' as the binding can, in theory, mutate
+    override protected def externalEventsDef = super.externalEventsDef ++ binding.abstractBinding.allowedExternalEvents
+    override def externalEvents              = externalEventsDef
 }

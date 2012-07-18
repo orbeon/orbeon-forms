@@ -181,8 +181,8 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
                             }
 
                             // Add attribute even if the control is not concrete
-                            if (placeHolderInfo != null && placeHolderInfo.placeholder != null)
-                                reusableAttributes.addAttribute("", "placeholder", "placeholder", ContentHandlerHelper.CDATA, placeHolderInfo.placeholder);
+                            if (placeHolderInfo != null && placeHolderInfo.placeholder() != null)
+                                reusableAttributes.addAttribute("", "placeholder", "placeholder", ContentHandlerHelper.CDATA, placeHolderInfo.placeholder());
 
                             reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, inputClasses.toString());
 
@@ -294,13 +294,13 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
 
     @Override
     protected void handleLabel() throws SAXException {
-        if (!(placeHolderInfo != null && placeHolderInfo.isLabelPlaceholder))
+        if (!(placeHolderInfo != null && placeHolderInfo.isLabelPlaceholder()))
             super.handleLabel();
     }
 
     @Override
     protected void handleHint() throws SAXException {
-        if (!(placeHolderInfo != null && placeHolderInfo.isHintPlaceholder))
+        if (!(placeHolderInfo != null && placeHolderInfo.isHintPlaceholder()))
             super.handleHint();
     }
 }

@@ -25,10 +25,12 @@ class OutputControl(staticStateContext: StaticStateContext, element: Element, pa
         extends CoreControl(staticStateContext, element, parent, preceding, scope)
         with ValueTrait
         with ChildrenBuilderTrait
-        with ChildrenLHHAAndActionsTrait {
+        with ChildrenLHHAAndActionsTrait
+        with FormatTrait {
 
     // Unlike other value controls, don't restrict to simple content (even though the spec says it should!)
     override def isAllowedBoundItem(item: Item) = DataModel.isAllowedBoundItem(item)
 
-    override def externalEvents = super.externalEvents ++ Set(XFORMS_HELP, DOM_ACTIVATE)
+    override protected def externalEventsDef = super.externalEventsDef ++ Set(XFORMS_HELP, DOM_ACTIVATE)
+    override val externalEvents              = externalEventsDef
 }

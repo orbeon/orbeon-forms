@@ -30,7 +30,8 @@ class RepeatControl(staticStateContext: StaticStateContext, element: Element, pa
     lazy val iteration = children collectFirst { case i: RepeatIterationControl ⇒ i }
     require(iterationElement ne null)
 
-    override val externalEvents = super.externalEvents + XXFORMS_DND
+    override protected def externalEventsDef = super.externalEventsDef + XXFORMS_DND
+    override val externalEvents              = externalEventsDef
 }
 
 object RepeatControl {

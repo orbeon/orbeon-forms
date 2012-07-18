@@ -108,7 +108,9 @@ trait PartXBLAnalysis extends TransientState {
     def baselineResources = xblBindings.baselineResources
 
     // For the given bound node prefixed id, remove the current shadow tree and create a new one
-    def updateShadowTree(prefixedId: String, element: Element) =
+    // NOTE: Can be used only in a sub-part, as this mutates the tree
+    def updateShadowTree(prefixedId: String, element: Element) = {
+        assert(! isTopLevel)
         getControlAnalysis(prefixedId) match {
             case existingComponent: ComponentControl ⇒
 
@@ -126,6 +128,7 @@ trait PartXBLAnalysis extends TransientState {
             case _ ⇒
                 throw new IllegalArgumentException
         }
+    }
 
     override def freeTransientState() = {
         super.freeTransientState()

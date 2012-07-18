@@ -83,7 +83,7 @@ trait PartGlobalOps {
     }
 
     def getSelect1Analysis(prefixedId: String) = getControlAnalysisOption(prefixedId) match {
-        case Some(selectionControl: SelectionControl) ⇒ selectionControl
+        case Some(selectionControl: SelectionControlTrait) ⇒ selectionControl
         case _ ⇒ null
     }
 

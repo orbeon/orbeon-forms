@@ -60,7 +60,7 @@
                     then concat('(', substring(., 1, 3), ') ', substring(., 4, 3), if (string-length() gt 6) then '-' else '', substring(., 7))
                     else ."
                 xxf:unformat="
-                    for $t in translate(normalize-space(), '()*-[]. ', '')
+                    for $t in translate(normalize-space(), '()*-[].#/'': ', '')
                     return if (matches($t, '^\d+$')) then $t else .">
                 <xf:hint appearance="minimal">(555) 555-5555</xf:hint>
             </xf:input>

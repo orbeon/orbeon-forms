@@ -172,6 +172,8 @@
                             <xf:action ev:event="DOMActivate">
                                 <!-- Open the dialog in "save-as" mode -->
                                 <xf:dispatch name="fb-show-dialog" targetid="dialog-form-settings">
+                                    <xxf:context name="title" value="xxf:bind('title-bind')"/>
+                                    <xxf:context name="description" value="xxf:bind('description-bind')"/>
                                     <xxf:context name="mode" value="'save-as'"/>
                                 </xf:dispatch>
                             </xf:action>
@@ -213,6 +215,8 @@
                                 <xf:dispatch name="fb-show-dialog" targetid="dialog-form-settings">
                                     <xxf:context name="app" value="xxf:bind('application-name-bind')"/>
                                     <xxf:context name="form" value="xxf:bind('form-name-bind')"/>
+                                    <xxf:context name="title" value="xxf:bind('title-bind')"/>
+                                    <xxf:context name="description" value="xxf:bind('description-bind')"/>
                                     <xxf:context name="mode" value="'edit'"/>
                                 </xf:dispatch>
                             </xf:action>
@@ -389,13 +393,19 @@
 
                             <!-- Form settings dialog -->
                             <fb:dialog-form-settings id="dialog-form-settings" resources-ref="$form-resources" fr-resources-ref="$fr-resources" body-ref="$body">
+                                <!-- Update title/description -->
+                                <xf:action ev:event="fb-update-metadata">
+                                    <xf:setvalue ref="xxf:bind('title-bind')"       value="event('title')"/>
+                                    <xf:setvalue ref="xxf:bind('description-bind')" value="event('description')"/>
+                                </xf:action>
                                 <!-- Update app/form name if changed -->
                                 <xf:action
                                         ev:event="fb-update-metadata"
                                         if="xxf:bind('application-name-bind') != event('app') or xxf:bind('form-name-bind') != event('form')">
+
                                     <!-- Copy data to main instance -->
                                     <xf:setvalue ref="xxf:bind('application-name-bind')" value="event('app')"/>
-                                    <xf:setvalue ref="xxf:bind('form-name-bind')" value="event('form')"/>
+                                    <xf:setvalue ref="xxf:bind('form-name-bind')"        value="event('form')"/>
                                     <!-- Refresh components -->
                                     <!-- De-annotate the form, as it will be re-annotated once the toolbox is loaded -->
                                     <xf:dispatch targetid="fr-form-model" name="fr-data-save-prepare"/>

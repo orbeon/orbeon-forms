@@ -31,11 +31,13 @@
             <xbl:handler event="fb-show-dialog" phase="target">
                 <xf:setvalue iterate="*[not(*)]" ref="."/> <!-- Clear all local values -->
 
-                <!--<xf:setvalue iterate="'app', 'form', 'mode'" ref="instance()/*[name() = current()]"  value="event(current())"/>-->
-
-                <xf:setvalue ref="app"  value="event('app')"/>
-                <xf:setvalue ref="form" value="event('form')"/>
-                <xf:setvalue ref="mode" value="event('mode')"/>
+                <xf:setvalue
+                    iterate="'app', 'form', 'title', 'description'"
+                    ref="instance()/*[name() = context()]"
+                    value="event(context())"/>
+                <xf:setvalue
+                    ref="mode"
+                    value="event('mode')"/>
 
                 <xxf:show dialog="dialog"/>
             </xbl:handler>
@@ -46,6 +48,8 @@
                     <instance>
                         <app/>
                         <form/>
+                        <title/>
+                        <description/>
                         <mode/>
                     </instance>
                 </xf:instance>
@@ -93,12 +97,13 @@
                         </xh:div>
                     </xf:group>
 
-                    <xh:p>
-                        <!-- Display message to user -->
-                        <xf:output value="if ($is-new-form) then $resources/messages/new-metadata-output
+                    <xf:var name="message" value="if ($is-new-form) then $resources/messages/new-metadata-output
                                               else if ($is-save-as) then $resources/messages/save-as-metadata-output
                                               else $resources/messages/edit-metadata-output"/>
-                    </xh:p>
+                    <xf:group ref=".[normalize-space($message)]" xxf:element="p">
+                        <!-- Display message to user -->
+                        <xf:output value="$message"/>
+                    </xf:group>
                     <xh:img src="/forms/orbeon/builder/images/label_64.png" alt=""/>
                     <xh:div class="fb-dialog-form-settings-fields">
                         <!-- Application name -->
@@ -129,6 +134,20 @@
                             <xf:hint ref="$resources/form-name/hint"/>
                             <xf:alert ref="$resources/form-name/alert"/>
                         </xf:input>
+
+                        <!-- Title -->
+                        <xf:input ref="title" id="fb-title-input" tabindex="3" xxf:autocomplete="off">
+                            <xf:label ref="$resources/title/label"/>
+                            <xf:hint ref="$resources/title/hint"/>
+                            <xf:alert ref="$resources/title/alert"/>
+                        </xf:input>
+
+                        <!-- Description -->
+                        <xf:textarea ref="description" tabindex="4">
+                            <xf:label ref="$resources/description/label"/>
+                            <xf:hint ref="$resources/description/hint"/>
+                            <xf:alert ref="$resources/description/alert"/>
+                        </xf:textarea>
 
                         <!-- Stats -->
                         <xf:group ref=".[$is-form-settings]" class="fb-dialog-form-settings-stats">
@@ -175,14 +194,16 @@
                     <!-- Event handler for 2 field and button -->
                     <xf:action
                             ev:event="DOMActivate"
-                            ev:target="fb-application-name-input fb-form-name-input fb-metadata-continue-trigger"
+                            ev:target="fb-application-name-input fb-form-name-input fb-title-input fb-metadata-continue-trigger"
                             if="xxf:valid(instance(), true())">
 
                         <!-- Dispatch event with result -->
                         <xf:dispatch name="fb-update-metadata" targetid="fb-dialog-form-settings">
-                            <xxf:context name="app"  value="instance()/app"/>
-                            <xxf:context name="form" value="instance()/form"/>
-                            <xxf:context name="mode" value="instance()/mode"/>
+                            <xxf:context name="app"         value="instance()/app"/>
+                            <xxf:context name="form"        value="instance()/form"/>
+                            <xxf:context name="title"       value="instance()/title"/>
+                            <xxf:context name="description" value="instance()/description"/>
+                            <xxf:context name="mode"        value="instance()/mode"/>
                         </xf:dispatch>
 
                         <!-- Hide this dialog -->

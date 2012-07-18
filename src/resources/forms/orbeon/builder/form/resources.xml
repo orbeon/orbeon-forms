@@ -17,7 +17,7 @@
         <!-- NOTE: Summary page expects to find application-name and form-name for the summary page here -->
         <application-name>
             <label>Application Name</label>
-            <hint>Identifies a group of forms, for instance by functionality or department (e.g. "sales"). If you have one group of forms, you can use you organization name (e.g. "acme"). This name shows in the URL of the deployed form, so we recommend you use only lowercases characters.</hint>
+            <hint>Identifies a group of forms, for instance by functionality or department (e.g. "sales"). If you have one group of forms, you can use your organization name (e.g. "acme"). This name shows in the URL of the deployed form, so we recommend you use only lowercases characters.</hint>
             <alert>Must be non-empty and contain no blanks</alert>
         </application-name>
         <form-name>
@@ -27,12 +27,11 @@
         </form-name>
         <title>
             <label>Form Title</label>
-            <hint>click to enter the form title</hint>
-            <alert>The form title is required in all languages</alert>
+            <hint>Form title in the current language</hint>
         </title>
         <description>
             <label>Form Description</label>
-            <hint>click to enter an optional form description</hint>
+            <hint>Form description in the current language</hint>
         </description>
         <logo>
             <label>Logo</label>
@@ -815,8 +814,8 @@
             <publish-success>The form was published successfully. {0,choice,0#No attachment has|1#1 attachment has|1&lt;{0,number,integer} attachments have} been published.</publish-success>
             <publish-error>There was an error during form publishing.</publish-error>
             <metadata-edit-title>Form Metadata</metadata-edit-title>
-            <new-metadata-output>Provide an application and form name, which will be used to identify your form (you can also change those later):</new-metadata-output>
-            <edit-metadata-output>Edit the application name and form name, or click Cancel to return to the builder:</edit-metadata-output>
+            <new-metadata-output>Please provide an application and form name, which will be used to identify your form (you can also change those later):</new-metadata-output>
+            <edit-metadata-output/>
             <save-as-metadata-output>Enter a new application name and form name to be used for the copy of this form:</save-as-metadata-output>
             <xpath-errors>There {0,choice,1#is one XPath error|1&lt;are {0,number,integer} XPath errors} in your form.</xpath-errors>
         </messages>
@@ -1630,7 +1629,7 @@
             <publish-error>Une erreur s'est produite durant la publication du formulaire.</publish-error>
             <metadata-edit-title>Métadonnées</metadata-edit-title>
             <new-metadata-output>Veuillez fournir un nom d'application et un nom de formulaire (vous pouvez les changer plus tard):</new-metadata-output>
-            <edit-metadata-output>Modifiez le nom d'application et/ou le nom du formulaire, ou cliquer Annuler pour revenir à l'éditeur:</edit-metadata-output>
+            <edit-metadata-output/>
             <save-as-metadata-output>Veuillez fournir un nom d'application et un nom de formulaire qui sera utilisé pour la copie de ce formulaire:</save-as-metadata-output>
             <xpath-errors>Il y a {0,choice,1#une erreur|1&lt;{0,number,integer} erreurs} XPath dans votre formulaire.</xpath-errors>
         </messages>
@@ -2446,7 +2445,7 @@
             <publish-error>Det oppsto en feil ved publisering.</publish-error>
             <metadata-edit-title>Metadata for skjemaet</metadata-edit-title>
             <new-metadata-output>Angi et applikasjons- og et skjemanavn som vil brukes for å identifisere skjemaet (de kan endres senere):</new-metadata-output>
-            <edit-metadata-output>Rediger applikasjons- eller skjemanavnet eller velg «Avbryt» for å gå tilbake til byggeren:</edit-metadata-output>
+            <edit-metadata-output/>
             <save-as-metadata-output>[Enter a new application name and form name to be used for the copy of this form:]</save-as-metadata-output>
             <xpath-errors>[There {0,choice,1#is one XPath error|1&lt;are {0,number,integer} errors} in your form.]</xpath-errors>
         </messages>
@@ -3261,7 +3260,7 @@
             <publish-error>При публикации формы произошла ошибка.</publish-error>
             <metadata-edit-title>Описание формы</metadata-edit-title>
             <new-metadata-output>Задайте название приложения и название формы. (При необходимости их можно будет изменить потом.)</new-metadata-output>
-            <edit-metadata-output>Задайте название приложения и название формы или нажмите Отменить чтобы вернуться к мастеру форм:</edit-metadata-output>
+            <edit-metadata-output/>
             <save-as-metadata-output>Задайте название приложения и название формы, куда необходимо сохранить данную форму:</save-as-metadata-output>
             <xpath-errors>[There {0,choice,1#is one XPath error|1&lt;are {0,number,integer} errors} in your form.]</xpath-errors>
         </messages>

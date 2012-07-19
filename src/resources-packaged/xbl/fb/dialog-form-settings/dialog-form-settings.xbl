@@ -209,11 +209,6 @@
                         <!-- Hide this dialog -->
                         <xxf:hide dialog="dialog"/>
                     </xf:action>
-
-                    <!-- Stop value change propagation so changes in this section of the form don't cause data
-                         to become dirty in fr-persistence-model -->
-                    <xf:action ev:event="#all" ev:propagate="stop"/>
-
                 </xh:div>
             </xxf:dialog>
         </xbl:template>

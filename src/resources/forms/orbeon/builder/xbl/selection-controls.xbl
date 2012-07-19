@@ -44,24 +44,25 @@
                 <small-icon>/forms/orbeon/builder/images/dropdown.png</small-icon>
                 <large-icon>/forms/orbeon/builder/images/dropdown.png</large-icon>
             </icon>
-            <datatype>xforms:string</datatype>
             <editors static-itemset="true"/>
-            <template>
-                <xforms:select1 id="" appearance="minimal" ref="" xmlns="">
-                    <xforms:label ref=""/>
-                    <xforms:hint ref=""/>
-                    <xforms:help ref=""/>
-                    <xforms:alert ref=""/>
-                    <xforms:item>
-                        <xforms:label>[Select...]</xforms:label>
-                        <xforms:value/>
-                    </xforms:item>
-                    <xforms:itemset ref="">
-                        <xforms:label ref="label"/>
-                        <xforms:value ref="value"/>
-                    </xforms:itemset>
-                </xforms:select1>
-            </template>
+            <templates>
+                <view>
+                    <xforms:select1 id="" appearance="minimal" ref="" xmlns="">
+                        <xforms:label ref=""/>
+                        <xforms:hint ref=""/>
+                        <xforms:help ref=""/>
+                        <xforms:alert ref=""/>
+                        <xforms:item>
+                            <xforms:label>[Select...]</xforms:label>
+                            <xforms:value/>
+                        </xforms:item>
+                        <xforms:itemset ref="">
+                            <xforms:label ref="label"/>
+                            <xforms:value ref="value"/>
+                        </xforms:itemset>
+                    </xforms:select1>
+                </view>
+            </templates>
         </metadata>
     </xbl:binding>
 
@@ -74,20 +75,21 @@
                 <small-icon>/forms/orbeon/builder/images/radio.png</small-icon>
                 <large-icon>/forms/orbeon/builder/images/radio.png</large-icon>
             </icon>
-            <datatype>xs:string</datatype>
             <editors static-itemset="true"/>
-            <template>
-                <xforms:select1 id="" appearance="full" ref="" xmlns="">
-                    <xforms:label ref=""/>
-                    <xforms:hint ref=""/>
-                    <xforms:help ref=""/>
-                    <xforms:alert ref=""/>
-                    <xforms:itemset ref="">
-                        <xforms:label ref="label"/>
-                        <xforms:value ref="value"/>
-                    </xforms:itemset>
-                </xforms:select1>
-            </template>
+            <templates>
+                <view>
+                    <xforms:select1 id="" appearance="full" ref="" xmlns="">
+                        <xforms:label ref=""/>
+                        <xforms:hint ref=""/>
+                        <xforms:help ref=""/>
+                        <xforms:alert ref=""/>
+                        <xforms:itemset ref="">
+                            <xforms:label ref="label"/>
+                            <xforms:value ref="value"/>
+                        </xforms:itemset>
+                    </xforms:select1>
+                </view>
+            </templates>
         </metadata>
     </xbl:binding>
 
@@ -100,20 +102,21 @@
                 <small-icon>/forms/orbeon/builder/images/checkbox.png</small-icon>
                 <large-icon>/forms/orbeon/builder/images/checkbox.png</large-icon>
             </icon>
-            <datatype>xs:string</datatype>
             <editors static-itemset="true"/>
-            <template>
-                <xforms:select id="" appearance="full" ref="" xmlns="">
-                    <xforms:label ref=""/>
-                    <xforms:hint ref=""/>
-                    <xforms:help ref=""/>
-                    <xforms:alert ref=""/>
-                    <xforms:itemset ref="">
-                        <xforms:label ref="label"/>
-                        <xforms:value ref="value"/>
-                    </xforms:itemset>
-                </xforms:select>
-            </template>
+            <templates>
+                <view>
+                    <xforms:select id="" appearance="full" ref="" xmlns="">
+                        <xforms:label ref=""/>
+                        <xforms:hint ref=""/>
+                        <xforms:help ref=""/>
+                        <xforms:alert ref=""/>
+                        <xforms:itemset ref="">
+                            <xforms:label ref="label"/>
+                            <xforms:value ref="value"/>
+                        </xforms:itemset>
+                    </xforms:select>
+                </view>
+            </templates>
         </metadata>
     </xbl:binding>
 
@@ -126,20 +129,21 @@
                 <small-icon>/forms/orbeon/builder/images/listbox.png</small-icon>
                 <large-icon>/forms/orbeon/builder/images/listbox.png</large-icon>
             </icon>
-            <datatype>xs:string</datatype>
             <editors static-itemset="true"/>
-            <template>
-                <xforms:select1 id="" appearance="compact" ref="" xmlns="">
-                    <xforms:label ref=""/>
-                    <xforms:hint ref=""/>
-                    <xforms:help ref=""/>
-                    <xforms:alert ref=""/>
-                    <xforms:itemset ref="">
-                        <xforms:label ref="label"/>
-                        <xforms:value ref="value"/>
-                    </xforms:itemset>
-                </xforms:select1>
-            </template>
+            <templates>
+                <view>
+                    <xforms:select1 id="" appearance="compact" ref="" xmlns="">
+                        <xforms:label ref=""/>
+                        <xforms:hint ref=""/>
+                        <xforms:help ref=""/>
+                        <xforms:alert ref=""/>
+                        <xforms:itemset ref="">
+                            <xforms:label ref="label"/>
+                            <xforms:value ref="value"/>
+                        </xforms:itemset>
+                    </xforms:select1>
+                </view>
+            </templates>
         </metadata>
     </xbl:binding>
 
@@ -153,20 +157,21 @@
                 <small-icon>/forms/orbeon/builder/images/listbox.png</small-icon>
                 <large-icon>/forms/orbeon/builder/images/listbox.png</large-icon>
             </icon>
-            <datatype>xs:string</datatype>
             <editors static-itemset="true"/>
-            <template>
-                <xforms:select id="" appearance="compact" ref="" xmlns="">
-                    <xforms:label ref=""/>
-                    <xforms:hint ref=""/>
-                    <xforms:help ref=""/>
-                    <xforms:alert ref=""/>
-                    <xforms:itemset ref="">
-                        <xforms:label ref="label"/>
-                        <xforms:value ref="value"/>
-                    </xforms:itemset>
-                </xforms:select>
-            </template>
+            <templates>
+                <view>
+                    <xforms:select id="" appearance="compact" ref="" xmlns="">
+                        <xforms:label ref=""/>
+                        <xforms:hint ref=""/>
+                        <xforms:help ref=""/>
+                        <xforms:alert ref=""/>
+                        <xforms:itemset ref="">
+                            <xforms:label ref="label"/>
+                            <xforms:value ref="value"/>
+                        </xforms:itemset>
+                    </xforms:select>
+                </view>
+            </templates>
         </metadata>
     </xbl:binding>
     -->
@@ -181,20 +186,21 @@
                 <small-icon>/forms/orbeon/builder/images/tree_mode.gif</small-icon>
                 <large-icon>/forms/orbeon/builder/images/tree_mode.gif</large-icon>
             </icon>
-            <datatype>xs:string</datatype>
             <editors static-itemset="true"/>
-            <template>
-                <xforms:select1 id="" appearance="xxforms:tree" ref="" xmlns="">
-                    <xforms:label ref=""/>
-                    <xforms:hint ref=""/>
-                    <xforms:help ref=""/>
-                    <xforms:alert ref=""/>
-                    <xforms:itemset ref="">
-                        <xforms:label ref="label"/>
-                        <xforms:value ref="value"/>
-                    </xforms:itemset>
-                </xforms:select1>
-            </template>
+            <templates>
+                <view>
+                    <xforms:select1 id="" appearance="xxforms:tree" ref="" xmlns="">
+                        <xforms:label ref=""/>
+                        <xforms:hint ref=""/>
+                        <xforms:help ref=""/>
+                        <xforms:alert ref=""/>
+                        <xforms:itemset ref="">
+                            <xforms:label ref="label"/>
+                            <xforms:value ref="value"/>
+                        </xforms:itemset>
+                    </xforms:select1>
+                </view>
+            </templates>
         </metadata>
     </xbl:binding>
 
@@ -207,20 +213,21 @@
                 <small-icon>/forms/orbeon/builder/images/tree_mode.gif</small-icon>
                 <large-icon>/forms/orbeon/builder/images/tree_mode.gif</large-icon>
             </icon>
-            <datatype>xs:string</datatype>
             <editors static-itemset="true"/>
-            <template>
-                <xforms:select id="" appearance="xxforms:tree" ref="" xmlns="">
-                    <xforms:label ref=""/>
-                    <xforms:hint ref=""/>
-                    <xforms:help ref=""/>
-                    <xforms:alert ref=""/>
-                    <xforms:itemset ref="">
-                        <xforms:label ref="label"/>
-                        <xforms:value ref="value"/>
-                    </xforms:itemset>
-                </xforms:select>
-            </template>
+            <templates>
+                <view>
+                    <xforms:select id="" appearance="xxforms:tree" ref="" xmlns="">
+                        <xforms:label ref=""/>
+                        <xforms:hint ref=""/>
+                        <xforms:help ref=""/>
+                        <xforms:alert ref=""/>
+                        <xforms:itemset ref="">
+                            <xforms:label ref="label"/>
+                            <xforms:value ref="value"/>
+                        </xforms:itemset>
+                    </xforms:select>
+                </view>
+            </templates>
         </metadata>
     </xbl:binding>
     -->

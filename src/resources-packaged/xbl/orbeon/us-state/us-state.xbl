@@ -31,17 +31,24 @@
                 <small-icon>/apps/fr/style/images/silk/plugin.png</small-icon>
                 <large-icon>/apps/fr/style/images/silk/plugin.png</large-icon>
             </icon>
-            <datatype>xforms:string</datatype>
-            <template>
-                 <fr:us-state>
-                     <xf:label ref=""/>
-                     <xf:hint ref=""/>
-                     <xf:help ref=""/>
-                     <xf:alert ref=""/>
-                </fr:us-state>
-            </template>
+            <templates>
+                <view>
+                    <fr:us-state>
+                        <xf:label ref=""/>
+                        <xf:hint ref=""/>
+                        <xf:help ref=""/>
+                        <xf:alert ref=""/>
+                    </fr:us-state>
+                </view>
+            </templates>
         </metadata>
 
+        <xbl:resources>
+            <xbl:style>
+                .xbl-fr-us-state .xforms-select1-appearance-minimal,
+                    .xbl-fr-us-state span.xforms-select1-appearance-minimal select { width: auto }
+            </xbl:style>
+        </xbl:resources>
         <xbl:implementation>
             <xf:model>
                 <xf:instance src="oxf:/xbl/orbeon/us-state/states.xml" xxf:readonly="true" xxf:cache="true"/>

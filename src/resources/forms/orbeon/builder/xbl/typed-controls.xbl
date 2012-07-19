@@ -44,15 +44,17 @@
                 <small-icon>/apps/fr/style/images/silk/date.png</small-icon>
                 <large-icon>/apps/fr/style/images/silk/date.png</large-icon>
             </icon>
-            <datatype>xforms:date</datatype>
-            <template>
-                <xforms:input id="" ref="" xmlns="">
-                    <xforms:label ref=""/>
-                    <xforms:hint ref=""/>
-                    <xforms:help ref=""/>
-                    <xforms:alert ref=""/>
-                </xforms:input>
-            </template>
+            <templates>
+                <bind type="xforms:date"/>
+                <view>
+                    <xforms:input id="" ref="" xmlns="">
+                        <xforms:label ref=""/>
+                        <xforms:hint ref=""/>
+                        <xforms:help ref=""/>
+                        <xforms:alert ref=""/>
+                    </xforms:input>
+                </view>
+            </templates>
         </metadata>
     </xbl:binding>
 
@@ -64,16 +66,18 @@
             <icon lang="en">
                 <small-icon>/apps/fr/style/images/silk/time.png</small-icon>
                 <large-icon>/apps/fr/style/images/silk/time.png</large-icon>
-            </icon>
-            <datatype>xforms:time</datatype>
-            <template>
-                <xforms:input id="" ref="" xmlns="">
-                    <xforms:label ref=""/>
-                    <xforms:hint ref=""/>
-                    <xforms:help ref=""/>
-                    <xforms:alert ref=""/>
-                </xforms:input>
-            </template>
+            </icon>type>
+            <templates>
+                <bind type="xforms:time"/>
+                <view>
+                    <xforms:input id="" ref="" xmlns="">
+                        <xforms:label ref=""/>
+                        <xforms:hint ref=""/>
+                        <xforms:help ref=""/>
+                        <xforms:alert ref=""/>
+                    </xforms:input>
+                </view>
+            </templates>
         </metadata>
     </xbl:binding>
 
@@ -86,15 +90,17 @@
                 <small-icon>/apps/fr/style/images/silk/clock_link.png</small-icon>
                 <large-icon>/apps/fr/style/images/silk/clock_link.png</large-icon>
             </icon>
-            <datatype>xforms:dateTime</datatype>
-            <template>
-                <xforms:input id="" ref="" xmlns="">
-                    <xforms:label ref=""/>
-                    <xforms:hint ref=""/>
-                    <xforms:help ref=""/>
-                    <xforms:alert ref=""/>
-                </xforms:input>
-            </template>
+            <templates>
+                <bind type="xforms:dateTime"/>
+                <view>
+                    <xforms:input id="" ref="" xmlns="">
+                        <xforms:label ref=""/>
+                        <xforms:hint ref=""/>
+                        <xforms:help ref=""/>
+                        <xforms:alert ref=""/>
+                    </xforms:input>
+                </view>
+            </templates>
         </metadata>
     </xbl:binding>
 
@@ -107,15 +113,17 @@
                 <small-icon>/apps/fr/style/images/silk/email.png</small-icon>
                 <large-icon>/apps/fr/style/images/silk/email.png</large-icon>
             </icon>
-            <datatype>xforms:email</datatype>
-            <template>
-                <xforms:input id="" ref="" xmlns="">
-                    <xforms:label ref=""/>
-                    <xforms:hint ref=""/>
-                    <xforms:help ref=""/>
-                    <xforms:alert ref=""/>
-                </xforms:input>
-            </template>
+            <templates>
+                <bind type="xforms:email"/>
+                <view>
+                    <xforms:input id="" ref="" xmlns="">
+                        <xforms:label ref=""/>
+                        <xforms:hint ref=""/>
+                        <xforms:help ref=""/>
+                        <xforms:alert ref=""/>
+                    </xforms:input>
+                </view>
+            </templates>
         </metadata>
     </xbl:binding>
 
@@ -128,8 +136,8 @@
                 <small-icon>/apps/fr/style/images/silk/photo.png</small-icon>
                 <large-icon>/apps/fr/style/images/silk/photo.png</large-icon>
             </icon>
-            <datatype>xforms:anyURI</datatype>
             <templates>
+                <bind type="xforms:anyURI"/>
                 <!-- NOTE: Don't place filename, mediatype and size as those are not needed -->
                 <instance/>
                 <view>

@@ -30,15 +30,17 @@
                 <small-icon>/apps/fr/style/images/silk/money_dollar.png</small-icon>
                 <large-icon>/apps/fr/style/images/silk/money_dollar.png</large-icon>
             </icon>
-            <datatype>xforms:decimal</datatype>
-            <template>
-                 <fr:currency>
-                     <xforms:label ref=""/>
-                     <xforms:hint ref=""/>
-                     <xforms:help ref=""/>
-                     <xforms:alert ref=""/>
-                </fr:currency>
-            </template>
+            <templates>
+                <bind type="xforms:decimal"/>
+                <view>
+                    <fr:currency>
+                        <xforms:label ref=""/>
+                        <xforms:hint ref=""/>
+                        <xforms:help ref=""/>
+                        <xforms:alert ref=""/>
+                    </fr:currency>
+                </view>
+            </templates>
         </metadata>
 
         <xbl:resources>

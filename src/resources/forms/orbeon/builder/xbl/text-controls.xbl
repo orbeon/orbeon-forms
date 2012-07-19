@@ -44,15 +44,16 @@
                 <small-icon>/forms/orbeon/builder/images/input.png</small-icon>
                 <large-icon>/forms/orbeon/builder/images/input.png</large-icon>
             </icon>
-            <datatype>xs:string</datatype>
-            <template>
-                <xforms:input id="" ref="" xmlns="">
-                    <xforms:label ref=""/>
-                    <xforms:hint ref=""/>
-                    <xforms:help ref=""/>
-                    <xforms:alert ref=""/>
-                </xforms:input>
-            </template>
+            <templates>
+                <view>
+                    <xforms:input id="" ref="" xmlns="">
+                        <xforms:label ref=""/>
+                        <xforms:hint ref=""/>
+                        <xforms:help ref=""/>
+                        <xforms:alert ref=""/>
+                    </xforms:input>
+                </view>
+            </templates>
         </metadata>
     </xbl:binding>
 
@@ -65,15 +66,16 @@
                 <small-icon>/forms/orbeon/builder/images/input.png</small-icon>
                 <large-icon>/forms/orbeon/builder/images/input.png</large-icon>
             </icon>
-            <datatype>xs:string</datatype>
-            <template>
-                <xforms:secret id="" ref="" xmlns="">
-                    <xforms:label ref=""/>
-                    <xforms:hint ref=""/>
-                    <xforms:help ref=""/>
-                    <xforms:alert ref=""/>
-                </xforms:secret>
-            </template>
+            <templates>
+                <view>
+                    <xforms:secret id="" ref="" xmlns="">
+                        <xforms:label ref=""/>
+                        <xforms:hint ref=""/>
+                        <xforms:help ref=""/>
+                        <xforms:alert ref=""/>
+                    </xforms:secret>
+                </view>
+            </templates>
         </metadata>
     </xbl:binding>
 
@@ -86,15 +88,16 @@
                 <small-icon>/forms/orbeon/builder/images/textarea.png</small-icon>
                 <large-icon>/forms/orbeon/builder/images/textarea.png</large-icon>
             </icon>
-            <datatype>xs:string</datatype>
-            <template>
-                <xforms:textarea id="" ref="" xmlns="">
-                    <xforms:label ref=""/>
-                    <xforms:hint ref=""/>
-                    <xforms:help ref=""/>
-                    <xforms:alert ref=""/>
-                </xforms:textarea>
-            </template>
+            <templates>
+                <view>
+                    <xforms:textarea id="" ref="" xmlns="">
+                        <xforms:label ref=""/>
+                        <xforms:hint ref=""/>
+                        <xforms:help ref=""/>
+                        <xforms:alert ref=""/>
+                    </xforms:textarea>
+                </view>
+            </templates>
         </metadata>
     </xbl:binding>
 
@@ -109,15 +112,16 @@
                 <small-icon>/forms/orbeon/builder/images/textarea.png</small-icon>
                 <large-icon>/forms/orbeon/builder/images/textarea.png</large-icon>
             </icon>
-            <datatype>xs:string</datatype>
-            <template>
-                <xforms:textarea id="" ref="" appearance="xxforms:autosize" xmlns="">
-                    <xforms:label ref=""/>
-                    <xforms:hint ref=""/>
-                    <xforms:help ref=""/>
-                    <xforms:alert ref=""/>
-                </xforms:textarea>
-            </template>
+            <templates>
+                <view>
+                    <xforms:textarea id="" ref="" appearance="xxforms:autosize" xmlns="">
+                        <xforms:label ref=""/>
+                        <xforms:hint ref=""/>
+                        <xforms:help ref=""/>
+                        <xforms:alert ref=""/>
+                    </xforms:textarea>
+                </view>
+            </templates>
         </metadata>
     </xbl:binding>
     -->
@@ -131,15 +135,16 @@
                 <small-icon>/apps/fr/style/images/silk/text_align_left.png</small-icon>
                 <large-icon>/apps/fr/style/images/silk/text_align_left.png</large-icon>
             </icon>
-            <datatype>xs:string</datatype>
-            <template>
-                <xforms:output id="" ref="" xmlns="">
-                    <xforms:label ref=""/>
-                    <xforms:hint ref=""/>
-                    <xforms:help ref=""/>
-                    <xforms:alert ref=""/>
-                </xforms:output>
-            </template>
+            <templates>
+                <view>
+                    <xforms:output id="" ref="" xmlns="">
+                        <xforms:label ref=""/>
+                        <xforms:hint ref=""/>
+                        <xforms:help ref=""/>
+                        <xforms:alert ref=""/>
+                    </xforms:output>
+                </view>
+            </templates>
         </metadata>
     </xbl:binding>
 

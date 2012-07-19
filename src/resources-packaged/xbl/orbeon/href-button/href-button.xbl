@@ -24,7 +24,7 @@
 
     <xbl:script type="text/javascript" src="/xbl/orbeon/href-button/href-button.js"/>
 
-    <xbl:binding id="fr-href-button" element="fr|href-button" xxbl:mode="binding handlers" xxbl:container="span">
+    <xbl:binding id="fr-href-button" element="fr|href-button" xxbl:mode="binding" xxbl:container="span">
         <xbl:template xxbl:transform="oxf:xslt">
             <xforms:group xsl:version="2.0">
                 <!-- Create the link so that the URL gets rewritten -->

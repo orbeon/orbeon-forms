@@ -189,18 +189,17 @@
                     </icon>
                 </xsl:for-each>
 
-                <!-- Type if any -->
-                <xsl:if test="$section-bind/@type">
-                    <datatype>
-                        <xsl:value-of select="$section-bind/@type"/>
-                    </datatype>
-                </xsl:if>
-
                 <!-- Control template -->
-                <template>
-                    <!-- NOTE: Element doesn't have LHHA elements for now -->
-                    <xsl:element name="component:{$component-id}" namespace="{$component-namespace}"/>
-                </template>
+                <templates>
+                    <!-- Type if any -->
+                    <xsl:if test="$section-bind/@type">
+                        <bind type="{$section-bind/@type}"/>
+                    </xsl:if>
+                    <view>
+                        <!-- NOTE: Element doesn't have LHHA elements for now -->
+                        <xsl:element name="component:{$component-id}" namespace="{$component-namespace}"/>
+                    </view>
+                </templates>
             </metadata>
 
             <!-- XBL implementation -->

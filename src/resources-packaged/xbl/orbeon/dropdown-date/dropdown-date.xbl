@@ -39,15 +39,17 @@
                 <small-icon>/ops/images/xforms/calendar.png</small-icon>
                 <large-icon>/ops/images/xforms/calendar.png</large-icon>
             </icon>
-            <datatype>xforms:date</datatype>
-            <template>
-                 <fr:dropdown-date>
-                     <xforms:label ref=""/>
-                     <xforms:hint ref=""/>
-                     <xforms:help ref=""/>
-                     <xforms:alert ref=""/>
-                </fr:dropdown-date>
-            </template>
+            <templates>
+                <bind type="xforms:date"/>
+                <view>
+                    <fr:dropdown-date>
+                        <xforms:label ref=""/>
+                        <xforms:hint ref=""/>
+                        <xforms:help ref=""/>
+                        <xforms:alert ref=""/>
+                    </fr:dropdown-date>
+                </view>
+            </templates>
         </metadata>
 
         <xbl:resources>

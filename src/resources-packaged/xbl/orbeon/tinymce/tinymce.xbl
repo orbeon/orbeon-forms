@@ -1,4 +1,16 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright (C) 2010 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
 <xbl:xbl xmlns:xhtml="http://www.w3.org/1999/xhtml"
          xmlns:xforms="http://www.w3.org/2002/xforms"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
@@ -27,15 +39,16 @@
                 <small-icon>/forms/orbeon/builder/images/html.png</small-icon>
                 <large-icon>/forms/orbeon/builder/images/html.png</large-icon>
             </icon>
-            <datatype>xs:string</datatype>
-            <template>
-                <fr:tinymce id="" xmlns="">
-                    <xforms:label ref=""/>
-                    <xforms:hint ref=""/>
-                    <xforms:help ref=""/>
-                    <xforms:alert ref=""/>
-                </fr:tinymce>
-            </template>
+            <templates>
+                <view>
+                    <fr:tinymce id="" xmlns="">
+                        <xforms:label ref=""/>
+                        <xforms:hint ref=""/>
+                        <xforms:help ref=""/>
+                        <xforms:alert ref=""/>
+                    </fr:tinymce>
+                </view>
+            </templates>
         </metadata>
         <xbl:resources>
             <xbl:style src="/xbl/orbeon/tinymce/tinymce.css"/>

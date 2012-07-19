@@ -34,15 +34,16 @@
                 <small-icon>/ops/images/xforms/calendar.png</small-icon>
                 <large-icon>/ops/images/xforms/calendar.png</large-icon>
             </icon>
-            <datatype>xforms:string</datatype>
-            <template>
-                 <fr:california-plate>
-                     <xforms:label ref=""/>
-                     <xforms:hint ref=""/>
-                     <xforms:help ref=""/>
-                     <xforms:alert ref=""/>
-                </fr:california-plate>
-            </template>
+            <templates>
+                <view>
+                    <fr:california-plate>
+                         <xforms:label ref=""/>
+                         <xforms:hint ref=""/>
+                         <xforms:help ref=""/>
+                         <xforms:alert ref=""/>
+                    </fr:california-plate>
+                </view>
+            </templates>
         </metadata>
 
         <xbl:resources>

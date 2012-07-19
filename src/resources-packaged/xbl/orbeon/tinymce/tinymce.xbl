@@ -15,8 +15,6 @@
          xmlns:xforms="http://www.w3.org/2002/xforms"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
          xmlns:ev="http://www.w3.org/2001/xml-events"
-         xmlns:xi="http://www.w3.org/2001/XInclude"
-         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
          xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
          xmlns:saxon="http://saxon.sf.net/"
@@ -88,32 +86,37 @@
             <xforms:var name="server-value" value="xxforms:binding('fr-tinymce')"/>
             <xforms:var name="client-value" value="client-value"/>
 
-            <!-- XForms control the JavaScript writes to -->
-            <xforms:textarea ref="$client-value" id="tinymce-client-value" class="xbl-fr-tinymce-xforms-client-value fr-hidden">
-                <xforms:setvalue ev:event="xforms-value-changed" ref="$server-value" value="xxforms:call-xpl('oxf:/ops/xforms/clean-html.xpl', 'dirty-html', $client-value, 'clean-html')"/>
-            </xforms:textarea>
-            <xforms:output ref="$server-value" id="tinymce-server-value" class="xbl-fr-tinymce-xforms-server-value fr-hidden">
-                <!-- Listen on xforms-enable to refresh TinyMCE with latest value in case the value changed while the component was non-relevant -->
-                <xxforms:script id="xf-ch" ev:event="xforms-value-changed xforms-enabled xxforms-iteration-moved">YAHOO.xbl.fr.Tinymce.instance(this).serverToClient();</xxforms:script>
-                <xxforms:script id="xf-ro" ev:event="xforms-readonly">YAHOO.xbl.fr.Tinymce.instance(this).readonly();</xxforms:script>
-                <xxforms:script id="xf-rw" ev:event="xforms-readwrite">YAHOO.xbl.fr.Tinymce.instance(this).readwrite();</xxforms:script>
-            </xforms:output>
+            <!-- Don't run script in static readonly and noscript modes -->
+            <xforms:var name="script" value="not(exf:readonly(xxforms:binding('fr-tinymce')) and property('xxforms:readonly-appearance') = 'static' or property('xxforms:noscript'))"/>
 
-            <!-- In portlet mode, we want the resource id to be processed into a base URL, and we use a magic value to
-                 indicate that. Search for 1b713b2e6d7fd45753f4b8a6270b776e in the code for more details. -->
-            <xhtml:a f:url-type="resource" style="display: none" href="/xbl/orbeon/tinymce/jscripts/tiny_mce/1b713b2e6d7fd45753f4b8a6270b776e.js" class="tinymce-base-url"/>
+            <xforms:group ref=".[$script]">
+                <!-- XForms control the JavaScript writes to -->
+                <xforms:textarea ref="$client-value" id="tinymce-client-value" class="xbl-fr-tinymce-xforms-client-value fr-hidden">
+                    <xforms:setvalue ev:event="xforms-value-changed" ref="$server-value" value="xxforms:call-xpl('oxf:/ops/xforms/clean-html.xpl', 'dirty-html', $client-value, 'clean-html')"/>
+                </xforms:textarea>
+                <xforms:output ref="$server-value" id="tinymce-server-value" class="xbl-fr-tinymce-xforms-server-value fr-hidden">
+                    <!-- Listen on xforms-enable to refresh TinyMCE with latest value in case the value changed while the component was non-relevant -->
+                    <xxforms:script id="xf-ch" ev:event="xforms-value-changed xforms-enabled xxforms-iteration-moved">YAHOO.xbl.fr.Tinymce.instance(this).serverToClient();</xxforms:script>
+                    <xxforms:script id="xf-ro" ev:event="xforms-readonly">YAHOO.xbl.fr.Tinymce.instance(this).readonly();</xxforms:script>
+                    <xxforms:script id="xf-rw" ev:event="xforms-readwrite">YAHOO.xbl.fr.Tinymce.instance(this).readwrite();</xxforms:script>
+                </xforms:output>
 
-            <!--
-                div to be converted into a TinyMCE Editor instance.
-                By default, a certain div element is used to bind the TinyMCE editor,
-                instead of the "textareas" default. Important: Make sure that class
-                attribute corresponds to myDivClass variable in tinymce.js! -->
-            <xhtml:div
-                class="xbl-fr-tinymce-div xbl-html-input"
-                id="tinymce-div"
-                xbl:attr="style tabindex tabindex=navindex" />
-            <!-- Stop propagation of all local UI events -->
-            <xforms:action ev:event="#all" ev:propagate="stop"/>
+                <!-- In portlet mode, we want the resource id to be processed into a base URL, and we use a magic value to
+                     indicate that. Search for 1b713b2e6d7fd45753f4b8a6270b776e in the code for more details. -->
+                <xhtml:a f:url-type="resource" style="display: none" href="/xbl/orbeon/tinymce/jscripts/tiny_mce/1b713b2e6d7fd45753f4b8a6270b776e.js" class="tinymce-base-url"/>
+
+                <!--
+                    div to be converted into a TinyMCE Editor instance.
+                    By default, a certain div element is used to bind the TinyMCE editor,
+                    instead of the "textareas" default. Important: Make sure that class
+                    attribute corresponds to myDivClass variable in tinymce.js! -->
+                <xhtml:div
+                    class="xbl-fr-tinymce-div xbl-html-input"
+                    id="tinymce-div"
+                    xbl:attr="style tabindex tabindex=navindex" />
+            </xforms:group>
+            <xforms:output mediatype="text/html" ref="$server-value[not($script)]"/>
+
         </xbl:template>
     </xbl:binding>
 

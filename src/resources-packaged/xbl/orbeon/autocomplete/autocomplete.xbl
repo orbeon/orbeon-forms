@@ -15,8 +15,6 @@
          xmlns:xforms="http://www.w3.org/2002/xforms"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
          xmlns:ev="http://www.w3.org/2001/xml-events"
-         xmlns:xi="http://www.w3.org/2001/XInclude"
-         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
          xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
          xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
@@ -94,7 +92,7 @@
                     <!-- Dispatch value change event so we dispatch the fr-search-changed to have the itemset updated right away -->
                     <xforms:dispatch name="xforms-value-changed" target="search"/>
                     <xforms:dispatch name="update-external-value" target="component-inner-group"/>
-                    <xxforms:script id="out-arp">YAHOO.xbl.fr.Autocomplete.instance(this).ajaxResponseProcessed();</xxforms:script>
+                    <xxforms:script id="out-arp" if="noscript != 'true'">YAHOO.xbl.fr.Autocomplete.instance(this).ajaxResponseProcessed();</xxforms:script>
                 </xforms:action>
             </xbl:handler>
             <xbl:handler event="fr-value-selected">
@@ -121,11 +119,18 @@
                                     <autocomplete>
                                         <relevant>false</relevant>
                                         <readonly>false</readonly>
+                                        <noscript>false</noscript>
                                         <textfield-value/>
                                         <resource/>
                                     </autocomplete>
                                 </xforms:instance>
-                                <xforms:bind ref="textfield-value" readonly="../readonly = 'true'"/>
+
+                                <xforms:bind ref="textfield-value"
+                                             readonly="../readonly = 'true'"/>
+                                <xforms:bind ref="noscript"
+                                             calculate="../readonly = 'true' and property('xxforms:readonly-appearance') = 'static'
+                                                        or property('xxforms:noscript')"/>
+
                                 <!-- In resource mode, the suggestions -->
                                 <xforms:instance id="suggestions-instance"><dummy/></xforms:instance>
                                 <!-- What do when doing a refresh -->
@@ -138,7 +143,7 @@
                             <!-- - - - - - - - - - - - - - - - - - - VARIABLES - - - - - - - - - - - - - - - - - - -->
 
                             <!-- Variable pointing to external single-node binding -->
-                            <xxforms:variable name="external-value"><xxforms:sequence select="." xxbl:scope="outer"/></xxforms:variable>
+                            <xxforms:variable name="binding"><xxforms:sequence select="." xxbl:scope="outer"/></xxforms:variable>
                             <xxforms:variable name="local" select="instance('local')"/>
                             <xxforms:variable name="dynamic-itemset-attribute" xbl:attr="xbl:text=dynamic-itemset"/>
                             <!-- Yes, we want this variable both in inner and outer scope  -->
@@ -171,7 +176,7 @@
                             <xforms:action ev:event="update-external-value">
                                 <xxforms:variable name="value" select="xxforms:element('value')"/>
                                 <xforms:dispatch name="get-value-from-itemset" target="component-inner-group"><xxforms:context name="fr-value" select="$value"/></xforms:dispatch>
-                                <xforms:setvalue ref="$external-value" value="$value"/>
+                                <xforms:setvalue ref="$binding" value="$value"/>
                                 <!-- If no value is found, clear the search field -->
                                 <xforms:setvalue if="$value = ''" ref="$local/textfield-value"/>
                                 <!-- HACK: We'll be able to move the if on the setvalue once the following is fixed: https://github.com/orbeon/orbeon-forms/issues/57 -->
@@ -182,7 +187,7 @@
                                 <xxforms:variable name="select1-items" select="xxforms:itemset('select1', 'xml')//item"/>
                                 <xxforms:variable name="select1-labels" select="($select1-items/value)[position() le count($select1-items) div 2]"/>
                                 <xxforms:variable name="select1-values" select="($select1-items/value)[position() gt count($select1-items) div 2]"/>
-                                <xforms:setvalue ref="$label" value="$select1-labels[index-of($select1-values, $external-value)[1]]"/>
+                                <xforms:setvalue ref="$label" value="$select1-labels[index-of($select1-values, $binding)[1]]"/>
                             </xforms:action>
                             <xforms:action ev:event="get-value-from-itemset">
                                 <xxforms:variable name="value" select="event('fr-value')"/>
@@ -197,7 +202,7 @@
 
                             <!-- Init event -->
                             <xforms:action id="xf-en" ev:event="xforms-enabled" ev:observer="component-inner-group" ev:target="component-inner-group">
-                                <xxforms:script id="init">YAHOO.xbl.fr.Autocomplete.instance(this).init();</xxforms:script>
+                                <xxforms:script id="init" if="not(exf:readonly($binding) and property('xxforms:readonly-appearance') = 'static')">YAHOO.xbl.fr.Autocomplete.instance(this).init();</xxforms:script>
                                 <!-- On xforms-enabled, if $has-labelref, copy the $external-label to the search field -->
                                 <xforms:setvalue if="$has-labelref" ref="$local/textfield-value" value="$external-label"/>
                             </xforms:action>
@@ -231,7 +236,7 @@
                                     <xforms:setfocus control="search"/>
                                     <xforms:dispatch target="resource-variable" name="xforms-value-changed"/>           <!-- For the resource mode, listening on resource AVT changing -->
                                     <xforms:dispatch target="search" name="xforms-value-changed"/>                      <!-- For the dynamic mode, listening on the search field content changing -->
-                                    <xxforms:script id="sr">YAHOO.xbl.fr.Autocomplete.instance(this).suggestionRequested = true;</xxforms:script>
+                                    <xxforms:script id="sr" if="noscript != 'true'">YAHOO.xbl.fr.Autocomplete.instance(this).suggestionRequested = true;</xxforms:script>
                                 </xforms:action>
                             </xsl:if>
                             <!-- In static mode, when the external value changes, search for an item with that value, and set search value to the item's label -->
@@ -241,7 +246,7 @@
                                 <xforms:setvalue ref="$local/textfield-value" value="$select1-current-label"/>
                             </xforms:action>
                             <!-- For the dynamic and resource mode, just reset the search field if the external value becomes empty -->
-                            <xforms:setvalue ev:event="xforms-value-changed" ev:observer="external-value" if="$dynamic-itemset and $external-value = ''" ref="$local/textfield-value"/>
+                            <xforms:setvalue ev:event="xforms-value-changed" ev:observer="external-value" if="$dynamic-itemset and $binding = ''" ref="$local/textfield-value"/>
                             <!-- Keep track of readonlyness and relevance -->
                             <xforms:setvalue ev:observer="external-value" ev:event="xforms-readonly" ref="$local/readonly">true</xforms:setvalue>
                             <xforms:setvalue ev:observer="external-value" ev:event="xforms-readwrite" ref="$local/readonly">false</xforms:setvalue>
@@ -277,7 +282,7 @@
                             <xsl:copy-of select="xxbl:parameter(., 'max-results-displayed')"/>
 
                             <!-- Dropdown with value shown by autocomplete -->
-                            <xforms:select1 id="select1" ref="$external-value" class="fr-autocomplete-select1" appearance="minimal" xxforms:encrypt-item-values="false" style="display: none">
+                            <xforms:select1 id="select1" ref="$binding" class="fr-autocomplete-select1" appearance="minimal" xxforms:encrypt-item-values="false" style="display: none">
                                 <!-- The hidden dropdown contains first all the label/label, then all the value/value -->
                                 <xsl:apply-templates select="xforms:itemset | xforms:item" mode="copy-label">
                                     <xsl:with-param name="resource-instance" tunnel="yes">suggestions-instance</xsl:with-param>

@@ -655,9 +655,7 @@
         <xsd:attribute name="model" type="xsd:NMTOKEN" use="optional"/>
         <xsd:attribute ref="ev:event"/>
         <xsd:attribute ref="ev:observer"/>
-        <!-- With this declaration, IntelliJ 7 considers the "target" attribute with no namespace on xforms:disptch invalid. -->
-        <!-- Commenting this, since we are not using ev:target at this point. avernet 2007-11-06 -->
-        <!--<xsd:attribute ref="ev:target"/>-->
+        <xsd:attribute ref="ev:target"/>
         <xsd:attribute ref="ev:handler"/>
         <xsd:attribute ref="ev:phase"/>
         <xsd:attribute ref="ev:propagate"/>

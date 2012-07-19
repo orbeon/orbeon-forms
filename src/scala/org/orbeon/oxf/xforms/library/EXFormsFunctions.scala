@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.library
 
-import org.orbeon.oxf.xforms.function.exforms.{EXFormsSort, EXFormsRequired, EXFormsReadonly, EXFormsRelevant}
+import org.orbeon.oxf.xforms.function.exforms._
 import org.orbeon.saxon.`type`.BuiltInAtomicType._
 import org.orbeon.saxon.expr.StaticProperty._
 import org.orbeon.saxon.`type`.Type
@@ -30,17 +30,17 @@ trait EXFormsFunctions extends OrbeonFunctionLibrary {
     Namespace(EXFormsFunctionsNS) {
         
         // exf:relevant()
-        Fun("relevant", classOf[EXFormsRelevant], 0, 0, BOOLEAN, EXACTLY_ONE,
+        Fun("relevant", classOf[EXFormsMIP], 0, 0, BOOLEAN, EXACTLY_ONE,
             Arg(Type.NODE_TYPE, ALLOWS_ZERO_OR_MORE)
         )
     
         // exf:readonly()
-        Fun("readonly", classOf[EXFormsReadonly], 0, 0, BOOLEAN, EXACTLY_ONE,
+        Fun("readonly", classOf[EXFormsMIP], 1, 0, BOOLEAN, EXACTLY_ONE,
             Arg(Type.NODE_TYPE, ALLOWS_ZERO_OR_MORE)
         )
     
         // exf:required()
-        Fun("required", classOf[EXFormsRequired], 0, 0, BOOLEAN, EXACTLY_ONE,
+        Fun("required", classOf[EXFormsMIP], 2, 0, BOOLEAN, EXACTLY_ONE,
             Arg(Type.NODE_TYPE, ALLOWS_ZERO_OR_MORE)
         )
     

@@ -18,8 +18,8 @@ globalState = 'initial'                                                         
 ORBEON.util.FiniteStateMachine =
     create: ({ events, elements, conditions, actions, transitions }) ->
         _.each transitions, (transition) ->
-            _.each transition.events, (event) ->
-                events[event] (event) ->
+            _.each transition.events, (eventName) ->
+                events[eventName] (event) ->
                     if transition.elements?                                                                             # State if per-element
                         elementsFromEvent = elements[transition.elements]
                         elts = elements[transition.elements] event                                                      # Get elements from event (e.g. editable inside cell for mouseover)
@@ -36,7 +36,8 @@ ORBEON.util.FiniteStateMachine =
                             conditionsMet = true
                             if transition.conditions
                                 _.each transition.conditions, (condition) ->
-                                    conditionsMet = false if not condition(event)
+                                    conditionsMet = false if not conditions[c](event)
                             if conditionsMet == true
-                                globalState = transition.to
-                                _.each transition.actions, (action) -> actions[action] event
+                                globalState = transition.to if transition.to?
+                                _.each transition.actions, (action) ->
+                                    actions[action] event

@@ -16,6 +16,7 @@
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
          xmlns:ev="http://www.w3.org/2001/xml-events"
          xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:exf="http://www.exforms.org/exf/1-0"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
          xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
          xmlns:saxon="http://saxon.sf.net/"
@@ -65,15 +66,21 @@
                                 <xsl:value-of select="/fr:button/@tabindex"/>
                             </xh:span>
                         </xsl:if>
-                        <!-- Bind trigger if needed so it can handle read-only -->
+
+                        <!-- Don't run script in static readonly and noscript modes -->
+                        <xf:var name="script" value="not(exf:readonly(xxf:binding('fr-button')) and property('xxf:readonly-appearance') = 'static' or property('xxf:noscript'))"/>
                         <xf:trigger xbl:attr="xxf:modal" xxbl:scope="outer">
+                            <!-- Bind trigger if needed so it can handle read-only -->
                             <xsl:if test="exists(/fr:button/(@ref, @bind))">
                                 <xsl:attribute name="ref">.</xsl:attribute>
                             </xsl:if>
                             <xbl:content includes=":root > xf|label, :root > xf|help, :root > xf|hint"/>
-                            <xxf:script ev:event="xforms-enabled xxforms-iteration-moved" ev:target="#observer">YAHOO.xbl.fr.Button.instance(this).enabled();</xxf:script>
-                            <xxf:script ev:event="xforms-readonly" ev:target="#observer">YAHOO.xbl.fr.Button.instance(this).readonly();</xxf:script>
-                            <xxf:script ev:event="xforms-readwrite" ev:target="#observer">YAHOO.xbl.fr.Button.instance(this).readwrite();</xxf:script>
+                            <xxf:script ev:event="xforms-enabled xxforms-iteration-moved" ev:target="#observer"
+                                if="$script" xxbl:scope="inner">YAHOO.xbl.fr.Button.instance(this).enabled();</xxf:script>
+                            <xxf:script ev:event="xforms-readonly" ev:target="#observer"
+                                if="$script" xxbl:scope="inner">YAHOO.xbl.fr.Button.instance(this).readonly();</xxf:script>
+                            <xxf:script ev:event="xforms-readwrite" ev:target="#observer"
+                                if="$script" xxbl:scope="inner">YAHOO.xbl.fr.Button.instance(this).readwrite();</xxf:script>
                         </xf:trigger>
                     </xh:span>
                 </xh:span>

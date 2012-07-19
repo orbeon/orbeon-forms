@@ -80,7 +80,6 @@
         <xbl:resources>
             <xbl:style src="/ops/yui/autocomplete/assets/skins/sam/autocomplete.css"/>
             <xbl:style src="/xbl/orbeon/autocomplete/autocomplete.css"/>
-            <xbl:style src="/ops/yui/button/assets/skins/sam/button.css"/>
         </xbl:resources>
         <xbl:handlers>
             <xbl:handler event="fr-set-label" phase="target">
@@ -265,9 +264,7 @@
                                      readonly would not have this unwanted behavior. -->
                                 <xf:group ref=".[not($local/readonly = 'true' and property('xxf:readonly-appearance') = 'static')]">
                                     <!-- Bound to text field value so button becomes readonly when the textfield is readonly -->
-                                    <fr:button ref="$local/textfield-value" class="fr-autocomplete-show-suggestions-button" id="show-suggestions-button">
-                                        <xf:label/>
-                                    </fr:button>
+                                    <xf:trigger ref="$local/textfield-value" class="fr-autocomplete-show-suggestions-button" id="show-suggestions-button"/>
                                 </xf:group>
                             </xsl:if>
                             <xh:div class="fr-autocomplete-yui-div"/>

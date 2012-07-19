@@ -44,7 +44,7 @@
 .xbl-fr-autocomplete input { vertical-align: middle }
 
 /* Hide the text that would otherwise show in the button */
-.xbl-fr-autocomplete .xbl-fr-select1-button .yui-menu-button button {
+.xbl-fr-autocomplete .fr-autocomplete-show-suggestions-button button {
     width: 22px;
     text-indent: -9999px;
     *text-indent: 0;
@@ -54,8 +54,8 @@
     height: 1.6em
 }
 
-.xbl-fr-autocomplete .xbl-fr-button .fr-autocomplete-show-suggestions-button button,
-.xbl-fr-autocomplete .xbl-fr-button .fr-autocomplete-show-suggestions-button button:hover {
+.xbl-fr-autocomplete .fr-autocomplete-show-suggestions-button button,
+.xbl-fr-autocomplete .fr-autocomplete-show-suggestions-button button:hover {
     background: url("../../../ops/yui/button/assets/skins/sam/menu-button-arrow.png") no-repeat right center;
     /* Override the min-height of 2em set in button.css. Ideally, we like to make the button exactly the same height
        as the text field, but this is a fairly decent approximation */

@@ -126,6 +126,7 @@
                                          xbl:attr="tabindex tabindex=navindex"/>
                         </xf:group>
                         <!-- Static readonly mode -->
+                        <!-- TODO: avoid code duplication for formatting expression -->
                         <xf:group ref="$binding[exf:readonly() and property('xxf:readonly-appearance') = 'static']">
                             <xf:output
                                 ref="."

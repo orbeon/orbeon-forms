@@ -215,7 +215,7 @@ object XFormsInputControl {
     }
 
     private def parse(patterns: Seq[ParsePattern], value: String): String = {
-        for (currentPattern ←  patterns) {
+        for (currentPattern ← patterns.toIterator) {
             val result = MatchResult(currentPattern.regex.pattern, value)
             if (result.matches)
                 return currentPattern(result)
@@ -280,8 +280,6 @@ object XFormsInputControl {
     // See also patterns on xforms.js
     private val TimeParsePatterns = Array(
         // TODO: remaining regexps from xforms.js?
-        // Now
-        // TODO
 
         // 12:34:56 p.m.
         new ParsePattern("^(\\d{1,2}):(\\d{1,2}):(\\d{1,2}) ?(p|pm|p\\.m\\.)$".r) {
@@ -313,8 +311,6 @@ object XFormsInputControl {
             def apply(result: MatchResult) =
                 stringsToTime(result.group(0), "0", "0")
         }
-        // hhmmss
-        // TODO: JS code has this, need to implement same logic
     )
 
     private abstract class ParsePattern(val regex: Regex) extends Function1[MatchResult, String] {

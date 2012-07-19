@@ -160,7 +160,7 @@ h1 .xforms-trigger-appearance-xxforms-minimal input, h2 .xforms-trigger-appearan
 }
 
 /* Set input/textarea controls background */
-.xforms-input input, textarea.xforms-textarea, input.xforms-secret, .xforms-textarea textarea, .xforms-secret input, .xbl-component .xbl-html-input {
+.xforms-input input, .xforms-textarea textarea, .xforms-secret input, .xbl-component .xbl-html-input {
     background-image: url(field.png);
     background-repeat: repeat-x;
     border: 1px solid #ccc;

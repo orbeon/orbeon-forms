@@ -78,7 +78,7 @@
                 .fb-itemset-editor-dialog .xforms-invalid .xforms-input-input { border-color: #DF731B }     /* Show errors also for fields that aren't visited */
 
                 /* ***** Styles from form-runner-orbeon.css ***********************************************************/
-                .xforms-input input, textarea.xforms-textarea, input.xforms-secret, .xforms-textarea textarea, .xforms-secret input {
+                .xforms-input input, .xforms-textarea textarea, .xforms-secret input,.xbl-component .xbl-html-input  {
                     border: 1px solid #ccc;
                 }
 

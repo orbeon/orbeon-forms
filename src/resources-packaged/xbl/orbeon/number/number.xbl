@@ -12,11 +12,11 @@
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
 <xbl:xbl xmlns:xhtml="http://www.w3.org/1999/xhtml"
-         xmlns:xforms="http://www.w3.org/2002/xforms"
+         xmlns:xf="http://www.w3.org/2002/xforms"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
          xmlns:ev="http://www.w3.org/2001/xml-events"
          xmlns:xi="http://www.w3.org/2001/XInclude"
-         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
          xmlns:exf="http://www.exforms.org/exf/1-0"
          xmlns:saxon="http://saxon.sf.net/"
          xmlns:xbl="http://www.w3.org/ns/xbl"
@@ -40,7 +40,7 @@
             </icon>
             <datatype>xforms:decimal</datatype>
             <template>
-                 <fr:number>
+                 <fr:number xmlns:xforms="http://www.w3.org/2002/xforms">
                      <xforms:label ref=""/>
                      <xforms:hint ref=""/>
                      <xforms:help ref=""/>
@@ -54,7 +54,7 @@
         </xbl:resources>
         <xbl:handlers>
             <xbl:handler event="xforms-focus" phase="target" defaultAction="cancel">
-                <xxforms:script id="xf-sf">YAHOO.xbl.fr.Number.instance(this).setfocus();</xxforms:script>
+                <xxf:script id="xf-sf">YAHOO.xbl.fr.Number.instance(this).setfocus();</xxf:script>
             </xbl:handler>
         </xbl:handlers>
         <xbl:template xxbl:transform="oxf:unsafe-xslt">
@@ -67,10 +67,10 @@
                     <xsl:variable name="js-object" as="xs:string" select="concat('YAHOO.xbl.fr.', if ($is-currency) then 'Currency' else 'Number', '.instance(this)')"/>
 
                     <!-- XSLT needs a root element, and as of 2012-05-08 the listeners need an XForms parent which is not the template root -->
-                    <xforms:group>
+                    <xf:group>
 
-                        <xxforms:script ev:event="xforms-enabled" ev:target="#observer"><xsl:value-of select="$js-object"/>.init();</xxforms:script>
-                        <xxforms:script ev:event="xforms-disabled" ev:target="#observer"><xsl:value-of select="$js-object"/>.destroy();</xxforms:script>
+                        <xxf:script ev:event="xforms-enabled"  ev:target="#observer"><xsl:value-of select="$js-object"/>.init();</xxf:script>
+                        <xxf:script ev:event="xforms-disabled" ev:target="#observer"><xsl:value-of select="$js-object"/>.destroy();</xxf:script>
 
                         <!-- Access to parameters -->
                         <xsl:copy-of select="xxbl:parameter(., 'prefix')"/>
@@ -80,14 +80,14 @@
                         <xsl:copy-of select="xxbl:parameter(., 'digits-after-decimal')"/>
                         <!--<xsl:copy-of select="xxbl:parameter(., 'picture')"/>-->
 
-                        <xforms:var name="picture-string"
-                                    value="concat(
-                                            '#,###',
-                                            if (xs:integer($digits-after-decimal) gt 0) then '.' else '',
-                                            substring('0000000000', 1, xs:integer($digits-after-decimal)))"/>
+                        <xf:var name="picture-string"
+                                value="concat(
+                                        '#,###',
+                                        if (xs:integer($digits-after-decimal) gt 0) then '.' else '',
+                                        substring('0000000000', 1, xs:integer($digits-after-decimal)))"/>
 
                         <!-- Access to XForms value and change event -->
-                        <!-- TODO: Here it seems that if the value doesn't change, the xxforms:format doesn't run; this leads to a bug when the prefix changes and the amount stays the same -->
+                        <!-- TODO: Here it seems that if the value doesn't change, the xxf:format doesn't run; this leads to a bug when the prefix changes and the amount stays the same -->
                         <!--
                             format:
                                 if the value is a decimal: prefix and space (if any prefix), then formatted decimal with grouping and decimal separator
@@ -95,35 +95,48 @@
                             unformat:
                                 first remove the grouping separator, then remove the prefix if any
                         -->
-                        <xforms:input
-                                ref="xxforms:binding('{if ($is-currency) then 'fr-currency' else 'fr-number'}')"
-                                class="xbl-fr-number-xforms-input"
-                                xxforms:format="
-                                    if (. castable as xs:decimal)
-                                    then concat(normalize-space($prefix),
-                                              if (normalize-space($prefix)) then ' ' else '',
-                                              translate(format-number(xs:decimal(.), $picture-string), ',.', concat($grouping-separator, $decimal-separator)))
-                                    else ."
-                                xxforms:unformat="
-                                    for $r1 in
-                                        replace(., concat('[\s', $grouping-separator, ']'), '')
-                                    return
-                                        if (normalize-space($prefix))
-                                        then replace($r1, concat('^', string-join(for $p in string-to-codepoints($prefix) return concat('[', codepoints-to-string($p), ']'), '')), '')
-                                        else $r1">
 
-                            <xxforms:script id="xf-ch" ev:event="xforms-value-changed xxforms-iteration-moved"><xsl:value-of select="$js-object"/>.update();</xxforms:script>
-                            <xxforms:script id="xf-ro" ev:event="xforms-readonly"><xsl:value-of select="$js-object"/>.readonly();</xxforms:script>
-                            <xxforms:script id="xf-rw" ev:event="xforms-readwrite"><xsl:value-of select="$js-object"/>.readwrite();</xxforms:script>
-                        </xforms:input>
+                        <xf:var name="binding" value="xxf:binding('{if ($is-currency) then 'fr-currency' else 'fr-number'}')"/>
+                        <xf:group ref="$binding[not(exf:readonly() and property('xxf:readonly-appearance') = 'static')]">
+                            <xf:input
+                                    ref="."
+                                    class="xbl-fr-number-xforms-input"
+                                    xxf:format="
+                                        if (. castable as xs:decimal)
+                                        then concat(normalize-space($prefix),
+                                                  if (normalize-space($prefix)) then ' ' else '',
+                                                  translate(format-number(xs:decimal(.), $picture-string), ',.', concat($grouping-separator, $decimal-separator)))
+                                        else ."
+                                    xxf:unformat="
+                                        for $r1 in
+                                            replace(., concat('[\s', $grouping-separator, ']'), '')
+                                        return
+                                            if (normalize-space($prefix))
+                                            then replace($r1, concat('^', string-join(for $p in string-to-codepoints($prefix) return concat('[', codepoints-to-string($p), ']'), '')), '')
+                                            else $r1">
 
-                        <!-- The visible HTML input -->
-                        <xhtml:input class="xbl-fr-number-visible-input xbl-html-input xforms-input-input"
-                                     xbl:attr="tabindex tabindex=navindex"/>                                            <!-- .xforms-input-input is added so the border gets highlighted when the container gets .xforms-invalid-visited -->
+                                <xxf:script id="xf-ch" ev:event="xforms-value-changed xxforms-iteration-moved"><xsl:value-of select="$js-object"/>.update();</xxf:script>
+                                <xxf:script id="xf-ro" ev:event="xforms-readonly"><xsl:value-of select="$js-object"/>.readonly();</xxf:script>
+                                <xxf:script id="xf-rw" ev:event="xforms-readwrite"><xsl:value-of select="$js-object"/>.readwrite();</xxf:script>
+                            </xf:input>
 
-                        <!-- Stop propagation of all local UI events -->
-                        <xforms:action ev:event="#all" ev:propagate="stop"/>
-                    </xforms:group>
+                            <!-- The visible HTML input -->
+                            <!-- .xforms-input-input is added so the border gets highlighted when the container gets .xforms-invalid-visited -->
+                            <xhtml:input class="xbl-fr-number-visible-input xbl-html-input xforms-input-input"
+                                         xbl:attr="tabindex tabindex=navindex"/>
+                        </xf:group>
+                        <!-- Static readonly mode -->
+                        <xf:group ref="$binding[exf:readonly() and property('xxf:readonly-appearance') = 'static']">
+                            <xf:output
+                                ref="."
+                                xxf:format="
+                                        if (. castable as xs:decimal)
+                                        then concat(normalize-space($prefix),
+                                                  if (normalize-space($prefix)) then ' ' else '',
+                                                  translate(format-number(xs:decimal(.), $picture-string), ',.', concat($grouping-separator, $decimal-separator)))
+                                        else ."/>
+                        </xf:group>
+                    </xf:group>
                 </xsl:template>
             </xsl:transform>
         </xbl:template>

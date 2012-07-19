@@ -121,7 +121,6 @@
                                         <readonly>false</readonly>
                                         <noscript>false</noscript>
                                         <textfield-value/>
-                                        <resource/>
                                     </autocomplete>
                                 </xforms:instance>
 
@@ -134,7 +133,7 @@
                                 <!-- In resource mode, the suggestions -->
                                 <xforms:instance id="suggestions-instance"><dummy/></xforms:instance>
                                 <!-- What do when doing a refresh -->
-                                <xforms:submission id="get-itemset" method="get" resource="{{instance('local')/resource}}" replace="instance"
+                                <xforms:submission id="get-itemset" method="get" resource="{{event('resource')}}" replace="instance"
                                                    instance="suggestions-instance" serialization="none">
                                     <xforms:insert ev:event="xforms-submit-error" ref="instance('suggestions-instance')" origin="xxforms:element('dummy')"/>
                                 </xforms:submission>
@@ -209,10 +208,10 @@
                             <!-- For resource mode: when the component is initialized or when resources changes, update our internal itemset -->
                             <xsl:if test="exists(@resource)">
                                 <xforms:action ev:event="xforms-value-changed" ev:observer="resource-variable">
-                                    <!-- Save resource in model, as it is used as an AVT by the submission -->
-                                    <xforms:setvalue ref="$local/resource" value="$resource"/>
                                     <!-- Update itemset based on resource -->
-                                    <xforms:send submission="get-itemset"/>
+                                    <xforms:send submission="get-itemset">
+                                        <xxforms:context name="resource" value="$resource"/>
+                                    </xforms:send>
                                 </xforms:action>
                             </xsl:if>
                             <!-- Forward focus event and keep track of whether we have the focus -->
@@ -293,10 +292,7 @@
                             </xforms:select1>
 
                             <!-- Input with external value -->
-                            <xforms:input id="external-value" ref="$external-value" class="fr-autocomplete-external-value" style="display: none"/>
-
-                            <!-- Stop propagation of all UI events -->
-                            <xforms:action ev:event="#all" ev:propagate="stop"/>
+                            <xforms:input id="external-value" ref="$binding" class="fr-autocomplete-external-value" style="display: none"/>
                         </xforms:group>
                     </xforms:group>
                 </xsl:template>

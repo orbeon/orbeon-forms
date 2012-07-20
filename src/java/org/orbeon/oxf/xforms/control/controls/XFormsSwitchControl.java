@@ -206,12 +206,12 @@ public class XFormsSwitchControl extends XFormsSingleNodeContainerControl {
     }
 
     @Override
-    public boolean setFocus() {
+    public boolean setFocus(boolean inputOnly) {
         if (! isRelevant())
             return false;
 
         final XFormsCaseControl selectedCase = getSelectedCase();
-        return selectedCase != null && selectedCase.setFocus();
+        return selectedCase != null && selectedCase.setFocus(inputOnly);
     }
 
     @Override

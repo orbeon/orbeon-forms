@@ -35,7 +35,9 @@ class XFormsHintEvent(target: XFormsEventTarget, properties: PropertyGetter)
 
 class XFormsFocusEvent(target: XFormsEventTarget, properties: PropertyGetter)
     extends XFormsUIEvent(XFORMS_FOCUS, target.asInstanceOf[XFormsControl], properties, bubbles = false, cancelable = true) {
-    def this(target: XFormsEventTarget) = this(target, EmptyGetter)
+    def this(target: XFormsEventTarget, inputOnly: Boolean = false) = this(target, Map("input-only" → Some(inputOnly)))
+
+    def inputOnly = property[Boolean]("input-only") getOrElse false
 }
 
 class DOMFocusInEvent(target: XFormsEventTarget, properties: PropertyGetter)
@@ -79,7 +81,7 @@ class XFormsInvalidEvent(target: XFormsEventTarget, properties: PropertyGetter)
 }
 
 class XFormsRequiredEvent(target: XFormsEventTarget, properties: PropertyGetter)
-        extends XFormsUIEvent(XFORMS_REQUIRED, target.asInstanceOf[XFormsControl], properties) {
+    extends XFormsUIEvent(XFORMS_REQUIRED, target.asInstanceOf[XFormsControl], properties) {
     def this(target: XFormsEventTarget) = this(target, EmptyGetter)
 }
 

@@ -52,13 +52,16 @@ trait ControlEventSupport {
             }
 
             // Focus on current control if possible
-            if (event.isInstanceOf[XFormsFocusEvent]) {
-                // Try to update hidden xforms:case controls
-                // NOTE: We don't allow this behavior when events come from the client in ClientEvents
-                // NOTE: See note above on re-obtaining controls by id. Do we need to do this here as well?
-                Focus.hiddenCases(this) foreach (_.toggle())
-
-                setFocus()
+            event match {
+                case focusEvent: XFormsFocusEvent ⇒
+                    
+                    // Try to update hidden xforms:case controls
+                    // NOTE: We don't allow this behavior when events come from the client in ClientEvents
+                    // NOTE: See note above on re-obtaining controls by id. Do we need to do this here as well?
+                    Focus.hiddenCases(this) foreach (_.toggle())
+                    
+                    setFocus(focusEvent.inputOnly)
+                case _ ⇒
             }
 
         case _: XFormsHelpEvent ⇒

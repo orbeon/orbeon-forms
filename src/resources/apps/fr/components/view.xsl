@@ -674,7 +674,7 @@
                 <xsl:when test="not($is-noscript)">
                     <xforms:trigger appearance="minimal">
                         <xforms:label value="xxforms:label('{$id}')"/>
-                        <xforms:setfocus ev:event="DOMActivate" control="{$id}"/>
+                        <xforms:setfocus ev:event="DOMActivate" control="{$id}" xxforms:input-only="true"/>
                     </xforms:trigger>
                 </xsl:when>
                 <xsl:otherwise>

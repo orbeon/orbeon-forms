@@ -254,7 +254,7 @@ class XFormsControl(
      * @return  true iif control accepted focus
      */
     // By default, a control doesn't accept focus
-    def setFocus() = false
+    def setFocus(inputOnly: Boolean) = false
 
     // Build children controls if any, delegating the actual construction to the given `buildTree` function
     def buildChildren(buildTree: (XBLContainer, BindingContext, ElementAnalysis, Seq[Int]) ⇒ Option[XFormsControl], idSuffix: Seq[Int]) =

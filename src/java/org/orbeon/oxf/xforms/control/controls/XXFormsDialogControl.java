@@ -177,7 +177,7 @@ public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
         } else if (XFormsEvents.XXFORMS_DIALOG_OPEN.equals(event.name())) {
             // If the dialog is open and the focus has not been set within the dialog, attempt to set the focus within
             if (isVisible() && ! Focus.isFocusWithinContainer(this))
-                Dispatch.dispatchEvent(new XFormsFocusEvent(this));
+                Dispatch.dispatchEvent(new XFormsFocusEvent(this, false));
         }
         super.performDefaultAction(event);
     }

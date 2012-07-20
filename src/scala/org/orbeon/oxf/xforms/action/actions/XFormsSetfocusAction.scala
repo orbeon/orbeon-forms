@@ -27,8 +27,11 @@ class XFormsSetfocusAction extends XFormsAction {
         // "This XForms Action begins by invoking the deferred update behavior."
         synchronizeAndRefreshIfNeeded(context)
 
+        // Extension: whether to focus on input controls only
+        val inputOnly = resolveBooleanAVT(context, "input-only", default = false)
+
         // Resolve and update control
         resolveControl(context, "control") foreach
-            (control ⇒ Dispatch.dispatchEvent(new XFormsFocusEvent(control, Map())))
+            (control ⇒ Dispatch.dispatchEvent(new XFormsFocusEvent(control, inputOnly)))
     }
 }

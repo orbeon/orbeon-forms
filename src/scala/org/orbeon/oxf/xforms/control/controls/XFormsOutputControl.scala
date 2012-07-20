@@ -207,7 +207,7 @@ class XFormsOutputControl(container: XBLContainer, parent: XFormsControl, elemen
 
     // It usually doesn't make sense to focus on xf:output, at least not in the sense "focus to enter data". So we
     // disallow this for now.
-    override def setFocus() = false
+    override def setFocus(inputOnly: Boolean) = false
 
     override def addAjaxCustomAttributes(attributesImpl: AttributesImpl, isNewRepeatIteration: Boolean, other: XFormsControl) =
         addFileMetadataAttributes(attributesImpl, isNewRepeatIteration, other.asInstanceOf[FileMetadata])

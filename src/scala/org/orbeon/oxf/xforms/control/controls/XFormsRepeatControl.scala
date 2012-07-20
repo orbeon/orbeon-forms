@@ -560,9 +560,9 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
 
     // "4.3.7 The xforms-focus Event [...] Setting focus to a repeat container form control sets the focus to the
     // repeat object  associated with the repeat index"
-    override def setFocus() =
+    override def setFocus(inputOnly: Boolean) =
         if (isRelevant && getIndex > 0)
-            children(getIndex - 1).setFocus()
+            children(getIndex - 1).setFocus(inputOnly)
         else
             false
 

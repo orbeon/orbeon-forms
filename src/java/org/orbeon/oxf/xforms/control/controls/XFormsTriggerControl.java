@@ -55,4 +55,9 @@ public class XFormsTriggerControl extends XFormsSingleNodeControl implements Foc
         // Don't output anything for triggers in static readonly mode
         return ! isStaticReadonly();
     }
+
+    @Override
+    public boolean setFocus(boolean inputOnly) {
+        return ! inputOnly && super.setFocus(inputOnly);
+    }
 }

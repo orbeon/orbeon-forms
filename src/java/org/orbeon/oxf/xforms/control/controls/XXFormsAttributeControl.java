@@ -148,7 +148,7 @@ public class XXFormsAttributeControl extends XFormsValueControl {
     }
 
     @Override
-    public boolean setFocus() {
+    public boolean setFocus(boolean inputOnly) {
         // Can't focus on AVTs
         return false;
     }

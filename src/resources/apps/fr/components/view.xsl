@@ -643,12 +643,12 @@
     <xsl:template name="fr-toc">
         <!-- This is statically built in XSLT instead of using XForms -->
         <xsl:if test="$has-toc and $is-detail and not($is-form-builder) and count(/xhtml:html/xhtml:body//fr:section) ge $min-toc">
-            <xhtml:div class="fr-toc">
+            <fr:section class="fr-toc">
+                <xforms:label>TOC</xforms:label>
                 <xhtml:ol>
                     <xsl:apply-templates mode="fr-toc-sections"/>
                 </xhtml:ol>
-            </xhtml:div>
-            <xhtml:div class="fr-separator">&#160;</xhtml:div>
+            </fr:section>
         </xsl:if>
     </xsl:template>
 

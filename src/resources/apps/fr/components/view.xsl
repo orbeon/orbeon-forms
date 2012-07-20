@@ -644,7 +644,7 @@
         <!-- This is statically built in XSLT instead of using XForms -->
         <xsl:if test="$has-toc and $is-detail and not($is-form-builder) and count(/xhtml:html/xhtml:body//fr:section) ge $min-toc">
             <fr:section class="fr-toc">
-                <xforms:label>TOC</xforms:label>
+                <xforms:label ref="$fr-resources/summary/titles/toc"/>
                 <xhtml:ol>
                     <xsl:apply-templates mode="fr-toc-sections"/>
                 </xhtml:ol>
@@ -653,10 +653,13 @@
     </xsl:template>
 
     <xsl:template match="text()" mode="fr-toc-sections"/>
+
     <xsl:template match="*" mode="fr-toc-sections">
         <xsl:apply-templates mode="fr-toc-sections"/>
     </xsl:template>
+
     <xsl:template match="fr:section" mode="fr-toc-sections">
+        <xsl:variable name="id" select="@id"/>
         <xsl:variable name="sub-sections">
             <xsl:if test="exists(fr:section)">
                 <xhtml:ol>
@@ -664,31 +667,26 @@
                 </xhtml:ol>
             </xsl:if>
         </xsl:variable>
-        <!-- Reference bind so that entry for section disappears if the section is non-relevant -->
-        <xsl:choose>
-            <!-- TODO: must handle @ref/@bind/inline text -->
-            <xsl:when test="@bind">
-                <xforms:group bind="{@bind}">
-                    <xhtml:li>
-                        <xhtml:a href="#{@id}">
-                            <xforms:output value="{xforms:label/@ref}"/>
-                        </xhtml:a>
-                        <xsl:copy-of select="$sub-sections"/>
-                    </xhtml:li>
-                </xforms:group>
-            </xsl:when>
-            <xsl:otherwise>
-                <xhtml:li>
-                    <xhtml:a href="#{@id}">
-                        <xsl:value-of select="xforms:label"/>
-                    </xhtml:a>
-                    <xsl:copy-of select="$sub-sections"/>
-                </xhtml:li>
-            </xsl:otherwise>
-        </xsl:choose>
+        <xhtml:li xxforms:control="true">
+            <xsl:copy-of select="@bind"/>
+            <!-- Reference bind so that entry for section disappears if the section is non-relevant -->
+            <xsl:choose>
+                <xsl:when test="not($is-noscript)">
+                    <xforms:trigger appearance="minimal">
+                        <xforms:label value="xxforms:label('{$id}')"/>
+                        <xforms:setfocus ev:event="DOMActivate" control="{$id}"/>
+                    </xforms:trigger>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xhtml:a href="#{$id}"><xforms:output value="xxforms:label('{$id}')"/></xhtml:a>
+                </xsl:otherwise>
+            </xsl:choose>
+            <xsl:copy-of select="$sub-sections"/>
+        </xhtml:li>
     </xsl:template>
 
     <!-- Add a default xforms:alert for those fields which don't have one. Only do this within grids and dialogs. -->
+    <!-- TODO: Do we really need/want this? -->
     <xsl:template
         match="xhtml:body//fr:grid//xforms:*[local-name() = ('input', 'textarea', 'select', 'select1', 'upload') and not(xforms:alert)]
                        | xhtml:body//xxforms:dialog//xforms:*[local-name() = ('input', 'textarea', 'select', 'select1', 'upload') and not(xforms:alert)]">

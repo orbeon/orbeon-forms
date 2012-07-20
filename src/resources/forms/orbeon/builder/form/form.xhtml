@@ -566,11 +566,11 @@
                             <xf:trigger appearance="minimal" class="delete-section-trigger">
                                 <xf:label><xh:img width="16" height="16" src="/apps/fr/style/images/silk/bin.png" alt="{{$fb-resources/delete-section-icon/label}}" title="{{$fb-resources/delete-section-icon/label}}"/></xf:label>
                                 <!-- Ask confirmation -->
-                                <xf:dispatch ev:event="DOMActivate" name="fr-show" targetid="fb-form-editor$dialog-confirmation">
+                                <xf:dispatch ev:event="DOMActivate" name="fr-show" targetid="dialog-confirmation">
                                     <xxf:context name="message"
                                          value="concat($fb-resources/messages/delete-section, ' ',
                                                             xxf:format-message($fb-resources/messages/controls-will-be-deleted, count($section//*:grid//*:td[*])))"/>
-                                    <xxf:context name="positive-targetid" value="xxf:effective-id('delete-section-trigger')"/>
+                                    <xxf:context name="positive-targetid" value="xxf:absolute-id('delete-section-trigger')"/>
                                 </xf:dispatch>
                                 <xf:action ev:event="fr-positive" type="xpath">
                                     sectionOps:deleteSection($section)
@@ -580,14 +580,14 @@
                             <xf:trigger appearance="minimal">
                                 <xf:label><xh:img width="16" height="16" src="/apps/fr/style/images/silk/cog.png" alt="{{$fb-resources/section-details-icon/label}}" title="{{$fb-resources/section-details-icon/label}}"/></xf:label>
                                 <!-- Show section details dialog -->
-                                <xf:dispatch ev:event="DOMActivate" name="fb-show-dialog" target="fb-form-editor$dialog-section-details">
+                                <xf:dispatch ev:event="DOMActivate" name="fb-show-dialog" targetid="dialog-section-details">
                                     <xxf:context name="section" value="$section"/>
                                 </xf:dispatch>
                             </xf:trigger>
                             <!-- Edit help for section -->
                             <xf:trigger appearance="minimal" class="fb-edit-section-help-trigger" id="fb-edit-section-help-trigger">
                                 <xf:label><xh:img alt="{{$fb-resources/help-icon/label}}" title="{{$fb-resources/help-icon/label}}" src="/ops/images/xforms/help.png"/></xf:label>
-                                <xf:dispatch ev:event="DOMActivate" name="fb-show-dialog" target="fb-form-editor$dialog-help">
+                                <xf:dispatch ev:event="DOMActivate" name="fb-show-dialog" targetid="dialog-help">
                                     <xxf:context name="control-id" value="$section/@id"/>
                                 </xf:dispatch>
                             </xf:trigger>

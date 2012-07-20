@@ -15,8 +15,6 @@
          xmlns:xf="http://www.w3.org/2002/xforms"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
          xmlns:ev="http://www.w3.org/2001/xml-events"
-         xmlns:xi="http://www.w3.org/2001/XInclude"
-         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
          xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
          xmlns:saxon="http://saxon.sf.net/"
@@ -31,7 +29,7 @@
          xmlns:xforms="http://www.w3.org/2002/xforms"
          xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
 
-    <xbl:binding id="fr-section" element="fr|section" xxforms:external-events="fb-set-current-section">
+    <xbl:binding id="fr-section" element="fr|section" xxforms:external-events="fb-set-current-section" xxbl:mode="binding lhha custom-lhha">
 
         <xbl:handlers>
             <xbl:handler event="fr-expand" phase="target">
@@ -112,17 +110,17 @@
                                         <!-- Actual section title -->
                                         <xsl:choose>
                                             <xsl:when test="$collapse">
-                                                <!-- Set the section id to this trigger: this id matching is needed for noscript help -->
-                                                <!-- TODO: check noscript help now that we have changed to XBL -->
                                                 <xforms:trigger appearance="minimal" class="fr-section-label fr-section-{{if ($open) then 'opened' else 'closed'}}">
-                                                    <xbl:content includes=":root > xforms|label, :root > xforms|help, :root > xforms|hint, :root > xforms|alert"/>
+                                                    <xforms:label value="xxforms:label('fr-section')"/>
+                                                    <xforms:help  value="xxforms:help('fr-section')"/>
+                                                    <xforms:hint  value="xxforms:hint('fr-section')"/>
                                                 </xforms:trigger>
                                             </xsl:when>
                                             <xsl:otherwise>
-                                                <!-- Set the section id to this output: this id matching is needed for noscript help -->
-                                                <!-- TODO: check noscript help now that we have changed to XBL -->
                                                 <xforms:output appearance="minimal" value="''">
-                                                    <xbl:content includes=":root > xforms|label, :root > xforms|help, :root > xforms|hint, :root > xforms|alert"/>
+                                                    <xforms:label value="xxforms:label('fr-section')"/>
+                                                    <xforms:help  value="xxforms:help('fr-section')"/>
+                                                    <xforms:hint  value="xxforms:hint('fr-section')"/>
                                                 </xforms:output>
                                             </xsl:otherwise>
                                         </xsl:choose>

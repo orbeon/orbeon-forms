@@ -409,10 +409,10 @@ input.xforms-trigger,
 .fr-repeat-table tr th .xforms-help-image {
   margin-top: 0;
 }
-/* so that label+hint or label only -> labels appear aligned*/
 .yui-skin-sam .fr-repeat-table tr th {
-    vertical-align: top
+  vertical-align: top;
 }
+/* so that label+hint or label only -> labels appear aligned*/
 .yui-skin-sam .fr-repeat-column-trigger .yui-dt-liner {
   padding: 4px;
 }

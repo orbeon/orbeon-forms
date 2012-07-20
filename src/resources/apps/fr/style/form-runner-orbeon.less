@@ -75,7 +75,6 @@ html, body { background-color: #f3f3f3 } // Light grey background
 
 /* ***** Other ****************************************************************************************************** */
 
-select,
 textarea,
 input[type = 'text'] {
     background-image: url(field.png);
@@ -258,11 +257,11 @@ h1 .xforms-trigger-appearance-xxforms-minimal input, h2 .xforms-trigger-appearan
 /* Messages area */
 .fr-messages {
     display: block;
-    clear: both;
     padding: 1em;
     margin-bottom: 1em;
     background-color: white;
     border: 1px solid #DDDDDD;
+    float: left;
 }
 
 .fr-messages p {
@@ -271,8 +270,6 @@ h1 .xforms-trigger-appearance-xxforms-minimal input, h2 .xforms-trigger-appearan
 
 .table th { text-align: center }
 
-.fr-messages .fr-message-fatal-error { text-align: center; color: red }
-.fr-messages .fr-message-validation-error { text-align: center; color: #B94A48 }
 .fr-messages .fr-message-success { text-align: center; color: green }
 
 .fr-messages p a { color: white }

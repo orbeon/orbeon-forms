@@ -82,12 +82,12 @@ html { overflow: hidden }
 /* ***** Dialogs **************************************************************************************************** */
 
 /* Metadata editor dialog */
-/*.fb-dialog-form-settings { width: 60em; }*/
+.fb-dialog-form-settings { width: 40em; }
 .fb-dialog-form-settings img { float: left; margin: 1em 2em 0 1em; }
 .fb-dialog-form-settings .xforms-label { display: block; }
-.fb-dialog-form-settings .xforms-hint { width: 25em; margin-bottom: 1em; }
-.fb-dialog-form-settings .xforms-alert { width: 25em; }
-.fb-dialog-form-settings .fb-dialog-form-settings-fields { float: left; width: 20em }
+.fb-dialog-form-settings .xforms-hint { margin-bottom: 1em; }
+.fb-dialog-form-settings .fb-dialog-form-settings-fields { float: left; width: 30em }
+.fb-dialog-form-settings input, .fb-dialog-form-settings textarea { width: 100% }
 
 .fb-dialog-form-settings .fb-dialog-form-settings-stats th { text-align: left }
 .fb-dialog-form-settings .fb-dialog-form-settings-stats td { text-align: right; padding-left: .5em }
@@ -306,7 +306,12 @@ a.xforms-help-image .fb-control-help { vertical-align: baseline; }
 .fr-editable .fr-grid-tr { height: 60px }   /* Enough space to hold row icons so that hovering doesn't cause the row to expand */
 .fr-grid.fr-editable.fr-norepeat:hover .fr-grid-td { border: 1px solid @lightBlue} /* Only for grid which is not a repeat, e.g. no highlighting in itemset editor */
 
-.fb-grid-cell-icons, .fb-grid-control-icons, .fb-grid-row-icons { display: block; width: 16px; min-height: 4em; height: auto !important; height: 4em; text-align: center }/* IE HACK for min-height */
+.fb-grid-cell-icons, .fb-grid-control-icons, .fb-grid-row-icons {
+    display: block;
+    width: 16px;
+    height: 60px;
+    text-align: center;
+}
 
 /* Grid icons and hovering */
 .fb-grid-top-left-td { text-align: center; width: 24px }
@@ -386,7 +391,7 @@ a.xforms-help-image .fb-control-help { vertical-align: baseline; }
 /* Even if the label or hint is empty, we still want space for 1 line to be reserved. */
 .fr-grid-content .xforms-label, .fr-grid-content .xforms-hint,  /* In regular grid content */
 .fr-grid-th .xforms-label, .fr-grid-th .xforms-hint             /* In grid header, for the repeat single line */
-    { min-height: 1.321em }
+    { min-height: 1.321em }                                     /* NOTE: Was changed to 1.5 at some point, check it too small */
 
 
 #fr-view {                                                                                                              // Show disabled hints, i.e. hints with no text, to reserve space for the placeholder
@@ -496,16 +501,14 @@ html.accordion-menu-js dd.a-m-d-anim {
     border-radius: 3px; -moz-border-radius: 3px; -webkit-border-radius: 3px; -ms-border-radius: 3px
 }
 
-.fb-top .fr-messages .fr-message-validation-error {
-    background-color: #DF731B;
-}
-
-.fb-top .fr-messages .fr-message-fatal-error {
-    background-color: red;
-}
-
 .fb-top .fr-messages .fr-message-success {
     background-color: green;
+}
+
+.fb-xpath-errors {
+    display: block;
+    float: left;
+    color: orange;
 }
 
 /* ***** YUI Layout ************************************************************************************************* */

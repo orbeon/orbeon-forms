@@ -122,7 +122,7 @@ html {
 }
 /* Because w/ Chrome, a DIV of the dialog remains under the toolbox DIV and causes the toolbox to scroll */
 /* ***** Dialogs **************************************************************************************************** */
-/* Form settings dialog */
+/* Metadata editor dialog */
 .fb-dialog-form-settings {
   width: 40em;
 }
@@ -140,8 +140,9 @@ html {
   float: left;
   width: 30em;
 }
-.fb-dialog-form-settings input, .fb-dialog-form-settings textarea {
-  width: 100%
+.fb-dialog-form-settings input,
+.fb-dialog-form-settings textarea {
+  width: 100%;
 }
 .fb-dialog-form-settings .fb-dialog-form-settings-stats th {
   text-align: left;
@@ -557,6 +558,7 @@ a.xforms-help-image .fb-control-help {
 .xbl-fr-grid table.fr-grid.fr-editable {
   border-collapse: collapse;
   /* override default in form-runner-base.css */
+
   width: 99.9% /* attempt to fix missing right border under Chrome */
 ;
 }
@@ -576,12 +578,9 @@ a.xforms-help-image .fb-control-help {
 .fb-grid-row-icons {
   display: block;
   width: 16px;
-  min-height: 4em;
-  height: auto !important;
-  height: 4em;
+  height: 60px;
   text-align: center;
 }
-/* IE HACK for min-height */
 /* Grid icons and hovering */
 .fb-grid-top-left-td {
   text-align: center;
@@ -749,6 +748,7 @@ a.xforms-help-image .fb-control-help {
 .fr-grid-th .xforms-hint {
   min-height: 1.321em;
 }
+/* NOTE: Was changed to 1.5 at some point, check it too small */
 #fr-view .fr-grid .xforms-hint.xforms-disabled {
   display: block;
   position: static;
@@ -913,19 +913,13 @@ html.accordion-menu-js dd.a-m-d-anim {
   -webkit-border-radius: 3px;
   -ms-border-radius: 3px;
 }
-.fb-top .fr-messages .fr-message-validation-error {
-  background-color: #DF731B;
-}
-.fb-top .fr-messages .fr-message-fatal-error {
-  background-color: red;
-}
 .fb-top .fr-messages .fr-message-success {
   background-color: green;
 }
 .fb-xpath-errors {
-    display: block;
-    float: left;
-    color: orange;
+  display: block;
+  float: left;
+  color: orange;
 }
 /* ***** YUI Layout ************************************************************************************************* */
 #fr-view {

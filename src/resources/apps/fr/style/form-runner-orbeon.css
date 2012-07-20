@@ -67,7 +67,6 @@ body {
   margin: 1em 0 1em 0;
 }
 /* ***** Other ****************************************************************************************************** */
-select,
 textarea,
 input[type='text'] {
   background-image: url(field.png);
@@ -201,6 +200,12 @@ h3 .xforms-trigger-appearance-xxforms-minimal input {
   color: #004B92;
 }
 /* Set input/textarea controls background */
+/*.xforms-input input, textarea.xforms-textarea, input.xforms-secret, .xforms-textarea textarea, .xforms-secret input, .xbl-component .xbl-html-input {*/
+/*background-image: url(field.png);*/
+/*background-repeat: repeat-x;*/
+/*border: 1px solid #ccc;*/
+/*padding: 0*/
+/*}*/
 /* Add a star before the label of required fields, but only in new/edit modes */
 /* NOTE: This only works in span layout (the default in FR since 2011-07-28) */
 /* NOTE: Also cover Form Builder classes here instead of form-builder.css, so we don't miss changes done here */
@@ -332,7 +337,6 @@ textarea.xforms-invalid-visited {
 .fr-messages p a {
   color: #ffffff;
 }
-
 /* ***** Print and PDF ********************************************************************************************** */
 /* This is also used for PDF generation */
 @media print {

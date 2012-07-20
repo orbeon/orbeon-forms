@@ -193,10 +193,7 @@ button.xforms-trigger, input.xforms-trigger, .xforms-trigger button, .xforms-tri
 
 /* Messages */
 .fr-message-success { color: green  }
-.fr-message-validation-error { color: #DF731B }
-.fr-message-fatal-error { color: red }
 .fr-unsaved-data { color: red }
-.fr-message-fatal-error .xforms-trigger { margin-left: .5em }
 
 /* Error summary */
 .xbl-fr-error-summary .fr-error-summary-body { padding: 0 10px; margin: 10px 0 0 }
@@ -268,6 +265,7 @@ button.xforms-trigger, input.xforms-trigger, .xforms-trigger button, .xforms-tri
 /* But if there is a nested table, show those in the label in the column header of that table */
 .fr-repeat-table tr th .xforms-label { display: block }         /* Label in repeat table header is block so yellow background in FB takes the whole width  */
 .fr-repeat-table tr th .xforms-help-image { margin-top: 0 }
+.yui-skin-sam .fr-repeat-table tr th { vertical-align: top }    /* so that label+hint or label only -> labels appear aligned*/
 
 .yui-skin-sam .fr-repeat-column-trigger .yui-dt-liner { padding: 4px } /* override YUI */
 .yui-skin-sam .yui-dt .fr-repeat-table th .yui-dt-liner {

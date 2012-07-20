@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010 Orbeon, Inc.
+ * Copyright (C) 2012 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -24,11 +24,14 @@ import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.serializer.store.ResultStore;
 import org.orbeon.oxf.processor.serializer.store.ResultStoreOutputStream;
 import org.orbeon.oxf.properties.PropertySet;
+import org.orbeon.oxf.resources.ResourceManagerWrapper;
+import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.processor.XFormsResourceServer;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.XPathUtils;
+import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -36,6 +39,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Collections;
 
 /**
@@ -208,7 +213,9 @@ public class FileSerializer extends ProcessorImpl {
             final ProcessorInput dataInput = getInputByName(INPUT_DATA);
 
             // Get file object
-            final File file = getFile(config.getDirectory(), config.getFile(), config.isMakeDirectories(), getPropertySet());
+            final File file = config.getUrl() == null?
+                getFile(config.getDirectory(), config.getFile(), config.isMakeDirectories(), getPropertySet())
+                : getFile(config.getUrl(), config.isMakeDirectories(), getPropertySet());        ;
 
             // NOTE: Caching here is broken, so we never cache. This is what we should do in case
             // we want caching:
@@ -362,9 +369,47 @@ public class FileSerializer extends ProcessorImpl {
         });
     }
 
+    public File getFile(String configUrl, boolean makeDirectories, PropertySet propertySet) {
+
+        // Use location data if present so that relative URLs can be supported
+        final LocationData locationData = getLocationData();
+        final URL fullURL;
+        final String realPath;
+        try {
+            fullURL = (locationData != null && locationData.getSystemID() != null)
+                                            ? URLFactory.createURL(locationData.getSystemID(), configUrl)
+                                            : URLFactory.createURL(configUrl);
+
+            if (fullURL.getProtocol().equals("oxf")) {
+                // Get real path to resource path if possible
+                realPath = ResourceManagerWrapper.instance().getRealPath(fullURL.getFile());
+                if (realPath == null)
+                    throw new OXFException("File serializer is unable to obtain the real path of the file using the oxf: protocol for the url property: " + configUrl);
+            } else if (fullURL.getProtocol().equals("file")) {
+                String host = fullURL.getHost();
+                realPath = host + (host.length() > 0 ? ":" : "") + fullURL.getFile();
+            } else {
+                throw new OXFException("File serializer only supports the file: and oxf: protocols for the url property: " + configUrl);
+            }
+
+            return getFile(null, realPath, makeDirectories, propertySet);
+            
+        } catch (MalformedURLException e) {
+            throw new OXFException(e);
+        }
+
+
+    }
+
+
     public static File getFile(String configDirectory, String configFile, boolean makeDirectories, PropertySet propertySet) {
         final File file;
         final String directoryProperty = (propertySet != null) ? propertySet.getString(DIRECTORY_PROPERTY) : null;
+
+        if (configDirectory != null && configDirectory.startsWith("oxf:")) {
+            
+        }
+
         if (directoryProperty == null && configDirectory == null) {
             // No base directory specified
             file = new File(configFile);

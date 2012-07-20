@@ -37,7 +37,7 @@
 
     <xbl:binding id="fb-input-select1-minimal" element="xforms|select1">
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
-            <display-name lang="en">Dropdown menu</display-name>
+            <display-name lang="en">Dropdown Menu</display-name>
             <display-name lang="fr">Menu déroulant</display-name>
             <display-name lang="ru">Выпадающий список</display-name>
             <icon lang="en">

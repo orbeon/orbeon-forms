@@ -26,6 +26,7 @@
          xmlns:oxf="http://www.orbeon.com/oxf/processors"
          xmlns:exf="http://www.exforms.org/exf/1-0"
          xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+         xmlns:xformsUtils="java:org.orbeon.oxf.xforms.XFormsUtils"
          xmlns:gridOps="java:org.orbeon.oxf.fb.GridOps"
          xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps"
 
@@ -116,14 +117,14 @@
                                                     <xxf:var name="count" value="count($grid/*:tr/*:td[*])"/>
 
                                                     <!-- Ask confirmation -->
-                                                    <xf:dispatch if="$count > 0" name="fr-show" targetid="fb-form-editor$dialog-confirmation">
+                                                     <xf:dispatch if="$count > 0" name="fr-show" targetid="{{xformsUtils:effectiveIdToAbsoluteId('dialog-confirmation')}}">
                                                         <xxf:context name="message"
                                                              value="concat($fb-resources/messages/delete-grid, ' ',
                                                                         xxf:format-message($fb-resources/messages/controls-will-be-deleted, $count))"/>
-                                                        <xxf:context name="positive-targetid" value="xxf:effective-id('delete-grid-trigger')"/>
+                                                         <xxf:context name="positive-targetid" value="xxf:absolute-id('delete-grid-trigger')"/>
                                                     </xf:dispatch>
                                                     <!-- We are automatically confirmed-->
-                                                    <xf:dispatch if="$count = 0" name="fr-positive" target="delete-grid-trigger"/>
+                                                    <xf:dispatch if="$count = 0" name="fr-positive" targetid="delete-grid-trigger"/>
                                                 </xf:action>
                                                 <xf:action ev:event="fr-positive" type="xpath">
                                                     gridOps:deleteGrid($grid)
@@ -167,14 +168,14 @@
                                                         <xxf:var name="count" value="gridOps:controlsInCol($first-row-td)"/>
 
                                                         <!-- Ask confirmation -->
-                                                        <xf:dispatch if="$count > 0" name="fr-show" targetid="fb-form-editor$dialog-confirmation">
+                                                        <xf:dispatch if="$count > 0" name="fr-show" targetid="{{xformsUtils:effectiveIdToAbsoluteId('dialog-confirmation')}}">
                                                             <xxf:context name="message"
                                                                  value="concat($fb-resources/messages/delete-column, ' ',
                                                                                 xxf:format-message($fb-resources/messages/controls-will-be-deleted, $count))"/>
-                                                            <xxf:context name="positive-targetid" value="xxf:effective-id('delete-col-{$static-col-pos}-trigger')"/>
+                                                             <xxf:context name="positive-targetid" value="xxf:absolute-id('delete-col-{$static-col-pos}-trigger')"/>
                                                         </xf:dispatch>
                                                         <!-- We are automatically confirmed-->
-                                                        <xf:dispatch if="$count = 0" name="fr-positive" target="delete-col-{$static-col-pos}-trigger"/>
+                                                        <xf:dispatch if="$count = 0" name="fr-positive" targetid="delete-col-{$static-col-pos}-trigger"/>
                                                     </xf:action>
                                                     <xf:action ev:event="fr-positive" type="xpath">
                                                         gridOps:deleteCol($first-row-td)
@@ -197,7 +198,7 @@
                                                     <!-- Grid properties -->
                                                     <xf:trigger appearance="minimal" id="grid-details-trigger">
                                                         <xf:label><xh:img src="/apps/fr/style/images/silk/cog.png" alt="{{$fb-resources/grid-details-icon/label}}" title="{{$fb-resources/grid-details-icon/label}}"/></xf:label>
-                                                        <xf:dispatch ev:event="DOMActivate" name="fb-show-dialog" target="fb-form-editor$dialog-grid-details">
+                                                        <xf:dispatch ev:event="DOMActivate" name="fb-show-dialog" targetid="{{xformsUtils:effectiveIdToAbsoluteId('dialog-grid-details')}}">
                                                             <xxf:context name="grid" select="$grid"/>
                                                         </xf:dispatch>
                                                     </xf:trigger>
@@ -299,14 +300,14 @@
                                                                         <xxf:var name="count" value="count($tr/*[*])"/>
 
                                                                         <!-- Ask confirmation -->
-                                                                        <xf:dispatch if="$count > 0" name="fr-show" targetid="fb-form-editor$dialog-confirmation">
+                                                                        <xf:dispatch if="$count > 0" name="fr-show" targetid="{{xformsUtils:effectiveIdToAbsoluteId('dialog-confirmation')}}">
                                                                             <xxf:context name="message"
                                                                                  value="concat($fb-resources/messages/delete-row, ' ',
                                                                                                 xxf:format-message($fb-resources/messages/controls-will-be-deleted, $count))"/>
-                                                                            <xxf:context name="positive-targetid" value="xxf:effective-id('delete-row-{$static-row-pos}-trigger')"/>
+                                                                            <xxf:context name="positive-targetid" value="xxf:absolute-id('delete-row-{$static-row-pos}-trigger')"/>
                                                                         </xf:dispatch>
                                                                         <!-- We are automatically confirmed-->
-                                                                        <xf:dispatch if="$count = 0" name="fr-positive" target="delete-row-{$static-row-pos}-trigger"/>
+                                                                        <xxf:context name="positive-targetid" value="xxf:absolute-id('delete-row-{$static-row-pos}-trigger')"/>
                                                                     </xf:action>
                                                                     <xf:action ev:event="fr-positive" type="xpath">
                                                                         gridOps:deleteRow($tr)

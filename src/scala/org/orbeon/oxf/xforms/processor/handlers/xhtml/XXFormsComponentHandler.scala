@@ -28,23 +28,24 @@ class XXFormsComponentHandler extends XFormsControlLifecyleHandler(false) {
     protected override def getContainingElementName = elementName
     protected override def getContainingElementQName = elementQName
 
-    private def binding = containingDocument.getStaticOps.getBinding(getPrefixedId) getOrElse (throw new IllegalStateException)
+    private lazy val binding    = containingDocument.getStaticOps.getBinding(getPrefixedId) getOrElse (throw new IllegalStateException)
+    private lazy val handleLHHA = binding.abstractBinding.modeLHHACustom
 
-    override def init(uri: String, localname: String, qName: String, attributes: Attributes, matched: AnyRef) = {
+    override def init(uri: String, localname: String, qName: String, attributes: Attributes, matched: AnyRef): Unit = {
         super.init(uri, localname, qName, attributes, matched)
 
         elementName = binding.abstractBinding.containerElementName
         elementQName = XMLUtils.buildQName(handlerContext.findXHTMLPrefix, elementName)
     }
 
-    protected override def addCustomClasses(classes: StringBuilder, control: XFormsControl) = {
+    protected override def addCustomClasses(classes: StringBuilder, control: XFormsControl): Unit = {
         if (classes.length != 0)
             classes.append(' ')
 
         classes.append("xbl-component xbl-" + binding.abstractBinding.cssName)
     }
 
-    protected def handleControlStart(uri: String, localname: String, qName: String, attributes: Attributes, effectiveId: String, control: XFormsControl) = {
+    protected def handleControlStart(uri: String, localname: String, qName: String, attributes: Attributes, effectiveId: String, control: XFormsControl): Unit = {
 
         val prefixedId = getPrefixedId
         val controller = handlerContext.getController
@@ -59,10 +60,16 @@ class XXFormsComponentHandler extends XFormsControlLifecyleHandler(false) {
 
     protected override def handleControlEnd(uri: String, localname: String, qName: String, attributes: Attributes, effectiveId: String, control: XFormsControl) =
         handlerContext.popComponentContext()
+
+    protected override def handleLabel() = if (handleLHHA) super.handleLabel()
+    protected override def handleAlert() = if (handleLHHA) super.handleAlert()
+    protected override def handleHint()  = if (handleLHHA) super.handleHint()
+    protected override def handleHelp()  = if (handleLHHA) super.handleHelp()
 }
 
 object XXFormsComponentHandler {
-    def processShadowTree(controller: ElementHandlerController, shadowTree: Document) = {
+
+    def processShadowTree(controller: ElementHandlerController, shadowTree: Document): Unit = {
         // Tell the controller we are providing a new body
         controller.startBody()
 

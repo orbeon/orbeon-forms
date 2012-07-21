@@ -28,6 +28,10 @@ import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.xml.XPathUtils;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.channels.FileChannel;
 import java.util.Iterator;
 
 /**
@@ -110,8 +114,48 @@ public class FileProcessor extends ProcessorImpl {
 
                     // Move
                     if (! fromFile.renameTo(toFile)) {
-                        throw new OXFException("Can't move from " + fromFile + " to  " + toFile);    
+                        // If for whatever reason renameTo fails, try to copy and delete it 
+                        copyFile(fromFile, toFile);
+                        final boolean deleted = fromFile.delete();
+                        if (!deleted)
+                            throw new OXFException("Can't delete file " + fromFile + " after copying it to " + toFile);
+
                     }
+
+
+                } else if (currentElement.getName().equals("copy")) {
+                    // Copy operation
+
+                    // From
+                    final File fromFile = FileSerializer.getFile(
+                            XPathUtils.selectStringValueNormalize(currentElement, "from/directory"),
+                            XPathUtils.selectStringValueNormalize(currentElement, "from/file"),
+                            XPathUtils.selectStringValueNormalize(currentElement, "from/url"),
+                            getLocationData(),
+                            false,
+                            getPropertySet()
+                            );
+
+                    if (!fromFile.exists() || ! fromFile.canRead()) {
+                        throw new OXFException("Can't copy file: " + fromFile);
+                    }
+
+                    // To
+                    final File toFile = FileSerializer.getFile(
+                            XPathUtils.selectStringValueNormalize(currentElement, "to/directory"),
+                            XPathUtils.selectStringValueNormalize(currentElement, "to/file"),
+                            XPathUtils.selectStringValueNormalize(currentElement, "to/url"),
+                            getLocationData(),
+                            ProcessorUtils.selectBooleanValue(currentElement, "to/make-directories", DEFAULT_MAKE_DIRECTORIES),
+                            getPropertySet()
+                            );
+
+                    if (! (toFile.exists() || toFile.createNewFile() )) {
+                        throw new OXFException("Can't create file: " + toFile);
+                    }
+
+                    // Copy
+                    copyFile(fromFile, toFile);
 
 
                 } else if (currentElement.getName().equals("scp")) {
@@ -161,6 +205,34 @@ public class FileProcessor extends ProcessorImpl {
             }
         } catch (Exception e) {
             throw new OXFException(e);
+        }
+    }
+
+    public static void copyFile(File sourceFile, File destFile)  {
+        try {
+        if(!destFile.exists()) {
+            destFile.createNewFile();
+        }
+
+        FileChannel source = null;
+        FileChannel destination = null;
+
+        try {
+            source = new FileInputStream(sourceFile).getChannel();
+            destination = new FileOutputStream(destFile).getChannel();
+            destination.transferFrom(source, 0, source.size());
+        }
+        finally {
+            if(source != null) {
+                source.close();
+            }
+            if(destination != null) {
+                destination.close();
+            }
+        }
+        }
+        catch (IOException e) {
+            throw new OXFException("Cannot copy file" + sourceFile + " to " + destFile, e);
         }
     }
 

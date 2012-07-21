@@ -105,11 +105,14 @@ public class FileProcessor extends ProcessorImpl {
                             );
 
                     if (! (toFile.exists() || toFile.createNewFile() )) {
-                        throw new OXFException("Can't move to file: " + toFile);    
+                        throw new OXFException("Can't create file: " + toFile);
                     }
 
                     // Move
-                    fromFile.renameTo(toFile);
+                    if (! fromFile.renameTo(toFile)) {
+                        throw new OXFException("Can't move from " + fromFile + " to  " + toFile);    
+                    }
+
 
                 } else if (currentElement.getName().equals("scp")) {
                     // scp operation

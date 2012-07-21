@@ -692,66 +692,76 @@
                             </xhtml:table>
                         </div>
 
-                        <div class="fr-paging-buttons">
-                            <xforms:trigger ref="instance('fr-paging-instance')/prev-trigger" appearance="minimal">
-                                <xforms:label>
-                                    <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/resultset_first.png" alt="First" title="First"/>
-                                    <!--<xhtml:span><xforms:output value="$fr-resources/summary/labels/first"/></xhtml:span>-->
-                                </xforms:label>
-                                <xforms:action ev:event="DOMActivate">
-                                    <xforms:setvalue ref="instance('fr-search-instance')/page-number" value="1"/>
-                                    <xforms:setindex repeat="documents-repeat" index="1"/>
-                                    <xforms:send submission="search-submission"/>
-                                </xforms:action>
-                            </xforms:trigger>
-
-                            <xforms:trigger ref="instance('fr-paging-instance')/prev-trigger" appearance="minimal">
-                                <xforms:label>
-                                    <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/resultset_previous.png" alt="Previous" title="Previous"/>
-                                    <!--<xhtml:span><xforms:output value="$fr-resources/summary/labels/previous"/></xhtml:span>-->
-                                </xforms:label>
-                                <xforms:action ev:event="DOMActivate">
-                                    <xforms:setvalue ref="instance('fr-search-instance')/page-number" value=". - 1"/>
-                                    <xforms:setindex repeat="documents-repeat" index="1"/>
-                                    <xforms:send submission="search-submission"/>
-                                </xforms:action>
-                            </xforms:trigger>
-
-                            <xforms:group class="fr-paging-numbers" ref=".[xs:integer(instance('fr-paging-instance')/search-total) gt 0]">
-                                <!-- Some results -->
-                                <xforms:output value="max((instance('fr-paging-instance')/from, 0))"/>
-                                <xforms:output value="$fr-resources/summary/paging/to"/>
-                                <xforms:output value="max((instance('fr-paging-instance')/to, 0))"/>
-                                <xforms:output value="$fr-resources/summary/paging/of"/>
-                                <xforms:output value="instance('fr-paging-instance')/search-total"/>
-                            </xforms:group>
-                            <xforms:group class="fr-paging-numbers" ref=".[xs:integer(instance('fr-paging-instance')/search-total) = 0]">
-                                <!-- No results -->
-                            </xforms:group>
-
-                            <xforms:trigger ref="instance('fr-paging-instance')/next-trigger" appearance="minimal">
-                                <xforms:label>
-                                    <!--<xhtml:span><xforms:output value="$fr-resources/summary/labels/next"/></xhtml:span>-->
-                                    <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/resultset_next.png" alt="Next" title="Next"/>
-                                </xforms:label>
-                                <xforms:action ev:event="DOMActivate">
-                                    <xforms:setvalue ref="instance('fr-search-instance')/page-number" value=". + 1"/>
-                                    <xforms:setindex repeat="documents-repeat" index="1"/>
-                                    <xforms:send submission="search-submission"/>
-                                </xforms:action>
-                            </xforms:trigger>
-
-                            <xforms:trigger ref="instance('fr-paging-instance')/next-trigger" appearance="minimal">
-                                <xforms:label>
-                                    <!--<xhtml:span><xforms:output value="$fr-resources/summary/labels/last"/></xhtml:span>-->
-                                    <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/resultset_last.png" alt="Last" title="Last"/>
-                                </xforms:label>
-                                <xforms:action ev:event="DOMActivate">
-                                    <xforms:setvalue ref="instance('fr-search-instance')/page-number" value="instance('fr-paging-instance')/page-count"/>
-                                    <xforms:setindex repeat="documents-repeat" index="1"/>
-                                    <xforms:send submission="search-submission"/>
-                                </xforms:action>
-                            </xforms:trigger>
+                        <div class="pagination pagination-centered">
+                            <ul>
+                                <li>
+                                    <xforms:trigger ref="instance('fr-paging-instance')/prev-trigger" appearance="minimal">
+                                        <xforms:label>
+                                            <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/resultset_first.png" alt="First" title="First"/>
+                                            <!--<xhtml:span><xforms:output value="$fr-resources/summary/labels/first"/></xhtml:span>-->
+                                        </xforms:label>
+                                        <xforms:action ev:event="DOMActivate">
+                                            <xforms:setvalue ref="instance('fr-search-instance')/page-number" value="1"/>
+                                            <xforms:setindex repeat="documents-repeat" index="1"/>
+                                            <xforms:send submission="search-submission"/>
+                                        </xforms:action>
+                                    </xforms:trigger>
+                                </li>
+                                <li>
+                                    <xforms:trigger ref="instance('fr-paging-instance')/prev-trigger" appearance="minimal">
+                                        <xforms:label>
+                                            <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/resultset_previous.png" alt="Previous" title="Previous"/>
+                                            <!--<xhtml:span><xforms:output value="$fr-resources/summary/labels/previous"/></xhtml:span>-->
+                                        </xforms:label>
+                                        <xforms:action ev:event="DOMActivate">
+                                            <xforms:setvalue ref="instance('fr-search-instance')/page-number" value=". - 1"/>
+                                            <xforms:setindex repeat="documents-repeat" index="1"/>
+                                            <xforms:send submission="search-submission"/>
+                                        </xforms:action>
+                                    </xforms:trigger>
+                                </li>
+                                <xforms:group class="fr-paging-numbers" ref=".[xs:integer(instance('fr-paging-instance')/search-total) gt 0]">
+                                    <!-- Some results -->
+                                    <li>
+                                        <a href="#" class="disabled">
+                                            <xforms:output value="max((instance('fr-paging-instance')/from, 0))"/>
+                                            <xforms:output value="$fr-resources/summary/paging/to"/>
+                                            <xforms:output value="max((instance('fr-paging-instance')/to, 0))"/>
+                                            <xforms:output value="$fr-resources/summary/paging/of"/>
+                                            <xforms:output value="instance('fr-paging-instance')/search-total"/>
+                                        </a>
+                                    </li>
+                                </xforms:group>
+                                <xforms:group class="fr-paging-numbers" ref=".[xs:integer(instance('fr-paging-instance')/search-total) = 0]">
+                                    <!-- No results -->
+                                </xforms:group>
+                                <li>
+                                    <xforms:trigger ref="instance('fr-paging-instance')/next-trigger" appearance="minimal">
+                                        <xforms:label>
+                                            <!--<xhtml:span><xforms:output value="$fr-resources/summary/labels/next"/></xhtml:span>-->
+                                            <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/resultset_next.png" alt="Next" title="Next"/>
+                                        </xforms:label>
+                                        <xforms:action ev:event="DOMActivate">
+                                            <xforms:setvalue ref="instance('fr-search-instance')/page-number" value=". + 1"/>
+                                            <xforms:setindex repeat="documents-repeat" index="1"/>
+                                            <xforms:send submission="search-submission"/>
+                                        </xforms:action>
+                                    </xforms:trigger>
+                                </li>
+                                <li>
+                                    <xforms:trigger ref="instance('fr-paging-instance')/next-trigger" appearance="minimal">
+                                        <xforms:label>
+                                            <!--<xhtml:span><xforms:output value="$fr-resources/summary/labels/last"/></xhtml:span>-->
+                                            <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/resultset_last.png" alt="Last" title="Last"/>
+                                        </xforms:label>
+                                        <xforms:action ev:event="DOMActivate">
+                                            <xforms:setvalue ref="instance('fr-search-instance')/page-number" value="instance('fr-paging-instance')/page-count"/>
+                                            <xforms:setindex repeat="documents-repeat" index="1"/>
+                                            <xforms:send submission="search-submission"/>
+                                        </xforms:action>
+                                    </xforms:trigger>
+                                </li>
+                            </ul>
                         </div>
 
                     </xforms:group>

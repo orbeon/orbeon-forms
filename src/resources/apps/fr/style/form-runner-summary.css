@@ -13,8 +13,7 @@
  */
 /* ***** Summary Page *********************************************************************************************** */
 .fr-summary-search,
-.fr-summary-table-div,
-.fr-paging-buttons {
+.fr-summary-table-div {
   display: block;
   padding-left: 22px;
   padding-right: 22px;
@@ -52,10 +51,6 @@
   color: black;
 }
 /* When there is no link (delete-only), override YUI CSS that shows current row text in white */
-.fr-summary-table-div tr.yui-dt-selected td {
-  background-color: transparent;
-}
-/* Override YUI class that highlights selected row */
 .fr-summary-table-div td {
   white-space: nowrap;
 }
@@ -114,9 +109,6 @@
   clear: both;
   padding: 1em 0 0 0;
 }
-.fr-summary-search .fr-search-options-buttons .yui-button {
-  margin: 0;
-}
 .fr-summary-search .fr-search-options-buttons a {
   vertical-align: middle;
   font-size: 77%;
@@ -125,19 +117,11 @@
 .fr-summary-search .xforms-label {
   font-weight: normal;
 }
-.fr-paging-buttons {
-  padding-bottom: 1em;
+.pagination {
+  margin-top: 0;
 }
-.fr-paging-buttons .xforms-trigger a {
-  text-decoration: none;
-}
-.fr-paging-buttons img {
-  vertical-align: middle;
-}
-.fr-paging-numbers {
-  vertical-align: middle;
-  margin-left: .5em;
-  margin-right: 0.5em;
+.fr-summary-table-div .table {
+  margin-bottom: 0;
 }
 .fr-search-input input {
   padding: 3px 0 3px 3px;

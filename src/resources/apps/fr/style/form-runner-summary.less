@@ -15,8 +15,7 @@
 /* ***** Summary Page *********************************************************************************************** */
 
 .fr-summary-search,
-.fr-summary-table-div,
-.fr-paging-buttons {
+.fr-summary-table-div {
     display: block;
     padding-left: 22px; padding-right: 22px;             // Use same spacing we have for section content when editing forms
 }
@@ -35,7 +34,6 @@
 
 .fr-summary-table-div tbody a { text-decoration: none; color: black; outline: 0 }   /* Links in table must appear as normal text */
 .fr-summary-table-div tbody span { color: black;  }                                 /* When there is no link (delete-only), override YUI CSS that shows current row text in white */
-.fr-summary-table-div tr.yui-dt-selected td { background-color: transparent }       /* Override YUI class that highlights selected row */
 .fr-summary-table-div td { white-space: nowrap }                                    /* Mainly to prevent dates to wrap */
 .fr-summary-table-div td a {                                                        /* Link to take as much space as possible in the cell */
     width: 100%;
@@ -61,14 +59,16 @@
 .fr-summary-search p { margin-bottom: 0 }
 .fr-summary-search .fr-search-options-title { font-weight: bold; padding: .2em 0 1em 0; }
 .fr-summary-search .fr-search-options-buttons { clear: both; padding: 1em 0 0 0; }
-.fr-summary-search .fr-search-options-buttons .yui-button { margin: 0; }
 .fr-summary-search .fr-search-options-buttons a { vertical-align: middle; font-size: 77%; margin: 0 0 0 1em; }
 .fr-summary-search .xforms-label { font-weight: normal; }
 
-.fr-paging-buttons { padding-bottom: 1em }
-.fr-paging-buttons .xforms-trigger a { text-decoration: none }
-.fr-paging-buttons img { vertical-align: middle }
-.fr-paging-numbers { vertical-align: middle; margin-left: .5em; margin-right: .5em }
+.pagination {
+    margin-top: 0;
+}
+
+.fr-summary-table-div .table {
+    margin-bottom: 0;
+}
 
 .fr-search-input input {
     padding: 3px 0 3px 3px; /* Make the input a bit bigger to look more proportional to the search button */

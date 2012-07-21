@@ -55,4 +55,3 @@
         <xi:include href="/xbl/orbeon/number/number.xbl" xpointer="xpath(/xbl:xbl/xbl:binding/xbl:template)"/>
     </xbl:binding>
 </xbl:xbl>
-

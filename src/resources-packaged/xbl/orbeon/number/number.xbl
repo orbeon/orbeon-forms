@@ -125,8 +125,10 @@
 
                             <!-- The visible HTML input -->
                             <!-- .xforms-input-input is added so the border gets highlighted when the container gets .xforms-invalid-visited -->
-                            <xhtml:input class="xbl-fr-number-visible-input xbl-html-input xforms-input-input"
-                                         xbl:attr="tabindex tabindex=navindex"/>
+                            <xhtml:input
+                                class="xbl-fr-number-visible-input xbl-html-input xforms-input-input"
+                                type="text"
+                                xbl:attr="tabindex tabindex=navindex"/>
                         </xf:group>
                         <!-- Static readonly mode -->
                         <xf:group ref="$binding[exf:readonly() and property('xxf:readonly-appearance') = 'static']">

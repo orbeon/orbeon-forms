@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 Orbeon, Inc.
+ * Copyright (C) 2012 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -22,6 +22,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
+import org.orbeon.oxf.processor.ProcessorUtils;
 import org.orbeon.oxf.processor.serializer.FileSerializer;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.xml.XPathUtils;
@@ -38,6 +39,8 @@ import java.util.Iterator;
  * etc.
  */
 public class FileProcessor extends ProcessorImpl {
+
+    private static final boolean DEFAULT_MAKE_DIRECTORIES = false;
 
     private static Logger logger = LoggerFactory.createLogger(FileProcessor.class);
 
@@ -57,12 +60,16 @@ public class FileProcessor extends ProcessorImpl {
                 if (currentElement.getName().equals("delete")) {
                     // delete operation
 
-                    // Directory and file
-                    final String directoryString = XPathUtils.selectStringValueNormalize(currentElement, "directory");
-                    final String fileString = XPathUtils.selectStringValueNormalize(currentElement, "file");
 
                     // Get file object
-                    final File file = FileSerializer.getFile(directoryString, fileString, false, getPropertySet());
+                    final File file = FileSerializer.getFile(
+                            XPathUtils.selectStringValueNormalize(currentElement, "directory"),
+                            XPathUtils.selectStringValueNormalize(currentElement, "file"),
+                            XPathUtils.selectStringValueNormalize(currentElement, "url"),
+                            getLocationData(),
+                            false,
+                            getPropertySet()
+                            );
 
                     // Delete file if it exists
                     if (file.exists() && file.canWrite()) {
@@ -70,6 +77,40 @@ public class FileProcessor extends ProcessorImpl {
                         if (!deleted)
                             throw new OXFException("Can't delete file: " + file);
                     }
+                } else if (currentElement.getName().equals("move")) {
+                    // Move operation
+
+                    // From
+                    final File fromFile = FileSerializer.getFile(
+                            XPathUtils.selectStringValueNormalize(currentElement, "from/directory"),
+                            XPathUtils.selectStringValueNormalize(currentElement, "from/file"),
+                            XPathUtils.selectStringValueNormalize(currentElement, "from/url"),
+                            getLocationData(),
+                            false,
+                            getPropertySet()
+                            );
+
+                    if (!fromFile.exists() || ! fromFile.canRead()) {
+                        throw new OXFException("Can't move file: " + fromFile);    
+                    }
+
+                    // To
+                    final File toFile = FileSerializer.getFile(
+                            XPathUtils.selectStringValueNormalize(currentElement, "to/directory"),
+                            XPathUtils.selectStringValueNormalize(currentElement, "to/file"),
+                            XPathUtils.selectStringValueNormalize(currentElement, "to/url"),
+                            getLocationData(),
+                            ProcessorUtils.selectBooleanValue(currentElement, "to/make-directories", DEFAULT_MAKE_DIRECTORIES),
+                            getPropertySet()
+                            );
+
+                    if (! (toFile.exists() || toFile.createNewFile() )) {
+                        throw new OXFException("Can't move to file: " + toFile);    
+                    }
+
+                    // Move
+                    fromFile.renameTo(toFile);
+
                 } else if (currentElement.getName().equals("scp")) {
                     // scp operation
 

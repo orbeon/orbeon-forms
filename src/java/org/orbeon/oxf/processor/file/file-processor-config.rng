@@ -1,5 +1,5 @@
 <!--
-  Copyright (C) 2009 Orbeon, Inc.
+  Copyright (C) 2012 Orbeon, Inc.
 
   This program is free software; you can redistribute it and/or modify it under the terms of the
   GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -12,20 +12,69 @@
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
 <element name="config" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes"
-    xmlns="http://relaxng.org/ns/structure/1.0">
+         xmlns="http://relaxng.org/ns/structure/1.0">
     <zeroOrMore>
         <choice>
-
             <element name="delete">
-                <interleave>
-                    <element name="file">
-                        <data type="string"/>
-                    </element>
-                    <optional>
-                        <element name="directory">
+                <choice>
+                    <interleave>
+                        <element name="file">
                             <data type="string"/>
                         </element>
-                    </optional>
+                        <optional>
+                            <element name="directory">
+                                <data type="string"/>
+                            </element>
+                        </optional>
+                    </interleave>
+                    <element name="url">
+                        <data type="anyURI"/>
+                    </element>
+                </choice>
+            </element>
+            <element name="move">
+                <interleave>
+                    <element name="from">
+                        <choice>
+                            <interleave>
+                                <element name="file">
+                                    <data type="string"/>
+                                </element>
+                                <optional>
+                                    <element name="directory">
+                                        <data type="string"/>
+                                    </element>
+                                </optional>
+                            </interleave>
+                            <element name="url">
+                                <data type="anyURI"/>
+                            </element>
+                        </choice>
+                    </element>
+                    <element name="to">
+                        <interleave>
+                            <choice>
+                                <interleave>
+                                    <element name="file">
+                                        <data type="string"/>
+                                    </element>
+                                    <optional>
+                                        <element name="directory">
+                                            <data type="string"/>
+                                        </element>
+                                    </optional>
+                                </interleave>
+                                <element name="url">
+                                    <data type="anyURI"/>
+                                </element>
+                            </choice>
+                            <optional>
+                                <element name="make-directories">
+                                    <data type="boolean"/>
+                                </element>
+                            </optional>
+                        </interleave>
+                    </element>
                 </interleave>
             </element>
             <element name="scp">

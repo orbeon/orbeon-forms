@@ -213,9 +213,7 @@ public class FileSerializer extends ProcessorImpl {
             final ProcessorInput dataInput = getInputByName(INPUT_DATA);
 
             // Get file object
-            final File file = config.getUrl() == null?
-                getFile(config.getDirectory(), config.getFile(), config.isMakeDirectories(), getPropertySet())
-                : getFile(config.getUrl(), config.isMakeDirectories(), getPropertySet());        ;
+            final File file = getFile(config.getDirectory(), config.getFile(), config.getUrl(), getLocationData(), config.isMakeDirectories(), getPropertySet());
 
             // NOTE: Caching here is broken, so we never cache. This is what we should do in case
             // we want caching:
@@ -369,16 +367,42 @@ public class FileSerializer extends ProcessorImpl {
         });
     }
 
-    public File getFile(String configUrl, boolean makeDirectories, PropertySet propertySet) {
+
+    /**
+     * Get a File object from either a URL or a path
+     * @param configDirectory
+     * @param configFile
+     * @param configUrl
+     * @param locationData
+     * @param makeDirectories
+     * @param propertySet
+     * @return
+     */
+    public static File getFile(String configDirectory, String configFile, String configUrl, LocationData locationData, boolean makeDirectories, PropertySet propertySet) {
+
+        return configUrl == null ?
+                getFile(configDirectory, configFile, makeDirectories, propertySet)
+                : getFile(configUrl, locationData, makeDirectories, propertySet);
+
+    }
+
+    /**
+     * Get a File object from a URL
+     * @param configUrl
+     * @param locationData
+     * @param makeDirectories
+     * @param propertySet
+     * @return
+     */
+    public static File getFile(String configUrl, LocationData locationData, boolean makeDirectories, PropertySet propertySet) {
 
         // Use location data if present so that relative URLs can be supported
-        final LocationData locationData = getLocationData();
         final URL fullURL;
         final String realPath;
         try {
             fullURL = (locationData != null && locationData.getSystemID() != null)
-                                            ? URLFactory.createURL(locationData.getSystemID(), configUrl)
-                                            : URLFactory.createURL(configUrl);
+                    ? URLFactory.createURL(locationData.getSystemID(), configUrl)
+                    : URLFactory.createURL(configUrl);
 
             if (fullURL.getProtocol().equals("oxf")) {
                 // Get real path to resource path if possible
@@ -393,7 +417,7 @@ public class FileSerializer extends ProcessorImpl {
             }
 
             return getFile(null, realPath, makeDirectories, propertySet);
-            
+
         } catch (MalformedURLException e) {
             throw new OXFException(e);
         }
@@ -401,13 +425,20 @@ public class FileSerializer extends ProcessorImpl {
 
     }
 
-
+    /**
+     * Get a File object from a path
+     * @param configDirectory
+     * @param configFile
+     * @param makeDirectories
+     * @param propertySet
+     * @return
+     */
     public static File getFile(String configDirectory, String configFile, boolean makeDirectories, PropertySet propertySet) {
         final File file;
         final String directoryProperty = (propertySet != null) ? propertySet.getString(DIRECTORY_PROPERTY) : null;
 
         if (configDirectory != null && configDirectory.startsWith("oxf:")) {
-            
+
         }
 
         if (directoryProperty == null && configDirectory == null) {

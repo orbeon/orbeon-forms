@@ -1,10 +1,11 @@
-<div xmlns="http://www.w3.org/1999/xhtml"
-           class="xforms-help-panel xforms-initially-hidden">
+<div
+        xmlns="http://www.w3.org/1999/xhtml"
+        class="xforms-help-panel xforms-initially-hidden">
     <div class="hd">Help</div>
     <div class="bd">
         <div class="xforms-help-panel-message"/>
         <div class="xforms-help-panel-close">
-            <button>Close</button>
+            <button class="btn btn-small">Close</button>
         </div>
     </div>
 </div>

@@ -206,6 +206,11 @@ input.xforms-trigger,
 .xforms-noscript .fr-help-back {
   margin-left: 0.5em;
 }
+.xforms-help-panel-message {
+  padding: .5em 0;
+  margin-bottom: .5em;
+  border-bottom: 2px solid #ddddee;
+}
 /* ***** General Layout ********************************************************************************************* */
 /* Main layout blocks */
 .fr-container {
@@ -474,7 +479,7 @@ input.xforms-trigger,
   padding-top: .5em;
   padding-bottom: .5em;
   margin-top: .5em;
-  border-top: 2px solid #DDDDEE;
+  border-top: 2px solid #ddddee;
   clear: both;
 }
 #fr-submission-result-dialog {

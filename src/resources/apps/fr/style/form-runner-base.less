@@ -14,6 +14,8 @@
 
 /* NOTE: IE em factor: 0.9759 */
 
+@border: #DDDDEE;
+
 /* ***** Utilities ************************************************************************************************** */
 .fr-clear { clear: both }
 
@@ -136,6 +138,12 @@ button.xforms-trigger, input.xforms-trigger, .xforms-trigger button, .xforms-tri
 .xforms-noscript .xforms-help-panel .xforms-help-anchor { display: none }
 .xforms-noscript .xforms-help-panel .xforms-help-image { display: none }
 .xforms-noscript .fr-help-back { margin-left: .5em }
+
+.xforms-help-panel-message {
+    padding: .5em 0;
+    margin-bottom: .5em;
+    border-bottom: 2px solid @border;
+}
 
 /* ***** General Layout ********************************************************************************************* */
 
@@ -287,7 +295,7 @@ button.xforms-trigger, input.xforms-trigger, .xforms-trigger button, .xforms-tri
 .fr-dialog .hd { background-color: #666699 }
 .fr-dialog .bd { margin: 0 .5em .5em .5em }
 .fr-dialog-icon { float: left; margin-right: 2em; margin-left: 1em; padding-bottom: 1em }
-.fr-dialog-buttons { text-align: right; padding-right: .5em; padding-top: .5em; padding-bottom: .5em; margin-top: .5em; border-top: 2px solid #DDDDEE; clear: both }
+.fr-dialog-buttons { text-align: right; padding-right: .5em; padding-top: .5em; padding-bottom: .5em; margin-top: .5em; border-top: 2px solid @border; clear: both }
 
 #fr-submission-result-dialog { width: 800px }
 

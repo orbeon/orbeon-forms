@@ -34,8 +34,13 @@ trait ShadowChildrenBuilder extends ChildrenBuilderTrait {
         def outerScope =
             if (innerScope.isTopLevelScope)
                 innerScope
-            else
-                component.staticStateContext.partAnalysis.getControlAnalysis(containerScope.fullPrefix.init).scope
+            else {
+                // Search in ancestor parts too
+                val controlId = containerScope.fullPrefix.init
+                val controlAnalysis = component.staticStateContext.partAnalysis.ancestorOrSelf map (_.getControlAnalysis(controlId)) filter (_ ne null) head
+
+                controlAnalysis.scope
+            }
 
         // Children elements have not been annotated earlier (because they are nested within the bound element)
         component.staticStateContext.partAnalysis.xblBindings.annotateSubtreeByElement(

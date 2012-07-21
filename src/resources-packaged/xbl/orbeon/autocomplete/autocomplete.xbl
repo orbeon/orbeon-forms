@@ -91,8 +91,9 @@
                     <xf:setvalue ref="textfield-value" value="event('label')"/>
                     <!-- Dispatch value change event so we dispatch the fr-search-changed to have the itemset updated right away -->
                     <xf:dispatch name="xforms-value-changed" targetid="search"/>
-                    <xf:dispatch name="update-external-value" targetid="component-inner-group"/>
-                    <xxf:script id="out-arp" if="noscript != 'true'">YAHOO.xbl.fr.Autocomplete.instance(this).ajaxResponseProcessed();</xxf:script>
+                    <xf:dispatch name="update-external-value" targetid="component-inner-group">
+                        <xxf:context name="ajax-response-processed" value="true()"/>
+                    </xf:dispatch>
                 </xf:action>
             </xbl:handler>
             <xbl:handler event="fr-value-selected">
@@ -115,16 +116,11 @@
                                 <autocomplete>
                                     <relevant>false</relevant>
                                     <readonly>false</readonly>
-                                    <noscript>false</noscript>
                                     <textfield-value/>
                                 </autocomplete>
                             </xf:instance>
 
-                            <xf:bind ref="textfield-value"
-                                         readonly="../readonly = 'true'"/>
-                            <xf:bind ref="noscript"
-                                         calculate="../readonly = 'true' and property('xxf:readonly-appearance') = 'static'
-                                                    or property('xxf:noscript')"/>
+                            <xf:bind ref="textfield-value" readonly="../readonly = 'true'"/>
 
                             <!-- In resource mode, the suggestions -->
                             <xf:instance id="suggestions-instance"><dummy/></xf:instance>
@@ -139,6 +135,8 @@
 
                         <!-- Variable pointing to external single-node binding -->
                         <xf:var name="binding" value="xxf:binding('fr-autocomplete')"/>
+                        <xf:var name="script"  value="not(exf:readonly($binding) and property('xxf:readonly-appearance') = 'static' or property('xxf:noscript'))"/>
+
                         <xf:var name="local" value="instance('local')"/>
                         <xf:var name="dynamic-itemset-attribute" xbl:attr="xbl:text=dynamic-itemset"/>
                         <!-- Yes, we want this variable both in inner and outer scope  -->
@@ -176,6 +174,7 @@
                             <xf:setvalue if="$value = ''" ref="$local/textfield-value"/>
                             <!-- HACK: We'll be able to move the if on the setvalue once the following is fixed: https://github.com/orbeon/orbeon-forms/issues/57 -->
                             <xf:action if="$has-labelref"><xf:setvalue ref="$external-label" value="$local/textfield-value"/></xf:action>
+                            <xxf:script id="out-arp" if="event('ajax-response-processed') and $script">YAHOO.xbl.fr.Autocomplete.instance(this).ajaxResponseProcessed();</xxf:script>
                         </xf:action>
                         <xf:action ev:event="get-label-from-itemset">
                             <xf:var name="label" value="event('fr-label')"/>
@@ -196,8 +195,8 @@
                         <!-- - - - - - - - - - - - - - - - - - - EVENTS - - - - - - - - - - - - - - - - - - -->
 
                         <!-- Init event -->
-                        <xf:action id="xf-en" ev:event="xforms-enabled" ev:observer="component-inner-group" ev:target="component-inner-group">
-                            <xxf:script id="init" if="not(exf:readonly($binding) and property('xxf:readonly-appearance') = 'static')">YAHOO.xbl.fr.Autocomplete.instance(this).init();</xxf:script>
+                        <xf:action id="xf-en" ev:event="xforms-enabled" ev:observer="component-inner-group" ev:target="#observer">
+                            <xxf:script id="init" if="$script">YAHOO.xbl.fr.Autocomplete.instance(this).init();</xxf:script>
                             <!-- On xforms-enabled, if $has-labelref, copy the $external-label to the search field -->
                             <xf:setvalue if="$has-labelref" ref="$local/textfield-value" value="$external-label"/>
                         </xf:action>
@@ -212,10 +211,10 @@
                         </xsl:if>
                         <!-- Forward focus event and keep track of whether we have the focus -->
                         <!-- HACK: We would like the propagation of the DOMFocusIn/DOMFocusOut to be done automatically by the XBL engine -->
-                        <xf:action ev:event="DOMFocusIn" ev:observer="component-inner-group" ev:target="component-inner-group">
+                        <xf:action ev:event="DOMFocusIn" ev:observer="component-inner-group" ev:target="#observer">
                             <xf:dispatch name="DOMFocusIn" targetid="fr-autocomplete"/>
                         </xf:action>
-                        <xf:action ev:event="DOMFocusOut" ev:observer="component-inner-group" ev:target="component-inner-group">
+                        <xf:action ev:event="DOMFocusOut" ev:observer="component-inner-group" ev:target="#observer">
                             <xf:dispatch name="DOMFocusOut" targetid="fr-autocomplete"/>
                             <xf:dispatch name="update-external-value" targetid="component-inner-group"/>
                         </xf:action>
@@ -231,7 +230,7 @@
                                 <xf:setfocus control="search"/>
                                 <xf:dispatch targetid="resource-variable" name="xforms-value-changed"/>           <!-- For the resource mode, listening on resource AVT changing -->
                                 <xf:dispatch targetid="search" name="xforms-value-changed"/>                      <!-- For the dynamic mode, listening on the search field content changing -->
-                                <xxf:script id="sr" if="noscript != 'true'">YAHOO.xbl.fr.Autocomplete.instance(this).suggestionRequested = true;</xxf:script>
+                                <xxf:script id="sr" if="$script">YAHOO.xbl.fr.Autocomplete.instance(this).suggestionRequested = true;</xxf:script>
                             </xf:action>
                         </xsl:if>
                         <!-- In static mode, when the external value changes, search for an item with that value, and set search value to the item's label -->

@@ -668,10 +668,10 @@
             </xsl:if>
         </xsl:variable>
         <xhtml:li xxforms:control="true">
-            <xsl:copy-of select="@bind"/>
+            <xsl:copy-of select="@bind | @ref"/>
             <!-- Reference bind so that entry for section disappears if the section is non-relevant -->
             <xsl:choose>
-                <xsl:when test="not($is-noscript)">
+                <xsl:when test="not($is-noscript) and $mode = ('new', 'edit', 'import')">
                     <xforms:trigger appearance="minimal">
                         <xforms:label value="xxforms:label('{$id}')"/>
                         <xforms:setfocus ev:event="DOMActivate" control="{$id}" xxforms:input-only="true"/>

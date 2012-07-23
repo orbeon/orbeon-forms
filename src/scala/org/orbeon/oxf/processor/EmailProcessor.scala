@@ -79,38 +79,57 @@ class EmailProcessor extends ProcessorImpl {
 
             // Get credentials if any
             val (usernameOption, passwordOption) = {
-                val credentials = messageElement.element("credentials")
-                if (credentials ne null) {
-                    val usernameElement = credentials.element("username")
-                    val passwordElement = credentials.element("password")
+                Option(messageElement.element("credentials")) match {
+                    case Some(credentials) ⇒
+                        val usernameElement = credentials.element("username")
+                        val passwordElement = credentials.element("password")
 
-                    (optionalValueTrim(usernameElement), optionalValueTrim(passwordElement))
-                } else
-                    (None, None)
+                        (optionalValueTrim(usernameElement), optionalValueTrim(passwordElement))
+                    case None ⇒
+                        (None, None)
+                }
             }
 
-            def ensureCredentials(transport: String) =
+            def ensureCredentials(encryption: String) =
                 if (usernameOption.isEmpty)
-                    throw new OXFException("Credentails are required when using SSL")
+                    throw new OXFException("Credentails are required when using " + encryption.toUpperCase)
+
+            val defaultUpdatePort: String ⇒ Unit =
+                properties.setProperty("mail.smtp.port", _)
 
             // SSL and TLS
-            optionalValueTrim(messageElement.element("encryption")) match {
-                case Some("ssl") ⇒
-                    ensureCredentials("ssl") // partly enforced by the schema, but could have been blank
+            val (defaultPort, updatePort) =
+                optionalValueTrim(messageElement.element("encryption")) match {
+                    case Some("ssl") ⇒
+                        ensureCredentials("ssl") // partly enforced by the schema, but could have been blank
 
-                    properties.setProperty("mail.smtp.auth", "true")
-                    properties.setProperty("mail.smtp.socketFactory.port", "465")
-                    properties.setProperty("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory")
-                    properties.setProperty("mail.smtp.port", "465")
-                case Some("tls") ⇒
-                    ensureCredentials("tls") // partly enforced by the schema, but could have been blank
+                        properties.setProperty("mail.smtp.auth", "true")
+                        properties.setProperty("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory")
 
-                    properties.setProperty("mail.smtp.auth", "true")
-                    properties.setProperty("mail.smtp.starttls.enable", "true")
-                    properties.setProperty("mail.smtp.port", "587")
+                        val updatePort: String ⇒ Unit = { port ⇒
+                            properties.setProperty("mail.smtp.socketFactory.port", port)
+                            defaultUpdatePort(port)
+                        }
 
-                case _ ⇒
-            }
+                        // Should we change the default to 587?
+                        // "Although some servers support port 465 for legacy secure SMTP in violation of the
+                        // specifications" http://en.wikipedia.org/wiki/Simple_Mail_Transfer_Protocol#Ports
+                        (Some("465"), updatePort)
+
+                    case Some("tls") ⇒
+                        ensureCredentials("tls") // partly enforced by the schema, but could have been blank
+
+                        properties.setProperty("mail.smtp.auth", "true")
+                        properties.setProperty("mail.smtp.starttls.enable", "true")
+
+                        (Some("587"), defaultUpdatePort)
+
+                    case _ ⇒
+                        (None, defaultUpdatePort)
+                }
+
+            // Set or override port depending on the encryption settings
+            optionalValueTrim(messageElement.element("smtp-port")) orElse defaultPort foreach updatePort
 
             usernameOption match {
                 case Some(username) ⇒
@@ -131,19 +150,15 @@ class EmailProcessor extends ProcessorImpl {
             }
         }
 
-        // Override port is requested
-        optionalValueTrim(messageElement.element("smtp-port")) foreach
-            (properties.setProperty("mail.smtp.port", _))
-
         // Create message
         val message = new MimeMessage(session)
 
         def createAddresses(addressElement: Element): Array[Address] = {
             val email = addressElement.element("email").getTextTrim // required
 
-            val result = addressElement.element("name") match {
-                case nameElement: Element ⇒ Seq(new InternetAddress(email, nameElement.getTextTrim))
-                case null                 ⇒ InternetAddress.parse(email).toList
+            val result = Option(addressElement.element("name")) match {
+                case Some(nameElement) ⇒ Seq(new InternetAddress(email, nameElement.getTextTrim))
+                case None              ⇒ InternetAddress.parse(email).toList
             }
 
             result.toArray
@@ -206,41 +221,39 @@ class EmailProcessor extends ProcessorImpl {
 
         // Find out if there are embedded parts
         val parts = bodyElement.elementIterator("part")
-        var multipart: String = null
-        if ("body" == bodyElement.getName) {
-            multipart = bodyElement.attributeValue("mime-multipart")
-            if (multipart != null && ! parts.hasNext)
-                throw new OXFException("mime-multipart attribute on body element requires part children elements")
-            // TODO: Check following lines, which were doing nothing!
-//            final String contentTypeFromAttribute = NetUtils.getContentTypeMediaType(bodyElement.attributeValue("content-type"));
-//            if (contentTypeFromAttribute != null && contentTypeFromAttribute.startsWith("multipart/"))
-//                contentTypeFromAttribute.substring("multipart/".length());
+        val multipartOption =
+            if (bodyElement.getName == "body") {
+                val bodyMultipart = Option(bodyElement.attributeValue("mime-multipart"))
 
-            if (parts.hasNext && multipart == null)
-                multipart = DefaultMultipart
-        } else {
-            val contentTypeAttribute = NetUtils.getContentTypeMediaType(bodyElement.attributeValue("content-type"))
-            multipart =
-                if (contentTypeAttribute != null && contentTypeAttribute.startsWith("multipart/"))
-                    contentTypeAttribute.substring("multipart/".length)
+                if (parts.hasNext)
+                    bodyMultipart orElse Some("mixed")
+                else if (bodyMultipart.isDefined)
+                    throw new OXFException("mime-multipart attribute on body element requires part children elements")
                 else
-                    null
-        }
-        if (multipart ne null) {
-            // Multipart content is requested
-            val mimeMultipart = new MimeMultipart(multipart)
-            while (parts.hasNext) {
-                val partElement: Element = parts.next.asInstanceOf[Element]
-                val mimeBodyPart: MimeBodyPart = new MimeBodyPart
-                handleBody(pipelineContext, dataInputSystemId, mimeBodyPart, partElement)
-                mimeMultipart.addBodyPart(mimeBodyPart)
+                    None
+            } else {
+                Option(NetUtils.getContentTypeMediaType(bodyElement.attributeValue("content-type"))) filter
+                (_.startsWith("multipart/")) map
+                (_.substring("multipart/".length))
             }
 
-            // Set content on parent part
-            parentPart.setContent(mimeMultipart)
-        } else
-            // No multipart, just use the content of the element and add to the current part (which can be the main message)
-            handlePart(pipelineContext, dataInputSystemId, parentPart, bodyElement)
+        multipartOption match {
+            case Some(multipart) ⇒
+                // Multipart content is requested
+                val mimeMultipart = new MimeMultipart(multipart)
+                while (parts.hasNext) {
+                    val partElement = parts.next.asInstanceOf[Element]
+                    val mimeBodyPart = new MimeBodyPart
+                    handleBody(pipelineContext, dataInputSystemId, mimeBodyPart, partElement)
+                    mimeMultipart.addBodyPart(mimeBodyPart)
+                }
+
+                // Set content on parent part
+                parentPart.setContent(mimeMultipart)
+            case None ⇒
+                // No multipart, just use the content of the element and add to the current part (which can be the main message)
+                handlePart(pipelineContext, dataInputSystemId, parentPart, bodyElement)
+        }
     }
 
     private def handlePart(pipelineContext: PipelineContext, dataInputSystemId: String, parentPart: Part, partOrBodyElement: Element) {
@@ -250,29 +263,29 @@ class EmailProcessor extends ProcessorImpl {
         val charset = Option(NetUtils.getContentTypeCharset(contentTypeAttribute)) getOrElse DEFAULT_CHARACTER_ENCODING
 
         val contentTypeWithCharset = contentType + "; charset=" + charset
-        val src = partOrBodyElement.attributeValue("src")
 
         // Either a String or a FileItem
         val content =
-            if (src ne null) {
-                // Content of the part is not inline
+            Option(partOrBodyElement.attributeValue("src")) match {
+                case Some(src) ⇒
+                    // Content of the part is not inline
 
-                // Generate a FileItem from the source
-                val source = getSAXSource(EmailProcessor.this, pipelineContext, src, dataInputSystemId, contentType)
-                Left(handleStreamedPartContent(pipelineContext, source))
-            } else {
-                // Content of the part is inline
+                    // Generate a FileItem from the source
+                    val source = getSAXSource(EmailProcessor.this, pipelineContext, src, dataInputSystemId, contentType)
+                    Left(handleStreamedPartContent(pipelineContext, source))
+                case None ⇒
+                    // Content of the part is inline
 
-                // In the cases of text/html and XML, there must be exactly one root element
-                val needsRootElement = contentType == "text/html"// || ProcessorUtils.isXMLContentType(contentType);
-                if (needsRootElement && partOrBodyElement.elements.size != 1)
-                    throw new ValidationException("The <body> or <part> element must contain exactly one element for text/html", partOrBodyElement.getData.asInstanceOf[LocationData])
+                    // In the cases of text/html and XML, there must be exactly one root element
+                    val needsRootElement = contentType == "text/html"// || ProcessorUtils.isXMLContentType(contentType);
+                    if (needsRootElement && partOrBodyElement.elements.size != 1)
+                        throw new ValidationException("The <body> or <part> element must contain exactly one element for text/html", partOrBodyElement.getData.asInstanceOf[LocationData])
 
-                // Create Document and convert it into a String
-                val rootElement = (if (needsRootElement) partOrBodyElement.elements.get(0) else partOrBodyElement).asInstanceOf[Element]
-                val partDocument = new NonLazyUserDataDocument
-                partDocument.setRootElement(rootElement.asInstanceOf[NonLazyUserDataElement].clone.asInstanceOf[Element])
-                Right(handleInlinePartContent(partDocument, contentType))
+                    // Create Document and convert it into a String
+                    val rootElement = (if (needsRootElement) partOrBodyElement.elements.get(0) else partOrBodyElement).asInstanceOf[Element]
+                    val partDocument = new NonLazyUserDataDocument
+                    partDocument.setRootElement(rootElement.asInstanceOf[NonLazyUserDataElement].clone.asInstanceOf[Element])
+                    Right(handleInlinePartContent(partDocument, contentType))
             }
 
         if (! XMLUtils.isTextOrJSONContentType(contentType)) {
@@ -333,11 +346,12 @@ class EmailProcessor extends ProcessorImpl {
 object EmailProcessor {
 
     val Logger = LoggerFactory.createLogger(classOf[EmailProcessor])
-    val SMTPHost = "smtp-host"
-    val TestTo = "test-to"
+
+    val SMTPHost     = "smtp-host"
+    val TestTo       = "test-to"
     val TestSMTPHost = "test-smtp-host"
+
     val ConfigNamespaceURI = "http://www.orbeon.com/oxf/email"
-    val DefaultMultipart = "mixed"
 
     // Use utf-8 as most email clients support it. This allows us not to have to pick an inferior encoding.
     val DEFAULT_CHARACTER_ENCODING = "utf-8"
@@ -353,20 +367,20 @@ object EmailProcessor {
     }
 
     def getSAXSource(processor: Processor, pipelineContext: PipelineContext, href: String, base: String, contentType: String): SAXSource = {
-        val xmlReader = {
-            val inputName = ProcessorImpl.getProcessorInputSchemeInputName(href)
-            if (inputName ne null)
-                new ProcessorOutputXMLReader(pipelineContext, processor.getInputByName(inputName).getOutput)
-            else {
-                val urlGenerator =
-                    if (contentType eq null)
-                        new URLGenerator(URLFactory.createURL(base, href))
-                    else
-                        new URLGenerator(URLFactory.createURL(base, href), contentType, true)
-                new ProcessorOutputXMLReader(pipelineContext, urlGenerator.createOutput(ProcessorImpl.OUTPUT_DATA))
+        val processorOutput =
+            Option(ProcessorImpl.getProcessorInputSchemeInputName(href)) match {
+                case Some(inputName) ⇒
+                    processor.getInputByName(inputName).getOutput
+                case None ⇒
+                    val urlGenerator =
+                        Option(contentType) map
+                        (new URLGenerator(URLFactory.createURL(base, href), _, true)) getOrElse
+                        (new URLGenerator(URLFactory.createURL(base, href)))
+
+                    urlGenerator.createOutput(ProcessorImpl.OUTPUT_DATA)
             }
-        }
-        val saxSource = new SAXSource(xmlReader, new InputSource)
+
+        val saxSource = new SAXSource(new ProcessorOutputXMLReader(pipelineContext, processorOutput), new InputSource)
         saxSource.setSystemId(href)
         saxSource
     }
@@ -383,21 +397,3 @@ object EmailProcessor {
         def getInputStream  = new ByteArrayInputStream(data)
     }
 }
-
-// Set content-transfer-encoding header
-//                    final String contentTransferEncoding = partElement.attributeValue("content-transfer-encoding");
-//
-//                    MimeBodyPart part = new MimeBodyPart() {
-//                        protected void updateHeaders() throws MessagingException {
-//                            super.updateHeaders();
-//                            if (contentTransferEncoding != null)
-//                                setHeader("Content-Transfer-Encoding", contentTransferEncoding);
-//                        }
-//                    };
-//                    // Set content-disposition header
-//                    String contentDisposition = partElement.attributeValue("content-disposition");
-//                    if (contentDisposition != null)
-//                        part.setDisposition(contentDisposition);
-//
-//                    part.setDataHandler(new DataHandler(new SimpleTextDataSource(name, contentType, content)));
-//                    mimeMultipart.addBodyPart(part);

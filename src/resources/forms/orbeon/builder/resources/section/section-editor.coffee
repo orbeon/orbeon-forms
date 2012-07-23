@@ -35,20 +35,25 @@ $ ->
                 offset: f$.offset section
                 height: f$.height section
 
-    positionEditor = ->
-        sectionEditor.show()
-        sectionEditor.offset
-            top: currentSection.offset().top
-            left: (f$.offset $ '#fr-form-group').left - (f$.outerWidth sectionEditor)
-
-    updateTriggerRelevance = () ->
-        container = currentSection.children '.fr-section-container'
-        _.each (['up', 'right', 'down', 'left']), (direction) ->
-            relevant = container.hasClass ("fb-can-move-" + direction)
-            trigger = sectionEditor.children ('.fb-section-move-' + direction)
-            if relevant then trigger.show() else trigger.hide()
-
     updateEditor = ->
+
+        becomesCurrentSection = ->
+            do positionEditor = ->
+                sectionEditor.show()
+                sectionEditor.offset
+                    top: currentSection.offset().top
+                    left: (f$.offset $ '#fr-form-group').left - (f$.outerWidth sectionEditor)
+            do updateTriggerRelevance = ->
+                container = currentSection.children '.fr-section-container'
+                _.each (['up', 'right', 'down', 'left']), (direction) ->
+                    relevant = container.hasClass ("fb-can-move-" + direction)
+                    trigger = sectionEditor.children ('.fb-section-move-' + direction)
+                    if relevant then trigger.show() else trigger.hide()
+
+        wasCurrentSection = ->
+            sectionEditor.hide()
+            currentSection = null
+
         viewPos = do ->
             view = $ '.fr-view'
             left = (f$.offset view).left
@@ -63,13 +68,22 @@ $ ->
                 sectionPos.top <= pageY <= sectionPos.bottom
         if newSection?
             if newSection.element != currentSection
+                wasCurrentSection() if currentSection?
                 currentSection = newSection.element
-                positionEditor()
-                updateTriggerRelevance()
+                becomesCurrentSection()
         else
-            currentSection = null
-            sectionEditor.hide()
+            wasCurrentSection() if currentSection?
+
 
     Events.clickEvent.subscribe (event) ->
-        if f$.is '*', f$.closest '.fb-section-editor', $ event.target
-            OD.dispatchEvent currentSection[0].id, 'fb-set-current-section'
+        target = $ event.target
+        conditionToEvents = [[
+            -> f$.is '*', f$.closest '.fb-section-editor', target
+            ['fb-set-current-section']
+        ], [
+            -> (f$.is 'a', target) and (f$.is '.fr-section-label', f$.parent target)
+            ['fb-set-current-section', 'fb-show-section-label-editor']
+        ]]
+        _.each conditionToEvents, ([condition, events]) ->
+            if condition()
+                _.each events, (e) -> OD.dispatchEvent currentSection[0].id, e

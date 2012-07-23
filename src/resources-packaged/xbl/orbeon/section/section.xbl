@@ -29,7 +29,7 @@
          xmlns:xforms="http://www.w3.org/2002/xforms"
          xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
 
-    <xbl:binding id="fr-section" element="fr|section" xxforms:external-events="fb-set-current-section" xxbl:mode="binding lhha custom-lhha">
+    <xbl:binding id="fr-section" element="fr|section" xxforms:external-events="fb-set-current-section fb-show-section-label-editor" xxbl:mode="binding lhha custom-lhha">
 
         <xbl:handlers>
             <xbl:handler event="fr-expand" phase="target">
@@ -92,9 +92,10 @@
                                     <!-- Open/close button -->
                                     <xforms:group appearance="xxforms:internal">
                                         <xsl:if test="$collapse">
-
                                             <!-- Handle DOMActivate event to open/close the switches -->
-                                            <xforms:action ev:event="DOMActivate">
+                                            <xf:message ev:event="DOMActivate" value="concat('reading ', xxforms:instance('fb-variables')/section-label-editor-relevant)"/>
+                                            <xforms:action ev:event="DOMActivate"
+                                                           if="xxforms:instance('fb-variables')/section-label-editor-relevant = 'false'">
                                                 <xxforms:variable name="expand" select="xxforms:case('switch') = 'case-closed'" as="xs:boolean"/>
                                                 <xforms:action if="$expand">
                                                     <!-- Expand -->

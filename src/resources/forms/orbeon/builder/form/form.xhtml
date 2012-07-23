@@ -624,6 +624,17 @@
                                 </xf:action>
                             </xf:trigger>
                         </xh:div>
+                        XXX <xf:output value="instance('fb-variables')/section-label-editor-relevant"/>
+                        XXX <xf:output value="controlOps:controlName(instance('fb-variables')/selected-section)"/>
+                        XXX <xf:output value="$current-resources/*[name() = controlOps:controlName(instance('fb-variables')/selected-section)]/label"/>
+                        <xf:input xxf:autocomplete="off" class="fb-edit-section-label" id="fb-edit-section-label" ref="
+                                if (instance('fb-variables')/section-label-editor-relevant = 'true') then
+                                    $current-resources/*[name() = controlOps:controlName(instance('fb-variables')/selected-section)]/label
+                                else ()">
+                            <xf:label appearance="minimal" ref="$form-resources/type-label/label"/>
+                            <xf:setfocus ev:event="xforms-enabled" control="fb-edit-section-label"/>
+                            <xf:setvalue ev:event="DOMActivate DOMFocusOut" ref="instance('fb-variables')/section-label-editor-relevant">false</xf:setvalue>
+                        </xf:input>
 
                     </fr:body>
                 </fr:view>

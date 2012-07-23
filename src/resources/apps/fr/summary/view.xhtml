@@ -694,7 +694,7 @@
 
                         <div class="pagination pagination-centered">
                             <ul>
-                                <li>
+                                <li class="{if (xxforms:readonly(instance('fr-paging-instance')/prev-trigger)) then 'disabled' else ''}">
                                     <xforms:trigger ref="instance('fr-paging-instance')/prev-trigger" appearance="minimal">
                                         <xforms:label>
                                             <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/resultset_first.png" alt="First" title="First"/>
@@ -707,7 +707,7 @@
                                         </xforms:action>
                                     </xforms:trigger>
                                 </li>
-                                <li>
+                                <li class="{if (xxforms:readonly(instance('fr-paging-instance')/prev-trigger)) then 'disabled' else ''}">
                                     <xforms:trigger ref="instance('fr-paging-instance')/prev-trigger" appearance="minimal">
                                         <xforms:label>
                                             <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/resultset_previous.png" alt="Previous" title="Previous"/>
@@ -722,8 +722,8 @@
                                 </li>
                                 <xforms:group class="fr-paging-numbers" ref=".[xs:integer(instance('fr-paging-instance')/search-total) gt 0]">
                                     <!-- Some results -->
-                                    <li>
-                                        <a href="#" class="disabled">
+                                    <li class="disabled">
+                                        <a href="#">
                                             <xforms:output value="max((instance('fr-paging-instance')/from, 0))"/>
                                             <xforms:output value="$fr-resources/summary/paging/to"/>
                                             <xforms:output value="max((instance('fr-paging-instance')/to, 0))"/>
@@ -735,7 +735,7 @@
                                 <xforms:group class="fr-paging-numbers" ref=".[xs:integer(instance('fr-paging-instance')/search-total) = 0]">
                                     <!-- No results -->
                                 </xforms:group>
-                                <li>
+                                <li class="{if (xxforms:readonly(instance('fr-paging-instance')/next-trigger)) then 'disabled' else ''}">
                                     <xforms:trigger ref="instance('fr-paging-instance')/next-trigger" appearance="minimal">
                                         <xforms:label>
                                             <!--<xhtml:span><xforms:output value="$fr-resources/summary/labels/next"/></xhtml:span>-->
@@ -748,7 +748,7 @@
                                         </xforms:action>
                                     </xforms:trigger>
                                 </li>
-                                <li>
+                                <li class="{if (xxforms:readonly(instance('fr-paging-instance')/next-trigger)) then 'disabled' else ''}">
                                     <xforms:trigger ref="instance('fr-paging-instance')/next-trigger" appearance="minimal">
                                         <xforms:label>
                                             <!--<xhtml:span><xforms:output value="$fr-resources/summary/labels/last"/></xhtml:span>-->

@@ -27,7 +27,7 @@
 			</optional>
             <choice>
                 <group>
-                    <element name="smtp-auth">
+                    <element name="encryption">
                         <choice>
                             <value>ssl</value>
                             <value>tls</value>
@@ -37,7 +37,7 @@
                 </group>
                 <group>
                     <optional>
-                        <element name="smtp-auth">
+                        <element name="encryption">
                             <value/>
                         </element>
                     </optional>

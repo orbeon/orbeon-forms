@@ -122,8 +122,10 @@
 
     <!-- Email configuration -->
     <property as="xs:string"  name="oxf.fr.email.smtp.host.*.*"                                 value=""/>
+    <property as="xs:string"  name="oxf.fr.email.smtp.port.*.*"                                 value=""/>
     <property as="xs:string"  name="oxf.fr.email.smtp.username.*.*"                             value=""/>
     <property as="xs:string"  name="oxf.fr.email.smtp.credentials.*.*"                          value=""/>
+    <property as="xs:string"  name="oxf.fr.email.smtp.encryption.*.*"                           value=""/>              <!-- blank, tls, or ssl -->
     <property as="xs:string"  name="oxf.fr.email.from.*.*"                                      value=""/>
     <property as="xs:string"  name="oxf.fr.email.to.*.*"                                        value=""/>
     <property as="xs:boolean" name="oxf.fr.email.attach-pdf.*.*"                                value="true"/>

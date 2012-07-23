@@ -175,9 +175,9 @@
                 <xsl:if test="normalize-space($port)">
                     <smtp-port><xsl:value-of select="$port"/></smtp-port>
                 </xsl:if>
-                <smtp-auth>
-                    <xsl:value-of select="xpl:property(string-join(('oxf.fr.email.smtp.auth', $app, $form), '.'))"/>
-                </smtp-auth>
+                <encryption>
+                    <xsl:value-of select="xpl:property(string-join(('oxf.fr.email.smtp.encryption', $app, $form), '.'))"/>
+                </encryption>
                 <credentials>
                     <username>
                         <xsl:value-of select="xpl:property(string-join(('oxf.fr.email.smtp.username', $app, $form), '.'))"/>

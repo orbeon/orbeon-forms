@@ -94,7 +94,7 @@ class EmailProcessor extends ProcessorImpl {
                     throw new OXFException("Credentails are required when using SSL")
 
             // SSL and TLS
-            optionalValueTrim(messageElement.element("smtp-auth")) match {
+            optionalValueTrim(messageElement.element("encryption")) match {
                 case Some("ssl") ⇒
                     ensureCredentials("ssl") // partly enforced by the schema, but could have been blank
 
@@ -134,9 +134,6 @@ class EmailProcessor extends ProcessorImpl {
         // Override port is requested
         optionalValueTrim(messageElement.element("smtp-port")) foreach
             (properties.setProperty("mail.smtp.port", _))
-
-        // XXX debug
-        session.setDebug(true)
 
         // Create message
         val message = new MimeMessage(session)

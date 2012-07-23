@@ -20,18 +20,32 @@
                     <data type="string"/>
                 </element>
 			</optional>
-			<optional>
-				<element name="credentials">
-					<interleave>
-						<element name="username">
-							<data type="string"/>
-						</element>
-						<element name="password">
-							<data type="string"/>
-						</element>
-					</interleave>
-				</element>
+            <optional>
+                <element name="smtp-port">
+                    <data type="integer"/>
+                </element>
 			</optional>
+            <choice>
+                <group>
+                    <element name="smtp-auth">
+                        <choice>
+                            <value>ssl</value>
+                            <value>tls</value>
+                        </choice>
+                    </element>
+                    <ref name="credentials"/>
+                </group>
+                <group>
+                    <optional>
+                        <element name="smtp-auth">
+                            <value/>
+                        </element>
+                    </optional>
+                    <optional>
+                        <ref name="credentials"/>
+                    </optional>
+                </group>
+            </choice>
             <element name="from">
                 <ref name="address"/>
             </element>
@@ -76,6 +90,19 @@
                 </element>
             </optional>
         </interleave>
+    </define>
+
+    <define name="credentials">
+        <element name="credentials">
+            <interleave>
+                <element name="username">
+                    <data type="string"/>
+                </element>
+                <element name="password">
+                    <data type="string"/>
+                </element>
+            </interleave>
+        </element>
     </define>
 
     <define name="body">

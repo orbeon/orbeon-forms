@@ -95,7 +95,7 @@ public class SchemaRepository {
 
         SCHEMAS.put(ScopeProcessorBase.SCOPE_CONFIG_NAMESPACE_URI, PROCESSORS_SCHEMA_PATH + "scope/scope-config.rng");
 
-        SCHEMAS.put(EmailProcessor.EMAIL_CONFIG_NAMESPACE_URI, "schemas/email.rng");
+        SCHEMAS.put(EmailProcessor.ConfigNamespaceURI(), "schemas/email.rng");
         SCHEMAS.put(BeanGenerator.BEAN_CONFIG_NAMESPACE_URI, "schemas/bean-generator-config.rng");
         SCHEMAS.put(ResourceServer.RESOURCE_SERVER_NAMESPACE_URI, "schemas/resource-server.rng");
         SCHEMAS.put(ResourceServer.MIMETYPES_NAMESPACE_URI, "schemas/mime-types.rng");

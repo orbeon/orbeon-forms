@@ -171,6 +171,13 @@
                 <smtp-host>
                     <xsl:value-of select="xpl:property(string-join(('oxf.fr.email.smtp.host', $app, $form), '.'))"/>
                 </smtp-host>
+                <xsl:variable name="port" select="xpl:property(string-join(('oxf.fr.email.smtp.port', $app, $form), '.'))"/>
+                <xsl:if test="normalize-space($port)">
+                    <smtp-port><xsl:value-of select="$port"/></smtp-port>
+                </xsl:if>
+                <smtp-auth>
+                    <xsl:value-of select="xpl:property(string-join(('oxf.fr.email.smtp.auth', $app, $form), '.'))"/>
+                </smtp-auth>
                 <credentials>
                     <username>
                         <xsl:value-of select="xpl:property(string-join(('oxf.fr.email.smtp.username', $app, $form), '.'))"/>

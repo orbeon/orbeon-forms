@@ -211,6 +211,7 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
 
                             reusableAttributes.clear();
                             reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, inputIdName);
+                            reusableAttributes.addAttribute("", "type", "type", ContentHandlerHelper.CDATA, "text");
                             reusableAttributes.addAttribute("", "src", "src", ContentHandlerHelper.CDATA, XFormsConstants.CALENDAR_IMAGE_URI);
                             reusableAttributes.addAttribute("", "title", "title", ContentHandlerHelper.CDATA, "");
                             reusableAttributes.addAttribute("", "alt", "alt", ContentHandlerHelper.CDATA, "");

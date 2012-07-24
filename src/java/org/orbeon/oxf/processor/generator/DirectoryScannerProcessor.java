@@ -26,20 +26,17 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.*;
-import org.orbeon.oxf.resources.ResourceManagerWrapper;
-import org.orbeon.oxf.resources.URLFactory;
+import org.orbeon.oxf.util.DateUtils;
+import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.NumberUtils;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.oxf.util.DateUtils;
 
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -96,28 +93,8 @@ public class DirectoryScannerProcessor extends ProcessorImpl {
 
                         // Use location data if present so that relative URLs can be supported
                         final LocationData locationData = getLocationData();
-                        final URL fullURL;
-                        final String realPath;
-                        try {
-                            fullURL = (locationData != null && locationData.getSystemID() != null)
-                                                            ? URLFactory.createURL(locationData.getSystemID(), baseDirectoryURLString)
-                                                            : URLFactory.createURL(baseDirectoryURLString);
 
-                            if (fullURL.getProtocol().equals("oxf")) {
-                                // Get real path to resource path if possible
-                                realPath = ResourceManagerWrapper.instance().getRealPath(fullURL.getFile());
-                                if (realPath == null)
-                                    throw new OXFException("Directory Scanner processor is unable to obtain the real path of the file using the oxf: protocol for the base-directory property: " + baseDirectoryURLString);
-                            } else if (fullURL.getProtocol().equals("file")) {
-                                String host = fullURL.getHost();
-                                realPath = host + (host.length() > 0 ? ":" : "") + fullURL.getFile();
-                            } else {
-                                throw new OXFException("Directory Scanner processor only supports the file: and oxf: protocols for the base-directory property: " + baseDirectoryURLString);
-                            }
-
-                        } catch (MalformedURLException e) {
-                            throw new OXFException(e);
-                        }
+                        final String realPath = NetUtils.getRealPath(baseDirectoryURLString, locationData);
                         config.setBaseDirectory(realPath);
 
                         for (Iterator i = XPathUtils.selectIterator(configNode, "/config/include"); i.hasNext();) {

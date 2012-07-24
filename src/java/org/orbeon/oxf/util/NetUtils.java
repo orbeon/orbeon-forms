@@ -23,11 +23,13 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.generator.RequestGenerator;
+import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.webapp.WebAppListener;
 import org.orbeon.oxf.xml.XMLReceiverAdapter;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.xml.dom4j.LocationData;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;
@@ -919,5 +921,93 @@ public class NetUtils {
     public static boolean isSuccessCode(int code) {
         // Accept any success code (in particular "201 Resource Created")
         return code >= 200 && code < 300;
+    }
+
+    /**
+     * Get a File object from either a URL or a path.
+     */
+    public static File getFile(String configDirectory, String configFile, String configUrl, LocationData locationData, boolean makeDirectories) {
+
+        return configUrl == null ?
+                getFile(configDirectory, configFile, makeDirectories)
+                : getFile(configUrl, locationData, makeDirectories);
+    }
+
+    /**
+     * Find the real path of an oxf: or file: URL.
+     */
+    public static String getRealPath(String configUrl, LocationData locationData) {
+        try {
+            // Use location data if present so that relative URLs can be supported
+            final URL fullURL = (locationData != null && locationData.getSystemID() != null)
+                    ? URLFactory.createURL(locationData.getSystemID(), configUrl)
+                    : URLFactory.createURL(configUrl);
+
+            final String realPath;
+            if (fullURL.getProtocol().equals("oxf")) {
+                // Get real path to resource path if possible
+                realPath = ResourceManagerWrapper.instance().getRealPath(fullURL.getFile());
+                if (realPath == null)
+                    throw new OXFException("Unable to obtain the real path of the file using the oxf: protocol for URL: " + configUrl);
+            } else if (fullURL.getProtocol().equals("file")) {
+                String host = fullURL.getHost();
+                realPath = host + (host.length() > 0 ? ":" : "") + fullURL.getFile();
+            } else {
+                throw new OXFException("Only the file: and oxf: protocols are supported for URL: " + configUrl);
+            }
+
+            return realPath;
+
+        } catch (MalformedURLException e) {
+            throw new OXFException(e);
+        }
+    }
+
+    /**
+     * Get a File object for an oxf: or file: URL.
+     */
+    public static File getFile(String configUrl, LocationData locationData, boolean makeDirectories) {
+        return getFile(null, getRealPath(configUrl, locationData), makeDirectories);
+    }
+
+    /**
+     * Get a File object from a path.
+     */
+    public static File getFile(String configDirectory, String configFile, boolean makeDirectories) {
+
+        if (configDirectory != null && configDirectory.startsWith("oxf:")) {
+            // ???
+        }
+
+        final File file;
+        if (configDirectory == null) {
+            // No base directory specified
+            file = new File(configFile);
+        } else {
+            // Base directory specified
+            final File baseDirectory = new File(configDirectory);
+
+            // Make directories if needed
+            if (makeDirectories) {
+                if (!baseDirectory.exists()) {
+                    if (!baseDirectory.mkdirs())
+                        throw new OXFException("Directory '" + baseDirectory + "' could not be created.");
+                }
+            }
+
+            if (!baseDirectory.isDirectory() || !baseDirectory.canWrite())
+                throw new OXFException("Directory '" + baseDirectory + "' is not a directory or is not writeable.");
+
+            file = new File(baseDirectory, configFile);
+        }
+        // Make directories if needed
+        if (makeDirectories) {
+            if (!file.getParentFile().exists()) {
+                if (!file.getParentFile().mkdirs())
+                    throw new OXFException("Directory '" + file.getParentFile() + "' could not be created.");
+            }
+        }
+
+        return file;
     }
 }

@@ -25,6 +25,7 @@ import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorUtils;
 import org.orbeon.oxf.processor.serializer.FileSerializer;
 import org.orbeon.oxf.util.LoggerFactory;
+import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xml.XPathUtils;
 
 import java.io.File;
@@ -66,14 +67,13 @@ public class FileProcessor extends ProcessorImpl {
 
 
                     // Get file object
-                    final File file = FileSerializer.getFile(
-                            XPathUtils.selectStringValueNormalize(currentElement, "directory"),
+                    final File file = NetUtils.getFile(
+                            getDirectory(currentElement, "directory"),
                             XPathUtils.selectStringValueNormalize(currentElement, "file"),
                             XPathUtils.selectStringValueNormalize(currentElement, "url"),
                             getLocationData(),
-                            false,
-                            getPropertySet()
-                            );
+                            false
+                    );
 
                     // Delete file if it exists
                     if (file.exists() && file.canWrite()) {
@@ -85,13 +85,12 @@ public class FileProcessor extends ProcessorImpl {
                     // Move operation
 
                     // From
-                    final File fromFile = FileSerializer.getFile(
-                            XPathUtils.selectStringValueNormalize(currentElement, "from/directory"),
+                    final File fromFile = NetUtils.getFile(
+                            getDirectory(currentElement, "from/directory"),
                             XPathUtils.selectStringValueNormalize(currentElement, "from/file"),
                             XPathUtils.selectStringValueNormalize(currentElement, "from/url"),
                             getLocationData(),
-                            false,
-                            getPropertySet()
+                            false
                             );
 
                     if (!fromFile.exists() || ! fromFile.canRead()) {
@@ -99,13 +98,12 @@ public class FileProcessor extends ProcessorImpl {
                     }
 
                     // To
-                    final File toFile = FileSerializer.getFile(
-                            XPathUtils.selectStringValueNormalize(currentElement, "to/directory"),
+                    final File toFile = NetUtils.getFile(
+                            getDirectory(currentElement, "to/directory"),
                             XPathUtils.selectStringValueNormalize(currentElement, "to/file"),
                             XPathUtils.selectStringValueNormalize(currentElement, "to/url"),
                             getLocationData(),
-                            ProcessorUtils.selectBooleanValue(currentElement, "to/make-directories", DEFAULT_MAKE_DIRECTORIES),
-                            getPropertySet()
+                            ProcessorUtils.selectBooleanValue(currentElement, "to/make-directories", DEFAULT_MAKE_DIRECTORIES)
                             );
 
                     if (! (toFile.exists() || toFile.createNewFile() )) {
@@ -127,13 +125,12 @@ public class FileProcessor extends ProcessorImpl {
                     // Copy operation
 
                     // From
-                    final File fromFile = FileSerializer.getFile(
-                            XPathUtils.selectStringValueNormalize(currentElement, "from/directory"),
+                    final File fromFile = NetUtils.getFile(
+                            getDirectory(currentElement, "from/directory"),
                             XPathUtils.selectStringValueNormalize(currentElement, "from/file"),
                             XPathUtils.selectStringValueNormalize(currentElement, "from/url"),
                             getLocationData(),
-                            false,
-                            getPropertySet()
+                            false
                             );
 
                     if (!fromFile.exists() || ! fromFile.canRead()) {
@@ -141,13 +138,12 @@ public class FileProcessor extends ProcessorImpl {
                     }
 
                     // To
-                    final File toFile = FileSerializer.getFile(
-                            XPathUtils.selectStringValueNormalize(currentElement, "to/directory"),
+                    final File toFile = NetUtils.getFile(
+                            getDirectory(currentElement, "to/directory"),
                             XPathUtils.selectStringValueNormalize(currentElement, "to/file"),
                             XPathUtils.selectStringValueNormalize(currentElement, "to/url"),
                             getLocationData(),
-                            ProcessorUtils.selectBooleanValue(currentElement, "to/make-directories", DEFAULT_MAKE_DIRECTORIES),
-                            getPropertySet()
+                            ProcessorUtils.selectBooleanValue(currentElement, "to/make-directories", DEFAULT_MAKE_DIRECTORIES)
                             );
 
                     if (! (toFile.exists() || toFile.createNewFile() )) {
@@ -206,6 +202,11 @@ public class FileProcessor extends ProcessorImpl {
         } catch (Exception e) {
             throw new OXFException(e);
         }
+    }
+
+    private String getDirectory(Element currentElement, String elementPath) {
+        final String configDirectory = XPathUtils.selectStringValueNormalize(currentElement, elementPath);
+        return configDirectory != null ? configDirectory : getPropertySet().getString(FileSerializer.DIRECTORY_PROPERTY);
     }
 
     public static void copyFile(File sourceFile, File destFile)  {

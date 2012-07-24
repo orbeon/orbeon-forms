@@ -34,29 +34,23 @@ public class ExceptionCatcher extends ProcessorImpl {
 
     @Override
     public ProcessorOutput createOutput(String name) {
-        ProcessorOutput output = new ProcessorOutputImpl(ExceptionCatcher.this, name) {
+        final ProcessorOutput output = new ProcessorOutputImpl(ExceptionCatcher.this, name) {
             public void readImpl(PipelineContext context, XMLReceiver xmlReceiver) {
                 try {
                     // Try to read input in SAX store
-                    SAXStore dataInput = new SAXStore();
+                    final SAXStore dataInput = new SAXStore();
                     readInputAsSAX(context, getInputByName(INPUT_DATA), dataInput);
                     // No exception: output what was read
                     dataInput.replay(xmlReceiver);
                 } catch (Throwable e) {
                     // Exception was thrown while reading input: generate a document with that exception
-                    ContentHandlerHelper helper = new ContentHandlerHelper(xmlReceiver);
+                    final ContentHandlerHelper helper = new ContentHandlerHelper(xmlReceiver);
                     helper.startDocument();
-                    String rootElementName = "exceptions";
+                    final String rootElementName = "exceptions";
                     helper.startElement(rootElementName);
 
                     // Find the root throwable
-                    Throwable innerMostThrowable = e; {
-                        while (true) {
-                            Throwable candidate = Exceptions.getNestedThrowableOrNull(innerMostThrowable);
-                            if (candidate == null) break;
-                            else innerMostThrowable = candidate;
-                        }
-                    }
+                    final Throwable innerMostThrowable = Exceptions.getRootThrowable(e);
 
                     ExceptionGenerator.addThrowable(helper, innerMostThrowable);
                     helper.endElement();

@@ -966,10 +966,6 @@ public class NetUtils {
      */
     public static File getFile(String configDirectory, String configFile, boolean makeDirectories) {
 
-        if (configDirectory != null && configDirectory.startsWith("oxf:")) {
-            // ???
-        }
-
         final File file;
         if (configDirectory == null) {
             // No base directory specified

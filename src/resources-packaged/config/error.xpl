@@ -59,18 +59,7 @@
     </p:processor>
 
     <!-- Convert to HTML -->
-    <p:processor name="oxf:qname-converter">
-        <p:input name="config">
-            <config>
-                <match>
-                    <uri>http://www.w3.org/1999/xhtml</uri>
-                </match>
-                <replace>
-                    <uri/>
-                    <prefix/>
-                </replace>
-            </config>
-        </p:input>
+    <p:processor name="oxf:plain-xhtml-converter">
         <p:input name="data" href="#rewritten-data"/>
         <p:output name="data" id="html-data"/>
     </p:processor>

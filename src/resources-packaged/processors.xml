@@ -416,6 +416,10 @@
         <class name="org.orbeon.oxf.processor.converter.QNameConverter"/>
     </processor>
 
+    <processor name="oxf:plain-xhtml-converter">
+        <class name="org.orbeon.oxf.processor.converter.PlainXHTMLConverter"/>
+    </processor>
+
     <processor name="oxf:to-xml-converter">
         <class name="org.orbeon.oxf.processor.converter.ToXMLConverter"/>
     </processor>

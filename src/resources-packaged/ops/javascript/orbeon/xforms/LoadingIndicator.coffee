@@ -24,8 +24,8 @@ class LoadingIndicator
     constructor: (@form) ->
         @shownCounter = 0
 
-        # For now hide the loading indicator
-        @loadingSpan = _.detect @form.childNodes, (node) -> YD.hasClass node, "xforms-loading-loading"
+        # For now hide the loading indicator (use jQuery to fix #403)
+        @loadingSpan = (f$.children '.xforms-loading-loading', $ @form)[0]
         @loadingSpan.style.display = "none"
 
         # Differ creation of the overlay to the first time we need it

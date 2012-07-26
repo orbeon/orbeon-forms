@@ -212,16 +212,6 @@ public class XMLUtils {
         return (colonIndex == -1) ? qName : qName.substring(colonIndex + 1);
     }
 
-    /**
-     * Return "" if there is no prefix, null if the prefix is not mapped, a URI otherwise.
-     */
-    public static String uriFromQName(String qName, NamespaceSupport3 namespaceSupport) {
-        final String prefix = prefixFromQName(qName);
-        if ("".equals(prefix))
-            return "";
-        return namespaceSupport.getURI(prefix);
-    }
-
     public static String buildQName(String prefix, String localname) {
         return (prefix == null || prefix.equals("")) ? localname : prefix + ":" + localname;
     }

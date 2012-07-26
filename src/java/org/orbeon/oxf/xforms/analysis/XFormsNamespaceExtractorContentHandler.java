@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.analysis;
 
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xml.ForwardingXMLReceiver;
-import org.orbeon.oxf.xml.NamespaceSupport3;
+import org.orbeon.oxf.xml.NamespaceContext;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
@@ -32,7 +32,7 @@ public class XFormsNamespaceExtractorContentHandler extends ForwardingXMLReceive
     private int xformsInstanceLevel = -1;
 
     private final Map<String, Map<String, Object>> namespaceMappings;
-    private NamespaceSupport3 namespaceSupport = new NamespaceSupport3();
+    private NamespaceContext namespaceContext = new NamespaceContext();
 
 //    private final Map ids = new HashMap();
 
@@ -42,7 +42,7 @@ public class XFormsNamespaceExtractorContentHandler extends ForwardingXMLReceive
 
     public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
 
-        namespaceSupport.startElement();
+        namespaceContext.startElement();
 
         level++;
 
@@ -61,10 +61,10 @@ public class XFormsNamespaceExtractorContentHandler extends ForwardingXMLReceive
 
                 // Gather namespace information
                 final Map<String, Object> namespaces = new HashMap<String, Object>();
-                for (Enumeration e = namespaceSupport.getPrefixes(); e.hasMoreElements();) {
+                for (Enumeration e = namespaceContext.getPrefixes(); e.hasMoreElements();) {
                     final String namespacePrefix = (String) e.nextElement();
                     if (!namespacePrefix.startsWith("xml") && !namespacePrefix.equals(""))
-                        namespaces.put(namespacePrefix, namespaceSupport.getURI(namespacePrefix));
+                        namespaces.put(namespacePrefix, namespaceContext.getURI(namespacePrefix));
                 }
 
                 namespaceMappings.put(idAttribute, namespaces);
@@ -86,11 +86,11 @@ public class XFormsNamespaceExtractorContentHandler extends ForwardingXMLReceive
 
         level--;
 
-        namespaceSupport.endElement();
+        namespaceContext.endElement();
     }
 
     public void startPrefixMapping(String prefix, String uri) throws SAXException {
-        namespaceSupport.startPrefixMapping(prefix, uri);
+        namespaceContext.startPrefixMapping(prefix, uri);
     }
 }
 

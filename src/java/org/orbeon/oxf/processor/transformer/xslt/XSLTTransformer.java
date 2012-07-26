@@ -847,7 +847,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
 
                 @Override
                 public String getURIForPrefix(String prefix) {
-                    return namespaces.getURI(prefix);
+                    return namespaceContext.getURI(prefix);
                 }
 
                 @Override
@@ -878,7 +878,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
         private Locator locator;
         private URIReferences uriReferences = new URIReferences();
         private String systemId;
-        private final NamespaceSupport3 namespaces = new NamespaceSupport3();
+        private final NamespaceContext namespaceContext = new NamespaceContext();
 
         public StylesheetForwardingXMLReceiver() {
             super();
@@ -901,13 +901,13 @@ public abstract class XSLTTransformer extends ProcessorImpl {
 
         @Override
         public void startPrefixMapping(String prefix, String uri) throws SAXException {
-            namespaces.startPrefixMapping(prefix, uri);
+            namespaceContext.startPrefixMapping(prefix, uri);
             super.startPrefixMapping(prefix, uri);
         }
 
         @Override
         public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
-            namespaces.startElement();
+            namespaceContext.startElement();
             // Save system id
             if (systemId == null && locator != null)
                 systemId = locator.getSystemId();
@@ -979,7 +979,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
         @Override
         public void endElement(String uri, String localname, String qName) throws SAXException {
             super.endElement(uri, localname, qName);
-            namespaces.endElement();
+            namespaceContext.endElement();
         }
 
         @Override

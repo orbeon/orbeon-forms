@@ -16,7 +16,8 @@ package org.orbeon.scaxon
 import org.xml.sax.{ContentHandler, Locator, Attributes}
 import org.xml.sax.ext.LexicalHandler
 import javax.xml.namespace.QName
-import org.orbeon.oxf.xml.{NamespaceSupport3, XMLUtils} // TODO: remove dependency on this or move dependency to Scaxon
+import org.orbeon.oxf.xml.{NamespaceContext, XMLUtils} // TODO: remove dependency on this or move dependency to Scaxon
+import scala.collection.mutable.ListBuffer
 
 // FSM specifically handling SAX events
 object SAXMachine {
@@ -25,7 +26,7 @@ object SAXMachine {
     case class DocumentLocator(locator: Locator) extends SAXEvent
     case object StartDocument extends SAXEvent
     case object EndDocument extends SAXEvent
-    case class StartElement(qName: QName, atts: Attributes) extends SAXEvent
+    case class StartElement(qName: QName, atts: Atts) extends SAXEvent
     case class EndElement(qName: QName) extends SAXEvent
     case class Characters(ch: Array[Char], start: Int, length: Int) extends SAXEvent
     case class Comment(ch: Array[Char], start: Int, length: Int) extends SAXEvent
@@ -33,16 +34,58 @@ object SAXMachine {
     case class StartPrefixMapping(prefix: String, uri: String) extends SAXEvent
     case class EndPrefixMapping(prefix: String) extends SAXEvent
 
+    case class Atts(atts: Seq[(QName, String)]) extends Attributes {
+        def getLength = atts.size
+
+        def getURI(index: Int)       = if (inRange(index)) atts(index)._1.getNamespaceURI else null
+        def getLocalName(index: Int) = if (inRange(index)) atts(index)._1.getLocalPart else null
+        def getQName(index: Int)     = if (inRange(index)) XMLUtils.buildQName(getPrefix(index), getLocalName(index)) else null
+        def getType(index: Int)      = if (inRange(index)) "CDATA" else null
+        def getValue(index: Int)     = if (inRange(index)) atts(index)._2 else null
+
+        def getIndex(uri: String, localName: String) =
+            atts indexWhere { case (qName, _) ⇒ qName.getNamespaceURI == uri && qName.getLocalPart == localName }
+
+        def getIndex(qName: String) = {
+            val (prefix, localName) = XML.parseQName(qName)
+            atts indexWhere { case (qName, _) ⇒ qName.getPrefix == prefix && qName.getLocalPart == localName }
+        }
+
+        def getValue(uri: String, localName: String) = getValue(getIndex(uri, localName))
+        def getValue(qName: String) = getValue(getIndex(qName))
+
+        def getType(uri: String, localName: String) = getType(getIndex(uri, localName))
+        def getType(qName: String) = getType(getIndex(qName))
+
+        private def getPrefix(index: Int) = if (inRange(index)) atts(index)._1.getPrefix else null
+        private def inRange(index: Int) = index >= 0 && index < atts.size
+    }
+
     // Allow creating a StartElement with SAX-compatible parameters
     object StartElement {
         def apply(namespaceURI: String, localName: String, qName: String, atts: Attributes): StartElement =
-            StartElement(new QName(namespaceURI, localName, XMLUtils.prefixFromQName(qName)), atts)
+            StartElement(new QName(namespaceURI, localName, XMLUtils.prefixFromQName(qName)), Atts(atts))
     }
 
     // Allow creating an EndElement with SAX-compatible parameters
     object EndElement {
         def apply(namespaceURI: String, localName: String, qName: String): EndElement =
             EndElement(new QName(namespaceURI, localName, XMLUtils.prefixFromQName(qName)))
+    }
+
+    object Atts {
+        def apply(atts: Attributes): Atts = Atts(toSeq(atts))
+
+        def toSeq(atts: Attributes) = {
+            val length = atts.getLength
+            val result = ListBuffer[(QName, String)]()
+            var i = 0
+            while (i < length) {
+                result += new QName(atts.getURI(i), atts.getLocalName(i), XMLUtils.prefixFromQName(atts.getQName(i))) → atts.getValue(i)
+                i += 1
+            }
+            result.toList
+        }
     }
 }
 
@@ -54,14 +97,13 @@ trait SAXMachine[S, D] extends FSM[S, SAXMachine.SAXEvent, D] with ContentHandle
     private var _level = 0
     protected def depth = _level
 
-    // TODO: Maybe rewrite NamespaceSupport as it's pretty bad
-    protected val namespaceSupport: NamespaceSupport3 = new NamespaceSupport3
+    protected val namespaceContext: NamespaceContext = new NamespaceContext
 
     // Forward the given SAX event to the output
     final protected def forward(out: ContentHandler with LexicalHandler, saxEvent: SAXEvent) = saxEvent match {
         case StartDocument ⇒ out.startDocument()
         case EndDocument ⇒ out.endDocument()
-        case StartElement(qName: QName, atts: Attributes) ⇒ out.startElement(qName.getNamespaceURI, qName.getLocalPart, XMLUtils.buildQName(qName.getPrefix, qName.getLocalPart), atts)
+        case StartElement(qName: QName, atts: Atts) ⇒ out.startElement(qName.getNamespaceURI, qName.getLocalPart, XMLUtils.buildQName(qName.getPrefix, qName.getLocalPart), atts)
         case EndElement(qName: QName) ⇒ out.endElement(qName.getNamespaceURI, qName.getLocalPart, XMLUtils.buildQName(qName.getPrefix, qName.getLocalPart))
         case Characters(ch: Array[Char], start: Int, length: Int) ⇒ out.characters(ch, start, length)
         case Comment(ch: Array[Char], start: Int, length: Int) ⇒ out.comment(ch, start, length)
@@ -77,7 +119,7 @@ trait SAXMachine[S, D] extends FSM[S, SAXMachine.SAXEvent, D] with ContentHandle
     final override def endDocument() = processEvent(EndDocument)
 
     final override def startElement(namespaceURI: String, localName: String, qName: String, atts: Attributes) = {
-        namespaceSupport.startElement()
+        namespaceContext.startElement()
         _level += 1
         processEvent(StartElement(namespaceURI, localName, qName, atts))
     }
@@ -85,7 +127,7 @@ trait SAXMachine[S, D] extends FSM[S, SAXMachine.SAXEvent, D] with ContentHandle
     final override def endElement(namespaceURI: String, localName: String, qName: String) = {
         processEvent(EndElement(namespaceURI, localName, qName))
         _level -= 1
-        namespaceSupport.endElement()
+        namespaceContext.endElement()
     }
 
     final override def characters(ch: Array[Char], start: Int, length: Int) = processEvent(Characters(ch, start, length))
@@ -94,7 +136,7 @@ trait SAXMachine[S, D] extends FSM[S, SAXMachine.SAXEvent, D] with ContentHandle
     final override def processingInstruction(target: String, data: String) = processEvent(PI(target, data))
     
     final override def startPrefixMapping(prefix: String, uri: String) = {
-        namespaceSupport.startPrefixMapping(prefix, uri)
+        namespaceContext.startPrefixMapping(prefix, uri)
         processEvent(StartPrefixMapping(prefix, uri))
     }
     final override def endPrefixMapping(prefix: String) = processEvent(EndPrefixMapping(prefix))

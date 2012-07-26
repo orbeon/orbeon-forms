@@ -38,7 +38,7 @@ public class InspectingContentHandler extends ForwardingXMLReceiver {
     private boolean documentStarted = false;
     private boolean documentEnded = false;
 
-    private NamespaceSupport3 namespaceSupport = new NamespaceSupport3();
+    private NamespaceContext namespaceContext = new NamespaceContext();
 
     public InspectingContentHandler(XMLReceiver xmlReceiver) {
         super(xmlReceiver);
@@ -65,7 +65,7 @@ public class InspectingContentHandler extends ForwardingXMLReceiver {
     }
 
     public void startElement(String uri, String localname, String qname, Attributes attributes) throws SAXException {
-        namespaceSupport.startElement();
+        namespaceContext.startElement();
         final String error = checkInDocument();
         if (error != null)
             throw new ValidationException(error + ": element " + qname, new LocationData(locator));
@@ -94,7 +94,7 @@ public class InspectingContentHandler extends ForwardingXMLReceiver {
         // Check name
         checkElementName(uri, localname, qname);
 
-        namespaceSupport.endElement();
+        namespaceContext.endElement();
 
         super.endElement(uri, localname, qname);
     }
@@ -143,7 +143,7 @@ public class InspectingContentHandler extends ForwardingXMLReceiver {
     }
 
     public void startPrefixMapping(String prefix, String uri) throws SAXException {
-        namespaceSupport.startPrefixMapping(prefix, uri);
+        namespaceContext.startPrefixMapping(prefix, uri);
 
         super.startPrefixMapping(prefix, uri);
     }
@@ -166,7 +166,7 @@ public class InspectingContentHandler extends ForwardingXMLReceiver {
             // We are in a namespace
             if (colonIndex == -1) {
                 // QName is not prefixed, check that we match the default namespace
-                if (!uri.equals(namespaceSupport.getURI("")))
+                if (!uri.equals(namespaceContext.getURI("")))
                     throw new ValidationException("Namespace doesn't match default namespace. Namespace: " + uri + "; QName: " + qname, new LocationData(locator));
             } else if (colonIndex == 0 || colonIndex == (qname.length() - 1)) {
                 // Invalid position of colon in QName
@@ -174,10 +174,10 @@ public class InspectingContentHandler extends ForwardingXMLReceiver {
             } else {
                 // Name is prefixed: check that prefix is bound and maps to namespace
                 final String prefix = qname.substring(0, colonIndex);
-                if (namespaceSupport.getURI(prefix) == null)
+                if (namespaceContext.getURI(prefix) == null)
                     throw new ValidationException("QName prefix is not in scope: " + qname, new LocationData(locator));
-                if (!uri.equals(namespaceSupport.getURI(prefix)))
-                    throw new ValidationException("QName prefix maps to URI: " + namespaceSupport.getURI(prefix) + "; but namespace provided is: " + uri, new LocationData(locator));
+                if (!uri.equals(namespaceContext.getURI(prefix)))
+                    throw new ValidationException("QName prefix maps to URI: " + namespaceContext.getURI(prefix) + "; but namespace provided is: " + uri, new LocationData(locator));
             }
         } else {
             // We are not in a namespace

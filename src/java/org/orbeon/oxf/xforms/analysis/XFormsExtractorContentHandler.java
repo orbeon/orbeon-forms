@@ -93,7 +93,7 @@ public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
 
     private int level;
 
-    private NamespaceSupport3 namespaceSupport = new NamespaceSupport3();
+    private NamespaceContext namespaceContext = new NamespaceContext();
 
     private boolean mustOutputFirstElement = true;
 
@@ -267,7 +267,7 @@ public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
 
     public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
 
-        namespaceSupport.startElement();
+        namespaceContext.startElement();
 
         // Handle location data
         if (locationData == null && locator != null && mustOutputFirstElement) {
@@ -439,16 +439,16 @@ public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
     }
 
     private void sendStartPrefixMappings() throws SAXException {
-        for (Enumeration e = namespaceSupport.getPrefixes(); e.hasMoreElements();) {
+        for (Enumeration e = namespaceContext.getPrefixes(); e.hasMoreElements();) {
             final String namespacePrefix = (String) e.nextElement();
-            final String namespaceURI = namespaceSupport.getURI(namespacePrefix);
+            final String namespaceURI = namespaceContext.getURI(namespacePrefix);
             if (!namespacePrefix.startsWith("xml"))
                 super.startPrefixMapping(namespacePrefix, namespaceURI);
         }
     }
 
     private void sendEndPrefixMappings() throws SAXException {
-        for (Enumeration e = namespaceSupport.getPrefixes(); e.hasMoreElements();) {
+        for (Enumeration e = namespaceContext.getPrefixes(); e.hasMoreElements();) {
             final String namespacePrefix = (String) e.nextElement();
             if (!namespacePrefix.startsWith("xml"))
                 super.endPrefixMapping(namespacePrefix);
@@ -503,7 +503,7 @@ public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
             elementStack.pop();
         }
 
-        namespaceSupport.endElement();
+        namespaceContext.endElement();
     }
 
     public void characters(char[] chars, int start, int length) throws SAXException {
@@ -519,7 +519,7 @@ public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
     }
 
     public void startPrefixMapping(String prefix, String uri) throws SAXException {
-        namespaceSupport.startPrefixMapping(prefix, uri);
+        namespaceContext.startPrefixMapping(prefix, uri);
         if (inXFormsOrExtension)
             super.startPrefixMapping(prefix, uri);
     }

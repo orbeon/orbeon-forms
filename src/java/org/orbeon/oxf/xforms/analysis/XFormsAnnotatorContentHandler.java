@@ -68,7 +68,7 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
     private final Metadata metadata;
     private final boolean isGenerateIds;
 
-    private NamespaceSupport3 namespaceSupport = new NamespaceSupport3();
+    private NamespaceContext namespaceContext = new NamespaceContext();
     private final List<String> xhtmlElementLocalnames = new ArrayList<String>();
 
     // Name of container elements that require the use of separators for handling visibility
@@ -124,7 +124,7 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
     @Override
     public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
 
-        namespaceSupport.startElement();
+        namespaceContext.startElement();
 
         if (XMLConstants.XHTML_NAMESPACE_URI.equals(uri))
             xhtmlElementLocalnames.add(localname);
@@ -468,7 +468,7 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
         if (XMLConstants.XHTML_NAMESPACE_URI.equals(uri))
             xhtmlElementLocalnames.remove(xhtmlElementLocalnames.size() - 1);
 
-        namespaceSupport.endElement();
+        namespaceContext.endElement();
     }
 
     private boolean isClosestXHTMLAncestorTableContainer() {
@@ -500,10 +500,10 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
 
     final private void addNamespaceMapping(String rawId) {
         final Map<String, String> namespaces = new HashMap<String, String>();
-        for (Enumeration e = namespaceSupport.getPrefixes(); e.hasMoreElements();) {
+        for (Enumeration e = namespaceContext.getPrefixes(); e.hasMoreElements();) {
             final String namespacePrefix = (String) e.nextElement();
             if (!namespacePrefix.startsWith("xml") && !namespacePrefix.equals("")) {
-                namespaces.put(namespacePrefix, namespaceSupport.getURI(namespacePrefix));
+                namespaces.put(namespacePrefix, namespaceContext.getURI(namespacePrefix));
             }
         }
         // Re-add standard "xml" prefix mapping
@@ -524,7 +524,7 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
         elementAttribute = elementAttribute.replace('|', ':');
         final String bindingPrefix = XMLUtils.prefixFromQName(elementAttribute);
         if (bindingPrefix != null) {
-            final String bindingURI = namespaceSupport.getURI(bindingPrefix);
+            final String bindingURI = namespaceContext.getURI(bindingPrefix);
             if (bindingURI != null) {
                 // Found URI
                 metadata.storeXBLBinding(bindingURI, XMLUtils.localNameFromQName(elementAttribute));
@@ -534,7 +534,7 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
 
     @Override
     public void startPrefixMapping(String prefix, String uri) throws SAXException {
-        namespaceSupport.startPrefixMapping(prefix, uri);
+        namespaceContext.startPrefixMapping(prefix, uri);
         startPrefixMapping(true, prefix, uri);
     }
 

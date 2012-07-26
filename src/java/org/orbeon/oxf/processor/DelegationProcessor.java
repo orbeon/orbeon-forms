@@ -73,11 +73,11 @@ public class DelegationProcessor extends ProcessorImpl {
                     ServiceDefinition service;
                     OperationDefinition operation;
                     SAXStore parameters;
-                    private NamespaceSupport3 namespaceSupport = new NamespaceSupport3();
+                    private NamespaceContext namespaceContext = new NamespaceContext();
 
                     public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
 
-                        namespaceSupport.startElement();
+                        namespaceContext.startElement();
 
                         if (uri.equals(DELEGATION_NAMESPACE_URI) && localname.equals("execute")) {
 
@@ -131,13 +131,13 @@ public class DelegationProcessor extends ProcessorImpl {
 
                                 {
                                     // Handle namespaces in scope as of delegation:execute element
-                                    for (Enumeration e = namespaceSupport.getPrefixes(); e.hasMoreElements();) {
+                                    for (Enumeration e = namespaceContext.getPrefixes(); e.hasMoreElements();) {
                                         final String namespacePrefix = (String) e.nextElement();
                                         if (!namespacePrefix.startsWith("xml") && !namespacePrefix.equals(""))
-                                            parameters.startPrefixMapping(namespacePrefix, namespaceSupport.getURI(namespacePrefix));
+                                            parameters.startPrefixMapping(namespacePrefix, namespaceContext.getURI(namespacePrefix));
                                     }
 
-                                    final String defaultNS = namespaceSupport.getURI("");
+                                    final String defaultNS = namespaceContext.getURI("");
                                     if (defaultNS != null && defaultNS.length() > 0)
                                         super.startPrefixMapping("", defaultNS);
                                 }
@@ -166,13 +166,13 @@ public class DelegationProcessor extends ProcessorImpl {
 
                                         {
                                             // Handle namespaces in scope as of delegation:execute element
-                                            for (Enumeration e = namespaceSupport.getPrefixes(); e.hasMoreElements();) {
+                                            for (Enumeration e = namespaceContext.getPrefixes(); e.hasMoreElements();) {
                                                 final String namespacePrefix = (String) e.nextElement();
                                                 if (!namespacePrefix.startsWith("xml") && !namespacePrefix.equals(""))
                                                     parameters.endPrefixMapping(namespacePrefix);
                                             }
 
-                                            final String defaultNS = namespaceSupport.getURI("");
+                                            final String defaultNS = namespaceContext.getURI("");
                                             if (defaultNS != null && defaultNS.length() > 0)
                                                 super.endPrefixMapping("");
                                         }
@@ -395,7 +395,7 @@ public class DelegationProcessor extends ProcessorImpl {
                             throw new OXFException(e);
                         }
 
-                        namespaceSupport.endElement();
+                        namespaceContext.endElement();
                     }
 
                     public void characters(char[] chars, int start, int length) throws SAXException {
@@ -408,7 +408,7 @@ public class DelegationProcessor extends ProcessorImpl {
                     }
 
                     public void startPrefixMapping(String prefix, String uri) throws SAXException {
-                        namespaceSupport.startPrefixMapping(prefix, uri);
+                        namespaceContext.startPrefixMapping(prefix, uri);
                         if (parameters == null) {
                             super.startPrefixMapping(prefix, uri);
                         } else {

@@ -20,7 +20,6 @@ import javax.xml.namespace.QName
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xforms.XFormsConstants._
 import collection.JavaConverters._
-import java.util.{Enumeration ⇒ JEnumeration}
 
 // All the states we know
 sealed trait State
@@ -103,11 +102,8 @@ class NewXFormsAnnotator(out: XMLReceiver) extends SAXMachine[State, Option[Elem
 
     protected def addNamespaces(id: String) {
         val tuples =
-            for {
-                prefix ← namespaceSupport.getPrefixes.asInstanceOf[JEnumeration[String]].asScala
-                if prefix != "" && ! prefix.startsWith("xml")
-            } yield
-                prefix → namespaceSupport.getURI(prefix)
+            namespaceContext.current.mappingsWithDefault filterNot
+            { case (prefix, uri) ⇒ prefix.startsWith("xml") }
 
         metadata.addNamespaceMapping(id, (tuples.toSeq :+ (XML_PREFIX → XML_URI) toMap).asJava)
     }

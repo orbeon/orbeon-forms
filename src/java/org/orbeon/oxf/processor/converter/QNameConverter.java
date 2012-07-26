@@ -19,7 +19,7 @@ import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.impl.CacheableTransformerOutputImpl;
 import org.orbeon.oxf.xml.ForwardingXMLReceiver;
-import org.orbeon.oxf.xml.NamespaceSupport3;
+import org.orbeon.oxf.xml.NamespaceContext;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
@@ -74,11 +74,11 @@ public class QNameConverter extends ProcessorImpl {
                 // Do the conversion
                 readInputAsSAX(context, INPUT_DATA, new ForwardingXMLReceiver(xmlReceiver) {
 
-                    private NamespaceSupport3 namespaceSupport = new NamespaceSupport3();
+                    private NamespaceContext namespaceContext = new NamespaceContext();
 
                     @Override
                     public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
-                        namespaceSupport.startElement();
+                        namespaceContext.startElement();
                         if (config.matchURI == null || config.matchURI.equals(uri)) {
                             int colonIndex = qName.indexOf(':');
                             String prefix = (colonIndex == -1) ? "" : qName.substring(0, colonIndex);
@@ -151,12 +151,12 @@ public class QNameConverter extends ProcessorImpl {
                             // No match
                             super.endElement(uri, localname, qName);
                         }
-                        namespaceSupport.endElement();
+                        namespaceContext.endElement();
                     }
 
                     @Override
                     public void startPrefixMapping(String prefix, String uri) throws SAXException {
-                        namespaceSupport.startPrefixMapping(prefix, uri);
+                        namespaceContext.startPrefixMapping(prefix, uri);
                         super.startPrefixMapping(prefix, uri);
                     }
 
@@ -172,8 +172,8 @@ public class QNameConverter extends ProcessorImpl {
                                 // new prefix -> URI not in scope
                                 if (start) {
                                     super.startPrefixMapping(newPrefix, newURI);
-                                    if (namespaceSupport.getURI(newPrefix) == null)
-                                        namespaceSupport.declarePrefix(newPrefix, newURI);
+                                    if (namespaceContext.getURI(newPrefix) == null)
+                                        namespaceContext.startPrefixMapping(newPrefix, newURI);
                                 } else {
                                     super.endPrefixMapping(newPrefix);
                                 }
@@ -182,7 +182,7 @@ public class QNameConverter extends ProcessorImpl {
                     }
 
                     private boolean isURIInScopeForPrefix(String prefix, String uri) {
-                        String inScopeURIForPrefix = namespaceSupport.getURI(prefix);
+                        String inScopeURIForPrefix = namespaceContext.getURI(prefix);
                         return (inScopeURIForPrefix != null) && inScopeURIForPrefix.equals(uri);
                     }
                 });

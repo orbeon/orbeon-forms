@@ -28,7 +28,6 @@
          xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderFunctions"
          xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps">
 
-    <xbl:script src="/ops/jquery/jquery-1.7.1.min.js"/>
     <xbl:script src="/xbl/fb/dialog-itemsets/dialog-itemsets.js"/>
     <xbl:binding id="fb-dialog-itemsets" element="fb|dialog-itemsets">
         <xbl:handlers>

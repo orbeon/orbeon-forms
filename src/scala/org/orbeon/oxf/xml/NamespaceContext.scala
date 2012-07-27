@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xml
 
-import NamespaceContext._
 import collection.JavaConverters._
 import java.util.{Enumeration ⇒ JEnumeration}
 
@@ -70,8 +69,8 @@ class NamespaceContext {
     }
 
     // Start with the standard "xml" prefix
-    private var _contexts = Context(None, Map("xml" → "http://www.w3.org/XML/1998/namespace"))
-    def current = _contexts
+    private var _current = Context(None, Map("xml" → "http://www.w3.org/XML/1998/namespace"))
+    def current = _current
 
     // Pending mappings, which will be in force for the next element
     private var _pending: Map[String, String] = Map()
@@ -79,13 +78,13 @@ class NamespaceContext {
 
     // When an element starts, we freeze its mappings
     def startElement(): Unit = {
-        _contexts = Context(Some(_contexts), _contexts.mappings ++ _pending)
+        _current = Context(Some(_current), _current.mappings ++ _pending)
         _pending = Map()
     }
 
     // When an element ends, the mappings become again those of the parent element
     def endElement(): Unit = {
-        _contexts = _contexts.parent.get
+        _current = _current.parent.get
         _pending = Map()
     }
 
@@ -98,10 +97,8 @@ class NamespaceContext {
     def getURI(prefix: String): String = current.uriForPrefix(prefix).orNull
     def getPrefixes: JEnumeration[String] = current.prefixes.iterator.asJavaEnumeration
     def getPrefix(uri: String) = current.firstPrefixForURI(uri).orNull
-}
 
-private object NamespaceContext {
     // See http://www.w3.org/TR/REC-xml-names/#xmlReserved
     // We ignore these 2 prefixes but do not reject other prefixes starting with "xml"
-    def isLegalPrefix(prefix: String) = ! Set("xml", "xmlns")(prefix)
+    private def isLegalPrefix(prefix: String) = ! Set("xml", "xmlns")(prefix)
 }

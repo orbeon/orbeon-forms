@@ -118,6 +118,38 @@ class XIncludeTest extends ResourceManagerTestBase with AssertionsForJUnit {
         assert(expected === collector.events)
     }
 
+    @Test def siblingIncludes() {
+
+        val collector = new Collector
+
+        XMLUtils.urlToSAX("oxf:/org/orbeon/oxf/processor/xinclude/include41.xml", collector, XINCLUDE_ONLY, true)
+
+        val expected = Seq(
+            StartDocument,
+                StartPrefixMapping("", HTML),
+                StartPrefixMapping("xforms", XForms),
+                    StartElement(HTML → "html", Atts(Seq())),
+                        StartPrefixMapping("", ""),
+                        StartPrefixMapping("xforms", ""),
+                        StartPrefixMapping("xhtml", HTML),
+                            StartElement(HTML → "head", Atts(Seq((XMLBase, "oxf:/org/orbeon/oxf/processor/xinclude/include42.xml")))),
+                            EndElement(HTML → "head"),
+                        EndPrefixMapping(""),
+                        EndPrefixMapping("xforms"),
+                        EndPrefixMapping("xhtml"),
+                        StartPrefixMapping("xforms", ""),
+                            StartElement(HTML → "body", Atts(Seq((XMLBase, "oxf:/org/orbeon/oxf/processor/xinclude/include43.xml")))),
+                            EndElement(HTML → "body"),
+                        EndPrefixMapping("xforms"),
+                    EndElement(HTML → "html"),
+                EndPrefixMapping(""),
+                EndPrefixMapping("xforms"),
+            EndDocument
+        )
+
+        assert(expected === collector.events)
+    }
+
     // Collect the SAX events we are interested in
     class Collector extends XMLReceiverAdapter {
 

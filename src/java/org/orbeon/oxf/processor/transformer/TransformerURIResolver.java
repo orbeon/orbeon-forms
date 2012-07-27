@@ -26,7 +26,6 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 
-import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.URIResolver;
 import javax.xml.transform.sax.SAXSource;
@@ -88,7 +87,7 @@ public class TransformerURIResolver implements URIResolver {
         destroyPipelineContext = true;
     }
 
-    public Source resolve(String href, String base) throws TransformerException {
+    public SAXSource resolve(String href, String base) throws TransformerException {
         try {
             // Create XML reader for URI
             final String systemId;

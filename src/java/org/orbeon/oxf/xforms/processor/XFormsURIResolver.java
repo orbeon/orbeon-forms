@@ -34,7 +34,6 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
-import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.sax.SAXSource;
 import java.net.MalformedURLException;
@@ -59,12 +58,12 @@ public class XFormsURIResolver extends TransformerURIResolver {
     }
 
     @Override
-    public Source resolve(String href, String base) throws TransformerException {
+    public SAXSource resolve(String href, String base) throws TransformerException {
         // Use global definition for headers to forward
         return resolve(href, base, null, Connection.getForwardHeaders());
     }
 
-    public Source resolve(String href, String base, final Connection.Credentials credentials, final String headersToForward) throws TransformerException {
+    public SAXSource resolve(String href, String base, final Connection.Credentials credentials, final String headersToForward) throws TransformerException {
 
         final String inputName = ProcessorImpl.getProcessorInputSchemeInputName(href);
         if (inputName != null) {

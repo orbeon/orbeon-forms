@@ -1,0 +1,5 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:xforms="http://www.w3.org/2002/xforms">
+
+    <xi:include href="include32.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+</html>

@@ -13,22 +13,24 @@
  */
 package org.orbeon.oxf.processor.xinclude
 
+import javax.xml.namespace.QName
 import org.junit.Test
 import org.orbeon.oxf.test.ResourceManagerTestBase
-import org.orbeon.oxf.xml.XMLUtils.ParserConfiguration
+import org.orbeon.oxf.xml.XMLUtils.ParserConfiguration.XINCLUDE_ONLY
 import org.orbeon.oxf.xml.{XMLReceiverAdapter, XMLUtils}
-import org.orbeon.scaxon.SAXMachine
+import org.orbeon.scaxon.SAXEvents._
 import org.scalatest.junit.AssertionsForJUnit
 import org.xml.sax.Attributes
-import SAXMachine._
-import javax.xml.namespace.QName
 
-class XIncludeProcessorTest extends ResourceManagerTestBase with  AssertionsForJUnit {
+class XIncludeTest extends ResourceManagerTestBase with AssertionsForJUnit {
 
     implicit def tupleToQName(tuple: (String, String)) = new QName(tuple._1, tuple._2, "")
     
-    val XML  = "http://www.w3.org/XML/1998/namespace"
-    val HTML = "http://www.w3.org/1999/xhtml"
+    val XML    = "http://www.w3.org/XML/1998/namespace"
+    val XI     = "http://www.w3.org/2001/XInclude"
+    val HTML   = "http://www.w3.org/1999/xhtml"
+    val XForms = "http://www.w3.org/2002/xforms"
+    val SVG    = "http://www.w3.org/2000/svg"
 
     val XMLBase: QName = XML → "base"
 
@@ -36,22 +38,24 @@ class XIncludeProcessorTest extends ResourceManagerTestBase with  AssertionsForJ
 
         val collector = new Collector
         
-        XMLUtils.urlToSAX("oxf:/org/orbeon/oxf/processor/xinclude/include11.xml", collector, ParserConfiguration.XINCLUDE_ONLY, true)
+        XMLUtils.urlToSAX("oxf:/org/orbeon/oxf/processor/xinclude/include11.xml", collector, XINCLUDE_ONLY, true)
         
         val expected = Seq(
             StartDocument,
-                StartPrefixMapping("", "http://www.w3.org/1999/xhtml"),
-                StartPrefixMapping("xforms", "http://www.w3.org/2002/xforms"),
-                StartPrefixMapping("xi", "http://www.w3.org/2001/XInclude"),
+                StartPrefixMapping("", HTML),
+                StartPrefixMapping("xforms", XForms),
+                StartPrefixMapping("xi", XI),
                     StartElement(HTML → "html", Atts(Seq())),
                         StartPrefixMapping("xforms", ""),
                         StartPrefixMapping("xi", ""),
+                        StartPrefixMapping("svg", SVG),
                             StartElement(HTML → "body", Atts(Seq((XMLBase, "oxf:/org/orbeon/oxf/processor/xinclude/include12.xml")))),
                                 StartElement(HTML → "div", Atts(Seq())),
                                 EndElement(HTML → "div"),
                             EndElement(HTML → "body"),
                         EndPrefixMapping("xforms"),
                         EndPrefixMapping("xi"),
+                        EndPrefixMapping("svg"),
                     EndElement(HTML → "html"),
                 EndPrefixMapping(""),
                 EndPrefixMapping("xforms"),
@@ -66,13 +70,13 @@ class XIncludeProcessorTest extends ResourceManagerTestBase with  AssertionsForJ
 
         val collector = new Collector
 
-        XMLUtils.urlToSAX("oxf:/org/orbeon/oxf/processor/xinclude/include21.xml", collector, ParserConfiguration.XINCLUDE_ONLY, true)
+        XMLUtils.urlToSAX("oxf:/org/orbeon/oxf/processor/xinclude/include21.xml", collector, XINCLUDE_ONLY, true)
         
         val expected = Seq(
             StartDocument,
-                StartPrefixMapping("", "http://www.w3.org/1999/xhtml"),
-                StartPrefixMapping("xforms", "http://www.w3.org/2002/xforms"),
-                StartPrefixMapping("xi", "http://www.w3.org/2001/XInclude"),
+                StartPrefixMapping("", HTML),
+                StartPrefixMapping("xforms", XForms),
+                StartPrefixMapping("xi", XI),
                     StartElement(HTML → "html", Atts(Seq())),
                         StartPrefixMapping("xforms", ""),
                         StartPrefixMapping("xi", ""),
@@ -89,7 +93,27 @@ class XIncludeProcessorTest extends ResourceManagerTestBase with  AssertionsForJ
             EndDocument
         )
 
-        println(collector.events mkString "\n")
+        assert(expected === collector.events)
+    }
+
+    @Test def noDuplicateNSEvents() {
+
+        val collector = new Collector
+
+        XMLUtils.urlToSAX("oxf:/org/orbeon/oxf/processor/xinclude/include31.xml", collector, XINCLUDE_ONLY, true)
+
+        val expected = Seq(
+            StartDocument,
+                StartPrefixMapping("", HTML),
+                StartPrefixMapping("xforms", XForms),
+                    StartElement(HTML → "html", Atts(Seq())),
+                        StartElement(HTML → "body", Atts(Seq((XMLBase, "oxf:/org/orbeon/oxf/processor/xinclude/include32.xml")))),
+                        EndElement(HTML → "body"),
+                    EndElement(HTML → "html"),
+                EndPrefixMapping(""),
+                EndPrefixMapping("xforms"),
+            EndDocument
+        )
 
         assert(expected === collector.events)
     }

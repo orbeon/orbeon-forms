@@ -15,7 +15,6 @@ package org.orbeon.oxf.processor.xinclude
 
 
 import XIncludeProcessor._
-import javax.xml.transform.sax.SAXSource
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.pipeline.api.{FunctionLibrary, PipelineContext, XMLReceiver}
@@ -26,6 +25,7 @@ import org.orbeon.oxf.processor.transformer.xslt.XSLTTransformer
 import org.orbeon.oxf.properties.PropertyStore
 import org.orbeon.oxf.util.{LoggerFactory, XPathCache}
 import org.orbeon.oxf.xml._
+import org.orbeon.oxf.xml.XMLUtils.{ParserConfiguration, addOrReplaceAttribute}
 import org.orbeon.oxf.xml.dom4j.LocationData
 import org.orbeon.saxon.om.ValueRepresentation
 import org.xml.sax._
@@ -72,7 +72,7 @@ class XIncludeProcessor extends ProcessorImpl {
                         Map.empty[String, Boolean]
 
                 // URL resolver is initialized with a parser configuration which can be configured to support external entities or not.
-                val parserConfiguration = new XMLUtils.ParserConfiguration(false, false, ! (configurationAttributes.get("external-entities") exists (_ == false)))
+                val parserConfiguration = new ParserConfiguration(false, false, ! (configurationAttributes.get("external-entities") exists (_ == false)))
                 val uriResolver = new TransformerURIResolver(self, pipelineContext, INPUT_CONFIG, parserConfiguration)
 
                 /**
@@ -124,6 +124,7 @@ object XIncludeProcessor {
 
     val Logger = LoggerFactory.createLogger(classOf[XIncludeProcessor])
     val AttributesInput = "attributes"
+    val XPointerPattern = """xpath\((.*)\)""".r
 
     class XIncludeXMLReceiver(
             pipelineContext: PipelineContext,
@@ -204,7 +205,7 @@ object XIncludeProcessor {
 
             val newAttributes =
                 if (! topLevel && level == 0 && generateXMLBase)
-                    XMLUtils.addOrReplaceAttribute(attributes, XML_URI, "xml", "base", xmlBase)
+                    addOrReplaceAttribute(attributes, XML_URI, "xml", "base", xmlBase)
                 else
                     attributes
 
@@ -214,10 +215,9 @@ object XIncludeProcessor {
                 if (uri == OLD_XINCLUDE_URI)
                     Logger.warn("Using incorrect XInclude namespace URI: '" + uri + "'; should use '" + XINCLUDE_URI + "' at " + new LocationData(outputLocator).toString)
 
-
-                val href = attributes.getValue("href")
-                val parse = attributes.getValue("parse")
-                val xpointer = attributes.getValue("xpointer")
+                val href     = attributes.getValue("href")
+                val parse    = Option(attributes.getValue("parse"))
+                val xpointer = Option(attributes.getValue("xpointer"))
 
                 // Whether to create/update xml:base attribute or not
                 val generateXMLBase = {
@@ -225,56 +225,63 @@ object XIncludeProcessor {
                     val fixupXMLBase = attributes.getValue(XINCLUDE_FIXUP_XML_BASE.getNamespaceURI, XINCLUDE_FIXUP_XML_BASE.getName)
                     ! (disableXMLBase == "true" || fixupXMLBase == "false")
                 }
-                if (parse != null && parse != "xml")
-                    throw new ValidationException("Invalid 'parse' attribute value: " + parse, new LocationData(outputLocator))
 
-                if (xpointer != null && ! (xpointer.startsWith("xpath(") && xpointer.endsWith(")")))
-                    throw new ValidationException("Invalid 'xpointer' attribute value: " + xpointer, new LocationData(outputLocator))
+                if (parse exists (_ != "xml"))
+                    throw new ValidationException("Invalid 'parse' attribute value: " + parse.get, new LocationData(outputLocator))
 
-                var systemId: String = null
+                // Get SAXSource
+                val base = Option(outputLocator) map (_.getSystemId) orNull
+                val source = uriResolver.resolve(href, base)
+                val systemId = source.getSystemId
+                
+                // Keep URI reference for caching
+                if (uriReferences ne null)
+                    uriReferences.addReference(base, href, null, null)
+
+                def createChildReceiver =
+                    new XIncludeXMLReceiver(pipelineContext, Some(self), getXMLReceiver, uriReferences, uriResolver, systemId, generateXMLBase, outputLocator)
+                
                 try {
-                    // Get SAXSource
-                    val base = if (outputLocator == null) null else outputLocator.getSystemId
-                    val source = uriResolver.resolve(href, base).asInstanceOf[SAXSource]
+                    xpointer match {
+                        case Some(XPointerPattern(xpath)) ⇒
+                            // xpath() scheme
 
-                    // Keep URI reference
-                    if (uriReferences ne null)
-                        uriReferences.addReference(base, href, null, null)
+                            // Document is read entirely in memory for XPath processing
+                            val document = TransformerUtils.readTinyTree(XPathCache.getGlobalConfiguration, source, false)
 
-                    systemId = source.getSystemId
+                            val result =
+                                XPathCache.evaluate(
+                                    document,
+                                    xpath,
+                                    new NamespaceMapping(namespaceContext.current.mappingsWithDefault.toMap.asJava),
+                                    Map.empty[String, ValueRepresentation].asJava,
+                                    FunctionLibrary.instance,
+                                    null,
+                                    systemId,
+                                    null)
 
-                    // Read document
-                    if (xpointer ne null) {
-                        // Experimental support for xpath() scheme
-                        val xpath = xpointer.substring("xpath(".length, xpointer.length - 1)
+                            // Each resulting object is output through the next level of processing
+                            for (item ← result.asScala)
+                                XPathProcessor.streamResult(pipelineContext, createChildReceiver, item, new LocationData(outputLocator))
 
-                        // Document is read entirely in memory for XPath processing
-                        val document = TransformerUtils.readTinyTree(XPathCache.getGlobalConfiguration, source, false)
+                        case Some(xpointer) ⇒
+                            // Other XPointer schemes are not supported
+                            throw new ValidationException("Invalid 'xpointer' attribute value: " + xpointer, new LocationData(outputLocator))
+                        case None ⇒
+                            // No xpointer attribute specified, just stream the child document
+                            val xmlReader = source.getXMLReader
+                            val xmlReceiver = createChildReceiver
 
-                        def xiPrefixMappings = namespaceContext.current.mappingsWithDefault.toMap
+                            xmlReader.setContentHandler(xmlReceiver)
+                            xmlReader.setProperty(SAX_LEXICAL_HANDLER, xmlReceiver)
 
-                        val result = XPathCache.evaluate(document, xpath, new NamespaceMapping(xiPrefixMappings.asJava), Map.empty[String, ValueRepresentation].asJava, FunctionLibrary.instance, null, source.getSystemId, null)
-
-                        // Each resulting object is output through the next level of processing
-                        for (item ← result.asScala) {
-                            val newReceiver = new XIncludeXMLReceiver(pipelineContext, Some(self), getXMLReceiver, uriReferences, uriResolver, source.getSystemId, generateXMLBase, outputLocator)
-                            XPathProcessor.streamResult(pipelineContext, newReceiver, item, new LocationData(outputLocator))
-                        }
-                    } else {
-                        // No xpointer attribute specified, just stream the child document
-                        val xmlReader = source.getXMLReader
-                        val xmlReceiver = new XIncludeXMLReceiver(pipelineContext, Some(self), getXMLReceiver, uriReferences, uriResolver, source.getSystemId, generateXMLBase, outputLocator)
-
-                        xmlReader.setContentHandler(xmlReceiver)
-                        xmlReader.setProperty(SAX_LEXICAL_HANDLER, xmlReceiver)
-
-                        xmlReader.parse(new InputSource(systemId)) // Yeah, the SAX API doesn't make much sense
+                            xmlReader.parse(new InputSource(systemId)) // Yeah, the SAX API doesn't make much sense
                     }
                 } catch {
                     case e: Exception ⇒
                         // Resource error, must go to fallback if possible
                         if (systemId != null)
-                            throw new OXFException("Error while parsing: " + systemId, e)
+                            throw new OXFException("Error while handling: " + systemId, e)
                         else
                             throw new OXFException(e)
                 }

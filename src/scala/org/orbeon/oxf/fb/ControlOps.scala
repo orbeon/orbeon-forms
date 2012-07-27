@@ -469,10 +469,22 @@ object ControlOps {
     def setControlHelp(controlId: String, value: String) = setControlResource(controlId, "help", value)
     def setControlAlert(controlId: String, value: String) = setControlResource(controlId, "alert", value)
 
-    // From an <xbl:binding>, returns the view template (say <fr:autocomplete>)
+    // From an <xbl:binding>, return the view template (say <fr:autocomplete>)
     def viewTemplate(binding: NodeInfo) = {
         val metadata = binding \ "*:metadata"
         (((metadata \ "*:template") ++ (metadata \ "*:templates" \ "*:view")) \ *).headOption
+    }
+
+    // From an <xbl:binding>, return all bind attributes
+    // They are obtained from the legacy datatype element or from templates/bind.
+    def bindAttributesTemplate(binding: NodeInfo) = {
+        val metadata = binding \ "*:metadata"
+        val typeFromDatatype = ("", "type") → ((metadata \ "*:datatype" map (_.stringValue) headOption) getOrElse "xs:string")
+        val bindAttributes = metadata \ "*:templates" \ "*:bind" \@ @* map (att ⇒ qname(att) →  att.stringValue)
+
+        typeFromDatatype +: bindAttributes filterNot
+            { case ((uri, local), value) ⇒ local == "type" && value == "xs:string" } map // TODO: assume literal 'xs:' prefix (should resolve namespace)
+            { case (qname, value) ⇒ attributeInfo(qname, value) }
     }
 
     // From a control element (say <fr:autocomplete>), returns the corresponding <xbl:binding>
@@ -525,9 +537,8 @@ object ControlOps {
         // Get matching xbl:bindings
         components \ (XBL → "xbl") \ (XBL → "binding") filter { binding ⇒
 
-            val metadata = binding \ (FB → "metadata")
-            val template = (metadata \ (FB → "template") \ * headOption)
-            val typeLocalname = (metadata \ (FB → "datatype") map (e ⇒ resolveQName(e, e.stringValue).getName) headOption)
+            val template = viewTemplate(binding)
+            val typeLocalname = bindAttributesTemplate(binding) self "type" map (_ stringValue) headOption
 
             // Control name and template name must match
             (template exists (qname(_) == controlQName)) &&

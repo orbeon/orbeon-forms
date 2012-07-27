@@ -95,18 +95,8 @@ object ToolboxOps {
                 delete(newControlElement \@ "ref")
                 ensureAttribute(newControlElement, "bind", bind \@ "id" stringValue)
 
-                // Get control type
-                val typeFromDatatype = ("", "type") → ((metadata \ "*:datatype" map (_.stringValue) headOption) getOrElse "xs:string")
-                val bindAttributes = metadata \ "*:templates" \ "*:bind" \@ @* map (att ⇒ qname(att) →  att.stringValue)
-
-                val allBindAttributes =
-                    typeFromDatatype +: bindAttributes filterNot
-                    { case ((uri, local), value) ⇒ local == "type" && value == "xs:string" } map // TODO: assume literal 'xs:' prefix (should resolve namespace)
-                    { case (qname, value) ⇒ attributeInfo(qname, value) }
-
-                // Set bind attributes
-                if (allBindAttributes.nonEmpty)
-                    insert(into = bind, origin = allBindAttributes)
+                // Set bind attributes if any
+                insert(into = bind, origin = bindAttributesTemplate(binding))
 
                 debugDumpDocument("insert new control", doc)
 
@@ -334,9 +324,8 @@ object ToolboxOps {
                 insert(after = Seq(model) ++ xbl, origin = binding parent * )
 
             // Insert template into section
-            val template = binding child (FB → "metadata") child (FB → "template") child *
-
-            insert(into = section, after = section \ *, origin = template)
+            viewTemplate(binding) foreach
+                (template ⇒ insert(into = section, after = section \ *, origin = template))
         }
 
     // Copy control to the clipboard

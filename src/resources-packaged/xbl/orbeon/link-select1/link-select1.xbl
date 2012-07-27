@@ -11,25 +11,21 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xbl:xbl xmlns:xhtml="http://www.w3.org/1999/xhtml"
-         xmlns:xforms="http://www.w3.org/2002/xforms"
+<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
          xmlns:ev="http://www.w3.org/2001/xml-events"
-         xmlns:xi="http://www.w3.org/2001/XInclude"
-         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
-         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
          xmlns:saxon="http://saxon.sf.net/"
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
-         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-         xmlns:oxf="http://www.orbeon.com/oxf/processors"
-         xmlns:exf="http://www.exforms.org/exf/1-0" >
+         xmlns:exf="http://www.exforms.org/exf/1-0">
 
     <!--
         Selection control appearing like a series of clickable links.
      -->
-    <xbl:binding id="fr-link-select1-binding" element="fr|link-select1">
+    <xbl:binding id="fr-link-select1-binding" element="fr|link-select1" xxbl:mode="binding value lhha">
 
         <!-- Orbeon Form Builder Component Metadata -->
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
@@ -41,7 +37,7 @@
                 <large-icon>/apps/fr/style/images/silk/link.png</large-icon>
             </icon>
             <editors static-itemset="true"/>
-            <template>
+            <template xmlns:xforms="http://www.w3.org/2002/xforms">
                  <fr:link-select1>
                      <xforms:label ref=""/>
                      <xforms:hint ref=""/>
@@ -55,47 +51,34 @@
             </template>
         </metadata>
 
-        <!--<xbl:resources>-->
-            <!--<xbl:style>-->
-            <!--</xbl:style>-->
-        <!--</xbl:resources>-->
-        <!-- NOTE: use XSLT so we can fetch attributes from under the itemset -->
         <xbl:template>
-            <!-- Outer group -->
-            <xforms:group xbl:attr="model context ref bind" xxbl:scope="outer">
-                <xbl:content includes=":root > xforms|label, :root > xforms|help, :root > xforms|hint, :root > xforms|alert"/>
+            <!-- Hidden select to hold itemset -->
+            <xf:var name="binding" value="xxf:binding('fr-link-select1-binding')"/>
 
-                <xforms:group class="fr-component-group" xxbl:scope="inner">
-                    <xforms:action ev:event="#all" ev:propagate="stop"/>
-                    
-                    <!-- Hidden select to hold itemset -->
-                    <xxforms:variable name="binding"><xxforms:sequence value="." xxbl:scope="outer"/></xxforms:variable>
-                    <xforms:select ref="$binding" appearance="xxforms:internal" id="hidden-select">
-                        <xbl:content includes=":root > xforms|itemset, :root > xforms|item, :root > xforms|choices"/>
-                    </xforms:select>
-                    <xxforms:variable name="items" value="xxforms:itemset('hidden-select', 'xml')//item"/>
+            <xf:select ref="$binding" appearance="xxf:internal" id="hidden-select">
+                <xbl:content includes=":root > xf|itemset, :root > xf|item, :root > xf|choices"/>
+            </xf:select>
+            <xf:var name="items" value="xxf:itemset('hidden-select', 'xml')//item"/>
 
-                    <!-- Variable pointing to external single-node binding -->
-                    <xxforms:variable name="result" as="node()?" select="."/>
+            <!-- HACK: Until we support the value XBL mode, use this in outer scope to capture xforms-value-changed -->
+            <xf:output class="xforms-disabled" ref="." xxbl:scope="outer"/>
 
-                    <!-- Iterate over values instead of the nodes returned by xxf:itemset() so as to avoid extra
-                         repeat nodeset recalculations -->
-                    <xforms:repeat ref="$items/value/string()">
-                            <xxforms:variable name="position" value="position()"/>
-                            <xxforms:variable name="value" value="."/>
-                            <xxforms:variable name="label" value="$items[value = $value]/label/string()"/>
+            <!-- Iterate over values instead of the nodes returned by xxf:itemset() so as to avoid extra
+                 repeat nodeset recalculations -->
+            <xf:repeat ref="$items/value/string()">
+                <xf:var name="position" value="position()"/>
+                <xf:var name="value" value="."/>
+                <xf:var name="label" value="$items[value = $value]/label/string()"/>
 
-                        <xforms:group ref=".[$position > 1]"> | </xforms:group>
-                        <xforms:group ref=".[$value != $binding]">
-                            <xforms:trigger appearance="minimal">
-                                <xforms:label value="$label"/>
-                                <xforms:setvalue ev:event="DOMActivate" ref="$binding" value="$value"/>
-                            </xforms:trigger>
-                        </xforms:group>
-                        <xforms:output ref=".[$value = $binding]" value="$label"/>
-                    </xforms:repeat>
-                </xforms:group>
-            </xforms:group>
+                <xf:group ref=".[$position > 1]">|</xf:group>
+                <xf:group ref=".[$value != $binding]">
+                    <xf:trigger appearance="minimal">
+                        <xf:label value="$label"/>
+                        <xf:setvalue ev:event="DOMActivate" ref="$binding" value="$value"/>
+                    </xf:trigger>
+                </xf:group>
+                <xf:output ref=".[$value = $binding]" value="$label"/>
+            </xf:repeat>
         </xbl:template>
     </xbl:binding>
 </xbl:xbl>

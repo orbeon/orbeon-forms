@@ -17,7 +17,7 @@ import EmailProcessor._
 import org.orbeon.oxf.util.ScalaUtils._
 import collection.JavaConverters._
 import java.io._
-import java.util.Properties
+import java.util.{Properties ⇒ JProperties}
 import javax.activation.DataHandler
 import javax.activation.DataSource
 import javax.mail.Message.RecipientType
@@ -65,7 +65,7 @@ class EmailProcessor extends ProcessorImpl {
         val dataInputSystemId = messageElement.getData.asInstanceOf[LocationData].getSystemID
 
         // Set SMTP host
-        val properties = new Properties
+        val properties = new JProperties
         val host =
             nonEmptyOrNone(getPropertySet.getString(TestSMTPHost)) orElse
             optionalValueTrim(messageElement.element("smtp-host")) orElse

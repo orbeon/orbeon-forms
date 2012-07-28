@@ -31,7 +31,6 @@ import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.processor.generator.URLGenerator;
 import org.orbeon.oxf.processor.transformer.TransformerURIResolver;
-import org.orbeon.oxf.processor.xinclude.XIncludeProcessor;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
@@ -424,7 +423,7 @@ public class XMLUtils {
         if (parserConfiguration.handleXInclude) {
             parserConfiguration =  new XMLUtils.ParserConfiguration(parserConfiguration.validating, false, parserConfiguration.externalEntities, parserConfiguration.uriReferences);
             resolver = new TransformerURIResolver(XMLUtils.ParserConfiguration.PLAIN);
-            xmlReceiver = new XIncludeProcessor.XIncludeXMLReceiver(null, xmlReceiver, parserConfiguration.uriReferences, resolver);
+            xmlReceiver = new XIncludeReceiver(null, xmlReceiver, parserConfiguration.uriReferences, resolver);
         } else {
             resolver = null;
         }

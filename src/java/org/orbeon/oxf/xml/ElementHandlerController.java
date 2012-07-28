@@ -16,7 +16,6 @@ package org.orbeon.oxf.xml;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
-import org.orbeon.oxf.processor.xinclude.XIncludeProcessor;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.xml.sax.Attributes;
 import org.xml.sax.Locator;
@@ -51,7 +50,7 @@ public class ElementHandlerController implements ElementHandlerContext, XMLRecei
 
     private final NamespaceContext namespaceContext = new NamespaceContext();
 
-    private XIncludeProcessor.OutputLocator locator;
+    private OutputLocator locator;
 
     private int level = 0;
 
@@ -373,7 +372,7 @@ public class ElementHandlerController implements ElementHandlerContext, XMLRecei
                 // This is likely the source's initial setDocumentLocator() call
 
                 // Use our own locator
-                this.locator = new XIncludeProcessor.OutputLocator();
+                this.locator = new OutputLocator();
                 this.locator.push(locator);
                 // We don't forward this (anyway nobody is listening initially)
             } else {

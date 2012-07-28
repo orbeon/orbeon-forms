@@ -362,7 +362,7 @@ public class TransformerUtils {
             if (handleXInclude) {
                 // Insert XIncludeContentHandler
                 resolver = new TransformerURIResolver(XMLUtils.ParserConfiguration.PLAIN);
-                xmlReceiver = new XIncludeProcessor.XIncludeXMLReceiver(null, dom4jResult, null, resolver);
+                xmlReceiver = new XIncludeReceiver(null, dom4jResult, null, resolver);
             } else {
                 resolver = null;
                 xmlReceiver = dom4jResult;
@@ -389,7 +389,7 @@ public class TransformerUtils {
             if (handleXInclude) {
                 // Insert XIncludeContentHandler
                 resolver = new TransformerURIResolver(XMLUtils.ParserConfiguration.PLAIN);
-                xmlReceiver = new XIncludeProcessor.XIncludeXMLReceiver(null, dom4jResult, null, resolver);
+                xmlReceiver = new XIncludeReceiver(null, dom4jResult, null, resolver);
             } else {
                 resolver = null;
                 xmlReceiver = dom4jResult;
@@ -418,7 +418,7 @@ public class TransformerUtils {
             if (handleXInclude) {
                 // Insert XIncludeContentHandler
                 resolver = new TransformerURIResolver(XMLUtils.ParserConfiguration.PLAIN);
-                xmlReceiver = new XIncludeProcessor.XIncludeXMLReceiver(null, identityHandler, null, resolver);
+                xmlReceiver = new XIncludeReceiver(null, identityHandler, null, resolver);
             } else {
                 resolver = null;
                 xmlReceiver = identityHandler;
@@ -450,7 +450,7 @@ public class TransformerUtils {
                     // Insert XIncludeContentHandler
                     final TransformerXMLReceiver identityHandler = getIdentityTransformerHandler(configuration);
                     identityHandler.setResult(treeBuilder);
-                    final XMLReceiver receiver = new XIncludeProcessor.XIncludeXMLReceiver(null, identityHandler, null, resolver);
+                    final XMLReceiver receiver = new XIncludeReceiver(null, identityHandler, null, resolver);
                     TransformerUtils.sourceToSAX(source, receiver);
                 } else {
                     final Transformer identity = getIdentityTransformer(configuration);

@@ -72,23 +72,24 @@ public class XXFormsAttributeControl extends XFormsValueControl {
     @Override
     public String getEscapedExternalValue() {
         // Rewrite URI attribute if needed
+        final String externalValue = getExternalValue();
         final String rewrittenValue;
         if ("src".equals(attributeName)) {
-            rewrittenValue = XFormsUtils.resolveResourceURL(containingDocument(), element(), getExternalValue(), ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
-        } else if ("href".equals(attributeName)) {
-
+            rewrittenValue = XFormsUtils.resolveResourceURL(containingDocument(), element(), externalValue, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
+        } else if ("href".equals(attributeName) && ! externalValue.startsWith("#")) {
+            // NOTE: Keep value unchanged if it's just a fragment (see also XFormsLoadAction)
             final String urlType = attributeControl.urlType();
             if ("action".equals(urlType)) {
-                rewrittenValue = XFormsUtils.resolveActionURL(containingDocument(), element(), getExternalValue(), false);
+                rewrittenValue = XFormsUtils.resolveActionURL(containingDocument(), element(), externalValue, false);
             } else if ("resource".equals(urlType)) {
-                rewrittenValue = XFormsUtils.resolveResourceURL(containingDocument(), element(), getExternalValue(), ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
+                rewrittenValue = XFormsUtils.resolveResourceURL(containingDocument(), element(), externalValue, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
             } else {
                 // Default is "render"
-                rewrittenValue = XFormsUtils.resolveRenderURL(containingDocument(), element(), getExternalValue(), false);
+                rewrittenValue = XFormsUtils.resolveRenderURL(containingDocument(), element(), externalValue, false);
             }
 
         } else {
-            rewrittenValue = getExternalValue();
+            rewrittenValue = externalValue;
         }
         return rewrittenValue;
     }

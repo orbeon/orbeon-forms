@@ -1016,7 +1016,6 @@
             <controls>
                 <xforms:output id="my-output" mediatype="image/*" ref="image"/>
                 <xforms:trigger id="my-trigger">
-                    <xforms:label/>
                     <xforms:setvalue ev:event="DOMActivate" ref="show" id="setvalue1">false</xforms:setvalue>
                 </xforms:trigger>
             </controls>
@@ -1104,7 +1103,6 @@
             <controls>
                 <xxforms:attribute id="my-src-avt" for="my-image" name="src" value="{image}" for-name="img"/>
                 <xforms:trigger id="my-trigger">
-                    <xforms:label/>
                     <xforms:setvalue ev:event="DOMActivate" ref="image" id="setvalue1">    </xforms:setvalue>
                 </xforms:trigger>
             </controls>
@@ -1162,7 +1160,6 @@
                     <xxforms:size ref="@size" id="my-size"/>
                 </xforms:upload>
                 <xforms:trigger id="my-trigger">
-                    <xforms:label/>
                     <xforms:setvalue ev:event="DOMActivate" ref="." id="setvalue1"/>
                 </xforms:trigger>
             </controls>
@@ -2112,6 +2109,56 @@
                 </xhtml:tr>
                 <xhtml:tr id="repeat-end-my-repeat" class="xforms-repeat-begin-end"/>
             </controls>
+        </output>
+    </test>
+
+    <test description="#405: Not found error with noscript error summary" name="oxf:pipeline">
+        <!-- See: https://github.com/orbeon/orbeon-forms/issues/405 -->
+        <input name="config" href="wrap-server.xpl"/>
+        <input name="action">
+            <xxforms:action>
+                <xxforms:event name="DOMActivate" source-control-id="my-trigger"/>
+            </xxforms:action>
+        </input>
+        <input name="controls">
+            <controls>
+                <xxforms:attribute id="my-href-avt" for="my-anchor" name="href" value="#{.}" for-name="a" ref=".[normalize-space()]"/>
+                <xforms:trigger id="my-trigger">
+                    <xforms:setvalue ev:event="DOMActivate" ref="." id="setvalue1">section1</xforms:setvalue>
+                </xforms:trigger>
+            </controls>
+        </input>
+        <input name="models">
+            <models>
+                <xforms:model id="model">
+                    <xforms:instance id="instance"/>
+                </xforms:model>
+            </models>
+        </input>
+        <input name="instances">
+            <instances>
+                <instance id="instance" model-id="model">
+                    <instance/>
+                </instance>
+            </instances>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <instance>section1</instance>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:attribute id="my-href-avt" for="my-anchor" name="href">#section1</xxf:attribute>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
         </output>
     </test>
 

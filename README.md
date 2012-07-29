@@ -174,7 +174,6 @@ This product includes software developed by the Apache Software Foundation
 - HttpComponents (<http://hc.apache.org/>)
 - log4j (<http://logging.apache.org/log4j/>)
 - Mime4j (<http://james.apache.org/mime4j/>)
-- ORO (<http://jakarta.apache.org/oro/>)
 - POI (<http://poi.apache.org/>)
 - Xerces (<http://xerces.apache.org/xerces-j/>)
 

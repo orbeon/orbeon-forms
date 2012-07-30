@@ -79,13 +79,14 @@ case class AbstractBinding(
 
     // XBL mode
     val xblMode = attSet(bindingElement, XFormsConstants.XXBL_MODE_QNAME)
-    def modeAllXForms = xblMode("xforms")
-    def modeBinding =    modeAllXForms || xblMode("binding")
-    def modeValue =      modeAllXForms || xblMode("value")
-    def modeUIEvents =   modeAllXForms || xblMode("ui-events")
-    def modeLHHA =       modeAllXForms || xblMode("lhha")
-    def modeLHHACustom = modeAllXForms || modeLHHA && ! xblMode("custom-lhha")
-    def modeItemset =    modeAllXForms || xblMode("itemset")
+    def modeAllXForms  = xblMode("xforms")
+    def modeBinding    = modeAllXForms || xblMode("binding")
+    def modeValue      = modeAllXForms || xblMode("value")
+    def modeUIEvents   = modeAllXForms || xblMode("ui-events")
+    def modeLHHA       = modeAllXForms || xblMode("lhha")
+    def modeItemset    = modeAllXForms || xblMode("itemset")
+
+    def modeLHHACustom = modeLHHA && xblMode("custom-lhha")
     def modeHandlers =  ! xblMode("nohandlers")
 }
 

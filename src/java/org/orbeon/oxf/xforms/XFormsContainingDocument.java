@@ -397,7 +397,8 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         return threadLocal.get();
     }
 
-    public PartAnalysis getPartAnalysis() {
+    @Override
+    public PartAnalysis partAnalysis() {
         return staticState.topLevelPart();
     }
 
@@ -1058,7 +1059,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         addAllModels();
     }
 
-    protected void initializeNestedControls() {
+    public void initializeNestedControls() {
         // Call-back from super class models initialization
 
         // This is important because if controls use binds, those must be up to date. In addition, MIP values will be up
@@ -1092,7 +1093,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
     }
 
     @Override
-    protected List<XFormsControl> getChildrenControls(XFormsControls controls) {
+    public List<XFormsControl> getChildrenControls(XFormsControls controls) {
         return controls.getCurrentControlTree().getChildren();
     }
 

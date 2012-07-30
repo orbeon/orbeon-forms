@@ -656,7 +656,8 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
         val document = mock[XFormsContainingDocument]
         Mockito when document.getStaticState thenReturn staticState
         Mockito when document.getInstanceForNode(Matchers.any[NodeInfo]) thenReturn instance
-        Mockito when document.getModels thenReturn Seq(model).asJava
+        Mockito when document.models thenReturn Seq(model)
+        Mockito when document.getModelsJava thenReturn Seq(model).asJava
         Mockito when document.getIndentedLogger(Matchers.any[String]) thenReturn new IndentedLogger(XFormsServer.logger, "any")
         Mockito when document.getIndentedLogger thenReturn new IndentedLogger(XFormsServer.logger, "document")
 

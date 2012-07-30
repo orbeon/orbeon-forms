@@ -30,7 +30,7 @@ public class XXFormsListModels extends XFormsFunction {
 
         final XFormsContainingDocument containingDocument = getContainingDocument(xpathContext);
         // Get all the models including local XML component models
-        final List<XFormsModel> models = containingDocument.getAllModels();
+        final List<XFormsModel> models = containingDocument.getAllModelsJava();
 
         if (models != null && models.size() > 0) {
             final List<StringValue> modelIds = new ArrayList<StringValue>(models.size());

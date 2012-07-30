@@ -401,7 +401,7 @@ public class XFormsToXHTML extends ProcessorImpl {
         // Set caching dependencies if the input was actually read
         // TODO: check all models/instances
         // Q: should use static dependency information instead? what about schema imports and instance replacements?
-        for (final XFormsModel currentModel: containingDocument.getModels()) {
+        for (final XFormsModel currentModel: containingDocument.getModelsJava()) {
             // Add schema dependencies
             final String[] schemaURIs = currentModel.getSchemaURIs();
             // TODO: We should also use dependencies computed in XFormsModelSchemaValidator.SchemaInfo

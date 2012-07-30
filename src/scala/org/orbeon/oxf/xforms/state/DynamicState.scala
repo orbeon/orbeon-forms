@@ -260,7 +260,7 @@ object DynamicState {
             toByteSeq(document.getPendingUploads.asScala.toSet),
             Option(document.getTemplate) map (_.asByteSeq), // template returns its own serialization
             toByteSeq(Option(document.getLastAjaxResponse)),
-            toByteSeq(document.getAllModels.asScala flatMap (_.getInstances.asScala) filter (_.mustSerialize) map (new InstanceState(_)) toList),
+            toByteSeq(document.getAllModels flatMap (_.getInstances.asScala) filter (_.mustSerialize) map (new InstanceState(_)) toList),
             toByteSeq(controlsToSerialize(document).toList)
         )
     }

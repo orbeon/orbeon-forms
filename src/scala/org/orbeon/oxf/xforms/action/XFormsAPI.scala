@@ -200,7 +200,7 @@ object XFormsAPI {
     // TODO: This searches only top-level models, find a better way
     def model(modelId: String) =
         // NOTE: This search is not very efficient, but this allows mocking in tests, where getObjectByEffectiveId causes issues
-        containingDocument.getModels.asScala.find(_.getId == modelId)
+        containingDocument.models find (_.getId == modelId)
 
     // Return the containing document
     def containingDocument = { assert(containingDocumentDyn.value.isDefined); containingDocumentDyn.value.get }

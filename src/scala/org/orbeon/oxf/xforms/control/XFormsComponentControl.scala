@@ -19,7 +19,6 @@ import org.orbeon.oxf.xforms.event.XFormsEvents
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.BindingContext
-import scala.collection.JavaConverters._
 
 /**
  * Control that represents a custom components.
@@ -49,7 +48,7 @@ class XFormsComponentControl(container: XBLContainer, parent: XFormsControl, ele
         // There may or may not be nested models
         newContainer.addAllModels()
         // Make sure there is location data
-        newContainer.setLocationData(getLocationData)
+        newContainer.locationData = getLocationData
 
         _nestedContainer = Some(newContainer)
     }

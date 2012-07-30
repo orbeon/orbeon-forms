@@ -163,7 +163,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
         val childContainer = container.createChildContainer(this, partAnalysis)
 
         childContainer.addAllModels()
-        childContainer.setLocationData(getLocationData)
+        childContainer.locationData = getLocationData
         childContainer.initializeModels(Array(
             XFORMS_MODEL_CONSTRUCT,
             XFORMS_MODEL_CONSTRUCT_DONE)

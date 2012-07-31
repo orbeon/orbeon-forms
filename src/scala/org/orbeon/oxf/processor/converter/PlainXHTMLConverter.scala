@@ -27,20 +27,25 @@ import org.xml.sax.helpers.AttributesImpl
 // - remove all attributes in a namespace
 // - remove the prefix of all XHTML elements
 // - remove all other namespace information on elements
-// - if the root element of the document is "{http://www.w3.org/1999/xhtml}html",
+// - for XHTML, if the root element of the document is "{http://www.w3.org/1999/xhtml}html"
 //   - add the XHTML namespace as default namespace on the root element
 //   - all elements in the document are in the XHTML namespace
-// - otherwise
+// - otherwise (including HTML as well as XHTML fragments)
 //   - don't output any namespace declaration
 //   - all elements in the document are in no namespace
 //
-class PlainXHTMLConverter extends ProcessorImpl {
+class PlainHTMLConverter  extends Converter("")
+class PlainXHTMLConverter extends Converter(HtmlURI)
+
+abstract class Converter(targetURI: String) extends ProcessorImpl {
+
+    self ⇒
 
     addInputInfo(new ProcessorInputOutputInfo(ProcessorImpl.INPUT_DATA))
     addOutputInfo(new ProcessorInputOutputInfo(ProcessorImpl.OUTPUT_DATA))
 
     override def createOutput(outputName: String) =
-        addOutput(outputName, new CacheableTransformerOutputImpl(PlainXHTMLConverter.this, outputName) {
+        addOutput(outputName, new CacheableTransformerOutputImpl(self, outputName) {
             def readImpl(pipelineContext: PipelineContext, xmlReceiver: XMLReceiver): Unit = {
 
                 readInputAsSAX(pipelineContext, ProcessorImpl.INPUT_DATA, new ForwardingXMLReceiver(xmlReceiver) {
@@ -54,13 +59,13 @@ class PlainXHTMLConverter extends ProcessorImpl {
                         // following http://www.w3.org/TR/xslt-xquery-serialization/#xhtml-output: "The serializer
                         // SHOULD output namespace declarations in a way that is consistent with the requirements of the
                         // XHTML DTD if this is possible".
-                        if (level == 0 && uri == HtmlURI && localname == "html") {
+                        if (level == 0 && targetURI == HtmlURI && uri == HtmlURI && localname == "html") {
                             inXHTMLNamespace = true
                             super.startPrefixMapping("", HtmlURI)
                         }
 
                         if (uri == HtmlURI)
-                            super.startElement(if (inXHTMLNamespace) HtmlURI else "", localname, localname, filterAttributes(attributes))
+                            super.startElement(if (inXHTMLNamespace) targetURI else "", localname, localname, filterAttributes(attributes))
 
                         level += 1
                     }
@@ -70,7 +75,7 @@ class PlainXHTMLConverter extends ProcessorImpl {
                         level -= 1
 
                         if (uri == HtmlURI)
-                            super.endElement(if (inXHTMLNamespace) HtmlURI else "", localname, localname)
+                            super.endElement(if (inXHTMLNamespace) targetURI else "", localname, localname)
 
                         if (level == 0 && inXHTMLNamespace)
                             super.endPrefixMapping("")

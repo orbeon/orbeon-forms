@@ -76,7 +76,7 @@
                 <p:output name="data" id="rewritten-data"/>
             </p:processor>
             <!-- Move from XHTML namespace to no namespace -->
-            <p:processor name="oxf:plain-xhtml-converter">
+            <p:processor name="oxf:plain-html-converter">
                 <p:input name="data" href="#rewritten-data"/>
                 <p:output name="data" id="html-data"/>
             </p:processor>

@@ -148,16 +148,15 @@
                                         <indent>true</indent>
                                         <indent-amount>0</indent-amount>
                                     </config>
-
                                 </p:input>
                                 <p:input name="data" href="#xhtml-data"/>
                                 <p:output name="data" id="converted"/>
                             </p:processor>
                         </p:when>
                         <p:otherwise>
-                            <p:processor name="oxf:plain-xhtml-converter">
+                            <p:processor name="oxf:plain-html-converter">
                                 <p:input name="data" href="#rewritten-data"/>
-                                <p:output name="data" id="html-data"/>
+                                <p:output name="data" id="xhtml-data"/>
                             </p:processor>
                             <p:processor name="oxf:html-converter">
                                 <p:input name="config">
@@ -168,7 +167,7 @@
                                         <indent-amount>0</indent-amount>
                                     </config>
                                 </p:input>
-                                <p:input name="data" href="#html-data"/>
+                                <p:input name="data" href="#xhtml-data"/>
                                 <p:output name="data" id="converted"/>
                             </p:processor>
                         </p:otherwise>
@@ -176,11 +175,6 @@
                 </p:when>
                 <p:otherwise>
                     <!-- Produce HTML output -->
-                    <!-- Move from XHTML namespace to no namespace -->
-                    <p:processor name="oxf:plain-xhtml-converter">
-                        <p:input name="data" href="#rewritten-data"/>
-                        <p:output name="data" id="html-data"/>
-                    </p:processor>
 
                     <!-- For embeddable, don't put a doctype declaration -->
                     <p:choose href="#request">
@@ -212,10 +206,15 @@
                         </p:otherwise>
                     </p:choose>
 
+                    <p:processor name="oxf:plain-html-converter">
+                        <p:input name="data" href="#rewritten-data"/>
+                        <p:output name="data" id="xhtml-data"/>
+                    </p:processor>
+
                     <!-- Convert to HTML, choosing between embeddable and plain -->
                     <p:processor name="oxf:html-converter">
                         <p:input name="config" href="#html-converter-config"/>
-                        <p:input name="data" href="#html-data"/>
+                        <p:input name="data" href="#xhtml-data"/>
                         <p:output name="data" id="converted"/>
                     </p:processor>
 

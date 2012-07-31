@@ -59,7 +59,7 @@
     </p:processor>
 
     <!-- Convert to HTML -->
-    <p:processor name="oxf:plain-xhtml-converter">
+    <p:processor name="oxf:plain-html-converter">
         <p:input name="data" href="#rewritten-data"/>
         <p:output name="data" id="html-data"/>
     </p:processor>

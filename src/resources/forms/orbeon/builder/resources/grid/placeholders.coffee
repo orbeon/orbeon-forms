@@ -146,14 +146,14 @@ $ ->
                 $ selectors
 
         conditions:
-            isEmpty: (element) -> (f$.text editableInitialValue element) == ''
-            isNonEmpty: (element) -> not conditions.isEmpty element
-            pointerInsideCell: do ->
+            isEmpty: isEmpty = (element) -> (f$.text editableInitialValue element) == ''
+            isNonEmpty: (element) -> not isEmpty element
+            pointerInsideCell: pointerInsideCell = do ->
                 currentCell = null
                 Builder.mouseEntersGridTdEvent.subscribe ({gridTd}) -> currentCell = gridTd
                 Builder.mouseExitsGridTdEvent.subscribe () -> currentCell = null
                 (element) -> currentCell? and f$.is '*', f$.closest currentCell, element
-            pointerOutsideCell: (element) -> not conditions.pointerInsideCell element
+            pointerOutsideCell: (element) -> not pointerInsideCell element
             isNextSeqNo: (element) ->
                 storeSeqNo = parseInt (f$.data 'seqNo', element)
                 (currentSeqNo element) == storeSeqNo + 1

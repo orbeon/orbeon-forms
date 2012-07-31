@@ -263,6 +263,7 @@ textarea.xforms-invalid-visited {
 .fr-section-title a {
   text-decoration: none;
   color: inherit;
+  display: block;
 }
 .fr-section-title .fr-section-open-close {
   border-bottom: #ffffff;

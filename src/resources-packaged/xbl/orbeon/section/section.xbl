@@ -29,7 +29,7 @@
          xmlns:xforms="http://www.w3.org/2002/xforms"
          xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
 
-    <xbl:binding id="fr-section" element="fr|section" xxforms:external-events="fb-set-current-section fb-show-section-label-editor" xxbl:mode="binding lhha custom-lhha">
+    <xbl:binding id="fr-section" element="fr|section" xxforms:external-events="fb-set-current-section fb-update-section-label" xxbl:mode="binding lhha custom-lhha">
 
         <xbl:handlers>
             <xbl:handler event="fr-expand" phase="target">
@@ -64,7 +64,7 @@
                     <xsl:variable name="open" as="xs:boolean" select="$mode = 'view' or not(@open = 'false')"/>
 
                     <!-- Section content area -->
-                    <xf:group appearance="xxf:internal"  xxbl:scope="outer">
+                    <xf:group appearance="xxf:internal" xxbl:scope="outer">
                         <xf:var name="id" xbl:attr="xbl:text=id"/>
                         <xf:var name="fb-section" value="xxforms:instance('fb-form-instance')/xhtml:body//fr:section[@id = $id]"/>
                         <xf:var name="fb-can-move-classes" value="if (exists($fb-section)) then sectionOps:canMoveClasses($fb-section) else ''"/>
@@ -90,12 +90,11 @@
                                     <xsl:attribute name="class" select="'fr-section-title'"/>
 
                                     <!-- Open/close button -->
+                                    <xforms:var name="fb-vars" value="xxforms:instance('fb-variables')"/>
                                     <xforms:group appearance="xxforms:internal">
                                         <xsl:if test="$collapse">
                                             <!-- Handle DOMActivate event to open/close the switches -->
-                                            <xf:message ev:event="DOMActivate" value="concat('reading ', xxforms:instance('fb-variables')/section-label-editor-relevant)"/>
-                                            <xforms:action ev:event="DOMActivate"
-                                                           if="xxforms:instance('fb-variables')/section-label-editor-relevant = 'false'">
+                                            <xforms:action ev:event="DOMActivate">
                                                 <xxforms:variable name="expand" select="xxforms:case('switch') = 'case-closed'" as="xs:boolean"/>
                                                 <xforms:action if="$expand">
                                                     <!-- Expand -->
@@ -111,7 +110,7 @@
                                         <!-- Actual section title -->
                                         <xsl:choose>
                                             <xsl:when test="$collapse">
-                                                <xforms:trigger appearance="minimal" class="fr-section-label fr-section-{{if ($open) then 'opened' else 'closed'}}">
+                                                <xforms:trigger appearance="minimal" id="fr-section-label" class="fr-section-label fr-section-{{if ($open) then 'opened' else 'closed'}}">
                                                     <xforms:label value="xxforms:label('fr-section')"/>
                                                     <xforms:help  value="xxforms:help('fr-section')"/>
                                                     <xforms:hint  value="xxforms:hint('fr-section')"/>

@@ -22,6 +22,9 @@ html {
 .xforms-dialog fieldset {
   border: 1px solid #CCCCCC;
 }
+.xbl-fr-section > label {
+  display: none;
+}
 .fb-section-editor {
   position: absolute;
   display: none;
@@ -29,6 +32,16 @@ html {
 }
 .fb-section-editor .xforms-trigger {
   display: block;
+}
+.fb-section-label-editor-click-interceptor {
+  position: absolute;
+  cursor: pointer;
+}
+.fb-edit-section-label {
+  position: absolute;
+  z-index: 2;
+  font-size: 20px;
+  box-sizing: border-box;
 }
 .fb-ie-warning {
   margin: 1em;

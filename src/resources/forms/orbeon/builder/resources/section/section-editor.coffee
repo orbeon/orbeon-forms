@@ -1,11 +1,13 @@
-OD = ORBEON.xforms.Document
-FSM = ORBEON.util.FiniteStateMachine
-Events = ORBEON.xforms.Events
-
 $ ->
+    Builder = ORBEON.Builder
+    OD = ORBEON.xforms.Document
+    FSM = ORBEON.util.FiniteStateMachine
+    Events = ORBEON.xforms.Events
+    Properties = ORBEON.util.Properties
+
     sectionEditor = $ '.fb-section-editor'
     currentSection = null
-    sections = null
+    sectionsCache = null
     pageX = 0; pageY = 0
 
     FSM.create
@@ -18,7 +20,7 @@ $ ->
             ajaxResponse: (f) -> Events.ajaxResponseProcessedEvent.subscribe f
         actions:
             mouseMoved: (event) ->
-                updateSectionsOffset() if not sections?
+                updateSectionsOffset() if not sectionsCache
                 pageX = event.pageX
                 pageY = event.pageY
                 updateEditor()
@@ -27,13 +29,20 @@ $ ->
                 updateEditor()
 
     updateSectionsOffset = () ->
-        sections = []
+        sectionsCache = []
         _.each ($ '.xbl-fr-section'), (section) ->
             section = $ section
-            sections.unshift
+            sectionsCache.unshift
                 element: section
-                offset: f$.offset section
+                containerOffset: f$.offset section
                 height: f$.height section
+                titleOffset: f$.offset f$.find 'a', section
+
+    findSection = (top) ->
+        _.find sectionsCache, (section) ->
+            sectionTop = section.containerOffset.top
+            sectionBottom = sectionTop + section.height
+            sectionTop <= top <= sectionBottom
 
     updateEditor = ->
 
@@ -60,12 +69,7 @@ $ ->
             left: left
             right: left + (f$.width view)
         if viewPos.left <= pageX <= viewPos.right
-            newSection = _.find sections, (section) ->
-                sectionPos = do ->
-                    top = section.offset.top
-                    top: top
-                    bottom: top + section.height
-                sectionPos.top <= pageY <= sectionPos.bottom
+            newSection = findSection pageY
         if newSection?
             if newSection.element != currentSection
                 wasCurrentSection() if currentSection?
@@ -74,16 +78,64 @@ $ ->
         else
             wasCurrentSection() if currentSection?
 
+    do setupLabelEditor = ->
 
-    Events.clickEvent.subscribe (event) ->
-        target = $ event.target
-        conditionToEvents = [[
-            -> f$.is '*', f$.closest '.fb-section-editor', target
-            ['fb-set-current-section']
-        ], [
-            -> (f$.is 'a', target) and (f$.is '.fr-section-label', f$.parent target)
-            ['fb-set-current-section', 'fb-show-section-label-editor']
-        ]]
-        _.each conditionToEvents, ([condition, events]) ->
-            if condition()
-                _.each events, (e) -> OD.dispatchEvent currentSection[0].id, e
+        labelInput = null
+
+        Events.clickEvent.subscribe setCurrentSection = ({target}) ->
+            if f$.is '*', f$.closest '.fb-section-editor', $ target
+                OD.dispatchEvent currentSection[0].id, 'fb-set-current-section'
+
+        sendNewLabelValue = ->
+            newLabelValue = f$.val labelInput
+            OD.setValue (f$.attr 'id', $ '.fb-section-new-label'), newLabelValue
+            section = findSection (f$.offset labelInput).top
+            f$.text newLabelValue, f$.find '.fr-section-label:first a', section.element
+            OD.dispatchEvent (f$.attr 'id', section.element), 'fb-update-section-label'
+            f$.hide labelInput
+
+        showLabelEditor = (clickInterceptor) ->
+            if ORBEON.xforms.Globals.eventQueue.length > 0 or ORBEON.xforms.Globals.requestInProgress
+                _.delay (-> showLabelEditor clickInterceptor), Properties.internalShortDelay.get()
+            else
+                if not labelInput?
+                    labelInput = $ '<input class="fb-edit-section-label"/>'
+                    f$.append labelInput, $ document.body
+                    labelInput.on 'blur', -> if f$.is ':visible', labelInput then sendNewLabelValue()
+                    labelInput.on 'keypress', (e) -> if e.charCode == 13 then sendNewLabelValue()
+                    Events.ajaxResponseProcessedEvent.subscribe -> f$.hide labelInput
+                offset = f$.offset clickInterceptor
+                labelAnchor = do ->
+                    section = findSection offset.top
+                    f$.find '.fr-section-label:first a', section.element
+                do setInputContent = ->
+                    labelText = f$.text labelAnchor
+                    labelInput.val labelText
+                f$.show labelInput
+                do positionSizeInput = ->
+                    offset.top += ((f$.height clickInterceptor) - (f$.height labelInput)) / 2
+                    f$.width (f$.width labelAnchor) - 10, labelInput
+                f$.focus labelInput
+                f$.offset offset, labelInput
+
+        do setupLabelClickInterceptor = ->
+
+            labelClickInterceptors = []
+            positionLabelClickInterceptors = ->
+                sections = $ '.xbl-fr-section'
+                _.each _.range(sections.length - labelClickInterceptors.length), ->                                     # Create interceptors, so we have enough to cover all the sections
+                    container = $ '<div class="fb-section-label-editor-click-interceptor">'
+                    f$.append container, $ document.body
+                    container.on 'click', ({target}) -> showLabelEditor $ target
+                    labelClickInterceptors.push container
+                _.each _.range(sections.length, labelClickInterceptors.length), (pos) ->                                # Hide interceptors we don't need
+                    labelClickInterceptors[pos].hide()
+                _.each _.range(sections.length), (pos) ->                                                               # Position interceptor for each section
+                    title = f$.find '.fr-section-label a', $ sections[pos]
+                    interceptor = labelClickInterceptors[pos]
+                    interceptor.offset title.offset()
+                    interceptor.height title.height()
+                    interceptor.width title.width()
+            Events.orbeonLoadedEvent.subscribe positionLabelClickInterceptors
+            ($ window).resize positionLabelClickInterceptors
+            Events.ajaxResponseProcessedEvent.subscribe positionLabelClickInterceptors

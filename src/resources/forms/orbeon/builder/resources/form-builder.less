@@ -22,11 +22,28 @@ html { overflow: hidden }
 
 #fr-view fieldset, .xforms-dialog fieldset { border: 1px solid #CCCCCC; }
 
+.xbl-fr-section > label { display: none }
+
 .fb-section-editor {
     position: absolute;                                                                                                 // Is left/right set in JS relative to the current section
     display: none;                                                                                                      // Shown in JS when mouse over section
     padding: 0 10px 20px 20px;                                                                                          // Space between icons and section, and at bottom/top in case the mouse moves a bit out
     .xforms-trigger { display: block; }                                                                                 // Icons shown vertically
+}
+
+.fb-section-label-editor-click-interceptor {                                                                            // Shown on top of each section label to avoid click → collapse
+    position: absolute;                                                                                                 // Is left/right set in JS relative to the current section label
+    cursor: pointer;
+    &:hover {
+        //background: blue;
+    }
+}
+
+.fb-edit-section-label {                                                                                                // Input created dynamically to edit section label
+    position: absolute;
+    z-index: 2;                                                                                                         // Display on top of click interceptor
+    font-size: 20px;                                                                                                    // Same as the one on .xforms-form h2 in f-r-o.css
+    box-sizing: border-box;                                                                                             // Makes relative sizing easier
 }
 
 .fb-ie-warning { margin: 1em; padding: .5em; border: 4px solid #D00000; background-color: #FFF0F0 }

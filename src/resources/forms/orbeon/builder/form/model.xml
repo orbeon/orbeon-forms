@@ -326,7 +326,7 @@
     <xforms:instance id="fb-variables">
         <variables>
             <selected-section/>
-            <section-label-editor-relevant>false</section-label-editor-relevant>
+            <section-new-label/>
             <selected-cell/>        <!-- Currently selected cell td id -->
 
             <!-- TODO: move to dialog-language.xml -->
@@ -353,11 +353,10 @@
     <xforms:action ev:observer="fb" ev:event="fb-set-current-section" xxforms:phantom="true">
         <xforms:setvalue ref="instance('fb-variables')/selected-section" value="event('xxforms:targetid')"/>
     </xforms:action>
-    <xforms:action ev:observer="fb" ev:event="fb-show-section-label-editor" xxforms:phantom="true">
-        <xforms:setvalue ref="instance('fb-variables')/section-label-editor-relevant">true</xforms:setvalue>
-        <xforms:message value="concat('setting ', xxforms:instance('fb-variables')/section-label-editor-relevant)"/>
+    <xforms:action ev:observer="fb" ev:event="fb-update-section-label" xxforms:phantom="true">
+        <xforms:setvalue ref="$current-resources/*[name() = controlOps:controlName(event('xxforms:targetid'))]/label"
+                         value="instance('fb-variables')/section-new-label"/>
     </xforms:action>
-
     <xforms:var name="variables" value="instance('fb-variables')"/>
     <xforms:var name="selected-cell" value="$variables/selected-cell"/>
 

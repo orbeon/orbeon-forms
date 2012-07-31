@@ -14,11 +14,9 @@
 package org.orbeon.oxf.xforms.control
 
 import collection.JavaConverters._
-import java.util.{Collections ⇒ JCollections}
 import org.dom4j.Element
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.xforms.XFormsProperties
-import org.orbeon.oxf.xforms.XFormsUtils
+import org.orbeon.oxf.xforms.{XFormsConstants, XFormsProperties, XFormsUtils}
 import org.orbeon.oxf.xforms.analysis.XPathDependencies
 import org.orbeon.oxf.xforms.event.XFormsEvent
 import org.orbeon.oxf.xforms.event.events.XXFormsValue
@@ -29,6 +27,8 @@ import org.orbeon.oxf.xml.{ContentHandlerHelper, NamespaceMapping}
 import org.orbeon.saxon.om.Item
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.saxon.value._
+import XFormsValueControl._
+import XFormsConstants._
 
 /**
  * Base class for all controls that hold a value.
@@ -134,9 +134,6 @@ abstract class XFormsValueControl(container: XBLContainer, parent: XFormsControl
         assert(isRelevant)
         assert(getValue ne null)
 
-//                final String lang = XFormsUtils.resolveXMLang(getControlElement());// this could be done as part of the static analysis?
-//                format = XFormsProperties.getTypeOutputFormat(containingDocument, typeName, lang);
-
         if (format eq null)
             // Try default format for known types
             Option(getBuiltinTypeName) flatMap
@@ -144,7 +141,7 @@ abstract class XFormsValueControl(container: XBLContainer, parent: XFormsControl
                     (outputFormat ⇒ evaluateAsString(
                         StringValue.makeStringValue(getValue),
                         outputFormat,
-                        XFormsValueControl.FormatNamespaceMapping,
+                        FormatNamespaceMapping,
                         getContextStack.getCurrentVariables)) orNull
         else
             // Format value according to format attribute
@@ -219,6 +216,13 @@ abstract class XFormsValueControl(container: XBLContainer, parent: XFormsControl
 }
 
 object XFormsValueControl {
-    // Assume xs: prefix for default formats
-    val FormatNamespaceMapping = new NamespaceMapping(Map(XSD_PREFIX → XSD_URI).asJava)
+
+    val FormatNamespaceMapping =
+        new NamespaceMapping(
+            Map(
+                XSD_PREFIX      → XSD_URI,
+                XFORMS_PREFIX   → XFORMS_NAMESPACE_URI,
+                XXFORMS_PREFIX  → XXFORMS_NAMESPACE_URI,
+                EXFORMS_PREFIX  → EXFORMS_NAMESPACE_URI
+            ).asJava)
 }

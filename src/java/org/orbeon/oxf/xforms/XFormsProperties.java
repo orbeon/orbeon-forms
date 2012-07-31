@@ -519,37 +519,6 @@ public class XFormsProperties {
         return getBooleanProperty(containingDocument, EXPOSE_XPATH_TYPES_PROPERTY);
     }
 
-    /**
-     * Get a format string given the given type and language.
-     *
-     * @param containingDocument    containing document
-     * @param typeName              type name, e.g. "date", "dateTime", etc.
-     * @param lang                  language, null, "en", "fr-CH"
-     * @return                      format string, null if not found
-     */
-    public static String getTypeOutputFormat(XFormsContainingDocument containingDocument, String typeName, String lang) {
-        final StringBuilder sb = new StringBuilder(TYPE_OUTPUT_FORMAT_PROPERTY_PREFIX);
-
-        if (lang == null) {
-            sb.append("*.*.");
-        } else {
-            final String[] langElements = StringUtils.split(lang, '-');
-            // Support e.g. "en" or "fr-CH"
-            for (int i = 0; i < 2; i++) {
-                if (i < langElements.length) {
-                    sb.append(langElements[i]);
-                    sb.append('.');
-                } else {
-                    sb.append("*.");
-                }
-            }
-        }
-
-        sb.append(typeName);
-
-        return getStringProperty(containingDocument, sb.toString());
-    }
-
     public static String getTypeInputFormat(XFormsContainingDocument containingDocument, String typeName) {
         return getStringProperty(containingDocument, TYPE_INPUT_FORMAT_PROPERTY_PREFIX + typeName);
     }

@@ -43,23 +43,10 @@
     <!-- XPath analysis (PE) -->
     <property as="xs:boolean" name="oxf.xforms.xpath-analysis"                          value="false"/>
 
-    <!-- TODO: new output formats depending on language; also support short/medium/long/full? -->
-    <property as="xs:string"  name="oxf.xforms.format.output.*.*.date"                  value="if (. castable as xs:date) then format-date(xs:date(.), '[FNn] [MNn] [D], [Y] [ZN]', 'en', (), ()) else ."/>
-    <property as="xs:string"  name="oxf.xforms.format.output.*.*.dateTime"              value="if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), '[FNn] [MNn] [D], [Y] [H01]:[m01]:[s01] [ZN]', 'en', (), ()) else ."/>
-    <property as="xs:string"  name="oxf.xforms.format.output.*.*.time"                  value="if (. castable as xs:time) then format-time(xs:time(.), '[H01]:[m01]:[s01] [ZN]', 'en', (), ()) else ."/>
-    <property as="xs:string"  name="oxf.xforms.format.output.*.*.decimal"               value="if (. castable as xs:decimal) then format-number(xs:decimal(.),'###,###,###,##0.00') else ."/>
-    <property as="xs:string"  name="oxf.xforms.format.output.*.*.integer"               value="if (. castable as xs:integer) then format-number(xs:integer(.),'###,###,###,##0') else ."/>
-    <property as="xs:string"  name="oxf.xforms.format.output.*.*.float"                 value="if (. castable as xs:float) then format-number(xs:float(.),'#,##0.000') else ."/>
-    <property as="xs:string"  name="oxf.xforms.format.output.*.*.double"                value="if (. castable as xs:double) then format-number(xs:double(.),'#,##0.000') else ."/>
-
-    <property as="xs:string"  name="oxf.xforms.format.output.fr.*.date"                 value="if (. castable as xs:date) then format-date(xs:date(.), '[FNn] [D] [Mn] [Y]', 'fr', (), ()) else ."/>
-    <property as="xs:string"  name="oxf.xforms.format.output.fr.*.dateTime"             value="if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), '[FNn] [D] [Mn] [Y] [H01]:[m01]:[s01]', 'fr', (), ()) else ."/>
-    <property as="xs:string"  name="oxf.xforms.format.output.fr.*.time"                 value="if (. castable as xs:time) then format-time(xs:time(.), '[H01]:[m01]:[s01]', 'fr', (), ()) else ."/>
-
-    <!-- TODO: remove these older formats when new formats above are supported -->
-    <property as="xs:string"  name="oxf.xforms.format.output.date"                      value="if (. castable as xs:date) then format-date(xs:date(.), '[FNn] [MNn] [D], [Y] [ZN]', 'en', (), ()) else ."/>
-    <property as="xs:string"  name="oxf.xforms.format.output.dateTime"                  value="if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), '[FNn] [MNn] [D], [Y] [H01]:[m01]:[s01] [ZN]', 'en', (), ()) else ."/>
-    <property as="xs:string"  name="oxf.xforms.format.output.time"                      value="if (. castable as xs:time) then format-time(xs:time(.), '[H01]:[m01]:[s01] [ZN]', 'en', (), ()) else ."/>
+    <!-- Formats -->
+    <property as="xs:string"  name="oxf.xforms.format.output.date"                      value="if (. castable as xs:date) then format-date(xs:date(.), '[FNn] [MNn] [D], [Y] [ZN]', xxforms:lang(), (), ()) else ."/>
+    <property as="xs:string"  name="oxf.xforms.format.output.dateTime"                  value="if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), '[FNn] [MNn] [D], [Y] [H01]:[m01]:[s01] [ZN]', xxforms:lang(), (), ()) else ."/>
+    <property as="xs:string"  name="oxf.xforms.format.output.time"                      value="if (. castable as xs:time) then format-time(xs:time(.), '[H01]:[m01]:[s01] [ZN]', xxforms:lang(), (), ()) else ."/>
     <property as="xs:string"  name="oxf.xforms.format.output.decimal"                   value="if (. castable as xs:decimal) then format-number(xs:decimal(.),'###,###,###,##0.00') else ."/>
     <property as="xs:string"  name="oxf.xforms.format.output.integer"                   value="if (. castable as xs:integer) then format-number(xs:integer(.),'###,###,###,##0') else ."/>
     <property as="xs:string"  name="oxf.xforms.format.output.float"                     value="if (. castable as xs:float) then format-number(xs:float(.),'#,##0.000') else ."/>

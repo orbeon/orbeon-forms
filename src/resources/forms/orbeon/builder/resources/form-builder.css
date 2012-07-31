@@ -704,7 +704,6 @@ a.xforms-help-image .fb-control-help {
 .fr-grid-th .xforms-hint {
   min-height: 18px;
 }
-/* NOTE: Was changed to 1.5 at some point, check it too small */
 #fr-view .fr-grid .xforms-hint.xforms-disabled {
   display: block;
   position: static;

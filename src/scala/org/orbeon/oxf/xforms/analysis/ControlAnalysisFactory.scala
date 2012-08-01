@@ -92,7 +92,7 @@ object ControlAnalysisFactory {
         XFORMS_TEXTAREA_QNAME         → ValueControlFactory,
         XFORMS_UPLOAD_QNAME           → (new UploadControl(_, _, _, _, _)),
         XFORMS_RANGE_QNAME            → ValueControlFactory,
-        XXFORMS_TEXT_QNAME            → ValueControlFactory,
+        XXFORMS_TEXT_QNAME            → (new OutputControl(_, _, _, _, _)),// TODO: don't accept any external events
         XFORMS_OUTPUT_QNAME           → (new OutputControl(_, _, _, _, _)),
         // Core controls
         XFORMS_TRIGGER_QNAME          → (new TriggerControl(_, _, _, _, _)),

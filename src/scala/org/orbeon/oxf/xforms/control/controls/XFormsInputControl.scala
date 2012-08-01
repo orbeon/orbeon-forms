@@ -28,7 +28,6 @@ import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.control.XFormsValueControl
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
-import org.orbeon.saxon.om.Item
 import org.orbeon.saxon.om.ValueRepresentation
 import org.orbeon.saxon.value.CalendarValue
 import org.orbeon.saxon.value.DateValue
@@ -78,8 +77,9 @@ class XFormsInputControl(container: XBLContainer, parent: XFormsControl, element
                 normalizeBooleanString(internalValue)
             else
                 // Other types or no type
-                // For now, format only if the format attribute is present
-                format map getValueUseFormat getOrElse internalValue
+                // Format only if the format attribute is present. We don't use the default formats, because we don't
+                // yet have default "unformats".
+                format flatMap valueWithSpecifiedFormat getOrElse internalValue
 
         setExternalValue(updatedValue)
     }
@@ -90,7 +90,7 @@ class XFormsInputControl(container: XBLContainer, parent: XFormsControl, element
 
         // Tricky: mark the external value as dirty if there is a format, as the client will expect an up to date formatted value
         format foreach { _ ⇒
-            markExternalValueDirty
+            markExternalValueDirty()
             containingDocument.getControls.markDirtySinceLastRequest(false)
         }
     }
@@ -120,7 +120,7 @@ class XFormsInputControl(container: XBLContainer, parent: XFormsControl, element
                     ""
             case _ ⇒
                 unformat flatMap
-                    (xpath ⇒ Option(evaluateAsString(xpath, Seq[Item](StringValue.makeStringValue(externalValue)).asJava, 1))) getOrElse externalValue
+                    (evaluateAsString(_, Seq(StringValue.makeStringValue(externalValue)), 1)) getOrElse externalValue
         }
     }
 
@@ -131,12 +131,12 @@ class XFormsInputControl(container: XBLContainer, parent: XFormsControl, element
                 getBuiltinTypeName match {
                     case "date" | "time" ⇒ formatSubValue(getFirstValueType, getValue)
                     case "dateTime"      ⇒ formatSubValue(getFirstValueType, getDateTimeDatePart(getValue, 'T'))
-                    case _               ⇒ getExternalValue
+                    case _               ⇒ Option(getExternalValue)
                 }
             } else
-                null
+                None
 
-        Option(result) getOrElse ""
+        result getOrElse ""
     }
 
     // Convenience method for handler: return the value of the second input field.
@@ -145,17 +145,17 @@ class XFormsInputControl(container: XBLContainer, parent: XFormsControl, element
             if (isRelevant) {
                 getBuiltinTypeName match {
                     case "dateTime"      ⇒ formatSubValue(getSecondValueType, getDateTimeTimePart(getValue, 'T'))
-                    case _               ⇒ null
+                    case _               ⇒ None
                 }
             } else
-                null
+                None
 
-        Option(result) getOrElse ""
+        result getOrElse ""
     }
 
-    // Convenience method for handler: return a formatted value for read-only output.
-    def getReadonlyValueUseFormat =
-        if (isRelevant) getValueUseFormat(format.orNull) else null
+    // Convenience method for handler: return a formatted value for read-only output
+    def getReadonlyValue =
+        getValueUseFormat(format) getOrElse getExternalValue
 
     private def formatSubValue(valueType: String, value: String) = {
         val variables = Map[String, ValueRepresentation]("v" → StringValue.makeStringValue(value))
@@ -177,7 +177,7 @@ class XFormsInputControl(container: XBLContainer, parent: XFormsControl, element
                 XFormsProperties.getTypeInputFormat(containingDocument, valueType) +
                 "', 'en', (), ()) else $v"
 
-            evaluateAsString(boundItem, xpathExpression, XFormsValueControl.FormatNamespaceMapping, variables.asJava)
+            evaluateAsString(xpathExpression, Option(boundItem), XFormsValueControl.FormatNamespaceMapping, variables.asJava)
         }
     }
 

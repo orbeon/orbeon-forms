@@ -249,8 +249,7 @@ public class XFormsInputHandler extends XFormsControlLifecyleHandler {
                     } else {
                         // Read-only mode
                         if (isConcreteControl) {
-                            final String formattedValue = inputControl.getReadonlyValueUseFormat();
-                            final String outputValue = (formattedValue != null) ? formattedValue : inputControl.getExternalValue();
+                            final String outputValue = inputControl.getReadonlyValue();
 
                             contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, enclosingElementLocalname, enclosingElementQName, containerAttributes);
 

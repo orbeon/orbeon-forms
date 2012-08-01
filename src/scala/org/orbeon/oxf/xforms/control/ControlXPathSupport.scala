@@ -16,8 +16,9 @@ package org.orbeon.oxf.xforms.control
 import org.orbeon.oxf.util.XPathCache
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xml.NamespaceMapping
-import java.util.{List ⇒ JList, Map ⇒ JMap}
+import java.util.{Map ⇒ JMap}
 import org.orbeon.saxon.om.{Item, ValueRepresentation}
+import collection.JavaConverters._
 
 trait ControlXPathSupport {
 
@@ -63,63 +64,49 @@ trait ControlXPathSupport {
         }
     }
 
-    /**
-     * Evaluate an XPath expression as a string in the context of this control.
-     *
-     * @param xpathString       XPath expression
-     * @return                  value, or null if cannot be computed
-     */
-    def evaluateAsString(xpathString: String, contextItems: JList[Item], contextPosition: Int) = {
+    // Evaluate an XPath expression as a string in the context of this control.
+    def evaluateAsString(xpathString: String, contextItems: Seq[Item], contextPosition: Int): Option[String] = {
         // NOTE: the control may or may not be bound, so don't use getBoundNode()
-        if ((contextItems eq null) || contextItems.size == 0)
-            null
+        if (contextItems.isEmpty)
+            None
         else {
             // Need to ensure the binding on the context stack is correct before evaluating XPath expressions
             // Reason is that XPath functions might use the context stack to get the current model, etc.
             getContextStack.setBinding(getBindingContext)
             try
-                XPathCache.evaluateAsString(contextItems, contextPosition, xpathString, getNamespaceMappings,
-                    bindingContext.getInScopeVariables, XFormsContainingDocument.getFunctionLibrary, getFunctionContext, null, getLocationData)
+                Option(XPathCache.evaluateAsString(contextItems.asJava, contextPosition, xpathString, getNamespaceMappings,
+                    bindingContext.getInScopeVariables, XFormsContainingDocument.getFunctionLibrary, getFunctionContext, null, getLocationData))
             catch {
                 case e: Exception ⇒
                     // Don't consider this as fatal
                     XFormsError.handleNonFatalXPathError(container, e)
-                    null
+                    None
             } finally
                 // Restore function context to prevent leaks caused by context pointing to removed controls
                 returnFunctionContext()
         }
     }
 
-    /**
-     * Evaluate an XPath expression as a string in the context of this control.
-     *
-     * @param contextItem           context item
-     * @param xpathString           XPath expression
-     * @param namespaceMapping      namespace mappings to use
-     * @param variableToValueMap    variables to use
-     * @return                      value, or null if cannot be computed
-     */
-    def evaluateAsString(contextItem: Item, xpathString: String, namespaceMapping: NamespaceMapping, variableToValueMap: JMap[String, ValueRepresentation]): String = {
-        if (contextItem == null)
-            null
-        else {
-            // Need to ensure the binding on the context stack is correct before evaluating XPath expressions
-            // Reason is that XPath functions might use the context stack to get the current model, etc.
-            getContextStack.setBinding(getBindingContext)
-            try
-                XPathCache.evaluateAsString(contextItem, xpathString, namespaceMapping, variableToValueMap,
-                    XFormsContainingDocument.getFunctionLibrary, getFunctionContext, null, getLocationData)
-            catch {
-                case e: Exception ⇒
-                    // Don't consider this as fatal
-                    XFormsError.handleNonFatalXPathError(container, e)
-                    null
-            } finally
-                // Restore function context to prevent leaks caused by context pointing to removed controls
-                returnFunctionContext()
+    // Evaluate an XPath expression as a string in the context of this control.
+    def evaluateAsString(xpathString: String, contextItem: Option[Item], namespaceMapping: NamespaceMapping, variableToValueMap: JMap[String, ValueRepresentation]): Option[String] =
+        contextItem match {
+            case None ⇒ None
+            case Some(contextItem) ⇒
+                // Need to ensure the binding on the context stack is correct before evaluating XPath expressions
+                // Reason is that XPath functions might use the context stack to get the current model, etc.
+                getContextStack.setBinding(getBindingContext)
+                try
+                    Option(XPathCache.evaluateAsString(contextItem, xpathString, namespaceMapping, variableToValueMap,
+                        XFormsContainingDocument.getFunctionLibrary, getFunctionContext, null, getLocationData))
+                catch {
+                    case e: Exception ⇒
+                        // Don't consider this as fatal
+                        XFormsError.handleNonFatalXPathError(container, e)
+                        None
+                } finally
+                    // Restore function context to prevent leaks caused by context pointing to removed controls
+                    returnFunctionContext()
         }
-    }
 
     // Return an XPath function context having this control as source control.
     private def getFunctionContext =

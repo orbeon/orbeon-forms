@@ -130,22 +130,29 @@ abstract class XFormsValueControl(container: XBLContainer, parent: XFormsControl
         // the controls as dirty, and they will be evaluated when necessary later.
     }
 
-    final protected def getValueUseFormat(format: String): String = {
+    final protected def getValueUseFormat(format: Option[String]) =
+        format flatMap valueWithSpecifiedFormat orElse valueWithDefaultFormat
+
+    // Format value according to format attribute
+    final protected def valueWithSpecifiedFormat(format: String): Option[String] = {
         assert(isRelevant)
         assert(getValue ne null)
 
-        if (format eq null)
-            // Try default format for known types
-            Option(getBuiltinTypeName) flatMap
-                (typeName ⇒ Option(XFormsProperties.getTypeOutputFormat(containingDocument, typeName))) map
-                    (outputFormat ⇒ evaluateAsString(
-                        StringValue.makeStringValue(getValue),
-                        outputFormat,
-                        FormatNamespaceMapping,
-                        getContextStack.getCurrentVariables)) orNull
-        else
-            // Format value according to format attribute
-            evaluateAsString(format, Seq[Item](StringValue.makeStringValue(getValue)).asJava, 1)
+        evaluateAsString(format, Seq(StringValue.makeStringValue(getValue)), 1)
+    }
+
+    // Try default format for known types
+    final protected def valueWithDefaultFormat: Option[String] = {
+        assert(isRelevant)
+        assert(getValue ne null)
+
+        Option(getBuiltinTypeName) flatMap
+            (typeName ⇒ Option(XFormsProperties.getTypeOutputFormat(containingDocument, typeName))) flatMap
+                (evaluateAsString(
+                    _,
+                    Option(StringValue.makeStringValue(getValue)),
+                    FormatNamespaceMapping,
+                    getContextStack.getCurrentVariables))
     }
 
     /**

@@ -12,7 +12,6 @@
             xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <xhtml:head>
-        <xhtml:title>Contact</xhtml:title>
         <xforms:model id="fr-form-model" xxforms:xpath-analysis="true">
             <xforms:instance id="fr-form-instance">
                 <form>
@@ -224,7 +223,6 @@
     </xhtml:head>
     <xhtml:body>
         <fr:view>
-            <xforms:label ref="instance('fr-form-metadata')/title"/>
             <fr:body>
                 <fr:section id="contact-section" bind="contact-bind">
                     <xforms:label ref="$form-resources/contact/label"/>

@@ -26,7 +26,8 @@
       xmlns="http://www.w3.org/1999/xhtml">
 
     <head>
-        <title>Orbeon Form Runner</title>
+    <!-- Make sure to use the source form's title -->
+        <xhtml:title><xforms:output value="$source-form-metadata/title[@xml:lang = xxforms:instance('fr-language-instance')], $source-form-metadata/title"/></xhtml:title>
         <xhtml:link rel="stylesheet" href="/apps/fr/style/form-runner-summary.css" type="text/css" media="all"/>
         <!-- Summary page XForms model -->
         <xforms:model id="fr-form-model" xxforms:xpath-analysis="true">
@@ -48,6 +49,10 @@
             <xforms:instance id="fr-source-form-instance" xxforms:readonly="false"><!-- Set to false so that xforms:insert works -->
                 <form xmlns=""/>
             </xforms:instance>
+
+            <xforms:var
+                name="source-form-metadata"
+                value="instance('fr-source-form-instance')/xhtml:head/xforms:model/xforms:instance[@id = 'fr-form-metadata']/*"/>
 
             <!-- NOTE: use xxforms:cache="false" otherwise updates to the form won't work in the summary page -->
             <!-- A solution for this might be for read-form.xpl, which is able to use conditional GET, to run always, or to
@@ -338,7 +343,19 @@
         <!-- Whether this is the summary page for the form builder -->
         <xforms:var name="is-form-builder" value="$app = 'orbeon' and $form = 'builder'"/>
         <fr:view>
-            <xforms:label>Orbeon Form Runner</xforms:label>
+            <fr:header>
+                <!-- Make sure to use the source form's logo -->
+                <fr:logo paths="$source-form-metadata/logo[@xml:lang = xxforms:instance('fr-language-instance')], $source-form-metadata/logo"/>
+                <fr:language-selector/>
+                <fr:noscript-selector/>
+                <fr:form-builder-doc/>
+                <fr:goto-content/>
+            </fr:header>
+            <fr:top>
+                <fr:title/>
+                <!-- Make sure to use the source form's description -->
+                <fr:description paths="$source-form-metadata/description[@xml:lang = xxforms:instance('fr-language-instance')], $source-form-metadata/description"/>
+            </fr:top>
             <fr:body>
                 <xforms:group appearance="xxforms:internal">
                     <!-- Stop value change propagation so changes in this section of the form don't cause data

@@ -25,6 +25,9 @@
       xmlns:form-runner="java:org.orbeon.oxf.fr.FormRunner">
 
     <xhtml:head>
+        <xhtml:title>
+            <xforms:output ref="$fr-resources/home/title"/>
+        </xhtml:title>
         <xhtml:link rel="stylesheet" href="/apps/fr/style/form-runner-home.css" type="text/css" media="all"/>
         <xforms:model id="fr-form-model" xxforms:xpath-analysis="true">
             <!-- NOTE: Necessary as referenced in view.xsl -->
@@ -43,9 +46,6 @@
                 </xforms:action>
             </xforms:action>
         </xforms:model>
-        <xhtml:title>
-            <xforms:output ref="$fr-resources/home/title"/>
-        </xhtml:title>
     </xhtml:head>
     <xhtml:body>
         <fr:view>

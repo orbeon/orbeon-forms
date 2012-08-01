@@ -85,25 +85,33 @@
                     xml:lang="{{xxforms:instance('fr-language-instance')}}">
             <xsl:apply-templates select="@*"/>
 
-            <!-- Global XForms variables -->
-            <xxforms:variable name="metadata-lang" select="xxforms:instance('fr-language-instance')"/>
-            <xxforms:variable name="source-form-metadata" select="xxforms:instance('fr-form-metadata')"/>
             <!-- Scope variable with Form Runner resources -->
             <xxforms:variable name="fr-resources" model="fr-resources-model" select="$fr-fr-resources" as="element(resource)?"/>
             <!-- Scope form resources -->
             <xxforms:variable name="form-resources" model="fr-resources-model" select="$fr-form-resources" as="element(resource)?"/>
 
-            <!-- Title in chosen language from metadata, view, or HTML title -->
-            <!-- Support title in xf:output inside xh:title, e.g. used in FR home page -->
-            <xsl:variable name="title-output" select="(/xhtml:html/xhtml:head/xhtml:title/xforms:output)[1]" as="element(xforms:output)?"/>
-            <xxforms:variable name="title"
-                              select="((xxforms:instance('fr-form-metadata')/title[@xml:lang = $metadata-lang],
-                                        xxforms:instance('fr-form-metadata')/title[1],
-                                        $source-form-metadata/title[@xml:lang = $metadata-lang],
-                                        $source-form-metadata/title[1],
-                                        ({$title-output/@ref}),
-                                        ({$title-output/@value}),
-                                        '{replace(xhtml:head/xhtml:title, '''', '''''')}')[normalize-space() != ''])[1]"/>
+            <!-- Title from the current form's metadata -->
+            <xforms:var
+                name="title-from-metadata"
+                value="xxforms:instance('fr-form-metadata')/title[@xml:lang = xxforms:instance('fr-language-instance')], xxforms:instance('fr-form-metadata')/title"/>
+
+            <!-- Title from the current page's xforms:output under HTML title -->
+             <xsl:choose>
+                <xsl:when test="xhtml:head/xhtml:title/xforms:output">
+                    <xforms:var
+                        name="title-from-output"
+                        model="fr-form-model"
+                        value="string()">
+                        <xsl:apply-templates select="(xhtml:head/xhtml:title/xforms:output)[1]/(@bind | @model | @context | @ref | @value)"/>
+                    </xforms:var>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xforms:var name="title-from-output"/>
+                </xsl:otherwise>
+            </xsl:choose>
+
+            <!-- Form title based on metadata or HTML title -->
+            <xforms:var name="title" value="($title-from-metadata, $title-from-output, '{replace(xhtml:head/xhtml:title, '''', '''''')}')[normalize-space()][1]"/>
 
             <xsl:apply-templates select="node()"/>
         </xhtml:html>

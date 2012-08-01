@@ -64,9 +64,7 @@
                                 <xsl:otherwise>
                                     <!-- Standard header -->
                                     <xsl:variable name="default-objects" as="element()+">
-                                        <xsl:if test="not($hide-logo)">
-                                            <fr:logo/>
-                                        </xsl:if>
+                                        <fr:logo/>
                                         <fr:language-selector/>
                                         <fr:noscript-selector/>
                                         <fr:form-builder-doc/>
@@ -308,29 +306,29 @@
 
     <xsl:template match="fr:description">
         <!-- Description in chosen language or first one if not found -->
-        <xxforms:variable name="description"
-            select="(xxforms:instance('fr-form-metadata')/description[@xml:lang = $metadata-lang],
-                xxforms:instance('fr-form-metadata')/description[1],
-                $source-form-metadata/description[@xml:lang = $metadata-lang],
-                $source-form-metadata/description[1])[1]"/>
-        <xforms:output class="fr-form-description" value="$description"/>
+        <xforms:output
+            class="fr-form-description"
+            model="fr-form-model"
+            value="({if (@paths) then concat(@paths, ', ') else ''}xxforms:instance('fr-form-metadata')/description[@xml:lang = xxforms:instance('fr-language-instance')],
+                        xxforms:instance('fr-form-metadata')/description)[normalize-space()][1]"/>
     </xsl:template>
 
     <xsl:template match="fr:logo">
-        <!-- Logo -->
-        <xxforms:variable name="logo-uri" as="xs:string?"
-            select="(($source-form-metadata/logo,
-                                    instance('fr-form-metadata')/logo,
-                                    '{$default-logo-uri}')[normalize-space() != ''])[1]"/>
+        <xsl:if test="not($hide-logo)">
 
-        <!-- If image comes from resources, use an img tag so we can serve GIF for IE6 -->
-        <xxforms:variable name="is-logo-in-resources" select="starts-with($logo-uri, 'oxf:')"/>
-        <xforms:group ref=".[$is-logo-in-resources]">
-            <xhtml:img class="fr-logo" src="{{substring-after($logo-uri, 'oxf:')}}" alt=""/>
-        </xforms:group>
-        <xforms:group ref=".[exists($logo-uri) and not($is-logo-in-resources)]">
-            <xforms:output class="fr-logo" value="$logo-uri" mediatype="image/*"/>
-        </xforms:group>
+            <xxforms:variable name="logo-uri"
+                select="({if (@paths) then concat(@paths, ', ') else ''}xxforms:instance('fr-form-metadata')/logo,
+                         '{$default-logo-uri}')[normalize-space()][1]"/>
+
+            <!-- If image comes from resources, use an img tag so we can serve GIF for IE6 -->
+            <xxforms:variable name="is-logo-in-resources" select="starts-with($logo-uri, 'oxf:')"/>
+            <xforms:group ref=".[$is-logo-in-resources]">
+                <xhtml:img class="fr-logo" src="{{substring-after($logo-uri, 'oxf:')}}" alt=""/>
+            </xforms:group>
+            <xforms:group ref=".[exists($logo-uri) and not($is-logo-in-resources)]">
+                <xforms:output class="fr-logo" value="$logo-uri" mediatype="image/*"/>
+            </xforms:group>
+        </xsl:if>
     </xsl:template>
 
     <xsl:template match="fr:form-builder-doc">

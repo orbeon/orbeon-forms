@@ -182,7 +182,7 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
 
         // NOTE: We support a null epilogue value and the pipeline then uses a plain HTML serializer
         val epilogueElement = configRoot.element("epilogue")
-        val epilogueURL     = Option(epilogueElement) flatMap (att(_, "url")) orElse controllerProperty(EpilogueProperty) get
+        val epilogueURL     = Option(epilogueElement) flatMap (att(_, "url")) orElse controllerProperty(EpilogueProperty)
 
         val topLevelElements = Dom4j.elements(configRoot)
 
@@ -258,7 +258,7 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
             stepProcessorContext: StepProcessorContext,
             urlBase: String,
             globalInstancePassing: String,
-            epilogueURL: String,
+            epilogueURL: Option[String],
             epilogueElement: Element,
             pageIdToPathInfo: JMap[String, String],
             pageIdToSetvaluesDocument: JMap[String, Document]) =
@@ -283,7 +283,7 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
             addStatement(new ASTChoose(new ASTHrefId(epilogueData)) {
                 addWhen(new ASTWhen("not(/*/@xsi:nil = 'true')") {
                     setNamespaces(PageFlowControllerBuilder.NAMESPACES_WITH_XSI_AND_XSLT)
-                    handleEpilogue(urlBase, getStatements, epilogueURL, epilogueElement,
+                    handleEpilogue(urlBase, getStatements, epilogueURL.orNull, epilogueElement,
                             epilogueData, epilogueModelData, epilogueInstance)
                 })
                 addWhen(new ASTWhen() {

@@ -183,11 +183,14 @@ object FormRunner {
      * Given the metadata for a form, returns the sequence of operations that the current user is authorized to perform.
      * The sequence can contain just the "*" string to denote that the user is allowed to perform any operation.
      */
-    def authorizedOperationsOnForm(metadata: NodeInfo): java.util.List[String] = {
+    def authorizedOperationsOnForm(permissionsElement: NodeInfo): java.util.List[String] = {
         val request = NetUtils.getExternalContext.getRequest
-        (metadata \ "permissions" match {
-            case Seq() ⇒ Seq("*")                                                      // No permissions defined for this form, authorize any operation
-            case ps ⇒ ( ps \ "permission"
+
+        val permissions =
+            if (permissionsElement eq null)
+                Seq("*")                                                                // No permissions defined for this form, authorize any operation
+            else
+                (permissionsElement \ "permission"
                     filter (p ⇒
                         (p \ * isEmpty) ||                                              // No constraint on the permission, so it is automatically satisfied
                         (p \ "user-role" forall (r ⇒                                   // If we have user-role constraints, they must all pass
@@ -195,9 +198,9 @@ object FormRunner {
                             map (_.replace("%20", " "))                                 // Unescape internal spaces as the roles used in Liferay are user-facing labels that can contain space (see also permissions.xbl)
                             exists request.isUserInRole)))
                     flatMap (p ⇒ (p \@ "operations" stringValue) split "\\s+")         // For the permissions that passed, return the list operations
-                    distinct                                                            // Remove duplicate operations
-                )
-        }) asJava
+                    distinct)                                                           // Remove duplicate operations
+
+        permissions.asJava
     }
 
     def getFormBuilderPermissionsAsXML(formRunnerRoles: NodeInfo): NodeInfo = {

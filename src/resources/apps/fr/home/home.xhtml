@@ -42,7 +42,7 @@
             <xforms:action ev:event="xforms-model-construct-done">
                 <xforms:send submission="get-forms"/>
                 <xforms:action iterate="instance('fr-forms')/form">
-                    <xforms:insert context="." origin="xxforms:attribute('operations', string-join(form-runner:authorizedOperationsOnForm(.), ' '))"/>
+                    <xforms:insert context="." origin="xxforms:attribute('operations', string-join(form-runner:authorizedOperationsOnForm(permissions), ' '))"/>
                 </xforms:action>
             </xforms:action>
         </xforms:model>

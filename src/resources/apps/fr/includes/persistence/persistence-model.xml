@@ -47,8 +47,10 @@
         </xf:action>
 
         <!-- Compute authorized operations -->
-        <xf:var name="metadata" value="xxf:instance('fr-form-metadata') treat as element()"/>
-        <xf:setvalue ref="instance('fr-authorized-operations')" value="string-join(formRunner:authorizedOperationsOnForm($metadata), ' ')"/>
+        <xf:var name="metadata" value="xxf:instance('fr-form-metadata')"/>
+        <xf:setvalue
+            ref="instance('fr-authorized-operations')"
+            value="string-join(formRunner:authorizedOperationsOnForm($metadata/permissions), ' ')"/>
         <!-- If user can't perform the required operations, deny access to this page -->
         <xf:var name="mode" value="xxf:instance('fr-parameters-instance')/mode treat as element()"/>
         <xf:var name="operations" value="tokenize(instance('fr-authorized-operations'), '\s')"/>

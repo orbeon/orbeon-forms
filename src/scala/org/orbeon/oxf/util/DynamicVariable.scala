@@ -12,11 +12,17 @@ package org.orbeon.oxf.util
  *
  * This is important when the thread is handled by a third-party, such as a servlet container.
  */
-class DynamicVariable[T] {
+class DynamicVariable[T](initial: ⇒ Option[T] = None, isInheritable: Boolean = true) {
 
-    protected val threadLocal = new InheritableThreadLocal[Option[T]] {
-        override def initialValue = None
-    }
+    protected val threadLocal =
+        if (isInheritable)
+            new InheritableThreadLocal[Option[T]] {
+                override def initialValue = initial
+            }
+        else
+            new ThreadLocal[Option[T]] {
+                override def initialValue = initial
+            }
 
     def value = threadLocal.get match {
         case some @ Some(value) ⇒ some

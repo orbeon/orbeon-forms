@@ -28,7 +28,7 @@
             <unsaved>Unsaved changes</unsaved>
         </errors>
         <email>
-            <subject>Orbeon Forms: Confirmation</subject>
+            <subject>Orbeon Forms Confirmation</subject>
             <body>Please find attached the form in PDF and XML format.</body>
         </email>
         <!-- Formats used for PDF template -->
@@ -198,7 +198,7 @@
             <unsaved>Modifications non enregistrées</unsaved>
         </errors>
         <email>
-            <subject>Orbeon Forms: Confirmation</subject>
+            <subject>Orbeon Forms Confirmation</subject>
             <body>Veuillez trouver en attachement le formulaire au formats XML et PDF.</body>
         </email>
         <print>
@@ -366,7 +366,7 @@
             <unsaved>[Unsaved Changes]</unsaved>
         </errors>
         <email>
-            <subject>[Orbeon Forms: Confirmation]</subject>
+            <subject>[Orbeon Forms Confirmation]</subject>
             <body>[Please find attached the form in PDF and XML format.]</body>
         </email>
         <print>
@@ -530,7 +530,7 @@
             <unsaved>Ulagrede endringer</unsaved>
         </errors>
         <email>
-            <subject>Orbeon Forms: Bekreftelse</subject>
+            <subject>Orbeon Forms Bekreftelse</subject>
             <body>Vedlagt er skjema i PDF- og XML-format.</body>
         </email>
         <!-- Formats used for PDF template -->

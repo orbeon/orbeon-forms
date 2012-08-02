@@ -90,7 +90,7 @@
                                         or @id = $attachment-controls/@bind]"/>
 
                 <!-- Iterate over attachment controls while there is no submission error -->
-                <xsl:for-each select="(1 to count($attachment-binds))">
+                <xsl:for-each select="1 to count($attachment-binds)">
 
                         <xsl:variable name="bind" as="element(xforms:bind)"
                                       select="($xhtml/xhtml:head/xforms:model//xforms:bind[(@class and tokenize(@class, '\s+') = 'fr-attachment')
@@ -98,7 +98,7 @@
 
                         <!-- Look at all binds except top-level one -->
                         <xsl:variable name="binds" select="$bind/ancestor-or-self::xforms:bind[position() lt last()]" as="element(xforms:bind)+"/>
-                        <xsl:variable name="expression" select="string-join($binds/@nodeset, '/')" as="xs:string"/>
+                        <xsl:variable name="expression" select="string-join($binds/(@ref, @nodeset)[1], '/')" as="xs:string"/>
 
                         <xsl:variable name="holders" select="$data/saxon:evaluate($expression)"/>
 
@@ -113,7 +113,7 @@
                 </xsl:for-each>
             </attachments>
         </p:input>
-        <p:output name="data" id="attachments"/>
+        <p:output name="data" id="attachments" debug="xxxx1"/>
     </p:processor>
 
 
@@ -148,11 +148,11 @@
                               select="for $control in $recipient-controls return $xhtml/xhtml:head/xforms:model//xforms:bind[@id = $control/@bind]"/>
 
                 <xsl:variable name="recipient-paths" as="xs:string*"
-                              select="for $bind in $recipient-binds return string-join(($bind/ancestor-or-self::xforms:bind/@nodeset)[position() gt 1], '/')"/>
+                              select="for $bind in $recipient-binds return string-join(($bind/ancestor-or-self::xforms:bind/(@ref, @nodeset)[1])[position() gt 1], '/')"/>
 
                 <!-- Extract email addresses from form if any -->
                 <xsl:variable name="email-addresses" as="xs:string*"
-                              select="for $path in $recipient-paths return $data/saxon:evaluate($path)"/>
+                              select="for $path in $recipient-paths[normalize-space()] return $data/saxon:evaluate($path)"/>
 
                 <!-- Find fr-email-recipient controls and binds -->
                 <xsl:variable name="subject-controls" as="element()*"
@@ -161,7 +161,7 @@
                               select="for $control in $subject-controls return $xhtml/xhtml:head/xforms:model//xforms:bind[@id = $control/@bind]"/>
 
                 <xsl:variable name="subject-paths" as="xs:string*"
-                              select="for $bind in $subject-binds return string-join(($bind/ancestor-or-self::xforms:bind/@nodeset)[position() gt 1], '/')"/>
+                              select="for $bind in $subject-binds return string-join(($bind/ancestor-or-self::xforms:bind/(@ref, @nodeset)[1])[position() gt 1], '/')"/>
 
                 <!-- Extract values from form if any -->
                 <xsl:variable name="subject-values" as="xs:string*"
@@ -211,7 +211,7 @@
                     <xsl:choose>
                         <xsl:when test="count($subject-values) > 0">
                             <!-- Append subject values to static subject, comma-separated -->
-                            <xsl:value-of select="concat($fr-resources/resource[@xml:lang = $request-language]/email/subject, string-join($subject-values, ', '))"/>
+                            <xsl:value-of select="concat($fr-resources/resource[@xml:lang = $request-language]/email/subject, ' ', string-join($subject-values, ', '))"/>
                         </xsl:when>
                         <xsl:otherwise>
                             <!-- Just put static subject -->

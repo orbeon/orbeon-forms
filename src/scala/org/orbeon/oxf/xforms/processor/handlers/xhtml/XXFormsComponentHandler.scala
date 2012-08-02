@@ -29,7 +29,7 @@ class XXFormsComponentHandler extends XFormsControlLifecyleHandler(false) {
     protected override def getContainingElementQName = elementQName
 
     private lazy val binding    = containingDocument.getStaticOps.getBinding(getPrefixedId) getOrElse (throw new IllegalStateException)
-    private lazy val handleLHHA = binding.abstractBinding.modeLHHACustom
+    private lazy val handleLHHA = binding.abstractBinding.modeLHHA && ! binding.abstractBinding.modeLHHACustom
 
     override def init(uri: String, localname: String, qName: String, attributes: Attributes, matched: AnyRef): Unit = {
         super.init(uri, localname, qName, attributes, matched)
@@ -65,6 +65,9 @@ class XXFormsComponentHandler extends XFormsControlLifecyleHandler(false) {
     protected override def handleAlert() = if (handleLHHA) super.handleAlert()
     protected override def handleHint()  = if (handleLHHA) super.handleHint()
     protected override def handleHelp()  = if (handleLHHA) super.handleHelp()
+
+    // Don't use @for as we ae not pointing to an HTML control
+    override def getForEffectiveId(effectiveId: String) = null
 }
 
 object XXFormsComponentHandler {

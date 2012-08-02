@@ -132,9 +132,9 @@ class XFormsComponentControl(container: XBLContainer, parent: XFormsControl, ele
     override def buildChildren(buildTree: (XBLContainer, BindingContext, ElementAnalysis, Seq[Int]) ⇒ Option[XFormsControl], idSuffix: Seq[Int]) =
         Controls.buildChildren(this, staticControl.children, (_, bindingContext, staticElement, idSuffix) ⇒ buildTree(nestedContainer, bindingContext, staticElement, idSuffix), idSuffix)
 
-    private lazy val handleLHHA = ! staticControl.binding.abstractBinding.modeLHHACustom
+    private lazy val handleLHHA = staticControl.binding.abstractBinding.modeLHHA && ! staticControl.binding.abstractBinding.modeLHHACustom
 
-    // Don't add Ajax LHHA for
+    // Don't add Ajax LHHA for custom-lhha mode
     override def addAjaxLHHA(other: XFormsControl, attributesImpl: AttributesImpl, isNewlyVisibleSubtree: Boolean) =
         handleLHHA && super.addAjaxLHHA(other, attributesImpl, isNewlyVisibleSubtree)
 

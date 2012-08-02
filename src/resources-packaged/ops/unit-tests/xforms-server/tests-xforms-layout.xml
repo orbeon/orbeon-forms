@@ -2162,4 +2162,50 @@
         </output>
     </test>
 
+    <test description="XBL controls with and without lhha" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-controls.xpl"/>
+        <input name="document">
+            <xhtml:html>
+                <xhtml:head>
+                    <xforms:model id="model"/>
+                    <xbl:xbl>
+                        <xbl:binding id="fr-foo" element="fr|foo" xxbl:mode="lhha" xxbl:container="span">
+                            <xbl:template/>
+                        </xbl:binding>
+                        <xbl:binding id="fr-bar" element="fr|bar" xxbl:mode="lhha custom-lhha" xxbl:container="span">
+                            <xbl:template/>
+                        </xbl:binding>
+                        <xbl:binding id="fr-baz" element="fr|baz" xxbl:mode="" xxbl:container="span">
+                            <xbl:template/>
+                        </xbl:binding>
+                    </xbl:xbl>
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:group id="my-group">
+                        <fr:foo id="foo">
+                            <xf:label>Gaga label</xf:label>
+                        </fr:foo>
+                        <fr:bar id="bar">
+                            <xf:label>Gaga label</xf:label>
+                        </fr:bar>
+                        <fr:baz id="baz">
+                            <xf:label>Gaga label</xf:label>
+                        </fr:baz>
+                    </xforms:group>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <controls>
+                <xhtml:span id="my-group" class="xforms-group">
+                    <xhtml:span id="foo" class="xbl-component xbl-fr-foo">
+                        <xhtml:label class="xforms-label">Gaga label</xhtml:label>
+                    </xhtml:span>
+                    <xhtml:span id="bar" class="xbl-component xbl-fr-bar"/>
+                    <xhtml:span id="baz" class="xbl-component xbl-fr-baz"/>
+                </xhtml:span>
+            </controls>
+        </output>
+    </test>
+
 </group>

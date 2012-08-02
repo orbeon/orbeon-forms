@@ -63,7 +63,7 @@
     <property as="xs:boolean" name="oxf.fr.detail.new.service.enable.*.*"                       value="false"/>
     <property as="xs:string"  name="oxf.fr.detail.new.service.uri.*.*"                          value="/fr/service/custom/my-app/new"/>
     <property as="xs:string"  name="oxf.fr.detail.new.service.passing-request-parameters.*.*"   value=""/>
-    <property as="xs:string"  name="oxf.fr.detail.buttons.*.*"                                  value="refresh close clear pdf email save workflow-review collapse-all expand-all"/>
+    <property as="xs:string"  name="oxf.fr.detail.buttons.*.*"                                  value="refresh collapse-all expand-all close clear pdf email save workflow-review"/>
     <property as="xs:string"  name="oxf.fr.detail.buttons.view.*.*"                             value="back workflow-edit pdf"/>
     <property as="xs:string"  name="oxf.fr.detail.captcha.*.*"                                  value=""/> <!-- Empty (no captcha), 'reCAPTCHA', or 'SimpleCaptcha'-->
     <property as="xs:boolean" name="oxf.fr.detail.submit.content-from-persistence.*.*"          value="false"/>
@@ -145,7 +145,7 @@
     <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.bookshelf.form"          value="resource"/>
     <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.controls.form"           value="resource"/>
     <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.contact.form"            value="exist"/>         <!-- Be specific, as user might have changed the default persistence layer -->
-    <property as="xs:string"  name="oxf.fr.detail.buttons.orbeon.controls"                      value="refresh pdf workflow-review collapse-all expand-all"/>
+    <property as="xs:string"  name="oxf.fr.detail.buttons.orbeon.controls"                      value="refresh collapse-all expand-all pdf workflow-review"/>
     <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.dmv-14.form"             value="resource"/>
     <property as="xs:string"  name="oxf.fr.resource.orbeon.dmv-14.*.print.formats.date"         value="[Y0001]-[M01]-[D01]"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.orbeon.dmv-14.fr-us-state"                   value="select-value"/>
@@ -164,7 +164,7 @@
     <property as="xs:boolean" name="oxf.fr.email.attach-pdf.orbeon.license"                     value="false"/>
 
     <!-- The following shows how you can use the "Submit" button instead of the "Save" button -->
-    <!--<property as="xs:string"  name="oxf.fr.detail.buttons.orbeon.bookshelf"                     value="refresh back clear pdf email submit collapse-all expand-all"/>-->
+    <!--<property as="xs:string"  name="oxf.fr.detail.buttons.orbeon.bookshelf"                     value="refresh collapse-all expand-all back clear pdf email submit"/>-->
     <!--<property as="xs:string"  name="oxf.fr.detail.submit.buttons.orbeon.bookshelf"              value="clear"/>-->
 
     <!-- Save button validates by default -->

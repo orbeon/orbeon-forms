@@ -186,22 +186,14 @@ trait JavaLongUTF extends CoreProtocol {
         result
     }
 
-    private[this] val buffers = new java.lang.ThreadLocal[(Array[Char], Array[Byte])] {
-        override def initialValue() = (new Array[Char](80), new Array[Byte](80))
-    }
-
-    private[this] def fetchBuffers(size: Int) = {
-        if (buffers.get()._1.length < size)
-            buffers.set((new Array[Char](size * 2), new Array[Byte](size * 2)))
-
-        buffers.get()
-    }
+    // NOTE: This used to use a ThreadLocal, but we don't want lingering ThreadLocals around so for now we create the
+    // buffers every time.
 
     implicit object StringFormat extends Format[String] {
         def reads(input: Input) = {
             // Read 4-byte size header (ObjectInputStream uses 2 or 8)
             val utfLength = read[Int](input)
-            val (cbuffer, bbuffer) = fetchBuffers(utfLength)
+            val (cbuffer, bbuffer) = (new Array[Char](utfLength * 2), new Array[Byte](utfLength * 2))
 
             input.readFully(bbuffer, 0, utfLength)
 
@@ -254,7 +246,7 @@ trait JavaLongUTF extends CoreProtocol {
             val utfLength = getUTFLength(value).toInt
             write(output, utfLength)
 
-            val bbuffer = fetchBuffers(utfLength)._2
+            val bbuffer = new Array[Byte](utfLength * 2)
             var count = 0
             def append(value: Int) {
                 bbuffer(count) = value.toByte

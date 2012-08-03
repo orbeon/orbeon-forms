@@ -41,62 +41,17 @@
         <xbl:handlers>
             <xbl:handler event="fr-visit-all" phase="target">
                 <!-- Mark all controls as visited -->
-                <xf:setvalue ref="instance('fr-visited-instance')"/>
-                <xf:setvalue ref="instance('fr-visited-instance')/@all">true</xf:setvalue>
-                <xxf:script>
-                    <![CDATA[
-
-                    var observersElement = YAHOO.util.Dom.getElementsByClassName("xbl-fr-error-summary-observer", null, this)[0];
-                    var observers = ORBEON.xforms.Document.getValue(observersElement.id).split(" ");
-
-                    for (var j = 0; j < observers.length; j++) {
-                        var observer = observers[j];
-                        var observerElement = ORBEON.util.Dom.get(observer);
-                        var controlElements = YAHOO.util.Dom.getElementsByClassName("xforms-control", null, observerElement);
-                        for (var i = 0; i < controlElements.length; i++) {
-                            var controlElement = controlElements[i];
-                            YAHOO.util.Dom.addClass(controlElement, "xforms-visited");
-                            if (YAHOO.util.Dom.hasClass(controlElement, "xforms-invalid"))
-                                YAHOO.util.Dom.addClass(controlElement, "xforms-invalid-visited");
-                        }
-                        var activeAlertElements = YAHOO.util.Dom.getElementsByClassName("xforms-alert-active", null, observerElement);
-                        for (var i = 0; i < activeAlertElements.length; i++) {
-                            var activeAlertElement = activeAlertElements[i];
-                            YAHOO.util.Dom.addClass(activeAlertElement, "xforms-alert-active-visited")
-                        }
-                    }
-                    ]]>
-                </xxf:script>
+                <xxf:setvisited iterate="tokenize(instance('fr-state-instance')/observer, '\s+')" control="{.}" visited="true" recurse="true"/>
+                <!-- There is no dependency handling with the xxf:visited() function. -->
+                <xf:recalculate/>
             </xbl:handler>
             <xbl:handler event="fr-unvisit-all" phase="target">`
                 <!-- Mark all controls as not visited -->
-                <xf:setvalue ref="instance('fr-visited-instance')"/>
-                <xf:setvalue ref="instance('fr-visited-instance')/@all">false</xf:setvalue>
-                <xxf:script>
-                    <![CDATA[
-
-                    var observersElement = YAHOO.util.Dom.getElementsByClassName("xbl-fr-error-summary-observer", null, this)[0];
-                    var observers = ORBEON.xforms.Document.getValue(observersElement.id).split(" ");
-
-                    for (var j = 0; j < observers.length; j++) {
-                        var observer = observers[j];
-                        var observerElement = ORBEON.util.Dom.get(observer);
-                        var controlElements = YAHOO.util.Dom.getElementsByClassName("xforms-control", null, observerElement);
-                        for (var i = 0; i < controlElements.length; i++) {
-                            var controlElement = controlElements[i];
-                            YAHOO.util.Dom.removeClass(controlElement, "xforms-visited");
-                            YAHOO.util.Dom.removeClass(controlElement, "xforms-invalid-visited");
-                        }
-                        var activeAlertElements = YAHOO.util.Dom.getElementsByClassName("xforms-alert-active-visited", null, observerElement);
-                        for (var i = 0; i < activeAlertElements.length; i++) {
-                            var activeAlertElement = activeAlertElements[i];
-                            YAHOO.util.Dom.removeClass(activeAlertElement, "xforms-alert-active-visited")
-                        }
-                    }
-                    ]]>
-                </xxf:script>
+                <xxf:setvisited iterate="tokenize(instance('fr-state-instance')/observer, '\s+')" control="{.}" visited="false" recurse="true"/>
+                <!-- There is no dependency handling with the xxf:visited() function. -->
+                <xf:recalculate/>
             </xbl:handler>
-            <xbl:handler event="fr-update" phase="target">`
+            <xbl:handler event="fr-update" phase="target">
                 <!-- Update errors in non-incremental mode -->
                 <xf:delete ref="instance('fr-snapshot-instance')/*"/>
                 <xf:insert context="instance('fr-snapshot-instance')" origin="instance('fr-errors-instance')/*"/>
@@ -112,8 +67,6 @@
                 <!-- Reset everything upon initialization -->
                 <xf:action ev:event="xforms-model-construct-done">
                     <xf:delete ref="instance('fr-errors-instance')/*"/>
-                    <xf:setvalue ref="instance('fr-visited-instance')"/>
-                    <xf:setvalue ref="instance('fr-visited-instance')/@all">false</xf:setvalue>
                 </xf:action>
 
                 <!-- Instance containing the current errors -->
@@ -128,13 +81,7 @@
 
                 <!-- Template for error information -->
                 <xf:instance id="fr-error-template" xxf:readonly="true">
-                    <error xmlns="" id="" full-id="" position="" repeats="" indexes="" label="" alert="" binds=""/>
-                </xf:instance>
-
-                <!-- Instance containing visited controls -->
-                <!-- NOTE: represent as space-separated effective ids, as using nested elements takes more space and may cause UI bindings updates -->
-                <xf:instance id="fr-visited-instance">
-                    <controls all="false" xmlns=""/>
+                    <error xmlns="" id="" position="" repeats="" indexes="" label="" alert="" binds=""/>
                 </xf:instance>
 
                 <!-- State instance -->
@@ -142,7 +89,7 @@
                     <state xmlns="">
                         <!-- Whether errors are shown incrementally or not -->
                         <incremental>true</incremental>
-                        <!-- Observer element -->
+                        <!-- Absolute ids of observers -->
                         <observer/>
                         <!-- Whether the form is valid or invalid -->
                         <valid>true</valid>
@@ -154,12 +101,15 @@
                 </xf:instance>
 
                 <!-- Errors for controls that have been visited -->
-                <!--<xf:var name="visible-errors" value="instance('fr-errors-instance')/error"/>-->
                 <xf:var name="visible-errors" as="element(error)*"
-                  value="for $e in instance(if (instance('fr-state-instance')/incremental != 'false') then 'fr-errors-instance' else 'fr-snapshot-instance')/error[normalize-space(@alert)]
-                            return
-                              if (instance('fr-visited-instance')/@all = 'true' or tokenize(instance('fr-visited-instance'), '\s+') = $e/@full-id)
-                                then $e else ()"/>
+                    value="for $e in instance(if (instance('fr-state-instance')/incremental != 'false') then 'fr-errors-instance' else 'fr-snapshot-instance')/error[normalize-space(@alert)]
+                           return
+                             if (xxf:visited(xformsUtils:effectiveIdToAbsoluteId(
+                                    string-join(
+                                        ($e/@id, if (normalize-space($e/@indexes)) then string-join($e/@indexes, '-') else ()), '·'
+                                    ))))
+                               then $e
+                               else ()"/>
 
                 <xf:bind ref="instance('fr-state-instance')">
                     <!-- Current number of errors -->
@@ -194,11 +144,6 @@ Inserting error information into error list:
                     </xf:message>
                     -->
 
-                    <!-- Full id looks like: "company-repeat·3/employee-repeat·2/first-name" -->
-                    <xf:var name="full-id" as="xs:string"
-                                      value="string-join((for $r in $repeat-ancestors
-                                                return concat($r, '·', $repeat-indexes[index-of($repeat-ancestors, $r)]), $prefixed-id), '/')"/>
-
                     <xf:var name="repeat-indexes-i" value="for $v in $repeat-indexes return xs:integer($v)" as="xs:integer*"/>
 
                     <!-- Here we compare the incoming error's position to existing error's positions by creating a
@@ -215,7 +160,6 @@ Inserting error information into error list:
                     <!-- Set all the attributes -->
                     <xf:action context="error[$insert-position + 1]">
                         <xf:setvalue ref="@id" value="$prefixed-id"/>
-                        <xf:setvalue ref="@full-id" value="$full-id"/>
                         <xf:setvalue ref="@position" value="$control-position"/>
                         <xf:setvalue ref="@indexes" value="string-join($repeat-indexes, ' ')"/>
                         <xf:setvalue ref="@repeats" value="string-join($repeat-ancestors, ' ')"/>
@@ -245,42 +189,33 @@ Inserting error information into error list:
                             * initial errors might have been inserted already or not, depending on where error summary is on page
                             * but in any case, this means a second refresh has to take place
                             -->
-                        <xf:setvalue ev:event="xforms-enabled" ref="instance('fr-state-instance')/incremental"
-                                         xxbl:scope="inner" xbl:attr="xbl:text=incremental"/>
-                        <!-- When the group becomes relevant, remember observer -->
-                        <!-- TODO: Q WHY? doesn't seem used ? -->
-                        <xf:setvalue ev:event="xforms-enabled" ref="instance('fr-state-instance')/observer"
-                                         xxbl:scope="inner" xbl:attr="xbl:text=observer"/>
+                        <xf:setvalue
+                            ev:event="xforms-enabled"
+                            xxbl:scope="inner"
+                            ref="instance('fr-state-instance')/incremental"
+                            xbl:attr="xbl:text=incremental"/>
 
-                        <!-- Expose observer(s) to the client -->
-                        <xsl:copy-of select="xxbl:parameter(., 'observer')"/>
+                        <!-- When the group becomes relevant, remember the observers (used by fr-(un)visit-all) -->
+                        <xf:var name="observer" xbl:attr="xbl:text=observer"/>
 
-                        <!-- Control visited: handle events on observer(s) passed -->
-                        <xf:action xbl:attr="ev:observer=observer" ev:event="DOMFocusOut xforms-value-changed xforms-disabled" xxf:phantom="true">
-                            <xf:action xxbl:scope="inner">
+                        <xf:var name="observers" xxbl:scope="inner">
+                            <xxf:sequence value="for $o in tokenize($observer, '\s+') return xxf:absolute-id($o)" xxbl:scope="outer"/>
 
-                                <!-- Useful stuff passed to us -->
-                                <xf:var name="prefixed-id" value="string-join((event('xxf:target-prefixes'), event('xxf:targetid')), '$')" as="xs:string"/>
-                                <xf:var name="repeat-ancestors" value="event('xxf:repeat-ancestors')" as="xs:string*"/>
-                                <xf:var name="repeat-indexes" value="event('xxf:repeat-indexes')" as="xs:string*"/>
+                            <xf:setvalue
+                                ev:event="xforms-enabled"
+                                ref="instance('fr-state-instance')/observer"
+                                value="string-join($observers, ' ')"/>
 
-                                <!-- Full id looks like: "company-repeat·3/employee-repeat·2/first-name" -->
-                                <xf:var name="full-id" as="xs:string"
-                                                  value="string-join((for $r in $repeat-ancestors return concat($r, '·', $repeat-indexes[index-of($repeat-ancestors, $r)]), $prefixed-id), '/')"/>
+                        </xf:var>
 
-                                <!-- Current list of visited controls -->
-                                <xf:var name="visited" value="tokenize(instance('fr-visited-instance'), '\s+')" as="xs:string*"/>
-
-                                <!-- Control visited: append only if we don't know already that this control has been visited -->
-                                <xf:setvalue if="event('xxf:type') != 'xforms-disabled' and not($visited = $full-id)"
-                                                 ref="instance('fr-visited-instance')" value="string-join((., $full-id), ' ')"/>
-                                <!-- Control removed: remove full id from list if present -->
-                                <xf:setvalue if="event('xxf:type') = 'xforms-disabled' and $visited = $full-id"
-                                                 ref="instance('fr-visited-instance')" value="string-join($visited[. != $full-id], ' ')"/>
-                            </xf:action>
+                        <!-- Make sure the model is recalculated when there is a chance visited controls might have
+                             changed. We do this because there is no dependency handling with the xxf:visited()
+                             function. -->
+                        <xf:action xbl:attr="ev:observer=observer" ev:event="DOMFocusOut" xxf:phantom="true">
+                            <xf:recalculate xxbl:scope="inner"/>
                         </xf:action>
 
-                        <!-- Control becomes invalid: handle xforms-invalid on observer(s) passed -->
+                        <!-- Control becomes invalid or its value is updated -->
                         <xf:action xbl:attr="ev:observer=observer" ev:event="xforms-invalid xforms-value-changed" xxf:phantom="true">
 
                             <xf:action xxbl:scope="inner">
@@ -318,7 +253,7 @@ Inserting error information into error list:
                             </xf:action>
                         </xf:action>
 
-                        <!-- Control becomes valid or is removed: handle xforms-valid and xforms-disabled on observer(s) passed -->
+                        <!-- Control becomes valid or is removed -->
                         <xf:action xbl:attr="ev:observer=observer" ev:event="xforms-valid xforms-disabled" xxf:phantom="true">
 
                             <xf:action xxbl:scope="inner">
@@ -340,7 +275,7 @@ Inserting error information into error list:
                             </xf:action>
                         </xf:action>
 
-                        <!-- Node-set changed: handle xxforms-nodeset-changed on observer(s) passed -->
+                        <!-- Node-set changed -->
                         <xf:action xbl:attr="ev:observer=observer" ev:event="xxforms-nodeset-changed" xxf:phantom="true"
                                        if="count(event('xxf:to-positions')) > 0">
                             <xf:action xxbl:scope="inner">

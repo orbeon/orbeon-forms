@@ -53,10 +53,6 @@ trait ControlEventSupport {
             if (event.isInstanceOf[XFormsFocusEvent])
                 setFocus()
 
-        case _: DOMFocusOutEvent ⇒
-            // Mark control visited upon focus out event
-            // This applies to any control, including grouping controls
-            self.visited = true
         case _: XFormsHelpEvent ⇒
             containingDocument.setClientHelpEffectiveControlId(getEffectiveId)
         case ev: XXFormsBindingErrorEvent ⇒
@@ -66,7 +62,15 @@ trait ControlEventSupport {
         case _ ⇒
     }
 
-    def performTargetAction(event: XFormsEvent) = ()
+    def performTargetAction(event: XFormsEvent): Unit = event match {
+        case _: DOMFocusOutEvent ⇒
+            // Mark control visited upon focus out event. This applies to any control, including grouping controls. We
+            // do this upon the event reaching the target, so that by the time a regular event listener makes use of the
+            // visited property, it is up to date. This seems reasonable since DOMFocusOut indicates that the focus has
+            // already left the control.
+            self.visited = true
+        case _ ⇒
+    }
 
     // Check whether this concrete control supports receiving the external event specified
     final def allowExternalEvent(eventName: String) = staticControl match {

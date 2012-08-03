@@ -191,6 +191,11 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
             Arg(STRING, EXACTLY_ONE)
         )
 
+        // xxforms:visited
+        Fun("visited", classOf[XXFormsVisited], 0, 1, BOOLEAN, ALLOWS_ZERO_OR_ONE,
+            Arg(STRING, EXACTLY_ONE)
+        )
+
         // xxforms:absolute-id
         Fun("absolute-id", classOf[XXFormsAbsoluteId], 0, 1, STRING, ALLOWS_ZERO_OR_ONE,
             Arg(STRING, EXACTLY_ONE)

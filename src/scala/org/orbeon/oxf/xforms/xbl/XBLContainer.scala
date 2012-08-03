@@ -31,6 +31,7 @@ import org.orbeon.oxf.xml.dom4j.LocationData
 import org.orbeon.saxon.om.Item
 import org.orbeon.saxon.om.NodeInfo
 import scala.collection.JavaConverters._
+import org.orbeon.oxf.xforms.analysis.controls.RepeatControl
 
 /**
  * Represent an XBL container of models and controls.
@@ -340,28 +341,32 @@ trait ContainerResolver {
      * @return                  repeat index, -1 if repeat is not found
      */
     def getRepeatIndex(sourceEffectiveId: String, repeatStaticId: String): Int = {
-        val repeatControl =
-            resolveObjectByIdInScope(sourceEffectiveId, repeatStaticId, null) match {
-                case repeat: XFormsRepeatControl ⇒ repeat
-                case iteration: XFormsRepeatIterationControl ⇒ iteration.repeat
-                case _ ⇒ null
-            }
 
-        if (repeatControl ne null) {
-            // 1. Found concrete control
-            repeatControl.getIndex
-        } else {
+        def fromConcreteRepeat = {
+
+            val repeatControl =
+                resolveObjectByIdInScope(sourceEffectiveId, repeatStaticId, null) match {
+                    case repeat: XFormsRepeatControl ⇒ Some(repeat)
+                    case iteration: XFormsRepeatIterationControl ⇒ Some(iteration.repeat)
+                    case _ ⇒ None
+                }
+
+            repeatControl map (_.getIndex)
+        }
+
+        def fromStaticRepeat = {
+            // Make sure to use prefixed id, e.g. my-stuff$my-foo-bar$my-repeat
             val sourcePrefixedId = XFormsUtils.getPrefixedId(sourceEffectiveId)
             val scope = partAnalysis.scopeForPrefixedId(sourcePrefixedId)
             val repeatPrefixedId = scope.prefixedIdForStaticId(repeatStaticId)
-            if (containingDocument.getStaticOps.getControlPosition(repeatPrefixedId) >= 0)
-                // 2. Found static control
-                // NOTE: above we make sure to use prefixed id, e.g. my-stuff$my-foo-bar$my-repeat
-                0
-            else
-                // 3. No repeat element exists
-                -1
+
+            containingDocument.getStaticOps.getControlAnalysisOption(repeatPrefixedId) match {
+                case Some(repeat: RepeatControl) ⇒ Some(0)
+                case _ ⇒ None
+            }
         }
+
+        fromConcreteRepeat orElse fromStaticRepeat getOrElse -1
     }
 
     def resolveObjectByIdInScope(sourceEffectiveId: String, targetStaticOrAbsoluteId: String, contextItem: Item): XFormsObject = {

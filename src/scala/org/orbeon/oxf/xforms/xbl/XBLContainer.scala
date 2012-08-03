@@ -231,8 +231,8 @@ trait ModelContainer {
 
     def getAllModelsJava = getAllModels.asJava
 
-    def searchContainedModels(sourceEffectiveId: String, targetStaticId: String, contextItem: Item): XFormsObject =
-        findInSelfAndDescendants(m ⇒ Option(m.resolveObjectById(sourceEffectiveId, targetStaticId, contextItem))) orNull
+    def searchContainedModels(sourceEffectiveId: String, staticId: String, contextItem: Item): XFormsObject =
+        findInSelfAndDescendants(m ⇒ Option(m.resolveObjectById(sourceEffectiveId, staticId, contextItem))) orNull
 
     def restoreModelsState(): Unit = {
         // Handle this container only
@@ -369,32 +369,32 @@ trait ContainerResolver {
         fromConcreteRepeat orElse fromStaticRepeat getOrElse -1
     }
 
-    def resolveObjectByIdInScope(sourceEffectiveId: String, targetStaticOrAbsoluteId: String, contextItem: Item): XFormsObject = {
+    def resolveObjectByIdInScope(sourceEffectiveId: String, staticOrAbsoluteId: String, contextItem: Item): XFormsObject = {
         val sourcePrefixedId = XFormsUtils.getPrefixedId(sourceEffectiveId)
         val resolutionScopeContainer = findScopeRoot(sourcePrefixedId)
-        resolutionScopeContainer.resolveObjectById(sourceEffectiveId, targetStaticOrAbsoluteId, contextItem)
+        resolutionScopeContainer.resolveObjectById(sourceEffectiveId, staticOrAbsoluteId, contextItem)
     }
 
     /**
      * Resolve an object in the scope of this container.
      *
-     * @param sourceEffectiveId         effective id of the source (control, model, instance, submission, ...) (can be null only for absolute ids)
-     * @param targetStaticOrAbsoluteId  static or absolute id of the target
-     * @param contextItem               context item, or null (used for bind resolution only)
-     * @return                          object, or null if not found
+     * @param sourceEffectiveId   effective id of the source (control, model, instance, submission, ...) (can be null only for absolute ids)
+     * @param staticOrAbsoluteId  static or absolute id of the object
+     * @param contextItem         context item, or null (used for bind resolution only)
+     * @return                    object, or null if not found
      */
-    def resolveObjectById(sourceEffectiveId: String, targetStaticOrAbsoluteId: String, contextItem: Item): XFormsObject = {
+    def resolveObjectById(sourceEffectiveId: String, staticOrAbsoluteId: String, contextItem: Item): XFormsObject = {
 
         def isEffectiveIdResolvableByThisContainer(effectiveId: String) =
             self eq findScopeRoot(XFormsUtils.getPrefixedId(effectiveId))
 
         // Handle "absolute ids" of format "/foo/bar.1-2"
         // NOTE: Experimental, definitive format TBD
-        if (XFormsUtils.isAbsoluteId(targetStaticOrAbsoluteId))
-            return containingDocument.getObjectByEffectiveId(XFormsUtils.absoluteIdToEffectiveId(targetStaticOrAbsoluteId))
+        if (XFormsUtils.isAbsoluteId(staticOrAbsoluteId))
+            return containingDocument.getObjectByEffectiveId(XFormsUtils.absoluteIdToEffectiveId(staticOrAbsoluteId))
 
         // Make sure the static id passed is actually a static id
-        require(XFormsUtils.isStaticId(targetStaticOrAbsoluteId), "Target id must be static id: " + targetStaticOrAbsoluteId)
+        require(XFormsUtils.isStaticId(staticOrAbsoluteId), "Target id must be static id: " + staticOrAbsoluteId)
 
         require(sourceEffectiveId ne null, "Source id must be specified.")
 
@@ -402,12 +402,12 @@ trait ContainerResolver {
         //    and return the control associated with the bound element.
         // TODO: should this use sourceControlEffectiveId?
         val bindingId = containingDocument.getStaticOps.getBindingId(prefixedId)
-        if (targetStaticOrAbsoluteId == bindingId)
+        if (staticOrAbsoluteId == bindingId)
             return containingDocument.getControls.getObjectByEffectiveId(effectiveId)
 
         // 2. Search in directly contained models
         // NOTE: As of 2011-11, models don't use sourceEffectiveId
-        val resultModelObject = searchContainedModels(sourceEffectiveId, targetStaticOrAbsoluteId, contextItem)
+        val resultModelObject = searchContainedModels(sourceEffectiveId, staticOrAbsoluteId, contextItem)
         if (resultModelObject ne null)
             return resultModelObject
 
@@ -436,7 +436,7 @@ trait ContainerResolver {
 
         // Resolve on controls
         val controls = containingDocument.getControls
-        val result = controls.resolveObjectById(sourceControlEffectiveId, targetStaticOrAbsoluteId, contextItem).asInstanceOf[XFormsControl]
+        val result = controls.resolveObjectById(sourceControlEffectiveId, staticOrAbsoluteId, contextItem).asInstanceOf[XFormsControl]
 
         // If result is provided, make sure it is within the resolution scope of this container
         if (result != null && ! isEffectiveIdResolvableByThisContainer(result.getEffectiveId))

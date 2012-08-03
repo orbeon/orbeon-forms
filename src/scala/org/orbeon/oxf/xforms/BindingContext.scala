@@ -91,7 +91,7 @@ case class BindingContext(
     def setVariables(variables: JList[VariableInfo]) =
         this._variables = variables
 
-    def getInScopeVariables: JMap[String, ValueRepresentation] = getInScopeVariables(true)
+    def getInScopeVariables: JMap[String, ValueRepresentation] = getInScopeVariables(scopeModelVariables = true)
 
     def getInScopeVariables(scopeModelVariables: Boolean): JMap[String, ValueRepresentation] = {
 

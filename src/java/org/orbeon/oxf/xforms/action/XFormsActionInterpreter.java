@@ -399,8 +399,7 @@ public class XFormsActionInterpreter {
     public XFormsObject resolveObject(Element actionElement, String targetStaticOrAbsoluteId) {
 
         // First resolve the object by static id
-        final XBLContainer resolutionScopeContainer = findResolutionScopeContainer(actionElement);
-        final XFormsObject result = resolutionScopeContainer.resolveObjectById(getSourceEffectiveId(actionElement), targetStaticOrAbsoluteId, null);
+        final XFormsObject result = _container.resolveObjectByIdInScope(getSourceEffectiveId(actionElement), targetStaticOrAbsoluteId, null);
 
         if (result == null) {
             return null;
@@ -414,6 +413,7 @@ public class XFormsActionInterpreter {
                 // Extension: repeat indexes are provided
 
                 // Repeat indexes in current scope
+                final XBLContainer resolutionScopeContainer = findResolutionScopeContainer(actionElement);
                 final int[] containerParts = XFormsUtils.getEffectiveIdSuffixParts(resolutionScopeContainer.getEffectiveId());
 
                 // Append new indexes

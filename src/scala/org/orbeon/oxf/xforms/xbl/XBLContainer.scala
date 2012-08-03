@@ -364,10 +364,10 @@ trait ContainerResolver {
         }
     }
 
-    def resolveObjectByIdInScope(sourceEffectiveId: String, targetStaticId: String, contextItem: Item): XFormsObject = {
+    def resolveObjectByIdInScope(sourceEffectiveId: String, targetStaticOrAbsoluteId: String, contextItem: Item): XFormsObject = {
         val sourcePrefixedId = XFormsUtils.getPrefixedId(sourceEffectiveId)
         val resolutionScopeContainer = findScopeRoot(sourcePrefixedId)
-        resolutionScopeContainer.resolveObjectById(sourceEffectiveId, targetStaticId, contextItem)
+        resolutionScopeContainer.resolveObjectById(sourceEffectiveId, targetStaticOrAbsoluteId, contextItem)
     }
 
     /**

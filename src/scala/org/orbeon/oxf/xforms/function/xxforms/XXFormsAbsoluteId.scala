@@ -36,7 +36,7 @@ trait ResolveIds extends XFormsFunction {
         case Some(expr) ⇒
             // Otherwise resolve the static id passed against the source id
             val staticId = expr.evaluateAsString(xpathContext).toString
-            Option(getXBLContainer(xpathContext).resolveObjectById(getSourceEffectiveId(xpathContext), staticId, null)) collect
+            Option(getXBLContainer(xpathContext).resolveObjectByIdInScope(getSourceEffectiveId(xpathContext), staticId, null)) collect
                 { case target: XFormsEventTarget ⇒ target.getEffectiveId }
     }
 }

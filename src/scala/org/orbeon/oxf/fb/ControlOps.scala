@@ -566,7 +566,7 @@ object ControlOps {
         val model = getFormModel
         for {
             controlId ← findControlIdByName(getFormDoc, controlName)
-            control ← Option(model.container.resolveObjectById(model.getEffectiveId, controlId, null)) map (_.asInstanceOf[XFormsControl])
+            control ← Option(model.container.resolveObjectByIdInScope(model.getEffectiveId, controlId, null)) map (_.asInstanceOf[XFormsControl])
         } yield
             control
     }

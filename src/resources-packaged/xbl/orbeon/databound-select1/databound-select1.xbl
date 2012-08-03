@@ -41,9 +41,9 @@
                     <xforms:hint ref=""/>
                     <xforms:help ref=""/>
                     <xforms:alert ref=""/>
-                    <xforms:itemset ref="">
-                        <xforms:label ref=""/>
-                        <xforms:value ref=""/>
+                    <xforms:itemset ref="item">
+                        <xforms:label ref="label"/>
+                        <xforms:value ref="value"/>
                     </xforms:itemset>
                 </fr:databound-select1>
             </fb:template>

@@ -94,13 +94,6 @@
                                     </xsl:when>
                                     <xsl:when test="not($hide-top)">
                                         <!-- Standard top -->
-
-                                        <xsl:variable name="default-objects" as="element()+">
-                                            <fr:description/>
-                                        </xsl:variable>
-
-                                        <xsl:apply-templates select="$default-objects"/>
-
                                     </xsl:when>
                                 </xsl:choose>
                             </xhtml:div>
@@ -112,8 +105,8 @@
                                     <xsl:call-template name="fr-explanation"/>
                                 </xsl:if>
 
-                                <!-- Table of contents -->
                                 <xsl:call-template name="fr-toc"/>
+                                <xsl:call-template name="fr-description"/>
 
                                 <!-- Error summary (if at top) -->
                                 <xsl:if test="$error-summary-top">
@@ -307,13 +300,23 @@
         </xhtml:h1>
     </xsl:template>
 
-    <xsl:template match="fr:description">
-        <!-- Description in chosen language or first one if not found -->
-        <xforms:output
-            class="fr-form-description"
-            model="fr-form-model"
-            value="({if (@paths) then concat(@paths, ', ') else ''}xxforms:instance('fr-form-metadata')/description[@xml:lang = xxforms:instance('fr-language-instance')],
-                        xxforms:instance('fr-form-metadata')/description)[normalize-space()][1]"/>
+    <xsl:template match="fr:description" name="fr-description">
+        <xsl:if test="not($is-form-builder)">
+
+            <xforms:var
+                name="description"
+                value="({if (@paths) then concat(@paths, ', ') else ''}xxforms:instance('fr-form-metadata')/description[@xml:lang = xxforms:instance('fr-language-instance')],
+                            xxforms:instance('fr-form-metadata')/description)[normalize-space()][1]"/>
+
+            <!-- Description in chosen language or first one if not found -->
+            <fr:section collapse="true" ref=".[normalize-space($description)]">
+                <xforms:label ref="$fr-resources/summary/titles/description"/>
+                <xforms:output
+                    class="fr-form-description"
+                    model="fr-form-model"
+                    value="$description"/>
+            </fr:section>
+        </xsl:if>
     </xsl:template>
 
     <xsl:template match="fr:logo">

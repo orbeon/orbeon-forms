@@ -48,6 +48,7 @@
                 <selected>Selected</selected>
                 <refresh>This operation will refresh the page</refresh>
                 <toc>Table of Contents</toc>
+                <description>Description</description>
                 <help>Help</help>
                 <error-count>Error in Your Form</error-count>
                 <errors-count>Errors in Your Form</errors-count>
@@ -217,6 +218,7 @@
                 <selected>Sélection</selected>
                 <refresh>Cette opération rafraichit la page</refresh>
                 <toc>Table des matières</toc>
+                <description>Description</description>
                 <help>Aide</help>
                 <error-count>erreur de saisie dans votre formulaire</error-count>
                 <errors-count>erreurs de saisie dans votre formulaire</errors-count>
@@ -385,6 +387,7 @@
                 <selected>Seleccionado</selected>
                 <refresh>Este botón actualizará la página</refresh>
                 <toc>Tabla de contenidos</toc>
+                <description>[Description]</description>
                 <help>Ayuda</help>
                 <error-count>Errores en su formulario</error-count>
                 <errors-count>Errores en su formulario</errors-count>
@@ -550,6 +553,7 @@
                 <selected>Valgt</selected>
                 <refresh>Denne operasjonen vil laste siden på nytt</refresh>
                 <toc>Innholdsfortegnelse</toc>
+                <description>Description</description>
                 <help>Hjelp</help>
                 <error-count>ugyldig eller manglende svar i skjema</error-count>
                 <errors-count>ugyldige eller manglende svar i skjema</errors-count>
@@ -718,6 +722,7 @@
                 <selected>Выбрана</selected>
                 <refresh>Эта операция потребует перезагрузки страницы</refresh>
                 <toc>Оглавление</toc>
+                <description>Description</description>
                 <help>Помощь</help>
                 <error-count>Есть ошибка</error-count>
                 <errors-count>Есть ошибки</errors-count>

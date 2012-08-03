@@ -282,7 +282,7 @@ public class XFormsContextStack {
             final BindingContext baseBindingContext = getBindingContext(scope);
 
             // Set context
-            final String tempSourceEffectiveId = functionContext.getSourceEffectiveId();
+            final String tempSourceEffectiveId = functionContext.sourceEffectiveId();
             if (sourceEffectiveId != null) {
                 functionContext.setSourceEffectiveId(sourceEffectiveId);
             }

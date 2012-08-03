@@ -25,7 +25,10 @@ import org.orbeon.saxon.om._
 class XXFormsInstance extends XFormsFunction {
 
     override def iterate(xpathContext: XPathContext): SequenceIterator = {
-        val containingDocument = getContainingDocument(xpathContext)
+
+        implicit val ctx = xpathContext
+
+        val containingDocument = context.containingDocument
 
         val instanceId     = argument(0).evaluateAsString(xpathContext).toString
         // TODO: Argument is undocumented. Is it ever used at all? We now have a syntax for absolute ids so don't really need it.
@@ -40,7 +43,7 @@ class XXFormsInstance extends XFormsFunction {
             } else {
                 // Search ancestor-or-self containers as suggested here: http://wiki.orbeon.com/forms/projects/xforms-model-scoping-rules
 
-                val startContainer = getXBLContainer(xpathContext)
+                val startContainer = context.container
 
                 // The idea here is that we first try to find a concrete instance. If that fails, we try to see if it
                 // exists statically. If it does exist statically only, we return an empty sequence, but we don't warn
@@ -74,7 +77,7 @@ class XXFormsInstance extends XFormsFunction {
             case Some(iterator) ⇒
                 iterator
             case None ⇒
-                getContainingDocument(xpathContext).getIndentedLogger(XFormsModel.LOGGING_CATEGORY).logWarning("xxforms:instance()", "instance not found", "instance id", instanceId)
+                containingDocument.getIndentedLogger(XFormsModel.LOGGING_CATEGORY).logWarning("xxforms:instance()", "instance not found", "instance id", instanceId)
                 EmptyIterator.getInstance
         }
     }

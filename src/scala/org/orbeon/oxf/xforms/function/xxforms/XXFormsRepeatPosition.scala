@@ -29,7 +29,7 @@ import org.orbeon.oxf.xforms.{XFormsUtils, BindingContext, XFormsContextStack}
 class XXFormsRepeatPosition extends XFormsFunction {
 
     override def evaluateItem(xpathContext: XPathContext) =
-        new Int64Value(getRepeatCurrentPosition(getContextStack(xpathContext),
+        new Int64Value(getRepeatCurrentPosition(context(xpathContext).contextStack,
             argument.headOption map (_.evaluateAsString(xpathContext).toString)))
 
     private def getRepeatCurrentPosition(contextStack: XFormsContextStack, repeatId: Option[String]) =

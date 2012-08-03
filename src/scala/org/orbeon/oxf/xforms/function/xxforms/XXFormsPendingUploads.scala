@@ -22,5 +22,5 @@ import org.orbeon.saxon.value.Int64Value
  */
 class XXFormsPendingUploads extends XFormsFunction {
     override def evaluateItem(xpathContext: XPathContext) =
-        new Int64Value(getContainingDocument(xpathContext).countPendingUploads)
+        new Int64Value(context(xpathContext).containingDocument.countPendingUploads)
 }

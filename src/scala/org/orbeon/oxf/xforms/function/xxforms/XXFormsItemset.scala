@@ -24,11 +24,13 @@ import org.orbeon.saxon.value.StringValue
 class XXFormsItemset extends XFormsFunction {
     override def evaluateItem(xpathContext: XPathContext): Item = {
 
+        implicit val ctx = xpathContext
+
         val controlStaticId = argument(0).evaluateAsString(xpathContext).toString
         val format          = argument(1).evaluateAsString(xpathContext).toString
         val selected        = argument.lift(2) map (e ⇒ ExpressionTool.effectiveBooleanValue(e.iterate(xpathContext))) getOrElse false
 
-        getXBLContainer(xpathContext).resolveObjectByIdInScope(getSourceEffectiveId(xpathContext), controlStaticId, null) match {
+        context.container.resolveObjectByIdInScope(getSourceEffectiveId, controlStaticId, null) match {
             case select1Control: XFormsSelect1Control if select1Control.isRelevant ⇒
 
                 val itemset = select1Control.getItemset

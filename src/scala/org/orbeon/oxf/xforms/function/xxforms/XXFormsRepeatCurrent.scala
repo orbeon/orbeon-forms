@@ -28,7 +28,7 @@ import org.orbeon.oxf.xforms.XFormsContextStack
 class XXFormsRepeatCurrent extends XFormsFunction with MatchSimpleAnalysis {
 
     override def evaluateItem(xpathContext: XPathContext) =
-        getRepeatCurrentSingleNode(getContextStack(xpathContext),
+        getRepeatCurrentSingleNode(context(xpathContext).contextStack,
             argument.headOption map (_.evaluateAsString(xpathContext).toString))
 
     override def addToPathMap(pathMap: PathMap, pathMapNodeSet: PathMapNodeSet): PathMapNodeSet = {

@@ -52,17 +52,17 @@ abstract class XFormsFunction extends SystemFunction {
     def context(implicit xpathContext: XPathContext) =
         PooledXPathExpression.getFunctionContext(xpathContext).asInstanceOf[XFormsFunction.Context]
 
-    def getControls(implicit xpathContext: XPathContext)      = context.getControls
-    def getXBLContainer(implicit xpathContext: XPathContext)  = context.getXBLContainer
-    def getSourceElement(implicit xpathContext: XPathContext) = context.getSourceElement
-    def getModel(implicit xpathContext: XPathContext)         = context.getModel
-    def getContextStack(implicit xpathContext: XPathContext)  = context.getContextStack
+    def getControls(implicit xpathContext: XPathContext)      = context.controls
+    def getXBLContainer(implicit xpathContext: XPathContext)  = context.container
+    def getSourceElement(implicit xpathContext: XPathContext) = context.sourceElement
+    def getModel(implicit xpathContext: XPathContext)         = context.model
+    def getContextStack(implicit xpathContext: XPathContext)  = context.contextStack
 
     def getSourceEffectiveId(implicit xpathContext: XPathContext) =
-        context.getSourceEffectiveId ensuring (_ ne null, "Source effective id not available for resolution.")
+        context.sourceEffectiveId ensuring (_ ne null, "Source effective id not available for resolution.")
 
     def getContainingDocument(implicit xpathContext: XPathContext) =
-        Option(context) map (_.getXBLContainer.getContainingDocument) orNull
+        Option(context) map (_.container.getContainingDocument) orNull
 
     protected def getQNameFromExpression(xpathContext: XPathContext, qNameExpression: Expression): QName = {
 
@@ -189,23 +189,15 @@ object XFormsFunction {
         def this(containingModel: XFormsModel, contextStack: XFormsContextStack) =
             this(containingModel.container, contextStack)
 
-        private var sourceEffectiveId: String = _
-        private var sourceElement: Element = _
-        private var model: XFormsModel = _
+        var sourceEffectiveId: String = _
+        var sourceElement: Element = _
+        var model: XFormsModel = _
 
-        def getXBLContainer = container
-        def getContextStack = contextStack
-
-        def getContainingDocument = container.getContainingDocument
-        def getControls = getContainingDocument.getControls
-
-        def getModel = model
+        def setSourceEffectiveId(sourceEffectiveId: String) = this.sourceEffectiveId = sourceEffectiveId
+        def setSourceElement(sourceElement: Element) = this.sourceElement = sourceElement
         def setModel(model: XFormsModel) = this.model = model
 
-        def getSourceEffectiveId = sourceEffectiveId
-        def setSourceEffectiveId(sourceEffectiveId: String) = this.sourceEffectiveId = sourceEffectiveId
-
-        def getSourceElement = sourceElement
-        def setSourceElement(sourceElement: Element) = this.sourceElement = sourceElement
+        def containingDocument = container.getContainingDocument
+        def controls = containingDocument.getControls
     }
 }

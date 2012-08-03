@@ -43,7 +43,7 @@ class XFormsElement extends XFormsFunction {
         if (hasNewText)
             Dom4jUtils.normalizeTextNodes(element)
 
-        getContainingDocument(xpathContext).getStaticState.documentWrapper.wrap(element)
+        context(xpathContext).containingDocument.getStaticState.documentWrapper.wrap(element)
     }
 }
 

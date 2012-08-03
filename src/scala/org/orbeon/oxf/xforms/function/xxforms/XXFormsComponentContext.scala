@@ -20,7 +20,7 @@ import org.orbeon.saxon.om._
 class XXFormsComponentContext extends XFormsFunction {
     // Get the closest associated control if any, then get its parent context if any, and then its nodeset
     override def iterate(xpathContext: XPathContext): SequenceIterator =
-        Option(getXBLContainer(xpathContext).getAssociatedControl) flatMap
+        Option(context(xpathContext).container.getAssociatedControl) flatMap
             (componentControl ⇒ Option(componentControl.getBindingContext.parent)) map
                 (contextBinding ⇒ new ListIterator(contextBinding.nodeset)) getOrElse
                     EmptyIterator.getInstance

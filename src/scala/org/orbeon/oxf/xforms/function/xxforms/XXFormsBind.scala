@@ -25,13 +25,13 @@ class XXFormsBind extends XFormsFunction {
 
     override def iterate(xpathContext: XPathContext): SequenceIterator = {
 
+        implicit val ctx = xpathContext
+
         // Get bind id
         val bindId = argument(0).evaluateAsString(xpathContext).toString
 
         // Get bind nodeset
-        val contextStack = getContextStack(xpathContext)
-
-        getXBLContainer(xpathContext).resolveObjectByIdInScope(getSourceEffectiveId(xpathContext), bindId, contextStack.getCurrentSingleItem) match {
+        context.container.resolveObjectByIdInScope(getSourceEffectiveId, bindId, context.contextStack.getCurrentSingleItem) match {
             case bind: XFormsModelBinds#Bind ⇒ new ListIterator(bind.nodeset)
             case _ ⇒ EmptyIterator.getInstance
         }

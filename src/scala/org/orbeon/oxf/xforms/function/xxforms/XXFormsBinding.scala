@@ -16,21 +16,14 @@ package org.orbeon.oxf.xforms.function.xxforms
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om._
 import scala.collection.JavaConverters._
-import org.orbeon.oxf.xforms.function.FunctionHelpers
+import org.orbeon.oxf.xforms.function.FunctionSupport
 
-class XXFormsBinding extends FunctionHelpers {
+class XXFormsBinding extends FunctionSupport {
 
-    override def iterate(xpathContext: XPathContext): SequenceIterator = {
-
-        // Get id
-        val staticIdOption = argument.lift(0) map (_.evaluateAsString(xpathContext).toString)
-
-        // Resolve control and get its binding
-        staticIdOption flatMap
-            (resolveControl(xpathContext, _)) map
-                (control ⇒ new ListIterator(control.binding.asJava)) getOrElse
-                    EmptyIterator.getInstance
-    }
+    override def iterate(xpathContext: XPathContext): SequenceIterator =
+        relevantControl(0)(xpathContext) map
+            (control ⇒ new ListIterator(control.binding.asJava)) getOrElse
+                EmptyIterator.getInstance
 
     // TODO: PathMap
 }

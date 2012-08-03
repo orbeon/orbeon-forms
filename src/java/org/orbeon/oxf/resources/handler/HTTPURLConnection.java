@@ -248,7 +248,7 @@ public class HTTPURLConnection extends URLConnection {
             if (method == null)
                 setRequestMethod("GET");
 
-            // Set all headers,
+            // Set all headers
             final boolean skipAuthorizationHeader = userInfo != null || username != null;
             for (final Map.Entry<String, String[]> currentEntry: requestProperties.entrySet()) {
                 final String currentHeaderName = currentEntry.getKey();

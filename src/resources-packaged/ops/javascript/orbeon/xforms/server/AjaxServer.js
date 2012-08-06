@@ -1427,13 +1427,10 @@
 
                                     // Update the required-empty/required-full even if the required has not changed or
                                     // is not specified as the value may have changed
-                                    var isRequiredEmpty;
                                     if (!isStaticReadonly && !YAHOO.util.Dom.hasClass(documentElement, "xforms-group")) {
                                         // We don't get the value for groups, so we are not calling this method as it would otherwise
                                         // incorrectly add the class xforms-required-empty on groups.
-                                        isRequiredEmpty = ORBEON.xforms.Controls.updateRequiredEmpty(documentElement, newControlValue);
-                                    } else {
-                                        isRequiredEmpty = false;
+                                        ORBEON.xforms.Controls.updateRequiredEmpty(documentElement, newControlValue);
                                     }
 
                                     // Store new label message in control attribute

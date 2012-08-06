@@ -311,36 +311,38 @@
 
                         <xxf:var name="dialogs-closed" value="instance('fb-variables')/dialogs-open = 0"/>
 
+                        <!-- Disable keyboard shortcuts until we can polish them, see #387 and #233 -->
+
                         <!-- Cut/copy/paste shortcuts -->
-                        <xf:dispatch if="$dialogs-closed" ev:observer="#document" ev:event="keypress" xxf:modifiers="control" xxf:text="x" name="DOMActivate" targetid="cut-trigger"/>
-                        <xf:dispatch if="$dialogs-closed" ev:observer="#document" ev:event="keypress" xxf:modifiers="control" xxf:text="c" name="DOMActivate" targetid="copy-trigger"/>
-                        <xf:dispatch if="$dialogs-closed" ev:observer="#document" ev:event="keypress" xxf:modifiers="control" xxf:text="v" name="DOMActivate" targetid="paste-trigger"/>
+                        <!--<xf:dispatch if="$dialogs-closed" ev:observer="#document" ev:event="keypress" xxf:modifiers="control" xxf:text="x" name="DOMActivate" targetid="cut-trigger"/>-->
+                        <!--<xf:dispatch if="$dialogs-closed" ev:observer="#document" ev:event="keypress" xxf:modifiers="control" xxf:text="c" name="DOMActivate" targetid="copy-trigger"/>-->
+                        <!--<xf:dispatch if="$dialogs-closed" ev:observer="#document" ev:event="keypress" xxf:modifiers="control" xxf:text="v" name="DOMActivate" targetid="paste-trigger"/>-->
 
                         <!-- Buttons shortcuts -->
-                        <xf:dispatch if="$dialogs-closed" ev:observer="#document" ev:event="keypress" xxf:modifiers="control" xxf:text="w" name="DOMActivate" targetid="fr-back-button"/>
-                        <xf:dispatch if="$dialogs-closed" ev:observer="#document" ev:event="keypress" xxf:modifiers="control" xxf:text="t" name="DOMActivate" targetid="fb-test-button"/>
-                        <xf:dispatch if="$dialogs-closed" ev:observer="#document" ev:event="keypress" xxf:modifiers="control" xxf:text="p" name="DOMActivate" targetid="fb-publish-button"/>
-                        <xf:dispatch if="$dialogs-closed" ev:observer="#document" ev:event="keypress" xxf:modifiers="control" xxf:text="s" name="DOMActivate" targetid="fr-save-button"/>
-                        <xf:dispatch if="$dialogs-closed" ev:observer="#document" ev:event="keypress" xxf:modifiers="control shift" xxf:text="s" name="DOMActivate" targetid="fr-save-as-button"/>
+                        <!--<xf:dispatch if="$dialogs-closed" ev:observer="#document" ev:event="keypress" xxf:modifiers="control" xxf:text="w" name="DOMActivate" targetid="fr-back-button"/>-->
+                        <!--<xf:dispatch if="$dialogs-closed" ev:observer="#document" ev:event="keypress" xxf:modifiers="control" xxf:text="t" name="DOMActivate" targetid="fb-test-button"/>-->
+                        <!--<xf:dispatch if="$dialogs-closed" ev:observer="#document" ev:event="keypress" xxf:modifiers="control" xxf:text="p" name="DOMActivate" targetid="fb-publish-button"/>-->
+                        <!--<xf:dispatch if="$dialogs-closed" ev:observer="#document" ev:event="keypress" xxf:modifiers="control" xxf:text="s" name="DOMActivate" targetid="fr-save-button"/>-->
+                        <!--<xf:dispatch if="$dialogs-closed" ev:observer="#document" ev:event="keypress" xxf:modifiers="control shift" xxf:text="s" name="DOMActivate" targetid="fr-save-as-button"/>-->
 
                         <!-- Open dialogs shortcuts -->
-                        <xxf:show if="$dialogs-closed" ev:observer="#document" ev:event="keypress" xxf:modifiers="alt" xxf:text="e" dialog="fb-source-editor-dialog"/>
-                        <xf:dispatch if="$dialogs-closed" ev:observer="#document" ev:event="keypress" xxf:modifiers="alt" xxf:text="i" name="DOMActivate" targetid="fb-edit-details-trigger"/>
-                        <xf:dispatch if="$dialogs-closed" ev:observer="#document" ev:event="keypress" xxf:modifiers="alt" xxf:text="v" name="DOMActivate" targetid="fb-edit-validation-trigger"/>
+                        <!--<xxf:show if="$dialogs-closed" ev:observer="#document" ev:event="keypress" xxf:modifiers="alt" xxf:text="e" dialog="fb-source-editor-dialog"/>-->
+                        <!--<xf:dispatch if="$dialogs-closed" ev:observer="#document" ev:event="keypress" xxf:modifiers="alt" xxf:text="i" name="DOMActivate" targetid="fb-edit-details-trigger"/>-->
+                        <!--<xf:dispatch if="$dialogs-closed" ev:observer="#document" ev:event="keypress" xxf:modifiers="alt" xxf:text="v" name="DOMActivate" targetid="fb-edit-validation-trigger"/>-->
 
                         <!-- Move section -->
-                        <xf:action ev:observer="#document" ev:event="keypress" xxf:modifiers="control alt" xxf:text="&#39;" type="xpath" xmlns:sectionOps="java:org.orbeon.oxf.fb.SectionOps">
-                            sectionOps:moveSectionRight($current-td/ancestor::*:section[1])
-                        </xf:action>
-                        <xf:action ev:observer="#document" ev:event="keypress" xxf:modifiers="control alt" xxf:text="&#37;" type="xpath" xmlns:sectionOps="java:org.orbeon.oxf.fb.SectionOps">
-                            sectionOps:moveSectionLeft($current-td/ancestor::*:section[1])
-                        </xf:action>
-                        <xf:action ev:observer="#document" ev:event="keypress" xxf:modifiers="control alt" xxf:text="&#38;" type="xpath" xmlns:sectionOps="java:org.orbeon.oxf.fb.SectionOps">
-                            sectionOps:moveSectionUp($current-td/ancestor::*:section[1])
-                        </xf:action>
-                        <xf:action ev:observer="#document" ev:event="keypress" xxf:modifiers="control alt" xxf:text="&#40;" type="xpath" xmlns:sectionOps="java:org.orbeon.oxf.fb.SectionOps">
-                            sectionOps:moveSectionDown($current-td/ancestor::*:section[1])
-                        </xf:action>
+                        <!--<xf:action ev:observer="#document" ev:event="keypress" xxf:modifiers="control alt" xxf:text="&#39;" type="xpath" xmlns:sectionOps="java:org.orbeon.oxf.fb.SectionOps">-->
+                            <!--sectionOps:moveSectionRight($current-td/ancestor::*:section[1])-->
+                        <!--</xf:action>-->
+                        <!--<xf:action ev:observer="#document" ev:event="keypress" xxf:modifiers="control alt" xxf:text="&#37;" type="xpath" xmlns:sectionOps="java:org.orbeon.oxf.fb.SectionOps">-->
+                            <!--sectionOps:moveSectionLeft($current-td/ancestor::*:section[1])-->
+                        <!--</xf:action>-->
+                        <!--<xf:action ev:observer="#document" ev:event="keypress" xxf:modifiers="control alt" xxf:text="&#38;" type="xpath" xmlns:sectionOps="java:org.orbeon.oxf.fb.SectionOps">-->
+                            <!--sectionOps:moveSectionUp($current-td/ancestor::*:section[1])-->
+                        <!--</xf:action>-->
+                        <!--<xf:action ev:observer="#document" ev:event="keypress" xxf:modifiers="control alt" xxf:text="&#40;" type="xpath" xmlns:sectionOps="java:org.orbeon.oxf.fb.SectionOps">-->
+                            <!--sectionOps:moveSectionDown($current-td/ancestor::*:section[1])-->
+                        <!--</xf:action>-->
 
                         <!-- Insert controls shortcuts -->
                         <!--<xf:dispatch if="$dialogs-closed" ev:observer="#document" ev:event="keypress" xxf:modifiers="Control" xxf:text="n" name="DOMActivate" targetid="insert-new-section-trigger"/>-->

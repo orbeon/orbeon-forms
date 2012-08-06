@@ -85,11 +85,7 @@
                 .xforms-label { font-weight: bold }
 
                 /* Colored border for invalid fields */
-                /* NOTE: style required-empty as well to show user which are the required fields */
-                .xforms-invalid-visited .xforms-input-input, textarea.xforms-invalid-visited,
-                    .xforms-required-empty .xforms-input-input, textarea.xforms-required-empty,
-                    input.xforms-required-empty, .xforms-required-empty input
-                        { border-color: #DF731B }
+                .xforms-invalid-visited input, .xforms-invalid-visited textarea { border-color: #DF731B }
 
                 .xforms-alert-active {
                     font-weight: bold;

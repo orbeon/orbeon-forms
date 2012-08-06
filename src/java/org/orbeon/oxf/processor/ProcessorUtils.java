@@ -18,7 +18,6 @@ import org.dom4j.Element;
 import org.dom4j.Node;
 import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.processor.generator.URLGenerator;
@@ -37,7 +36,6 @@ import org.xml.sax.helpers.AttributesImpl;
 import java.io.BufferedInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Iterator;
 
@@ -115,13 +113,9 @@ public class ProcessorUtils {
     }
 
     public static URL createRelativeURL(LocationData locationData, String urlString) {
-        try {
-            return (locationData != null && locationData.getSystemID() != null)
-                    ? URLFactory.createURL(locationData.getSystemID(), urlString)
-                    : URLFactory.createURL(urlString);
-        } catch (MalformedURLException e) {
-            throw new ValidationException(e, locationData);
-        }
+        return (locationData != null && locationData.getSystemID() != null)
+                ? URLFactory.createURL(locationData.getSystemID(), urlString)
+                : URLFactory.createURL(urlString);
     }
 
     public static Document createDocumentFromEmbeddedOrHref(Element element, String urlString) {

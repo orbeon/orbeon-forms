@@ -32,7 +32,6 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocument;
 
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
 
@@ -147,21 +146,18 @@ public class PipelineBlock {
             processorInput.setOutput(aggregatorOutput);
 
         } else if (href instanceof ASTHrefURL) {
-            try {
-                // Get the docbase url from the location data if available
-                // and concatenate it with the current href
-                final URL url = URLFactory.createURL(locationData != null && locationData.getSystemID() != null ?
-                        locationData.getSystemID() : null,
-                        ((ASTHrefURL) href).getURL());
 
-                // This is interpreted as a URL, use URL Generator
-                final Processor urlGenerator = new URLGenerator(url.toExternalForm());
-                final ProcessorOutput referencedOutput = urlGenerator.createOutput(ProcessorImpl.OUTPUT_DATA);
-                referencedOutput.setInput(processorInput);
-                processorInput.setOutput(referencedOutput);
-            } catch (MalformedURLException e) {
-                throw new ValidationException(e, locationData);
-            }
+            // Get the docbase url from the location data if available
+            // and concatenate it with the current href
+            final URL url = URLFactory.createURL(locationData != null && locationData.getSystemID() != null ?
+                    locationData.getSystemID() : null,
+                    ((ASTHrefURL) href).getURL());
+
+            // This is interpreted as a URL, use URL Generator
+            final Processor urlGenerator = new URLGenerator(url.toExternalForm());
+            final ProcessorOutput referencedOutput = urlGenerator.createOutput(ProcessorImpl.OUTPUT_DATA);
+            referencedOutput.setInput(processorInput);
+            processorInput.setOutput(referencedOutput);
 
         } else if (href instanceof ASTHrefXPointer) {
 

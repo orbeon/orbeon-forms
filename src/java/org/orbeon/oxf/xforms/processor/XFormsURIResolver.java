@@ -36,7 +36,6 @@ import org.xml.sax.XMLReader;
 
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.sax.SAXSource;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
@@ -71,12 +70,7 @@ public class XFormsURIResolver extends TransformerURIResolver {
             return super.resolve(href, base);
         } else {
             // This is a regular URL
-            final URL url;
-            try {
-                url = URLFactory.createURL(base, href);
-            } catch (MalformedURLException e) {
-                throw new OXFException(e);
-            }
+            final URL url = URLFactory.createURL(base, href);
 
             final String protocol = url.getProtocol();
             final boolean isHttpProtocol = protocol.equals("http") || protocol.equals("https");

@@ -44,7 +44,6 @@ import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.*;
 import java.io.*;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
@@ -115,11 +114,7 @@ public class ImageServer extends ProcessorImpl {
                     if (!imageDirectoryString.endsWith("/"))
                         imageDirectoryString = imageDirectoryString + '/';
 
-                    try {
-                        result.imageDirectoryURL = URLFactory.createURL(imageDirectoryString);
-                    } catch (MalformedURLException e) {
-                        throw new OXFException(e);
-                    }
+                    result.imageDirectoryURL = URLFactory.createURL(imageDirectoryString);
 
                     final String cacheDirectoryString = XPathUtils.selectStringValueNormalize(configDocument, "/config/cache/directory");
                     result.cacheDir = (cacheDirectoryString == null) ? null : new File(cacheDirectoryString);
@@ -443,11 +438,7 @@ public class ImageServer extends ProcessorImpl {
                         return null;
                 }
 
-                try {
-                    return URLFactory.createURL(config.imageDirectoryURL, imageConfig.urlString);
-                } catch (MalformedURLException e) {
-                    throw new OXFException(e);
-                }
+                return URLFactory.createURL(config.imageDirectoryURL, imageConfig.urlString);
             }
         };
         addOutput(name, output);

@@ -106,36 +106,32 @@ public class XHTMLToPDFProcessor extends HttpBinarySerializer {// TODO: HttpBina
                 // - getBinaryResource (not sure when called)
                 // - getXMLResource (not sure when called)
                 protected InputStream resolveAndOpenStream(String uri) {
-                    try {
-                        final String resolvedURI = resolveURI(uri);
-                        // TODO: Use xforms:submission code instead
 
-                        // Tell callee we are loading that we are a servlet environment, as in effect we act like
-                        // a browser retrieving resources directly, not like a portlet. This is the case also if we are
-                        // called by the proxy portlet or if we are directly within a portlet.
-                        final Map<String, String[]> headers = new HashMap<String, String[]>();
-                        headers.put("Orbeon-Client", new String[] { "servlet" });
-                        
-                        final ConnectionResult connectionResult
-                            = new Connection().open(externalContext, new IndentedLogger(logger, ""), false, Connection.Method.GET.name(),
-                                URLFactory.createURL(resolvedURI), null, null, null, headers, Connection.getForwardHeaders());
+                    final String resolvedURI = resolveURI(uri);
+                    // TODO: Use xforms:submission code instead
 
-                        if (connectionResult.statusCode != 200) {
-                            connectionResult.close();
-                            throw new OXFException("Got invalid return code while loading resource: " + uri + ", " + connectionResult.statusCode);
-                        }
+                    // Tell callee we are loading that we are a servlet environment, as in effect we act like
+                    // a browser retrieving resources directly, not like a portlet. This is the case also if we are
+                    // called by the proxy portlet or if we are directly within a portlet.
+                    final Map<String, String[]> headers = new HashMap<String, String[]>();
+                    headers.put("Orbeon-Client", new String[] { "servlet" });
 
-                        pipelineContext.addContextListener(new PipelineContext.ContextListener() {
-                            public void contextDestroyed(boolean success) {
-                                connectionResult.close();
-                            }
-                        });
+                    final ConnectionResult connectionResult
+                        = new Connection().open(externalContext, new IndentedLogger(logger, ""), false, Connection.Method.GET.name(),
+                            URLFactory.createURL(resolvedURI), null, null, null, headers, Connection.getForwardHeaders());
 
-                        return connectionResult.getResponseInputStream();
-
-                    } catch (IOException e) {
-                        throw new OXFException(e);
+                    if (connectionResult.statusCode != 200) {
+                        connectionResult.close();
+                        throw new OXFException("Got invalid return code while loading resource: " + uri + ", " + connectionResult.statusCode);
                     }
+
+                    pipelineContext.addContextListener(new PipelineContext.ContextListener() {
+                        public void contextDestroyed(boolean success) {
+                            connectionResult.close();
+                        }
+                    });
+
+                    return connectionResult.getResponseInputStream();
                 }
 
                 public ImageResource getImageResource(String uri) {

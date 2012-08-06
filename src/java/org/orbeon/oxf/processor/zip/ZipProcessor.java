@@ -28,7 +28,6 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
 import java.io.*;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -92,27 +91,22 @@ public class ZipProcessor extends ProcessorImpl {
                                     if ("file".equals(localName)) {
                                         zipOutputStream.putNextEntry(new ZipEntry(name));
                                         final LocationData locationData = getLocationData();
-                                        final URL fullURL;
                                         final String realPath;
-                                        try {
-                                            fullURL = (locationData != null && locationData.getSystemID() != null)
-                                                                            ? URLFactory.createURL(locationData.getSystemID(), uri.toString())
-                                                                            : URLFactory.createURL(uri.toString());
 
-                                            if (fullURL.getProtocol().equals("oxf")) {
-                                                // Get real path to resource path if possible
-                                                realPath = ResourceManagerWrapper.instance().getRealPath(fullURL.getFile());
-                                                if (realPath == null)
-                                                    throw new OXFException("Zip processor is unable to obtain the real path of the file using the oxf: protocol for the base-directory property: " + uri.toString());
-                                            } else if (fullURL.getProtocol().equals("file")) {
-                                                String host = fullURL.getHost();
-                                                realPath = host + (host.length() > 0 ? ":" : "") + fullURL.getFile();
-                                            } else {
-                                                throw new OXFException("Zip processor only supports the file: and oxf: protocols for the base-directory property: " + uri.toString());
-                                            }
+                                        final URL fullURL = (locationData != null && locationData.getSystemID() != null)
+                                            ? URLFactory.createURL(locationData.getSystemID(), uri.toString())
+                                            : URLFactory.createURL(uri.toString());
 
-                                        } catch (MalformedURLException e) {
-                                            throw new OXFException(e);
+                                        if (fullURL.getProtocol().equals("oxf")) {
+                                            // Get real path to resource path if possible
+                                            realPath = ResourceManagerWrapper.instance().getRealPath(fullURL.getFile());
+                                            if (realPath == null)
+                                                throw new OXFException("Zip processor is unable to obtain the real path of the file using the oxf: protocol for the base-directory property: " + uri.toString());
+                                        } else if (fullURL.getProtocol().equals("file")) {
+                                            String host = fullURL.getHost();
+                                            realPath = host + (host.length() > 0 ? ":" : "") + fullURL.getFile();
+                                        } else {
+                                            throw new OXFException("Zip processor only supports the file: and oxf: protocols for the base-directory property: " + uri.toString());
                                         }
 
                                         InputStream fileInputStream = new FileInputStream(new File(realPath));

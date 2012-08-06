@@ -46,7 +46,6 @@ import org.orbeon.saxon.value.Value;
 import scala.Option;
 import scala.collection.Seq;
 
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
 
@@ -673,12 +672,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
             if (indentedLogger.isDebugEnabled())
                 indentedLogger.logDebug("load", "getting document from URI", "URI", absoluteURLString);
 
-            final URL absoluteResolvedURL;
-            try {
-                absoluteResolvedURL = URLFactory.createURL(absoluteURLString);
-            } catch (MalformedURLException e) {
-                throw new OXFException("Invalid URL: " + absoluteURLString);
-            }
+            final URL absoluteResolvedURL = URLFactory.createURL(absoluteURLString);
 
             final ConnectionResult connectionResult = new Connection().open(
                     NetUtils.getExternalContext(), indentedLogger, BaseSubmission.isLogBody(),

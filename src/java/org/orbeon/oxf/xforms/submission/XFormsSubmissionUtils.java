@@ -34,7 +34,6 @@ import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
 
 import java.io.*;
-import java.net.MalformedURLException;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.util.List;
@@ -208,10 +207,6 @@ public class XFormsSubmissionUtils {
                             }
                         }
                     }
-                } catch (UnsupportedEncodingException e) {
-                    throw new OXFException(e);
-                } catch (MalformedURLException e) {
-                    throw new OXFException(e);
                 } catch (IOException e) {
                     throw new OXFException(e);
                 }

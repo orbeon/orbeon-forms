@@ -467,22 +467,24 @@ public class NetUtils {
      * characters long, to avoid confusion with Windows drive letters.
      */
     public static boolean urlHasProtocol(String urlString) {
+        return getProtocol(urlString) != null;
+    }
+
+    public static String getProtocol(String urlString) {
         int colonIndex = urlString.indexOf(":");
 
-        // No protocol is there is no colon or if there is only one character in the protocol
-        if (colonIndex == -1 || colonIndex == 1)
-            return false;
+        // Require at least two characters in a protocol
+        if (colonIndex < 2)
+            return null;
 
-        // Check that there is a protocol
-        boolean allChar = true;
+        // Check that there is a protocol made only of letters
         for (int i = 0; i < colonIndex; i++) {
-            char c = urlString.charAt(i);
+            final char c = urlString.charAt(i);
             if ((c < 'a' || c > 'z') && (c < 'A' || c > 'Z')) {
-                allChar = false;
-                break;
+                return null;
             }
         }
-        return allChar;
+        return urlString.substring(0, colonIndex);
     }
 
     /**
@@ -937,30 +939,25 @@ public class NetUtils {
      * Find the real path of an oxf: or file: URL.
      */
     public static String getRealPath(String configUrl, LocationData locationData) {
-        try {
-            // Use location data if present so that relative URLs can be supported
-            final URL fullURL = (locationData != null && locationData.getSystemID() != null)
-                    ? URLFactory.createURL(locationData.getSystemID(), configUrl)
-                    : URLFactory.createURL(configUrl);
+        // Use location data if present so that relative URLs can be supported
+        final URL fullURL = (locationData != null && locationData.getSystemID() != null)
+                ? URLFactory.createURL(locationData.getSystemID(), configUrl)
+                : URLFactory.createURL(configUrl);
 
-            final String realPath;
-            if (fullURL.getProtocol().equals("oxf")) {
-                // Get real path to resource path if possible
-                realPath = ResourceManagerWrapper.instance().getRealPath(fullURL.getFile());
-                if (realPath == null)
-                    throw new OXFException("Unable to obtain the real path of the file using the oxf: protocol for URL: " + configUrl);
-            } else if (fullURL.getProtocol().equals("file")) {
-                String host = fullURL.getHost();
-                realPath = host + (host.length() > 0 ? ":" : "") + fullURL.getFile();
-            } else {
-                throw new OXFException("Only the file: and oxf: protocols are supported for URL: " + configUrl);
-            }
-
-            return realPath;
-
-        } catch (MalformedURLException e) {
-            throw new OXFException(e);
+        final String realPath;
+        if (fullURL.getProtocol().equals("oxf")) {
+            // Get real path to resource path if possible
+            realPath = ResourceManagerWrapper.instance().getRealPath(fullURL.getFile());
+            if (realPath == null)
+                throw new OXFException("Unable to obtain the real path of the file using the oxf: protocol for URL: " + configUrl);
+        } else if (fullURL.getProtocol().equals("file")) {
+            String host = fullURL.getHost();
+            realPath = host + (host.length() > 0 ? ":" : "") + fullURL.getFile();
+        } else {
+            throw new OXFException("Only the file: and oxf: protocols are supported for URL: " + configUrl);
         }
+
+        return realPath;
     }
 
     /**

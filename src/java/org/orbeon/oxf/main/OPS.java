@@ -255,7 +255,7 @@ public class OPS {
                     URL url = URLFactory.createURL(outputArg.substring(iEqual + 1));
                     // Create the output
                     ProcessorOutput output = processor.createOutput(outputName);
-                    // Connect to an URLserializer
+                    // Connect to an URL serializer
                     URLSerializer urlSerializer = new URLSerializer();
                     PipelineUtils.connect(processor, output.getName(), urlSerializer, "data");
                     // Serialize

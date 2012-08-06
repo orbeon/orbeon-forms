@@ -29,7 +29,6 @@ import org.xml.sax.XMLReader;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.URIResolver;
 import javax.xml.transform.sax.SAXSource;
-import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
@@ -88,67 +87,63 @@ public class TransformerURIResolver implements URIResolver {
     }
 
     public SAXSource resolve(String href, String base) throws TransformerException {
-        try {
-            // Create XML reader for URI
-            final String systemId;
-            XMLReader xmlReader;
-            {
-                final String inputName = ProcessorImpl.getProcessorInputSchemeInputName(href);
-                if (prohibitedInput != null && prohibitedInput.equals(inputName)) {
-                    // Don't allow a prohibited input (usually INPUT_DATA) to be read this way. We do this to prevent that input to read twice from XSLT.
-                    throw new OXFException("Can't read '" + prohibitedInput + "' input. If you are calling this from XSLT, use a '/' expression in XPath instead.");
-                } else if (inputName != null) {
-                    // Resolve to input of current processor
-                    if (processor == null)
-                        throw new OXFException("Can't read URL '" + href + "'.");
 
-                    xmlReader = new ProcessorOutputXMLReader(pipelineContext, processor.getInputByName(inputName).getOutput());
-                    systemId = href;
-                } else {
-                    // Resolve to regular URI
-                    final URL url = URLFactory.createURL(base, href);
-                    // NOTE: below, we disable use of the URLGenerator's local cache, so that we don't check validity
-                    // with HTTP and HTTPS. When would it make sense to use local caching?
-                    final String protocol = url.getProtocol();
-                    final boolean cacheUseLocalCache = !(protocol.equals("http") || protocol.equals("https"));
-                    final Processor urlGenerator = new URLGenerator(url, null, false, null, false, false, parserConfiguration, true, mode, null, null, cacheUseLocalCache, false);
-                    xmlReader = new ProcessorOutputXMLReader(pipelineContext, urlGenerator.createOutput(ProcessorImpl.OUTPUT_DATA));
-                    systemId = url.toExternalForm();
-                }
+        // Create XML reader for URI
+        final String systemId;
+        XMLReader xmlReader;
+        {
+            final String inputName = ProcessorImpl.getProcessorInputSchemeInputName(href);
+            if (prohibitedInput != null && prohibitedInput.equals(inputName)) {
+                // Don't allow a prohibited input (usually INPUT_DATA) to be read this way. We do this to prevent that input to read twice from XSLT.
+                throw new OXFException("Can't read '" + prohibitedInput + "' input. If you are calling this from XSLT, use a '/' expression in XPath instead.");
+            } else if (inputName != null) {
+                // Resolve to input of current processor
+                if (processor == null)
+                    throw new OXFException("Can't read URL '" + href + "'.");
+
+                xmlReader = new ProcessorOutputXMLReader(pipelineContext, processor.getInputByName(inputName).getOutput());
+                systemId = href;
+            } else {
+                // Resolve to regular URI
+                final URL url = URLFactory.createURL(base, href);
+                // NOTE: below, we disable use of the URLGenerator's local cache, so that we don't check validity
+                // with HTTP and HTTPS. When would it make sense to use local caching?
+                final String protocol = url.getProtocol();
+                final boolean cacheUseLocalCache = !(protocol.equals("http") || protocol.equals("https"));
+                final Processor urlGenerator = new URLGenerator(url, null, false, null, false, false, parserConfiguration, true, mode, null, null, cacheUseLocalCache, false);
+                xmlReader = new ProcessorOutputXMLReader(pipelineContext, urlGenerator.createOutput(ProcessorImpl.OUTPUT_DATA));
+                systemId = url.toExternalForm();
             }
-
-            final URIResolverListener uriResolverListener =
-                    (URIResolverListener) pipelineContext.getAttribute(XSLTTransformer.XSLT_STYLESHEET_URI_LISTENER);
-            if (uriResolverListener != null) {
-
-                // Also send data to listener, if there is one
-                // NOTE: As of 2010-06-25, this is only used by XSLTTransformer
-
-                xmlReader = new ForwardingXMLReader(xmlReader) {
-
-                    private ContentHandler originalHandler;
-
-                    @Override
-                    public void setContentHandler(ContentHandler handler) {
-                        originalHandler = handler;
-                        // NOTE: We don't need to handle comments in the source stylesheets so we can use new SimpleForwardingXMLReceiver() below
-                        final List<XMLReceiver> xmlReceivers = Arrays.asList(uriResolverListener.getXMLReceiver(), new SimpleForwardingXMLReceiver(handler));
-                        super.setContentHandler(new TeeXMLReceiver(xmlReceivers));
-                    }
-
-                    @Override
-                    public ContentHandler getContentHandler() {
-                        return originalHandler;
-                    }
-                };
-            }
-
-            // Create SAX Source based on XML Reader
-            return new SAXSource(xmlReader, new InputSource(systemId)); // set system id so that we can get it on the Source object from outside
-
-        } catch (IOException e) {
-            throw new OXFException(e);
         }
+
+        final URIResolverListener uriResolverListener =
+                (URIResolverListener) pipelineContext.getAttribute(XSLTTransformer.XSLT_STYLESHEET_URI_LISTENER);
+        if (uriResolverListener != null) {
+
+            // Also send data to listener, if there is one
+            // NOTE: As of 2010-06-25, this is only used by XSLTTransformer
+
+            xmlReader = new ForwardingXMLReader(xmlReader) {
+
+                private ContentHandler originalHandler;
+
+                @Override
+                public void setContentHandler(ContentHandler handler) {
+                    originalHandler = handler;
+                    // NOTE: We don't need to handle comments in the source stylesheets so we can use new SimpleForwardingXMLReceiver() below
+                    final List<XMLReceiver> xmlReceivers = Arrays.asList(uriResolverListener.getXMLReceiver(), new SimpleForwardingXMLReceiver(handler));
+                    super.setContentHandler(new TeeXMLReceiver(xmlReceivers));
+                }
+
+                @Override
+                public ContentHandler getContentHandler() {
+                    return originalHandler;
+                }
+            };
+        }
+
+        // Create SAX Source based on XML Reader
+        return new SAXSource(xmlReader, new InputSource(systemId)); // set system id so that we can get it on the Source object from outside
     }
 
     protected ProcessorImpl getProcessor() {

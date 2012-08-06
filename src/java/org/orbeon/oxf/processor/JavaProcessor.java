@@ -342,17 +342,9 @@ public class JavaProcessor extends ProcessorImpl {
      * exception is thrown.
      */
     public static File getFileFromURL(String urlString, LocationData locationData) {
-        URL sourcePathURL;
-        {
-            try {
-                // Resolve relative URLs
-                sourcePathURL = (locationData != null && locationData.getSystemID() != null)
-                        ? URLFactory.createURL(locationData.getSystemID(), urlString)
-                        : URLFactory.createURL(urlString);
-            } catch (MalformedURLException e) {
-                throw new ValidationException("Invalid sourcepath attribute: '" + urlString + "'", e, locationData);
-            }
-        }
+        URL sourcePathURL = (locationData != null && locationData.getSystemID() != null)
+            ? URLFactory.createURL(locationData.getSystemID(), urlString)
+            : URLFactory.createURL(urlString);
 
         // Make sure the protocol is oxf: or file:
         if (sourcePathURL.getProtocol().equals("file")) {

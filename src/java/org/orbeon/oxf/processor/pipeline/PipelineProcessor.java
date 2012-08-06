@@ -34,7 +34,6 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 
-import java.net.MalformedURLException;
 import java.util.*;
 
 /**
@@ -477,16 +476,7 @@ public class PipelineProcessor extends ProcessorImpl {
         } else if (schemaHref != null) {
             String url;
             if (locationData != null) {
-                try {
-                    url = URLFactory.createURL(locationData.getSystemID(), schemaHref).toString();
-                } catch (MalformedURLException e) {
-                    // Does this happen? If yes, why?
-                    // We don't really know. Set let's just throw an exception in this case.
-                    // If it never happens, we can then remove this comment.
-                    //url = schemaHref;
-                    throw new ValidationException("Invalid URL: sytem id is '" + locationData.getSystemID()
-                            + "' and schema href is '" + schemaHref + "'", locationData);
-                }
+                url = URLFactory.createURL(locationData.getSystemID(), schemaHref).toString();
             } else {
                 url = schemaHref;
             }

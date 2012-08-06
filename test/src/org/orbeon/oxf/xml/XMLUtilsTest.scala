@@ -28,9 +28,9 @@ class XMLUtilsTest extends AssertionsForJUnit {
             XMLUtils.makeNCName("  ")
         }
 
-        assert("foo" === XMLUtils.makeNCName("foo"))
-        assert("_foo_" === XMLUtils.makeNCName(" foo "))
-        assert("_2foos" === XMLUtils.makeNCName("42foos"))
+        assert("foo"      === XMLUtils.makeNCName("foo"))
+        assert("_foo_"    === XMLUtils.makeNCName(" foo "))
+        assert("_2foos"   === XMLUtils.makeNCName("42foos"))
         assert("foo_bar_" === XMLUtils.makeNCName("foo(bar)"))
     }
 }

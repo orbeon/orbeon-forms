@@ -27,7 +27,6 @@ import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xml.SAXStore;
 import org.orbeon.oxf.xml.XMLUtils;
 
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -384,12 +383,9 @@ public abstract class URIProcessorOutputImpl extends ProcessorOutputImpl {
                 final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
 
                 // Compute absolute submission URL
-                final URL submissionURL;
-                try {
-                    submissionURL = URLFactory.createURL(URLRewriterUtils.rewriteServiceURL(externalContext.getRequest(), urlString, ExternalContext.Response.REWRITE_MODE_ABSOLUTE));
-                } catch (MalformedURLException e) {
-                    throw new OXFException(e);
-                }
+                final URL submissionURL =
+                        URLFactory.createURL(URLRewriterUtils.rewriteServiceURL(externalContext.getRequest(), urlString, ExternalContext.Response.REWRITE_MODE_ABSOLUTE));
+
                 // Open connection
                 final ConnectionResult connectionResult
                     = new Connection().open(externalContext, new IndentedLogger(logger, ""), false, Connection.Method.GET.name(),

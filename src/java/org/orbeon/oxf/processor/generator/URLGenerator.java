@@ -40,7 +40,6 @@ import javax.xml.transform.dom.DOMSource;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
 
@@ -85,19 +84,11 @@ public class URLGenerator extends ProcessorImpl {
     }
 
     public URLGenerator(String url) {
-        try {
-            init(URLFactory.createURL(url), DEFAULT_HANDLE_XINCLUDE);
-        } catch (MalformedURLException e) {
-            throw new OXFException(e);
-        }
+        init(URLFactory.createURL(url), DEFAULT_HANDLE_XINCLUDE);
     }
 
     public URLGenerator(String url, boolean handleXInclude) {
-        try {
-            init(URLFactory.createURL(url), handleXInclude);
-        } catch (MalformedURLException e) {
-            throw new OXFException(e);
-        }
+        init(URLFactory.createURL(url), handleXInclude);
     }
 
     public URLGenerator(URL url) {
@@ -319,12 +310,8 @@ public class URLGenerator extends ProcessorImpl {
                             {
                                 final String url = configElement.getTextTrim();
                                 if (url != null && !url.equals("")) {
-                                    try {
-                                        // Legacy, don't even care about handling relative URLs
-                                        return new ConfigURIReferences(new Config(URLFactory.createURL(url)));
-                                    } catch (MalformedURLException e) {
-                                        throw new ValidationException(e, locationData);
-                                    }
+                                    // Legacy, don't even care about handling relative URLs
+                                    return new ConfigURIReferences(new Config(URLFactory.createURL(url)));
                                 }
                             }
 
@@ -400,28 +387,24 @@ public class URLGenerator extends ProcessorImpl {
                             final TidyConfig tidyConfig = new TidyConfig(XPathUtils.selectSingleNode(configElement, "/config/tidy-options"));
 
                             // Create configuration object
-                            try {
-                                // Use location data if present so that relative URLs can be supported
-                                // NOTE: We check whether there is a protocol, because we have
-                                // some Java location data which are NOT to be interpreted as
-                                // base URIs
-                                final URL fullURL = (locationData != null && locationData.getSystemID() != null && NetUtils.urlHasProtocol(locationData.getSystemID()))
-                                        ? URLFactory.createURL(locationData.getSystemID(), url)
-                                        : URLFactory.createURL(url);
+                            // Use location data if present so that relative URLs can be supported
+                            // NOTE: We check whether there is a protocol, because we have
+                            // some Java location data which are NOT to be interpreted as
+                            // base URIs
+                            final URL fullURL = (locationData != null && locationData.getSystemID() != null && NetUtils.urlHasProtocol(locationData.getSystemID()))
+                                    ? URLFactory.createURL(locationData.getSystemID(), url)
+                                    : URLFactory.createURL(url);
 
-                                // Create configuration
-                                final Config config = new Config(fullURL, contentType, forceContentType, encoding, forceEncoding,
-                                        ignoreConnectionEncoding, new XMLUtils.ParserConfiguration(validating, handleXInclude, externalEntities), handleLexical, mode,
-                                        headerNameValues, forwardHeaders,
-                                        cacheUseLocalCache, enableConditionalGET,
-                                        username, password, preemptiveAuthentication, domain,
-                                        tidyConfig);
-                                if (logger.isDebugEnabled())
-                                    logger.debug("Read configuration: " + config.toString());
-                                return new ConfigURIReferences(config);
-                            } catch (MalformedURLException e) {
-                                throw new ValidationException(e, locationData);
-                            }
+                            // Create configuration
+                            final Config config = new Config(fullURL, contentType, forceContentType, encoding, forceEncoding,
+                                    ignoreConnectionEncoding, new XMLUtils.ParserConfiguration(validating, handleXInclude, externalEntities), handleLexical, mode,
+                                    headerNameValues, forwardHeaders,
+                                    cacheUseLocalCache, enableConditionalGET,
+                                    username, password, preemptiveAuthentication, domain,
+                                    tidyConfig);
+                            if (logger.isDebugEnabled())
+                                logger.debug("Read configuration: " + config.toString());
+                            return new ConfigURIReferences(config);
                         }
                     });
                 try {
@@ -550,72 +533,66 @@ public class URLGenerator extends ProcessorImpl {
             @Override
             public OutputCacheKey getKeyImpl(PipelineContext pipelineContext) {
                 makeSureStateIsSet(pipelineContext);
-                try {
-                    final ConfigURIReferences configURIReferences = getConfigURIReferences(pipelineContext);
-                    if (configURIReferences == null) {
+
+                final ConfigURIReferences configURIReferences = getConfigURIReferences(pipelineContext);
+                if (configURIReferences == null) {
+                    return null;
+                }
+
+                final int keyCount = 1 + ((localConfigURIReferences == null) ? 1 : 0)
+                        + ((configURIReferences.uriReferences != null) ? configURIReferences.uriReferences.size() : 0);
+                final CacheKey[] outputKeys = new CacheKey[keyCount];
+
+                // Handle config if read as input
+                int keyIndex = 0;
+                if (localConfigURIReferences == null) {
+                    KeyValidity configKeyValidity = getInputKeyValidity(pipelineContext, INPUT_CONFIG);
+                    if (configKeyValidity == null) {
                         return null;
                     }
-
-                    final int keyCount = 1 + ((localConfigURIReferences == null) ? 1 : 0)
-                            + ((configURIReferences.uriReferences != null) ? configURIReferences.uriReferences.size() : 0);
-                    final CacheKey[] outputKeys = new CacheKey[keyCount];
-
-                    // Handle config if read as input
-                    int keyIndex = 0;
-                    if (localConfigURIReferences == null) {
-                        KeyValidity configKeyValidity = getInputKeyValidity(pipelineContext, INPUT_CONFIG);
-                        if (configKeyValidity == null) {
-                            return null;
-                        }
-                        outputKeys[keyIndex++] = configKeyValidity.key;
-                    }
-                    // Handle main document and config
-                    outputKeys[keyIndex++] = new SimpleOutputCacheKey(getProcessorClass(), name, configURIReferences.config.toString());
-                    // Handle dependencies if any
-                    if (configURIReferences.uriReferences != null) {
-                        for (URIProcessorOutputImpl.URIReference uriReference : configURIReferences.uriReferences) {
-                            outputKeys[keyIndex++] = new InternalCacheKey(URLGenerator.this, "urlReference", URLFactory.createURL(uriReference.context, uriReference.spec).toExternalForm());
-                        }
-                    }
-                    return new CompoundOutputCacheKey(getProcessorClass(), name, outputKeys);
-                } catch (MalformedURLException e) {
-                    throw new OXFException(e);
+                    outputKeys[keyIndex++] = configKeyValidity.key;
                 }
+                // Handle main document and config
+                outputKeys[keyIndex++] = new SimpleOutputCacheKey(getProcessorClass(), name, configURIReferences.config.toString());
+                // Handle dependencies if any
+                if (configURIReferences.uriReferences != null) {
+                    for (URIProcessorOutputImpl.URIReference uriReference : configURIReferences.uriReferences) {
+                        outputKeys[keyIndex++] = new InternalCacheKey(URLGenerator.this, "urlReference", URLFactory.createURL(uriReference.context, uriReference.spec).toExternalForm());
+                    }
+                }
+                return new CompoundOutputCacheKey(getProcessorClass(), name, outputKeys);
             }
 
             @Override
             public Object getValidityImpl(PipelineContext pipelineContext) {
                 makeSureStateIsSet(pipelineContext);
-                try {
-                    ConfigURIReferences configURIReferences = getConfigURIReferences(pipelineContext);
-                    if (configURIReferences == null)
+
+                ConfigURIReferences configURIReferences = getConfigURIReferences(pipelineContext);
+                if (configURIReferences == null)
+                    return null;
+
+                List<Object> validities = new ArrayList<Object>();
+
+                // Handle config if read as input
+                if (localConfigURIReferences == null) {
+                    KeyValidity configKeyValidity = getInputKeyValidity(pipelineContext, INPUT_CONFIG);
+                    if (configKeyValidity == null)
                         return null;
-
-                    List<Object> validities = new ArrayList<Object>();
-
-                    // Handle config if read as input
-                    if (localConfigURIReferences == null) {
-                        KeyValidity configKeyValidity = getInputKeyValidity(pipelineContext, INPUT_CONFIG);
-                        if (configKeyValidity == null)
-                            return null;
-                        validities.add(configKeyValidity.validity);
-                    }
-
-                    // Handle main document and config
-                    final URLGeneratorState state = (URLGenerator.URLGeneratorState) URLGenerator.this.getState(pipelineContext);
-                    final ResourceHandler resourceHandler = state.ensureMainResourceHandler(pipelineContext, configURIReferences.config);
-                    validities.add(getHandlerValidity(pipelineContext, configURIReferences.config, configURIReferences.config.getURL(), resourceHandler));
-
-                    // Handle dependencies if any
-                    if (configURIReferences.uriReferences != null) {
-                        for (URIProcessorOutputImpl.URIReference uriReference: configURIReferences.uriReferences) {
-                            validities.add(getHandlerValidity(pipelineContext, configURIReferences.config, URLFactory.createURL(uriReference.context, uriReference.spec), null));
-                        }
-                    }
-                    return validities;
-                } catch (IOException e) {
-                    throw new OXFException(e);
+                    validities.add(configKeyValidity.validity);
                 }
+
+                // Handle main document and config
+                final URLGeneratorState state = (URLGenerator.URLGeneratorState) URLGenerator.this.getState(pipelineContext);
+                final ResourceHandler resourceHandler = state.ensureMainResourceHandler(pipelineContext, configURIReferences.config);
+                validities.add(getHandlerValidity(pipelineContext, configURIReferences.config, configURIReferences.config.getURL(), resourceHandler));
+
+                // Handle dependencies if any
+                if (configURIReferences.uriReferences != null) {
+                    for (URIProcessorOutputImpl.URIReference uriReference: configURIReferences.uriReferences) {
+                        validities.add(getHandlerValidity(pipelineContext, configURIReferences.config, URLFactory.createURL(uriReference.context, uriReference.spec), null));
+                    }
+                }
+                return validities;
             }
 
             private Long getHandlerValidity(PipelineContext pipelineContext, Config config, URL url, ResourceHandler handler) {

@@ -27,7 +27,6 @@ import org.orbeon.oxf.xml.NamespaceMapping;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.*;
 
-import java.net.MalformedURLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -78,12 +77,8 @@ public class PageFlowControllerBuilder {
         } else {
             // Send result through epilogue
             statements.add(new ASTProcessorCall(XMLConstants.PIPELINE_PROCESSOR_QNAME) {{
-                final String url;
-                try {
-                    url = URLFactory.createURL(controllerContext, epilogueURL).toExternalForm();
-                } catch (MalformedURLException e) {
-                    throw new OXFException(e);
-                }
+                final String url = URLFactory.createURL(controllerContext, epilogueURL).toExternalForm();
+
                 addInput(new ASTInput("config", new ASTHrefURL(url)));
                 addInput(new ASTInput("data", new ASTHrefId(epilogueData)));
                 addInput(new ASTInput("model-data", new ASTHrefId(epilogueModelData)));
@@ -140,12 +135,8 @@ public class PageFlowControllerBuilder {
         final ASTOutput defaultSubmission = new ASTOutput("data", "default-submission");
         if (defaultSubmissionAttribute != null) {
             statementsList.add(new ASTProcessorCall(XMLConstants.URL_GENERATOR_PROCESSOR_QNAME) {{
-                final String url;
-                try {
-                    url = URLFactory.createURL(urlBase, defaultSubmissionAttribute).toExternalForm();
-                } catch (MalformedURLException e) {
-                    throw new OXFException(e);
-                }
+                final String url = URLFactory.createURL(urlBase, defaultSubmissionAttribute).toExternalForm();
+
                 final Document configDocument = new NonLazyUserDataDocument(new NonLazyUserDataElement("config"));
                 configDocument.getRootElement().addText(url);
 
@@ -902,29 +893,26 @@ public class PageFlowControllerBuilder {
     private static class StepProcessorCall extends ASTProcessorCall {
         public StepProcessorCall(StepProcessorContext stepProcessorContext, String controllerContext, String uri, String stepType) {
             super(new PipelineProcessor(stepProcessorContext.getPipelineConfig()));
-            try {
-                // Create document and input for URI
-                final String url = URLFactory.createURL(controllerContext, uri).toExternalForm();
-                final Document configDocument;
-                {
-                    configDocument = new NonLazyUserDataDocument(new NonLazyUserDataElement("config"));
-                    final Element urlElement = configDocument.getRootElement().addElement("url");
-                    urlElement.addText(url);
-                    final Element handleXIncludeElement = configDocument.getRootElement().addElement("handle-xinclude");
-                    handleXIncludeElement.addText("false");
-                    // Allow external entities in document
-                    final Element externalEntitiesElement = configDocument.getRootElement().addElement("external-entities");
-                    externalEntitiesElement.addText("true");
-                }
 
-                addInput(new ASTInput("step-url", configDocument));
-                // Create document and input for step type
-                final Document stepTypeDocument = new NonLazyUserDataDocument(new NonLazyUserDataElement("step-type"));
-                stepTypeDocument.getRootElement().addText(stepType);
-                addInput(new ASTInput("step-type", stepTypeDocument));
-            } catch (MalformedURLException e) {
-                throw new OXFException(e);
+            // Create document and input for URI
+            final String url = URLFactory.createURL(controllerContext, uri).toExternalForm();
+            final Document configDocument;
+            {
+                configDocument = new NonLazyUserDataDocument(new NonLazyUserDataElement("config"));
+                final Element urlElement = configDocument.getRootElement().addElement("url");
+                urlElement.addText(url);
+                final Element handleXIncludeElement = configDocument.getRootElement().addElement("handle-xinclude");
+                handleXIncludeElement.addText("false");
+                // Allow external entities in document
+                final Element externalEntitiesElement = configDocument.getRootElement().addElement("external-entities");
+                externalEntitiesElement.addText("true");
             }
+
+            addInput(new ASTInput("step-url", configDocument));
+            // Create document and input for step type
+            final Document stepTypeDocument = new NonLazyUserDataDocument(new NonLazyUserDataElement("step-type"));
+            stepTypeDocument.getRootElement().addText(stepType);
+            addInput(new ASTInput("step-type", stepTypeDocument));
         }
     }
 }

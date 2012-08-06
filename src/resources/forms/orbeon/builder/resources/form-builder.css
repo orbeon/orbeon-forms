@@ -43,6 +43,9 @@ html {
   font-size: 20px;
   box-sizing: border-box;
 }
+.fr-section-label.hover a {
+  background-color: #FFFFD3;
+}
 .fb-ie-warning {
   margin: 1em;
   padding: .5em;

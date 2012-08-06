@@ -118,6 +118,12 @@ $ ->
                 f$.focus labelInput
                 f$.offset offset, labelInput
 
+        updateHightlight = (updateClass, clickInterceptor) ->
+            offset = f$.offset clickInterceptor
+            section = findSection offset.top
+            sectionLabel = f$.find '.fr-section-title:first', section.element
+            updateClass 'hover', sectionLabel
+
         do setupLabelClickInterceptor = ->
 
             labelClickInterceptors = []
@@ -127,6 +133,8 @@ $ ->
                     container = $ '<div class="fb-section-label-editor-click-interceptor">'
                     f$.append container, $ document.body
                     container.on 'click', ({target}) -> showLabelEditor $ target
+                    container.on 'mouseover', ({target}) -> updateHightlight f$.addClass, $ target
+                    container.on 'mouseout', ({target}) -> updateHightlight f$.removeClass, $ target
                     labelClickInterceptors.push container
                 _.each _.range(sections.length, labelClickInterceptors.length), (pos) ->                                # Hide interceptors we don't need
                     labelClickInterceptors[pos].hide()

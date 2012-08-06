@@ -121,8 +121,8 @@ $ ->
         updateHightlight = (updateClass, clickInterceptor) ->
             offset = f$.offset clickInterceptor
             section = findSection offset.top
-            sectionLabel = f$.find '.fr-section-title:first', section.element
-            updateClass 'hover', sectionLabel
+            sectionTitle = f$.find '.fr-section-title:first', section.element
+            updateClass 'hover', sectionTitle
 
         do setupLabelClickInterceptor = ->
 

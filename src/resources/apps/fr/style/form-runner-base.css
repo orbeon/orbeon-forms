@@ -86,12 +86,6 @@
     width: 100%;
 }
 
-.xforms-noscript .xforms-hint {
-    /* NOTE: In noscript mode, help appears last in a control for accessibility reasons */
-    float: left;
-    width: auto;
-}
-
 /* Make sure text in trigger does not wrap (leads to non-native widget being used on Firefox) */
 button.xforms-trigger, input.xforms-trigger, .xforms-trigger button, .xforms-trigger input { white-space: nowrap }
 /* Space between the image and the text in a button, only for the buttons bar

@@ -380,15 +380,15 @@ object ControlOps {
 
     // Update a mip for the given control, grid or section id
     // The bind is created if needed
-    def updateMip(inDoc: NodeInfo, controlId: String, mipName: String, mipValue: String) {
+    def updateMip(inDoc: NodeInfo, controlName: String, mipName: String, mipValue: String) {
 
         require(Model.AllMIPNames(mipName))
         val mipQName = convertMIP(mipName)
 
-        findControlById(inDoc, controlId) foreach { control ⇒
+        findControlByName(inDoc, controlName) foreach { control ⇒
 
             // Get or create the bind element
-            val bind = ensureBinds(inDoc, findContainerNames(control) :+ controlName(controlId))
+            val bind = ensureBinds(inDoc, findContainerNames(control) :+ controlName)
 
             // Create/update or remove attribute
             Option(mipValue) map (_.trim) match {
@@ -399,19 +399,19 @@ object ControlOps {
     }
 
     // Get the value of a MIP attribute if present
-    def getMip(inDoc: NodeInfo, controlId: String, mipName: String) = {
+    def getMip(inDoc: NodeInfo, controlName: String, mipName: String) = {
         require(Model.AllMIPNames(mipName))
         val mipQName = convertMIP(mipName)
 
-        findBindByName(inDoc, controlName(controlId)) flatMap (bind ⇒ attValueOption(bind \@ mipQName))
+        findBindByName(inDoc, controlName) flatMap (bind ⇒ attValueOption(bind \@ mipQName))
     }
 
     private def convertMIP(mipName: String) =
         RewrittenMIPs.get(mipName) orElse (AllMIPsByName.get(mipName) map (_.qName)) getOrElse (throw new IllegalArgumentException)
 
     // XForms callers: find the value of a MIP or null (the empty sequence)
-    def getMipOrEmpty(inDoc: NodeInfo, controlId: String, mipName: String) =
-        getMip(inDoc, controlId, mipName).orNull
+    def getMipOrEmpty(inDoc: NodeInfo, controlName: String, mipName: String) =
+        getMip(inDoc, controlName, mipName).orNull
 
     // Get all control names by inspecting all elements with an id that converts to a valid name
     def getAllControlNames(inDoc: NodeInfo) =
@@ -428,12 +428,12 @@ object ControlOps {
             (e ⇒ isIdForControl(e attValue "id"))
 
     // Get the control's resource holder
-    def getControlResourceOrEmpty(controlId: String, resourceName: String) =
-        findCurrentResourceHolder(controlName(controlId)) flatMap
+    def getControlResourceOrEmpty(controlName: String, resourceName: String) =
+        findCurrentResourceHolder(controlName) flatMap
             (n ⇒ n \ resourceName map (_.stringValue) headOption) getOrElse("")
 
-    def getControlHelpOrEmpty(controlId: String) = getControlResourceOrEmpty(controlId, "help")
-    def getControlAlertOrEmpty(controlId: String) = getControlResourceOrEmpty(controlId, "alert")
+    def getControlHelpOrEmpty(controlName: String)  = getControlResourceOrEmpty(controlName, "help")
+    def getControlAlertOrEmpty(controlName: String) = getControlResourceOrEmpty(controlName, "alert")
 
     // Get the control's <item> for the current language
     def getControlItems(controlId: String) =
@@ -461,13 +461,13 @@ object ControlOps {
     }
 
     // Set a control's current resource
-    def setControlResource(controlId: String, resourceName: String, value: String) =
-        findCurrentResourceHolder(controlName(controlId)) flatMap
+    def setControlResource(controlName: String, resourceName: String, value: String) =
+        findCurrentResourceHolder(controlName) flatMap
             (n ⇒ n \ resourceName headOption) foreach
                 (setvalue(_, value))
 
-    def setControlHelp(controlId: String, value: String) = setControlResource(controlId, "help", value)
-    def setControlAlert(controlId: String, value: String) = setControlResource(controlId, "alert", value)
+    def setControlHelp(controlName: String,  value: String) = setControlResource(controlName, "help",  value)
+    def setControlAlert(controlName: String, value: String) = setControlResource(controlName, "alert", value)
 
     // From an <xbl:binding>, return the view template (say <fr:autocomplete>)
     def viewTemplate(binding: NodeInfo) = {

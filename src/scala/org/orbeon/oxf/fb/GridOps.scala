@@ -31,14 +31,6 @@ object GridOps {
         def originalRowspan_= (newRowSpan: Int): Unit = ensureAttribute(td, "rowspan", newRowSpan.toString)
     }
 
-    // Find a grid element
-    def findGridElement(doc: NodeInfo, gridName: String) =
-        findControlById(doc, gridId(gridName))
-
-    // XForms callers: find a grid element by name or null (the empty sequence)
-    def findGridElementOrEmpty(doc: NodeInfo, gridName: String) =
-        findGridElement(doc, gridName).orNull
-
     // Predicates
     val IsRepeat: NodeInfo ⇒ Boolean = node ⇒ IsGrid(node) && node.attValue("repeat") == "true"
     def isRepeat(node: NodeInfo) = IsRepeat(node) // for Java callers
@@ -358,10 +350,10 @@ object GridOps {
     }
 
     def getMin(doc: NodeInfo, gridName: String) =
-        findControlById(doc, gridId(gridName)) flatMap (grid ⇒ attValueOption(grid \@ "min")) map (_.toInt) getOrElse 0
+        findControlByName(doc, gridName) flatMap (grid ⇒ attValueOption(grid \@ "min")) map (_.toInt) getOrElse 0
 
     def getMax(doc: NodeInfo, gridName: String) =
-        findControlById(doc, gridId(gridName)) flatMap (grid ⇒ attValueOption(grid \@ "max")) map (_.toInt)
+        findControlByName(doc, gridName) flatMap (grid ⇒ attValueOption(grid \@ "max")) map (_.toInt)
 
     // XForms callers: get the grid's max attribute or null (the empty sequence)
     def getMaxOrEmpty(doc: NodeInfo, gridName: String) = getMax(doc, gridName) map (_.toString) orNull
@@ -371,7 +363,7 @@ object GridOps {
         // A missing or invalid value is taken as the default value: 0 for min, unbounded for max. In both cases, we
         // don't set the attribute value. This means that in the end we only set positive integer values.
         def set(name: String, value: Int) =
-            findControlById(doc, gridId(gridName)) foreach { control ⇒
+            findControlByName(doc, gridName) foreach { control ⇒
                 if (value > 0)
                     ensureAttribute(control, name, value.toString)
                 else

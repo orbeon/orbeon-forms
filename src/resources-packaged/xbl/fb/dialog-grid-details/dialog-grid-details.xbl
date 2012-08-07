@@ -107,8 +107,8 @@
                     <xf:setvalue ref="$local/min-repeat" value="gridOps:getMin($form, $local/grid-name)"/>
                     <xf:setvalue ref="$local/max-repeat" value="gridOps:getMaxOrEmpty($form, $local/grid-name)"/>
 
-                    <xf:setvalue ref="$local/relevant" value="controlOps:getMipOrEmpty($form, fbf:controlId($local/grid-name), 'relevant')"/>
-                    <xf:setvalue ref="$local/readonly" value="controlOps:getMipOrEmpty($form, fbf:controlId($local/grid-name), 'readonly')"/>
+                    <xf:setvalue ref="$local/relevant" value="controlOps:getMipOrEmpty($form, $local/grid-name, 'relevant')"/>
+                    <xf:setvalue ref="$local/readonly" value="controlOps:getMipOrEmpty($form, $local/grid-name, 'readonly')"/>
 
                     <xf:setvalue ref="$local/control-names" value="string-join(controlOps:getAllControlNamesXPath($body), ' ')"/>
 
@@ -129,8 +129,8 @@
 
                     <xf:action type="xpath">
                         controlOps:findRenameControl($form, $old-name, $new-name),
-                        controlOps:updateMip($form, fbf:gridId($new-name), 'relevant', $local/relevant),
-                        controlOps:updateMip($form, fbf:gridId($new-name), 'readonly', $local/readonly),
+                        controlOps:updateMip($form, $new-name, 'relevant', $local/relevant),
+                        controlOps:updateMip($form, $new-name, 'readonly', $local/readonly),
                         gridOps:setMinMax($form, $new-name, xs:integer($local/min-repeat),
                                           if ($local/max-repeat castable as xs:integer) then xs:integer($local/max-repeat) else -1)
                     </xf:action>

@@ -35,8 +35,8 @@
                 <xf:setvalue iterate="*[not(*)]" ref="."/> <!-- Clear all local values -->
                 <xf:setvalue ref="@relevant" value="'true'"/>
 
-                <xf:setvalue ref="control-id" value="event('control-id')"/>
-                <xf:setvalue ref="help" value="controlOps:getControlHelpOrEmpty(../control-id)"/>
+                <xf:setvalue ref="control-name" value="controlOps:controlName(event('control-id'))"/>
+                <xf:setvalue ref="help" value="controlOps:getControlHelpOrEmpty(../control-name)"/>
 
                 <xf:refresh/> <!-- The view needs to be relevant before it gets the event for action to run in a proper context -->
                 <xxf:show dialog="dialog"/>
@@ -46,7 +46,7 @@
             <xf:model id="model">
                 <xf:instance id="local">
                     <local relevant=""><!-- TODO: Relevance must be handled automatically by the XForms engine! -->
-                        <control-id/>
+                        <control-name/>
                         <help/>
 
                         <save-trigger/>          <!-- Contains 'enabled' if all the fields are valid -->
@@ -78,7 +78,7 @@
                 <xf:action ev:event="DOMActivate" ev:observer="dialog" if="event('xxf:targetid') != 'cancel-trigger' and $local/save-trigger = 'enabled'">
 
                     <xf:action type="xpath">    
-                        controlOps:setControlHelp($local/control-id, $local/help)
+                        controlOps:setControlHelp($local/control-name, $local/help)
                     </xf:action>
 
                     <xxf:hide dialog="dialog"/>

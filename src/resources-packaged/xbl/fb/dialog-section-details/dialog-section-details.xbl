@@ -101,8 +101,8 @@
                     <xf:setvalue ref="$local/control-xpath" value="dataModel:getBindRefOrEmpty($form, $local/control-name)"/>
                     <xf:setvalue ref="$local/is-custom-instance" value="dataModel:isCustomInstance()"/>
                     
-                    <xf:setvalue ref="$local/relevant" value="controlOps:getMipOrEmpty($form, fbf:controlId($local/original-control-name), 'relevant')"/>
-                    <xf:setvalue ref="$local/readonly" value="controlOps:getMipOrEmpty($form, fbf:controlId($local/original-control-name), 'readonly')"/>
+                    <xf:setvalue ref="$local/relevant" value="controlOps:getMipOrEmpty($form, $local/original-control-name, 'relevant')"/>
+                    <xf:setvalue ref="$local/readonly" value="controlOps:getMipOrEmpty($form, $local/original-control-name, 'readonly')"/>
 
                     <xf:setvalue ref="$local/control-names" value="string-join(controlOps:getAllControlNamesXPath($body), ' ')"/>
                     
@@ -119,8 +119,8 @@
                                 
                     <xf:action type="xpath">
                         controlOps:findRenameControl($form, $old-name, $new-name),
-                        controlOps:updateMip($form, fbf:sectionId($new-name), 'relevant', $local/relevant),
-                        controlOps:updateMip($form, fbf:sectionId($new-name), 'readonly', $local/readonly)
+                        controlOps:updateMip($form, $new-name, 'relevant', $local/relevant),
+                        controlOps:updateMip($form, $new-name, 'readonly', $local/readonly)
                     </xf:action>
                     <!-- Update XPath on bind -->
                     <xf:action if="dataModel:isCustomInstance()" type="xpath">

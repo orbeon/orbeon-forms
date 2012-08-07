@@ -92,13 +92,13 @@
                 <!-- When the dialog opens, get type information from the form -->
                 <xforms:action ev:event="xxforms-dialog-open" ev:observer="dialog">
                     <!-- Read help/alert -->
-                    <xforms:setvalue ref="$local/help" value="controlOps:getControlHelpOrEmpty(fbf:controlId($local/control-name))"/>
-                    <xforms:setvalue ref="$local/alert" value="controlOps:getControlAlertOrEmpty(fbf:controlId($local/control-name))"/>
+                    <xforms:setvalue ref="$local/help"  value="controlOps:getControlHelpOrEmpty($local/control-name)"/>
+                    <xforms:setvalue ref="$local/alert" value="controlOps:getControlAlertOrEmpty($local/control-name)"/>
 
                     <!-- Read bind information -->
 
                     <!-- Set type information if there is a type specified -->
-                    <xforms:var name="type-bind" value="controlOps:getMipOrEmpty($form, fbf:controlId($local/control-name), 'type')"/>
+                    <xforms:var name="type-bind" value="controlOps:getMipOrEmpty($form, $local/control-name, 'type')"/>
 
                     <xforms:setvalue if="empty($type-bind)" ref="$local/builtin-type">string</xforms:setvalue>
                     <xforms:setvalue ref="$local/schema-type"/>
@@ -116,11 +116,11 @@
                     </xforms:action>
 
                     <!-- Read all other built-in MIPs -->
-                    <xforms:setvalue ref="$local/constraint" value="controlOps:getMipOrEmpty($form, fbf:controlId($local/control-name), 'constraint')"/>
-                    <xforms:setvalue ref="$local/relevant"   value="controlOps:getMipOrEmpty($form, fbf:controlId($local/control-name), 'relevant')"/>
-                    <xforms:setvalue ref="$local/readonly"   value="controlOps:getMipOrEmpty($form, fbf:controlId($local/control-name), 'readonly')"/>
-                    <xforms:setvalue ref="$local/calculate"  value="controlOps:getMipOrEmpty($form, fbf:controlId($local/control-name), 'calculate')"/>
-                    <xforms:setvalue ref="$local/default"    value="controlOps:getMipOrEmpty($form, fbf:controlId($local/control-name), 'default')"/>
+                    <xforms:setvalue ref="$local/constraint" value="controlOps:getMipOrEmpty($form, $local/control-name, 'constraint')"/>
+                    <xforms:setvalue ref="$local/relevant"   value="controlOps:getMipOrEmpty($form, $local/control-name, 'relevant')"/>
+                    <xforms:setvalue ref="$local/readonly"   value="controlOps:getMipOrEmpty($form, $local/control-name, 'readonly')"/>
+                    <xforms:setvalue ref="$local/calculate"  value="controlOps:getMipOrEmpty($form, $local/control-name, 'calculate')"/>
+                    <xforms:setvalue ref="$local/default"    value="controlOps:getMipOrEmpty($form, $local/control-name, 'default')"/>
 
                 </xforms:action>
 
@@ -132,8 +132,8 @@
 
                     <!-- Copy back the help/alert -->
                     <xforms:action type="xpath">
-                        controlOps:setControlHelp(fbf:controlId($local/control-name), $local/help),
-                        controlOps:setControlAlert(fbf:controlId($local/control-name), $local/alert)
+                        controlOps:setControlHelp($local/control-name, $local/help),
+                        controlOps:setControlAlert($local/control-name, $local/alert)
                     </xforms:action>
 
                     <!-- Switch between default alert message and user-specified alert message as needed -->
@@ -142,7 +142,7 @@
 
                     <!-- Insert bind if needed -->
                     <xforms:action type="xpath">
-                        for $control-name in fbf:controlId($local/control-name) return (
+                        for $control-name in string($local/control-name) return (
                             (: Set built-in type if needed :)
                             if ($local/builtin-type != '') then
                                 controlOps:updateMip($form, $control-name, 'type',

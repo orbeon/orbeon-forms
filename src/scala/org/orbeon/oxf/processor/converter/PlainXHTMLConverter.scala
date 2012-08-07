@@ -27,10 +27,10 @@ import org.xml.sax.helpers.AttributesImpl
 // - remove all attributes in a namespace
 // - remove the prefix of all XHTML elements
 // - remove all other namespace information on elements
-// - for XHTML, if the root element of the document is "{http://www.w3.org/1999/xhtml}html"
+// - for XHTML
 //   - add the XHTML namespace as default namespace on the root element
 //   - all elements in the document are in the XHTML namespace
-// - otherwise (including HTML as well as XHTML fragments)
+// - otherwise
 //   - don't output any namespace declaration
 //   - all elements in the document are in no namespace
 //
@@ -55,11 +55,14 @@ abstract class Converter(targetURI: String) extends ProcessorImpl {
 
                     override def startElement(uri: String, localname: String, qName: String, attributes: Attributes) = {
 
-                        // Only output the top-level namespace if the element is "{http://www.w3.org/1999/xhtml}html",
-                        // following http://www.w3.org/TR/xslt-xquery-serialization/#xhtml-output: "The serializer
-                        // SHOULD output namespace declarations in a way that is consistent with the requirements of the
-                        // XHTML DTD if this is possible".
-                        if (level == 0 && targetURI == HtmlURI && uri == HtmlURI && localname == "html") {
+                        // http://www.w3.org/TR/xslt-xquery-serialization/#xhtml-output: "The serializer SHOULD output
+                        // namespace declarations in a way that is consistent with the requirements of the XHTML DTD if
+                        // this is possible". We tried to output the document in the XHTML namespace only if the root
+                        // element is "{http://www.w3.org/1999/xhtml}html", however the issue then is that in the case
+                        // of a fragment, the resulting document is not in the XHTML namespace and the XHTML serializer
+                        // is unable to output elements such as <br />. So we have reverted this change and when the
+                        // HTML namespace is specified we now always output the document in the XHTML namespace.
+                        if (level == 0 && targetURI == HtmlURI) {
                             inXHTMLNamespace = true
                             super.startPrefixMapping("", HtmlURI)
                         }

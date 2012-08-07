@@ -39,7 +39,7 @@ import java.util.Map;
 public class PooledXPathExpression {
 
     private XPathExpression  expression;
-    private ObjectPool pool;
+    private ObjectPool<PooledXPathExpression> pool;
     private Map<String, XPathVariable> variables;
 
     // Dynamic context
@@ -47,7 +47,7 @@ public class PooledXPathExpression {
     private Item contextItem;
     private int contextPosition;
 
-    public PooledXPathExpression(XPathExpression expression, ObjectPool pool, Map<String, XPathVariable> variables) {
+    public PooledXPathExpression(XPathExpression expression, ObjectPool<PooledXPathExpression> pool, Map<String, XPathVariable> variables) {
         this.expression = expression;
         this.pool = pool;
         this.variables = variables;

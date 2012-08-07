@@ -86,7 +86,7 @@
         <include name="commons-io-2.0.1.jar"/>
         <include name="commons-lang-2_3.jar"/>
         <include name="commons-logging-1.1.1.jar"/>
-        <include name="commons-pool-1.5.4.jar"/>
+        <include name="commons-pool-1.6.jar"/>
         <include name="commons-validator-1_0_2.jar"/>
         <include name="joda-time-2.1.jar"/> <!--We don't include joda-convert-1.2.jar; it is only a compile-time dependency for Scala -->
         <include name="httpclient-4.1.jar"/>

@@ -31,7 +31,7 @@ object XFormsCompressor {
     private val TRAILER_SIZE = 8
 
     def compressBytes(bytesToEncode: Array[Byte], level: Int) = {
-        val deflater = deflaterPool.borrowObject.asInstanceOf[Deflater]
+        val deflater = deflaterPool.borrowObject
         deflater.setLevel(level)
         try {
             val os = new ByteArrayOutputStream
@@ -94,7 +94,7 @@ object XFormsCompressor {
         os.toByteArray
     }
 
-    private class DeflaterPoolableObjectFactory extends PoolableObjectFactory {
+    private class DeflaterPoolableObjectFactory extends PoolableObjectFactory[Deflater] {
 
         def makeObject = {
             XFormsUtils.indentedLogger.logDebug("compressor", "creating new Deflater")
@@ -102,16 +102,15 @@ object XFormsCompressor {
             new Deflater(Deflater.BEST_SPEED, true)
         }
 
-        def destroyObject(o: AnyRef) = ()
-        def validateObject(o: AnyRef) = true
-        def activateObject(o: AnyRef) = ()
-        def passivateObject(o: AnyRef) {
-            try {
-                o.asInstanceOf[Deflater].reset()
-            } catch {
+        def passivateObject(o: Deflater): Unit =
+            try o.reset()
+            catch {
                 case e ⇒ XFormsUtils.indentedLogger.logError("compressor", "exception while passivating Deflater", e)
             }
-        }
+
+        def destroyObject(o: Deflater) = ()
+        def validateObject(o: Deflater) = true
+        def activateObject(o: Deflater) = ()
     }
 
     // GZIPOutputStream which uses a custom Deflater

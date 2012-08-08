@@ -43,10 +43,7 @@ import org.orbeon.saxon.value.SequenceExtent
 import collection.JavaConverters._
 
 /**
- * Use the object cache to cache XPath expressions, which are costly to parse.
- *
- * It is mandatory to call returnToPool() on the returned PooledXPathExpression after use. It is
- * good to do this within a finally() block enclosing the use of the expression.
+ * XPath expressions cache.
  */
 object XPathCache {
 
@@ -568,7 +565,7 @@ object XPathCache {
     private def withEvaluation[T](xpathString: String, xpathExpression: PooledXPathExpression, locationData: LocationData)(body: ⇒ T): T =
         try body
         catch { case e: Exception ⇒ throw handleXPathException(e, xpathString, "evaluating XPath expression", locationData) }
-        finally if (xpathExpression ne null) xpathExpression.returnToPool()
+        finally xpathExpression.returnToPool()
 
     private def handleXPathException(e: Exception, xpathString: String, description: String, locationData: LocationData) = {
         val validationException = ValidationException.wrapException(e, new ExtendedLocationData(locationData, description, "expression", xpathString))

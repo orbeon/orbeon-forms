@@ -14,7 +14,6 @@
 package org.orbeon.oxf.processor
 
 import EmailProcessor._
-import org.orbeon.oxf.util.ScalaUtils._
 import collection.JavaConverters._
 import java.io._
 import java.util.{Properties ⇒ JProperties}
@@ -33,7 +32,9 @@ import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.processor.generator.URLGenerator
 import org.orbeon.oxf.processor.serializer.BinaryTextXMLReceiver
+import org.orbeon.oxf.properties.PropertySet
 import org.orbeon.oxf.resources.URLFactory
+import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xml._
 import org.orbeon.oxf.xml.dom4j._
@@ -64,12 +65,13 @@ class EmailProcessor extends ProcessorImpl {
         // Get system id (will likely be null if document is generated dynamically)
         val dataInputSystemId = messageElement.getData.asInstanceOf[LocationData].getSystemID
 
+        implicit val propertySet = getPropertySet
+
         // Set SMTP host
         val properties = new JProperties
         val host =
-            nonEmptyOrNone(getPropertySet.getString(TestSMTPHost)) orElse
-            optionalValueTrim(messageElement.element("smtp-host")) orElse
-            nonEmptyOrNone(getPropertySet.getString(SMTPHost))     getOrElse
+            nonEmptyOrNone(propertySet.getString(TestSMTPHost))  orElse
+            valueFromElementOrProperty(messageElement, SMTPHost) getOrElse
             (throw new OXFException("Could not find SMTP host in configuration or in properties"))
 
         properties.setProperty("mail.smtp.host", host)
@@ -81,12 +83,12 @@ class EmailProcessor extends ProcessorImpl {
             val (usernameOption, passwordOption) = {
                 Option(messageElement.element("credentials")) match {
                     case Some(credentials) ⇒
-                        val usernameElement = credentials.element("username")
-                        val passwordElement = credentials.element("password")
+                        val usernameElement = credentials.element(Username)
+                        val passwordElement = credentials.element(Password)
 
                         (optionalValueTrim(usernameElement), optionalValueTrim(passwordElement))
                     case None ⇒
-                        (None, None)
+                        (nonEmptyOrNone(propertySet.getString(Username)), nonEmptyOrNone(propertySet.getString(Password)))
                 }
             }
 
@@ -99,7 +101,7 @@ class EmailProcessor extends ProcessorImpl {
 
             // SSL and TLS
             val (defaultPort, updatePort) =
-                optionalValueTrim(messageElement.element("encryption")) match {
+                valueFromElementOrProperty(messageElement, Encryption) match {
                     case Some("ssl") ⇒
                         ensureCredentials("ssl") // partly enforced by the schema, but could have been blank
 
@@ -129,7 +131,7 @@ class EmailProcessor extends ProcessorImpl {
                 }
 
             // Set or override port depending on the encryption settings
-            optionalValueTrim(messageElement.element("smtp-port")) orElse defaultPort foreach updatePort
+            valueFromElementOrProperty(messageElement, SMTPPort) orElse defaultPort foreach updatePort
 
             usernameOption match {
                 case Some(username) ⇒
@@ -174,7 +176,7 @@ class EmailProcessor extends ProcessorImpl {
         message.addFrom(createAddresses(messageElement.element("from")))
 
         // Set To
-        nonEmptyOrNone(getPropertySet.getString(TestTo)) match {
+        nonEmptyOrNone(propertySet.getString(TestTo)) match {
             case Some(testTo) ⇒
                 message.addRecipient(Message.RecipientType.TO, new InternetAddress(testTo))
             case None ⇒
@@ -348,6 +350,11 @@ object EmailProcessor {
     val Logger = LoggerFactory.createLogger(classOf[EmailProcessor])
 
     val SMTPHost     = "smtp-host"
+    val SMTPPort     = "smtp-port"
+    val Username     = "username"
+    val Password     = "password"
+    val Encryption   = "encryption"
+
     val TestTo       = "test-to"
     val TestSMTPHost = "test-smtp-host"
 
@@ -358,6 +365,11 @@ object EmailProcessor {
 
     // Get Some(trimmed value of the element) or None if the element is null
     def optionalValueTrim(e: Element) = nonEmptyOrNone(Option(e) map(_.getStringValue) orNull)
+
+    // First try to get the value from a child element, then from the properties
+    def valueFromElementOrProperty(e: Element, name: String)(implicit propertySet: PropertySet) =
+        optionalValueTrim(e.element(name)) orElse
+        nonEmptyOrNone(propertySet.getString(name))
 
     // Read a text or binary document and return it as a FileItem
     def handleStreamedPartContent(pipelineContext: PipelineContext, source: SAXSource): FileItem = {

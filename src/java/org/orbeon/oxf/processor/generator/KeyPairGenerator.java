@@ -17,7 +17,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.*;
-import org.orbeon.oxf.processor.impl.ProcessorOutputImpl;
+import org.orbeon.oxf.util.Base64;
 import org.orbeon.oxf.xml.XMLUtils;
 
 import java.security.KeyPair;
@@ -47,8 +47,8 @@ public class KeyPairGenerator extends ProcessorImpl {
                     final PrivateKey priv = pair.getPrivate();
                     final PublicKey pub = pair.getPublic();
 
-                    final String pubKey = new sun.misc.BASE64Encoder().encode(new X509EncodedKeySpec(pub.getEncoded()).getEncoded());
-                    final String privKey = new sun.misc.BASE64Encoder().encode(new PKCS8EncodedKeySpec(priv.getEncoded()).getEncoded());
+                    final String pubKey = Base64.encode(new X509EncodedKeySpec(pub.getEncoded()).getEncoded(), true);
+                    final String privKey = Base64.encode(new PKCS8EncodedKeySpec(priv.getEncoded()).getEncoded(), true);
 
                     xmlReceiver.startDocument();
 

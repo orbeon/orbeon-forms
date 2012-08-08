@@ -26,8 +26,8 @@ trait ValueTrait extends SimpleElementAnalysis with SingleNodeTrait {
     override val canHoldValue = true
 
     override protected def computeValueAnalysis: Option[XPathAnalysis] = {
-        val subExpression = if (value.isDefined) "(" + value.get + ")" else "."
-        Some(analyzeXPath(getChildrenContext, "xs:string(" + subExpression + "[1])"))
+        val subExpression = if (value.isDefined) value.get else "."
+        Some(analyzeXPath(getChildrenContext, "string(" + subExpression + ")"))
     }
 
     override def isAllowedBoundItem(item: Item) = DataModel.isAllowedValueBoundItem(item)

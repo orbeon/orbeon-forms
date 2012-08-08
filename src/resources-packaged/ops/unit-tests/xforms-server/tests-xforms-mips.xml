@@ -1440,7 +1440,7 @@
         </output>
     </test>
 
-    <test description="$73: Schema validation: no datatype assigned to attribute" name="oxf:pipeline">
+    <test description="#73: Schema validation: no datatype assigned to attribute" name="oxf:pipeline">
         <!-- See: https://github.com/orbeon/orbeon-forms/issues/73 -->
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
@@ -1486,7 +1486,7 @@
 
         </input>
         <output name="response">
-            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+            <xxf:event-response>
                 <xxf:dynamic-state>
                     <dynamic-state/>
                 </xxf:dynamic-state>
@@ -1495,6 +1495,41 @@
                         <xxf:control id="input1" type="{http://www.w3.org/2001/XMLSchema}boolean">false</xxf:control>
                         <xxf:control id="input2" type="{http://www.w3.org/2001/XMLSchema}boolean">true</xxf:control>
                     </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="#331: Namespace interference with xs:*" name="oxf:pipeline">
+        <!-- See: https://github.com/orbeon/orbeon-forms/issues/331 -->
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                <!-- Override xs prefix -->
+                <xf:model id="model" xmlns:xs="foo">
+                    <xf:instance id="instance">
+                        <value/>
+                    </xf:instance>
+                    <xf:bind ref="." calculate="42"/>
+                </xf:model>
+            </xh:head>
+            <xh:body/>
+        </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response>
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <value>42</value>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values/>
                 </xxf:action>
             </xxf:event-response>
         </output>

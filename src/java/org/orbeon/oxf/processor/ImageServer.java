@@ -13,10 +13,6 @@
  */
 package org.orbeon.oxf.processor;
 
-import com.sun.image.codec.jpeg.JPEGCodec;
-import com.sun.image.codec.jpeg.JPEGEncodeParam;
-import com.sun.image.codec.jpeg.JPEGImageDecoder;
-import com.sun.image.codec.jpeg.JPEGImageEncoder;
 import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.dom4j.Element;
@@ -40,6 +36,9 @@ import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocument;
 
+import javax.imageio.ImageIO;
+import javax.imageio.ImageWriteParam;
+import javax.imageio.ImageWriter;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.*;
@@ -241,8 +240,7 @@ public class ImageServer extends ProcessorImpl {
                             // If this failed (most common case) decode the image
                             if (img1 == null) {
                                 // Decode image into BufferedImage
-                                JPEGImageDecoder decoder = JPEGCodec.createJPEGDecoder(urlConnectionInputStream);
-                                img1 = decoder.decodeAsBufferedImage();
+                                img1 = ImageIO.read(urlConnectionInputStream);
 
                                 // Store the image into the soft cache
                                 if (cache == null)
@@ -273,11 +271,19 @@ public class ImageServer extends ProcessorImpl {
                         }
 
                         // Encode image to OutputStream
-                        JPEGImageEncoder encoder = JPEGCodec.createJPEGEncoder(os);
-                        JPEGEncodeParam params = encoder.getDefaultJPEGEncodeParam(img2);
-                        params.setQuality(quality, false);
-                        encoder.setJPEGEncodeParam(params);
-                        encoder.encode(img2);
+
+                        final Iterator writers = ImageIO.getImageWritersByFormatName("jpeg");
+                        final ImageWriter writer = (ImageWriter) writers.next();
+
+                        writer.setOutput(ImageIO.createImageOutputStream(os));
+
+                        final ImageWriteParam params = writer.getDefaultWriteParam();
+
+                        // Set quality
+                        params.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+                        params.setCompressionQuality(quality);
+
+                        writer.write(img2);
                     } catch (OXFException e) {
                         logger.error(OrbeonFormatter.format(e));
                         imageResponse.setStatus(ExternalContext.SC_INTERNAL_SERVER_ERROR);

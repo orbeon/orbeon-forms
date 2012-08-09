@@ -17,15 +17,18 @@ import org.scalatest.junit.AssertionsForJUnit
 import java.util.Collections
 import org.junit.Test
 import org.orbeon.oxf.test.ResourceManagerTestBase
+import org.orbeon.oxf.util.IndentedLogger
 
 class XFormsResourceServerTest extends ResourceManagerTestBase with AssertionsForJUnit {
 
     @Test def proxyURI() {
 
+        val indentedLogger = ResourceManagerTestBase.newIndentedLogger
+
         assert("/xforms-server/dynamic/cc104a4fe62471ecc02ae13e1233f31275cb68d6" ===
-            XFormsResourceServer.proxyURI(null, "/foo/bar.png", null, null, -1, Collections.emptyMap(), null))
+            XFormsResourceServer.proxyURI(indentedLogger, "/foo/bar.png", null, null, -1, Collections.emptyMap(), null))
 
         assert("/xforms-server/dynamic/1dd011d51abc6f3d9003fabd2f5561943d066c73" ===
-            XFormsResourceServer.proxyURI(null, "http://example.org/foo/bar.png", null, null, -1, Collections.emptyMap(), null))
+            XFormsResourceServer.proxyURI(indentedLogger, "http://example.org/foo/bar.png", null, null, -1, Collections.emptyMap(), null))
     }
 }

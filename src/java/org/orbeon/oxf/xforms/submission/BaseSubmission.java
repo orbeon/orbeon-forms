@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.submission;
 
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.externalcontext.ForwardExternalContextRequestWrapper;
+import org.orbeon.oxf.externalcontext.LocalRequest;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.util.Connection;
 import org.orbeon.oxf.util.ConnectionResult;
@@ -134,9 +134,10 @@ public abstract class BaseSubmission implements Submission {
                                                    ExternalContext.Response response,
                                                    final IndentedLogger indentedLogger,
                                                    XFormsContainingDocument containingDocument, // used in case we need to dispatch XFormsSubmitErrorEvent
-                                                   String httpMethod, final String resource, String mediatype,
+                                                   String httpMethod, final String resource,
+                                                   String actualRequestMediatype, String encoding,
                                                    byte[] messageBody, String queryString,
-                                                   final boolean isReplaceAll, String[] headerNames,
+                                                   final boolean isReplaceAll, String headerNames,
                                                    Map<String, String[]> customHeaderNameValues,
                                                    SubmissionProcess submissionProcess,
                                                    boolean isContextRelative, boolean isDefaultContext) {
@@ -154,25 +155,30 @@ public abstract class BaseSubmission implements Submission {
             // Destination context path is the context path of the current request, or the context path implied by the new URI
             final String destinationContextPath = isDefaultContext ? "" : isContextRelative ? externalContext.getRequest().getContextPath() : NetUtils.getFirstPathElement(resource);
 
+            // Determine headers
+            final Map<String, String[]> headers =
+                Connection.jBuildConnectionHeadersWithSOAP(httpMethod, null, actualRequestMediatype, encoding, customHeaderNameValues, headerNames, indentedLogger);
+
             // Create requestAdapter depending on method
-            final ForwardExternalContextRequestWrapper requestAdapter;
+            final LocalRequest requestAdapter;
             final String effectiveResourceURI;
             final String rootAdjustedResourceURI;
             {
-                if (httpMethod.equals("POST") || httpMethod.equals("PUT")) {
+                if (Connection.requiresRequestBody(httpMethod)) {
                     // Simulate a POST or PUT
                     effectiveResourceURI = resource;
 
                     // Log request body
                     if (indentedLogger.isDebugEnabled() && isLogBody())
-                        Connection.logRequestBody(indentedLogger, mediatype, messageBody);
+                        Connection.logRequestBody(indentedLogger, actualRequestMediatype, messageBody);
 
                     rootAdjustedResourceURI = isDefaultContext || isContextRelative ? effectiveResourceURI : NetUtils.removeFirstPathElement(effectiveResourceURI);
                     if (rootAdjustedResourceURI == null)
                         throw new OXFException("Action must start with a servlet context path: " + resource);
 
-                    requestAdapter = new ForwardExternalContextRequestWrapper(externalContext, indentedLogger, destinationContextPath,
-                            rootAdjustedResourceURI, httpMethod, (mediatype != null) ? mediatype : XMLUtils.XML_CONTENT_TYPE, messageBody, headerNames, customHeaderNameValues);
+                    requestAdapter = new LocalRequest(
+                        externalContext, indentedLogger, destinationContextPath, rootAdjustedResourceURI, httpMethod,
+                        messageBody, headers);
                 } else {
                     // Simulate a GET or DELETE
                     {
@@ -191,15 +197,15 @@ public abstract class BaseSubmission implements Submission {
                     if (rootAdjustedResourceURI == null)
                         throw new OXFException("Action must start with a servlet context path: " + resource);
 
-                    requestAdapter = new ForwardExternalContextRequestWrapper(externalContext, indentedLogger, destinationContextPath,
-                            rootAdjustedResourceURI, httpMethod, headerNames, customHeaderNameValues);
+                    requestAdapter = new LocalRequest(
+                        externalContext, indentedLogger, destinationContextPath, rootAdjustedResourceURI, httpMethod, headers);
                 }
             }
 
             if (indentedLogger.isDebugEnabled())
                 indentedLogger.logDebug("", "dispatching request",
                             "method", httpMethod,
-                            "mediatype", mediatype,
+                            "mediatype", actualRequestMediatype,
                             "context path", destinationContextPath,
                             "effective resource URI (original)", effectiveResourceURI,
                             "effective resource URI (relative to servlet root)", rootAdjustedResourceURI);
@@ -210,16 +216,13 @@ public abstract class BaseSubmission implements Submission {
             final ConnectionResult connectionResult = new ConnectionResult(effectiveResourceURI) {
                 @Override
                 public void close() {
-                    if (getResponseInputStream() != null) {
-                        // Case of !isReplaceAll where we read from the response
-                        try {
-                            getResponseInputStream().close();
-                        } catch (IOException e) {
-                            throw new OXFException("Exception while closing input stream for resource: " + resource);
-                        }
-                    } else {
-                        // Case of isReplaceAll where forwarded resource writes to the response directly
+                    final boolean nullInputStream = getResponseInputStream() == null;
 
+                    // Try to close input stream
+                    super.close();
+
+                    // Case of isReplaceAll where forwarded resource writes to the response directly
+                    if (nullInputStream) {
                         // Try to obtain, flush and close the stream to work around WebSphere issue
                         try {
                             if (effectiveResponse != null) {

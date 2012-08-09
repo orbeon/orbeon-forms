@@ -23,6 +23,7 @@ import java.util.{List ⇒ JList}
 import java.util.concurrent.Callable
 import WSRPURLRewriter._
 import URLRewriter._
+import org.orbeon.oxf.portlet.WSRP2Utils
 
 // This URL rewriter rewrites URLs using the WSRP encoding
 class WSRPURLRewriter(
@@ -78,7 +79,7 @@ class WSRPURLRewriter(
         val baseURL = new URL("http", "example.org", request.getRequestPath)
         val u = new URL(baseURL, urlString)
         // Decode query string
-        val parameters = NetUtils.decodeQueryString(u.getQuery, true)
+        val parameters = WSRP2Utils.decodeQueryString(u.getQuery)
         // Add special path parameter
         val path =
             if (urlString.startsWith("?"))

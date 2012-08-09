@@ -45,7 +45,7 @@ class XXFormsRootControl(container: XBLContainer, parent: XFormsControl, element
                 val (pathInfo, parameters) =
                     if (qmIndex != -1) {
                         (resource.substring(0, qmIndex),
-                         NetUtils.decodeQueryString(resource.substring(qmIndex + 1), false))
+                         NetUtils.decodeQueryString(resource.substring(qmIndex + 1)))
                     } else
                         (resource, null)
                 NetUtils.getExternalContext.getResponse.sendRedirect(pathInfo, parameters, false, false)

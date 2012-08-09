@@ -76,13 +76,13 @@ object Headers {
                 }
 
                 // Array of existing values (an empty Array if none)
-                val existingHeaderValues = headerNameValues.getOrElse(headerName, Array.empty[String])
+                def existingHeaderValues = headerNameValues.getOrElse(headerName, Array.empty[String])
 
                 // Append/prepend/replace
                 headerNameValues += headerName → (combine match {
-                    case "append" ⇒ existingHeaderValues :+ headerValue
+                    case "append"  ⇒ existingHeaderValues :+ headerValue
                     case "prepend" ⇒ headerValue +: existingHeaderValues
-                    case _ ⇒ Array(headerValue)
+                    case _         ⇒ Array(headerValue)
                 })
             }
 

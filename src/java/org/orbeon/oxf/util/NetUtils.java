@@ -43,7 +43,6 @@ public class NetUtils {
     private static Logger logger = LoggerFactory.createLogger(NetUtils.class);
 
     private static final Pattern PATTERN_NO_AMP;
-    private static final Pattern PATTERN_AMP;
 
     public static final int COPY_BUFFER_SIZE = 8192;
     public static final String STANDARD_PARAMETER_ENCODING = "utf-8";
@@ -63,7 +62,6 @@ public class NetUtils {
     static {
         final String token = "[^=&]";
         PATTERN_NO_AMP = Pattern.compile( "(" + token + "+)=(" + token + "*)(?:&|(?<!&)\\z)" );
-        PATTERN_AMP = Pattern.compile( "(" + token + "+)=(" + token + "*)(?:&amp;|&|(?<!&amp;|&)\\z)" );
     }
 
     /**
@@ -269,30 +267,29 @@ public class NetUtils {
     }
 
     public static String getContentTypeCharset(String contentType) {
-        final Map<String, String> parameters = getContentTypeParameters(contentType);
-        return (parameters == null) ? null : parameters.get("charset");
+        return getContentTypeParameters(contentType).get("charset");
     }
 
     public static Map<String, String> getContentTypeParameters(String contentType) {
         if (contentType == null)
-            return null;
+            return Collections.emptyMap();
 
         // Check whether there may be parameters
         final int semicolonIndex = contentType.indexOf(";");
         if (semicolonIndex == -1)
-            return null;
+            return Collections.emptyMap();
 
         // Tokenize
         final StringTokenizer st = new StringTokenizer(contentType, ";");
 
         if (!st.hasMoreTokens())
-            return null; // should not happen as there should be at least the content type    
+            return Collections.emptyMap(); // should not happen as there should be at least the content type
 
         st.nextToken();
 
         // No parameters
         if (!st.hasMoreTokens())
-            return null;
+            return Collections.emptyMap();
 
         // Parse parameters
         final Map<String, String> parameters = new HashMap<String, String>();
@@ -319,21 +316,18 @@ public class NetUtils {
 
     /**
      * @param queryString a query string of the form n1=v1&n2=v2&... to decode.  May be null.
-     * @param acceptAmp -> "&amp;" if true, "&" if false
      *
      * @return a Map of String[] indexed by name, an empty Map if the query string was null
      */
-    public static Map<String, String[]> decodeQueryString(final CharSequence queryString, final boolean acceptAmp) {
+    public static Map<String, String[]> decodeQueryString(final CharSequence queryString) {
 
-        final Map<String, String[]> result = new TreeMap<String, String[]>();
+        final Map<String, String[]> result = new LinkedHashMap<String, String[]>();
         if (queryString != null) {
-            final Matcher matcher = acceptAmp ? PATTERN_AMP.matcher(queryString) : PATTERN_NO_AMP.matcher(queryString);
+            final Matcher matcher = PATTERN_NO_AMP.matcher(queryString);
             int matcherEnd = 0;
             while (matcher.find()) {
                 matcherEnd = matcher.end();
                 try {
-                    // Group 0 is the whole match, e.g. a=b, while group 1 is the first group
-                    // denoted ( with parens ) in the expression.  Hence we start with group 1.
                     final String name = URLDecoder.decode(matcher.group(1), NetUtils.STANDARD_PARAMETER_ENCODING);
                     final String value = URLDecoder.decode(matcher.group(2), NetUtils.STANDARD_PARAMETER_ENCODING);
 

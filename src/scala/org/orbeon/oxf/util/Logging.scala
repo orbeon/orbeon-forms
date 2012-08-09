@@ -46,6 +46,14 @@ trait Logging {
                 logger.endHandleOperation()
         }
 
+    // Run the given block only in debug mode
+    def ifDebug(body: ⇒ Any)(implicit logger: IndentedLogger): Unit =
+        if (logger.isDebugEnabled)
+            body
+
+    // Whether debug logging is enabled
+    def debugEnabled(implicit logger: IndentedLogger) = logger.isDebugEnabled
+
     // Call from a result block to set result parameters
     def debugResults(parameters: ⇒ Seq[(String, String)])(implicit logger: IndentedLogger) =
         if (logger.isDebugEnabled)

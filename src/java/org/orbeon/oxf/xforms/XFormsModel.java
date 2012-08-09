@@ -674,10 +674,13 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
             final URL absoluteResolvedURL = URLFactory.createURL(absoluteURLString);
 
-            final ConnectionResult connectionResult = new Connection().open(
-                    NetUtils.getExternalContext(), indentedLogger, BaseSubmission.isLogBody(),
-                    Connection.Method.GET.name(), absoluteResolvedURL, instance.credentials(),
-                    null, null, null, XFormsProperties.getForwardSubmissionHeaders(containingDocument));
+            final Map<String, String[]> headers =
+                Connection.jBuildConnectionHeaders(absoluteResolvedURL.getProtocol(), instance.credentialsOrNull(), null,
+                    XFormsProperties.getForwardSubmissionHeaders(containingDocument), indentedLogger);
+
+            final ConnectionResult connectionResult = Connection.apply(
+                "GET", absoluteResolvedURL, instance.credentialsOrNull(), null,
+                headers, true, BaseSubmission.isLogBody(), indentedLogger).connect(true);
 
             try {
                 // Handle connection errors
@@ -709,11 +712,11 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
             if (!instance.readonly()) {
                 instanceDocument = containingDocument.getURIResolver().readAsDom4j(
-                        absoluteURLString, instance.credentials(),
+                        absoluteURLString, instance.credentialsOrNull(),
                         XFormsProperties.getForwardSubmissionHeaders(containingDocument));
             } else {
                 instanceDocument = containingDocument.getURIResolver().readAsTinyTree(XPathCache.getGlobalConfiguration(),
-                        absoluteURLString, instance.credentials(),
+                        absoluteURLString, instance.credentialsOrNull(),
                         XFormsProperties.getForwardSubmissionHeaders(containingDocument));
             }
         }

@@ -108,7 +108,7 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
                     // Run the not found route
                     externalContext.getResponse.setStatus(404)
                     try notFoundRoute.process(pipelineContext, request, MatchResult(matches = false))
-                    catch { case t ⇒ runErrorRoute(t) }
+                    catch { case t: Throwable ⇒ runErrorRoute(t) }
                 case None ⇒
                     // We don't have a not found route so throw instead
                     runErrorRoute(t getOrElse new HttpStatusCodeException(404))
@@ -136,7 +136,7 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
                 debug("processing page/service", logParams)
                 // Run the given route and handle "not found" and error conditions
                 try route.process(pipelineContext, request, matchResult)
-                catch { case t ⇒
+                catch { case t: Throwable ⇒
                     getRootThrowable(t) match {
                         case e: HttpRedirectException                            ⇒ externalContext.getResponse.sendRedirect(e.path, e.jParameters.orNull, e.serverSide, e.exitPortal)
                         case e: HttpStatusCodeException if Set(404)(e.code)      ⇒ runNotFoundRoute(Some(t))
@@ -345,7 +345,7 @@ object PageFlowControllerProcessor {
                 idAtt(e),
                 path,
                 compilePattern(e, path, defaultMatcher),
-                att(e, VisibilityProperty) map (isPublic(_)) getOrElse (e.getName == "page"), // public by default for pages
+                att(e, VisibilityProperty) map isPublic getOrElse (e.getName == "page"), // public by default for pages
                 att(e, "default-submission"),
                 att(e, "model"),
                 att(e, "view"),
@@ -368,7 +368,7 @@ object PageFlowControllerProcessor {
                 unauthorized()
     }
 
-    case class PageOrServiceRoute(routeElement: PageOrServiceElement, compile: PageOrServiceElement ⇒ PipelineConfig) extends Route {
+    case class PageOrServiceRoute(routeElement: PageOrServiceElement, compile: PageOrServiceElement ⇒ PipelineConfig) extends Route with Authorization {
 
         // Compile pipeline lazily
         lazy val pipelineConfig = compile(routeElement)
@@ -376,7 +376,8 @@ object PageFlowControllerProcessor {
         // Run a page
         def process(pipelineContext: PipelineContext, request: Request, matchResult: MatchResult) = {
 
-            //checkAccess(request)
+            // Make sure the request is authorized
+            checkAccess(request)
 
             // PipelineConfig is reusable, but PipelineProcessor is not
             val pipeline = new PipelineProcessor(pipelineConfig)
@@ -392,18 +393,31 @@ object PageFlowControllerProcessor {
             pipeline.reset(pipelineContext)
             pipeline.start(pipelineContext)
         }
+    }
+
+    trait Authorization {
+
+        self: PageOrServiceRoute ⇒
+
+        val TokenKey = "orbeon-token"
 
         def checkAccess(request: Request) =
             if (! routeElement.public && ! authorizedRequest(request))
                 unauthorized()
 
-        def authorizedRequest(request: Request) =
-            token(request) exists authorizedToken
+        def authorizedRequest(request: Request) = {
+            val token = requestToken(request)
 
-        def token(request: Request) =
-            (Option(request.getHeaderValuesMap.get("orbeon-token")) flatten) headOption
+            token.isDefined && token == sessionToken(request)
+        }
 
-        def authorizedToken(token: String) = false // TODO
+        def requestToken(request: Request) =
+            (Option(request.getHeaderValuesMap.get(TokenKey)) flatten) headOption
+
+        def sessionToken(request: Request) =
+            Option(request.getSession(false)) flatMap
+            (_.getAttributesMap.asScala.get(TokenKey)) collect
+            { case token: String ⇒ token }
     }
 
     def unauthorized() = throw new HttpStatusCodeException(403)
@@ -418,6 +432,7 @@ object PageFlowControllerProcessor {
 
     def att(e: Element, name: String) = Option(e.attributeValue(name))
     def idAtt(e: Element) = att(e, "id")
+
     // @path-info for backward compatibility
     def getPath(e: Element) = att(e, "path") orElse att(e, "path-info") ensuring (_.isDefined) get
 

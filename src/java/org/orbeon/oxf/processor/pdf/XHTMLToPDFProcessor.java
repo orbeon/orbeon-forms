@@ -34,6 +34,8 @@ import org.xhtmlrenderer.resource.ImageResource;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URL;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -113,12 +115,17 @@ public class XHTMLToPDFProcessor extends HttpBinarySerializer {// TODO: HttpBina
                     // Tell callee we are loading that we are a servlet environment, as in effect we act like
                     // a browser retrieving resources directly, not like a portlet. This is the case also if we are
                     // called by the proxy portlet or if we are directly within a portlet.
-                    final Map<String, String[]> headers = new HashMap<String, String[]>();
-                    headers.put("Orbeon-Client", new String[] { "servlet" });
+                    final Map<String, String[]> explicitHeaders = new HashMap<String, String[]>();
+                    explicitHeaders.put("Orbeon-Client", new String[] { "servlet" });
 
-                    final ConnectionResult connectionResult
-                        = new Connection().open(externalContext, new IndentedLogger(logger, ""), false, Connection.Method.GET.name(),
-                            URLFactory.createURL(resolvedURI), null, null, null, headers, Connection.getForwardHeaders());
+                    final IndentedLogger indentedLogger = new IndentedLogger(logger, "");
+
+                    final URL url = URLFactory.createURL(resolvedURI);
+                    final Map<String, String[]> headers =
+                        Connection.jBuildConnectionHeaders(url.getProtocol(), null, explicitHeaders, Connection.getForwardHeaders(), indentedLogger);
+
+                    final ConnectionResult connectionResult =
+                        Connection.apply("GET", url, null, null, headers, true, false, indentedLogger).connect(true);
 
                     if (connectionResult.statusCode != 200) {
                         connectionResult.close();

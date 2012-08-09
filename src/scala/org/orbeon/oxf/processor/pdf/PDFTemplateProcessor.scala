@@ -288,7 +288,19 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
                     Image.getInstance(os.toByteArray)
                 case None ⇒
                     val url = URLFactory.createURL(hrefAttribute)
-                    val connectionResult = (new Connection).open(NetUtils.getExternalContext, context.logger, false, Connection.Method.GET.name, url, null, null, null, null, Connection.getForwardHeaders)
+
+                    implicit val logger = context.logger
+                    val headers = Connection.buildConnectionHeaders(None, Map(), Option(Connection.getForwardHeaders))
+
+                    val connectionResult =
+                        Connection(
+                            "GET",
+                            url,
+                            null, null,
+                            headers,
+                            loadState = true,
+                            logBody = false).connect(saveState = true)
+
                     if (connectionResult.statusCode != 200) {
                         connectionResult.close()
                         throw new OXFException("Got invalid return code while loading image: " + url.toExternalForm + ", " + connectionResult.statusCode)

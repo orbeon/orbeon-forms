@@ -114,7 +114,7 @@ public class ExternalContextToHttpServletResponseWrapper extends HttpServletResp
         final int qmIndex = path.indexOf('?');
         if (qmIndex != -1) {
             pathInfo = path.substring(0, qmIndex);
-            parameters = NetUtils.decodeQueryString(path.substring(qmIndex + 1), false);
+            parameters = NetUtils.decodeQueryString(path.substring(qmIndex + 1));
         } else {
             pathInfo = path;
             parameters = null;

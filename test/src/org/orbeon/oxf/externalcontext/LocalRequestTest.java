@@ -19,14 +19,16 @@ import org.junit.Test;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.test.ResourceManagerTestBase;
+import org.orbeon.oxf.util.Connection;
 import org.orbeon.oxf.util.NetUtils;
 
 import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
-public class ForwardExternalContextRequestWrapperTest extends ResourceManagerTestBase {
+public class LocalRequestTest extends ResourceManagerTestBase {
 
     @Before
     public void setUp() {
@@ -48,9 +50,18 @@ public class ForwardExternalContextRequestWrapperTest extends ResourceManagerTes
             throw new OXFException(e);
         }
 
-        final ForwardExternalContextRequestWrapper wrapper = new ForwardExternalContextRequestWrapper(NetUtils.getExternalContext(), null,
-                "/orbeon", "/foobar?name1=value1a&name2=value2a&name3=value3", "post", "application/x-www-form-urlencoded",
-                messageBody, null, null);
+        final String method = "POST";
+        final String bodyMediaType = "application/x-www-form-urlencoded";
+
+        final Map<String, String[]> explicitHeaders = new HashMap<String, String[]>();
+        explicitHeaders.put("content-type", new String[] { bodyMediaType });
+
+        final Map<String, String[]> headers =
+            Connection.jBuildConnectionHeadersWithSOAP(method, null, bodyMediaType, "UTF-8", explicitHeaders, "", newIndentedLogger());
+
+        final LocalRequest wrapper = new LocalRequest(NetUtils.getExternalContext(), null,
+                "/orbeon", "/foobar?name1=value1a&name2=value2a&name3=value3", method,
+                messageBody, headers);
 
         final Map<String, Object[]> parameters = wrapper.getParameterMap();
 

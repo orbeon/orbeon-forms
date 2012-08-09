@@ -401,7 +401,9 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                 /* ***** Serialization ********************************************************************************** */
 
                 // Get serialization requested from @method and @serialization attributes
-                final String requestedSerialization = getRequestedSerialization(p.serialization, p.resolvedMethod);
+                final String requestedSerialization = XFormsSubmissionUtils.getRequestedSerialization(p.serialization, p.resolvedMethod);
+                if (requestedSerialization == null)
+                    throw new XFormsSubmissionException(this, "xforms:submission: invalid submission method requested: " + p.resolvedMethod, "serializing instance");
 
                 final Document documentToSubmit;
                 if (p.serialize) {
@@ -801,10 +803,10 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                 resolvedMethod = Dom4jUtils.qNameToExplodedQName(Dom4jUtils.extractTextValueQName(namespaceMapping.mapping, resolvedMethodQName, true));
 
                 // Get actual method based on the method attribute
-                actualHttpMethod = getActualHttpMethod(resolvedMethod);
+                actualHttpMethod = XFormsSubmissionUtils.getActualHttpMethod(resolvedMethod);
 
                 // Get mediatype
-                resolvedMediatype = XFormsUtils.resolveAttributeValueTemplates(xpathContext, refNodeInfo , avtMediatype);
+                resolvedMediatype = XFormsUtils.resolveAttributeValueTemplates(xpathContext, refNodeInfo, avtMediatype);
 
                 // Serialization
                 serialization = XFormsUtils.resolveAttributeValueTemplates(xpathContext, refNodeInfo, avtSerialization);
@@ -892,9 +894,12 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
 
             mode = XFormsUtils.resolveAttributeValueTemplates(p.xpathContext, p.refNodeInfo, avtMode);
             version = XFormsUtils.resolveAttributeValueTemplates(p.xpathContext, p.refNodeInfo, avtVersion);
-            encoding = XFormsUtils.resolveAttributeValueTemplates(p.xpathContext, p.refNodeInfo, avtEncoding);
             separator = XFormsUtils.resolveAttributeValueTemplates(p.xpathContext, p.refNodeInfo, avtSeparator);
 
+            {
+                final String temp = XFormsUtils.resolveAttributeValueTemplates(p.xpathContext, p.refNodeInfo, avtEncoding);
+                encoding = (temp != null) ? temp : "UTF-8";
+            }
             {
                 final String temp = XFormsUtils.resolveAttributeValueTemplates(p.xpathContext, p.refNodeInfo, avtIndent);
                 indent = Boolean.valueOf(temp);
@@ -995,7 +1000,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                 final String defaultMediatypeForSerialization;
                 if (overriddenSerializedData != null && !overriddenSerializedData.equals("")) {
                     // Form author set data to serialize
-                    if (p.actualHttpMethod.equals("POST") || p.actualHttpMethod.equals("PUT")) {
+                    if (Connection.requiresRequestBody(p.actualHttpMethod)) {
                         queryString = null;
                         messageBody = overriddenSerializedData.getBytes("UTF-8");
                         defaultMediatypeForSerialization = "application/xml";
@@ -1006,7 +1011,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                     }
                 } else if (requestedSerialization.equals("application/x-www-form-urlencoded")) {
                     // Perform "application/x-www-form-urlencoded" serialization
-                    if (p.actualHttpMethod.equals("POST") || p.actualHttpMethod.equals("PUT")) {
+                    if (Connection.requiresRequestBody(p.actualHttpMethod)) {
                         queryString = null;
                         messageBody = XFormsSubmissionUtils.createWwwFormUrlEncoded(documentToSubmit, p2.separator).getBytes("UTF-8");// the resulting string is already ASCII in fact
                         defaultMediatypeForSerialization = "application/x-www-form-urlencoded";
@@ -1110,7 +1115,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                     throw new XFormsSubmissionException(XFormsModelSubmission.this, "xforms:submission: invalid submission serialization requested: " + requestedSerialization, "serializing instance");
                 }
 
-                // Actual request mediatype
+                // Actual request mediatype: the one specified by @mediatype, or the default mediatype for the serialization otherwise
                 actualRequestMediatype = (p.resolvedMediatype == null) ? defaultMediatypeForSerialization : p.resolvedMediatype;
             } else {
                 queryString = null;
@@ -1166,44 +1171,6 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
 
     public void performTargetAction(XFormsEvent event) {
         // NOP
-    }
-
-    private String getRequestedSerialization(String submissionSerializationAttribute, String submissionMethodAttribute) {
-        final String actualSerialization;
-        if (submissionSerializationAttribute == null) {
-            if (submissionMethodAttribute.equals("multipart-post")) {
-                actualSerialization = "multipart/related";
-            } else if (submissionMethodAttribute.equals("form-data-post")) {
-                actualSerialization = "multipart/form-data";
-            } else if (submissionMethodAttribute.equals("urlencoded-post")) {
-                actualSerialization = "application/x-www-form-urlencoded";
-            } else if (XFormsSubmissionUtils.isPost(submissionMethodAttribute) || XFormsSubmissionUtils.isPut(submissionMethodAttribute)) {
-                actualSerialization = "application/xml";
-            } else if (XFormsSubmissionUtils.isGet(submissionMethodAttribute) || XFormsSubmissionUtils.isDelete(submissionMethodAttribute)) {
-                actualSerialization = "application/x-www-form-urlencoded";
-            } else {
-                throw new XFormsSubmissionException(this, "xforms:submission: invalid submission method requested: " + submissionMethodAttribute, "serializing instance");
-            }
-        } else {
-            actualSerialization = submissionSerializationAttribute;
-        }
-        return actualSerialization;
-    }
-
-    private static String getActualHttpMethod(String submissionMethodAttribute) {
-        final String actualMethod;
-        if (XFormsSubmissionUtils.isPost(submissionMethodAttribute)) {
-            actualMethod = "POST";
-        } else if (XFormsSubmissionUtils.isGet(submissionMethodAttribute)) {
-            actualMethod = "GET";
-        } else if (XFormsSubmissionUtils.isPut(submissionMethodAttribute)) {
-            actualMethod = "PUT";
-        } else if (XFormsSubmissionUtils.isDelete(submissionMethodAttribute)) {
-            actualMethod = "DELETE";
-        } else {
-            actualMethod = submissionMethodAttribute;
-        }
-        return actualMethod;
     }
 
     private Document createDocumentToSubmit(IndentedLogger indentedLogger, NodeInfo currentNodeInfo,

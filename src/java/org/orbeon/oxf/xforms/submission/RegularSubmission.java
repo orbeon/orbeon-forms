@@ -17,7 +17,6 @@ import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.Connection;
 import org.orbeon.oxf.util.ConnectionResult;
 import org.orbeon.oxf.util.IndentedLogger;
-import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.XFormsProperties;
 
 import java.net.URL;
@@ -54,13 +53,16 @@ public class RegularSubmission extends BaseSubmission {
         final Map<String, String[]> customHeaderNameValues = evaluateHeaders(submission.getModel().getContextStack());
         final String headersToForward = XFormsProperties.getForwardSubmissionHeaders(containingDocument, p.isReplaceAll);
 
+        final Map<String, String[]> headers =
+            Connection.jBuildConnectionHeadersWithSOAP(p.actualHttpMethod, p2.credentials, sp.actualRequestMediatype,
+            p2.encoding, customHeaderNameValues, headersToForward, detailsLogger);
+
         final String submissionEffectiveId = submission.getEffectiveId();
 
         // Prepare Connection in this thread as async submission can't access the request object
-        final Connection connection = new Connection();
-        connection.prepare(NetUtils.getExternalContext(), detailsLogger, isLogBody(), p.actualHttpMethod, absoluteResolvedURL,
-                p2.credentials, sp.actualRequestMediatype, sp.messageBody,
-                customHeaderNameValues, headersToForward, true);
+        final Connection connection =
+            Connection.apply(p.actualHttpMethod, absoluteResolvedURL,
+                p2.credentials, sp.messageBody, headers, true, isLogBody(), detailsLogger);
 
         // Pack external call into a Callable so it can be run:
         // o now and synchronously
@@ -82,10 +84,10 @@ public class RegularSubmission extends BaseSubmission {
                     detailsLogger.startHandleOperation("", "opening connection");
                     try {
                         // Connect, and cleanup
-                        final ConnectionResult result = connection.connect();
                         // TODO: Consider how the state could be saved. Maybe do this before connect() in the initiating thread?
-                        connection.cleanup(NetUtils.getExternalContext(), !p2.isAsynchronous); // NOTE: ExternalContext not used if we don't save state, as of 2011-08-02
-                        connectionResult = result;
+                        // Or make sure it's ok to touch app/session (but not request) from other thread (ExternalContext
+                        // in scope + synchronization)
+                        connectionResult = connection.connect(! p2.isAsynchronous);
                     } finally {
                         // In case an exception is thrown in the body, still do adjust the logs
                         detailsLogger.endHandleOperation();

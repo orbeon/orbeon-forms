@@ -294,14 +294,13 @@ public class XMLUtils {
      * Given an input stream, return a reader. This performs encoding detection as per the XML spec. Caller must close
      * the resulting Reader when done.
      *
-     * @param uri           resource URI (probably unneeded)
      * @param inputStream   InputStream to process
      * @return              Reader initialized with the proper encoding
      * @throws IOException
      */
-    public static Reader getReaderFromXMLInputStream(String uri, InputStream inputStream) throws IOException {
+    public static Reader getReaderFromXMLInputStream(InputStream inputStream) throws IOException {
         // Create a Xerces XMLInputSource
-        final XMLInputSource inputSource = new XMLInputSource(uri, null, null, inputStream, null);
+        final XMLInputSource inputSource = new XMLInputSource(null, null, null, inputStream, null);
         // Obtain encoding from Xerces
         final XMLEntityManager entityManager = new XMLEntityManager();
         entityManager.setProperty(Constants.XERCES_PROPERTY_PREFIX + Constants.ERROR_REPORTER_PROPERTY, new XMLErrorReporter());// prevent NPE by providing this

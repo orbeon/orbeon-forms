@@ -13,14 +13,12 @@
  */
 package org.orbeon.oxf.xforms.submission;
 
-import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.util.Connection;
 import org.orbeon.oxf.util.ConnectionResult;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.xml.XMLUtils;
 
 import java.io.ByteArrayInputStream;
-import java.io.UnsupportedEncodingException;
 
 /**
  * Test submission which just echoes the incoming document.
@@ -50,17 +48,12 @@ public class EchoSubmission extends BaseSubmission {
         } else {
             // Log message body for debugging purposes
             final IndentedLogger indentedLogger = getDetailsLogger(p, p2);
-            if (indentedLogger.isDebugEnabled() && isLogBody()) {
-                try {
-                    Connection.logRequestBody(indentedLogger, sp.actualRequestMediatype, sp.messageBody);
-                } catch (UnsupportedEncodingException e) {
-                    throw new OXFException(e);
-                }
-            }
+            if (indentedLogger.isDebugEnabled() && isLogBody())
+                Connection.logRequestBody(indentedLogger, sp.actualRequestMediatype, sp.messageBody);
         }
 
         // Do as if we are receiving a regular XML response
-        final ConnectionResult connectionResult = new ConnectionResult(null);
+        final ConnectionResult connectionResult = new ConnectionResult(p2.actionOrResource);
         connectionResult.statusCode = 200;
         connectionResult.responseHeaders = ConnectionResult.EMPTY_HEADERS_MAP;
         connectionResult.setLastModified(null);

@@ -26,9 +26,11 @@ import org.orbeon.oxf.xforms.Loggers;
 import org.orbeon.oxf.xforms.XFormsProperties;
 
 import java.io.*;
+import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -67,8 +69,8 @@ public class XFormsResourceServer extends ProcessorImpl {
                 // Use same session scope as proxyURI()
                 final DynamicResource resource = (DynamicResource) session.getAttributesMap(ExternalContext.Session.APPLICATION_SCOPE).get(lookupKey);
 
-                if (resource != null && resource.uri != null) {
-                    // Found URI, stream it out
+                if (resource != null && resource.url != null) {
+                    // Found URL, stream it out
 
                     // Set caching headers
 
@@ -109,14 +111,8 @@ public class XFormsResourceServer extends ProcessorImpl {
                     InputStream is = null;
                     OutputStream os = null;
                     try {
-                        // The resource URI may already be absolute, or may be relative to the server base. Make sure we work with an absolute URI.
-                        final String absoluteResourceURI = URLRewriterUtils.rewriteServiceURL(
-                            NetUtils.getExternalContext().getRequest(),
-                            resource.uri,
-                            ExternalContext.Response.REWRITE_MODE_ABSOLUTE
-                        );
-
-                        final URLConnection connection = URLFactory.createURL(absoluteResourceURI).openConnection();
+                        //
+                        final URLConnection connection = resource.url.openConnection();
 
                         // Set outgoing headers
                         for (final Map.Entry<String, String[]> entry : resource.headers.entrySet() ) {
@@ -277,12 +273,25 @@ public class XFormsResourceServer extends ProcessorImpl {
 
         if (session != null) {
 
+            final URL url; {
+
+                // The resource URI may already be absolute, or may be relative to the server base. Make sure we work with an absolute URI.
+                final String absoluteResourceURI = URLRewriterUtils.rewriteServiceURL(
+                    NetUtils.getExternalContext().getRequest(),
+                    uri,
+                    ExternalContext.Response.REWRITE_MODE_ABSOLUTE
+                );
+
+                url = URLFactory.createURL(absoluteResourceURI);
+            };
+
             // Determine outgoing headers
-            final Map<String, String[]> outgoingHeaders = Connection.getHeadersMap(externalContext, indentedLogger, null, headers, headersToForward);
+            final Map<String, String[]> outgoingHeaders =
+                Connection.jBuildConnectionHeaders(url.getProtocol(), null, headers, headersToForward, indentedLogger);
 
             // Store mapping into session
             session.getAttributesMap(ExternalContext.Session.APPLICATION_SCOPE).put(DYNAMIC_RESOURCES_SESSION_KEY + digest,
-                    new DynamicResource(uri, filename, contentType, -1, lastModified, outgoingHeaders));
+                    new DynamicResource(url, filename, contentType, -1, lastModified, outgoingHeaders));
         }
 
         // Rewrite new URI to absolute path without the context
@@ -300,15 +309,15 @@ public class XFormsResourceServer extends ProcessorImpl {
     }
 
     public static class DynamicResource implements Serializable {
-        public final String uri;
+        public final URL url;
         public final String filename;
         public final String contentType;
         public final long size;
         public final long lastModified;
         public final Map<String, String[]> headers;
 
-        public DynamicResource(String uri, String filename, String contentType, long size, long lastModified, Map<String, String[]> headers) {
-            this.uri = uri;
+        public DynamicResource(URL url, String filename, String contentType, long size, long lastModified, Map<String, String[]> headers) {
+            this.url = url;
             this.filename = filename;
             this.contentType = contentType;
             this.size = size;

@@ -41,17 +41,14 @@ class Instance(staticStateContext: StaticStateContext, element: Element, parent:
     val validation = element.attributeValue(XXFORMS_VALIDATION_QNAME)
     def exposeXPathTypes = staticStateContext.partAnalysis.staticState.isExposeXPathTypes
 
-    val credentials = {
+    val credentialsOrNull = {
         // NOTE: AVTs not supported because XPath expressions in those could access instances that haven't been loaded
         def username = element.attributeValue(XXFORMS_USERNAME_QNAME)
         def password = element.attributeValue(XXFORMS_PASSWORD_QNAME)
         def preemptiveAuthentication = element.attributeValue(XXFORMS_PREEMPTIVE_AUTHENTICATION_QNAME)
         def domain = element.attributeValue(XXFORMS_DOMAIN_QNAME)
 
-        if (username ne null)
-            new Credentials(username, password, preemptiveAuthentication, domain)
-        else
-            null
+        Option(username) map (Credentials(_, password, preemptiveAuthentication, domain)) orNull
     }
 
     val excludeResultPrefixes = stringOptionToSet(Option(element.attributeValue(XXFORMS_EXCLUDE_RESULT_PREFIXES)))

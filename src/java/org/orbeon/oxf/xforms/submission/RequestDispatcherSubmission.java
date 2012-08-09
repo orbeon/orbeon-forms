@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms.submission;
 
-import org.apache.commons.lang3.StringUtils;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.util.ConnectionResult;
@@ -144,7 +143,7 @@ public class RequestDispatcherSubmission extends BaseSubmission {
 
         // Headers
         final Map<String, String[]> customHeaderNameValues = evaluateHeaders(submission.getModel().getContextStack());
-        final String[] headersToForward = StringUtils.split(XFormsProperties.getForwardSubmissionHeaders(containingDocument, p.isReplaceAll));
+        final String headersToForward = XFormsProperties.getForwardSubmissionHeaders(containingDocument, p.isReplaceAll);
 
         final String submissionEffectiveId = submission.getEffectiveId();
 
@@ -162,8 +161,8 @@ public class RequestDispatcherSubmission extends BaseSubmission {
                 ConnectionResult connectionResult = null;
                 try {
                     connectionResult = openRequestDispatcherConnection(NetUtils.getExternalContext(),
-                        containingDocument, detailsLogger,
-                        p.actualHttpMethod, resolvedURI.toString(), submission.isURLNorewrite(), sp.actualRequestMediatype, sp.messageBody,
+                        containingDocument, detailsLogger, p.actualHttpMethod, resolvedURI.toString(),
+                        submission.isURLNorewrite(), sp.actualRequestMediatype, p2.encoding, sp.messageBody,
                         sp.queryString, p.isReplaceAll, headersToForward, customHeaderNameValues);
 
                     // Update status
@@ -202,9 +201,10 @@ public class RequestDispatcherSubmission extends BaseSubmission {
     public ConnectionResult openRequestDispatcherConnection(ExternalContext externalContext,
                                                             XFormsContainingDocument containingDocument,
                                                             IndentedLogger indentedLogger,
-                                                            String httpMethod, final String resource, boolean isNorewrite, String mediatype,
+                                                            String httpMethod, final String resource, boolean isNorewrite,
+                                                            String actualRequestMediatype, String encoding,
                                                             byte[] messageBody, String queryString,
-                                                            final boolean isReplaceAll, String[] headerNames,
+                                                            final boolean isReplaceAll, String headerNames,
                                                             Map<String, String[]> customHeaderNameValues) {
 
         // NOTE: This code does custom rewriting of the path on the action, taking into account whether
@@ -234,7 +234,7 @@ public class RequestDispatcherSubmission extends BaseSubmission {
 
         final ExternalContext.Response response = containingDocument.getResponse() != null ? containingDocument.getResponse() : externalContext.getResponse();
         return openLocalConnection(externalContext, response, indentedLogger,
-           containingDocument, httpMethod, effectiveResource, mediatype,
+           containingDocument, httpMethod, effectiveResource, actualRequestMediatype, encoding,
            messageBody, queryString, isReplaceAll, headerNames, customHeaderNameValues, new SubmissionProcess() {
                public void process(ExternalContext.Request request, ExternalContext.Response response) {
                   try {

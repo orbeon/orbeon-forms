@@ -24,8 +24,8 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.net.URLDecoder;
+import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -87,12 +87,10 @@ public class WSRP2Utils {
         }
     }
 
-    private static final Pattern PATTERN_NO_AMP;
     private static final Pattern PATTERN_AMP;
 
     static {
         final String token = "[^=&]+";
-        PATTERN_NO_AMP = Pattern.compile( "(" + token + ")=(" + token + ")?(?:&|(?<!&)\\z)" );
         PATTERN_AMP = Pattern.compile( "(" + token + ")=(" + token + ")?(?:&amp;|&|(?<!&amp;|&)\\z)" );
     }
 
@@ -104,17 +102,16 @@ public class WSRP2Utils {
 
     public static final String STANDARD_PARAMETER_ENCODING = "utf-8";
 
-    public static Map<String, String[]> decodeQueryString(final CharSequence queryString, final boolean acceptAmp) {
+    // This is a modified copy of NetUtils.decodeQueryString(). Try to avoid duplication!
+    public static Map<String, String[]> decodeQueryString(final CharSequence queryString) {
 
-        final Map<String, String[]> result = new TreeMap<String, String[]>();
+        final Map<String, String[]> result = new LinkedHashMap<String, String[]>();
         if (queryString != null) {
-            final Matcher matcher = acceptAmp ? PATTERN_AMP.matcher(queryString) : PATTERN_NO_AMP.matcher(queryString);
+            final Matcher matcher = PATTERN_AMP.matcher(queryString);
             int matcherEnd = 0;
             while (matcher.find()) {
                 matcherEnd = matcher.end();
                 try {
-                    // Group 0 is the whole match, e.g. a=b, while group 1 is the first group
-                    // denoted (with parens) in the expression. Hence we start with group 1.
                     String name = URLDecoder.decode(matcher.group(1), STANDARD_PARAMETER_ENCODING);
                     String group2 = matcher.group(2);
 
@@ -122,7 +119,7 @@ public class WSRP2Utils {
 
                     // Handle the case where the source contains &amp;amp; because of double escaping which does occur in
                     // full Ajax updates!
-                    if (acceptAmp && name.startsWith("amp;"))
+                    if (name.startsWith("amp;"))
                         name = name.substring("amp;".length());
 
                     // NOTE: Replace spaces with '+'. This is an artifact of the fact that URLEncoder/URLDecoder
@@ -146,7 +143,7 @@ public class WSRP2Utils {
      */
     private static String wsrpToPortletURL(String encodedURL, MimeResponse response) {
         // Parse URL
-        final Map<String, String[]> wsrpParameters = decodeQueryString(encodedURL, true);
+        final Map<String, String[]> wsrpParameters = decodeQueryString(encodedURL);
 
         // Check URL type and create URL
         try {
@@ -178,7 +175,7 @@ public class WSRP2Utils {
                         // Should not happen
                         throw new OXFException(e);
                     }
-                    navigationParameters = decodeQueryString(decodedNavigationalState, true);
+                    navigationParameters = decodeQueryString(decodedNavigationalState);
                 } else {
                     navigationParameters = null;
                 }

@@ -14,6 +14,7 @@
 package org.orbeon.oxf.util;
 
 import org.apache.log4j.Level;
+import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.xml.XMLUtils;
 
@@ -56,7 +57,6 @@ public class ConnectionResult {
     public void setResponseInputStream(final InputStream responseInputStream) throws IOException {
         this.responseInputStream = responseInputStream;
         setHasContentFlag();
-
     }
 
     public void setResponseContentType(String responseContentType) {
@@ -151,7 +151,15 @@ public class ConnectionResult {
      *
      * This can be overridden by specific subclasses.
      */
-    public void close() {}
+    public void close() {
+        try {
+            final InputStream is = getResponseInputStream();
+            if (is != null)
+                is.close();
+        } catch (IOException e) {
+            throw new OXFException("Exception while closing InputStream for URL: " + resourceURI);
+        }
+    }
 
     /**
      * Return the response body as text, null if not a text or XML result.
@@ -177,7 +185,7 @@ public class ConnectionResult {
             // XML mediatype other than text/xml
 
             // TODO: What should we do if the response Content-Type includes a charset parameter?
-            final Reader reader = XMLUtils.getReaderFromXMLInputStream(resourceURI, getResponseInputStream());
+            final Reader reader = XMLUtils.getReaderFromXMLInputStream(getResponseInputStream());
             try {
                 return NetUtils.readStreamAsString(reader);
             } finally {

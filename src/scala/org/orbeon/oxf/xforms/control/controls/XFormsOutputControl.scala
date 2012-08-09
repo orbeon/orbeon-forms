@@ -123,7 +123,7 @@ class XFormsOutputControl(container: XBLContainer, parent: XFormsControl, elemen
         catch {
             case e: Exception ⇒ {
                 XFormsError.handleNonFatalXPathError(container, e)
-                return Collections.emptyMap()
+                Collections.emptyMap()
             }
         }
     }

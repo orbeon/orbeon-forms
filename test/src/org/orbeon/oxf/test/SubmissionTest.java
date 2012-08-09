@@ -15,9 +15,11 @@ package org.orbeon.oxf.test;
 
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.orbeon.oxf.externalcontext.ForwardExternalContextRequestWrapper;
+import org.orbeon.oxf.externalcontext.LocalRequest;
 import org.orbeon.oxf.externalcontext.RequestAdapter;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.util.Connection;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -39,25 +41,15 @@ public class SubmissionTest extends ResourceManagerTestBase {
         final ExternalContext.Request incomingRequest = new RequestAdapter() {
 
             // Fake standard headers
-            final Map<String, String> incomingHeaderMap = new LinkedHashMap<String, String>();
             final Map<String, String[]> incomingHeaderValuesMap = new LinkedHashMap<String, String[]>();
-
             {
-                incomingHeaderMap.put("user-agent", "Mozilla 12.1");
-                incomingHeaderMap.put("authorization", "xsifj1skf3");
-                incomingHeaderMap.put("host", "localhost");
-                incomingHeaderMap.put("cookie", "JSESSIONID=4FF78C3BD70905FAB502BC989450E40C");
-
                 incomingHeaderValuesMap.put("user-agent", new String[] { "Mozilla 12.1" });
                 incomingHeaderValuesMap.put("authorization", new String[] { "xsifj1skf3" });
                 incomingHeaderValuesMap.put("host", new String[] { "localhost" });
                 incomingHeaderValuesMap.put("cookie", new String[] { "JSESSIONID=4FF78C3BD70905FAB502BC989450E40C" });
             }
 
-            public Map<String, String> getHeaderMap() {
-                return incomingHeaderMap;
-            }
-
+            @Override
             public Map<String, String[]> getHeaderValuesMap() {
                 return incomingHeaderValuesMap;
             }
@@ -66,9 +58,13 @@ public class SubmissionTest extends ResourceManagerTestBase {
         final ExternalContext externalContext = Mockito.mock(ExternalContext.class);
         Mockito.when(externalContext.getRequest()).thenReturn(incomingRequest);
 
-        final ForwardExternalContextRequestWrapper request
-                = new ForwardExternalContextRequestWrapper(externalContext, null, "/orbeon", "/foo/bar",
-                "GET", new String[] { "cookie", "authorization", "user-agent"}, customHeaderValuesMap);
+        // NOTE: Should instead use withExternalContext()
+        PipelineContext.get().setAttribute(PipelineContext.EXTERNAL_CONTEXT, externalContext);
+
+        final Map<String, String[]> headers =
+            Connection.jBuildConnectionHeadersWithSOAP("GET", null, null, "UTF-8", customHeaderValuesMap, "cookie authorization user-agent", newIndentedLogger());
+
+        final LocalRequest request = new LocalRequest(externalContext, null, "/orbeon", "/foo/bar", "GET", headers);
 
         // Test standard headers received
         final Map<String, String[]> headerValuesMap = request.getHeaderValuesMap();

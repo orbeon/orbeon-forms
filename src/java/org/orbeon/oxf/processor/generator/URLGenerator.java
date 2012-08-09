@@ -18,7 +18,6 @@ import org.dom4j.Element;
 import org.orbeon.oxf.cache.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.*;
@@ -878,7 +877,6 @@ public class URLGenerator extends ProcessorImpl {
 
         private void openConnection(Long lastModified) throws IOException {
             if (connectionResult == null) {
-                final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
                 // TODO: pass logging callback
 
                 final Map<String, String[]> newHeaders;
@@ -893,12 +891,18 @@ public class URLGenerator extends ProcessorImpl {
                     newHeaders = config.getHeaderNameValues();
                 }
 
-                Connection.Credentials credentials = config.getUsername() == null ?
-                        null :
-                        new Connection.Credentials(config.getUsername(), config.getPassword(), config.isPreemptiveAuthentication() ? "true" : "false", config.getDomain());
-                connectionResult = new Connection().open(externalContext, indentedLogger, false, Connection.Method.GET.name(),
-                        config.getURL(), credentials, null, null, newHeaders, config.getForwardHeaders());
-                inputStream = connectionResult.getResponseInputStream(); // empty stream if conditional GET succeeded
+                final Connection.Credentials credentials = config.getUsername() == null ?
+                    null :
+                    new Connection.Credentials(config.getUsername(), config.getPassword(), config.isPreemptiveAuthentication() ? "true" : "false", config.getDomain());
+
+                final URL url = config.getURL();
+                final Map<String, String[]> headers =
+                    Connection.jBuildConnectionHeaders(url.getProtocol(), credentials, newHeaders, config.getForwardHeaders(), indentedLogger);
+
+                connectionResult =
+                    Connection.apply("GET", url, credentials, null, headers, true, false, indentedLogger).connect(true);
+                inputStream =
+                    connectionResult.getResponseInputStream(); // empty stream if conditional GET succeeded
             }
         }
 

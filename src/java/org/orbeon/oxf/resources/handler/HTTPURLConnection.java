@@ -255,7 +255,7 @@ public class HTTPURLConnection extends URLConnection {
                 final String[] currentHeaderValues = currentEntry.getValue();
                 for (final String currentHeaderValue: currentHeaderValues) {
                     // Skip over Authorization header if user authentication specified
-                    if (skipAuthorizationHeader && currentHeaderName.toLowerCase().equals(Connection.AUTHORIZATION_HEADER.toLowerCase()))
+                    if (skipAuthorizationHeader && currentHeaderName.toLowerCase().equals(Connection.AuthorizationHeader().toLowerCase()))
                         continue;
                     method.addHeader(currentHeaderName, currentHeaderValue);
                 }

@@ -28,7 +28,6 @@ import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl;
 import org.orbeon.oxf.xml.XMLConstants;
-import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
@@ -43,21 +42,60 @@ import java.util.Map;
  * Utilities for XForms submission processing.
  */
 public class XFormsSubmissionUtils {
-
-    public static boolean isGet(String method) {
-        return method.equals("get") || method.equals(XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "get"));
+    
+    public static String getActualHttpMethod(String methodAttribute) {
+        final String actualMethod;
+        if (isPost(methodAttribute)) {
+            actualMethod = "POST";
+        } else if (isGet(methodAttribute)) {
+            actualMethod = "GET";
+        } else if (isPut(methodAttribute)) {
+            actualMethod = "PUT";
+        } else if (isDelete(methodAttribute)) {
+            actualMethod = "DELETE";
+        } else {
+            actualMethod = methodAttribute.toUpperCase();
+        }
+        return actualMethod;
     }
 
+    public static String getRequestedSerialization(String serializationAttribute, String methodAttribute) {
+        final String actualSerialization;
+        if (serializationAttribute == null) {
+            if (methodAttribute.equals("multipart-post")) {
+                actualSerialization = "multipart/related";
+            } else if (methodAttribute.equals("form-data-post")) {
+                actualSerialization = "multipart/form-data";
+            } else if (methodAttribute.equals("urlencoded-post")) {
+                actualSerialization = "application/x-www-form-urlencoded";
+            } else if (XFormsSubmissionUtils.isPost(methodAttribute) || XFormsSubmissionUtils.isPut(methodAttribute)) {
+                actualSerialization = "application/xml";
+            } else if (XFormsSubmissionUtils.isGet(methodAttribute) || XFormsSubmissionUtils.isDelete(methodAttribute)) {
+                actualSerialization = "application/x-www-form-urlencoded";
+            } else {
+                actualSerialization = null;
+            }
+        } else {
+            actualSerialization = serializationAttribute;
+        }
+        return actualSerialization;
+    }
+
+    public static boolean isGet(String method) {
+        return method.equals("get");
+    }
+
+    // This is to support XForms's multipart-post, form-data-post and urlencoded-post
     public static boolean isPost(String method) {
-        return method.equals("post") || method.endsWith("-post") || method.equals(XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "post"));
+        return method.equals("post") || method.endsWith("-post");
     }
 
     public static boolean isPut(String method) {
-        return method.equals("put") || method.equals(XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "put"));
+        return method.equals("put");
     }
 
     public static boolean isDelete(String method) {
-        return method.equals("delete") || method.equals(XMLUtils.buildExplodedQName(XFormsConstants.XXFORMS_NAMESPACE_URI, "delete"));
+        return method.equals("delete");
     }
 
     /**

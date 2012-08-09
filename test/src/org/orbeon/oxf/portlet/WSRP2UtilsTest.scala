@@ -32,7 +32,7 @@ class WSRP2UtilsTest extends AssertionsForJUnit {
                     "p2" → Seq("v21", "", "v23"))
         )
         
-        def decode(s: String) = WSRP2Utils.decodeQueryString(s, true).asScala.mapValues(_.toList)
+        def decode(s: String) = WSRP2Utils.decodeQueryString(s).asScala.mapValues(_.toList)
         
         for ((query, extracted) ← expected) {
             // Test with both separators

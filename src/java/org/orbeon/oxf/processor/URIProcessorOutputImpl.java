@@ -28,10 +28,7 @@ import org.orbeon.oxf.xml.SAXStore;
 import org.orbeon.oxf.xml.XMLUtils;
 
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Implementation of a caching transformer output that assumes that an output depends on a set
@@ -387,9 +384,12 @@ public abstract class URIProcessorOutputImpl extends ProcessorOutputImpl {
                         URLFactory.createURL(URLRewriterUtils.rewriteServiceURL(externalContext.getRequest(), urlString, ExternalContext.Response.REWRITE_MODE_ABSOLUTE));
 
                 // Open connection
+                final IndentedLogger indentedLogger = new IndentedLogger(logger, "");
+                final Map<String, String[]> headers =
+                    Connection.jBuildConnectionHeaders(submissionURL.getProtocol(), credentials, null, headersToForward, indentedLogger);
+
                 final ConnectionResult connectionResult
-                    = new Connection().open(externalContext, new IndentedLogger(logger, ""), false, Connection.Method.GET.name(),
-                        submissionURL, credentials, null, null, null, headersToForward);
+                    = Connection.apply("GET", submissionURL, credentials, null, headers, true, false, indentedLogger).connect(true);
 
                 // Throw if connection failed (this is caught by the caller)
                 if (connectionResult.statusCode != 200)

@@ -383,7 +383,7 @@ public class XFormsToXHTML extends ProcessorImpl {
                         ExternalContext.Response.REWRITE_MODE_ABSOLUTE);
 
                     if (!instance.cache()) {
-                        stage1CacheableState.addReference(null, resolvedDependencyURL, instance.credentials(), forwardSubmissionHeaders);
+                        stage1CacheableState.addReference(null, resolvedDependencyURL, instance.credentialsOrNull(), forwardSubmissionHeaders);
 
                         if (indentedLogger.isDebugEnabled())
                                 indentedLogger.logDebug("", "adding document cache dependency for non-cacheable instance", "instance URI", resolvedDependencyURL);

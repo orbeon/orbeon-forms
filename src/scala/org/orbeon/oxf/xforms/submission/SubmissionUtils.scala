@@ -18,7 +18,7 @@ import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.xforms.{XFormsModel, XFormsProperties}
 import org.orbeon.oxf.xml.TransformerUtils
-import org.orbeon.oxf.util.{XPathCache, ConnectionResult, Connection, NetUtils}
+import org.orbeon.oxf.util._
 import org.orbeon.saxon.om.DocumentInfo
 
 // The plan is to move stuff from XFormsSubmissionUtils to here as needed
@@ -48,13 +48,15 @@ object SubmissionUtils {
                 throw new OXFException("Got invalid return code while reading URL: " + resolvedURL + ", " + result.statusCode)
         }
 
-    def openGETConnection(model: XFormsModel, resolvedURL: String): ConnectionResult =
-        (new Connection).open(
-            NetUtils.getExternalContext,
-            model.indentedLogger,
-            BaseSubmission.isLogBody,
-            Connection.Method.GET.name,
+    def openGETConnection(model: XFormsModel, resolvedURL: String): ConnectionResult = {
+        val headers = Connection.buildConnectionHeaders(None, Map(), Option(XFormsProperties.getForwardSubmissionHeaders(model.containingDocument)))(model.indentedLogger)
+        implicit val logger = model.indentedLogger
+        Connection(
+            "GET",
             URLFactory.createURL(resolvedURL),
-            null, null, null, null,
-            XFormsProperties.getForwardSubmissionHeaders(model.containingDocument))
+            null, null,
+            headers,
+            loadState = true,
+            logBody = BaseSubmission.isLogBody).connect(saveState = true)
+    }
 }

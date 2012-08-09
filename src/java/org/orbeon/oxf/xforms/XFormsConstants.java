@@ -319,8 +319,10 @@ public class XFormsConstants {
     public static final QName XXFORMS_INTERNAL_APPEARANCE_QNAME = new QName("internal", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_TEXT_APPEARANCE_QNAME = new QName("text", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_DOWNLOAD_APPEARANCE_QNAME = new QName("download", XXFORMS_NAMESPACE);
-    public static final QName XXFORMS_SEPARATOR_APPEARANCE_QNAME = new QName("separator", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_PLACEHOLDER_APPEARANCE_QNAME = new QName("placeholder", XXFORMS_NAMESPACE);
+
+    // See: https://github.com/orbeon/orbeon-forms/issues/418
+    public static final QName XXFORMS_SEPARATOR_APPEARANCE_QNAME = new QName("xxforms-separator");
 
     public static final QName XXFORMS_TARGET_QNAME = new QName("target", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_UPLOADS_QNAME = new QName("uploads", XXFORMS_NAMESPACE);

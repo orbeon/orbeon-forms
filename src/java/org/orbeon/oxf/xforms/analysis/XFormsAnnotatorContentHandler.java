@@ -207,6 +207,7 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
 
                 // Append the new xxforms:separator appearance
                 final String existingAppearance = attributes.getValue("appearance");
+                // See: https://github.com/orbeon/orbeon-forms/issues/418
                 attributes = XMLUtils.addOrReplaceAttribute(attributes, "", "", XFormsConstants.APPEARANCE_QNAME.getName(),
                         (existingAppearance != null ? existingAppearance + " " : "") + XFormsConstants.XXFORMS_SEPARATOR_APPEARANCE_QNAME.getQualifiedName());
                 startElement(true, uri, localname, qName, attributes);

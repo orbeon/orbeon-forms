@@ -30,9 +30,6 @@ import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
 
 public class SecureUtils {
 
@@ -40,66 +37,11 @@ public class SecureUtils {
         (byte) -26, (byte) 101, (byte) -106, (byte) 2,
         (byte) 61, (byte) -80, (byte) -40, (byte) -8
     };
-    private static final int count = 20;
-    private static Random random = new Random();
 
-    /**
-     * General purpos parameter for algorithm
-     */
+    private static final int count = 20;
+
     private static final PBEParameterSpec pbeParamSpec = new PBEParameterSpec(salt, count);
     private static final String CIPHER_TYPE = "PBEWithMD5AndDES";
-
-    private static Map<String, Cipher> passwordToEncryptionCipher = new HashMap<String, Cipher>();
-    private static Map<String, Cipher> passwordToDecryptionCipher = new HashMap<String, Cipher>();
-
-    public static Cipher getEncryptingCipher(String password, boolean cacheCipher) {
-        try {
-            Cipher cipher;
-            if (cacheCipher) {
-                synchronized(passwordToEncryptionCipher) {
-                    cipher = passwordToEncryptionCipher.get(password);
-                    if (cipher == null) {
-                        cipher = Cipher.getInstance(CIPHER_TYPE);
-                        cipher.init(Cipher.ENCRYPT_MODE, getSecretKey(password), pbeParamSpec);
-                        passwordToEncryptionCipher.put(password, cipher);
-                    }
-                }
-            } else {
-                cipher = Cipher.getInstance(CIPHER_TYPE);
-                cipher.init(Cipher.ENCRYPT_MODE, getSecretKey(password), pbeParamSpec);
-            }
-            return cipher;
-        } catch (Exception e) {
-            throw new OXFException(e);
-        }
-    }
-
-    public static Cipher getDecryptingCipher(String password, boolean cacheCipher) {
-        try {
-            Cipher cipher;
-            if (cacheCipher) {
-                synchronized(passwordToDecryptionCipher) {
-                    cipher = passwordToDecryptionCipher.get(password);
-                    if (cipher == null) {
-                        cipher = Cipher.getInstance(CIPHER_TYPE);
-                        cipher.init(Cipher.DECRYPT_MODE, getSecretKey(password), pbeParamSpec);
-                        passwordToDecryptionCipher.put(password, cipher);
-                    }
-                }
-            } else {
-                cipher = Cipher.getInstance(CIPHER_TYPE);
-                cipher.init(Cipher.DECRYPT_MODE, getSecretKey(password), pbeParamSpec);
-            }
-            return cipher;
-        } catch (Exception e) {
-            throw new OXFException(e);
-        }
-    }
-
-    public static String generateRandomPassword() {
-        // There is obviously room for improvement in our "password generation algorithm"
-        return Long.toString(random.nextLong());
-    }
 
     /**
      * Encrypt a string of text using the given password. The result is converted to Base64 encoding without line

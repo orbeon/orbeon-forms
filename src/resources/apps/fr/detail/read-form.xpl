@@ -58,7 +58,7 @@
 
     <p:choose href="#binary-document">
         <!-- HACK: we test on the request path to make this work for the toolbox, but really we should handle this in a different way -->
-        <p:when test="if (not(matches(p:get-request-path(), '/fr/service/custom/orbeon/(new)?builder/toolbox'))
+        <p:when test="if (not(matches(p:get-request-path(), '/fr/service/custom/orbeon/builder/toolbox'))
                           and (for $c in /*/@status-code return $c castable as xs:integer and (not((xs:integer($c) ge 200 and xs:integer($c) lt 300) or xs:integer($c) = 304))))
                       then form-runner:sendError(/*/@status-code)
                       else false()">

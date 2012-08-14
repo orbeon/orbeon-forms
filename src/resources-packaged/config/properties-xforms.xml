@@ -18,6 +18,7 @@
 
     <!-- Encryption of XForms hidden fields and field names -->
     <property as="xs:string"  name="oxf.xforms.password"                                value="CHANGE THIS PASSWORD"/>
+    <property as="xs:integer" name="oxf.xforms.key-length"                              value="128"/>
     <property as="xs:boolean" name="oxf.xforms.encrypt-item-values"                     value="true"/>
     <property as="xs:boolean" name="oxf.xforms.encrypt-hidden"                          value="true"/>
     <property as="xs:boolean" name="oxf.xforms.encrypt-names"                           value="true"/>

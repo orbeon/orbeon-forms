@@ -15,7 +15,6 @@ package org.orbeon.oxf.xforms.state;
 
 import org.apache.commons.lang.StringUtils;
 import org.junit.Test;
-import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.processor.test.TestExternalContext;
 import org.orbeon.oxf.test.ResourceManagerTestBase;
@@ -81,36 +80,6 @@ public class XFormsStateManagerTest extends ResourceManagerTestBase {
 
         // Test that the document is no longer in cache
         assertNull(XFormsDocumentCache.instance().takeDocument(document.getUUID()));
-    }
-
-    @Test(expected=OXFException.class)
-    public void testClientStaticStateEncrypted() {
-        final XFormsState state = createDocumentGetState();
-
-        // This should throw an exception
-        XFormsUtils.decodeXML(state.staticState(), "WrongPassword");
-    }
-
-    @Test(expected=OXFException.class)
-    public void testClientDynamicStateEncrypted() {
-        final XFormsState state = createDocumentGetState();
-
-        // This should throw an exception
-        XFormsUtils.decodeXML(state.dynamicState().encodeToString(XFormsProperties.isGZIPState(), true), "WrongPassword");
-    }
-
-    private XFormsState createDocumentGetState() {
-        final XFormsStaticState staticState = XFormsStaticStateTest.getStaticState("oxf:/org/orbeon/oxf/xforms/state/client-nocache.xhtml");
-        final XFormsContainingDocument document = new XFormsContainingDocument(staticState, null, null, null);
-
-        final String staticStateString = stateManager.getClientEncodedStaticState(document);
-        final String dynamicStateString = stateManager.getClientEncodedDynamicState(document);
-
-        // X2 is the prefix saying it's encrypted
-        assertTrue(staticStateString.startsWith("X2"));
-        assertTrue(dynamicStateString.startsWith("X2"));
-
-        return new XFormsState(scala.Option.apply(staticState.digest()), staticStateString, DynamicState.apply(document));
     }
 
     private static class State {

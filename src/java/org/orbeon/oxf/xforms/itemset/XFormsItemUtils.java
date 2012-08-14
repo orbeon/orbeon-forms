@@ -17,6 +17,7 @@ import org.apache.commons.lang.StringUtils;
 import org.dom4j.Element;
 import org.dom4j.QName;
 import org.dom4j.Text;
+import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.util.SecureUtils;
 import org.orbeon.oxf.util.XPathCache;
@@ -30,6 +31,8 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.NodeInfo;
 
+import java.io.UnsupportedEncodingException;
+import java.security.SecureRandom;
 import java.util.*;
 
 /**
@@ -39,12 +42,25 @@ public class XFormsItemUtils {
 
     public static final QName[] ATTRIBUTES_TO_PROPAGATE = { XFormsConstants.CLASS_QNAME, XFormsConstants.STYLE_QNAME, XFormsConstants.XXFORMS_OPEN_QNAME };
 
+    private static byte[] iv = new byte[SecureUtils.AESIVSize()];
+    static {
+        (new SecureRandom()).nextBytes(iv);
+    }
+
     public static String encryptValue(String value) {
-        return SecureUtils.encrypt(XFormsProperties.getXFormsPassword(), value);
+        try {
+            return SecureUtils.encryptIV(value.getBytes("utf-8"), scala.Option.apply(iv));
+        } catch (UnsupportedEncodingException e) {
+            throw new OXFException(e);
+        }
     }
 
     public static String decryptValue(String value) {
-        return SecureUtils.decryptAsString(XFormsProperties.getXFormsPassword(), value);
+        try {
+            return new String(SecureUtils.decryptIV(value, scala.Option.apply(iv)), "utf-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new OXFException(e);
+        }
     }
 
     /**

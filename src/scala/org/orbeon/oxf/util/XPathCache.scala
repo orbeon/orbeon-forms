@@ -14,8 +14,7 @@
 package org.orbeon.oxf.util
 
 import java.util.{List ⇒ JList, Map ⇒ JMap}
-import org.apache.commons.pool.ObjectPool
-import org.apache.commons.pool.PoolableObjectFactory
+import org.apache.commons.pool.{BasePoolableObjectFactory, ObjectPool}
 import org.orbeon.oxf.cache.InternalCacheKey
 import org.orbeon.oxf.cache.ObjectCache
 import org.orbeon.oxf.common.ValidationException
@@ -495,7 +494,7 @@ object XPathCache {
             isAvt: Boolean,
             allowAllVariables: Boolean,
             locationData: LocationData)
-        extends PoolableObjectFactory[PooledXPathExpression] {
+        extends BasePoolableObjectFactory[PooledXPathExpression] {
 
         // NOTE: storing the FunctionLibrary in cache is ok if it doesn't hold dynamic references (case of global XFormsFunctionLibrary)
 
@@ -536,10 +535,7 @@ object XPathCache {
             createPoolableXPathExpression(pool, independentContext, xpathString, variables.toMap.asJava, isAvt)
         }
 
-        def destroyObject(o: PooledXPathExpression): Unit = o.destroy()
-        def activateObject(o: PooledXPathExpression) = ()
-        def passivateObject(o: PooledXPathExpression) = ()
-        def validateObject(o: PooledXPathExpression) = true
+        override def destroyObject(o: PooledXPathExpression): Unit = o.destroy()
     }
 
     private class CustomXPathExpression(evaluator: XPathEvaluator, exp: Expression, map: SlotManager, numberOfExternalVariables: Int)

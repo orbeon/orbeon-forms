@@ -119,9 +119,13 @@ object SecureUtils {
         hmacBytes(key.getBytes("utf-8"), data.getBytes("utf-8"), algorithm, encoding)
 
     def hmacBytes(key: Array[Byte], data: Array[Byte], algorithm: String, encoding: String): String = {
-        val secretKey = new SecretKeySpec(key, algorithm)
-        val mac = Mac.getInstance("Hmac" + algorithm.toUpperCase.replace("-", ""))
-        mac.init(secretKey)
+
+        // See standard names:
+        // http://docs.oracle.com/javase/6/docs/technotes/guides/security/StandardNames.html
+        val fullAlgorithmName = "Hmac" + algorithm.toUpperCase.replace("-", "")
+
+        val mac = Mac.getInstance(fullAlgorithmName)
+        mac.init(new SecretKeySpec(key, fullAlgorithmName))
 
         val digestBytes = mac.doFinal(data)
         val result = withEncoding(digestBytes, encoding)

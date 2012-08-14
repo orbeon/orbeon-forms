@@ -298,6 +298,6 @@ object XFormsStaticStateImpl {
         // If an existing state is passed in, use it, otherwise encode from XML, encrypting if necessary.
         // NOTE: We do compress the result as we think we can afford this for the static state (probably not so for the dynamic state).
         def asBase64 =
-            XFormsUtils.encodeXML(xmlDocument, true, if (isClientStateHandling) P.getXFormsPassword else null, true)
+            XFormsUtils.encodeXML(xmlDocument, compress = true, encrypt = isClientStateHandling, location = true)
     }
 }

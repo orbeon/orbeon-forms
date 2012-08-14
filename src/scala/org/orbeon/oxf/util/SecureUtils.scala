@@ -61,9 +61,9 @@ object SecureUtils {
         finally pool.returnObject(cipher)
     }
 
-    // Encrypt a byte array using the given password
+    // Encrypt a byte array
     // The result is converted to Base64 encoding without line breaks or spaces
-    def encrypt(password: String, bytes: Array[Byte]): String = encryptIV(bytes, None)
+    def encrypt(bytes: Array[Byte]): String = encryptIV(bytes, None)
 
     def encryptIV(bytes: Array[Byte], ivOption: Option[Array[Byte]]): String =
         withCipher { cipher ⇒
@@ -81,8 +81,8 @@ object SecureUtils {
             }
         }
 
-    // Decrypt a Base64-encoded string into a byte array using the given password.
-    def decrypt(password: String, text: String): Array[Byte] = decryptIV(text, None)
+    // Decrypt a Base64-encoded string into a byte array
+    def decrypt(text: String): Array[Byte] = decryptIV(text, None)
 
     def decryptIV(text: String, ivOption: Option[Array[Byte]]): Array[Byte] =
         withCipher { cipher ⇒

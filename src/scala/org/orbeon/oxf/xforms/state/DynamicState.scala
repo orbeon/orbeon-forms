@@ -80,7 +80,7 @@ case class DynamicState(
         XFormsUtils.encodeBytes(
             toByteArray(this),
             compress,
-            if (isForceEncryption) XFormsProperties.getXFormsPassword else null
+            isForceEncryption
         )
 
     // Encode to an XML representation (as of 2012-02-05, used only by unit tests)
@@ -267,7 +267,7 @@ object DynamicState {
 
     // Create a DynamicState from an encoded string representation
     def apply(encoded: String): DynamicState = {
-        val bytes = XFormsUtils.decodeBytes(encoded, XFormsProperties.getXFormsPassword)
+        val bytes = XFormsUtils.decodeBytes(encoded)
         fromByteArray[DynamicState](bytes)
     }
 

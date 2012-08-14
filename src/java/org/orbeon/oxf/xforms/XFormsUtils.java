@@ -66,17 +66,17 @@ public class XFormsUtils {
 
     public static String encodeXMLAsDOM(org.w3c.dom.Node node) {
         try {
-            return encodeXML(TransformerUtils.domToDom4jDocument(node), XFormsProperties.isGZIPState(), XFormsProperties.getXFormsPassword(), false);
+            return encodeXML(TransformerUtils.domToDom4jDocument(node), XFormsProperties.isGZIPState(), true, false);
         } catch (TransformerException e) {
             throw new OXFException(e);
         }
     }
 
     public static String encodeXML(Document documentToEncode, boolean encodeLocationData) {
-        return encodeXML(documentToEncode, XFormsProperties.isGZIPState(), XFormsProperties.getXFormsPassword(), encodeLocationData);
+        return encodeXML(documentToEncode, XFormsProperties.isGZIPState(), true, encodeLocationData);
     }
 
-    public static String encodeXML(Document document, boolean compress, String encryptionPassword, boolean location) {
+    public static String encodeXML(Document document, boolean compress, boolean encrypt, boolean location) {
         //        XFormsServer.logger.debug("XForms - encoding XML.");
 
         // Get SAXStore
@@ -98,22 +98,22 @@ public class XFormsUtils {
         }
 
         // Encode bytes
-        return encodeBytes(bytes, compress, encryptionPassword);
+        return encodeBytes(bytes, compress, encrypt);
     }
 
-    public static String encodeBytes(byte[] bytesToEncode, boolean compress, String encryptionPassword) {
+    public static String encodeBytes(byte[] bytesToEncode, boolean compress, boolean encrypt) {
         // Compress if needed
         final byte[] gzipByteArray = compress ? XFormsCompressor.compressBytes(bytesToEncode) : null;
 
         // Encrypt if needed
-        if (encryptionPassword != null) {
+        if (encrypt) {
             // Perform encryption
             if (gzipByteArray == null) {
                 // The data was not compressed above
-                return "X1" + SecureUtils.encrypt(encryptionPassword, bytesToEncode);
+                return "X1" + SecureUtils.encrypt(bytesToEncode);
             } else {
                 // The data was compressed above
-                return "X2" + SecureUtils.encrypt(encryptionPassword, gzipByteArray);
+                return "X2" + SecureUtils.encrypt(gzipByteArray);
             }
         } else {
             // No encryption
@@ -442,12 +442,8 @@ public class XFormsUtils {
     }
 
     public static Document decodeXML(String encodedXML) {
-        return decodeXML(encodedXML, XFormsProperties.getXFormsPassword());
-    }
 
-    public static Document decodeXML(String encodedXML, String encryptionPassword) {
-
-        final byte[] bytes = decodeBytes(encodedXML, encryptionPassword);
+        final byte[] bytes = decodeBytes(encodedXML);
 
         // Deserialize bytes to SAXStore
         // TODO: This is not optimal
@@ -472,7 +468,7 @@ public class XFormsUtils {
         return result.getDocument();
     }
 
-    public static byte[] decodeBytes(String encoded, String encryptionPassword) {
+    public static byte[] decodeBytes(String encoded) {
         // Get raw text
         byte[] resultBytes;
         {
@@ -483,12 +479,12 @@ public class XFormsUtils {
             final byte[] gzipByteArray;
             if (prefix.equals("X1")) {
                 // Encryption + uncompressed
-                resultBytes1 = SecureUtils.decrypt(encryptionPassword, encodedString);
+                resultBytes1 = SecureUtils.decrypt(encodedString);
                 gzipByteArray = null;
             } else if (prefix.equals("X2")) {
                 // Encryption + compressed
                 resultBytes1 = null;
-                gzipByteArray = SecureUtils.decrypt(encryptionPassword, encodedString);
+                gzipByteArray = SecureUtils.decrypt(encodedString);
             } else if (prefix.equals("X3")) {
                 // No encryption + uncompressed
                 resultBytes1 = Base64.decode(encodedString);

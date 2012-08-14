@@ -50,7 +50,7 @@ object SecureUtils {
     }
 
     // Cipher is not thread-safe, see:
-        // http://stackoverflow.com/questions/6957406/is-cipher-thread-safe
+    // http://stackoverflow.com/questions/6957406/is-cipher-thread-safe
     private val pool = new SoftReferenceObjectPool(new BasePoolableObjectFactory[Cipher] {
         def makeObject() = Cipher.getInstance(EncryptionCipherTransformation)
     })
@@ -100,25 +100,21 @@ object SecureUtils {
             cipher.doFinal(message)
         }
 
-    def digestString(data: String, algorithm: String, encoding: String): String =
-        digestBytes(data.getBytes("utf-8"), algorithm, encoding)
+    // Compute a digest
+    def digestString(text: String, algorithm: String, encoding: String): String =
+        digestBytes(text.getBytes("utf-8"), algorithm, encoding)
 
-    private def withEncoding(bytes: Array[Byte], encoding: String) = encoding match {
-        case "base64" ⇒ Base64.encode(bytes, false)
-        case "hex"    ⇒ byteArrayToHex(bytes)
-        case _        ⇒ throw new IllegalArgumentException("Invalid digest encoding (must be one of 'base64' or 'hex'): " + encoding)
-    }
-
-    def digestBytes(data: Array[Byte], algorithm: String, encoding: String): String = {
+    def digestBytes(bytes: Array[Byte], algorithm: String, encoding: String): String = {
         val messageDigest = MessageDigest.getInstance(algorithm)
-        messageDigest.update(data)
+        messageDigest.update(bytes)
         withEncoding(messageDigest.digest, encoding)
     }
 
-    def hmacString(key: String, data: String, algorithm: String, encoding: String): String =
-        hmacBytes(key.getBytes("utf-8"), data.getBytes("utf-8"), algorithm, encoding)
+    // Compute an HMAC
+    def hmacString(key: String, text: String, algorithm: String, encoding: String): String =
+        hmacBytes(key.getBytes("utf-8"), text.getBytes("utf-8"), algorithm, encoding)
 
-    def hmacBytes(key: Array[Byte], data: Array[Byte], algorithm: String, encoding: String): String = {
+    def hmacBytes(key: Array[Byte], bytes: Array[Byte], algorithm: String, encoding: String): String = {
 
         // See standard names:
         // http://docs.oracle.com/javase/6/docs/technotes/guides/security/StandardNames.html
@@ -127,12 +123,19 @@ object SecureUtils {
         val mac = Mac.getInstance(fullAlgorithmName)
         mac.init(new SecretKeySpec(key, fullAlgorithmName))
 
-        val digestBytes = mac.doFinal(data)
+        val digestBytes = mac.doFinal(bytes)
         val result = withEncoding(digestBytes, encoding)
 
         result.replace("\n", "")
     }
 
+    private def withEncoding(bytes: Array[Byte], encoding: String) = encoding match {
+        case "base64" ⇒ Base64.encode(bytes, false)
+        case "hex"    ⇒ byteArrayToHex(bytes)
+        case _        ⇒ throw new IllegalArgumentException("Invalid digest encoding (must be one of 'base64' or 'hex'): " + encoding)
+    }
+
+    // Convert to a lowercase hexadecimal value
     def byteArrayToHex(bytes: Array[Byte]): String = {
         val sb = new StringBuilder(bytes.length * 2)
 

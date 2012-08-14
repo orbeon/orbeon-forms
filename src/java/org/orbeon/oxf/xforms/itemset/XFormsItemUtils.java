@@ -17,9 +17,7 @@ import org.apache.commons.lang.StringUtils;
 import org.dom4j.Element;
 import org.dom4j.QName;
 import org.dom4j.Text;
-import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.util.SecureUtils;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.analysis.controls.SelectionControlTrait;
@@ -31,8 +29,6 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.NodeInfo;
 
-import java.io.UnsupportedEncodingException;
-import java.security.SecureRandom;
 import java.util.*;
 
 /**
@@ -41,27 +37,6 @@ import java.util.*;
 public class XFormsItemUtils {
 
     public static final QName[] ATTRIBUTES_TO_PROPAGATE = { XFormsConstants.CLASS_QNAME, XFormsConstants.STYLE_QNAME, XFormsConstants.XXFORMS_OPEN_QNAME };
-
-    private static byte[] iv = new byte[SecureUtils.AESIVSize()];
-    static {
-        (new SecureRandom()).nextBytes(iv);
-    }
-
-    public static String encryptValue(String value) {
-        try {
-            return SecureUtils.encryptIV(value.getBytes("utf-8"), scala.Option.apply(iv));
-        } catch (UnsupportedEncodingException e) {
-            throw new OXFException(e);
-        }
-    }
-
-    public static String decryptValue(String value) {
-        try {
-            return new String(SecureUtils.decryptIV(value, scala.Option.apply(iv)), "utf-8");
-        } catch (UnsupportedEncodingException e) {
-            throw new OXFException(e);
-        }
-    }
 
     /**
      * Return whether a select control's value is selected given an item value.
@@ -129,6 +104,7 @@ public class XFormsItemUtils {
         final boolean isEncryptItemValues = select1Control.isEncryptItemValues();
         Dom4jUtils.visitSubtree(select1Control.element(), new Dom4jUtils.VisitorListener() {
 
+            private int position = 0;
             private ItemContainer currentContainer = result;
 
             private String getElementEffectiveId(Element element) {
@@ -147,7 +123,7 @@ public class XFormsItemUtils {
                     final String value = getValueValue(element.element(XFormsConstants.XFORMS_VALUE_QNAME));
 
                     final Map<QName, String> attributes = getAttributes(element);
-                    currentContainer.addChildItem(new Item(isMultiple, isEncryptItemValues, attributes, label, StringUtils.defaultString(value)));
+                    currentContainer.addChildItem(new Item(position++, isMultiple, isEncryptItemValues, attributes, label, StringUtils.defaultString(value)));
 
                 } else if (XFormsConstants.ITEMSET_QNAME.getName().equals(localname)) {
                     // xforms:itemset
@@ -221,7 +197,7 @@ public class XFormsItemUtils {
                                         // a leaf item, so we prune such non-relevant items later.
 
                                         final Map<QName, String> attributes = getAttributes(element);
-                                        currentContainer.addChildItem(new Item(isMultiple, isEncryptItemValues, attributes, label, value));
+                                        currentContainer.addChildItem(new Item(position++, isMultiple, isEncryptItemValues, attributes, label, value));
                                     } else {
                                         // TODO: handle xforms:copy
                                         throw new ValidationException("xforms:copy is not yet supported.", select1Control.getLocationData());
@@ -246,7 +222,7 @@ public class XFormsItemUtils {
                         // NOTE: returned label can be null in some cases
 
                         final Map<QName, String> attributes = getAttributes(element);
-                        final Item newContainer = new Item(isMultiple, isEncryptItemValues, attributes, label, null);
+                        final Item newContainer = new Item(position++, isMultiple, isEncryptItemValues, attributes, label, null);
                         currentContainer.addChildItem(newContainer);
                         currentContainer = newContainer;
                     }
@@ -392,6 +368,4 @@ public class XFormsItemUtils {
 
         return result;
     }
-
-
 }

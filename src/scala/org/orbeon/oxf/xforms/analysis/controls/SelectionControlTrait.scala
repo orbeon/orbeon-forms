@@ -166,6 +166,7 @@ trait SelectionControlTrait extends SimpleElementAnalysis with SelectAppearanceT
 
         Dom4jUtils.visitSubtree(element, new Dom4jUtils.VisitorListener() {
 
+            private var position = 0
             private var currentContainer: ItemContainer = result
 
             def startElement(element: Element): Unit = {
@@ -186,7 +187,8 @@ trait SelectionControlTrait extends SimpleElementAnalysis with SelectAppearanceT
                         val value = XFormsUtils.getStaticChildElementValue(containerScope.fullPrefix, valueElement, false, null)
 
                         val attributes = SelectionControlUtil.getAttributes(element)
-                        currentContainer.addChildItem(new Item(isMultiple, isEncryptValues, attributes, new Item.Label(label, containsHTML(0)), StringUtils.defaultString(value)))
+                        currentContainer.addChildItem(new Item(position, isMultiple, isEncryptValues, attributes, new Item.Label(label, containsHTML(0)), StringUtils.defaultString(value)))
+                        position += 1
 
                     case ITEMSET_QNAME ⇒ // xforms:itemset
 
@@ -201,7 +203,8 @@ trait SelectionControlTrait extends SimpleElementAnalysis with SelectAppearanceT
                             assert(label ne null)
 
                             val attributes = SelectionControlUtil.getAttributes(element)
-                            val newContainer = new Item(isMultiple, isEncryptValues, attributes, new Item.Label(label, false), null)
+                            val newContainer = new Item(position, isMultiple, isEncryptValues, attributes, new Item.Label(label, false), null)
+                            position += 1
                             currentContainer.addChildItem(newContainer);
                             currentContainer = newContainer
                         }

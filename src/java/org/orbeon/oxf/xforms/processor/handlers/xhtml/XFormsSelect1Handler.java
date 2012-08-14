@@ -378,7 +378,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
             final String itemEffectiveId = "$xforms-item-id-select" + (isMultiple? "" : "1") + "$";
             handleItemFull(baseHandler, contentHandler, reusableAttributes, attributes,
                     xhtmlPrefix, spanQName, containingDocument, null, itemName, itemEffectiveId, isMultiple, fullItemType,
-                    new Item(isMultiple, false, null, // make sure the value "$xforms-template-value$" is not encrypted
+                    new Item(0, isMultiple, false, null, // make sure the value "$xforms-template-value$" is not encrypted
                             new Item.Label("$xforms-template-label$", false), "$xforms-template-value$"), true);
         }
         contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);

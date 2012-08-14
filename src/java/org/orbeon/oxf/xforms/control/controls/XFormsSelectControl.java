@@ -23,7 +23,6 @@ import org.orbeon.oxf.xforms.event.events.XFormsDeselectEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsSelectEvent;
 import org.orbeon.oxf.xforms.itemset.Item;
 import org.orbeon.oxf.xforms.itemset.Itemset;
-import org.orbeon.oxf.xforms.itemset.XFormsItemUtils;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 
 import java.util.*;
@@ -59,20 +58,23 @@ public class XFormsSelectControl extends XFormsSelect1Control {
             // All items
             final Itemset itemset = getItemset();
             // Current values in the instance
-            final Set<String> instanceValues = tokenize(controlValue, false);
+            final Set<String> instanceValues = tokenize(controlValue);
 
             // Values currently selected in the UI
-            final Set<String> uiValues = tokenize(value, isEncryptItemValues());
+            final Set<String> newUIValues = tokenize(value);
 
             // Iterate over all the items
             final List<XFormsSelectEvent> selectEvents = new ArrayList<XFormsSelectEvent>();
             final List<XFormsDeselectEvent> deselectEvents = new ArrayList<XFormsDeselectEvent>();
 
-            for (Item currentItem: itemset.toList()) {
+            final boolean valueIsPosition = isEncryptItemValues();
+
+            for (Item currentItem : itemset.toList()) {
                 final String currentItemValue = currentItem.getValue();
                 final boolean itemWasSelected = instanceValues.contains(currentItemValue);
                 final boolean itemIsSelected;
-                if (uiValues.contains(currentItemValue)) {
+                if (valueIsPosition && newUIValues.contains(Integer.toString(currentItem.getPosition()))
+                    || ! valueIsPosition && newUIValues.contains(currentItemValue)) {
                     // Value is currently selected in the UI
                     instanceValues.add(currentItemValue);
                     itemIsSelected = true;
@@ -92,16 +94,13 @@ public class XFormsSelectControl extends XFormsSelect1Control {
             }
             // Dispatch xforms-deselect events
             if (deselectEvents.size() > 0) {
-                for (XFormsEvent currentEvent: deselectEvents) {
+                for (XFormsEvent currentEvent : deselectEvents)
                     Dispatch.dispatchEvent(currentEvent);
-                }
             }
             // Select events must be sent after all xforms-deselect events
-            final boolean hasSelectedItem = selectEvents.size() > 0;
-            if (hasSelectedItem) {
-                for (XFormsEvent currentEvent: selectEvents) {
+            if (selectEvents.size() > 0) {
+                for (XFormsEvent currentEvent : selectEvents)
                     Dispatch.dispatchEvent(currentEvent);
-                }
             }
 
             // Create resulting string
@@ -149,12 +148,12 @@ public class XFormsSelectControl extends XFormsSelect1Control {
             if (itemset != null) {
 
                 // Current values in the instance
-                final Set<String> instanceValues = tokenize(internalValue, false);
+                final Set<String> instanceValues = tokenize(internalValue);
 
                 // Actual value to return is the intersection of values in the instance and values in the itemset
                 final StringBuilder sb = new StringBuilder(internalValue.length());
                 int index = 0;
-                for (Item currentItem: itemset.toList()) {
+                for (Item currentItem : itemset.toList()) {
                     final String currentValue = currentItem.getValue();
                     if (instanceValues.contains(currentValue)) {
                         if (index > 0)
@@ -175,14 +174,12 @@ public class XFormsSelectControl extends XFormsSelect1Control {
         setExternalValue(updatedValue);
     }
 
-    private static Set<String> tokenize(String value, boolean decryptValues) {
+    private static Set<String> tokenize(String value) {
         final Set<String> result;
         if (value != null) {
             result = new LinkedHashSet<String>();
             for (final StringTokenizer st = new StringTokenizer(value); st.hasMoreTokens();) {
-                final String token = st.nextToken();
-                // Keep value and decrypt if necessary
-                result.add(decryptValues ? XFormsItemUtils.decryptValue(token) : token);
+                result.add(st.nextToken());
             }
         } else {
             result = Collections.emptySet();

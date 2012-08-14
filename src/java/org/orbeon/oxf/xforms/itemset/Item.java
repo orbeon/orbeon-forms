@@ -33,6 +33,7 @@ import java.util.Map;
  */
 public class Item implements ItemContainer {
 
+    private final int position;
     private final boolean isEncryptValue; // whether this item is part of an open selection control
     private final Map<QName, String> attributes;
     private final Label label;
@@ -43,7 +44,7 @@ public class Item implements ItemContainer {
     private ItemContainer parent;
     private List<Item> children;
 
-    public Item(boolean isMultiple, boolean isEncryptValue, Map<QName, String> attributes, Label label, String value) {
+    public Item(int position, boolean isMultiple, boolean isEncryptValue, Map<QName, String> attributes, Label label, String value) {
 
         // NOTE: As of 2010-08-18, label can be null in these cases:
         //
@@ -53,12 +54,18 @@ public class Item implements ItemContainer {
         //   o exception when dereferencing an @src attribute
         // o xforms|input:xxforms-type(xs:boolean)
 
+        this.position = position;
+
         // Value is encrypted if requested, except with single selection if the value
         this.isEncryptValue = isEncryptValue && (isMultiple || StringUtils.isNotEmpty(value));
 
         this.attributes = attributes;
         this.label = label;
         this.value = value;
+    }
+
+    public int getPosition() {
+        return position;
     }
 
     void setLevel(int level) {
@@ -117,11 +124,11 @@ public class Item implements ItemContainer {
     }
 
     public String getExternalValue() {
-        return value == null ? "" : isEncryptValue ? XFormsItemUtils.encryptValue(value) : value;
+        return value == null ? "" : isEncryptValue ? Integer.toString(position) : value;
     }
 
     public String getExternalJSValue() {
-        return value == null ? "" : isEncryptValue ? XFormsItemUtils.encryptValue(value) : XFormsUtils.escapeJavaScript(value);
+        return value == null ? "" : isEncryptValue ? Integer.toString(position) : XFormsUtils.escapeJavaScript(value);
     }
 
     public String getExternalJSLabel(final LocationData locationData) {

@@ -45,6 +45,10 @@ public class XFormsSelectEvent extends XFormsUIEvent {
         this.itemValue = itemValue;
     }
 
+    public String getItemValue() {
+        return itemValue;
+    }
+
     public SequenceIterator getAttribute(String name) {
         if (XXFORMS_ITEM_VALUE.equals(name)) {
             // Return the selected item value

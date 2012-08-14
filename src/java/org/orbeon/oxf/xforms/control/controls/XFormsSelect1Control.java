@@ -200,7 +200,23 @@ public class XFormsSelect1Control extends XFormsValueControl implements Focusabl
             // NOTE: We could in the future check that the value is in fact part of the itemset first, and send a blank value otherwise..
             if (isEncryptItemValues()) {
                 // For closed selection, values sent to client must be encrypted
-                updatedValue = XFormsItemUtils.encryptValue(internalValue);
+                final Itemset itemset = getItemset();
+                if (itemset != null) {
+                    // Find the position of the first matching value
+                    String foundValue = null;
+                    for (Item currentItem : itemset.toList()) {
+                        final String currentValue = currentItem.getValue();
+                        if (internalValue.equals(currentValue)) {
+                            foundValue = Integer.toString(currentItem.getPosition());
+                            break;
+                        }
+                    }
+                    updatedValue = foundValue;
+                } else {
+                    // Null itemset probably means the control was non-relevant. This should be handled better: if the
+                    // control is not relevant, it should simply not be evaluated.
+                    updatedValue = null;
+                }
             } else {
                 // For open selection, values sent to client are the internal values
                 updatedValue = internalValue;
@@ -210,73 +226,66 @@ public class XFormsSelect1Control extends XFormsValueControl implements Focusabl
     }
 
     @Override
-    public void storeExternalValue(String value) {
+    public void storeExternalValue(String newValue) {
 
         if (!(this instanceof XFormsSelectControl)) {// kind of a HACK due to the way our class hierarchy is setup
             // Handle xforms:select1-specific logic
-
-            // Decrypt incoming value. With open selection, values are sent to the client.
-            if (isEncryptItemValues()) {
-                try {
-                    value = XFormsItemUtils.decryptValue(value);
-                } catch (IllegalArgumentException e) {
-                    getIndentedLogger().logError("", "exception decrypting value", "control id", getEffectiveId(), "value", value);
-                    throw e;
-                }
-            }
 
             // Current control value
             final String controlValue = getValue();
 
             // Iterate over all the items
             final Itemset itemset = getItemset();
-            final List<XFormsEvent> selectEvents = new ArrayList<XFormsEvent>();
-            final List<XFormsEvent> deselectEvents = new ArrayList<XFormsEvent>();
-            if (itemset != null) {
-                for (Item currentItem: itemset.toList()) {
-                    final String currentItemValue = currentItem.getValue();
-                    final boolean itemWasSelected = controlValue.equals(currentItemValue);
-                    final boolean itemIsSelected;
-                    if (value.equals(currentItemValue)) {
-                        // Value is currently selected in the UI
-                        itemIsSelected = true;
-                    } else {
-                        // Value is currently NOT selected in the UI
-                        itemIsSelected = false;
-                    }
+            final List<XFormsSelectEvent> selectEvents = new ArrayList<XFormsSelectEvent>();
+            final List<XFormsDeselectEvent> deselectEvents = new ArrayList<XFormsDeselectEvent>();
 
-                    // Handle xforms-select / xforms-deselect
-                    // TODO: Dispatch to itemset or item once we support doing that
-                    if (!itemWasSelected && itemIsSelected) {
-                        selectEvents.add(new XFormsSelectEvent(containingDocument(), this, currentItemValue));
-                    } else if (itemWasSelected && !itemIsSelected) {
-                        deselectEvents.add(new XFormsDeselectEvent(containingDocument(), this, currentItemValue));
-                    }
-                }
-            }
+            // Find what got selected/deselected
+            gatherEvents(itemset, selectEvents, deselectEvents, newValue, controlValue);
 
             // Dispatch xforms-deselect events
             if (deselectEvents.size() > 0) {
-                for (XFormsEvent currentEvent: deselectEvents) {
+                for (XFormsEvent currentEvent : deselectEvents)
                     Dispatch.dispatchEvent(currentEvent);
-                }
             }
             // Select events must be sent after all xforms-deselect events
-            final boolean hasSelectedItem = selectEvents.size() > 0;
-            if (hasSelectedItem) {
-                for (XFormsEvent currentEvent: selectEvents) {
+            if (selectEvents.size() > 0) {
+                for (XFormsEvent currentEvent : selectEvents)
                     Dispatch.dispatchEvent(currentEvent);
-                }
-            }
 
-            if (hasSelectedItem) {
                 // Only then do we store the external value. This ensures that if the value is NOT in the itemset AND
                 // we are a closed selection then we do NOT store the value in instance.
-                super.storeExternalValue(value);
+                super.storeExternalValue(selectEvents.get(0).getItemValue());
             }
         } else {
             // Forward to superclass
-            super.storeExternalValue(value);
+            super.storeExternalValue(newValue);
+        }
+    }
+
+    private void gatherEvents(Itemset itemset, List<XFormsSelectEvent> selectEvents, List<XFormsDeselectEvent> deselectEvents, String newValue, String currentValue) {
+        final boolean valueIsPosition = isEncryptItemValues();
+        final int newPosition = Integer.parseInt(newValue);
+
+        for (Item currentItem : itemset.toList()) {
+            final String currentItemValue = currentItem.getValue();
+            final boolean itemWasSelected = currentValue.equals(currentItemValue);
+            final boolean itemIsSelected;
+
+            if (valueIsPosition && newPosition == currentItem.getPosition() || ! valueIsPosition && newValue.equals(currentItemValue)) {
+                // Value is currently selected in the UI
+                itemIsSelected = true;
+            } else {
+                // Value is currently NOT selected in the UI
+                itemIsSelected = false;
+            }
+
+            // Handle xforms-select / xforms-deselect
+            // TODO: Dispatch to itemset or item once we support doing that
+            if (! itemWasSelected && itemIsSelected) {
+                selectEvents.add(new XFormsSelectEvent(containingDocument(), this, currentItemValue));
+            } else if (itemWasSelected && ! itemIsSelected) {
+                deselectEvents.add(new XFormsDeselectEvent(containingDocument(), this, currentItemValue));
+            }
         }
     }
 

@@ -34,8 +34,9 @@
         </p:input>
         <p:output name="data" id="request"/>
     </p:processor>
+
     <p:processor name="oxf:regexp">
-        <p:input name="config"><config>/fr/(service/)?([^/]+)/([^/]+)/(new|edit|view|pdf|email|validate|import)(/([^/]+))?(/([A-Z0-9\-]+)\.pdf)?</config></p:input>
+        <p:input name="config"><config>/fr/(service/)?([^/]+)/([^/]+)/(new|edit|view|pdf|email|validate|import)(/([^/]+))?(/([0-9A-Za-z\-]+)\.pdf)?</config></p:input>
         <p:input name="data" href="#request#xpointer(/request/request-path)"/>
         <p:output name="data" id="matcher-groups"/>
     </p:processor>

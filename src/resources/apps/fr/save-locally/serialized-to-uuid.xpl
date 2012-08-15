@@ -34,7 +34,7 @@
         <p:input name="data" href="#url"/>
         <p:input name="config">
             <uuid xsl:version="2.0">
-                <xsl:value-of xmlns:uuid-utils="org.orbeon.oxf.util.UUIDUtils" select="uuid-utils:createPseudoUUID()"/>
+                <xsl:value-of xmlns:secure="java:org.orbeon.oxf.util.SecureUtils" select="secure:randomHexId()"/>
             </uuid>
         </p:input>
         <p:output name="data" id="uuid"/>

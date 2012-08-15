@@ -64,7 +64,7 @@ public class CacheableSubmission extends BaseSubmission {
         // Compute a hash of the body if needed
         final String requestBodyHash;
         if (sp.messageBody != null) {
-            requestBodyHash = SecureUtils.digestBytes(sp.messageBody, "MD5", "hex");
+            requestBodyHash = SecureUtils.digestBytes(sp.messageBody, "hex");
         } else {
             requestBodyHash = null;
         }

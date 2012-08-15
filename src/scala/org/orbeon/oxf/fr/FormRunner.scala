@@ -317,8 +317,7 @@ object FormRunner {
         //val nonTrustedFilename = XFormsUploadControl.getParameter(localURL, "filename")
         //val nonTrustedMediatype = XFormsUploadControl.getParameter(localURL, "mediatype")
 
-        val randomHex = SecureUtils.digestString(Random.evaluate(true).toString, "MD5", "hex")
-        createFormDataAttachmentPath(app, form, document, randomHex + ".bin")
+        createFormDataAttachmentPath(app, form, document, SecureUtils.randomHexId + ".bin")
     }
 
     // Path for a form definition attachment

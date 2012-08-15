@@ -468,7 +468,7 @@ public class TestExternalContext implements ExternalContext  {
 
     public ExternalContext.Session getSession(boolean create) {
         if (session == null && create) {
-            session = new TestSession(UUIDUtils.createPseudoUUID());
+            session = new TestSession(SecureUtils.randomHexId());
         }
         return session;
     }

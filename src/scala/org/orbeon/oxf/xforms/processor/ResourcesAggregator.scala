@@ -281,7 +281,7 @@ object ResourcesAggregator {
 
             // All resource paths are hashed
             val itemsToHash = resources ++ (if (hasAppResource && StringUtils.isNotBlank(appVersion)) Set(appVersion) else Set())
-            val resourcesHash = ScalaUtils.digest("SHA-1", Seq(itemsToHash mkString "|"))
+            val resourcesHash = SecureUtils.digestString(itemsToHash mkString "|", "hex")
 
             // Cache mapping so that resource can be served by oxf:resource-server
             Caches.resourcesCache.put(new EhElement(resourcesHash, resources.toArray)) // use Array which is serializable and usable from Java

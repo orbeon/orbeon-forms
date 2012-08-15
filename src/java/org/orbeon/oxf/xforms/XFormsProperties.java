@@ -260,9 +260,6 @@ public class XFormsProperties {
     }
 
     // Global properties
-    private static final String PASSWORD_PROPERTY = XFORMS_PROPERTY_PREFIX + "password";
-    private static final String KEY_LENGTH = XFORMS_PROPERTY_PREFIX + "key-length";
-
     private static final String STORE_APPLICATION_SIZE_PROPERTY = XFORMS_PROPERTY_PREFIX + "store.application.size";
     private static final int STORE_APPLICATION_SIZE_DEFAULT = 20 * 1024 * 1024;
 
@@ -330,14 +327,6 @@ public class XFormsProperties {
 
         final PropertyDefinition propertyDefinition = getPropertyDefinition(propertyName);
         return (propertyDefinition == null) ? null : propertyDefinition.parseProperty(propertyValue);
-    }
-
-    public static String getXFormsPassword() {
-        return Properties.instance().getPropertySet().getString(PASSWORD_PROPERTY);
-    }
-
-    public static int getXFormsKeyLength() {
-        return Properties.instance().getPropertySet().getInteger(KEY_LENGTH, 128).intValue();
     }
 
     public static Set<String> getDebugLogging() {

@@ -19,10 +19,30 @@ import javax.crypto.Mac
 import javax.crypto.SecretKey
 import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.{IvParameterSpec, PBEKeySpec, SecretKeySpec}
-import org.orbeon.oxf.xforms.XFormsProperties
 import org.apache.commons.pool.BasePoolableObjectFactory
+import org.orbeon.oxf.properties.Properties
+import org.orbeon.oxf.common.OXFException
 
 object SecureUtils {
+
+    // Properties
+    private val XFormsPasswordProperty = "oxf.xforms.password" // for backward compatibility
+    private val PasswordProperty       = "oxf.crypto.password"
+    private val KeyLengthProperty      = "oxf.crypto.key-length"
+    private val HashAlgorithmProperty  = "oxf.crypto.hash-algorithm"
+
+    private def getPassword: String = {
+        val propertySet = Properties.instance.getPropertySet
+        Option(propertySet.getString(XFormsPasswordProperty)) orElse
+            Option(propertySet.getString(PasswordProperty)) getOrElse
+            (throw new OXFException(PasswordProperty + "property is not set"))
+    }
+
+    private def getKeyLength: Int =
+        Properties.instance.getPropertySet.getInteger(KeyLengthProperty, 128).intValue
+
+    private def getHashAlgorithm: String =
+        Properties.instance.getPropertySet.getString(HashAlgorithmProperty, "SHA1")
 
     private val HexDigits = Array('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f')
 
@@ -33,17 +53,16 @@ object SecureUtils {
     val AESBlockSize = 128
     val AESIVSize    = AESBlockSize / 8
 
+    private lazy val secureRandom = new SecureRandom
+
     // Secret key valid for the life of the classloader
     private lazy val secretKey: SecretKey = {
 
-        val password  = XFormsProperties.getXFormsPassword
-        val keyLength = XFormsProperties.getXFormsKeyLength
-
         // Random seeded salt
         val salt = new Array[Byte](8)
-        (new SecureRandom).nextBytes(salt)
+        secureRandom.nextBytes(salt)
 
-        val spec = new PBEKeySpec(password.toCharArray, salt, 65536, keyLength)
+        val spec = new PBEKeySpec(getPassword.toCharArray, salt, 65536, getKeyLength)
 
         val factory = SecretKeyFactory.getInstance(KeyCipherAlgorithm)
         new SecretKeySpec(factory.generateSecret(spec).getEncoded, "AES")
@@ -104,11 +123,22 @@ object SecureUtils {
     def digestString(text: String, algorithm: String, encoding: String): String =
         digestBytes(text.getBytes("utf-8"), algorithm, encoding)
 
+    // Compute a digest with the default algorithm
+    def digestString(text: String, encoding: String): String =
+        digestString(text, getHashAlgorithm, encoding)
+
+    def digestBytes(bytes: Array[Byte], encoding: String): String =
+        digestBytes(bytes, getHashAlgorithm, encoding)
+
     def digestBytes(bytes: Array[Byte], algorithm: String, encoding: String): String = {
         val messageDigest = MessageDigest.getInstance(algorithm)
         messageDigest.update(bytes)
         withEncoding(messageDigest.digest, encoding)
     }
+
+    // Compute an HMAC with the default password and algorithm
+    def hmacString(text: String, encoding: String): String =
+        hmacBytes(getPassword.getBytes("utf-8"), text.getBytes("utf-8"), getHashAlgorithm, encoding)
 
     // Compute an HMAC
     def hmacString(key: String, text: String, algorithm: String, encoding: String): String =
@@ -148,4 +178,21 @@ object SecureUtils {
 
         sb.toString
     }
+
+    // Length of a value returned by randomHexId
+    lazy val HexIdLength = randomHexId.size
+
+    // Generate a random 128-bit value hashed to hex
+    def randomHexId: String = {
+        // It's unclear whether there is a real benefit to re-seed once in a while:
+        // http://stackoverflow.com/questions/295628/securerandom-init-once-or-every-time-it-is-needed
+        val bytes = new Array[Byte](16)
+        secureRandom.nextBytes(bytes)
+        // We hash on top so that the actual random sequence won't be known if the id is made public
+        digestBytes(bytes, "hex")
+    }
+
+    // Get a new message digest with the default algorithm
+    def defaultMessageDigest: MessageDigest =
+        MessageDigest.getInstance(getHashAlgorithm)
 }

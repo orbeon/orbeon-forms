@@ -56,7 +56,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.CoderResult;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 public class XMLUtils {
@@ -529,7 +528,7 @@ public class XMLUtils {
      * Compute a digest for a SAX source.
      */
     public static byte[] getDigest(Source source) {
-        final DigestContentHandler digester = new DigestContentHandler("MD5");
+        final DigestContentHandler digester = new DigestContentHandler();
         TransformerUtils.sourceToSAX(source, digester);
         return digester.getResult();
     }
@@ -564,22 +563,11 @@ public class XMLUtils {
         /**
          * Encoder has state and therefore cannot be shared across threads.
          */
-        private final CharsetEncoder charEncoder;
-        private java.nio.CharBuffer charBuff;
-        private java.nio.ByteBuffer byteBuff;
+        private final CharsetEncoder charEncoder = utf16BECharset.newEncoder();
+        private java.nio.CharBuffer charBuff = java.nio.CharBuffer.allocate(64);
+        private java.nio.ByteBuffer byteBuff = java.nio.ByteBuffer.allocate(128);
 
-        private MessageDigest digest;
-
-        public DigestContentHandler(String algorithm) {
-            try {
-                digest = MessageDigest.getInstance(algorithm);
-            } catch (NoSuchAlgorithmException e) {
-                throw new OXFException(e);
-            }
-            charEncoder = utf16BECharset.newEncoder();
-            charBuff = java.nio.CharBuffer.allocate(64);
-            byteBuff = java.nio.ByteBuffer.allocate(128);
-        }
+        private final MessageDigest digest = SecureUtils.defaultMessageDigest();
 
         private void ensureCharBuffRemaining(final int size) {
             if (charBuff.remaining() < size) {

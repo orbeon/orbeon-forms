@@ -304,7 +304,7 @@ public class XFormsToXHTML extends ProcessorImpl {
             final LocationDocumentResult documentResult = new LocationDocumentResult();
             documentReceiver.setResult(documentResult);
 
-            final XMLUtils.DigestContentHandler digestReceiver = computeDigest ? new XMLUtils.DigestContentHandler("MD5") : null;
+            final XMLUtils.DigestContentHandler digestReceiver = computeDigest ? new XMLUtils.DigestContentHandler() : null;
             final XMLReceiver extractorOutput;
             if (isLogStaticStateInput) {
                 extractorOutput = computeDigest ? new TeeXMLReceiver(documentReceiver, digestReceiver, getDebugReceiver(indentedLogger)) : new TeeXMLReceiver(documentReceiver, getDebugReceiver(indentedLogger));

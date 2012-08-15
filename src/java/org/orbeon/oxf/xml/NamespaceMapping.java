@@ -15,6 +15,7 @@ package org.orbeon.oxf.xml;
 
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.util.NumberUtils;
+import org.orbeon.oxf.util.SecureUtils;
 
 import java.security.MessageDigest;
 import java.util.*;
@@ -55,7 +56,7 @@ public class NamespaceMapping {
 
     public static String hashMapping(Map<String, String> sortedMapping) {
         try {
-            final MessageDigest digest = MessageDigest.getInstance("SHA1");
+            final MessageDigest digest = SecureUtils.defaultMessageDigest();
             for (final Map.Entry<String, String> sortedEntry : sortedMapping.entrySet()) {
                 digest.update(sortedEntry.getKey().getBytes("UTF-8"));
                 digest.update((byte) ' ');

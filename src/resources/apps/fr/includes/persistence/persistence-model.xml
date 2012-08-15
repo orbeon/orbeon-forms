@@ -24,6 +24,7 @@
               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
               xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
               xmlns:formRunner="java:org.orbeon.oxf.fr.FormRunner"
+              xmlns:secure="java:org.orbeon.oxf.util.SecureUtils"
               xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary">
 
     <xf:var name="parameters" value="xxf:instance('fr-parameters-instance')" as="element()"/>
@@ -74,7 +75,7 @@
 
             <!-- Create random document id if none is provided. This is the default for 'new', but a missing id is also
                  allowed for 'edit', 'view', etc., when data is posted to the page. -->
-            <xf:setvalue if="$is-new-id" ref="$document" value="digest(string(random(true)), 'MD5', 'hex')"/>
+            <xf:setvalue if="$is-new-id" ref="$document" value="secure:randomHexId()"/>
 
             <!-- Case of 'new' mode where we load the initial data via a service -->
             <xf:var name="new-from-service" value="$mode = 'new' and xxf:property(string-join(('oxf.fr.detail.new.service.enable', $app, $form), '.'))"/>
@@ -190,7 +191,7 @@
     </xf:action>
 
     <!-- New document operation -->
-    <xf:setvalue ev:event="fr-new-document" ref="$document" value="digest(string(random(true())), 'MD5', 'hex')"/>
+    <xf:setvalue ev:event="fr-new-document" ref="$document" value="secure:randomHexId()"/>
 
     <!-- Delete operation -->
     <xf:action ev:event="fr-delete-data">

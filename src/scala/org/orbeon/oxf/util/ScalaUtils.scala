@@ -15,7 +15,6 @@ package org.orbeon.oxf.util
 
 import org.orbeon.errorified.Exceptions
 import org.orbeon.exception._
-import java.security.MessageDigest
 import org.apache.log4j.Logger
 import java.net.URLEncoder.{encode ⇒ encodeURL}
 import java.net.URLDecoder.{decode ⇒ decodeURL}
@@ -108,15 +107,6 @@ object ScalaUtils {
                 logger.error("Exception when running " + action + '\n' + OrbeonFormatter.format(e))
                 throw newException(Exceptions.getRootThrowable(e))
         }
-
-    def digest(algorithm: String, data: Traversable[String]) = {
-        // Create and update digest
-        val messageDigest = MessageDigest.getInstance(algorithm)
-        data foreach (s ⇒ messageDigest.update(s.getBytes("utf-8")))
-
-        // Format result
-        SecureUtils.byteArrayToHex(messageDigest.digest())
-    }
 
     def dropTrailingSlash(s: String) = if (s.size == 0 || s.last != '/') s else s.init
     def dropStartingSlash(s: String) = if (s.size == 0 || s.head != '/') s else s.tail

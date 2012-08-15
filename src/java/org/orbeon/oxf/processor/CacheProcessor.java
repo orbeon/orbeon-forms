@@ -96,7 +96,7 @@ public class CacheProcessor extends ProcessorImpl {
             // Get a digest of the key input, if possible from cache
             state.keyDigest = readCacheInputAsObject(context, getInputByName(INPUT_KEY), new CacheableInputReader<String>() {
                 public String read(PipelineContext context, ProcessorInput input) {
-                    XMLUtils.DigestContentHandler digestContentHandler = new XMLUtils.DigestContentHandler("MD5");
+                    XMLUtils.DigestContentHandler digestContentHandler = new XMLUtils.DigestContentHandler();
                     readInputAsSAX(context, input, digestContentHandler);
                     return new String(digestContentHandler.getResult());
                 }

@@ -176,7 +176,7 @@ public class BeanGenerator extends ProcessorImpl {
                 State state = (State) digestState;
                 if (state.beanStore == null) {
                     state.beanStore = new SAXStore();
-                    final XMLUtils.DigestContentHandler digester = new XMLUtils.DigestContentHandler("MD5");
+                    final XMLUtils.DigestContentHandler digester = new XMLUtils.DigestContentHandler();
                     final TeeXMLReceiver tee = new TeeXMLReceiver(Arrays.asList(state.beanStore, digester));
                     readBean(pipelineContext, getConfig(pipelineContext), getMapping(pipelineContext), tee);
                     state.digest = digester.getResult();

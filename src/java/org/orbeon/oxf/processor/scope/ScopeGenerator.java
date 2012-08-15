@@ -128,7 +128,7 @@ public class ScopeGenerator extends ScopeProcessorBase {
                         }
 
                         // Compute digest of the SAX Store
-                        XMLUtils.DigestContentHandler digester = new XMLUtils.DigestContentHandler("MD5");
+                        XMLUtils.DigestContentHandler digester = new XMLUtils.DigestContentHandler();
                         state.saxStore.replay(digester);
                         state.digest = digester.getResult();
                     }

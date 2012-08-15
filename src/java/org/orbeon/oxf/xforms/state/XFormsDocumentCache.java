@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.state;
 import org.orbeon.oxf.cache.Cache;
 import org.orbeon.oxf.cache.InternalCacheKey;
 import org.orbeon.oxf.cache.ObjectCache;
-import org.orbeon.oxf.util.UUIDUtils;
+import org.orbeon.oxf.util.SecureUtils;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsStaticState;
 
@@ -85,7 +85,7 @@ public class XFormsDocumentCache {
     private InternalCacheKey createCacheKey(String uuid) {
 
         // Make sure that we are getting a UUID back
-        assert uuid.length() == UUIDUtils.UUID_LENGTH;
+        assert uuid.length() == SecureUtils.HexIdLength();
 
         return new InternalCacheKey(CONTAINING_DOCUMENT_KEY_TYPE, uuid);
     }

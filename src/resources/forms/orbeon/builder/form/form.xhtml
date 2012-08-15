@@ -23,6 +23,7 @@
       xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
       xmlns:saxon="http://saxon.sf.net/"
       xmlns:xbl="http://www.w3.org/ns/xbl"
+      xmlns:secure="java:org.orbeon.oxf.util.SecureUtils"
       xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps"
       xmlns:xformsUtils="java:org.orbeon.oxf.xforms.XFormsUtils">
     <xh:head>
@@ -418,7 +419,7 @@
                                         ev:event="fb-update-metadata"
                                         if="event('mode') = 'save-as'">
                                     <!-- Create new document id -->
-                                    <xf:setvalue ref="xxf:instance('fr-parameters-instance')/document" value="digest(string(random(true())), 'MD5', 'hex')"/>
+                                    <xf:setvalue ref="xxf:instance('fr-parameters-instance')/document" value="secure:randomHexId()"/>
                                     <!-- Actually save -->
                                     <xf:dispatch name="fr-save-action" target="fr-persistence-model">
                                         <xxf:context name="fr:check-data-valid" value="true()"/>

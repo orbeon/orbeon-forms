@@ -15,6 +15,11 @@
             xmlns:oxf="http://www.orbeon.com/oxf/processors"
             xmlns:xi="http://www.w3.org/2001/XInclude">
 
+    <!-- Encryption properties -->
+    <property as="xs:string"  name="oxf.crypto.password"                             value="CHANGE THIS PASSWORD"/>
+    <property as="xs:integer" name="oxf.crypto.key-length"                           value="128"/>
+    <property as="xs:string"  name="oxf.crypto.hash-algorithm"                       value="SHA1"/>
+
     <!-- Global properties -->
     <property as="xs:anyURI"  name="oxf.log4j-config"                                value="oxf:/config/log4j.xml"/>
     <property as="xs:integer" name="oxf.cache.size"                                  value="1000"/>

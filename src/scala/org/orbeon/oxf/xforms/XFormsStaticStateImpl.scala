@@ -30,7 +30,7 @@ import org.orbeon.oxf.xforms.XFormsStaticStateImpl.StaticStateDocument
 import state.AnnotatedTemplate
 import xbl.Scope
 import org.dom4j.{Element, Document}
-import org.orbeon.oxf.util.{NumberUtils, XPathCache}
+import org.orbeon.oxf.util.{SecureUtils, NumberUtils, XPathCache}
 import org.orbeon.oxf.util.ScalaUtils.stringOptionToSet
 
 class XFormsStaticStateImpl(
@@ -85,8 +85,6 @@ class XFormsStaticStateImpl(
 }
 
 object XFormsStaticStateImpl {
-
-    val DIGEST_LENGTH = 32
 
     val BASIC_NAMESPACE_MAPPING =
         new NamespaceMapping(Map(
@@ -172,7 +170,7 @@ object XFormsStaticStateImpl {
         identity.setResult(documentResult)
 
         val metadata = new Metadata
-        val digestContentHandler = new XMLUtils.DigestContentHandler("MD5")
+        val digestContentHandler = new XMLUtils.DigestContentHandler
         val template = new SAXStore
 
         val prefix = startScope.fullPrefix
@@ -289,7 +287,7 @@ object XFormsStaticStateImpl {
         
         def getOrComputeDigest(digest: Option[String]) =
             digest getOrElse {
-                val digestContentHandler = new XMLUtils.DigestContentHandler("MD5")
+                val digestContentHandler = new XMLUtils.DigestContentHandler
                 TransformerUtils.writeDom4j(xmlDocument, digestContentHandler)
                 NumberUtils.toHexString(digestContentHandler.getResult)
             }

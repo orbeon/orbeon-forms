@@ -24,10 +24,7 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.PageFlowControllerProcessor;
 import org.orbeon.oxf.servlet.OrbeonXFormsFilter;
-import org.orbeon.oxf.util.IndentedLogger;
-import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.util.URLRewriterUtils;
-import org.orbeon.oxf.util.UUIDUtils;
+import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.action.XFormsAPI;
 import org.orbeon.oxf.xforms.analysis.XPathDependencies;
 import org.orbeon.oxf.xforms.control.XFormsControl;
@@ -174,7 +171,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         setLocationData(staticState.locationData());
 
         // Create UUID for this document instance
-        this.uuid = UUIDUtils.createPseudoUUID();
+        this.uuid = SecureUtils.randomHexId();
 
         // Initialize request information
         {

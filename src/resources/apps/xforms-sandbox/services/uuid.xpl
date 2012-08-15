@@ -13,21 +13,19 @@
 -->
 <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
     xmlns:oxf="http://www.orbeon.com/oxf/processors"
-    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-    xmlns:thread="java.lang.Thread">
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
     <p:param name="data" type="output"/>
 
     <p:processor name="oxf:unsafe-xslt">
         <p:input name="data"><dummy/></p:input>
         <p:input name="config">
-            <uuid xsl:version="2.0" xmlns:uuid="java:org.orbeon.oxf.util.UUIDUtils">
+            <uuid xsl:version="2.0">
                 <!-- Prevent pipeline engine to cache the output of this processor -->
                 <xsl:if test="false()">
                     <xsl:value-of select="doc('http://dummy')"/>
                 </xsl:if>
-                <!-- Wait for 5 seconds -->
-                <xsl:value-of select="uuid:createPseudoUUID()"/>
+                <xsl:value-of xmlns:secure="java:org.orbeon.oxf.util.SecureUtils" select="secure:randomHexId()"/>
             </uuid>
         </p:input>
         <p:output name="data" ref="data"/>

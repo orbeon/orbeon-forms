@@ -19,11 +19,10 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.processor.test.TestExternalContext;
 import org.orbeon.oxf.test.ResourceManagerTestBase;
 import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.util.UUIDUtils;
+import org.orbeon.oxf.util.SecureUtils;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.XFormsStaticState;
-import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.analysis.XFormsStaticStateTest;
 import org.orbeon.oxf.xforms.event.ClientEvents;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
@@ -107,7 +106,7 @@ public class XFormsStateManagerTest extends ResourceManagerTestBase {
             state1.staticStateString = stateManager.getClientEncodedStaticState(state1.document);
             state1.dynamicStateString = stateManager.getClientEncodedDynamicState(state1.document);
 
-            assertEquals(state1.uuid.length(), UUIDUtils.UUID_LENGTH);
+            assertEquals(state1.uuid.length(), SecureUtils.HexIdLength());
             assertNotNull(StringUtils.trimToNull(state1.staticStateString));
             assertNotNull(StringUtils.trimToNull(state1.dynamicStateString));
 
@@ -172,7 +171,7 @@ public class XFormsStateManagerTest extends ResourceManagerTestBase {
             state1.staticStateString = stateManager.getClientEncodedStaticState(state1.document);
             state1.dynamicStateString = stateManager.getClientEncodedDynamicState(state1.document);
 
-            assertEquals(state1.uuid.length(), UUIDUtils.UUID_LENGTH);
+            assertEquals(state1.uuid.length(), SecureUtils.HexIdLength());
             assertNull(StringUtils.trimToNull(state1.staticStateString));
             assertNull(StringUtils.trimToNull(state1.dynamicStateString));
 

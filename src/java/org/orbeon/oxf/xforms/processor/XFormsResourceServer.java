@@ -269,7 +269,7 @@ public class XFormsResourceServer extends ProcessorImpl {
                                   long lastModified, Map<String, String[]> headers, String headersToForward) {
 
         // Create a digest, so that for a given URI we always get the same key
-        final String digest = SecureUtils.digestString(uri, "SHA1", "hex");
+        final String digest = SecureUtils.digestString(uri, "hex");
 
         // Get session
         final ExternalContext externalContext = NetUtils.getExternalContext();

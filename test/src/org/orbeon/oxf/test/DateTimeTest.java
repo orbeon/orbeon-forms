@@ -13,15 +13,15 @@
  */
 package org.orbeon.oxf.test;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 import org.orbeon.oxf.xforms.control.controls.XFormsInputControl;
 
+import static org.junit.Assert.assertEquals;
 
-public class DateTimeTest extends TestCase {
 
-    protected void setUp() throws Exception {
-    }
+public class DateTimeTest extends ResourceManagerTestBase {
 
+    @Test
     public void testTimeParsing() {
 
         // Test PM time parsing
@@ -51,6 +51,7 @@ public class DateTimeTest extends TestCase {
         }
     }
 
+    @Test
     public void testDateParsing() {
         assertEquals("2010-02-19", XFormsInputControl.testParseDate("2/19/2010"));
         assertEquals("2010-02-19", XFormsInputControl.testParseDate("02/19/2010"));

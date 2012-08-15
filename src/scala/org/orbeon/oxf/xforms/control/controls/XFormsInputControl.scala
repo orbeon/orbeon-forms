@@ -84,18 +84,13 @@ class XFormsInputControl(container: XBLContainer, parent: XFormsControl, element
         setExternalValue(updatedValue)
     }
 
-    override def storeExternalValue(value: String): Unit =  {
-        // Store after converting
-        super.storeExternalValue(convertFromExternalValue(value))
+    override def translateExternalValue(externalValue: String) = {
 
         // Tricky: mark the external value as dirty if there is a format, as the client will expect an up to date formatted value
         format foreach { _ ⇒
             markExternalValueDirty()
             containingDocument.getControls.markDirtySinceLastRequest(false)
         }
-    }
-
-    private def convertFromExternalValue(externalValue: String): String = {
 
         // NOTE: We have decided that it did not make much sense to encrypt the value for boolean. This also poses
         // a problem since the server does not send an itemset for new booleans, therefore the client cannot know

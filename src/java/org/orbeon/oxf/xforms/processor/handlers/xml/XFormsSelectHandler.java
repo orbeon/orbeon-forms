@@ -21,7 +21,6 @@ import org.orbeon.oxf.xforms.itemset.Item;
 import org.orbeon.oxf.xforms.itemset.Itemset;
 import org.orbeon.oxf.xforms.itemset.ItemsetListener;
 import org.xml.sax.Attributes;
-import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
 /**
@@ -43,28 +42,27 @@ public class XFormsSelectHandler extends XFormsControlLifecyleHandlerXML {
     		reusableAttributes.clear();
 			xmlReceiver.startElement(XFormsConstants.XXFORMS_NAMESPACE_URI, "items", XFormsConstants.XXFORMS_PREFIX + ":items", reusableAttributes);
 			
-    		itemset.visit(xmlReceiver, new ItemsetListener() {
+    		itemset.visit(xmlReceiver, new ItemsetListener<Object>() {
 
-				public void startLevel(ContentHandler contentHandler, Item item) throws SAXException {
+				public void startLevel(Object o, Item item) {
 					// We don't have to do anything here. We handle depth by startItem and endItem
 				}
 
-				public void endLevel(ContentHandler contentHandler) throws SAXException {
+				public void endLevel(Object o) {
 					// We don't have to do anything here. We handle depth by startItem and endItem
 				}
 
-				public void startItem(ContentHandler contentHandler, Item item, boolean first) throws SAXException {
+				public void startItem(Object o, Item item, boolean first) throws SAXException {
 					reusableAttributes.clear();
-					assert !item.getLabel().isHTML(); // TODO Handle rich content in select labels
-					reusableAttributes.addAttribute(XFormsConstants.XXFORMS_NAMESPACE_URI, "label", XFormsConstants.XXFORMS_PREFIX + ":label", "CDATA", item.getLabel().getLabel());
-					reusableAttributes.addAttribute(XFormsConstants.XXFORMS_NAMESPACE_URI, "value", XFormsConstants.XXFORMS_PREFIX + ":value", "CDATA", item.getValue());
-					xmlReceiver.startElement(XFormsConstants.XXFORMS_NAMESPACE_URI, "item", XFormsConstants.XXFORMS_PREFIX + ":item", reusableAttributes);
-				}
+					assert !item.label().isHTML(); // TODO Handle rich content in select labels
+					reusableAttributes.addAttribute(XFormsConstants.XXFORMS_NAMESPACE_URI, "label", XFormsConstants.XXFORMS_PREFIX + ":label", "CDATA", item.label().label());
+					reusableAttributes.addAttribute(XFormsConstants.XXFORMS_NAMESPACE_URI, "value", XFormsConstants.XXFORMS_PREFIX + ":value", "CDATA", item.value());
+                    xmlReceiver.startElement(XFormsConstants.XXFORMS_NAMESPACE_URI, "item", XFormsConstants.XXFORMS_PREFIX + ":item", reusableAttributes);
+                }
 
-				 public void endItem(ContentHandler contentHandler, Item item) throws SAXException {
-					xmlReceiver.endElement(XFormsConstants.XXFORMS_NAMESPACE_URI, "item", XFormsConstants.XXFORMS_PREFIX + ":item");
-				}
-    			
+				 public void endItem(Object o, Item item) throws SAXException {
+                     xmlReceiver.endElement(XFormsConstants.XXFORMS_NAMESPACE_URI, "item", XFormsConstants.XXFORMS_PREFIX + ":item");
+                 }
     		});
     		
     		xmlReceiver.endElement(XFormsConstants.XXFORMS_NAMESPACE_URI, "items", XFormsConstants.XXFORMS_PREFIX + ":items");

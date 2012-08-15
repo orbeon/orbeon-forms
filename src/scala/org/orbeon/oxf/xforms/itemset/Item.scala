@@ -1,0 +1,79 @@
+/**
+ * Copyright (C) 2010 Orbeon, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ *
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ */
+package org.orbeon.oxf.xforms.itemset
+
+import Item._
+import collection.JavaConverters._
+import java.util.{Map ⇒ JMap}
+import org.apache.commons.lang.StringUtils
+import org.dom4j.QName
+import org.orbeon.oxf.xforms.XFormsUtils
+import org.orbeon.oxf.xforms.control.XFormsControl
+import org.orbeon.oxf.xml.ContentHandlerHelper
+import org.orbeon.oxf.xml.XMLUtils
+import org.orbeon.oxf.xml.dom4j.LocationData
+
+/**
+ * Represents an item (xforms:item, xforms:choice, or item in itemset).
+ */
+case class Item(label: Label, value: String, attributes: Map[QName, String])(val position: Int, encode: Boolean)
+        extends ItemContainer {
+
+    assert(attributes ne null)
+
+    // NOTE: As of 2010-08-18, label can be null in these cases:
+    //
+    // - xforms:choice with (see XFormsUtils.getElementValue())
+    //   - single-node binding that doesn't point to an acceptable item
+    //   - value attribute but the evaluation context is empty
+    //   - exception when dereferencing an @src attribute
+    // - xforms|input:xxforms-type(xs:boolean)
+
+    def jAttributes = attributes.asJava
+
+    def getExternalValue   = Option(value) map (v ⇒ if (encode) position.toString else v) getOrElse ""
+    def getExternalJSValue = Option(value) map (v ⇒ if (encode) position.toString else XFormsUtils.escapeJavaScript(v)) getOrElse ""
+
+    def getExternalJSLabel(locationData: LocationData) =
+        if (label eq null)
+            ""
+        else XFormsUtils.escapeJavaScript(
+            if (label.isHTML)
+                XFormsControl.getEscapedHTMLValue(locationData, label.label)
+            else
+                XMLUtils.escapeXMLMinimal(label.label))
+
+    // Implement deep equals because children is not part of the case class
+    override def equals(other: Any) = other match {
+        case otherItem: Item ⇒ super.equals(otherItem) && children == otherItem.children
+        case _ ⇒ false
+    }
+
+    // Missing: position, encode, attributes
+    override def toString = level + ' ' + ("  " * level) + label + '→' + value
+}
+object Item {
+
+    // Value is encrypted if requested, except with single selection if the value is empty
+    def apply(position: Int, isMultiple: Boolean, encode: Boolean, attributes: JMap[QName, String], label: Label, value: String): Item =
+        Item(label, value, if (attributes eq null) Map() else attributes.asScala.toMap)(position, encode && (isMultiple || StringUtils.isNotEmpty(value)))
+
+    case class Label(label: String, isHTML: Boolean) {
+        def streamAsHTML(ch: ContentHandlerHelper, locationData: LocationData): Unit =
+            if (isHTML)
+                XFormsUtils.streamHTMLFragment(ch.getXmlReceiver, label, locationData, "")
+            else
+                ch.text(StringUtils.defaultString(label))
+    }
+}

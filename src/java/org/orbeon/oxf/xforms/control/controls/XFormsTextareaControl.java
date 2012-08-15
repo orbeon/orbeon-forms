@@ -65,30 +65,30 @@ public class XFormsTextareaControl extends XFormsValueControl implements Focusab
      * a stylesheet that removes all unknown or dangerous content.
      */
     @Override
-    public void storeExternalValue(String value) {
+    public String translateExternalValue(String externalValue) {
         if (XFormsControl.isHTMLMediatype(this)) {
             final IndentedLogger indentedLogger = containingDocument().getControls().getIndentedLogger();
             final boolean isDebugEnabled = indentedLogger.isDebugEnabled();
             if (isDebugEnabled)
-                indentedLogger.startHandleOperation("xforms:textarea", "cleaning-up HTML", "value", value);
+                indentedLogger.startHandleOperation("xforms:textarea", "cleaning-up HTML", "value", externalValue);
 
             // Do TagSoup and XSLT cleaning
-            final Document tagSoupedDocument = XFormsUtils.htmlStringToDom4jTagSoup(value, null);
+            final Document tagSoupedDocument = XFormsUtils.htmlStringToDom4jTagSoup(externalValue, null);
             if (isDebugEnabled)
                 indentedLogger.logDebug("xforms:textarea", "after TagSoup cleanup", "value", Dom4jUtils.domToString(tagSoupedDocument));
             final Document cleanedDocument = XMLUtils.cleanXML(tagSoupedDocument, "oxf:/ops/xforms/clean-html.xsl");
 
             // Remove dummy tags (the dummy tags are added by the XSLT, as we need a root element for XSLT processing)
-            value = Dom4jUtils.domToString(cleanedDocument);
-            if ("<dummy-root/>".equals(value)) {
-                value = "";                                                                 // Becomes empty
+            externalValue = Dom4jUtils.domToString(cleanedDocument);
+            if ("<dummy-root/>".equals(externalValue)) {
+                externalValue = "";                                                                 // Becomes empty
             } else {
-                value = value.substring("<dummy-root>".length());                           // Remove start dummy tag
-                value = value.substring(0, value.length() - "</dummy-root>".length());      // Remove end dummy tag
+                externalValue = externalValue.substring("<dummy-root>".length());                           // Remove start dummy tag
+                externalValue = externalValue.substring(0, externalValue.length() - "</dummy-root>".length());      // Remove end dummy tag
             }
             if (isDebugEnabled)
-                indentedLogger.endHandleOperation("value", value);
+                indentedLogger.endHandleOperation("value", externalValue);
         }
-        super.storeExternalValue(value);
+        return externalValue;
     }
 }

@@ -11,17 +11,16 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.xforms.itemset;
+package org.orbeon.oxf.xforms.itemset
 
-import org.xml.sax.ContentHandler;
-import org.xml.sax.SAXException;
+import org.xml.sax.SAXException
 
 /**
  * Callback interface for visiting itemsets.
  */
-public interface ItemsetListener {
-    void startLevel(ContentHandler contentHandler, Item item) throws SAXException;
-    void endLevel(ContentHandler contentHandler) throws SAXException;
-    void startItem(ContentHandler contentHandler, Item item, boolean first) throws SAXException;
-    void endItem(ContentHandler contentHandler, Item item) throws SAXException;
+trait ItemsetListener[T] {
+    @throws(classOf[SAXException]) def startLevel(o: T, item: Item)
+    @throws(classOf[SAXException]) def endLevel(o: T)
+    @throws(classOf[SAXException]) def startItem(o: T, item: Item, first: Boolean)
+    @throws(classOf[SAXException]) def endItem(o: T, item: Item)
 }

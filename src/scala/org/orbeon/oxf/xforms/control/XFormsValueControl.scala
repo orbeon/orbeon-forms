@@ -14,21 +14,20 @@
 package org.orbeon.oxf.xforms.control
 
 import collection.JavaConverters._
+import XFormsValueControl._
 import org.dom4j.Element
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.xforms.{XFormsConstants, XFormsProperties, XFormsUtils}
 import org.orbeon.oxf.xforms.analysis.XPathDependencies
 import org.orbeon.oxf.xforms.event.XFormsEvent
 import org.orbeon.oxf.xforms.event.events.XXFormsValue
 import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.oxf.xforms.xbl.XBLContainer
+import org.orbeon.oxf.xforms.XFormsProperties
+import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml.{ContentHandlerHelper, NamespaceMapping}
-import org.orbeon.saxon.om.Item
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.saxon.value._
-import XFormsValueControl._
-import XFormsConstants._
 
 /**
  * Base class for all controls that hold a value.
@@ -103,28 +102,29 @@ abstract class XFormsValueControl(container: XBLContainer, parent: XFormsControl
         ! isExternalValueEvaluated
 
     override def isValueChanged: Boolean = {
-        val result = ! XFormsUtils.compareStrings(previousValue, value)
+        val result = previousValue != value
         previousValue = value
         result
     }
 
-    /**
-     * Notify the control that its value has changed due to external user interaction. The value passed is a value as
-     * understood by the UI layer.
-     *
-     * @param value             the new external value
-     */
-    def storeExternalValue(value: String): Unit = {
-        // Set value into the instance
+    // This usually doesn't need to be overridden (only XFormsUploadControl as of 2012-08-15)
+    def storeExternalValue(externalValue: String) = doStoreExternalValue(externalValue)
 
+    // Subclasses can override this to translate the incoming external value
+    def translateExternalValue(externalValue: String) = externalValue
+
+    // Set the external value into the instance
+    final def doStoreExternalValue(externalValue: String): Unit = {
         // NOTE: Standard value controls should be bound to simple content only. Is there anything we should / can do
         // about this? See: https://github.com/orbeon/orbeon-forms/issues/13
 
-
-        val boundItem: Item = getBoundItem
+        val boundItem = getBoundItem
         if (! boundItem.isInstanceOf[NodeInfo])// this should not happen
             throw new OXFException("Control is no longer bound to a node. Cannot set external value.")
-        DataModel.jSetValueIfChanged(containingDocument, getIndentedLogger, this, getLocationData, boundItem.asInstanceOf[NodeInfo], value, "client", isCalculate = false)
+
+        val translatedValue = translateExternalValue(externalValue)
+
+        DataModel.jSetValueIfChanged(containingDocument, getIndentedLogger, this, getLocationData, boundItem.asInstanceOf[NodeInfo], translatedValue, "client", isCalculate = false)
 
         // NOTE: We do *not* call evaluate() here, as that will break the difference engine. doSetValue() above marks
         // the controls as dirty, and they will be evaluated when necessary later.

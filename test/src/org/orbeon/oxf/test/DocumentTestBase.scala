@@ -74,7 +74,7 @@ abstract class DocumentTestBase extends ResourceManagerTestBase {
     def getType(controlId: String) = getSingleNodeControl(controlId).getType
 
     def getItemset(controlId: String) =
-        getObject(controlId).asInstanceOf[XFormsSelect1Control].getItemset.getJSONTreeInfo(null, false, null)
+        getObject(controlId).asInstanceOf[XFormsSelect1Control].getItemset.getJSONTreeInfo(null, null)
 
     // Automatically convert between Scala Elem andDom4j Document/Element
     implicit def elemToDocument(e: Elem) = Dom4jUtils.readDom4j(e.toString)

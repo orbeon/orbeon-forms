@@ -162,7 +162,7 @@ trait SelectionControlTrait extends SimpleElementAnalysis with SelectAppearanceT
 
         assert(hasStaticItemset)
 
-        val result = new Itemset
+        val result = new Itemset(isMultiple)
 
         Dom4jUtils.visitSubtree(element, new Dom4jUtils.VisitorListener() {
 
@@ -187,7 +187,7 @@ trait SelectionControlTrait extends SimpleElementAnalysis with SelectAppearanceT
                         val value = XFormsUtils.getStaticChildElementValue(containerScope.fullPrefix, valueElement, false, null)
 
                         val attributes = SelectionControlUtil.getAttributes(element)
-                        currentContainer.addChildItem(new Item(position, isMultiple, isEncryptValues, attributes, new Item.Label(label, containsHTML(0)), StringUtils.defaultString(value)))
+                        currentContainer.addChildItem(Item(position, isMultiple, isEncryptValues, attributes, new Item.Label(label, containsHTML(0)), StringUtils.defaultString(value)))
                         position += 1
 
                     case ITEMSET_QNAME ⇒ // xforms:itemset
@@ -203,7 +203,7 @@ trait SelectionControlTrait extends SimpleElementAnalysis with SelectAppearanceT
                             assert(label ne null)
 
                             val attributes = SelectionControlUtil.getAttributes(element)
-                            val newContainer = new Item(position, isMultiple, isEncryptValues, attributes, new Item.Label(label, false), null)
+                            val newContainer = Item(position, isMultiple, isEncryptValues, attributes, new Item.Label(label, false), null)
                             position += 1
                             currentContainer.addChildItem(newContainer);
                             currentContainer = newContainer
@@ -218,7 +218,7 @@ trait SelectionControlTrait extends SimpleElementAnalysis with SelectAppearanceT
                     // xforms:choices
                     val labelElement = element.element(LABEL_QNAME)
                     if (labelElement ne null)
-                        currentContainer = currentContainer.getParent
+                        currentContainer = currentContainer.parent
                 }
 
             def text(text: Text) = ()

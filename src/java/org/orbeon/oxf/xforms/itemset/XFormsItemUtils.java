@@ -93,7 +93,7 @@ public class XFormsItemUtils {
         final boolean isMultiple = staticControl.isMultiple();
         final XBLContainer container = select1Control.container();
 
-        final Itemset result = new Itemset();
+        final Itemset result = new Itemset(isMultiple);
 
         // Set binding on this control, after saving the current context because the context stack must
         // remain unmodified.
@@ -101,7 +101,7 @@ public class XFormsItemUtils {
         final BindingContext savedBindingContext = contextStack.getCurrentBindingContext();
         contextStack.setBinding(select1Control.getBindingContext());
 
-        final boolean isEncryptItemValues = select1Control.isEncryptItemValues();
+        final boolean isEncryptItemValues = select1Control.isEncryptValues();
         Dom4jUtils.visitSubtree(select1Control.element(), new Dom4jUtils.VisitorListener() {
 
             private int position = 0;
@@ -123,7 +123,7 @@ public class XFormsItemUtils {
                     final String value = getValueValue(element.element(XFormsConstants.XFORMS_VALUE_QNAME));
 
                     final Map<QName, String> attributes = getAttributes(element);
-                    currentContainer.addChildItem(new Item(position++, isMultiple, isEncryptItemValues, attributes, label, StringUtils.defaultString(value)));
+                    currentContainer.addChildItem(Item.apply(position++, isMultiple, isEncryptItemValues, attributes, label, StringUtils.defaultString(value)));
 
                 } else if (XFormsConstants.ITEMSET_QNAME.getName().equals(localname)) {
                     // xforms:itemset
@@ -176,12 +176,11 @@ public class XFormsItemUtils {
                                             nodeStack.pop();
                                             for (int i = newLevel; i < currentLevel; i++) {
                                                 nodeStack.pop();
-                                                currentContainer = currentContainer.getParent();
+                                                currentContainer = currentContainer.parent();
                                             }
                                         } else if (newLevel > currentLevel) {
                                             // Going up one level, set new container as last added child
-                                            final List<Item> children = currentContainer.getChildren();
-                                            currentContainer = children.get(children.size() - 1);
+                                            currentContainer = currentContainer.lastChild();
                                         }
                                         currentLevel = newLevel;
                                     }
@@ -197,7 +196,7 @@ public class XFormsItemUtils {
                                         // a leaf item, so we prune such non-relevant items later.
 
                                         final Map<QName, String> attributes = getAttributes(element);
-                                        currentContainer.addChildItem(new Item(position++, isMultiple, isEncryptItemValues, attributes, label, value));
+                                        currentContainer.addChildItem(Item.apply(position++, isMultiple, isEncryptItemValues, attributes, label, value));
                                     } else {
                                         // TODO: handle xforms:copy
                                         throw new ValidationException("xforms:copy is not yet supported.", select1Control.getLocationData());
@@ -222,7 +221,7 @@ public class XFormsItemUtils {
                         // NOTE: returned label can be null in some cases
 
                         final Map<QName, String> attributes = getAttributes(element);
-                        final Item newContainer = new Item(position++, isMultiple, isEncryptItemValues, attributes, label, null);
+                        final Item newContainer = Item.apply(position++, isMultiple, isEncryptItemValues, attributes, label, null);
                         currentContainer.addChildItem(newContainer);
                         currentContainer = newContainer;
                     }
@@ -236,7 +235,7 @@ public class XFormsItemUtils {
 
                     final Element labelElement = element.element(XFormsConstants.LABEL_QNAME);
                     if (labelElement != null) {
-                        currentContainer = currentContainer.getParent();
+                        currentContainer = currentContainer.parent();
                     }
                 }
                 contextStack.popBinding();

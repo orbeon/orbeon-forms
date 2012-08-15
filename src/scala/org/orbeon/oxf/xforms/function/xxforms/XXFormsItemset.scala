@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms.function.xxforms
 
 import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control
-import org.orbeon.oxf.xforms.control.controls.XFormsSelectControl
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.saxon.expr.ExpressionTool
 import org.orbeon.saxon.expr.XPathContext
@@ -35,14 +34,13 @@ class XXFormsItemset extends XFormsFunction {
 
                 val itemset = select1Control.getItemset
                 val controlValueForSelection = if (selected) select1Control.getValue else null
-                val isMultiple = select1Control.isInstanceOf[XFormsSelectControl]
 
                 if (format == "json")
                     // Return a string
-                    StringValue.makeStringValue(itemset.getJSONTreeInfo(controlValueForSelection, isMultiple, select1Control.getLocationData))
+                    StringValue.makeStringValue(itemset.getJSONTreeInfo(controlValueForSelection, select1Control.getLocationData))
                 else
                     // Return an XML document
-                    itemset.getXMLTreeInfo(xpathContext.getConfiguration, controlValueForSelection, isMultiple, select1Control.getLocationData)
+                    itemset.getXMLTreeInfo(xpathContext.getConfiguration, controlValueForSelection, select1Control.getLocationData)
 
             case _ ⇒ null
         }

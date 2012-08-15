@@ -23,7 +23,6 @@ import org.orbeon.saxon.om.{Item, NodeInfo}
 import org.orbeon.oxf.xforms.function.xxforms.{XXFormsProperty, XXFormsPropertiesStartsWith}
 import java.util.{Map ⇒ JMap, List ⇒ JList}
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
-import org.orbeon.oxf.xforms.function.Random
 import org.orbeon.oxf.util.{SecureUtils, NetUtils, XPathCache}
 import org.apache.commons.lang.StringUtils
 import org.orbeon.oxf.pipeline.api.ExternalContext.Request

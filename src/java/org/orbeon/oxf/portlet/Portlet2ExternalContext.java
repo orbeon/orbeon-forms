@@ -588,7 +588,7 @@ public class Portlet2ExternalContext implements ExternalContext {
         return request;
     }
 
-    public Response getResponse() {
+    public ExternalContext.Response getResponse() {
         if (response == null)
             response = new BufferedResponse(request);
         return response;

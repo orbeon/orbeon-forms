@@ -59,9 +59,9 @@ class Itemset(multiple: Boolean) extends ItemContainer {
 
                     // Item label and value
                     sb.append(""""label":"""")
-                    sb.append(item.getExternalJSLabel(locationData))
+                    sb.append(item.javaScriptLabel(locationData))
                     sb.append("""","value":"""")
-                    sb.append(item.getExternalJSValue)
+                    sb.append(item.javaScriptValue)
                     sb.append('"')
 
                     // Item attributes if any

@@ -73,7 +73,7 @@ class XFormsSelectControl(container: XBLContainer, parent: XFormsControl, elemen
         newInstanceValue mkString " "
     }
 
-    override def markDirtyImpl(xpathDependencies: XPathDependencies) {
+    override def markDirtyImpl(xpathDependencies: XPathDependencies): Unit = {
 
         // Default implementation
         super.markDirtyImpl(xpathDependencies)
@@ -102,7 +102,7 @@ class XFormsSelectControl(container: XBLContainer, parent: XFormsControl, elemen
                             item ← itemset.allItemsIterator
                             if instanceValues(item.value)
                         } yield
-                            item.getExternalValue
+                            item.externalValue
 
                     // NOTE: In encoded mode, external values are guaranteed to be distinct, but in non-encoded mode,
                     // there might be duplicates.
@@ -127,12 +127,12 @@ object XFormsSelectControl {
         (newlySelectedValues, newlyDeselectedValues, newInstanceValue)
     }
 
-    def valueAsLinkedSet(s: String) = nonEmptyOrNone(s) match {
+    private def valueAsLinkedSet(s: String) = nonEmptyOrNone(s) match {
         case Some(list) ⇒ mutable.LinkedHashSet(list split """\s+""": _*)
         case None ⇒ Set[String]()
     }
 
-    def valueAsSet(s: String) = nonEmptyOrNone(s) match {
+    private def valueAsSet(s: String) = nonEmptyOrNone(s) match {
         case Some(list) ⇒ list split """\s+""" toSet
         case None ⇒ Set[String]()
     }

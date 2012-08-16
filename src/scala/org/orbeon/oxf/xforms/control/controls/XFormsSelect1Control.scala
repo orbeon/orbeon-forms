@@ -81,7 +81,7 @@ class XFormsSelect1Control(container: XBLContainer, parent: XFormsControl, eleme
             itemsetProperty.handleMarkDirty()
     }
 
-    // Get this control's itemset.
+    // Get this control's itemset
     def getItemset: Itemset =
         try {
             // Non-relevant control does not return an itemset
@@ -225,7 +225,7 @@ class XFormsSelect1Control(container: XBLContainer, parent: XFormsControl, eleme
         }
     }
 
-    override def outputAjaxDiff(ch: ContentHandlerHelper, other: XFormsControl, attributesImpl: AttributesImpl, isNewlyVisibleSubtree: Boolean) {
+    override def outputAjaxDiff(ch: ContentHandlerHelper, other: XFormsControl, attributesImpl: AttributesImpl, isNewlyVisibleSubtree: Boolean): Unit = {
 
         // Output regular diff
         super.outputAjaxDiff(ch, other, attributesImpl, isNewlyVisibleSubtree)
@@ -260,37 +260,23 @@ object XFormsSelect1Control {
     private val AppearancesWithInitialization =
         Set(XXFORMS_TREE_APPEARANCE_QNAME, XXFORMS_MENU_APPEARANCE_QNAME, XFORMS_COMPACT_APPEARANCE_QNAME)
 
-    /**
-     * Get itemset for a selection control given either directly or by id. If the control is null or non-relevant,
-     * lookup by id takes place and the control must have a static itemset or otherwise null is returned.
-     *
-     * @param containingDocument    current containing document
-     * @param control               control from which to obtain itemset (may be null if control has a static itemset)
-     * @param prefixedId            prefixed id of control from which to obtain itemset (if control is null)
-     * @return                      itemset or null if it is not possible to obtain it
-     */
-    def getInitialItemset(containingDocument: XFormsContainingDocument, control: XFormsSelect1Control, prefixedId: String): Itemset = {
+    // Get itemset for a selection control given either directly or by id. If the control is null or non-relevant,
+    // lookup by id takes place and the control must have a static itemset or otherwise null is returned.
+    def getInitialItemset(containingDocument: XFormsContainingDocument, control: XFormsSelect1Control, prefixedId: String): Itemset =
         if ((control ne null) && control.isRelevant) {
             // Control is there and relevant so just ask it (this will include static itemsets evaluation as well)
             control.getItemset
         } else if (isStaticItemset(containingDocument, prefixedId)) {
             // Control is not there or is not relevant, so use static itemsets
             // NOTE: This way we output static itemsets during initialization as well, even for non-relevant controls
-            (containingDocument.getStaticOps.getControlAnalysisOption(prefixedId).get.asInstanceOf[SelectionControlTrait]).evaluateStaticItemset()
+            containingDocument.getStaticOps.getSelect1Analysis(prefixedId).evaluateStaticItemset()
         } else {
             // Not possible so return null
             null
         }
-    }
 
-    /**
-     * Whether the given control has a static set of items.
-     *
-     * @param containingDocument    containing document
-     * @param prefixedId            prefixed id
-     * @return                      true iif control has a static set of items
-     */
-    def isStaticItemset(containingDocument: XFormsContainingDocument, prefixedId: String): Boolean = {
+    // Whether the given control has a static set of items.
+    private def isStaticItemset(containingDocument: XFormsContainingDocument, prefixedId: String): Boolean = {
         val analysis = containingDocument.getStaticOps.getSelect1Analysis(prefixedId)
         analysis.hasStaticItemset
     }

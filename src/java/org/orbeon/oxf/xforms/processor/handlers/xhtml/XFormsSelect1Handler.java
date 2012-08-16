@@ -431,7 +431,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                 final String name = (!isMultiple && xformsControl instanceof XFormsSelect1Control) ? ((XFormsSelect1Control) xformsControl).getGroupName() : itemName;
                 reusableAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, name);
 
-                reusableAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, item.getExternalValue());
+                reusableAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, item.externalValue());
 
                 if (!handlerContext.isTemplate() && xformsControl != null) {
 
@@ -478,7 +478,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
         final AttributesImpl optionAttributes = getAttributes(XMLUtils.EMPTY_ATTRIBUTES, itemClasses, null);
         // Add item attributes to option
         addItemAttributes(item, optionAttributes);
-        optionAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, item.getExternalValue());
+        optionAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, item.externalValue());
 
         // Figure out whether what items are selected
         boolean isSelected = isSelected(handlerContext, xformsControl, isMultiple, item);

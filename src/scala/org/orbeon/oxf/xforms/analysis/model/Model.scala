@@ -310,7 +310,7 @@ class BindTree(model: Model, bindElements: Seq[Element]) {
             def analyzeXPath() {
 
                 def booleanOrStringExpression =
-                    if (BooleanXPathMIPNames.contains(name)) "boolean(" + expression + ")" else "string(" + expression + ")"
+                    if (BooleanXPathMIPNames.contains(name)) "boolean(" + expression + ")" else "string((" + expression + ")[1])"
 
                 // Analyze and remember if figured out
                 Bind.this.analyzeXPath(getChildrenContext, bindsVariablesSeq, booleanOrStringExpression) match {

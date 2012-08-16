@@ -296,7 +296,7 @@ object XPathCache {
 
         val xpathExpression =
             getXPathExpression(
-                getGlobalConfiguration, contextItems, contextPosition, "string(" + xpathString + ")",
+                getGlobalConfiguration, contextItems, contextPosition, "string((" + xpathString + ")[1])",
                 namespaceMapping, variableToValueMap, functionLibrary, baseURI, false, locationData)
 
         withEvaluation(xpathString, xpathExpression, locationData) {

@@ -186,7 +186,7 @@
                                 </analysis>
                             </binding>
                             <mip name="calculate" expression="42">
-                                <analysis expression="string(42)" analyzed="true"/>
+                                <analysis expression="string((42)[1])" analyzed="true"/>
                             </mip>
                         </bind>
                         <bind id="bc3" ref="instance('i6')">
@@ -228,7 +228,7 @@
                                 </analysis>
                             </binding>
                             <mip name="default" expression="42">
-                                <analysis expression="string(42)" analyzed="true"/>
+                                <analysis expression="string((42)[1])" analyzed="true"/>
                             </mip>
                         </bind>
                     </binds>
@@ -446,7 +446,7 @@
                                     </analysis>
                                 </binding>
                                 <mip name="calculate" expression="concat(../b, ../c)">
-                                    <analysis expression="string(concat(../b, ../c))" analyzed="true">
+                                    <analysis expression="string((concat(../b, ../c))[1])" analyzed="true">
                                         <value-dependent>
                                             <path>instance('i2')/b</path>
                                             <path>instance('i2')/c</path>
@@ -478,7 +478,7 @@
                                     </analysis>
                                 </binding>
                                 <mip name="default" expression="concat(../a, ../c)">
-                                    <analysis expression="string(concat(../a, ../c))" analyzed="true">
+                                    <analysis expression="string((concat(../a, ../c))[1])" analyzed="true">
                                         <value-dependent>
                                             <path>instance('i2')/a</path>
                                             <path>instance('i2')/c</path>
@@ -1165,7 +1165,7 @@
                 </model>
                 <output scope="" prefixed-id="output1" model-prefixed-id="model" binding="false" value="true">
                     <value>
-                        <analysis expression="string($mv)" analyzed="true">
+                        <analysis expression="string(($mv)[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('instance')</path>
                             </value-dependent>
@@ -1251,7 +1251,7 @@
                 </model>
                 <output scope="" prefixed-id="output1" model-prefixed-id="model2" binding="false" value="true">
                     <value>
-                        <analysis expression="string($mv)" analyzed="true">
+                        <analysis expression="string(($mv)[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('instance2')</path>
                             </value-dependent>
@@ -1317,7 +1317,7 @@
                 </model>
                 <output scope="" prefixed-id="output1" model-prefixed-id="model1" binding="false" value="true">
                     <value>
-                        <analysis expression="string($mv)" analyzed="true">
+                        <analysis expression="string(($mv)[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('instance1')</path>
                             </value-dependent>
@@ -1333,7 +1333,7 @@
                 <group scope="" prefixed-id="group2" model-prefixed-id="model2" binding="false" value="false"/>
                 <output scope="" prefixed-id="output2a" model-prefixed-id="model2" binding="false" value="true">
                     <value>
-                        <analysis expression="string($mv)" analyzed="true">
+                        <analysis expression="string(($mv)[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('instance2')</path>
                             </value-dependent>
@@ -1348,7 +1348,7 @@
                 </output>
                 <output scope="" prefixed-id="output2b" model-prefixed-id="model1" binding="false" value="true">
                     <value>
-                        <analysis expression="string($mv)" analyzed="true">
+                        <analysis expression="string(($mv)[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('instance1')</path>
                             </value-dependent>
@@ -1381,7 +1381,7 @@
                 </group>
                 <output scope="" prefixed-id="output3a" model-prefixed-id="model1" binding="false" value="true">
                     <value>
-                        <analysis expression="string($mv)" analyzed="true">
+                        <analysis expression="string(($mv)[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('instance1')</path>
                             </value-dependent>
@@ -1396,7 +1396,7 @@
                 </output>
                 <output scope="" prefixed-id="output3b" model-prefixed-id="model1" binding="false" value="true">
                     <value>
-                        <analysis expression="string($mv)" analyzed="true">
+                        <analysis expression="string(($mv)[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('instance1')</path>
                             </value-dependent>
@@ -1411,7 +1411,7 @@
                 </output>
                 <output scope="" prefixed-id="output3c" model-prefixed-id="model2" binding="false" value="true">
                     <value>
-                        <analysis expression="string($mv)" analyzed="true">
+                        <analysis expression="string(($mv)[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('instance2')</path>
                             </value-dependent>
@@ -1427,7 +1427,7 @@
                 <group scope="" prefixed-id="group4" model-prefixed-id="model1" binding="false" value="false"/>
                 <output scope="" prefixed-id="output4a" model-prefixed-id="model1" binding="false" value="true">
                     <value>
-                        <analysis expression="string($mv)" analyzed="true">
+                        <analysis expression="string(($mv)[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('instance1')</path>
                             </value-dependent>
@@ -1442,7 +1442,7 @@
                 </output>
                 <output scope="" prefixed-id="output4b" model-prefixed-id="model1" binding="false" value="true">
                     <value>
-                        <analysis expression="string($mv)" analyzed="true">
+                        <analysis expression="string(($mv)[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('instance1')</path>
                             </value-dependent>
@@ -1457,7 +1457,7 @@
                 </output>
                 <output scope="" prefixed-id="output4c" model-prefixed-id="model2" binding="false" value="true">
                     <value>
-                        <analysis expression="string($mv)" analyzed="true">
+                        <analysis expression="string(($mv)[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('instance2')</path>
                             </value-dependent>
@@ -1508,7 +1508,7 @@
                 </variable>
                 <output scope="" prefixed-id="output5a" model-prefixed-id="model1" binding="false" value="true">
                     <value>
-                        <analysis expression="string($mv1)" analyzed="true">
+                        <analysis expression="string(($mv1)[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('instance1')</path>
                             </value-dependent>
@@ -1523,7 +1523,7 @@
                 </output>
                 <output scope="" prefixed-id="output5b" model-prefixed-id="model1" binding="false" value="true">
                     <value>
-                        <analysis expression="string($mv2)" analyzed="true">
+                        <analysis expression="string(($mv2)[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('instance2')</path>
                             </value-dependent>
@@ -2085,7 +2085,7 @@
                 </variable>
                 <output scope="" prefixed-id="osum" model-prefixed-id="model" binding="false" value="true">
                     <value>
-                        <analysis expression="string($sum)" analyzed="true">
+                        <analysis expression="string(($sum)[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('instance')/foo</path>
                                 <path>instance('instance')/bar</path>
@@ -2101,7 +2101,7 @@
                 </output>
                 <output scope="" prefixed-id="oproduct" model-prefixed-id="model" binding="false" value="true">
                     <value>
-                        <analysis expression="string($product)" analyzed="true">
+                        <analysis expression="string(($product)[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('instance')/foo</path>
                                 <path>instance('instance')/bar</path>
@@ -2117,7 +2117,7 @@
                 </output>
                 <output scope="" prefixed-id="odifference" model-prefixed-id="model" binding="false" value="true">
                     <value>
-                        <analysis expression="string($difference)" analyzed="true">
+                        <analysis expression="string(($difference)[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('instance')/foo</path>
                                 <path>instance('instance')/bar</path>
@@ -2294,7 +2294,7 @@
                 </group>
                 <output scope="my-foo" prefixed-id="my-foo$oexternal" model-prefixed-id="my-foo$model" binding="false" value="true">
                     <value>
-                        <analysis expression="string($external)" analyzed="true">
+                        <analysis expression="string(($external)[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('instance')/foo</path>
                             </value-dependent>
@@ -2309,7 +2309,7 @@
                 </output>
                 <output scope="my-foo" prefixed-id="my-foo$oro" model-prefixed-id="my-foo$model" binding="false" value="true">
                     <value>
-                        <analysis expression="string($readonly)" analyzed="false"/>
+                        <analysis expression="string(($readonly)[1])" analyzed="false"/>
                     </value>
                 </output>
             </request>
@@ -2460,7 +2460,7 @@
                 <model scope="" prefixed-id="model" analyzed-binds="true"/>
                 <output scope="" prefixed-id="output" model-prefixed-id="model" binding="false" value="true">
                     <value>
-                        <analysis expression="string(current-date())" analyzed="true"/>
+                        <analysis expression="string((current-date())[1])" analyzed="true"/>
                     </value>
                 </output>
             </request>
@@ -2497,7 +2497,7 @@
                 <template scope="my-foo" prefixed-id="my-foo$xf-2" binding="false" value="false"/>
                 <output scope="my-foo" prefixed-id="my-foo$output" binding="false" value="true">
                     <value>
-                        <analysis expression="string(current-date())" analyzed="true"/>
+                        <analysis expression="string((current-date())[1])" analyzed="true"/>
                     </value>
                 </output>
             </request>
@@ -2756,9 +2756,8 @@
                                     </analysis>
                                 </mip>
                                 <mip name="calculate" expression="if (../units castable as xs:integer and ../price castable as xs:decimal) then ../units * ../price else '-'">
-                                    <analysis expression="string(if (../units castable as xs:integer and ../price castable as xs:decimal) then ../units * ../price else '-')" analyzed="true">
+                                    <analysis expression="string((if (../units castable as xs:integer and ../price castable as xs:decimal) then ../units * ../price else '-')[1])" analyzed="true">
                                         <value-dependent>
-                                            <path>instance('po')/items/item/total</path>
                                             <path>instance('po')/items/item/units</path>
                                             <path>instance('po')/items/item/price</path>
                                         </value-dependent>
@@ -2820,7 +2819,7 @@
                                     </analysis>
                                 </value>
                                 <mip name="calculate" expression="sum(for $t in ../../items/item/total[. castable as xs:decimal] return $t)">
-                                    <analysis expression="string(sum(for $t in ../../items/item/total[. castable as xs:decimal] return $t))" analyzed="true">
+                                    <analysis expression="string((sum(for $t in ../../items/item/total[. castable as xs:decimal] return $t))[1])" analyzed="true">
                                         <value-dependent>
                                             <path>instance('po')/items/item/total</path>
                                         </value-dependent>
@@ -2864,7 +2863,7 @@
                                     </analysis>
                                 </value>
                                 <mip name="calculate" expression="../subtotal * ../../info/tax">
-                                    <analysis expression="string(../subtotal * ../../info/tax)" analyzed="true">
+                                    <analysis expression="string((../subtotal * ../../info/tax)[1])" analyzed="true">
                                         <value-dependent>
                                             <path>instance('po')/totals/subtotal</path>
                                             <path>instance('po')/info/tax</path>
@@ -2909,7 +2908,7 @@
                                     </analysis>
                                 </value>
                                 <mip name="calculate" expression="for $t in ../subtotal + ../tax return if ($t &gt; 4000) then $t else $t * 0.9">
-                                    <analysis expression="string(for $t in ../subtotal + ../tax return if ($t &gt; 4000) then $t else $t * 0.9)" analyzed="true">
+                                    <analysis expression="string((for $t in ../subtotal + ../tax return if ($t &gt; 4000) then $t else $t * 0.9)[1])" analyzed="true">
                                         <value-dependent>
                                             <path>instance('po')/totals/subtotal</path>
                                             <path>instance('po')/totals/tax</path>
@@ -3369,7 +3368,7 @@
                 <model scope="" prefixed-id="model" default-instance-prefixed-id="i1" analyzed-binds="true"/>
                 <output scope="" prefixed-id="01" model-prefixed-id="model" binding="false" value="true">
                     <value>
-                        <analysis expression="string(a[last()]/b)" analyzed="true">
+                        <analysis expression="string((a[last()]/b)[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('i1')/a/b</path>
                             </value-dependent>
@@ -3490,7 +3489,7 @@
                 </group>
                 <output scope="" prefixed-id="o1" model-prefixed-id="model" binding="false" value="true">
                     <value>
-                        <analysis expression="string(xxf:context('g1')/../bar)" analyzed="true">
+                        <analysis expression="string((xxf:context('g1')/../bar)[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('i1')/bar</path>
                             </value-dependent>
@@ -3505,7 +3504,7 @@
                 </output>
                 <output scope="" prefixed-id="o2" model-prefixed-id="model" binding="false" value="true">
                     <value>
-                        <analysis expression="string(xxf:context('g2')/../bar)" analyzed="true">
+                        <analysis expression="string((xxf:context('g2')/../bar)[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('i2')/bar</path>
                             </value-dependent>
@@ -3520,7 +3519,7 @@
                 </output>
                 <output scope="" prefixed-id="o3" model-prefixed-id="model" binding="false" value="true">
                     <value>
-                        <analysis expression="string(xxf:context('g3')/../bar)" analyzed="true">
+                        <analysis expression="string((xxf:context('g3')/../bar)[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('i3')/bar</path>
                             </value-dependent>
@@ -3535,7 +3534,7 @@
                 </output>
                 <output scope="" prefixed-id="o4" model-prefixed-id="model" binding="false" value="true">
                     <value>
-                        <analysis expression="string(xxf:context('o4')/../bar)" analyzed="true">
+                        <analysis expression="string((xxf:context('o4')/../bar)[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('i3')/bar</path>
                             </value-dependent>
@@ -3604,7 +3603,7 @@
                 <model scope="" prefixed-id="model" default-instance-prefixed-id="i1" analyzed-binds="true"/>
                 <output scope="" prefixed-id="o1" model-prefixed-id="model" binding="false" value="true">
                     <value>
-                        <analysis expression="string(context())" analyzed="true">
+                        <analysis expression="string((context())[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('i1')</path>
                             </value-dependent>
@@ -3637,7 +3636,7 @@
                 </group>
                 <output scope="" prefixed-id="o2" model-prefixed-id="model" binding="false" value="true">
                     <value>
-                        <analysis expression="string(context())" analyzed="true">
+                        <analysis expression="string((context())[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('i1')/foo</path>
                             </value-dependent>
@@ -3670,7 +3669,7 @@
                 </group>
                 <output scope="" prefixed-id="o3" model-prefixed-id="model" binding="false" value="true">
                     <value>
-                        <analysis expression="string(context())" analyzed="true">
+                        <analysis expression="string((context())[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('i2')/bar</path>
                             </value-dependent>
@@ -3686,7 +3685,7 @@
                 <group scope="" prefixed-id="g3" model-prefixed-id="model" binding="false" value="false"/>
                 <output scope="" prefixed-id="o4" model-prefixed-id="model" binding="false" value="true">
                     <value>
-                        <analysis expression="string(baz[context() = instance('i1')])" analyzed="true">
+                        <analysis expression="string((baz[context() = instance('i1')])[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('i2')/bar/baz</path>
                                 <path>instance('i2')/bar</path>
@@ -3705,7 +3704,7 @@
                 <group scope="" prefixed-id="g4" model-prefixed-id="model" binding="false" value="false"/>
                 <output scope="" prefixed-id="o5" model-prefixed-id="model" binding="false" value="true">
                     <value>
-                        <analysis expression="string(baz[context() = instance('i1')])" analyzed="true">
+                        <analysis expression="string((baz[context() = instance('i1')])[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('i2')/bar/toto/baz</path>
                                 <path>instance('i2')/bar/toto</path>
@@ -3741,7 +3740,7 @@
                 </group>
                 <output scope="" prefixed-id="o6" model-prefixed-id="model" binding="false" value="true">
                     <value>
-                        <analysis expression="string(baz[context() = instance('i1')])" analyzed="true">
+                        <analysis expression="string((baz[context() = instance('i1')])[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('i2')/bar/toto/gaga/baz</path>
                                 <path>instance('i2')/bar/toto/gaga</path>
@@ -3778,7 +3777,7 @@
                 <repeat-iteration scope="" prefixed-id="r1~iteration" model-prefixed-id="model" binding="false" value="false"/>
                 <output scope="" prefixed-id="o7" model-prefixed-id="model" binding="false" value="true">
                     <value>
-                        <analysis expression="string(context())" analyzed="true">
+                        <analysis expression="string((context())[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('i1')/item</path>
                             </value-dependent>
@@ -3870,7 +3869,7 @@
                 <repeat-iteration scope="" prefixed-id="r2~iteration" model-prefixed-id="model" binding="false" value="false"/>
                 <output scope="" prefixed-id="o1" model-prefixed-id="model" binding="false" value="true">
                     <value>
-                        <analysis expression="string(xxf:repeat-current('r1')/../bar)" analyzed="true">
+                        <analysis expression="string((xxf:repeat-current('r1')/../bar)[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('i1')/bar</path>
                             </value-dependent>
@@ -3885,7 +3884,7 @@
                 </output>
                 <output scope="" prefixed-id="o2" model-prefixed-id="model" binding="false" value="true">
                     <value>
-                        <analysis expression="string(xxf:repeat-current('r2')/../bar)" analyzed="true">
+                        <analysis expression="string((xxf:repeat-current('r2')/../bar)[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('i2')/bar</path>
                             </value-dependent>
@@ -3900,7 +3899,7 @@
                 </output>
                 <output scope="" prefixed-id="o3" model-prefixed-id="model" binding="false" value="true">
                     <value>
-                        <analysis expression="string(xxf:repeat-current()/../bar)" analyzed="true">
+                        <analysis expression="string((xxf:repeat-current()/../bar)[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('i2')/bar</path>
                             </value-dependent>
@@ -3915,7 +3914,7 @@
                 </output>
                 <output scope="" prefixed-id="o4" model-prefixed-id="model" binding="false" value="true">
                     <value>
-                        <analysis expression="string(gaga[toto = xxf:repeat-current('r1')])" analyzed="true">
+                        <analysis expression="string((gaga[toto = xxf:repeat-current('r1')])[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('i2')/foo/gaga</path>
                                 <path>instance('i2')/foo/gaga/toto</path>
@@ -3933,7 +3932,7 @@
                 </output>
                 <output scope="" prefixed-id="o5" model-prefixed-id="model" binding="false" value="true">
                     <value>
-                        <analysis expression="string(gaga[toto = xxf:repeat-current('r2')])" analyzed="true">
+                        <analysis expression="string((gaga[toto = xxf:repeat-current('r2')])[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('i2')/foo/gaga</path>
                                 <path>instance('i2')/foo/gaga/toto</path>
@@ -3950,7 +3949,7 @@
                 </output>
                 <output scope="" prefixed-id="o6" model-prefixed-id="model" binding="false" value="true">
                     <value>
-                        <analysis expression="string(gaga[toto = xxf:repeat-current()])" analyzed="true">
+                        <analysis expression="string((gaga[toto = xxf:repeat-current()])[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('i2')/foo/gaga</path>
                                 <path>instance('i2')/foo/gaga/toto</path>
@@ -3999,7 +3998,7 @@
                 <model scope="" prefixed-id="model" default-instance-prefixed-id="i1" analyzed-binds="true"/>
                 <output scope="" prefixed-id="o1" model-prefixed-id="model" binding="false" value="true">
                     <value>
-                        <analysis expression="string(xxf:serialize(instance()/foo/bar, 'xml'))" analyzed="true">
+                        <analysis expression="string((xxf:serialize(instance()/foo/bar, 'xml'))[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('i1')/foo/bar</path>
                             </value-dependent>
@@ -4014,7 +4013,7 @@
                 </output>
                 <output scope="" prefixed-id="o2" model-prefixed-id="model" binding="false" value="true">
                     <value>
-                        <analysis expression="string(xxf:serialize(instance('i2')/foo/bar, 'html'))" analyzed="true">
+                        <analysis expression="string((xxf:serialize(instance('i2')/foo/bar, 'html'))[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('i2')/foo/bar</path>
                             </value-dependent>
@@ -4029,7 +4028,7 @@
                 </output>
                 <output scope="" prefixed-id="o3" model-prefixed-id="model" binding="false" value="true">
                     <value>
-                        <analysis expression="string(xxf:serialize(instance()/foo/bar, instance('i2')/gaga))" analyzed="true">
+                        <analysis expression="string((xxf:serialize(instance()/foo/bar, instance('i2')/gaga))[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('i1')/foo/bar</path>
                                 <path>instance('i2')/gaga</path>
@@ -4082,7 +4081,7 @@
                 <model scope="" prefixed-id="model" default-instance-prefixed-id="instance" analyzed-binds="true"/>
                 <output scope="" prefixed-id="o11" model-prefixed-id="model" binding="false" value="true">
                     <value>
-                        <analysis expression="string(a/count(b))" analyzed="true">
+                        <analysis expression="string((a/count(b))[1])" analyzed="true">
                             <dependent-models>
                                 <model>model</model>
                             </dependent-models>
@@ -4094,7 +4093,7 @@
                 </output>
                 <output scope="" prefixed-id="o12" model-prefixed-id="model" binding="false" value="true">
                     <value>
-                        <analysis expression="string(a/count(following-sibling::b))" analyzed="true">
+                        <analysis expression="string((a/count(following-sibling::b))[1])" analyzed="true">
                             <dependent-models>
                                 <model>model</model>
                             </dependent-models>
@@ -4106,7 +4105,7 @@
                 </output>
                 <output scope="" prefixed-id="o13" model-prefixed-id="model" binding="false" value="true">
                     <value>
-                        <analysis expression="string(a/count(preceding-sibling::b))" analyzed="true">
+                        <analysis expression="string((a/count(preceding-sibling::b))[1])" analyzed="true">
                             <dependent-models>
                                 <model>model</model>
                             </dependent-models>
@@ -4118,7 +4117,7 @@
                 </output>
                 <output scope="" prefixed-id="o14" model-prefixed-id="model" binding="false" value="true">
                     <value>
-                        <analysis expression="string(a/count(self::a))" analyzed="true">
+                        <analysis expression="string((a/count(self::a))[1])" analyzed="true">
                             <dependent-models>
                                 <model>model</model>
                             </dependent-models>
@@ -4130,7 +4129,7 @@
                 </output>
                 <output scope="" prefixed-id="o15" model-prefixed-id="model" binding="false" value="true">
                     <value>
-                        <analysis expression="string(a/b/count(ancestor::a))" analyzed="true">
+                        <analysis expression="string((a/b/count(ancestor::a))[1])" analyzed="true">
                             <dependent-models>
                                 <model>model</model>
                             </dependent-models>
@@ -4142,7 +4141,7 @@
                 </output>
                 <output scope="" prefixed-id="o21" model-prefixed-id="model" binding="false" value="true">
                     <value>
-                        <analysis expression="string(a/sum(b))" analyzed="true">
+                        <analysis expression="string((a/sum(b))[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('instance')/a/b</path>
                             </value-dependent>
@@ -4157,7 +4156,7 @@
                 </output>
                 <output scope="" prefixed-id="o22" model-prefixed-id="model" binding="false" value="true">
                     <value>
-                        <analysis expression="string(a/sum(following-sibling::b))" analyzed="true">
+                        <analysis expression="string((a/sum(following-sibling::b))[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('instance')/b</path>
                             </value-dependent>
@@ -4172,7 +4171,7 @@
                 </output>
                 <output scope="" prefixed-id="o23" model-prefixed-id="model" binding="false" value="true">
                     <value>
-                        <analysis expression="string(a/sum(preceding-sibling::b))" analyzed="true">
+                        <analysis expression="string((a/sum(preceding-sibling::b))[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('instance')/b</path>
                             </value-dependent>
@@ -4187,7 +4186,7 @@
                 </output>
                 <output scope="" prefixed-id="o24" model-prefixed-id="model" binding="false" value="true">
                     <value>
-                        <analysis expression="string(a/sum(self::a))" analyzed="true">
+                        <analysis expression="string((a/sum(self::a))[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('instance')/a</path>
                             </value-dependent>
@@ -4202,7 +4201,7 @@
                 </output>
                 <output scope="" prefixed-id="o25" model-prefixed-id="model" binding="false" value="true">
                     <value>
-                        <analysis expression="string(a/b/sum(ancestor::a))" analyzed="true">
+                        <analysis expression="string((a/b/sum(ancestor::a))[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('instance')/a</path>
                             </value-dependent>
@@ -4242,7 +4241,7 @@
                 <model scope="" prefixed-id="model" default-instance-prefixed-id="instance" analyzed-binds="true"/>
                 <output scope="" prefixed-id="o11" model-prefixed-id="model" binding="false" value="true">
                     <value>
-                        <analysis expression="string(@a)" analyzed="true">
+                        <analysis expression="string((@a)[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('instance')/@a</path>
                             </value-dependent>
@@ -4286,7 +4285,7 @@
                 <model scope="" prefixed-id="model" default-instance-prefixed-id="instance" analyzed-binds="true"/>
                 <output scope="" prefixed-id="o11" model-prefixed-id="model" binding="false" value="true">
                     <value>
-                        <analysis expression="string(position())" analyzed="true">
+                        <analysis expression="string((position())[1])" analyzed="true">
                             <dependent-models>
                                 <model>model</model>
                             </dependent-models>
@@ -4298,7 +4297,7 @@
                 </output>
                 <output scope="" prefixed-id="o12" model-prefixed-id="model" binding="false" value="true">
                     <value>
-                        <analysis expression="string(a/position())" analyzed="true">
+                        <analysis expression="string((a/position())[1])" analyzed="true">
                             <dependent-models>
                                 <model>model</model>
                             </dependent-models>
@@ -4310,7 +4309,7 @@
                 </output>
                 <output scope="" prefixed-id="o13" model-prefixed-id="model" binding="false" value="true">
                     <value>
-                        <analysis expression="string(a[position() = 1])" analyzed="true">
+                        <analysis expression="string((a[position() = 1])[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('instance')/a</path>
                             </value-dependent>
@@ -4325,7 +4324,7 @@
                 </output>
                 <output scope="" prefixed-id="o14" model-prefixed-id="model" binding="false" value="true">
                     <value>
-                        <analysis expression="string(a[position() = @p])" analyzed="true">
+                        <analysis expression="string((a[position() = @p])[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('instance')/a</path>
                                 <path>instance('instance')/a/@p</path>
@@ -4768,7 +4767,7 @@
                         </analysis>
                     </help>
                     <hint>
-                        <analysis expression="string(@label)" analyzed="true">
+                        <analysis expression="string((@label)[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('i22')/resource/@label</path>
                             </value-dependent>
@@ -4781,7 +4780,7 @@
                         </analysis>
                     </hint>
                     <alert>
-                        <analysis expression="string(xxf:context('i2')/@label2)" analyzed="true">
+                        <analysis expression="string((xxf:context('i2')/@label2)[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('i11')/@label2</path>
                             </value-dependent>
@@ -4905,7 +4904,7 @@
                         </analysis>
                     </help>
                     <hint>
-                        <analysis expression="(string(.)) | (string(index('my-repeat')))" analyzed="false"/>
+                        <analysis expression="(string(.)) | (string((index('my-repeat'))[1]))" analyzed="false"/>
                     </hint>
                 </input>
             </request>
@@ -4958,7 +4957,7 @@
                 </input>
                 <output scope="" prefixed-id="o1" model-prefixed-id="model" binding="false" value="true">
                     <value>
-                        <analysis expression="string(concat(gaga, $bar))" analyzed="true">
+                        <analysis expression="string((concat(gaga, $bar))[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('instance')/gaga</path>
                             </value-dependent>
@@ -5111,7 +5110,7 @@
                         </analysis>
                     </value>
                     <label>
-                        <analysis expression="string($bar)" analyzed="true">
+                        <analysis expression="string(($bar)[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('instance')/@bar</path>
                             </value-dependent>
@@ -5199,7 +5198,7 @@
                         </analysis>
                     </value>
                     <label>
-                        <analysis expression="string(@label1)" analyzed="true">
+                        <analysis expression="string((@label1)[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('instance')/@label1</path>
                             </value-dependent>
@@ -5212,7 +5211,7 @@
                         </analysis>
                     </label>
                         <help>
-                            <analysis expression="string(@help1)" analyzed="true">
+                        <analysis expression="string((@help1)[1])" analyzed="true">
                                 <value-dependent>
                                     <path>instance('instance')/nested/@help1</path>
                                 </value-dependent>
@@ -5227,7 +5226,7 @@
                 </input>
                 <group scope="" prefixed-id="group1" model-prefixed-id="model" binding="false" value="false">
                     <label>
-                        <analysis expression="string(@group-label)" analyzed="true">
+                        <analysis expression="string((@group-label)[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('instance')/nested/@group-label</path>
                             </value-dependent>
@@ -5271,7 +5270,7 @@
                         </analysis>
                     </value>
                     <label>
-                        <analysis expression="string(@label2)" analyzed="true">
+                        <analysis expression="string((@label2)[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('instance')/@label2</path>
                             </value-dependent>
@@ -5284,7 +5283,7 @@
                         </analysis>
                     </label>
                         <help>
-                            <analysis expression="string(@help2)" analyzed="true">
+                            <analysis expression="string((@help2)[1])" analyzed="true">
                                 <value-dependent>
                                     <path>instance('instance')/@help2</path>
                                 </value-dependent>
@@ -5328,7 +5327,7 @@
                         </analysis>
                     </value>
                     <label>
-                        <analysis expression="string(@label3)" analyzed="true">
+                        <analysis expression="string((@label3)[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('instance')/nested/@label3</path>
                             </value-dependent>
@@ -5341,7 +5340,7 @@
                         </analysis>
                     </label>
                         <help>
-                            <analysis expression="string(@help3)" analyzed="true">
+                            <analysis expression="string((@help3)[1])" analyzed="true">
                                 <value-dependent>
                                     <path>instance('instance')/@help3</path>
                                 </value-dependent>
@@ -5554,7 +5553,7 @@
                         </analysis>
                     </value>
                     <itemset>
-                        <analysis expression="((((((((((((((((((((../item) | (string(.))) | (string(value))) | (item)) | (string(.))) | (string(.))) | (../choices)) | (string(.))) | (item)) | (string(.))) | (string(value))) | (itemset)) | (string(.))) | (string(.))) | (items)) | (items)) | (string(.))) | (string(item1/value))) | (item2)) | (string(.))) | (string(value))" analyzed="true">
+                        <analysis expression="((((((((((((((((((((../item) | (string(.))) | (string((value)[1]))) | (item)) | (string(.))) | (string(.))) | (../choices)) | (string(.))) | (item)) | (string(.))) | (string((value)[1]))) | (itemset)) | (string(.))) | (string(.))) | (items)) | (items)) | (string(.))) | (string((item1/value)[1]))) | (item2)) | (string(.))) | (string((value)[1]))" analyzed="true">
                             <value-dependent>
                                 <path>instance('instance1')/item</path>
                                 <path>instance('instance1')/item/label</path>
@@ -5686,7 +5685,7 @@
                 </variable>
                 <output scope="my-foo" prefixed-id="my-foo$output1" model-prefixed-id="my-foo$foo-model" binding="false" value="true">
                     <value>
-                        <analysis expression="string($v2)" analyzed="true">
+                        <analysis expression="string(($v2)[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('instance')</path>
                             </value-dependent>
@@ -5737,7 +5736,7 @@
                 </variable>
                 <output scope="" prefixed-id="my-foo$output2" model-prefixed-id="model" binding="false" value="true">
                     <value>
-                        <analysis expression="string($v4)" analyzed="true">
+                        <analysis expression="string(($v4)[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('my-foo$foo-instance')</path>
                             </value-dependent>
@@ -5940,7 +5939,7 @@
                                     </analysis>
                                 </binding>
                                 <mip name="calculate" expression="$source">
-                                    <analysis expression="string($source)" analyzed="true">
+                                    <analysis expression="string(($source)[1])" analyzed="true">
                                         <value-dependent>
                                             <path>instance('instance')/@source</path>
                                         </value-dependent>
@@ -6073,7 +6072,7 @@
                 <model scope="" prefixed-id="m2" default-instance-prefixed-id="m2i1" analyzed-binds="true"/>
                 <output scope="" prefixed-id="o1" model-prefixed-id="m1" binding="false" value="true">
                     <value>
-                        <analysis expression="string(xxf:instance('m1i1'))" analyzed="true">
+                        <analysis expression="string((xxf:instance('m1i1'))[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('m1i1')</path>
                             </value-dependent>
@@ -6088,7 +6087,7 @@
                 </output>
                 <output scope="" prefixed-id="o2" model-prefixed-id="m1" binding="false" value="true">
                     <value>
-                        <analysis expression="string(xxf:instance('m2i1'))" analyzed="true">
+                        <analysis expression="string((xxf:instance('m2i1'))[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('m2i1')</path>
                             </value-dependent>
@@ -6107,7 +6106,7 @@
                 <template scope="foo1" prefixed-id="foo1$xf-3" model-prefixed-id="foo1$m1" binding="false" value="false"/>
                 <output scope="foo1" prefixed-id="foo1$o1" model-prefixed-id="foo1$m1" binding="false" value="true">
                     <value>
-                        <analysis expression="string(xxf:instance('m1i1'))" analyzed="true">
+                        <analysis expression="string((xxf:instance('m1i1'))[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('foo1$m1i1')</path>
                             </value-dependent>
@@ -6122,7 +6121,7 @@
                 </output>
                 <output scope="foo1" prefixed-id="foo1$o2" model-prefixed-id="foo1$m1" binding="false" value="true">
                     <value>
-                        <analysis expression="string(xxf:instance('m2i1'))" analyzed="true">
+                        <analysis expression="string((xxf:instance('m2i1'))[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('foo1$m2i1')</path>
                             </value-dependent>
@@ -6137,7 +6136,7 @@
                 </output>
                 <output scope="foo1" prefixed-id="foo1$o3" model-prefixed-id="foo1$m1" binding="false" value="true">
                     <value>
-                        <analysis expression="string(xxf:instance('m1i2'))" analyzed="true">
+                        <analysis expression="string((xxf:instance('m1i2'))[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('m1i2')</path>
                             </value-dependent>
@@ -6152,7 +6151,7 @@
                 </output>
                 <output scope="foo1" prefixed-id="foo1$o4" model-prefixed-id="foo1$m1" binding="false" value="true">
                     <value>
-                        <analysis expression="string(xxf:instance('m2i2'))" analyzed="true">
+                         <analysis expression="string((xxf:instance('m2i2'))[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('m2i2')</path>
                             </value-dependent>
@@ -6171,7 +6170,7 @@
                 <template scope="foo1$bar1" prefixed-id="foo1$bar1$xf-4" model-prefixed-id="foo1$bar1$m1" binding="false" value="false"/>
                 <output scope="foo1$bar1" prefixed-id="foo1$bar1$o1" model-prefixed-id="foo1$bar1$m1" binding="false" value="true">
                     <value>
-                        <analysis expression="string(xxf:instance('m1i1'))" analyzed="true">
+                        <analysis expression="string((xxf:instance('m1i1'))[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('foo1$bar1$m1i1')</path>
                             </value-dependent>
@@ -6186,7 +6185,7 @@
                 </output>
                 <output scope="foo1$bar1" prefixed-id="foo1$bar1$o2" model-prefixed-id="foo1$bar1$m1" binding="false" value="true">
                     <value>
-                        <analysis expression="string(xxf:instance('m2i1'))" analyzed="true">
+                        <analysis expression="string((xxf:instance('m2i1'))[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('foo1$bar1$m2i1')</path>
                             </value-dependent>
@@ -6201,7 +6200,7 @@
                 </output>
                 <output scope="foo1$bar1" prefixed-id="foo1$bar1$o3" model-prefixed-id="foo1$bar1$m1" binding="false" value="true">
                     <value>
-                        <analysis expression="string(xxf:instance('m1i3'))" analyzed="true">
+                        <analysis expression="string((xxf:instance('m1i3'))[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('foo1$m1i3')</path>
                             </value-dependent>
@@ -6216,7 +6215,7 @@
                 </output>
                 <output scope="foo1$bar1" prefixed-id="foo1$bar1$o4" model-prefixed-id="foo1$bar1$m1" binding="false" value="true">
                     <value>
-                        <analysis expression="string(xxf:instance('m2i3'))" analyzed="true">
+                        <analysis expression="string((xxf:instance('m2i3'))[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('foo1$m2i3')</path>
                             </value-dependent>
@@ -6231,7 +6230,7 @@
                 </output>
                 <output scope="foo1$bar1" prefixed-id="foo1$bar1$o5" model-prefixed-id="foo1$bar1$m1" binding="false" value="true">
                     <value>
-                        <analysis expression="string(xxf:instance('m1i2'))" analyzed="true">
+                        <analysis expression="string((xxf:instance('m1i2'))[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('m1i2')</path>
                             </value-dependent>
@@ -6246,7 +6245,7 @@
                 </output>
                 <output scope="foo1$bar1" prefixed-id="foo1$bar1$o6" model-prefixed-id="foo1$bar1$m1" binding="false" value="true">
                     <value>
-                        <analysis expression="string(xxf:instance('m2i2'))" analyzed="true">
+                        <analysis expression="string((xxf:instance('m2i2'))[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('m2i2')</path>
                             </value-dependent>
@@ -6262,7 +6261,7 @@
                 <group scope="foo1" prefixed-id="foo1$bar1$g2" model-prefixed-id="foo1$m1" binding="false" value="false"/>
                 <output scope="foo1" prefixed-id="foo1$bar1$o9" model-prefixed-id="foo1$m1" binding="false" value="true">
                     <value>
-                        <analysis expression="string(xxf:instance('m1i1'))" analyzed="true">
+                        <analysis expression="string((xxf:instance('m1i1'))[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('foo1$m1i1')</path>
                             </value-dependent>
@@ -6277,7 +6276,7 @@
                 </output>
                 <output scope="foo1" prefixed-id="foo1$bar1$o10" model-prefixed-id="foo1$m1" binding="false" value="true">
                     <value>
-                        <analysis expression="string(xxf:instance('m2i1'))" analyzed="true">
+                        <analysis expression="string((xxf:instance('m2i1'))[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('foo1$m2i1')</path>
                             </value-dependent>
@@ -6292,7 +6291,7 @@
                 </output>
                 <output scope="foo1" prefixed-id="foo1$bar1$o11" model-prefixed-id="foo1$m1" binding="false" value="true">
                     <value>
-                        <analysis expression="string(xxf:instance('m1i3'))" analyzed="true">
+                        <analysis expression="string((xxf:instance('m1i3'))[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('foo1$m1i3')</path>
                             </value-dependent>
@@ -6307,7 +6306,7 @@
                 </output>
                 <output scope="foo1" prefixed-id="foo1$bar1$o12" model-prefixed-id="foo1$m1" binding="false" value="true">
                     <value>
-                        <analysis expression="string(xxf:instance('m2i3'))" analyzed="true">
+                        <analysis expression="string((xxf:instance('m2i3'))[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('foo1$m2i3')</path>
                             </value-dependent>
@@ -6322,7 +6321,7 @@
                 </output>
                 <output scope="foo1" prefixed-id="foo1$bar1$o13" model-prefixed-id="foo1$m1" binding="false" value="true">
                     <value>
-                        <analysis expression="string(xxf:instance('m1i2'))" analyzed="true">
+                        <analysis expression="string((xxf:instance('m1i2'))[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('m1i2')</path>
                             </value-dependent>
@@ -6337,7 +6336,7 @@
                 </output>
                 <output scope="foo1" prefixed-id="foo1$bar1$o14" model-prefixed-id="foo1$m1" binding="false" value="true">
                     <value>
-                        <analysis expression="string(xxf:instance('m2i2'))" analyzed="true">
+                        <analysis expression="string((xxf:instance('m2i2'))[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('m2i2')</path>
                             </value-dependent>
@@ -6353,7 +6352,7 @@
                 <group scope="" prefixed-id="foo1$g1" model-prefixed-id="m1" binding="false" value="false"/>
                 <output scope="" prefixed-id="foo1$o5" model-prefixed-id="m1" binding="false" value="true">
                     <value>
-                        <analysis expression="string(xxf:instance('m1i1'))" analyzed="true">
+                        <analysis expression="string((xxf:instance('m1i1'))[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('m1i1')</path>
                             </value-dependent>
@@ -6368,7 +6367,7 @@
                 </output>
                 <output scope="" prefixed-id="foo1$o6" model-prefixed-id="m1" binding="false" value="true">
                     <value>
-                        <analysis expression="string(xxf:instance('m2i1'))" analyzed="true">
+                        <analysis expression="string((xxf:instance('m2i1'))[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('m2i1')</path>
                             </value-dependent>
@@ -6383,7 +6382,7 @@
                 </output>
                 <output scope="" prefixed-id="foo1$o7" model-prefixed-id="m1" binding="false" value="true">
                     <value>
-                        <analysis expression="string(xxf:instance('m1i2'))" analyzed="true">
+                        <analysis expression="string((xxf:instance('m1i2'))[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('m1i2')</path>
                             </value-dependent>
@@ -6398,7 +6397,7 @@
                 </output>
                 <output scope="" prefixed-id="foo1$o8" model-prefixed-id="m1" binding="false" value="true">
                     <value>
-                        <analysis expression="string(xxf:instance('m2i2'))" analyzed="true">
+                        <analysis expression="string((xxf:instance('m2i2'))[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('m2i2')</path>
                             </value-dependent>
@@ -6417,7 +6416,7 @@
                 <template scope="foo1$bar2" prefixed-id="foo1$bar2$xf-5" model-prefixed-id="foo1$bar2$m1" binding="false" value="false"/>
                 <output scope="foo1$bar2" prefixed-id="foo1$bar2$o1" model-prefixed-id="foo1$bar2$m1" binding="false" value="true">
                     <value>
-                        <analysis expression="string(xxf:instance('m1i1'))" analyzed="true">
+                        <analysis expression="string((xxf:instance('m1i1'))[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('foo1$bar2$m1i1')</path>
                             </value-dependent>
@@ -6432,7 +6431,7 @@
                 </output>
                 <output scope="foo1$bar2" prefixed-id="foo1$bar2$o2" model-prefixed-id="foo1$bar2$m1" binding="false" value="true">
                     <value>
-                        <analysis expression="string(xxf:instance('m2i1'))" analyzed="true">
+                        <analysis expression="string((xxf:instance('m2i1'))[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('foo1$bar2$m2i1')</path>
                             </value-dependent>
@@ -6447,7 +6446,7 @@
                 </output>
                 <output scope="foo1$bar2" prefixed-id="foo1$bar2$o3" model-prefixed-id="foo1$bar2$m1" binding="false" value="true">
                     <value>
-                        <analysis expression="string(xxf:instance('m1i3'))" analyzed="true">
+                        <analysis expression="string((xxf:instance('m1i3'))[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('foo1$m1i3')</path>
                             </value-dependent>
@@ -6462,7 +6461,7 @@
                 </output>
                 <output scope="foo1$bar2" prefixed-id="foo1$bar2$o4" model-prefixed-id="foo1$bar2$m1" binding="false" value="true">
                     <value>
-                        <analysis expression="string(xxf:instance('m2i3'))" analyzed="true">
+                        <analysis expression="string((xxf:instance('m2i3'))[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('foo1$m2i3')</path>
                             </value-dependent>
@@ -6477,7 +6476,7 @@
                 </output>
                 <output scope="foo1$bar2" prefixed-id="foo1$bar2$o5" model-prefixed-id="foo1$bar2$m1" binding="false" value="true">
                     <value>
-                        <analysis expression="string(xxf:instance('m1i2'))" analyzed="true">
+                        <analysis expression="string((xxf:instance('m1i2'))[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('m1i2')</path>
                             </value-dependent>
@@ -6492,7 +6491,7 @@
                 </output>
                 <output scope="foo1$bar2" prefixed-id="foo1$bar2$o6" model-prefixed-id="foo1$bar2$m1" binding="false" value="true">
                     <value>
-                        <analysis expression="string(xxf:instance('m2i2'))" analyzed="true">
+                        <analysis expression="string((xxf:instance('m2i2'))[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('m2i2')</path>
                             </value-dependent>
@@ -6508,7 +6507,7 @@
                 <group scope="" prefixed-id="foo1$bar2$g2" model-prefixed-id="m1" binding="false" value="false"/>
                 <output scope="" prefixed-id="foo1$bar2$o9" model-prefixed-id="m1" binding="false" value="true">
                     <value>
-                        <analysis expression="string(xxf:instance('m1i1'))" analyzed="true">
+                        <analysis expression="string((xxf:instance('m1i1'))[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('m1i1')</path>
                             </value-dependent>
@@ -6523,7 +6522,7 @@
                 </output>
                 <output scope="" prefixed-id="foo1$bar2$o10" model-prefixed-id="m1" binding="false" value="true">
                     <value>
-                        <analysis expression="string(xxf:instance('m2i1'))" analyzed="true">
+                        <analysis expression="string((xxf:instance('m2i1'))[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('m2i1')</path>
                             </value-dependent>
@@ -6538,17 +6537,17 @@
                 </output>
                 <output scope="" prefixed-id="foo1$bar2$o11" model-prefixed-id="m1" binding="false" value="true">
                     <value>
-                        <analysis expression="string(xxf:instance('m1i3'))" analyzed="true"/>
+                        <analysis expression="string((xxf:instance('m1i3'))[1])" analyzed="true"/>
                     </value>
                 </output>
                 <output scope="" prefixed-id="foo1$bar2$o12" model-prefixed-id="m1" binding="false" value="true">
                     <value>
-                        <analysis expression="string(xxf:instance('m2i3'))" analyzed="true"/>
+                        <analysis expression="string((xxf:instance('m2i3'))[1])" analyzed="true"/>
                     </value>
                 </output>
                 <output scope="" prefixed-id="foo1$bar2$o13" model-prefixed-id="m1" binding="false" value="true">
                     <value>
-                        <analysis expression="string(xxf:instance('m1i2'))" analyzed="true">
+                        <analysis expression="string((xxf:instance('m1i2'))[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('m1i2')</path>
                             </value-dependent>
@@ -6563,7 +6562,7 @@
                 </output>
                 <output scope="" prefixed-id="foo1$bar2$o14" model-prefixed-id="m1" binding="false" value="true">
                     <value>
-                        <analysis expression="string(xxf:instance('m2i2'))" analyzed="true">
+                        <analysis expression="string((xxf:instance('m2i2'))[1])" analyzed="true">
                             <value-dependent>
                                 <path>instance('m2i2')</path>
                             </value-dependent>
@@ -6659,7 +6658,7 @@
                 <model scope="" prefixed-id="nested-model" analyzed-binds="true"/>
                 <output scope="" prefixed-id="my-output" model-prefixed-id="model" binding="false" value="true">
                     <value>
-                        <analysis expression="string($foo)" analyzed="true"/>
+                        <analysis expression="string(($foo)[1])" analyzed="true"/>
                     </value>
                 </output>
             </request>

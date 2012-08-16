@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.function
 
-import org.apache.commons.lang.StringUtils
+import org.apache.commons.lang3.StringUtils
 import org.orbeon.oxf.xforms.XFormsModel
 import org.orbeon.saxon.expr._
 import org.orbeon.saxon.om._

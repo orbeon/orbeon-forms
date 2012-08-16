@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.xbl
 
-import org.apache.commons.lang.StringUtils
+import org.apache.commons.lang3.StringUtils
 
 // Poor man's CSS selector parser. See XBLTransformerTest for the supported subset of CSS.
 // TODO: handle [att], [att=val], [att~=val], [att|=val]

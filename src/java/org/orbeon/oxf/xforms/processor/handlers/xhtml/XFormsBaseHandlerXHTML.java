@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers.xhtml;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.dom4j.QName;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;

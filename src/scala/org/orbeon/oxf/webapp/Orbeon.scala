@@ -15,7 +15,7 @@ package org.orbeon.oxf.webapp
 
 import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.oxf.resources.{ResourceManagerWrapper, WebAppResourceManagerImpl}
-import org.apache.commons.lang.StringUtils
+import org.apache.commons.lang3.StringUtils
 import org.orbeon.oxf.common.{OXFException, Version}
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.pipeline.InitUtils

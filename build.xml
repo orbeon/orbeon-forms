@@ -84,7 +84,7 @@
         <include name="commons-discovery-0.4.jar"/>
         <include name="commons-fileupload-1.2.2.jar"/>
         <include name="commons-io-2.0.1.jar"/>
-        <include name="commons-lang-2_3.jar"/>
+        <include name="commons-lang3-3.1.jar"/>
         <include name="commons-logging-1.1.1.jar"/>
         <include name="commons-pool-1.6.jar"/>
         <include name="commons-validator-1_0_2.jar"/>
@@ -607,7 +607,7 @@
                 <include name="orbeon-errorified-20120619.jar"/>
                 <include name="scala-library-*.jar"/>
                 <include name="commons-fileupload-*.jar"/>
-                <include name="commons-lang-*.jar"/>
+                <include name="commons-lang3-*.jar"/>
                 <include name="log4j-*.jar"/>
             </lib>
         </war>

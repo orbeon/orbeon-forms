@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.properties.Properties;
 import org.orbeon.oxf.properties.PropertySet;

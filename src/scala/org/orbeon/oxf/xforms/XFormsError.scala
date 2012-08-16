@@ -26,7 +26,7 @@ import org.orbeon.oxf.xml._
 import dom4j.LocationData
 import processor.handlers.xhtml.XHTMLBodyHandler
 import org.orbeon.saxon.om.NodeInfo
-import org.apache.commons.lang.StringUtils
+import org.apache.commons.lang3.StringUtils
 import org.orbeon.oxf.common.{ValidationException, OXFException}
 import java.util.{List ⇒ JList}
 import xbl.{Scope, XBLContainer}

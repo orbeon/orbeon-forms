@@ -15,7 +15,7 @@ package org.orbeon.oxf.processor.serializer
 
 import BinaryTextXMLReceiver._
 import java.io._
-import org.apache.commons.lang.StringUtils.isNotBlank
+import org.apache.commons.lang3.StringUtils.isNotBlank
 import org.dom4j.Namespace
 import org.dom4j.QName
 import org.orbeon.oxf.common.OXFException

@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.state;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.processor.test.TestExternalContext;

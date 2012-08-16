@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers.xhtml;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.orbeon.oxf.xforms.control.LHHASupport;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsGroupControl;

@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.util;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.orbeon.oxf.common.OXFException;
 
 import java.io.File;

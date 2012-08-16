@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.event.events;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.event.*;
 

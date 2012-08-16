@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.webapp
 
-import org.apache.commons.lang.StringUtils
+import org.apache.commons.lang3.StringUtils
 
 object RunMode {
 

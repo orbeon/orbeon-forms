@@ -18,7 +18,7 @@ import org.orbeon.oxf.xforms._
 import org.xml.sax.helpers.AttributesImpl
 import org.orbeon.oxf.xforms.XFormsConstants._
 import collection.mutable.LinkedHashSet
-import org.apache.commons.lang.StringUtils
+import org.apache.commons.lang3.StringUtils
 import AjaxSupport._
 import org.orbeon.oxf.xml.{XMLUtils, ContentHandlerHelper}
 

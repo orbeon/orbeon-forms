@@ -15,7 +15,7 @@ package org.orbeon.exception
 
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.xml.dom4j.{ExtendedLocationData, LocationData}
-import org.apache.commons.lang.StringUtils._
+import org.apache.commons.lang3.StringUtils._
 import collection.JavaConverters._
 import org.orbeon.errorified._
 

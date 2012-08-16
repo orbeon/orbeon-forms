@@ -18,7 +18,7 @@ import org.orbeon.exception._
 import org.apache.log4j.Logger
 import java.net.URLEncoder.{encode ⇒ encodeURL}
 import java.net.URLDecoder.{decode ⇒ decodeURL}
-import org.apache.commons.lang.StringUtils.{isNotBlank, trimToEmpty}
+import org.apache.commons.lang3.StringUtils.{isNotBlank, trimToEmpty}
 
 object ScalaUtils {
 

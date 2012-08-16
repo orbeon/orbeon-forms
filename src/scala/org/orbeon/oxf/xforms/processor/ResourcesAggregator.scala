@@ -27,7 +27,7 @@ import org.orbeon.oxf.processor._
 import collection.mutable.{Buffer, LinkedHashSet}
 import org.orbeon.oxf.xforms._
 import org.dom4j.QName
-import org.apache.commons.lang.StringUtils
+import org.apache.commons.lang3.StringUtils
 import ResourcesAggregator._
 import org.orbeon.oxf.externalcontext.URLRewriter
 

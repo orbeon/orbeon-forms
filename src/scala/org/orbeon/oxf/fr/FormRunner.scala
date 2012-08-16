@@ -24,7 +24,7 @@ import org.orbeon.oxf.xforms.function.xxforms.{XXFormsProperty, XXFormsPropertie
 import java.util.{Map ⇒ JMap, List ⇒ JList}
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
 import org.orbeon.oxf.util.{SecureUtils, NetUtils, XPathCache}
-import org.apache.commons.lang.StringUtils
+import org.apache.commons.lang3.StringUtils
 import org.orbeon.oxf.pipeline.api.ExternalContext.Request
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.webapp.HttpStatusCodeException

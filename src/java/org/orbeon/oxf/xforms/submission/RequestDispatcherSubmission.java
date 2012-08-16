@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.submission;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.util.ConnectionResult;

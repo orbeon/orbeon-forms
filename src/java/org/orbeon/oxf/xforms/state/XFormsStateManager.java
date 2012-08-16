@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.state;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.QName;

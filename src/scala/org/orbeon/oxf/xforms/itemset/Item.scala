@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.itemset
 import Item._
 import collection.JavaConverters._
 import java.util.{Map ⇒ JMap}
-import org.apache.commons.lang.StringUtils
+import org.apache.commons.lang3.StringUtils
 import org.dom4j.QName
 import org.orbeon.oxf.xforms.XFormsUtils._
 import org.orbeon.oxf.xforms.control.XFormsControl.getEscapedHTMLValue

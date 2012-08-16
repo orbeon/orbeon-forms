@@ -17,7 +17,7 @@ import orbeon.apache.xerces.impl.Constants;
 import orbeon.apache.xerces.impl.XMLEntityManager;
 import orbeon.apache.xerces.impl.XMLErrorReporter;
 import orbeon.apache.xerces.xni.parser.XMLInputSource;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.dom4j.Element;
 import org.dom4j.QName;

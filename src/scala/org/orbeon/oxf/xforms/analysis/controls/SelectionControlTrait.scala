@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.analysis.controls
 import collection.mutable.Stack
 import org.orbeon.oxf.xml.ContentHandlerHelper
 import org.orbeon.oxf.util.XPathCache
-import org.apache.commons.lang.StringUtils
+import org.apache.commons.lang3.StringUtils
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, StringAnalysis, XPathAnalysis, SimpleElementAnalysis}

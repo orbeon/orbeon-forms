@@ -23,7 +23,7 @@ import org.orbeon.oxf.xforms.event.XFormsEventFactory.createEvent
 import org.orbeon.oxf.xforms.event.XFormsEventTarget
 import org.orbeon.oxf.xforms.xbl.Scope
 import org.orbeon.saxon.om.Item
-import org.apache.commons.lang.StringUtils.isNotBlank
+import org.apache.commons.lang3.StringUtils.isNotBlank
 
 /**
  * 10.1.2 The dispatch Element

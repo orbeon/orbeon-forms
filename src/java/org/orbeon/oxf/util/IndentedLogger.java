@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.util;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.orbeon.exception.OrbeonFormatter;
@@ -221,7 +222,7 @@ public class IndentedLogger {
             parametersString = "";
         }
 
-        logger.log(level, getLogIndentSpaces(indentLevel) + (org.apache.commons.lang.StringUtils.isNotEmpty(type) ? (type + " - ") : "") + message + parametersString);
+        logger.log(level, getLogIndentSpaces(indentLevel) + (StringUtils.isNotEmpty(type) ? (type + " - ") : "") + message + parametersString);
 //        logger.log(level, prefix + " - " + getLogIndentSpaces(indentLevel) + type + " - " + message + parametersString);
     }
 

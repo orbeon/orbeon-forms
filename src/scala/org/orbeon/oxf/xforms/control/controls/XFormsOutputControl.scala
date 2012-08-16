@@ -17,7 +17,7 @@ import XFormsOutputControl._
 import collection.JavaConverters._
 import java.util.Collections
 import java.util.{Map ⇒ JMap}
-import org.apache.commons.lang.StringUtils
+import org.apache.commons.lang3.StringUtils
 import org.dom4j.Element
 import org.dom4j.QName
 import org.orbeon.oxf.externalcontext.ServletURLRewriter

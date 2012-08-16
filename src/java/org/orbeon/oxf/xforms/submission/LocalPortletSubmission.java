@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.submission;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.orbeon.oxf.externalcontext.AsyncExternalContext;
 import org.orbeon.oxf.externalcontext.AsyncRequest;
 import org.orbeon.oxf.externalcontext.ExternalContextWrapper;

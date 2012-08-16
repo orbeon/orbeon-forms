@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.xml.*;
 import org.xml.sax.*;

@@ -17,7 +17,7 @@ import org.orbeon.oxf.xforms._
 import analysis.{XFormsExtractorContentHandler, XFormsAnnotatorContentHandler, PartAnalysisImpl, Metadata}
 import processor.handlers.xhtml.XHTMLHeadHandler
 import org.orbeon.oxf.properties.PropertySet
-import org.apache.commons.lang.StringUtils
+import org.apache.commons.lang3.StringUtils
 import org.orbeon.oxf.resources.ResourceManagerWrapper
 import scala.collection.JavaConverters._
 

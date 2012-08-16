@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.control.controls
 
 import org.orbeon.oxf.xforms.XFormsConstants._
-import org.apache.commons.lang.StringUtils
+import org.apache.commons.lang3.StringUtils
 import org.orbeon.oxf.util.{NetUtils, Multipart}
 import org.dom4j.Element
 import org.orbeon.oxf.xforms.model.DataModel

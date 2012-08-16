@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.ccil.cowan.tagsoup.HTMLSchema;
 import org.dom4j.*;
 import org.dom4j.io.DocumentSource;

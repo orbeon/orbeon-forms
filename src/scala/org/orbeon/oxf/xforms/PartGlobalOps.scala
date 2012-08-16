@@ -21,7 +21,7 @@ import org.dom4j.{Element, QName}
 import java.util.{List ⇒ JList, Collection ⇒ JCollection}
 import org.orbeon.oxf.xml.SAXStore
 import xbl.{Scope, XBLBindings, ConcreteBinding}
-import org.apache.commons.lang.StringUtils
+import org.apache.commons.lang3.StringUtils
 import collection.JavaConverters._
 
 trait PartGlobalOps {

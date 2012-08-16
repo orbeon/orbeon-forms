@@ -17,7 +17,7 @@ import dom4j.Dom4jUtils
 import dom4j.Dom4jUtils._
 import org.dom4j._
 import java.util.{List ⇒ JList, Map ⇒ JMap}
-import org.apache.commons.lang.StringUtils._
+import org.apache.commons.lang3.StringUtils._
 import collection.JavaConverters._
 import org.orbeon.saxon.value.Whitespace
 import collection.mutable.Buffer

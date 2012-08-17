@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms;
 
-import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.saxon.expr.XPathContext;
@@ -31,10 +30,9 @@ public class XXFormsGetRequestPath extends XXFormsGetScopeAttribute {
     public Item evaluateItem(XPathContext xpathContext) throws XPathException {
 
         final XFormsContainingDocument containingDocument = getContainingDocument(xpathContext);
-        if (containingDocument == null || containingDocument.isInitializing()) { // support null for use outside of XForms
+        if (containingDocument == null) // support null for use outside of XForms
             return StringValue.makeStringValue(NetUtils.getExternalContext().getRequest().getRequestPath());
-        } else {
-            throw new OXFException("xxforms:get-request-path() can only be called during XForms initialization.");
-        }
+        else
+            return StringValue.makeStringValue(containingDocument.getRequestPath());
     }
 }

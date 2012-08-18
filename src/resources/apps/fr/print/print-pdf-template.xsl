@@ -80,10 +80,11 @@
         </xsl:choose>
     </xsl:function>
 
-    <xsl:variable name="is-a-control-classes" select="('xforms-control', 'xbl-component')" as="xs:string*"/>
+    <xsl:variable name="is-a-control-classes"     select="('xforms-control', 'xbl-component')" as="xs:string*"/>
     <xsl:variable name="is-not-a-control-classes" select="('xforms-trigger', 'xforms-disabled', 'xforms-group', 'xforms-case', 'xforms-switch', 'xforms-repeat')" as="xs:string*"/>
-    <xsl:variable name="control-classes" select="('xforms-input', 'xforms-textarea', 'xforms-select', 'xforms-select1', 'fr-attachment', 'xforms-output')" as="xs:string*"/>
-    <xsl:variable name="attachment-classes" select="('fr-attachment', 'xbl-fr-image-attachment')" as="xs:string*"/>
+    <xsl:variable name="control-classes"          select="('xforms-input', 'xforms-textarea', 'xforms-select', 'xforms-select1', 'fr-attachment', 'xforms-output')" as="xs:string*"/>
+    <xsl:variable name="image-attachment-classes" select="('xbl-fr-image-attachment')" as="xs:string*"/>
+    <xsl:variable name="attachment-classes"       select="('fr-attachment', $image-attachment-classes)" as="xs:string*"/>
 
     <xsl:template match="/">
         <config>
@@ -122,7 +123,8 @@
                         <xsl:when test="$classes = 'xbl-component'">
                             <!-- XBL component -->
                             <xsl:variable name="component-name" select="for $c in $classes return if (starts-with($c, 'xbl-') and $c != 'xbl-component') then substring-after($c, 'xbl-') else ()"/>
-                            <xsl:copy-of select="formRunner:getPDFFormatExpression($pdfFormats, $parameters/app, $parameters/form, $component-name, ())"/>
+                            <xsl:variable name="type" select="(for $c in $classes return if (starts-with($c, 'xforms-type-')) then substring-after($c, 'xforms-type-') else (), 'string')[1]"/>
+                            <xsl:copy-of select="formRunner:getPDFFormatExpression($pdfFormats, $parameters/app, $parameters/form, $component-name, $type)"/>
                         </xsl:when>
                         <xsl:when test="$classes = $control-classes">
                             <!-- Built-in controls -->
@@ -138,7 +140,7 @@
                     <xsl:variable name="value" select="$control/saxon:evaluate(string($expression))"/>
                     <xsl:if test="$value">
                         <xsl:choose>
-                            <xsl:when test="$classes = $attachment-classes">
+                            <xsl:when test="$classes = $image-attachment-classes">
                                 <!-- Handle URL rewriting for image attachments -->
                                 <image acro-field-name="'{$effective-id}'" href="{xpl:rewriteResourceURI($value, true())}"/>
                             </xsl:when>

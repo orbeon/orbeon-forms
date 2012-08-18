@@ -293,7 +293,8 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
                         Connection(
                             "GET",
                             url,
-                            null, null,
+                            None,
+                            None,
                             Connection.buildConnectionHeaders(None, Map(), Option(Connection.getForwardHeaders))(context.logger),
                             loadState = true,
                             logBody = false)(context.logger).connect(saveState = true)

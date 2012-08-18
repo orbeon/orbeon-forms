@@ -18,7 +18,7 @@ import ScalaUtils._
 import collection.JavaConverters._
 import java.net.{URI, URLConnection, URL}
 import java.util.{Map ⇒ JMap}
-import javax.servlet.http.HttpServletRequest
+import javax.servlet.http.{Cookie, HttpServletRequest}
 import org.apache.http.client.CookieStore
 import org.apache.log4j.Level
 import org.orbeon.oxf.common.{ValidationException, OXFException}
@@ -200,13 +200,13 @@ trait ConnectionState {
     var cookieStoreOption: Option[CookieStore] = None
 
     def loadHttpState()(implicit logger: IndentedLogger): Unit = {
-        cookieStoreOption = stateAttributes flatMap (m ⇒ Option(m.get(HttpCookieStoreAttribute).asInstanceOf[CookieStore]))
+        cookieStoreOption = stateAttributes(createSession = false) flatMap (m ⇒ Option(m.get(HttpCookieStoreAttribute).asInstanceOf[CookieStore]))
         debugStore("loaded HTTP state", "did not load HTTP state")
     }
 
     def saveHttpState()(implicit logger: IndentedLogger): Unit = {
         cookieStoreOption foreach { cookieStore ⇒
-            stateAttributes foreach (_.put(HttpCookieStoreAttribute, cookieStore))
+            stateAttributes(createSession = true) foreach (_.put(HttpCookieStoreAttribute, cookieStore))
         }
         debugStore("saved HTTP state", "did not save HTTP state")
     }
@@ -217,23 +217,23 @@ trait ConnectionState {
                 case Some(cookieStore) ⇒
                     val cookies = cookieStore.getCookies.asScala map (_.getName) mkString " | "
                     debug(positive, Seq(
-                        "scope" → stateScope.name,
+                        "scope" → stateScope,
                         "cookie names" → (if (cookies.nonEmpty) cookies else null)))
                 case None ⇒
                     debug(negative)
             }
         }
 
-    private def stateAttributes = {
+    private def stateAttributes(createSession: Boolean) = {
         val externalContext = NetUtils.getExternalContext
         stateScope match {
-            case RequestScope ⇒
+            case "request" ⇒
                 Some(externalContext.getRequest.getAttributesMap)
-            case SessionScope if externalContext.getSession(false) ne null ⇒
-                Some(externalContext.getSession(false).getAttributesMap)
-            case ApplicationScope ⇒
+            case "session" if externalContext.getSession(createSession) ne null ⇒
+                Some(externalContext.getSession(createSession).getAttributesMap)
+            case "application" ⇒
                 Some(externalContext.getWebAppContext.getAttributesMap)
-            case NoneScope ⇒
+            case _ ⇒
                 None
         }
     }
@@ -243,22 +243,16 @@ private object ConnectionState {
 
     def stateScopeFromProperty = {
         val propertySet = Properties.instance.getPropertySet
-        val scopeString = propertySet.getString(HttpStateProperty, DefaultStateScope.name)
+        val scopeString = propertySet.getString(HttpStateProperty, DefaultStateScope)
 
-        AllScopes find (_.name == scopeString) get
+        if (AllScopes(scopeString)) scopeString else DefaultStateScope
     }
 
-    val DefaultStateScope = SessionScope
+    val DefaultStateScope = "session"
     val HttpStateProperty = "oxf.http.state"
     val HttpCookieStoreAttribute = "oxf.http.cookie-store"
 
-    sealed trait StateScope { def name: String }
-    object NoneScope        extends StateScope { val name = "none" }
-    object RequestScope     extends StateScope { val name = "request" }
-    object SessionScope     extends StateScope { val name = "session" }
-    object ApplicationScope extends StateScope { val name = "application" }
-
-    val AllScopes = Set(NoneScope, RequestScope, SessionScope, ApplicationScope)
+    val AllScopes = Set("none", "request", "session", "application")
 }
 
 object Connection extends Logging {
@@ -443,12 +437,10 @@ object Connection extends Logging {
         // 4. Authorization token
         val tokenHeader = {
 
-            // There might not be a session in rare cases, e.g. in a context listener
-            val tokenOption =
-                Option(externalContext.getSession(true)) map
-                (_.getAttributesMap.asScala.getOrElseUpdate(TokenKey, SecureUtils.randomHexId).asInstanceOf[String])
+            // Get token from web app scope
+            val token = externalContext.getWebAppContext.attributes.getOrElseUpdate(TokenKey, SecureUtils.randomHexId).asInstanceOf[String]
 
-            tokenOption map (TokenKey → Array(_))
+            Seq(TokenKey → Array(token))
         }
 
         // Don't forward headers for which a value is explicitly passed by the caller, so start with headersToForward
@@ -548,7 +540,7 @@ object Connection extends Logging {
                 session.getId == requestedSessionId
             }
 
-        val cookies = Option(nativeRequest.getCookies) getOrElse Array()
+        val cookies = Option(nativeRequest.getCookies) getOrElse Array.empty[Cookie]
         if (requestedSessionIdMatches && cookies.nonEmpty) {
 
             val pairsToForward =

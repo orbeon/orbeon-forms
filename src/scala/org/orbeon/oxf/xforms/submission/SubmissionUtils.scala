@@ -52,7 +52,8 @@ object SubmissionUtils {
         Connection(
             "GET",
             URLFactory.createURL(resolvedURL),
-            null, null,
+            None,
+            None,
             Connection.buildConnectionHeaders(None, Map(), getHeadersToForward(model.containingDocument))(model.indentedLogger),
             loadState = true,
             logBody = BaseSubmission.isLogBody)(model.indentedLogger).connect(saveState = true)

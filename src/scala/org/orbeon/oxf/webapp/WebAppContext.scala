@@ -102,7 +102,7 @@ trait ParametersAndAttributes {
 
     protected def getAttribute(k: String): AnyRef
     protected def getAttributeNames: Seq[String]
-    protected def setAttribute(k: String, v: AnyRef);
+    protected def setAttribute(k: String, v: AnyRef)
     protected def removeAttribute(k: String)
 }
 

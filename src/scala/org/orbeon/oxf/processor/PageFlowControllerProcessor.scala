@@ -21,7 +21,7 @@ import java.util.{List ⇒ JList, Map ⇒ JMap}
 import org.dom4j.{QName, Document, Element}
 import org.orbeon.errorified.Exceptions._
 import org.orbeon.oxf.pipeline.api.ExternalContext.Request
-import org.orbeon.oxf.pipeline.api.{XMLReceiver, PipelineContext}
+import org.orbeon.oxf.pipeline.api.{ExternalContext, XMLReceiver, PipelineContext}
 import org.orbeon.oxf.processor.PageFlowControllerProcessor.FileRoute
 import org.orbeon.oxf.processor.PageFlowControllerProcessor.PageFlow
 import org.orbeon.oxf.processor.PageFlowControllerProcessor.PageOrServiceRoute
@@ -88,7 +88,7 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
                 error("error caught", logParams)
                 externalContext.getResponse.setStatus(500)
                 error(OrbeonFormatter.format(t))
-                errorRoute.process(pipelineContext, request, MatchResult(matches = false))
+                errorRoute.process(pipelineContext, externalContext, MatchResult(matches = false))
             case None ⇒
                 // We don't have an error route so throw instead
                 throw t
@@ -107,7 +107,7 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
                 case Some(notFoundRoute) ⇒
                     // Run the not found route
                     externalContext.getResponse.setStatus(404)
-                    try notFoundRoute.process(pipelineContext, request, MatchResult(matches = false))
+                    try notFoundRoute.process(pipelineContext, externalContext, MatchResult(matches = false))
                     catch { case t: Throwable ⇒ runErrorRoute(t) }
                 case None ⇒
                     // We don't have a not found route so throw instead
@@ -120,7 +120,7 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
                 // Run the unauthorized route
                 info("unauthorized", logParams)
                 externalContext.getResponse.setStatus(code)
-                unauthorizedRoute.process(pipelineContext, request, MatchResult(matches = false))
+                unauthorizedRoute.process(pipelineContext, externalContext, MatchResult(matches = false))
             case None ⇒
                 // We don't have an unauthorized route so throw instead
                 throw t
@@ -131,16 +131,16 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
             case Some((route: FileRoute, matchResult)) ⇒
                 // Run the given route and let the caller handle errors
                 debug("processing file", logParams)
-                route.process(pipelineContext, request, matchResult)
+                route.process(pipelineContext, externalContext, matchResult)
             case Some((route: PageOrServiceRoute, matchResult)) ⇒
                 debug("processing page/service", logParams)
                 // Run the given route and handle "not found" and error conditions
-                try route.process(pipelineContext, request, matchResult)
+                try route.process(pipelineContext, externalContext, matchResult)
                 catch { case t: Throwable ⇒
                     getRootThrowable(t) match {
                         case e: HttpRedirectException                            ⇒ externalContext.getResponse.sendRedirect(e.path, e.jParameters.orNull, e.serverSide, e.exitPortal)
                         case e: HttpStatusCodeException if Set(404)(e.code)      ⇒ runNotFoundRoute(Some(t))
-                        case e: HttpStatusCodeException if Set(401, 403)(e.code) ⇒ runUnauthorizedRoute(t ,e.code)
+                        case e: HttpStatusCodeException if Set(401, 403)(e.code) ⇒ runUnauthorizedRoute(t, e.code)
                         case e: ResourceNotFoundException                        ⇒ runNotFoundRoute(Some(t))
                         case e                                                   ⇒ runErrorRoute(t)
                     }
@@ -357,13 +357,13 @@ object PageFlowControllerProcessor {
     lazy val MimeTypes = ResourceServer.readMimeTypeConfig
 
     // Routes
-    sealed trait Route { def routeElement: RouteElement; def process(pipelineContext: PipelineContext, request: Request, matchResult: MatchResult) }
+    sealed trait Route { def routeElement: RouteElement; def process(pipelineContext: PipelineContext, externalContext: ExternalContext, matchResult: MatchResult) }
 
     case class FileRoute(routeElement: FileElement) extends Route {
         // Serve a file by path
-        def process(pipelineContext: PipelineContext, request: Request, matchResult: MatchResult) =
-            if (request.getMethod == "GET")
-                ResourceServer.serveResource(MimeTypes, request.getRequestPath, routeElement.versioned)
+        def process(pipelineContext: PipelineContext, externalContext: ExternalContext, matchResult: MatchResult) =
+            if (externalContext.getRequest.getMethod == "GET")
+                ResourceServer.serveResource(MimeTypes, externalContext.getRequest.getRequestPath, routeElement.versioned)
             else
                 unauthorized()
     }
@@ -374,10 +374,10 @@ object PageFlowControllerProcessor {
         lazy val pipelineConfig = compile(routeElement)
 
         // Run a page
-        def process(pipelineContext: PipelineContext, request: Request, matchResult: MatchResult) = {
+        def process(pipelineContext: PipelineContext, externalContext: ExternalContext, matchResult: MatchResult) = {
 
             // Make sure the request is authorized
-            checkAccess(request)
+            checkAccess(externalContext)
 
             // PipelineConfig is reusable, but PipelineProcessor is not
             val pipeline = new PipelineProcessor(pipelineConfig)
@@ -401,22 +401,21 @@ object PageFlowControllerProcessor {
 
         val TokenKey = "orbeon-token"
 
-        def checkAccess(request: Request) =
-            if (! routeElement.public && ! authorizedRequest(request))
+        def checkAccess(externalContext: ExternalContext) =
+            if (! routeElement.public && ! authorizedRequest(externalContext))
                 unauthorized()
 
-        def authorizedRequest(request: Request) = {
-            val token = requestToken(request)
+        def authorizedRequest(externalContext: ExternalContext) = {
+            val token = requestToken(externalContext.getRequest)
 
-            token.isDefined && token == sessionToken(request)
+            token.isDefined && token == applicationToken(externalContext)
         }
 
         def requestToken(request: Request) =
             (Option(request.getHeaderValuesMap.get(TokenKey)) flatten) headOption
 
-        def sessionToken(request: Request) =
-            Option(request.getSession(false)) flatMap
-            (_.getAttributesMap.asScala.get(TokenKey)) collect
+        def applicationToken(externalContext: ExternalContext) =
+            externalContext.getWebAppContext.attributes.get(TokenKey) collect
             { case token: String ⇒ token }
     }
 

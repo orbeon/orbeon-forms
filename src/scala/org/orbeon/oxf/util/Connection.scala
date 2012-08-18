@@ -596,7 +596,7 @@ object Connection extends Logging {
                     val acceptHeader = APPLICATION_SOAP_XML + charsetSuffix(parameters)
 
                     // Accept header with optional charset
-                    Seq("Accept" → Array(acceptHeader))
+                    Seq("accept" → Array(acceptHeader))
 
                 case "POST" if contentTypeMediaType == APPLICATION_SOAP_XML ⇒
                     // Set Content-Type and optionally SOAPAction headers
@@ -606,14 +606,14 @@ object Connection extends Logging {
                     val actionParameter = parameters.get("action")
 
                     // Content-Type with optional charset and SOAPAction header if any
-                    Seq("Content-Type" → Array(overriddenContentType)) ++ (actionParameter map (a ⇒ "SOAPAction" → Array(a)))
+                    Seq("content-type" → Array(overriddenContentType)) ++ (actionParameter map (a ⇒ "soapaction" → Array(a)))
                 case _ ⇒
                     // Not a SOAP submission
                     Seq()
             }
 
         if (newHeaders.nonEmpty)
-            debug("adding SOAP headers", newHeaders map { case (k, v) ⇒ k → v(0) })
+            debug("adding SOAP headers", newHeaders map { case (k, v) ⇒ capitalizeHeader(k) → v(0) })
 
         newHeaders
     }

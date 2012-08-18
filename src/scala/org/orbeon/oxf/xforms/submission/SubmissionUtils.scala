@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.submission
 import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.xforms.{XFormsModel, XFormsProperties}
+import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsModel, XFormsProperties}
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.oxf.util._
 import org.orbeon.saxon.om.DocumentInfo
@@ -48,15 +48,15 @@ object SubmissionUtils {
                 throw new OXFException("Got invalid return code while reading URL: " + resolvedURL + ", " + result.statusCode)
         }
 
-    def openGETConnection(model: XFormsModel, resolvedURL: String): ConnectionResult = {
-        val headers = Connection.buildConnectionHeaders(None, Map(), Option(XFormsProperties.getForwardSubmissionHeaders(model.containingDocument)))(model.indentedLogger)
-        implicit val logger = model.indentedLogger
+    def openGETConnection(model: XFormsModel, resolvedURL: String) =
         Connection(
             "GET",
             URLFactory.createURL(resolvedURL),
             null, null,
-            headers,
+            Connection.buildConnectionHeaders(None, Map(), getHeadersToForward(model.containingDocument))(model.indentedLogger),
             loadState = true,
-            logBody = BaseSubmission.isLogBody).connect(saveState = true)
-    }
+            logBody = BaseSubmission.isLogBody)(model.indentedLogger).connect(saveState = true)
+
+    private def getHeadersToForward(containingDocument: XFormsContainingDocument) =
+        Option(XFormsProperties.getForwardSubmissionHeaders(containingDocument))
 }

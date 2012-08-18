@@ -282,6 +282,9 @@ object Connection extends Logging {
     // Whether the given scheme requires setting headers
     def requiresHeaders(scheme: String) = ! Set("file", "oxf")(scheme)
 
+    // Whether the scheme is http: or https:
+    def isHTTPOrHTTPS(scheme: String) = Set("http", "https")(scheme)
+
     // For Java callers
     def jBuildConnectionHeaders(
             scheme: String,
@@ -650,6 +653,4 @@ object Connection extends Logging {
             logger.logDebug("submission", "setting request body", "body", new String(messageBody, "UTF-8"))
         else
             logger.logDebug("submission", "setting binary request body")
-
-    private def isHTTPOrHTTPS(scheme: String) = Set("http", "https")(scheme)
 }

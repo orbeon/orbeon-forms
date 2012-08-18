@@ -289,17 +289,14 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
                 case None ⇒
                     val url = URLFactory.createURL(hrefAttribute)
 
-                    implicit val logger = context.logger
-                    val headers = Connection.buildConnectionHeaders(None, Map(), Option(Connection.getForwardHeaders))
-
                     val connectionResult =
                         Connection(
                             "GET",
                             url,
                             null, null,
-                            headers,
+                            Connection.buildConnectionHeaders(None, Map(), Option(Connection.getForwardHeaders))(context.logger),
                             loadState = true,
-                            logBody = false).connect(saveState = true)
+                            logBody = false)(context.logger).connect(saveState = true)
 
                     if (connectionResult.statusCode != 200) {
                         connectionResult.close()

@@ -170,7 +170,7 @@ object ScalaUtils {
     // The caller can specify the type of the resulting values, e.g.:
     // - combineValues[AnyRef, Array]
     // - combineValues[String, List]
-    def combineValues[U, T[_]](parameters: Seq[(String, String)])(implicit cbf: CanBuildFrom[T[U], String, T[U]]): Seq[(String, T[U])] = {
+    def combineValues[U >: String, T[_]](parameters: Seq[(String, String)])(implicit cbf: CanBuildFrom[T[U], U, T[U]]): Seq[(String, T[U])] = {
         val result = mutable.LinkedHashMap[String, mutable.Builder[String, T[U]]]()
 
         for ((name, value) ← parameters)

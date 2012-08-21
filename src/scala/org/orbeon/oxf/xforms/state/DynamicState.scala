@@ -34,6 +34,8 @@ case class DynamicState(
     deploymentType: Option[String],
     requestContextPath: Option[String],
     requestPath: Option[String],
+    requestHeaders: Seq[(String, Seq[String])],
+    requestParameters: Seq[(String, Seq[String])],
     containerType: Option[String],
     containerNamespace: Option[String],
     pathMatchers: Seq[Byte],
@@ -56,6 +58,8 @@ case class DynamicState(
     def decodeDeploymentTypeJava = deploymentType.orNull
     def decodeRequestContextPathJava = requestContextPath.orNull
     def decodeRequestPathJava = requestPath.orNull
+    def decodeRequestHeadersJava = requestHeaders.toMap mapValues (_.toArray)
+    def decodeRequestParametersJava = requestParameters.toMap mapValues (_.toArray)
     def decodeContainerTypeJava = containerType.orNull
     def decodeContainerNamespaceJava = containerNamespace.orNull
     def decodePathMatchersJava = decodePathMatchers.asJava
@@ -253,6 +257,8 @@ object DynamicState {
             Option(document.getDeploymentType) map (_.toString),
             Option(document.getRequestContextPath),
             Option(document.getRequestPath),
+            document.getRequestHeaders mapValues (_.toList) toList,
+            document.getRequestParameters mapValues (_.toList) toList,
             Option(document.getContainerType),
             Option(document.getContainerNamespace),
             toByteSeq(document.getVersionedPathMatchers.asScala.toList),

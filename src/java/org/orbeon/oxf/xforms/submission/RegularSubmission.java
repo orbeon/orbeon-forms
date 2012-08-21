@@ -50,8 +50,8 @@ public class RegularSubmission extends BaseSubmission {
         final IndentedLogger detailsLogger = getDetailsLogger(p, p2);
 
         // Headers
-        final Map<String, String[]> customHeaderNameValues = evaluateHeaders(submission.getModel().getContextStack());
-        final String headersToForward = XFormsProperties.getForwardSubmissionHeaders(containingDocument, p.isReplaceAll);
+        final Map<String, String[]> customHeaderNameValues = SubmissionUtils.evaluateHeaders(submission, p.isReplaceAll);
+        final String headersToForward = XFormsProperties.getForwardSubmissionHeaders(containingDocument);
 
         final Map<String, String[]> headers =
             Connection.jBuildConnectionHeadersWithSOAP(p.actualHttpMethod, p2.credentials, sp.actualRequestMediatype,

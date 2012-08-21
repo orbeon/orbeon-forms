@@ -104,15 +104,11 @@ public class StringConversions {
         map.put(name, ArrayUtils.add(map.get(name), value));
     }
 
-    public static void addValuesToObjectArrayMap(Map<String, Object[]> map, String name, Object[] values) {
-        map.put(name, ArrayUtils.addAll(map.get(name), values));
-    }
-
     public static void addValueToStringArrayMap(Map<String, String[]> map, String name, String value) {
-        map.put(name, (String[])ArrayUtils.add(map.get(name), value));
+        map.put(name, ArrayUtils.add(map.get(name), value));
     }
 
     public static void addValuesToStringArrayMap(Map<String, String[]> map, String name, String[] values) {
-        map.put(name, (String[])ArrayUtils.addAll(map.get(name), values));
+        map.put(name, ArrayUtils.addAll(map.get(name), values));
     }
 }

@@ -530,24 +530,6 @@ public class XFormsProperties {
             return Connection.getForwardHeaders();
     }
 
-    public static String getForwardSubmissionHeaders(XFormsContainingDocument containingDocument, boolean forwardUserAgent) {
-        // NOTE about headers forwarding: forwarding the user agent and accept headers makes sense when dealing with
-        // resources that typically would come from the client browser, including:
-        //
-        // - submission with replace="all"
-        // - dynamic resources loaded by xforms:output
-        //
-        // Also useful when the target URL renders XForms in noscript mode, where some browser sniffing takes
-        // place for handling the <button> vs. <submit> element.
-        //
-        // NOTE: In cases where there is replace="all" but not a two-pass submission, the XForms engine will have to
-        // remember these headers.
-        final String forwardSubmissionHeaders = XFormsProperties.getForwardSubmissionHeaders(containingDocument).trim().toLowerCase();
-        return forwardUserAgent
-                ? (forwardSubmissionHeaders.length() == 0 ? "" : forwardSubmissionHeaders + " ") + "user-agent accept"
-                : forwardSubmissionHeaders;
-    }
-
     public static int getSubmissionPollDelay(XFormsContainingDocument containingDocument) {
         return getIntegerProperty(containingDocument, ASYNC_SUBMISSION_POLL_DELAY);
     }

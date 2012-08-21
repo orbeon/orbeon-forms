@@ -122,6 +122,8 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
     private XFormsConstants.DeploymentType deploymentType;
     private String requestContextPath;
     private String requestPath;
+    private scala.collection.immutable.Map<String, String[]> requestHeaders;
+    private scala.collection.immutable.Map<String, String[]> requestParameters;
     private String containerType;
     private String containerNamespace;
     private List<URLRewriterUtils.PathMatcher> versionedPathMatchers;
@@ -267,6 +269,9 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
                 this.requestPath = request.getRequestPath();
         }
 
+        this.requestHeaders = immutableHeadersMap(request);
+        this.requestParameters = immutableParametersMap(request);
+
         this.containerType = request.getContainerType();
         this.containerNamespace = StringUtils.defaultIfEmpty(externalContext.getRequest().getContainerNamespace(), "");
     }
@@ -343,6 +348,8 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
             this.deploymentType = XFormsConstants.DeploymentType.valueOf(dynamicState.decodeDeploymentTypeJava());
             this.requestContextPath = dynamicState.decodeRequestContextPathJava();
             this.requestPath = dynamicState.decodeRequestPathJava();
+            this.requestHeaders = dynamicState.decodeRequestHeadersJava();
+            this.requestParameters = dynamicState.decodeRequestParametersJava();
             this.containerType = dynamicState.decodeContainerTypeJava();
             this.containerNamespace = dynamicState.decodeContainerNamespaceJava();
         } else {
@@ -455,6 +462,14 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
      */
     public String getRequestPath() {
         return requestPath;
+    }
+
+    public scala.collection.immutable.Map<String, String[]> getRequestHeaders() {
+        return requestHeaders;
+    }
+
+    public scala.collection.immutable.Map<String, String[]> getRequestParameters() {
+        return requestParameters;
     }
 
     /**

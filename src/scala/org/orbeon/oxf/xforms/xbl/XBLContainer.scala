@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.xbl
 
-import java.util.{List ⇒ JList}
+import java.util.{List ⇒ JList, Map ⇒ JMap}
 import org.dom4j.Element
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.xforms._
@@ -30,8 +30,10 @@ import org.orbeon.oxf.xml.NamespaceMapping
 import org.orbeon.oxf.xml.dom4j.LocationData
 import org.orbeon.saxon.om.Item
 import org.orbeon.saxon.om.NodeInfo
-import scala.collection.JavaConverters._
 import org.orbeon.oxf.xforms.analysis.controls.RepeatControl
+import org.orbeon.oxf.util.StringConversions
+import collection.JavaConverters._
+import org.orbeon.oxf.pipeline.api.ExternalContext.Request
 
 /**
  * Represent an XBL container of models and controls.
@@ -184,6 +186,14 @@ class XBLContainer(
             for (container ← _childrenXBLContainers.values)
                 doInContainer(container)
         }
+
+    // Helper for XFormsContainingDocument
+    def immutableHeadersMap(request: Request): Map[String, Array[String]] =
+        request.getHeaderValuesMap.asScala.toMap
+
+    // Helper for XFormsContainingDocument
+    def immutableParametersMap(request: Request): Map[String, Array[String]] =
+        request.getParameterMap.asScala mapValues StringConversions.objectArrayToStringArray toMap
 }
 
 trait ModelContainer {

@@ -16,10 +16,10 @@ package org.orbeon.oxf.xforms.submission
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, LocationData}
 import org.orbeon.oxf.xforms._
-import java.util.{LinkedHashMap ⇒ JLinkedHashMap, Collections ⇒ JCollections}
 import scala.collection.JavaConversions._
 import org.orbeon.oxf.common.OXFException
 import org.dom4j.{QName, Element}
+import scala.collection.mutable
 
 object Headers {
     /**
@@ -31,14 +31,15 @@ object Headers {
      * @return map of headers or null if no header elements
      */
     def evaluateHeaders(xblContainer: XBLContainer, contextStack: XFormsContextStack,
-                        sourceEffectiveId: String, enclosingElement: Element) = {
+                        sourceEffectiveId: String, enclosingElement: Element,
+                        initialHeaders: Map[String, Array[String]]): collection.Map[String, Array[String]] = {
 
         val fullPrefix = xblContainer.getFullPrefix
 
         val headerElements = Dom4jUtils.elements(enclosingElement, XFormsConstants.XFORMS_HEADER_QNAME)
         if (headerElements.nonEmpty) {
 
-            val headerNameValues = new JLinkedHashMap[String, Array[String]]
+            val headerNameValues = mutable.LinkedHashMap[String, Array[String]](initialHeaders.toList: _*)
 
             // Handle a single header element
             def handleHeaderElement(headerElement: Element) = {
@@ -107,7 +108,7 @@ object Headers {
             }
             headerNameValues
         } else
-            JCollections.emptyMap[String, Array[String]]
+            initialHeaders
     }
 
     val defaultCombineValue = "append"

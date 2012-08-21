@@ -13,13 +13,15 @@
  */
 package org.orbeon.oxf.xforms.submission
 
+import java.util.{Map ⇒ JMap}
+import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.util.ScalaUtils._
-import org.orbeon.oxf.common.OXFException
+import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsModel, XFormsProperties}
 import org.orbeon.oxf.xml.TransformerUtils
-import org.orbeon.oxf.util._
 import org.orbeon.saxon.om.DocumentInfo
+import collection.JavaConverters._
 
 // The plan is to move stuff from XFormsSubmissionUtils to here as needed
 object SubmissionUtils {
@@ -60,4 +62,48 @@ object SubmissionUtils {
 
     private def getHeadersToForward(containingDocument: XFormsContainingDocument) =
         Option(XFormsProperties.getForwardSubmissionHeaders(containingDocument))
+
+    def evaluateHeaders(submission: XFormsModelSubmission, forwardClientHeaders: Boolean): JMap[String, Array[String]] = {
+        try {
+            val headersToForward =
+                clientHeadersToForward(submission.getContainingDocument.getRequestHeaders, forwardClientHeaders)
+
+            val newHeaders =
+                Headers.evaluateHeaders(
+                    submission.container,
+                    submission.getModel.getContextStack,
+                    submission.getEffectiveId,
+                    submission.getSubmissionElement,
+                    headersToForward
+                )
+
+            newHeaders asJava
+
+        } catch {
+            case e: OXFException ⇒ throw new XFormsSubmissionException(submission, e, e.getMessage, "processing <header> elements")
+        }
+    }
+
+    def clientHeadersToForward(allHeaders: Map[String, Array[String]], forwardClientHeaders: Boolean) = {
+        if (forwardClientHeaders) {
+            // Forwarding the user agent and accept headers makes sense when dealing with resources that
+            // typically would come from the client browser, including:
+            //
+            // - submission with replace="all"
+            // - dynamic resources loaded by xforms:output
+            //
+            // Also useful when the target URL renders XForms in noscript mode, where some browser sniffing takes
+            // place for handling the <button> vs. <submit> element.
+            val toForward =
+                for {
+                    name ← Seq("user-agent", "accept")
+                    values ← allHeaders.get(name)
+                } yield
+                    name → values
+
+            // Give priority to explicit headers
+            toForward.toMap
+        } else
+            Map.empty[String, Array[String]]
+    }
 }

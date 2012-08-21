@@ -33,7 +33,7 @@ import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.control.XFormsValueControl
 import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.oxf.xforms.processor.XFormsResourceServer.proxyURI
-import org.orbeon.oxf.xforms.submission.Headers
+import org.orbeon.oxf.xforms.submission.{SubmissionUtils, Headers}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.xml.sax.helpers.AttributesImpl
 
@@ -119,7 +119,8 @@ class XFormsOutputControl(container: XBLContainer, parent: XFormsControl, elemen
     def evaluatedHeaders: JMap[String, Array[String]] = {
         // TODO: pass BindingContext directly
         getContextStack.setBinding(getBindingContext)
-        try Headers.evaluateHeaders(container, getContextStack, getEffectiveId, staticControl.element)
+        val headersToForward = SubmissionUtils.clientHeadersToForward(containingDocument.getRequestHeaders, forwardClientHeaders = true)
+        try Headers.evaluateHeaders(container, getContextStack, getEffectiveId, staticControl.element, headersToForward).asJava
         catch {
             case e: Exception ⇒ {
                 XFormsError.handleNonFatalXPathError(container, e)
@@ -138,7 +139,7 @@ class XFormsOutputControl(container: XBLContainer, parent: XFormsControl, elemen
                 value
 
         def doProxyURI(uri: String, lastModified: Long) =
-            proxyURI(getIndentedLogger, uri, filename, mediatype, lastModified, evaluatedHeaders, XFormsProperties.getForwardSubmissionHeaders(containingDocument, true))
+            proxyURI(getIndentedLogger, uri, filename, mediatype, lastModified, evaluatedHeaders, XFormsProperties.getForwardSubmissionHeaders(containingDocument))
 
         val typeName = getBuiltinTypeName
 

@@ -61,6 +61,10 @@ html { overflow: hidden }
     padding: 0;
 }
 
+div.xbl-fr-grid {
+    padding: 16px 0 0 16px;                                                                                             // Reserve space for icons
+}
+
 /* ***** Toolbox **************************************************************************************************** */
 
 #fb-toolbox {
@@ -398,19 +402,6 @@ a.xforms-help-image .fb-control-help { vertical-align: baseline; }
         position: static;                                                                                               // Overrides position: absolute; top: -10000px; left: -10000px in xforms.css
     }
 }
-
-/* Styling of the repeat grid to look the same as it does at runtime */
-/* Everything is scoped to .fr-view so not to impact repeats outside of the form itself, e.g. in the itemset editor  */
-.fr-view .fr-grid.fr-repeat.fr-editable { border: none }                                                    /* Remove borders on the table */
-.fr-view .fr-grid td.fb-grid-repeat-bottom { border-bottom: 1px solid #7f7f7f }
-.fr-view table.fr-grid.fr-repeat > * > tr > td:first-child { border-right: 1px solid #7f7f7f }              /* Darker border on the left of the repeat table, which is to the right of the first column */
-.fr-view table.fr-grid.fr-repeat > thead:first-child > tr:first-child > td {                                /* First line of thead is added by Form Builder */
-    border-right: none; border-left: none; border-bottom: 1px solid #7f7f7f; }                              /* No "vertical lines", but add border at the bottom, seen as the top border of the repeat table */
-.fr-view table.fr-grid.fr-repeat > thead > tr:first-child > td:first-child { border-bottom: none; }      /* Remove borders in the first column */
-.fr-view table.fr-grid.fr-repeat > * > tr.yui-dt-first > td:first-child { border-top: none }
-.fr-view table.fr-grid.fr-repeat > * > tr > td:first-child { background-color: white }                      /* Remove odd/even background color on the first column */
-.fr-view table.fr-grid.fr-repeat > thead.yui-dt-hd > tr > th:last-child,
-    .fr-view table.fr-grid.fr-repeat > tbody > tr > td:last-child { border-right: 1px solid #7f7f7f }       /* Add thicker border to the right of the table */
 
 .fb-use-toolbar-message, .fb-click-message { display: none; font-size: 70%; color: gray; width: 100%; font-style: italic; text-align: center; margin-top: 2em  }
 .fb-selected .fb-use-toolbar-message { display: block }

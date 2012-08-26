@@ -563,7 +563,7 @@
                         <xh:div class="fb-section-editor">
                             <xf:var name="section" value="instance('fb-form-instance')/xhtml:body//fr:section[@id = instance('fb-variables')/selected-section]"/>
                             <!-- Delete section -->
-                            <xf:trigger appearance="minimal" class="delete-section-trigger">
+                            <xf:trigger appearance="minimal" id="delete-section-trigger" class="delete-section-trigger">
                                 <xf:label><xh:img width="16" height="16" src="/apps/fr/style/images/silk/bin.png" alt="{{$fb-resources/delete-section-icon/label}}" title="{{$fb-resources/delete-section-icon/label}}"/></xf:label>
                                 <!-- Ask confirmation -->
                                 <xf:dispatch ev:event="DOMActivate" name="fr-show" targetid="dialog-confirmation">

@@ -7,7 +7,7 @@ $ ->
 
     sectionEditor = $ '.fb-section-editor'
     currentSection = null
-    sectionsCache = null
+    sectionsCache = []
     pageX = 0; pageY = 0
 
     FSM.create
@@ -20,63 +20,39 @@ $ ->
             ajaxResponse: (f) -> Events.ajaxResponseProcessedEvent.subscribe f
         actions:
             mouseMoved: (event) ->
-                updateSectionsOffset() if not sectionsCache
+                updateSectionsOffset() if sectionsCache.length == 0
                 pageX = event.pageX
                 pageY = event.pageY
-                updateEditor()
             domUpdated: ->
                 updateSectionsOffset()
-                updateEditor()
 
-    updateSectionsOffset = () ->
-        sectionsCache = []
+    updateSectionsOffset = ->
+        sectionsCache.length = 0
         _.each ($ '.xbl-fr-section'), (section) ->
             section = $ section
             sectionsCache.unshift
                 element: section
-                containerOffset: f$.offset section
+                offset: f$.offset section
                 height: f$.height section
                 titleOffset: f$.offset f$.find 'a', section
 
-    findSection = (top) ->
-        _.find sectionsCache, (section) ->
-            sectionTop = section.containerOffset.top
-            sectionBottom = sectionTop + section.height
-            sectionTop <= top <= sectionBottom
-
-    updateEditor = ->
-
-        becomesCurrentSection = ->
+    Builder.currentContainerChanged sectionsCache,
+        (section) ->
+            sectionEditor.hide()
+            currentSection = null
+        (section) ->
+            currentSection = section.element
             do positionEditor = ->
                 sectionEditor.show()
                 sectionEditor.offset
-                    top: currentSection.offset().top
+                    top: section.offset.top - f$.scrollTop f$.closest '.yui-layout-bd', $ '#fr-view'
                     left: (f$.offset $ '#fr-form-group').left - (f$.outerWidth sectionEditor)
             do updateTriggerRelevance = ->
-                container = currentSection.children '.fr-section-container'
+                container = section.element.children '.fr-section-container'
                 _.each (['up', 'right', 'down', 'left']), (direction) ->
                     relevant = container.hasClass ("fb-can-move-" + direction)
                     trigger = sectionEditor.children ('.fb-section-move-' + direction)
                     if relevant then trigger.show() else trigger.hide()
-
-        wasCurrentSection = ->
-            sectionEditor.hide()
-            currentSection = null
-
-        viewPos = do ->
-            view = $ '.fr-view'
-            left = (f$.offset view).left
-            left: left
-            right: left + (f$.width view)
-        if viewPos.left <= pageX <= viewPos.right
-            newSection = findSection pageY
-        if newSection?
-            if newSection.element != currentSection
-                wasCurrentSection() if currentSection?
-                currentSection = newSection.element
-                becomesCurrentSection()
-        else
-            wasCurrentSection() if currentSection?
 
     do setupLabelEditor = ->
 
@@ -89,7 +65,7 @@ $ ->
         sendNewLabelValue = ->
             newLabelValue = f$.val labelInput
             OD.setValue (f$.attr 'id', $ '.fb-section-new-label'), newLabelValue
-            section = findSection (f$.offset labelInput).top
+            section = Builder.findInCache sectionsCache, (f$.offset labelInput).top
             f$.text newLabelValue, f$.find '.fr-section-label:first a', section.element
             OD.dispatchEvent (f$.attr 'id', section.element), 'fb-update-section-label'
             f$.hide labelInput
@@ -106,7 +82,7 @@ $ ->
                     Events.ajaxResponseProcessedEvent.subscribe -> f$.hide labelInput
                 offset = f$.offset clickInterceptor
                 labelAnchor = do ->
-                    section = findSection offset.top
+                    section = Builder.findInCache sectionsCache, offset.top
                     f$.find '.fr-section-label:first a', section.element
                 do setInputContent = ->
                     labelText = f$.text labelAnchor
@@ -120,7 +96,7 @@ $ ->
 
         updateHightlight = (updateClass, clickInterceptor) ->
             offset = f$.offset clickInterceptor
-            section = findSection offset.top
+            section = Builder.findInCache sectionsCache, offset.top
             sectionTitle = f$.find '.fr-section-title:first', section.element
             updateClass 'hover', sectionTitle
 

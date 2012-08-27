@@ -50,6 +50,7 @@
                     <!-- Point to the source element for this grid -->
                     <xsl:variable name="edit-ref" select="@edit-ref"/>
                     <xsl:variable name="is-editable" select="exists(@edit-ref)"/>
+                    <!--<xsl:variable name="is-editable" select="false()"/>-->
 
                     <!-- Root element -->
                     <xf:group appearance="xxf:internal">
@@ -109,27 +110,6 @@
                                     <xh:tr>
                                         <!-- Top left corner td -->
                                         <xh:td class="fb-grid-top-left-td">
-                                            <!-- Until we implement the new selection system allowing moving stuff around freely, don't allow deleting the last grid in a section -->
-                                            <xf:trigger appearance="minimal" id="delete-grid-trigger" ref="$grid[not(gridOps:isLastGridInSection(.))]">
-                                                <xf:label><xh:img src="/apps/fr/style/images/silk/bin.png" alt="{{$fb-resources/delete-grid-icon/label}}" title="{{$fb-resources/delete-grid-icon/label}}"/></xf:label>
-                                                <xf:action ev:event="DOMActivate">
-
-                                                    <xxf:var name="count" value="count($grid/*:tr/*:td[*])"/>
-
-                                                    <!-- Ask confirmation -->
-                                                     <xf:dispatch if="$count > 0" name="fr-show" targetid="{{xformsUtils:effectiveIdToAbsoluteId('dialog-confirmation')}}">
-                                                        <xxf:context name="message"
-                                                             value="concat($fb-resources/messages/delete-grid, ' ',
-                                                                        xxf:format-message($fb-resources/messages/controls-will-be-deleted, $count))"/>
-                                                         <xxf:context name="positive-targetid" value="xxf:absolute-id('delete-grid-trigger')"/>
-                                                    </xf:dispatch>
-                                                    <!-- We are automatically confirmed-->
-                                                    <xf:dispatch if="$count = 0" name="fr-positive" targetid="delete-grid-trigger"/>
-                                                </xf:action>
-                                                <xf:action ev:event="fr-positive" type="xpath">
-                                                    gridOps:deleteGrid($grid)
-                                                </xf:action>
-                                            </xf:trigger>
                                         </xh:td>
                                         <xsl:if test="$is-repeat">
                                             <!-- Column for repeat add/remove -->

@@ -25,7 +25,7 @@ html { overflow: hidden }
 .xbl-fr-section > label { display: none }
 
 .fb-section-editor {
-    position: absolute;                                                                                                 // Is left/right set in JS relative to the current section
+    position: absolute;                                                                                                 // Its left/right set in JS relative to the current section
     display: none;                                                                                                      // Shown in JS when mouse over section
     padding: 0 10px 20px 20px;                                                                                          // Space between icons and section, and at bottom/top in case the mouse moves a bit out
     .xforms-trigger { display: block; }                                                                                 // Icons shown vertically
@@ -45,6 +45,12 @@ html { overflow: hidden }
 
 .fr-section-title.hover {                                                                                               // .hover added by CS on mouse over click interceptor
     background-image: -webkit-linear-gradient(top, white, #DDD);                                                        // Yellow background to indicate clickable area
+}
+
+.fb-delete-grid-trigger {
+    position: absolute;                                                                                                 // Its left/right set in JS relative to the current grid
+    display: none;                                                                                                      // Shown in JS when mouse over grid
+    padding: 0;                                                                                          // Space between icons and grid, and at top/left in case the mouse moves a bit out
 }
 
 .fb-ie-warning { margin: 1em; padding: .5em; border: 4px solid #D00000; background-color: #FFF0F0 }

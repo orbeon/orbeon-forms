@@ -46,6 +46,11 @@ html {
 .fr-section-title.hover {
   background-image: -webkit-linear-gradient(top, #ffffff, #dddddd);
 }
+.fb-delete-grid-trigger {
+  position: absolute;
+  display: none;
+  padding: 0;
+}
 .fb-ie-warning {
   margin: 1em;
   padding: .5em;

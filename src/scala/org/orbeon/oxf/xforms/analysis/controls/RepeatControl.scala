@@ -55,7 +55,8 @@ object RepeatControl {
                 (currentPart.parent map
                     (_.getControlAnalysis(currentPart.startScope.fullPrefix.init)) // .init removes the trailing '$'
                         flatMap getAncestorRepeatAcrossParts) // recursively search ancestor parts
-        case _ ⇒ throw new IllegalArgumentException
+        //case _ ⇒ throw new IllegalArgumentException
+        case _ => None
     }
 
     // Get all ancestor repeats across parts, from leaf to root

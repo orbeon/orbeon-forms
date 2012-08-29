@@ -27,7 +27,8 @@
             <!-- Go over sections -->
             <xsl:for-each select="$document//fr:section">
                 <xsl:variable name="section-position" select="position()"/>
-                <xsl:variable name="section-id" as="xs:string" select="replace(@id, '(.*)-section', '$1')"/>
+                <xsl:variable name="section-id" as="xs:string"
+                              select="replace(@id, '(.*)(-section)|(-control)', '$1')"/>                                <!-- Also support '-section' for backward compatibility -->
                 <!-- Go over controls -->
                 <xsl:for-each select=".//*[exists(@bind)]">
                     <xsl:variable name="control-position" select="position()"/>

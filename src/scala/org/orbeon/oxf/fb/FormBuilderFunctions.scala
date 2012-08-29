@@ -42,12 +42,11 @@ object FormBuilderFunctions extends Logging {
     val DynamicControlId = "fb"
 
     // Get an id based on a name
-    // NOTE: The idea as of 2011-06-21 is that we support reading indiscriminately the -control, -grid and -section
+    // NOTE: The idea as of 2011-06-21 is that we support reading indiscriminately the -control, -grid
     // suffixes, whatever type of actual control they apply to. The idea is that in the end we might decide to just use
     // -control. OTOH we must have distinct ids for binds, controls and templates, so the -bind, -control and -template
     // suffixes must remain.
     def bindId(controlName: String) = controlName + "-bind"
-    def sectionId(sectionName: String) = sectionName + "-section"
     def gridId(gridName: String) = gridName + "-grid"
     def controlId(controlName: String) = controlName + "-control"
     def templateId(gridName: String) = gridName + "-template"

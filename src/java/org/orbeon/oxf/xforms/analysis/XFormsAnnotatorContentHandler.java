@@ -440,10 +440,11 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
 
                     final String inspectorPrefix = "fr";
                     final String inspectorQName = XMLUtils.buildQName(inspectorPrefix, inspectorLocal);
-                    
+
                     startPrefixMapping(true, inspectorPrefix, frURI);
                     reusableAttributes.clear();
-                    final Attributes newAttributes = getAttributesGatherNamespaces(inspectorQName, reusableAttributes, reusableStringArray, -1);
+                    reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, "orbeon-inspector");
+                    final Attributes newAttributes = getAttributesGatherNamespaces(inspectorQName, reusableAttributes, reusableStringArray, 0);
                     startElement(true, frURI, inspectorLocal, inspectorQName, newAttributes);
                     endElement(true, frURI, inspectorLocal, inspectorQName);
                     endPrefixMapping(true, inspectorPrefix);
@@ -516,7 +517,7 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
     final private void putMark(String rawId) {
         metadata.putMark(templateSAXStore.getMark(rewriteId(rawId)));
     }
-    
+
     protected String rewriteId(String id) {
         return id;
     }

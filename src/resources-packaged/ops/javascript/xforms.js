@@ -1123,10 +1123,10 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                         // If we wanted to fix this, we could run the code below also for <textarea> and for all <input>, not
                         // only those with type="radio". We should also try to detect the issue so that we do not run this for IE
                         // 8 in standards mode.
-                        var clone = document.createElement("<" + element.tagName + " name='" + newName + "'>");
+                        var clone = document.createElement("<" + element.tagName + " name='" + newName + "' type='" + element.type + "'>");
                         for (var attributeIndex = 0; attributeIndex < element.attributes.length; attributeIndex++) {
                             var attribute = element.attributes[attributeIndex];
-                            if (attribute.nodeName.toLowerCase() != "name" && attribute.nodeName.toLowerCase() != "height" && attribute.nodeValue)
+                            if (attribute.nodeName.toLowerCase() != "name" && attribute.nodeName.toLowerCase() != "type" && attribute.nodeName.toLowerCase() != "height" && attribute.nodeValue)
                                 clone.setAttribute(attribute.nodeName, attribute.nodeValue);
                         }
                         YAHOO.util.Event.addListener(clone, "focus", ORBEON.xforms.Events.focus);

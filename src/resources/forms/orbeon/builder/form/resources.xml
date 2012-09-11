@@ -1,5 +1,5 @@
 <!--
-  Copyright (C) 2010 Orbeon, Inc.
+Copyright (C) 2010 Orbeon, Inc.
 
   This program is free software; you can redistribute it and/or modify it under the terms of the
   GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -3279,6 +3279,833 @@
                 <item>
                     <label>[Third choice]</label>
                     <value>[three]</value>
+                </item>
+            </items>
+        </template>
+    </resource>
+    <resource xml:lang="de">
+        <!-- Form metadata -->
+        <application-name>
+            <label>Anwendung</label>
+             <hint>Bezeichnet eine Gruppe von Formularen, zum Beispiel für ein bestimmtes Einsatzgebiet oder eine Abteilung, (bspw. "vertrieb"). Wenn Sie nur eine Gruppe von Formularen haben,können Sie den Namen der Organisation verwenden (bspw. "acme"). Dieser Name erscheint in der URL des Formulars, deshalb empfehlen wir, nur Kleinbuchstaben zu verwenden.</hint>
+            <alert>Feld muss angegeben werden und darf keine Leerzeichen enthalten</alert>
+        </application-name>
+        <form-name>
+            <label>Formular</label>
+            <hint>Bezeichnet dieses bestimmte Formular, zum Beispiel "antrag" oder "forderung". Dieser Name erscheint in der URL des Formulars, deshalb empfehlen wir, nur Kleinbuchstaben zu verwenden.</hint>
+            <alert>Feld muss angegeben werden und darf keine Leerzeichen enthalten</alert>
+        </form-name>
+        <title>
+            <label>Formulartitel</label>
+            <hint>Formulartitel in der aktuellen Sprache</hint>
+
+        </title>
+        <description>
+            <label>Formularbeschreibung</label>
+            <hint>Formularbeschreibung in der aktuellen Sprache</hint>
+
+        </description>
+        <logo>
+            <label>Logo</label>
+            <hint>Das Logo erscheint oberhalb des Formulars</hint>
+        </logo>
+        <!-- Sections -->
+        <section-name>
+            <label>Abschnittsname</label>
+            <hint>Hier klicken, um den Abschnittsnamen einzugeben</hint>
+            <alert>Der Abschnittsname muss angegeben werden</alert>
+        </section-name>
+        <!-- Toolbox -->
+        <cut>
+            <label>Ausschneiden</label>
+        </cut>
+        <copy>
+            <label>Kopieren</label>
+        </copy>
+        <paste>
+            <label>Einfügen</label>
+        </paste>
+        <controls>
+            <label>Bedienelemente</label>
+        </controls>
+        <i18n>
+            <label>Internationalisierung</label>
+        </i18n>
+        <language>
+            <label>Aktuelle Sprache</label>
+        </language>
+        <advanced>
+            <label>Erweitert</label>
+        </advanced>
+        <services-actions>
+            <label>Dienste &amp; Aktionen</label>
+        </services-actions>
+        <http-services>
+            <label>HTTP Dienste</label>
+        </http-services>
+        <database-services>
+            <label>Datenbankdienste</label>
+        </database-services>
+        <actions>
+            <label>Aktionen</label>
+        </actions>
+        <new-section>
+            <label>Neuer Abschnitt</label>
+        </new-section>
+        <new-grid>
+            <label>Neues Raster</label>
+        </new-grid>
+        <change-schema>
+            <label>Schema ändern</label>
+        </change-schema>
+        <upload-schema>
+            <label>Schema hochladen</label>
+        </upload-schema>
+        <change-pdf>
+            <label>PDF ändern</label>
+        </change-pdf>
+        <upload-pdf>
+            <label>PDF hochladen</label>
+        </upload-pdf>
+        <change-css>
+            <label>CSS ändern</label>
+        </change-css>
+        <upload-css>
+            <label>CSS hochladen</label>
+        </upload-css>
+        <show-source>
+            <label>Quelltext anzeigen</label>
+        </show-source>
+        <edit-source>
+            <label>Quelltext editieren</label>
+        </edit-source>
+        <custom-xml>
+            <label>XML anpassen (customize)</label>
+        </custom-xml>
+        <permissions>
+            <label>Berechtigungen festlegen</label>
+        </permissions>
+        <reload-components>
+            <label>Bedienelemente neu laden</label>
+        </reload-components>
+        <enter-label>
+            <label>Hier klicken, um die Beschriftung zu ändern</label>
+        </enter-label>
+        <type-label>
+            <label>Beschriftung hier eingeben</label>
+        </type-label>
+        <enter-hint>
+            <label>Hier klicken, um den optionalen Hinweis zu ändern</label>
+        </enter-hint>
+        <type-hint>
+            <label>Hier Hinweis eingeben</label>
+        </type-hint>
+        <enter-text>
+            <label>Hier klicken, um einen Text einzugeben</label>
+        </enter-text>
+        <click-cell>
+            <label>Hier klicken, um diese Zelle auszuwählen</label>
+        </click-cell>
+        <insert-control>
+            <label>Mit Hilfe der Werkzeugleiste können neue Bedienelemente eingefügt werden</label>
+        </insert-control>
+        <edit-items>
+            <label>Einträge editieren</label>
+        </edit-items>
+        <expand-icon>
+            <label>Ausklappen</label>
+        </expand-icon>
+        <shrink-icon>
+            <label>Einklappen</label>
+        </shrink-icon>
+        <delete-control-icon>
+            <label>Bedienelemente löschen</label>
+        </delete-control-icon>
+        <delete-grid-icon>
+            <label>Raster löschen</label>
+        </delete-grid-icon>
+        <delete-section-icon>
+            <label>Abschnitt löschen</label>
+        </delete-section-icon>
+        <delete-row-icon>
+            <label>Zeile löschen</label>
+        </delete-row-icon>
+        <delete-column-icon>
+            <label>Spalte löschen</label>
+        </delete-column-icon>
+        <insert-column-left-icon>
+            <label>Eine Spalte links einfügen</label>
+        </insert-column-left-icon>
+        <insert-column-right-icon>
+            <label>Eine Spalte rechts einfügen</label>
+        </insert-column-right-icon>
+        <insert-row-above-icon>
+            <label>Eine Zeile oberhalb einfügen</label>
+        </insert-row-above-icon>
+        <insert-row-below-icon>
+            <label>Eine Spalte unterhalb einfügen</label>
+        </insert-row-below-icon>
+        <section-details-icon>
+            <label>Abschnittdetails</label>
+        </section-details-icon>
+        <grid-details-icon>
+            <label>Rasterdetails</label>
+        </grid-details-icon>
+        <move-up-icon>
+            <label>Nach oben</label>
+        </move-up-icon>
+        <move-down-icon>
+            <label>Nach unten</label>
+        </move-down-icon>
+        <move-right-icon>
+            <label>Nach rechts</label>
+        </move-right-icon>
+        <move-left-icon>
+            <label>Nach links</label>
+        </move-left-icon>
+        <control-details-icon>
+            <label>Bedienelementdetails</label>
+        </control-details-icon>
+        <validation-settings-icon>
+            <label>Validierungseinstellungen</label>
+        </validation-settings-icon>
+        <switch-appearance-icon>
+            <label>Aussehen ändern</label>
+        </switch-appearance-icon>
+        <help-icon>
+            <label>Hilfetext editieren</label>
+        </help-icon>
+        <edit-metadata>
+            <label>Metadaten editieren</label>
+        </edit-metadata>
+        <!-- Common -->
+        <add>
+            <label>Hinzufügen</label>
+        </add>
+        <remove>
+            <label>Entfernen</label>
+        </remove>
+        <edit>
+            <label>Editieren</label>
+        </edit>
+        <!-- Dialogs -->
+        <continue>
+            <label>Weiter</label>
+        </continue>
+        <apply>
+            <label>Anwenden</label>
+        </apply>
+        <cancel>
+            <label>Abbrechen</label>
+        </cancel>
+        <close>
+            <label>Schließen</label>
+        </close>
+        <delete>
+            <label>Löschen</label>
+        </delete>
+        <or>
+            <label>oder</label>
+        </or>
+        <select>
+            <label>[Auswählen...]</label>
+        </select>
+        <dialog-form-settings>
+            <label>Formulareinstellungen</label>
+            <open><label>Formulareinstellungen</label></open>
+            <stats>Formularstatistiken</stats>
+            <sections>Abschnitte</sections>
+            <repeats>Wiederholbare Elemente</repeats>
+            <grids>Raster</grids>
+            <section-templates>Abschnittsvorlagen</section-templates>
+            <controls>Bedienelemente</controls>
+            <all>Alle</all>
+        </dialog-form-settings>
+        <dialog-control-details>
+            <label>Bedienelementdetails bearbeiten</label>
+            <control-name>
+                <label>Bedienelementname</label>
+                <alert>Name ist bereits vergeben oder ungültig</alert>
+                <hint>Z.B.: "vorname"</hint>
+            </control-name>
+            <control-xpath>
+                <label>XPath</label>
+                <alert>Ungültiger XPath-Ausdruck</alert>
+                <hint>Zeigt auf den Knoten mit Wert für dieses Element</hint>
+            </control-xpath>
+            <classes>
+                <label>Auswahlseite</label>
+                <item>
+                    <label>In der Auswahlseite anzeigen</label>
+                    <value>fr-summary</value>
+                </item>
+                <item>
+                    <label>In der Suche zeigen</label>
+                    <value>fr-search</value>
+                </item>
+                <item>
+                    <label>Email Empfänger</label>
+                    <value>fr-email-recipient</value>
+                </item>
+                <item>
+                    <label>Email Betreff</label>
+                    <value>fr-email-subject</value>
+                </item>
+            </classes>
+        </dialog-control-details>
+        <dialog-section-details>
+            <label>Abschnittdetails bearbeiten</label>
+            <control-name>
+                <label>Abschnittsname</label>
+                <alert>Name ist bereits vergeben oder ungültig</alert>
+                <hint>Z.B.: "kontaktdaten"</hint>
+            </control-name>
+            <visibility>
+                <label>Sichtbarkeit</label>
+                <alert>Ungültiger XPath-Ausdruck</alert>
+                <hint>Boolescher XPath-Ausdruck (z.B.: "true()")</hint>
+            </visibility>
+            <readonly>
+                <label>Schreibgeschützt</label>
+                <alert>Ungültiger XPath-Ausdruck</alert>
+                <hint>Boolescher XPath-Ausdruck (z.B.: "true()")</hint>
+            </readonly>
+        </dialog-section-details>
+        <dialog-grid-details>
+            <label>Rasterdetails bearbeiten</label>
+            <grid-name>
+                <label>Rastername</label>
+                <alert>Name ist bereits vergeben oder ungültig</alert>
+                <hint>Z.B.: "vorname"</hint>
+            </grid-name>
+            <visibility>
+                <label>Sichtbarkeit</label>
+                <alert>Ungültiger XPath-Ausdruck</alert>
+                <hint>Boolescher XPath-Ausdruck (z.B.: "true()")</hint>
+            </visibility>
+            <readonly>
+                <label>Schreibgeschützt</label>
+                <alert>Ungültiger XPath-Ausdruck</alert>
+                <hint>Boolescher XPath-Ausdruck (z.B.: "true()")</hint>
+            </readonly>
+            <min>
+                <label>Minimale Anzahl von Wiederholungen</label>
+                <alert>Ungültiger Wert</alert>
+                <hint>Nicht-negative Zahl</hint>
+            </min>
+            <max>
+                <label>Maximale Anzahl von Wiederholungen</label>
+                <alert>Ungültiger Wert</alert>
+                <hint>Positive Zahl</hint>
+            </max>
+        </dialog-grid-details>
+        <dialog-validation-details>
+            <label>Validierungseinstellungen bearbeiten</label>
+            <types>
+                <label>Datentyp</label>
+            </types>
+            <builtin-type>
+                <label>Eingebaute Typen</label>
+                <hint>Eingebaute Datentypen</hint>
+                 
+                <choices>
+                    <choices>
+                        <label>Häufige Typen</label>
+                        <type label="Text" allow-empty="true">string</type>
+                        <type label="Fließkommazahl (doppelte Genauigkeit)">double</type>
+                        <type label="Dezimalzahl">decimal</type>
+                        <type label="Ganzzahl">integer</type>
+                        <type label="Datum und Zeit">dateTime</type>
+                        <type label="Datum">date</type>
+                        <type label="Zeit">time</type>
+                        <type label="Falsch/ Wahr">boolean</type>
+                        <type label="URI">anyURI</type>
+                        <type label="E-Mail Addresse">email</type>
+                    </choices>
+                    <choices>
+                        <label>Zahlentypen</label>
+                        <type label="Fließkommazahl (einfache Genauigkeit)">float</type>
+                        <type label="Fließkommazahl (doppelte Genauigkeit)">double</type>
+                        <type label="Dezimalzahl">decimal</type>
+                        <type label="ganze Zahl">integer</type>
+ 
+                        <type label="Positive Ganzzahl">positiveInteger</type>
+                        <type label="Nicht-positive Ganzzahl">nonPositiveInteger</type>
+                        <type label="Negative Ganzzahl">negativeInteger</type>
+                        <type label="Nicht-negative Ganzzahl">nonNegativeInteger</type>
+ 
+                        <type label="">long</type>
+                        <type label="">int</type>
+                        <type label="">short</type>
+                        <type label="">byte</type>
+                        <type label="">unsignedLong</type>
+                        <type label="">unsignedInt</type>
+                        <type label="">unsignedShort</type>
+                        <type label="">unsignedByte</type>
+                    </choices>
+                    <choices>
+                        <label>Zeittypen</label>
+                        <type label="Datum und Zeit">dateTime</type>
+                        <type label="Datum">date</type>
+                        <type label="Zeit">time</type>
+                        <type label="Dauer">duration</type>
+                        <type label="Monat und Jahr">gYearMonth</type>
+                        <type label="Tag und Monat">gMonthDay</type>
+                        <type label="Jahr">gYear</type>
+                        <type label="Monat">gMonth</type>
+                        <type label="Tag">gDay</type>
+                    </choices>
+                    <choices>
+                        <label>String Types</label>
+                        <type label="Text" allow-empty="true">string</type>
+                        <type label="" allow-empty="true">normalizedString</type>
+                        <type label="">token</type>
+                        <type label="">language</type>
+                        <type label="">Name</type>
+                        <type label="">NCName</type>
+                        <type label="">ID</type>
+                        <type label="">IDREF</type>
+                        <type label="">IDREFS</type>
+                        <type label="">ENTITY</type>
+                        <type label="">ENTITIES</type>
+                        <type label="">NMTOKEN</type>
+                        <type label="">NMTOKENS</type>
+                    </choices>
+                    <choices>
+                        <label>Andere Typen</label>
+                        <type label="Falsch/ Wahr">boolean</type>
+                        <!-- Not 100% sure if these two types allow empty content -->
+                        <type label="Base64-kodierter Binärwert" allow-empty="true">base64Binary</type>
+                        <type label="Hexadezimal kodierter Binärwert" allow-empty="true">hexBinary</type>
+                        <type label="URI">anyURI</type>
+                        <type label="XML qualifizierter Name">QName</type>
+                        <type label="">NOTATION</type>
+                    </choices>
+                </choices>
+            </builtin-type>
+            <schema-type>
+                <label>Schematyp</label>
+                <hint>Typ eines importierten Schemas</hint>
+            </schema-type>
+            <required>
+                <label>Pflichtfeld</label>
+                <alert>Ungültiger XPath-Ausdruck</alert>
+                <hint>Boolescher XPath-Ausdruck (z.B.: "true()")</hint>
+                <item>
+                    <label>Ja</label>
+                    <value>true</value>
+                </item>
+                <item>
+                    <label>Nein</label>
+                    <value>false</value>
+                </item>
+            </required>
+            <constraint>
+                <label>Bedingung</label>
+                <alert>Ungültiger XPath-Ausdruck</alert>
+                <hint>Boolescher XPath-Ausdruck (z.B.: "true()")</hint>
+            </constraint>
+            <visibility>
+                <label>Sichtbarkeit</label>
+                <alert>Ungültiger XPath-Ausdruck</alert>
+                <hint>Boolescher XPath-Ausdruck (z.B.: "true()")</hint>
+            </visibility>
+            <readonly>
+                <label>Schreibgeschützt</label>
+                <alert>Ungültiger XPath-Ausdruck</alert>
+                <hint>Boolescher XPath-Ausdruck (z.B.: "true()")</hint>
+            </readonly>
+            <default>
+                <label>Initialwert</label>
+                <alert>Ungültiger XPath-Ausdruck</alert>
+                <hint>XPath-Ausdruck</hint>
+            </default>
+            <calculate>
+                <label>Berechneter Wert</label>
+                <alert>Ungültiger XPath-Ausdruck</alert>
+                <hint>XPath-Ausdruck</hint>
+            </calculate>
+          <help>
+              <label>Hilfe-Text</label>
+              <hint>Wird angezeigt bei Klick auf das Hilfe-Icon neben der Beschriftung</hint>
+          </help>
+            <alert>
+                <label>Fehlernachricht</label>
+                <hint>Wird angezeigt bei fehlenden oder ungültigen Werten</hint>
+            </alert>
+        </dialog-validation-details>
+        <dialog-confirmation>
+            <label>Bestätigen</label>
+        </dialog-confirmation>
+        <dialog-help>
+            <label>Hilfenachricht editieren</label>
+            <help-message>
+                <label>Hilfenachricht ändern</label>
+            </help-message>
+        </dialog-help>
+        <dialog-publish>
+            <label>Formular aktivieren</label>
+            <publish>
+                <label>Aktivieren</label>
+            </publish>
+            <publish-and-open>
+                <label>Veröffentlichen und öffnen</label>
+            </publish-and-open>
+            <messages>
+                <open-summary>Formular-Übersichtsseite anzeigen </open-summary>
+                <open-new>Neues Formular öffnen</open-new>
+            </messages>
+        </dialog-publish>
+        <dialog-add-language>
+            <label>Sprache hinzufügen</label>
+            <new-language>
+                <label>Füge folgende Sprache hinzu:</label>
+            </new-language>
+            <add-language>
+                <label>Sprache hinzufügen</label>
+            </add-language>
+            <remove-language>
+                <label>Sprache entfernen</label>
+            </remove-language>
+        </dialog-add-language>
+        <dialog-upload-schema>
+            <label>XML Schema hochladen</label>
+            <schema-type>
+                <label>Verfügbare Schematypen</label>
+                <hint>Diese Liste enthält einfache Typen aus dem hochgeladenen Schema</hint>
+            </schema-type>
+            <namespace-uri>
+                <label>Schema Namespace URI</label>
+                <hint>Namespace URI des hochgeladenen Schemas</hint>
+            </namespace-uri>
+            <operations>
+                <label>Befehle</label>
+            </operations>
+            <delete-schema>
+                <label>Bestehendes XML Schema löschen</label>
+            </delete-schema>
+            <change-schema>
+                <label>XML Schema ändern</label>
+            </change-schema>
+            <replace-schema>
+                <label>XML Schema ersetzen</label>
+            </replace-schema>
+            <upload-schema>
+                <label>XML Schema hochladen</label>
+            </upload-schema>
+            <messages>
+                <no-simple-types>Ihr Schema enthält keine einfachen Typen. Aus diesem Schema können keine Typen zur Validierung ausgewählt werden. </no-simple-types>
+                <has-includes>Ihr Schema enthält Imports oder Includes. Diese werden deaktiviert.</has-includes>
+                <not-a-schema>Die hochgeladene Datei enthält kein valides Schema.</not-a-schema>
+                <new-schema-information>Neue Schema-Information</new-schema-information>
+                <existing-schema-information>Bestehende Schema-Information</existing-schema-information>
+            </messages>
+        </dialog-upload-schema>
+        <dialog-edit-source>
+            <label>Quelltext editieren</label>
+            <source>
+                <alert>Muss wohlgeformtes XML enthalten.</alert>
+            </source>
+        </dialog-edit-source>
+        <dialog-view-source>
+            <label>Quelltext anzeigen</label>
+        </dialog-view-source>
+        <dialog-upload-pdf>
+            <label>PDF hochladen</label>
+            <upload-pdf>
+                <label>PDF-Datei</label>
+            </upload-pdf>
+        </dialog-upload-pdf>
+        <dialog-itemsets>
+            <label>Einträge editieren</label>
+            <resources-language>
+                <label>Resourcen Sprache</label>
+            </resources-language>
+            <label>
+                <label>Beschriftung</label>
+            </label>
+            <value>
+                <label>Wert</label>
+            </value>
+        </dialog-itemsets>
+        <dialog-http-services>
+            <label>HTTP Dienste bearbeiten</label>
+            <service-name>
+                <label>Dienstname</label>
+                <hint>Wählen Sie einen eindeutigen Namen für den Dienst</hint>
+            </service-name>
+            <resource>
+                <label>URL des Dienstes</label>
+                <hint>z.B. http://meine-domain.de/mein-service.xml</hint>
+            </resource>
+            <method>
+                <label>HTTP-Methode</label>
+            </method>
+            <serialization>
+                <label>Serialisierung</label>
+            </serialization>
+            <soap-submission>
+                <label>SOAP Service?</label>
+                <hint>Ob es sich um einen SOAP Service handelt</hint>
+            </soap-submission>
+            <soap-action>
+                <label>SOAPAction Header (optional)</label>
+                <hint>Optionaler SOAPAction Header</hint>
+            </soap-action>
+            <http-authentication>
+                <label>HTTP Authentication</label>
+                <hint>HTTP Authentication</hint>
+            </http-authentication>
+            <username>
+                <label>Username</label>
+            </username>
+            <password>
+                <label>Password</label>
+            </password>
+            <request-body>
+                <label>Request Body</label>
+                <hint>XML-Daten (kann ein SOAP envelope sein)</hint>
+            </request-body>
+            <response>
+                <label>Antwort</label>
+            </response>
+            <error-type>
+                <label>Fehlertyp</label>
+                <item>
+                    <label>Submission in progress</label>
+                    <value>submission-in-progress</value>
+                </item>
+                <item>
+                    <label>Keine Daten</label>
+                    <value>no-data</value>
+                </item>
+                <item>
+                    <label>Validierungsfehler</label>
+                    <value>validation-error</value>
+                </item>
+                <item>
+                    <label>Resourcen-Fehler</label>
+                    <value>resource-error</value>
+                </item>
+                <item>
+                    <label>Target-Fehler</label>
+                    <value>target-error</value>
+                </item>
+                <item>
+                    <label>Interner Fehler</label>
+                    <value>xxforms-internal-error</value>
+                </item>
+            </error-type>
+            <resource-uri>
+                <label>Resource URL</label>
+            </resource-uri>
+            <status-code>
+                <label>Status Code</label>
+            </status-code>
+            <headers>
+                <label>Headers</label>
+            </headers>
+            <header-name>
+                <label>Name</label>
+            </header-name>
+            <header-value>
+                <label>Wert(e)</label>
+            </header-value>
+            <response-body>
+                <label>Response Body</label>
+            </response-body>
+            <save>
+                <label>Speichern</label>
+            </save>
+            <test>
+                <label>Testen</label>
+            </test>
+        </dialog-http-services>
+        <dialog-database-services>
+            <label>Database Service Editor</label>
+            <service-name>
+                <label>Service Name</label>
+                <hint>Wählen Sie einen eindeutigen Namen für diesen Service</hint>
+            </service-name>
+            <datasource>
+                <label>Datasource</label>
+                <hint>JNDI datasource für diesen Service</hint>
+            </datasource>
+            <query>
+                <label>SQL Query</label>
+                <hint>SQL query (kann Platzhalter für Parameter enthalten)</hint>
+            </query>
+            <save>
+                <label>Speichern</label>
+            </save>
+            <test>
+                <label>Testen</label>
+            </test>
+        </dialog-database-services>
+        <dialog-actions>
+            <label>Aktionen bearbeiten</label>
+            <service-name>
+                <label>Aktionname</label>
+                <hint>Wählen Sie einen eindeutigen Namen für die Aktion</hint>
+            </service-name>
+            <event-type>
+                <label>Aktion soll ausgelöst werden bei ...</label>
+                <!-- Just a value change -->
+                <item>
+                    <label>... Änderung eines Bedienelementwertes</label>
+                    <value>xforms-value-changed</value>
+                </item>
+                <!-- Value change AND the first time the control shows -->
+                <!--<item>
+                    <label>Value Change or Form Load</label>
+                    <value>xforms-value-changed xforms-enabled</value>
+                </item>-->
+                <!-- Control activation -->
+                <!--<item>
+                    <label>... </label>
+                    <value>DOMActivate</value>
+                </item>-->
+                <!-- Form load -->
+                <item>
+                    <label>... Laden des Formulars</label>
+                    <value>xforms-ready</value>
+                </item>
+            </event-type>
+            <event-condition>
+                <label>Condition</label>
+                <item>
+                    <label>Immer ausführen</label>
+                    <value>true()</value>
+                </item>
+                <item>
+                    <label>Nur beim Erzeugen ausführen</label>
+                    <value>$fr-mode='new'</value>
+                </item>
+            </event-condition>
+            <event-control>
+                <label>Bedienelement</label>
+            </event-control>
+            <service-to-call>
+                <label>Aufzurufender Dienst</label>
+                <hint>Dienst, welcher beim Auslösen der Aktion ausgerufen werden soll</hint>
+            </service-to-call>
+            <request-parameters>
+                <label>Folgende Werte von Bedienelemente sollen in die Anfrage des Dienstes gesetzt werden:</label>
+            </request-parameters>
+            <source-control>
+                <label>Bedienelement (Quelle)</label>
+            </source-control>
+            <destination-xpath>
+                <label>XPath Ausdruck (Ziel)</label>
+            </destination-xpath>
+            <request-database-parameter>
+                <label>Set Database Service Parameters</label>
+            </request-database-parameter>
+            <parameter-number>
+                <label>Parameter-Nr</label>
+            </parameter-number>
+            <response-values>
+                <label>Folgende Werte aus der Antwort des Dienstes soll in Bedienelemente gesetzt werden:</label>
+            </response-values>
+            <destination-control>
+                <label>Bedienelement (Ziel)</label>
+            </destination-control>
+            <source-xpath>
+                <label>XPath Ausdruck (Quelle)</label>
+            </source-xpath>
+            <response-itemset>
+                <label>Folgende Einträge aus der Antwort des Dienstes sollen in Auswahllisten (z.B. Aufklappmenü) geladen werden:</label>
+            </response-itemset>
+            <destination-selection-control>
+                <label>Auswahlliste (Ziel)</label>
+            </destination-selection-control>
+            <itemset>
+                <label>Definition von Einträgen</label>
+                <hint>XPath-Ausdrücke zum Erzeugen eines neuen itemsets</hint>
+            </itemset>
+            <items>
+                <label>Einträge</label>
+                <hint>XPath-Ausdruck, der die relevanten Knoten an Einträgen selektiert (z.B. '/versicherungen/versicherung')</hint>
+            </items>
+            <label>
+                <label>Beschriftung</label>
+                <hint>XPath-Ausdruck relativ zum Knoten eines Eintrags (z.B. 'name')</hint>
+            </label>
+            <value>
+                <label>Wert</label>
+                <hint>XPath-Ausdruck relativ zum Knoten eines Eintrags (z.B. 'id')</hint>
+            </value>
+            <save>
+                <label>Speichern</label>
+            </save>
+            <test>
+                <label>Testen</label>
+            </test>
+        </dialog-actions>
+        <dialog-test>
+            <label>Formularvorschau</label>
+        </dialog-test>
+        <dialog-pe>
+            <label>Orbeon Forms PE Feature</label>
+            <message>
+                <div>
+                    <p>Dieses Feature ist nur verfügbar in der Orbeon Forms PE.</p>
+                    <p>Weitere Informationen auf der <a href="http://www.orbeon.com/support-services/professional" target="_blank">Orbeon web site</a>.</p>
+                </div>
+            </message>
+        </dialog-pe>
+        <dialog-custom-xml>
+            <label>Eigenes XML</label>
+            <mode-label>Die von den Benutzern in das Formular eingetragene Information wird in einem XML Dokument abgelegt:</mode-label>
+            <mode-automatic>XML vom Form Builder automatisch erzeugen lassen</mode-automatic>
+            <mode-custom>Ein eigenes XML Dokument manuell bereitstellen</mode-custom>
+        </dialog-custom-xml>
+        <dialog-permissions>
+            <label>Berechtigungen</label>
+            <role-based-permissions>Rollen-basierte Berechtigungen für dieses Formular aktivieren</role-based-permissions>
+            <role>Rolle</role>
+            <permissions>Berechtigungen</permissions>
+            <operations>Befehle</operations>
+            <anyone>Jeder</anyone>
+            <create>Erzeugen</create>
+            <read-update>Lesen und schreiben</read-update>
+            <delete>Löschen</delete>
+        </dialog-permissions>
+        <!-- Messages -->
+        <messages>
+            <delete-section>Wollen Sie den aktuellen Abschnitt wirklich löschen?</delete-section>
+            <delete-grid>Wollen Sie das aktuelle Raster wirklich löschen?</delete-grid>
+            <delete-column>Wollen Sie die aktuelle Spalte wirklich löschen?</delete-column>
+            <delete-row>Wollen Sie den aktuellen Zeile wirklich löschen?</delete-row>
+            <expand-cell>Wollen Sie die aktuelle Zelle wirklich  erweitern? Dabei wird ein Bedienelement gelöschtn.</expand-cell>
+            <delete-resources>Sind Sie sicher, dass Sie alle Eingaben für diese Sprache löschen wollen?</delete-resources>
+            <delete-service>Wollen Sie den Service wirklich löschen?</delete-service>
+            <delete-action>Wollen Sie die Aktion wirklich löschen?</delete-action>
+            <controls-will-be-deleted> Dabei werden Bedienelemente gelöscht.</controls-will-be-deleted>
+            <publish-form>Sind Sie sicher, dass Sie dieses Formular aktivieren wollen? Diese Version des Formulars ersetzt dann die bestehenden Versionen von:</publish-form>
+            <publish-success>Das Formular wurde erfolgreich aktiviert. {0,choice,0#Kein|1#1 Anhang wurde|1&lt;{0,number,integer} Anhänge wurden} publiziert.</publish-success>
+            <publish-error>Beim Aktivieren des Formulars sind Fehler aufgetreten.</publish-error>
+            <metadata-edit-title>Formularmetadaten</metadata-edit-title>
+            <new-metadata-output>Geben Sie bitte den Anwendungsnamen und den Formularnamen  an.</new-metadata-output>
+            <edit-metadata-output></edit-metadata-output>
+            <save-as-metadata-output>Neuen Anwendungsnamen und neuen Formularnamen für die Kopie dieses Formulars eingeben:</save-as-metadata-output>
+            <xpath-errors>Ihr Formular enthält {0,choice,1#is one XPath error|1&lt;are {0,number,integer} XPath errors} Fehler.</xpath-errors>
+        </messages>
+        <template>
+            <untitled-form>Unbenanntes Formular</untitled-form>
+            <untitled-section>Unbenannter Abschnitt</untitled-section>
+            <items>
+                <item>
+                    <label>Erster Punkt</label>
+                    <value>one</value>
+                </item>
+                <item>
+                    <label>Zweiter Punkt</label>
+                    <value>two</value>
+                </item>
+                <item>
+                    <label>Dritter Punkt</label>
+                    <value>three</value>
                 </item>
             </items>
         </template>

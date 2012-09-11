@@ -845,4 +845,173 @@
             </dialog-body>
         </save-locally>
     </resource>
+    <resource xml:lang="de">
+        <components>
+            <labels>
+                <open-section>Abschnitt anzeigen</open-section>
+                <close-section>Abschnitt verbergen</close-section>
+                <section-name>Abschnittname</section-name>
+            </labels>
+        </components>
+        <errors>    
+            <summary-title>Ihr Formular enthält die folgenden Fehler:</summary-title>
+            <some>Fehler im Formular</some>
+            <none>Keine Fehler im Formular</none>
+            <unsaved>Ungespeicherte Änderungen</unsaved>
+        </errors>
+        <email>
+            <subject>Orbeon Forms Bestätigung</subject>
+            <body>Im Anhang finden Sie das Formular in PDF- und XML-Format.</body>
+        </email>
+        <!-- Formats used for PDF template -->
+        <print>
+            <formats>
+                <date>[D].[M].[Y]</date>
+                <time>[H01]:[m01]:[s01]</time>
+                <dateTime>[D].[M].[Y] [H01]:[m01]:[s01]</dateTime>
+            </formats>
+        </print>
+        <summary>
+            <titles>
+                <summary-title>Übersicht</summary-title>
+                <row-number>Nr.</row-number>
+                <created>Erzeugt am</created>
+                <last-modified>Zuletzt geändert am</last-modified>
+                <selected>Ausgewählt</selected>
+                <refresh>Diese Operation aktualisiert die Seite</refresh>
+                <toc>Inhalt</toc>
+                <help>Hilfe</help>
+                <error-count>Fehler im Formular</error-count>
+                <errors-count>Fehler im Formular</errors-count>
+            </titles>
+            <search>
+                <search>Suche</search>
+                <search-forms>Formulare suchen</search-forms>
+                <show-options>Erweiterte Suchoptionen</show-options>
+                <close-options>Suchoptionen schließen</close-options>
+                <returned-1>Die Suche ergibt</returned-1>
+                <returned-2>Dokumente.</returned-2>
+            </search>
+            <paging>
+                <to>bis</to>
+                <of>von</of>
+            </paging>
+            <messages>
+                <no-form-found><i>Keine Formulardaten gefunden</i></no-form-found>
+                <delete-confirmation>Wollen Sie Formulare wirklich löschen?</delete-confirmation>
+            </messages>
+            <labels>
+                <new-form>Neu</new-form>
+                <import-forms>Formulare importieren</import-forms>
+                <edit-form>Editieren</edit-form>
+                <delete-form>Löschen</delete-form>
+                <view-readonly>HTML anzeigen</view-readonly>
+                <view-xml>XML anzeigen</view-xml>
+                <view-pdf>PDF anzeigen</view-pdf>
+                <language-choice>Sprache wählen</language-choice>
+                <form-choice>Formular auswählen</form-choice>
+                <free-search>Freie Suche</free-search>
+                <any>[Beliebig]</any>
+                <previous>Zurück</previous>
+                <next>Nächstes</next>
+                <script>Vollversion</script>
+                <noscript>Verfügbare Version</noscript>
+                <refresh>Aktualisieren</refresh>
+                <close-box>[Schließen]</close-box>
+                <help-back>Zurück</help-back>
+                <goto-content>Gehe zum Inhalt</goto-content>
+            </labels>
+            <formats>
+                <date>[MNn] [D], [Y]</date>
+                <time>[H01]:[m01]:[s01]</time>
+                <dateTime>[MNn] [D], [Y] [H01]:[m01]:[s01]</dateTime>
+                <save-datetime>[MNn] [D], [Y] [H01]:[m01]:[s01]</save-datetime>
+            </formats>
+        </summary>
+        <detail>
+            <messages>
+                <save-success>Formular erfolgreich gespeichert!</save-success>
+                <form-validation-error>Formular wurde nicht gespeichert: Bitte korrigieren Sie Fehler im Formular.</form-validation-error>
+                <upload-in-progress>Dateien werden hochgeladen. Bitte versuchen Sie es erneut, wenn der Ladevorgang beendet oder abgebrochen ist.</upload-in-progress>
+                <database-error>Fehler beim Verbinden mit der Datenbank: bitte wenden Sie sich an Ihren Systemadministrator.</database-error>
+                <clear-confirm-message>Wollen Sie das Formular wirklich zurücksetzen? Damit gehen alle Änderungen seit dem letzten Speichern verloren.</clear-confirm-message>
+                <error-dialog-title>Aktion kann nicht abgeschlossen werden</error-dialog-title>
+                <submit-dialog-title>Formular wurde abgeschickt</submit-dialog-title>
+                <submit-dialog-message>Ihre Informationen wurden abgeschickt.</submit-dialog-message>
+                <buttons-message/>
+                <saved-locally-open>Hier klicken, um das Dokument zu öffnen. Die eingegebene Information wird so im Werkzeug angezeigt, wie Sie sie gespeichert haben.</saved-locally-open>
+                <buttons-placeholder>An dieser Stelle erscheinen die Schaltflächen des Formulars.</buttons-placeholder>
+            </messages>
+            <labels>
+                <save-document>Speichern</save-document>
+                <save-as-document>Speichern als…</save-as-document>
+                <publish>Aktivieren</publish>
+                <test>Testen</test>
+                <save-locally>Lokal Speichern</save-locally>
+                <save-offline>Offline Speichern</save-offline>
+                <submit-document>Absenden</submit-document>
+                <workflow-review>Prüfen</workflow-review>
+                <workflow-edit>Ändern</workflow-edit>
+                <workflow-send>Absenden</workflow-send>
+                <return>Zurück zum Formular</return>
+                <discard>Abbrechen</discard>
+                <language-choice>Sprache</language-choice>
+                <errors>Fehlerübersicht</errors>
+                <check-errors-in-form>Dieses Formular enthält Fehler</check-errors-in-form>
+                <error-details>Fehlerdetails anzeigen</error-details>
+                <language-choice>Sprache</language-choice>
+                <close>Schließen</close>
+                <home>Home</home>
+                <review>Prüfen</review>
+                <print>Drucken</print>
+                <print-pdf>PDF</print-pdf>
+                <print-pdf-template>PDF (Template)</print-pdf-template>
+                <clear>Zurücksetzen</clear>
+                <confirm>Bestätigen</confirm>
+                <cancel>Abbrechen</cancel>
+                <offline>Offline nehmen</offline>
+                <online>Online nehmen</online>
+                <alert>Fehlender oder falscher Wert</alert>
+                <email>E-Mail</email>
+                <submit-dialog-clear>Zurücksetzen und Schließen</submit-dialog-clear>
+                <submit-dialog-keep>Werte behalten und Schließen</submit-dialog-keep>
+                <submit-dialog-go>OK</submit-dialog-go>
+                <submit-dialog-close-window>Fenster schließen</submit-dialog-close-window>
+                <collapse-all>Alles zuklappen</collapse-all>
+                <expand-all>Alles aufklappen</expand-all>
+                <show-content>Zeige Inhalt</show-content>
+                <hide-content>Verstecke Inhalt</hide-content>
+                <captcha-label>Captcha</captcha-label>
+                <captcha-help>Ihre Eingabe entspricht leider nicht der Vorlage, bitte versuchen Sie es noch einmal.</captcha-help>
+            </labels>
+            <view>
+                <explanation>
+                    Dies ist eine schreibgeschützte Ansicht des Formulars.
+                </explanation>
+            </view>
+        </detail>
+        <save-locally>
+            <dialog-title>Speichern</dialog-title>
+            <dialog-body>
+                <div>
+                    <p>
+                        Um die eingegeben Daten zu speichern, klicken Sie bitte auf den unteren Link und speichern
+                        Sie das Dokument auf Ihrem Computer.
+                    </p>
+                    <p>
+                        Um die eingegeben Daten wieder zu öffnen, klicken Sie doppelt auf
+                        die auf Ihrem Computer gespeicherten Datei.
+                    </p>
+                    <p>
+                        <b>Anmerkung:</b> Die Daten werden nicht auf dem Server gespeichert.
+                        Falls Sie die heruntergeladene Datei löschen, sind die eingegeben Daten
+                        verloren.
+                    </p>
+                </div>
+            </dialog-body>
+        </save-locally>
+        <home>
+            <title>Formulare Home</title>
+        </home>
+    </resource>
 </resources>

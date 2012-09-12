@@ -108,6 +108,10 @@
 
     <!-- ==== Other services ======================================================================================= -->
 
+    <!-- Generate a schema for a form -->
+    <!-- TODO rename to service; using page for testing -->
+    <page path="/fr/service/schema/([^/^.]+)/([^/^.]+)" model="ws/schema.xpl"/>
+
     <!-- Email document -->
     <service path="/fr/service/([^/^.]+)/([^/^.]+)/(email)(/([^/^.]+))?"
              view="email/email-form.xpl"/>
@@ -136,9 +140,6 @@
 
     <!-- Import a collection of form data -->
     <service path="/fr/service/([^/^.]+)/([^/^.]+)/(import)" view="import/import.xpl"/>
-
-    <!-- Generate a schema for a form -->
-    <service path="/fr/service/[^/]+/[^/]+/schema" view="import/import.xpl"/>
 
     <!-- ==== Custom services and pages ============================================================================ -->
 

@@ -94,6 +94,14 @@ object ScalaUtils {
                 runQuietly(closable.close())
         }
 
+    def connectAndDisconnect[T <: {def connect(); def disconnect()}, U](connection: T)(block: ⇒ U): U = {
+        connection.connect()
+        try block
+        finally {
+            runQuietly(connection.disconnect())
+        }
+    }
+
     // Run a block and swallow any exception. Use only for things like close().
     def runQuietly(block: ⇒ Unit) =
         try block

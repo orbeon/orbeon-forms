@@ -32,7 +32,7 @@
     <xf:var name="form" value="$parameters/form" as="xs:string"/>
     <xf:var name="document" value="$parameters/document"/>
     <xf:var name="mode" value="$parameters/mode"/>
-    
+
     <xf:var name="persistence-instance" value="instance('fr-persistence-instance')"/>
 
     <!-- Model initialization when we have a specific app and form -->
@@ -315,11 +315,11 @@
                 <xf:var name="after-urls"
                             value="for $holder in $upload-holders return
                                    formRunner:createAttachmentPath($app, $form, $document, normalize-space($holder))"/>
-                
+
                 <!--<xf:message level="xxf:log-debug">-->
                     <!--xxx <xf:output value="count($upload-holders)"/>-->
                 <!--</xf:message>-->
-                
+
                 <xf:action iterate="$upload-holders" if="$persistence-instance/is-error = 'false'">
 
                     <xf:var name="p" value="position()"/>
@@ -344,7 +344,7 @@
 
                     <!-- Update the path -->
                     <xf:setvalue if="$persistence-instance/is-error = 'false'" ref="$holder" value="$resource"/>
-                    
+
                 </xf:action>
 
                 <xf:action if="$persistence-instance/is-error = 'false'">
@@ -415,7 +415,7 @@
     <!-- Calls a service to get the initial instance -->
     <xf:submission id="fr-get-instance-from-service"
             method="get" separator="&amp;" ref="instance('fr-service-parameters')"
-            resource="xxf:property(string-join(('oxf.fr.detail.new.service.uri', $app, $form), '.'))"
+            resource="{xxf:property(string-join(('oxf.fr.detail.new.service.uri', $app, $form), '.'))}"
             replace="instance" xxf:instance="fr-form-instance"/>
 
     <xf:instance id="fr-persistence-instance">

@@ -3701,7 +3701,7 @@ Copyright (C) 2010 Orbeon, Inc.
                 </item>
             </required>
             <constraint>
-                <label>Bedingung</label>
+                <label>Einschränkung</label>
                 <alert>Ungültiger XPath-Ausdruck</alert>
                 <hint>Boolescher XPath-Ausdruck (z.B.: "true()")</hint>
             </constraint>

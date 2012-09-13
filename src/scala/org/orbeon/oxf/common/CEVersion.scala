@@ -15,7 +15,6 @@ package org.orbeon.oxf.common
 
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.analysis.DumbXPathDependencies
-import org.orbeon.oxf.xforms.analysis.XPathDependencies
 import scala.collection.mutable
 
 class CEVersion extends Version {
@@ -36,7 +35,7 @@ class CEVersion extends Version {
         false
     }
 
-    def createUIDependencies(containingDocument: XFormsContainingDocument): XPathDependencies = new DumbXPathDependencies
+    def createUIDependencies(containingDocument: XFormsContainingDocument) = new DumbXPathDependencies
 }
 
 private object CEVersion {

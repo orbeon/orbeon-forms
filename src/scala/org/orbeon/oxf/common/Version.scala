@@ -37,33 +37,32 @@ object Version {
 
     val logger = LoggerFactory.createLogger(classOf[Version])
 
-    lazy val instance: Version =
-        if (isPE) {
-            // Create a PEVersion instance using reflection
-            val versionClassName = "org.orbeon.oxf.common.PEVersion"
+    // Create a Version instance using reflection
+    lazy val instance: Version = {
 
-            def contextClassLoaderOpt =
-                try Option(Thread.currentThread.getContextClassLoader)
-                catch {
-                    case e: Exception ⇒
-                        logger.error("Failed calling getContextClassLoader(), trying Class.forName()")
-                        None
-                }
+        val versionClassName = "org.orbeon.oxf.common." + Edition + "Version"
 
-            def fromClassLoader =
-                contextClassLoaderOpt flatMap { classLoader ⇒
-                    try Some(classLoader.loadClass(versionClassName).asInstanceOf[Class[Version]])
-                    catch {
-                        case e: Exception ⇒ None
-                    }
-                }
+        def logContextClassLoaderIssue[T](message: String): PartialFunction[Throwable, Option[T]] = {
+            case throwable ⇒
+                logger.info(message, throwable)
+                None
+        }
 
-            def fromName = Class.forName(versionClassName).asInstanceOf[Class[Version]]
+        def contextClassLoaderOpt =
+            try Option(Thread.currentThread.getContextClassLoader)
+            catch logContextClassLoaderIssue("Failed to obtain context ClassLoader")
 
-            fromClassLoader getOrElse fromName newInstance
-        } else
-            // Just create a CEVersion instance
-            new CEVersion
+        def fromContextClassLoaderOpt =
+            contextClassLoaderOpt flatMap { classLoader ⇒
+                try Some(classLoader.loadClass(versionClassName).asInstanceOf[Class[Version]])
+                catch logContextClassLoaderIssue("Failed to load Version from context ClassLoader")
+            }
+
+        def fromName =
+            Class.forName(versionClassName).asInstanceOf[Class[Version]]
+
+        fromContextClassLoaderOpt getOrElse fromName newInstance
+    }
 
     def isPE = Edition == "PE"
 }

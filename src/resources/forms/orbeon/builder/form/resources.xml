@@ -3443,7 +3443,7 @@ Copyright (C) 2010 Orbeon, Inc.
             <label>Eine Zeile oberhalb einfügen</label>
         </insert-row-above-icon>
         <insert-row-below-icon>
-            <label>Eine Spalte unterhalb einfügen</label>
+            <label>Eine Zeile unterhalb einfügen</label>
         </insert-row-below-icon>
         <section-details-icon>
             <label>Abschnittdetails</label>
@@ -4081,7 +4081,7 @@ Copyright (C) 2010 Orbeon, Inc.
             <delete-resources>Sind Sie sicher, dass Sie alle Eingaben für diese Sprache löschen wollen?</delete-resources>
             <delete-service>Wollen Sie den Service wirklich löschen?</delete-service>
             <delete-action>Wollen Sie die Aktion wirklich löschen?</delete-action>
-            <controls-will-be-deleted> Dabei werden Bedienelemente gelöscht.</controls-will-be-deleted>
+            <controls-will-be-deleted> Dabei werden die Bedienelemente gelöscht.</controls-will-be-deleted>
             <publish-form>Sind Sie sicher, dass Sie dieses Formular aktivieren wollen? Diese Version des Formulars ersetzt dann die bestehenden Versionen von:</publish-form>
             <publish-success>Das Formular wurde erfolgreich aktiviert. {0,choice,0#Kein|1#1 Anhang wurde|1&lt;{0,number,integer} Anhänge wurden} publiziert.</publish-success>
             <publish-error>Beim Aktivieren des Formulars sind Fehler aufgetreten.</publish-error>
@@ -4089,7 +4089,7 @@ Copyright (C) 2010 Orbeon, Inc.
             <new-metadata-output>Geben Sie bitte den Anwendungsnamen und den Formularnamen  an.</new-metadata-output>
             <edit-metadata-output></edit-metadata-output>
             <save-as-metadata-output>Neuen Anwendungsnamen und neuen Formularnamen für die Kopie dieses Formulars eingeben:</save-as-metadata-output>
-            <xpath-errors>Ihr Formular enthält {0,choice,1#is one XPath error|1&lt;are {0,number,integer} XPath errors} Fehler.</xpath-errors>
+            <xpath-errors>Ihr Formular enthält {0,choice,1#einen|1&lt;are {0,number,integer}} XPath-Fehler.</xpath-errors>
         </messages>
         <template>
             <untitled-form>Unbenanntes Formular</untitled-form>

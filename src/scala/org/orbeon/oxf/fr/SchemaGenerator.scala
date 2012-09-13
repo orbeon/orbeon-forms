@@ -14,22 +14,23 @@
 package org.orbeon.oxf.fr
 
 import org.orbeon.oxf.pipeline.api.PipelineContext
-import org.orbeon.oxf.util.{XPathCache, URLRewriterUtils, NetUtils}
+import org.orbeon.oxf.util._
 import org.orbeon.oxf.processor.ProcessorImpl
 import org.orbeon.oxf.xml.{XMLConstants, TransformerUtils}
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.externalcontext.URLRewriter
 import org.orbeon.oxf.resources.URLFactory
-import org.orbeon.oxf.resources.handler.HTTPURLConnection
 import java.io.OutputStreamWriter
 import org.orbeon.scaxon.XML._
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import xml._
 import xml.Attribute
-import scala.Some
-import xml.Text
 import org.dom4j.QName
 import org.orbeon.oxf.common.OXFException
+import scala.Some
+import xml.Text
+import xml.NamespaceBinding
+import org.orbeon.oxf.xforms.XFormsConstants.XFORMS_NAMESPACE_URI
 
 /**
  *  Supported:
@@ -48,17 +49,34 @@ class SchemaGenerator extends ProcessorImpl {
 
     private val SchemaPath = """/fr/service/schema/([^/]+)/([^/]+)""".r
     private val ComponentNSPrefix = "http://orbeon.org/oxf/xml/form-builder/component/"
+    private implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(classOf[SchemaGenerator]), "")
+
     case class Libraries(orbeon: Option[DocumentInfo], app: Option[DocumentInfo])
 
     override def start(pipelineContext: PipelineContext) {
+
+        // Read form and library
         val ec = NetUtils.getExternalContext
         val response = ec.getResponse
         val SchemaPath(appName, formName) = ec.getRequest.getRequestPath
-        val library = Libraries(read("orbeon", "library"), read(appName, "library"))
         val formSource = read(appName, formName).get
-        val schema = <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
-                        { formSource \ "*:html" \ "*:head" \ "*:model" \ "*:bind" flatMap (handleBind(library, _)) }
-                     </xs:schema>
+        val library = Libraries(read("orbeon", "library"), read(appName, "library"))
+
+        // Compute root xs:element
+        val rootBind = formSource \ "*:html" \ "*:head" \ "*:model" \ "*:bind" head
+        val rootXsElement: Elem = handleBind(library, rootBind)
+
+        // Import XForms schema if necessary and return
+        val schema =
+            <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                {
+                    val hasXFormsNamespace = rootXsElement.descendant_or_self exists (_.scope.getPrefix(XFORMS_NAMESPACE_URI) != null)
+                    if (hasXFormsNamespace)
+                        <xs:import namespace="http://www.w3.org/2002/xforms"
+                                   schemaLocation="http://www.w3.org/MarkUp/Forms/2007/XForms-11-Schema.xsd"/>
+                }
+                { rootXsElement }
+            </xs:schema>
         response.setContentType("application/xml")
         useAndClose(new OutputStreamWriter(response.getOutputStream))(_.write(schema.toString))
     }
@@ -68,17 +86,16 @@ class SchemaGenerator extends ProcessorImpl {
         val uri = "/fr/service/persistence/crud/" + appName + "/" + formName + "/form/form.xhtml"
         val urlString = URLRewriterUtils.rewriteServiceURL(NetUtils.getExternalContext.getRequest, uri, URLRewriter.REWRITE_MODE_ABSOLUTE)
         val url = URLFactory.createURL(urlString)
-        val connection = url.openConnection.asInstanceOf[HTTPURLConnection]
-        val ec = NetUtils.getExternalContext
-        connection.setRequestProperty("orbeon-token", ec.getWebAppContext.attributes.get("orbeon-token").get.asInstanceOf[String])
-        connectAndDisconnect(connection) {
-            connection.getContentLength match {
-                case 0 ⇒ None
-                case _ ⇒ Some(useAndClose(connection.getInputStream) (inputStream ⇒
-                            TransformerUtils.readTinyTree(XPathCache.getGlobalConfiguration, inputStream, url.toString, false, false)
-                        ))
-            }
-        }
+
+        val headers = Connection.buildConnectionHeaders(None, Map(), Option(Connection.getForwardHeaders))
+        val connectionResult = Connection("GET", url, credentials = None, messageBody = None, headers = headers, loadState = true, logBody = false).connect(saveState = true)
+
+        if (connectionResult.hasContent)
+            Some(useAndClose(connectionResult.getResponseInputStream) { inputStream ⇒
+                TransformerUtils.readTinyTree(XPathCache.getGlobalConfiguration, inputStream, url.toString, false, false)
+            })
+        else
+            None
     }
 
     // Recursive function generating an xs:element from an xforms:bind

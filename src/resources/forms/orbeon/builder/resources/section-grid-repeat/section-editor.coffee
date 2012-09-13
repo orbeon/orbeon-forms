@@ -13,28 +13,25 @@ $ ->
     FSM.create
         transitions : [
             { events: [ 'mouseMove'    ], actions: [ 'mouseMoved' ] }
-            { events: [ 'ajaxResponse' ], actions: [ 'domUpdated'  ] }
         ]
         events:
             mouseMove:    (f) -> ($ document).on 'mousemove', (e) -> f e
-            ajaxResponse: (f) -> Events.ajaxResponseProcessedEvent.subscribe f
         actions:
             mouseMoved: (event) ->
-                updateSectionsOffset() if sectionsCache.length == 0
                 pageX = event.pageX
                 pageY = event.pageY
-            domUpdated: ->
-                updateSectionsOffset()
 
     updateSectionsOffset = ->
         sectionsCache.length = 0
-        _.each ($ '.xbl-fr-section'), (section) ->
+        _.each ($ '.xbl-fr-section:visible'), (section) ->
             section = $ section
             sectionsCache.unshift
                 element: section
                 offset: f$.offset section
                 height: f$.height section
                 titleOffset: f$.offset f$.find 'a', section
+    ($ document).on 'mousemove', updateSectionsOffset                                                                   # On mousemove rather than load, as the offset changes on scroll
+    Events.ajaxResponseProcessedEvent.subscribe updateSectionsOffset
 
     Builder.currentContainerChanged sectionsCache,
         (section) ->
@@ -45,7 +42,7 @@ $ ->
             do positionEditor = ->
                 sectionEditor.show()
                 sectionEditor.offset
-                    top: section.offset.top - f$.scrollTop f$.closest '.yui-layout-bd', $ '#fr-view'
+                    top: section.offset.top
                     left: (f$.offset $ '#fr-form-group').left - (f$.outerWidth sectionEditor)
             do updateTriggerRelevance = ->
                 container = section.element.children '.fr-section-container'

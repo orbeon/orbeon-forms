@@ -628,24 +628,44 @@
                         </xh:div>
                         <xh:div class="fb-grid-repeat-editor">
                             <!-- Until we implement the new selection system allowing moving stuff around freely, don't allow deleting the last grid in a section -->
-                            <xf:trigger appearance="minimal" id="delete-grid-trigger" class="fb-delete-grid-trigger" ref="$grid[not(gridOps:isLastGridInSection(.))]">
-                                <xf:label><xh:img src="/apps/fr/style/images/silk/bin.png" alt="{{$fb-resources/delete-grid-icon/label}}" title="{{$fb-resources/delete-grid-icon/label}}"/></xf:label>
-                                <xf:action ev:event="DOMActivate">
-
-                                    <xxf:var name="count" value="count($grid/*:tr/*:td[*])"/>
-
-                                    <!-- Ask confirmation -->
-                                     <xf:dispatch if="$count > 0" name="fr-show" targetid="{{xformsUtils:effectiveIdToAbsoluteId('dialog-confirmation')}}">
-                                        <xxf:context name="message"
-                                             value="concat($fb-resources/messages/delete-grid, ' ',
-                                                        xxf:format-message($fb-resources/messages/controls-will-be-deleted, $count))"/>
-                                         <xxf:context name="positive-targetid" value="xxf:absolute-id('delete-grid-trigger')"/>
-                                    </xf:dispatch>
-                                    <!-- We are automatically confirmed-->
-                                    <xf:dispatch if="$count = 0" name="fr-positive" targetid="delete-grid-trigger"/>
-                                </xf:action>
+                            <xf:trigger appearance="minimal" id="delete-grid-trigger" class="fb-delete-grid-trigger">
                                 <xf:action ev:event="fr-positive" type="xpath">
                                     gridOps:deleteGrid($grid)
+                                </xf:action>
+                            </xf:trigger>
+                            <!-- Insert column to the left -->
+                            <xf:trigger appearance="minimal" class="fb-insert-column-left">
+                                <xf:label><xh:img src="/apps/fr/style/images/silk/bullet_arrow_left.png" alt="{{$fb-resources/insert-column-left-icon/label}}" title="{{$fb-resources/insert-column-left-icon/label}}"/></xf:label>
+                                <xf:action ev:event="DOMActivate" type="xpath">
+                                    gridOps:insertColLeft($first-row-td)
+                                </xf:action>
+                            </xf:trigger>
+                            <!-- Insert column to the right -->
+                            <xf:trigger appearance="minimal" class="fb-insert-column-right">
+                                <xf:label><xh:img src="/apps/fr/style/images/silk/bullet_arrow_right.png" alt="{{$fb-resources/insert-column-right-icon/label}}" title="{{$fb-resources/insert-column-right-icon/label}}"/></xf:label>
+                                <xf:action ev:event="DOMActivate" type="xpath">
+                                    gridOps:insertColRight($first-row-td)
+                                </xf:action>
+                            </xf:trigger>
+                            <!-- Delete column -->
+                            <xf:trigger appearance="minimal" id="delete-col-trigger" class="fb-delete-column">
+                                <xf:label><xh:img src="/apps/fr/style/images/silk/bin.png" alt="{{$fb-resources/delete-column-icon/label}}" title="{{$fb-resources/delete-column-icon/label}}"/></xf:label>
+                                <xf:action ev:event="DOMActivate">
+
+                                    <xxf:var name="count" value="gridOps:controlsInCol($first-row-td)"/>
+
+                                    <!-- Ask confirmation -->
+                                    <xf:dispatch if="$count > 0" name="fr-show" targetid="{{xformsUtils:effectiveIdToAbsoluteId('dialog-confirmation')}}">
+                                        <xxf:context name="message"
+                                             value="concat($fb-resources/messages/delete-column, ' ',
+                                                            xxf:format-message($fb-resources/messages/controls-will-be-deleted, $count))"/>
+                                         <xxf:context name="positive-targetid" value="xxf:absolute-id('delete-col-{$static-col-pos}-trigger')"/>
+                                    </xf:dispatch>
+                                    <!-- We are automatically confirmed-->
+                                    <xf:dispatch if="$count = 0" name="fr-positive" targetid="delete-col-{$static-col-pos}-trigger"/>
+                                </xf:action>
+                                <xf:action ev:event="fr-positive" type="xpath">
+                                    gridOps:deleteCol($first-row-td)
                                 </xf:action>
                             </xf:trigger>
                         </xh:div>

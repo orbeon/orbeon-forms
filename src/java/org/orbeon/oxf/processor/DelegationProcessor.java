@@ -212,7 +212,7 @@ public class DelegationProcessor extends ProcessorImpl {
                                                 if (child instanceof org.w3c.dom.Element) {
                                                     requestBody.addChild(new MessageElement((org.w3c.dom.Element) child));
                                                 } else if (child instanceof org.w3c.dom.Text) {
-                                                    requestBody.addTextNode(((org.w3c.dom.Text) child).toString());
+                                                    requestBody.addTextNode(child.toString());
                                                 } else {
                                                     throw new OXFException("Unsupported node type: " + child.getClass().getName());
                                                 }
@@ -338,7 +338,7 @@ public class DelegationProcessor extends ProcessorImpl {
                                         final List<Class> parameterTypes = new ArrayList<Class>();
                                         final List<Serializable> parameterValues = new ArrayList<Serializable>();
 
-                                        // Go throught elements
+                                        // Go through elements
                                         for (Iterator i = XPathUtils.selectIterator(parametersDocument, "/*/*"); i.hasNext();) {
                                             final org.dom4j.Element parameterElement = (org.dom4j.Element) i.next();
                                             final String parameterValue = parameterElement.getText();
@@ -463,7 +463,7 @@ public class DelegationProcessor extends ProcessorImpl {
     }
 
     /**
-     * Returns a list of AbstractSercice objects.
+     * Returns a list of AbstractService objects.
      */
     private List<ServiceDefinition> readServices(Document interfaceDocument) {
 

@@ -277,7 +277,7 @@ public class URLRewriterUtils {
             // 3. Iterate through matchers and see if we get a match
             if (isVersionedURL(absolutePathNoContext, pathMatchers)) {
                 // 4. Found a match, perform additional rewrite at the beginning
-                final String version = isPlatformURL ? Version.getVersionNumber() : applicationVersion;
+                final String version = isPlatformURL ? Version.VersionNumber() : applicationVersion;
                 // Call full method so that we can get the proper client context path
                 return rewriteURL(request.getScheme(), request.getServerName(), request.getServerPort(),
                         request.getClientContextPath(urlString), request.getRequestPath(), "/" + version + absoluteURINoContext, rewriteMode);

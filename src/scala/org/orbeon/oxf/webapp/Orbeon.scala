@@ -43,7 +43,7 @@ object Orbeon {
                 LoggerFactory.initBasicLogger()
 
             // 0. Say hello
-            logger.info("Starting " + Version.getVersionString)
+            logger.info("Starting " + Version.VersionString)
 
             // 1. Initialize the Resource Manager
             val properties = context.initParameters filter
@@ -71,7 +71,7 @@ object Orbeon {
 
             // 3. Initialize Version object (depends on resource manager)
             // Better to do it here so that log messages will go to the same place as the above logs
-            Version.instance()
+            Version.instance
 
             // 4. Initialize log4j with a DOMConfiguration
             if (initializeLogging)

@@ -23,12 +23,12 @@ public class VersionTest extends ResourceManagerTestBase {
     @Test
     public void productConfiguration() {
         if (Version.isPE()) {
-            assertEquals("PE", Version.getEdition());
+            assertEquals("PE", Version.Edition());
             assertTrue(Version.isPE());
             assertFalse(Version.instance().isPEFeatureEnabled(false, "foobar"));
             assertTrue(Version.instance().isPEFeatureEnabled(true, "foobar"));
         } else {
-            assertEquals("CE", Version.getEdition());
+            assertEquals("CE", Version.Edition());
             assertFalse(Version.isPE());
             assertFalse(Version.instance().isPEFeatureEnabled(false, "foobar"));
             assertFalse(Version.instance().isPEFeatureEnabled(true, "foobar"));

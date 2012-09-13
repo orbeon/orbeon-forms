@@ -61,7 +61,7 @@ object XFormsResourceRewriter extends Logging {
         }
 
         // Output Orbeon Forms version
-        outputWriter.write("/* This file was produced by " + Version.getVersionString + " */\n")
+        outputWriter.write("/* This file was produced by " + Version.VersionString + " */\n")
 
         for (resource ← resources.asScala) {
             val resourcePath = resource.getResourcePath(isMinimal)
@@ -118,7 +118,7 @@ object XFormsResourceRewriter extends Logging {
     private def generateJS(logger: IndentedLogger, resources: JList[ResourceConfig], os: OutputStream, isMinimal: Boolean): Unit = {
         // Output Orbeon Forms version
         val outputWriter = new OutputStreamWriter(os, "utf-8")
-        outputWriter.write("// This file was produced by " + Version.getVersionString + "\n")
+        outputWriter.write("// This file was produced by " + Version.VersionString + "\n")
         outputWriter.flush()
 
         for (resourceConfig ← resources.asScala) {

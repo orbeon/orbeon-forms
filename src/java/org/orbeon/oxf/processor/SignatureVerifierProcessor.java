@@ -68,7 +68,7 @@ public class SignatureVerifierProcessor extends ProcessorImpl {
                     dsa.update(Dom4jUtils.domToString(sigData).getBytes("utf-8"));
 
                     if (!dsa.verify(Base64.decode(sig)))
-                        throw new OXFException("Invalid Signature");
+                        throw new SignatureException("Invalid Signature");
                     else {
                         final LocationSAXWriter saw = new LocationSAXWriter();
                         saw.setContentHandler(xmlReceiver);
@@ -81,5 +81,11 @@ public class SignatureVerifierProcessor extends ProcessorImpl {
         };
         addOutput(name, output);
         return output;
+    }
+
+    public static class SignatureException extends OXFException {
+        public SignatureException(String message) {
+            super(message);
+        }
     }
 }

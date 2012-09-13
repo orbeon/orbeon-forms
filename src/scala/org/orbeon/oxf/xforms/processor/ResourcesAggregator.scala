@@ -288,7 +288,7 @@ object ResourcesAggregator {
 
             // Output link to resource
             val path = "" :: "xforms-server" ::
-                (if (URLRewriterUtils.isResourcesVersioned) List(Version.getVersionNumber) else Nil) :::
+                (if (URLRewriterUtils.isResourcesVersioned) List(Version.VersionNumber) else Nil) :::
                 "orbeon-" + resourcesHash + (if (isCSS) ".css" else ".js") :: Nil mkString "/"
 
             val result = outputElement(path)

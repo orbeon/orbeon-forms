@@ -153,7 +153,7 @@ public class PropertyStore {
     public static class DateConverter implements Converter {
         public Object convert(final String value, final Element element) {
             // NOTE: Not sure if we ever use dates in properties as of 2012-05-29
-            return new Date(DateUtils.parse(value));
+            return new Date(DateUtils.parseISODateOrDateTime(value));
         }
     }
 

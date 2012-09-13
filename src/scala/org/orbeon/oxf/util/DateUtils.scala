@@ -58,7 +58,7 @@ object DateUtils {
     // - Format for a date:     [-]yyyy-mm-dd[([+|-]hh:mm | Z)]
     //
     // Throws IllegalArgumentException if the date format is incorrect.
-    def parse(date: String): Long = {
+    def parseISODateOrDateTime(date: String): Long = {
         val valueOrFailure =
             if (date.length >= 11 && date.charAt(10) == 'T')
                 DateTimeValue.makeDateTimeValue(date)

@@ -143,7 +143,7 @@ public class CacheProcessor extends ProcessorImpl {
                 }
             } else {
                 // Validity is a date
-                state.validity = new Long(DateUtils.parse(validity.validity));
+                state.validity = new Long(DateUtils.parseISODateOrDateTime(validity.validity));
             }
         }
         return state;

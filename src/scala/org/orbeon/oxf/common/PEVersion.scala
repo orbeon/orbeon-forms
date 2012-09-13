@@ -165,7 +165,7 @@ private object PEVersion {
             val issued        = select("issued")
 
             val versionOpt    = nonEmptyOrNone(select("version"))
-            val expirationOpt = nonEmptyOrNone(select("expiration")) map (s ⇒ new JDate(DateUtils.parse(s)))
+            val expirationOpt = nonEmptyOrNone(select("expiration")) map (s ⇒ new JDate(DateUtils.parseISODateOrDateTime(s)))
 
             LicenseInfo(licensor, licensee, organization, email, issued, versionOpt, expirationOpt)
         }

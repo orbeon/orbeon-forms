@@ -39,10 +39,10 @@ class DateUtilsTest extends AssertionsForJUnit {
         val defaultTzOffsetMs = DateUtils.DefaultOffsetMinutes * 60 * 1000
 
         for ((value, expected) ← valuesNoExplicitTz)
-            assert(expected - defaultTzOffsetMs === DateUtils.parse(value))
+            assert(expected - defaultTzOffsetMs === DateUtils.parseISODateOrDateTime(value))
 
         for ((value, expected) ← valuesWithExplicitTz)
-            assert(expected === DateUtils.parse(value))
+            assert(expected === DateUtils.parseISODateOrDateTime(value))
 
         // Test all 3 HTTP date formats
         for (value ← Seq("Tue, 29 May 2012 19:35:04 GMT", "Tuesday, 29-May-12 19:35:04 GMT", "Tue May 29 19:35:04 2012"))

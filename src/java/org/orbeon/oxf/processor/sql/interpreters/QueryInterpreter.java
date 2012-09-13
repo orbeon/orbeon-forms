@@ -534,14 +534,14 @@ public class QueryInterpreter extends SQLProcessor.InterpreterContentHandler {
                                                 if (stringValue == null) {
                                                     stmt.setNull(index, Types.DATE);
                                                 } else {
-                                                    java.sql.Date date = new java.sql.Date(DateUtils.parse(stringValue));
+                                                    java.sql.Date date = new java.sql.Date(DateUtils.parseISODateOrDateTime(stringValue));
                                                     stmt.setDate(index, date);
                                                 }
                                             } else if (Dom4jUtils.qNameToExplodedQName(XMLConstants.XS_DATETIME_QNAME).equals(xmlType)) {
                                                 if (stringValue == null) {
                                                     stmt.setNull(index, Types.TIMESTAMP);
                                                 } else {
-                                                    java.sql.Timestamp timestamp = new java.sql.Timestamp(DateUtils.parse(stringValue));
+                                                    java.sql.Timestamp timestamp = new java.sql.Timestamp(DateUtils.parseISODateOrDateTime(stringValue));
                                                     stmt.setTimestamp(index, timestamp);
                                                 }
                                             } else if (Dom4jUtils.qNameToExplodedQName(XMLConstants.XS_BOOLEAN_QNAME).equals(xmlType)) {

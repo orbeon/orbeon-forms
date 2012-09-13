@@ -35,6 +35,9 @@ object Version {
     val Edition       = "@EDITION@"
     val VersionString = "Orbeon Forms " + VersionNumber + ' ' + Edition
 
+    // For backward compatibility
+    def getVersionString = VersionString
+
     val logger = LoggerFactory.createLogger(classOf[Version])
 
     // Create a Version instance using reflection

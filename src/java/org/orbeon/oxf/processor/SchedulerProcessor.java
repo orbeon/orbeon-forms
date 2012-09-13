@@ -90,7 +90,7 @@ public class SchedulerProcessor extends ProcessorImpl {
                         if ("now".equalsIgnoreCase(startTimeString)) {
                             startTime = System.currentTimeMillis();
                         } else {
-                            startTime = DateUtils.parse(startTimeString);
+                            startTime = DateUtils.parseISODateOrDateTime(startTimeString);
                         }
                         config.setStartTime(startTime);
 

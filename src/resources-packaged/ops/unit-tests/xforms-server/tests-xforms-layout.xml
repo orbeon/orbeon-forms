@@ -2208,4 +2208,100 @@
         </output>
     </test>
 
+    <test description="Initial xforms:select1 items encoding and selection" name="oxf:pipeline">
+        <!-- See also: https://github.com/orbeon/orbeon-forms/issues/433 -->
+        <input name="config" href="wrap-xforms-controls.xpl"/>
+        <input name="document">
+            <xhtml:html>
+                <xhtml:head>
+                    <xforms:model id="model">
+                        <xforms:instance id="selection">
+                            <selection>
+                                <blank/>
+                                <apple>apple</apple>
+                                <other>other</other>
+                            </selection>
+                        </xforms:instance>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:repeat id="my-repeat" ref="*">
+                        <xforms:select1 id="select-1" ref="." appearance="minimal" xxforms:encrypt-item-values="true">
+                            <xforms:item>
+                                <xforms:label>Select...</xforms:label>
+                                <xforms:value/>
+                            </xforms:item>
+                            <xforms:item>
+                                <xforms:label>Apple</xforms:label>
+                                <xforms:value>apple</xforms:value>
+                            </xforms:item>
+                        </xforms:select1>
+                        <xforms:select1 id="select-2" ref="." appearance="minimal" xxforms:encrypt-item-values="false">
+                            <xforms:item>
+                                <xforms:label>Select...</xforms:label>
+                                <xforms:value/>
+                            </xforms:item>
+                            <xforms:item>
+                                <xforms:label>Apple</xforms:label>
+                                <xforms:value>apple</xforms:value>
+                            </xforms:item>
+                        </xforms:select1>
+                    </xforms:repeat>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <controls>
+                <xhtml:span id="select-1·1" class="xforms-control xforms-select1 xforms-incremental xforms-select1-appearance-minimal xforms-repeat-selected-item-1">
+                    <xhtml:select id="select-1$$c·1" name="select-1·1">
+                        <xhtml:option value="0" selected="selected">Select...</xhtml:option>
+                        <xhtml:option value="1">Apple</xhtml:option>
+                    </xhtml:select>
+                </xhtml:span>
+                <xhtml:span id="select-2·1" class="xforms-control xforms-select1 xforms-incremental xforms-select1-appearance-minimal xforms-repeat-selected-item-1">
+                    <xhtml:select id="select-2$$c·1" name="select-2·1">
+                        <xhtml:option value="" selected="selected">Select...</xhtml:option>
+                        <xhtml:option value="apple">Apple</xhtml:option>
+                    </xhtml:select>
+                </xhtml:span>
+                <xhtml:span id="select-1·2" class="xforms-control xforms-select1 xforms-incremental xforms-select1-appearance-minimal">
+                    <xhtml:select id="select-1$$c·2" name="select-1·2">
+                        <xhtml:option value="0">Select...</xhtml:option>
+                        <xhtml:option value="1" selected="selected">Apple</xhtml:option>
+                    </xhtml:select>
+                </xhtml:span>
+                <xhtml:span id="select-2·2" class="xforms-control xforms-select1 xforms-incremental xforms-select1-appearance-minimal">
+                    <xhtml:select id="select-2$$c·2" name="select-2·2">
+                        <xhtml:option value="">Select...</xhtml:option>
+                        <xhtml:option value="apple" selected="selected">Apple</xhtml:option>
+                    </xhtml:select>
+                </xhtml:span>
+                <xhtml:span id="select-1·3" class="xforms-control xforms-select1 xforms-incremental xforms-select1-appearance-minimal">
+                    <xhtml:select id="select-1$$c·3" name="select-1·3">
+                        <xhtml:option value="0">Select...</xhtml:option>
+                        <xhtml:option value="1">Apple</xhtml:option>
+                    </xhtml:select>
+                </xhtml:span>
+                <xhtml:span id="select-2·3" class="xforms-control xforms-select1 xforms-incremental xforms-select1-appearance-minimal">
+                    <xhtml:select id="select-2$$c·3" name="select-2·3">
+                        <xhtml:option value="">Select...</xhtml:option>
+                        <xhtml:option value="apple">Apple</xhtml:option>
+                    </xhtml:select>
+                </xhtml:span>
+                <xhtml:span id="select-1" class="xforms-control xforms-select1 xforms-incremental xforms-select1-appearance-minimal xforms-repeat-template">
+                    <xhtml:select id="select-1$$c" name="select-1">
+                        <xhtml:option value="0">Select...</xhtml:option>
+                        <xhtml:option value="1">Apple</xhtml:option>
+                    </xhtml:select>
+                </xhtml:span>
+                <xhtml:span id="select-2" class="xforms-control xforms-select1 xforms-incremental xforms-select1-appearance-minimal xforms-repeat-template">
+                    <xhtml:select id="select-2$$c" name="select-2">
+                        <xhtml:option value="">Select...</xhtml:option>
+                        <xhtml:option value="apple">Apple</xhtml:option>
+                    </xhtml:select>
+                </xhtml:span>
+            </controls>
+        </output>
+    </test>
+
 </group>

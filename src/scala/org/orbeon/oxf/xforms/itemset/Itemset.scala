@@ -84,7 +84,7 @@ class Itemset(multiple: Boolean) extends ItemContainer {
 
                     // Handle selection
                     val itemValue = Option(item.value) getOrElse ""
-                    val itemSelected = (itemValue ne null) && XFormsItemUtils.isSelected(multiple, controlValue, itemValue)
+                    val itemSelected = (itemValue ne null) && isSelected(multiple, controlValue, itemValue)
 
                     if (itemSelected) {
                         sb.append(""","selected":""")
@@ -135,7 +135,7 @@ class Itemset(multiple: Boolean) extends ItemContainer {
 
                 def startItem(o: AnyRef, item: Item, first: Boolean): Unit = {
                     val itemValue = Option(item.value) getOrElse ""
-                    val itemSelected = (itemValue ne null) && XFormsItemUtils.isSelected(multiple, controlValue, itemValue)
+                    val itemSelected = (itemValue ne null) && isSelected(multiple, controlValue, itemValue)
 
                     val itemAttributes =
                         if (itemSelected)

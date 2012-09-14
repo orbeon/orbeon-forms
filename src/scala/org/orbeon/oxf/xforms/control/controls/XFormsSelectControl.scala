@@ -89,6 +89,8 @@ class XFormsSelectControl(container: XBLContainer, parent: XFormsControl, elemen
             val internalValue = getValue
             if (StringUtils.isEmpty(internalValue)) {
                 // Keep null or ""
+                // "" means that nothing is selected
+                // TODO: When can the value be null? If the control is non-relevant?
                 internalValue
             } else {
                 // Values in the itemset

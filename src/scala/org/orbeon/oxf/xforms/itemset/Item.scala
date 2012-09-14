@@ -43,7 +43,7 @@ case class Item(label: Label, value: String, attributes: Map[QName, String])(val
     def jAttributes = attributes.asJava
 
     def externalValue   = Option(value) map (v ⇒ if (encode) position.toString else v) getOrElse ""
-    def javaScriptValue = Option(value) map (v ⇒ if (encode) position.toString else escapeJavaScript(v)) getOrElse ""
+    def javaScriptValue = escapeJavaScript(externalValue)
 
     def javaScriptLabel(locationData: LocationData) =
         Option(label) map (_.javaScriptValue(locationData)) getOrElse ""
@@ -57,9 +57,9 @@ case class Item(label: Label, value: String, attributes: Map[QName, String])(val
 
 object Item {
 
-    // Value is encrypted if requested, except with single selection if the value is empty
+    // Value is encrypted if requested, except with single selection if the value is empty [WHY?]
     def apply(position: Int, isMultiple: Boolean, encode: Boolean, attributes: JMap[QName, String], label: Label, value: String): Item =
-        Item(label, value, if (attributes eq null) Map() else attributes.asScala.toMap)(position, encode && (isMultiple || StringUtils.isNotEmpty(value)))
+        Item(label, value, if (attributes eq null) Map() else attributes.asScala.toMap)(position, encode)
 
     // Represent a label
     case class Label(label: String, isHTML: Boolean) {

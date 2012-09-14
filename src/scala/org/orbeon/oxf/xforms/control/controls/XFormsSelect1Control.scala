@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms.control.controls
 
-import org.apache.commons.lang3.StringUtils
 import org.dom4j.Element
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.xforms.XFormsConstants._
@@ -29,7 +28,7 @@ import org.orbeon.oxf.xforms.control.XFormsValueControl
 import org.orbeon.oxf.xforms.event.Dispatch
 import org.orbeon.oxf.xforms.event.events.XFormsDeselectEvent
 import org.orbeon.oxf.xforms.event.events.XFormsSelectEvent
-import org.orbeon.oxf.xforms.itemset.{Item, Itemset, XFormsItemUtils}
+import org.orbeon.oxf.xforms.itemset.{Itemset, XFormsItemUtils}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.ContentHandlerHelper
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData
@@ -109,23 +108,21 @@ class XFormsSelect1Control(container: XBLContainer, parent: XFormsControl, eleme
     override def evaluateExternalValue(): Unit = {
         val internalValue = getValue
         val updatedValue =
-            if (StringUtils.isEmpty(internalValue)) {
-                // Keep null or ""
-                // In the latter case, this is important for multiple selection, as the client expects a blank value to mean "nothing selected"
+            if (internalValue == null) {
+                // Keep null
+                // TODO: When can the value be null? If the control is non-relevant?
                 internalValue
-            } else if (isEncryptValues) {
-                // For closed selection, values sent to client must be encrypted
-                val itemset = getItemset
-                if (itemset ne null)
-                    // Find the position of the first matching value
-                    itemset.allItemsIterator find (_.value == internalValue) map (_.position.toString) orNull
-                else
-                    // Null itemset probably means the control was non-relevant. This should be handled better: if the
-                    // control is not relevant, it should simply not be evaluated.
-                    null
-            } else
-                // Values sent to client are the internal values
-                internalValue
+            } else {
+                Option(getItemset) match {
+                    case Some(itemset) ⇒
+                        // Find the position of the first matching value
+                        itemset.allItemsIterator find (_.value == internalValue) map (_.externalValue) orNull
+                    case None ⇒
+                        // Null itemset probably means the control was non-relevant. This should be handled better: if the
+                        // control is not relevant, it should simply not be evaluated.
+                        null
+                }
+            }
 
         super.setExternalValue(updatedValue)
     }
@@ -153,13 +150,7 @@ class XFormsSelect1Control(container: XBLContainer, parent: XFormsControl, eleme
             existingValue
     }
 
-    private def gatherEvents(newValue: String, existingValue: String) = {
-
-        val matches: Item ⇒ Boolean =
-            if (isEncryptValues)
-                item ⇒ newValue == item.position.toString
-            else
-                item ⇒ newValue == item.value
+    private def gatherEvents(newExternalValue: String, existingValue: String) = {
 
         val selectEvents   = mutable.Buffer[XFormsSelectEvent]()
         val deselectEvents = mutable.Buffer[XFormsDeselectEvent]()
@@ -168,7 +159,7 @@ class XFormsSelect1Control(container: XBLContainer, parent: XFormsControl, eleme
             val currentItemValue = currentItem.value
 
             val itemWasSelected = existingValue == currentItemValue
-            val itemIsSelected  = matches(currentItem)
+            val itemIsSelected  = currentItem.externalValue == newExternalValue
 
             // Handle xforms-select / xforms-deselect
             if (! itemWasSelected && itemIsSelected)

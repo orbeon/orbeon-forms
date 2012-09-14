@@ -86,7 +86,7 @@ class PEVersion extends Version {
                         case e: SignatureException ⇒
                             licenseError("Invalid license file signature")
                         case e: Exception ⇒
-                            licenseError("Error loading license file", Option(e))
+                            licenseError("Error loading license file", Some(e))
                     }
             }
 

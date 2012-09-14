@@ -114,7 +114,7 @@ class SchemaGenerator extends ProcessorImpl {
         object Bind { def unapply(bind: NodeInfo): Option[BindInfo] = {
             val repeatGrid = control(bind, "*:grid") filter (_ \@ "repeat" === "true")
             Some(BindInfo(
-                elemName = bind \@ "ref",
+                elemName = Seq("ref", "nodeset") flatMap (bind \@ _) map (_ stringValue) head,
                 elemType = bind \@ "type",
                 repeated = repeatGrid nonEmpty,
                 min = repeatGrid.toSeq \@ "min",

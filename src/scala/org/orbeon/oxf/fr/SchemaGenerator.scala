@@ -128,8 +128,8 @@ class SchemaGenerator extends ProcessorImpl {
             case Bind(BindInfo(elemName, elemType, repeated, min, max)) ⇒ {
 
                 // Optional type attribute
-                def attr(name: String)(value: String) = Attribute(None, name, Text(value), Null)
-                val typeAttr = elemType map attr("type")
+                def attr(name: String, value: String) = Attribute(None, name, Text(value), Null)
+                val typeAttr = elemType map (attr("type", _))
 
                 // Get type qname, so we can declare a namespace if necessary, filtering the already declared XSD namespace
                 val typeQName = elemType map (resolveQName(bind, _)) filter (qname ⇒
@@ -141,7 +141,7 @@ class SchemaGenerator extends ProcessorImpl {
 
                 // Optional min/max attributes
                 def attrDefault(value: Option[String], name: String, default: String) =
-                    if (repeated) Some(attr(name)(value getOrElse default)) else None
+                    if (repeated) Some(attr(name, value getOrElse default)) else None
                 val minAttr = attrDefault(min, "minOccurs", "0")
                 val maxAttr = attrDefault(max, "maxOccurs", "unbounded")
 
@@ -159,9 +159,14 @@ class SchemaGenerator extends ProcessorImpl {
             case Nil ⇒
                 val section = control(bind, "*:section")
                 val component = section.toSeq \ * filter (_.getURI startsWith ComponentNSPrefix) headOption
-                val library = component flatMap (c ⇒
-                    if (c.getURI substring ComponentNSPrefix.length equals "orbeon/library")
-                        libraries.orbeon else libraries.app)
+                val library = component flatMap ( c ⇒ {
+                        val componentNamespaceURISuffix = c.getURI.substring(ComponentNSPrefix.length)
+                        componentNamespaceURISuffix match {
+                            case "orbeon/library" ⇒ libraries.orbeon
+                            case _ ⇒ libraries.app
+                        }
+                    }
+                )
                 val libraryRootBind = library.toSeq \ "*:html" \ "*:head" \ "*:model" \ "*:bind"
                 val componentBind = libraryRootBind \ "*:bind" filter (_ \@ "name" === component.get.getLocalPart)
                 componentBind \ "*:bind"

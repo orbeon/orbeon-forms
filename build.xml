@@ -333,7 +333,7 @@
     <!-- Perform string replacement in Version.scala to set version and edition  -->
     <target name="set-version" depends="init">
         <mkdir dir="${build.dir}/src"/>
-        <copy todir="${build.dir}/src" file="${scala-src.dir}/org/orbeon/oxf/common/Version.scala" overwrite="true">
+        <copy todir="${build.dir}/src" file="${scala-src.dir}/org/orbeon/oxf/common/Version.scala" overwrite="true" encoding="UTF-8">
             <filterset>
                 <filter token="RELEASE" value="${release.number}"/>
                 <filter token="EDITION" value="${edition}"/>

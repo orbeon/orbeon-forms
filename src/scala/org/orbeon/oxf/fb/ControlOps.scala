@@ -98,7 +98,7 @@ object ControlOps {
         findFRBodyElement(inDoc) \\ * filter (hasIdValue(_, id)) headOption
 
     // Return a bind ref or nodeset attribute if present
-    def bindRefOrNodeset(bind: NodeInfo) = (bind \@ "ref") ++ (bind \@ "nodeset") headOption
+    def bindRefOrNodeset(bind: NodeInfo) = bind \@ ("ref" || "nodeset") headOption
 
     // Find control holder
     // Don't return anything if isCustomInstance is true

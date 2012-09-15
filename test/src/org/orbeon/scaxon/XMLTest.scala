@@ -34,7 +34,6 @@ class XMLTest extends AssertionsForJUnit {
 
         assert((foo \@ @* map (_.stringValue) sorted) === Seq("v1", "v2", "v3a", "v3b"))
 
-        // This fails because resulting tests test on element node type:
-//        assert((foo \@ ("a1" || "a2") map (_.stringValue) sorted) === Seq("v1", "v2"))
+        assert((foo \@ ("a1" || "a2") map (_.stringValue) sorted) === Seq("v1", "v2"))
     }
 }

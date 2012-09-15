@@ -30,6 +30,7 @@ import org.orbeon.saxon.om._
 import scala.Predef._
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.oxf.util.ScalaUtils.stringOptionToSet
+import org.orbeon.saxon.tinytree.TinyTree
 
 object XML {
 
@@ -125,7 +126,54 @@ object XML {
         def -(that: Test) = except(that)
     }
 
-    class NodeLocalNameTest(nodeKind: Int, name: String) extends Test {
+    private val ElementOrAttribute = Set(Type.ELEMENT, Type.ATTRIBUTE)
+
+    private class LocalNameOnlyTest(pool: NamePool, localName: String) extends NodeTest {
+
+        // Matches the name only, but not the node kind
+        def matches(nodeKind: Int, fingerprint: Int, annotation: Int) =
+            fingerprint != -1 && ElementOrAttribute(nodeKind.toShort) && localName == pool.getLocalName(fingerprint)
+
+        override def matches(tree: TinyTree, nodeNr: Int) = {
+            val fingerprint = tree.getNameCode(nodeNr) & NamePool.FP_MASK
+            fingerprint != -1 && ElementOrAttribute(tree.getNodeKind(nodeNr).toShort) && localName == pool.getLocalName(fingerprint)
+        }
+
+        override def matches(node: NodeInfo) =
+            ElementOrAttribute(node.getNodeKind.toShort) && localName == node.getLocalPart
+
+        override def getNodeKindMask = 1 << Type.ELEMENT | 1 << Type.ATTRIBUTE
+        override def toString = "*:" + localName
+
+        def getDefaultPriority = -0.25 // probably not used right now
+    }
+
+    private class NameOnlyTest(pool: NamePool, uri: String, localName: String) extends NodeTest {
+
+        private val fingerprint = pool.allocate("", uri, localName) & NamePool.FP_MASK
+
+        // Matches the name only, but not the node kind
+        def matches(nodeKind: Int, fingerprint: Int, annotation: Int) =
+            ElementOrAttribute(nodeKind.toShort) && (fingerprint & 0xfffff) == this.fingerprint
+
+        override def matches(tree: TinyTree, nodeNr: Int) =
+            ElementOrAttribute(tree.getNodeKind(nodeNr).toShort) && (tree.getNameCode(nodeNr) & 0xfffff) == this.fingerprint
+
+        override def matches(node: NodeInfo) =
+            ElementOrAttribute(node.getNodeKind.toShort) && (
+                node match {
+                    case _: FingerprintedNode ⇒ node.getFingerprint == fingerprint
+                    case _                    ⇒ localName == node.getLocalPart && uri == node.getURI
+                }
+            )
+
+        override def getNodeKindMask = 1 << Type.ELEMENT | 1 << Type.ATTRIBUTE
+        override def toString = pool.getClarkName(fingerprint)
+
+        def getDefaultPriority = -0.25 // probably not used right now
+    }
+
+    class NodeLocalNameTest(name: String, nodeKind: Option[Int] = None) extends Test {
         override def test(nodeInfo: NodeInfo) = {
 
             val pool = nodeInfo.getNamePool
@@ -143,18 +191,14 @@ object XML {
             if (! Set("", "*")(qName._1))
                 throw new IllegalArgumentException("""Only local name tests of the form "*:foo" are supported.""")
 
-            new LocalNameTest(pool, nodeKind, qName._2)
+            nodeKind map (new LocalNameTest(pool, _, qName._2)) getOrElse new LocalNameOnlyTest(pool, qName._2)
         }
     }
 
-    class NodeQNameTest(nodeKind: Int, name: (String, String)) extends Test {
-
-        def this(nodeKind: Int, name: QName) =
-            this(nodeKind, (name.getNamespaceURI, name.getName))
-
+    class NodeQNameTest(name: (String, String), nodeKind: Option[Int] = None) extends Test {
         override def test(nodeInfo: NodeInfo) = {
             val pool = nodeInfo.getNamePool
-            new NameTest(nodeKind, name._1, name._2, pool)
+            nodeKind map (new NameTest(_, name._1, name._2, pool)) getOrElse new NameOnlyTest(pool, name._1, name._2)
         }
     }
 
@@ -224,14 +268,14 @@ object XML {
     def hasElementOnlyContent(nodeInfo: NodeInfo): Boolean =
         isElement(nodeInfo) && hasChildElement(nodeInfo) && ! hasNonEmptyChildNode(nodeInfo)
 
-    // Passing a string as test means to test on the local name of an element
-    implicit def stringToTest(s: String): Test = new NodeLocalNameTest(Type.ELEMENT, s)
+    // Passing a string as test means to test on the local name of an element or attribute
+    implicit def stringToTest(s: String): Test = new NodeLocalNameTest(s)
 
-    // Passing a QName as test means to test on the qualified name of an element
-    implicit def qNameToTest(s: QName): Test = new NodeQNameTest(Type.ELEMENT, s)
+    // Passing a QName as test means to test on the qualified name of an element or attribute
+    implicit def qNameToTest(attName: QName): Test = new NodeQNameTest((attName.getNamespaceURI, attName.getName))
 
     // Qualified name can also be passed as a pair of strings
-    implicit def pairToTest(s: (String, String)): Test = new NodeQNameTest(Type.ELEMENT, s)
+    implicit def pairToTest(s: (String, String)): Test = new NodeQNameTest(s)
 
     // Operations on NodeInfo
     class NodeInfoOps(nodeInfo: NodeInfo) {
@@ -244,14 +288,14 @@ object XML {
         def \\(test: Test): Seq[NodeInfo] = find(Axis.DESCENDANT, test)
 
         // Return an element's attributes
-        def \@(attName: String): Seq[NodeInfo] = \@(new NodeLocalNameTest(Type.ATTRIBUTE, attName))
-        def \@(attName: QName): Seq[NodeInfo] = \@(new NodeQNameTest(Type.ATTRIBUTE, attName))
-        def \@(attName: (String, String)): Seq[NodeInfo] = \@(new NodeQNameTest(Type.ATTRIBUTE, attName))
+        def \@(attName: String): Seq[NodeInfo] = \@(new NodeLocalNameTest(attName, Some(Type.ATTRIBUTE)))
+        def \@(attName: QName): Seq[NodeInfo] = \@(new NodeQNameTest((attName.getNamespaceURI, attName.getName), Some(Type.ATTRIBUTE)))
+        def \@(attName: (String, String)): Seq[NodeInfo] = \@(new NodeQNameTest(attName, Some(Type.ATTRIBUTE)))
         def \@(test: Test): Seq[NodeInfo] = find(Axis.ATTRIBUTE, test)
 
-        def \\@(attName: String): Seq[NodeInfo] = \\@(new NodeLocalNameTest(Type.ATTRIBUTE, attName))
-        def \\@(attName: QName): Seq[NodeInfo] = \\@(new NodeQNameTest(Type.ATTRIBUTE, attName))
-        def \\@(attName: (String, String)): Seq[NodeInfo] = \\@(new NodeQNameTest(Type.ATTRIBUTE, attName))
+        def \\@(attName: String): Seq[NodeInfo] = \\@(new NodeLocalNameTest(attName, Some(Type.ATTRIBUTE)))
+        def \\@(attName: QName): Seq[NodeInfo] = \\@(new NodeQNameTest((attName.getNamespaceURI, attName.getName), Some(Type.ATTRIBUTE)))
+        def \\@(attName: (String, String)): Seq[NodeInfo] = \\@(new NodeQNameTest(attName, Some(Type.ATTRIBUTE)))
         def \\@(test: Test): Seq[NodeInfo] = find(Axis.DESCENDANT, test)
 
         def root = nodeInfo.getDocumentRoot

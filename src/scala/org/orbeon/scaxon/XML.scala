@@ -154,10 +154,10 @@ object XML {
 
         // Matches the name only, but not the node kind
         def matches(nodeKind: Int, fingerprint: Int, annotation: Int) =
-            ElementOrAttribute(nodeKind.toShort) && (fingerprint & 0xfffff) == this.fingerprint
+            ElementOrAttribute(nodeKind.toShort) && (fingerprint & NamePool.FP_MASK) == this.fingerprint
 
         override def matches(tree: TinyTree, nodeNr: Int) =
-            ElementOrAttribute(tree.getNodeKind(nodeNr).toShort) && (tree.getNameCode(nodeNr) & 0xfffff) == this.fingerprint
+            ElementOrAttribute(tree.getNodeKind(nodeNr).toShort) && (tree.getNameCode(nodeNr) & NamePool.FP_MASK) == this.fingerprint
 
         override def matches(node: NodeInfo) =
             ElementOrAttribute(node.getNodeKind.toShort) && (

@@ -13,15 +13,12 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers.xml;
 
-import java.util.Map;
-
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.xforms.StaticStateGlobalOps;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis;
 import org.orbeon.oxf.xforms.control.XFormsControl;
-import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
@@ -42,50 +39,9 @@ public abstract class XFormsBaseHandlerXML extends XFormsBaseHandler {
 
         // Output MIP classes only having a binding
         final boolean hasBinding = containingDocument.getStaticOps().hasBinding(controlPrefixedId);
-        if (hasBinding) {
-            if (control != null) {
-                // Output standard MIP classes
-            	newAttributes.addAttribute(XFormsConstants.XXFORMS_NAMESPACE_URI, "relevant", XFormsConstants.XXFORMS_PREFIX + ":relevant", ContentHandlerHelper.CDATA, control.isRelevant()?"true":"false");
-            	
-                if (control instanceof XFormsSingleNodeControl) {
-                    // TODO: inherit from this method instead rather than using instanceof
-                    final XFormsSingleNodeControl singleNodeControl = (XFormsSingleNodeControl) control;
-                    
-                    newAttributes.addAttribute(XFormsConstants.XXFORMS_NAMESPACE_URI, "valid", XFormsConstants.XXFORMS_PREFIX + ":valid", ContentHandlerHelper.CDATA, singleNodeControl.isValid()?"true":"false");
-                    newAttributes.addAttribute(XFormsConstants.XXFORMS_NAMESPACE_URI, "read-only", XFormsConstants.XXFORMS_PREFIX + ":read-only", ContentHandlerHelper.CDATA, singleNodeControl.isReadonly()?"true":"false");
-                    newAttributes.addAttribute(XFormsConstants.XXFORMS_NAMESPACE_URI, "static-read-only", XFormsConstants.XXFORMS_PREFIX + ":static-read-only", ContentHandlerHelper.CDATA, isStaticReadonly(control)?"true":"false");
-                    boolean required = singleNodeControl.isRequired();
-					newAttributes.addAttribute(XFormsConstants.XXFORMS_NAMESPACE_URI, "required", XFormsConstants.XXFORMS_PREFIX + ":required", ContentHandlerHelper.CDATA, required?"true":"false");
-                    if (required)
-                    {
-                    	newAttributes.addAttribute(XFormsConstants.XXFORMS_NAMESPACE_URI, "required-and-empty", XFormsConstants.XXFORMS_PREFIX + ":required-and-empty", ContentHandlerHelper.CDATA, isEmpty(control)?"true":"false");
-                    }
-
-                    // Output custom MIPs classes
-                    final Map<String, String> customMIPs = singleNodeControl.getCustomMIPs();
-                    if (customMIPs != null) {
-	                    for(Map.Entry<String, String> customMip : customMIPs.entrySet()) {
-	                    	final String customMipName = customMip.getKey();
-							newAttributes.addAttribute(XFormsConstants.XXFORMS_NAMESPACE_URI, customMipName, XFormsConstants.XXFORMS_PREFIX + ":" + customMipName, ContentHandlerHelper.CDATA, customMip.getValue());
-	                    }
-                    }
-                    
-                    // Output type class
-                    final String typeName = singleNodeControl.getBuiltinTypeName();
-                    if (typeName != null) {
-                        // Control is bound to built-in schema type
-                    	newAttributes.addAttribute(XFormsConstants.XXFORMS_NAMESPACE_URI, "xforms-type", XFormsConstants.XXFORMS_PREFIX + ":xforms-type", ContentHandlerHelper.CDATA, typeName);
-                    } else {
-                        // Output custom type class
-                       final String customTypeName = singleNodeControl.getTypeLocalName();
-                       if (customTypeName != null) {
-                           // Control is bound to a custom schema type
-                    	   newAttributes.addAttribute(XFormsConstants.XXFORMS_NAMESPACE_URI, "xforms-type-custom", XFormsConstants.XXFORMS_PREFIX + ":xforms-type-custom", ContentHandlerHelper.CDATA, customTypeName);
-                       }
-                    }
-                }
-            }
-        }
+        if (hasBinding && control != null)
+            // Output standard MIP classes
+            control.writeMIPsAsAttributes(newAttributes);
     }
     
     public void handleValueAttribute(AttributesImpl newAttributes, String controlPrefixedId, XFormsControl control) {

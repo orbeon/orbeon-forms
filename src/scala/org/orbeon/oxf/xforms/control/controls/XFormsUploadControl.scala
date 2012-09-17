@@ -126,7 +126,7 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
                 if (isFileURL(newValue)) {
                     // Setting new file
                     val convertedValue = {
-                        val isTargetBase64 = Set(XS_BASE64BINARY_QNAME, XFORMS_BASE64BINARY_QNAME)(getType)
+                        val isTargetBase64 = Set(XS_BASE64BINARY_QNAME, XFORMS_BASE64BINARY_QNAME)(valueType)
                         if (isTargetBase64) {
                             // Convert value to Base64 and delete incoming file
                             val converted = NetUtils.anyURIToBase64Binary(newValue)

@@ -396,14 +396,14 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-control·1" class="foo-bar-is-not-g">bloody</xxf:control>
-                        <xxf:control id="my-control·2" class="foo-bar-is-not-g">valencia</xxf:control>
-                        <xxf:control id="my-control·3" class="foo-bar-is-g">green</xxf:control>
-                        <xxf:control id="my-control·4" class="foo-bar-is-not-g">red</xxf:control>
-                        <xxf:control id="my-control·5" class="foo-bar-is-not-g">iPod</xxf:control>
-                        <xxf:control id="my-control·6" class="foo-bar-is-g">green</xxf:control>
-                        <xxf:control id="my-control·7" class="foo-bar-is-not-g">williams</xxf:control>
-                        <xxf:control id="my-control·8" class="foo-bar-is-not-g">yellow</xxf:control>
+                        <xxf:control id="my-control·1" class="+foo-bar-is-not-g">bloody</xxf:control>
+                        <xxf:control id="my-control·2" class="+foo-bar-is-not-g">valencia</xxf:control>
+                        <xxf:control id="my-control·3" class="+foo-bar-is-g">green</xxf:control>
+                        <xxf:control id="my-control·4" class="+foo-bar-is-not-g">red</xxf:control>
+                        <xxf:control id="my-control·5" class="+foo-bar-is-not-g">iPod</xxf:control>
+                        <xxf:control id="my-control·6" class="+foo-bar-is-g">green</xxf:control>
+                        <xxf:control id="my-control·7" class="+foo-bar-is-not-g">williams</xxf:control>
+                        <xxf:control id="my-control·8" class="+foo-bar-is-not-g">yellow</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>

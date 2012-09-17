@@ -33,7 +33,7 @@ import org.orbeon.oxf.xforms.{BindingContext, Variable, XFormsUtils}
 class XFormsVariableControl(container: XBLContainer, parent: XFormsControl, element: Element, effectiveId: String)
         extends XFormsSingleNodeControl(container, parent, element, effectiveId) with NoLHHATrait {
 
-    override type Control = VariableControl
+    override type Control <: VariableControl
 
     // Actual variable name/value representation
     private val variable = new Variable(staticControl.asInstanceOf[VariableAnalysisTrait], container.getContextStack)
@@ -104,7 +104,7 @@ class XFormsVariableControl(container: XBLContainer, parent: XFormsControl, elem
             }
     }
 
-    override def isValueChanged = {
+    override def isValueChanged() = {
         val result = ! compareValues(_previousValue, _value)
         _previousValue = _value
         result

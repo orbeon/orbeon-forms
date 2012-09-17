@@ -550,6 +550,7 @@
                                     <xf:instance id="instance">
                                         <instance show="false">
                                             <date>2011-11-03</date>
+                                            <select/>
                                         </instance>
                                     </xf:instance>
                                     <xf:bind ref=".[@show = 'true']">
@@ -581,7 +582,7 @@
                                     <xxf:variable name="var2" select="xs:date('error6')"/>                          <!-- XPath error on variable value -->
                                     <xf:input ref=".[xs:date('error7') = current-date()]"/>                         <!-- XPath error on control binding -->
                                     <xf:output value="xs:date('error8')"/>                                          <!-- XPath error on control value -->
-                                    <xf:select>
+                                    <xf:select ref="select">
                                         <xf:itemset ref=".[1]">
                                             <xf:label value="xs:date('error9')"/>                                   <!-- XPath error on itemset label -->
                                             <xf:value/>
@@ -668,6 +669,7 @@
                                         <xf:instance id="instance">
                                             <instance show="false">
                                                 <date>2011-11-03</date>
+                                                <select/>
                                             </instance>
                                         </xf:instance>
                                         <xf:bind ref=".[@show = 'true']">
@@ -699,7 +701,7 @@
                                         <xxf:variable name="var2" select="xs:date('error6')"/>                          <!-- XPath error on variable value -->
                                         <xf:input ref=".[xs:date('error7') = current-date()]"/>                         <!-- XPath error on control binding -->
                                         <xf:output value="xs:date('error8')"/>                                          <!-- XPath error on control value -->
-                                        <xf:select>
+                                        <xf:select ref="select">
                                             <xf:itemset ref=".[1]">
                                                 <xf:label value="xs:date('error9')"/>                                   <!-- XPath error on itemset label -->
                                                 <xf:value/>

@@ -60,6 +60,8 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
             if (control != null) {
                 // The case of a concrete control
 
+                // TODO: Move this to to control itself, like writeMIPsAsAttributes
+
                 // Output standard MIP classes
                 if (!control.isRelevant()) {
                     if (sb.length() > 0)
@@ -95,7 +97,7 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
                         if (control instanceof XFormsValueControl) {
                             // NOTE: Test above excludes xforms:group
                             // Combined class for IE6
-                            if (isEmpty(control))
+                            if (((XFormsValueControl) control).isEmpty())
                                 sb.append(" xforms-required-empty");
                             else
                                 sb.append(" xforms-required-filled");
@@ -103,8 +105,8 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
                     }
 
                     // Output custom MIPs classes
-                    final String customMIPs = singleNodeControl.getCustomMIPsClasses();
-                    if (customMIPs != null) {
+                    final String customMIPs = singleNodeControl.jCustomMIPsClassesAsString();
+                    if (! customMIPs.equals("")) {
                         if (sb.length() > 0)
                             sb.append(' ');
                         sb.append(customMIPs);

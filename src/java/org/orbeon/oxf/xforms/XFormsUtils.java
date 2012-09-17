@@ -893,7 +893,7 @@ public class XFormsUtils {
                     }
 
                     @Override
-                    protected boolean isAllowedBoundItem(Item item) {
+                    public boolean isAllowedBoundItem(Item item) {
                         return DataModel.isAllowedBoundItem(item);
                     }
                 };

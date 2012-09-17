@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import controls._
+import org.orbeon.oxf.xforms.analysis.controls._
 import model.{Instance, Model, Submission}
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsUtils
@@ -33,23 +33,28 @@ object ControlAnalysisFactory {
     // NOTE: xxforms-upload-done is a trusted server event so doesn't need to be listed here
     private val UploadExternalEvents  = Set(XFORMS_SELECT, XXFORMS_UPLOAD_START, XXFORMS_UPLOAD_CANCEL, XXFORMS_UPLOAD_PROGRESS)
 
-    class ValueControl(staticStateContext: StaticStateContext, element: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], scope: Scope)
+    abstract class ValueControl(staticStateContext: StaticStateContext, element: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], scope: Scope)
             extends CoreControl(staticStateContext, element, parent, preceding, scope)
             with ValueTrait
             with ChildrenBuilderTrait
             with ChildrenLHHAAndActionsTrait
             with FormatTrait {
+    }
+
+    class InputValueControl(staticStateContext: StaticStateContext, element: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], scope: Scope)
+            extends ValueControl(staticStateContext, element, parent, preceding, scope)
+            with RequiredSingleNode {
         override protected def externalEventsDef = super.externalEventsDef ++ ValueExternalEvents
         override val externalEvents = externalEventsDef
     }
 
     class SelectionControl(staticStateContext: StaticStateContext, element: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], scope: Scope)
-            extends ValueControl(staticStateContext, element, parent, preceding, scope)
+            extends InputValueControl(staticStateContext, element, parent, preceding, scope)
             with SelectionControlTrait
 
     class TriggerControl(staticStateContext: StaticStateContext, element: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], scope: Scope)
             extends CoreControl(staticStateContext, element, parent, preceding, scope)
-            with SingleNodeTrait
+            with OptionalSingleNode
             with TriggerAppearanceTrait
             with ChildrenBuilderTrait
             with ChildrenLHHAAndActionsTrait {
@@ -58,24 +63,26 @@ object ControlAnalysisFactory {
     }
 
     class UploadControl(staticStateContext: StaticStateContext, element: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], scope: Scope)
-            extends ValueControl(staticStateContext, element, parent, preceding, scope) {
+            extends InputValueControl(staticStateContext, element, parent, preceding, scope) {
         override protected def externalEventsDef = super.externalEventsDef ++ UploadExternalEvents
         override val externalEvents = externalEventsDef
     }
 
     private val VariableControlFactory: ControlFactory = (new VariableControl(_, _, _, _, _) with ChildrenActionsTrait)
-    private val LHHAControlFactory: ControlFactory     = (new LHHAAnalysis(_, _, _, _, _))
-    private val ValueControlFactory: ControlFactory    = (new ValueControl(_, _, _, _, _))
-    private val SwitchControlFactory: ControlFactory   = (new ContainerControl(_, _, _, _, _) with SingleNodeTrait with LHHATrait with ChildrenBuilderTrait)
-    private val CaseControlFactory: ControlFactory     = (new ContainerControl(_, _, _, _, _) with SingleNodeTrait with LHHATrait with ChildrenBuilderTrait)
+    private val LHHAControlFactory    : ControlFactory = (new LHHAAnalysis(_, _, _, _, _))
+    private val ValueControlFactory   : ControlFactory = (new InputValueControl(_, _, _, _, _))
+    private val SwitchControlFactory  : ControlFactory = (new ContainerControl(_, _, _, _, _) with OptionalSingleNode with LHHATrait with ChildrenBuilderTrait)
+    private val CaseControlFactory    : ControlFactory = (new ContainerControl(_, _, _, _, _) with OptionalSingleNode with LHHATrait with ChildrenBuilderTrait)
 
     private val GroupControlFactory: ControlFactory =
-        (new ContainerControl(_, _, _, _, _) with SingleNodeTrait with LHHATrait with ChildrenBuilderTrait
-            { override val externalEvents = super.externalEvents + DOM_ACTIVATE }) // allow DOMActivate on group
+        (new ContainerControl(_, _, _, _, _) with OptionalSingleNode with LHHATrait with ChildrenBuilderTrait {
+            override val externalEvents = super.externalEvents + DOM_ACTIVATE // allow DOMActivate
+        })
 
     private val DialogControlFactory: ControlFactory =
-        (new ContainerControl(_, _, _, _, _) with SingleNodeTrait with LHHATrait with ChildrenBuilderTrait
-            { override val externalEvents = super.externalEvents + XXFORMS_DIALOG_CLOSE }) // allow xxforms-dialog-close on dialog
+        (new ContainerControl(_, _, _, _, _) with OptionalSingleNode with LHHATrait with ChildrenBuilderTrait {
+            override val externalEvents = super.externalEvents + XXFORMS_DIALOG_CLOSE // allow xxforms-dialog-close
+        })
 
     // Variable factories indexed by QName
     // NOTE: We have all these QNames for historical reasons (XForms 2 is picking <xforms:var>)
@@ -108,7 +115,7 @@ object ControlAnalysisFactory {
         XFORMS_CASE_QNAME             → CaseControlFactory,
         XXFORMS_DIALOG_QNAME          → DialogControlFactory,
         // Dynamic control
-        XXFORMS_DYNAMIC_QNAME         → (new ContainerControl(_, _, _, _, _) with SingleNodeTrait),
+        XXFORMS_DYNAMIC_QNAME         → (new ContainerControl(_, _, _, _, _) with RequiredSingleNode),
         // Repeat control
         XFORMS_REPEAT_QNAME           → (new RepeatControl(_, _, _, _, _)),
         XFORMS_REPEAT_ITERATION_QNAME → (new RepeatIterationControl(_, _, _, _, _)),

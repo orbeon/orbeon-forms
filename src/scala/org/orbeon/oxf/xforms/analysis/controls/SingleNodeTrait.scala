@@ -18,9 +18,13 @@ import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 
 trait SingleNodeTrait extends ElementAnalysis {
+    def isBindingOptional: Boolean
     // NOTE: Static controls do not by themselves support concrete bindings, but whether a control can bind to a certain
     // item or not is a property of the control type, not of a specific instance of concrete control. So we place this
     // here instead of in concrete controls. This also helps Form Builder, which sometimes needs to test whether
     // a binding is allowed without having access to a concrete control.
     def isAllowedBoundItem(item: Item): Boolean = DataModel.isAllowedBoundItem(item)
 }
+
+trait OptionalSingleNode extends SingleNodeTrait { def isBindingOptional = true }
+trait RequiredSingleNode extends SingleNodeTrait { def isBindingOptional = false }

@@ -43,7 +43,7 @@ import org.xml.sax.helpers.AttributesImpl
 class XFormsOutputControl(container: XBLContainer, parent: XFormsControl, element: Element, id: String)
         extends XFormsValueControl(container, parent, element, id) with FileMetadata {
 
-    override type Control = OutputControl
+    override type Control <: OutputControl
 
     def supportedFileMetadata = Seq("mediatype", "filename")
 
@@ -203,7 +203,7 @@ class XFormsOutputControl(container: XBLContainer, parent: XFormsControl, elemen
     // Question: what if we have both @ref and @value? Should a type still be provided? This is not supported in
     // XForms 1.1 but we do support it, with the idea that the bound node does not provide the value but provides
     // mips. Not sure if the code below makes sense after all then.
-    override def getType: QName = if (valueAttribute eq null) super.getType else null
+    override def valueType: QName = if (valueAttribute eq null) super.valueType else null
 
     // It usually doesn't make sense to focus on xf:output, at least not in the sense "focus to enter data". So we
     // disallow this for now.

@@ -19,4 +19,4 @@ import org.orbeon.oxf.xforms.xbl.Scope
 
 class VariableControl(staticStateContext: StaticStateContext, element: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], scope: Scope)
         extends CoreControl(staticStateContext, element, parent, preceding, scope)
-        with ValueTrait with VariableAnalysisTrait
+        with ValueTrait with OptionalSingleNode with VariableAnalysisTrait

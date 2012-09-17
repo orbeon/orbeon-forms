@@ -20,7 +20,6 @@ import org.dom4j.Element
 import org.orbeon.oxf.processor.RegexpMatcher.MatchResult
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsProperties
-import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.ValueControl
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis
 import org.orbeon.oxf.xforms.control.FocusableTrait
@@ -40,8 +39,6 @@ import scala.util.matching.Regex
  */
 class XFormsInputControl(container: XBLContainer, parent: XFormsControl, element: Element, id: String)
         extends XFormsValueControl(container, parent, element, id) with FocusableTrait {
-
-    override type Control = ValueControl
 
     override def getExtensionAttributes = ExtensionAttributes
 

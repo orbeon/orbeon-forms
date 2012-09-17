@@ -13,27 +13,30 @@
  */
 package org.orbeon.oxf.xforms.control
 
-import collection.JavaConverters._
 import XFormsValueControl._
+import collection.JavaConverters._
 import org.dom4j.Element
 import org.orbeon.oxf.common.OXFException
+import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.analysis.XPathDependencies
 import org.orbeon.oxf.xforms.event.XFormsEvent
 import org.orbeon.oxf.xforms.event.events.XXFormsValue
 import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xforms.XFormsProperties
-import org.orbeon.oxf.xforms.XFormsConstants._
+import org.orbeon.oxf.xforms.{XFormsModelBinds, XFormsProperties}
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml.{ContentHandlerHelper, NamespaceMapping}
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.saxon.value._
+import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.ValueControl
 
 /**
  * Base class for all controls that hold a value.
  */
 abstract class XFormsValueControl(container: XBLContainer, parent: XFormsControl, element: Element, effectiveId: String)
     extends XFormsSingleNodeControl(container, parent, element, effectiveId) {
+
+    override type Control <: ValueControl
 
     // Value
     private var value: String = null // TODO: use ControlProperty<String>?
@@ -101,7 +104,7 @@ abstract class XFormsValueControl(container: XBLContainer, parent: XFormsControl
     protected def isExternalValueDirty: Boolean =
         ! isExternalValueEvaluated
 
-    override def isValueChanged: Boolean = {
+    override def isValueChanged(): Boolean = {
         val result = previousValue != value
         previousValue = value
         result
@@ -159,6 +162,7 @@ abstract class XFormsValueControl(container: XBLContainer, parent: XFormsControl
      * Return the control's internal value.
      */
     final def getValue = value
+    final def isEmpty = XFormsModelBinds.isEmptyValue(value)
 
     /**
      * Return the control's external value is the value as exposed to the UI layer.
@@ -220,6 +224,13 @@ abstract class XFormsValueControl(container: XBLContainer, parent: XFormsControl
         super.toXML(helper, attributes) {
             helper.text(getExternalValue())
         }
+
+    override def writeMIPs(write: (String, String) => Unit) {
+        super.writeMIPs(write)
+
+        if (isRequired)
+            write("required-and-empty", XFormsModelBinds.isEmptyValue(getValue).toString)
+    }
 }
 
 object XFormsValueControl {

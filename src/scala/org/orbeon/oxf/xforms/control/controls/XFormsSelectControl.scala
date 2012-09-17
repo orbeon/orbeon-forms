@@ -84,37 +84,35 @@ class XFormsSelectControl(container: XBLContainer, parent: XFormsControl, elemen
         }
     }
 
-    override def evaluateExternalValue(): Unit =
-        setExternalValue {
-            val internalValue = getValue
-            if (StringUtils.isEmpty(internalValue)) {
-                // Keep null or ""
-                // "" means that nothing is selected
-                // TODO: When can the value be null? If the control is non-relevant?
+    override def evaluateExternalValue(): Unit = {
+
+        // If the control is relevant, its internal value and itemset must be defined
+        val internalValue = getValue   ensuring (_ ne null)
+        val itemset       = getItemset ensuring (_ ne null)
+
+        val updatedValue =
+            if (internalValue == "") {
+                // This means that nothing is selected
                 internalValue
             } else {
                 // Values in the itemset
-                val itemset = getItemset
-                if (itemset ne null) {
-                    val instanceValues = valueAsSet(internalValue)
+                val instanceValues = valueAsSet(internalValue)
 
-                    // All itemset external values for which the value exists in the instance
-                    val intersection =
-                        for {
-                            item ← itemset.allItemsIterator
-                            if instanceValues(item.value)
-                        } yield
-                            item.externalValue
+                // All itemset external values for which the value exists in the instance
+                val intersection =
+                    for {
+                        item ← itemset.allItemsIterator
+                        if instanceValues(item.value)
+                    } yield
+                        item.externalValue
 
-                    // NOTE: In encoded mode, external values are guaranteed to be distinct, but in non-encoded mode,
-                    // there might be duplicates.
-                    intersection mkString " "
-                } else
-                    // Null itemset probably means the control was non-relevant. This should be handled better: if the
-                    // control is not relevant, it should simply not be evaluated.
-                    null
+                // NOTE: In encoded mode, external values are guaranteed to be distinct, but in non-encoded mode,
+                // there might be duplicates.
+                intersection mkString " "
             }
-        }
+
+        setExternalValue(updatedValue)
+    }
 }
 
 object XFormsSelectControl {

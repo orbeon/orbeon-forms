@@ -43,7 +43,7 @@ class XFormsSelect1Control(container: XBLContainer, parent: XFormsControl, eleme
 
     import XFormsSelect1Control._
 
-    override type Control = SelectionControlTrait
+    override type Control <: SelectionControlTrait
 
     // This is a var just for getBackCopy
     private var itemsetProperty: ControlProperty[Itemset] = new MutableItemsetProperty(this)
@@ -106,25 +106,15 @@ class XFormsSelect1Control(container: XBLContainer, parent: XFormsControl, eleme
         }
 
     override def evaluateExternalValue(): Unit = {
-        val internalValue = getValue
-        val updatedValue =
-            if (internalValue == null) {
-                // Keep null
-                // TODO: When can the value be null? If the control is non-relevant?
-                internalValue
-            } else {
-                Option(getItemset) match {
-                    case Some(itemset) ⇒
-                        // Find the position of the first matching value
-                        itemset.allItemsIterator find (_.value == internalValue) map (_.externalValue) orNull
-                    case None ⇒
-                        // Null itemset probably means the control was non-relevant. This should be handled better: if the
-                        // control is not relevant, it should simply not be evaluated.
-                        null
-                }
-            }
 
-        super.setExternalValue(updatedValue)
+        // If the control is relevant, its internal value and itemset must be defined
+        val internalValue = getValue   ensuring (_ ne null)
+        val itemset       = getItemset ensuring (_ ne null)
+
+        // Find the position of the first matching value
+        val updatedValue = itemset.allItemsIterator find (_.value == internalValue) map (_.externalValue) orNull
+
+        setExternalValue(updatedValue)
     }
 
     override def translateExternalValue(externalValue: String) = {

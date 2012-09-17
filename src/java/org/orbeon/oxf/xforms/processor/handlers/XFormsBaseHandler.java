@@ -17,7 +17,6 @@ import org.dom4j.QName;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis;
 import org.orbeon.oxf.xforms.analysis.controls.AttributeControl;
-import org.orbeon.oxf.xforms.control.Controls;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
@@ -108,10 +107,6 @@ public abstract class XFormsBaseHandler extends ElementHandler {
     
     public boolean isNonRelevant(XFormsControl control) {
         return control == null || ! control.isRelevant();
-    }
-
-    protected boolean isEmpty(XFormsControl control) {
-        return control instanceof XFormsValueControl && XFormsModelBinds.isEmptyValue(((XFormsValueControl) control).getValue());
     }
 
     protected static void handleAccessibilityAttributes(Attributes srcAttributes, AttributesImpl destAttributes) {

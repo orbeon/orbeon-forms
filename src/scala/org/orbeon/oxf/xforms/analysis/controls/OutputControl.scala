@@ -20,10 +20,12 @@ import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.oxf.xforms.xbl.Scope
 import org.orbeon.saxon.om.Item
+import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.ValueControl
 
 class OutputControl(staticStateContext: StaticStateContext, element: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], scope: Scope)
-        extends CoreControl(staticStateContext, element, parent, preceding, scope)
+        extends ValueControl(staticStateContext, element, parent, preceding, scope)
         with ValueTrait
+        with OptionalSingleNode
         with ChildrenBuilderTrait
         with ChildrenLHHAAndActionsTrait
         with FormatTrait {

@@ -1124,4 +1124,36 @@
         </output>
     </test>
 
+    <test description="Control with missing required single-node binding is marked as non-relevant" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html>
+                <xhtml:head>
+                    <xforms:model id="foo-model">
+                        <xforms:instance id="foo-instance">
+                            <value>foo</value>
+                        </xforms:instance>
+                    </xforms:model>
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:input id="my-relevant-input" ref="instance()"/>
+                    <xforms:input id="my-non-relevant-input"/>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response>
+                <xxf:dynamic-state>
+                    <dynamic-state/>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="my-relevant-input">foo</xxf:control>
+                        <xxf:control id="my-non-relevant-input" relevant="false"/>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 </group>

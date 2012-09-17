@@ -20,7 +20,8 @@ import org.orbeon.oxf.xforms.xbl.Scope
 
 class AttributeControl(staticStateContext: StaticStateContext, element: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], scope: Scope)
         extends CoreControl(staticStateContext, element, parent, preceding, scope)
-        with ValueTrait {
+        with ValueTrait
+        with OptionalSingleNode {
 
     // Attribute control uses an AVT
     // TODO: Add support for analyzing AVT

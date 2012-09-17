@@ -46,7 +46,7 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
         with NoLHHATrait
         with Logging {
 
-    override type Control = RepeatControl
+    override type Control <: RepeatControl
 
     // TODO: this must be handled following the same pattern as usual refresh events
     private var refreshInfo: RefreshInfo = null

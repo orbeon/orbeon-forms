@@ -20,11 +20,9 @@ import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.ContentHandlerHelper
 import org.xml.sax.helpers.AttributesImpl
-import org.orbeon.oxf.xforms.event.XFormsEvents
 import org.orbeon.oxf.xforms.analysis.controls.RepeatIterationControl
 import org.orbeon.oxf.xforms.control.{NoLHHATrait, XFormsControl, XFormsSingleNodeContainerControl}
 import org.orbeon.oxf.xforms.BindingContext
-import scala.collection.JavaConverters._
 
 /**
  * Represents xforms:repeat iteration information.
@@ -37,7 +35,7 @@ class XFormsRepeatIterationControl(container: XBLContainer, parent: XFormsContro
         extends XFormsSingleNodeContainerControl(container, parent, element, effectiveId)
         with NoLHHATrait {
 
-    override type Control = RepeatIterationControl
+    override type Control <: RepeatIterationControl
 
     // Initialize based on the effective id
     private var _iterationIndex = XFormsUtils.getEffectiveIdSuffixParts(effectiveId).lastOption getOrElse -1
@@ -61,7 +59,7 @@ class XFormsRepeatIterationControl(container: XBLContainer, parent: XFormsContro
     // Does not support refresh events for now (could make sense though)
     override def supportsRefreshEvents = false
     override def isStaticReadonly = false
-    override def getType = null
+    override def valueType = null
 
     override def supportFullAjaxUpdates = false
 

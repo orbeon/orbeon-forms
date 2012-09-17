@@ -301,7 +301,7 @@ public class XFormsSwitchControl extends XFormsSingleNodeContainerControl {
     }
 
     @Override
-    public QName getType() {
+    public QName valueType() {
         return null;
     }
 }

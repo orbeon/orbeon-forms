@@ -71,7 +71,7 @@ abstract class DocumentTestBase extends ResourceManagerTestBase {
     def isRequired(controlId: String) = getSingleNodeControl(controlId).isRequired
     def isReadonly(controlId: String) = getSingleNodeControl(controlId).isReadonly
     def isValid(controlId: String) = getSingleNodeControl(controlId).isValid
-    def getType(controlId: String) = getSingleNodeControl(controlId).getType
+    def getType(controlId: String) = getSingleNodeControl(controlId).valueType
 
     def getItemset(controlId: String) =
         getObject(controlId).asInstanceOf[XFormsSelect1Control].getItemset.getJSONTreeInfo(null, null)

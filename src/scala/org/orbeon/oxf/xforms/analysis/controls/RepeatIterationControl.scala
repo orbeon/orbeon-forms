@@ -20,7 +20,7 @@ import org.orbeon.oxf.xforms.event.XFormsEvents._
 
 class RepeatIterationControl (staticStateContext: StaticStateContext, element: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], scope: Scope)
     extends ContainerControl(staticStateContext, element, parent, preceding, scope)
-    with SingleNodeTrait
+    with RequiredSingleNode
     with ChildrenBuilderTrait {
 
     override protected def externalEventsDef = super.externalEventsDef + XXFORMS_REPEAT_ACTIVATE

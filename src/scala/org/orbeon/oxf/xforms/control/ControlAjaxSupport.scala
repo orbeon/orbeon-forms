@@ -134,6 +134,16 @@ trait ControlAjaxSupport {
             }
         }
     }
+
+    def writeMIPs(write: (String, String) ⇒ Unit): Unit =
+        write("relevant", isRelevant.toString)
+
+    final def writeMIPsAsAttributes(newAttributes: AttributesImpl): Unit = {
+        def write(name: String, value: String) =
+            newAttributes.addAttribute(XXFORMS_NAMESPACE_URI, name, XXFORMS_PREFIX + ':' + name, ContentHandlerHelper.CDATA, value)
+
+        writeMIPs(write)
+    }
 }
 
 // NOTE: Use name different from trait so that the Java compiler is happy

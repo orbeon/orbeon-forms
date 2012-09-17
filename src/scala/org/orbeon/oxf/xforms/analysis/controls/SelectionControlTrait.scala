@@ -26,8 +26,9 @@ import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.XFormsConstants._
 import collection.JavaConverters._
 import org.orbeon.saxon.dom4j.DocumentWrapper
+import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.InputValueControl
 
-trait SelectionControlTrait extends SimpleElementAnalysis with SelectAppearanceTrait {
+trait SelectionControlTrait extends InputValueControl with SelectAppearanceTrait {
 
     // Try to figure out if we have dynamic items. This attempts to cover all cases, including
     // nested xforms:output controls. Check only under xforms:choices, xforms:item and xforms:itemset so that we
@@ -68,7 +69,9 @@ trait SelectionControlTrait extends SimpleElementAnalysis with SelectAppearanceT
             def startElement(element: Element): Unit = {
 
                 // Make lazy as might not be used
-                lazy val itemElementAnalysis = new SimpleElementAnalysis(staticStateContext, element, Some(stack.top), None, stack.top.getChildElementScope(element)) with ValueTrait with ViewTrait
+                lazy val itemElementAnalysis =
+                    new SimpleElementAnalysis(staticStateContext, element, Some(stack.top), None, stack.top.getChildElementScope(element))
+                        with ValueTrait with OptionalSingleNode with ViewTrait
 
                 def processElement(qName: QName, required: Boolean) {
                     val nestedElement = element.element(qName)

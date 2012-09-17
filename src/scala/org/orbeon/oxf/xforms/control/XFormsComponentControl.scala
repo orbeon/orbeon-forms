@@ -33,7 +33,7 @@ import org.xml.sax.helpers.AttributesImpl
 class XFormsComponentControl(container: XBLContainer, parent: XFormsControl, element: Element, effectiveId: String)
         extends XFormsSingleNodeContainerControl(container, parent, element, effectiveId) {
 
-    override type Control = ComponentControl
+    override type Control <: ComponentControl
 
     private var _nestedContainer: Option[XBLContainer] = None
     def nestedContainer = _nestedContainer.get

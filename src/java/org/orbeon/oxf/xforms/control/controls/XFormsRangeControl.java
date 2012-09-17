@@ -79,7 +79,7 @@ public class XFormsRangeControl extends XFormsValueControl {
         if (internalValue == null) {// can it be really?
             updatedValue = null;
         } else if (getStart() != null && getEnd() != null
-                && (XMLConstants.XS_INTEGER_QNAME.equals(getType()) || XFormsConstants.XFORMS_INTEGER_QNAME.equals(getType()))) {
+                && (XMLConstants.XS_INTEGER_QNAME.equals(valueType()) || XFormsConstants.XFORMS_INTEGER_QNAME.equals(valueType()))) {
 
             final int start = Integer.parseInt(getStart());
             final int end = Integer.parseInt(getEnd());

@@ -64,7 +64,7 @@ public class XFormsGroupControl extends XFormsSingleNodeContainerControl {
     }
 
     @Override
-    public QName getType() {
+    public QName valueType() {
         return null;
     }
 }

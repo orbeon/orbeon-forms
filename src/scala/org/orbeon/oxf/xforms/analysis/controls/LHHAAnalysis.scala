@@ -75,7 +75,10 @@ class LHHAAnalysis(staticStateContext: StaticStateContext, element: Element, par
             // Value is likely not static
 
             // Delegate to concrete implementation
-            val delegateAnalysis = new SimpleElementAnalysis(staticStateContext, element, parent, preceding, scope) with ValueTrait with ViewTrait
+            val delegateAnalysis =
+                new SimpleElementAnalysis(staticStateContext, element, parent, preceding, scope)
+                    with ValueTrait with OptionalSingleNode with ViewTrait
+
             delegateAnalysis.analyzeXPath()
 
             if (ref.isDefined || value.isDefined) {
@@ -97,8 +100,9 @@ class LHHAAnalysis(staticStateContext: StaticStateContext, element: Element, par
                     def startElement(element: Element) {
                         if (element.getQName == XFormsConstants.XFORMS_OUTPUT_QNAME) {
                             // Add dependencies
-                            val outputAnalysis = new SimpleElementAnalysis(staticStateContext, element, Some(delegateAnalysis), None, delegateAnalysis.getChildElementScope(element))
-                                    with ValueTrait with ViewTrait
+                            val outputAnalysis =
+                                new SimpleElementAnalysis(staticStateContext, element, Some(delegateAnalysis), None, delegateAnalysis.getChildElementScope(element))
+                                    with ValueTrait with OptionalSingleNode with ViewTrait
                             outputAnalysis.analyzeXPath()
                             if (outputAnalysis.getValueAnalysis.isDefined)
                                 combinedAnalysis = combinedAnalysis combine outputAnalysis.getValueAnalysis.get

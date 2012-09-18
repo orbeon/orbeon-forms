@@ -640,13 +640,6 @@
                                     gridOps:insertColLeft($first-row-td)
                                 </xf:action>
                             </xf:trigger>
-                            <!-- Insert column to the right -->
-                            <xf:trigger appearance="minimal" class="fb-insert-column-right">
-                                <xf:label><xh:img src="/apps/fr/style/images/silk/bullet_arrow_right.png" alt="{{$fb-resources/insert-column-right-icon/label}}" title="{{$fb-resources/insert-column-right-icon/label}}"/></xf:label>
-                                <xf:action ev:event="DOMActivate" type="xpath">
-                                    gridOps:insertColRight($first-row-td)
-                                </xf:action>
-                            </xf:trigger>
                             <!-- Delete column -->
                             <xf:trigger appearance="minimal" id="delete-col-trigger" class="fb-delete-column">
                                 <xf:label><xh:img src="/apps/fr/style/images/silk/bin.png" alt="{{$fb-resources/delete-column-icon/label}}" title="{{$fb-resources/delete-column-icon/label}}"/></xf:label>
@@ -666,6 +659,48 @@
                                 </xf:action>
                                 <xf:action ev:event="fr-positive" type="xpath">
                                     gridOps:deleteCol($first-row-td)
+                                </xf:action>
+                            </xf:trigger>
+                            <!-- Insert column to the right -->
+                            <xf:trigger appearance="minimal" class="fb-insert-column-right">
+                                <xf:label><xh:img src="/apps/fr/style/images/silk/bullet_arrow_right.png" alt="{{$fb-resources/insert-column-right-icon/label}}" title="{{$fb-resources/insert-column-right-icon/label}}"/></xf:label>
+                                <xf:action ev:event="DOMActivate" type="xpath">
+                                    gridOps:insertColRight($first-row-td)
+                                </xf:action>
+                            </xf:trigger>
+                            <!-- Insert row above -->
+                            <xf:trigger appearance="minimal" class="fb-insert-row-above">
+                                <xf:label><xh:img src="/apps/fr/style/images/silk/bullet_arrow_top.png" alt="{{$fb-resources/insert-row-above-icon/label}}" title="{{$fb-resources/insert-row-above-icon/label}}"/></xf:label>
+                                <xf:action ev:event="DOMActivate" type="xpath">
+                                    gridOps:insertRowAbove($tr)
+                                </xf:action>
+                            </xf:trigger>
+                            <!-- Delete row -->
+                            <xf:trigger appearance="minimal" class="fb-delete-row">
+                                <xf:label><xh:img src="/apps/fr/style/images/silk/bin.png" alt="{{$fb-resources/delete-row-icon/label}}" title="{{$fb-resources/delete-row-icon/label}}"/></xf:label>
+                                <xf:action ev:event="DOMActivate">
+
+                                    <xxf:var name="count" value="count($tr/*[*])"/>
+
+                                    <!-- Ask confirmation -->
+                                    <xf:dispatch if="$count > 0" name="fr-show" targetid="{{xformsUtils:effectiveIdToAbsoluteId('dialog-confirmation')}}">
+                                        <xxf:context name="message"
+                                             value="concat($fb-resources/messages/delete-row, ' ',
+                                                            xxf:format-message($fb-resources/messages/controls-will-be-deleted, $count))"/>
+                                        <xxf:context name="positive-targetid" value="xxf:absolute-id('delete-row-{$static-row-pos}-trigger')"/>
+                                    </xf:dispatch>
+                                    <!-- We are automatically confirmed-->
+                                    <xxf:context name="positive-targetid" value="xxf:absolute-id('delete-row-{$static-row-pos}-trigger')"/>
+                                </xf:action>
+                                <xf:action ev:event="fr-positive" type="xpath">
+                                    gridOps:deleteRow($tr)
+                                </xf:action>
+                            </xf:trigger>
+                            <!-- Insert row below -->
+                            <xf:trigger appearance="minimal" class="fb-insert-row-below">
+                                <xf:label><xh:img src="/apps/fr/style/images/silk/bullet_arrow_bottom.png" alt="{{$fb-resources/insert-row-below-icon/label}}" title="{{$fb-resources/insert-row-below-icon/label}}"/></xf:label>
+                                <xf:action ev:event="DOMActivate" type="xpath">
+                                    gridOps:insertRowBelow($tr)
                                 </xf:action>
                             </xf:trigger>
                         </xh:div>

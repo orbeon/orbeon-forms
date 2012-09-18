@@ -103,70 +103,6 @@
                                           if ($is-repeat) then ('table', 'table-bordered', 'table-condensed', 'fr-repeat', 'fr-repeat-table', if ($static-row-count le 1) then 'fr-repeat-single-row' else 'fr-repeat-multiple-rows') else 'fr-norepeat',
                                           if ($is-editable) then 'fr-editable' else ()}">
 
-                            <!-- If editable, add top row to manipulate grid -->
-                            <xsl:if test="$is-editable">
-                                <xxf:var name="columns" value="{$static-col-count}"/>
-                                <xh:thead>
-                                    <xh:tr>
-                                        <!-- Top left corner td -->
-                                        <xh:td class="fb-grid-top-left-td">
-                                        </xh:td>
-                                        <xsl:if test="$is-repeat">
-                                            <!-- Column for repeat add/remove -->
-                                            <xh:td class="fb-grid-top-left-td"/>
-                                        </xsl:if>
-                                        <!-- Column icons -->
-                                        <xsl:for-each select="*:tr[1]/*:td">
-                                            <xsl:variable name="static-col-pos" select="position()"/>
-                                            <xxf:var name="first-row-td" value="$grid/*:tr[1]/*:td[{$static-col-pos}]"/>
-                                            <xxf:var name="column-number" value="position()"/>
-
-                                            <xh:td class="fb-grid-column-toolbar-td">
-                                                <!-- Insert column to the left -->
-                                                <xh:div class="fb-insert-left">
-                                                    <xf:trigger appearance="minimal" ref="$grid[$columns lt $max-columns]">
-                                                        <xf:label><xh:img src="/apps/fr/style/images/silk/bullet_arrow_left.png" alt="{{$fb-resources/insert-column-left-icon/label}}" title="{{$fb-resources/insert-column-left-icon/label}}"/></xf:label>
-                                                        <xf:action ev:event="DOMActivate" type="xpath">
-                                                            gridOps:insertColLeft($first-row-td)
-                                                        </xf:action>
-                                                    </xf:trigger>
-                                                </xh:div>
-                                                <!-- Insert column to the right -->
-                                                <xh:div class="fb-insert-right">
-                                                    <xf:trigger appearance="minimal" ref="$grid[$columns lt $max-columns]">
-                                                        <xf:label><xh:img src="/apps/fr/style/images/silk/bullet_arrow_right.png" alt="{{$fb-resources/insert-column-right-icon/label}}" title="{{$fb-resources/insert-column-right-icon/label}}"/></xf:label>
-                                                        <xf:action ev:event="DOMActivate" type="xpath">
-                                                            gridOps:insertColRight($first-row-td)
-                                                        </xf:action>
-                                                    </xf:trigger>
-                                                </xh:div>
-                                                <!-- Delete column -->
-                                                <xf:trigger appearance="minimal" ref="$grid[$columns gt 1]" id="delete-col-{$static-col-pos}-trigger">
-                                                    <xf:label><xh:img src="/apps/fr/style/images/silk/bin.png" alt="{{$fb-resources/delete-column-icon/label}}" title="{{$fb-resources/delete-column-icon/label}}"/></xf:label>
-                                                    <xf:action ev:event="DOMActivate">
-
-                                                        <xxf:var name="count" value="gridOps:controlsInCol($first-row-td)"/>
-
-                                                        <!-- Ask confirmation -->
-                                                        <xf:dispatch if="$count > 0" name="fr-show" targetid="{{xformsUtils:effectiveIdToAbsoluteId('dialog-confirmation')}}">
-                                                            <xxf:context name="message"
-                                                                 value="concat($fb-resources/messages/delete-column, ' ',
-                                                                                xxf:format-message($fb-resources/messages/controls-will-be-deleted, $count))"/>
-                                                             <xxf:context name="positive-targetid" value="xxf:absolute-id('delete-col-{$static-col-pos}-trigger')"/>
-                                                        </xf:dispatch>
-                                                        <!-- We are automatically confirmed-->
-                                                        <xf:dispatch if="$count = 0" name="fr-positive" targetid="delete-col-{$static-col-pos}-trigger"/>
-                                                    </xf:action>
-                                                    <xf:action ev:event="fr-positive" type="xpath">
-                                                        gridOps:deleteCol($first-row-td)
-                                                    </xf:action>
-                                                </xf:trigger>
-                                            </xh:td>
-                                        </xsl:for-each>
-                                    </xh:tr>
-                                </xh:thead>
-                            </xsl:if>
-
                             <!-- If repeat, add buttons and headers-->
                             <xsl:if test="$is-repeat">
                                 <xh:thead class="yui-dt-hd">
@@ -259,52 +195,6 @@
                                                     </xsl:choose>
                                                     <xsl:copy-of select="@* except @class"/>
 
-                                                    <xsl:if test="$is-editable">
-                                                        <xxf:var name="tr" value="$grid/*:tr[{$static-row-pos}]"/>
-                                                        <xh:td>
-                                                            <xh:div class="fb-grid-row-icons">
-                                                                <!-- Insert row above -->
-                                                                <xh:div>
-                                                                    <xf:trigger appearance="minimal">
-                                                                        <xf:label><xh:img src="/apps/fr/style/images/silk/bullet_arrow_top.png" alt="{{$fb-resources/insert-row-above-icon/label}}" title="{{$fb-resources/insert-row-above-icon/label}}"/></xf:label>
-                                                                        <xf:action ev:event="DOMActivate" type="xpath">
-                                                                            gridOps:insertRowAbove($tr)
-                                                                        </xf:action>
-                                                                    </xf:trigger>
-                                                                </xh:div>
-                                                                <!-- Delete row -->
-                                                                <xf:trigger appearance="minimal" ref="$grid[count($grid/*:tr) gt 1]" id="delete-row-{$static-row-pos}-trigger">
-                                                                    <xf:label><xh:img src="/apps/fr/style/images/silk/bin.png" alt="{{$fb-resources/delete-row-icon/label}}" title="{{$fb-resources/delete-row-icon/label}}"/></xf:label>
-                                                                    <xf:action ev:event="DOMActivate">
-
-                                                                        <xxf:var name="count" value="count($tr/*[*])"/>
-
-                                                                        <!-- Ask confirmation -->
-                                                                        <xf:dispatch if="$count > 0" name="fr-show" targetid="{{xformsUtils:effectiveIdToAbsoluteId('dialog-confirmation')}}">
-                                                                            <xxf:context name="message"
-                                                                                 value="concat($fb-resources/messages/delete-row, ' ',
-                                                                                                xxf:format-message($fb-resources/messages/controls-will-be-deleted, $count))"/>
-                                                                            <xxf:context name="positive-targetid" value="xxf:absolute-id('delete-row-{$static-row-pos}-trigger')"/>
-                                                                        </xf:dispatch>
-                                                                        <!-- We are automatically confirmed-->
-                                                                        <xxf:context name="positive-targetid" value="xxf:absolute-id('delete-row-{$static-row-pos}-trigger')"/>
-                                                                    </xf:action>
-                                                                    <xf:action ev:event="fr-positive" type="xpath">
-                                                                        gridOps:deleteRow($tr)
-                                                                    </xf:action>
-                                                                </xf:trigger>
-                                                                <!-- Insert row below -->
-                                                                <xh:div>
-                                                                    <xf:trigger appearance="minimal">
-                                                                        <xf:label><xh:img src="/apps/fr/style/images/silk/bullet_arrow_bottom.png" alt="{{$fb-resources/insert-row-below-icon/label}}" title="{{$fb-resources/insert-row-below-icon/label}}"/></xf:label>
-                                                                        <xf:action ev:event="DOMActivate" type="xpath">
-                                                                            gridOps:insertRowBelow($tr)
-                                                                        </xf:action>
-                                                                    </xf:trigger>
-                                                                </xh:div>
-                                                            </xh:div>
-                                                        </xh:td>
-                                                    </xsl:if>
                                                     <xsl:if test="$is-repeat">
                                                         <xsl:if test="not($readonly) and $static-row-pos = 1">
                                                             <xf:group ref=".">

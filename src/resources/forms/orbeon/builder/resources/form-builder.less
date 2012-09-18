@@ -25,14 +25,18 @@ html { overflow: hidden }
 .xbl-fr-section > label { display: none }
 
 .fb-section-editor {
-    position: absolute;                                                                                                 // Its left/right set in JS relative to the current section
-    display: none;                                                                                                      // Shown in JS when mouse over section
+    position: absolute;                                                                                                 // Its left/right set in CoffeeScript relative to the current section
+    display: none;                                                                                                      // Shown in CoffeeScript when mouse over section
     padding: 0 10px 20px 20px;                                                                                          // Space between icons and section, and at bottom/top in case the mouse moves a bit out
     .xforms-trigger { display: block; }                                                                                 // Icons shown vertically
 }
 
+.fb-grid-repeat-editor {                                                                                                // Section that contains the grid/repeat icons that are moved based on pointer position
+  .xforms-trigger { display: none }                                                                                     // Shown in CoffeeScript based on pointer position
+}
+
 .fb-section-label-editor-click-interceptor {                                                                            // Shown on top of each section label to avoid click → collapse
-    position: absolute;                                                                                                 // Is left/right set in JS relative to the current section label
+    position: absolute;                                                                                                 // Is left/right set in CoffeeScript relative to the current section label
     cursor: pointer;
 }
 
@@ -50,7 +54,7 @@ html { overflow: hidden }
 .fb-delete-grid-trigger {
     position: absolute;                                                                                                 // Its left/right set in JS relative to the current grid
     display: none;                                                                                                      // Shown in JS when mouse over grid
-    padding: 0;                                                                                          // Space between icons and grid, and at top/left in case the mouse moves a bit out
+    padding: 0;                                                                                                         // Space between icons and grid, and at top/left in case the mouse moves a bit out
 }
 
 .fb-ie-warning { margin: 1em; padding: .5em; border: 4px solid #D00000; background-color: #FFF0F0 }
@@ -68,7 +72,7 @@ html { overflow: hidden }
 }
 
 div.xbl-fr-grid {
-    padding: 16px 0 0 16px;                                                                                             // Reserve space for icons
+    padding: 22px 0 0 22px;                                                                                             // Reserve space for icons
 }
 
 /* ***** Toolbox **************************************************************************************************** */

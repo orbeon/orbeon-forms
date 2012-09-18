@@ -587,8 +587,11 @@
 
     <!-- WAR file -->
     <target name="orbeon-war" depends="classes" description="Create exploded WAR file">
-        <antcall target="war"/>
+        <antcall target="war">
+            <param name="skip.compilation" value="true"/>
+        </antcall>
         <antcall target="war-copy-descriptors">
+            <param name="skip.compilation" value="true"/>
             <param name="target" value="devel"/>
             <param name="build.root" value="${build.root}"/>
         </antcall>
@@ -790,8 +793,11 @@
     <target name="orbeon-dist-war" depends="jars, exist-import-sample-data-to-build" description="Creates Orbeon Forms war file">
         <mkdir dir="${build.distrib.dir}"/>
 
-        <antcall target="war"/>
+        <antcall target="war">
+            <param name="skip.compilation" value="true"/>
+        </antcall>
         <antcall target="war-copy-descriptors">
+            <param name="skip.compilation" value="true"/>
             <param name="target" value="war"/>
             <param name="build.root" value="${build.root}"/>
         </antcall>

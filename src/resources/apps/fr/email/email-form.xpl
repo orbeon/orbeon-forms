@@ -113,7 +113,7 @@
                 </xsl:for-each>
             </attachments>
         </p:input>
-        <p:output name="data" id="attachments" debug="xxxx1"/>
+        <p:output name="data" id="attachments"/>
     </p:processor>
 
 

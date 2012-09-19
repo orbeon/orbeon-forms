@@ -38,9 +38,9 @@ abstract class XFormsEvent(
     require(containingDocument ne null)
     require(targetObject ne null)
 
-    private var _currentPhase: Phase = _
-    private var _currentObserver: XFormsEventObserver = _
-    private var _custom: Map[String, SequenceExtent] = Map()
+    private[this] var _currentPhase: Phase = _
+    private[this] var _currentObserver: XFormsEventObserver = _
+    private[this] var _custom: Map[String, SequenceExtent] = Map()
 
     def currentPhase: Phase = _currentPhase
     def currentPhase_=(currentPhase: Phase): Unit = _currentPhase = currentPhase

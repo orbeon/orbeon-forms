@@ -655,6 +655,7 @@
         <xsd:attribute name="if" type="xsd:string" use="optional"/>
         <xsd:attribute name="while" type="xsd:string" use="optional"/>
         <xsd:attribute name="model" type="xsd:NMTOKEN" use="optional"/>
+        <xsd:attribute name="event" type="xs:NMTOKEN"/>
         <xsd:attribute ref="ev:event"/>
         <xsd:attribute ref="ev:observer"/>
         <xsd:attribute ref="ev:target"/>

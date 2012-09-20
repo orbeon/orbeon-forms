@@ -34,14 +34,18 @@ ORBEON.util.String = _.tap {}, (OString) -> _.extend OString,
         jsString = OString.replace jsString, "\r", " "
         eval jsString
 
-    # Escape text that appears in an HTML attribute, e.g. to be used in an innerHTML
-    escapeAttribute: (text) ->
-        OString.replace text, '"', '&quot;'
-
     # Escape text that appears in an HTML attribute which we use in an innerHTML
-    escapeHTMLMinimal: (text) ->
-        text = OString.replace text, '&', '&amp;'
-        OString.replace text, '<', '&lt;'
+    escapeForMarkup: (text) ->
+        # List of characters to replace per http://stackoverflow.com/a/1091953/5295
+        characters =
+            '"': '&quot;'
+            "'": '&apos;'
+            '<': '&lt;'
+            '>': '&gt;'
+            '&': '&amp;'
+        for from, to of characters
+            text = OString.replace text, from, to
+        text
 
     # Checks if a string ends with another string
     endsWith: (text, suffix) ->

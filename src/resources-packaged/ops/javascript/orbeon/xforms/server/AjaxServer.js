@@ -939,9 +939,9 @@
                                         // Utility function to generate an option
                                         function generateOption(label, value, clazz, selectedValues) {
                                             var selected = xformsArrayContains(selectedValues, value);
-                                            return '<option value="' + ORBEON.util.String.escapeAttribute(value) + '"'
+                                            return '<option value="' + ORBEON.util.String.escapeForMarkup(value) + '"'
                                                     + (selected ? ' selected="selected"' : '')
-                                                    + (clazz != null ? ' class="' + ORBEON.util.String.escapeAttribute(clazz) + '"' : '')
+                                                    + (clazz != null ? ' class="' + ORBEON.util.String.escapeForMarkup(clazz) + '"' : '')
                                                     + '>' + label + '</option>';
                                         }
 
@@ -962,8 +962,8 @@
                                                 if (inOptgroup) // nested optgroups are not allowed, close the old one
                                                     sb[sb.length] = '</optgroup>';
                                                 // open optgroup
-                                                sb[sb.length] = '<optgroup label="' + ORBEON.util.String.escapeAttribute(itemElement.label) + '"'
-                                                    + (clazz != null ? ' class="' + ORBEON.util.String.escapeAttribute(clazz) + '"' : '')
+                                                sb[sb.length] = '<optgroup label="' + ORBEON.util.String.escapeForMarkup(itemElement.label) + '"'
+                                                    + (clazz != null ? ' class="' + ORBEON.util.String.escapeForMarkup(clazz) + '"' : '')
                                                     + '">';
                                                 inOptgroup = true;
                                                 // add subitems
@@ -1896,10 +1896,10 @@
 
                         // Create HTML with message
                         details += "<li>" + message;
-                        if (file) details += " in " + ORBEON.util.String.escapeHTMLMinimal(file);
-                        if (line) details += " line " + ORBEON.util.String.escapeHTMLMinimal(line);
-                        if (col) details += " column " + ORBEON.util.String.escapeHTMLMinimal(col);
-                        if (exception) details += " (" + ORBEON.util.String.escapeHTMLMinimal(exception) + ")";
+                        if (file) details += " in " + ORBEON.util.String.escapeForMarkup(file);
+                        if (line) details += " line " + ORBEON.util.String.escapeForMarkup(line);
+                        if (col) details += " column " + ORBEON.util.String.escapeForMarkup(col);
+                        if (exception) details += " (" + ORBEON.util.String.escapeForMarkup(exception) + ")";
                         details += "</li>";
                     }
                     details += "</ul>";

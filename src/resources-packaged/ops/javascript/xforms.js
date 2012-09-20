@@ -1997,7 +1997,7 @@ ORBEON.xforms.Controls = {
 
     setHelpMessage: function(control, message) {
         // We escape the value because the help element is a little special, containing escaped HTML
-        message = ORBEON.util.String.escapeHTMLMinimal(message);
+        message = ORBEON.util.String.escapeForMarkup(message);
         ORBEON.xforms.Controls._setMessage(control, "help", message);
         ORBEON.xforms.Controls._setTooltipMessage(control, message, ORBEON.xforms.Globals.helpTooltipForControl);
     },

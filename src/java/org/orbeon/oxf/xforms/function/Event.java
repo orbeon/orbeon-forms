@@ -61,7 +61,7 @@ public class Event extends XFormsFunction {
         // element. There are other ways of obtaining the namespaces, for example we could extract them from the static
         // state.
 //        final Element element = getContextStack(xpathContext).getCurrentBindingContext().getControlElement();
-//        final Map namespaceMappings = getContainingDocument(xpathContext).getStaticState().getNamespaceMappings(element);
+//        final Map namespaceMappings = containingDocument(xpathContext).getStaticState().getNamespaceMappings(element);
 
         final QName attributeQName = Dom4jUtils.extractTextValueQName(namespaceMappings, attributeName, true);
 

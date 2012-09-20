@@ -35,6 +35,6 @@ public class XFormsRevalidateAction extends XFormsAction {
 
         // Because of inter-model dependencies, we consider for now that the action must force the operation
         model.getDeferredActionContext().revalidate = true;
-        Dispatch.dispatchEvent(new XFormsRevalidateEvent(containingDocument, model));
+        Dispatch.dispatchEvent(new XFormsRevalidateEvent(model));
     }
 }

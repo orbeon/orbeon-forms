@@ -34,6 +34,7 @@ import org.orbeon.oxf.xml.ContentHandlerHelper
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData
 import org.xml.sax.helpers.AttributesImpl
 import scala.collection.mutable
+import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.SelectionControl
 
 /**
  * Represents an xforms:select1 control.
@@ -135,7 +136,7 @@ class XFormsSelect1Control(container: XBLContainer, parent: XFormsControl, eleme
 
             // Only then do we store the external value. This ensures that if the value is NOT in the itemset AND
             // we are a closed selection then we do NOT store the value in instance.
-            selectEvents(0).getItemValue
+            selectEvents(0).itemValue
         } else
             existingValue
     }
@@ -153,9 +154,9 @@ class XFormsSelect1Control(container: XBLContainer, parent: XFormsControl, eleme
 
             // Handle xforms-select / xforms-deselect
             if (! itemWasSelected && itemIsSelected)
-                selectEvents += new XFormsSelectEvent(containingDocument, this, currentItemValue)
+                selectEvents += new XFormsSelectEvent(this, currentItemValue)
             else if (itemWasSelected && ! itemIsSelected)
-                deselectEvents += new XFormsDeselectEvent(containingDocument, this, currentItemValue)
+                deselectEvents += new XFormsDeselectEvent(this, currentItemValue)
         }
 
         (selectEvents, deselectEvents)

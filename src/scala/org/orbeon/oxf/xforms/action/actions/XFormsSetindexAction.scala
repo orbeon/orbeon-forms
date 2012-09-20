@@ -41,7 +41,7 @@ class XFormsSetindexAction extends XFormsAction {
 
             val indexXPath = element.attributeValue("index")
             val contextStack = interpreter.actionXPathContext
-            val indexString = interpreter.evaluateStringExpression(element, contextStack.getCurrentNodeset, contextStack.getCurrentPosition, "number(" + indexXPath + ")")
+            val indexString = interpreter.evaluateAsString(element, contextStack.getCurrentNodeset, contextStack.getCurrentPosition, "number(" + indexXPath + ")")
 
             try indexString.toInt
             catch { case _ ⇒ return } // "If the index evaluates to NaN the action has no effect."
@@ -75,7 +75,7 @@ object XFormsSetindexAction {
                 val focusedBefore = interpreter.containingDocument().getControls.getFocusedControl
 
                 // Dispatch to any control so that other custom controls can implement the notion of "setindex"
-                Dispatch.dispatchEvent(new XXFormsSetindexEvent(interpreter.containingDocument(), control, index))
+                Dispatch.dispatchEvent(new XXFormsSetindexEvent(control, index))
 
                 // Handle focus changes
                 Focus.updateFocusWithEvents(focusedBefore)

@@ -141,31 +141,31 @@ object InstanceMirror {
                     false
             }
         case insert: XFormsInsertEvent ⇒
-            findMatchingNode(insert.getInsertLocationNodeInfo, insert.targetObject.getId, insert.getPosition == "into") match {
+            findMatchingNode(insert.insertLocationNode, insert.targetObject.getId, insert.position == "into") match {
                 case Some(insertNode) ⇒
-                    insert.getPosition match {
+                    insert.position match {
                         case "into" ⇒
                             doInsert(containingDocument, indentedLogger, "after", null,
-                                insertNode, insert.getOriginItems, -1, doClone = true, doDispatch = false)
+                                insertNode, insert.originItems.asJava, -1, doClone = true, doDispatch = false)
                         case position @ ("before" | "after") ⇒
 
                             def containsRootElement(items: Seq[Item]) =
                                 items collect { case node: NodeInfo ⇒ node } exists (node ⇒ node == node.rootElement)
 
-                            if (containsRootElement(insert.getInsertedItems.asScala)) {
+                            if (containsRootElement(insert.insertedItems)) {
                                 // If the inserted items contain the root element it means the root element was replaced, so
                                 // remove it first
 
-                                assert(insert.getInsertedItems.size == 1)
+                                assert(insert.insertedItems.size == 1)
 
                                 val parent = insertNode.parentOption.get
                                 doDelete(containingDocument, indentedLogger, Seq(insertNode).asJava, - 1, doDispatch = false)
                                 doInsert(containingDocument, indentedLogger, position, null,
-                                    parent, insert.getOriginItems, 1, doClone = true, doDispatch = false)
+                                    parent, insert.originItems.asJava, 1, doClone = true, doDispatch = false)
                             } else {
                                 // Not replacing the root element
                                 doInsert(containingDocument, indentedLogger, position, Seq(insertNode).asJava,
-                                    null, insert.getOriginItems, 1, doClone = true, doDispatch = false)
+                                    null, insert.originItems.asJava, 1, doClone = true, doDispatch = false)
                             }
                         case _ ⇒ throw new IllegalStateException
                     }
@@ -174,7 +174,7 @@ object InstanceMirror {
                     false
             }
         case delete: XFormsDeleteEvent ⇒
-            delete.deleteInfos.asScala map { deleteInfo ⇒ // more than one node might have been removed
+            delete.deleteInfos map { deleteInfo ⇒ // more than one node might have been removed
 
                 val removedNodeInfo = deleteInfo.nodeInfo
                 val removedNodeIndex = deleteInfo.index

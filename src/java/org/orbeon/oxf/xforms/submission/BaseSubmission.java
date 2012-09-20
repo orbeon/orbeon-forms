@@ -21,7 +21,6 @@ import org.orbeon.oxf.util.ConnectionResult;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.XFormsContextStack;
 import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitErrorEvent;
@@ -40,7 +39,7 @@ public abstract class BaseSubmission implements Submission {
 
     protected BaseSubmission(XFormsModelSubmission submission) {
         this.submission = submission;
-        this.containingDocument = submission.getContainingDocument();
+        this.containingDocument = submission.containingDocument();
     }
 
     protected String getAbsoluteSubmissionURL(String resolvedActionOrResource, String queryString, boolean isNorewrite) {
@@ -252,7 +251,7 @@ public abstract class BaseSubmission implements Submission {
                 // the response is buffered, for example do a sendError().
                 if (! NetUtils.isSuccessCode(connectionResult.statusCode))
                     throw new XFormsSubmissionException(submission, "xforms:submission for submission id: " + submission.getId() + ", error code received when submitting instance: " + connectionResult.statusCode, "processing submission response",
-                            new XFormsSubmitErrorEvent(containingDocument, submission, XFormsSubmitErrorEvent.ErrorType.RESOURCE_ERROR, connectionResult));
+                            new XFormsSubmitErrorEvent(submission, XFormsSubmitErrorEvent.RESOURCE_ERROR(), connectionResult));
 
             } else {
                 // We must intercept the reply

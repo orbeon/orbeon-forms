@@ -661,6 +661,8 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
         Mockito when document.getIndentedLogger(Matchers.any[String]) thenReturn new IndentedLogger(XFormsServer.logger, "any")
         Mockito when document.getIndentedLogger thenReturn new IndentedLogger(XFormsServer.logger, "document")
 
+        Mockito when instance.containingDocument thenReturn document
+
         val actionInterpreter = mock[XFormsActionInterpreter]
         Mockito when actionInterpreter.containingDocument thenReturn document
         Mockito when actionInterpreter.container thenReturn xblContainer

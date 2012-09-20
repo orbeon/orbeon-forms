@@ -75,9 +75,15 @@ class XFormsDispatchAction extends XFormsAction {
             // Find actual target
             actionInterpreter.resolveObject(actionElement, resolvedNewEventTargetStaticId) match {
                 case xformsEventTarget: XFormsEventTarget ⇒
-                    // Create and dispatch the event
-                    val newEvent = createEvent(containingDocument, resolvedNewEventName, xformsEventTarget, newEventBubbles, newEventCancelable)
-                    addContextAttributes(actionInterpreter, actionElement, newEvent)
+                    // Create and dispatch the event including custom properties (AKA context information)
+                    val newEvent = createEvent(
+                        resolvedNewEventName,
+                        xformsEventTarget,
+                        eventProperties(actionInterpreter, actionElement),
+                        allowCustomEvents = true,
+                        bubbles = newEventBubbles,
+                        cancelable = newEventCancelable)
+
                     Dispatch.dispatchEvent(newEvent)
                 case _ ⇒
                     // "If there is a null search result for the target object and the source object is an XForms action such as

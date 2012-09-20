@@ -46,7 +46,7 @@ class TextReplacer(submission: XFormsModelSubmission, containingDocument: XForms
                 // xforms-submit-error with appropriate context information, including an error-type of resource-error."
                 val message = """Mediatype is neither text nor XML for replace="text": """ + connectionResult.getResponseMediaType
                 throw new XFormsSubmissionException(submission, message, "reading response body",
-                    new XFormsSubmitErrorEvent(containingDocument, submission, XFormsSubmitErrorEvent.ErrorType.RESOURCE_ERROR, connectionResult))
+                    new XFormsSubmitErrorEvent(submission, XFormsSubmitErrorEvent.RESOURCE_ERROR, connectionResult))
         }
 
     def replace(connectionResult: ConnectionResult, p: XFormsModelSubmission#SubmissionParameters, p2: XFormsModelSubmission#SecondPassParameters) = {
@@ -59,7 +59,7 @@ class TextReplacer(submission: XFormsModelSubmission, containingDocument: XForms
         // dispatching the event xforms-submit-error with an error-type of target-error."
         def throwSubmissionException(message: String) =
             throw new XFormsSubmissionException(submission, message, "processing targetref attribute",
-                new XFormsSubmitErrorEvent(containingDocument, submission, XFormsSubmitErrorEvent.ErrorType.TARGET_ERROR, connectionResult))
+                new XFormsSubmitErrorEvent(submission, XFormsSubmitErrorEvent.TARGET_ERROR, connectionResult))
 
         // Find target location
         val destinationNodeInfo =

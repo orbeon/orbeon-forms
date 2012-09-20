@@ -20,6 +20,7 @@ import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.BindingContext
 import org.xml.sax.helpers.AttributesImpl
+import collection.JavaConverters._
 
 /**
  * Control that represents a custom components.
@@ -103,7 +104,7 @@ class XFormsComponentControl(container: XBLContainer, parent: XFormsControl, ele
 
     override def onBindingUpdate(oldBinding: BindingContext, newBinding: BindingContext) {
         super.onBindingUpdate(oldBinding, newBinding)
-        val isNodesetChange = ! Controls.compareNodesets(oldBinding.getNodeset, newBinding.getNodeset)
+        val isNodesetChange = ! Controls.compareNodesets(oldBinding.getNodeset.asScala, newBinding.getNodeset.asScala)
         if (isNodesetChange) {
             // Control's binding changed
             // NOP for now

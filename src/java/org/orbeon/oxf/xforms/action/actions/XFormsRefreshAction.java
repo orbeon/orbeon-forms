@@ -16,7 +16,6 @@ package org.orbeon.oxf.xforms.action.actions;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsModel;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
@@ -33,8 +32,6 @@ public class XFormsRefreshAction extends XFormsAction {
     public void execute(XFormsActionInterpreter actionInterpreter, Element actionElement,
                         Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
 
-        final XFormsContainingDocument containingDocument = actionInterpreter.containingDocument();
-
         final String modelId = actionElement.attributeValue(XFormsConstants.MODEL_QNAME);
         final XFormsModel model = actionInterpreter.resolveModel(actionElement, modelId);
 
@@ -43,6 +40,6 @@ public class XFormsRefreshAction extends XFormsAction {
 
         // NOTE: We no longer need to force the refresh flag here because the refresh flag is global. If a change in any
         // model occurred, then the flag will be already set and we are safe. Otherwise, it is safe not to do anything.
-        Dispatch.dispatchEvent(new XFormsRefreshEvent(containingDocument, model));
+        Dispatch.dispatchEvent(new XFormsRefreshEvent(model));
     }
 }

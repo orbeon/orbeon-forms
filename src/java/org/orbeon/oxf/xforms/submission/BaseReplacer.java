@@ -13,11 +13,8 @@
  */
 package org.orbeon.oxf.xforms.submission;
 
-import org.orbeon.oxf.util.ConnectionResult;
 import org.orbeon.oxf.util.IndentedLogger;
-import org.orbeon.oxf.util.PropertyContext;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.event.events.XFormsSubmitDoneEvent;
 
 public abstract class BaseReplacer implements Replacer {
 

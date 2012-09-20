@@ -27,6 +27,7 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
+import org.orbeon.saxon.value.AtomicValue;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -95,7 +96,7 @@ public class XFormsInsertAction extends XFormsAction {
         }
 
         // "3. The origin node-set is determined."
-        final List originObjects;
+        final List<Item> originObjects;
         {
             if (originAttribute == null) {
                 originObjects = null;
@@ -105,8 +106,8 @@ public class XFormsInsertAction extends XFormsAction {
                 // "If the origin attribute is given, the origin node-set is the result of the evaluation of the
                 // origin attribute in the insert context."
 
-                originObjects = actionInterpreter.evaluateExpression(actionElement,
-                        Collections.singletonList((Item) insertContextItem), 1, originAttribute);
+                originObjects = actionInterpreter.evaluateKeepItems(actionElement,
+                        Collections.singletonList(insertContextItem), 1, originAttribute);
 
                 // "The insert action is terminated with no effect if the origin node-set is the empty node-set."
                 if (originObjects.size() == 0) {
@@ -132,7 +133,7 @@ public class XFormsInsertAction extends XFormsAction {
                 // position is 1."
 
                 // "b. The return value is processed according to the rules of the XPath function round()"
-                final String insertionIndexString = actionInterpreter.evaluateStringExpression(
+                final String insertionIndexString = actionInterpreter.evaluateAsString(
                         actionElement, collectionToBeUpdated, 1, "round(" + atAttribute + ")");
 
                 // "c. If the result is in the range 1 to the Node Set Binding node-set size, then the insert
@@ -172,8 +173,8 @@ public class XFormsInsertAction extends XFormsAction {
                 (NodeInfo) insertContextItem, originObjects, insertionIndex, true, true);
     }
 
-    public static List doInsert(XFormsContainingDocument containingDocument, IndentedLogger indentedLogger, String positionAttribute,
-                                List collectionToBeUpdated, NodeInfo insertContextNodeInfo, List originItems, int insertionIndex, boolean doClone, boolean doDispatch) {
+    public static List<Item> doInsert(XFormsContainingDocument containingDocument, IndentedLogger indentedLogger, String positionAttribute,
+                                List collectionToBeUpdated, NodeInfo insertContextNodeInfo, List<Item> originItems, int insertionIndex, boolean doClone, boolean doDispatch) {
 
         final boolean isEmptyNodesetBinding = collectionToBeUpdated == null || collectionToBeUpdated.size() == 0;
 
@@ -204,8 +205,6 @@ public class XFormsInsertAction extends XFormsAction {
 
                 sourceNodes = Collections.singletonList(singleSourceNode);
                 clonedNodesTemp = Collections.singletonList(singleClonedNode);
-
-                originItems = null;
             } else {
                 // There are explicitly specified origin objects
 
@@ -221,7 +220,7 @@ public class XFormsInsertAction extends XFormsAction {
                 sourceNodes = new ArrayList<Node>(originItems.size()); // set to max possible size
                 clonedNodesTemp = new ArrayList<Node>(originItems.size());
 
-                for (final Object currentObject: originItems) {
+                for (final Object currentObject : originItems) {
                     if (currentObject instanceof NodeInfo) {
                         // This is the regular case covered by XForms 1.1 / XPath 1.0
 
@@ -232,21 +231,17 @@ public class XFormsInsertAction extends XFormsAction {
                         sourceNodes.add(sourceNode);
                         clonedNodesTemp.add(clonedNode);
 
-                    } else {
-                        // This is an extension: support sequences containing other items
+                    } else if (currentObject instanceof AtomicValue){
+                        // This is an extension: support sequences containing atomic values
 
                         // Convert the result to a text node
-                        final String stringValue;
-                        if (currentObject instanceof Item)
-                            stringValue = ((Item) currentObject).getStringValue();
-                        else
-                            stringValue = currentObject.toString();
-
+                        final String stringValue = ((Item) currentObject).getStringValue();
                         final Text textNode = Dom4jUtils.createText(stringValue);
 
                         sourceNodes.add(null); // there is no source node for this cloned node, it's a source item
                         clonedNodesTemp.add(textNode);
-                    }
+                    } else
+                        throw new IllegalStateException();
                 }
             }
 
@@ -436,7 +431,7 @@ public class XFormsInsertAction extends XFormsAction {
         // XFormsInstance handles index and repeat items updates 
         if (doDispatch && modifiedInstance != null) {
             Dispatch.dispatchEvent(
-                    new XFormsInsertEvent(containingDocument, modifiedInstance, insertedNodeInfos, originItems, insertLocationNodeInfo, beforeAfterInto));
+                    new XFormsInsertEvent(modifiedInstance, insertedNodeInfos, originItems, insertLocationNodeInfo, beforeAfterInto));
         }
 
         return insertedNodeInfos;

@@ -85,7 +85,7 @@ public class XFormsDeleteAction extends XFormsAction {
                     // position is 1."
 
                     // "2. The return value is processed according to the rules of the XPath function round()"
-                    final String insertionIndexString = actionInterpreter.evaluateStringExpression(
+                    final String insertionIndexString = actionInterpreter.evaluateAsString(
                             actionElement, collectionToUpdate, 1, "round(" + atAttribute + ")");
 
                     // "3. If the result is in the range 1 to the Node Set Binding node-set size, then the insert
@@ -172,7 +172,7 @@ public class XFormsDeleteAction extends XFormsAction {
 
                 // "4. If the delete is successful, the event xforms-delete is dispatched."
                 if (doDispatch)
-                    Dispatch.dispatchEvent(new XFormsDeleteEvent(containingDocument, modifiedInstance, deleteInfos, deleteIndex));
+                    Dispatch.dispatchEvent(new XFormsDeleteEvent(modifiedInstance, deleteInfos, deleteIndex));
             }
         }
 

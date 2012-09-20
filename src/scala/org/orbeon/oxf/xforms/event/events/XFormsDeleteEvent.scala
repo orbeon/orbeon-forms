@@ -13,39 +13,25 @@
  */
 package org.orbeon.oxf.xforms.event.events
 
-import org.orbeon.oxf.xforms.XFormsContainingDocument
-import org.orbeon.oxf.xforms.action.actions.XFormsDeleteAction
+import java.util.{List ⇒ JList}
+import org.orbeon.oxf.xforms.action.actions.XFormsDeleteAction.DeleteInfo
 import org.orbeon.oxf.xforms.event.XFormsEvent
 import org.orbeon.oxf.xforms.event.XFormsEventTarget
-import org.orbeon.oxf.xforms.event.XFormsEvents
-import java.util.{List ⇒ JList}
+import org.orbeon.oxf.xforms.event.XFormsEvents._
+import XFormsEvent._
 import collection.JavaConverters._
-import org.orbeon.saxon.om.SequenceIterator
-import XFormsDeleteEvent._
+import org.orbeon.saxon.om.NodeInfo
 
-/**
- * 4.4.5 The xforms-insert and xforms-delete Events
- *
- * Target: instance / Bubbles: Yes / Cancelable: No / Context Info: Path expression used for insert/delete (xsd:string).
- * The default action for these events results in the following: None; notification event only.
- */
-class XFormsDeleteEvent(containingDocument: XFormsContainingDocument, targetObject: XFormsEventTarget,
-                        val deleteInfos: JList[XFormsDeleteAction.DeleteInfo], val deleteIndex: Int)
-    extends XFormsEvent(containingDocument, XFormsEvents.XFORMS_DELETE, targetObject, bubbles = true, cancelable = false) {
+class XFormsDeleteEvent(target: XFormsEventTarget, properties: PropertyGetter)
+    extends XFormsEvent(XFORMS_DELETE, target, properties, bubbles = true, cancelable = false) {
 
-    def this(containingDocument: XFormsContainingDocument, targetObject: XFormsEventTarget) =
-        this(containingDocument, targetObject, null, -1)
+    def this(target: XFormsEventTarget, deleteInfos: JList[DeleteInfo], deleteIndex: Int) = {
+        this(target, Map("deleted-nodes" → Option(deleteInfos.asScala map (_.nodeInfo)), "delete-location" → Option(deleteIndex)))
+        _deleteInfosOpt = Option(deleteInfos.asScala)
+    }
 
-    override def getStandardAttribute(name: String) =
-        StandardAttributes.get(name) orElse super.getStandardAttribute(name)
-}
+    private var _deleteInfosOpt: Option[Seq[DeleteInfo]] = None
+    def deleteInfos = _deleteInfosOpt.get
 
-private object XFormsDeleteEvent {
-
-    import XFormsEvent._
-
-    val StandardAttributes = Map[String, XFormsDeleteEvent ⇒ SequenceIterator](
-        "deleted-nodes"   → (e ⇒ listIterator(e.deleteInfos.asScala map (_.nodeInfo))),
-        "delete-location" → (e ⇒ longIterator(e.deleteIndex, e.deleteIndex > 0))
-    )
+    def deletedNodes = property[Seq[NodeInfo]]("deleted-nodes").get
 }

@@ -85,7 +85,7 @@ object XPathCache {
             functionLibrary: FunctionLibrary,
             functionContext: FunctionContext,
             baseURI: String,
-            locationData: LocationData): JList[_] =
+            locationData: LocationData): JList[AnyRef] =
         evaluate(
             Seq(contextItem).asJava,
             1,
@@ -97,7 +97,8 @@ object XPathCache {
             baseURI,
             locationData)
 
-    // Evaluate an XPath expression on the document
+    // Evaluate an XPath expression on the document and return a List of native Java objects (i.e. String, Boolean,
+    // etc.), but NodeInfo wrappers are preserved.
     def evaluate(
             contextItems: JList[Item],
             contextPosition: Int,
@@ -107,7 +108,7 @@ object XPathCache {
             functionLibrary: FunctionLibrary,
             functionContext: FunctionContext,
             baseURI: String,
-            locationData: LocationData): JList[_] = {
+            locationData: LocationData): JList[AnyRef] = {
 
         val xpathExpression =
             getXPathExpression(
@@ -118,6 +119,10 @@ object XPathCache {
             xpathExpression.evaluateKeepNodeInfo(functionContext)
         }
     }
+
+    // If passed a sequence of size 1, return the contained object. This makes sense since XPath 2 says that "An item is
+    // identical to a singleton sequence containing that item." It's easier for callers to switch on the item time.
+    def normalizeSingletons(seq: Seq[AnyRef]): AnyRef = if (seq.size == 1) seq(0) else seq
 
     // Evaluate an XPath expression on the document and keep Item objects in the result
     def evaluateKeepItems(

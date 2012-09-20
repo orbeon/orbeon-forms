@@ -15,7 +15,6 @@ package org.orbeon.oxf.xforms.action.actions;
 
 import org.dom4j.Element;
 import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsModel;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
@@ -31,8 +30,6 @@ public class XFormsRecalculateAction extends XFormsAction {
     public void execute(XFormsActionInterpreter actionInterpreter, Element actionElement,
                         Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
 
-        final XFormsContainingDocument containingDocument = actionInterpreter.containingDocument();
-
         final XFormsModel model = actionInterpreter.actionXPathContext().getCurrentModel();
 
         // @xxforms:defaults
@@ -43,6 +40,6 @@ public class XFormsRecalculateAction extends XFormsAction {
 
         // Because of inter-model dependencies, we consider for now that the action must force the operation
         model.getDeferredActionContext().recalculate = true;
-        Dispatch.dispatchEvent(new XFormsRecalculateEvent(containingDocument, model, applyDefaults));
+        Dispatch.dispatchEvent(new XFormsRecalculateEvent(model, applyDefaults));
     }
 }

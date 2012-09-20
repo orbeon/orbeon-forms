@@ -166,7 +166,7 @@ object DataModel {
             nodeInfo,
             valueToSet,
             logAndNotifyValueChange(containingDocument, indentedLogger, source, nodeInfo, _, valueToSet, isCalculate),
-            reason ⇒ Dispatch.dispatchEvent(new XXFormsBindingErrorEvent(containingDocument, eventTarget, locationData, reason))
+            reason ⇒ Dispatch.dispatchEvent(new XXFormsBindingErrorEvent(eventTarget, locationData, reason))
         )
     }
 
@@ -194,7 +194,7 @@ object DataModel {
                 modifiedInstance.model.markValueChange(nodeInfo, isCalculate)
 
                 // Dispatch extension event to instance
-                Dispatch.dispatchEvent(new XXFormsValueChanged(containingDocument, modifiedInstance, nodeInfo, oldValue, newValue))
+                Dispatch.dispatchEvent(new XXFormsValueChanged(modifiedInstance, nodeInfo, oldValue, newValue))
             case None ⇒
                 // Value modified is not in an instance
                 // Q: Is the code below the right thing to do?

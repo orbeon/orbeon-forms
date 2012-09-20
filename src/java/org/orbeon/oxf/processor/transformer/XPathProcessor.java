@@ -84,7 +84,7 @@ public class XPathProcessor extends ProcessorImpl {
                     final String baseURI = (locationData == null) ? null : locationData.getSystemID();
                     xpath = XPathCache.getXPathExpression(documentInfo.getConfiguration(), documentInfo,
                             config.getExpression(), config.getNamespaces(), null, org.orbeon.oxf.pipeline.api.FunctionLibrary.instance(), baseURI, locationData);
-                    List results = xpath.evaluate();
+                    List<Object> results = xpath.evaluateToJava();
                     xmlReceiver.startDocument();
                     // WARNING: Here we break the rule that processors must output valid XML documents, because
                     // we potentially output several root nodes. This works because the XPathProcessor is always
@@ -142,7 +142,7 @@ public class XPathProcessor extends ProcessorImpl {
             final double d = ((Double) result).doubleValue();
             strVal = XMLUtils.removeScientificNotation(d);
         } else if (result instanceof Boolean) {
-            strVal = ((Boolean) result).toString();
+            strVal = (result.toString());
         } else if (result instanceof StringBuilder) {
             strVal = result.toString();
         } else {

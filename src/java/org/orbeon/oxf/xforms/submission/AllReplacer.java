@@ -61,7 +61,7 @@ public class AllReplacer extends BaseReplacer {
                 // already been written out. This gives the form author a chance to do something in cases the response is
                 // buffered, for example do a sendError().
                 throw new XFormsSubmissionException(submission, "xforms:submission for submission id: " + submission.getId() + ", error code received when submitting instance: " + connectionResult.statusCode, "processing submission response",
-                        new XFormsSubmitErrorEvent(containingDocument, submission, XFormsSubmitErrorEvent.ErrorType.RESOURCE_ERROR, connectionResult));
+                        new XFormsSubmitErrorEvent(submission, XFormsSubmitErrorEvent.RESOURCE_ERROR(), connectionResult));
         } else {
             // We don't want any changes to happen to the document upon xxforms-submit when producing a new document, so
             // we don't dispatch success/error events.

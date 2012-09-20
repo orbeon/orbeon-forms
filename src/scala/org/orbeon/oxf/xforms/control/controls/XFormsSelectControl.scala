@@ -64,11 +64,11 @@ class XFormsSelectControl(container: XBLContainer, parent: XFormsControl, elemen
 
         // Dispatch xforms-deselect events
         for (value ← newlySelectedValues)
-            Dispatch.dispatchEvent(new XFormsSelectEvent(containingDocument, this, value))
+            Dispatch.dispatchEvent(new XFormsSelectEvent(this, value))
 
         // Select events must be sent after all xforms-deselect events
         for (value ← newlyDeselectedValues)
-            Dispatch.dispatchEvent(new XFormsDeselectEvent(containingDocument, this, value))
+            Dispatch.dispatchEvent(new XFormsDeselectEvent(this, value))
 
         newInstanceValue mkString " "
     }

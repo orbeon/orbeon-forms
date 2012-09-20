@@ -431,11 +431,11 @@
                             </instance>
                             <instance id="fr-errors-instance" model-id="my-summary$fr-error-summary-model">
                                 <errors>
-                                    <error id="first-name-control" position="133" repeats="" indexes="" label="First name" alert="Invalid first name" binds="first-name-bind"/>
-                                    <error id="note-control" position="138" repeats="repeat" indexes="1" label="Note" alert="Invalid note" binds="note-bind"/>
-                                    <error id="note-control" position="138" repeats="repeat" indexes="2" label="Note" alert="Invalid note" binds="note-bind"/>
-                                    <error id="note-control" position="138" repeats="repeat" indexes="3" label="Note" alert="Invalid note" binds=""/>
-                                    <error id="last-name-control" position="141" repeats="" indexes="" label="Last name" alert="Invalid last name" binds="last-name-bind"/>
+                                    <error id="first-name-control" position="131" repeats="" indexes="" label="First name" alert="Invalid first name" binds="first-name-bind"/>
+                                    <error id="note-control" position="136" repeats="repeat" indexes="1" label="Note" alert="Invalid note" binds="note-bind"/>
+                                    <error id="note-control" position="136" repeats="repeat" indexes="2" label="Note" alert="Invalid note" binds="note-bind"/>
+                                    <error id="note-control" position="136" repeats="repeat" indexes="3" label="Note" alert="Invalid note" binds=""/>
+                                    <error id="last-name-control" position="139" repeats="" indexes="" label="Last name" alert="Invalid last name" binds="last-name-bind"/>
                                 </errors>
                             </instance>
                             <instance id="fr-state-instance" model-id="my-summary$fr-error-summary-model">
@@ -462,19 +462,19 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:control id="my-summary$body" class="fr-error-summary-body"/>
-                        <xxf:control id="my-summary$xf-101·1" relevant="false"/>
-                        <xxf:attribute id="my-summary$xf-103·1" for="my-summary$xf-102·1" name="href"/>
-                        <xxf:control id="my-summary$xf-104·1" class="fr-error-label" relevant="false"/>
-                        <xxf:control id="my-summary$xf-107·1" class="fr-error-label" label="Note"/>
+                        <xxf:control id="my-summary$xf-99·1" relevant="false"/>
+                        <xxf:attribute id="my-summary$xf-101·1" for="my-summary$xf-100·1" name="href"/>
+                        <xxf:control id="my-summary$xf-102·1" class="fr-error-label" relevant="false"/>
+                        <xxf:control id="my-summary$xf-105·1" class="fr-error-label" label="Note"/>
                         <xxf:control id="my-summary$io·1" class="fr-error-row">[3]</xxf:control>
-                        <xxf:control id="my-summary$xf-110·1" class="fr-error-dash">-</xxf:control>
+                        <xxf:control id="my-summary$xf-108·1" class="fr-error-dash">-</xxf:control>
                         <xxf:control id="my-summary$ao·1" class="fr-error-alert">Invalid note</xxf:control>
-                        <xxf:control id="my-summary$xf-101·2" relevant="false"/>
-                        <xxf:attribute id="my-summary$xf-103·2" for="my-summary$xf-102·2" name="href"/>
-                        <xxf:control id="my-summary$xf-104·2" class="fr-error-label" relevant="false"/>
-                        <xxf:control id="my-summary$xf-107·2" class="fr-error-label" label="Last name"/>
+                        <xxf:control id="my-summary$xf-99·2" relevant="false"/>
+                        <xxf:attribute id="my-summary$xf-101·2" for="my-summary$xf-100·2" name="href"/>
+                        <xxf:control id="my-summary$xf-102·2" class="fr-error-label" relevant="false"/>
+                        <xxf:control id="my-summary$xf-105·2" class="fr-error-label" label="Last name"/>
                         <xxf:control id="my-summary$io·2" class="fr-error-row" relevant="false"/>
-                        <xxf:control id="my-summary$xf-110·2" class="fr-error-dash">-</xxf:control>
+                        <xxf:control id="my-summary$xf-108·2" class="fr-error-dash">-</xxf:control>
                         <xxf:control id="my-summary$ao·2" class="fr-error-alert">Invalid last name</xxf:control>
                         <xxf:control id="first-name-control" label="First name" alert="Invalid first name" required="true" valid="false"/>
                         <xxf:control id="note-control·1" label="Note" alert="Invalid note" required="true" valid="false"/>

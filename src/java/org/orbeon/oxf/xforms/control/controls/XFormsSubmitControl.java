@@ -49,7 +49,7 @@ public class XFormsSubmitControl extends XFormsTriggerControl {
             final XFormsObject object = container().resolveObjectByIdInScope(getEffectiveId(), submissionId, null);
             if (object instanceof XFormsModelSubmission) {
                 final XFormsModelSubmission submission = (XFormsModelSubmission) object;
-                Dispatch.dispatchEvent(new XFormsSubmitEvent(containingDocument(), submission));
+                Dispatch.dispatchEvent(new XFormsSubmitEvent(submission));
             } else {
                 // "If there is a null search result for the target object and the source object is an XForms action such as
                 // dispatch, send, setfocus, setindex or toggle, then the action is terminated with no effect."

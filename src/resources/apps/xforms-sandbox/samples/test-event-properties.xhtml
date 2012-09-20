@@ -9,7 +9,8 @@
             <xf:instance>
                 <instance>
                     <triggered>false</triggered>
-                    <p1/><p2/>
+                    <p1/>
+                    <p2/>
                 </instance>
             </xf:instance>
             <xf:setfocus control="send-event" event="xforms-ready"/>
@@ -20,7 +21,7 @@
                     var AjaxServer = ORBEON.xforms.server.AjaxServer;
                     AjaxServer.beforeSendingEvent.add(function(event, addProperties) {
                         if (event.eventName == 'DOMActivate' && event.targetId == 'send-event')
-                            if (false) addProperties({p1: 'v1', p2: 'v2'});
+                            addProperties({p1: 'v1', p2: 'v2'});
                     });
                 });
             ]]>
@@ -37,6 +38,8 @@
         <xf:trigger id="send-event">
             <xf:label>Send event</xf:label>
             <xf:setvalue event="DOMActivate" ref="triggered">true</xf:setvalue>
+            <xf:setvalue event="DOMActivate" ref="p1" value="event('p1')"/>
+            <xf:setvalue event="DOMActivate" ref="p2" value="event('p2')"/>
         </xf:trigger>
 
         <xf:repeat ref="*">

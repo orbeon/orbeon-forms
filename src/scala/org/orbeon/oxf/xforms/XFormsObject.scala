@@ -16,4 +16,5 @@ package org.orbeon.oxf.xforms
 
 trait XFormsObject {
     def getEffectiveId: String
+    def containingDocument: XFormsContainingDocument
 }

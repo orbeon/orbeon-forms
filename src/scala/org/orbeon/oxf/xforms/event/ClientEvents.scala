@@ -30,19 +30,25 @@ import org.orbeon.oxf.util.{IndentedLogger, Multipart, Logging}
 import XFormsEvents._
 import collection.JavaConverters._
 import org.orbeon.oxf.xforms.analysis.controls.RepeatControl
+import org.orbeon.oxf.xforms.event.XFormsEvent._
+import scala.Some
 
 // Process events sent by the client, including sorting, filtering, and security
 object ClientEvents extends Logging {
 
-    private val EventParameters = List("dnd-start", "dnd-end", "modifiers", "text", "file", "filename", "content-type", "content-length")
+    // Only a few events specify custom properties that can be set by the client
+    private val AllStandardProperties = XXFormsDndEvent.StandardProperties ++ KeypressEvent.StandardProperties ++ XXFormsUploadDoneEvent.StandardProperties
     private val DummyEvent = List(new LocalEvent(Dom4jUtils.createElement("dummy"), false))
 
-    private case class LocalEvent(element: Element, trusted: Boolean) {
+    private case class LocalEvent(private val element: Element, trusted: Boolean) {
         val name = element.attributeValue("name")
         val targetEffectiveId = element.attributeValue("source-control-id")
         val bubbles = element.attributeValue("bubbles") != "false" // default is true
         val cancelable = element.attributeValue("cancelable") != "false" // default is true
-        val value = element.getText
+
+        def attributeValue(name: String) = element.attributeValue(name)
+        lazy val properties = Dom4j.elements(element, XXFORMS_PROPERTY_QNAME) map { e ⇒ (e.attributeValue("name"), Option(e.getText)) } toMap
+        lazy val value = if (properties.nonEmpty) "" else element.getText // for now we don't support both a value and properties
     }
 
     // Entry point called by the server: process a sequence of incoming client events.
@@ -273,15 +279,23 @@ object ClientEvents extends Logging {
         // Create event
         mapEventName(event, eventTarget) map { eventName ⇒
 
-            def gatherParameters(event: LocalEvent) =
-                Map((for {
-                        attributeName ← EventParameters
-                        attributeValue = event.element.attributeValue(attributeName)
-                        if attributeValue ne null
-                    } yield (attributeName → attributeValue)): _*)
+            def standardProperties =
+                for {
+                    attributeName ← AllStandardProperties
+                    attributeValue = event.attributeValue(attributeName)
+                    if attributeValue ne null
+                } yield
+                    (attributeName → Option(attributeValue))
 
-            XFormsEventFactory.createEvent(doc, eventName, eventTarget, true,
-                event.bubbles, event.cancelable, event.value, gatherParameters(event).asJava)
+            def eventValue = if (eventName == XXFORMS_VALUE) Seq("value" → Option(event.value)) else Seq()
+
+            XFormsEventFactory.createEvent(
+                eventName,
+                eventTarget,
+                event.properties ++ standardProperties ++ eventValue,
+                allowCustomEvents = true,
+                event.bubbles,
+                event.cancelable)
         }
     }
 
@@ -429,7 +443,7 @@ object ClientEvents extends Logging {
                     warn("read-only control")
 
                 // Single node controls accept value change event only if actually bound
-                case control: XFormsSingleNodeControl if (control.getBoundItem eq null) && event.isInstanceOf[XXFormsValue] ⇒
+                case control: XFormsSingleNodeControl if (control.getBoundItem eq null) && event.isInstanceOf[XXFormsValueEvent] ⇒
                     warn("control without single-node binding")
 
                 case _ ⇒
@@ -450,7 +464,7 @@ object ClientEvents extends Logging {
 
             // Optimize case where a value change event won't change the control value to actually change
             (event, target) match {
-                case (valueChange: XXFormsValue, target: XFormsValueControl) if target.getExternalValue == valueChange.getNewValue ⇒
+                case (valueChange: XXFormsValueEvent, target: XFormsValueControl) if target.getExternalValue == valueChange.value ⇒
                     // We completely ignore the event if the value in the instance is the same. This also saves dispatching xxforms-repeat-activate below.
                     debug("ignoring value change event as value is the same", Seq(
                         "control id" → targetEffectiveId,
@@ -480,7 +494,7 @@ object ClientEvents extends Logging {
 
             // Handle repeat iteration if the event target is in a repeat
             if (hasEffectiveIdSuffix(targetEffectiveId))
-                dispatchEventCheckTarget(new XXFormsRepeatActivateEvent(doc, target))
+                dispatchEventCheckTarget(new XXFormsRepeatActivateEvent(target, EmptyGetter))
 
             // Interpret event
             dispatchEventCheckTarget(event)

@@ -123,8 +123,8 @@
                     <!-- Useful stuff passed to us -->
                     <xf:var name="prefixed-id" value="event('prefixed-id')" as="xs:string"/>
                     <xf:var name="control-position" value="event('control-position')" as="xs:integer"/>
-                    <xf:var name="repeat-indexes" value="event('repeat-indexes')" as="xs:string*"/>
-                    <xf:var name="repeat-ancestors" value="event('repeat-ancestors')" as="xs:string*"/>
+                    <xf:var name="repeat-indexes" value="event('fr-repeat-indexes')" as="xs:string*"/>
+                    <xf:var name="repeat-ancestors" value="event('fr-repeat-ancestors')" as="xs:string*"/>
                     <xf:var name="alert" value="event('alert')" as="xs:string"/>
                     <xf:var name="label" value="event('label')" as="xs:string"/>
                     <xf:var name="invalid-binds" value="event('invalid-binds')" as="xs:string"/>
@@ -223,6 +223,7 @@ Inserting error information into error list:
                                 <!-- Useful stuff passed to us -->
                                 <xf:var name="prefixed-id" value="string-join((event('xxf:target-prefixes'), event('xxf:targetid')), '$')" as="xs:string"/>
                                 <xf:var name="repeat-indexes" value="event('xxf:repeat-indexes')" as="xs:string*"/>
+
                                 <xf:var name="repeat-ancestors" value="event('xxf:repeat-ancestors')" as="xs:string*"/>
 
                                 <!-- Try to find existing error element -->
@@ -242,8 +243,8 @@ Inserting error information into error list:
                                     <xf:dispatch name="fr-insert-error" targetid="fr-error-summary-model">
                                         <xxf:context name="prefixed-id" value="$prefixed-id"/>
                                         <xxf:context name="control-position" value="event('xxf:control-position')"/>
-                                        <xxf:context name="repeat-indexes" value="$repeat-indexes"/>
-                                        <xxf:context name="repeat-ancestors" value="event('xxf:repeat-ancestors')"/>
+                                        <xxf:context name="fr-repeat-indexes" value="$repeat-indexes"/>
+                                        <xxf:context name="fr-repeat-ancestors" value="event('xxf:repeat-ancestors')"/>
                                         <xxf:context name="alert" value="event('xxf:alert')"/>
                                         <xxf:context name="label" value="event('xxf:label')"/>
                                         <xxf:context name="invalid-binds" value="string-join(xxf:invalid-binds(event('xxf:binding')), ' ')"/>
@@ -311,21 +312,6 @@ Inserting error information into error list:
                                                             return string-join((for $r in $repeat-ancestors
                                                               return concat($r, '·', $repeat-indexes[index-of($repeat-ancestors, $r)]), concat($prefixed-id, '·', $p)), '/')"/>
 
-                                <!-- Replace visited control full ids -->
-                                <xf:var name="updated-visited" as="xs:string*"
-                                                  value="for $v in tokenize(instance('fr-visited-instance'), '\s+')
-                                                            return for $full-prefix in string-join(subsequence(tokenize($v, '/'), 1, $prefix-size), '/')
-                                                              return if ($full-prefixes = $full-prefix)
-                                                                then string-join(
-                                                                      (concat(
-                                                                          string-join(tokenize($full-prefix, '·')[position() lt last()], '·'),
-                                                                          '·',
-                                                                          $to-positions[index-of($from-positions, xs:integer(tokenize($full-prefix, '·')[last()]))[1]],
-                                                                          substring($v, string-length($full-prefix) + 1))), '/')
-                                                                else $v
-                                                            "/>
-                                <xf:setvalue ref="instance('fr-visited-instance')" value="string-join($updated-visited, ' ')"/>
-
                                 <!-- Remove affected errors from instance -->
                                 <xf:delete ref="$affected-errors"/>
 
@@ -341,10 +327,10 @@ Inserting error information into error list:
                                         <xxf:context name="prefixed-id" value="$error/@id"/>
                                         <xxf:context name="control-position" value="$error/@position"/>
                                         <!-- Replace old iteration by new iteration and keep the rest the same -->
-                                        <xxf:context name="repeat-indexes"
-                                                         value="($repeat-indexes, xs:string($to-position), subsequence($current-indexes, $prefix-size + 1))"/>
+                                        <xxf:context name="fr-repeat-indexes"
+                                                     value="($repeat-indexes, xs:string($to-position), subsequence($current-indexes, $prefix-size + 1))"/>
                                         <!-- Unchanged -->
-                                        <xxf:context name="repeat-ancestors" value="$error/@repeats"/>
+                                        <xxf:context name="fr-repeat-ancestors" value="$error/@repeats"/>
                                         <xxf:context name="alert" value="$error/@alert"/>
                                         <xxf:context name="label" value="$error/@label"/>
                                         <xxf:context name="invalid-binds" value="$error/@invalid-binds"/>

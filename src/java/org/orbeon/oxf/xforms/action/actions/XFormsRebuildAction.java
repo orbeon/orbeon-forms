@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms.action.actions;
 
 import org.dom4j.Element;
-import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsModel;
 import org.orbeon.oxf.xforms.action.XFormsAction;
@@ -31,11 +30,10 @@ public class XFormsRebuildAction extends XFormsAction {
     public void execute(XFormsActionInterpreter actionInterpreter, Element actionElement,
                         Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
 
-        final XFormsContainingDocument containingDocument = actionInterpreter.containingDocument();
         final XFormsModel model = actionInterpreter.actionXPathContext().getCurrentModel();
 
         // Because of inter-model dependencies, we consider for now that the action must force the operation
         model.getDeferredActionContext().rebuild = true;
-        Dispatch.dispatchEvent(new XFormsRebuildEvent(containingDocument, model));
+        Dispatch.dispatchEvent(new XFormsRebuildEvent(model));
     }
 }

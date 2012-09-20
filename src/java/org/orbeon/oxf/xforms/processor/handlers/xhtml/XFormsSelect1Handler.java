@@ -365,7 +365,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                                               AttributesImpl reusableAttributes, Attributes attributes, String templateId,
                                               String itemName, boolean isMultiple, String fullItemType) throws SAXException {
         reusableAttributes.clear();
-//        reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, XFormsUtils.namespaceId(handlerContext.getContainingDocument(), templateId));
+//        reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, XFormsUtils.namespaceId(handlerContext.containingDocument(), templateId));
         // Client queries template by id without namespace, so output that. Not ideal as all ids should be namespaced.
         reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, templateId);
         reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-template");

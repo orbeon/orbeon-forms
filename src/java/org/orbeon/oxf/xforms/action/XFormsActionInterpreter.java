@@ -32,6 +32,7 @@ import org.orbeon.oxf.xml.NamespaceMapping;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.Item;
+import org.orbeon.saxon.value.BooleanValue;
 import scala.Option;
 
 import java.util.Collections;
@@ -246,9 +247,9 @@ public class XFormsActionInterpreter {
             }
         }
 
-        final List conditionResult = evaluateExpression(actionElement,
+        final List<Item> conditionResult = evaluateKeepItems(actionElement,
                 contextNodeset, contextPosition, "boolean(" + conditionAttribute + ")");
-        if (!(Boolean) conditionResult.get(0)) {
+        if (! ((BooleanValue) conditionResult.get(0)).effectiveBooleanValue()) {
             // Don't execute action
 
             if (_indentedLogger.isDebugEnabled())
@@ -274,8 +275,7 @@ public class XFormsActionInterpreter {
     /**
      * Evaluate an expression as a string. This returns "" if the result is an empty sequence.
      */
-    public String evaluateStringExpression(Element actionElement,
-                                           List<Item> nodeset, int position, String xpathExpression) {
+    public String evaluateAsString(Element actionElement, List<Item> nodeset, int position, String xpathExpression) {
 
         // Setup function context
         final XFormsFunction.Context functionContext = _actionXPathContext.getFunctionContext(getSourceEffectiveId(actionElement));
@@ -293,15 +293,14 @@ public class XFormsActionInterpreter {
         return result != null ? result : "";
     }
 
-    public List evaluateExpression(Element actionElement,
-                                   List<Item> nodeset, int position, String xpathExpression) {
+    public List<Item> evaluateKeepItems(Element actionElement, List<Item> nodeset, int position, String xpathExpression) {
 
 
         // Setup function context
         final XFormsFunction.Context functionContext = _actionXPathContext.getFunctionContext(getSourceEffectiveId(actionElement));
 
         // @ref points to something
-        final List result = XPathCache.evaluate(
+        final List<Item> result = XPathCache.evaluateKeepItems(
                 nodeset, position,
                 xpathExpression, getNamespaceMappings(actionElement), _actionXPathContext.getCurrentVariables(),
                 XFormsContainingDocument.getFunctionLibrary(), functionContext, null,

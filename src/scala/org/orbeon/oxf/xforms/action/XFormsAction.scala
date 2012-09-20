@@ -21,12 +21,12 @@ import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.analysis.VariableAnalysis
 import org.orbeon.oxf.xforms.control.XFormsControl
-import org.orbeon.oxf.xforms.event.XFormsEvent
+import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xforms.xbl.Scope
-import org.orbeon.oxf.xml.dom4j.{LocationData, Dom4jUtils ⇒ Dom4j}
+import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, LocationData}
 import org.orbeon.saxon.om.Item
-import org.orbeon.saxon.value.{StringValue, SequenceExtent}
-import scala.collection.JavaConverters._
+import org.orbeon.oxf.xml.Dom4j
+import collection.JavaConverters._
 
 abstract class XFormsAction extends Logging {
 
@@ -50,53 +50,57 @@ abstract class XFormsAction extends Logging {
        overriddenContext: Item): Unit = ()
 
     /**
-     * Add event context attributes based on nested xxforms:context elements.
+     * Obtain context attributes based on nested xxforms:context elements.
      *
      * @param actionInterpreter current XFormsActionInterpreter
      * @param actionElement     action element
-     * @param event             event to add context information to
      */
-    protected def addContextAttributes(actionInterpreter: XFormsActionInterpreter, actionElement: Element, event: XFormsEvent) {
+    protected def eventProperties(actionInterpreter: XFormsActionInterpreter, actionElement: Element): PropertyGetter = {
 
         val contextStack = actionInterpreter.actionXPathContext
 
         // Iterate over context information if any
-        for (currentContextInfo ← Dom4j.elements(actionElement, XXFORMS_CONTEXT_QNAME).asScala) {
-            // Get and check attributes
-            val name =
-                Option(Dom4j.qNameToExplodedQName(Dom4j.extractAttributeValueQName(currentContextInfo, NAME_QNAME))) getOrElse
-                    (throw new OXFException(XXFORMS_CONTEXT_QNAME.getQualifiedName + " element must have a \"name\" attribute."))
+        val tuples =
+            for {
+                currentContextInfo ← Dom4j.elements(actionElement, XXFORMS_CONTEXT_QNAME)
 
-            val value = VariableAnalysis.valueOrSelectAttribute(currentContextInfo) match {
-                case valueOrSelect: String ⇒
-                    // XPath expression
+                // Get and check attributes
+                name =
+                    Option(Dom4jUtils.qNameToExplodedQName(Dom4jUtils.extractAttributeValueQName(currentContextInfo, NAME_QNAME))) getOrElse
+                        (throw new OXFException(XXFORMS_CONTEXT_QNAME.getQualifiedName + " element must have a \"name\" attribute."))
 
-                    // Set context on context element
-                    val currentActionScope = actionInterpreter.getActionScope(currentContextInfo)
-                    contextStack.pushBinding(currentContextInfo, actionInterpreter.getSourceEffectiveId(currentContextInfo), currentActionScope, false)
+                value = VariableAnalysis.valueOrSelectAttribute(currentContextInfo) match {
+                    case valueOrSelect: String ⇒
+                        // XPath expression
 
-                    // Evaluate context parameter
-                    val result = XPathCache.evaluateAsExtent(
-                        actionInterpreter.actionXPathContext.getCurrentNodeset,
-                        actionInterpreter.actionXPathContext.getCurrentPosition,
-                        valueOrSelect,
-                        actionInterpreter.getNamespaceMappings(currentContextInfo),
-                        contextStack.getCurrentVariables,
-                        XFormsContainingDocument.getFunctionLibrary,
-                        contextStack.getFunctionContext(actionInterpreter.getSourceEffectiveId(currentContextInfo)),
-                        null,
-                        currentContextInfo.getData.asInstanceOf[LocationData])
+                        // Set context on context element
+                        val currentActionScope = actionInterpreter.getActionScope(currentContextInfo)
+                        contextStack.pushBinding(currentContextInfo, actionInterpreter.getSourceEffectiveId(currentContextInfo), currentActionScope, false)
 
-                    contextStack.returnFunctionContext()
-                    contextStack.popBinding()
-                    result
-                case _ ⇒
-                    // Literal text
-                    new SequenceExtent(Array[Item](StringValue.makeStringValue(currentContextInfo.getStringValue)))
-            }
+                        // Evaluate context parameter
+                        val result = XPathCache.normalizeSingletons(XPathCache.evaluate(
+                            actionInterpreter.actionXPathContext.getCurrentNodeset,
+                            actionInterpreter.actionXPathContext.getCurrentPosition,
+                            valueOrSelect,
+                            actionInterpreter.getNamespaceMappings(currentContextInfo),
+                            contextStack.getCurrentVariables,
+                            XFormsContainingDocument.getFunctionLibrary,
+                            contextStack.getFunctionContext(actionInterpreter.getSourceEffectiveId(currentContextInfo)),
+                            null,
+                            currentContextInfo.getData.asInstanceOf[LocationData]).asScala)
 
-            event.setCustom(name, value)
-        }
+                        contextStack.returnFunctionContext()
+                        contextStack.popBinding()
+
+                        result
+                    case _ ⇒
+                        // Literal text
+                        currentContextInfo.getStringValue
+                }
+            } yield
+                (name, Option(value))
+
+        tuples.toMap
     }
 
     // Resolve a control given the name of an AVT

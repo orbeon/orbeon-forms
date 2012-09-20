@@ -15,7 +15,6 @@ package org.orbeon.oxf.xforms.action.actions;
 
 import org.dom4j.Element;
 import org.orbeon.oxf.util.IndentedLogger;
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsObject;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
@@ -34,8 +33,6 @@ public class XXFormsShowAction extends XFormsAction {
 
     public void execute(XFormsActionInterpreter actionInterpreter, Element actionElement,
                         Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
-
-        final XFormsContainingDocument containingDocument = actionInterpreter.containingDocument();
 
         // Resolve all attributes as AVTs
         final String dialogStaticOrAbsoluteId = actionInterpreter.resolveAVT(actionElement, "dialog");
@@ -57,8 +54,7 @@ public class XXFormsShowAction extends XFormsAction {
             if (controlObject instanceof XXFormsDialogControl) {
                 final XXFormsDialogControl targetDialog = (XXFormsDialogControl) controlObject;
 
-                final XFormsEvent newEvent = new XXFormsDialogOpenEvent(containingDocument, targetDialog, neighborEffectiveId, constrainToViewport);
-                addContextAttributes(actionInterpreter, actionElement, newEvent);
+                final XFormsEvent newEvent = new XXFormsDialogOpenEvent(eventProperties(actionInterpreter, actionElement), targetDialog, neighborEffectiveId, constrainToViewport);
                 Dispatch.dispatchEvent(newEvent);
 
             } else {

@@ -20,7 +20,7 @@ import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.analysis.XPathDependencies
 import org.orbeon.oxf.xforms.event.XFormsEvent
-import org.orbeon.oxf.xforms.event.events.XXFormsValue
+import org.orbeon.oxf.xforms.event.events.XXFormsValueEvent
 import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xforms.{XFormsModelBinds, XFormsProperties}
@@ -216,7 +216,7 @@ abstract class XFormsValueControl(container: XBLContainer, parent: XFormsControl
     }
 
     override def performDefaultAction(event: XFormsEvent): Unit = event match {
-        case xxformsValue: XXFormsValue ⇒ storeExternalValue(xxformsValue.getNewValue)
+        case xxformsValue: XXFormsValueEvent ⇒ storeExternalValue(xxformsValue.value)
         case _ ⇒ super.performDefaultAction(event)
     }
 

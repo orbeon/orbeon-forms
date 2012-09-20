@@ -364,7 +364,7 @@ public class XFormsModelBinds {
         final ValidationException ve = ValidationException.wrapException(e, new ExtendedLocationData(bind.staticBind.locationData(), message,
             bind.staticBind.element(), "expression", expression));
 
-        Dispatch.dispatchEvent(new XXFormsXPathErrorEvent(containingDocument, model, ve.getMessage(), ve));
+        Dispatch.dispatchEvent(new XXFormsXPathErrorEvent(model, ve.getMessage(), ve));
     }
 
     private String evaluateXXFormsDefaultBind(Bind bind, int position) {
@@ -875,6 +875,10 @@ public class XFormsModelBinds {
         public final QName typeQName;
 
         private List<BindNode> bindNodes; // List<BindIteration>
+
+        public XFormsContainingDocument containingDocument() {
+            return XFormsModelBinds.this.containingDocument;
+        }
 
         // To work around Scala compiler bug ("error: not found: value BindTree") when accessing staticBind directly
         public NamespaceMapping namespaceMapping() {

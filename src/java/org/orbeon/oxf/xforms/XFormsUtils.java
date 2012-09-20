@@ -346,7 +346,7 @@ public class XFormsUtils {
                     // Dispatch xforms-link-error to model
                     final XFormsModel currentModel = currentBindingContext.model();
                     // NOTE: xforms-link-error is no longer in XForms 1.1 starting 2009-03-10
-                    Dispatch.dispatchEvent(new XFormsLinkErrorEvent(container.getContainingDocument(), currentModel, srcAttributeValue, childElement, e));
+                    Dispatch.dispatchEvent(new XFormsLinkErrorEvent(currentModel, srcAttributeValue, e));
                     // Exception when dereferencing the linking attribute
                     return null;
                 }

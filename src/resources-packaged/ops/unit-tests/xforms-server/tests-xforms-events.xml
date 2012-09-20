@@ -198,28 +198,28 @@
 
                         <xforms:action ev:event="xforms-ready">
                             <xforms:dispatch target="repeat1" name="xxforms-dnd">
-                                <xxforms:context name="dnd-start" select="1"/>
-                                <xxforms:context name="dnd-end" select="2"/>
+                                <xxforms:context name="dnd-start" select="'1'"/>
+                                <xxforms:context name="dnd-end" select="'2'"/>
                             </xforms:dispatch>
                             <xforms:dispatch target="repeat2" name="xxforms-dnd">
-                                <xxforms:context name="dnd-start" select="1"/>
-                                <xxforms:context name="dnd-end" select="3"/>
+                                <xxforms:context name="dnd-start" select="'1'"/>
+                                <xxforms:context name="dnd-end" select="'3'"/>
                             </xforms:dispatch>
                             <xforms:dispatch target="repeat3" name="xxforms-dnd">
-                                <xxforms:context name="dnd-start" select="2"/>
-                                <xxforms:context name="dnd-end" select="1"/>
+                                <xxforms:context name="dnd-start" select="'2'"/>
+                                <xxforms:context name="dnd-end" select="'1'"/>
                             </xforms:dispatch>
                             <xforms:dispatch target="repeat4" name="xxforms-dnd">
-                                <xxforms:context name="dnd-start" select="2"/>
-                                <xxforms:context name="dnd-end" select="3"/>
+                                <xxforms:context name="dnd-start" select="'2'"/>
+                                <xxforms:context name="dnd-end" select="'3'"/>
                             </xforms:dispatch>
                             <xforms:dispatch target="repeat5" name="xxforms-dnd">
-                                <xxforms:context name="dnd-start" select="3"/>
-                                <xxforms:context name="dnd-end" select="1"/>
+                                <xxforms:context name="dnd-start" select="'3'"/>
+                                <xxforms:context name="dnd-end" select="'1'"/>
                             </xforms:dispatch>
                             <xforms:dispatch target="repeat6" name="xxforms-dnd">
-                                <xxforms:context name="dnd-start" select="3"/>
-                                <xxforms:context name="dnd-end" select="2"/>
+                                <xxforms:context name="dnd-start" select="'3'"/>
+                                <xxforms:context name="dnd-end" select="'2'"/>
                             </xforms:dispatch>
                         </xforms:action>
 

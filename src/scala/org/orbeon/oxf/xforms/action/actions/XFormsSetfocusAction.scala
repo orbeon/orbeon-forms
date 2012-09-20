@@ -29,6 +29,6 @@ class XFormsSetfocusAction extends XFormsAction {
 
         // Resolve and update control
         resolveControl(context, "control") foreach
-            (control ⇒ Dispatch.dispatchEvent(new XFormsFocusEvent(context.containingDocument, control)))
+            (control ⇒ Dispatch.dispatchEvent(new XFormsFocusEvent(control, Map())))
     }
 }

@@ -13,38 +13,36 @@
  */
 package org.orbeon.oxf.xforms.event.events
 
-import org.orbeon.exception._
-import org.orbeon.oxf.xforms.XFormsContainingDocument
-import org.orbeon.oxf.xml.dom4j.ExtendedLocationData
-import org.orbeon.oxf.xforms.event.{XFormsEvent, XFormsEventTarget, XFormsEvents}
-import org.orbeon.saxon.om.SequenceIterator
-import XXFormsActionErrorEvent._
-import org.orbeon.oxf.common.ValidationException
 import org.orbeon.errorified.Exceptions
+import org.orbeon.exception._
+import org.orbeon.oxf.common.ValidationException
+import org.orbeon.oxf.xforms.event.{XFormsEvent, XFormsEventTarget, XFormsEvents}
+import org.orbeon.oxf.xml.dom4j.ExtendedLocationData
+import XFormsEvent._
 
-class XXFormsActionErrorEvent(containingDocument: XFormsContainingDocument, target: XFormsEventTarget, val throwable: Throwable)
-    extends XFormsEvent(containingDocument, XFormsEvents.XXFORMS_ACTION_ERROR, target, bubbles = true, cancelable = false) {
+class XXFormsActionErrorEvent(target: XFormsEventTarget, properties: PropertyGetter)
+    extends XFormsEvent(XFormsEvents.XXFORMS_ACTION_ERROR, target, properties, bubbles = true, cancelable = false) {
 
-    private lazy val rootLocationData = ValidationException.getRootLocationData(throwable)
+    def this(target: XFormsEventTarget, throwable: Throwable) = {
+        this(target, EmptyGetter)
+        throwableOpt = Option(throwable)
+    }
 
-    override def getStandardAttribute(name: String) =
-        StandardAttributes.get(name) orElse super.getStandardAttribute(name)
+    private var throwableOpt: Option[Throwable] = None
+    def throwable = throwableOpt.orNull
+    private lazy val rootLocationOpt = throwableOpt map ValidationException.getRootLocationData
+
+    override def lazyProperties = getters(this, XXFormsActionErrorEvent.Getters)
 }
 
 private object XXFormsActionErrorEvent {
 
-    import XFormsEvent._
-
-    val StandardAttributes = Map[String, XXFormsActionErrorEvent ⇒ SequenceIterator](
-
-        "element"   → (e ⇒ e.rootLocationData match {
-                            case rootLocationData: ExtendedLocationData ⇒ stringIterator(rootLocationData.getElementDebugString)
-                            case _ ⇒ emptyIterator
-                       }),
-        "system-id" →  (e ⇒ stringIterator(e.rootLocationData.getSystemID,      e.rootLocationData ne null)),
-        "line"      →  (e ⇒ stringIterator(e.rootLocationData.getLine.toString, e.rootLocationData ne null)),
-        "column"    →  (e ⇒ stringIterator(e.rootLocationData.getCol.toString,  e.rootLocationData ne null)),
-        "message"   →  (e ⇒ stringIterator(Exceptions.getRootThrowable(e.throwable).getMessage)),
-        "throwable" →  (e ⇒ stringIterator(OrbeonFormatter.format(e.throwable)))
+    val Getters = Map[String, XXFormsActionErrorEvent ⇒ Option[Any]](
+        "element"   → (e ⇒ e.rootLocationOpt collect { case x: ExtendedLocationData ⇒ x.getElementDebugString }),
+        "system-id" → (e ⇒ e.rootLocationOpt flatMap (l ⇒ Option(l.getSystemID))),
+        "line"      → (e ⇒ e.rootLocationOpt flatMap (l ⇒ Option(l.getLine))),
+        "column"    → (e ⇒ e.rootLocationOpt flatMap (l ⇒ Option(l.getCol))),
+        "message"   → (e ⇒ e.throwableOpt map Exceptions.getRootThrowable flatMap (t ⇒ Option(t.getMessage))),
+        "throwable" → (e ⇒ e.throwableOpt map OrbeonFormatter.format)
     )
 }

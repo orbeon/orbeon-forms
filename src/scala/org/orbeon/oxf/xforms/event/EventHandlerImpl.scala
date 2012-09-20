@@ -211,7 +211,7 @@ class EventHandlerImpl(
                 // is running within a model before controls are created, that won't be available. SO the answer is to
                 // dispatch to what we know exists, and that is the current observer or the target. The observer is
                 // "closer" from the action, so we dispatch to that.
-                Dispatch.dispatchEvent(new XXFormsActionErrorEvent(container.getContainingDocument, eventObserver, e))
+                Dispatch.dispatchEvent(new XXFormsActionErrorEvent(eventObserver, e))
         }
     }
 

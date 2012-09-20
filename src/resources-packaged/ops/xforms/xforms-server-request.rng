@@ -95,9 +95,10 @@
                                         <data type="string"/>
                                     </attribute>
                                 </optional>
-                                <optional>
+                                <choice>
                                     <data type="string"/>
-                                </optional>
+                                    <ref name="properties"/>
+                                </choice>
                             </optional>
                             <!-- xxforms-dnd event -->
                             <group>
@@ -111,6 +112,7 @@
                                 <attribute name="dnd-end">
                                     <data type="string"/>
                                 </attribute>
+                                <ref name="properties"/>
                             </group>
                             <!-- keypress event -->
                             <group>
@@ -126,6 +128,7 @@
                                 <attribute name="text">
                                     <data type="string"/>
                                 </attribute>
+                                <ref name="properties"/>
                             </group>
                         </choice>
                     </element>
@@ -139,5 +142,16 @@
             </zeroOrMore>
         </element>
     </start>
+
+    <define name="properties">
+        <zeroOrMore>
+            <element name="xxforms:property">
+                <attribute name="name">
+                    <data type="string"/>
+                </attribute>
+                <data type="string"/>
+            </element>
+        </zeroOrMore>
+    </define>
 
 </grammar>

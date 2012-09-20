@@ -28,7 +28,7 @@
 
     <property name="src.dir" location="src"/>
 
-    <property name="saxon.jar" value="saxon-9-1-0-8_orbeon_20120628.jar"/>
+    <property name="saxon.jar" value="saxon-9-1-0-8_orbeon_20120926.jar"/>
 
     <!-- Scala tasks -->
     <!-- http://www.scala-lang.org/node/98 -->

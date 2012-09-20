@@ -464,8 +464,8 @@
                                 }
                                 requestDocumentString.push(event.value);
                             } else if (! _.isEmpty(event.properties)) {
-                                // Only add properties when we don't have a value (in the future, the value should be send a
-                                // sub-element, so both a value and properties can be sent for the same event)
+                                // Only add properties when we don't have a value (in the future, the value should be
+                                // sent in a sub-element, so both a value and properties can be sent for the same event)
                                 requestDocumentString.push('\n');
                                 _.each(_.keys(event.properties), function(name) {
                                     var value = event.properties[name];

@@ -13,26 +13,36 @@
  */
 package org.orbeon.oxf.xforms.event.events
 
-import org.orbeon.oxf.xforms.XFormsContainingDocument
-import org.orbeon.oxf.xforms.event.{XFormsEventTarget, XFormsEvents, XFormsEvent}
+import org.orbeon.oxf.xforms.event.XFormsEvent._
+import org.orbeon.oxf.xforms.event.XFormsEvents._
+import org.orbeon.oxf.xforms.event.{XFormsEventTarget, XFormsEvent}
 import org.orbeon.saxon.om._
-import XXFormsValueChanged._
 
-class XXFormsValueChanged(containingDocument: XFormsContainingDocument, targetObject: XFormsEventTarget,
-                          val node: NodeInfo, val oldValue: String, val newValue: String)
-    extends XFormsEvent(containingDocument, XFormsEvents.XXFORMS_VALUE_CHANGED, targetObject, true, true) {
+class XXFormsValueChanged(target: XFormsEventTarget, properties: PropertyGetter)
+    extends XFormsEvent(XXFORMS_VALUE_CHANGED, target, properties, bubbles = true, cancelable = true) {
 
-    override def getStandardAttribute(name: String) =
-        StandardAttributes.get(name) orElse super.getStandardAttribute(name)
+    def this(target: XFormsEventTarget, node: NodeInfo, oldValue: String, newValue: String) = {
+        this(target, EmptyGetter)
+        nodeOpt = Option(node)
+        oldValueOpt = Option(oldValue)
+        newValueOpt = Option(newValue)
+    }
+
+    private var nodeOpt: Option[NodeInfo] = None
+    def node = nodeOpt.orNull
+
+    private var oldValueOpt: Option[String] = None
+    private var newValueOpt: Option[String] = None
+    def newValue = newValueOpt.get
+
+    override def lazyProperties = getters(this, XXFormsValueChanged.Getters)
 }
 
 private object XXFormsValueChanged {
 
-    import XFormsEvent._
-
-    val StandardAttributes = Map[String, XXFormsValueChanged ⇒ SequenceIterator](
-        "node"      → (e ⇒ SingletonIterator.makeIterator(e.node)),
-        "old-value" → (e ⇒ stringIterator(e.oldValue)),
-        "new-value" → (e ⇒ stringIterator(e.newValue))
+    val Getters = Map[String, XXFormsValueChanged ⇒ Option[Any]](
+        "node"      → (_.nodeOpt),
+        "old-value" → (_.oldValueOpt),
+        "new-value" → (_.newValueOpt)
     )
 }

@@ -15,7 +15,6 @@ package org.orbeon.oxf.xforms.action.actions;
 
 import org.dom4j.Element;
 import org.orbeon.oxf.util.IndentedLogger;
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.control.controls.XXFormsDialogControl;
@@ -33,8 +32,6 @@ public class XXFormsHideAction extends XFormsAction {
     public void execute(XFormsActionInterpreter actionInterpreter, Element actionElement,
                         Scope actionScope, boolean hasOverriddenContext, Item overriddenContext) {
 
-        final XFormsContainingDocument containingDocument = actionInterpreter.containingDocument();
-
         // Resolve attribute as AVTs
         final String dialogStaticId = actionInterpreter.resolveAVT(actionElement, "dialog");
         if (dialogStaticId == null) {
@@ -46,8 +43,7 @@ public class XXFormsHideAction extends XFormsAction {
             final Object controlObject = actionInterpreter.resolveObject(actionElement, dialogStaticId);
             if (controlObject instanceof XXFormsDialogControl) {
                 final XXFormsDialogControl targetDialog = (XXFormsDialogControl) controlObject;
-                final XFormsEvent newEvent = new XXFormsDialogCloseEvent(containingDocument, targetDialog);
-                addContextAttributes(actionInterpreter, actionElement, newEvent);
+                final XFormsEvent newEvent = new XXFormsDialogCloseEvent(targetDialog, eventProperties(actionInterpreter, actionElement));
                 Dispatch.dispatchEvent(newEvent);
             } else {
                 final IndentedLogger indentedLogger = actionInterpreter.indentedLogger();

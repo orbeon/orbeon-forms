@@ -13,78 +13,101 @@
  */
 package org.orbeon.oxf.xforms.event
 
+import XFormsEvent._
+import collection.JavaConverters._
 import org.orbeon.oxf.xforms.XFormsConstants._
-import org.orbeon.oxf.xforms.{XFormsUtils, XFormsContainingDocument}
+import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.XFormsUtils._
 import org.orbeon.oxf.xml.XMLUtils.buildExplodedQName
 import org.orbeon.oxf.xml.dom4j.LocationData
 import org.orbeon.saxon.om._
-import XFormsEvent._
-import collection.JavaConverters._
-import org.orbeon.saxon.value.{Int64Value, BooleanValue, SequenceExtent, StringValue}
+import org.orbeon.saxon.xqj.{SaxonXQDataFactory, StandardObjectConverter}
+import org.orbeon.oxf.util.XPathCache
 
 /**
  * XFormsEvent represents an XForms event passed to all events and actions.
+ *
+ * TODO: Explain implementation
  */
 abstract class XFormsEvent(
-        val containingDocument: XFormsContainingDocument,
         val name: String,
         val targetObject: XFormsEventTarget,
+        properties: PropertyGetter,
         val bubbles: Boolean,
         val cancelable: Boolean) {
 
-    self ⇒
-
-    require(containingDocument ne null)
     require(targetObject ne null)
+    require(containingDocument ne null)
 
+    final def containingDocument = targetObject.containingDocument
+
+    // Priority is given to the base properties, then the lazyProperties, then the properties passed at construction
+    private lazy val allProperties = getters(this, XFormsEvent.Getters) orElse lazyProperties orElse properties
+    def lazyProperties: PropertyGetter = EmptyGetter
+
+    // Mutable phase and observer as the event is being dispatched
     private[this] var _currentPhase: Phase = _
     private[this] var _currentObserver: XFormsEventObserver = _
-    private[this] var _custom: Map[String, SequenceExtent] = Map()
 
-    def currentPhase: Phase = _currentPhase
-    def currentPhase_=(currentPhase: Phase): Unit = _currentPhase = currentPhase
+    final def currentPhase: Phase = _currentPhase
+    final def currentPhase_=(currentPhase: Phase): Unit = _currentPhase = currentPhase
 
-    def currentObserver: XFormsEventObserver = _currentObserver
-    def currentObserver_=(currentObserver: XFormsEventObserver): Unit = _currentObserver = currentObserver
+    final def currentObserver: XFormsEventObserver = _currentObserver
+    final def currentObserver_=(currentObserver: XFormsEventObserver): Unit = _currentObserver = currentObserver
 
-    def custom = _custom
+    // Return a property of the given type
+    // WARNING: Remember that type erasure takes place! Property[T[U1]] will work even if the underlying type was T[U2]!
+    //
+    // Return None if:
+    // - the property is not supported
+    // - it is supported but no value is available for it
+    final def property[T](name: String): Option[T] =
+        if (allProperties.isDefinedAt(name)) {
+            // NOTE: With Scala 2.10, move to `applyOrElse`
+            allProperties(name) map (_.asInstanceOf[T])
+        } else {
+            warnUnsupportedIfNeeded(name)
+            None
+        }
 
-    def setCustom(name: String, value: SequenceExtent): Unit =
-        _custom += name → value
+    final def propertyAsIterator(name: String): Option[SequenceIterator] =
+        allProperties(name) map {
+            case s: Seq[_]           ⇒ listIterator(s map anyToItemIfNeeded)
+            case other               ⇒ itemIterator(anyToItemIfNeeded(other))
+        }
 
-    def setCustomAsString(name: String, value: String): Unit =
-        setCustom(name, new SequenceExtent(Array[Item](StringValue.makeStringValue(value))))
+    // Get an attribute as an XPath SequenceIterator
+    final def getAttribute(name: String): SequenceIterator = {
 
-    // These methods can be overridden by subclasses
-    def isDeprecated(name: String) = Deprecated.get(name)
-    def getStandardAttribute(name: String): Option[this.type ⇒ SequenceIterator] = StandardAttributes.get(name)
+        warnDeprecatedIfNeeded(name)
 
-    def default(): SequenceIterator = {
-        // "If the event context information does not contain the property indicated by the string argument, then an
-        // empty node-set is returned."
-        indentedLogger.logWarning("", "Unsupported event context information for event('" + name + "').")
-        EmptyIterator.getInstance
+        // NOTE: With Scala 2.10, move to `applyOrElse`
+        if (allProperties.isDefinedAt(name)) {
+            propertyAsIterator(name) getOrElse emptyIterator
+        } else {
+            // "If the event context information does not contain the property indicated by the string argument, then an
+            // empty node-set is returned."
+            warnUnsupportedIfNeeded(name)
+            emptyIterator
+        }
     }
 
-    // This method is overridden by legacy event classes (remove when those have been rewritten)
-    def getAttribute(name: String): SequenceIterator = {
+    final def getAttributeAsString(name: String): String =
+        Option(getAttribute(name).next()) map (_.getStringValue) orNull
 
-        // Deprecation warning if needed
-        def checkDeprecated() = isDeprecated(name) foreach { newName ⇒
+    private def warnDeprecatedIfNeeded(name: String) =
+        newPropertyName(name) foreach { newName ⇒
             indentedLogger.logWarning("", "event('" + name + "') is deprecated. Use event('" + newName + "') instead.")
         }
 
-        // Try custom attributes first, then standard attributes
-        custom.get(name) map (_.iterate()) orElse
-            { checkDeprecated(); getStandardAttribute(name) map (_(self)) } getOrElse
-                default
-    }
+    private def warnUnsupportedIfNeeded(name: String) =
+        if (warnIfMissingProperty)
+            indentedLogger.logWarning("", "Unsupported event context information for event('" + name + "').")
 
-    def getAttributeAsString(name: String): String =
-        Option(getAttribute(name).next()) map (_.getStringValue) orNull
-
-    def indentedLogger = containingDocument.getIndentedLogger(XFormsEvents.LOGGING_CATEGORY)
+    // These methods can be overridden by subclasses
+    implicit def indentedLogger = containingDocument.getIndentedLogger(XFormsEvents.LOGGING_CATEGORY)
+    def warnIfMissingProperty = true
+    def newPropertyName(name: String) = Deprecated.get(name)
     def locationData: LocationData = null
 
     // Whether this event matches filters placed on the given event handler.
@@ -100,16 +123,34 @@ object XFormsEvent {
     object Target   extends Phase("target")
     object Bubbling extends Phase("bubbling")
 
+    // PropertyGetter is more general than Map, but a Map is automatically a PropertyGetter
+    type PropertyGetter = PartialFunction[String, Option[Any]]
+    val EmptyGetter: PropertyGetter = Map()
+
+    // With Scala 2.10, implement applyOrElse
+    def getters[E <: XFormsEvent](e: E, m: Map[String, E ⇒ Option[Any]]): PropertyGetter = new PropertyGetter {
+        def isDefinedAt(name: String) = m.isDefinedAt(name)
+        def apply(name: String)       = m(name)(e)
+    }
+
+    // Convert a Java object to a Saxon Item using the Saxon API
+    private val anyToItem = new StandardObjectConverter(new SaxonXQDataFactory {
+        def getConfiguration = XPathCache.getGlobalConfiguration
+    }).convertToItem(_: Any)
+
+    // Convert a Java object to a Saxon Item but keep unchanged if already an Item
+    private val anyToItemIfNeeded: Any ⇒ Item = _ match {
+        case i: Item ⇒ i
+        case a ⇒ anyToItem(a)
+    }
+
     import SingletonIterator.makeIterator
-    import StringValue.makeStringValue
 
     def emptyIterator = EmptyIterator.getInstance
-    def stringIterator (s: String,    cond: ⇒ Boolean = true) = if ((s ne null) && cond) makeIterator(makeStringValue(s)) else emptyIterator
-    def booleanIterator(b: Boolean,   cond: ⇒ Boolean = true) = if (cond) makeIterator(BooleanValue.get(b)) else emptyIterator
-    def longIterator   (l: Long,      cond: ⇒ Boolean = true) = if (cond) makeIterator(new Int64Value(l)) else emptyIterator
-    def listIterator   (s: Seq[Item], cond: ⇒ Boolean = true) = if (cond) new ListIterator(s.asJava) else emptyIterator
+    def itemIterator   (i: Item)      = if (i ne null)  makeIterator(i)            else emptyIterator
+    def listIterator   (s: Seq[Item]) = if (s.nonEmpty) new ListIterator(s.asJava) else emptyIterator
 
-    def xxformsName(name: String)   = buildExplodedQName(XXFORMS_NAMESPACE_URI, name)
+    def xxformsName(name: String) = buildExplodedQName(XXFORMS_NAMESPACE_URI, name)
     
     private val Deprecated = Map(
         "target"         → "xxforms:targetid",
@@ -117,40 +158,39 @@ object XFormsEvent {
         "repeat-indexes" → "xxforms:repeat-indexes"
     )
     
-    private val StandardAttributes = Map[String, XFormsEvent ⇒ SequenceIterator](
-        "target"                            → (e ⇒ stringIterator(e.targetObject.getId)),
-        xxformsName("target")               → (e ⇒ stringIterator(e.targetObject.getId)),
-        xxformsName("targetid")             → (e ⇒ stringIterator(e.targetObject.getId)),
-        xxformsName("absolute-targetid")    → (e ⇒ stringIterator(XFormsUtils.effectiveIdToAbsoluteId(e.targetObject.getEffectiveId))),
-        "event"                             → (e ⇒ stringIterator(e.name)),
-        xxformsName("type")                 → (e ⇒ stringIterator(e.name)),
-        xxformsName("bubbles")              → (e ⇒ booleanIterator(e.bubbles)),
-        xxformsName("cancelable")           → (e ⇒ booleanIterator(e.cancelable)),
-        xxformsName("phase")                → (e ⇒ stringIterator(e.currentPhase.name)),
-        xxformsName("observerid")           → (e ⇒ stringIterator(e.currentObserver.getId)),
-        xxformsName("absolute-observerid")  → (e ⇒ stringIterator(XFormsUtils.effectiveIdToAbsoluteId(e.currentObserver.getEffectiveId))),
+    private val Getters = Map[String, XFormsEvent ⇒ Option[Any]](
+        "target"                            → (e ⇒ Option(e.targetObject.getId)),
+        xxformsName("target")               → (e ⇒ Option(e.targetObject.getId)),
+        xxformsName("targetid")             → (e ⇒ Option(e.targetObject.getId)),
+        xxformsName("absolute-targetid")    → (e ⇒ Option(XFormsUtils.effectiveIdToAbsoluteId(e.targetObject.getEffectiveId))),
+        "event"                             → (e ⇒ Option(e.name)),
+        xxformsName("type")                 → (e ⇒ Option(e.name)),
+        xxformsName("bubbles")              → (e ⇒ Option(e.bubbles)),
+        xxformsName("cancelable")           → (e ⇒ Option(e.cancelable)),
+        xxformsName("phase")                → (e ⇒ Option(e.currentPhase.name)),
+        xxformsName("observerid")           → (e ⇒ Option(e.currentObserver.getId)),
+        xxformsName("absolute-observerid")  → (e ⇒ Option(XFormsUtils.effectiveIdToAbsoluteId(e.currentObserver.getEffectiveId))),
         "repeat-indexes"                    → repeatIndexes,
         xxformsName("repeat-indexes")       → repeatIndexes,
         xxformsName("repeat-ancestors")     → repeatAncestors,
         xxformsName("target-prefixes")      → targetPrefixes
     )
 
-    private def repeatIndexes(e: XFormsEvent) = {
-        val parts = getEffectiveIdSuffixParts(e.targetObject.getEffectiveId)
-        listIterator(parts.toList map (index ⇒ StringValue.makeStringValue(index.toString)))
+    // NOTE: should ideally be Option[Seq[Int]]. At this time XForms callers assume Option[Seq[String]].
+    private def repeatIndexes(e: XFormsEvent): Option[Seq[String]] = {
+        val result = Some(getEffectiveIdSuffixParts(e.targetObject.getEffectiveId).toList map (_.toString))
+        result
     }
 
-    private def repeatAncestors(e: XFormsEvent) =
+    private def repeatAncestors(e: XFormsEvent): Option[Seq[String]] =
         if (hasEffectiveIdSuffix(e.targetObject.getEffectiveId)) {
             // There is a suffix so compute
             val ancestorRepeats = e.containingDocument.getStaticOps.getAncestorRepeats(getPrefixedId(e.targetObject.getEffectiveId), null)
-            listIterator(ancestorRepeats map (prefixedId ⇒ StringValue.makeStringValue(getStaticIdFromId(prefixedId))))
+            Some(ancestorRepeats map getStaticIdFromId)
         } else
             // No suffix
-            emptyIterator
+            None
 
-    private def targetPrefixes(e: XFormsEvent) = {
-        val parts = getEffectiveIdPrefixParts(e.targetObject.getEffectiveId)
-        listIterator(parts.toList map StringValue.makeStringValue)
-    }
+    private def targetPrefixes(e: XFormsEvent): Option[Seq[String]] =
+        Some(getEffectiveIdPrefixParts(e.targetObject.getEffectiveId).toList)
 }

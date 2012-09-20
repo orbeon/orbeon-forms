@@ -263,6 +263,7 @@ public class XFormsConstants {
     public static final QName XXFORMS_EVENT_QNAME = new QName("event", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_EVENTS_QNAME = new QName("events", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_DIVS_QNAME = new QName("divs", XXFORMS_NAMESPACE);
+    public static final QName XXFORMS_PROPERTY_QNAME = new QName("property", XXFORMS_NAMESPACE);
 
     public static final QName LABEL_QNAME = new QName("label", XFORMS_NAMESPACE);
     public static final QName HELP_QNAME = new QName("help", XFORMS_NAMESPACE);

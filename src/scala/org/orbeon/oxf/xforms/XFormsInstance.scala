@@ -96,6 +96,8 @@ class XFormsInstance(
 
     require(! (_readonly && _documentInfo.isInstanceOf[VirtualNode]))
 
+    def containingDocument = parent.containingDocument
+
     // Getters
     def instanceCaching = _instanceCaching
     def documentInfo = _documentInfo
@@ -171,7 +173,7 @@ class XFormsInstance(
                 // inserted.
     
                 // Find affected repeats
-                val insertedNodes = insertEvent.getInsertedItems
+                val insertedNodes = insertEvent.insertedItems
     
                 //didInsertNodes = insertedNodes.size() != 0
                 
@@ -180,9 +182,7 @@ class XFormsInstance(
                 updateRepeatNodesets(controls, insertedNodes)
             case deleteEvent: XFormsDeleteEvent ⇒
                 // New nodes were just deleted
-                val deletedNodes = deleteEvent.deleteInfos
-                val didDeleteNodes = deletedNodes.size != 0
-                if (didDeleteNodes) {
+                if (deleteEvent.deletedNodes.nonEmpty) {
                     // Find affected repeats and update them
                     val controls = container.getContainingDocument.getControls
                     updateRepeatNodesets(controls, null)
@@ -190,7 +190,7 @@ class XFormsInstance(
             case _ ⇒
         }
 
-    private def updateRepeatNodesets(controls: XFormsControls, insertedNodes: JList[Item]) {
+    private def updateRepeatNodesets(controls: XFormsControls, insertedNodes: Seq[Item]) {
         val repeatControlsMap = controls.getCurrentControlTree.getRepeatControls
         if (! repeatControlsMap.isEmpty) {
             val instanceScope = container.getPartAnalysis.scopeForPrefixedId(getPrefixedId)

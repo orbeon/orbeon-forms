@@ -260,7 +260,7 @@ object ToolboxOps {
             case Some(templateInstance) ⇒
                 // clear existing template instance content
                 delete(templateInstance \ *)
-                insert(into = templateInstance , origin = <dummy/>.copy(label = newGridName))
+                insert(into = templateInstance , origin = <dummy/>.copy(label = newGridName): NodeInfo)
 
             case None ⇒
                 // Insert template instance if not present

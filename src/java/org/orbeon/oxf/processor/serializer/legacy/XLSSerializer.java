@@ -73,10 +73,10 @@ public class XLSSerializer extends HttpBinarySerializer {
             int sheetIndex = 0;
 
             PooledXPathExpression expr = null;
-            List nodes = null;
+            List<Object> nodes = null;
             try {
                 expr = XPathCache.getXPathExpression(wrapper.getConfiguration(), wrapper, "/workbook/sheet", getLocationData());
-                nodes = expr.evaluate();
+                nodes = expr.evaluateToJava();
             } catch (XPathException e) {
                 throw new OXFException(e);
             } finally {

@@ -40,7 +40,7 @@ class XXFormsRootControl(container: XBLContainer, parent: XFormsControl, element
         case load: XXFormsLoadEvent ⇒
             // Internal load event
             try {
-                val resource = load.getResource
+                val resource = load.resource
                 val qmIndex = resource.indexOf('?')
                 val (pathInfo, parameters) =
                     if (qmIndex != -1) {

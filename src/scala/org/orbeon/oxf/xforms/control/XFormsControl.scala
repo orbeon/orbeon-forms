@@ -70,7 +70,7 @@ class XFormsControl(
 
     // Static information (never changes for the lifetime of the containing document)
     // TODO: Pass staticControl during construction (find which callers don't pass the necessary information)
-    final val staticControl: Control = Option(container.getPartAnalysis.getControlAnalysis(XFormsUtils.getPrefixedId(effectiveId))).orNull.asInstanceOf[Control]
+    final val staticControl: Control = container.getPartAnalysis.getControlAnalysis(XFormsUtils.getPrefixedId(effectiveId)).asInstanceOf[Control]
 
     final val prefixedId = Option(staticControl) map (_.prefixedId) getOrElse XFormsUtils.getPrefixedId(effectiveId)
 

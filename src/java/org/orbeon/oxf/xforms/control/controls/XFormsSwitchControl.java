@@ -119,7 +119,7 @@ public class XFormsSwitchControl extends XFormsSingleNodeContainerControl {
             // performs the following:"
 
             // "1. Dispatching an xforms-deselect event to the currently selected case."
-            Dispatch.dispatchEvent(new XFormsDeselectEvent(containingDocument(), previouslySelectedCaseControl));
+            Dispatch.dispatchEvent(new XFormsDeselectEvent(previouslySelectedCaseControl));
 
             if (isXForms11Switch()) {
                 // Partial refresh on the case that is being deselected
@@ -132,7 +132,7 @@ public class XFormsSwitchControl extends XFormsSingleNodeContainerControl {
             }
 
             // "2. Dispatching an xforms-select event to the case to be selected."
-            Dispatch.dispatchEvent(new XFormsSelectEvent(containingDocument(), caseControlToSelect));
+            Dispatch.dispatchEvent(new XFormsSelectEvent(caseControlToSelect));
         }
     }
 

@@ -88,7 +88,7 @@ object XFormsAPI {
 
     // Insert
     // @return the inserted nodes
-    def insert[T](origin: Seq[T], into: Seq[NodeInfo] = Seq(), after: Seq[NodeInfo] = Seq(), before: Seq[NodeInfo] = Seq()): Seq[T] = {
+    def insert[T <: Item](origin: Seq[T], into: Seq[NodeInfo] = Seq(), after: Seq[NodeInfo] = Seq(), before: Seq[NodeInfo] = Seq()): Seq[T] = {
 
         if (origin.nonEmpty && (into.nonEmpty || after.nonEmpty || before.nonEmpty)) {
             val action = actionInterpreterDyn.value
@@ -105,7 +105,7 @@ object XFormsAPI {
                 positionAttribute,
                 collectionToUpdate.asJava,
                 into.headOption.orNull,
-                origin.asJava,
+                origin.asJava.asInstanceOf[JList[Item]], // dirty cast for Java, safe if doInsert() doesn't modify the list
                 collectionToUpdate.size,
                 doClone = true,
                 doDispatch = true).asInstanceOf[JList[T]].asScala

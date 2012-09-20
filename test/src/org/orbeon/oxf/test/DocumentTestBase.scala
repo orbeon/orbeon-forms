@@ -16,7 +16,7 @@ package org.orbeon.oxf.test
 import org.orbeon.oxf.processor.ProcessorUtils
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.junit.After
-import org.orbeon.oxf.xforms.event.events.XXFormsValue
+import org.orbeon.oxf.xforms.event.events.XXFormsValueEvent
 import org.orbeon.oxf.xforms.control._
 import controls.XFormsSelect1Control
 import org.dom4j.{Element, Document ⇒ JDocument}
@@ -65,7 +65,7 @@ abstract class DocumentTestBase extends ResourceManagerTestBase {
     }
 
     def setControlValueWithEvent(controlId: String, value: String): Unit =
-        ClientEvents.processEvent(_document, new XXFormsValue(_document, getObject(controlId).asInstanceOf[XFormsEventTarget], value))
+        ClientEvents.processEvent(_document, new XXFormsValueEvent(getObject(controlId).asInstanceOf[XFormsEventTarget], value))
 
     def isRelevant(controlId: String) = getObject(controlId).asInstanceOf[XFormsControl].isRelevant
     def isRequired(controlId: String) = getSingleNodeControl(controlId).isRequired

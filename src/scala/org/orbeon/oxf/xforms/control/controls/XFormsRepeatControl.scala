@@ -104,7 +104,7 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
         setIndexInternal(index)
         if (oldRepeatIndex != getIndex) {
             // Dispatch custom event to notify that the repeat index has changed
-            Dispatch.dispatchEvent(new XXFormsIndexChangedEvent(containingDocument, this, oldRepeatIndex, getIndex))
+            Dispatch.dispatchEvent(new XXFormsIndexChangedEvent(this, oldRepeatIndex, getIndex))
         }
 
         // Handle rebuild flags for container affected by changes to this repeat
@@ -186,7 +186,6 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
             deleteInfos.get(0).nodeInfo
         }
 
-
         // Adjust destination collection to reflect new state
         val deletedNodePosition = destinationNodeset.indexOf(deletedNodeInfo)
         val (actualDestinationIndex, destinationPosition) =
@@ -220,7 +219,7 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
             destinationPosition,
             destinationNodeset,
             insertContextNodeInfo,
-            Seq(deletedNodeInfo).asJava,
+            Seq(deletedNodeInfo: Item).asJava,
             actualDestinationIndex,
             false,
             true
@@ -234,10 +233,10 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
         dndAttribute != null && dndAttribute != "none"
     }
 
-    def updateNodesetForInsertDelete(insertedNodeInfos: JList[Item]): Unit = {
+    def updateNodesetForInsertDelete(insertedNodeInfos: Seq[Item]): Unit = {
 
         // Get old nodeset
-        val oldRepeatNodeset = getBindingContext.getNodeset
+        val oldRepeatNodeset = getBindingContext.getNodeset.asScala
 
         // Set new binding context on the repeat control
         locally {
@@ -259,7 +258,7 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
         }
 
         // Move things around and create new iterations if needed
-        if (! Controls.compareNodesets(oldRepeatNodeset, getBindingContext.getNodeset)) {
+        if (! Controls.compareNodesets(oldRepeatNodeset, getBindingContext.getNodeset.asScala)) {
             // Update iterationsInitialStateIfNeeded()
 
             val focusedBefore = containingDocument.getControls.getFocusedControl
@@ -290,7 +289,7 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
      * @param insertedItems         items just inserted by xforms:insert if any, or null
      * @return                      new iterations if any, or an empty list
      */
-    def updateIterations(oldRepeatItems: JList[Item], insertedItems: JList[Item], isInsertDelete: Boolean):
+    def updateIterations(oldRepeatItems: Seq[Item], insertedItems: Seq[Item], isInsertDelete: Boolean):
             (Seq[XFormsRepeatIterationControl], Option[XFormsRepeatControl]) = {
 
         // NOTE: The following assumes the nodesets have changed
@@ -298,7 +297,7 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
         val controls = containingDocument.getControls
 
         // Get current (new) nodeset
-        val newRepeatNodeset = getBindingContext.getNodeset
+        val newRepeatNodeset = getBindingContext.getNodeset.asScala
 
         val isInsert = insertedItems ne null
 
@@ -534,25 +533,25 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
             this.refreshInfo = null
             if (refreshInfo.isNodesetChanged) {
                 // Dispatch custom event to xforms:repeat to notify that the nodeset has changed
-                Dispatch.dispatchEvent(new XXFormsNodesetChangedEvent(containingDocument, this, refreshInfo.newIterations,
+                Dispatch.dispatchEvent(new XXFormsNodesetChangedEvent(this, refreshInfo.newIterations,
                     refreshInfo.movedIterationsOldPositions, refreshInfo.movedIterationsNewPositions))
             }
 
             if (refreshInfo.oldRepeatIndex != getIndex) {
                 // Dispatch custom event to notify that the repeat index has changed
-                Dispatch.dispatchEvent(new XXFormsIndexChangedEvent(containingDocument, this, refreshInfo.oldRepeatIndex, getIndex))
+                Dispatch.dispatchEvent(new XXFormsIndexChangedEvent(this, refreshInfo.oldRepeatIndex, getIndex))
             }
         }
     }
 
-    private def findNodeIndexes(nodeset1: JList[Item], nodeset2: JList[Item]) = {
+    private def findNodeIndexes(nodeset1: Seq[Item], nodeset2: Seq[Item]) = {
 
-        val nodeset2Scala = nodeset2.asScala
+        val nodeset2Scala = nodeset2
 
         def indexOfItem(otherItem: Item) =
             nodeset2Scala indexWhere (XFormsUtils.compareItems(_, otherItem))
 
-        nodeset1.asScala map indexOfItem toArray
+        nodeset1 map indexOfItem toArray
     }
 
     // Serialize index

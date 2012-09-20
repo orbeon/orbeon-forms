@@ -241,15 +241,15 @@ public class CacheableSubmission extends BaseSubmission {
             // xforms-submit-error with an error-type of target-error."
 
             throw new XFormsSubmissionException(submission, "targetref attribute doesn't point to an element for replace=\"instance\".", "processing targetref attribute",
-                    new XFormsSubmitErrorEvent(containingDocument, submission, XFormsSubmitErrorEvent.ErrorType.TARGET_ERROR, null));
+                    new XFormsSubmitErrorEvent(submission, XFormsSubmitErrorEvent.TARGET_ERROR(), null));
         }
 
-        updatedInstance = submission.getContainingDocument().getInstanceForNode(destinationNodeInfo);
+        updatedInstance = submission.containingDocument().getInstanceForNode(destinationNodeInfo);
         if (updatedInstance == null || !updatedInstance.instanceRoot().isSameNodeInfo(destinationNodeInfo)) {
             // Only support replacing the root element of an instance
             // TODO: in the future, check on resolvedXXFormsReadonly to implement this restriction only when using a readonly instance
             throw new XFormsSubmissionException(submission, "targetref attribute must point to an instance root element when using cached/shared instance replacement.", "processing targetref attribute",
-                    new XFormsSubmitErrorEvent(containingDocument, submission, XFormsSubmitErrorEvent.ErrorType.TARGET_ERROR, null));
+                    new XFormsSubmitErrorEvent(submission, XFormsSubmitErrorEvent.TARGET_ERROR(), null));
         }
 
         if (indentedLogger.isDebugEnabled())

@@ -214,18 +214,18 @@ trait ModelContainer {
         initializeModels(Array(XFORMS_MODEL_CONSTRUCT, XFORMS_MODEL_CONSTRUCT_DONE, XFORMS_READY))
 
     def initializeModels(eventsToDispatch: Array[String]): Unit =
-        for ((event, index) ← eventsToDispatch.zipWithIndex){
+        for ((eventName, index) ← eventsToDispatch.zipWithIndex){
             if (index == 2) {
                 initializeNestedControls()
                 requireRefresh()
             }
             for (model ← _models)
-                Dispatch.dispatchEvent(XFormsEventFactory.createEvent(containingDocument, event, model))
+                Dispatch.dispatchEvent(XFormsEventFactory.createEvent(eventName, model))
         }
 
     def destroyModels(): Unit =
         for (model ← models)
-            Dispatch.dispatchEvent(new XFormsModelDestructEvent(containingDocument, model))
+            Dispatch.dispatchEvent(new XFormsModelDestructEvent(model, Map()))
 
     def getDefaultModel = _models.headOption.orNull
 

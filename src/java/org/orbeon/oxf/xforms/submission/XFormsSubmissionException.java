@@ -19,11 +19,11 @@ import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 
 public class XFormsSubmissionException extends ValidationException {
 
-    private XFormsSubmitErrorEvent submitErrorEvent;
+    private XFormsSubmitErrorEvent XFormsSubmitErrorEvent;
 
-    public XFormsSubmissionException(XFormsModelSubmission submission, String message, String description, XFormsSubmitErrorEvent submitErrorEvent) {
+    public XFormsSubmissionException(XFormsModelSubmission submission, String message, String description, XFormsSubmitErrorEvent XFormsSubmitErrorEvent) {
         this(submission, message, description);
-        this.submitErrorEvent = submitErrorEvent;
+        this.XFormsSubmitErrorEvent = XFormsSubmitErrorEvent;
     }
 
     public XFormsSubmissionException(XFormsModelSubmission submission, String message, String description) {
@@ -36,12 +36,12 @@ public class XFormsSubmissionException extends ValidationException {
                 submission.getSubmissionElement()));
     }
 
-    public XFormsSubmissionException(XFormsModelSubmission submission, Throwable e, String message, String description, XFormsSubmitErrorEvent submitErrorEvent) {
+    public XFormsSubmissionException(XFormsModelSubmission submission, Throwable e, String message, String description, XFormsSubmitErrorEvent XFormsSubmitErrorEvent) {
         this(submission, e, message, description);
-        this.submitErrorEvent = submitErrorEvent;
+        this.XFormsSubmitErrorEvent = XFormsSubmitErrorEvent;
     }
 
-    public XFormsSubmitErrorEvent getSubmitErrorEvent() {
-        return submitErrorEvent;
+    public XFormsSubmitErrorEvent getXFormsSubmitErrorEvent() {
+        return XFormsSubmitErrorEvent;
     }
 }

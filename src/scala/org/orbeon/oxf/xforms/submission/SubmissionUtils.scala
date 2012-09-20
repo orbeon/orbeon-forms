@@ -66,7 +66,7 @@ object SubmissionUtils {
     def evaluateHeaders(submission: XFormsModelSubmission, forwardClientHeaders: Boolean): JMap[String, Array[String]] = {
         try {
             val headersToForward =
-                clientHeadersToForward(submission.getContainingDocument.getRequestHeaders, forwardClientHeaders)
+                clientHeadersToForward(submission.containingDocument.getRequestHeaders, forwardClientHeaders)
 
             val newHeaders =
                 Headers.evaluateHeaders(

@@ -13,33 +13,36 @@
  */
 package org.orbeon.oxf.xforms.event.events
 
-import XXFormsNodesetChangedEvent._
-import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatIterationControl
+import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xforms.event.XFormsEvents.XXFORMS_NODESET_CHANGED
-import org.orbeon.saxon.om.SequenceIterator
-import org.orbeon.saxon.value.Int64Value
-import org.orbeon.oxf.xforms.event.XFormsEvent
+import org.orbeon.oxf.xforms.event.{XFormsEventTarget, XFormsEvent}
 
-class XXFormsNodesetChangedEvent(
-        containingDocument: XFormsContainingDocument,
-        targetObject: XFormsControl,
-        val newIterations: Seq[XFormsRepeatIterationControl],
-        val oldIterationPositions: Seq[Int],
-        val newIterationPositions: Seq[Int])
-    extends XFormsUIEvent(containingDocument, XXFORMS_NODESET_CHANGED, targetObject) {
+class XXFormsNodesetChangedEvent(target: XFormsEventTarget, properties: PropertyGetter)
+    extends XFormsUIEvent(XXFORMS_NODESET_CHANGED, target.asInstanceOf[XFormsControl], properties, bubbles = true, cancelable = false) {
 
-    override def getStandardAttribute(name: String) = StandardAttributes.get(name) orElse super.getStandardAttribute(name)
+    def this(target: XFormsControl, newIterations: Seq[XFormsRepeatIterationControl], oldIterationPositions: Seq[Int], newIterationPositions: Seq[Int]) = {
+        this(target, EmptyGetter)
+        this.newIterationsOpt = Option(newIterations map (_.iterationIndex))
+        this.oldIterationPositionsOpt = Option(oldIterationPositions)
+        this.newIterationPositionsOpt = Option(newIterationPositions)
+    }
+
+    private var newIterationsOpt: Option[Seq[Int]] = None
+    private var oldIterationPositionsOpt: Option[Seq[Int]] = None
+    private var newIterationPositionsOpt: Option[Seq[Int]] = None
+
+    override def lazyProperties = super.lazyProperties orElse getters(this, XXFormsNodesetChangedEvent.Getters)
 }
 
-object XXFormsNodesetChangedEvent {
+private object XXFormsNodesetChangedEvent {
 
     import XFormsEvent._
 
-    val StandardAttributes = Map[String, XXFormsNodesetChangedEvent ⇒ SequenceIterator](
-        xxformsName("new-positions")    → (e ⇒ listIterator(e.newIterations         map (i ⇒ new Int64Value(i.iterationIndex)))),
-        xxformsName("from-positions")   → (e ⇒ listIterator(e.oldIterationPositions map (i ⇒ new Int64Value(i)))),
-        xxformsName("to-positions")     → (e ⇒ listIterator(e.newIterationPositions map (i ⇒ new Int64Value(i))))
+    val Getters = Map[String, XXFormsNodesetChangedEvent ⇒ Option[Any]](
+        xxformsName("new-positions")    → (_.newIterationsOpt),
+        xxformsName("from-positions")   → (_.oldIterationPositionsOpt),
+        xxformsName("to-positions")     → (_.newIterationPositionsOpt)
     )
 }

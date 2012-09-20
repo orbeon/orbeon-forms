@@ -13,14 +13,15 @@
  */
 package org.orbeon.oxf.xforms.event.events
 
-import org.orbeon.oxf.xforms.XFormsContainingDocument
-import org.orbeon.oxf.xforms.event.{XFormsEvents, XFormsEvent, XFormsEventTarget}
-import XFormsEvent._
+import org.orbeon.oxf.xforms.event.XFormsEvents._
+import org.orbeon.oxf.xforms.event.{XFormsEvent, XFormsEventTarget}
+import org.orbeon.oxf.xforms.event.XFormsEvent._
 
-class XXFormsSetindexEvent(containingDocument: XFormsContainingDocument, targetObject: XFormsEventTarget, val index: Int)
-    extends XFormsEvent(containingDocument, XFormsEvents.XXFORMS_SETINDEX, targetObject, true, false) {
+class XXFormsSetindexEvent(target: XFormsEventTarget, properties: PropertyGetter)
+    extends XFormsEvent(XXFORMS_SETINDEX, target, properties, bubbles = true, cancelable = false) {
 
-    override def getStandardAttribute(name: String) =
-        Map("index" → ((e: this.type) ⇒ longIterator(index))).get(name) orElse
-            super.getStandardAttribute(name)
+    def this(target: XFormsEventTarget, index: Int) =
+        this(target, Map("index" → Option(index)))
+
+    def index = property[Int]("index").get
 }

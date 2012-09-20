@@ -21,7 +21,6 @@ import xbl.XBLContainer
 import org.orbeon.oxf.xforms.BindingContext
 import org.orbeon.saxon.om.Item
 import collection.JavaConverters._
-import java.util.{List ⇒ JList}
 
 object Controls {
 
@@ -286,7 +285,7 @@ object Controls {
                 control match {
                     case repeatControl: XFormsRepeatControl ⇒
                         // Update iterations
-                        val oldRepeatSeq = control.getBindingContext.getNodeset
+                        val oldRepeatSeq = control.getBindingContext.getNodeset.asScala
                         control.evaluateBinding(bindingContext, update = true)
                         val (newIterations, partialFocusRepeatOption) = repeatControl.updateIterations(oldRepeatSeq, null, isInsertDelete = false)
 
@@ -338,14 +337,14 @@ object Controls {
     }
 
     // Whether two nodesets contain identical items
-    def compareNodesets(nodeset1: JList[Item], nodeset2: JList[Item]): Boolean = {
+    def compareNodesets(nodeset1: Seq[Item], nodeset2: Seq[Item]): Boolean = {
         // Can't be the same if the size has changed
         if (nodeset1.size != nodeset2.size)
             return false
 
         val j = nodeset2.iterator
-        for (currentItem1 ← nodeset1.asScala) {
-            val currentItem2 = j.next
+        for (currentItem1 ← nodeset1) {
+            val currentItem2 = j.next()
             if (! XFormsUtils.compareItems(currentItem1, currentItem2))
                 return false
         }

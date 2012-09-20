@@ -13,38 +13,36 @@
  */
 package org.orbeon.oxf.xforms.event.events
 
-import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.event.XFormsEvent
-import org.orbeon.saxon.om.SequenceIterator
-import XFormsUIEvent._
+import XFormsEvent._
 
 /**
- * Base class for UI events.
+ * Base class for UI events, that is events only dispatched to controls.
  */
 abstract class XFormsUIEvent(
-        containingDocument: XFormsContainingDocument,
         eventName: String,
         val targetControl: XFormsControl,
+        properties: PropertyGetter,
         bubbles: Boolean,
         cancelable: Boolean)
     extends XFormsEvent(
-        containingDocument,
         eventName,
         targetControl,
+        properties,
         bubbles,
         cancelable) {
 
-    def this(containingDocument: XFormsContainingDocument, eventName: String, targetControl: XFormsControl) =
-        this(containingDocument, eventName, targetControl, true, false)
+    def this(eventName: String, target: XFormsControl, properties: PropertyGetter) =
+        this(eventName, target, properties, bubbles = true, cancelable = false)
 
-    override def isDeprecated(name: String) = Deprecated.get(name) orElse super.isDeprecated(name)
-    override def getStandardAttribute(name: String) = StandardAttributes.get(name) orElse super.getStandardAttribute(name)
+    require(targetControl ne null)
+
+    override def lazyProperties = getters(this, XFormsUIEvent.Getters)
+    override def newPropertyName(name: String) = XFormsUIEvent.Deprecated.get(name) orElse super.newPropertyName(name)
 }
 
 private object XFormsUIEvent {
-
-    import XFormsEvent._
     
     val Deprecated = Map(
         "target-ref" → "xxforms:binding",
@@ -54,7 +52,7 @@ private object XFormsUIEvent {
         "help"       → "xxforms:help"
     )
     
-    val StandardAttributes = Map[String, XFormsUIEvent ⇒ SequenceIterator](
+    val Getters = Map[String, XFormsUIEvent ⇒ Option[Any]](
         "target-ref"                    → binding,
         xxformsName("binding")          → binding,
         xxformsName("control-position") → controlPosition,
@@ -68,16 +66,15 @@ private object XFormsUIEvent {
         xxformsName("alert")            → alert
     )
 
-    def binding(e: XFormsUIEvent) = listIterator(e.targetControl.binding)
+    def binding(e: XFormsUIEvent) = Option(e.targetControl.binding)
 
     def controlPosition(e: XFormsUIEvent) = {
         val controlStaticPosition = e.targetControl.container.getPartAnalysis.getControlPosition(e.targetControl.getPrefixedId)
-        longIterator(controlStaticPosition, controlStaticPosition >= 0)
+        if (controlStaticPosition >= 0) Some(controlStaticPosition) else None
     }
 
-    def label(e: XFormsUIEvent) = stringIterator(e.targetControl.getLabel)
-    def help(e: XFormsUIEvent)  = stringIterator(e.targetControl.getHelp)
-    def hint(e: XFormsUIEvent)  = stringIterator(e.targetControl.getHint)
-    def alert(e: XFormsUIEvent) = stringIterator(e.targetControl.getAlert)
-
+    def label(e: XFormsUIEvent) = Option(e.targetControl.getLabel)
+    def help(e: XFormsUIEvent)  = Option(e.targetControl.getHelp)
+    def hint(e: XFormsUIEvent)  = Option(e.targetControl.getHint)
+    def alert(e: XFormsUIEvent) = Option(e.targetControl.getAlert)
 }

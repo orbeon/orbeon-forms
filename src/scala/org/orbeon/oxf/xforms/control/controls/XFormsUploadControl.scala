@@ -32,6 +32,8 @@ import org.orbeon.oxf.xforms.XFormsContainingDocument
 import java.net.{URLEncoder, URI}
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
 import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.xforms.event.XFormsEvent._
+import scala.Some
 
 /**
  * Represents an xforms:upload control.
@@ -149,7 +151,7 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
 
                     if (StringUtils.isNotEmpty(oldValue))
                         // TODO: This should probably take place during refresh instead.
-                        Dispatch.dispatchEvent(new XFormsDeselectEvent(containingDocument, this))
+                        Dispatch.dispatchEvent(new XFormsDeselectEvent(this, EmptyGetter))
 
                     // Try to delete temporary file associated with old value if any
                     deleteFileIfPossible(oldValue)

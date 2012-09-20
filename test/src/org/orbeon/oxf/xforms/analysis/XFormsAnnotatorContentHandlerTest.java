@@ -86,7 +86,7 @@ public class XFormsAnnotatorContentHandlerTest extends ResourceManagerTestBase {
         final DocumentWrapper documentWrapper = new DocumentWrapper(annotatedDocument, null, XPathCache.getGlobalConfiguration());
 
         // Check there is an xxforms:attribute for "html" with correct name
-        List result = XPathCache.evaluate(documentWrapper, "//xxforms:attribute[@for = 'html']", XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING(), null, null, null, null, null);
+        List<Object> result = XPathCache.evaluate(documentWrapper, "//xxforms:attribute[@for = 'html']", XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING(), null, null, null, null, null);
 
         assertNotNull(result);
         assertEquals(1, result.size());

@@ -125,7 +125,7 @@ public class PooledXPathExpression {
     /**
      * Evaluate and return a List of native Java objects, including underlying wrapped nodes.
      */
-    public List evaluate() throws XPathException {
+    public List<Object> evaluateToJava() throws XPathException {
         return convertToJava(evaluate(null));
     }
 
@@ -185,18 +185,6 @@ public class PooledXPathExpression {
             }
         }
     }
-
-//    private List<Object> convertToJava(SequenceExtent extent) throws XPathException {
-//        final List<Object> result = new ArrayList<Object>(extent.getLength());
-//        final SequenceIterator iter = extent.iterate(null);
-//        while (true) {
-//            final Item currentItem = iter.next();
-//            if (currentItem == null) {
-//                return result;
-//            }
-//            result.add(Value.convertToJava(currentItem));
-//        }
-//    }
 
     private List<Object> convertToJava(SequenceIterator iterator) throws XPathException {
         final List<Object> result = new ArrayList<Object>();

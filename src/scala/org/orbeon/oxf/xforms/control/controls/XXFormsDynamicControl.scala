@@ -189,8 +189,8 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
             }
 
             def changeListener(record: Seq[NodeInfo] ⇒ Boolean): EventListener = {
-                case insert: XFormsInsertEvent ⇒ record(insert.getInsertedItems.asScala collect { case n: NodeInfo ⇒ n })
-                case delete: XFormsDeleteEvent ⇒ record(delete.deleteInfos.asScala map (_.nodeInfo))
+                case insert: XFormsInsertEvent ⇒ record(insert.insertedItems collect { case n: NodeInfo ⇒ n })
+                case delete: XFormsDeleteEvent ⇒ record(delete.deletedNodes)
                 case valueChanged: XXFormsValueChanged ⇒ record(Seq(valueChanged.node))
                 case _ ⇒ false
             }

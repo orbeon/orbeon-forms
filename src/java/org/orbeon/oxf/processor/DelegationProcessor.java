@@ -309,7 +309,7 @@ public class DelegationProcessor extends ProcessorImpl {
                                                             ? operation.selectNamespaceContext : null, getLocationData());
 
                                             try {
-                                                for (Iterator i = expr.evaluate().iterator(); i.hasNext();) {
+                                                for (Iterator i = expr.evaluateToJava().iterator(); i.hasNext();) {
 
                                                     // Create document with node from SOAP envelope
                                                     final Object result = i.next();

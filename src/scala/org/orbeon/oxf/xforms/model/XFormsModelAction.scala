@@ -21,6 +21,7 @@ class XFormsModelAction(parent: XFormsEventObserver, eventHandler: EventHandlerI
 
     val getEffectiveId = XFormsUtils.getRelatedEffectiveId(parent.getEffectiveId, eventHandler.staticId)
     def container = parent.container
+    def containingDocument = parent.containingDocument
 
     // This is called by EventHandlerImpl when determining the XPath context for nested event handlers
     def getBindingContext(containingDocument: XFormsContainingDocument) = parent match {

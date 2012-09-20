@@ -343,8 +343,10 @@
 
     <!-- A task we use only from IntelliJ before running tests that sets the version in place in Version.scala.
          The task is executed automatically by IntelliJ, which saves us from having to edit that file by hand. -->
-    <target name="intellij-set-version" depends="set-version">
-        <copy file="${build.dir}/src/Version.scala" tofile="${scala-src.dir}/org/orbeon/oxf/common/Version.scala" overwrite="true"/>
+    <target name="intellij-before-make" depends="set-version">
+        <mkdir dir="test/src/config"/>
+        <copy file="src/resources-private/config/license.xml" todir="test/src/config"/>
+        <copy file="build/src/Version.scala" tofile="src/scala/org/orbeon/oxf/common/Version.scala" overwrite="true"/>
     </target>
 
     <!-- Compile source -->

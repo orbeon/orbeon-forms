@@ -21,6 +21,7 @@
     var AjaxServer = ORBEON.xforms.server.AjaxServer;
     var Controls = ORBEON.xforms.Controls;
     var Properties = ORBEON.util.Properties;
+    var StringUtils = ORBEON.util.String;
 
     AjaxServer.Event = function(form, targetId, value, eventName, bubbles, cancelable, ignoreErrors, showProgress, progressMessage, additionalAttribs) {
         // If no form is provided, infer the form based on that targetId, if one is provided
@@ -35,6 +36,7 @@
         this.showProgress = YAHOO.lang.isBoolean(showProgress) ? showProgress : true;
         this.progressMessage = YAHOO.lang.isUndefined(progressMessage) ? null: progressMessage;
         this.additionalAttribs = YAHOO.lang.isUndefined(additionalAttribs) ? null: additionalAttribs;
+        this.properties = {};
     };
 
     /**
@@ -145,6 +147,8 @@
             ORBEON.util.Utils.logMessage(" " + eventIndex + " - name: " + event.eventName + " | targetId: " + event.targetId + " | value: " + event.value);
         }
     };
+
+    AjaxServer.beforeSendingEvent = $.Callbacks();
 
     AjaxServer.executeNextRequest = function(bypassRequestQueue) {
         bypassRequestQueue = typeof(bypassRequestQueue) == "boolean" && bypassRequestQueue == true;
@@ -292,6 +296,13 @@
                     }
                     ORBEON.xforms.Globals.eventQueue = newEvents;
                 }
+
+                // Call listeners on events before being sent, giving them a sense to provide additional event properties
+                _.each(ORBEON.xforms.Globals.eventQueue, function(event) {
+                    AjaxServer.beforeSendingEvent.fire(event, function(properties) {
+                        _.extend(event.properties, properties);
+                    });
+                });
 
                 // Check again that we have events to send after collapsing
                 if (ORBEON.xforms.Globals.eventQueue.length > 0) {
@@ -452,6 +463,21 @@
                                     event.value = event.value.replace(XFORMS_REGEXP_INVALID_XML_CHAR, "");
                                 }
                                 requestDocumentString.push(event.value);
+                            } else if (! _.isEmpty(event.properties)) {
+                                // Only add properties when we don't have a value (in the future, the value should be send a
+                                // sub-element, so both a value and properties can be sent for the same event)
+                                requestDocumentString.push('\n');
+                                _.each(_.keys(event.properties), function(name) {
+                                    var value = event.properties[name];
+                                    var propertyParts = [
+                                        indent + indent + indent,
+                                        '<xxforms:property name="' + StringUtils.escapeForMarkup(name) + '">',
+                                        StringUtils.escapeForMarkup(value),
+                                        '</xxforms:property>\n'
+                                    ];
+                                    _.each(propertyParts, function(part) { requestDocumentString.push(part); });
+                                });
+                                requestDocumentString.push(indent + indent);
                             }
                             requestDocumentString.push('</xxforms:event>\n');
                             remainingEvents = _.without(remainingEvents, event);

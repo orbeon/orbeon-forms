@@ -11,7 +11,7 @@
 # The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 
 # TODO: should most likel be called StringUtils rather than String, to avoid overloading String when imported
-ORBEON.util.String = _.tap {}, (OString) -> _.extend OString,
+ORBEON.util.String = _.tap {}, (StringUtils) -> _.extend StringUtils,
 
     # Based on code by Fagner Brack, under MIT license
     # http://stackoverflow.com/a/9918856/5295
@@ -30,8 +30,8 @@ ORBEON.util.String = _.tap {}, (OString) -> _.extend OString,
     # Evaluates JavaScript which can contain return characters we need to remove
     # TODO: Why do we need to replace newline in JavaScript before it to eval()?
     eval: (jsString) ->
-        jsString = OString.replace jsString, "\n", " "
-        jsString = OString.replace jsString, "\r", " "
+        jsString = StringUtils.replace jsString, "\n", " "
+        jsString = StringUtils.replace jsString, "\r", " "
         eval jsString
 
     # Escape text that appears in an HTML attribute which we use in an innerHTML
@@ -44,7 +44,7 @@ ORBEON.util.String = _.tap {}, (OString) -> _.extend OString,
             '>': '&gt;'
             '&': '&amp;'
         for from, to of characters
-            text = OString.replace text, from, to
+            text = StringUtils.replace text, from, to
         text
 
     # Checks if a string ends with another string

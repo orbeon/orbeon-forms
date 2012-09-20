@@ -1,0 +1,49 @@
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xh:head>
+        <xh:title>Add custom event properties to XForms events</xh:title>
+        <xf:model>
+            <xf:instance>
+                <instance>
+                    <triggered>false</triggered>
+                    <p1/><p2/>
+                </instance>
+            </xf:instance>
+            <xf:setfocus control="send-event" event="xforms-ready"/>
+        </xf:model>
+        <xh:script type="text/javascript">
+            <![CDATA[
+                $(function() {
+                    var AjaxServer = ORBEON.xforms.server.AjaxServer;
+                    AjaxServer.beforeSendingEvent.add(function(event, addProperties) {
+                        if (event.eventName == 'DOMActivate' && event.targetId == 'send-event')
+                            addProperties({p1: 'v1', p2: 'v2'});
+                    });
+                });
+            ]]>
+        </xh:script>
+        <xh:style type="text/css">
+            .xforms-trigger { display: block; margin-bottom: 1em }
+            .xforms-repeat-selected-item-1 { background-color: inherit }
+            .xforms-output { display: block }
+            .xforms-label { display: inline-block; min-width: 5em }
+        </xh:style>
+    </xh:head>
+    <xh:body>
+
+        <xf:trigger id="send-event">
+            <xf:label>Send event</xf:label>
+            <xf:setvalue event="DOMActivate" ref="triggered">true</xf:setvalue>
+        </xf:trigger>
+
+        <xf:repeat ref="*">
+            <xf:output value=".">
+                <xf:label ref="local-name()"/>
+            </xf:output>
+        </xf:repeat>
+
+    </xh:body>
+</xh:html>

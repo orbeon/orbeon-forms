@@ -492,58 +492,6 @@ var DEFAULT_LOADING_TEXT = "Loading...";
         },
 
         /**
-         * General purpose methods on string
-         */
-        String: {
-            replace: function(text, placeholder, replacement) {
-                // Don't try to do the replacement if the string does not contain the placeholder
-                return text.indexOf(placeholder) == -1 ? text :
-                       text.replace(new RegExp(placeholder, "g"), replacement);
-            },
-
-            /**
-             * Evaluates JavaScript which can contain return characters we need to remove
-             */
-            eval: function(javascriptString) {
-                javascriptString = ORBEON.util.String.replace(javascriptString, "\n", " ");
-                javascriptString = ORBEON.util.String.replace(javascriptString, "\r", " ");
-                return eval(javascriptString);
-            },
-
-            /**
-             * Escape text that appears in an HTML attribute which we use in an innerHTML.
-             */
-            escapeAttribute: function(text) {
-                return ORBEON.util.String.replace(text, '"', '&quot;');
-            },
-
-            /**
-             * Escape text that appears in an HTML attribute which we use in an innerHTML.
-             */
-            escapeHTMLMinimal: function(text) {
-                text = ORBEON.util.String.replace(text, '&', '&amp;');
-                return ORBEON.util.String.replace(text, '<', '&lt;');
-            },
-
-            /**
-             * Checks if a string ends with another string.
-             */
-            endsWith: function(text, suffix) {
-                var index = text.lastIndexOf(suffix);
-                return index != -1 && index + suffix.length == text.length;
-            },
-
-            normalizeSerializedHTML: function(text) {
-                // Mmmh, the caller might pass an integer, e.g. for the slider. Not sure if fixing this here is the best way.
-                if (typeof text == "string") {
-                    return text.replace(XFORMS_REGEXP_CR, "");
-                } else {
-                    return text;
-                }
-            }
-        },
-
-        /**
          * Utility functions dealing with dates and times.
          *
          * Credits - This is based and inspired by:

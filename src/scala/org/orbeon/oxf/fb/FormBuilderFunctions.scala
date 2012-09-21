@@ -46,10 +46,10 @@ object FormBuilderFunctions extends Logging {
     // suffixes, whatever type of actual control they apply to. The idea is that in the end we might decide to just use
     // -control. OTOH we must have distinct ids for binds, controls and templates, so the -bind, -control and -template
     // suffixes must remain.
-    def bindId(controlName: String) = controlName + "-bind"
-    def gridId(gridName: String) = gridName + "-grid"
+    def bindId(controlName: String)    = controlName + "-bind"
+    def gridId(gridName: String)       = gridName    + "-grid"
     def controlId(controlName: String) = controlName + "-control"
-    def templateId(gridName: String) = gridName + "-template"
+    def templateId(gridName: String)   = gridName    + "-template"
 
     // Find the form document being edited
     def getFormDoc = asNodeInfo(model("fr-form-model").get.getVariable("model")).getDocumentRoot

@@ -20,7 +20,6 @@
       <sourceFolder url="file://$MODULE_DIR$/src/scala" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/resources-packaged/xbl/orbeon/simple-captcha/src/scala" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/build/classes" />
-      <excludeFolder url="file://$MODULE_DIR$/out" />
       <excludeFolder url="file://$MODULE_DIR$/src/resources-packaged/ops/unit-tests/exist-data" />
     </content>
     <orderEntry type="inheritedJdk" />

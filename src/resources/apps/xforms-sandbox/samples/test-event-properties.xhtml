@@ -20,7 +20,7 @@
                     var AjaxServer = ORBEON.xforms.server.AjaxServer;
                     AjaxServer.beforeSendingEvent.add(function(event, addProperties) {
                         if (event.eventName == 'DOMActivate' && event.targetId == 'send-event')
-                            addProperties({p1: 'v1', p2: 'v2'});
+                            if (false) addProperties({p1: 'v1', p2: 'v2'});
                     });
                 });
             ]]>
@@ -40,9 +40,7 @@
         </xf:trigger>
 
         <xf:repeat ref="*">
-            <xf:output value=".">
-                <xf:label ref="local-name()"/>
-            </xf:output>
+            <xf:output value="." class="{local-name()}"/>
         </xf:repeat>
 
     </xh:body>

@@ -754,6 +754,7 @@
                 <fileset dir="${build.test-classes.dir}">
                     <include name="org/orbeon/oxf/**/*Test.class"/>
                     <include name="org/orbeon/oxf/**/Test*.class"/>
+                    <exclude name="org/orbeon/oxf/test/SeleniumTest.class"/>
                 </fileset>
             </batchtest>
 

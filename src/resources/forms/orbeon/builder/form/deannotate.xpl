@@ -68,7 +68,7 @@
                 </xsl:template>
 
                 <!-- xf:group → fr:view -->
-                <xsl:template match="xforms:group[tokenize(@class, '\s+') = 'fb-annotation']">
+                <xsl:template match="xforms:group[tokenize(@class, '\s+') = 'fb-view']">
                     <fr:view>
                         <fr:body>
                             <xsl:apply-templates select="xforms:group[tokenize(@class, '\s+') = 'fb-body']/node()"/>

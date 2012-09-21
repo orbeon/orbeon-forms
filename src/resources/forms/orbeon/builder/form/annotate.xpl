@@ -73,7 +73,7 @@
 
                 <!-- fr:view → xf:group -->
                 <xsl:template match="xhtml:body//fr:view">
-                    <xforms:group class="fb-annotation">
+                    <xforms:group class="fb-view">
                         <!-- NOTE: We don't copy the view label anymore as it's unneeded -->
 
                         <!-- Scope $lang which is the language of the form being edited -->

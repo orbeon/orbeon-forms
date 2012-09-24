@@ -13,6 +13,7 @@
       <properties>
         <property name="skip.compilation" value="true" />
       </properties>
+      <executeOn event="beforeCompilation" target="intellij-before-make" />
     </buildFile>
   </component>
 </project>

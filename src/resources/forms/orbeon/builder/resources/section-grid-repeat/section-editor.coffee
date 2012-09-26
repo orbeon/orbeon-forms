@@ -1,8 +1,9 @@
 $ ->
+    AjaxServer = ORBEON.xforms.server.AjaxServer
     Builder = ORBEON.Builder
-    OD = ORBEON.xforms.Document
-    FSM = ORBEON.util.FiniteStateMachine
     Events = ORBEON.xforms.Events
+    FSM = ORBEON.util.FiniteStateMachine
+    OD = ORBEON.xforms.Document
     Properties = ORBEON.util.Properties
 
     sectionEditor = $ '.fb-section-editor'
@@ -55,9 +56,12 @@ $ ->
 
         labelInput = null
 
-        Events.clickEvent.subscribe setCurrentSection = ({target}) ->
-            if f$.is '*', f$.closest '.fb-section-editor', $ target
-                OD.dispatchEvent currentSection[0].id, 'fb-set-current-section'
+        # On click on a trigger inside .fb-section-editor, send section id as a property along with the event
+        AjaxServer.beforeSendingEvent.add (event, addProperties) ->
+            target = $ document.getElementById event.targetId
+            inSectionEditor = f$.is '*', f$.closest '.fb-section-editor', target
+            if event.eventName == 'DOMActivate' && inSectionEditor
+                addProperties 'section-id': f$.attr 'id', currentSection
 
         sendNewLabelValue = ->
             newLabelValue = f$.val labelInput

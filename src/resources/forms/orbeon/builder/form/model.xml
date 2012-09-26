@@ -325,7 +325,6 @@
     <!-- Global variables -->
     <xforms:instance id="fb-variables">
         <variables>
-            <selected-section/>
             <section-new-label/>
             <selected-cell/>        <!-- Currently selected cell td id -->
 
@@ -350,9 +349,6 @@
         </variables>
     </xforms:instance>
 
-    <xforms:action ev:observer="fb" ev:event="fb-set-current-section" xxforms:phantom="true">
-        <xforms:setvalue ref="instance('fb-variables')/selected-section" value="event('xxforms:targetid')"/>
-    </xforms:action>
     <xforms:action ev:observer="fb" ev:event="fb-update-section-label" xxforms:phantom="true">
         <xforms:setvalue ref="$current-resources/*[name() = controlOps:controlName(event('xxforms:targetid'))]/label"
                          value="instance('fb-variables')/section-new-label"/>

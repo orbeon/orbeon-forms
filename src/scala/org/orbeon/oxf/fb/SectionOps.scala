@@ -21,6 +21,11 @@ import org.orbeon.oxf.fb.ControlOps._
 
 object SectionOps {
 
+    def containerById(sectionId: String): NodeInfo = {
+        val formInstance = asNodeInfo(model("fr-form-model").get.getInstance("fb-form-instance"))
+        formInstance \ "*:body" \\ "*:section" filter (_ \@ "id" === sectionId) head
+    }
+
     // Delete the entire section and contained controls
     def deleteSection(section: NodeInfo) = deleteContainer(section)
 

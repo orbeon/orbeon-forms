@@ -17,6 +17,8 @@ import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.processor.ProcessorImpl
 import org.orbeon.oxf.xml.{XMLConstants, TransformerUtils}
+import org.orbeon.oxf.xml.XMLConstants.XS_STRING_QNAME
+import org.orbeon.oxf.xforms.XFormsConstants.XFORMS_STRING_QNAME
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.externalcontext.URLRewriter
 import org.orbeon.oxf.resources.URLFactory
@@ -101,7 +103,7 @@ class SchemaGenerator extends ProcessorImpl {
     // Recursive function generating an xs:element from an xforms:bind
     private def handleBind(libraries: Libraries, bind: NodeInfo): Elem = {
 
-        case class BindInfo(elemName: String, elemType: Option[String], repeated: Boolean, min: Option[String], max: Option[String])
+        case class BindInfo(elemName: String, elemType: Option[QName], repeated: Boolean, min: Option[String], max: Option[String])
 
         // Returns control corresponding to a bind, with a given name (e.g. *:grid)
         def control(bind: NodeInfo, controlName: String): Option[NodeInfo] = {
@@ -115,7 +117,9 @@ class SchemaGenerator extends ProcessorImpl {
             val repeatGrid = control(bind, "*:grid") filter (_ \@ "repeat" === "true")
             Some(BindInfo(
                 elemName = bind \@ ("ref" || "nodeset"),
-                elemType = bind \@ "type",
+                elemType = (bind \@ "type").headOption map (_.stringValue) map (resolveQName(bind, _)) filter
+                        // Filter xs:string and xf:string as they add no information to the schema
+                        (_ != XS_STRING_QNAME) filter (_ != XFORMS_STRING_QNAME),
                 repeated = repeatGrid nonEmpty,
                 min = repeatGrid.toSeq \@ "min",
                 max = repeatGrid.toSeq \@ "max"
@@ -129,14 +133,14 @@ class SchemaGenerator extends ProcessorImpl {
 
                 // Optional type attribute
                 def attr(name: String, value: String) = Attribute(None, name, Text(value), Null)
-                val typeAttr = elemType map (attr("type", _))
+                val typeAttr = elemType map (_.getQualifiedName) map (attr("type", _))
 
-                // Get type qname, so we can declare a namespace if necessary, filtering the already declared XSD namespace
-                val typeQName = elemType map (resolveQName(bind, _)) filter (qname ⇒
+                // Create namespace binding for type, filtering the already declared XSD namespace
+                val typeNamespaceBinding = elemType flatMap ( qname ⇒
                     (qname.getNamespacePrefix, qname.getNamespaceURI) match {
-                        case (XMLConstants.XSD_PREFIX, XMLConstants.XSD_URI) ⇒ false
+                        case (XMLConstants.XSD_PREFIX, XMLConstants.XSD_URI) ⇒ None
                         case (XMLConstants.XSD_PREFIX, _) ⇒ throw new OXFException("Non-schema types with the 'xs' prefix are not supported")
-                        case _ ⇒ true
+                        case (prefix, uri) ⇒ Some(NamespaceBinding(prefix, uri, _: NamespaceBinding))
                     })
 
                 // Optional min/max attributes
@@ -147,8 +151,7 @@ class SchemaGenerator extends ProcessorImpl {
 
                 // Build element with optional attributes and new namespace
                 val xsElem = <xs:element name={elemName}/>
-                def newScope(qname: QName) = NamespaceBinding(qname.getNamespacePrefix, qname.getNamespaceURI, xsElem.scope)
-                val xsElemWithNS = typeQName map (qname ⇒ xsElem.copy(scope = newScope(qname))) getOrElse xsElem
+                val xsElemWithNS = typeNamespaceBinding map (_(xsElem.scope)) map (s ⇒ xsElem.copy(scope = s)) getOrElse xsElem
                 val attributes = typeAttr ++ minAttr ++ maxAttr
                 attributes.foldLeft(xsElemWithNS)(_ % _)
             }

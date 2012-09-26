@@ -133,8 +133,6 @@ public class XFormsConstants {
 
     public static final QName XFORMS_SUBMIT_QNAME = new QName("submit", XFORMS_NAMESPACE);
     public static final QName XFORMS_TRIGGER_QNAME = new QName("trigger", XFORMS_NAMESPACE);
-
-    // XForms QNames
     public static final QName XFORMS_BIND_QNAME = new QName("bind", XFORMS_NAMESPACE);
 
     // eXForms at http://www.exforms.org/

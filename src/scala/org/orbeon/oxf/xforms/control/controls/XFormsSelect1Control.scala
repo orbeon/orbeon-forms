@@ -43,7 +43,7 @@ class XFormsSelect1Control(container: XBLContainer, parent: XFormsControl, eleme
 
     import XFormsSelect1Control._
 
-    override type Control <: SelectionControlTrait
+    override type Control <: SelectionControl
 
     // This is a var just for getBackCopy
     private var itemsetProperty: ControlProperty[Itemset] = new MutableItemsetProperty(this)

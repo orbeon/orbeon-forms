@@ -43,7 +43,7 @@
                 <xsl:import href="oxf:/oxf/xslt/utils/xbl.xsl"/>
 
                 <xsl:template match="/*">
-                    
+
                     <xsl:variable name="has-multiple-choices" select="count(fr:positive-choice | fr:negative-choice | fr:neutral-choice) > 1"/>
 
                     <!-- Once AVTs are supported: close="{exists(fr:neutral-choice) and not ($has-multiple-choices)}"  -->
@@ -101,7 +101,7 @@
                                     <xxforms:hide dialog="dialog" xxbl:scope="inner"/>
                                     <xforms:setvalue iterate="*" ref="." xxbl:scope="inner"/>
                                 </xforms:action>
-                                <xsl:apply-templates/>
+                                    <xsl:apply-templates/>
                             </xforms:group>
                         </xhtml:div>
                     </xxforms:dialog>
@@ -109,19 +109,19 @@
 
                 <xsl:template match="fr:positive-choice">
                     <xhtml:span class="xbl-fr-alert-dialog-positive">
-                        <xsl:copy-of select="xforms:trigger(*, 'Yes', 'positive')"/>
+                    <xsl:copy-of select="xforms:trigger(*, 'Yes', 'positive')"/>
                     </xhtml:span>
                 </xsl:template>
 
                 <xsl:template match="fr:negative-choice">
                     <xhtml:span class="xbl-fr-alert-dialog-negative">
-                        <xsl:copy-of select="xforms:trigger(*, 'No', 'negative')"/>
+                    <xsl:copy-of select="xforms:trigger(*, 'No', 'negative')"/>
                     </xhtml:span>
                 </xsl:template>
 
                 <xsl:template match="fr:neutral-choice">
                     <xhtml:span class="xbl-fr-alert-dialog-neutral">
-                        <xsl:copy-of select="xforms:trigger(*, 'OK', 'neutral')"/>
+                    <xsl:copy-of select="xforms:trigger(*, 'OK', 'neutral')"/>
                     </xhtml:span>
                 </xsl:template>
 
@@ -132,9 +132,13 @@
                     <xsl:variable name="fr-label" as="element(fr:label)?" select="$content/self::fr:label"/>
                     <xforms:trigger ref="." xxbl:scope="outer">
                         <xforms:label>
+                            <xsl:if test="$handler = 'positive'"><xhtml:img src="/apps/fr/style/images/silk/tick.png" alt=""/></xsl:if>
+                            <xsl:if test="$handler = 'negative'"><xhtml:img src="/apps/fr/style/images/silk/cross.png" alt=""/></xsl:if>
                             <xsl:choose>
                                 <xsl:when test="exists($fr-label)">
-                                    <xsl:copy-of select="$fr-label/(@* | node())"/>
+                                    <xforms:output>
+                                        <xsl:copy-of select="$fr-label/(@* | node())"/>
+                                    </xforms:output>
                                 </xsl:when>
                                 <xsl:otherwise>
                                     <xsl:value-of select="$default"/>

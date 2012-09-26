@@ -12,6 +12,3 @@
 .xbl-fr-alert-dialog-buttons { text-align: right; padding-right: .5em; padding-top: .5em; padding-bottom: .5em; margin-top: .5em; border-top: 2px solid #DDDDEE; clear: both }
 .xbl-fr-alert-dialog-buttons .xforms-trigger button img { margin-right: .5em; }
 .xbl-fr-alert-dialog-buttons .xforms-trigger button { margin-left: 4px }
-/* NOTE: These rules are not great if the user provides custom button label content */
-.xbl-fr-alert-dialog-positive .xforms-trigger button { padding-left: 25px; background: url(../../../apps/fr/style/images/silk/tick.png) no-repeat 5px }
-.xbl-fr-alert-dialog-negative .xforms-trigger button { padding-left: 25px; background: url(../../../apps/fr/style/images/silk/cross.png) no-repeat 5px }

@@ -22,7 +22,7 @@ import org.orbeon.oxf.xforms.XFormsConstants.XFORMS_STRING_QNAME
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.externalcontext.URLRewriter
 import org.orbeon.oxf.resources.URLFactory
-import java.io.OutputStreamWriter
+import java.io.OutputStream
 import org.orbeon.scaxon.XML._
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import xml._
@@ -33,6 +33,7 @@ import scala.Some
 import xml.Text
 import xml.NamespaceBinding
 import org.orbeon.oxf.xforms.XFormsConstants.XFORMS_NAMESPACE_URI
+import javax.xml.transform.stream.StreamResult
 
 /**
  *  Supported:
@@ -80,7 +81,10 @@ class SchemaGenerator extends ProcessorImpl {
                 { rootXsElement }
             </xs:schema>
         response.setContentType("application/xml")
-        useAndClose(new OutputStreamWriter(response.getOutputStream))(_.write(schema.toString))
+        val schemaDocument = elemToDocumentInfo(schema)
+        val writeDocument = (new StreamResult(_: OutputStream)) andThen
+                (TransformerUtils.getXMLIdentityTransformer.transform(schemaDocument, _))
+        useAndClose(response.getOutputStream)(writeDocument)
     }
 
     // Retrieves a form from the persistence layer

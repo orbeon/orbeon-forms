@@ -32,6 +32,7 @@
         <xbl:handlers>
             <xbl:handler event="fr-show" phase="target">
                 <xforms:setvalue if="event('message')" ref="message" value="event('message')"/>
+                <xforms:setvalue if="event('context')" ref="context" value="event('context')"/>
                 <xforms:setvalue if="event('positive-targetid')" ref="positive" value="event('positive-targetid')"/>
                 <xforms:setvalue if="event('negative-targetid')" ref="negative" value="event('negative-targetid')"/>
                 <xforms:setvalue if="event('neutral-targetid')" ref="neutral" value="event('neutral-targetid')"/>
@@ -155,7 +156,9 @@
                         <!-- If a custom target is provided, dispatch to it -->
                         <!-- NOTE: For now target must be an absolute or effective id -->
                         <xforms:action ev:event="DOMActivate">
-                            <xforms:dispatch if="normalize-space($local/{$handler})" name="fr-{$handler}" targetid="{{$local/{$handler}}}" xxbl:scope="inner"/>
+                            <xforms:dispatch if="normalize-space($local/{$handler})" name="fr-{$handler}" targetid="{{$local/{$handler}}}" xxbl:scope="inner">
+                                <xxforms:context name="context" value="$local/context"/>
+                            </xforms:dispatch>
                         </xforms:action>
                     </xforms:trigger>
                 </xsl:function>

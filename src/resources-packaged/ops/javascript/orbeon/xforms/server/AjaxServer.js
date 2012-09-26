@@ -1383,7 +1383,7 @@
                                         } else {
                                             var currentValue = ORBEON.xforms.Controls.getCurrentValue(documentElement);
                                             if (currentValue != null) {
-                                                previousServerValue = ORBEON.util.String.normalizeSerializedHTML(previousServerValue);
+                                                previousServerValue = previousServerValue == null ? null : ORBEON.util.String.normalizeSerializedHTML(previousServerValue);
                                                 currentValue = ORBEON.util.String.normalizeSerializedHTML(currentValue);
                                                 newControlValue = ORBEON.util.String.normalizeSerializedHTML(newControlValue);
 

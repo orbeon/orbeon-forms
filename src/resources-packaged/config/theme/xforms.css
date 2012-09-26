@@ -357,26 +357,6 @@ a.xforms-readonly, .xforms-trigger-readonly a { color: gray; cursor: default }
     background-color: #ff3;
 }
 
-/* ***** Orbeon buttons ********************************************************************************************* */
-
-.xforms-trigger-appearance-full button:hover,
-.xforms-trigger-appearance-full button:focus {
-    background-position: 0 -6px;
-    border-color: #999 #999 #666;
-    color: black;
-    text-decoration: none;
-}
-
-.xforms-trigger-appearance-full.xforms-readonly button,
-.xforms-trigger-appearance-full.xforms-readonly button:hover {
-    background: #DDD url(../../ops/yui/assets/skins/sam/sprite.png) repeat-x 0 0;
-    background-position: 0 -1501px;         /* Lighter grey when readonly */
-    border-color: #CCC;
-    cursor: default;
-    color: #AAA!important;
-    text-shadow: none;
-}
-
 /* ***** Indicators and messages ************************************************************************************ */
 
 .xforms-loading-loading {

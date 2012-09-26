@@ -24,6 +24,7 @@
 
     <xhtml:head>
         <xhtml:title>XBL - Alert Dialog</xhtml:title>
+        <xhtml:link rel="stylesheet" type="text/css" href="/apps/fr/style/bootstrap/css/bootstrap.css"/>
         <xforms:model id="main-model">
             <xforms:instance>
                 <instance>
@@ -42,7 +43,7 @@
                     <xforms:label>Yes/no dialog with event handler on positive case</xforms:label>
                     <xforms:action ev:event="DOMActivate">
                         <xforms:toggle case="replaces-start-case"/>
-                        <xforms:dispatch target="yes-no-dialog" name="fr-show"/>
+                        <xforms:dispatch targetid="yes-no-dialog" name="fr-show"/>
                     </xforms:action>
                 </xforms:trigger>
                 <fr:alert-dialog id="yes-no-dialog">
@@ -63,13 +64,13 @@
             <xhtml:li>
                 <xforms:trigger appearance="minimal">
                     <xforms:label>OK/cancel, where we change the label of the buttons</xforms:label>
-                    <xforms:dispatch ev:event="DOMActivate" target="ok-cancel-dialog" name="fr-show"/>
+                    <xforms:dispatch ev:event="DOMActivate" targetid="ok-cancel-dialog" name="fr-show"/>
                 </xforms:trigger>
                 <fr:alert-dialog id="ok-cancel-dialog">
                     <fr:label>Copy</fr:label>
                     <fr:message>An item with the same name already exists. The file you are copying will replace it.</fr:message>
-                    <fr:negative-choice><fr:label ref="ok"/></fr:negative-choice>
                     <fr:positive-choice><fr:label ref="cancel"/></fr:positive-choice>
+                    <fr:negative-choice><fr:label ref="ok"/></fr:negative-choice>
                 </fr:alert-dialog>
             </xhtml:li>
 
@@ -77,7 +78,7 @@
             <xhtml:li>
                 <xforms:trigger appearance="minimal">
                     <xforms:label>Information dialog with OK button</xforms:label>
-                    <xforms:dispatch ev:event="DOMActivate" target="information-dialog" name="fr-show"/>
+                    <xforms:dispatch ev:event="DOMActivate" targetid="information-dialog" name="fr-show"/>
                 </xforms:trigger>
                 <fr:alert-dialog id="information-dialog">
                     <fr:title>Saved</fr:title>

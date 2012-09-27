@@ -50,12 +50,9 @@ class XFormsSubmitErrorEvent(target: XFormsEventTarget, properties: PropertyGett
     private[this] var _connectionResult: Option[ConnectionResult] = None
     def connectionResult = _connectionResult
 
-    override def lazyProperties = getters(this, SubmitResponseEvent.Getters)
-
-    def setThrowable(throwable: Throwable): Unit =
-        if (errorType != VALIDATION_ERROR) {
+    def logThrowable(throwable: Throwable): Unit =
+        if (errorType != VALIDATION_ERROR)
             indentedLogger.logError("xforms-submit-error", "setting throwable", "throwable", OrbeonFormatter.format(throwable))
-        }
 }
 
 object XFormsSubmitErrorEvent {
@@ -69,7 +66,8 @@ object XFormsSubmitErrorEvent {
     object TargetError           extends ErrorType("target-error")
     object XXFormsPendingUploads extends ErrorType("xxforms-pending-uploads")
     object XXFormsInternalError  extends ErrorType("xxforms-internal-error")
-    
+
+    // For Java callers
     def SUBMISSION_IN_PROGRESS  = SubmissionInProgress
     def NO_DATA                 = NoData
     def VALIDATION_ERROR        = ValidationError

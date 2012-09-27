@@ -23,26 +23,26 @@ import org.orbeon.oxf.xml._
 import org.orbeon.saxon.om._
 import org.apache.log4j.Level
 import org.orbeon.oxf.util.ScalaUtils._
-import scala.Left
-import scala.Some
-import scala.Right
 import java.net.URL
 import org.orbeon.oxf.xforms.XFormsProperties
 import java.io.InputStreamReader
+import org.orbeon.oxf.xforms.event.XFormsEvent._
+import scala.Left
+import scala.Right
+import scala.Some
 
 // Helper trait for xforms-submit-done/xforms-submit-error
 trait SubmitResponseEvent extends XFormsEvent {
-
-    import SubmitResponseEvent._
 
     def connectionResult: Option[ConnectionResult]
     final def headers = connectionResult flatMap (c ⇒ Option(c) map (_.responseHeaders)) map (_.asScala)
 
     override implicit def indentedLogger = containingDocument.getIndentedLogger(XFormsModelSubmission.LOGGING_CATEGORY)
-    override def newPropertyName(name: String) = Deprecated.get(name) orElse super.newPropertyName(name)
+    override def lazyProperties = getters(this, SubmitResponseEvent.Getters)
+    override def newPropertyName(name: String) = SubmitResponseEvent.Deprecated.get(name) orElse super.newPropertyName(name)
 }
 
-object SubmitResponseEvent {
+private object SubmitResponseEvent {
 
     import NamespaceMapping.EMPTY_MAPPING
     import XPathCache._

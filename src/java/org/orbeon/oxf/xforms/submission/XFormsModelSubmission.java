@@ -615,21 +615,21 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
         model.resetAndEvaluateVariables();
 
         // Try to get error event from exception
-        XFormsSubmitErrorEvent XFormsSubmitErrorEvent = null;
+        XFormsSubmitErrorEvent submitErrorEvent = null;
         if (throwable instanceof XFormsSubmissionException) {
             final XFormsSubmissionException submissionException = (XFormsSubmissionException) throwable;
-            XFormsSubmitErrorEvent = submissionException.getXFormsSubmitErrorEvent();
+            submitErrorEvent = submissionException.getXFormsSubmitErrorEvent();
         }
 
         // If no event obtained, create default event
-        if (XFormsSubmitErrorEvent == null) {
-            XFormsSubmitErrorEvent = new XFormsSubmitErrorEvent(XFormsModelSubmission.this,
-                XFormsSubmitErrorEvent.XXFORMS_INTERNAL_ERROR(), submissionResult.getConnectionResult());
+        if (submitErrorEvent == null) {
+            submitErrorEvent = new XFormsSubmitErrorEvent(XFormsModelSubmission.this,
+                submitErrorEvent.XXFORMS_INTERNAL_ERROR(), submissionResult.getConnectionResult());
         }
 
         // Dispatch event
-        XFormsSubmitErrorEvent.setThrowable(throwable);
-        Dispatch.dispatchEvent(XFormsSubmitErrorEvent);
+        submitErrorEvent.logThrowable(throwable);
+        Dispatch.dispatchEvent(submitErrorEvent);
     }
 
     private void sendSubmitError(String resolvedActionOrResource, Throwable throwable) {
@@ -638,21 +638,21 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
         model.resetAndEvaluateVariables();
 
         // Try to get error event from exception
-        XFormsSubmitErrorEvent XFormsSubmitErrorEvent = null;
+        XFormsSubmitErrorEvent submitErrorEvent = null;
         if (throwable instanceof XFormsSubmissionException) {
             final XFormsSubmissionException submissionException = (XFormsSubmissionException) throwable;
-            XFormsSubmitErrorEvent = submissionException.getXFormsSubmitErrorEvent();
+            submitErrorEvent = submissionException.getXFormsSubmitErrorEvent();
         }
 
         // If no event obtained, create default event
-        if (XFormsSubmitErrorEvent == null) {
-            XFormsSubmitErrorEvent = new XFormsSubmitErrorEvent(XFormsModelSubmission.this, resolvedActionOrResource,
-                XFormsSubmitErrorEvent.XXFORMS_INTERNAL_ERROR(), 0);
+        if (submitErrorEvent == null) {
+            submitErrorEvent = new XFormsSubmitErrorEvent(XFormsModelSubmission.this, resolvedActionOrResource,
+                submitErrorEvent.XXFORMS_INTERNAL_ERROR(), 0);
         }
 
         // Dispatch event
-        XFormsSubmitErrorEvent.setThrowable(throwable);
-        Dispatch.dispatchEvent(XFormsSubmitErrorEvent);
+        submitErrorEvent.logThrowable(throwable);
+        Dispatch.dispatchEvent(submitErrorEvent);
     }
 
     public Replacer getReplacer(ConnectionResult connectionResult, SubmissionParameters p) throws IOException {

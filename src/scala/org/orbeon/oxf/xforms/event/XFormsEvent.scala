@@ -25,9 +25,26 @@ import org.orbeon.saxon.xqj.{SaxonXQDataFactory, StandardObjectConverter}
 import org.orbeon.oxf.util.XPathCache
 
 /**
- * XFormsEvent represents an XForms event passed to all events and actions.
+ * Base class for all DOM events.
  *
- * TODO: Explain implementation
+ * - an event has a number of properties
+ * - a property can be defined or not
+ * - if a property is defined, it may have a value or not
+ * - properties are obtained from 3 sources
+ *   - XFormsEvent base properties
+ *   - overriding lazyProperties
+ *   - passing to the constructor
+ * - the reason we use lazyProperties is that we had trouble passing a PropertyGetter with a reference to this to the
+ *   constructor!
+ * - all property values are Java values or Seq of Java values
+ * - for Java/Scala consumers, use property[T
+ * - for XPath consumers, use propertyAsIterator
+ * - PropertyGetter is used instead of a plain Map because:
+ *   - it allows for values to be computed dynamically, so we don't compute all property values unnecessarily
+ *   - it is a PartialFunction so PropertyGetter can be easily composed with orElse
+ *   - a Map is automatically a PropertyGetter
+ * - whenever possible, all aspects of an event are represented as properties
+ * - in some cases, events store special values natively (e.g. Throwable, ConnectionResult, etc.)
  */
 abstract class XFormsEvent(
         val name: String,
@@ -91,9 +108,6 @@ abstract class XFormsEvent(
             emptyIterator
         }
     }
-
-    final def getAttributeAsString(name: String): String =
-        Option(getAttribute(name).next()) map (_.getStringValue) orNull
 
     private def warnDeprecatedIfNeeded(name: String) =
         newPropertyName(name) foreach { newName ⇒

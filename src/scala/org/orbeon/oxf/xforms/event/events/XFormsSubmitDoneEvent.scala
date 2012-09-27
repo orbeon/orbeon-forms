@@ -27,8 +27,6 @@ class XFormsSubmitDoneEvent(target: XFormsEventTarget, properties: PropertyGette
         _connectionResult = Option(connectionResult)
     }
 
-    override def lazyProperties = getters(this, SubmitResponseEvent.Getters)
-
     private[this] var _connectionResult: Option[ConnectionResult] = None
     def connectionResult = _connectionResult
 }

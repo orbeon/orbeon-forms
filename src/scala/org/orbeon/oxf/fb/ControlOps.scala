@@ -15,6 +15,8 @@ package org.orbeon.oxf.fb
 
 import scala.collection.JavaConverters._
 import annotation.tailrec
+import org.orbeon.oxf.xml.XMLConstants.XS_STRING_QNAME
+import org.orbeon.oxf.xforms.XFormsConstants.XFORMS_STRING_QNAME
 import org.orbeon.oxf.fb.FormBuilderFunctions._
 import org.orbeon.oxf.xforms.analysis.model.Model
 import org.orbeon.oxf.fb.GridOps._
@@ -390,9 +392,15 @@ object ControlOps {
             // Get or create the bind element
             val bind = ensureBinds(inDoc, findContainerNames(control) :+ controlName)
 
+            // We don't want to add a type="xs:string|xf:string"
+            def isTypeString = mipName == "type" && {
+                val typeValue = resolveQName(bind, mipValue)
+                Seq(XS_STRING_QNAME, XFORMS_STRING_QNAME) exists (_ == typeValue)
+            }
+
             // Create/update or remove attribute
             Option(mipValue) map (_.trim) match {
-                case Some(value) if value.length > 0 ⇒ ensureAttribute(bind, mipQName, value)
+                case Some(value) if value.length > 0 && !isTypeString ⇒ ensureAttribute(bind, mipQName, value)
                 case _ ⇒ delete(bind \@ mipQName)
             }
         }

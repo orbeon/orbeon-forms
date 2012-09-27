@@ -75,7 +75,7 @@
                             </xhtml:a>
                         </xhtml:div>
                         <xhtml:span style="float: right; margin-right: 1em; margin-top: .2em; white-space: nowrap">
-                            <form method="GET" class="blue" style="margin:0.2em; margin-bottom:0"
+                            <xhtml:form method="GET" class="blue" style="margin:0.2em; margin-bottom:0"
                                   action="http://www.google.com/custom">
                                 <xhtml:a href="http://www.orbeon.com/" f:url-norewrite="true">Orbeon.com</xhtml:a>
                                 |
@@ -83,13 +83,13 @@
                                 |
                                 <xhtml:span style="white-space: nowrap">
                                     Search:
-                                    <input type="text" name="q" size="10" maxlength="255" value=""/>
-                                    <input type="submit" name="sa" value="Go" style="margin-left: 0.2em;"/>
+                                    <xhtml:input type="text" name="q" size="10" maxlength="255" value=""/>
+                                    <xhtml:input type="submit" name="sa" value="Go" style="margin-left: 0.2em;"/>
                                 </xhtml:span>
-                                <input type="hidden" name="cof"
+                                <xhtml:input type="hidden" name="cof"
                                        value="GIMP:#FF9900;T:black;LW:510;ALC:#FF9900;L:http://www.orbeon.com/pics/orbeon-google.png;GFNT:#666699;LC:#666699;LH:42;BGC:#FFFFFF;AH:center;VLC:#666699;GL:0;S:http://www.orbeon.com;GALT:#FF9900;AWFID:8ac636f034abb7d8;"/>
-                                <input type="hidden" name="sitesearch" value="orbeon.com"/>
-                            </form>
+                                <xhtml:input type="hidden" name="sitesearch" value="orbeon.com"/>
+                            </xhtml:form>
                         </xhtml:span>
                     </xhtml:div>
                     <!-- Tabs -->

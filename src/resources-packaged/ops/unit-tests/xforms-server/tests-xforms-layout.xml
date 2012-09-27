@@ -1788,6 +1788,7 @@
                 <xh:script src="/ops/javascript/orbeon/xforms/server/AjaxServer/nextAjaxResponse-min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/orbeon/xforms/server/UploadServer-min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/orbeon/xforms/LoadingIndicator-min.js" class="xforms-baseline"/>
+                <xh:script src="/ops/javascript/orbeon/xforms/Document-min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/orbeon/xforms/Form-min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/orbeon/xforms/Page-min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/orbeon/xforms/control/Control-min.js" class="xforms-baseline"/>

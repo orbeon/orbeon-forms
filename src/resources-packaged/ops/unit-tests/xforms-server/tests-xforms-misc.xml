@@ -720,7 +720,7 @@
                              <div class="bd">
                                  <div class="xforms-help-panel-message"/>
                                  <div class="xforms-help-panel-close">
-                                     <button>Close</button>
+                                     <button class="btn btn-small">Close</button>
                                  </div>
                              </div>
                          </div>

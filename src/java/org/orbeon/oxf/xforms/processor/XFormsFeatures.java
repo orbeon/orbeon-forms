@@ -115,6 +115,7 @@ public class XFormsFeatures {
             new ResourceConfig("/ops/javascript/orbeon/util/ExecutionQueue.js",                         "/ops/javascript/orbeon/util/ExecutionQueue-min.js"),
             new ResourceConfig("/ops/javascript/orbeon/xforms/server/Server.js",                        "/ops/javascript/orbeon/xforms/server/Server-min.js"),
             new ResourceConfig("/ops/javascript/orbeon/xforms/server/AjaxServer.js",                    "/ops/javascript/orbeon/xforms/server/AjaxServer-min.js"),
+            new ResourceConfig("/ops/javascript/orbeon/xforms/server/AjaxServer/AjaxServerEvent.js",    "/ops/javascript/orbeon/xforms/server/AjaxServer/AjaxServerEvent-min.js"),
             new ResourceConfig("/ops/javascript/orbeon/xforms/server/AjaxServer/nextAjaxResponse.js",   "/ops/javascript/orbeon/xforms/server/AjaxServer/nextAjaxResponse-min.js"),
             new ResourceConfig("/ops/javascript/orbeon/xforms/server/UploadServer.js",                  "/ops/javascript/orbeon/xforms/server/UploadServer-min.js"),
             new ResourceConfig("/ops/javascript/orbeon/xforms/LoadingIndicator.js",                     "/ops/javascript/orbeon/xforms/LoadingIndicator-min.js"),

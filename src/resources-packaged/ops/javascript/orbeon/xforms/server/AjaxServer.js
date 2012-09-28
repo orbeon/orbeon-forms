@@ -23,22 +23,6 @@
     var Properties = ORBEON.util.Properties;
     var StringUtils = ORBEON.util.String;
 
-    AjaxServer.Event = function(form, targetId, value, eventName, bubbles, cancelable, ignoreErrors, showProgress, progressMessage, additionalAttribs) {
-        // If no form is provided, infer the form based on that targetId, if one is provided
-        this.form = YAHOO.lang.isObject(form) ? form
-            : YAHOO.lang.isString(targetId) ? ORBEON.xforms.Controls.getForm(ORBEON.util.Dom.get(targetId)) : null;
-        this.targetId = YAHOO.lang.isUndefined(targetId) ? null: targetId;
-        this.value = YAHOO.lang.isUndefined(value) ? null: value;
-        this.eventName = YAHOO.lang.isUndefined(eventName) ? null: eventName;
-        this.bubbles = YAHOO.lang.isUndefined(bubbles) ? null: bubbles;
-        this.cancelable = YAHOO.lang.isUndefined(cancelable) ? null: cancelable;
-        this.ignoreErrors = YAHOO.lang.isUndefined(ignoreErrors) ? null: ignoreErrors;
-        this.showProgress = YAHOO.lang.isBoolean(showProgress) ? showProgress : true;
-        this.progressMessage = YAHOO.lang.isUndefined(progressMessage) ? null: progressMessage;
-        this.additionalAttribs = YAHOO.lang.isUndefined(additionalAttribs) ? null: additionalAttribs;
-        this.properties = {};
-    };
-
     /**
      * When an exception happens while we communicate with the server, we catch it and show an error in the UI.
      * This is to prevent the UI from becoming totally unusable after an error.

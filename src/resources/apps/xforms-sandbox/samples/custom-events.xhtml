@@ -12,67 +12,35 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
-    xmlns:ev="http://www.w3.org/2001/xml-events"
-    xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
+        xmlns:xh="http://www.w3.org/1999/xhtml"
+        xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+        xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xhtml:head>
-        <xhtml:title>Custom Events</xhtml:title>
-        <xforms:model id="acme-model" xxforms:external-events="acme-super-event">
-
-            <!-- This runs on XForms initialization -->
-            <xforms:action ev:event="xforms-ready">
-                <!-- The script then dispatches an event back to the model -->
-                <xxforms:script>
-                    ORBEON.xforms.Document.dispatchEvent("acme-model", "acme-super-event");
-                </xxforms:script>
-            </xforms:action>
-
-            <!-- Display a message -->
-            <xforms:message ev:event="acme-super-event" level="modal">Hi there!</xforms:message>
-
-        </xforms:model>
-    </xhtml:head>
-    <xhtml:body>
-        <xhtml:p>
-            This example shows how you can send a custom event from JavaScript back to the XForms model. You should see
-            an alert message come up right after you have loaded this page. Here is how it works:
-        </xhtml:p>
-        <xhtml:ul>
-            <xhtml:li>
-                <xhtml:p>
-                    Upon XForms initialization, the XForms model receives the event <code>xforms-ready</code>. This
-                    happens before the page is sent to the web browser.
-                </xhtml:p>
-            </xhtml:li>
-            <xhtml:li>
-                <xhtml:p>
-                    The event handler for <code>xforms-ready</code> executes the extension <code>xxforms:script</code>
-                    action which allows running JavaScript code on the client.
-                </xhtml:p>
-            </xhtml:li>
-            <xhtml:li>
-                <xhtml:p>
-                    Just after the page is loaded in the browser, the <code>xxforms:script</code> action runs in the web
-                    browser and executes its JavaScript content.
-                </xhtml:p>
-            </xhtml:li>
-            <xhtml:li>
-                <xhtml:p>
-                    The JavaScript dispatches a custom XForms event to the XForms model. The event is sent from the web
-                    browser to the XForms engine on the server. The event here is called <code>acme-super-event</code>
-                    and must be explicitly allowed on the model using the <code>xxforms:external-events</code> property,
-                    for security reasons.
-                </xhtml:p>
-            </xhtml:li>
-            <xhtml:li>
-                <xhtml:p>
-                    The event reaches the XForms model on the server. An event handler for
-                    <code>xxforms:external-events</code> causes a message to be displayed on the client.
-                </xhtml:p>
-            </xhtml:li>
-        </xhtml:ul>
-    </xhtml:body>
-</xhtml:html>
+    <xh:head>
+        <xh:title>Custom Events</xh:title>
+        <xf:model id="acme-model" xxf:external-events="acme-super-event">
+            <xf:action event="xforms-ready">
+                <xxf:script>ORBEON.xforms.Document.dispatchEvent("acme-model", "acme-super-event");</xxf:script>
+            </xf:action>
+            <xf:message event="acme-super-event" level="modal"
+                        value="concat('Hi there! p1=', event('p1'), ', p2=', event('p2'))"/>
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <xf:trigger>
+            <xf:label>Dispatch</xf:label>
+            <xxf:script event="DOMActivate">ORBEON.xforms.Document.dispatchEvent("acme-model", "acme-super-event");</xxf:script>
+        </xf:trigger>
+        <xf:trigger>
+            <xf:label>Dispatch with property</xf:label>
+            <xxf:script event="DOMActivate">
+                ORBEON.xforms.Document.dispatchEvent({
+                    targetId: "acme-model",
+                    eventName: "acme-super-event",
+                    properties: { p1: 'v1', p2: 'v2' }
+                });
+            </xxf:script>
+        </xf:trigger>
+    </xh:body>
+</xh:html>

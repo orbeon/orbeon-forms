@@ -18,9 +18,18 @@ ORBEON.xforms.Document = _.tap {}, (Document) -> _.extend Document,
 
     # Reference: http://www.w3.org/TR/xforms/slice10.html#action-dispatch
     # Use the first XForms form on the page when no form is provided
-    dispatchEvent: (targetId, eventName, form, bubbles, cancelable, incremental, ignoreErrors) ->
-        form = f$.filter '.xforms-form', $ document.forms unless form?
-        event = new AjaxServer.Event form, targetId, null, eventName, bubbles, cancelable, ignoreErrors
+    dispatchEvent: (args) ->
+
+        # Backward compatibility: support arguments passed as a series of parameters
+        if arguments.length > 1
+            oldParams = ['targetId', 'eventName', 'form', 'bubbles', 'cancelable', 'incremental', 'ignoreErrors']
+            newArgs = {}
+            newArgs[name] = arguments[i] for name, i in oldParams
+            args = newArgs
+
+        # Use first XForms form, if none is specified
+        args.form = _.head f$.filter '.xforms-form', $ document.forms unless args.form?
+        event = new AjaxServer.Event args
         AjaxServer.fireEvents [event], incremental? and incremental
 
     # Returns the value of an XForms control.

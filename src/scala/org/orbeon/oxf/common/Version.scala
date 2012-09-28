@@ -31,8 +31,10 @@ abstract class Version {
 
 object Version {
 
+    private val PossibleEditions = Set("CE", "PE")
+
     val VersionNumber = "@RELEASE@"
-    val Edition       = "@EDITION@"
+    val Edition       = Option("@EDITION@") filter PossibleEditions getOrElse "CE"
     val VersionString = "Orbeon Forms " + VersionNumber + ' ' + Edition
 
     // For backward compatibility

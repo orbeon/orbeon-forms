@@ -53,7 +53,7 @@
         <classpath>
             <pathelement location="lib/yui-compressor-ant-task-0.5.jar"/>
             <pathelement location="lib/jargs-1.0.jar"/>
-            <pathelement location="lib/yuicompressor-2.4.2.jar"/>
+            <pathelement location="lib/yuicompressor-2.4.7.jar"/>
         </classpath>
     </taskdef>
 

@@ -22,18 +22,22 @@ import org.orbeon.oxf.xforms.XFormsConstants
  */
 trait VariableAnalysisTrait extends SimpleElementAnalysis with VariableTrait {
 
+    variableSelf ⇒
+
     // Variable name and value
     val name = element.attributeValue(XFormsConstants.NAME_QNAME)
 
     private lazy val sequenceAnalysis =
         element.element(XFormsConstants.XXFORMS_SEQUENCE_QNAME) match { // lazy because accessing scopeModel
             case sequenceElement: Element ⇒
-                Some(new SimpleElementAnalysis(staticStateContext, sequenceElement, Some(VariableAnalysisTrait.this), None, getChildElementScope(sequenceElement)) {
+                Some(new SimpleElementAnalysis(staticStateContext, sequenceElement, Some(variableSelf), None, getChildElementScope(sequenceElement)) {
+
+                    sequenceSelf ⇒
 
                     override protected def computeValueAnalysis =
                         Some(VariableAnalysis.valueOrSelectAttribute(element) match {
                             // @value or @select
-                            case value: String ⇒ analyzeXPath(getChildrenContext, value)
+                            case value: String ⇒ analyzeXPath(sequenceSelf.getChildrenContext, value)
                             // Value is constant
                             case _ ⇒ StringAnalysis() // TODO: store constant value?
                         })
@@ -44,13 +48,13 @@ trait VariableAnalysisTrait extends SimpleElementAnalysis with VariableTrait {
 
                     // TODO: This is bad architecture as we duplicate the logic in ViewTrait.
                     override lazy val inScopeVariables =
-                        if (VariableAnalysisTrait.this.scope == scope)
-                            VariableAnalysisTrait.this.inScopeVariables
+                        if (variableSelf.scope == sequenceSelf.scope)
+                            variableSelf.inScopeVariables
                         else
-                            getRootVariables ++ treeInScopeVariables
+                            getRootVariables ++ sequenceSelf.treeInScopeVariables
 
-                    override protected def getRootVariables = VariableAnalysisTrait.this match {
-                        case _: ViewTrait ⇒ model match { case Some(model) ⇒ model.variablesMap; case None ⇒ Map() }
+                    override protected def getRootVariables = variableSelf match {
+                        case _: ViewTrait ⇒ sequenceSelf.model match { case Some(model) ⇒ model.variablesMap; case None ⇒ Map() }
                         case _ ⇒ Map()
                     }
                 })

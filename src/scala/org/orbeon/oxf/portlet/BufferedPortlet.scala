@@ -14,7 +14,6 @@
 package org.orbeon.oxf.portlet
 
 import org.orbeon.oxf.util.NetUtils
-import scala.Array
 import BufferedPortlet._
 import javax.portlet._
 import java.util.{Map ⇒ JMap}

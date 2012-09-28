@@ -27,9 +27,6 @@ import java.net.URL
 import org.orbeon.oxf.xforms.XFormsProperties
 import java.io.InputStreamReader
 import org.orbeon.oxf.xforms.event.XFormsEvent._
-import scala.Left
-import scala.Right
-import scala.Some
 
 // Helper trait for xforms-submit-done/xforms-submit-error
 trait SubmitResponseEvent extends XFormsEvent {

@@ -29,7 +29,6 @@ import xml._
 import xml.Attribute
 import org.dom4j.QName
 import org.orbeon.oxf.common.OXFException
-import scala.Some
 import xml.Text
 import xml.NamespaceBinding
 import org.orbeon.oxf.xforms.XFormsConstants.XFORMS_NAMESPACE_URI

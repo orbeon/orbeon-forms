@@ -30,9 +30,7 @@ import org.dom4j._
 import org.orbeon.scaxon.XML._
 import collection.mutable.Buffer
 import XXFormsDynamicControl._
-import scala.None
 import org.orbeon.oxf.xforms.event.{EventListener ⇒ JEventListener, XFormsEvent}
-import scala.Predef._
 import org.orbeon.oxf.xforms.event.events.{XXFormsValueChanged, XFormsDeleteEvent, XFormsInsertEvent}
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.saxon.om.{VirtualNode, NodeInfo}

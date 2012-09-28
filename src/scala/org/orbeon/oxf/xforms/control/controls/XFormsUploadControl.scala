@@ -33,7 +33,6 @@ import java.net.{URLEncoder, URI}
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.xforms.event.XFormsEvent._
-import scala.Some
 
 /**
  * Represents an xforms:upload control.

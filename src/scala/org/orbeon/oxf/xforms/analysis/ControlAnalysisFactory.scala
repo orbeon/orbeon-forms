@@ -19,7 +19,6 @@ import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsUtils
 import org.dom4j.{QName, Element}
 import org.orbeon.oxf.xforms.action.XFormsActions
-import scala.PartialFunction
 import org.orbeon.oxf.xforms.xbl.Scope
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 

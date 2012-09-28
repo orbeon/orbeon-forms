@@ -32,7 +32,6 @@ import org.dom4j._
 import org.orbeon.scaxon.XML._
 import org.orbeon.oxf.common.OXFException
 import XXFormsDynamicControl._
-import scala.None
 import org.orbeon.oxf.xforms.event.{ListenersTrait, EventListener ⇒ JEventListener}
 import org.orbeon.saxon.om._
 

@@ -27,7 +27,6 @@ import org.dom4j.{Document, Attribute, QName, Element}
 import org.orbeon.saxon.pattern._
 import org.orbeon.saxon.expr.{Token, ExpressionTool}
 import org.orbeon.saxon.om._
-import scala.Predef._
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.oxf.util.ScalaUtils.stringOptionToSet
 import org.orbeon.saxon.tinytree.TinyTree

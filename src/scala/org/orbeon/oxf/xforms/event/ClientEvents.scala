@@ -31,7 +31,6 @@ import XFormsEvents._
 import collection.JavaConverters._
 import org.orbeon.oxf.xforms.analysis.controls.RepeatControl
 import org.orbeon.oxf.xforms.event.XFormsEvent._
-import scala.Some
 
 // Process events sent by the client, including sorting, filtering, and security
 object ClientEvents extends Logging {

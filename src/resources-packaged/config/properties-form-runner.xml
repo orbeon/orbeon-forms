@@ -89,6 +89,7 @@
     <!-- NOTE: In the future we don't want those to apply to XHTML, but to an intermediate representation -->
     <property as="xs:string"  name="oxf.fr.pdf.format.input-string"                             value=".//*[tokenize(@class, '\s+') = 'xforms-input-input']/@value/string()"/>
     <property as="xs:string"  name="oxf.fr.pdf.format.input-dateTime"                           value="string-join(.//*[tokenize(@class, '\s+') = 'xforms-input-input']/@value/string(), ' ')"/>
+    <property as="xs:string"  name="oxf.fr.pdf.format.textarea"                                 value=".//textarea/string()"/>
     <property as="xs:string"  name="oxf.fr.pdf.format.select-label"                             value="(.//option[@selected = 'selected'], .//input[@checked = 'checked']/parent::label)[1]/string()"/>
     <property as="xs:string"  name="oxf.fr.pdf.format.select-value"                             value="(.//option[@selected = 'selected'], .//input[@checked = 'checked'])[1]/@value/string()"/>
     <property as="xs:string"  name="oxf.fr.pdf.format.select-labels-string"                     value="string-join((.//option[@selected = 'selected'], .//input[@checked = 'checked']/parent::label)/string(), ' - ')"/>
@@ -108,6 +109,7 @@
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.xforms-input.time"                       value="input-string"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.xforms-input.dateTime"                   value="input-dateTime"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.xforms-input.boolean"                    value="select-value"/>
+    <property as="xs:string"  name="oxf.fr.pdf.map.*.*.xforms-textarea.*"                       value="textarea"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.xforms-select.*"                         value="select-labels-string"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.xforms-select1.*"                        value="select-label"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.*.*.xforms-select.boolean"                   value="select-value"/>

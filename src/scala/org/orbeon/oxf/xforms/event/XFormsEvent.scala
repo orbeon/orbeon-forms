@@ -87,12 +87,6 @@ abstract class XFormsEvent(
             None
         }
 
-    final def propertyAsIterator(name: String): Option[SequenceIterator] =
-        allProperties(name) map {
-            case s: Seq[_]           ⇒ listIterator(s map anyToItemIfNeeded)
-            case other               ⇒ itemIterator(anyToItemIfNeeded(other))
-        }
-
     // Get an attribute as an XPath SequenceIterator
     final def getAttribute(name: String): SequenceIterator = {
 
@@ -100,7 +94,13 @@ abstract class XFormsEvent(
 
         // NOTE: With Scala 2.10, move to `applyOrElse`
         if (allProperties.isDefinedAt(name)) {
-            propertyAsIterator(name) getOrElse emptyIterator
+
+            def propertyAsIterator = allProperties(name) map {
+                case s: Seq[_] ⇒ listIterator(s map anyToItemIfNeeded)
+                case other     ⇒ itemIterator(anyToItemIfNeeded(other))
+            }
+
+            propertyAsIterator getOrElse emptyIterator
         } else {
             // "If the event context information does not contain the property indicated by the string argument, then an
             // empty node-set is returned."

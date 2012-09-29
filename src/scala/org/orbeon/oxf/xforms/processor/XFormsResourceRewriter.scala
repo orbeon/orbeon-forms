@@ -21,7 +21,7 @@ import java.util.{List ⇒ JList}
 import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.externalcontext.URLRewriter
 import org.orbeon.oxf.pipeline.api.{PipelineContext, ExternalContext}
-import org.orbeon.oxf.processor.PageFlowControllerProcessor
+import org.orbeon.oxf.controller.PageFlowControllerProcessor
 import org.orbeon.oxf.resources.ResourceManagerWrapper
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.processor.XFormsFeatures.ResourceConfig

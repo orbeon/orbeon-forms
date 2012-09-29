@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xml;
 
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.controller.PageFlowControllerProcessor;
 import org.orbeon.oxf.portlet.processor.PortletPreferencesSerializer;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.XQuery.XQueryProcessor;

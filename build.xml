@@ -588,7 +588,7 @@
     </target>
 
     <!-- WAR file -->
-    <target name="orbeon-war" depends="classes" description="Create exploded WAR file">
+    <target name="orbeon-war" depends="classes" description="Create exploded WAR">
         <antcall target="war">
             <param name="skip.compilation" value="true"/>
         </antcall>
@@ -599,7 +599,7 @@
         </antcall>
     </target>
 
-    <target name="proxy-portlet-war" depends="jars" description="Create proxy portlet WAR file">
+    <target name="proxy-portlet-war" depends="jars" description="Create proxy portlet WAR">
     	<mkdir dir="${build.distrib.dir}"/>
         <war destfile="${build.distrib.dir}/${versioned-proxy-portlet-name}.war">
             <webinf dir="descriptors/proxy-portlet"/>
@@ -615,6 +615,15 @@
                 <include name="commons-lang3-*.jar"/>
                 <include name="log4j-*.jar"/>
             </lib>
+        </war>
+    </target>
+
+    <target name="orbeon-auth-war" depends="classes" description="Creates Orbeon Forms orbeon-auth.war">
+        <mkdir dir="${build.distrib.dir}"/>
+        <war destfile="${build.distrib.dir}/orbeon-auth.war" webxml="descriptors/orbeon-auth-war/web.xml">
+            <zipfileset dir="${build.dir}/classes" prefix="WEB-INF/classes">
+                <include name="org/orbeon/oxf/controller/AuthorizerServlet*.class"/>
+            </zipfileset>
         </war>
     </target>
 
@@ -793,7 +802,7 @@
         </junit>
     </target>
 
-    <target name="orbeon-dist-war" depends="jars, exist-import-sample-data-to-build" description="Creates Orbeon Forms war file">
+    <target name="orbeon-dist-war" depends="jars, exist-import-sample-data-to-build" description="Creates Orbeon Forms WAR">
         <mkdir dir="${build.distrib.dir}"/>
 
         <antcall target="war">
@@ -834,14 +843,16 @@
         </zip>
     </target>
 
-    <target name="orbeon-dist-packages" depends="orbeon-dist-war, orbeon-src">
+    <target name="orbeon-dist-packages" depends="orbeon-dist-war, proxy-portlet-war, orbeon-src">
         <!-- Create temporary zip file -->
         <property name="tmp-zip" value="${build.distrib.dir}/${versioned-name}-tmp.zip"/>
         <zip zipfile="${tmp-zip}">
             <zipfileset dir="${build.distrib.dir}" fullpath="${versioned-name}/${project.name}.war">
                 <include name="${versioned-name}.war"/>
             </zipfileset>
-            <zipfileset file="${build.distrib.dir}/${versioned-proxy-portlet-name}.war" prefix="${versioned-name}"/>
+            <zipfileset dir="${build.distrib.dir}" fullpath="${versioned-name}/orbeon-auth.war">
+                <include name="orbeon-auth.war"/>
+            </zipfileset>
             <zipfileset file="README.md" prefix="${versioned-name}"/>
             <zipfileset file="README.md" fullpath="${versioned-name}/README.txt"/>
             <zipfileset file="LICENSE.txt" prefix="${versioned-name}"/>

@@ -294,7 +294,7 @@
 
     <!-- Page Flow processors -->
     <processor name="oxf:page-flow">
-        <class name="org.orbeon.oxf.processor.PageFlowControllerProcessor"/>
+        <class name="org.orbeon.oxf.controller.PageFlowControllerProcessor"/>
     </processor>
 
     <processor name="oxf:pfc-xslt-1.0">

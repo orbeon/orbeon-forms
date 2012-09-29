@@ -23,10 +23,10 @@ AjaxServer.Event = (args) ->
         targetId:           string -> null
         value:              string -> null
         eventName:          string -> null
-        bubbles:            boolean -> null
-        cancelable:         boolean -> null
-        ignoreErrors:       boolean -> null
-        showProgress:       boolean -> true
+        bubbles:            bool -> null
+        cancelable:         bool -> null
+        ignoreErrors:       bool -> null
+        showProgress:       bool -> true
         progressMessage:    string -> null
         additionalAttribs:  object -> null
         properties:         object -> {}
@@ -43,6 +43,6 @@ AjaxServer.Event = (args) ->
         @[name] = if isType args[name] then args[name] else alternative()
     object = type _.isObject
     string = type _.isString
-    boolean = type _.isBoolean
+    bool = type _.isBoolean
     setDefault name for name, setDefault of supportedArgs()
     return

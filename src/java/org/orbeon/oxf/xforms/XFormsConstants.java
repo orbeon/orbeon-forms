@@ -345,8 +345,11 @@ public class XFormsConstants {
     public static final QName XXFORMS_PROGRESS_MESSAGE_QNAME = new QName("progress-message", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_OPEN_QNAME = new QName("open", XXFORMS_NAMESPACE);
 
-    public static final QName XXFORMS_REFRESH_ITEMS_QNAME = new QName("refresh-items", XXFORMS_NAMESPACE);
+    // XForms 2.0 standardizes the xforms:property element
+    public static final QName XFORMS_PROPERTY_QNAME = new QName("property", XFORMS_NAMESPACE);
     public static final QName XXFORMS_CONTEXT_QNAME = new QName("context", XXFORMS_NAMESPACE);
+
+    public static final QName XXFORMS_REFRESH_ITEMS_QNAME = new QName("refresh-items", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_REPEAT_INDEXES_QNAME = new QName("repeat-indexes", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_DND_QNAME = new QName("dnd", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_DEFERRED_UPDATES_QNAME = new QName("deferred-updates", XXFORMS_NAMESPACE);

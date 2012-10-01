@@ -62,32 +62,33 @@ abstract class XFormsAction extends Logging {
         // Iterate over context information if any
         val tuples =
             for {
-                currentContextInfo ← Dom4j.elements(actionElement, XXFORMS_CONTEXT_QNAME)
+                element ← Dom4j.elements(actionElement)
+                if Set(XFORMS_PROPERTY_QNAME, XXFORMS_CONTEXT_QNAME)(element.getQName) // xforms:property since XForms 2.0
 
                 // Get and check attributes
                 name =
-                    Option(Dom4jUtils.qNameToExplodedQName(Dom4jUtils.extractAttributeValueQName(currentContextInfo, NAME_QNAME))) getOrElse
+                    Option(Dom4jUtils.qNameToExplodedQName(Dom4jUtils.extractAttributeValueQName(element, NAME_QNAME))) getOrElse
                         (throw new OXFException(XXFORMS_CONTEXT_QNAME.getQualifiedName + " element must have a \"name\" attribute."))
 
-                value = VariableAnalysis.valueOrSelectAttribute(currentContextInfo) match {
+                value = VariableAnalysis.valueOrSelectAttribute(element) match {
                     case valueOrSelect: String ⇒
                         // XPath expression
 
                         // Set context on context element
-                        val currentActionScope = actionInterpreter.getActionScope(currentContextInfo)
-                        contextStack.pushBinding(currentContextInfo, actionInterpreter.getSourceEffectiveId(currentContextInfo), currentActionScope, false)
+                        val currentActionScope = actionInterpreter.getActionScope(element)
+                        contextStack.pushBinding(element, actionInterpreter.getSourceEffectiveId(element), currentActionScope, false)
 
                         // Evaluate context parameter
                         val result = XPathCache.normalizeSingletons(XPathCache.evaluate(
                             actionInterpreter.actionXPathContext.getCurrentNodeset,
                             actionInterpreter.actionXPathContext.getCurrentPosition,
                             valueOrSelect,
-                            actionInterpreter.getNamespaceMappings(currentContextInfo),
+                            actionInterpreter.getNamespaceMappings(element),
                             contextStack.getCurrentVariables,
                             XFormsContainingDocument.getFunctionLibrary,
-                            contextStack.getFunctionContext(actionInterpreter.getSourceEffectiveId(currentContextInfo)),
+                            contextStack.getFunctionContext(actionInterpreter.getSourceEffectiveId(element)),
                             null,
-                            currentContextInfo.getData.asInstanceOf[LocationData]).asScala)
+                            element.getData.asInstanceOf[LocationData]).asScala)
 
                         contextStack.returnFunctionContext()
                         contextStack.popBinding()
@@ -95,7 +96,7 @@ abstract class XFormsAction extends Logging {
                         result
                     case _ ⇒
                         // Literal text
-                        currentContextInfo.getStringValue
+                        element.getStringValue
                 }
             } yield
                 (name, Option(value))

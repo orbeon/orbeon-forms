@@ -41,9 +41,10 @@ import org.orbeon.saxon.om.NodeInfo
 
 object InitUtils {
 
-    val CacheSizeProperty = "oxf.cache.size"
-    val PrologueProperty  = "oxf.prologue"
-    val DefaultPrologue   = "oxf:/processors.xml"
+    private val CacheSizeProperty            = "oxf.cache.size"
+    private val ProcessorsProperty           = "oxf.pipeline.processors"
+    private val DeprecatedProcessorsProperty = "oxf.prologue"
+    private val DefaultProcessors            = "oxf:/processors.xml"
 
     // Run with a pipeline context and destroy the pipeline when done
     def withPipelineContext[T](body: PipelineContext ⇒ T) = {
@@ -189,9 +190,12 @@ object InitUtils {
             }
         }
 
-        // Register processors from processors.xml and from custom property
+        // Register processors from processors.xml and from custom properties
         val propertySet = Properties.instance.getPropertySet
-        Seq(DefaultPrologue) ++ Option(propertySet.getString(PrologueProperty)) foreach registerProcessors
+        def fromProperty(s: String) = Option(propertySet.getString(s))
+        val processors =  fromProperty(ProcessorsProperty) orElse fromProperty(DeprecatedProcessorsProperty) getOrElse DefaultProcessors
+
+        registerProcessors(processors)
     }
 
     def getDefinitionFromServletContext(servletContext: ServletContext, uriNamePropertyPrefix: String, inputPropertyPrefix: String) =

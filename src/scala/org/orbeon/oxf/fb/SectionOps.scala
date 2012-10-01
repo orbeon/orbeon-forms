@@ -21,7 +21,7 @@ import org.orbeon.oxf.fb.ControlOps._
 
 object SectionOps {
 
-    def containerById(sectionId: String): NodeInfo = {
+    def sectionById(sectionId: String): NodeInfo = {
         val formInstance = asNodeInfo(model("fr-form-model").get.getInstance("fb-form-instance"))
         formInstance \ "*:body" \\ "*:section" filter (_ \@ "id" === sectionId) head
     }

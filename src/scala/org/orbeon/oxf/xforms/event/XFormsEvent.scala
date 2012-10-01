@@ -45,6 +45,9 @@ import org.orbeon.oxf.util.XPathCache
  *   - a Map is automatically a PropertyGetter
  * - whenever possible, all aspects of an event are represented as properties
  * - in some cases, events store special values natively (e.g. Throwable, ConnectionResult, etc.)
+ *
+ * Possible improvement: we might be able to use reflection for standard properties. This would simply the implementation
+ * of XFormsEvent, XFormsUIEvent, and derived events which have more complex properties.
  */
 abstract class XFormsEvent(
         val name: String,

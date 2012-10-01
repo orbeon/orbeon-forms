@@ -15,19 +15,6 @@
             xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
             xmlns:xi="http://www.w3.org/2001/XInclude">
 
-    <!-- Include user definitions. By default an empty file is present in packaged resources, and can be overridden. -->
-    <xi:include href="oxf:/config/processors-local.xml"/>
-
-    <!-- For backward compatibility -->
-    <xi:include href="oxf:/config/custom-processors.xml"/>
-
-    <!-- Include third-party definitions. The file must be present. -->
-    <xi:include href="oxf:/config/third-party-processors.xml"/>
-
-    <!-- These are the main processor declarations. They are defined globally for any pipeline
-    running in OXF. The uri attributes are present only for backward compatibility and is likely to
-    be deprecated. The name attribute should be used for new processor definitions. -->
-
     <!-- Base processors -->
     <processor name="oxf:identity">
         <class name="org.orbeon.oxf.processor.IdentityProcessor"/>
@@ -789,6 +776,15 @@
         <class name="org.orbeon.oxf.fr.SchemaGenerator"/>
     </processor>
 
-    <!-- No longer supported processors -->
+    <!-- Include in the end so it's possible to override, see: https://github.com/orbeon/orbeon-forms/issues/447 -->
+
+    <!-- Include user definitions. By default an empty file is present in packaged resources, and can be overridden. -->
+    <xi:include href="oxf:/config/processors-local.xml"/>
+
+    <!-- For backward compatibility -->
+    <xi:include href="oxf:/config/custom-processors.xml"/>
+
+    <!-- Include third-party definitions. The file must be present. -->
+    <xi:include href="oxf:/config/third-party-processors.xml"/>
 
 </processors>

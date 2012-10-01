@@ -120,9 +120,7 @@ class SchemaGenerator extends ProcessorImpl {
             val repeatGrid = control(bind, "*:grid") filter (_ \@ "repeat" === "true")
             Some(BindInfo(
                 elemName = bind \@ ("ref" || "nodeset"),
-                elemType = (bind \@ "type").headOption map (_.stringValue) map (resolveQName(bind, _)) filter
-                        // Filter xs:string and xf:string as they add no information to the schema
-                        (_ != XS_STRING_QNAME) filter (_ != XFORMS_STRING_QNAME),
+                elemType = (bind \@ "type").headOption map (_.stringValue) map (resolveQName(bind, _)) filterNot Set(XS_STRING_QNAME, XFORMS_STRING_QNAME),
                 repeated = repeatGrid nonEmpty,
                 min = repeatGrid.toSeq \@ "min",
                 max = repeatGrid.toSeq \@ "max"

@@ -395,12 +395,12 @@ object ControlOps {
             // We don't want to add a type="xs:string|xf:string"
             def isTypeString = mipName == "type" && {
                 val typeValue = resolveQName(bind, mipValue)
-                Seq(XS_STRING_QNAME, XFORMS_STRING_QNAME) exists (_ == typeValue)
+                Set(XS_STRING_QNAME, XFORMS_STRING_QNAME)(typeValue)
             }
 
             // Create/update or remove attribute
             Option(mipValue) map (_.trim) match {
-                case Some(value) if value.length > 0 && !isTypeString ⇒ ensureAttribute(bind, mipQName, value)
+                case Some(value) if value.length > 0 && ! isTypeString ⇒ ensureAttribute(bind, mipQName, value)
                 case _ ⇒ delete(bind \@ mipQName)
             }
         }

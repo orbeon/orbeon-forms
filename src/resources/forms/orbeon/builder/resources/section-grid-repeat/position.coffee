@@ -13,8 +13,8 @@ $ ->
             container.offset.top <= top <= container.offset.top + container.height
 
     # Container is either a section or grid; calls listeners passing old/new container
-    Builder.currentContainerChanged = (containerCache, wasCurrentContainer, becomesCurrentContainer) ->
-        notifyChange = notifyOnChange wasCurrentContainer, becomesCurrentContainer
+    Builder.currentContainerChanged = (containerCache, {wasCurrent, becomesCurrent}) ->
+        notifyChange = notifyOnChange wasCurrent, becomesCurrent
         Builder.onUnderPointerChange ->
             if viewPos.left <= pointerPos.left <= viewPos.right
                 newContainer = Builder.findInCache containerCache, pointerPos.top
@@ -23,7 +23,9 @@ $ ->
     # Calls listeners when, in a grid, the pointer moves out of or in a new row/cell
     Builder.currentRowColChanged = (gridsCache, {wasCurrentRow, becomesCurrentRow, wasCurrentCol, becomesCurrentCol}) ->
         currentGrid = null; do ->
-            Builder.currentContainerChanged gridsCache, (-> currentGrid = null), ((g) -> currentGrid = g)
+            Builder.currentContainerChanged gridsCache,
+                wasCurrent: -> currentGrid = null
+                becomesCurrent: (g) -> currentGrid = g
         notifyRowChange = notifyOnChange wasCurrentRow, becomesCurrentRow
         notifyColChange = notifyOnChange wasCurrentCol, becomesCurrentCol
         Builder.onUnderPointerChange ->

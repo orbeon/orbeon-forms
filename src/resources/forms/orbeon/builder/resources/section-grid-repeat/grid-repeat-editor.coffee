@@ -26,8 +26,9 @@ $ ->
     # Position delete icon
     do ->
         deleteIcon = $ '.fb-delete-grid-trigger'
-        Builder.currentContainerChanged gridsCache, (-> deleteIcon.hide()),
-            (grid) ->
+        Builder.currentContainerChanged gridsCache,
+            wasCurrent: -> deleteIcon.hide()
+            becomesCurrent: (grid) ->
                 deleteIcon.show()
                 scrollContainer = f$.closest '.yui-layout-bd', $ '#fr-view'
                 deleteIcon.offset

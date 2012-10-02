@@ -23,17 +23,40 @@ import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.externalcontext.URLRewriter
 import java.lang.{Boolean ⇒ JBoolean}
 import org.orbeon.oxf.properties.PropertySet
+import org.orbeon.oxf.pipeline.api.ExternalContext
 
 object Authorizer extends Logging {
 
     import PageFlowControllerProcessor._
     import URLRewriter._
 
+    private val TokenKey = "orbeon-token"
+
+    // For now don't remember authorization, because simply remembering in the session is not enough if the authorization
+    // depends on the request method, path, or headers.
+    private val RememberAuthorization = false
+
     private val HeadersToFilter = Set("transfer-encoding", "connection", "host", "content-length")
     private val AuthorizedKey = "org.orbeon.oxf.controller.service.authorized"
 
+    // Whether the incoming request is authorized either with a token or via the delegate
+    def authorized(ec: ExternalContext)(implicit logger: IndentedLogger, propertySet: PropertySet) =
+        authorizedWithToken(ec) || (if (RememberAuthorization) authorizeIfNeededAndRemember(ec.getRequest) else authorizedWithDelegate(ec.getRequest))
+
+    // Whether the incoming request is authorized with a token
+    def authorizedWithToken(ec: ExternalContext) = {
+
+        val requestToken =
+            (Option(ec.getRequest.getHeaderValuesMap.get(TokenKey)) flatten) headOption
+
+        def applicationToken =
+            ec.getWebAppContext.attributes.get(TokenKey) collect { case token: String ⇒ token }
+
+        requestToken.isDefined && requestToken == applicationToken
+    }
+
     // Check the session to see if the request is already authorized. If not, try to authorize, and remember the
-    // authorization if successful. Return whether the request
+    // authorization if successful. Return whether the request is authorized.
     def authorizeIfNeededAndRemember(request: Request)(implicit logger: IndentedLogger, propertySet: PropertySet) = {
 
         def alreadyAuthorized =
@@ -47,7 +70,7 @@ object Authorizer extends Logging {
             (_.getAttributesMap.put(AuthorizedKey, JBoolean.TRUE))
 
         if (! alreadyAuthorized) {
-            val newlyAuthorized = authorize(request)
+            val newlyAuthorized = authorizedWithDelegate(request)
             if (newlyAuthorized)
                 rememberAuthorized()
             newlyAuthorized
@@ -56,8 +79,22 @@ object Authorizer extends Logging {
     }
 
     // Authorize the given request with the given delegate service
-    def authorize(request: Request)(implicit logger: IndentedLogger, propertySet: PropertySet) =
-        delegateAbsoluteBaseURIOpt(request) match {
+    def authorizedWithDelegate(request: Request)(implicit logger: IndentedLogger, propertySet: PropertySet) = {
+
+        def appendToURI(uri: URI, path: String, query: Option[String]) = {
+
+            val newPath  = dropTrailingSlash(uri.getPath) + appendStartingSlash(path)
+            val newQuery = Option(uri.getQuery) ++ query mkString "&"
+
+            new URI(uri.getScheme, uri.getUserInfo, uri.getHost, uri.getPort, newPath, if (newQuery.nonEmpty) newQuery else null, null)
+        }
+
+        // NOTE: If the authorizer base URL is an absolute path, it is rewritten against the host
+        def delegateAbsoluteBaseURIOpt =
+            Option(propertySet.getStringOrURIAsString(AuthorizerProperty)) map
+                (p ⇒ new URI(URLRewriterUtils.rewriteServiceURL(request, p, REWRITE_MODE_ABSOLUTE_NO_CONTEXT)))
+
+        delegateAbsoluteBaseURIOpt match {
             case Some(baseDelegateURI) ⇒
                 // Forward method and headers but not the body
                 val method  = request.getMethod
@@ -85,17 +122,5 @@ object Authorizer extends Logging {
                 debug("No authorizer configured")
                 false
         }
-
-    private def appendToURI(uri: URI, path: String, query: Option[String]) = {
-
-        val newPath  = dropTrailingSlash(uri.getPath) + appendStartingSlash(path)
-        val newQuery = Option(uri.getQuery) ++ query mkString "&"
-
-        new URI(uri.getScheme, uri.getUserInfo, uri.getHost, uri.getPort, newPath, if (newQuery.nonEmpty) newQuery else null, null)
     }
-
-    // NOTE: If the authorizer base URL is an absolute path, it is rewritten against the host
-    private def delegateAbsoluteBaseURIOpt(request: Request)(implicit propertySet: PropertySet) =
-        Option(propertySet.getStringOrURIAsString(AuthorizerProperty)) map
-            (p ⇒ new URI(URLRewriterUtils.rewriteServiceURL(request, p, REWRITE_MODE_ABSOLUTE_NO_CONTEXT)))
 }

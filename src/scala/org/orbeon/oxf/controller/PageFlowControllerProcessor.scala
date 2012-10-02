@@ -19,7 +19,6 @@ import java.util.{List ⇒ JList, Map ⇒ JMap}
 import org.dom4j.{QName, Document, Element}
 import org.orbeon.errorified.Exceptions._
 import org.orbeon.exception.OrbeonFormatter
-import org.orbeon.oxf.pipeline.api.ExternalContext.Request
 import org.orbeon.oxf.pipeline.api.{ExternalContext, PipelineContext}
 import org.orbeon.oxf.processor.RegexpMatcher.MatchResult
 import org.orbeon.oxf.processor._
@@ -35,6 +34,8 @@ import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils._
 import org.orbeon.oxf.xml.dom4j.LocationData
 import org.orbeon.oxf.properties.PropertySet
+import org.orbeon.oxf.pipeline.api.ExternalContext.Request
+import org.orbeon.oxf.util.ScalaUtils._
 
 // Orbeon Forms application controller
 class PageFlowControllerProcessor extends ProcessorImpl with Logging {
@@ -170,12 +171,13 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
         def controllerPropertyQName(name: String, default: Option[QName] = None) =
             Option(extractAttributeValueQName(configRoot, name)) orElse Option(properties.getQName(name, default.orNull))
 
-        val controllerMatcher          = controllerPropertyQName(MatcherProperty, Some(DefaultMatcher)).get
-        val controllerPublicVisibility = controllerProperty(VisibilityProperty, Some(DefaultVisibility)).get == "public"
-        val controllerInstancePassing  = controllerProperty(InstancePassingProperty, Some(DefaultInstancePassing)).get
+        val defaultMatcher              = controllerPropertyQName(MatcherProperty, Some(DefaultMatcher)).get
+        val defaultInstancePassing      = controllerProperty(InstancePassingProperty, Some(DefaultInstancePassing)).get
+        val defaultPagePublicMethods    = stringOptionToSet(controllerProperty(PagePublicMethodsProperty, Some(PagePublicMethods mkString " ")))
+        val defaultServicePublicMethods = stringOptionToSet(controllerProperty(ServicePublicMethodsProperty, Some(ServicePublicMethods mkString " ")))
 
         // NOTE: We use a global property, not an oxf:page-flow scoped one
-        val controllerVersioned =
+        val defaultVersioned =
             att(configRoot, "versioned") map (_.toBoolean) getOrElse isResourcesVersioned
 
         // NOTE: We support a null epilogue value and the pipeline then uses a plain HTML serializer
@@ -188,7 +190,7 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
         val syntheticPages =
             (controllerProperty(SubmissionPathProperty), controllerProperty(SubmissionModelProperty)) match {
                 case (Some(submissionPath), submissionModel @ Some(_)) ⇒
-                    Seq(PageOrServiceElement(None, submissionPath, Pattern.compile(submissionPath), None, submissionModel, None, configRoot, public = true))
+                    Seq(PageOrServiceElement(None, submissionPath, Pattern.compile(submissionPath), None, submissionModel, None, configRoot, SubmissionPublicMethods))
                 case _ ⇒
                     Seq()
             }
@@ -197,8 +199,8 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
             syntheticPages ++ (
                 for (e ← topLevelElements filter (e ⇒ Set("files", "page", "service")(e.getName)))
                 yield e.getName match {
-                    case "files" ⇒ FileElement(e, controllerMatcher, controllerVersioned)
-                    case "page" | "service" ⇒ PageOrServiceElement(e, controllerMatcher, controllerPublicVisibility)
+                    case "files"            ⇒ FileElement(e, defaultMatcher, defaultVersioned)
+                    case "page" | "service" ⇒ PageOrServiceElement(e, defaultMatcher, defaultPagePublicMethods, defaultServicePublicMethods)
                 }
             )
 
@@ -218,7 +220,7 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
                 controllerValidity,
                 stepProcessorContext,
                 urlBase,
-                controllerInstancePassing,
+                defaultInstancePassing,
                 epilogueURL,
                 epilogueElement,
                 pathIdToPath.asJava,
@@ -302,21 +304,25 @@ object PageFlowControllerProcessor {
     val ControllerNamespaceURI = "http://www.orbeon.com/oxf/controller"
 
     // Properties
-    val MatcherProperty         = "matcher"
-    val VisibilityProperty      = "visibility"
-    val InstancePassingProperty = "instance-passing"
-    val SubmissionModelProperty = "submission-model"
-    val SubmissionPathProperty  = "submission-path"
-    val EpilogueProperty        = "epilogue"
-    val AuthorizerProperty      = "authorizer"
+    val MatcherProperty              = "matcher"
+    val InstancePassingProperty      = "instance-passing"
+    val SubmissionModelProperty      = "submission-model"
+    val SubmissionPathProperty       = "submission-path"
+    val EpilogueProperty             = "epilogue"
 
-    val DefaultMatcher          = new QName("glob")
-    val DefaultVisibility       = "private"
-    val DefaultInstancePassing  = PageFlowControllerBuilder.INSTANCE_PASSING_REDIRECT
+    val PagePublicMethodsProperty    = "page-public-methods"
+    val ServicePublicMethodsProperty = "service-public-methods"
+    val AuthorizerProperty           = "authorizer"
 
-    def isPublic(s: String) = s == "public"
+    val DefaultMatcher               = new QName("glob")
+    val DefaultVisibility            = "private"
+    val DefaultInstancePassing       = PageFlowControllerBuilder.INSTANCE_PASSING_REDIRECT
 
-    val PathMatchers            = "path-matchers"
+    val PathMatchers                 = "path-matchers"
+
+    val PagePublicMethods            = Set("GET", "HEAD")
+    val ServicePublicMethods         = Set.empty[String]
+    val SubmissionPublicMethods      = Set("GET", "POST") // Q: do we need GET? PUT?
 
     // Route elements
     sealed trait RouteElement { def id: Option[String]; def path: String; def pattern: Pattern }
@@ -337,7 +343,7 @@ object PageFlowControllerProcessor {
             model: Option[String],
             view: Option[String],
             element: Element,
-            public: Boolean)
+            publicMethods: Set[String])
         extends RouteElement
 
     object FileElement {
@@ -354,8 +360,12 @@ object PageFlowControllerProcessor {
     }
 
     object PageOrServiceElement {
-        // id?, path-info, matcher?, default-submission?, model?, view?
-        def apply(e: Element, defaultMatcher: QName, defaultPublic: Boolean): PageOrServiceElement = {
+        // id?, path-info, matcher?, default-submission?, model?, view?, public-methods?
+        def apply(e: Element, defaultMatcher: QName, defaultPagePublicMethods: Set[String], defaultServicePublicMethods: Set[String]): PageOrServiceElement = {
+
+            def localPublicMethods   = att(e, "public-methods") map stringToSet
+            def defaultPublicMethods = if (e.getName == "page") defaultPagePublicMethods else defaultServicePublicMethods
+
             val path = getPath(e)
             PageOrServiceElement(
                 idAtt(e),
@@ -365,7 +375,7 @@ object PageFlowControllerProcessor {
                 att(e, "model"),
                 att(e, "view"),
                 e,
-                public = att(e, VisibilityProperty) map isPublic getOrElse (e.getName == "page")) // public by default for pages
+                publicMethods = localPublicMethods getOrElse defaultPublicMethods)
         }
     }
 
@@ -399,7 +409,7 @@ object PageFlowControllerProcessor {
         def process(pc: PipelineContext, ec: ExternalContext, matchResult: MatchResult)(implicit logger: IndentedLogger) = {
 
             // Make sure the request is authorized
-            checkAccess(ec)
+            authorize(ec)
 
             // PipelineConfig is reusable, but PipelineProcessor is not
             val pipeline = new PipelineProcessor(pipelineConfig)
@@ -421,25 +431,16 @@ object PageFlowControllerProcessor {
 
         self: PageOrServiceRoute ⇒
 
-        val TokenKey = "orbeon-token"
+        // Require authorization based on whether the request method is considered publicly accessible or not. If it is
+        // public, then authorization does not take place.
+        def requireAuthorization(request: Request) =
+            ! routeElement.publicMethods(request.getMethod)
 
-        def checkAccess(ec: ExternalContext)(implicit logger: IndentedLogger) = {
-
-            def authorizedRequest =
-                authorizedWithToken || Authorizer.authorizeIfNeededAndRemember(ec.getRequest)
-
-            def authorizedWithToken =
-                requestToken(ec.getRequest) exists (_ == applicationToken)
-
-            def requestToken(request: Request) =
-                (Option(request.getHeaderValuesMap.get(TokenKey)) flatten) headOption
-
-            def applicationToken =
-                ec.getWebAppContext.attributes.get(TokenKey) collect { case token: String ⇒ token }
-
-            if (! routeElement.public && ! authorizedRequest)
+        // Authorize the incoming request. Throw an HttpStatusCodeException if the request requires authorization based
+        // on the request method, and is not authorized (with a token or via an authorizer service).
+        def authorize(ec: ExternalContext)(implicit logger: IndentedLogger) =
+            if (requireAuthorization(ec.getRequest) && ! Authorizer.authorized(ec))
                 unauthorized()
-        }
     }
 
     def unauthorized() = throw new HttpStatusCodeException(403)

@@ -231,7 +231,7 @@
 
     <!-- ==== Epilogue and handlers ================================================================================ -->
 
-    <page id="not-found"    path="/fr/not-found"    view="/apps/fr/not-found.xpl"/>
+    <page id="not-found"    path="/fr/not-found"    view="not-found.xpl"/>
     <page id="unauthorized" path="/fr/unauthorized" view="unauthorized.xhtml"/>
     <page id="error"        path="/fr/error"        model="/config/error.xpl"/>
 

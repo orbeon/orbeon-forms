@@ -34,12 +34,13 @@
     <page id="home" path="/home/" model="apps/home/page-flow.xml"/>
 
     <!-- Dispatch request to a specific application -->
-    <page id="apps" path="/([^/]+)/.*" model="apps/${1}/page-flow.xml"/>
+    <page id="apps" path="/([^/]+)/.*" model="apps/${1}/page-flow.xml" public-methods="GET PUT POST HEAD"/>
 
     <!-- ==== Epilogue and handlers ================================================================================ -->
 
-    <page id="not-found" path="/not-found" view="/config/not-found.xhtml"/>
-    <page id="error" path="/error" model="/config/error.xpl"/>
+    <page id="not-found"    path="/not-found"    view="/config/not-found.xhtml"/>
+    <page id="unauthorized" path="/unauthorized" view="/config/unauthorized.xhtml"/>
+    <page id="error"        path="/error"        model="/config/error.xpl"/>
 
     <epilogue url="/config/epilogue.xpl"/>
     <not-found-handler page="not-found"/>

@@ -48,7 +48,9 @@
                             <name>c:service</name>
                         </choice>
                         <ref name="route-attributes"/>
-                        <ref name="visibility-attribute"/>
+                        <optional>
+                            <attribute name="public-methods"/>
+                        </optional>
                         <optional>
                             <attribute name="default-submission"/>
                         </optional>
@@ -158,7 +160,12 @@
     <define name="root-attributes">
         <ref name="common-attributes"/>
         <ref name="matcher-attribute"/>
-        <ref name="visibility-attribute"/>
+        <optional>
+            <attribute name="page-public-methods"/>
+        </optional>
+        <optional>
+            <attribute name="service-public-methods"/>
+        </optional>
         <ref name="instance-passing-attribute"/>
         <ref name="versioned-attribute"/>
         <optional>
@@ -216,17 +223,6 @@
                     <value>redirect</value>
                     <value>forward</value>
                     <value>redirect-exit-portal</value>
-                </choice>
-            </attribute>
-        </optional>
-    </define>
-
-    <define name="visibility-attribute">
-        <optional>
-            <attribute name="visibility">
-                <choice>
-                    <value>public</value>
-                    <value>private</value>
                 </choice>
             </attribute>
         </optional>

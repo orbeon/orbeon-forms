@@ -133,10 +133,9 @@ object ScalaUtils {
     implicit def anyToPipeOps[A](a: A) = new PipeOps(a)
 
     // Convert a string of tokens to a set
-    def stringOptionToSet(s: Option[String]) = s match {
-        case Some(list) ⇒ list split """\s+""" toSet
-        case None ⇒ Set[String]()
-    }
+    // NOTE: ("" split """\s+""" toSet).size == 1!
+    def stringToSet(s: String)               = nonEmptyOrNone(s) map (_ split """\s+""" toSet) getOrElse  Set.empty[String]
+    def stringOptionToSet(s: Option[String]) = s map stringToSet getOrElse Set.empty[String]
 
     // Split a URL into a path and query part
     def splitQuery(url: String): (String, Option[String]) = {

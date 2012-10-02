@@ -13,6 +13,8 @@
 AjaxServer = ORBEON.xforms.server.AjaxServer
 Controls = ORBEON.xforms.Controls
 
+AjaxServer.eventCreated = $.Callbacks()
+
 AjaxServer.Event = (args) ->
 
     supportedArgs = ->
@@ -39,10 +41,15 @@ AjaxServer.Event = (args) ->
         newArgs[name] = arguments[i] for name, i in oldParams
         args = newArgs
 
+    # Set event properties based on `supportedArgs` defined above
     type = (isType) => (alternative) => (name) =>
         @[name] = if isType args[name] then args[name] else alternative()
     object = type _.isObject
     string = type _.isString
     bool = type _.isBoolean
     setDefault name for name, setDefault of supportedArgs()
+
+    # Notify listeners, given them a chance to, say, add properties to the event
+    AjaxServer.eventCreated.fire @
+    # Make sure we don't return anything, since this is a constructor
     return

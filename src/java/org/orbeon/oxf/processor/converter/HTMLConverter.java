@@ -14,18 +14,10 @@
 package org.orbeon.oxf.processor.converter;
 
 import org.dom4j.QName;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
-import org.orbeon.oxf.processor.ProcessorInput;
-import org.orbeon.oxf.xml.SimpleForwardingXMLReceiver;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.xml.sax.ContentHandler;
-import org.xml.sax.SAXException;
-
-import javax.xml.transform.stream.StreamResult;
-import java.io.Writer;
 
 /**
  * Converts XML into text according to the XSLT HTML output method.
@@ -37,18 +29,13 @@ public class HTMLConverter extends TextConverterBase {
     public static final String DEFAULT_CONTENT_TYPE = "text/html";
     public static final QName DEFAULT_METHOD = QName.get("html");
 
-    public static final String DEFAULT_PUBLIC_DOCTYPE = "-//W3C//DTD HTML 4.01 Transitional//EN";
-    public static final String DEFAULT_SYSTEM_DOCTYPE = null;
-    public static final String DEFAULT_VERSION = "4.01";
-
-    public HTMLConverter() {
-    }
+    public HTMLConverter() {}
 
     protected String getDefaultContentType() {
         return DEFAULT_CONTENT_TYPE;
     }
 
-    protected boolean readInput(PipelineContext context, final ContentHandler contentHandler, ProcessorInput input, Config config, Writer writer) {
+    protected TransformerXMLReceiver createTransformer(Config config) {
 
         // Create an identity transformer and start the transformation
         final TransformerXMLReceiver identity = TransformerUtils.getIdentityTransformerHandler();
@@ -63,33 +50,26 @@ public class HTMLConverter extends TextConverterBase {
                 config.indent,
                 config.indentAmount);
 
-        identity.setResult(new StreamResult(writer));
-        final boolean[] didEndDocument = new boolean[1];
-        readInputAsSAX(context, input,  new StripNamespaceXMLReceiver(identity) {
-            public void endDocument() throws SAXException {
-                super.endDocument();
-                sendEndDocument(contentHandler);
-                didEndDocument[0] = true;
-            }
-        });
-
-        return didEndDocument[0];
+        return identity;
     }
 
-    /**
-     * This makes the HTML output clear of namespace declarations. It is not clear whether this is meant to be done this
-     * way.
-     */
-    protected static class StripNamespaceXMLReceiver extends SimpleForwardingXMLReceiver {
-        public StripNamespaceXMLReceiver(XMLReceiver xmlReceiver) {
-            super(xmlReceiver);
+    @Override
+    protected XMLReceiver createFilterReceiver(XMLReceiver downstreamReceiver, XMLReceiver transformer, boolean[] didEndDocument) {
+        // Override so we can filter namespace declarations. It is not clear whether this is meant to be done this way!
+        // As of 2012-10-02, do this for backward compatibility.
+        return new HTMLFilterReceiver(downstreamReceiver, transformer, didEndDocument);
+    }
+
+    protected static class HTMLFilterReceiver extends FilterReceiver {
+        public HTMLFilterReceiver(XMLReceiver downstreamReceiver, XMLReceiver transformer, boolean[] didEndDocument) {
+            super(downstreamReceiver, transformer, didEndDocument);
         }
 
-        public void startPrefixMapping(String s, String s1) throws SAXException {
+        public void startPrefixMapping(String s, String s1) {
             // Do nothing
         }
 
-        public void endPrefixMapping(String s) throws SAXException {
+        public void endPrefixMapping(String s) {
             // Do nothing
         }
     }

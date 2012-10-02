@@ -15,18 +15,22 @@ package org.orbeon.oxf.processor.converter;
 
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.ProcessorInput;
 import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.processor.ProcessorUtils;
 import org.orbeon.oxf.processor.impl.CacheableTransformerOutputImpl;
+import org.orbeon.oxf.processor.serializer.BinaryTextXMLReceiver;
 import org.orbeon.oxf.util.ContentHandlerWriter;
+import org.orbeon.oxf.xml.SimpleForwardingXMLReceiver;
 import org.orbeon.oxf.xml.XMLConstants;
+import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
-import java.io.Writer;
+import javax.xml.transform.stream.StreamResult;
 
 /**
  * Base class for text converters.
@@ -40,7 +44,7 @@ public abstract class TextConverterBase extends ConverterBase {
      *
      * @return true iif the method already
      */
-    protected abstract boolean readInput(PipelineContext context, ContentHandler contentHandler, ProcessorInput input, Config config, Writer writer);
+    protected abstract TransformerXMLReceiver createTransformer(Config config);
 
     /**
      * Return the namespace URI of the schema validating the config input. Can be overridden by
@@ -59,8 +63,6 @@ public abstract class TextConverterBase extends ConverterBase {
             throw new OXFException("Invalid output created: " + name);
         final ProcessorOutput output = new CacheableTransformerOutputImpl(TextConverterBase.this, name) {
             public void readImpl(PipelineContext pipelineContext, XMLReceiver xmlReceiver) {
-                // Create OutputStream that converts to Base64
-                final Writer writer = new ContentHandlerWriter(xmlReceiver);
 
                 // Read configuration input
                 final Config config = readConfig(pipelineContext);
@@ -80,8 +82,12 @@ public abstract class TextConverterBase extends ConverterBase {
                     xmlReceiver.startPrefixMapping(XMLConstants.XSD_PREFIX, XMLConstants.XSD_URI);
                     xmlReceiver.startElement("", ProcessorUtils.DEFAULT_TEXT_DOCUMENT_ELEMENT, ProcessorUtils.DEFAULT_TEXT_DOCUMENT_ELEMENT, attributes);
 
+                    // Create OutputStream that converts to Base64
+                    final TransformerXMLReceiver transformer = createTransformer(config);
+                    transformer.setResult(new StreamResult(new ContentHandlerWriter(xmlReceiver)));
+
                     // Write content
-                    final boolean didEndDocument = readInput(pipelineContext, xmlReceiver, getInputByName(INPUT_DATA), config, writer);
+                    final boolean didEndDocument = readInput(pipelineContext, xmlReceiver, getInputByName(INPUT_DATA), transformer);
 
                     // End document if readInput() did not do it
 
@@ -100,7 +106,61 @@ public abstract class TextConverterBase extends ConverterBase {
         return output;
     }
 
-    protected void sendEndDocument(ContentHandler contentHandler) {
+    private boolean readInput(PipelineContext context, final XMLReceiver downstreamReceiver, ProcessorInput input, final XMLReceiver transformer) {
+
+        final boolean[] didEndDocument = new boolean[1];
+        readInputAsSAX(context, input, createFilterReceiver(downstreamReceiver, transformer, didEndDocument));
+        return didEndDocument[0];
+    }
+
+    protected XMLReceiver createFilterReceiver(XMLReceiver downstreamReceiver, XMLReceiver transformer, boolean[] didEndDocument) {
+        return new FilterReceiver(downstreamReceiver, transformer, didEndDocument);
+    }
+
+    protected static class FilterReceiver extends SimpleForwardingXMLReceiver {
+
+        private final XMLReceiver downstreamReceiver;
+        private final boolean[] didEndDocument;
+
+        public FilterReceiver(XMLReceiver downstreamReceiver, XMLReceiver transformer, boolean[] didEndDocument) {
+            super(transformer);
+            this.downstreamReceiver = downstreamReceiver;
+            this.didEndDocument = didEndDocument;
+        }
+
+        private boolean seenRootElement = false;
+
+        @Override
+        public void processingInstruction(String target, String data) throws SAXException {
+
+            // Forward directly to the output any serializer processing instructions that took place before the root
+            // element. Note that this is a rather arbitrary choice! we could do any of the following:
+            //
+            // 1. Just let the transformer serialize the PI
+            // 2. Place serializer PIs as attribues the root element of the resulting <document> (e.g. <document status-code="404">)
+            // 3. Forward those PIs as we do here
+            //
+            // This could even be configurable. For now, we choose option #3 for ease of implementation.
+            if (seenRootElement || ! BinaryTextXMLReceiver.isSerializerPI(target, data))
+                super.processingInstruction(target, data);
+            else
+                downstreamReceiver.processingInstruction(target, data);
+        }
+
+        @Override
+        public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
+            seenRootElement = true;
+            super.startElement(uri, localname, qName, attributes);
+        }
+
+        public void endDocument() throws SAXException {
+            super.endDocument();
+            sendEndDocument(downstreamReceiver);
+            didEndDocument[0] = true;
+        }
+    }
+
+    private static void sendEndDocument(ContentHandler contentHandler) {
         try {
             contentHandler.endElement("", ProcessorUtils.DEFAULT_TEXT_DOCUMENT_ELEMENT, ProcessorUtils.DEFAULT_TEXT_DOCUMENT_ELEMENT);
             contentHandler.endDocument();

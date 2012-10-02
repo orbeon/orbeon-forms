@@ -178,21 +178,17 @@ class BinaryTextXMLReceiver(
     }
 
     override def processingInstruction(target: String, data: String): Unit =
-        if (target == "oxf-serializer") {
-            if ((data ne null) && data.startsWith("status-code=\"")) {
-                val endIndex = data.indexOf('"', 13)
-                if (endIndex != -1) {
-                    val codeString = data.substring(13, endIndex)
-                    response foreach (_.setStatus(codeString.toInt))
-                }
-            } else if (data == "flush") {
+        parseSerializerPI(target, data) match {
+            case Some(("status-code", Some(code))) ⇒
+                response foreach (_.setStatus(code.toInt))
+            case Some(("flush", _)) ⇒
                 if (writer ne null)
                     writer.flush()
 
                 outputStream.flush()
-            }
-        } else
-            super.processingInstruction(target, data)
+            case _ ⇒
+                super.processingInstruction(target, data)
+        }
 
     // Content type determination algorithm
     private def getContentType(contentTypeAttribute: Option[String], defaultContentType: String) =
@@ -214,6 +210,23 @@ class BinaryTextXMLReceiver(
 }
 
 object BinaryTextXMLReceiver {
+
     val DefaultBinaryContentType = "application/octet-stream"
     val DefaultTextContentType   = "text/plain"
+
+    val PITargets = Set("orbeon-serializer", "oxf-serializer")
+
+    private val StatusCodeRE = """status-code="([^"]*)"""".r
+
+    def parseSerializerPI(target: String, data: String): Option[(String, Option[String])] = {
+        if (PITargets(target)) {
+            Option(data) collect {
+                case StatusCodeRE(code) ⇒ "status-code" → Some(code)
+                case "flush"            ⇒ "flush" → None
+            }
+        } else
+            None
+    }
+
+    def isSerializerPI(target: String, data: String) = parseSerializerPI(target, data).isDefined
 }

@@ -434,7 +434,6 @@ public class ServletExternalContext implements ExternalContext  {
             nativeResponse.setStatus(status);
         }
 
-
         public void setHeader(String name, String value) {
             nativeResponse.setHeader(name, value);
         }

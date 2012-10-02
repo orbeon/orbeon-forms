@@ -42,7 +42,7 @@ public abstract class HttpBinarySerializer extends HttpSerializerBase {
 
         // Read input into an OutputStream
         try {
-            readInput(pipelineContext, input, (Config) config, response.getOutputStream());
+            readInput(pipelineContext, input, config, response.getOutputStream());
         } catch (IOException e) {
             throw new OXFException(e);
         }

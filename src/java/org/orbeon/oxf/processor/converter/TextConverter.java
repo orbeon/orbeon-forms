@@ -14,17 +14,9 @@
 package org.orbeon.oxf.processor.converter;
 
 import org.dom4j.QName;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
-import org.orbeon.oxf.processor.ProcessorInput;
-import org.orbeon.oxf.xml.SimpleForwardingXMLReceiver;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.xml.sax.ContentHandler;
-import org.xml.sax.SAXException;
-
-import javax.xml.transform.stream.StreamResult;
-import java.io.Writer;
 
 /**
  * Converts XML into text according to the XSLT Text output method.
@@ -36,14 +28,13 @@ public class TextConverter extends TextConverterBase {
     public static String DEFAULT_CONTENT_TYPE = "text/plain";
     public static QName DEFAULT_METHOD = QName.get("text");
 
-    public TextConverter() {
-    }
+    public TextConverter() {}
 
     protected String getDefaultContentType() {
         return DEFAULT_CONTENT_TYPE;
     }
 
-    protected boolean readInput(PipelineContext context, final ContentHandler contentHandler, ProcessorInput input, Config config, Writer writer) {
+    protected TransformerXMLReceiver createTransformer(Config config) {
 
         // Create an identity transformer and start the transformation
         final TransformerXMLReceiver identity = TransformerUtils.getIdentityTransformerHandler();
@@ -57,16 +48,7 @@ public class TextConverter extends TextConverterBase {
                 null,
                 false,
                 DEFAULT_INDENT_AMOUNT);
-        identity.setResult(new StreamResult(writer));
-        final boolean[] didEndDocument = new boolean[1];
-        readInputAsSAX(context, INPUT_DATA,  new SimpleForwardingXMLReceiver(identity) {
-            public void endDocument() throws SAXException {
-                super.endDocument();
-                sendEndDocument(contentHandler);
-                didEndDocument[0] = true;
-            }
-        });
 
-        return didEndDocument[0];
+        return identity;
     }
 }

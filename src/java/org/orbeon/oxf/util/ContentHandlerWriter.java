@@ -44,7 +44,7 @@ public class ContentHandlerWriter extends Writer {
     public void flush() throws IOException {
         if (supportFlush) {
             try {
-                contentHandler.processingInstruction("oxf-serializer", "flush");
+                contentHandler.processingInstruction("orbeon-serializer", "flush");
             } catch (SAXException e) {
                 throw new OXFException(e);
             }

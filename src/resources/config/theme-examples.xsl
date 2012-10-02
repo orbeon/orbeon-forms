@@ -44,6 +44,8 @@
 
     <!-- - - - - - - Themed page template - - - - - - -->
     <xsl:template match="/">
+        <!-- Copy PIs before root element in particular so that orbeon-serializer PIs are propagated -->
+        <xsl:apply-templates select="processing-instruction()"/>
         <xhtml:html>
             <xsl:apply-templates select="/xhtml:html/@*"/>
             <xhtml:head>

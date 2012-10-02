@@ -109,8 +109,8 @@ public abstract class HttpSerializerBase extends CachedSerializer {
                         }
                     }
 
-                    // Set status code
-                    // STATUS CODE: Processing instruction can override this when the input is being read
+                    // STATUS CODE: Set status code based on the configuration
+                    // An XML processing instruction may override this when the input is being read
                     response.setStatus(config.statusCode);
 
                     // Set custom headers
@@ -129,11 +129,16 @@ public abstract class HttpSerializerBase extends CachedSerializer {
 
                 final OutputStream httpOutputStream = response.getOutputStream();
 
-                if (config.cacheUseLocalCache) {
-                    // If local caching of the data is enabled, use the caching API
+                // If local caching of the data is enabled and if the configuration status code is a success code, use
+                // the caching API. It doesn't make sense in HTTP to allow caching of non-successful responses.
+                if (config.cacheUseLocalCache && NetUtils.isSuccessCode(config.statusCode)) {
+
                     // We return a ResultStore
                     final boolean[] read = new boolean[1];
                     final ExtendedResultStoreOutputStream resultStore = readCacheInputAsObject(pipelineContext, dataInput, new CacheableInputReader<ExtendedResultStoreOutputStream>() {
+
+                        private int statusCode = config.statusCode;
+
                         public ExtendedResultStoreOutputStream read(PipelineContext pipelineContext, ProcessorInput input) {
                             read[0] = true;
                             if (logger.isDebugEnabled())
@@ -153,12 +158,26 @@ public abstract class HttpSerializerBase extends CachedSerializer {
                                     public OutputStream getOutputStream() {
                                         return resultStoreOutputStream;
                                     }
+
+                                    @Override
+                                    public void setStatus(int status) {
+                                        // STATUS CODE: This typically is overridden via a processing instruction.
+                                        statusCode = status;
+                                        resultStoreOutputStream.setStatus(status);
+                                        super.setStatus(status);
+                                    }
                                 }, input, config);
                                 resultStoreOutputStream.close();
                                 return resultStoreOutputStream;
                             } catch (IOException e) {
                                 throw new OXFException(e);
                             }
+                        }
+
+                        @Override
+                        public boolean allowCaching() {
+                            // It doesn't make sense in HTTP to allow caching of non-successful responses
+                            return NetUtils.isSuccessCode(statusCode);
                         }
                     });
 
@@ -167,6 +186,10 @@ public abstract class HttpSerializerBase extends CachedSerializer {
                         if (logger.isDebugEnabled())
                             logger.debug("Serializer output cached");
                         if (externalContext != null) {
+                            // Set saved status code
+                            final int status = resultStore.getStatus();
+                            if (status > 0)
+                                response.setStatus(status);
                             // Set saved content type
                             final String contentType = resultStore.getContentType();
                             if (contentType != null)
@@ -340,6 +363,7 @@ public abstract class HttpSerializerBase extends CachedSerializer {
     private static class ExtendedResultStoreOutputStream extends ResultStoreOutputStream {
 
         private String contentType;
+        private int status;
 
         public ExtendedResultStoreOutputStream(OutputStream out) {
             super(out);
@@ -351,6 +375,14 @@ public abstract class HttpSerializerBase extends CachedSerializer {
 
         public String getContentType() {
             return contentType;
+        }
+
+        public void setStatus(int status) {
+            this.status = status;
+        }
+
+        public int getStatus() {
+            return status;
         }
     }
 }

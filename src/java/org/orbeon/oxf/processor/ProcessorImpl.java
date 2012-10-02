@@ -362,17 +362,19 @@ public abstract class ProcessorImpl implements Processor {
 
         final T result = reader.read(pipelineContext, input);
 
-        // Cache new result if possible, asking again for KeyValidity if needed
-        if (keyValidity == null || keyValidity.key == null || keyValidity.validity == null)
-            keyValidity = getInputKeyValidity(pipelineContext, input);
+        if (reader.allowCaching()) {
+            // Cache new result if possible, asking again for KeyValidity if needed
+            if (keyValidity == null || keyValidity.key == null || keyValidity.validity == null)
+                keyValidity = getInputKeyValidity(pipelineContext, input);
 
-        if (keyValidity != null && keyValidity.key != null && keyValidity.validity != null) {
-            if (logger.isDebugEnabled())
-                logger.debug("Cache " + debugInfo + ": source cacheable for key '" + keyValidity.key + "'. STORING object:" + result);
+            if (keyValidity != null && keyValidity.key != null && keyValidity.validity != null) {
+                if (logger.isDebugEnabled())
+                    logger.debug("Cache " + debugInfo + ": source cacheable for key '" + keyValidity.key + "'. STORING object:" + result);
 
-            cache.add(keyValidity.key, keyValidity.validity, result);
+                cache.add(keyValidity.key, keyValidity.validity, result);
 
-            reader.storedInCache();
+                reader.storedInCache();
+            }
         }
 
         return result;

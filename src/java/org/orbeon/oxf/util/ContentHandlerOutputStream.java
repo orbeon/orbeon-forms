@@ -114,7 +114,7 @@ public class ContentHandlerOutputStream extends OutputStream {
             // should we just ignore? We can't output an incomplete encoded line unless we have a
             // number of bytes in the buffer multiple of 3. Otherwise, we would have to output '='
             // characters, which do signal an end of transmission.
-            contentHandler.processingInstruction("oxf-serializer", "flush");
+            contentHandler.processingInstruction("orbeon-serializer", "flush");
         } catch (SAXException e) {
             throw new OXFException(e);
         }

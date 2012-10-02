@@ -35,6 +35,11 @@ public abstract class CacheableInputReader<T> {
     public void foundInCache() {}
 
     /**
+     * Method called back after read() to check whether the result can be stored in cache.
+     */
+    public boolean allowCaching() { return true; }
+
+    /**
      * Method called back when the input data has been cached after a call to read().
      */
     public void storedInCache() {}

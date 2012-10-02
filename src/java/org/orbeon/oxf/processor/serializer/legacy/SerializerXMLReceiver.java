@@ -15,10 +15,13 @@ package org.orbeon.oxf.processor.serializer.legacy;
 
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
+import org.orbeon.oxf.processor.serializer.BinaryTextXMLReceiver;
 import org.orbeon.oxf.xml.NamespaceCleanupXMLReceiver;
 import org.xml.sax.SAXException;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.Writer;
 
 /**
  * A forwarding content handler that flushes the output when receiving a given processing instruction.
@@ -38,14 +41,9 @@ public class SerializerXMLReceiver extends NamespaceCleanupXMLReceiver {
         this.writer = writer;
     }
 
-    public SerializerXMLReceiver(XMLReceiver xmlReceiver, OutputStream os, boolean serializeXML11) {
-        this(xmlReceiver, serializeXML11);
-        this.os = os;
-    }
-
     public void processingInstruction(String target, String data) throws SAXException {
-        if ("oxf-serializer".equals(target)) {
-                try {
+        if (BinaryTextXMLReceiver.PITargets().apply(target)) {
+            try {
                 if ("flush".equals(data)) {
                     if (writer != null)
                         writer.flush();

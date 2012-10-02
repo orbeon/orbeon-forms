@@ -47,10 +47,14 @@ $ ->
                     left: (f$.offset $ '#fr-form-group').left - (f$.outerWidth sectionEditor)
             do updateTriggerRelevance = ->
                 container = section.element.children '.fr-section-container'
+                # Hide/show section move icons
                 _.each (['up', 'right', 'down', 'left']), (direction) ->
                     relevant = container.hasClass ("fb-can-move-" + direction)
                     trigger = sectionEditor.children ('.fb-section-move-' + direction)
                     if relevant then trigger.show() else trigger.hide()
+                # Hide/show delete icon
+                deleteTrigger = f$.children '.delete-section-trigger', sectionEditor
+                if f$.is '.fb-can-delete', container then f$.show deleteTrigger else f$.hide deleteTrigger
 
     do setupLabelEditor = ->
 

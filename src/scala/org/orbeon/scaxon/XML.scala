@@ -323,6 +323,7 @@ object XML {
 
         def precedingSibling(test: Test): Seq[NodeInfo] = find(Axis.PRECEDING_SIBLING, test) // TODO: use Type/NODE?
         def followingSibling(test: Test): Seq[NodeInfo] = find(Axis.FOLLOWING_SIBLING, test) // TODO: use Type/NODE?
+        def sibling(test: Test): Seq[NodeInfo] = precedingSibling(test) ++ followingSibling(test)
 
         def precedingElement = nodeInfo precedingSibling * headOption
         def followingElement = nodeInfo followingSibling * headOption
@@ -374,6 +375,7 @@ object XML {
 
         def precedingSibling(test: Test) = seq flatMap (_ precedingSibling test)
         def followingSibling(test: Test) = seq flatMap (_ followingSibling test)
+        def sibling(test: Test) = seq flatMap (_ sibling test)
 
         // The string value is not defined on sequences. We take the first value, for convenience, like in XPath 2.0's
         // XPath 1.0 compatibility mode.

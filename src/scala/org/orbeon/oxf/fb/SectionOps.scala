@@ -32,6 +32,12 @@ object SectionOps {
     // Delete the entire section and contained controls
     def deleteSection(section: NodeInfo) = deleteContainer(section)
 
+    def canDeleteSection(section: NodeInfo): Boolean = {
+        val isSubSection = (section ancestor "*:section").nonEmpty        // We can always delete a sub-section
+        val hasSiblingSection = (section sibling "*:section").nonEmpty    // We don't want to delete the last top-level section
+        isSubSection || hasSiblingSection
+    }
+
     // Move the section up if possible
     def moveSectionUp(container: NodeInfo) =
         if (canMoveUp(container))
@@ -76,10 +82,14 @@ object SectionOps {
     def canMoveLeft(container: NodeInfo) =
         findAncestorContainers(container).size >= 2
 
-    def canMoveClasses(container: NodeInfo) = {
-        val directionCheck = Map("up" → (canMoveUp _), "right" → (canMoveRight _), "down" → (canMoveDown _),  "left" → (canMoveLeft _))
-        val canDirections = directionCheck filter { case (_, check) ⇒ check(container) } map { case (direction, _) ⇒ direction }
-        canDirections map ( "fb-can-move-" ++ _) mkString " "
+    def canDoClasses(container: NodeInfo): String = {
+        val directionClasses = {
+            val directionCheck = Map("up" → (canMoveUp _), "right" → (canMoveRight _), "down" → (canMoveDown _),  "left" → (canMoveLeft _))
+            val canDirections = directionCheck filter { case (_, check) ⇒ check(container) } map { case (direction, _) ⇒ direction }
+            canDirections map ( "fb-can-move-" ++ _)
+        }
+        val deleteClass = if (canDeleteSection(container)) Some("fb-can-delete") else None
+        (directionClasses ++ deleteClass) mkString " "
     }
 
     private def precedingSection(container: NodeInfo) =

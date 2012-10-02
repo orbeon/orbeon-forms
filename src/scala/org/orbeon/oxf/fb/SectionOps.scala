@@ -18,12 +18,15 @@ import org.orbeon.oxf.fb.ContainerOps._
 import org.orbeon.scaxon.XML._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.fb.ControlOps._
+import org.orbeon.oxf.xforms.XFormsUtils
 
 object SectionOps {
 
     def sectionById(sectionId: String): NodeInfo = {
+        // Support effective id, to make it easier to use from XForms (i.e. no need to call XFormsUtils.getStaticIdFromId every time)
+        val staticId = XFormsUtils.getStaticIdFromId(sectionId)
         val formInstance = asNodeInfo(model("fr-form-model").get.getInstance("fb-form-instance"))
-        formInstance \ "*:body" \\ "*:section" filter (_ \@ "id" === sectionId) head
+        formInstance \ "*:body" \\ "*:section" filter (_ \@ "id" === staticId) head
     }
 
     // Delete the entire section and contained controls

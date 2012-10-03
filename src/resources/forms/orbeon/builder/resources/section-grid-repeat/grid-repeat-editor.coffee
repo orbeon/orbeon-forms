@@ -1,4 +1,5 @@
 $ ->
+    AjaxServer = ORBEON.xforms.server.AjaxServer
     Builder = ORBEON.Builder
     Events = ORBEON.xforms.Events
 
@@ -76,3 +77,37 @@ $ ->
             becomesCurrentRow:  showIcons rowIcons
             wasCurrentCol:      hideIcons colIcons
             becomesCurrentCol:  showIcons colIcons
+
+    # On click on a trigger inside .fb-grid-repeat-editor, send section/row/column info along with the event
+    do ->
+
+        # Keep track of current grid/row/column so we can send this information to the server on click
+        current =
+            gridId: null
+            colPos: -1
+            rowPos: -1
+
+        # Functions maintaining current row/col position
+        resetPos = (pos) -> -> current[pos] = -1
+        setPos = (pos) -> (rowCol) -> current[pos] = 1 + f$.length f$.prev rowCol.el[0].tagName, rowCol.el
+
+        Builder.currentRowColChanged gridsCache,
+            wasCurrentRow:      resetPos 'rowPos'
+            becomesCurrentRow:  setPos   'rowPos'
+            wasCurrentCol:      resetPos 'colPos'
+            becomesCurrentCol:  setPos   'colPos'
+
+        Builder.currentContainerChanged gridsCache,
+            wasCurrent: -> current.gridId = null
+            becomesCurrent: (grid) -> current.gridId = f$.attr 'id', grid.el
+
+        # Provide event context properties on click
+        AjaxServer.eventCreated.add (event) ->
+            target = $ document.getElementById event.targetId
+            inGridRepeatEditor = f$.is '*', f$.closest '.fb-grid-repeat-editor', target
+            if event.eventName == 'DOMActivate' && inGridRepeatEditor
+                classContains = (text) -> f$.is '*[class *= "' + text + '"]', target
+                add = (name, value) -> event.properties[name] = value.toString()
+                add 'grid-id', current.gridId
+                add 'row-pos', current.rowPos if classContains 'row'
+                add 'col-pos', current.colPos if classContains 'column'

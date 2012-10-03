@@ -8,17 +8,17 @@ $ ->
             gridsCache.length = 0
             _.each ($ 'div.xbl-fr-grid:visible'), (grid) ->
                 gridInfo =
-                    element: $ grid
+                    el: $ grid
                     offset: f$.offset $ grid
                     height: f$.height $ grid
                 gridInfo.rows = _.map (f$.find 'tr', $ grid), (tr) ->
                     grid: gridInfo
-                    element: $ tr
+                    el: $ tr
                     offset: f$.offset $ tr
                     height: f$.height $ tr
                 gridInfo.cols = _.map (f$.find 'tr:first td', $ grid), (td) ->
                     grid: gridInfo
-                    element: $ td
+                    el: $ td
                     offset: f$.offset $ td
                     width: f$.width $ td
                 gridsCache.unshift gridInfo

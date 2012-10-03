@@ -27,7 +27,7 @@ $ ->
         _.each ($ '.xbl-fr-section:visible'), (section) ->
             section = $ section
             sectionsCache.unshift
-                element: section
+                el: section
                 offset: f$.offset section
                 height: f$.height section
                 titleOffset: f$.offset f$.find 'a', section
@@ -39,14 +39,14 @@ $ ->
             sectionEditor.hide()
             currentSection = null
         becomesCurrent: (section) ->
-            currentSection = section.element
+            currentSection = section.el
             do positionEditor = ->
                 sectionEditor.show()
                 sectionEditor.offset
                     top: section.offset.top
                     left: (f$.offset $ '#fr-form-group').left - (f$.outerWidth sectionEditor)
             do updateTriggerRelevance = ->
-                container = section.element.children '.fr-section-container'
+                container = section.el.children '.fr-section-container'
                 # Hide/show section move icons
                 _.each (['up', 'right', 'down', 'left']), (direction) ->
                     relevant = container.hasClass ("fb-can-move-" + direction)
@@ -71,8 +71,8 @@ $ ->
             newLabelValue = f$.val labelInput
             OD.setValue (f$.attr 'id', $ '.fb-section-new-label'), newLabelValue
             section = Builder.findInCache sectionsCache, (f$.offset labelInput).top
-            f$.text newLabelValue, f$.find '.fr-section-label:first a', section.element
-            OD.dispatchEvent (f$.attr 'id', section.element), 'fb-update-section-label'
+            f$.text newLabelValue, f$.find '.fr-section-label:first a', section.el
+            OD.dispatchEvent (f$.attr 'id', section.el), 'fb-update-section-label'
             f$.hide labelInput
 
         showLabelEditor = (clickInterceptor) ->
@@ -88,7 +88,7 @@ $ ->
                 offset = f$.offset clickInterceptor
                 labelAnchor = do ->
                     section = Builder.findInCache sectionsCache, offset.top
-                    f$.find '.fr-section-label:first a', section.element
+                    f$.find '.fr-section-label:first a', section.el
                 do setInputContent = ->
                     labelText = f$.text labelAnchor
                     labelInput.val labelText
@@ -102,7 +102,7 @@ $ ->
         updateHightlight = (updateClass, clickInterceptor) ->
             offset = f$.offset clickInterceptor
             section = Builder.findInCache sectionsCache, offset.top
-            sectionTitle = f$.find '.fr-section-title:first', section.element
+            sectionTitle = f$.find '.fr-section-title:first', section.el
             updateClass 'hover', sectionTitle
 
         do setupLabelClickInterceptor = ->

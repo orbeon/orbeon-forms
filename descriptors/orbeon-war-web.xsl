@@ -284,10 +284,16 @@
                 <servlet-class>org.jfree.chart.servlet.DisplayChart</servlet-class>
             </servlet>
 
-            <servlet>
-                <servlet-name>exist-xmlrpc-servlet</servlet-name>
-                <servlet-class>org.exist.xmlrpc.RpcServlet</servlet-class>
-            </servlet>
+            <xsl:call-template name="comment">
+                <xsl:with-param name="caption" select="'eXist XMLRPC support'"/>
+                <xsl:with-param name="commented" select="$target = 'war'"/>
+                <xsl:with-param name="content">
+                    <servlet>
+                        <servlet-name>exist-xmlrpc-servlet</servlet-name>
+                        <servlet-class>org.exist.xmlrpc.RpcServlet</servlet-class>
+                    </servlet>
+                </xsl:with-param>
+            </xsl:call-template>
 
             <servlet>
                 <servlet-name>exist-rest-servlet</servlet-name>
@@ -306,23 +312,20 @@
                 </init-param>
             </servlet>
 
-            <servlet>
-                <servlet-name>exist-webdav-servlet</servlet-name>
-                <servlet-class>org.exist.http.servlets.WebDAVServlet</servlet-class>
-                <init-param>
-                    <param-name>authentication</param-name>
-                    <param-value>basic</param-value>
-                </init-param>
-            </servlet>
-
-            <servlet>
-                <servlet-name>exist-atom-servlet</servlet-name>
-                <servlet-class>org.exist.atom.http.AtomServlet</servlet-class>
-                <init-param>
-                    <param-name>authentication</param-name>
-                    <param-value>basic</param-value>
-                </init-param>
-            </servlet>
+            <xsl:call-template name="comment">
+                <xsl:with-param name="caption" select="'eXist WebDAV support'"/>
+                <xsl:with-param name="commented" select="$target = 'war'"/>
+                <xsl:with-param name="content">
+                    <servlet>
+                        <servlet-name>exist-webdav-servlet</servlet-name>
+                        <servlet-class>org.exist.http.servlets.WebDAVServlet</servlet-class>
+                        <init-param>
+                            <param-name>authentication</param-name>
+                            <param-value>basic</param-value>
+                        </init-param>
+                    </servlet>
+                </xsl:with-param>
+            </xsl:call-template>
 
             <xsl:call-template name="comment">
                 <xsl:with-param name="caption" select="'SQL examples'"/>
@@ -355,14 +358,20 @@
             </servlet-mapping>
 
             <servlet-mapping>
-                <servlet-name>exist-xmlrpc-servlet</servlet-name>
-                <url-pattern>/exist/xmlrpc</url-pattern>
-            </servlet-mapping>
-
-            <servlet-mapping>
                 <servlet-name>exist-rest-servlet</servlet-name>
                 <url-pattern>/exist/rest/*</url-pattern>
             </servlet-mapping>
+
+            <xsl:call-template name="comment">
+                <xsl:with-param name="caption" select="'eXist XMLRPC support'"/>
+                <xsl:with-param name="commented" select="$target = 'war'"/>
+                <xsl:with-param name="content">
+                    <servlet-mapping>
+                        <servlet-name>exist-xmlrpc-servlet</servlet-name>
+                        <url-pattern>/exist/xmlrpc</url-pattern>
+                    </servlet-mapping>
+                </xsl:with-param>
+            </xsl:call-template>
 
             <xsl:call-template name="comment">
                 <xsl:with-param name="caption" select="'eXist WebDAV support'"/>

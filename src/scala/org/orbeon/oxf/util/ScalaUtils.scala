@@ -123,7 +123,7 @@ object ScalaUtils {
     def appendStartingSlash(s: String) = if (s.size != 0 && s.head == '/') s else '/' + s
 
     def capitalizeHeader(s: String) =
-        if (s equalsIgnoreCase "SOAPAction") "SOAPAction" else s split '-' map (_.capitalize) mkString "-"
+        if (s equalsIgnoreCase "SOAPAction") "SOAPAction" else s split '-' map (_.toLowerCase.capitalize) mkString "-"
 
     // Shortcut for "not implemented yet" (something like this is in Scala 2.10)
     def ??? = throw new RuntimeException("NIY")

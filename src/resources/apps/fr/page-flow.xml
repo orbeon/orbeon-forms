@@ -228,6 +228,10 @@
         <setvalue ref="/*/mode"     matcher-group="3"/>
     </page>
 
+    <!-- Login -->
+    <page path="/fr/login"       view="login.xhtml"/>
+    <page path="/fr/login-error" view="login-error.xhtml" public-methods="GET HEAD POST"/>
+
     <!-- ==== Epilogue and handlers ================================================================================ -->
 
     <page id="not-found"    path="/fr/not-found"    view="not-found.xpl"/>

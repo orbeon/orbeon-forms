@@ -405,6 +405,44 @@
             </xsl:call-template>
 
             <xsl:call-template name="comment">
+                <xsl:with-param name="caption" select="'Form Runner authentication'"/>
+                <xsl:with-param name="commented" select="$target = 'war'"/>
+                <xsl:with-param name="content">
+                    <security-constraint>
+                        <web-resource-collection>
+                            <web-resource-name>Form Runner pages</web-resource-name>
+                            <url-pattern>/fr/*</url-pattern>
+                        </web-resource-collection>
+                        <auth-constraint>
+                            <role-name>orbeon-user</role-name>
+                        </auth-constraint>
+                    </security-constraint>
+                    <security-constraint>
+                        <web-resource-collection>
+                            <web-resource-name>Form Runner services and public pages</web-resource-name>
+                            <url-pattern>/fr/service/*</url-pattern>
+                            <url-pattern>/fr/not-found</url-pattern>
+                            <url-pattern>/fr/unauthorized</url-pattern>
+                            <url-pattern>/fr/error</url-pattern>
+                            <url-pattern>/fr/login</url-pattern>
+                            <url-pattern>/fr/login-error</url-pattern>
+                        </web-resource-collection>
+                        <!-- No auth-constraint -->
+                    </security-constraint>
+                    <login-config>
+                        <auth-method>FORM</auth-method>
+                        <form-login-config>
+                            <form-login-page>/fr/login</form-login-page>
+                            <form-error-page>/fr/login-error</form-error-page>
+                        </form-login-config>
+                    </login-config>
+                    <security-role>
+                        <role-name>orbeon-user</role-name>
+                    </security-role>
+                </xsl:with-param>
+            </xsl:call-template>
+
+            <xsl:call-template name="comment">
                 <xsl:with-param name="caption" select="'authentication example'"/>
                 <xsl:with-param name="commented" select="$target = 'war'"/>
                 <xsl:with-param name="content">

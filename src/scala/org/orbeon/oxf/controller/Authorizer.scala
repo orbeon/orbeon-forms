@@ -30,7 +30,7 @@ object Authorizer extends Logging {
     import PageFlowControllerProcessor._
     import URLRewriter._
 
-    private val TokenKey = "orbeon-token"
+    val TokenKey = "orbeon-token"
 
     // For now don't remember authorization, because simply remembering in the session is not enough if the authorization
     // depends on the request method, path, or headers.

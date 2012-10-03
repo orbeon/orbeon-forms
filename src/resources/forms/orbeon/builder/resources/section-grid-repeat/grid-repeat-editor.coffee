@@ -64,15 +64,15 @@ $ ->
                 rowIcon '.fb-insert-row-below', (row, icon) -> row.height - icon.height()
             ]
 
-        # When row/col isn't current anymore, hide icons
-        wasCurrent = (icons) -> -> _.each (_.values icons), (icon) -> f$.hide icon.el
-        becomesCurrent = (icons) -> (rowOrCol) ->
+        # Hide/show icons
+        hideIcons = (icons) -> -> _.each (_.values icons), (icon) -> f$.hide icon.el
+        showIcons = (icons) -> (rowOrCol) ->
             _.each icons, (icon) ->
                 f$.show icon.el
                 f$.offset (icon.offset rowOrCol), icon.el
 
         Builder.currentRowColChanged gridsCache,
-            wasCurrentRow: wasCurrent rowIcons
-            becomesCurrentRow: becomesCurrent rowIcons
-            wasCurrentCol: wasCurrent colIcons
-            becomesCurrentCol: becomesCurrent colIcons
+            wasCurrentRow:      hideIcons rowIcons
+            becomesCurrentRow:  showIcons rowIcons
+            wasCurrentCol:      hideIcons colIcons
+            becomesCurrentCol:  showIcons colIcons

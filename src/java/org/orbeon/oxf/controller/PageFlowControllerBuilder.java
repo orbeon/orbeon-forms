@@ -336,7 +336,7 @@ public class PageFlowControllerBuilder {
             }
 
             if (!foundActionWithoutWhen[0]) {
-                // Defaul branch for when all actions fail
+                // Default branch for when all actions fail
                 addWhen(new ASTWhen() {{
                     addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
                         addInput(new ASTInput("data", new ASTHrefId(xformedInstance)));

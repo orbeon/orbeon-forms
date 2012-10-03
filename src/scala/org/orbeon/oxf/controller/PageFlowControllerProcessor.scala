@@ -81,26 +81,48 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
             }
         }
 
-        def runErrorRoute(t: Throwable) = pageFlow.errorRoute match {
-            case Some(errorRoute) ⇒
-                // Run the error route
-                error("error caught", logParams)
-                ec.getResponse.setStatus(500)
-                error(OrbeonFormatter.format(t))
-                errorRoute.process(pc, ec, MatchResult(matches = false))
-            case None ⇒
-                // We don't have an error route so throw instead
-                throw t
+        def logError(t: Throwable) = {
+            error("error caught", logParams)
+            error(OrbeonFormatter.format(t))
         }
 
-        def runNotFoundRoute(t: Option[Throwable]) = {
+        def logNotFound(t: Option[Throwable]) = {
 
             def rootResource = t map getRootThrowable collect {
                 case e: ResourceNotFoundException ⇒ e.resource
                 case HttpStatusCodeException(_, Some(resource)) ⇒ resource
             }
 
-            info("not found", logParams ++ (rootResource.toList map ("resource" → _)))
+            info("not found", logParams ++ (rootResource map ("resource" → _)))
+        }
+
+        def logUnauthorized(e: HttpStatusCodeException) =
+            info("unauthorized", logParams :+ ("status-code" → e.code.toString))
+
+        // For services: only log and set response code
+        def sendError(t: Throwable)                      = { logError(t);        ec.getResponse.setStatus(500) }
+        def sendNotFound(t: Option[Throwable])           = { logNotFound(t);     ec.getResponse.setStatus(404) }
+        def sendUnauthorized(e: HttpStatusCodeException) = { logUnauthorized(e); ec.getResponse.setStatus(e.code) }
+
+        // For pages: log and try to run routes
+        def runErrorRoute(t: Throwable, log: Boolean = true) = {
+
+            if (log) logError(t)
+
+            pageFlow.errorRoute match {
+                case Some(errorRoute) ⇒
+                    // Run the error route
+                    ec.getResponse.setStatus(500)
+                    errorRoute.process(pc, ec, MatchResult(matches = false))
+                case None ⇒
+                    // We don't have an error route so throw instead
+                    throw t
+            }
+        }
+
+        def runNotFoundRoute(t: Option[Throwable]) = {
+
+            logNotFound(t)
 
             pageFlow.notFoundRoute match {
                 case Some(notFoundRoute) ⇒
@@ -109,20 +131,25 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
                     try notFoundRoute.process(pc, ec, MatchResult(matches = false))
                     catch { case t: Throwable ⇒ runErrorRoute(t) }
                 case None ⇒
-                    // We don't have a not found route so throw instead
-                    runErrorRoute(t getOrElse new HttpStatusCodeException(404))
+                    // We don't have a not found route so try the error route instead
+                    // Don't log because we already logged above
+                    runErrorRoute(t getOrElse new HttpStatusCodeException(404), log = false)
             }
         }
 
-        def runUnauthorizedRoute(t: Throwable, code: Int) = pageFlow.unauthorizedRoute match {
-            case Some(unauthorizedRoute) ⇒
-                // Run the unauthorized route
-                info("unauthorized", logParams)
-                ec.getResponse.setStatus(code)
-                unauthorizedRoute.process(pc, ec, MatchResult(matches = false))
-            case None ⇒
-                // We don't have an unauthorized route so throw instead
-                throw t
+        def runUnauthorizedRoute(e: HttpStatusCodeException) = {
+
+            logUnauthorized(e)
+
+            pageFlow.unauthorizedRoute match {
+                case Some(unauthorizedRoute) ⇒
+                    // Run the unauthorized route
+                    ec.getResponse.setStatus(e.code)
+                    unauthorizedRoute.process(pc, ec, MatchResult(matches = false))
+                case None ⇒
+                    // We don't have an unauthorized route so throw instead
+                    throw e
+            }
         }
 
         // Run the first matching entry if any
@@ -138,10 +165,10 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
                 catch { case t: Throwable ⇒
                     getRootThrowable(t) match {
                         case e: HttpRedirectException                            ⇒ ec.getResponse.sendRedirect(e.path, e.jParameters.orNull, e.serverSide, e.exitPortal)
-                        case e: HttpStatusCodeException if Set(404)(e.code)      ⇒ runNotFoundRoute(Some(t))
-                        case e: HttpStatusCodeException if Set(401, 403)(e.code) ⇒ runUnauthorizedRoute(t, e.code)
-                        case e: ResourceNotFoundException                        ⇒ runNotFoundRoute(Some(t))
-                        case e                                                   ⇒ runErrorRoute(t)
+                        case e: HttpStatusCodeException if Set(404)(e.code)      ⇒ if (route.isPage) runNotFoundRoute(Some(t)) else sendNotFound(Some(t))
+                        case e: HttpStatusCodeException if Set(401, 403)(e.code) ⇒ if (route.isPage) runUnauthorizedRoute(e)   else sendUnauthorized(e)
+                        case e: ResourceNotFoundException                        ⇒ if (route.isPage) runNotFoundRoute(Some(t)) else sendNotFound(Some(t))
+                        case e                                                   ⇒ if (route.isPage) runErrorRoute(t)          else sendError(t)
                     }
                 }
             case None ⇒
@@ -190,7 +217,7 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
         val syntheticPages =
             (controllerProperty(SubmissionPathProperty), controllerProperty(SubmissionModelProperty)) match {
                 case (Some(submissionPath), submissionModel @ Some(_)) ⇒
-                    Seq(PageOrServiceElement(None, submissionPath, Pattern.compile(submissionPath), None, submissionModel, None, configRoot, SubmissionPublicMethods))
+                    Seq(PageOrServiceElement(None, submissionPath, Pattern.compile(submissionPath), None, submissionModel, None, configRoot, SubmissionPublicMethods, isPage = true))
                 case _ ⇒
                     Seq()
             }
@@ -230,7 +257,7 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
             if (logger.isDebugEnabled) {
                 val astDocumentHandler = new ASTDocumentHandler
                 ast.walk(astDocumentHandler)
-                debug("Created PFC pipeline", Seq("path" → page.path, "pipeline" → ('\n' + domToString(astDocumentHandler.getDocument))))
+                debug("created PFC pipeline", Seq("path" → page.path, "pipeline" → ('\n' + domToPrettyString(astDocumentHandler.getDocument))))
             }
 
             PipelineProcessor.createConfigFromAST(ast)
@@ -343,7 +370,8 @@ object PageFlowControllerProcessor {
             model: Option[String],
             view: Option[String],
             element: Element,
-            publicMethods: Set[String])
+            publicMethods: Set[String],
+            isPage: Boolean)
         extends RouteElement
 
     object FileElement {
@@ -363,8 +391,10 @@ object PageFlowControllerProcessor {
         // id?, path-info, matcher?, default-submission?, model?, view?, public-methods?
         def apply(e: Element, defaultMatcher: QName, defaultPagePublicMethods: Set[String], defaultServicePublicMethods: Set[String]): PageOrServiceElement = {
 
+            val isPage = e.getName == "page"
+
             def localPublicMethods   = att(e, "public-methods") map stringToSet
-            def defaultPublicMethods = if (e.getName == "page") defaultPagePublicMethods else defaultServicePublicMethods
+            def defaultPublicMethods = if (isPage) defaultPagePublicMethods else defaultServicePublicMethods
 
             val path = getPath(e)
             PageOrServiceElement(
@@ -375,7 +405,8 @@ object PageFlowControllerProcessor {
                 att(e, "model"),
                 att(e, "view"),
                 e,
-                publicMethods = localPublicMethods getOrElse defaultPublicMethods)
+                localPublicMethods getOrElse defaultPublicMethods,
+                isPage)
         }
     }
 
@@ -388,25 +419,32 @@ object PageFlowControllerProcessor {
         def process(pc: PipelineContext, ec: ExternalContext, matchResult: MatchResult)(implicit logger: IndentedLogger)
     }
 
-    case class FileRoute(routeElement: FileElement) extends Route {
+    case class FileRoute(routeElement: FileElement) extends Route with Logging {
         // Serve a file by path
-        def process(pc: PipelineContext, ec: ExternalContext, matchResult: MatchResult)(implicit logger: IndentedLogger) =
+        def process(pc: PipelineContext, ec: ExternalContext, matchResult: MatchResult)(implicit logger: IndentedLogger) = {
+            debug("processing route", Seq("route" → this.toString))
             if (ec.getRequest.getMethod == "GET")
                 ResourceServer.serveResource(MimeTypes, ec.getRequest.getRequestPath, routeElement.versioned)
             else
                 unauthorized()
+        }
     }
 
     case class PageOrServiceRoute(
             routeElement: PageOrServiceElement,
             compile: PageOrServiceElement ⇒ PipelineConfig)(implicit val propertySet: PropertySet)
-        extends Route with Authorization {
+        extends Route with Authorization with Logging {
+
+        val isPage    = routeElement.isPage
+        val isService = ! isPage
 
         // Compile pipeline lazily
         lazy val pipelineConfig = compile(routeElement)
 
         // Run a page
         def process(pc: PipelineContext, ec: ExternalContext, matchResult: MatchResult)(implicit logger: IndentedLogger) = {
+
+            debug("processing route", Seq("route" → this.toString))
 
             // Make sure the request is authorized
             authorize(ec)

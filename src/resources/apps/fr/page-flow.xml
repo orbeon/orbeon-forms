@@ -109,8 +109,7 @@
     <!-- ==== Other services ======================================================================================= -->
 
     <!-- Generate a schema for a form -->
-    <!-- TODO rename to service; using page for testing -->
-    <page path="/fr/service/schema/([^/^.]+)/([^/^.]+)" model="ws/schema.xpl"/>
+    <service path="/fr/service/schema/([^/^.]+)/([^/^.]+)" model="ws/schema.xpl"/>
 
     <!-- Email document -->
     <service path="/fr/service/([^/^.]+)/([^/^.]+)/(email)(/([^/^.]+))?"
@@ -118,7 +117,7 @@
 
     <!-- Create PDF directly from an XForms engine live document -->
     <page path="/fr/service/([^/^.]+)/([^/^.]+)/(pdf)/([^/^.]+)/([0-9A-Za-z\-]+)\.pdf"
-             view="print/pdf-instant-view.xpl">
+          view="print/pdf-instant-view.xpl">
     </page>
 
     <!-- Create PDF from a stored document -->
@@ -166,12 +165,12 @@
              view="/forms/${1}/${2}/service/${3}.xpl"/>
 
     <!-- Custom pages provided by the application -->
-    <service path="/fr/page/custom/([^/^.]+)/([^/^.]+)"
-             view="/forms/${1}/page/${2}.xhtml"/>
+    <page path="/fr/page/custom/([^/^.]+)/([^/^.]+)"
+          view="/forms/${1}/page/${2}.xhtml"/>
 
     <!-- Custom pages provided by the form -->
-    <service path="/fr/page/custom/([^/^.]+)/([^/^.]+)/([^/^.]+)"
-             view="/forms/${1}/${2}/page/${3}.xhtml"/>
+    <page path="/fr/page/custom/([^/^.]+)/([^/^.]+)/([^/^.]+)"
+          view="/forms/${1}/${2}/page/${3}.xhtml"/>
 
     <!-- ==== Pages ================================================================================================ -->
 

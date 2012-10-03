@@ -442,32 +442,6 @@
                 </xsl:with-param>
             </xsl:call-template>
 
-            <xsl:call-template name="comment">
-                <xsl:with-param name="caption" select="'authentication example'"/>
-                <xsl:with-param name="commented" select="$target = 'war'"/>
-                <xsl:with-param name="content">
-                    <security-constraint>
-                        <web-resource-collection>
-                            <web-resource-name>Authentication example</web-resource-name>
-                            <url-pattern>/java-authentication/</url-pattern>
-                        </web-resource-collection>
-                        <auth-constraint>
-                            <role-name>orbeon-admin</role-name>
-                        </auth-constraint>
-                    </security-constraint>
-                    <login-config>
-                        <auth-method>FORM</auth-method>
-                        <form-login-config>
-                            <form-login-page>/java-authentication/login</form-login-page>
-                            <form-error-page>/java-authentication/login-error</form-error-page>
-                        </form-login-config>
-                    </login-config>
-                    <security-role>
-                        <role-name>orbeon-admin</role-name>
-                    </security-role>
-                </xsl:with-param>
-            </xsl:call-template>
-
             <session-config>
                 <!-- 12 * 60 = 12 hours -->
                 <session-timeout>720</session-timeout>

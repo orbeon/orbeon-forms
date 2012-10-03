@@ -56,6 +56,5 @@
         <application id="xforms-jsp/guess-the-number" label="JSP Guess the Number"/>
         <application id="xforms-jsp/flickr-search" label="JSP Flickr Search"/>
         <application id="java-api" label="Java API"/>
-        <application id="java-authentication" label="Java Authentication"/>
     </section>
 </applications>

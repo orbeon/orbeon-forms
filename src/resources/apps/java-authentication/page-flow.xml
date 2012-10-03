@@ -16,7 +16,7 @@
     <page id="home" path="/java-authentication/" model="model.xpl" view="view.xhtml"/>
 
     <page path="/java-authentication/login" view="login.xhtml"/>
-    <page path="/java-authentication/login-error" view="login-error.xhtml"/>
+    <page path="/java-authentication/login-error" view="login-error.xhtml" public-methods="GET HEAD POST"/>
     <page path="/java-authentication/logout">
         <action action="logout.xpl">
             <result page="home"/>

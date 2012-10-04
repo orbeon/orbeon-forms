@@ -428,8 +428,9 @@
                     </security-constraint>
                     <security-constraint>
                         <web-resource-collection>
-                            <web-resource-name>Form Runner services and public pages</web-resource-name>
+                            <web-resource-name>Form Runner services and public pages and resources</web-resource-name>
                             <url-pattern>/fr/service/*</url-pattern>
+                            <url-pattern>/fr/style/*</url-pattern>
                             <url-pattern>/fr/not-found</url-pattern>
                             <url-pattern>/fr/unauthorized</url-pattern>
                             <url-pattern>/fr/error</url-pattern>

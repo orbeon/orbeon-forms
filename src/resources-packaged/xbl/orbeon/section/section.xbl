@@ -67,10 +67,10 @@
                     <xf:group appearance="xxf:internal" xxbl:scope="outer">
                         <xf:var name="id" xbl:attr="xbl:text=id"/>
                         <xf:var name="fb-section" value="xxforms:instance('fb-form-instance')/xhtml:body//fr:section[@id = $id]"/>
-                        <xf:var name="fb-can-move-classes" value="if (exists($fb-section)) then sectionOps:canDoClasses($fb-section) else ''"/>
+                        <xf:var name="fb-can-do-classes" value="if (exists($fb-section)) then sectionOps:canDoClasses($fb-section) else ''"/>
 
                         <xforms:group xbl:attr="model context ref bind"
-                                class="{string-join(('fr-section-container', @class), ' ')} {{$fb-can-move-classes}}">
+                                class="{string-join(('fr-section-container', @class), ' ')} {{$fb-can-do-classes}}">
 
                             <xf:group xxbl:scope="inner" appearance="xxf:internal">
 

@@ -35,6 +35,7 @@ html {
 }
 .fb-grid-repeat-editor .xforms-trigger {
   display: none;
+  position: absolute;
 }
 .fb-section-label-editor-click-interceptor {
   position: absolute;

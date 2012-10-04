@@ -32,7 +32,10 @@ html { overflow: hidden }
 }
 
 .fb-grid-repeat-editor {                                                                                                // Section that contains the grid/repeat icons that are moved based on pointer position
-  .xforms-trigger { display: none }                                                                                     // Shown in CoffeeScript based on pointer position
+    .xforms-trigger {
+        display: none;                                                                                                  // Shown in CoffeeScript based on pointer position
+        position: absolute;                                                                                             // Left/right set in CoffeeScript
+    }
 }
 
 .fb-section-label-editor-click-interceptor {                                                                            // Shown on top of each section label to avoid click → collapse

@@ -576,7 +576,7 @@
                                     <xxf:context name="positive-targetid" value="xxf:absolute-id('delete-section-trigger')"/>
                                     <xxf:context name="context" value="event('section-id')"/>
                                 </xf:dispatch>
-                                <xf:action ev:event="fr-positive" type="xpath">containerOps:deleteContainer(event('context'))</xf:action>
+                                <xf:action ev:event="fr-positive" type="xpath">containerOps:deleteContainerById(event('context'))</xf:action>
                             </xf:trigger>
                             <!-- Edit details -->
                             <xf:trigger appearance="minimal">
@@ -629,9 +629,17 @@
                         <xh:div class="fb-grid-repeat-editor">
                             <!-- Delete grid -->
                             <xf:trigger appearance="minimal" id="delete-grid-trigger" class="fb-delete-grid-trigger">
-                                <xf:action ev:event="fr-positive" type="xpath">
-                                    gridOps:deleteGrid($grid)
-                                </xf:action>
+                                <xf:label><xh:img width="16" height="16" src="/apps/fr/style/images/silk/bin.png" alt="{{$fb-resources/delete-grid-icon/label}}" title="{{$fb-resources/delete-grid-icon/label}}"/></xf:label>
+                                <!-- Ask confirmation -->
+                                <xf:dispatch ev:event="DOMActivate" name="fr-show" targetid="dialog-confirmation">
+                                    <xxf:context name="message"
+                                         value="concat($fb-resources/messages/delete-grid, ' ',
+                                                       xxf:format-message($fb-resources/messages/controls-will-be-deleted,
+                                                                          containerOps:controlsInContainer(event('grid-id'))))"/>
+                                    <xxf:context name="positive-targetid" value="xxf:absolute-id('delete-grid-trigger')"/>
+                                    <xxf:context name="context" value="event('grid-id')"/>
+                                </xf:dispatch>
+                                <xf:action ev:event="fr-positive" type="xpath">containerOps:deleteContainerById(event('context'))</xf:action>
                             </xf:trigger>
                             <!-- Insert column to the left -->
                             <xf:trigger appearance="minimal" class="fb-insert-column-left">

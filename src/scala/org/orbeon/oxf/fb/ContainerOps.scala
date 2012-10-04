@@ -84,7 +84,7 @@ object ContainerOps {
         container \ * filter IsGrid
 
     // Delete the entire container and contained controls
-    def deleteContainer(containerId: String): Unit = deleteContainer(containerById(containerId))
+    def deleteContainerById(containerId: String): Unit = deleteContainer(containerById(containerId))
     def deleteContainer(container: NodeInfo) = {
 
         // Find the new td to select if we are removing the currently selected td

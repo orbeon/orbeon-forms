@@ -252,23 +252,6 @@
 
         </xforms:model>
 
-        <!-- This model handles help -->
-        <!--<xforms:model id="fr-help-model">-->
-            <!--<xforms:instance id="fr-help-instance">-->
-                <!--<help xmlns="">-->
-                    <!--<label/>-->
-                    <!--<help/>-->
-                <!--</help>-->
-            <!--</xforms:instance>-->
-
-            <!-- Take action upon xforms-help on #fr-form-group -->
-            <!--<xforms:action ev:observer="fr-form-group" ev:event="xforms-help" ev:defaultAction="cancel">-->
-                <!--<xforms:setvalue ref="instance('fr-help-instance')/label" value="event('xxforms:label')"/>-->
-                <!--<xforms:setvalue ref="instance('fr-help-instance')/help" value="event('xxforms:help')"/>-->
-            <!--</xforms:action>-->
-
-        <!--</xforms:model>-->
-
         <xxforms:variable name="url-base-for-requests" select="'{$url-base-for-requests}'"/>
 
         <!-- This model handles Form Builder roles and permissions -->

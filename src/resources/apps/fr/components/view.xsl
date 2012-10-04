@@ -645,7 +645,7 @@
         </xhtml:div>
     </xsl:template>
 
-    <!-- Table of contents UI -->
+    <!-- TOC: Top-level -->
     <xsl:template name="fr-toc">
         <!-- This is statically built in XSLT instead of using XForms -->
         <xsl:if test="$has-toc and $is-detail and not($is-form-builder) and count(/xhtml:html/xhtml:body//fr:section) ge $min-toc">
@@ -658,41 +658,36 @@
         </xsl:if>
     </xsl:template>
 
+    <!-- TOC: Swallow unneeded nodes -->
     <xsl:template match="text()" mode="fr-toc-sections"/>
 
     <xsl:template match="*" mode="fr-toc-sections">
         <xsl:apply-templates mode="fr-toc-sections"/>
     </xsl:template>
 
+    <!-- TOC: handle section -->
     <xsl:template match="fr:section" mode="fr-toc-sections">
-        <xsl:variable name="id" select="@id"/>
-        <xsl:variable name="sub-sections">
-            <xsl:if test="exists(fr:section)">
-                <xhtml:ol>
-                    <xsl:apply-templates mode="fr-toc-sections"/>
-                </xhtml:ol>
-            </xsl:if>
-        </xsl:variable>
-        <xhtml:li xxforms:control="true">
-            <xsl:copy-of select="@bind | @ref"/>
-            <!-- Reference bind so that entry for section disappears if the section is non-relevant -->
-            <xsl:choose>
-                <xsl:when test="not($is-noscript) and $mode = ('new', 'edit', 'import')">
-                    <xforms:trigger appearance="minimal">
-                        <xforms:label value="xxforms:label('{$id}')"/>
-                        <xforms:setfocus ev:event="DOMActivate" control="{$id}" xxforms:input-only="true"/>
-                    </xforms:trigger>
-                </xsl:when>
-                <xsl:otherwise>
-                    <xhtml:a href="#{$id}"><xforms:output value="xxforms:label('{$id}')"/></xhtml:a>
-                </xsl:otherwise>
-            </xsl:choose>
-            <xsl:copy-of select="$sub-sections"/>
-        </xhtml:li>
+        <xforms:group>
+            <!-- Propagate binding so that entry for section disappears if the section is non-relevant -->
+            <xsl:copy-of select="@model | @context | @bind | @ref"/>
+            <xhtml:li>
+                <!-- Clicking sets the focus -->
+                <xforms:trigger appearance="minimal">
+                    <xforms:label value="xxforms:label('{@id}')"/>
+                    <xforms:setfocus ev:event="DOMActivate" control="{@id}" input-only="true"/>
+                </xforms:trigger>
+                <!-- Sub-sections if any -->
+                <xsl:if test="exists(fr:section)">
+                    <xhtml:ol>
+                        <xsl:apply-templates mode="fr-toc-sections"/>
+                    </xhtml:ol>
+                </xsl:if>
+            </xhtml:li>
+        </xforms:group>
     </xsl:template>
 
     <!-- Add a default xforms:alert for those fields which don't have one. Only do this within grids and dialogs. -->
-    <!-- TODO: Do we really need/want this? -->
+    <!-- Q: Do we really need this? -->
     <xsl:template
         match="xhtml:body//fr:grid//xforms:*[local-name() = ('input', 'textarea', 'select', 'select1', 'upload') and not(xforms:alert)]
                        | xhtml:body//xxforms:dialog//xforms:*[local-name() = ('input', 'textarea', 'select', 'select1', 'upload') and not(xforms:alert)]">

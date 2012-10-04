@@ -22,16 +22,6 @@ import org.orbeon.oxf.xforms.XFormsUtils
 
 object SectionOps {
 
-    def sectionById(sectionId: String): NodeInfo = {
-        // Support effective id, to make it easier to use from XForms (i.e. no need to call XFormsUtils.getStaticIdFromId every time)
-        val staticId = XFormsUtils.getStaticIdFromId(sectionId)
-        val formInstance = asNodeInfo(model("fr-form-model").get.getInstance("fb-form-instance"))
-        formInstance \ "*:body" \\ "*:section" filter (_ \@ "id" === staticId) head
-    }
-
-    // Delete the entire section and contained controls
-    def deleteSection(section: NodeInfo) = deleteContainer(section)
-
     def canDeleteSection(section: NodeInfo): Boolean = {
         val isSubSection = (section ancestor "*:section").nonEmpty        // We can always delete a sub-section
         val hasSiblingSection = (section sibling "*:section").nonEmpty    // We don't want to delete the last top-level section

@@ -446,7 +446,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
         )
 
         assertSelectedTdAfterDelete(beforeAfter) { td ⇒
-            deleteGrid(getContainingGrid(td))
+            deleteContainer(getContainingGrid(td))
         }
     }
 
@@ -461,7 +461,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
         )
 
         assertSelectedTdAfterDelete(beforeAfter) { td ⇒
-            deleteSection(findAncestorContainers(getContainingGrid(td)) head)
+            deleteContainer(findAncestorContainers(getContainingGrid(td)) head)
         }
     }
 

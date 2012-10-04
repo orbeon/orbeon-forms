@@ -89,7 +89,7 @@ $ ->
 
         # Functions maintaining current row/col position
         resetPos = (pos) -> -> current[pos] = -1
-        setPos = (pos) -> (rowCol) -> current[pos] = 1 + f$.length f$.prev rowCol.el[0].tagName, rowCol.el
+        setPos = (pos) -> (rowCol) -> current[pos] = f$.length f$.prev rowCol.el[0].tagName, rowCol.el
 
         Builder.currentRowColChanged gridsCache,
             wasCurrentRow:      resetPos 'rowPos'

@@ -104,7 +104,13 @@ object GridOps {
             <xhtml:td xmlns:xhtml="http://www.w3.org/1999/xhtml" id={id}/>
     }
 
+    private def trAtRowPos(gridId: String, rowPos: Int): NodeInfo = {
+        val grid = containerById(gridId)
+        (grid \ "*:tr")(rowPos)
+    }
+
     // Insert a row below
+    def insertRowBelow(gridId: String, rowPos: Int): NodeInfo = insertRowBelow(trAtRowPos(gridId, rowPos))
     def insertRowBelow(tr: NodeInfo): NodeInfo = {
 
         // NOTE: This algorithm expands rowspans that span over the current row, but not rowspans that end with the
@@ -128,6 +134,7 @@ object GridOps {
     }
 
     // Insert a row above
+    def insertRowAbove(gridId: String, rowPos: Int): NodeInfo = insertRowAbove(trAtRowPos(gridId, rowPos))
     def insertRowAbove(tr: NodeInfo): NodeInfo =
         tr precedingSibling "*:tr" headOption match {
             case Some(prevRow) ⇒
@@ -152,7 +159,9 @@ object GridOps {
     }
 
     // Delete a row and contained controls
-    def deleteRow(tr: NodeInfo) {
+
+    def deleteRow(gridId: String, rowPos: Int): Unit = deleteRow(trAtRowPos(gridId, rowPos))
+    def deleteRow(tr: NodeInfo): Unit = {
 
         val allRowCells  = getAllRowCells(getContainingGrid(tr))
 
@@ -196,10 +205,14 @@ object GridOps {
     // NOTE: Use this until we implement the new selection system allowing moving stuff around freely
     def isLastGridInSection(grid: NodeInfo) = childrenGrids(findAncestorContainers(grid).head).size == 1
 
-    // Delete the entire grid and contained controls
-    def deleteGrid(grid: NodeInfo) = deleteContainer(grid)
+    private def tdAtColPos(gridId: String, colPos: Int): NodeInfo = {
+        val grid = containerById(gridId)
+        val firstRow = (grid \ "*:tr").head
+        (firstRow \ "*:td")(colPos)
+    }
 
     // Insert a column to the right
+    def insertColRight(gridId: String, colPos: Int): Unit = insertColRight(tdAtColPos(gridId, colPos))
     def insertColRight(firstRowTd: NodeInfo) {
 
         val grid = getContainingGrid(firstRowTd)
@@ -221,6 +234,7 @@ object GridOps {
     }
 
     // Insert a column to the left
+    def insertColLeft(gridId: String, colPos: Int): Unit = insertColLeft(tdAtColPos(gridId, colPos))
     def insertColLeft(firstRowTd: NodeInfo) {
 
         val grid = getContainingGrid(firstRowTd)
@@ -252,6 +266,7 @@ object GridOps {
     }
 
     // Insert a column and contained controls
+    def deleteCol(gridId: String, colPos: Int): Unit = deleteCol(tdAtColPos(gridId, colPos))
     def deleteCol(firstRowTd: NodeInfo) {
 
         val grid = getContainingGrid(firstRowTd)
@@ -276,13 +291,20 @@ object GridOps {
         debugDumpDocument("delete col", grid)
     }
 
-    def controlsInCol(firstRowTd: NodeInfo) = {
+    def controlsInCol(gridId: String, colPos: Int): Int = controlsInCol(tdAtColPos(gridId, colPos))
+    def controlsInCol(firstRowTd: NodeInfo): Int = {
         val grid = getContainingGrid(firstRowTd)
         val allRowCells = getAllRowCells(grid)
-        
+
         val (x, _) = tdCoordinates(firstRowTd: NodeInfo, allRowCells: Seq[Seq[Cell]])
 
         allRowCells map (_(x)) filterNot (_.missing) filter (cell ⇒ hasChildren(cell.td)) size
+    }
+
+    def controlsInRow(gridId: String, rowPos: Int): Int = {
+        val grid = containerById(gridId)
+        val row = (grid \ "*:tr")(rowPos)
+        (row \ "*:td" \ *).length
     }
 
     private def selectedCellVar =
@@ -324,7 +346,7 @@ object GridOps {
                     case Seq(followingTd, _*) if followingTd \ * isEmpty  ⇒
                         // Next td exists is empty: move to that one
                         selectTd(followingTd)
-                        Some(followingTd)   
+                        Some(followingTd)
                     case Seq(followingTd, _*) ⇒
                         // Next td exists but is not empty: NOP for now
                         None
@@ -449,7 +471,7 @@ object GridOps {
 
         val trToInsertInto = grid \ "*:tr" apply posyToInsertInto
         val tdToInsertAfter = rowBelow.slice(0, x).reverse find (! _.missing) map (_.td) toSeq
-        
+
         insert(into = trToInsertInto, after = tdToInsertAfter, origin = newTdElement(grid, nextId(grid, "tmp")))
     }
 

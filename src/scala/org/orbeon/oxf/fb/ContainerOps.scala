@@ -19,6 +19,7 @@ import org.orbeon.scaxon.XML._
 import org.orbeon.oxf.fb.ControlOps._
 import org.orbeon.oxf.fb.GridOps._
 import FormBuilderFunctions._
+import org.orbeon.oxf.xforms.XFormsUtils
 
 object ContainerOps {
 
@@ -39,6 +40,15 @@ object ContainerOps {
 
     val IsSectionTemplateContent: NodeInfo ⇒ Boolean =
         container ⇒ (container parent * exists IsSection) && ComponentURI.findFirstIn(namespaceURI(container)).nonEmpty
+
+    def containerById(containerId: String): NodeInfo = {
+        // Support effective id, to make it easier to use from XForms (i.e. no need to call XFormsUtils.getStaticIdFromId every time)
+        val staticId = XFormsUtils.getStaticIdFromId(containerId)
+        val formInstance = asNodeInfo(model("fr-form-model").get.getInstance("fb-form-instance"))
+        formInstance \ "*:body" \\ * filter IsContainer filter (_ \@ "id" === staticId) head
+    }
+
+    def controlsInContainer(containerId: String): Int = (containerById(containerId) \\ "*:td" \ *).length
 
     // XForms callers: get the name for a section or grid element or null (the empty sequence)
     def getContainerNameOrEmpty(elem: NodeInfo) = getControlNameOption(elem).orNull
@@ -74,6 +84,7 @@ object ContainerOps {
         container \ * filter IsGrid
 
     // Delete the entire container and contained controls
+    def deleteContainer(containerId: String): Unit = deleteContainer(containerById(containerId))
     def deleteContainer(container: NodeInfo) = {
 
         // Find the new td to select if we are removing the currently selected td

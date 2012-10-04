@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.control
 
 import controls._
-import org.orbeon.oxf.xforms.control.Controls.AncestorIterator
+import org.orbeon.oxf.xforms.control.Controls.AncestorOrSelfIterator
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 
 import org.orbeon.oxf.xforms.event._
@@ -148,7 +148,7 @@ object Focus {
     // Whether focus is currently within the given container
     def isFocusWithinContainer(container: XFormsContainerControl) =
         Option(container.containingDocument.getControls.getFocusedControl) match {
-            case Some(control) if new AncestorIterator(control.parent) exists (_ eq container) ⇒ true
+            case Some(control) if new AncestorOrSelfIterator(control.parent) exists (_ eq container) ⇒ true
             case _ ⇒ false
         }
 
@@ -190,14 +190,19 @@ object Focus {
         removeFocusPartially(doc, boundary = None)
 
     // Whether the control is hidden within a non-visible case or dialog
-    private def isHidden(control: XFormsControl) = new AncestorIterator(control.parent) exists {
+    private def isHidden(control: XFormsControl) = new AncestorOrSelfIterator(control.parent) exists {
         case switchCase: XFormsCaseControl if ! switchCase.isVisible ⇒ true
         case dialog: XXFormsDialogControl if ! dialog.isVisible ⇒ true
         case _ ⇒ false
     }
 
+    // Return all the ancestor-or-self hidden cases
+    def hiddenCases(control: XFormsControl) = new AncestorOrSelfIterator(control.parent) collect {
+        case switchCase: XFormsCaseControl if ! switchCase.isVisible ⇒ switchCase
+    }
+
     // Whether the control is focusable, that is it supports focus, is relevant, not read-only, and is not in a hidden case or dialog
-    private def isFocusable(control: XFormsControl) = control match {
+    def isFocusable(control: XFormsControl) = control match {
         case focusable: XFormsSingleNodeControl with FocusableTrait ⇒ focusable.isRelevant && ! isHidden(focusable) && ! focusable.isReadonly
         case focusable: FocusableTrait                              ⇒ focusable.isRelevant && ! isHidden(focusable)
         case _ ⇒ false
@@ -212,7 +217,7 @@ object Focus {
 
     // Find all ancestor container controls of the given control from leaf to root
     private def containers(control: XFormsControl) =
-        new AncestorIterator(control.parent) collect
+        new AncestorOrSelfIterator(control.parent) collect
             { case container: XFormsContainerControl ⇒ container } toList
 
     // Ancestor controls and control from leaf to root excepting the root control

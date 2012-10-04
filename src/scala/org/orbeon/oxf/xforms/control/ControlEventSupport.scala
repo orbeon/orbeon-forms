@@ -14,11 +14,10 @@
 package org.orbeon.oxf.xforms.control
 
 import org.orbeon.oxf.xforms._
-import control.Controls.AncestorIterator
+import control.Controls.AncestorOrSelfIterator
 import event.events._
 import event.{EventListener, XFormsEvent, XFormsEventObserver}
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatIterationControl
-import java.util.{Set ⇒ JSet, Collections ⇒ JCollections }
 import org.orbeon.oxf.xforms.analysis.controls.ViewTrait
 
 trait ControlEventSupport {
@@ -31,9 +30,12 @@ trait ControlEventSupport {
 
             // Find current path through ancestor xforms:repeat elements, if any
             val repeatIterationsToModify =
-                new AncestorIterator(self) collect
+                new AncestorOrSelfIterator(self) collect
                     { case ri: XFormsRepeatIterationControl if ! ri.isCurrentIteration ⇒ ri.getEffectiveId }
 
+            // NOTE: It would be nice to review whether it makes sense to re-obtain controls by id in the code below. Is
+            // there a use case for it? Events canbe dispatched via setIndex(), which means that repeats and relevance
+            // can change. But is there a better way?
             if (repeatIterationsToModify.nonEmpty) {
                 val controls = containingDocument.getControls
                 // Find all repeat iterations and controls again
@@ -50,8 +52,14 @@ trait ControlEventSupport {
             }
 
             // Focus on current control if possible
-            if (event.isInstanceOf[XFormsFocusEvent])
+            if (event.isInstanceOf[XFormsFocusEvent]) {
+                // Try to update hidden xforms:case controls
+                // NOTE: We don't allow this behavior when events come from the client in ClientEvents
+                // NOTE: See note above on re-obtaining controls by id. Do we need to do this here as well?
+                Focus.hiddenCases(this) foreach (_.toggle())
+
                 setFocus()
+            }
 
         case _: XFormsHelpEvent ⇒
             containingDocument.setClientHelpEffectiveControlId(getEffectiveId)

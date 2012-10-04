@@ -441,9 +441,11 @@ object ClientEvents extends Logging {
                 case control: XFormsSingleNodeControl if control.isReadonly ⇒
                     warn("read-only control")
 
-                // Single node controls accept value change event only if actually bound
-                case control: XFormsSingleNodeControl if (control.getBoundItem eq null) && event.isInstanceOf[XXFormsValueEvent] ⇒
-                    warn("control without single-node binding")
+                // Disallow focus if the control is no focusable
+                // Relevance and read-only above are already caught. This catches hidden controls, which must not be
+                // focusable from the client.
+                case control: XFormsControl if event.isInstanceOf[XFormsFocusEvent] && ! Focus.isFocusable(control) ⇒
+                    warn("non-focusable control")
 
                 case _ ⇒
                     true

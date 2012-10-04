@@ -778,17 +778,14 @@
                             <!-- Initial control -->
                             <xf:setfocus control="my-input-1"/>
                             <xf:insert model="events-model" context="." ref="*" origin="xxf:element('separator')"/>
-                            <!-- Set focus to hidden control (must fail) -->
+                            <!-- Set focus to hidden control (used to fail, now passes and case-2 is toggled) -->
                             <xf:setfocus control="my-input-2"/>
                             <xf:insert model="events-model" context="." ref="*" origin="xxf:element('separator')"/>
-                            <!-- Toggle case (focus must go away) -->
-                            <xf:toggle case="case-2"/>
+                            <!-- Toggle back to case-1 (focus must go away) -->
+                            <xf:toggle case="case-1"/>
                             <xf:insert model="events-model" context="." ref="*" origin="xxf:element('separator')"/>
-                            <!-- Set focus to hidden control (must fail) -->
+                            <!-- Set focus back to control -->
                             <xf:setfocus control="my-input-1"/>
-                            <xf:insert model="events-model" context="." ref="*" origin="xxf:element('separator')"/>
-                            <!-- Set focus to newly visible control (must succeed) -->
-                            <xf:setfocus control="my-input-2"/>
                             <xf:insert model="events-model" context="." ref="*" origin="xxf:element('separator')"/>
                             <!-- Toggle 3rd case (focus must go to new control) -->
                             <xf:toggle case="case-3"/>
@@ -805,7 +802,7 @@
                 <xh:body>
 
                     <!-- Record focus events -->
-                    <xf:insert ev:event="DOMFocusIn DOMFocusOut" model="events-model" context="." ref="*"
+                    <xf:insert ev:event="DOMFocusIn DOMFocusOut xforms-select xforms-deselect" model="events-model" context="." ref="*"
                         origin="xxf:element('event',
                                 (xxf:attribute('type', event('xxf:type')),
                                  xxf:attribute('target', event('xxf:absolute-targetid'))))"/>
@@ -827,7 +824,7 @@
             </xh:html>
         </input>
         <output name="response">
-            <xxf:event-response>
+           <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
@@ -837,20 +834,31 @@
                                     <event type="DOMFocusIn" target="/case-1"/>
                                     <event type="DOMFocusIn" target="/my-input-1"/>
                                     <separator/>
-                                    <separator/>
+                                    <event type="xforms-deselect" target="/case-1"/>
+                                    <event type="xforms-select" target="/case-2"/>
                                     <event type="DOMFocusOut" target="/my-input-1"/>
                                     <event type="DOMFocusOut" target="/case-1"/>
-                                    <event type="DOMFocusOut" target="/my-switch"/>
-                                    <separator/>
-                                    <separator/>
-                                    <event type="DOMFocusIn" target="/my-switch"/>
                                     <event type="DOMFocusIn" target="/case-2"/>
                                     <event type="DOMFocusIn" target="/my-input-2"/>
                                     <separator/>
+                                    <event type="xforms-deselect" target="/case-2"/>
+                                    <event type="xforms-select" target="/case-1"/>
                                     <event type="DOMFocusOut" target="/my-input-2"/>
                                     <event type="DOMFocusOut" target="/case-2"/>
+                                    <event type="DOMFocusOut" target="/my-switch"/>
+                                    <separator/>
+                                    <event type="DOMFocusIn" target="/my-switch"/>
+                                    <event type="DOMFocusIn" target="/case-1"/>
+                                    <event type="DOMFocusIn" target="/my-input-1"/>
+                                    <separator/>
+                                    <event type="xforms-deselect" target="/case-1"/>
+                                    <event type="DOMFocusOut" target="/my-input-1"/>
+                                    <event type="DOMFocusOut" target="/case-1"/>
+                                    <event type="DOMFocusOut" target="/my-switch"/>
+                                    <event type="DOMFocusIn" target="/my-switch"/>
                                     <event type="DOMFocusIn" target="/case-3"/>
                                     <event type="DOMFocusIn" target="/my-input-3"/>
+                                    <event type="xforms-select" target="/case-3"/>
                                 </events>
                             </instance>
                         </instances>

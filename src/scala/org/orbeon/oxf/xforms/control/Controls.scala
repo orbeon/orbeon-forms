@@ -353,7 +353,7 @@ object Controls {
     }
 
     // Iterator over a control's ancestors
-    class AncestorIterator(start: XFormsControl) extends Iterator[XFormsControl] {
+    class AncestorOrSelfIterator(start: XFormsControl) extends Iterator[XFormsControl] {
         private var _next = start
         def hasNext = _next ne null
         def next() = {

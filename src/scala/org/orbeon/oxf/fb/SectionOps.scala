@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.fb
 
+import collection.JavaConverters._
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.oxf.fb.ContainerOps._
 import org.orbeon.scaxon.XML._
@@ -72,14 +73,14 @@ object SectionOps {
     def canMoveLeft(container: NodeInfo) =
         findAncestorContainers(container).size >= 2
 
-    def canDoClasses(container: NodeInfo): String = {
+    def canDoClasses(container: NodeInfo): java.util.List[String] = {
         val directionClasses = {
             val directionCheck = Map("up" → (canMoveUp _), "right" → (canMoveRight _), "down" → (canMoveDown _),  "left" → (canMoveLeft _))
             val canDirections = directionCheck filter { case (_, check) ⇒ check(container) } map { case (direction, _) ⇒ direction }
             canDirections map ( "fb-can-move-" ++ _)
         }
         val deleteClass = if (canDeleteSection(container)) Some("fb-can-delete") else None
-        (directionClasses ++ deleteClass) mkString " "
+        (directionClasses ++ deleteClass).toList.asJava
     }
 
     private def precedingSection(container: NodeInfo) =

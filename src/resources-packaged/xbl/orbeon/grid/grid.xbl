@@ -39,7 +39,7 @@
 
     <xbl:binding id="fr-grid-binding" element="fr|grid">
 
-        <xbl:template xxbl:transform="oxf:xslt">
+        <xbl:template xxbl:transform="oxf:unsafe-xslt">
             <xsl:transform version="2.0">
                 <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
                 <xsl:import href="oxf:/oxf/xslt/utils/xbl.xsl"/>
@@ -95,14 +95,19 @@
                             </xxf:var>
                         </xsl:if>
 
-                        <xxf:var name="max-columns" value="xxforms:property('oxf.fb.grid.max-columns')"/>
+                        <xf:var name="max-columns" value="xxforms:property('oxf.fb.grid.max-columns')"/>
 
                         <!-- Grid table -->
+                        <xf:var name="id" xbl:attr="xbl:text=id"/>
                         <xh:table class="{'fr-grid',
                                           @class,
-                                          if ($is-repeat) then ('table', 'table-bordered', 'table-condensed', 'fr-repeat', 'fr-repeat-table', if ($static-row-count le 1) then 'fr-repeat-single-row' else 'fr-repeat-multiple-rows') else 'fr-norepeat',
-                                          if ($is-editable) then 'fr-editable' else ()}">
-
+                                          if ($is-repeat)
+                                                then ('table', 'table-bordered', 'table-condensed', 'fr-repeat', 'fr-repeat-table',
+                                                      if ($static-row-count le 1) then 'fr-repeat-single-row' else 'fr-repeat-multiple-rows')
+                                                else 'fr-norepeat',
+                                          if ($is-editable)
+                                                then ('fr-editable', gridOps:canDoClasses(@id))
+                                                else ()}">
                             <!-- If repeat, add buttons and headers-->
                             <xsl:if test="$is-repeat">
                                 <xh:thead class="yui-dt-hd">

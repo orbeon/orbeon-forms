@@ -496,4 +496,10 @@ object GridOps {
         // 2. Select the first td if any
         bodyElement \\ "*:grid" \\ "*:td" take 1 foreach (selectTd(_))
     }
+
+    def canDeleteGrid(grid: NodeInfo): Boolean = (grid sibling "*:grid").nonEmpty
+    def canDoClasses(gridId: String): String = {
+        val grid = containerById(gridId)
+        if (canDeleteGrid(grid)) "fb-can-delete" else ""
+    }
 }

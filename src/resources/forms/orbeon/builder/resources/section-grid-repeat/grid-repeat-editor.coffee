@@ -30,12 +30,13 @@ $ ->
         Builder.currentContainerChanged gridsCache,
             wasCurrent: -> deleteIcon.hide()
             becomesCurrent: (grid) ->
-                f$.show deleteIcon
-                scrollContainer = f$.closest '.yui-layout-bd', $ '#fr-view'
-                offset =
-                    top:  grid.offset.top
-                    left: grid.offset.left
-                f$.offset offset, deleteIcon
+                if f$.is '.fb-can-delete', f$.children '.fr-grid', grid.el
+                    f$.show deleteIcon
+                    scrollContainer = f$.closest '.yui-layout-bd', $ '#fr-view'
+                    offset =
+                        top:  grid.offset.top
+                        left: grid.offset.left
+                    f$.offset offset, deleteIcon
 
     # Position icons do add/remove columns/rows
     do ->

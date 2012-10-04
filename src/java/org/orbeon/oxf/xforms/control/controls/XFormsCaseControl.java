@@ -65,6 +65,15 @@ public class XFormsCaseControl extends XFormsNoSingleNodeContainerControl {
      *
      */
     public void toggle() {
+        // There are dependencies on toggled cases for:
+        //
+        // - xxforms:case()
+        // - case content relevance when XForms 1.1-behavior is enabled
+        //
+        // Ideally, XPath dependencies should make this smarter.
+        //
+        containingDocument().getControls().requireRefresh();
+
         getSwitch().setSelectedCase(this);
     }
 

@@ -19,7 +19,6 @@ import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.xforms.BindingContext;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsContextStack;
-import org.orbeon.oxf.xforms.XFormsControls;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.control.XFormsControl;
@@ -64,12 +63,9 @@ public class XFormsToggleAction extends XFormsAction {
             if (caseControl.parent().isRelevant() && !caseControl.isSelected()) {
                 // This case is in a relevant switch and not currently selected
 
+                final XFormsControl focusedBefore = containingDocument.getControls().getFocusedControl();
+
                 // Actually toggle the xforms:case
-                final XFormsControls controls = containingDocument.getControls();
-                controls.markDirtySinceLastRequest(false);// NOTE: xxforms:case() function might still be impacted, so this is not quite right
-
-                final XFormsControl focusedBefore = controls.getFocusedControl();
-
                 caseControl.toggle();// this will dispatch events
 
                 // Handle focus changes

@@ -30,7 +30,7 @@ $ ->
         Builder.currentContainerChanged gridsCache,
             wasCurrent: -> deleteIcon.hide()
             becomesCurrent: (grid) ->
-                if f$.is '.fb-can-delete', f$.children '.fr-grid', grid.el
+                if f$.is '.fb-can-delete-grid', f$.children '.fr-grid', grid.el
                     f$.show deleteIcon
                     scrollContainer = f$.closest '.yui-layout-bd', $ '#fr-view'
                     offset =
@@ -52,9 +52,9 @@ $ ->
             colIcon = (selector, colOffset) -> _.tap (icon selector), (icon) ->
                 icon.offset = (col) -> top: col.grid.offset.top, left: col.offset.left + colOffset col, icon
             [
-                colIcon '.fb-insert-column-left',  -> 0
-                colIcon '.fb-delete-column',       (col, icon) -> (col.width - icon.width()) / 2
-                colIcon '.fb-insert-column-right', (col, icon) -> col.width - icon.width()
+                colIcon '.fb-insert-col-left',  -> 0
+                colIcon '.fb-delete-col',       (col, icon) -> (col.width - icon.width()) / 2
+                colIcon '.fb-insert-col-right', (col, icon) -> col.width - icon.width()
             ]
 
         # 3 icons to add/delete rows
@@ -71,8 +71,15 @@ $ ->
         hideIcons = (icons) -> -> _.each (_.values icons), (icon) -> f$.hide icon.el
         showIcons = (icons) -> (rowOrCol) ->
             _.each icons, (icon) ->
-                f$.show icon.el
-                f$.offset (icon.offset rowOrCol), icon.el
+                dontShow = _.any ['delete-row', 'delete-col'], (operation) ->
+                    isDelete = f$.is '.fb-' + operation, icon.el
+                    isDelete and do ->
+                        gridDiv = rowOrCol.grid.el
+                        gridTable = f$.children '.fr-grid', gridDiv
+                        not f$.is '.fb-can-' + operation, gridTable
+                unless dontShow
+                    f$.show icon.el
+                    f$.offset (icon.offset rowOrCol), icon.el
 
         Builder.currentRowColChanged gridsCache,
             wasCurrentRow:      hideIcons rowIcons
@@ -112,4 +119,4 @@ $ ->
                 add = (name, value) -> event.properties[name] = value.toString()
                 add 'grid-id', current.gridId
                 add 'row-pos', current.rowPos if classContains 'row'
-                add 'col-pos', current.colPos if classContains 'column'
+                add 'col-pos', current.colPos if classContains 'col'

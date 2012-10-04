@@ -642,12 +642,12 @@
                                 <xf:action ev:event="fr-positive" type="xpath">containerOps:deleteContainerById(event('context'))</xf:action>
                             </xf:trigger>
                             <!-- Insert column to the left -->
-                            <xf:trigger appearance="minimal" class="fb-insert-column-left">
+                            <xf:trigger appearance="minimal" class="fb-insert-col-left">
                                 <xf:label><xh:img src="/apps/fr/style/images/silk/bullet_arrow_left.png" alt="{{$fb-resources/insert-column-left-icon/label}}" title="{{$fb-resources/insert-column-left-icon/label}}"/></xf:label>
                                 <xf:action ev:event="DOMActivate" type="xpath">gridOps:insertColLeft(event('grid-id'), xs:integer(event('col-pos')))</xf:action>
                             </xf:trigger>
                             <!-- Delete column -->
-                            <xf:trigger appearance="minimal" id="delete-col-trigger" class="fb-delete-column">
+                            <xf:trigger appearance="minimal" id="delete-col-trigger" class="fb-delete-col">
                                 <xf:label><xh:img src="/apps/fr/style/images/silk/bin.png" alt="{{$fb-resources/delete-column-icon/label}}" title="{{$fb-resources/delete-column-icon/label}}"/></xf:label>
                                 <xf:action ev:event="DOMActivate">
 
@@ -673,7 +673,7 @@
                                 </xf:action>
                             </xf:trigger>
                             <!-- Insert column to the right -->
-                            <xf:trigger appearance="minimal" class="fb-insert-column-right">
+                            <xf:trigger appearance="minimal" class="fb-insert-col-right">
                                 <xf:label><xh:img src="/apps/fr/style/images/silk/bullet_arrow_right.png" alt="{{$fb-resources/insert-column-right-icon/label}}" title="{{$fb-resources/insert-column-right-icon/label}}"/></xf:label>
                                 <xf:action ev:event="DOMActivate" type="xpath">gridOps:insertColRight(event('grid-id'), xs:integer(event('col-pos')))</xf:action>
                             </xf:trigger>

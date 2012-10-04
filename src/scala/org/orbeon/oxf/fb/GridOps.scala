@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.fb
 
+import collection.JavaConverters._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.scaxon.XML._
 import org.orbeon.oxf.fb.FormBuilderFunctions._
@@ -498,8 +499,13 @@ object GridOps {
     }
 
     def canDeleteGrid(grid: NodeInfo): Boolean = (grid sibling "*:grid").nonEmpty
-    def canDoClasses(gridId: String): String = {
+    def canDeleteRow(grid: NodeInfo): Boolean = (grid \ "*:tr").length > 1
+    def canDeleteCol(grid: NodeInfo): Boolean = ((grid \ "*:tr").head \ "*:td").length > 1
+    def canDoClasses(gridId: String): java.util.List[String] = {
         val grid = containerById(gridId)
-        if (canDeleteGrid(grid)) "fb-can-delete" else ""
+        val deleteTests = Map("grid" → (canDeleteGrid _), "row" → (canDeleteRow _), "col" → (canDeleteCol _))
+        val canDelete = deleteTests filter { case (_, test) ⇒ test(grid) } map { case (what, _) ⇒ what }
+        val classes = canDelete map ( "fb-can-delete-" ++ _)
+        classes.toList.asJava
     }
 }

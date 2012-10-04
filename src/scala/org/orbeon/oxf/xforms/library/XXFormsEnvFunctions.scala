@@ -40,6 +40,10 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
         Fun("case", classOf[XXFormsCase], 0, 1, STRING, EXACTLY_ONE,
             Arg(STRING, EXACTLY_ONE)
         )
+
+        Fun("cases", classOf[XXFormsCases], 0, 1, STRING, ALLOWS_ZERO_OR_MORE,
+            Arg(STRING, EXACTLY_ONE)
+        )
     
         // xxforms:repeat-current
         Fun("repeat-current", classOf[XXFormsRepeatCurrent], 0, 0, Type.NODE_TYPE, EXACTLY_ONE,

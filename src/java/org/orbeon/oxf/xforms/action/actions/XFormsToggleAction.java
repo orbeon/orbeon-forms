@@ -46,6 +46,7 @@ public class XFormsToggleAction extends XFormsAction {
 
         final String caseStaticId;
         if (bindingContext.getSingleItem() != null) {
+            // NOTE: resolveAVTProvideValue can return null!
             caseStaticId = actionInterpreter.resolveAVTProvideValue(actionElement, caseAttribute);
         } else {
             // TODO: Presence of context is not the right way to decide whether to evaluate AVTs or not
@@ -57,7 +58,7 @@ public class XFormsToggleAction extends XFormsAction {
             containingDocument.synchronizeAndRefresh();
 
         // Find case control
-        final XFormsCaseControl caseControl = (XFormsCaseControl) actionInterpreter.resolveObject(actionElement, caseStaticId);
+        final XFormsCaseControl caseControl = (caseStaticId != null) ? (XFormsCaseControl) actionInterpreter.resolveObject(actionElement, caseStaticId) : null;
         if (caseControl != null) { // can be null if the switch is not relevant
             // Found control
             if (caseControl.parent().isRelevant() && !caseControl.isSelected()) {

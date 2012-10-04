@@ -82,7 +82,7 @@ public class XFormsSwitchControl extends XFormsSingleNodeContainerControl {
         }
     }
 
-    private List<XFormsCaseControl> getChildrenCases() {
+    public List<XFormsCaseControl> getChildrenCases() {
         final List<XFormsControl> children = childrenJava();
         final List<XFormsCaseControl> childrenCases;
         if (children.isEmpty()) {

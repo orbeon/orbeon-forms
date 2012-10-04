@@ -55,7 +55,7 @@ $ ->
         currentValue = null
         (newValue) ->
             if newValue?
-                if currentValue is null or newValue.el != currentValue.el
+                if currentValue is null or not f$.is newValue.el, currentValue.el
                     was currentValue if currentValue?
                     currentValue = newValue
                     becomes newValue

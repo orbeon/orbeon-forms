@@ -576,7 +576,7 @@
                                     <xxf:context name="positive-targetid" value="xxf:absolute-id('delete-section-trigger')"/>
                                     <xxf:context name="context" value="event('section-id')"/>
                                 </xf:dispatch>
-                                <xf:action ev:event="fr-positive" type="xpath">containerOps:deleteContainerById(event('context'))</xf:action>
+                                <xf:action ev:event="fr-positive" type="xpath">sectionOps:deleteSectionById(event('context'))</xf:action>
                             </xf:trigger>
                             <!-- Edit details -->
                             <xf:trigger appearance="minimal">
@@ -639,7 +639,7 @@
                                     <xxf:context name="positive-targetid" value="xxf:absolute-id('delete-grid-trigger')"/>
                                     <xxf:context name="context" value="event('grid-id')"/>
                                 </xf:dispatch>
-                                <xf:action ev:event="fr-positive" type="xpath">containerOps:deleteContainerById(event('context'))</xf:action>
+                                <xf:action ev:event="fr-positive" type="xpath">gridOps:deleteGridById(event('context'))</xf:action>
                             </xf:trigger>
                             <!-- Insert column to the left -->
                             <xf:trigger appearance="minimal" class="fb-insert-col-left">

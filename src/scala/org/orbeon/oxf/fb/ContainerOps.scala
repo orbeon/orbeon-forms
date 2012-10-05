@@ -24,13 +24,13 @@ import org.orbeon.oxf.xforms.XFormsUtils
 object ContainerOps {
 
     // Node tests
-    private val GridElementTest:    Test = FR → "grid"
+    private val GridElementTest: Test = FR → "grid"
     private val SectionElementTest: Test = FR → "section"
     private val ContainerElementTest = SectionElementTest || GridElementTest
 
     // Predicates
-    val IsGrid:      NodeInfo ⇒ Boolean = _ self GridElementTest
-    val IsSection:   NodeInfo ⇒ Boolean = _ self SectionElementTest
+    val IsGrid: NodeInfo ⇒ Boolean = _ self GridElementTest
+    val IsSection: NodeInfo ⇒ Boolean = _ self SectionElementTest
 
     val IsContainer: NodeInfo ⇒ Boolean =
         node ⇒ (node self ContainerElementTest) || ((node self (XF → "group")) && node.attClasses("fb-body"))
@@ -55,8 +55,9 @@ object ContainerOps {
 
     // Find ancestor sections and grids (including non-repeated grids) from leaf to root
     def findAncestorContainers(descendant: NodeInfo, includeSelf: Boolean = false) =
-        if (includeSelf) descendant ancestorOrSelf * else descendant ancestor * filter
-            IsContainer
+        if (includeSelf) descendant ancestorOrSelf *
+        else descendant ancestor * filter
+                IsContainer
 
     // Find ancestor section and grid names from root to leaf
     def findContainerNames(descendant: NodeInfo): Seq[String] =
@@ -70,7 +71,7 @@ object ContainerOps {
                 // NOTE: Could improve this by favoring things "at same level", e.g. stay in grid if possible, then
                 // stay in section, etc.
                 (followingTd(selectedTd) filterNot (tdsToDelete contains _) headOption) orElse
-                    (precedingTds(selectedTd) filterNot (tdsToDelete contains _) headOption)
+                        (precedingTds(selectedTd) filterNot (tdsToDelete contains _) headOption)
             case _ ⇒
                 None
         }
@@ -84,7 +85,12 @@ object ContainerOps {
         container \ * filter IsGrid
 
     // Delete the entire container and contained controls
-    def deleteContainerById(containerId: String): Unit = deleteContainer(containerById(containerId))
+    def deleteContainerById(canDelete: NodeInfo ⇒ Boolean, containerId: String): Unit = {
+        val container = containerById(containerId)
+        if (canDelete(container))
+            deleteContainer(container)
+    }
+
     def deleteContainer(container: NodeInfo) = {
 
         // Find the new td to select if we are removing the currently selected td
@@ -122,7 +128,7 @@ object ContainerOps {
     // Find all siblings of the given element with the given name, excepting the given element
     def findSiblingsWithName(element: NodeInfo, siblingName: String) =
         element parent * child * filter
-            (name(_) == siblingName) filterNot
+                (name(_) == siblingName) filterNot
                 (_ isSameNodeInfo element)
 
     // Move a container based on a move function (typically up or down)
@@ -161,9 +167,10 @@ object ContainerOps {
                     s filter (getControlNameOption(_).isDefined) headOption
 
                 def tryToMoveHolders(siblingName: String, moveOp: (NodeInfo, NodeInfo) ⇒ NodeInfo) =
-                    findResourceAndTemplateHolders(doc, name) foreach { holder ⇒
-                        findSiblingsWithName(holder, siblingName).headOption foreach
-                            (moveOp(holder, _))
+                    findResourceAndTemplateHolders(doc, name) foreach {
+                        holder ⇒
+                            findSiblingsWithName(holder, siblingName).headOption foreach
+                                    (moveOp(holder, _))
                     }
 
                 val movedContainer = findControlById(doc, container \@ "id").get // must get new reference
@@ -177,6 +184,7 @@ object ContainerOps {
             case _ ⇒
         }
     }
+
     // Return a td's preceding tds in the hierarchy of containers
     def precedingTds(td: NodeInfo) = {
         val preceding = td preceding "*:td"
@@ -191,21 +199,31 @@ object ContainerOps {
 
     // Return all the container controls in the view
     def getAllContainerControlsWithIds(inDoc: NodeInfo) = getAllControlsWithIds(inDoc) filter IsContainer
+
     def getAllContainerControls(inDoc: NodeInfo) = findFRBodyElement(inDoc) descendant * filter IsContainer
 
     // Various counts
     def countSections(inDoc: NodeInfo) = getAllControlsWithIds(inDoc) filter IsSection size
-    def countAllGrids(inDoc: NodeInfo) = findFRBodyElement(inDoc) descendant * filter IsGrid size // includes repeated grids
+
+    def countAllGrids(inDoc: NodeInfo) = findFRBodyElement(inDoc) descendant * filter IsGrid size
+
+    // includes repeated grids
     def countRepeats(inDoc: NodeInfo) = getAllControlsWithIds(inDoc) filter IsRepeat size
-    def countGrids(inDoc: NodeInfo) = countAllGrids(inDoc) - countRepeats(inDoc) // non-repeated grids
+
+    def countGrids(inDoc: NodeInfo) = countAllGrids(inDoc) - countRepeats(inDoc)
+
+    // non-repeated grids
     def countSectionTemplates(inDoc: NodeInfo) = findFRBodyElement(inDoc) descendant * filter IsSectionTemplateContent size
+
     def countAllNonContainers(inDoc: NodeInfo) = getAllControlsWithIds(inDoc) filterNot IsContainer size
+
     def countAllContainers(inDoc: NodeInfo) = getAllContainerControls(inDoc).size
+
     def countAllControls(inDoc: NodeInfo) = countAllContainers(inDoc) + countAllNonContainers(inDoc) + countSectionTemplates(inDoc)
 
     // Whether it is possible to move an item into the given container
     // Currently: must be a section without section template content
     // Later: fr:tab (maybe fr:tabview), wizard
     def canMoveInto(container: NodeInfo) =
-        IsSection(container) && ! (container \ * exists IsSectionTemplateContent)
+        IsSection(container) && !(container \ * exists IsSectionTemplateContent)
 }

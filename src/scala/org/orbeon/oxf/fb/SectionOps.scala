@@ -29,6 +29,8 @@ object SectionOps {
         isSubSection || hasSiblingSection
     }
 
+    def deleteSectionById(sectionId: String): Unit = deleteContainerById(canDeleteSection, sectionId)
+
     // Move the section up if possible
     def moveSectionUp(container: NodeInfo) =
         if (canMoveUp(container))

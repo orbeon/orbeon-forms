@@ -499,6 +499,8 @@ object GridOps {
     }
 
     def canDeleteGrid(grid: NodeInfo): Boolean = (grid sibling "*:grid").nonEmpty
+    def deleteGridById(gridId: String) = deleteContainerById(canDeleteGrid, gridId)
+
     def canDeleteRow(grid: NodeInfo): Boolean = (grid \ "*:tr").length > 1
     def canDeleteCol(grid: NodeInfo): Boolean = ((grid \ "*:tr").head \ "*:td").length > 1
     def canDoClasses(gridId: String): java.util.List[String] = {

@@ -130,4 +130,18 @@ class ScalaUtilsTest extends AssertionsForJUnit {
         assert(Some("foo") === nonEmptyOrNone("foo"))
         assert(Some("foo") === nonEmptyOrNone("  foo  "))
     }
+
+    @Test def testBooleanOption(): Unit = {
+        locally {
+            var invoked = false
+            assert(Some("foo") === true.option({invoked = true; "foo"}))
+            assert(invoked)
+        }
+
+        locally {
+            var invoked = false
+            assert(None === false.option({invoked = true; "foo"}))
+            assert(! invoked)
+        }
+    }
 }

@@ -188,4 +188,8 @@ object ScalaUtils {
 
     // If the string is null or empty, return none, otherwise return the trimmed value
     def nonEmptyOrNone(s: String) = Option(s) map trimToEmpty filter isNotBlank
+
+    // Extension Boolean.option[A](a: A): Option[A]
+    class BooleanWrapper(b: Boolean) { def option[A](a: ⇒ A) = if (b) Some(a) else None }
+    implicit def booleanToBooleanWrapper(b: Boolean) = new BooleanWrapper(b)
 }

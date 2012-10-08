@@ -144,4 +144,19 @@ class ScalaUtilsTest extends AssertionsForJUnit {
             assert(! invoked)
         }
     }
+
+    @Test def testCollectByType(): Unit = {
+
+        class Foo
+        class Bar extends Foo
+
+        assert(collectByErasedType[Foo](new Foo).isDefined)
+        assert(collectByErasedType[Foo](new Bar).isDefined)
+        assert(collectByErasedType[Bar](new Bar).isDefined)
+        assert(collectByErasedType[Bar](new Foo).isEmpty)
+        assert(collectByErasedType[Foo](new String).isEmpty)
+
+        assert(collectByErasedType[Seq[String]](Seq("a")).isDefined)
+        assert(collectByErasedType[Seq[String]](Seq(42)).isDefined) // erasure!
+    }
 }

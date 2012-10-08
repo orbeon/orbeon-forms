@@ -192,4 +192,10 @@ object ScalaUtils {
     // Extension Boolean.option[A](a: A): Option[A]
     class BooleanWrapper(b: Boolean) { def option[A](a: ⇒ A) = if (b) Some(a) else None }
     implicit def booleanToBooleanWrapper(b: Boolean) = new BooleanWrapper(b)
+
+    // WARNING: Remember that type erasure takes place! collectByErasedType[T[U1]] will work even if the underlying type was T[U2]!
+    // NOTE: With Scala 2.10, use `ClassTag` and `case t: T`
+    def collectByErasedType[T: ClassManifest](value: AnyRef) =
+        Option(value) collect
+        { case t: AnyRef if implicitly[ClassManifest[T]].erasure.isAssignableFrom(t.getClass) ⇒ t.asInstanceOf[T] }
 }

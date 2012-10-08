@@ -14,21 +14,18 @@
 package org.orbeon.oxf.xforms.function.xxforms
 
 import org.orbeon.oxf.xforms.control.controls.XFormsSwitchControl
-import org.orbeon.oxf.xforms.function.XFormsFunction
+import org.orbeon.oxf.xforms.function.{FunctionSupport, XFormsFunction}
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om.Item
 import org.orbeon.saxon.value.StringValue
+import org.orbeon.oxf.util.ScalaUtils._
 
 /**
  * Extension xxforms:case($switch-id as xs:string) as xs:string? function.
  */
-class XXFormsCase extends XFormsFunction {
-    override def evaluateItem(xpathContext: XPathContext): Item = {
-        val switchStaticId = argument(0).evaluateAsString(xpathContext).toString
-
-        Option(getXBLContainer(xpathContext).resolveObjectByIdInScope(getSourceEffectiveId(xpathContext), switchStaticId, null)) collect {
-            case switchControl: XFormsSwitchControl if switchControl.isRelevant ⇒
-                StringValue.makeStringValue(switchControl.getSelectedCase.getId)
-        } orNull
-    }
+class XXFormsCase extends XFormsFunction with FunctionSupport {
+    override def evaluateItem(xpathContext: XPathContext): Item =
+        relevantControl(0)(xpathContext) flatMap
+            collectByErasedType[XFormsSwitchControl] map
+            (control ⇒ StringValue.makeStringValue(control.getSelectedCase.getId)) orNull
 }

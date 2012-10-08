@@ -36,7 +36,7 @@ class XXFormsGetRequestHeader extends XFormsFunction {
                 Option(NetUtils.getExternalContext.getRequest.getHeaderValuesMap.get(parameterName))
             } else {
                 // Ask XForms document
-                containingDocument.getRequestParameters.get(parameterName)
+                containingDocument.getRequestHeaders.get(parameterName)
             }
 
         parameterValues match {

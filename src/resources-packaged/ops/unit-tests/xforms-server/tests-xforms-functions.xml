@@ -1672,32 +1672,6 @@
         </output>
     </test>
 
-    <test description="xxforms:get-request-path()" name="oxf:pipeline">
-        <input name="config" href="wrap-xforms-state.xpl"/>
-        <input name="document">
-            <xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xforms="http://www.w3.org/2002/xforms">
-                <xhtml:head>
-                    <xforms:model id="model"/>
-                </xhtml:head>
-                <xhtml:body>
-                    <xforms:output id="output1" value="xxforms:get-request-path()"/>
-                </xhtml:body>
-            </xhtml:html>
-        </input>
-        <output name="response">
-            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
-                <xxf:dynamic-state>
-                    <dynamic-state/>
-                </xxf:dynamic-state>
-                <xxf:action>
-                    <xxf:control-values>
-                        <xxf:control id="output1">/doc/home-welcome</xxf:control>
-                    </xxf:control-values>
-                </xxf:action>
-            </xxf:event-response>
-        </output>
-    </test>
-
     <test description="xxforms:create-document() with insert" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
@@ -2033,6 +2007,36 @@
                         <xxf:div id="my-case-2" visibility="visible"/>
                         <xxf:div id="my-case-1" visibility="hidden"/>
                         <xxf:control id="my-output">my-case-2</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="xxforms:get-request-path(), xxforms:get-request-parameter, xxforms:get-request-header" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xforms="http://www.w3.org/2002/xforms">
+                <xhtml:head>
+                    <xforms:model id="model"/>
+                </xhtml:head>
+                <xhtml:body>
+                    <xforms:output id="output1" value="xxforms:get-request-path()"/>
+                    <xforms:output id="output2" value="xxforms:get-request-parameter('id')"/>
+                    <xforms:output id="output3" value="xxforms:get-request-header('referer')"/>
+                </xhtml:body>
+            </xhtml:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state/>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="output1">/doc/home-welcome</xxf:control>
+                        <xxf:control id="output2">12</xxf:control>
+                        <xxf:control id="output3">http://localhost:8080/orbeon/</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>

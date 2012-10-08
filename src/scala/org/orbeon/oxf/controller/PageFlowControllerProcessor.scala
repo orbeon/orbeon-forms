@@ -350,6 +350,7 @@ object PageFlowControllerProcessor {
     val PagePublicMethods            = Set("GET", "HEAD")
     val ServicePublicMethods         = Set.empty[String]
     val SubmissionPublicMethods      = Set("GET", "POST") // Q: do we need GET? PUT?
+    val AllPublicMethods             = "#all"
 
     // Route elements
     sealed trait RouteElement { def id: Option[String]; def path: String; def pattern: Pattern }
@@ -370,7 +371,7 @@ object PageFlowControllerProcessor {
             model: Option[String],
             view: Option[String],
             element: Element,
-            publicMethods: Set[String],
+            publicMethods: String ⇒ Boolean,
             isPage: Boolean)
         extends RouteElement
 
@@ -393,7 +394,11 @@ object PageFlowControllerProcessor {
 
             val isPage = e.getName == "page"
 
-            def localPublicMethods   = att(e, "public-methods") map stringToSet
+            def localPublicMethods = att(e, "public-methods") map {
+                case att if att == AllPublicMethods ⇒ (_: String) ⇒ true
+                case att                            ⇒ stringToSet(att)
+            }
+
             def defaultPublicMethods = if (isPage) defaultPagePublicMethods else defaultServicePublicMethods
 
             val path = getPath(e)

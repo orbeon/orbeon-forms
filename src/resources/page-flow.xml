@@ -34,7 +34,7 @@
     <page id="home" path="/home/" model="apps/home/page-flow.xml"/>
 
     <!-- Dispatch request to a specific application -->
-    <page id="apps" path="/([^/]+)/.*" model="apps/${1}/page-flow.xml" public-methods="GET PUT POST HEAD"/>
+    <page id="apps" path="/([^/]+)/.*" model="apps/${1}/page-flow.xml" public-methods="#all"/>
 
     <!-- ==== Epilogue and handlers ================================================================================ -->
 

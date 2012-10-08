@@ -1136,7 +1136,7 @@
                 <hint>Nombre non-négatif</hint>
             </min>
             <max>
-                <label>Nombre minimum de répétitions</label>
+                <label>Nombre maximum de répétitions</label>
                 <alert>Valeur incorrecte</alert>
                 <hint>Nombre positif</hint>
             </max>

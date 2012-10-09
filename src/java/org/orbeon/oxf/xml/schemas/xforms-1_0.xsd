@@ -713,8 +713,8 @@
 
             <xsd:attributeGroup ref="xforms:Common.Attributes"/>
             <xsd:attributeGroup ref="xforms:Nodeset.Binding.Attributes"/>
-            <xsd:attribute name="at" type="xforms:XPathExpression" use="required"/>
-            <xsd:attribute name="position" use="required">
+            <xsd:attribute name="at" type="xforms:XPathExpression" use="optional"/>
+            <xsd:attribute name="position" use="optional">
                 <xsd:simpleType>
                     <xsd:restriction base="xsd:string">
                         <xsd:enumeration value="before"/>

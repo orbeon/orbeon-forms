@@ -540,21 +540,19 @@ a.xforms-help-image .fb-control-help {
   display: none;
 }
 /* Contains the editing markup that will be moved inside each grid td */
-.xbl-fr-grid table.fr-grid.fr-editable {
+.fr-view table.fr-grid.fr-norepeat {
   border-collapse: collapse;
-  /* override default in form-runner-base.css */
-
-  width: 99.9% /* attempt to fix missing right border under Chrome */
-;
+}
+.fr-view table.fr-grid.fr-norepeat:hover .fr-grid-td {
+  border: 1px solid #ddeeff;
+}
+.fr-view .fr-grid-tr {
+  height: 60px;
 }
 .fr-grid-td {
   border: 1px solid transparent;
 }
-.fr-editable .fr-grid-tr {
-  height: 60px;
-}
-/* Enough space to hold row icons so that hovering doesn't cause the row to expand */
-.fr-grid.fr-editable.fr-norepeat:hover .fr-grid-td {
+.fr-grid.fr-norepeat:hover .fr-grid-td {
   border: 1px solid #ddeeff;
 }
 /* Only for grid which is not a repeat, e.g. no highlighting in itemset editor */
@@ -573,16 +571,6 @@ a.xforms-help-image .fb-control-help {
 }
 .fr-grid .fb-grid-top-left-td img {
   display: none;
-}
-.fr-grid.fr-editable:hover .fb-grid-top-left-td img {
-  display: inline;
-}
-/* Row icons and hovering */
-.fr-grid.fr-editable .fr-grid-tr .fb-grid-row-icons img {
-  display: none;
-}
-.fr-grid.fr-editable .fr-grid-tr:hover .fb-grid-row-icons img {
-  display: inline;
 }
 /* Delete, expand, shrink shown to the left of the cell */
 .fb-grid-cell-icons {
@@ -719,11 +707,11 @@ a.xforms-help-image .fb-control-help {
 .fr-grid-content .xforms-hint input {
   width: 100%;
 }
-.fr-view .fr-grid.fr-editable .fr-grid-content .xforms-label:hover,
-.fr-view .fr-grid.fr-editable .fr-grid-content .xforms-hint:hover,
-.fr-view .fr-grid.fr-editable .fr-grid-th .xforms-label:hover,
-.fr-view .fr-grid.fr-editable .fr-grid-th .xforms-hint:hover,
-.fr-view .fr-grid.fr-editable .xforms-mock-button span:hover {
+.fr-view .fr-grid .fr-grid-content .xforms-label:hover,
+.fr-view .fr-grid .fr-grid-content .xforms-hint:hover,
+.fr-view .fr-grid .fr-grid-th .xforms-label:hover,
+.fr-view .fr-grid .fr-grid-th .xforms-hint:hover,
+.fr-view .fr-grid .xforms-mock-button span:hover {
   background-color: #ffffd3;
 }
 .fr-grid-content .xforms-label,

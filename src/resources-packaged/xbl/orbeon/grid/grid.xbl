@@ -113,19 +113,6 @@
                                 <xh:thead class="yui-dt-hd">
                                     <!-- Row with column headers -->
                                     <xh:tr class="fr-dt-master-row">
-                                        <xsl:if test="$is-editable">
-                                            <xh:td class="fb-grid-top-left-td">
-                                                <xsl:if test="$is-repeat">
-                                                    <!-- Grid properties -->
-                                                    <xf:trigger appearance="minimal" id="grid-details-trigger">
-                                                        <xf:label><xh:img src="/apps/fr/style/images/silk/cog.png" alt="{{$fb-resources/grid-details-icon/label}}" title="{{$fb-resources/grid-details-icon/label}}"/></xf:label>
-                                                        <xf:dispatch ev:event="DOMActivate" name="fb-show-dialog" targetid="{{xformsUtils:effectiveIdToAbsoluteId('dialog-grid-details')}}">
-                                                            <xxf:context name="grid" select="$grid"/>
-                                                        </xf:dispatch>
-                                                    </xf:trigger>
-                                                </xsl:if>
-                                            </xh:td>
-                                        </xsl:if>
                                         <xsl:if test="not($readonly)">
                                             <!--<xf:group ref="$grid[not(exf:readonly(.))]">-->
                                             <xf:group ref=".">

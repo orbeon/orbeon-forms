@@ -641,6 +641,13 @@
                                 </xf:dispatch>
                                 <xf:action ev:event="fr-positive" type="xpath">gridOps:deleteGridById(event('context'))</xf:action>
                             </xf:trigger>
+                            <!-- Grid properties -->
+                            <xf:trigger appearance="minimal" id="grid-details-trigger" class="fb-grid-details-trigger">
+                                <xf:label><xh:img src="/apps/fr/style/images/silk/cog.png" alt="{{$fb-resources/grid-details-icon/label}}" title="{{$fb-resources/grid-details-icon/label}}"/></xf:label>
+                                <xf:dispatch ev:event="DOMActivate" name="fb-show-dialog" targetid="{{xformsUtils:effectiveIdToAbsoluteId('dialog-grid-details')}}">
+                                    <xxf:context name="grid" select="$grid"/>
+                                </xf:dispatch>
+                            </xf:trigger>
                             <!-- Insert column to the left -->
                             <xf:trigger appearance="minimal" class="fb-insert-col-left">
                                 <xf:label><xh:img src="/apps/fr/style/images/silk/bullet_arrow_left.png" alt="{{$fb-resources/insert-column-left-icon/label}}" title="{{$fb-resources/insert-column-left-icon/label}}"/></xf:label>

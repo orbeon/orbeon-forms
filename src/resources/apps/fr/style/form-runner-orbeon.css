@@ -317,6 +317,9 @@ textarea.xforms-invalid-visited {
   display: block;
   padding: 1em;
   margin-bottom: 1em;
+  width: 100%;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
   background-color: white;
   border: 1px solid #DDDDDD;
   float: left;

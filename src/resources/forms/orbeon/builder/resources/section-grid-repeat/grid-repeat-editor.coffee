@@ -12,14 +12,14 @@ $ ->
                 gridInfo =
                     el: grid
                     offset: f$.offset grid
-                    height: f$.height grid
+                    height: f$.outerHeight grid                                                                         # Include grid padding
                 table = f$.children '.fr-grid', gridInfo.el
                 if f$.is '.fr-repeat', table
                     head = f$.find 'thead', table
                     gridInfo.head =
                         offset: f$.offset head
                         height: f$.height head
-                gridInfo.rows = _.map (f$.find '.fr-grid-tr', grid), (tr) ->                                          # .fr-grid-tr leaves out the header row in the repeat
+                gridInfo.rows = _.map (f$.find '.fr-grid-tr', grid), (tr) ->                                            # .fr-grid-tr leaves out the header row in the repeat
                     grid: gridInfo
                     el: $ tr
                     offset: f$.offset $ tr

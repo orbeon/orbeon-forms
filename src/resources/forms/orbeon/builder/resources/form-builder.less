@@ -316,6 +316,7 @@ a.xforms-help-image .fb-control-help { vertical-align: baseline; }
 .fb-cell-editor { display: none } /* Contains the editing markup that will be moved inside each grid td */
 
 .fr-view {
+    display: block;                                                                                                     // So we can get its width in `position.coffee`
     table.fr-grid.fr-norepeat {                                                                                         // For non-repeat grid (`table` to override collapse in FR.less)
         border-collapse: collapse;
         &:hover .fr-grid-td { border: 1px solid @lightBlue }

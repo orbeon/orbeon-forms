@@ -540,6 +540,9 @@ a.xforms-help-image .fb-control-help {
   display: none;
 }
 /* Contains the editing markup that will be moved inside each grid td */
+.fr-view {
+  display: block;
+}
 .fr-view table.fr-grid.fr-norepeat {
   border-collapse: collapse;
 }

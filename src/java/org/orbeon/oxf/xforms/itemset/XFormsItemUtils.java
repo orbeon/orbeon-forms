@@ -101,6 +101,7 @@ public class XFormsItemUtils {
         final BindingContext savedBindingContext = contextStack.getCurrentBindingContext();
         contextStack.setBinding(select1Control.getBindingContext());
 
+        // TODO: This visits all of the control's descendants. It should only visit the top-level item|itemset|choices elements.
         final boolean isEncryptItemValues = select1Control.isEncryptValues();
         Dom4jUtils.visitSubtree(select1Control.element(), new Dom4jUtils.VisitorListener() {
 
@@ -114,10 +115,10 @@ public class XFormsItemUtils {
             public void startElement(Element element) {
                 final String localname = element.getName();
 
-                contextStack.pushBinding(element, getElementEffectiveId(element), select1Control.getChildElementScope(element));
-
                 if (XFormsConstants.ITEM_QNAME.getName().equals(localname)) {
                     // xforms:item
+
+                    contextStack.pushBinding(element, getElementEffectiveId(element), select1Control.getChildElementScope(element));
 
                     final Label label = getLabelValue(element.element(XFormsConstants.LABEL_QNAME));
                     final String value = getValueValue(element.element(XFormsConstants.XFORMS_VALUE_QNAME));
@@ -127,6 +128,8 @@ public class XFormsItemUtils {
 
                 } else if (XFormsConstants.ITEMSET_QNAME.getName().equals(localname)) {
                     // xforms:itemset
+
+                    contextStack.pushBinding(element, getElementEffectiveId(element), select1Control.getChildElementScope(element));
 
                     final BindingContext currentBindingContext = contextStack.getCurrentBindingContext();
 
@@ -214,6 +217,8 @@ public class XFormsItemUtils {
                 } else if (XFormsConstants.CHOICES_QNAME.getName().equals(localname)) {
                     // xforms:choices
 
+                    contextStack.pushBinding(element, getElementEffectiveId(element), select1Control.getChildElementScope(element));
+
                     final Element labelElement = element.element(XFormsConstants.LABEL_QNAME);
                     if (labelElement != null) {
                         final Label label = getLabelValue(labelElement);
@@ -230,15 +235,18 @@ public class XFormsItemUtils {
 
             public void endElement(Element element) {
                 final String localname = element.getName();
-                if (XFormsConstants.CHOICES_QNAME.getName().equals(localname)) {
-                    // xforms:choices
+                if (XFormsConstants.ITEM_QNAME.getName().equals(localname)) {
+                    contextStack.popBinding();
+                } else if (XFormsConstants.ITEMSET_QNAME.getName().equals(localname)) {
+                    contextStack.popBinding();
+                } else if (XFormsConstants.CHOICES_QNAME.getName().equals(localname)) {
+                    contextStack.popBinding();
 
                     final Element labelElement = element.element(XFormsConstants.LABEL_QNAME);
                     if (labelElement != null) {
                         currentContainer = currentContainer.parent();
                     }
                 }
-                contextStack.popBinding();
             }
 
             private String getValueValue(Element valueElement) {

@@ -6,7 +6,7 @@ $ ->
     # Keep track of grids positions, including the position their rows and columns
     gridsCache = []; do ->
         Builder.onUnderPointerChange ->
-            gridsCache.length = 0
+            gridsCache.length = 0                                                                                       # Update gridsCache in-place, as references are kept by other functions
             _.each ($ 'div.xbl-fr-grid:visible'), (grid) ->
                 grid = $ grid
                 gridInfo =
@@ -103,7 +103,7 @@ $ ->
             wasCurrentCol:      hideIcons colIcons
             becomesCurrentCol:  showIcons colIcons
 
-    # On click on a trigger inside .fb-grid-repeat-editor, send section/row/column info along with the event
+    # On click on a trigger inside .fb-grid-repeat-editor, send grid/row/column info along with the event
     do ->
 
         # Keep track of current grid/row/column so we can send this information to the server on click

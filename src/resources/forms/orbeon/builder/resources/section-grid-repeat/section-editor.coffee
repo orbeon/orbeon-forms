@@ -35,7 +35,7 @@ $ ->
     Events.ajaxResponseProcessedEvent.subscribe updateSectionsOffset
 
     Builder.currentContainerChanged sectionsCache,
-        wasCurrent: (section) ->
+        wasCurrent: ->
             sectionEditor.hide()
             currentSection = null
         becomesCurrent: (section) ->

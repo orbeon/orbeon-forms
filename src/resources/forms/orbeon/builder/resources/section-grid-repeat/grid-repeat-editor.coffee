@@ -8,16 +8,23 @@ $ ->
         Builder.onUnderPointerChange ->
             gridsCache.length = 0
             _.each ($ 'div.xbl-fr-grid:visible'), (grid) ->
+                grid = $ grid
                 gridInfo =
-                    el: $ grid
-                    offset: f$.offset $ grid
-                    height: f$.height $ grid
-                gridInfo.rows = _.map (f$.find '.fr-grid-tr', $ grid), (tr) ->                                          # .fr-grid-tr leaves out the header row in the repeat
+                    el: grid
+                    offset: f$.offset grid
+                    height: f$.height grid
+                table = f$.children '.fr-grid', gridInfo.el
+                if f$.is '.fr-repeat', table
+                    head = f$.find 'thead', table
+                    gridInfo.head =
+                        offset: f$.offset head
+                        height: f$.height head
+                gridInfo.rows = _.map (f$.find '.fr-grid-tr', grid), (tr) ->                                          # .fr-grid-tr leaves out the header row in the repeat
                     grid: gridInfo
                     el: $ tr
                     offset: f$.offset $ tr
                     height: f$.height $ tr
-                gridInfo.cols = _.map (f$.find '.fr-grid-tr:first .fr-grid-td', $ grid), (td) ->
+                gridInfo.cols = _.map (f$.find '.fr-grid-tr:first .fr-grid-td', grid), (td) ->
                     grid: gridInfo
                     el: $ td
                     offset: f$.offset $ td
@@ -27,16 +34,25 @@ $ ->
     # Position delete icon
     do ->
         deleteIcon = $ '.fb-delete-grid-trigger'
+        detailsIcon = $ '.fb-grid-details-trigger'
+        detailsHeight = _.memoize -> f$.height detailsIcon
         Builder.currentContainerChanged gridsCache,
-            wasCurrent: -> deleteIcon.hide()
+            wasCurrent: -> _.each [deleteIcon, detailsIcon], (i) -> f$.hide i
             becomesCurrent: (grid) ->
-                if f$.is '.fb-can-delete-grid', f$.children '.fr-grid', grid.el
+                table = f$.children '.fr-grid', grid.el
+                if f$.is '.fb-can-delete-grid', table
                     f$.show deleteIcon
-                    scrollContainer = f$.closest '.yui-layout-bd', $ '#fr-view'
                     offset =
                         top:  grid.offset.top
                         left: grid.offset.left
                     f$.offset offset, deleteIcon
+                if grid.head?
+                    f$.show detailsIcon
+                    head = f$.find 'thead', table
+                    offset =
+                        top: grid.head.offset.top + (grid.head.height - detailsHeight()) / 2
+                        left: grid.offset.left
+                    f$.offset offset, detailsIcon
 
     # Position icons do add/remove columns/rows
     do ->

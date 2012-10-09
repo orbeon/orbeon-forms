@@ -43,7 +43,7 @@
                 <xhtml:div id="{if ($width = '750px') then 'doc' else if ($width = '950px') then 'doc2' else if ($width = '1154px') then 'doc-fb' else if ($width = '100%') then 'doc3' else 'doc4'}"
                            class="fr-container{if (fr:left) then ' yui-t2 ' else ''}">
                     <!-- Don't use fixed navbar in Form Builder, as Form Builder has its own fixed navbar at the top of viewport -->
-                    <xsl:variable name="header-classes" as="xs:string*" select="('fr-header', 'navbar',
+                    <xsl:variable name="header-classes" as="xs:string*" select="('fr-header', 'navbar', 'navbar-inverse',
                         if ($is-form-builder) then () else 'navbar-fixed-top')"/>
                     <xhtml:div class="{string-join($header-classes, ' ')}">
                         <xhtml:div class="navbar-inner">

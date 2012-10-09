@@ -1,28 +1,42 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<web-app version="2.4" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/j2ee">
-    <display-name>Orbeon Forms 3.9.0.post.201209282319 PE</display-name>
+<web-app version="2.4"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://java.sun.com/xml/ns/j2ee">
+    <display-name>Optional authorizer for Orbeon Forms</display-name>
     <description>
-        Optional authorizer for Orbeon Forms.
+        See "Authorization of pages and services" in the Orbeon Forms doc:
+        http://wiki.orbeon.com/forms/doc/developer-guide/page-flow-controller/authorization
     </description>
     <servlet>
         <servlet-name>orbeon-authorizer-servlet</servlet-name>
         <servlet-class>org.orbeon.oxf.controller.AuthorizerServlet</servlet-class>
     </servlet>
+    <!-- The authorizer servlet handles any request -->
     <servlet-mapping>
         <servlet-name>orbeon-authorizer-servlet</servlet-name>
         <url-pattern>/*</url-pattern>
     </servlet-mapping>
+    <!-- Example: require that all external requests to Form Runner services are
+         authenticated with BASIC authentication and have the orbeon-service role.
+         Block any other request. -->
     <security-constraint>
         <web-resource-collection>
             <web-resource-name>Form Runner services</web-resource-name>
-            <url-pattern>/*</url-pattern>
+            <url-pattern>/fr/service/*</url-pattern>
         </web-resource-collection>
         <auth-constraint>
             <role-name>orbeon-service</role-name>
         </auth-constraint>
-        <!--<user-data-constraint>-->
-            <!--<transport-guarantee>CONFIDENTIAL</transport-guarantee>-->
-        <!--</user-data-constraint>-->
+    </security-constraint>
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>Everything else</web-resource-name>
+            <url-pattern>/*</url-pattern>
+        </web-resource-collection>
+        <!-- Make sure there is an empty auth-constraint to require authentication.
+             But since there are no constraints specified, authentication will always
+             fail. -->
+        <auth-constraint/>
     </security-constraint>
     <login-config>
         <auth-method>BASIC</auth-method>

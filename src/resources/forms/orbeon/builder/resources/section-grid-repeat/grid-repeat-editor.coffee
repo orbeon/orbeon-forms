@@ -12,12 +12,12 @@ $ ->
                     el: $ grid
                     offset: f$.offset $ grid
                     height: f$.height $ grid
-                gridInfo.rows = _.map (f$.find 'tr', $ grid), (tr) ->
+                gridInfo.rows = _.map (f$.find '.fr-grid-tr', $ grid), (tr) ->                                          # .fr-grid-tr leaves out the header row in the repeat
                     grid: gridInfo
                     el: $ tr
                     offset: f$.offset $ tr
                     height: f$.height $ tr
-                gridInfo.cols = _.map (f$.find 'tr:first td', $ grid), (td) ->
+                gridInfo.cols = _.map (f$.find '.fr-grid-tr:first .fr-grid-td', $ grid), (td) ->
                     grid: gridInfo
                     el: $ td
                     offset: f$.offset $ td
@@ -98,7 +98,9 @@ $ ->
 
         # Functions maintaining current row/col position
         resetPos = (pos) -> -> current[pos] = -1
-        setPos = (pos) -> (rowCol) -> current[pos] = f$.length f$.prev rowCol.el[0].tagName, rowCol.el
+        setPos = (pos) -> (rowCol) ->
+            selector = '.fr-grid-' + rowCol.el[0].nodeName.toLowerCase()
+            current[pos] = f$.length f$.prev selector, rowCol.el
 
         Builder.currentRowColChanged gridsCache,
             wasCurrentRow:      resetPos 'rowPos'

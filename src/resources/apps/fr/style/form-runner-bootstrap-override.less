@@ -19,7 +19,7 @@ a {
     text-decoration: underline;     // Don't remove the underline for anchors; this is an important web convention
 }
 
-#fr-view {
+form.xforms-form {
 
     select,
     textarea,
@@ -40,5 +40,15 @@ a {
 
     table th {
         font-weight: normal;        // Set to bold in Bootstrap
+    }
+
+    // Used in Form Builder in particular and we probably never want the humongous legends anywhere
+    legend {
+        line-height: inherit;
+        width: auto;
+        border: none;
+        padding-left: 4px;
+        padding-right: 4px;
+        font-size: 16px;
     }
 }

@@ -5,20 +5,28 @@ form.xforms-layout-span {
 a {
   text-decoration: underline;
 }
-#fr-view select,
-#fr-view textarea,
-#fr-view input {
+form.xforms-form select,
+form.xforms-form textarea,
+form.xforms-form input {
   margin-bottom: 0;
   color: black;
 }
-#fr-view select,
-#fr-view input[type="file"] {
+form.xforms-form select,
+form.xforms-form input[type="file"] {
   height: auto;
   line-height: auto;
 }
-#fr-view .fr-grid tr th label {
+form.xforms-form .fr-grid tr th label {
   margin: 0;
 }
-#fr-view table th {
+form.xforms-form table th {
   font-weight: normal;
+}
+form.xforms-form legend {
+  line-height: inherit;
+  width: auto;
+  border: none;
+  padding-left: 4px;
+  padding-right: 4px;
+  font-size: 16px;
 }

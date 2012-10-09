@@ -88,20 +88,10 @@
                 /new below. Would that break in case of switching modes (script/noscript)? Here seems to be a good start. -->
             <xf:insert ref="instance('fr-initial-instance')" origin="xxf:instance('fr-form-instance')"/>
 
-            <!-- Check the data submitted to the page.
+            <!-- NOTE: We used to do a sort of permission check here for submits. Since #75 is implemented and there is
+                 a proper authorization mechanism, this check is no longer required. -->
 
-                 - 'new' mode:  check if we accept submitted data based on a property
-                 - 'edit' mode: check based on a property, but let plain XML POSTs pass as that's used internally to switch modes
-                 - 'view' mode: accept XML POSTs
-
-                 In the future, we should enforce other cases by making sure that the data comes from Form Runner itself. -->
-            <xf:var name="pass-submit-check"
-                              value="$mode = 'new'                    and xxf:property(string-join(('oxf.fr.detail.new.accept-post', $app, $form), '.'))
-                                   or $mode = 'edit'                   and ($is-xml-submit or xxf:property(string-join(('oxf.fr.detail.edit.accept-post', $app, $form), '.')))
-                                   or $mode = ('view', 'pdf', 'email') and $is-xml-submit"/>
-
-            <!-- Case of data submitted to the page -->
-            <xf:action if="$is-submit and $pass-submit-check">
+            <xf:action if="$is-submit">
 
                 <!-- Do we have data posted to this form as a parameter? -->
                 <xf:action if="not($is-xml-submit)">
@@ -143,19 +133,15 @@
 
             <xf:message level="xxf:log-debug">
                 $is-submit: <xf:output value="$is-submit"/>
-                $pass-submit-check: <xf:output value="$pass-submit-check"/>
                 $mode: <xf:output value="$mode"/>
                 $is-new-id: <xf:output value="$is-new-id"/>
             </xf:message>
 
-            <!-- Don't allow if the constraints are not satisfied:
-
-                 - either we got a submit and passed
-                 - or we didn't get a submit, in which case we check that we have the proper id depending on the mode
+            <!-- Don't allow if we didn't get a submit and we don't have the proper id depending on the mode
 
                  NOTE: 403 applies well to the first condition. For the second condition, a 404 could also be possible.
              -->
-            <xf:action if="($is-submit and not($pass-submit-check)) or (not($is-submit) and not($is-new-id and $mode = 'new' or $mode != 'new'))" type="xpath">
+            <xf:action if="not($is-submit) and not($is-new-id and $mode = 'new' or $mode != 'new')" type="xpath">
                 formRunner:sendError(403)
             </xf:action>
         </xf:action>

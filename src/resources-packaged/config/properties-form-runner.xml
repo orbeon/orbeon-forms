@@ -59,7 +59,6 @@
     <property as="xs:boolean" name="oxf.fr.detail.hints.inline.*.*"                             value="true"/>
     <property as="xs:integer" name="oxf.fr.detail.toc.*.*"                                      value="-1"/> <!-- TOC disabled by default -->
     <property as="xs:string"  name="oxf.fr.detail.error-summary.*.*"                            value="bottom"/>
-    <property as="xs:boolean" name="oxf.fr.detail.new.accept-post.*.*"                          value="false"/>
     <property as="xs:boolean" name="oxf.fr.detail.new.service.enable.*.*"                       value="false"/>
     <property as="xs:string"  name="oxf.fr.detail.new.service.uri.*.*"                          value="/fr/service/custom/my-app/new"/>
     <property as="xs:string"  name="oxf.fr.detail.new.service.passing-request-parameters.*.*"   value=""/>

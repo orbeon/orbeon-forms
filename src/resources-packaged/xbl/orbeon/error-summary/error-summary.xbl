@@ -32,7 +32,7 @@
         <xbl:resources>
             <xbl:style>
                 .xbl-fr-error-summary { clear: both; width: 100%; padding: 0 }
-                .xbl-fr-error-summary .fr-error-title { display: block; padding: .3em }
+                .xbl-fr-error-summary .fr-error-title { display: block }
                 .xbl-fr-error-summary .fr-error-summary-body { display: block }
                 .xbl-fr-error-summary .fr-error-list li { margin-bottom: .5em }
                 .xbl-fr-error-summary .fr-error-alert { color: red }

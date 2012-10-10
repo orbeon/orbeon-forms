@@ -68,7 +68,7 @@ $ ->
         sendNewLabelValue = ->
             newLabelValue = f$.val labelInput
             OD.setValue (f$.attr 'id', $ '.fb-section-new-label'), newLabelValue
-            section = Builder.findInCache sectionsCache, (f$.offset labelInput).top
+            section = Builder.findInCache sectionsCache, (Builder.adjustedOffset labelInput).top
             f$.text newLabelValue, f$.find '.fr-section-label:first a', section.el
             OD.dispatchEvent (f$.attr 'id', section.el), 'fb-update-section-label'
             f$.hide labelInput
@@ -77,52 +77,60 @@ $ ->
             if ORBEON.xforms.Globals.eventQueue.length > 0 or ORBEON.xforms.Globals.requestInProgress
                 _.delay (-> showLabelEditor clickInterceptor), Properties.internalShortDelay.get()
             else
-                if not labelInput?
+                # Create single input element, if we don't have one already
+                unless labelInput?
                     labelInput = $ '<input class="fb-edit-section-label"/>'
-                    f$.append labelInput, $ document.body
+                    f$.append labelInput, $ '.fr-view'
                     labelInput.on 'blur', -> if f$.is ':visible', labelInput then sendNewLabelValue()
                     labelInput.on 'keypress', (e) -> if e.charCode == 13 then sendNewLabelValue()
                     Events.ajaxResponseProcessedEvent.subscribe -> f$.hide labelInput
-                offset = f$.offset clickInterceptor
+                interceptorOffset = Builder.adjustedOffset clickInterceptor
+                # From the section title, get the anchor element, which contains the title
                 labelAnchor = do ->
-                    section = Builder.findInCache sectionsCache, offset.top
+                    section = Builder.findInCache sectionsCache, interceptorOffset.top
                     f$.find '.fr-section-label:first a', section.el
-                do setInputContent = ->
-                    labelText = f$.text labelAnchor
-                    labelInput.val labelText
+                # Populate and show input
+                f$.val (f$.text labelAnchor), labelInput
                 f$.show labelInput
-                do positionSizeInput = ->
-                    offset.top += ((f$.height clickInterceptor) - (f$.height labelInput)) / 2
-                    f$.width (f$.width labelAnchor) - 10, labelInput
+                # Position and size input
+                inputOffset =
+                    top: interceptorOffset.top -
+                        # Interceptor offset is normalized, so we need to remove the scrollTop when setting the offset
+                        Builder.scrollTop() +
+                        # Vertically center input inside click interceptor
+                        ((f$.height clickInterceptor) - (f$.height labelInput)) / 2
+                    left: interceptorOffset.left
+                f$.offset inputOffset, labelInput
+                f$.width (f$.width labelAnchor) - 10, labelInput
                 f$.focus labelInput
-                f$.offset offset, labelInput
 
         updateHightlight = (updateClass, clickInterceptor) ->
-            offset = f$.offset clickInterceptor
+            offset = Builder.adjustedOffset clickInterceptor
             section = Builder.findInCache sectionsCache, offset.top
             sectionTitle = f$.find '.fr-section-title:first', section.el
             updateClass 'hover', sectionTitle
 
-        do setupLabelClickInterceptor = ->
+        # Handle click
+        do ->
 
             labelClickInterceptors = []
-            positionLabelClickInterceptors = ->
+            Builder.onOffsetMayHaveChanged ->
                 sections = $ '.xbl-fr-section'
-                _.each _.range(sections.length - labelClickInterceptors.length), ->                                     # Create interceptors, so we have enough to cover all the sections
+                # Create interceptor divs, so we have enough to cover all the sections
+                _.each _.range(sections.length - labelClickInterceptors.length), ->
                     container = $ '<div class="fb-section-label-editor-click-interceptor">'
-                    f$.append container, $ document.body
+                    f$.append container, $ '.fr-view'
                     container.on 'click', ({target}) -> showLabelEditor $ target
                     container.on 'mouseover', ({target}) -> updateHightlight f$.addClass, $ target
                     container.on 'mouseout', ({target}) -> updateHightlight f$.removeClass, $ target
                     labelClickInterceptors.push container
-                _.each _.range(sections.length, labelClickInterceptors.length), (pos) ->                                # Hide interceptors we don't need
+                # Hide interceptors we don't need
+                _.each _.range(sections.length, labelClickInterceptors.length), (pos) ->
                     labelClickInterceptors[pos].hide()
-                _.each _.range(sections.length), (pos) ->                                                               # Position interceptor for each section
+                # Position interceptor for each section
+                _.each _.range(sections.length), (pos) ->
                     title = f$.find '.fr-section-label a', $ sections[pos]
                     interceptor = labelClickInterceptors[pos]
                     interceptor.offset title.offset()
                     interceptor.height title.height()
                     interceptor.width title.width()
-            Events.orbeonLoadedEvent.subscribe positionLabelClickInterceptors
-            ($ window).resize positionLabelClickInterceptors
-            Events.ajaxResponseProcessedEvent.subscribe positionLabelClickInterceptors

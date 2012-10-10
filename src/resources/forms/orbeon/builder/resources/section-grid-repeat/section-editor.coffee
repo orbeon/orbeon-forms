@@ -28,7 +28,7 @@ $ ->
             section = $ section
             sectionsCache.unshift
                 el: section
-                offset: f$.offset section
+                offset: Builder.adjustedOffset section
                 height: f$.height section
                 titleOffset: f$.offset f$.find 'a', section
 

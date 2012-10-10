@@ -20,6 +20,10 @@ $ ->
     # How much we need to add to offset to account for the form having been scrolled
     Builder.scrollTop = -> f$.scrollTop f$.closest '.yui-layout-bd', $ '.fr-view'
 
+    # Gets an element offset, normalizing for scrolling, so the offset can be stored in a cache
+    Builder.adjustedOffset = (jQueryObject) ->
+        _.tap (f$.offset jQueryObject), (offset) -> offset.top += Builder.scrollTop()
+
     # Container is either a section or grid; calls listeners passing old/new container
     Builder.currentContainerChanged = (containerCache, {wasCurrent, becomesCurrent}) ->
         notifyChange = notifyOnChange wasCurrent, becomesCurrent

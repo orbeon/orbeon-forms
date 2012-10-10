@@ -11,23 +11,23 @@ $ ->
                 grid = $ grid
                 gridInfo =
                     el: grid
-                    offset: f$.offset grid
+                    offset: Builder.adjustedOffset grid
                     height: f$.outerHeight grid                                                                         # Include grid padding
                 table = f$.children '.fr-grid', gridInfo.el
                 if f$.is '.fr-repeat', table
                     head = f$.find 'thead', table
                     gridInfo.head =
-                        offset: f$.offset head
+                        offset: Builder.adjustedOffset head
                         height: f$.height head
                 gridInfo.rows = _.map (f$.find '.fr-grid-tr', grid), (tr) ->                                            # .fr-grid-tr leaves out the header row in the repeat
                     grid: gridInfo
                     el: $ tr
-                    offset: f$.offset $ tr
+                    offset: Builder.adjustedOffset $ tr
                     height: f$.height $ tr
                 gridInfo.cols = _.map (f$.find '.fr-grid-tr:first .fr-grid-td', grid), (td) ->
                     grid: gridInfo
                     el: $ td
-                    offset: f$.offset $ td
+                    offset: Builder.adjustedOffset $ td
                     width: f$.width $ td
                 gridsCache.unshift gridInfo
 

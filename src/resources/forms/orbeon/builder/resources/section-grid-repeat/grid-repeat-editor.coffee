@@ -120,7 +120,7 @@ $ ->
         resetPos = (pos) -> -> current[pos] = -1
         setPos = (pos) -> (rowCol) ->
             selector = '.fr-grid-' + rowCol.el[0].nodeName.toLowerCase()
-            current[pos] = f$.length f$.prev selector, rowCol.el
+            current[pos] = f$.length f$.prevAll selector, rowCol.el
 
         Builder.currentRowColChanged gridsCache,
             wasCurrentRow:      resetPos 'rowPos'

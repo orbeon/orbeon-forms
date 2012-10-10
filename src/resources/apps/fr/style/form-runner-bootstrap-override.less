@@ -10,9 +10,12 @@
 //
 // The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 
-form.xforms-layout-span {           // Override Bootstrap styling for element with a class name ending with 'span'
-    float: none;
-    margin: 0;
+@import "bootstrap-src/less/variables"; // Modify this for custom colors, font-sizes, etc
+@import "bootstrap-src/less/mixins";    // Modify this for custom colors, font-sizes, etc
+
+body, label, input, button,         // Bootstrap sets a default font-size of 14px, and here we reset it to the
+select, textarea, .btn {            // YUI's default value of 13px
+    font-size: 13px;
 }
 
 a {
@@ -20,6 +23,10 @@ a {
 }
 
 form.xforms-form {
+
+    // Override Bootstrap styling for element with a class name ending with 'span' (.xforms-layout-span)
+    float: none;
+    margin: 0;
 
     select,
     textarea,
@@ -29,9 +36,9 @@ form.xforms-form {
     }
 
     select,
-    input[type="file"] {
-        height: auto;
-        line-height: auto;
+    input[type="file"], input {
+        height: @baseLineHeight;
+        .box-sizing(content-box);
     }
 
     .fr-grid tr th label {
@@ -43,7 +50,7 @@ form.xforms-form {
     }
 
     // Used in Form Builder in particular and we probably never want the humongous legends anywhere
-    legend {
+    fieldset > legend {
         line-height: inherit;
         width: auto;
         border: none;

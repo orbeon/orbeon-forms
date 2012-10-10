@@ -1,9 +1,45 @@
-form.xforms-layout-span {
-  float: none;
-  margin: 0;
+.clearfix {
+  *zoom: 1;
+}
+.clearfix:before,
+.clearfix:after {
+  display: table;
+  content: "";
+  line-height: 0;
+}
+.clearfix:after {
+  clear: both;
+}
+.hide-text {
+  font: 0/0 a;
+  color: transparent;
+  text-shadow: none;
+  background-color: transparent;
+  border: 0;
+}
+.input-block-level {
+  display: block;
+  width: 100%;
+  min-height: 30px;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+body,
+label,
+input,
+button,
+select,
+textarea,
+.btn {
+  font-size: 13px;
 }
 a {
   text-decoration: underline;
+}
+form.xforms-form {
+  float: none;
+  margin: 0;
 }
 form.xforms-form select,
 form.xforms-form textarea,
@@ -12,9 +48,12 @@ form.xforms-form input {
   color: black;
 }
 form.xforms-form select,
-form.xforms-form input[type="file"] {
-  height: auto;
-  line-height: auto;
+form.xforms-form input[type="file"],
+form.xforms-form input {
+  height: 20px;
+  -webkit-box-sizing: content-box;
+  -moz-box-sizing: content-box;
+  box-sizing: content-box;
 }
 form.xforms-form .fr-grid tr th label {
   margin: 0;
@@ -22,7 +61,7 @@ form.xforms-form .fr-grid tr th label {
 form.xforms-form table th {
   font-weight: normal;
 }
-form.xforms-form legend {
+form.xforms-form fieldset > legend {
   line-height: inherit;
   width: auto;
   border: none;

@@ -463,22 +463,6 @@
                 <exclude name="ops/**/*.jpg"/>
                 <exclude name="ops/**/*.html"/>
                 <exclude name="ops/**/*.htc"/>
-                <exclude name="ops/fckeditor/_samples"/>
-                <exclude name="ops/fckeditor/_samples/**"/>
-                <exclude name="ops/fckeditor/editor/_source"/>
-                <exclude name="ops/fckeditor/editor/_source/**"/>
-                <exclude name="ops/fckeditor/_testcases"/>
-                <exclude name="ops/fckeditor/_testcases/**"/>
-                <exclude name="ops/fckeditor/**/*.cfm"/>
-                <exclude name="ops/fckeditor/**/*.cfc"/>
-                <exclude name="ops/fckeditor/**/*.asp"/>
-                <exclude name="ops/fckeditor/**/*.afp"/>
-                <exclude name="ops/fckeditor/**/*.cgi"/>
-                <exclude name="ops/fckeditor/**/*.py"/>
-                <exclude name="ops/fckeditor/**/*.aspx"/>
-                <exclude name="ops/fckeditor/**/*.php"/>
-                <exclude name="ops/fckeditor/**/*.pl"/>
-                <exclude name="ops/fckeditor/**/*.lasso"/>
                 <include name="oxf/**"/>
                 <include name="config/**"/>
                 <exclude name="config/theme"/>
@@ -507,16 +491,11 @@
                 <include name="ops/**/*.jpg"/>
                 <include name="ops/**/*.html"/>
                 <include name="ops/**/*.htc"/>
-                <exclude name="ops/fckeditor/_samples"/>
-                <exclude name="ops/fckeditor/_samples/**"/>
-                <exclude name="ops/fckeditor/editor/_source"/>
-                <exclude name="ops/fckeditor/editor/_source/**"/>
-                <exclude name="ops/fckeditor/_testcases"/>
-                <exclude name="ops/fckeditor/_testcases/**"/>
                 <include name="config/theme/**/*.*"/>
             </fileset>
             <zipfileset dir="${war.dir}/WEB-INF/resources">
                 <include name="**/*.js"/>
+                <exclude name="apps/fr/style/bootstrap-src/**/*.*"/>
             </zipfileset>
         </jar>
 
@@ -527,6 +506,7 @@
                 <exclude name="apps/fr/persistence/oracle/**/*.*"/>
                 <exclude name="apps/fr/alfresco/**/*.*"/>
                 <exclude name="apps/fr/print/print-pdf-template.xpl"/>
+                <exclude name="apps/fr/style/bootstrap-src/**/*.*"/>
             </fileset>
         </jar>
 

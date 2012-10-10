@@ -21,7 +21,7 @@
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
       xmlns:saxon="http://saxon.sf.net/"
 
-      id="fb-action-dialog" level="modal" close="true" draggable="true" class="fr-dialog" model="fb-bindings-model">
+      id="fb-action-dialog" level="modal" close="true" draggable="true" model="fb-bindings-model">
 
     <xforms:label ref="$form-resources/dialog-actions/label"/>
 

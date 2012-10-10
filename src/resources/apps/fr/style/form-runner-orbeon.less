@@ -12,123 +12,53 @@
 
 @error: #B94A48;
 
-html, body { background-color: #f3f3f3 } // Light grey background
+@import "bootstrap-src/less/variables";
+@import "bootstrap-src/less/mixins";
+@import "form-runner-common";
 
-.fr-body {
-    *border: 1px solid #DDD;             // Move this to effects.less and use a mixin
-    -webkit-border-radius: 6px;
-    -moz-border-radius: 6px;
-    border-radius: 6px;
-    -webkit-box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    -moz-box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    background-color: white;
-}
-
-.fr-header, .fb-top {
-    .container {
-        position: relative;
-    }
-    h1 {
-        display: inline;
-        margin: 0 0 0 .5em;
-        font-weight: normal;
-        font-size: 20px;
-        line-height: 40px;
-        vertical-align: middle;
-        color: #ddd;
-        font-family: "Lucida Grande", Tahoma, Arial, Verdana, sans-serif;   // Form title on dark background is readable in Lucida than Helvetica
-    }
-}
+html, body { background-color: @frBackground }
 
 /* ***** Headings (titles and sections) ***************************************************************************** */
 
-.xforms-form h2, .xforms-form h3 {
-    background-image: -webkit-linear-gradient(top, #fff, #eee);
-	margin: 1em 0;
-    /*color: #004B92;*/
-}
+.xforms-form {
+    h2, h3 {
+        background-image: -webkit-linear-gradient(top, #fff, #eee);
+        margin: 1em 0;
+        /*color: #004B92;*/
+    }
 
-.xforms-form h2, .xforms-form h3, .xforms-form h4, .xforms-form h5, .xforms-form h6 {
-    text-align: left;
-    font-weight: normal;
-    clear: left;
-    padding: 0;
-    color: #555;                                    /* Lighter grey to compensate for larger title font */
-}
+    h2, h3, h4, h5, h6 {
+        text-align: left;
+        font-weight: normal;
+        clear: left;
+        padding: 0;
+        color: #555;                                    /* Lighter grey to compensate for larger title font */
+    }
 
-.xforms-form h2 {
-    font-size: 20px;
-    margin: .5em 0 .5em 0;
-}
+    h2 {
+        font-size: 20px;
+        margin: .5em 0 .5em 0;
+    }
 
-.xforms-form h2 .fr-section-label {
-    border-bottom: 2px solid #eee;                  /* Line under title */
-    display: block;                                 /* So the line expands all the way to the right */
-}
+    h2 .fr-section-label {
+        border-bottom: 2px solid #eee;                  /* Line under title */
+        display: block;                                 /* So the line expands all the way to the right */
+    }
 
-.xforms-form h3, .xforms-form h4 {
-    font-size: 110%;
-    line-height: 135%;
-    margin: 1em 0 1em 0;
+    h3, h4 {
+        font-size: 110%;
+        line-height: 135%;
+        margin: 1em 0 1em 0;
+    }
 }
 
 /* ***** Other ****************************************************************************************************** */
-
-textarea,
-input[type = 'text'] {
-    background-image: url(field.png);
-    background-repeat: repeat-x;
-}
-
-.table th {
-    background-color: #EEE;
-}
-
-.fr-top, .fr-footer { background-repeat: no-repeat; clear: both }
-.fr-footer { min-height: 10px } /* help display background image */
-
-/*#doc .fr-footer { background-image: url(bottom-750.png); _background-image: none }*/
-/*#doc4 .fr-footer { background-image: url(bottom-974.png); _background-image: none }*/
-/*#doc-fb .fr-footer { background-image: url(bottom-974.png); _background-image: none }*/
-
-/* Put margins here as they are not needed */
-/*#fr-form-group { margin: .5em 1em .5em }*/
 
 .fr-orbeon-version {
     text-align: center;
     font-size: smaller;
     padding: 10px;
     color: #6E6E6E;
-}
-
-.fr-separator {
-    /*background-color: #9999CC;*/
-    height: 4px;    /* size in em seems to cause issues in Firefox as not all separators appear the same height */
-    font-size: 0;   /* help IE */
-}
-
-.fr-bottom {
-    padding: 1em;
-}
-
-.yui-skin-sam .yui-button button {
-    *height: 2em;   /* IE doesn't honor the min-height provided by YUI */
-}
-
-/* Apply YUI SAM skin style for <input> buttons under IE 6 (other browsers use <button>) */
-.yui-skin-sam .xforms-noscript .yui-button input {
-    color: #000000;
-    font-size: 93%;
-    line-height: 2;
-    min-height: 2em;
-    padding: 0 10px;
-
-    background-color: transparent;
-    cursor: pointer;
-    border: medium none;
-    display: block;
-    margin: 0;
 }
 
 .fr-explanation .xforms-output {
@@ -142,10 +72,10 @@ input[type = 'text'] {
     font-weight: bold;
     font-size: smaller;
     color: @error;
-    border-radius: 3px; -moz-border-radius: 2px; -webkit-border-radius: 3px; -ms-border-radius: 2px /* radius appears differently w/ Safari 3.1 vs. Firefox 3.0b4*/
+    .border-radius(3px);
 }
 
-.xforms-hint, .fr-form-description {
+.xforms-hint {
     display: block;
     clear: both;
     font-size: smaller;
@@ -153,18 +83,34 @@ input[type = 'text'] {
     margin-left: 0;/* used to have margin here but with new colors no margin seems better */
     width: 100%;
     color: #6E6E6E;
-    font-style: italic
 }
 
-.xforms-noscript .xforms-help-panel .xforms-help-group { list-style-type: square }
+.xforms-noscript {
+    .xforms-help-panel .xforms-help-group { list-style-type: square }
+}
 
-/* Metadata */
-.fr-language-choice, .fr-noscript-choice, .fr-goto-content, .fr-doc-links { color: gray; font-size: 85%; float: right; margin-top: .2em; text-align: right }
-.fr-language-choice a, .fr-noscript-choice a, .fr-goto-content a, .fr-doc-links a { color: #6E6E6E }
+/* Navbar */
+.fr-language-choice, .fr-noscript-choice, .fr-goto-content {
+    color: @navbarLinkColorActive;
+    font-size: 85%;
+    float: right;
+    margin-top: 10px;
+    text-align: right;
+
+    a { color: @navbarLinkColor }
+}
+
+.navbar-inverse {
+    .fr-language-choice, .fr-noscript-choice, .fr-goto-content {
+        color: @navbarInverseLinkColorActive;
+        a { color: @navbarInverseLinkColor }
+    }
+}
+
 .fr-goto-content { border: 2px solid #888888; padding: .5em; float: left; margin-left: 1em }
 
 /* Make button appear the same color as a link */
-.xforms-trigger-appearance-xxforms-minimal, .xforms-trigger-appearance-xxforms-minimal button, .xforms-trigger-appearance-xxforms-minimal input {
+.xforms-trigger-appearance-xxforms-minimal button, .xforms-trigger-appearance-xxforms-minimal input {
     color: #6E6E6E;
 }
 
@@ -174,14 +120,6 @@ h1 .xforms-trigger-appearance-xxforms-minimal button, h2 .xforms-trigger-appeara
 h1 .xforms-trigger-appearance-xxforms-minimal input, h2 .xforms-trigger-appearance-xxforms-minimal input, h3 .xforms-trigger-appearance-xxforms-minimal input {
     color: #004B92;
 }
-
-/* Set input/textarea controls background */
-/*.xforms-input input, textarea.xforms-textarea, input.xforms-secret, .xforms-textarea textarea, .xforms-secret input, .xbl-component .xbl-html-input {*/
-    /*background-image: url(field.png);*/
-    /*background-repeat: repeat-x;*/
-    /*border: 1px solid #ccc;*/
-    /*padding: 0*/
-/*}*/
 
 /* Add a star before the label of required fields, but only in new/edit modes */
 /* NOTE: This only works in span layout (the default in FR since 2011-07-28) */
@@ -196,93 +134,83 @@ h1 .xforms-trigger-appearance-xxforms-minimal input, h2 .xforms-trigger-appearan
 
 /* Colored border for invalid fields */
 /* NOTE: We don't use this style for required fields, as we are now using an asterisk next to the label */
-.xforms-invalid-visited .xforms-input-input, textarea.xforms-invalid-visited { border-color: #B94A48 }
+.xforms-invalid-visited .xforms-input-input, textarea.xforms-invalid-visited { border-color: @error }
 
 /* Upload control information */
 .xforms-upload-info { background-color: transparent }
-
-/* Metadata */
-.fr-top {
-    padding: 1em .5em .5em .5em;
-}
 
 /* Table of contents */
 .fr-toc a { text-decoration: none }
 
 /* Error summary */
-.fr-view .xbl-fr-error-summary .fr-error-title {
-    font-size: smaller;
-    font-weight: bold;
-    background-color: @error;
-    color: white;
-    border-radius: 3px; -moz-border-radius: 2px; -webkit-border-radius: 3px; -ms-border-radius: 2px /* radius appears differently w/ Safari 3.1 vs. Firefox 3.0b4*/
+.fr-view .xbl-fr-error-summary {
+    .fr-error-title {
+        font-size: smaller;
+        font-weight: bold;
+        background-color: @error;
+        color: white;
+        .border-radius(4px);
+    }
+
+    .fr-error-label, .fr-error-row { font-weight: bold }
+    .fr-error-alert { color: @error } // override default of XBL component
+
+    // Mix-in a border into the error summary body
+    .fr-error-summary-body {
+        .fr-border;
+    }
 }
-.fr-view .xbl-fr-error-summary .fr-error-label, .xbl-fr-error-summary .fr-error-row { font-weight: bold }
-.fr-view .xbl-fr-error-summary .fr-error-alert { color: #B94A48 } /* override default of XBL component */
 
 /* Section */
-.fr-section-title a {
-    text-decoration: none;
-    color: inherit;             // Don't use the default styling for anchors
-    display: block;             // Width extends all the way to the right, which makes it easier to position the .fb-section-label-editor-container
-}
-.fr-section-title .fr-section-open-close { border-bottom: white }
-.fr-section-title, .fr-section-title .xforms-label { font-weight: normal }
-.fr-section-title .fr-section-arrow { float: left; display: block; height: 1.5em; background-color: white }
-.fr-section-title .xforms-trigger-appearance-xxforms-minimal,
-    .fr-section-title .xforms-trigger-appearance-xxforms-minimal button,
-    .fr-section-title .xforms-trigger-appearance-xxforms-minimal input { text-decoration: none }
+.xbl-fr-section {
 
-.fr-section-opened,
-.fr-section-closed {
-    padding-left: 20px;
-    background-repeat: no-repeat;
-    background-position: 5px 50%;
-    cursor: pointer;                                        // So the "hand" cursor shows wherever the mouse is on the line, not just on the text of the title
-}
+    background-color: white;
 
-.fr-section-opened {
-    background-image: url('arrow-down.png');
-}
-.fr-section-closed {
-    background-image: url('arrow-right.png');
+    .fr-section-title {
+        a {
+            text-decoration: none;
+            color: inherit;             // Don't use the default styling for anchors
+            display: inline-block;
+        }
+        .fr-section-open-close { border-bottom: white }
+        .xforms-label { font-weight: normal }
+        .fr-section-arrow { float: left; display: block; height: 1.5em; background-color: white }
+        .xforms-trigger-appearance-xxforms-minimal button,
+            .xforms-trigger-appearance-xxforms-minimal input { text-decoration: none }
+
+        .fr-section-opened, .fr-section-closed {
+            padding-left: 20px;
+            background-repeat: no-repeat;
+            background-position: 5px 50%;
+            cursor: pointer;                                        // So the "hand" cursor shows wherever the mouse is on the line, not just on the text of the title
+        }
+
+        .fr-section-opened {
+            background-image: url(arrow-down.png);
+        }
+        .fr-section-closed {
+            background-image: url(arrow-right.png);
+        }
+    }
 }
 
 /* Add background to static read-only fields and special output fields */
 .xforms-static, .fr-static { min-height: 1em }
-.fr-mode-view .fr-grid-content { margin-bottom: 1em; background-color: #E8F2FF }
-.fr-mode-view .fr-repeat .fr-grid-content { background-color: transparent; margin-bottom: 0 }
-.fr-mode-view #fr-form-group { margin-top: 1em }
-
-/* Messages area */
-.fr-messages {
-    display: block;
-    padding: 1em;
-    margin-bottom: 1em;
-    width: 100%;
-    box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    background-color: white;
-    border: 1px solid #DDDDDD;
-    float: left;
-}
-
-.fr-messages p {
-    margin: 0;
+.fr-mode-view {
+    .fr-grid-content { margin-bottom: 1em }
+    .fr-repeat .fr-grid-content {
+        background-color: transparent;
+        margin-bottom: 0;
+    }
 }
 
 .table th { text-align: center }
-
-.fr-messages .fr-message-success { text-align: center; color: green }
-
-.fr-messages p a { color: white }
 
 /* ***** Print and PDF ********************************************************************************************** */
 
 /* This is also used for PDF generation */
 @media print {
     html, html body { background-color: white; background-image: none }
-    /*html body #fr-form-group h2 { font-family: "Arial Unicode MS" }*/
     html { font-family: "Arial Unicode MS" }
     .fr-separator { background-color: black; height: 2px }
     h1, h2, h3 { color: black }

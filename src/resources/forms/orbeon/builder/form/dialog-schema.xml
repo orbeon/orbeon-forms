@@ -22,7 +22,7 @@
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
       xmlns:saxon="http://saxon.sf.net/"
 
-      id="fb-schema-upload-dialog" level="modal" class="fr-dialog">
+      id="fb-schema-upload-dialog" level="modal">
 
     <xforms:label ref="$form-resources/dialog-upload-schema/label"/>
 

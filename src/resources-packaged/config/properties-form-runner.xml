@@ -33,11 +33,9 @@
     <property as="xs:anyURI"  name="oxf.fr.appserver.uri"                                       value=""/>
     <property as="xs:string"  name="oxf.fr.default-language.*.*"                                value="en"/>
     <property as="xs:anyURI"  name="oxf.fr.default-logo.uri.*.*"                                value="oxf:/apps/fr/style/orbeon-navbar-logo.png"/>
-    <property as="xs:string"  name="oxf.fr.css.uri.*.*"                                         value="/ops/yui/reset-fonts-grids/reset-fonts-grids.css
-                                                                                                       /apps/fr/style/bootstrap/css/bootstrap.css
+    <property as="xs:string"  name="oxf.fr.css.uri.*.*"                                         value="/apps/fr/style/bootstrap/css/bootstrap.css
                                                                                                        /apps/fr/style/form-runner-bootstrap-override.css
                                                                                                        /apps/fr/style/form-runner-base.css
-                                                                                                       /apps/fr/style/form-runner-html.css
                                                                                                        /apps/fr/style/form-runner-orbeon.css"/>
     <property as="xs:string"  name="oxf.fr.authentication.method"                               value=""/>                      <!-- "container" or "header" or empty -->
     <property as="xs:string"  name="oxf.fr.authentication.header.username"                      value="My-Username-Header"/>    <!-- with Liferay: Orbeon-Liferay-User-Email or Orbeon-Liferay-User-Full-Name are also possible -->

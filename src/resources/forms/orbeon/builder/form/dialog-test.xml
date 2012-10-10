@@ -22,7 +22,7 @@
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
       xmlns:saxon="http://saxon.sf.net/"
 
-      id="fb-test-dialog" level="modal" close="true" draggable="false" class="fr-dialog fb-test-dialog"
+      id="fb-test-dialog" level="modal" close="true" draggable="false" class="fb-test-dialog"
       style="width: 400px; height: 600px">
 
     <xforms:label ref="$form-resources/dialog-test/label"/>

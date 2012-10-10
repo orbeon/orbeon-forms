@@ -137,17 +137,18 @@
                             </xf:group>
 
                             <!-- Logo -->
-                            <xf:group ref=".[$is-form-settings]">
-                                <xf:label ref="$resources/logo/label" class="fr-hidden"/>
-                                <fr:image-attachment ref="logo" class="fr-attachment">
-                                    <!-- Only show hint if there is no attachment -->
-                                    <xf:hint ref="$resources/logo/hint[not(normalize-space(context()))]"/>
-                                    <!-- Store all the details -->
-                                    <xf:filename ref="@filename"/>
-                                    <xf:mediatype ref="@mediatype"/>
-                                    <xxf:size ref="@size"/>
-                                </fr:image-attachment>
-                            </xf:group>
+                            <!-- Custom logo upload is removed in 4.0 -->
+                            <!--<xf:group ref=".[$is-form-settings]">-->
+                                <!--<xf:label ref="$resources/logo/label" class="fr-hidden"/>-->
+                                <!--<fr:image-attachment ref="logo" class="fr-attachment">-->
+                                    <!--&lt;!&ndash; Only show hint if there is no attachment &ndash;&gt;-->
+                                    <!--<xf:hint ref="$resources/logo/hint[not(normalize-space(context()))]"/>-->
+                                    <!--&lt;!&ndash; Store all the details &ndash;&gt;-->
+                                    <!--<xf:filename ref="@filename"/>-->
+                                    <!--<xf:mediatype ref="@mediatype"/>-->
+                                    <!--<xxf:size ref="@size"/>-->
+                                <!--</fr:image-attachment>-->
+                            <!--</xf:group>-->
 
                         </xh:div>
 

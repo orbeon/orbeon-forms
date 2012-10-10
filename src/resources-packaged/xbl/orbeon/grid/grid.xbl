@@ -44,33 +44,32 @@
                 <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
                 <xsl:import href="oxf:/oxf/xslt/utils/xbl.xsl"/>
 
-                <!-- Edit mode -->
-                <xsl:template match="/*">
+                <xsl:variable name="root" select="/*[1]"/>
 
-                    <!-- Point to the source element for this grid -->
-                    <xsl:variable name="edit-ref" select="@edit-ref"/>
-                    <xsl:variable name="is-editable" select="exists(@edit-ref)"/>
-                    <!--<xsl:variable name="is-editable" select="false()"/>-->
+                <!-- Point to the source element for this grid -->
+                <xsl:variable name="edit-ref"           select="$root/@edit-ref"/>
+                <xsl:variable name="is-editable"        select="exists($edit-ref)"/>
+
+                <xsl:variable name="is-repeat"          select="$root/@repeat = 'true' or exists($root/@minOccurs | $root/@maxOccurs | $root/@min | $root/@max)"/>
+                <xsl:variable name="grid-rows"          select="($root/*:body, $root/self::*)[1]/*:tr"/>
+
+                <xsl:variable name="static-row-count"   select="count($grid-rows)"/>
+                <xsl:variable name="static-col-count"   select="count($grid-rows[1]/*:td)"/>
+                <!-- Show LHH in header only if repeating over a row group containing only one row -->
+                <xsl:variable name="lhh-in-header"      select="$is-repeat and $static-row-count = 1"/>
+
+                <xsl:variable name="min-occurs"         select="($root/@min, $root/@minOccurs, 0)[1]"/>
+                <xsl:variable name="max-occurs"         select="($root/@max, $root/@maxOccurs, 'unbounded')[1]"/>
+                <xsl:variable name="readonly"           select="$root/@readonly = 'true'"/>
+                <xsl:variable name="remove-constraint"  select="$root/@remove-constraint"/>
+                <xsl:variable name="repeat-id"          select="concat($root/@id, '-repeat')"/>
+
+                <xsl:variable name="repeat-expression"  select="($root/@ref, $root/@nodeset, concat('xxforms:bind(''', $root/@bind, ''')'))[1]" as="xs:string"/>
+
+                <xsl:template match="/*">
 
                     <!-- Root element -->
                     <xf:group appearance="xxf:internal">
-
-                        <xsl:variable name="is-repeat" select="@repeat = 'true' or exists(@minOccurs | @maxOccurs | @min | @max)"/>
-                        <xsl:variable name="grid-rows" select="(*:body, self::*)[1]/*:tr"/>
-
-                        <xsl:variable name="static-row-count" select="count($grid-rows)"/>
-                        <xsl:variable name="static-col-count" select="count($grid-rows[1]/*:td)"/>
-                        <!-- Show LHH in header only if repeating over a row group containing only one row -->
-                        <xsl:variable name="lhh-in-header" select="$is-repeat and $static-row-count = 1"/>
-
-                        <xsl:variable name="min-occurs" select="(@min, @minOccurs, 0)[1]"/>
-                        <xsl:variable name="max-occurs" select="(@max, @maxOccurs, 'unbounded')[1]"/>
-                        <xsl:variable name="readonly" select="@readonly = 'true'"/>
-                        <xsl:variable name="remove-constraint" select="@remove-constraint"/>
-                        <xsl:variable name="repeat-id" as="xs:string" select="concat(@id, '-repeat')"/>
-
-                        <xsl:variable name="repeat-expression" select="(@ref, @nodeset, concat('xxforms:bind(''', @bind, ''')'))[1]" as="xs:string"/>
-
                         <xsl:if test="$is-editable">
                             <!-- Point to the design-time source -->
                             <xxf:var name="grid" value="{$edit-ref}"/>
@@ -114,9 +113,9 @@
                                     <!-- Row with column headers -->
                                     <xh:tr class="fr-dt-master-row">
                                         <xsl:if test="not($readonly)">
-                                            <xf:group ref=".">
+                                            <xf:group ref="$repeat-context[not(xxf:readonly(.))]">
                                                 <xh:th class="fr-repeat-column fr-repeat-column-trigger">
-                                                    <xxf:var name="can-add" as="boolean"
+                                                    <xxf:var name="can-add" as="xs:boolean"
                                                              value="{if ($max-occurs = 'unbounded') then 'true()'
                                                                        else concat('count($repeat-sequence) lt ', $max-occurs)}"/>
                                                     <xf:trigger appearance="minimal" ref="$repeat-context[$can-add]">
@@ -162,7 +161,7 @@
                                 </xh:thead>
                             </xsl:if>
 
-                            <xh:tbody class="yui-dt-data">
+                            <!--<xh:tbody class="yui-dt-data">-->
                                 <!-- Iterate over table rows -->
 
                                 <!-- Row group -->
@@ -188,7 +187,7 @@
 
                                                     <xsl:if test="$is-repeat">
                                                         <xsl:if test="not($readonly) and $static-row-pos = 1">
-                                                            <xf:group ref=".">
+                                                            <xf:group ref="$repeat-context[not(xxf:readonly(.))]">
                                                                 <xh:td class="fr-repeat-column fr-repeat-column-trigger" rowspan="{$static-row-count}">
                                                                     <!-- Remove trigger -->
                                                                     <xxf:var name="can-remove"
@@ -196,7 +195,6 @@
                                                                     <xf:trigger appearance="minimal" ref="$repeat-context[$can-remove]">
                                                                         <!-- TODO: i18n of alt/title -->
                                                                         <xf:label><xh:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/delete_16.png" alt="Remove" title="Remove"/></xf:label>
-                                                                        <!--/apps/fr/style/images/silk/bin.png-->
                                                                         <xf:delete ev:event="DOMActivate" ref="$repeat-sequence" at="$repeat-index"/>
                                                                     </xf:trigger>
                                                                     <xf:group ref="$repeat-context[not($can-remove)]">
@@ -281,12 +279,7 @@
                                         <xsl:copy-of select="$content"/>
                                     </xsl:otherwise>
                                 </xsl:choose>
-
-                                <!-- IE hack so that the bottom border shows up -->
-                                <!--<xh:tr>-->
-                                    <!--<xh:td colspan="4"/>-->
-                                <!--</xh:tr>-->
-                            </xh:tbody>
+                            <!--</xh:tbody>-->
 
                             <!--<xsl:if test="fr:footer">-->
                                 <!--<xhtml:tfoot>-->
@@ -302,16 +295,20 @@
                 </xsl:template>
 
                 <xsl:template match="*:tr[empty(ancestor::*/local-name()[not(. = ('group', 'grid'))])]">
-                    <xh:tr class="{'fr-grid-tr', @class}">
+                    <xh:tr>
+                        <!-- Place Bootstrap classes  when no in a repeated grid -->
+                        <!--<xsl:if test="not($is-repeat)"><xsl:attribute name="class">row</xsl:attribute></xsl:if>-->
                         <xsl:copy-of select="@* except @class"/>
                         <xsl:apply-templates select="*"/><!-- don't bother with other nodes -->
                     </xh:tr>
                 </xsl:template>
 
                 <xsl:template match="*:td[empty(ancestor::*/local-name()[not(. = ('group', 'tr', 'grid'))])]">
-                    <xh:td class="{'fr-grid-td', @class}">
+                    <xh:td>
+                        <!-- Place Bootstrap classes  when no in a repeated grid -->
+                        <!--<xsl:if test="not($is-repeat)"><xsl:attribute name="class" select="concat('span', 12 idiv $static-col-count)"/></xsl:if>-->
                         <xsl:copy-of select="@* except @class"/>
-                        <xh:div class="fr-grid-content">
+                        <xh:div class="fr-grid-content"><!-- TODO: see if we want to keep this -->
                             <xsl:apply-templates select="node()"/>
                         </xh:div>
                     </xh:td>

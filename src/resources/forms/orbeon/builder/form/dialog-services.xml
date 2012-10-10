@@ -22,7 +22,7 @@
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
       xmlns:saxon="http://saxon.sf.net/"
 
-      id="fb-service-dialog" level="modal" close="true" draggable="true" class="fr-dialog" model="fb-service-model">
+      id="fb-service-dialog" level="modal" close="true" draggable="true" model="fb-service-model">
 
     <xforms:label ref="$form-resources/dialog-http-services/label"/>
 

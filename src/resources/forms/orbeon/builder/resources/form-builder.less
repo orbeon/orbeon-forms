@@ -12,16 +12,55 @@
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 
+@import "../../../../apps/fr/style/form-runner-common";
+
 @darkBlue: #004B92;
 @lightBlue: #DEF;
+@yellow: #ffffd3;
+@fbGutter: 10px;
 
-/* Overwrite definition in form-runner-orbeon.css if any */
-html { overflow: hidden }
+.fr-border {
+    padding: 0;
+    margin-bottom: 20px;
+    background-color: @wellBackground;
+    border: 1px solid darken(@wellBackground, 7%);
+    .border-radius(4px);
+    .box-shadow(inset 0 1px 1px rgba(0,0,0,.05));
+}
 
-.xforms-select table { margin-bottom: 0 }
+// Overwrite definition in form-runner-orbeon.css if any
+html {
+    overflow-y: scroll;
+    background-color: darkgray;
+    background-image: url("../../../../forms/orbeon/builder/images/low_contrast_linen_@2X.png");
+}
+body {
+    padding-top: 0;
+    margin-right: 4px;
+    background-image: url("../../../../forms/orbeon/builder/images/low_contrast_linen_@2X.png");
+}
+
+.fb-center {
+    position: absolute;
+    top: 40px + @fbGutter;
+    right: @fbGutter;
+    left: 200px + @fbGutter;
+    bottom: 62px;
+    overflow-y: auto;
+    .fr-border();
+    .box-sizing(border-box);
+    margin-bottom: 0;
+    border: 1px solid #222;
+}
+
+.fb-bottom {
+    z-index: @zindexFixedNavbar;        // put in front like the navbar
+    background-color: @frBackground;
+}
 
 #fr-view fieldset, .xforms-dialog fieldset { border: 1px solid #CCCCCC; }
 
+// TODO: Do we need this one?
 .xbl-fr-section > label { display: none }
 
 .fb-section-editor {
@@ -66,7 +105,7 @@ html { overflow: hidden }
 .fb-xforms-disabled { display: none }
 .fb-hide-alert .xforms-alert { display: none }
 
-/* This is for the form builder title at the top */
+// This is for the form builder title at the top
 .fb-top h1.fr-form-title {
     clear: none;
     color: @darkBlue;
@@ -80,128 +119,195 @@ div.xbl-fr-grid {
 
 /* ***** Toolbox **************************************************************************************************** */
 
-#fb-toolbox {
-    position: static;
-    left: 0;
-    top: 0;
-    height: 100%;
+.fb-toolbox {
+    position: fixed;
+    left: @fbGutter;
+    top: 40px + @fbGutter;
+    bottom: 62px;
+    width: 192px;
+    padding: 0px;
+    padding-bottom: 6px;
+    overflow-y: auto;
+    .box-sizing(border-box);
+
+    .fb-toolbox-inside {
+        width: 100%;
+        .box-sizing(border-box);
+
+        .fb-tools {
+            .fr-border();
+            padding: 8px;
+            margin-bottom: @fbGutter;
+
+            legend {
+                margin-bottom: 10px;
+                font-size: 12pt;
+                text-indent: 4px;
+                line-height: 24px;
+                margin-top: -4px;
+            }
+
+            .xforms-label {
+                display: block;
+                margin: 1em 0 .5em 0;
+                font-size: 93%;
+            }
+
+            .fb-tool {
+                margin: 0 0 0 .7em;
+
+                .xforms-trigger { display: block }                                                                      // tools to always show vertically
+                .xforms-trigger button     {
+                    padding: 2px 0 2px 0;
+                    border: none; background: none; box-shadow: none;                                                   // remove button default styling
+                    font-size: 85%;                                                                                     // smaller text next icon
+                }
+            }
+
+            // Services and actions
+            ul { margin: 0; overflow: auto }
+            li { list-style-type: none; white-space: nowrap; font-size: 11px }
+            .xforms-trigger a { text-decoration: none }
+        }
+
+        // Cut / Copy / Paste
+        .fb-xvc { text-align: center }
+        .fb-xvc .xforms-trigger { margin-right: .5em }
+
+        .xbl-fr-alert-dialog {display: none }   // because w/ Chrome, a DIV of the dialog remains under the toolbox DIV and causes the toolbox to scroll
+
+        .fr-orbeon-version { color: white; }
+    }
 }
-
-#fb-toolbox .fb-toolbox-inside {
-    width: 100%;
-    padding-bottom: 1.5em /* with Firefox and Safari, scrollable content appears otherwise clipped a little (because content gets out of the box?) */
-}
-
-#fb-toolbox .bd { background: @lightBlue; padding: .5em; }                                /* Body background*/
-#fb-toolbox .fb-tool { margin: 0 0 0 .7em }
-#fb-toolbox .fb-tool .xforms-trigger { display: block }                                                                 // Tools to always show vertically
-#fb-toolbox .fb-tool .xforms-trigger button     {
-    padding: 2px 0 2px 0;
-    border: none; background: none; box-shadow: none;                               /* Remove button default styling */
-    font-size: 85%;                                                                 /* Smaller text next icon */
-}
-#fb-toolbox .fb-tools .xforms-label             { display: block; margin: 1em 0 .5em 0; font-size: 93% }
-#fb-toolbox button.xforms-trigger img { margin-right: .2em }
-
-/* Cut / Copy / Paste */
-#fb-toolbox .fb-xvc { text-align: center }
-#fb-toolbox .fb-xvc .xforms-trigger { margin-right: .5em }
-
-/* Services and actions */
-#fb-toolbox ul { margin: 0; overflow: auto }
-#fb-toolbox li { list-style-type: none; white-space: nowrap; font-size: 11px }
-
-#fb-toolbox span.xforms-trigger a { text-decoration: none }
-
-#fb-toolbox .fb-metadata-settings select { width: 100% }
-
-#fb-toolbox .xbl-fr-button { display: block; } /* Otherwise inline-block buttons don't take the full width of the toolbox */
-
-.fb-toolbox-inside dt { text-align: center } /* Center text in sections title */
-
-#fb-toolbox .xbl-fr-alert-dialog {display: none } /* Because w/ Chrome, a DIV of the dialog remains under the toolbox DIV and causes the toolbox to scroll */
 
 /* ***** Dialogs **************************************************************************************************** */
 
-/* Metadata editor dialog */
-.fb-dialog-form-settings { width: 40em; }
-.fb-dialog-form-settings img { float: left; margin: 1em 2em 0 1em; }
-.fb-dialog-form-settings .xforms-label { display: block; }
-.fb-dialog-form-settings .xforms-hint { margin-bottom: 1em; }
-.fb-dialog-form-settings .fb-dialog-form-settings-fields { float: left; width: 30em }
-.fb-dialog-form-settings input, .fb-dialog-form-settings textarea { width: 100% }
+// Metadata editor dialog
+.fb-dialog-form-settings {
+    width: 40em;
 
-.fb-dialog-form-settings .fb-dialog-form-settings-stats th { text-align: left }
-.fb-dialog-form-settings .fb-dialog-form-settings-stats td { text-align: right; padding-left: .5em }
-.fb-dialog-form-settings .fb-dialog-form-settings-stats > .xforms-label { border-bottom: 1px solid #DDE }
+    img { float: left; margin: 1em 2em 0 1em; }
+    .xforms-label { display: block; }
+    .xforms-hint { margin-bottom: 1em; }
+    .fb-dialog-form-settings-fields { float: left; width: 30em }
+    input, textarea { width: 100% }
 
-/* Itemset editor dialog */
-/* Using a class instead of an id since the id is simply 'dialog' as it is declared in a component */
-.fb-itemset-editor-dialog { width: 35em }
-.fb-itemset-editor-dialog .fr-grid-2-columns .xforms-input input { width: 13em }
-.fb-itemset-editor-dialog .xbl-fr-link-select1 { margin-bottom: .5em; float: right }
-.fb-itemset-editor-dialog .xbl-fr-link-select1 .xforms-label { display: none }
-.fb-itemset-editor-dialog .yui-dt { clear: both } /* help IE 6/7 */
-.fb-itemset-editor-dialog .xforms-invalid .xforms-input-input { border-color: #DF731B }     /* Show errors also for fields that aren't visited */
+    .fb-dialog-form-settings-stats {
+        th { text-align: left }
+        td { text-align: right; padding-left: .5em }
+        &> .xforms-label { border-bottom: 1px solid #DDE }
+    }
+}
 
-/* Submission editor dialog */
-#fb-service-dialog { width: 45em }
-.fb-service-dialog-error { border: 2px solid red; padding: .25em }
-.fb-service-dialog-error select { border: none }
-.fb-service-dialog-success { border: 2px solid green; padding: .25em }
-.fb-submission-response { display: block; height: 200px; overflow-y: auto }
-.fb-submission-response textarea { height: 10em }
+// Itemset editor dialog
+// Using a class instead of an id since the id is simply 'dialog' as it is declared in a component
+.fb-itemset-editor-dialog {
+    width: 35em;
 
-/* Bindings editor dialog */
-#fb-action-dialog { width: 45em }
-#fb-action-dialog .xforms-select1 { width: auto }
-#fb-action-dialog .fr-repeat-table .fb-parameters .xforms-label { display: block }
-#fb-action-dialog .fr-repeat-table .fb-parameters .xforms-hint { display: block }
-#fb-action-dialog .fr-repeat-table .fb-parameters .xforms-disabled { display: none }
-#fb-action-dialog .fr-repeat-table th { white-space: nowrap }
+    .fr-grid-2-columns .xforms-input input { width: 13em }
+    .xbl-fr-link-select1 { margin-bottom: .5em; float: right }
+    .xbl-fr-link-select1 .xforms-label { display: none }
+    .xforms-invalid .xforms-input-input { border-color: #DF731B }     // show errors also for fields that aren't visited
+}
 
-#fb-database-service-dialog { width: 45em }
-#fb-database-service-dialog textarea { height: 10em; font-family: monospace }
+// Submission editor dialog
+#fb-service-dialog {
+    width: 45em;
+    .fb-service-dialog-error {
+        border: 2px solid red; padding: .25em;
+        select {
+            border: none;
+        }
+    }
+    .fb-service-dialog-success {
+        border: 2px solid green;
+        padding: .25em;
+    }
+    .fb-submission-response {
+        display: block;
+        height: 200px;
+        overflow-y: auto;
+        textarea {
+            height: 10em;
+        }
+    }
+}
 
-/* Help dialog */
-#fb-edit-help-dialog { width: 40em }
-#fb-edit-help-dialog textarea { width: 98%; height: 12em }
 
-/* Other dialogs */
+// Bindings editor dialog
+#fb-action-dialog {
+    width: 45em;
+    .xforms-select1 { width: auto }
+    .fr-repeat-table {
+        .fb-parameters {
+            .xforms-label { display: block }
+            .xforms-hint { display: block }
+            .xforms-disabled { display: none }
+        }
+        th { white-space: nowrap }
+    }
+}
+
+#fb-database-service-dialog {
+    width: 45em;
+    textarea {
+        height: 10em;
+        font-family: monospace;
+    }
+}
+
+
+// Help dialog
+#fb-edit-help-dialog {
+    width: 40em;
+    textarea {
+        width: 98%;
+        height: 12em;
+    }
+}
+
+// Other dialogs
 .xforms-dialog .bd { padding-left: .5em; padding-right: .5em }
 .xforms-dialog .xforms-label img { vertical-align: middle }
 
-#fb-css-upload-dialog, #fb-schema-upload-dialog { width: 35em }
-
-#fb-edit-details-dialog,
-    #fb-section-details-dialog,
+#fb-section-details-dialog,
     #fb-add-language-dialog { width: 20em }
-#fb-edit-validation-dialog { width: 30em }
-#fb-edit-details-dialog .xforms-input input { width: 98% }
-#fb-section-details-dialog .xforms-input input { width: 98% }
+#dialog-control-details\$dialog .xforms-input input { width: 98% }
 
-#fb-edit-validation-dialog textarea { width: 98%; height: 4em }
-#fb-edit-validation-dialog .xforms-label { display: block; clear: both }
-#fb-edit-validation-dialog .xforms-hint { display: block; clear: both }
-#fb-edit-validation-dialog .xforms-disabled { display: none }
+#dialog-control-details\$dialog {
+    width: 20em;
+    .xforms-input input { width: 98% }
+}
 
-#fb-schema-upload-dialog .xforms-hint { width: 100% }
-#fb-schema-upload-dialog .xforms-select1 { height: 10em; width: 100% }
-#fb-schema-upload-dialog .fb-dialog-h2 { font-size: larger; display: block; padding-top: .3em; padding-bottom: .3em }
-#fb-schema-upload-dialog .fb-dialog-section { display: block; margin-left: 1em }
+#fb-edit-validation-dialog {
+    width: 30em; 
+    
+    textarea { width: 98%; height: 4em }
+    .xforms-label { display: block; clear: both }
+    .xforms-hint { display: block; clear: both }
+    .xforms-disabled { display: none }
+}
 
-#fb-xml-dialog .fb-xml-dialog-view { width: 100%; height: 29em; overflow: auto; background-color: white }
+#fb-schema-upload-dialog {
+    width: 35em;
+    
+    .xforms-hint { width: 100% }
+    .xforms-select1 { height: 10em; width: 100% }
+    .fb-dialog-h2 { font-size: larger; display: block; padding-top: .3em; padding-bottom: .3em }
+    .fb-dialog-section { display: block; margin-left: 1em }
+}
 
-/* TODO: change this to properly dynamically size dialog */
-#fb-source-editor-dialog, #fb-xml-dialog { width: 70em }
-#fb-source-editor-dialog .CodeMirror { font-size: 12px }        /* Pick slightly smaller font size, default being 13px */
-#fb-source-editor-dialog .CodeMirror-scroll { height: auto }
-#fb-source-editor-dialog .xforms-alert-active { display: block }
+#fb-source-editor-dialog {
+    width: 70em;
+    .CodeMirror { font-size: 12px; }        // Pick slightly smaller font size, default being 13px
+    .CodeMirror-scroll { height: auto }
+    .xforms-alert-active { display: block }
+    
+    .fb-xml-dialog-view { width: 100% }
+    .fb-xml-dialog-view textarea.xforms-textarea { width: 100%; height: 29em; font-family: monospace }
+}
 
-#fb-source-editor-dialog .fb-xml-dialog-view { width: 100% }
-#fb-source-editor-dialog .fb-xml-dialog-view textarea.xforms-textarea { width: 100%; height: 29em; font-family: monospace }
-
-/* Publish dialog */
+// Publish dialog
 #fb-publish-dialog { width: 35em }
 .fb-publish-message {
     background-color: white;
@@ -210,49 +316,42 @@ div.xbl-fr-grid {
     padding: .5em;
 }
 
-/* Test dialog */
-.fb-test-dialog .fb-test-iframe { width: 100%; border: 1px solid #666; }
-.fb-test-dialog .xforms-trigger button { float: right; width: 9.5em }
+// Test dialog
+.fb-test-dialog {
+    .fb-test-iframe { width: 100%; border: 1px solid #666; }
+    .xforms-trigger button { float: right; width: 9.5em }
+}
 
-/* PE dialog */
-/* NOTE: This should not be needed because alert dialog should not use label for message content */
+// PE dialog
+// NOTE: This should not be needed because alert dialog should not use label for message content
 .xbl-fr-alert-dialog-message .xforms-label { font-weight: normal }
 
 /* ***** Header ***************************************************************************************************** */
 
-.fr-header #fb-form-settings-trigger { display: inline-block; float: right; margin-left: .5em }
-.fr-header .fb-language-triggers  { display: inline-block; float: right; margin-left: 1em }
+.fr-header {
+    .fb-form-settings-trigger { display: inline-block; float: right; margin-left: .5em }
+    .fb-language-triggers  { display: inline-block; float: right; margin-left: 1em }
+}
 
 /* ***** Top ******************************************************************************************************** */
 
-/* Title and description */
+// Title and description
 .fb-top h1 {
-    font-size: 25px;    /* Make title larger than what it is in Form Runner (overrides 20px) */
-    line-height: 45px;  /* Make line higher to compensate for larger font (overrides 40px) */
+    font-size: 25px;    // Make title larger than what it is in Form Runner (overrides 20px)
+    line-height: 45px;  // Make line higher to compensate for larger font (overrides 40px)
 }
-.fr-top .xbl-fr-inplace-input .xforms-label { display: none }
-.fr-top .xbl-fr-inplace-input .fr-inplace-cancel a { color: white }
-.fr-top .xbl-fr-inplace-input .fr-inplace-content .xforms-output { color: white }
-.fr-top .xbl-fr-inplace-input .fr-inplace-content .xforms-output:hover { color: @darkBlue }
-.fr-top .xbl-fr-inplace-input .fr-inplace-content .xforms-input input { color: #6E6E6E }
-.fr-top .xbl-fr-inplace-input .fr-inplace-buttons .xforms-trigger-appearance-minimal { color: white }
-
-.fr-top .xbl-fr-inplace-input.fb-title-control .xforms-output { font-size: 20pt }
-.fr-top .xbl-fr-inplace-input.fb-title-control .xforms-input input { font-size: 20pt }
-
-.fr-top .xbl-fr-inplace-input.fb-description-control .xforms-output { font-size: 8pt }
-.fr-top .xbl-fr-inplace-input.fb-description-control .xforms-input input { font-size: 8pt  }
 
 /* ***** Footer ***************************************************************************************************** */
 
-/* Give height to footer so it shows up even if empty */
+// Give height to footer so it shows up even if empty
 .fr-footer div { height: 1em }
 
 /* ***** In-Place Editing ******************************************************************************************* */
 
-/* In-place editing for regular fields */
+// In-place editing for regular fields
+// TODO: Do we still need these?
 .fr-inplace-buttons { display: block; margin-top: .3em; margin-bottom: .5em }
-.fr-grid .fr-grid-content .fr-inplace-buttons button.xforms-trigger { margin-top: 0 } /* because another rule puts a margin to position buttons further down in the grid */
+.fr-grid .fr-grid-content .fr-inplace-buttons button.xforms-trigger { margin-top: 0 } // because another rule puts a margin to position buttons further down in the grid
 .fr-inplace-input input {
     border: 1px inset rgb(233, 233, 174); padding: 0; background-color: #FFFF88; background-image: none; width: 100%
 }
@@ -263,10 +362,10 @@ div.xbl-fr-grid {
 
 .fr-inplace-buttons .xforms-control { display: inline }
 
-/* Highlighting of in-place outputs depending on hovering */
+// Highlighting of in-place outputs depending on hovering
 .fr-inplace-content .xforms-output:hover { background-color: #FFFF88 }
 
-/* In-place editing for metadata section */
+// In-place editing for metadata section
 .fr-top .xbl-fr-inplace-input { display: block }
 .fr-top .xbl-fr-inplace-input .xforms-input input { width: 100% }
 
@@ -277,17 +376,17 @@ h2 .fr-section-label {
 
 /* ***** Misc ******************************************************************************************************* */
 
-/* Highlighting of top-level blocks (sections, ...) */
+// Highlighting of top-level blocks (sections, ...)
 .fb-top-level-content { padding-left: .5em; margin-bottom: .5em; border-left: 0 solid transparent }
 .fb-top-level-content:hover { border-left: 0 solid #ccc }
 .fr-section-container .xforms-repeat-selected-item-1 { border-left: 0 solid @darkBlue}
 
-/* Highlighting of section content (grids, ...) */
+// Highlighting of section content (grids, ...)
 .fb-section-content { display: block; padding-left: .5em; margin-bottom: .5em; border-left: 0 solid transparent }
 .fb-section-content:hover { border-left: 0 solid #ccc}
 .fr-section-container .xforms-repeat-selected-item-2 { border-left: 0 solid @darkBlue}
 
-/* Control editor */
+// Control editor
 .fb-edit-label .xforms-label { display: none }
 .fb-edit-label .fr-inplace-content {
     display: inline;
@@ -298,7 +397,7 @@ h2 .fr-section-label {
 
 a.xforms-help-image .fb-control-help { vertical-align: baseline; }
 
-/* Would be nice to make text gray when only a hint */
+// Would be nice to make text gray when only a hint
 /*.fb-control-label .fr-inplace-content { color: gray }*/
 
 .fb-edit-hint .fr-inplace-content {
@@ -314,7 +413,7 @@ a.xforms-help-image .fb-control-help { vertical-align: baseline; }
 .fr-logo .xforms-upload-remove { padding-left: 0 }
 
 /* ***** Grid ******************************************************************************************************* */
-.fb-cell-editor { display: none } /* Contains the editing markup that will be moved inside each grid td */
+.fb-cell-editor { display: none } // Contains the editing markup that will be moved inside each grid td
 
 .fr-view {
     display: block;                                                                                                     // So we can get its width in `position.coffee`
@@ -326,87 +425,96 @@ a.xforms-help-image .fb-control-help { vertical-align: baseline; }
 }
 
 .fr-grid-td { border: 1px solid transparent }
-.fr-grid.fr-norepeat:hover .fr-grid-td { border: 1px solid @lightBlue} /* Only for grid which is not a repeat, e.g. no highlighting in itemset editor */
+.fr-grid.fr-norepeat:hover .fr-grid-td { border: 1px solid @lightBlue} // Only for grid which is not a repeat, e.g. no highlighting in itemset editor
 
 .fb-grid-cell-icons, .fb-grid-control-icons, .fb-grid-row-icons {
     display: block; width: 16px;
     height: 60px;
     text-align: center }
 
-/* Grid icons and hovering */
+// Grid icons and hovering
 .fb-grid-top-left-td { text-align: center; width: 24px }
 .fr-grid .fb-grid-top-left-td img { display: none }
 
-/* Delete, expand, shrink shown to the left of the cell */
+// Delete, expand, shrink shown to the left of the cell
 .fb-grid-cell-icons { position: absolute; left: .5em; top: .5em}
 .fb-grid-cell-icons img { margin-bottom: 0; padding: 0 }
 .fr-grid .fr-grid-td .fb-grid-cell-icons img { display: inline }
-/* Control details and validation shown to the top right of the cell */
+// Control details and validation shown to the top right of the cell
 .fb-grid-control-icons { position: absolute; right: .5em; top: .5em }
 .fb-grid-control-icons img { margin-bottom: 0; padding: 0 }
-/* Optional link to itemset editor shown to the bottom of the cell */
-/* Position to the left (2.5em) matched left margin of the fr-grid-content */
+// Optional link to itemset editor shown to the bottom of the cell
+// Position to the left (2.5em) matched left margin of the fr-grid-content
 .fb-edit-items { text-decoration: none; display: block; clear: both; position: absolute; left: 2.5em; bottom: .5em }
-/*  Show upload UI at the bottom of the cell and remove file upload indicator */
-.fb-static-upload { position: absolute; left: 2.5em; bottom: .5em }
-/* Simply styling for file select to just show "x" */
-#fr-form-group .fb-static-upload { background-color: none }
-#fr-form-group .fb-static-upload .xforms-upload-info { padding: 0 }
-#fr-form-group .fb-static-upload .xforms-upload-size { padding: 0 }
-#fr-form-group .fb-static-upload .xforms-upload-remove { padding: 0 }
+// Simply styling for file select to just show "x"
+#fr-form-group .fb-static-upload {
+    background-color: none;
+    position: absolute; // show upload UI at the bottom of the cell and remove file upload indicator
+    left: 2.5em;
+    bottom: .5em;
+    .xforms-upload-info { padding: 0 }
+    .xforms-upload-size { padding: 0 }
+    .xforms-upload-remove { padding: 0 }
+}
 
 .fr-grid .fr-grid-td .fb-grid-control-icons img { display: inline }
-.fb-label-hint-placeholder,                                                         /* Grey color for placeholder "Click here to edit…" so users can distinguish it from an actual value */
-.fb-label-hint-placeholder .xforms-mock-button { color: #bbb }                      /* To take precedence over color set for button's labels in xforms.css */
-.fr-grid .fr-grid-content .xforms-trigger .xforms-mock-button input,                /* Override margin set in form-runner-base.css for buttons in noscript (rendered as input) */
+.fb-label-hint-placeholder,                                                         // Grey color for placeholder "Click here to edit…" so users can distinguish it from an actual value
+.fb-label-hint-placeholder .xforms-mock-button { color: #bbb }                      // To take precedence over color set for button's labels in xforms.css
+.fr-grid .fr-grid-content .xforms-trigger .xforms-mock-button input,                // Override margin set in form-runner-base.css for buttons in noscript (rendered as input)
 .fr-grid .fr-grid-content .xforms-trigger .fb-mock-link input
     { margin: 0 }
-.fb-mock-link { color: @darkBlue; text-decoration: underline }                        /* Simulate  styling of a link */
-.xforms-mock-button .xforms-label { margin: 0 }                                     /* Override margin set in form-runner-base.css for regular labels */
-.fb-label-hint-placeholder .fb-mock-link { color: #bbb; text-decoration: none }     /* When placeholder shown, don't underline and use grey color, to make it clear this is a placeholder */
-.fb-mock-link:hover { background-color: #ffffd3 }                                   /* Simulated link get yellow background on mouse over to suggest it can be edited */
+.fb-mock-link { color: @darkBlue; text-decoration: underline }                      // Simulate  styling of a link
+.xforms-mock-button .xforms-label { margin: 0 }                                     // Override margin set in form-runner-base.css for regular labels
+.fb-label-hint-placeholder .fb-mock-link { color: #bbb; text-decoration: none }     // When placeholder shown, don't underline and use grey color, to make it clear this is a placeholder
+.fb-mock-link:hover { background-color: @yellow }                                   // Simulated link get yellow background on mouse over to suggest it can be edited
 
-.fr-grid-td .fb-hover { position: relative }                                        /* So elements shown on hover can be absolutely positioned relative to the cell
-                                                                                       Necessary as Firefox doesn't support position: relative on table cells (http://goo.gl/Atzi2) */
+.fr-grid-td .fb-hover { position: relative }                                        // So elements shown on hover can be absolutely positioned relative to the cell
+                                                                                    // Necessary as Firefox doesn't support position: relative on table cells (http://goo.gl/Atzi2)
 
-/* Column icons */
-.fr-grid thead .fb-grid-column-toolbar-td {                                         /* .fr-grid and thead added to take precedence over YUI's text-align: left */
+// Column icons
+.fr-grid thead .fb-grid-column-toolbar-td {                                         // .fr-grid and thead added to take precedence over YUI's text-align: left
     text-align: center;
-    padding-bottom: 2px;                                                            /* Padding so that the icon doesn't touch the table border */
-    height: 22px;                                                                   /* Tall enough so that FF doesn't do funny things when the icons are shown upon hover */
+    padding-bottom: 2px;                                                            // Padding so that the icon doesn't touch the table border
+    height: 22px;                                                                   // Tall enough so that FF doesn't do funny things when the icons are shown upon hover
 }
 .fb-grid-column-toolbar-td .fb-insert-left { float: left }
 .fb-grid-column-toolbar-td .fb-insert-right { float: right }
-.fb-grid-column-toolbar-td a { display: none }                                      /* By default, don't show the icons at the top of the grid */
-.fb-grid-column-toolbar-td:hover a,                                                 /* Show them when the mouse is specifically over that toolbar td */
-.fb-grid-column-toolbar-td.fb-hover a                                               /* Show them when the mouse is in a cell of the same column; style.coffee adds the .fb-hover */
+.fb-grid-column-toolbar-td a { display: none }                                      // By default, don't show the icons at the top of the grid
+.fb-grid-column-toolbar-td:hover a,                                                 // Show them when the mouse is specifically over that toolbar td
+.fb-grid-column-toolbar-td.fb-hover a                                               // Show them when the mouse is in a cell of the same column; style.coffee adds the .fb-hover
     { display: block }
 
 .fb-selected {                                                                      // Selected cell in grids
     box-shadow: 0 0 10px @darkBlue;                                                 // Highlight current cell with "halo"
 }
 
-/* Grid content */
-/* Margin leaves space for the icons to the left and right of the control */
-.fr-grid-content { padding-left: 2.5em; padding-right: 2.5em }
-/* Margin leaves space for trigger showing the itemset editor */
-.fr-grid-content.fb-itemset { padding-bottom: 2.5em }
-/* Margin leaves space for file upload  */
-.fr-grid-content.fb-upload { padding-bottom: 2.5em }
-/* Inputs for editing the label and hint to take the whole width of the grid content */
-.fr-grid-content .xforms-label input, .fr-grid-content .xforms-hint input { width: 100% }
+// Grid
+.fr-view .fr-grid {
 
-.fr-view .fr-grid .fr-grid-content .xforms-label:hover,          /* Yellow background to hint that the hint and label can be edited by clicking */
-.fr-view .fr-grid .fr-grid-content .xforms-hint:hover,           /* .fr-grid-content for label/hint in body */
-.fr-view .fr-grid .fr-grid-th .xforms-label:hover,               /* .fr-grid-th for label/hint in thead of a repeat */
-.fr-view .fr-grid .fr-grid-th .xforms-hint:hover,
-.fr-view .fr-grid .xforms-mock-button span:hover
-    { background-color: #ffffd3 }
+    .fr-grid-content .xforms-hint:hover,           // .fr-grid-content for label/hint in body
+    .fr-grid-th .xforms-label:hover,               // .fr-grid-th for label/hint in thead of a repeat
+    .fr-grid-th .xforms-hint:hover,
+    .xforms-mock-button span:hover
+        { background-color: @yellow }
 
-// Even if the label or hint is empty, we still want space for 1 line to be reserved
-.fr-grid-content .xforms-label, .fr-grid-content .xforms-hint,                                                          // In regular grid content
-.fr-grid-th .xforms-label, .fr-grid-th .xforms-hint                                                                     // In grid header, for the repeat single line
-    { min-height: 18px }                                                                                                // Use min-height instead of height so text wraps if it doesn't fit on 1 line
+    // Even if the label or hint is empty, we still want space for 1 line to be reserved
+    .fr-grid-content .xforms-label, .fr-grid-content .xforms-hint,                                                      // In regular grid content
+    .fr-grid-th .xforms-label, .fr-grid-th .xforms-hint                                                                 // In grid header, for the repeat single line
+        { min-height: 20px }                                                                                            // Use min-height instead of height so text wraps if it doesn't fit on 1 line
+
+    .fr-grid-content {
+        // Space for the icons to the left and right of the control
+        padding-left: 2.5em;
+        padding-right: 2.5em;
+
+        // Space for trigger showing the itemset editor and file upload
+        &.fb-itemset, &.fb-upload {
+            padding-bottom: 2.5em;
+        }
+        // Inputs for editing the label and hint to take the whole width of the grid content
+        .xforms-label input, .xforms-hint input { width: 100% }
+    }
+}
 
 #fr-view {                                                                                                              // Show disabled hints, i.e. hints with no text, to reserve space for the placeholder
     .fr-grid .xforms-hint.xforms-disabled {                                                                             // Override the #fr-view .xforms-disabled { display: none } in form-runner-base.less
@@ -422,63 +530,12 @@ td.fb-selected:hover .fb-click-message { display: none }
 
 .fb-component-icon { display: block }
 
-/* Read-only components */
+// Read-only components
 .fb-section-component .fr-grid-td { background-image: none; background-color: #F8F8F8; border: solid 1px #F8F8F8 }
 .xforms-readonly .xforms-input-input { background-image: none; background-color: #CCCCCC }
 .xforms-readonly textarea { background-image: none; background-color: #CCCCCC }
 
 .fr-buttons-placeholder .xforms-output { color: gray }
-
-/* ***** Accordion Menu ********************************************************************************************* */
-
-dl.accordion-menu { margin: 0; padding: 0; width: 100% }
-dl.accordion-menu dt.a-m-t {
-    margin: 0;
-    padding: 0.3em 1em;
-    background: url("../../../../ops/yui/assets/skins/sam/sprite.png") repeat-x scroll left -1400px;
-    color: #EEE;
-    font-weight: bold;
-}
-
-dl.accordion-menu dt.a-m-t-hover {
-    /*background: url("../../../../ops/yui/assets/skins/sam/sprite.png") repeat-x scroll left -1300px;*/
-    color: #FFFF88;
-}
-
-html.accordion-menu-js dt.a-m-t-expand {}
-
-dl.accordion-menu dd.a-m-d .bd {
-	border: solid 1px gray;
-    border-top-width: 0;
-    border-left-color: #CCCCCC
-}
-
-dl.accordion-menu dt.a-m-t { border-right: none; border-left: none }
-dl.accordion-menu dd.a-m-d .bd { border-right: none; border-left: none }
-
-html.accordion-menu-js dt.a-m-t{
-	cursor: pointer;
-	zoom: 1;
-}
-
-dl.accordion-menu dd.a-m-d { margin: 0; padding: 0 }
-html.accordion-menu-js dd.a-m-d { display: none }
-html.accordion-menu-js dd.a-m-d-expand { display: block }
-
-html.accordion-menu-js dd.a-m-d-before-expand {
-	display: block;
-	position: relative;
-	z-index: -1;
-	opacity: 0;
-	height: auto !important;
-	visibility: hidden;
-	overflow: visible;
-}
-
-html.accordion-menu-js dd.a-m-d-anim {
-	overflow: hidden;
-	display: block;
-}
 
 /* ***** Message **************************************************************************************************** */
 
@@ -488,22 +545,18 @@ html.accordion-menu-js dd.a-m-d-anim {
     border: none;
     margin: 0;
     padding: 0;
-    clear: none; /* override "both" so that IE 7 support for inline-block works */
+    clear: none; // override "both" so that IE 7 support for inline-block works
 }
 
 .fb-top .fr-messages .fr-message {
     display: -moz-inline-box;
     display: inline-block;
-    *zoom: 1; /* IE 7 hack */
+    *zoom: 1; // IE 7 hack
     margin:0.35em 0 0 2em;
     padding: .2em;
     color: white;
     border-color: white;
     border-radius: 3px; -moz-border-radius: 3px; -webkit-border-radius: 3px; -ms-border-radius: 3px
-}
-
-.fb-top .fr-messages .fr-message-success {
-    background-color: green;
 }
 
 .fb-xpath-errors {
@@ -512,35 +565,70 @@ html.accordion-menu-js dd.a-m-d-anim {
     color: orange;
 }
 
-/* ***** YUI Layout ************************************************************************************************* */
+/* ***** Layout ***************************************************************************************************** */
 
 #fr-view { margin-left: 0 }
-.yui-layout-unit-left { background-color: white }
-.yui-layout-unit-top .yui-layout-hd, .yui-layout-unit-bottom .yui-layout-hd, .yui-layout-unit-left .yui-layout-hd  { display: none }
 
-.fr-bottom, .fb-bottom { padding: .8em }
+.fb-bottom {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    .box-sizing(border-box);
+    padding: .8em;
 
-#fb-layout {
-    .fr-container { top: 10px }         // Override 40px in form-runner-base.css as we don't leave as much as space at the top since the navbar isn't fixed
-    .navbar { margin-bottom: 0 }        // Override 18px in bootstrap.css as the content below the navbar (.fr-top) already as its own padding
-    .yui-layout-bd { border: none }
-    .yui-layout-unit-center  .yui-layout-bd { box-shadow: 0 0 10px @darkBlue; }
-    .yui-layout-unit-top .yui-layout-bd    { background-color: @lightBlue } /* Top section */
-    .yui-layout-unit-top .fr-logo          { padding: 0 0 0 1em }
-    .yui-layout-unit-left .yui-layout-bd   { background-color: @lightBlue }
-    .yui-layout-unit-bottom .yui-layout-bd { background-color: @lightBlue }
+    .fr-buttons {
+        margin: 0;
+    }
 }
 
 
-/* Always show vertical scrollbar so that there is no reflow of the left panel when it becomes shorter/taller */
-.yui-layout .yui-layout-unit-left div.yui-layout-bd {
-    overflow-y: scroll;
+
+.fr-container { top: 10px }                                 // override 40px in form-runner-base.css as we don't leave as much as space at the top since the navbar isn't fixed
+
+// Both navbars
+.navbar .navbar-inner {
+    box-shadow: none;
+}
+
+// Top Form Builder navbar only
+.fb-navbar {
+    margin-bottom: 0;                                       // override 18px in bootstrap.css as the content below the navbar (.fr-top) already as its own padding
+
+    .border-radius(0);                                      // override Boostrap rounded corners
+
+    .fr-language-choice {
+        text-shadow: 0 1px 0 @navbarBackgroundHighlight;    // make it look like Boostrap nav links
+        margin-left: 15px;
+        font-size: inherit;                                 // ovverride FR
+    }
+
+    .container {
+        width: auto;
+        margin-left: 15px;
+        margin-right: 15px;
+    }
+}
+
+// Form navbar only
+.fb-center .navbar-inverse .navbar-inner {
+
+    #gradient > .vertical(#222, #444);
+//    border-color: #222;
+    .border-radius(0);
+
+    .fb-language-triggers, .fb-form-settings-trigger {
+        margin-top: 8px;
+        margin-left: 6px;
+    }
+
+    .fr-language-choice {
+        margin-right: 0;                                    // ovverride FR
+    }
 }
 
 /* ***** Other media ************************************************************************************************ */
 
-/* This is also used for PDF generation */
+// This is also used for PDF generation
 @media print {
-    #doc, #doc2, #doc3, #doc4 { margin-left: auto; *margin-left: auto }
     input { height: 1em }
 }

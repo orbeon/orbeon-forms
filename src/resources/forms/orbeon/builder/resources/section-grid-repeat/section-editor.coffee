@@ -22,7 +22,7 @@ $ ->
                 pageX = event.pageX
                 pageY = event.pageY
 
-    updateSectionsOffset = ->
+    Builder.onOffsetMayHaveChanged ->
         sectionsCache.length = 0
         _.each ($ '.xbl-fr-section:visible'), (section) ->
             section = $ section
@@ -31,8 +31,6 @@ $ ->
                 offset: f$.offset section
                 height: f$.height section
                 titleOffset: f$.offset f$.find 'a', section
-    ($ document).on 'mousemove', updateSectionsOffset                                                                   # On mousemove rather than load, as the offset changes on scroll
-    Events.ajaxResponseProcessedEvent.subscribe updateSectionsOffset
 
     Builder.currentContainerChanged sectionsCache,
         wasCurrent: ->
@@ -43,7 +41,7 @@ $ ->
             do positionEditor = ->
                 sectionEditor.show()
                 sectionEditor.offset
-                    top: section.offset.top
+                    top: section.offset.top - Builder.scrollTop()
                     left: (f$.offset $ '#fr-form-group').left - (f$.outerWidth sectionEditor)
             do updateTriggerRelevance = ->
                 container = section.el.children '.fr-section-container'

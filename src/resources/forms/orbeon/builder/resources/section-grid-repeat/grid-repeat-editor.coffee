@@ -5,7 +5,7 @@ $ ->
 
     # Keep track of grids positions, including the position their rows and columns
     gridsCache = []; do ->
-        Builder.onUnderPointerChange ->
+        Builder.onOffsetMayHaveChanged ->
             gridsCache.length = 0                                                                                       # Update gridsCache in-place, as references are kept by other functions
             _.each ($ 'div.xbl-fr-grid:visible'), (grid) ->
                 grid = $ grid
@@ -43,14 +43,14 @@ $ ->
                 if f$.is '.fb-can-delete-grid', table
                     f$.show deleteIcon
                     offset =
-                        top:  grid.offset.top
+                        top:  grid.offset.top - Builder.scrollTop()
                         left: grid.offset.left
                     f$.offset offset, deleteIcon
                 if grid.head?
                     f$.show detailsIcon
                     head = f$.find 'thead', table
                     offset =
-                        top: grid.head.offset.top + (grid.head.height - detailsHeight()) / 2
+                        top: grid.head.offset.top + (grid.head.height - detailsHeight()) / 2 - Builder.scrollTop()
                         left: grid.offset.left
                     f$.offset offset, detailsIcon
 
@@ -66,7 +66,9 @@ $ ->
         # 3 icons to add/delete columns
         colIcons = do ->
             colIcon = (selector, colOffset) -> _.tap (icon selector), (icon) ->
-                icon.offset = (col) -> top: col.grid.offset.top, left: col.offset.left + colOffset col, icon
+                icon.offset = (col) ->
+                    top: col.grid.offset.top - Builder.scrollTop()
+                    left: col.offset.left + colOffset col, icon
             [
                 colIcon '.fb-insert-col-left',  -> 0
                 colIcon '.fb-delete-col',       (col, icon) -> (col.width - icon.width()) / 2
@@ -76,7 +78,9 @@ $ ->
         # 3 icons to add/delete rows
         rowIcons = do ->
             rowIcon = (selector, rowOffset) -> _.tap (icon selector), (icon) ->
-                icon.offset = (row) -> top: row.offset.top + (rowOffset row, icon), left: row.grid.offset.left
+                icon.offset = (row) ->
+                    top: row.offset.top + (rowOffset row, icon) - Builder.scrollTop()
+                    left: row.grid.offset.left
             [
                 rowIcon '.fb-insert-row-above', -> 0
                 rowIcon '.fb-delete-row',       (row, icon) -> (row.height - icon.height()) / 2

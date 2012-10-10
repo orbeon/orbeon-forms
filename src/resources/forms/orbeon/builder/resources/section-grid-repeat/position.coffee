@@ -3,21 +3,30 @@ $ ->
     Events = ORBEON.xforms.Events
 
     # Calls listener when what is under the pointer has potentially changed
-    Builder.onUnderPointerChange = (f) ->
+    onUnderPointerChange = (f) ->
         ($ document).on 'mousemove', f
         Events.ajaxResponseProcessedEvent.subscribe f
+
+    # Call listener when anything on the page that could change element positions happened
+    Builder.onOffsetMayHaveChanged = (f) ->
+        Events.orbeonLoadedEvent.subscribe f                                                                            # After the form is first shown
+        Events.ajaxResponseProcessedEvent.subscribe f                                                                   # After an Ajax response, as it might have changed the DOM
 
     # Finds the container, if any, based on a vertical position
     Builder.findInCache = (containerCache, top) ->
         _.find containerCache, (container) ->
             container.offset.top <= top <= container.offset.top + container.height
 
+    # How much we need to add to offset to account for the form having been scrolled
+    Builder.scrollTop = -> f$.scrollTop f$.closest '.yui-layout-bd', $ '.fr-view'
+
     # Container is either a section or grid; calls listeners passing old/new container
     Builder.currentContainerChanged = (containerCache, {wasCurrent, becomesCurrent}) ->
         notifyChange = notifyOnChange wasCurrent, becomesCurrent
-        Builder.onUnderPointerChange ->
+        onUnderPointerChange ->
             if viewPos.left <= pointerPos.left <= viewPos.right
-                newContainer = Builder.findInCache containerCache, pointerPos.top
+                top = pointerPos.top + Builder.scrollTop()
+                newContainer = Builder.findInCache containerCache, top
             notifyChange newContainer
 
     # Calls listeners when, in a grid, the pointer moves out of or in a new row/cell
@@ -28,9 +37,9 @@ $ ->
                 becomesCurrent: (g) -> currentGrid = g
         notifyRowChange = notifyOnChange wasCurrentRow, becomesCurrentRow
         notifyColChange = notifyOnChange wasCurrentCol, becomesCurrentCol
-        Builder.onUnderPointerChange ->
+        onUnderPointerChange ->
             if currentGrid?
-                newRow = _.find currentGrid.rows, (r) -> r.offset.top  <= pointerPos.top  <= r.offset.top + r.height
+                newRow = _.find currentGrid.rows, (r) -> r.offset.top  <= pointerPos.top + Builder.scrollTop() <= r.offset.top + r.height
                 newCol = _.find currentGrid.cols, (c) -> c.offset.left <= pointerPos.left <= c.offset.left + c.width
             notifyRowChange newRow
             notifyColChange newCol

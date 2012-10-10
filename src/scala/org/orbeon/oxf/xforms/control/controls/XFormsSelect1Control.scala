@@ -19,7 +19,6 @@ import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.analysis.XPathDependencies
-import org.orbeon.oxf.xforms.analysis.controls.SelectionControlTrait
 import org.orbeon.oxf.xforms.control.FocusableTrait
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.control.XFormsControl.{ControlProperty, ImmutableControlProperty}

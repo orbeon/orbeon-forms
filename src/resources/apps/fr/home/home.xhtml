@@ -50,29 +50,30 @@
     <xhtml:body>
         <fr:view>
             <fr:body>
-                <fr:datatable width="100%">
-                    <xforms:repeat nodeset="instance('fr-forms')/form[@operations != '']">
+                <xhtml:table class="table table-borderedxxx table-condensed table-striped table-hover">
+                    <xhtml:tr>
+                        <!-- TODO: i18n -->
+                        <xhtml:th>Application</xhtml:th>
+                        <xhtml:th>Form</xhtml:th>
+                        <xhtml:th>Title</xhtml:th>
+                        <xhtml:th>View</xhtml:th>
+                        <xhtml:th>New</xhtml:th>
+                    </xhtml:tr>
+                    <xforms:repeat nodeset="instance('fr-forms')/form[exists(*) and @operations != '']"><!--  -->
                         <xhtml:tr>
-                            <xhtml:td fr:sortable="true" fr:sortType="text">
-                                <xforms:output value="application-name">
-                                    <xforms:label>Application</xforms:label>
-                                </xforms:output>
+                            <xhtml:td>
+                                <xforms:output value="application-name"/>
                             </xhtml:td>
-                            <xhtml:td fr:sortable="true" fr:sortType="text">
-                                <xforms:output value="form-name">
-                                    <xforms:label>Form</xforms:label>
-                                </xforms:output>
+                            <xhtml:td>
+                                <xforms:output value="form-name"/>
                             </xhtml:td>
-                            <xhtml:td fr:sortable="true" fr:sortType="text">
-                                <xforms:output value="title">
-                                    <xforms:label>Title</xforms:label>
-                                </xforms:output>
+                            <xhtml:td>
+                                <xforms:output value="title"/>
                             </xhtml:td>
                             <xhtml:td>
                                 <xforms:group ref=".[tokenize(@operations, '\s') = ('*', 'update', 'read', 'delete')]">
                                     <xhtml:a href="/fr/{application-name}/{form-name}/summary">
                                         <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/magnifier.png"/>
-                                        View form data
                                     </xhtml:a>
                                 </xforms:group>
                             </xhtml:td>
@@ -80,13 +81,12 @@
                                 <xforms:group ref=".[tokenize(@operations, '\s') = ('*', 'create')]">
                                     <xhtml:a href="/fr/{application-name}/{form-name}/new">
                                         <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/add.png"/>
-                                        Fill new form
                                     </xhtml:a>
                                 </xforms:group>
                             </xhtml:td>
                         </xhtml:tr>
                     </xforms:repeat>
-                </fr:datatable>
+                </xhtml:table>
             </fr:body>
             <fr:bottom/>
         </fr:view>

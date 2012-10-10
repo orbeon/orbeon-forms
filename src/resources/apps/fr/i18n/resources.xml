@@ -181,7 +181,7 @@
             </dialog-body>
         </save-locally>
         <home>
-            <title>Forms Home</title>
+            <title>Form Runner Home</title>
         </home>
     </resource>
     <resource xml:lang="fr">
@@ -352,6 +352,9 @@
                 </div>
             </dialog-body>
         </save-locally>
+        <home>
+            <title>[Form Runner Home]</title>
+        </home>
     </resource>
     <resource xml:lang="es">
         <components>
@@ -517,6 +520,9 @@
                 </div>
             </dialog-body>
         </save-locally>
+        <home>
+            <title>[Form Runner Home]</title>
+        </home>
     </resource>
     <resource xml:lang="no">
         <components>
@@ -686,7 +692,9 @@
                 </div>
             </dialog-body>
         </save-locally>
-
+        <home>
+            <title>[Form Runner Home]</title>
+        </home>
     </resource>
     <resource xml:lang="ru">
         <components>
@@ -849,5 +857,8 @@
                 </div>
             </dialog-body>
         </save-locally>
+        <home>
+            <title>[Form Runner Home]</title>
+        </home>
     </resource>
 </resources>

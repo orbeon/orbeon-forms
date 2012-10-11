@@ -415,7 +415,7 @@
 
             <xsl:call-template name="comment">
                 <xsl:with-param name="caption" select="'Form Runner authentication'"/>
-                <xsl:with-param name="commented" select="$target = 'war'"/>
+                <xsl:with-param name="commented" select="true()"/>
                 <xsl:with-param name="content">
                     <security-constraint>
                         <web-resource-collection>

@@ -38,12 +38,14 @@ $ ->
             currentSection = null
         becomesCurrent: (section) ->
             currentSection = section.el
-            do positionEditor = ->
+            # Position the editor
+            do ->
                 sectionEditor.show()
                 sectionEditor.offset
                     top: section.offset.top - Builder.scrollTop()
-                    left: (f$.offset $ '#fr-form-group').left - (f$.outerWidth sectionEditor)
-            do updateTriggerRelevance = ->
+                    left: section.offset.left - f$.outerWidth sectionEditor
+            # Update trigger relevance
+            do ->
                 container = section.el.children '.fr-section-container'
                 # Hide/show section move icons
                 _.each (['up', 'right', 'down', 'left']), (direction) ->

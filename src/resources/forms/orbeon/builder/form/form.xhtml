@@ -14,21 +14,17 @@
 <xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
       xmlns:xf="http://www.w3.org/2002/xforms"
       xmlns:xs="http://www.w3.org/2001/XMLSchema"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:ev="http://www.w3.org/2001/xml-events"
       xmlns:xi="http://www.w3.org/2001/XInclude"
       xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
       xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
       xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-      xmlns:saxon="http://saxon.sf.net/"
-      xmlns:xbl="http://www.w3.org/ns/xbl"
       xmlns:secure="java:org.orbeon.oxf.util.SecureUtils"
       xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps"
       xmlns:containerOps="java:org.orbeon.oxf.fb.ContainerOps"
       xmlns:sectionOps="java:org.orbeon.oxf.fb.SectionOps"
-      xmlns:gridOps="java:org.orbeon.oxf.fb.GridOps"
-      xmlns:xformsUtils="java:org.orbeon.oxf.xforms.XFormsUtils">
+      xmlns:gridOps="java:org.orbeon.oxf.fb.GridOps">
     <xh:head>
         <!-- CSS -->
         <xh:link rel="stylesheet" type="text/css" href="/ops/yui/assets/skins/sam/resize.css"/>
@@ -228,6 +224,7 @@
                         </xh:div>
 
                         <!-- Add/remove language -->
+                        <!--suppress XmlUnusedNamespaceDeclaration -->
                         <xf:group class="fb-language-triggers" ref=".[xpl:isPE()]" xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary">
                             <xf:trigger appearance="minimal">
                                 <xf:label><xh:img src="/apps/fr/style/images/silk/add.png" alt="" title="{$form-resources/dialog-add-language/add-language/label}"/></xf:label>
@@ -408,7 +405,7 @@
                                     <!-- Create new document id -->
                                     <xf:setvalue ref="xxf:instance('fr-parameters-instance')/document" value="secure:randomHexId()"/>
                                     <!-- Actually save -->
-                                    <xf:dispatch name="fr-save-action" target="fr-persistence-model">
+                                    <xf:dispatch name="fr-save-action" targetid="fr-persistence-model">
                                         <xxf:context name="fr:check-data-valid" value="true()"/>
                                     </xf:dispatch>
                                     <!-- Change URL to have new document id -->
@@ -473,7 +470,7 @@
                                         </xf:dispatch>
                                         <xf:action if="not($confirm)">
                                             <!-- We are automatically confirmed as there is no control to delete -->
-                                            <xf:dispatch name="fr-positive" target="fb-expand-trigger"/>
+                                            <xf:dispatch name="fr-positive" targetid="fb-expand-trigger"/>
                                         </xf:action>
                                     </xf:action>
                                     <xf:action ev:event="fr-positive" type="xpath" xmlns:gridOps="java:org.orbeon.oxf.fb.GridOps">

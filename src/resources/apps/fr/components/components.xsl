@@ -366,6 +366,9 @@
             <!-- Bind to set the form instance read-only when necessary -->
             <xforms:bind nodeset="instance('fr-form-instance')" readonly="$fr-mode = ('view', 'pdf', 'email')"/>
 
+            <!-- Focus to the first control supporting input on load -->
+            <xforms:setfocus ev:event="xforms-ready" control="fr-form-group" input-only="true"/>
+
         </xsl:copy>
 
         <xsl:if test="not($is-noscript)">

@@ -114,7 +114,6 @@
                                     <!-- Row with column headers -->
                                     <xh:tr class="fr-dt-master-row">
                                         <xsl:if test="not($readonly)">
-                                            <!--<xf:group ref="$grid[not(exf:readonly(.))]">-->
                                             <xf:group ref=".">
                                                 <xh:th class="fr-repeat-column fr-repeat-column-trigger">
                                                     <xxf:var name="can-add" as="boolean"

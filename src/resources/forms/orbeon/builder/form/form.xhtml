@@ -566,7 +566,7 @@
                         <xh:div class="fb-section-editor">
                             <!-- Delete section -->
                             <xf:trigger appearance="minimal" id="delete-section-trigger" class="delete-section-trigger">
-                                <xf:label><xh:img width="16" height="16" src="/apps/fr/style/images/silk/bin.png" alt="{{$fb-resources/delete-section-icon/label}}" title="{{$fb-resources/delete-section-icon/label}}"/></xf:label>
+                                <xf:label><xh:img width="16" height="16" src="/apps/fr/style/images/silk/bin.png" alt="{$fb-resources/delete-section-icon/label}" title="{$fb-resources/delete-section-icon/label}"/></xf:label>
                                 <!-- Ask confirmation -->
                                 <xf:dispatch ev:event="DOMActivate" name="fr-show" targetid="dialog-confirmation">
                                     <xxf:context name="message"
@@ -580,7 +580,7 @@
                             </xf:trigger>
                             <!-- Edit details -->
                             <xf:trigger appearance="minimal">
-                                <xf:label><xh:img width="16" height="16" src="/apps/fr/style/images/silk/cog.png" alt="{{$fb-resources/section-details-icon/label}}" title="{{$fb-resources/section-details-icon/label}}"/></xf:label>
+                                <xf:label><xh:img width="16" height="16" src="/apps/fr/style/images/silk/cog.png" alt="{$fb-resources/section-details-icon/label}" title="{$fb-resources/section-details-icon/label}"/></xf:label>
                                 <!-- Show section details dialog -->
                                 <xf:dispatch ev:event="DOMActivate" name="fb-show-dialog" targetid="dialog-section-details">
                                     <xxf:context name="section" value="containerOps:containerById(event('section-id'))"/>
@@ -588,14 +588,14 @@
                             </xf:trigger>
                             <!-- Edit help for section -->
                             <xf:trigger appearance="minimal" class="fb-edit-section-help-trigger" id="fb-edit-section-help-trigger">
-                                <xf:label><xh:img alt="{{$fb-resources/help-icon/label}}" title="{{$fb-resources/help-icon/label}}" src="/ops/images/xforms/help.png"/></xf:label>
+                                <xf:label><xh:img alt="{$fb-resources/help-icon/label}" title="{$fb-resources/help-icon/label}" src="/ops/images/xforms/help.png"/></xf:label>
                                 <xf:dispatch ev:event="DOMActivate" name="fb-show-dialog" targetid="dialog-help">
                                     <xxf:context name="control-id" value="event('section-id')"/>
                                 </xf:dispatch>
                             </xf:trigger>
                             <!-- Move up -->
                             <xf:trigger appearance="minimal" class="fb-section-move-up">
-                                <xf:label><xh:img width="16" height="16" src="/apps/fr/style/images/silk/arrow_up.png" alt="{{$fb-resources/move-up-icon/label}}" title="{{$fb-resources/move-up-icon/label}}"/></xf:label>
+                                <xf:label><xh:img width="16" height="16" src="/apps/fr/style/images/silk/arrow_up.png" alt="{$fb-resources/move-up-icon/label}" title="{$fb-resources/move-up-icon/label}"/></xf:label>
                                 <!-- Move section up -->
                                 <xf:action ev:event="DOMActivate" type="xpath">
                                     sectionOps:moveSectionUp(containerOps:containerById(event('section-id')))
@@ -603,7 +603,7 @@
                             </xf:trigger>
                             <!-- Move down -->
                             <xf:trigger appearance="minimal" class="fb-section-move-down">
-                                <xf:label><xh:img width="16" height="16" src="/apps/fr/style/images/silk/arrow_down.png" alt="{{$fb-resources/move-down-icon/label}}" title="{{$fb-resources/move-down-icon/label}}"/></xf:label>
+                                <xf:label><xh:img width="16" height="16" src="/apps/fr/style/images/silk/arrow_down.png" alt="{$fb-resources/move-down-icon/label}" title="{$fb-resources/move-down-icon/label}"/></xf:label>
                                 <!-- Move section down -->
                                 <xf:action ev:event="DOMActivate" type="xpath">
                                     sectionOps:moveSectionDown(containerOps:containerById(event('section-id')))
@@ -611,7 +611,7 @@
                             </xf:trigger>
                             <!-- Move right -->
                             <xf:trigger appearance="minimal" class="fb-section-move-right">
-                                <xf:label><xh:img width="16" height="16" src="/apps/fr/style/images/silk/arrow_right.png" alt="{{$fb-resources/move-right-icon/label}}" title="{{$fb-resources/move-right-icon/label}}"/></xf:label>
+                                <xf:label><xh:img width="16" height="16" src="/apps/fr/style/images/silk/arrow_right.png" alt="{$fb-resources/move-right-icon/label}" title="{$fb-resources/move-right-icon/label}"/></xf:label>
                                 <!-- Move section right -->
                                 <xf:action ev:event="DOMActivate" type="xpath">
                                     sectionOps:moveSectionRight(containerOps:containerById(event('section-id')))
@@ -619,7 +619,7 @@
                             </xf:trigger>
                             <!-- Move left -->
                             <xf:trigger appearance="minimal" class="fb-section-move-left">
-                                <xf:label><xh:img width="16" height="16" src="/apps/fr/style/images/silk/arrow_left.png" alt="{{$fb-resources/move-left-icon/label}}" title="{{$fb-resources/move-left-icon/label}}"/></xf:label>
+                                <xf:label><xh:img width="16" height="16" src="/apps/fr/style/images/silk/arrow_left.png" alt="{$fb-resources/move-left-icon/label}" title="{$fb-resources/move-left-icon/label}"/></xf:label>
                                 <!-- Move section left -->
                                 <xf:action ev:event="DOMActivate" type="xpath">
                                     sectionOps:moveSectionLeft(containerOps:containerById(event('section-id')))
@@ -629,7 +629,7 @@
                         <xh:div class="fb-grid-repeat-editor">
                             <!-- Delete grid -->
                             <xf:trigger appearance="minimal" id="delete-grid-trigger" class="fb-delete-grid-trigger">
-                                <xf:label><xh:img width="16" height="16" src="/apps/fr/style/images/silk/bin.png" alt="{{$fb-resources/delete-grid-icon/label}}" title="{{$fb-resources/delete-grid-icon/label}}"/></xf:label>
+                                <xf:label><xh:img width="16" height="16" src="/apps/fr/style/images/silk/bin.png" alt="{$fb-resources/delete-grid-icon/label}" title="{$fb-resources/delete-grid-icon/label}"/></xf:label>
                                 <!-- Ask confirmation -->
                                 <xf:dispatch ev:event="DOMActivate" name="fr-show" targetid="dialog-confirmation">
                                     <xxf:context name="message"
@@ -643,19 +643,19 @@
                             </xf:trigger>
                             <!-- Grid details -->
                             <xf:trigger appearance="minimal" id="grid-details-trigger" class="fb-grid-details-trigger">
-                                <xf:label><xh:img src="/apps/fr/style/images/silk/cog.png" alt="{{$fb-resources/grid-details-icon/label}}" title="{{$fb-resources/grid-details-icon/label}}"/></xf:label>
+                                <xf:label><xh:img src="/apps/fr/style/images/silk/cog.png" alt="{$fb-resources/grid-details-icon/label}" title="{$fb-resources/grid-details-icon/label}"/></xf:label>
                                 <xf:dispatch ev:event="DOMActivate" name="fb-show-dialog" targetid="dialog-grid-details">
                                     <xxf:context name="grid" select="containerOps:containerById(event('grid-id'))"/>
                                 </xf:dispatch>
                             </xf:trigger>
                             <!-- Insert column to the left -->
                             <xf:trigger appearance="minimal" class="fb-insert-col-left">
-                                <xf:label><xh:img src="/apps/fr/style/images/silk/bullet_arrow_left.png" alt="{{$fb-resources/insert-column-left-icon/label}}" title="{{$fb-resources/insert-column-left-icon/label}}"/></xf:label>
+                                <xf:label><xh:img src="/apps/fr/style/images/silk/bullet_arrow_left.png" alt="{$fb-resources/insert-column-left-icon/label}" title="{$fb-resources/insert-column-left-icon/label}"/></xf:label>
                                 <xf:action ev:event="DOMActivate" type="xpath">gridOps:insertColLeft(event('grid-id'), xs:integer(event('col-pos')))</xf:action>
                             </xf:trigger>
                             <!-- Delete column -->
                             <xf:trigger appearance="minimal" id="delete-col-trigger" class="fb-delete-col">
-                                <xf:label><xh:img src="/apps/fr/style/images/silk/bin.png" alt="{{$fb-resources/delete-column-icon/label}}" title="{{$fb-resources/delete-column-icon/label}}"/></xf:label>
+                                <xf:label><xh:img src="/apps/fr/style/images/silk/bin.png" alt="{$fb-resources/delete-column-icon/label}" title="{$fb-resources/delete-column-icon/label}"/></xf:label>
                                 <xf:action ev:event="DOMActivate">
 
                                     <xf:var name="context" value="concat(event('grid-id'), ' ', event('col-pos'))"/>
@@ -681,17 +681,17 @@
                             </xf:trigger>
                             <!-- Insert column to the right -->
                             <xf:trigger appearance="minimal" class="fb-insert-col-right">
-                                <xf:label><xh:img src="/apps/fr/style/images/silk/bullet_arrow_right.png" alt="{{$fb-resources/insert-column-right-icon/label}}" title="{{$fb-resources/insert-column-right-icon/label}}"/></xf:label>
+                                <xf:label><xh:img src="/apps/fr/style/images/silk/bullet_arrow_right.png" alt="{$fb-resources/insert-column-right-icon/label}" title="{$fb-resources/insert-column-right-icon/label}"/></xf:label>
                                 <xf:action ev:event="DOMActivate" type="xpath">gridOps:insertColRight(event('grid-id'), xs:integer(event('col-pos')))</xf:action>
                             </xf:trigger>
                             <!-- Insert row above -->
                             <xf:trigger appearance="minimal" class="fb-insert-row-above">
-                                <xf:label><xh:img src="/apps/fr/style/images/silk/bullet_arrow_top.png" alt="{{$fb-resources/insert-row-above-icon/label}}" title="{{$fb-resources/insert-row-above-icon/label}}"/></xf:label>
+                                <xf:label><xh:img src="/apps/fr/style/images/silk/bullet_arrow_top.png" alt="{$fb-resources/insert-row-above-icon/label}" title="{$fb-resources/insert-row-above-icon/label}"/></xf:label>
                                 <xf:action ev:event="DOMActivate" type="xpath">gridOps:insertRowAbove(event('grid-id'), xs:integer(event('row-pos')))</xf:action>
                             </xf:trigger>
                             <!-- Delete row -->
                             <xf:trigger appearance="minimal" id="delete-row-trigger" class="fb-delete-row">
-                                <xf:label><xh:img src="/apps/fr/style/images/silk/bin.png" alt="{{$fb-resources/delete-row-icon/label}}" title="{{$fb-resources/delete-row-icon/label}}"/></xf:label>
+                                <xf:label><xh:img src="/apps/fr/style/images/silk/bin.png" alt="{$fb-resources/delete-row-icon/label}" title="{$fb-resources/delete-row-icon/label}"/></xf:label>
                                 <xf:action ev:event="DOMActivate">
 
                                     <xf:var name="context" value="concat(event('grid-id'), ' ', event('row-pos'))"/>
@@ -717,7 +717,7 @@
                             </xf:trigger>
                             <!-- Insert row below -->
                             <xf:trigger appearance="minimal" class="fb-insert-row-below">
-                                <xf:label><xh:img src="/apps/fr/style/images/silk/bullet_arrow_bottom.png" alt="{{$fb-resources/insert-row-below-icon/label}}" title="{{$fb-resources/insert-row-below-icon/label}}"/></xf:label>
+                                <xf:label><xh:img src="/apps/fr/style/images/silk/bullet_arrow_bottom.png" alt="{$fb-resources/insert-row-below-icon/label}" title="{$fb-resources/insert-row-below-icon/label}"/></xf:label>
                                 <xf:action ev:event="DOMActivate" type="xpath">gridOps:insertRowBelow(event('grid-id'), xs:integer(event('row-pos')))</xf:action>
                             </xf:trigger>
                         </xh:div>

@@ -11,6 +11,7 @@ $ ->
     Builder.onOffsetMayHaveChanged = (f) ->
         Events.orbeonLoadedEvent.subscribe f                                                                            # After the form is first shown
         Events.ajaxResponseProcessedEvent.subscribe f                                                                   # After an Ajax response, as it might have changed the DOM
+        f$.on 'resize', f, $ window
 
     # Finds the container, if any, based on a vertical position
     Builder.findInCache = (containerCache, top) ->

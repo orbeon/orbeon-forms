@@ -24,13 +24,12 @@
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
          script-type="application/xhtml+xml">
-    <xbl:script type="text/javascript" src="/xbl/orbeon/code-mirror/CodeMirror-2.0/lib/codemirror.js"/>
-    <xbl:script type="text/javascript" src="/xbl/orbeon/code-mirror/CodeMirror-2.0/mode/xml/xml.js"/>
+    <xbl:script type="text/javascript" src="/xbl/orbeon/code-mirror/CodeMirror-2.34/lib/codemirror.js"/>
+    <xbl:script type="text/javascript" src="/xbl/orbeon/code-mirror/CodeMirror-2.34/mode/xml/xml.js"/>
     <xbl:script type="text/javascript" src="/xbl/orbeon/code-mirror/code-mirror.js"/>
     <xbl:binding id="fr-code-mirror" element="fr|code-mirror" xxbl:mode="binding lhha">
         <xbl:resources>
-            <xbl:style src="/xbl/orbeon/code-mirror/CodeMirror-2.0/lib/codemirror.css"/>
-            <xbl:style src="/xbl/orbeon/code-mirror/CodeMirror-2.0/mode/xml/xml.css"/>
+            <xbl:style src="/xbl/orbeon/code-mirror/CodeMirror-2.34/lib/codemirror.css"/>
             <xbl:style src="/xbl/orbeon/code-mirror/code-mirror.css"/>
         </xbl:resources>
         <xbl:template>

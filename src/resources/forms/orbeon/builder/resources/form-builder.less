@@ -40,17 +40,20 @@ body {
     background-image: url("../../../../forms/orbeon/builder/images/low_contrast_linen_@2X.png");
 }
 
-.fb-center {
+.fb-main {
     position: absolute;
     top: 40px + @fbGutter;
     right: @fbGutter;
     left: 200px + @fbGutter;
     bottom: 62px;
     overflow-y: auto;
-    .fr-border();
-    .box-sizing(border-box);
-    margin-bottom: 0;
-    border: 1px solid #222;
+
+    .fb-main-inner {
+        .fr-border();
+        .box-sizing(border-box);
+        margin-bottom: 0;
+        border: 1px solid #222;
+    }
 }
 
 .fb-bottom {
@@ -184,13 +187,19 @@ div.xbl-fr-grid {
 
 // Metadata editor dialog
 .fb-dialog-form-settings {
-    width: 40em;
+    width: 600px;
 
     img { float: left; margin: 1em 2em 0 1em; }
     .xforms-label { display: block; }
     .xforms-hint { margin-bottom: 1em; }
-    .fb-dialog-form-settings-fields { float: left; width: 30em }
-    input, textarea { width: 100% }
+    .fb-dialog-form-settings-fields {
+        float: left;
+        width: 475px;
+        input, textarea {
+            width: 100%;
+            box-sizing: border-box;
+        }
+    }
 
     .fb-dialog-form-settings-stats {
         th { text-align: left }
@@ -348,26 +357,13 @@ div.xbl-fr-grid {
 
 /* ***** In-Place Editing ******************************************************************************************* */
 
-// In-place editing for regular fields
-// TODO: Do we still need these?
-.fr-inplace-buttons { display: block; margin-top: .3em; margin-bottom: .5em }
-.fr-grid .fr-grid-content .fr-inplace-buttons button.xforms-trigger { margin-top: 0 } // because another rule puts a margin to position buttons further down in the grid
-.fr-inplace-input input {
-    border: 1px inset rgb(233, 233, 174); padding: 0; background-color: #FFFF88; background-image: none; width: 100%
+// Label and hint editors
+.fr-grid .xforms-label input, .fr-grid .xforms-hint input  {
+    height: @baseLineHeight;
+    padding: 0;
+    .box-sizing(border-box);
+    .border-radius(0);
 }
-
-.fr-inplace-textarea textarea.xforms-textarea {
-    border: 1px inset rgb(233, 233, 174); padding: 0; background-color: #FFFF88; background-image: none
-}
-
-.fr-inplace-buttons .xforms-control { display: inline }
-
-// Highlighting of in-place outputs depending on hovering
-.fr-inplace-content .xforms-output:hover { background-color: #FFFF88 }
-
-// In-place editing for metadata section
-.fr-top .xbl-fr-inplace-input { display: block }
-.fr-top .xbl-fr-inplace-input .xforms-input input { width: 100% }
 
 h2 .fr-section-label {
     height: 36px;                                                                                                       // So the title takes space even when empty; 36px is line-height in bootstrap.css
@@ -610,10 +606,9 @@ td.fb-selected:hover .fb-click-message { display: none }
 }
 
 // Form navbar only
-.fb-center .navbar-inverse .navbar-inner {
+.fb-main .navbar-inverse .navbar-inner {
 
     #gradient > .vertical(#222, #444);
-//    border-color: #222;
     .border-radius(0);
 
     .fb-language-triggers, .fb-form-settings-trigger {

@@ -331,16 +331,9 @@ body { padding-top: 40px } // if using navbar-fixed-top
 .fr-grid-td .fr-grid-content .fr-hidden { display: none } // for users of .fr-hidden without #fr-view
 
 .fr-grid {
-    .xforms-input input,
-    .xforms-upload input,
-    .xforms-textarea textarea,
-    .xforms-secret input,
-    .xforms-select1-appearance-minimal select,
-    .xforms-select1-appearance-compact select,
-    .xforms-select-appearance-compact select {
-        width: auto;
-        //width: 100%;
-        //.box-sizing(padding-box); // TODO: can we do this and fix the control heights
+
+    select, textarea, input {
+        width: 100%;
     }
 
     table-layout: fixed;
@@ -360,10 +353,11 @@ body { padding-top: 40px } // if using navbar-fixed-top
     .xforms-mediatype-text-html textarea { height: 10.1em } // NOTE: with Firefox, 10em makes bottom line disappear
 
     // Set this again as default is 100% above
-    // NOTE: This doesn't work well with IE 6/7, see below hand-tuned widths for IE
-    .xforms-input input.xforms-type-date,
-        .fr-grid .xforms-input input.xforms-type-time {
-        width: 7.5em;
+    // NOTE: This doesn't work well with IE 6/7
+    .xforms-input input {
+        &.xforms-type-date, &.xforms-type-time {
+            width: 7.5em;
+        }
     }
 
     // Cell content

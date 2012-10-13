@@ -72,13 +72,15 @@ body {
   margin-right: 4px;
   background-image: url("../../../../forms/orbeon/builder/images/low_contrast_linen_@2X.png");
 }
-.fb-center {
+.fb-main {
   position: absolute;
   top: 50px;
   right: 10px;
   left: 210px;
   bottom: 62px;
   overflow-y: auto;
+}
+.fb-main .fb-main-inner {
   padding: 0;
   margin-bottom: 20px;
   background-color: #f5f5f5;
@@ -245,7 +247,7 @@ div.xbl-fr-grid {
 }
 /* ***** Dialogs **************************************************************************************************** */
 .fb-dialog-form-settings {
-  width: 40em;
+  width: 600px;
 }
 .fb-dialog-form-settings img {
   float: left;
@@ -259,11 +261,12 @@ div.xbl-fr-grid {
 }
 .fb-dialog-form-settings .fb-dialog-form-settings-fields {
   float: left;
-  width: 30em;
+  width: 475px;
 }
-.fb-dialog-form-settings input,
-.fb-dialog-form-settings textarea {
+.fb-dialog-form-settings .fb-dialog-form-settings-fields input,
+.fb-dialog-form-settings .fb-dialog-form-settings-fields textarea {
   width: 100%;
+  box-sizing: border-box;
 }
 .fb-dialog-form-settings .fb-dialog-form-settings-stats th {
   text-align: left;
@@ -409,8 +412,6 @@ div.xbl-fr-grid {
 #fb-source-editor-dialog .CodeMirror {
   font-size: 12px;
 }
-/* Pick slightly smaller font size, default being 13px */
-#fb-source-editor-dialog .CodeMirror { height: 50em }
 #fb-source-editor-dialog .CodeMirror-scroll {
   height: auto;
 }
@@ -466,38 +467,16 @@ div.xbl-fr-grid {
   height: 1em;
 }
 /* ***** In-Place Editing ******************************************************************************************* */
-.fr-inplace-buttons {
-  display: block;
-  margin-top: .3em;
-  margin-bottom: 0.5em;
-}
-.fr-grid .fr-grid-content .fr-inplace-buttons button.xforms-trigger {
-  margin-top: 0;
-}
-.fr-inplace-input input {
-  border: 1px inset #e9e9ae;
+.fr-grid .xforms-label input,
+.fr-grid .xforms-hint input {
+  height: 20px;
   padding: 0;
-  background-color: #FFFF88;
-  background-image: none;
-  width: 100%;
-}
-.fr-inplace-textarea textarea.xforms-textarea {
-  border: 1px inset #e9e9ae;
-  padding: 0;
-  background-color: #FFFF88;
-  background-image: none;
-}
-.fr-inplace-buttons .xforms-control {
-  display: inline;
-}
-.fr-inplace-content .xforms-output:hover {
-  background-color: #ffff88;
-}
-.fr-top .xbl-fr-inplace-input {
-  display: block;
-}
-.fr-top .xbl-fr-inplace-input .xforms-input input {
-  width: 100%;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  -webkit-border-radius: 0;
+  -moz-border-radius: 0;
+  border-radius: 0;
 }
 h2 .fr-section-label {
   height: 36px;
@@ -820,7 +799,7 @@ td.fb-selected:hover .fb-click-message {
   margin-left: 15px;
   margin-right: 15px;
 }
-.fb-center .navbar-inverse .navbar-inner {
+.fb-main .navbar-inverse .navbar-inner {
   background-color: #303030;
   background-image: -moz-linear-gradient(top, #222222, #444444);
   background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#222222), to(#444444));
@@ -833,12 +812,12 @@ td.fb-selected:hover .fb-click-message {
   -moz-border-radius: 0;
   border-radius: 0;
 }
-.fb-center .navbar-inverse .navbar-inner .fb-language-triggers,
-.fb-center .navbar-inverse .navbar-inner .fb-form-settings-trigger {
+.fb-main .navbar-inverse .navbar-inner .fb-language-triggers,
+.fb-main .navbar-inverse .navbar-inner .fb-form-settings-trigger {
   margin-top: 8px;
   margin-left: 6px;
 }
-.fb-center .navbar-inverse .navbar-inner .fr-language-choice {
+.fb-main .navbar-inverse .navbar-inner .fr-language-choice {
   margin-right: 0;
 }
 /* ***** Other media ************************************************************************************************ */

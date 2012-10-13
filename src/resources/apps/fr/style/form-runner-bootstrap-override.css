@@ -46,14 +46,14 @@ form.xforms-form textarea,
 form.xforms-form input {
   margin-bottom: 0;
   color: black;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  height: 28px;
 }
-form.xforms-form select,
-form.xforms-form input[type="file"],
-form.xforms-form input {
-  height: 20px;
-  -webkit-box-sizing: content-box;
-  -moz-box-sizing: content-box;
-  box-sizing: content-box;
+form.xforms-form .input-append .add-on,
+form.xforms-form .input-prepend .add-on {
+  height: 18px;
 }
 form.xforms-form .fr-grid tr th label {
   margin: 0;

@@ -71,10 +71,15 @@ body {
 /* ***** Headings (titles and sections) ***************************************************************************** */
 .xforms-form h2,
 .xforms-form h3 {
+  background-color: #f8f8f8;
+  background-image: -moz-linear-gradient(top, #ffffff, #eeeeee);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#ffffff), to(#eeeeee));
   background-image: -webkit-linear-gradient(top, #ffffff, #eeeeee);
+  background-image: -o-linear-gradient(top, #ffffff, #eeeeee);
+  background-image: linear-gradient(to bottom, #ffffff, #eeeeee);
+  background-repeat: repeat-x;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffffff', endColorstr='#ffeeeeee', GradientType=0);
   margin: 1em 0;
-  /*color: #004B92;*/
-
 }
 .xforms-form h2,
 .xforms-form h3,

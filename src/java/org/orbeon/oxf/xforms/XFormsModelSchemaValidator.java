@@ -164,19 +164,17 @@ public class XFormsModelSchemaValidator {
     }
 
     private static class SchemaKey extends CacheKey {
-        final int hash;
 
-        final URL url;
+        final String urlString;
 
-        SchemaKey(final URL u) {
+        SchemaKey(final String urlString) {
             setClazz(SchemaKey.class);
-            url = u;
-            hash = url.hashCode();
+            this.urlString = urlString;
         }
 
         @Override
         public int hashCode() {
-            return hash;
+            return urlString.hashCode();
         }
 
         @Override
@@ -184,7 +182,8 @@ public class XFormsModelSchemaValidator {
             final boolean ret;
             if (other instanceof SchemaKey) {
                 final SchemaKey rhs = (SchemaKey) other;
-                ret = url.equals(rhs.url);
+                // NOTE: Must NEVER use URL.equals(), see http://brian.pontarelli.com/2006/12/05/mr-gosling-why-did-you-make-url-equals-suck/
+                ret = urlString.equals(rhs.urlString);
             } else {
                 ret = false;
             }
@@ -193,7 +192,7 @@ public class XFormsModelSchemaValidator {
 
         @Override
         public void toXML(ContentHandlerHelper helper, Object validities) {
-            helper.element("url", new String[] { "class", getClazz().getName(), "validity", (validities != null) ? validities.toString() : null, "url", url.toExternalForm() });
+            helper.element("url", new String[] { "class", getClazz().getName(), "validity", (validities != null) ? validities.toString() : null, "url", urlString });
         }
     }
 
@@ -686,13 +685,13 @@ public class XFormsModelSchemaValidator {
     /**
      * Load and cache a Grammar for a given schema URI.
      */
-    private Grammar loadCacheGrammar(final String schemaURI) {
+    private Grammar loadCacheGrammar(final String absoluteSchemaURL) {
         try {
-            final URL url = URLFactory.createURL(schemaURI);
+            final URL url = URLFactory.createURL(absoluteSchemaURL);
             final Long modificationTime = NetUtils.getLastModifiedAsLong(url);
 
             final Cache cache = ObjectCache.instance();
-            final SchemaKey schemaKey = new SchemaKey(url);
+            final SchemaKey schemaKey = new SchemaKey(absoluteSchemaURL);
 
             final SchemaInfo schemaInfo;
             {
@@ -706,8 +705,8 @@ public class XFormsModelSchemaValidator {
             if (schemaInfo == null || !schemaInfo.includesUpToDate()) {
                 final SchemaInfo newSchemaInfo = new SchemaInfo();
 
-                final InputSource is = XMLUtils.ENTITY_RESOLVER.resolveEntity("", schemaURI);
-                final MSVGrammarReaderController controller = new MSVGrammarReaderController(schemaURI, newSchemaInfo);
+                final InputSource is = XMLUtils.ENTITY_RESOLVER.resolveEntity("", absoluteSchemaURL);
+                final MSVGrammarReaderController controller = new MSVGrammarReaderController(absoluteSchemaURL, newSchemaInfo);
                 final SAXParserFactory factory = XMLUtils.getSAXParserFactory(XMLUtils.ParserConfiguration.XINCLUDE_ONLY);
 
                 grammar = GrammarLoader.loadSchema(is, controller, factory);
@@ -718,7 +717,7 @@ public class XFormsModelSchemaValidator {
             }
             return grammar;
         } catch (Exception e) {
-            throw ValidationException.wrapException(e, new ExtendedLocationData(schemaURI, -1, -1, "loading schema from URI"));
+            throw ValidationException.wrapException(e, new ExtendedLocationData(absoluteSchemaURL, -1, -1, "loading schema from URI"));
         }
     }
 

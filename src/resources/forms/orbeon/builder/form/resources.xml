@@ -53,6 +53,9 @@
         <paste>
             <label>Paste</label>
         </paste>
+        <form-structure>
+            <label>Form Structure</label>
+        </form-structure>
         <controls>
             <label>Controls</label>
         </controls>
@@ -878,6 +881,9 @@
         <paste>
             <label>Coller</label>
         </paste>
+        <form-structure>
+            <label>Structure du formulaire</label>
+        </form-structure>
         <controls>
             <label>Contrôles</label>
         </controls>
@@ -1694,6 +1700,9 @@
         <paste>
             <label>Lim inn</label>
         </paste>
+        <form-structure>
+            <label>[Form Structure]</label>
+        </form-structure>
         <controls>
             <label>Skjemaelementer</label>
         </controls>
@@ -2509,6 +2518,9 @@
         <paste>
             <label>Вставить</label>
         </paste>
+        <form-structure>
+            <label>[Form Structure]</label>
+        </form-structure>
         <controls>
             <label>Элементы</label>
         </controls>

@@ -75,7 +75,7 @@
 
         <!-- Sections, grids, etc. toolbox -->
         <xhtml:div class="fb-tools">
-            <xhtml:legend>Sections &amp; Grids</xhtml:legend>
+            <xhtml:legend><xforms:output value="$form-resources/form-structure/label"/></xhtml:legend>
             <!-- Add new section -->
             <xhtml:div class="fb-tool">
                 <xforms:trigger id="insert-new-section-trigger" ref="instance('fb-variables')/section-trigger" >

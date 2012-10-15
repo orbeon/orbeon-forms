@@ -169,7 +169,9 @@ h1 .xforms-trigger-appearance-xxforms-minimal input, h2 .xforms-trigger-appearan
         a {
             text-decoration: none;
             color: inherit;             // Don't use the default styling for anchors
-            display: inline-block;
+                                        // For positioning of the .fb-section-label-editor-click-interceptor, positioned relative to the anchor:
+            display: inline-block;      // - So it extends all the way to the right
+            height: 100%;               // - So it take the whole height, even when the section title is empty
         }
         .fr-section-open-close { border-bottom: white }
         .xforms-label { font-weight: normal }

@@ -1,6 +1,7 @@
 $ ->
     AjaxServer = ORBEON.xforms.server.AjaxServer
     Builder = ORBEON.Builder
+    Controls = ORBEON.xforms.Controls
     Events = ORBEON.xforms.Events
     FSM = ORBEON.util.FiniteStateMachine
     OD = ORBEON.xforms.Document
@@ -79,6 +80,8 @@ $ ->
             if ORBEON.xforms.Globals.eventQueue.length > 0 or ORBEON.xforms.Globals.requestInProgress
                 _.delay (-> showLabelEditor clickInterceptor), Properties.internalShortDelay.get()
             else
+                # Clear interceptor click hint, if any
+                f$.text '', clickInterceptor
                 # Create single input element, if we don't have one already
                 unless labelInput?
                     labelInput = $ '<input class="fb-edit-section-label"/>'
@@ -91,6 +94,11 @@ $ ->
                 labelAnchor = do ->
                     section = Builder.findInCache sectionsCache, interceptorOffset.top
                     f$.find '.fr-section-label:first a', section.el
+                # Set placeholder, done every time to account for a value change when changing current language
+                do ->
+                    placeholderOutput = f$.children '.fb-type-section-title-label', sectionEditor
+                    placeholderValue = Controls.getCurrentValue placeholderOutput[0]
+                    f$.attr 'placeholder', placeholderValue, labelInput
                 # Populate and show input
                 f$.val (f$.text labelAnchor), labelInput
                 f$.show labelInput
@@ -106,11 +114,22 @@ $ ->
                 f$.width (f$.width labelAnchor) - 10, labelInput
                 f$.focus labelInput
 
+        # Update highlight of section title, as a hint users can click to edit
         updateHightlight = (updateClass, clickInterceptor) ->
             offset = Builder.adjustedOffset clickInterceptor
             section = Builder.findInCache sectionsCache, offset.top
             sectionTitle = f$.find '.fr-section-title:first', section.el
             updateClass 'hover', sectionTitle
+
+        # Show textual indication user can click on empty section title
+        showClickHintIfTitleEmpty = (clickInterceptor) ->
+            interceptorOffset = Builder.adjustedOffset clickInterceptor
+            section = Builder.findInCache sectionsCache, interceptorOffset.top
+            labelAnchor = f$.find '.fr-section-label:first a', section.el
+            if (f$.text labelAnchor) == ''
+                enterTitleOutput = f$.children '.fb-enter-section-title-label', sectionEditor
+                enterTitleValue = Controls.getCurrentValue enterTitleOutput[0]
+                f$.text enterTitleValue, clickInterceptor
 
         # Handle click
         do ->
@@ -123,8 +142,12 @@ $ ->
                     container = $ '<div class="fb-section-label-editor-click-interceptor">'
                     f$.append container, $ '.fr-view'
                     container.on 'click', ({target}) -> showLabelEditor $ target
-                    container.on 'mouseover', ({target}) -> updateHightlight f$.addClass, $ target
-                    container.on 'mouseout', ({target}) -> updateHightlight f$.removeClass, $ target
+                    container.on 'mouseover', ({target}) ->
+                        updateHightlight f$.addClass, $ target
+                        showClickHintIfTitleEmpty $ target
+                    container.on 'mouseout', ({target}) ->
+                        updateHightlight f$.removeClass, $ target
+                        f$.text '', $ target
                     labelClickInterceptors.push container
                 # Hide interceptors we don't need
                 _.each _.range(sections.length, labelClickInterceptors.length), (pos) ->

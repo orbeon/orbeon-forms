@@ -83,6 +83,10 @@ body {
 .fb-section-label-editor-click-interceptor {                                                                            // Shown on top of each section label to avoid click → collapse
     position: absolute;                                                                                                 // Is left/right set in CoffeeScript relative to the current section label
     cursor: pointer;
+    font-size: 20px;                                                                                                    // Matching the title font size
+    line-height: 40px;                                                                                                  // So text is vertically centered
+    color: #BBB;                                                                                                        // Light gray denoting hint
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;                                                        // Matching font defined by Bootstrap for titles
 }
 
 .fb-edit-section-label {                                                                                                // Input created dynamically to edit section label

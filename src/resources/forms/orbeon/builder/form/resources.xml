@@ -37,12 +37,6 @@
             <label>Logo</label>
             <hint>The logo appears at the top of your form</hint>
         </logo>
-        <!-- Sections -->
-        <section-name>
-            <label>Section Name</label>
-            <hint>click to enter a section title</hint>
-            <alert>The section title is required in all languages</alert>
-        </section-name>
         <!-- Toolbox -->
         <cut>
             <label>Cut</label>
@@ -119,8 +113,14 @@
         <reload-components>
             <label>Reload Toolbox</label>
         </reload-components>
+        <enter-section-title>
+            <label>Click to enter a section title</label>
+        </enter-section-title>
+        <type-section-title>
+            <label>Type your section title</label>
+        </type-section-title>
         <enter-label>
-            <label>Click to add a label</label>
+            <label>Click to enter a label</label>
         </enter-label>
         <type-label>
             <label>Type your label here</label>
@@ -865,12 +865,6 @@
             <label>Logo</label>
             <hint>Le logo apparaît au sommet de votre formulaire</hint>
         </logo>
-        <!-- Sections -->
-        <section-name>
-            <label>Nom de la section</label>
-            <hint>cliquer pour entrer un titre de section</hint>
-            <alert>Le title de section est requis dans toutes les langues</alert>
-        </section-name>
         <!-- Toolbox -->
         <cut>
             <label>Couper</label>
@@ -947,6 +941,12 @@
         <reload-components>
             <label>Recharger la boîte à outils</label>
         </reload-components>
+        <enter-section-title>
+            <label>Cliquez pour entrer un titre de section</label>
+        </enter-section-title>
+        <type-section-title>
+            <label>Saisisez le titre de section</label>
+        </type-section-title>
         <enter-label>
             <label>cliquez pour entrer un libellé</label>
         </enter-label>
@@ -1684,12 +1684,6 @@
             <label>Logo</label>
             <hint>Logoen synes på toppen av skjemaene</hint>
         </logo>
-        <!-- Sections -->
-        <section-name>
-            <label>[Section Name]</label>
-            <hint>klikk for å legge inn en seksjonstittel</hint>
-            <alert>Seksjonstittel er påkrevd for alle språk</alert>
-        </section-name>
         <!-- Toolbox -->
         <cut>
             <label>Klipp ut</label>
@@ -1766,6 +1760,12 @@
         <reload-components>
             <label>Last skjemakomponenter på nytt</label>
         </reload-components>
+        <enter-section-title>
+            <label>[Click to enter a section title]</label>
+        </enter-section-title>
+        <type-section-title>
+            <label>[Type your section title]</label>
+        </type-section-title>
         <enter-label>
             <label>klikk for å legge inn en ledetekst</label>
         </enter-label>
@@ -2502,12 +2502,6 @@
             <label>Логотип</label>
             <hint>Логотип отображается в верхней части формы</hint>
         </logo>
-        <!-- Sections -->
-        <section-name>
-            <label>[Section Name]</label>
-            <hint>Нажмите чтобы ввести заголовок раздела</hint>
-            <alert>Заголовок необходимо ввести на всех языках формы</alert>
-        </section-name>
         <!-- Toolbox -->
         <cut>
             <label>Вырезать</label>
@@ -2584,6 +2578,12 @@
         <reload-components>
             <label>Перезагрузить элементы</label>
         </reload-components>
+        <enter-section-title>
+            <label>[Click to enter a section title]</label>
+        </enter-section-title>
+        <type-section-title>
+            <label>[Type your section title]</label>
+        </type-section-title>
         <enter-label>
             <label>Нажмите чтобы ввести название</label>
         </enter-label>

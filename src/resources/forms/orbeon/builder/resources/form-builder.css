@@ -123,6 +123,10 @@ body {
 .fb-section-label-editor-click-interceptor {
   position: absolute;
   cursor: pointer;
+  font-size: 20px;
+  line-height: 40px;
+  color: #BBB;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 .fb-edit-section-label {
   position: absolute;

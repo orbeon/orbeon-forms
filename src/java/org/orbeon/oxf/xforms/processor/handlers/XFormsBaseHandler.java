@@ -109,7 +109,7 @@ public abstract class XFormsBaseHandler extends ElementHandler {
         return control == null || ! control.isRelevant();
     }
 
-    protected static void handleAccessibilityAttributes(Attributes srcAttributes, AttributesImpl destAttributes) {
+    public static void handleAccessibilityAttributes(Attributes srcAttributes, AttributesImpl destAttributes) {
         // Handle "tabindex"
         {
             // This is the standard XForms attribute

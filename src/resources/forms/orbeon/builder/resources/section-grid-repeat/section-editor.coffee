@@ -14,10 +14,10 @@ $ ->
 
     FSM.create
         transitions : [
-            { events: [ 'mouseMove'    ], actions: [ 'mouseMoved' ] }
+            { events: [ 'mouseMove'], actions: [ 'mouseMoved' ] }
         ]
         events:
-            mouseMove:    (f) -> ($ document).on 'mousemove', (e) -> f e
+            mouseMove: (f) -> ($ document).on 'mousemove', (e) -> f e
         actions:
             mouseMoved: (event) ->
                 pageX = event.pageX
@@ -85,7 +85,7 @@ $ ->
                 # Create single input element, if we don't have one already
                 unless labelInput?
                     labelInput = $ '<input class="fb-edit-section-label"/>'
-                    f$.append labelInput, $ '.fr-view'
+                    f$.append labelInput, $ '.fb-main'
                     labelInput.on 'blur', -> if f$.is ':visible', labelInput then sendNewLabelValue()
                     labelInput.on 'keypress', (e) -> if e.charCode == 13 then sendNewLabelValue()
                     Events.ajaxResponseProcessedEvent.subscribe -> f$.hide labelInput
@@ -133,14 +133,13 @@ $ ->
 
         # Handle click
         do ->
-
             labelClickInterceptors = []
             Builder.onOffsetMayHaveChanged ->
                 sections = $ '.xbl-fr-section'
                 # Create interceptor divs, so we have enough to cover all the sections
                 _.each _.range(sections.length - labelClickInterceptors.length), ->
                     container = $ '<div class="fb-section-label-editor-click-interceptor">'
-                    f$.append container, $ '.fr-view'
+                    f$.append container, $ '.fb-main'
                     container.on 'click', ({target}) -> showLabelEditor $ target
                     container.on 'mouseover', ({target}) ->
                         updateHightlight f$.addClass, $ target

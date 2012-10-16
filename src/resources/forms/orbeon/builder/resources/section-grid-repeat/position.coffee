@@ -19,7 +19,7 @@ $ ->
             container.offset.top <= top <= container.offset.top + container.height
 
     # How much we need to add to offset to account for the form having been scrolled
-    Builder.scrollTop = -> f$.scrollTop f$.closest '.yui-layout-bd', $ '.fr-view'
+    Builder.scrollTop = -> f$.scrollTop $ '.fb-main'
 
     # Gets an element offset, normalizing for scrolling, so the offset can be stored in a cache
     Builder.adjustedOffset = (jQueryObject) ->
@@ -52,9 +52,9 @@ $ ->
     # Keep track of FB's main area left/right, as we don't want to show icons when pointer is over the toolbar
     viewPos = left: 0, right: 0; do ->
         updateViewPos = ->
-            view = $ '.fr-view'
-            viewPos.left = (f$.offset view).left
-            viewPos.right = viewPos.left + (f$.width view)
+            fbMain = $ '.fb-main'
+            viewPos.left = (f$.offset fbMain).left
+            viewPos.right = viewPos.left + (f$.width fbMain)
         f$.on 'load resize', updateViewPos, $ window
 
     # Keeps track of pointer position

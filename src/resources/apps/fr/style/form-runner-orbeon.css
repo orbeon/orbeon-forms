@@ -256,6 +256,7 @@ textarea.xforms-invalid-visited {
 /* Section */
 .xbl-fr-section {
   background-color: white;
+  overflow: hidden;
 }
 .xbl-fr-section .fr-section-title a {
   text-decoration: none;

@@ -41,7 +41,8 @@ body {
 
     .fb-main-inner {
         background-color: @wellBackground;
-        .border-radius(4px);
+        .border-radius(6px);
+        overflow: hidden;               // So navbar at the top doesn't get over the "border radius" and cancels its effect
         .box-sizing(border-box);
         margin-bottom: 0;
     }

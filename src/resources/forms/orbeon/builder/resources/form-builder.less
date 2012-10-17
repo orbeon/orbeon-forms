@@ -19,15 +19,6 @@
 @yellow: #ffffd3;
 @fbGutter: 10px;
 
-.fr-border {
-    padding: 0;
-    margin-bottom: 20px;
-    background-color: @wellBackground;
-    border: 1px solid darken(@wellBackground, 7%);
-    .border-radius(4px);
-    .box-shadow(inset 0 1px 1px rgba(0,0,0,.05));
-}
-
 // Overwrite definition in form-runner-orbeon.css if any
 html {
     overflow-y: scroll;
@@ -49,10 +40,10 @@ body {
     overflow-y: auto;
 
     .fb-main-inner {
-        .fr-border();
+        background-color: @wellBackground;
+        .border-radius(4px);
         .box-sizing(border-box);
         margin-bottom: 0;
-        border: 1px solid #222;
     }
 }
 
@@ -293,8 +284,8 @@ div.xbl-fr-grid {
 }
 
 #fb-edit-validation-dialog {
-    width: 30em; 
-    
+    width: 30em;
+
     textarea { width: 98%; height: 4em }
     .xforms-label { display: block; clear: both }
     .xforms-hint { display: block; clear: both }
@@ -303,7 +294,7 @@ div.xbl-fr-grid {
 
 #fb-schema-upload-dialog {
     width: 35em;
-    
+
     .xforms-hint { width: 100% }
     .xforms-select1 { height: 10em; width: 100% }
     .fb-dialog-h2 { font-size: larger; display: block; padding-top: .3em; padding-bottom: .3em }
@@ -315,7 +306,7 @@ div.xbl-fr-grid {
     .CodeMirror { font-size: 12px; }        // Pick slightly smaller font size, default being 13px
     .CodeMirror-scroll { height: auto }
     .xforms-alert-active { display: block }
-    
+
     .fb-xml-dialog-view { width: 100% }
     .fb-xml-dialog-view textarea.xforms-textarea { width: 100%; height: 29em; font-family: monospace }
 }

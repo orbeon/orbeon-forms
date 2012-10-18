@@ -418,7 +418,7 @@ public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
                 // Callback for elements of interest
                 if (isXFormsOrExtension || inLHHA) {
                     // NOTE: We call this also for HTML elements within LHHA so we can gather scope information for AVTs
-                    startXFormsOrExtension(uri, localname, qName, attributes, elementStack.peek().scope);
+                    startXFormsOrExtension(uri, localname, attributes, elementStack.peek().scope);
                 }
             }
 
@@ -541,7 +541,7 @@ public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
         super.setDocumentLocator(locator);
     }
 
-    protected void startXFormsOrExtension(String uri, String localname, String qName, Attributes attributes, XFormsConstants.XXBLScope scope) {
+    protected void startXFormsOrExtension(String uri, String localname, Attributes attributes, XFormsConstants.XXBLScope scope) {
         // NOP
     }
 

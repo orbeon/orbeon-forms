@@ -436,7 +436,7 @@ class XBLBindings(indentedLogger: IndentedLogger, partAnalysis: PartAnalysisImpl
         assert(innerScope ne null)
         assert(outerScope ne null)
 
-        override def startXFormsOrExtension(uri: String, localname: String, qName: String, attributes: Attributes, currentScope: XXBLScope) {
+        override def startXFormsOrExtension(uri: String, localname: String, attributes: Attributes, currentScope: XXBLScope) {
 
             // Index prefixed id ⇒ scope
             val staticId = attributes.getValue("id")

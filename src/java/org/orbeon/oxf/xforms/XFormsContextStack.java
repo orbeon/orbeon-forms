@@ -225,7 +225,7 @@ public class XFormsContextStack {
         returnFunctionContext();
 
         assert this.head.variables().size() == 1;
-        return this.head.variables().get(0);
+        return this.head.variables().head();
     }
 
     public BindingContext setBinding(BindingContext bindingContext) {

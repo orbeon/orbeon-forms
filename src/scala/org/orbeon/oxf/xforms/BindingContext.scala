@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms
 
 import xbl.Scope
-import java.util.{List ⇒ JList, ArrayList ⇒ JArrayList, Map ⇒ JMap, HashMap ⇒ JHashMap}
+import java.util.{List ⇒ JList, Map ⇒ JMap, HashMap ⇒ JHashMap}
 import org.dom4j.Element
 import collection.JavaConverters._
 import org.orbeon.saxon.om.{NodeInfo, ValueRepresentation, Item}
@@ -46,7 +46,7 @@ case class BindingContext(
     // Location data associated with the XForms element (typically, a control) associated with the binding. If location
     // data was passed during construction, pass that, otherwise try to get location data from passed element.
     val locationData = Option(_locationData) orElse (Option(controlElement) map (_.getData.asInstanceOf[LocationData])) orNull
-    private var _variables: JList[VariableInfo] = _
+    private var _variables: List[VariableInfo] = Nil
 
     // Constructor for scoping a variable
     def this(
@@ -61,8 +61,7 @@ case class BindingContext(
         this(parent, base.model, null, base.nodeset, base.position, base.elementId, false,
              controlElement, locationData, false, base.contextItem, scope)
 
-        _variables = new JArrayList[VariableInfo]
-        _variables.add(new VariableInfo(variableName, variableValue))
+        _variables ::= new VariableInfo(variableName, variableValue)
     }
 
     // Create a copy with a new variable in scope
@@ -89,7 +88,7 @@ case class BindingContext(
             nodeset.get(position - 1)
 
     def setVariables(variables: JList[VariableInfo]) =
-        this._variables = variables
+        this._variables = variables.asScala.toList
 
     def getInScopeVariables: JMap[String, ValueRepresentation] = getInScopeVariables(scopeModelVariables = true)
 
@@ -103,7 +102,7 @@ case class BindingContext(
             if bindingContext.scope == scope
             currentInfo = bindingContext._variables
             if currentInfo ne null
-            VariableInfo(name: String, value) ← currentInfo.asScala
+            VariableInfo(name: String, value) ← currentInfo
         } yield {
             // The binding defines a variable and there is not already a variable with that name
             // NOTE: Put condition here to make sure we take previous variables into account

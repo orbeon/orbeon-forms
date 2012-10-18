@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.xbl
 
-import java.util.{List ⇒ JList, Map ⇒ JMap}
+import java.util.{List ⇒ JList}
 import org.dom4j.Element
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.xforms._
@@ -34,6 +34,8 @@ import org.orbeon.oxf.xforms.analysis.controls.RepeatControl
 import org.orbeon.oxf.util.StringConversions
 import collection.JavaConverters._
 import org.orbeon.oxf.pipeline.api.ExternalContext.Request
+import scala.collection.mutable
+import scala.collection.mutable.ArrayBuffer
 
 /**
  * Represent an XBL container of models and controls.
@@ -76,7 +78,7 @@ class XBLContainer(
     var locationData: LocationData = null
     val contextStack = new XFormsContextStack(self)
 
-    private var _childrenXBLContainers = Map[String, XBLContainer]()
+    private var _childrenXBLContainers: mutable.Buffer[XBLContainer] = ArrayBuffer()
     def childrenXBLContainers = _childrenXBLContainers
 
     def effectiveId = _effectiveId
@@ -129,16 +131,12 @@ class XBLContainer(
     }
     
     private def addChild(container: XBLContainer): Unit =
-        _childrenXBLContainers += container.getEffectiveId → container
-    
-    private def removeChild(container: XBLContainer): Unit = {
-        val effectiveId = container.getEffectiveId
-        val containerForEffectiveId = _childrenXBLContainers.get(effectiveId)
-        // Only remove if the object matches, in case another object with same effective id was added in the meanwhile.
-        // Possible with repeat iteration updates.
-        if (containerForEffectiveId exists (_ eq container))
-            _childrenXBLContainers -= effectiveId
-    }
+        _childrenXBLContainers += container
+
+    // Only remove if there is an identity match, in case another object with same effective id was added in the
+    // meanwhile, which is possible with repeat iteration updates.
+    private def removeChild(container: XBLContainer): Unit =
+        _childrenXBLContainers  = _childrenXBLContainers filterNot (_ eq container)
 
     // Find the root container for the given prefixed id, starting with the current container.
     // This is the container which has the given scope as inner scope.
@@ -162,18 +160,21 @@ class XBLContainer(
 
     def findInSelfAndDescendants[T](findInModel: XFormsModel ⇒ Option[T], findInContainer: Option[XBLContainer ⇒ Option[T]] = None): Option[T] = {
         if (isRelevant) {
-            for (model ← models) {
-                val result = findInModel(model)
-                if (result.isDefined)
-                    return result
-            }
-            findInContainer foreach { find2 ⇒
-                for (container ← _childrenXBLContainers.values) {
-                    val result = find2(container)
+            if (models.nonEmpty)
+                for (model ← models) {
+                    val result = findInModel(model)
                     if (result.isDefined)
                         return result
                 }
-            }
+
+            if (_childrenXBLContainers.nonEmpty)
+                findInContainer foreach { find2 ⇒
+                    for (container ← _childrenXBLContainers) {
+                        val result = find2(container)
+                        if (result.isDefined)
+                            return result
+                    }
+                }
         }
         None
     }
@@ -183,7 +184,7 @@ class XBLContainer(
             for (model ← models)
                 doInModel(model)
 
-            for (container ← _childrenXBLContainers.values)
+            for (container ← _childrenXBLContainers)
                 doInContainer(container)
         }
 
@@ -235,7 +236,7 @@ trait ModelContainer {
     // Get a list of all the relevant models in this container and all sub-containers
     def getAllModels: Seq[XFormsModel] =
         if (isRelevant)
-            _models ++ (childrenXBLContainers.values flatMap (_.getAllModels))
+            _models ++ (childrenXBLContainers flatMap (_.getAllModels))
         else
             Seq()
 

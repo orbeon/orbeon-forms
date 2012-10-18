@@ -60,15 +60,11 @@
                     </xsl:copy>
                 </xsl:template>
 
-                <!-- Update namespace on observers on FB actions so that they don't run at design time -->
-                <xsl:template match="xforms:action[ends-with(@id, '-binding')]">
-                    <xsl:copy>
-                        <xsl:apply-templates select="@* | node()" mode="update-observers"/>
-                    </xsl:copy>
-                </xsl:template>
-
-                <xsl:template match="@ev:observer | @observer" mode="update-observers">
-                    <xsl:attribute name="fb:{local-name()}" select="."/>
+                <!-- Update namespace on actions and services so that they don't run at design time -->
+                <xsl:template match="xforms:model/xforms:*[tokenize(@class, '\s+') = ('fr-service', 'fr-database-service')] | xforms:model/xforms:action[ends-with(@id, '-binding')]">
+                    <xsl:element name="fb:{local-name()}">
+                        <xsl:apply-templates select="@* | node()"/>
+                    </xsl:element>
                 </xsl:template>
 
                 <!-- fr:view → xf:group -->

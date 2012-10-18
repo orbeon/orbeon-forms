@@ -56,15 +56,11 @@
                     </xsl:copy>
                 </xsl:template>
 
-                <!-- Restore namespace on observers on FB actions  -->
-                <xsl:template match="xforms:action[ends-with(@id, '-binding')]">
-                    <xsl:copy>
-                        <xsl:apply-templates select="@* | node()" mode="update-observers"/>
-                    </xsl:copy>
-                </xsl:template>
-
-                <xsl:template match="@fb:observer" mode="update-observers">
-                    <xsl:attribute name="ev:{local-name()}" select="."/>
+                <!-- Restore namespace on actions and services -->
+                <xsl:template match="xforms:model/fb:*[tokenize(@class, '\s+') = ('fr-service', 'fr-database-service')] | xforms:model/fb:action[ends-with(@id, '-binding')]">
+                    <xsl:element name="xforms:{local-name()}">
+                        <xsl:apply-templates select="@* | node()"/>
+                    </xsl:element>
                 </xsl:template>
 
                 <!-- xf:group → fr:view -->

@@ -73,10 +73,12 @@
             <fr:messages/>
 
             <!-- XPath errors in edited form -->
-            <xf:output
-                class="fb-xpath-errors"
-                ref="instance('fb-variables')/xpath-errors[xs:integer(.) gt 0]"
-                value="xxf:format-message($form-resources/messages/xpath-errors, xs:integer(.))"/>
+            <xh:div class="fb-xpath-errors">
+                <xf:output
+                    class="alert"
+                    ref="instance('fb-variables')/xpath-errors[xs:integer(.) gt 0]"
+                    value="xxf:format-message($form-resources/messages/xpath-errors, xs:integer(.))"/>
+            </xh:div>
 
             <xh:div class="fr-buttons">
                 <!-- Back/Close -->

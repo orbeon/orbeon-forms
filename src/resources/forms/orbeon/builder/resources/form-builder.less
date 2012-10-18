@@ -104,14 +104,6 @@ body {
 .fb-xforms-disabled { display: none }
 .fb-hide-alert .xforms-alert { display: none }
 
-// This is for the form builder title at the top
-.fb-top h1.fr-form-title {
-    clear: none;
-    color: @darkBlue;
-    margin: 0 0 0 2em;
-    padding: 0;
-}
-
 div.xbl-fr-grid {
     padding: 22px 0 0 22px;                                                                                             // Reserve space for icons
 }
@@ -345,14 +337,6 @@ div.xbl-fr-grid {
     .fb-language-triggers  { display: inline-block; float: right; margin-left: 1em }
 }
 
-/* ***** Top ******************************************************************************************************** */
-
-// Title and description
-.fb-top h1 {
-    font-size: 25px;    // Make title larger than what it is in Form Runner (overrides 20px)
-    line-height: 45px;  // Make line higher to compensate for larger font (overrides 40px)
-}
-
 /* ***** Footer ***************************************************************************************************** */
 
 // Give height to footer so it shows up even if empty
@@ -538,24 +522,16 @@ td.fb-selected:hover .fb-click-message { display: none }
 
 /* ***** Message **************************************************************************************************** */
 
-.fb-top .fr-messages {
-    display: inline;
-    background: inherit;
-    border: none;
-    margin: 0;
-    padding: 0;
-    clear: none; // override "both" so that IE 7 support for inline-block works
-}
-
-.fb-top .fr-messages .fr-message {
-    display: -moz-inline-box;
+// Size message so that it fits within bottom navbar, see #486
+.fr-messages {
     display: inline-block;
-    *zoom: 1; // IE 7 hack
-    margin:0.35em 0 0 2em;
-    padding: .2em;
-    color: white;
-    border-color: white;
-    border-radius: 3px; -moz-border-radius: 3px; -webkit-border-radius: 3px; -ms-border-radius: 3px
+    float: left;
+
+    .alert {
+        margin: 0;
+        padding-top: 5px;
+        padding-bottom: 5px;
+    }
 }
 
 .fb-xpath-errors {

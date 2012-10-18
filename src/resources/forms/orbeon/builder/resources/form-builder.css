@@ -139,12 +139,6 @@ body {
 .fb-hide-alert .xforms-alert {
   display: none;
 }
-.fb-top h1.fr-form-title {
-  clear: none;
-  color: #004b92;
-  margin: 0 0 0 2em;
-  padding: 0;
-}
 div.xbl-fr-grid {
   padding: 22px 0 0 22px;
 }
@@ -451,11 +445,6 @@ div.xbl-fr-grid {
   float: right;
   margin-left: 1em;
 }
-/* ***** Top ******************************************************************************************************** */
-.fb-top h1 {
-  font-size: 25px;
-  line-height: 45px;
-}
 /* ***** Footer ***************************************************************************************************** */
 .fr-footer div {
   height: 1em;
@@ -729,26 +718,14 @@ td.fb-selected:hover .fb-click-message {
   color: #808080;
 }
 /* ***** Message **************************************************************************************************** */
-.fb-top .fr-messages {
-  display: inline;
-  background: inherit;
-  border: none;
-  margin: 0;
-  padding: 0;
-  clear: none;
-}
-.fb-top .fr-messages .fr-message {
-  display: -moz-inline-box;
+.fr-messages {
   display: inline-block;
-  *zoom: 1;
-  margin: 0.35em 0 0 2em;
-  padding: .2em;
-  color: white;
-  border-color: white;
-  border-radius: 3px;
-  -moz-border-radius: 3px;
-  -webkit-border-radius: 3px;
-  -ms-border-radius: 3px;
+  float: left;
+}
+.fr-messages .alert {
+  margin: 0;
+  padding-top: 5px;
+  padding-bottom: 5px;
 }
 .fb-xpath-errors {
   display: block;

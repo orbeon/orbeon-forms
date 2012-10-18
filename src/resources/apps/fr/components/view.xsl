@@ -26,8 +26,10 @@
         xmlns:xbl="http://www.w3.org/ns/xbl"
         xmlns:formRunner="java:org.orbeon.oxf.fr.FormRunner">
 
-    <xsl:variable name="view" select="/xhtml:html/xhtml:body/fr:view" as="element(fr:view)?"/>
-    <xsl:variable name="body" select="($view/fr:body, $view)[1]"      as="element(*)?"/>
+    <xsl:variable name="view"    select="/xhtml:html/xhtml:body/fr:view"     as="element(fr:view)?"/>
+    <xsl:variable name="body"    select="($view/fr:body, $view)[1]"          as="element()?"/>
+    <xsl:variable name="bottom"  select="$body/following-sibling::fr:bottom" as="element()?"/>
+    <xsl:variable name="buttons" select="$bottom/fr:buttons"                 as="element()?"/>
 
     <!-- This is a template for the default layout of a form -->
     <xsl:variable name="default-page-template" as="element(fr:template)">
@@ -71,10 +73,7 @@
                 <xhtml:div class="row">
                     <fr:messages/>
                 </xhtml:div>
-                <xhtml:div class="row">
-                    <fr:status-icons/>
-                    <fr:buttons-bar/>
-                </xhtml:div>
+                <fr:bottom-bar/>
                 <xhtml:div class="row">
                     <fr:version/>
                 </xhtml:div>
@@ -558,15 +557,32 @@
         </xforms:switch>
     </xsl:template>
 
+    <xsl:template match="fr:bottom-bar">
+        <xhtml:div class="row">
+            <xsl:choose>
+                <xsl:when test="$bottom">
+                    <xsl:apply-templates select="$bottom/node()"/>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:variable name="template" as="element()*">
+                        <fr:status-icons/>
+                        <fr:buttons-bar/>
+                    </xsl:variable>
+                    <xsl:apply-templates select="$template"/>
+                </xsl:otherwise>
+            </xsl:choose>
+        </xhtml:div>
+    </xsl:template>
+
     <xsl:template match="fr:buttons-bar" name="fr-buttons-bar">
         <!-- Buttons -->
         <xsl:if test="not($hide-buttons-bar)">
             <xhtml:div class="fr-buttons">
                 <xsl:choose>
                     <!-- Use user-provided buttons -->
-                    <xsl:when test="fr:buttons">
+                    <xsl:when test="$buttons">
                         <!-- Copy all the content -->
-                        <xsl:apply-templates select="fr:buttons/node()"/>
+                        <xsl:apply-templates select="$buttons/node()"/>
                     </xsl:when>
                     <!-- Test mode -->
                     <xsl:when test="$mode = ('test')">

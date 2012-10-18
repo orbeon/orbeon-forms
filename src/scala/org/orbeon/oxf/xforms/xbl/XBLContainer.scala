@@ -136,7 +136,7 @@ class XBLContainer(
     // Only remove if there is an identity match, in case another object with same effective id was added in the
     // meanwhile, which is possible with repeat iteration updates.
     private def removeChild(container: XBLContainer): Unit =
-        _childrenXBLContainers  = _childrenXBLContainers filterNot (_ eq container)
+        _childrenXBLContainers = _childrenXBLContainers filterNot (_ eq container)
 
     // Find the root container for the given prefixed id, starting with the current container.
     // This is the container which has the given scope as inner scope.

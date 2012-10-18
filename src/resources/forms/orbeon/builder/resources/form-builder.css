@@ -267,6 +267,14 @@ div.xbl-fr-grid {
 .fb-itemset-editor-dialog {
   width: 35em;
 }
+.fb-itemset-editor-dialog .xbl-fr-grid {
+  height: 30em;
+  overflow-y: auto;
+  padding: 0;
+}
+.fb-itemset-editor-dialog .xbl-fr-grid table {
+  background-color: white;
+}
 .fb-itemset-editor-dialog .fr-grid-2-columns .xforms-input input {
   width: 13em;
 }

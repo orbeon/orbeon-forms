@@ -11,29 +11,14 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-/* ***** Summary Page *********************************************************************************************** */
 .fr-summary-search,
-.fr-summary-table-div {
+.fr-summary-table-div,
+.fr-summary-search-count {
   display: block;
-  padding-left: 22px;
-  padding-right: 22px;
-}
-.fr-summary-repeat-selection-checkbox {
-  width: 1em;
-}
-/*force minimum column width*/
-.fr-summary-repeat-selection-checkbox label {
-  display: none;
-}
-/*prevent second line in td after checkbox*/
-.fr-summary-repeat-column-number {
-  text-align: right;
-  width: 3em;
+  margin: 20px;
 }
 .fr-summary-search .xforms-label {
   display: block;
-  /* So control is not displayed next to the help icon but on a new line */
-
   /*margin-top: 0.3em;  */
   /* Insert some space between the label / help and the control */
 
@@ -41,52 +26,12 @@
 
   margin-bottom: .1em;
 }
-.fr-summary-table-div tbody a {
-  text-decoration: none;
-  color: black;
-  outline: 0;
-}
-/* Links in table must appear as normal text */
-.fr-summary-table-div tbody span {
-  color: black;
-}
-/* When there is no link (delete-only), override YUI CSS that shows current row text in white */
-.fr-summary-table-div td {
-  white-space: nowrap;
-}
-/* Mainly to prevent dates to wrap */
-.fr-summary-table-div td a {
-  /* Link to take as much space as possible in the cell */
-
-  width: 100%;
-  display: -moz-inline-box;
-  display: inline-block;
-  *zoom: 1;
-  *display: inline;
-  vertical-align: middle;
-}
-/* With IE 6/7, legend and overflow don't behave */
-.xforms-noscript .fr-summary-table-div td legend {
-  display: none;
-}
-.xforms-noscript .fr-summary-table-div td .datatable-cell-content {
-  overflow: visible;
-}
-.fr-summary-search {
-  padding-top: 2em;
-  padding-bottom: 2em;
-}
-.fr-summary-search-count {
-  display: block;
-  margin-top: 1em;
-  margin-bottom: 1em;
-}
-.fr-summary-search-item {
+.fr-summary-search .fr-summary-search-item {
   float: left;
   margin-right: 0.5em;
 }
-.fr-summary-search-item select,
-.fr-summary-search-item input {
+.fr-summary-search .fr-summary-search-item select,
+.fr-summary-search .fr-summary-search-item input {
   width: 12em;
 }
 .fr-summary-search .fr-search-button-td {
@@ -96,7 +41,6 @@
 .fr-summary-search .fr-search-options-td {
   vertical-align: middle;
   font-size: 77%;
-  padding-left: 1em;
 }
 .fr-summary-search p {
   margin-bottom: 0;
@@ -117,13 +61,7 @@
 .fr-summary-search .xforms-label {
   font-weight: normal;
 }
-.pagination {
-  margin-top: 0;
-}
-.fr-summary-table-div .table {
-  margin-bottom: 0;
-}
-.fr-search-input input {
+.fr-summary-search .fr-search-input input {
   padding: 3px 0 3px 3px;
   /* Make the input a bit bigger to look more proportional to the search button */
 
@@ -132,9 +70,65 @@
   /* Wider text field, inspired by Gmail */
 
 }
-/* Controls added just to expose instance nodes to JavaScript */
-.fr-expose-to-javascript {
+.fr-summary-table-div {
+  overflow: auto;
+  background: white;
+}
+.fr-summary-table-div .table {
+  margin-bottom: 0;
+}
+.fr-summary-table-div tbody {
+  /* Links in table must appear as normal text */
+
+  /* When there is no link (delete-only), override YUI CSS that shows current row text in white */
+
+}
+.fr-summary-table-div tbody a {
+  text-decoration: none;
+  color: black;
+  outline: 0;
+}
+.fr-summary-table-div tbody span {
+  color: black;
+}
+.fr-summary-table-div td {
+  white-space: nowrap;
+  /* Mainly to prevent dates from wrapping */
+}
+.fr-summary-table-div td a {
+  /* Link to take as much space as possible in the cell */
+
+  width: 100%;
+  display: -moz-inline-box;
+  display: inline-block;
+  *zoom: 1;
+  *display: inline;
+  vertical-align: middle;
+}
+.fr-summary-table-div .fr-summary-repeat-selection-checkbox {
+  width: 1em;
+}
+.fr-summary-table-div .fr-summary-repeat-selection-checkbox label {
+  margin: 0;
+  padding: 0;
+  text-indent: 0;
+}
+.fr-summary-table-div .fr-summary-repeat-selection-checkbox label input {
+  margin: 0;
+}
+.fr-summary-table-div .fr-summary-repeat-column-number {
+  text-align: right;
+  width: 3em;
+}
+/* With IE 6/7, legend and overflow don't behave */
+.xforms-noscript .fr-summary-table-div td legend {
   display: none;
+}
+.xforms-noscript .fr-summary-table-div td .datatable-cell-content {
+  overflow: visible;
+}
+.pagination {
+  margin-top: 0;
 }
 .xforms-readonly input {
   background-color: white;

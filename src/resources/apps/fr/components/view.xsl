@@ -26,10 +26,10 @@
         xmlns:xbl="http://www.w3.org/ns/xbl"
         xmlns:formRunner="java:org.orbeon.oxf.fr.FormRunner">
 
-    <xsl:variable name="view"    select="/xhtml:html/xhtml:body/fr:view"     as="element(fr:view)?"/>
-    <xsl:variable name="body"    select="($view/fr:body, $view)[1]"          as="element()?"/>
-    <xsl:variable name="bottom"  select="$body/following-sibling::fr:bottom" as="element()?"/>
-    <xsl:variable name="buttons" select="$bottom/fr:buttons"                 as="element()?"/>
+    <xsl:variable name="view"           select="/xhtml:html/xhtml:body/fr:view"     as="element(fr:view)?"/>
+    <xsl:variable name="body"           select="($view/fr:body, $view)[1]"          as="element()?"/>
+    <xsl:variable name="bottom"         select="$body/following-sibling::fr:bottom" as="element()?"/>
+    <xsl:variable name="custom-buttons" select="$bottom/fr:buttons"                 as="element()?"/>
 
     <!-- This is a template for the default layout of a form -->
     <xsl:variable name="default-page-template" as="element(fr:template)">
@@ -580,9 +580,9 @@
             <xhtml:div class="fr-buttons">
                 <xsl:choose>
                     <!-- Use user-provided buttons -->
-                    <xsl:when test="$buttons">
+                    <xsl:when test="exists($custom-buttons)">
                         <!-- Copy all the content -->
-                        <xsl:apply-templates select="$buttons/node()"/>
+                        <xsl:apply-templates select="$custom-buttons/node()"/>
                     </xsl:when>
                     <!-- Test mode -->
                     <xsl:when test="$mode = ('test')">

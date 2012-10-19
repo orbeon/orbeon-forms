@@ -99,9 +99,6 @@ body {
   margin: .5em 0 .5em 0;
 }
 .xforms-form h2 .fr-section-label {
-  border-bottom: 2px solid #eee;
-  /* Line under title */
-
   display: block;
   /* So the line expands all the way to the right */
 
@@ -263,6 +260,7 @@ textarea.xforms-invalid-visited {
   color: inherit;
   display: block;
   height: 100%;
+  overflow: hidden;
 }
 .xbl-fr-section .fr-section-title .fr-section-open-close {
   border-bottom: #ffffff;
@@ -284,7 +282,7 @@ textarea.xforms-invalid-visited {
 .xbl-fr-section .fr-section-title .fr-section-closed {
   padding-left: 20px;
   background-repeat: no-repeat;
-  background-position: 5px 50%;
+  background-position: 5px 17px;
   cursor: pointer;
 }
 .xbl-fr-section .fr-section-title .fr-section-opened {

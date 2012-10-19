@@ -40,7 +40,6 @@ html, body { background-color: @frBackground }
     }
 
     h2 .fr-section-label {
-        border-bottom: 2px solid #eee;                  /* Line under title */
         display: block;                                 /* So the line expands all the way to the right */
     }
 
@@ -173,6 +172,7 @@ h1 .xforms-trigger-appearance-xxforms-minimal input, h2 .xforms-trigger-appearan
                                         // For positioning of the .fb-section-label-editor-click-interceptor, positioned relative to the anchor:
             display: block;             // - So it extends all the way to the right
             height: 100%;               // - So it take the whole height, even when the section title is empty
+            overflow: hidden;           // Avoid wrapping under help image for long title
         }
         .fr-section-open-close { border-bottom: white }
         .xforms-label { font-weight: normal }
@@ -183,7 +183,9 @@ h1 .xforms-trigger-appearance-xxforms-minimal input, h2 .xforms-trigger-appearan
         .fr-section-opened, .fr-section-closed {
             padding-left: 20px;
             background-repeat: no-repeat;
-            background-position: 5px 50%;
+            background-position: 5px 17px;                          // 17 is (40-7)/7, to vertically align on the middle of the first line of the section title
+                                                                    // We use 17px, an offset in pixels, instead of 50%, for multi-line titles, for which we want the open/close
+                                                                    // to be aligned on the first line, not the middle of the section area
             cursor: pointer;                                        // So the "hand" cursor shows wherever the mouse is on the line, not just on the text of the title
         }
 

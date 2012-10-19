@@ -394,6 +394,11 @@ body {
   display: block;
   clear: both;
 }
+.fr-section-container .fr-section-title .xforms-help-image {
+  float: left;
+  padding-top: 12px;
+  padding-right: 10px;
+}
 .fr-section-container p {
   margin-top: 1em;
 }
@@ -414,10 +419,6 @@ body {
   margin-left: 22px;
   margin-top: 1.5em;
   margin-bottom: 1em;
-}
-.xforms-help-image {
-  vertical-align: baseline;
-  margin-right: 3px;
 }
 /* ***** Grids ****************************************************************************************************** */
 .fr-grid-td .fr-grid-content .fr-hidden {
@@ -455,11 +456,12 @@ body {
   padding: 4px;
   *padding-right: 6px;
 }
+.fr-grid .fr-grid-content .xforms-help-image {
+  float: left;
+  margin-right: 3px;
+}
 .fr-grid .fr-grid-content .xforms-label {
   margin-bottom: .5em;
-  /* Insert some space between the label / help and the control (we add spacing below the label rather
-                                           than above the control to make the CSS more generally applicable to XBL components) */
-
   display: block;
   overflow: hidden;
   zoom: 1;

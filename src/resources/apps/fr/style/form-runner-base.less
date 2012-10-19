@@ -84,13 +84,13 @@ body { padding-top: 40px } // if using navbar-fixed-top
     .fr-section-title .xforms-help-image {
         display: inline;
     }
-    
+
     // Noscript help section
     .xforms-help-panel {
         display: block;
         width: auto;
         padding: 0 1em;
-        
+
         .xforms-help-group { margin: 0 0 .5em }
         .xforms-label { display: inline }
         .xforms-help { display: inline }
@@ -265,11 +265,11 @@ body { padding-top: 40px } // if using navbar-fixed-top
         .xforms-label { display: block }         // Label in repeat table header is block so yellow background in FB takes the whole width
         .xforms-help-image { margin-top: 0 }
     }
-    
+
     .fr-repeat-column-trigger {
         width: 16px;
         text-align: center;
-        
+
         img { margin: 0; display: block }
         span img { *margin-left: 0px } // IE buttons depress; is there a way to remove their 1px 3px padding?
         button { display: block; margin: auto }
@@ -298,18 +298,26 @@ body { padding-top: 40px } // if using navbar-fixed-top
 // Sections
 .fr-section-container {
     display: block; clear: both;
-    
+
+    .fr-section-title {
+        .xforms-help-image {
+            float: left;                        // Help on the same line as section title in display: block
+            padding-top: 12px;                  // To make it vertically centered, with a linge height of 40px and image height of 16px: (40-16)/2 = 12px
+            padding-right: 10px;                // Space between help icon and section title
+        }
+    }
+
     p { margin-top: 1em }
     .fr-section-open-close img { margin-right: 0 }
     .fr-section-open-close {
         // Padding is designed to make the <a> box around the section open/close images a square
         padding: 0 7px 0 7px;
     }
-    
+
     .fr-section-content {
         display: block;
-        margin-left: 22px;                          // To be aligned with the start of the text of the titles
-        margin-right: 22px;                         // To have the same margin on both side, especially visible with tables
+        margin-left: 22px;                      // To be aligned with the start of the text of the titles
+        margin-right: 22px;                     // To have the same margin on both side, especially visible with tables
         margin-bottom: .25em;
     }
 }
@@ -319,11 +327,6 @@ body { padding-top: 40px } // if using navbar-fixed-top
     display: block;                             // By default captcha is inline
     margin-left: 22px;                          // Margin left to be aligned with fr-section-content
     margin-top: 1.5em; margin-bottom: 1em;      // Spacing before and after
-}
-
-.xforms-help-image {
-    vertical-align: baseline;
-    margin-right: 3px;
 }
 
 /* ***** Grids ****************************************************************************************************** */
@@ -362,12 +365,17 @@ body { padding-top: 40px } // if using navbar-fixed-top
 
     // Cell content
     .fr-grid-content {
-        padding: 4px;               // Add some space around control
-        *padding-right: 6px;        // To help IE move back controls within .fr-grid-content
+        padding: 4px;                   // Add some space around control
+        *padding-right: 6px;            // To help IE move back controls within .fr-grid-content
+
+        .xforms-help-image {
+            float: left;
+            margin-right: 3px;
+        }
 
         .xforms-label {
-            margin-bottom: .5em;        /* Insert some space between the label / help and the control (we add spacing below the label rather
-                                           than above the control to make the CSS more generally applicable to XBL components) */
+            margin-bottom: .5em;        // Insert some space between the label / help and the control (we add spacing below the label rather
+                                        // than above the control to make the CSS more generally applicable to XBL components)
             display: block;             // Content after the label to show on a "new line"
             overflow: hidden;           // So the block area doesn't extend below the floated help, when there is one. Also see http://bit.ly/ruAKSU
             zoom: 1;                    // For the overflow: hidden to have an effect on IE6

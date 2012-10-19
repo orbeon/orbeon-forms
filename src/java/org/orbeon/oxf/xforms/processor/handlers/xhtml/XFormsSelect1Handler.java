@@ -348,7 +348,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                         final Item item = i.next();
                         final String itemEffectiveId = getItemId(effectiveId, Integer.toString(itemIndex));
                         handleItemFull(this, xmlReceiver, reusableAttributes, attributes, xhtmlPrefix, spanQName,
-                                containingDocument, xformsControl, effectiveId, itemEffectiveId, isMultiple, fullItemType, item, itemIndex == 0);
+                                containingDocument, xformsControl, effectiveId, itemEffectiveId, isMultiple, fullItemType, item, itemIndex == 0, isBooleanInput);
                     }
                 }
             }
@@ -377,7 +377,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
             handleItemFull(baseHandler, contentHandler, reusableAttributes, attributes,
                     xhtmlPrefix, spanQName, containingDocument, null, itemName, itemEffectiveId, isMultiple, fullItemType,
                     Item.apply(0, isMultiple, false, null, // make sure the value "$xforms-template-value$" is not encrypted
-                            new Item.Label("$xforms-template-label$", false), "$xforms-template-value$"), true);
+                            new Item.Label("$xforms-template-label$", false), "$xforms-template-value$"), true, false);
         }
         contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
     }
@@ -396,7 +396,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                                       AttributesImpl reusableAttributes, Attributes attributes, String xhtmlPrefix, String spanQName,
                                       XFormsContainingDocument containingDocument, XFormsValueControl xformsControl,
                                       String itemName, String itemEffectiveId, boolean isMultiple, String type,
-                                      Item item, boolean isFirst) throws SAXException {
+                                      Item item, boolean isFirst, boolean isBooleanInput) throws SAXException {
 
         final HandlerContext handlerContext = baseHandler.getHandlerContext();
 
@@ -412,9 +412,8 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
 
         {
             final Item.Label itemLabel = item.label();
-            final boolean labelNonEmpty = itemLabel != null && itemLabel.label().length() != 0;// empty only for xforms|input:xxforms-type(xs:boolean)
             final String itemNamespacedId = XFormsUtils.namespaceId(handlerContext.getContainingDocument(), itemEffectiveId);
-            if (labelNonEmpty) {
+            if (! isBooleanInput) {
                 reusableAttributes.clear();
                 outputLabelForStart(handlerContext, reusableAttributes, null, itemNamespacedId, LHHAC.LABEL, "label", false);
             }
@@ -451,7 +450,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                 contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName);
             }
 
-            if (labelNonEmpty) {
+            if (! isBooleanInput) {
                 outputLabelForEnd(handlerContext, "label", itemLabel.label(), itemLabel.isHTML());
             }
         }

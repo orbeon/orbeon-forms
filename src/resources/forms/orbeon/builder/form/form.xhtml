@@ -44,6 +44,22 @@
     </xh:head>
     <xh:body>
 
+        <!-- For the summary page -->
+        <xh:div class="fr-hidden">
+            <xf:output id="application-name-control" bind="application-name-bind" class="fr-summary fr-search">
+                <xf:label ref="$form-resources/application-name/label"/>
+            </xf:output>
+            <xf:output id="form-name-control" bind="form-name-bind" class="fr-summary fr-search">
+                <xf:label ref="$form-resources/form-name/label"/>
+            </xf:output>
+            <xf:output id="title-control" bind="title-bind" class="fr-summary fr-search">
+                <xf:label ref="$form-resources/title/label"/>
+            </xf:output>
+            <xf:output id="description-control" bind="description-bind" class="fr-summary fr-search">
+                <xf:label ref="$form-resources/description/label"/>
+            </xf:output>
+        </xh:div>
+
         <xh:div class="fb-navbar navbar navbar-fixed-top">
             <xh:div class="navbar-inner">
                 <xh:div class="container">
@@ -238,16 +254,6 @@
                             </xh:div>
                         </xh:div>
                     </xh:div>
-                </xh:div>
-
-                <xh:div class="fr-hidden">
-                    <!-- Application name and form name for the summary page -->
-                    <xf:output id="application-name-control" bind="application-name-bind" class="fr-summary fr-search fr-static">
-                        <xf:label ref="$form-resources/application-name/label"/>
-                    </xf:output>
-                    <xf:output id="form-name-control" bind="form-name-bind" class="fr-summary fr-search fr-static">
-                        <xf:label ref="$form-resources/form-name/label"/>
-                    </xf:output>
                 </xh:div>
 
                 <xh:div class="container">

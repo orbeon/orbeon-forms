@@ -58,6 +58,9 @@ form.xforms-form .input-prepend .add-on {
 form.xforms-form .fr-grid tr th label {
   margin: 0;
 }
+form.xforms-form .table {
+  margin: 0;
+}
 form.xforms-form table th {
   font-weight: normal;
 }

@@ -73,7 +73,6 @@ body {
   -webkit-border-radius: 6px;
   -moz-border-radius: 6px;
   border-radius: 6px;
-  overflow: hidden;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
@@ -718,19 +717,17 @@ td.fb-selected:hover .fb-click-message {
   color: #808080;
 }
 /* ***** Message **************************************************************************************************** */
-.fr-messages {
+.fr-messages,
+.fb-xpath-errors {
   display: inline-block;
   float: left;
 }
-.fr-messages .alert {
+.fr-messages .alert,
+.fb-xpath-errors .alert {
+  display: block;
   margin: 0;
   padding-top: 5px;
   padding-bottom: 5px;
-}
-.fb-xpath-errors {
-  display: block;
-  float: left;
-  color: orange;
 }
 /* ***** Layout ***************************************************************************************************** */
 #fr-view {
@@ -779,9 +776,9 @@ td.fb-selected:hover .fb-click-message {
   background-image: linear-gradient(to bottom, #222222, #444444);
   background-repeat: repeat-x;
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff222222', endColorstr='#ff444444', GradientType=0);
-  -webkit-border-radius: 0;
-  -moz-border-radius: 0;
-  border-radius: 0;
+  -webkit-border-radius: 6px 6px 0 0;
+  -moz-border-radius: 6px 6px 0 0;
+  border-radius: 6px 6px 0 0;
 }
 .fb-main .navbar-inverse .navbar-inner .fb-language-triggers,
 .fb-main .navbar-inverse .navbar-inner .fb-form-settings-trigger {

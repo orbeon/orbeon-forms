@@ -410,9 +410,10 @@ body {
 }
 .fr-section-container .fr-section-content {
   display: block;
-  margin-left: 22px;
-  margin-right: 22px;
-  margin-bottom: .25em;
+  padding-left: 22px;
+  padding-right: 22px;
+  padding-top: 22px;
+  padding-bottom: 22px;
 }
 .fr-captcha {
   display: block;

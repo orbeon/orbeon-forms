@@ -79,7 +79,7 @@ body {
   background-image: linear-gradient(to bottom, #ffffff, #eeeeee);
   background-repeat: repeat-x;
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffffff', endColorstr='#ffeeeeee', GradientType=0);
-  margin: 1em 0;
+  margin: 0;
 }
 .xforms-form h2,
 .xforms-form h3,
@@ -96,7 +96,6 @@ body {
 }
 .xforms-form h2 {
   font-size: 20px;
-  margin: .5em 0 .5em 0;
 }
 .xforms-form h2 .fr-section-label {
   display: block;
@@ -107,7 +106,6 @@ body {
 .xforms-form h4 {
   font-size: 110%;
   line-height: 135%;
-  margin: 1em 0 1em 0;
 }
 /* ***** Other ****************************************************************************************************** */
 .fr-orbeon-version {
@@ -253,7 +251,6 @@ textarea.xforms-invalid-visited {
 /* Section */
 .xbl-fr-section {
   background-color: white;
-  overflow: hidden;
 }
 .xbl-fr-section .fr-section-title a {
   text-decoration: none;

@@ -152,7 +152,7 @@ object GridOps {
 
     private def newRow(grid: NodeInfo, size: Int): NodeInfo = {
         // Get as many fresh ids as there are tds
-        val ids = nextIds(grid, "tmp", size, useInstance = false).toIterator
+        val ids = nextIds(grid, "tmp", size).toIterator
 
         <xhtml:tr xmlns:xhtml="http://www.w3.org/1999/xhtml">{
             (1 to size) map (_ ⇒ <xhtml:td id={ids.next()}/>)
@@ -220,7 +220,7 @@ object GridOps {
         val allRowCells = getAllRowCells(grid)
         val pos = firstRowTd precedingSibling "*:td" size
 
-        val ids = nextIds(grid, "tmp", allRowCells.size, useInstance = false).toIterator
+        val ids = nextIds(grid, "tmp", allRowCells.size).toIterator
 
         allRowCells foreach { cells ⇒
             val cell = cells(pos)
@@ -248,7 +248,7 @@ object GridOps {
         } else {
             // First column: just insert plain tds as the first row
             val trs = grid \ "*:tr"
-            val ids = nextIds(grid, "tmp", trs.size, useInstance = false).toIterator
+            val ids = nextIds(grid, "tmp", trs.size).toIterator
 
             trs foreach { tr ⇒
                 insert(into = tr, origin = newTdElement(grid, ids.next()))
@@ -483,7 +483,7 @@ object GridOps {
 
         def annotate(token: String, elements: Seq[NodeInfo]) = {
             // Get as many fresh ids as there are tds
-            val ids = nextIds(doc, token, elements.size, useInstance = false).toIterator
+            val ids = nextIds(doc, token, elements.size).toIterator
 
             // Add the missing ids
             elements foreach (ensureAttribute(_, "id", ids.next()))

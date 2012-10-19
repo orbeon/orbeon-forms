@@ -20,7 +20,6 @@ import org.orbeon.oxf.fb.FormBuilderFunctions._
 import org.orbeon.oxf.fb.ControlOps._
 import org.orbeon.oxf.fb.GridOps._
 import org.orbeon.oxf.fb.ContainerOps._
-import org.orbeon.oxf.xml.TransformerUtils
 
 /*
  * Form Builder: toolbox operations.
@@ -171,13 +170,16 @@ object ToolboxOps {
 
         val (into, after, _) = findGridInsertionPoint(inDoc)
 
+        // Obtain ids first
+        val ids = nextIds(inDoc, "tmp", 2).toIterator
+
         // The grid template
         val gridTemplate: NodeInfo =
-            <fr:grid edit-ref="" id={nextId(inDoc, "tmp")}
+            <fr:grid edit-ref="" id={ids.next()}
                      xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
                      xmlns:xhtml="http://www.w3.org/1999/xhtml">
                 <xhtml:tr>
-                    <xhtml:td id={nextId(inDoc, "tmp", useInstance = false)}/>
+                    <xhtml:td id={ids.next()}/>
                 </xhtml:tr>
             </fr:grid>
 
@@ -198,6 +200,9 @@ object ToolboxOps {
         val newSectionName = controlName(nextId(inDoc, "section"))
         val precedingSectionName = after flatMap (getControlNameOption(_))
 
+        // Obtain ids first
+        val ids = nextIds(inDoc, "tmp", 2).toIterator
+
         // NOTE: use xxforms:update="full" so that xxf:dynamic can better update top-level XBL controls
         val sectionTemplate: NodeInfo =
             <fr:section id={controlId(newSectionName)} bind={bindId(newSectionName)} edit-ref="" xxforms:update="full"
@@ -209,9 +214,9 @@ object ToolboxOps {
                 <xforms:label ref={"$form-resources/" + newSectionName + "/label"}/>
                 <xforms:help ref={"$form-resources/" + newSectionName + "/help"}/>{
                 if (withGrid)
-                    <fr:grid edit-ref="" id={nextId(inDoc, "tmp")}>
+                    <fr:grid edit-ref="" id={ids.next()}>
                         <xhtml:tr>
-                            <xhtml:td id={nextId(inDoc, "tmp", useInstance = false)}/>
+                            <xhtml:td id={ids.next()}/>
                         </xhtml:tr>
                     </fr:grid>
             }</fr:section>
@@ -277,7 +282,7 @@ object ToolboxOps {
                      xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
                      xmlns:xhtml="http://www.w3.org/1999/xhtml">
                 <xhtml:tr>
-                    <xhtml:td id={nextId(inDoc, "tmp", useInstance = false)}/>
+                    <xhtml:td id={nextId(inDoc, "tmp")}/>
                 </xhtml:tr>
             </fr:grid>
 
@@ -289,7 +294,7 @@ object ToolboxOps {
             newGridElement,
             elementInfo(newGridName),
             Seq(),
-            grid flatMap (precedingControlNameInSectionForGrid(_, true))
+            grid flatMap (precedingControlNameInSectionForGrid(_, includeSelf = true))
         )
 
         // Make sure binds are created

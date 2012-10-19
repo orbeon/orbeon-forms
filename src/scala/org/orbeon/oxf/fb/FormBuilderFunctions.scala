@@ -81,7 +81,7 @@ object FormBuilderFunctions extends Logging {
     def templateRoot(inDoc: NodeInfo, templateName: String) = inlineInstanceRootElement(inDoc, templateId(templateName))
 
     // Find the next available id for a given token
-    def nextId(inDoc: NodeInfo, token: String, useInstance: Boolean = true) =
+    def nextId(inDoc: NodeInfo, token: String) =
         nextIds(inDoc, token, 1).head
 
     // Find a series of next available ids for a given token

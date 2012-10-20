@@ -112,11 +112,13 @@ object Controls {
         // NOTE: If we are unable to create a control (case of Model at least), this has no effect
         Option(XFormsControlFactory.createXFormsControl(container, parentOption.orNull, staticElement.element, effectiveId)) map {
             control ⇒
+                // Index the new control
+                // NOTE: We used to do this after evaluating the binding. In general it shouldn't hurt to do it here.
+                // The reason to move indexing before is that
+                controlIndex.indexControl(control)
+
                 // Determine binding
                 control.evaluateBinding(bindingContext, update = false)
-
-                // Index the new control
-                controlIndex.indexControl(control)
 
                 // Build the control's children if any
                 control.buildChildren(buildTree(controlIndex, _, _, Some(control), _, _), idSuffix)

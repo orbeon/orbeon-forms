@@ -64,9 +64,6 @@ class XFormsVariableControl(container: XBLContainer, parent: XFormsControl, elem
     override def evaluateChildFollowingBinding() {
         // NOTE: markDirtyImpl() has already been called
 
-        // Evaluate variable right away in case it is used by further bindings
-        evaluate()
-
         // Push variable value on the stack and remember it
         // NOTE: The following should be reasonably cheap, in case the variable had not been made dirty. It would be
         // nice to keep _bindingContextForChild/_bindingContextForFollowing if no reevaluation is needed, but then we

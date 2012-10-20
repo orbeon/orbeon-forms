@@ -101,23 +101,6 @@ public class ControlIndex {
                 || (isNoscript && control instanceof XFormsSelectControl && ((XFormsSelectControl) control).isFullAppearance());
     }
 
-    /**
-     * Evaluate all the given controls.
-     *
-     * Called during initial controls creation and for creation of repeat iterations.
-     *
-     * @param indentedLogger            logger
-     * @param controls                  controls to evaluate
-     */
-    public static void evaluateAll(IndentedLogger indentedLogger, Collection<XFormsControl> controls) {
-        indentedLogger.startHandleOperation("controls", "evaluating");
-        // Evaluate all controls
-        for (final XFormsControl control: controls) {
-            control.evaluate();
-        }
-        indentedLogger.endHandleOperation();
-    }
-
     public XFormsControl getControl(String effectiveId) {
         return effectiveIdsToControls.get(effectiveId);
     }

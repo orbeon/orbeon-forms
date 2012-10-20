@@ -49,6 +49,9 @@ trait ControlBindingSupport {
     // Evaluate the control's binding, either during create or update
     final def evaluateBinding(parentContext: BindingContext, update: Boolean) = {
         pushBinding(parentContext, update)
+        // NOTE: We should call evaluate only if relevant
+        //if (control.isRelevant)
+        evaluate()
         evaluateChildFollowingBinding()
     }
 
@@ -58,6 +61,9 @@ trait ControlBindingSupport {
         // ensure that the chain of bindings is consistent
         setBindingContext(getBindingContext.copy(parent = parentContext))
         markDirtyImpl(containingDocument.getXPathDependencies)
+        // NOTE: We should call evaluate only if relevant
+        //if (control.isRelevant)
+        evaluate()
         evaluateChildFollowingBinding()
     }
 

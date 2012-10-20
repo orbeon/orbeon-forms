@@ -95,7 +95,6 @@ public class ControlTree implements ExternalCopyable {
 
         // Evaluate all controls
         final Collection<XFormsControl> allControls = controlIndex.getEffectiveIdsToControls().values();
-        ControlIndex.evaluateAll(indentedLogger, allControls);
 
         // Dispatch initialization events for all controls created in index
         if (!containingDocument.isRestoringDynamicState()) {
@@ -368,9 +367,6 @@ public class ControlTree implements ExternalCopyable {
                 return true;
             }
         }, includeCurrent, true);
-
-        // Evaluate controls, passing directly all the controls
-        ControlIndex.evaluateAll(indentedLogger, effectiveIdsToControls.values());
 
         // Dispatch initialization events, passing the ids only
         dispatchRefreshEvents(effectiveIdsToControls.keySet());

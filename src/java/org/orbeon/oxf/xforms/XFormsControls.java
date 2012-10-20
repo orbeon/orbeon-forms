@@ -313,8 +313,6 @@ public class XFormsControls implements XFormsObjectResolver {
 
                 // Update control bindings
                 final Controls.BindingUpdater updater = updateControlBindings();
-                // Update control values
-                evaluateControlValues();
 
                 if (currentControlTree.isAllowSendingRefreshEvents()) {
                     // There are potentially event handlers for UI events, so do the whole processing
@@ -381,26 +379,6 @@ public class XFormsControls implements XFormsObjectResolver {
         }
     }
 
-    /**
-     * Evaluate all the control values.
-     *
-     */
-    private void evaluateControlValues() {
-
-        indentedLogger.startHandleOperation("controls", "evaluating");
-        {
-            final Map<String, XFormsControl> effectiveIdsToControls = getCurrentControlTree().getEffectiveIdsToControls();
-            // Evaluate all controls if needed
-            if (effectiveIdsToControls != null) {
-                for (final Map.Entry<String, XFormsControl> currentEntry: effectiveIdsToControls.entrySet()) {
-                    final XFormsControl currentControl = currentEntry.getValue();
-                    currentControl.evaluate();
-                }
-            }
-        }
-        indentedLogger.endHandleOperation();
-    }
-
     private List<String> gatherControlsForRefresh() {
 
         final List<String> eventsToDispatch = new ArrayList<String>();
@@ -429,15 +407,6 @@ public class XFormsControls implements XFormsObjectResolver {
 
         // Update bindings starting at the container control
         final Controls.BindingUpdater updater = updateSubtreeBindings(containerControl);
-
-        // Evaluate the controls
-        Controls.visitControls((XFormsControl) containerControl, new Controls.XFormsControlVisitorAdapter() {
-            @Override
-            public boolean startVisitControl(XFormsControl control) {
-                control.evaluate();
-                return true;
-            }
-        }, true, true);
 
         if (currentControlTree.isAllowSendingRefreshEvents()) {
             // There are potentially event handlers for UI events, so do the whole processing

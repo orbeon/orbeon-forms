@@ -71,7 +71,9 @@ $ ->
     # Function dealing with editables
     anyEditableSelector = _.pluck (_.values editables), 'selector'                                                      # CSS selectors for all the editables
     editable = (element) -> _.first _.filter (_.values editables), (e) -> f$.is '*', f$.findOrIs e.selector, element    # element: editable -> editable info
-    editableEditInput = (element) -> $ (editable element).editInputSelector                                             # Input field used for editing
+    editableEditInput = do ->                                                                                           # Input field used for editing
+        selectorToInput = _.memoize (selector) -> $ selector                                                            # Avoid "loosing" editors when HTML is replaced
+        (element) -> selectorToInput (editable element).editInputSelector
     editablePlaceholderOutput = (element) -> $ (editable element).placeholderOutputSelector                             # Element in which we put the placeholder
     editableInside = (selectorType, element) -> f$.findOrIs (editable element)[selectorType], element                   # Find an element inside a container element for a certain type of selector
     editablePlaceholderContainer = (element) -> editableInside 'placeholderContainerSelector', element

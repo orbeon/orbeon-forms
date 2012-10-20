@@ -20,28 +20,29 @@
 
 .fr-summary-search {
 
-    .xforms-label {
-        display: block;         // So control is not displayed next to the help icon but on a new line
-        /*margin-top: 0.3em;  *//* Insert some space between the label / help and the control */
-        /*clear: both;*/
-        margin-bottom: .1em;
+    .fr-search-free {
+        display: inline-block;
+
+        input {
+            width: 25em;
+        }
     }
 
-    .fr-summary-search-item { float: left; margin-right: .5em }
-    .fr-summary-search-item select, .fr-summary-search-item input { width: 12em }
+    .fr-search-options {
+        display: block; // so that search buttons will always be underneath
 
-    .fr-search-button-td { vertical-align: bottom; padding-left: 1em; }
-    .fr-search-options-td { vertical-align: middle; font-size: 77%; }
-    p { margin-bottom: 0 }
-    .fr-search-options-title { font-weight: bold; padding: .2em 0 1em 0; }
-    .fr-search-options-buttons { clear: both; padding: 1em 0 0 0; }
-    .fr-search-options-buttons a { vertical-align: middle; font-size: 77%; margin: 0 0 0 1em; }
-    .xforms-label { font-weight: normal; }
+        .fr-summary-search-item {
+            display: inline-block;
+            margin-bottom: @spacing;
 
-    .fr-search-input input {
-        padding: 3px 0 3px 3px; /* Make the input a bit bigger to look more proportional to the search button */
-        margin: 2px 0 0 0;
-        width: 25em; /* Wider text field, inspired by Gmail */
+            input, select {
+                width: 12em;
+            }
+        }
+    }
+
+    .fr-search-buttons {
+        display: inline-block;  // will be next to free search, but under search items
     }
 }
 

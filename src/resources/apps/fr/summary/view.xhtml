@@ -363,171 +363,137 @@
                             <xforms:send submission="search-submission"/>
                         </xforms:action>
 
-                        <xforms:switch>
+                        <xforms:switch id="search-switch">
                             <!-- Free-text search -->
                             <xforms:case id="search-free">
-                                <table class="fr-layout-table">
-                                    <tr>
-                                        <td class="fr-search-options-td">
-                                            <!-- Search field -->
-                                            <xforms:input ref="instance('fr-search-instance')/query" class="fr-search-input"/>
-                                        </td>
-                                        <td class="fr-search-button-td">
-                                            <!-- Search button -->
-                                            <xforms:trigger>
-                                                <xforms:label>
-                                                    <xhtml:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/search_16.png" alt=""/>
-                                                    <xforms:output value="$fr-resources/summary/search/search-forms"/>
-                                                </xforms:label>
-                                            </xforms:trigger>
-                                        </td>
-                                        <td class="fr-search-options-td">
-                                            <!-- Search options -->
-                                            <xforms:group ref=".[instance('fr-search-instance')/query[@path and @search-field = 'true']]">
-                                                <xforms:trigger appearance="minimal">
-                                                    <xforms:label ref="$fr-resources/summary/search/show-options"/>
-                                                    <xforms:action ev:event="DOMActivate">
-                                                        <xforms:setvalue iterate="instance('fr-search-instance')/query" ref="."/>
-                                                        <xforms:toggle case="search-options"/>
-                                                        <xforms:setfocus control="search-options"/>
-                                                    </xforms:action>
-                                                </xforms:trigger>
-                                            </xforms:group>
-                                        </td>
-                                    </tr>
-                                </table>
+                                <xhtml:div class="fr-search-free">
+                                    <xforms:input ref="instance('fr-search-instance')/query"/>
+                                </xhtml:div>
                             </xforms:case>
                             <!-- Search options -->
                             <xforms:case id="search-options">
-                                <xhtml:div class="fr-search-options-div">
+                                <xhtml:div class="fr-search-options">
                                     <!-- Special form builder search: use input or select1 for app/form name -->
-                                    <xforms:group ref=".[$is-form-builder and $has-roles]">
-                                        <div class="fr-summary-search-item">
-                                            <!-- Application -->
-                                            <xforms:group ref="$app-query">
-                                                <xforms:var name="label" value="formRunner:summaryLanguage(@name, $form-resources, @inline-label)"/>
-                                                <!-- Use an input if app name is a wildcard -->
-                                                <xforms:var name="is-input" value="xxforms:instance('fr-permissions')/app[@name = '*']" as="xs:boolean"/>
-                                                <xforms:input ref=".[$is-input]">
-                                                    <xforms:label>
-                                                        <xforms:output value="$label"/>
-                                                    </xforms:label>
-                                                </xforms:input>
-                                                <xforms:select1 ref=".[not($is-input)]">
-                                                    <xforms:label>
-                                                        <xforms:output value="$label"/>
-                                                    </xforms:label>
-                                                    <xforms:itemset model="fr-roles-model" ref="instance('fr-permissions')/app">
-                                                        <xforms:label ref="@name"/>
-                                                        <xforms:value ref="@name"/>
-                                                    </xforms:itemset>
 
-                                                    <xforms:action ev:event="xforms-value-changed">
-                                                        <!-- Clear dependent form, actual value is recalculated just before submission if needed -->
-                                                        <xforms:setvalue ref="$form-query"/>
+                                    <!-- Application -->
+                                    <xforms:group ref="$app-query[$is-form-builder and $has-roles]" class="fr-summary-search-item">
+                                        <xforms:var name="label" value="formRunner:summaryLanguage(@name, $form-resources, @inline-label)"/>
+                                        <!-- Use an input if app name is a wildcard -->
+                                        <xforms:var name="is-input" value="xxforms:instance('fr-permissions')/app[@name = '*']" as="xs:boolean"/>
+                                        <xforms:input ref=".[$is-input]">
+                                            <xforms:label>
+                                                <xforms:output value="$label"/>
+                                            </xforms:label>
+                                        </xforms:input>
+                                        <xforms:select1 ref=".[not($is-input)]">
+                                            <xforms:label>
+                                                <xforms:output value="$label"/>
+                                            </xforms:label>
+                                            <xforms:itemset model="fr-roles-model" ref="instance('fr-permissions')/app">
+                                                <xforms:label ref="@name"/>
+                                                <xforms:value ref="@name"/>
+                                            </xforms:itemset>
 
-                                                        <!-- Reset search selection and navigation -->
-                                                        <xforms:setvalue ref="instance('fr-selection-instance')" value="''"/>
-                                                        <xforms:setindex repeat="documents-repeat" index="1"/>
-                                                        <xforms:setvalue ref="instance('fr-search-instance')/page-number" value="1"/>
+                                            <xforms:action ev:event="xforms-value-changed">
+                                                <!-- Clear dependent form, actual value is recalculated just before submission if needed -->
+                                                <xforms:setvalue ref="$form-query"/>
 
-                                                        <xforms:send submission="search-submission"/>
-                                                    </xforms:action>
-                                                </xforms:select1>
-                                            </xforms:group>
-                                        </div>
-                                        <div class="fr-summary-search-item">
-                                            <!-- Form -->
-                                            <xforms:group ref="$form-query">
-                                                <xforms:var name="label" value="formRunner:summaryLanguage(@name, $form-resources, @inline-label)"/>
-                                                <xforms:var name="current-app" value="xxforms:instance('fr-permissions')/app[@name = $app-query]"/>
-                                                <!-- Use an input if app name or form name is a wildcard -->
-                                                <xforms:var name="is-input" value="xxforms:instance('fr-permissions')/app/@name = '*' or $current-app/form[@name = '*']" as="xs:boolean"/>
-                                                <xforms:input ref=".[$is-input]">
-                                                    <xforms:label>
-                                                        <xforms:output value="$label"/>
-                                                    </xforms:label>
-                                                </xforms:input>
-                                                <xforms:select1 ref=".[not($is-input)]">
-                                                    <xforms:label>
-                                                        <xforms:output value="$label"/>
-                                                    </xforms:label>
-                                                    <xforms:itemset ref="$current-app/form">
-                                                        <xforms:label ref="@name"/>
-                                                        <xforms:value ref="@name"/>
-                                                    </xforms:itemset>
+                                                <!-- Reset search selection and navigation -->
+                                                <xforms:setvalue ref="instance('fr-selection-instance')" value="''"/>
+                                                <xforms:setindex repeat="documents-repeat" index="1"/>
+                                                <xforms:setvalue ref="instance('fr-search-instance')/page-number" value="1"/>
 
-                                                    <!-- Update search results when selection changes -->
-                                                    <xforms:action ev:event="xforms-value-changed">
-                                                        <!-- Reset search selection and navigation -->
-                                                        <xforms:setvalue ref="instance('fr-selection-instance')" value="''"/>
-                                                        <xforms:setindex repeat="documents-repeat" index="1"/>
-                                                        <xforms:setvalue ref="instance('fr-search-instance')/page-number" value="1"/>
+                                                <xforms:send submission="search-submission"/>
+                                            </xforms:action>
+                                        </xforms:select1>
+                                    </xforms:group>
+                                    <!-- Form -->
+                                    <xforms:group ref="$form-query" class="fr-summary-search-item">
+                                        <xforms:var name="label" value="formRunner:summaryLanguage(@name, $form-resources, @inline-label)"/>
+                                        <xforms:var name="current-app" value="xxforms:instance('fr-permissions')/app[@name = $app-query]"/>
+                                        <!-- Use an input if app name or form name is a wildcard -->
+                                        <xforms:var name="is-input" value="xxforms:instance('fr-permissions')/app/@name = '*' or $current-app/form[@name = '*']" as="xs:boolean"/>
+                                        <xforms:input ref=".[$is-input]">
+                                            <xforms:label>
+                                                <xforms:output value="$label"/>
+                                            </xforms:label>
+                                        </xforms:input>
+                                        <xforms:select1 ref=".[not($is-input)]">
+                                            <xforms:label>
+                                                <xforms:output value="$label"/>
+                                            </xforms:label>
+                                            <xforms:itemset ref="$current-app/form">
+                                                <xforms:label ref="@name"/>
+                                                <xforms:value ref="@name"/>
+                                            </xforms:itemset>
 
-                                                        <xforms:send submission="search-submission"/>
-                                                    </xforms:action>
-                                                </xforms:select1>
-                                            </xforms:group>
-                                        </div>
+                                            <!-- Update search results when selection changes -->
+                                            <xforms:action ev:event="xforms-value-changed">
+                                                <!-- Reset search selection and navigation -->
+                                                <xforms:setvalue ref="instance('fr-selection-instance')" value="''"/>
+                                                <xforms:setindex repeat="documents-repeat" index="1"/>
+                                                <xforms:setvalue ref="instance('fr-search-instance')/page-number" value="1"/>
+
+                                                <xforms:send submission="search-submission"/>
+                                            </xforms:action>
+                                        </xforms:select1>
                                     </xforms:group>
                                     <!-- Structured search over query terms that have search-field set to 'true' -->
                                     <xforms:repeat ref="instance('fr-search-instance')/query[@path and @search-field = 'true']" id="search-repeat">
                                         <xforms:var name="control-name" value="@name"/>
-                                        <div class="fr-summary-search-item">
-                                            <xforms:var name="label" value="formRunner:summaryLanguage(@name, $form-resources, @inline-label)"/>
+                                        <xforms:var name="label" value="formRunner:summaryLanguage(@name, $form-resources, @inline-label)"/>
 
-                                            <xforms:group ref=".[not($is-form-builder and $has-roles and (contains(@path, 'application-name') or contains(@path, 'form-name')))]">
-                                                <!-- Regular search field (exclude app/form name if we are Form Builder and we have roles) -->
+                                        <xforms:group ref=".[not($is-form-builder and $has-roles and (contains(@path, 'application-name') or contains(@path, 'form-name')))]" class="fr-summary-search-item">
+                                            <!-- Regular search field (exclude app/form name if we are Form Builder and we have roles) -->
 
-                                                <!-- input -->
-                                                <xforms:input ref=".[@control = ('input', 'inplace-input')]">
-                                                    <xforms:label value="$label"/>
-                                                </xforms:input>
-                                                <!-- textarea -->
-                                                <xforms:input ref=".[@control = 'textarea']">
-                                                    <xforms:label value="$label"/>
-                                                </xforms:input>
-                                                <!-- select1 -->
-                                                <xforms:select1 ref=".[@control = 'select1']">
-                                                    <xforms:label value="$label"/>
-                                                    <xforms:item>
-                                                        <xforms:label ref="$fr-resources/summary/labels/any"/>
-                                                        <xforms:value/>
-                                                    </xforms:item>
-                                                    <xforms:itemset model="fr-persistence-model"
-                                                                    ref="$form-resources/*[local-name() = $control-name]/item"
-                                                                    xxforms:refresh-items="false">
-                                                        <xforms:label ref="label"/>
-                                                        <xforms:value ref="value"/>
-                                                    </xforms:itemset>
-                                                </xforms:select1>
-                                            </xforms:group>
-                                        </div>
+                                            <!-- input -->
+                                            <xforms:input ref=".[@control = ('input', 'inplace-input', 'output')]">
+                                                <xforms:label value="$label"/>
+                                            </xforms:input>
+                                            <!-- textarea -->
+                                            <xforms:input ref=".[@control = 'textarea']">
+                                                <xforms:label value="$label"/>
+                                            </xforms:input>
+                                            <!-- select1 -->
+                                            <xforms:select1 ref=".[@control = 'select1']">
+                                                <xforms:label value="$label"/>
+                                                <xforms:item>
+                                                    <xforms:label ref="$fr-resources/summary/labels/any"/>
+                                                    <xforms:value/>
+                                                </xforms:item>
+                                                <xforms:itemset model="fr-persistence-model"
+                                                                ref="$form-resources/*[local-name() = $control-name]/item"
+                                                                xxforms:refresh-items="false">
+                                                    <xforms:label ref="label"/>
+                                                    <xforms:value ref="value"/>
+                                                </xforms:itemset>
+                                            </xforms:select1>
+                                        </xforms:group>
                                     </xforms:repeat>
-                                    <xhtml:div class="fr-search-options-buttons">
-                                        <!-- Search button -->
-                                        <xforms:trigger>
-                                            <xforms:label>
-                                                <!--<xhtml:img width="10" height="14" src="/apps/fr/style/search.gif" alt=""/>-->
-                                                <xhtml:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/search_16.png" alt=""/>
-                                                <xforms:output value="$fr-resources/summary/search/search-forms"/>
-                                            </xforms:label>
-                                        </xforms:trigger>
-                                        <!-- Close search options -->
-                                        <xforms:trigger appearance="minimal">
-                                            <xforms:label ref="$fr-resources/summary/search/close-options"/>
-                                            <xforms:action ev:event="DOMActivate">
-                                                <xforms:setvalue iterate="instance('fr-search-instance')/query" ref="."/>
-                                                <xforms:toggle case="search-free"/>
-                                                <xforms:setfocus control="search-free"/>
-                                            </xforms:action>
-                                        </xforms:trigger>
-                                    </xhtml:div>
                                 </xhtml:div>
                             </xforms:case>
                         </xforms:switch>
 
-                        <div class="fr-clear"/>
+                        <xhtml:div class="fr-search-buttons">
+                            <xforms:trigger>
+                                <xforms:label>
+                                    <xhtml:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/search_16.png" alt=""/>
+                                    <xforms:output value="$fr-resources/summary/search/search-forms"/>
+                                </xforms:label>
+                            </xforms:trigger>
+                            <!-- Don't allow showing search options if there are no search fields specified -->
+                            <xforms:trigger appearance="minimal" ref=".[instance('fr-search-instance')/query[@path and @search-field = 'true']]">
+                                <!-- Switch label depending on which case is shown -->
+                                <xforms:label ref="$fr-resources/summary/search/(if (xxforms:case('search-switch') = 'search-free') then show-options else close-options)"/>
+                                <xforms:action ev:event="DOMActivate">
+                                    <!-- Clear all queries when switching -->
+                                    <xforms:setvalue iterate="instance('fr-search-instance')/query" ref="."/>
+                                    <!-- Switch the other case -->
+                                    <xforms:toggle case="search-{if (xxforms:case('search-switch') = 'search-free') then 'options' else 'free'}"/>
+                                    <xforms:setfocus control="search-switch"/>
+                                </xforms:action>
+                            </xforms:trigger>
+                        </xhtml:div>
                     </xforms:group>
 
                     <xforms:group ref="instance('fr-summary-instance')" xxforms:update="full">

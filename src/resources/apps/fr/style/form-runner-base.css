@@ -76,14 +76,6 @@ body {
 .fr-clear {
   clear: both;
 }
-.fr-layout-table {
-  padding: 0;
-  margin: 0;
-}
-.fr-layout-table tr td {
-  width: auto;
-  vertical-align: top;
-}
 /* ***** Portlet reset *********************************************************************************************** */
 .orbeon-portlet-body {
   font: 13px/1.231 arial, helvetica, clean, sans-serif;

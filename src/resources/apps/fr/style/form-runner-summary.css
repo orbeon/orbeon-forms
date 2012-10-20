@@ -17,58 +17,25 @@
   display: block;
   margin: 20px;
 }
-.fr-summary-search .xforms-label {
+.fr-summary-search .fr-search-free {
+  display: inline-block;
+}
+.fr-summary-search .fr-search-free input {
+  width: 25em;
+}
+.fr-summary-search .fr-search-options {
   display: block;
-  /*margin-top: 0.3em;  */
-  /* Insert some space between the label / help and the control */
-
-  /*clear: both;*/
-
-  margin-bottom: .1em;
 }
-.fr-summary-search .fr-summary-search-item {
-  float: left;
-  margin-right: 0.5em;
+.fr-summary-search .fr-search-options .fr-summary-search-item {
+  display: inline-block;
+  margin-bottom: 20px;
 }
-.fr-summary-search .fr-summary-search-item select,
-.fr-summary-search .fr-summary-search-item input {
+.fr-summary-search .fr-search-options .fr-summary-search-item input,
+.fr-summary-search .fr-search-options .fr-summary-search-item select {
   width: 12em;
 }
-.fr-summary-search .fr-search-button-td {
-  vertical-align: bottom;
-  padding-left: 1em;
-}
-.fr-summary-search .fr-search-options-td {
-  vertical-align: middle;
-  font-size: 77%;
-}
-.fr-summary-search p {
-  margin-bottom: 0;
-}
-.fr-summary-search .fr-search-options-title {
-  font-weight: bold;
-  padding: .2em 0 1em 0;
-}
-.fr-summary-search .fr-search-options-buttons {
-  clear: both;
-  padding: 1em 0 0 0;
-}
-.fr-summary-search .fr-search-options-buttons a {
-  vertical-align: middle;
-  font-size: 77%;
-  margin: 0 0 0 1em;
-}
-.fr-summary-search .xforms-label {
-  font-weight: normal;
-}
-.fr-summary-search .fr-search-input input {
-  padding: 3px 0 3px 3px;
-  /* Make the input a bit bigger to look more proportional to the search button */
-
-  margin: 2px 0 0 0;
-  width: 25em;
-  /* Wider text field, inspired by Gmail */
-
+.fr-summary-search .fr-search-buttons {
+  display: inline-block;
 }
 .fr-summary-table-div {
   overflow: auto;

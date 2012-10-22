@@ -155,6 +155,7 @@ $ ->
                 _.each _.range(sections.length), (pos) ->
                     title = f$.find '.fr-section-label a', $ sections[pos]
                     interceptor = labelClickInterceptors[pos]
+                    interceptor.show()                                          # Might be an interceptor that was previously hidden, and is now reused
                     interceptor.offset title.offset()
                     interceptor.height title.height()
                     interceptor.width title.width()

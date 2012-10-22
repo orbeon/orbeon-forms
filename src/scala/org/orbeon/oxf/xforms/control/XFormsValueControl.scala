@@ -199,21 +199,14 @@ abstract class XFormsValueControl(container: XBLContainer, parent: XFormsControl
         super.getBackCopy
     }
 
-    override def equalsExternal(other: XFormsControl): Boolean = {
-        if ((other eq null) || ! other.isInstanceOf[XFormsValueControl])
-            return false
-
-        if (this eq other)
-            return true
-
-        val otherValueControl = other.asInstanceOf[XFormsValueControl]
-
-        // Compare on external value, not internal value
-        if (getExternalValue != otherValueControl.getExternalValue)
-            return false
-
-        super.equalsExternal(other)
-    }
+    override def equalsExternal(other: XFormsControl): Boolean =
+        other match {
+            case other if this eq other ⇒ true
+            case other: XFormsValueControl ⇒
+                getExternalValue == other.getExternalValue &&
+                super.equalsExternal(other)
+            case _ ⇒ false
+        }
 
     override def performDefaultAction(event: XFormsEvent): Unit = event match {
         case xxformsValue: XXFormsValueEvent ⇒ storeExternalValue(xxformsValue.value)

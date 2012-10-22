@@ -218,6 +218,8 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
     // Allow override only for dangling XFormsOutputControl
     def isAllowedBoundItem(item: Item) = staticControl.isAllowedBoundItem(item)
 
+    // NOTE: We don't compare the type here anymore, because only some controls (xforms:input) need to tell the client
+    // about value type changes.
     override def equalsExternal(other: XFormsControl): Boolean =
         other match {
             case other if this eq other ⇒ true
@@ -225,7 +227,6 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
                 isReadonly == other.isReadonly &&
                 isRequired == other.isRequired &&
                 isValid    == other.isValid &&
-                valueType  == other.valueType &&
                 customMIPs == other.customMIPs &&
                 super.equalsExternal(other)
             case _ ⇒ false
@@ -302,15 +303,6 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
         if (isNewlyVisibleSubtree && !control2.isValid || control1 != null && control1.isValid != control2.isValid) {
             attributesImpl.addAttribute("", VALID_ATTRIBUTE_NAME, VALID_ATTRIBUTE_NAME, ContentHandlerHelper.CDATA, control2.isValid.toString)
             added = true
-        }
-        // Type attribute
-        {
-            val typeValue1 = if (isNewlyVisibleSubtree) null else control1.typeExplodedQName
-            val typeValue2 = control2.typeExplodedQName
-            if (isNewlyVisibleSubtree || !XFormsUtils.compareStrings(typeValue1, typeValue2)) {
-                val attributeValue = if (typeValue2 != null) typeValue2 else ""
-                added |= AjaxSupport.addOrAppendToAttributeIfNeeded(attributesImpl, "type", attributeValue, isNewlyVisibleSubtree, (attributeValue == "") || (XS_STRING_EXPLODED_QNAME == attributeValue) || (XFORMS_STRING_EXPLODED_QNAME == attributeValue))
-            }
         }
 
         // Custom MIPs

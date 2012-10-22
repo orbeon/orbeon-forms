@@ -370,7 +370,7 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:control id="id1" type="{http://www.w3.org/2001/XMLSchema}date">October 11, 2005</xxf:control>
-                        <xxf:control id="id2" type="{http://www.w3.org/2001/XMLSchema}date">11. Oktober 2005</xxf:control>
+                        <xxf:control id="id2">11. Oktober 2005</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>

@@ -22,9 +22,7 @@ import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsProperties
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis
-import org.orbeon.oxf.xforms.control.FocusableTrait
-import org.orbeon.oxf.xforms.control.XFormsControl
-import org.orbeon.oxf.xforms.control.XFormsValueControl
+import org.orbeon.oxf.xforms.control.{AjaxSupport, FocusableTrait, XFormsControl, XFormsValueControl}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.saxon.om.ValueRepresentation
@@ -33,6 +31,8 @@ import org.orbeon.saxon.value.DateValue
 import org.orbeon.saxon.value.StringValue
 import org.orbeon.saxon.value.TimeValue
 import scala.util.matching.Regex
+import org.xml.sax.helpers.AttributesImpl
+import org.orbeon.oxf.xml.XMLConstants._
 
 /**
  * Represents an xforms:input control.
@@ -180,9 +180,36 @@ class XFormsInputControl(container: XBLContainer, parent: XFormsControl, element
 
     def getSecondValueType =
         if (getBuiltinTypeName == "dateTime") "time" else null
+
+    // Also compare type
+    override def equalsExternal(other: XFormsControl) =
+        other match {
+            case other if this eq other ⇒ true
+            case other: XFormsInputControl ⇒
+                valueType == other.valueType &&
+                super.equalsExternal(other)
+            case _ ⇒ false
+        }
+
+    // Add type attribute if needed
+    override def addAjaxAttributes(attributesImpl: AttributesImpl, isNewlyVisibleSubtree: Boolean, other: XFormsControl): Boolean = {
+
+        var added = super.addAjaxAttributes(attributesImpl, isNewlyVisibleSubtree, other)
+
+        val typeValue1 = if (isNewlyVisibleSubtree) null else other.asInstanceOf[XFormsInputControl].typeExplodedQName
+        val typeValue2 = typeExplodedQName
+        if (isNewlyVisibleSubtree || typeValue1 != typeValue2) {
+            val attributeValue = if (typeValue2 ne null) typeValue2 else ""
+            added |= AjaxSupport.addOrAppendToAttributeIfNeeded(attributesImpl, "type", attributeValue, isNewlyVisibleSubtree, attributeValue == "" || StringQNames(attributeValue))
+        }
+
+        added
+    }
 }
 
 object XFormsInputControl {
+
+    val StringQNames = Set(XS_STRING_EXPLODED_QNAME, XFORMS_STRING_EXPLODED_QNAME)
 
     // List of attributes to handle as AVTs
     val ExtensionAttributes = Array(XXFORMS_SIZE_QNAME, XXFORMS_MAXLENGTH_QNAME, XXFORMS_AUTOCOMPLETE_QNAME)

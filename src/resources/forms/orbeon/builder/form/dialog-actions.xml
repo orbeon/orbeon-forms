@@ -19,6 +19,7 @@
       xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
       xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+      xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
       xmlns:saxon="http://saxon.sf.net/"
 
       id="fb-action-dialog" level="modal" close="true" draggable="true" model="fb-bindings-model">
@@ -39,7 +40,7 @@
             </xhtml:td>
             <xhtml:td>
                 <!-- Condition -->
-                <xforms:select1 ref="$instance/xforms:action/xforms:action[1]/@if">
+                <xforms:select1 ref="$instance/fb:action/xforms:action[1]/@if">
                     <xforms:label ref="$form-resources/dialog-actions/event-condition/label"/>
                     <xforms:itemset ref="$form-resources/dialog-actions/event-condition/item">
                         <xforms:label ref="label"/>
@@ -51,7 +52,7 @@
         <xhtml:tr>
             <xhtml:td>
                 <!-- React to -->
-                <xforms:select1 ref="$instance/xforms:action/xforms:action[1]/@ev:event">
+                <xforms:select1 ref="$instance/fb:action/xforms:action[1]/@ev:event">
                     <xforms:label ref="$form-resources/dialog-actions/event-type/label"/>
                     <xforms:hint ref="$form-resources/dialog-actions/event-type/hint"/>
                     <xforms:item>
@@ -66,7 +67,7 @@
             </xhtml:td>
             <xhtml:td>
                 <!-- Control -->
-                <xforms:select1 ref="$instance/xforms:action/xforms:action[1]/@ev:observer">`
+                <xforms:select1 ref="$instance/fb:action/xforms:action[1]/@ev:observer">`
                     <xforms:label ref="$form-resources/dialog-actions/event-control/label"/>
                     <xforms:item>
                         <xforms:label ref="$form-resources/select/label"/>
@@ -83,7 +84,7 @@
         <xhtml:tr>
             <xhtml:td>
                 <!-- Service to Call -->
-                <xforms:select1 ref="$instance/xforms:action/xforms:action[1]/xforms:send/@submission" id="fb-bindings-submission-select">
+                <xforms:select1 ref="$instance/fb:action/xforms:action[1]/xforms:send/@submission" id="fb-bindings-submission-select">
                     <xforms:label ref="$form-resources/dialog-actions/service-to-call/label"/>
                     <xforms:hint ref="$form-resources/dialog-actions/service-to-call/hint"/>
                     <xforms:item>
@@ -91,7 +92,7 @@
                         <xforms:value/>
                     </xforms:item>
                     <!-- Show submissions that are NOT yet used by a service. This is a current limitation. -->
-                    <xforms:itemset ref="$model/xforms:submission[ends-with(@id, '-submission') and not(@id = ../xforms:action[ends-with(@id, '-binding') and @id != concat($instance/initial-name, '-binding')]/xforms:action[1]/xforms:send/@submission)]">
+                    <xforms:itemset ref="$model/fb:submission[ends-with(@id, '-submission') and not(@id = ../fb:action[ends-with(@id, '-binding') and @id != concat($instance/initial-name, '-binding')]/xforms:action[1]/xforms:send/@submission)]">
                         <xforms:label value="substring-before(@id, '-submission')"/>
                         <xforms:value value="@id"/>
                     </xforms:itemset>
@@ -104,7 +105,7 @@
     <xhtml:div class="fr-grid">
         <xhtml:div class="fr-grid-content">
 
-            <xforms:group ref="$instance/xforms:action" appearance="xxforms:internal">
+            <xforms:group ref="$instance/fb:action" appearance="xxforms:internal">
 
                 <!-- Set request values -->
                 <xforms:group ref="xforms:action[@ev:event = 'xforms-submit']/xforms:action">
@@ -260,11 +261,11 @@
                 <xforms:action ev:event="DOMActivate">
 
                     <!-- Delete existing binding if any -->
-                    <xforms:var name="binding-id" value="$instance/xforms:action[1]/@id"/>
-                    <xforms:delete ref="$model/xforms:action[@id = $binding-id]"/>
+                    <xforms:var name="binding-id" value="$instance/fb:action[1]/@id"/>
+                    <xforms:delete ref="$model/fb:action[@id = $binding-id]"/>
 
                     <!-- Insert new binding -->
-                    <xforms:insert context="$model" ref="*" origin="$instance/xforms:action[1]"/>
+                    <xforms:insert context="$model" ref="*" origin="$instance/fb:action[1]"/>
 
                     <!-- Hide dialog -->
                     <xxforms:hide dialog="fb-action-dialog"/>
@@ -289,7 +290,7 @@
         <!-- Clear working values -->
         <xforms:setvalue ref="$instance/name"/>
         <xforms:setvalue ref="$instance/initial-name"/>
-        <xforms:delete ref="$instance/xforms:action"/>
+        <xforms:delete ref="$instance/fb:action"/>
 
         <!-- Empty binding if no binding id passed -->
         <xforms:action if="not($binding-name)">
@@ -301,10 +302,10 @@
             <xforms:setvalue ref="$instance/name" value="$binding-name"/>
             <xforms:setvalue ref="$instance/initial-name" value="$binding-name"/>
 
-            <xforms:insert ref="$instance/*" origin="$model/xforms:action[@id = $binding-id]"/>
+            <xforms:insert ref="$instance/*" origin="$model/fb:action[@id = $binding-id]"/>
 
             <!-- Insert condition on action if missing -->
-            <xforms:var name="action1" value="$instance/xforms:action/xforms:action[1]"/>
+            <xforms:var name="action1" value="$instance/fb:action/xforms:action[1]"/>
             <xforms:insert if="not(exists($action1/@if))" context="$action1" origin="xxforms:attribute('if', 'true()')"/>
         </xforms:action>
     </xforms:action>
@@ -314,7 +315,7 @@
 
         <xforms:var name="fb-lang" value="xxforms:instance('fb-language-instance')"/>
         <xforms:var name="model" value="xxforms:instance('fb-form-instance')/xhtml:head/xforms:model[@id = 'fr-form-model']"/>
-        <xforms:var name="resources" value="$model/xforms:instance[@id = 'fr-form-resources']/*"/>
+        <xforms:var name="resources" value="$model/fb:instance[@id = 'fr-form-resources']/*"/>
         <xforms:var name="current-resources" value="$resources/resource[@xml:lang = $fb-lang]"/>
 
         <xforms:instance id="fb-bindings-editor-instance">
@@ -323,7 +324,7 @@
                 <initial-name/>
                 <instance-id/>
                 <save-test-trigger/>
-                <xforms:action/>
+                <fb:action/>
             </bindings-editor>
         </xforms:instance>
 
@@ -334,7 +335,7 @@
         <xforms:bind ref="instance('fb-bindings-editor-instance')">
             <xforms:bind ref="name" type="xs:NCName" required="true()"
                          constraint="(normalize-space() != '' and normalize-space() = ../initial-name)
-                                        or not(../xforms:action[1]/@id = $model/xforms:action/@id)"/>
+                                        or not(../xforms:action[1]/@id = $model/fb:action/@id)"/>
             <xforms:bind ref="instance-id" calculate="concat(../name, '-instance')"/>
 
             <xforms:bind ref="xforms:action">

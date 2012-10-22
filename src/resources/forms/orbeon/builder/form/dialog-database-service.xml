@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <!--
   Copyright (C) 2010 Orbeon, Inc.
 
@@ -20,6 +19,7 @@
       xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
       xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+      xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
       xmlns:saxon="http://saxon.sf.net/"
 
       id="fb-database-service-dialog" level="modal" close="true" draggable="true" model="fb-database-service-model">
@@ -102,20 +102,20 @@
                     <xforms:var name="instance-id" value="$instance/instance-id"/>
 
                     <!-- Insert new submission if needed -->
-                    <xforms:action if="not(exists($model/xforms:submission[@id = $submission-id]))">
-                        <xforms:insert context="$model" ref="xforms:instance | xforms:submission" origin="instance('fb-database-submission-template')"/>
-                        <xforms:setvalue ref="$model/xforms:submission[last()]/@id" value="$submission-id"/>
+                    <xforms:action if="not(exists($model/fb:submission[@id = $submission-id]))">
+                        <xforms:insert context="$model" ref="fb:instance | fb:submission" origin="instance('fb-database-submission-template')"/>
+                        <xforms:setvalue ref="$model/fb:submission[last()]/@id" value="$submission-id"/>
                     </xforms:action>
-                    <xforms:var name="submission" value="$model/xforms:submission[@id = $submission-id]"/>
+                    <xforms:var name="submission" value="$model/fb:submission[@id = $submission-id]"/>
 
                     <!-- Insert new instance just before submission if needed -->
-                    <xforms:action if="not(exists($model/xforms:instance[@id = $instance-id]))">
+                    <xforms:action if="not(exists($model/fb:instance[@id = $instance-id]))">
                         <xforms:insert ref="$submission" position="before" origin="instance('fb-database-instance-template')"/>
-                        <xforms:setvalue ref="$submission/preceding-sibling::xforms:instance[1]/@id" value="$instance-id"/>
+                        <xforms:setvalue ref="$submission/preceding-sibling::fb:instance[1]/@id" value="$instance-id"/>
                     </xforms:action>
 
                     <!-- Set instance content -->
-                    <xforms:action context="$model/xforms:instance[@id = $instance-id]/*">
+                    <xforms:action context="$model/fb:instance[@id = $instance-id]/*">
                         <!-- Get query template -->
                         <xforms:var name="sql-query" value="xxforms:extract-document(instance('fb-database-query-template'), '#all')/*" as="element()"/>
                         <!-- Set datasource -->
@@ -156,9 +156,9 @@
         <xforms:action if="$submission-name">
             <xforms:setvalue ref="$instance/name" value="$submission-name"/>
             <xforms:setvalue ref="$instance/initial-name" value="$submission-name"/>
-            <xforms:var name="submission" value="$model/xforms:submission[@id = concat($submission-name, '-submission')]"/>
+            <xforms:var name="submission" value="$model/fb:submission[@id = concat($submission-name, '-submission')]"/>
             <!-- Get query -->
-            <xforms:var name="query-instance" value="$model/xforms:instance[@id = concat($submission-name, '-instance')]"/>
+            <xforms:var name="query-instance" value="$model/fb:instance[@id = concat($submission-name, '-instance')]"/>
             <xforms:action if="normalize-space($query-instance/*) != ''">
                 <!-- Assume there is a serialized query -->
                 <xforms:var name="sql-query" value="saxon:parse($query-instance/*)/*" as="element()"/>
@@ -197,8 +197,8 @@
             <!-- Make sure that the name is not already in use  -->
             <xforms:bind ref="name" type="xs:NCName"
                          constraint="(normalize-space() != '' and normalize-space() = ../initial-name)
-                                        or not(../submission-id = $model/xforms:submission/@id
-                                            or ../instance-id = $model/xforms:instance/@id)"/>
+                                        or not(../submission-id = $model/fb:submission/@id
+                                            or ../instance-id = $model/fb:instance/@id)"/>
             <xforms:bind ref="submission-id" calculate="concat(../name, '-submission')"/>
             <xforms:bind ref="instance-id" calculate="concat(../name, '-instance')"/>
             <!-- TODO: type of datasource. What's the format? jdbc/foobar? a/b/c? use regexp -->
@@ -213,16 +213,16 @@
 
         <!-- Template for the submission -->
         <xforms:instance id="fb-database-submission-template" xxforms:readonly="true" xxforms:exclude-result-prefixes="pipeline xhtml xs xsi xi xxi fr fb saxon xbl exforms">
-            <xforms:submission id="" class="fr-database-service" ref="instance('fr-service-request-instance')"
+            <fb:submission id="" class="fr-database-service" ref="instance('fr-service-request-instance')"
                    resource="/fr/service/custom/orbeon/database" method="post"
                    serialization="application/xml" replace="instance" instance="fr-service-response-instance"/>
         </xforms:instance>
 
         <!-- Template for inserting an instance -->
         <xforms:instance id="fb-database-instance-template" xxforms:readonly="true" xxforms:exclude-result-prefixes="pipeline xhtml xs xsi xi xxi fr fb saxon xbl exforms">
-            <xforms:instance id="" class="fr-database-service" xxforms:exclude-result-prefixes="#all">
+            <fb:instance id="" class="fr-database-service" xxforms:exclude-result-prefixes="#all">
                 <body/>
-            </xforms:instance>
+            </fb:instance>
         </xforms:instance>
 
         <!-- Template for the instance containing the SQL query -->

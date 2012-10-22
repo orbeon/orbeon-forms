@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <!--
   Copyright (C) 2010 Orbeon, Inc.
 
@@ -20,6 +19,7 @@
       xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
       xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+      xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
       xmlns:saxon="http://saxon.sf.net/"
 
       id="fb-service-dialog" level="modal" close="true" draggable="true" model="fb-service-model">
@@ -235,13 +235,13 @@
                     <xforms:var name="instance-id" value="$instance/instance-id"/>
 
                     <!-- Insert new submission if needed -->
-                    <xforms:action if="not(exists($model/xforms:submission[@id = $submission-id]))">
-                        <xforms:insert context="$model" ref="xforms:instance | xforms:submission" origin="instance('fb-submission-template')"/>
-                        <xforms:setvalue ref="$model/xforms:submission[last()]/@id" value="$submission-id"/>
+                    <xforms:action if="not(exists($model/fb:submission[@id = $submission-id]))">
+                        <xforms:insert context="$model" ref="fb:instance | fb:submission" origin="instance('fb-submission-template')"/>
+                        <xforms:setvalue ref="$model/fb:submission[last()]/@id" value="$submission-id"/>
                     </xforms:action>
 
                     <!-- Set submission properties -->
-                    <xforms:var name="submission" value="$model/xforms:submission[@id = $submission-id]"/>
+                    <xforms:var name="submission" value="$model/fb:submission[@id = $submission-id]"/>
                     <xforms:var name="request" value="$instance/request"/>
                     <xforms:action context="$submission">
                         <!-- TODO: couldn't we have the editor directly edit a submission? -->
@@ -263,13 +263,13 @@
                     </xforms:action>
 
                     <!-- Insert new instance just before submission if needed -->
-                    <xforms:action if="not(exists($model/xforms:instance[@id = $instance-id]))">
+                    <xforms:action if="not(exists($model/fb:instance[@id = $instance-id]))">
                         <xforms:insert ref="$submission" position="before" origin="instance('fb-instance-template')"/>
-                        <xforms:setvalue ref="$submission/preceding-sibling::xforms:instance[1]/@id" value="$instance-id"/>
+                        <xforms:setvalue ref="$submission/preceding-sibling::fb:instance[1]/@id" value="$instance-id"/>
                     </xforms:action>
 
                     <!-- Set instance document -->
-                    <xforms:action context="$model/xforms:instance[@id = $instance-id]">
+                    <xforms:action context="$model/fb:instance[@id = $instance-id]">
                         <!--<xforms:delete context="." ref="node()"/>-->
                         <!--<xforms:insert context="." origin="saxon:parse($request/body)"/>-->
                         <xforms:setvalue ref="*" value="$request/body"/>
@@ -313,16 +313,16 @@
             <xforms:setvalue ref="$instance/id" value="$submission-name"/>
             <xforms:setvalue ref="$instance/initial-id" value="$submission-name"/>
             
-            <xforms:var name="submission" value="$model/xforms:submission[@id = concat($submission-name, '-submission')]"/>
+            <xforms:var name="submission" value="$model/fb:submission[@id = concat($submission-name, '-submission')]"/>
             <xforms:setvalue ref="$instance/request/method" value="$submission/@method"/>
             <xforms:setvalue ref="$instance/request/serialization" value="$submission/@serialization"/>
             <xforms:setvalue ref="$instance/request/resource" value="$submission/@resource"/>
             <!--<xforms:setvalue ref="$instance/request/replace" value="$submission/@replace"/>-->
             <xforms:setvalue ref="$instance/request/body"
-                             value="$model/xforms:instance[@id = concat($submission-name, '-instance')]/*"/>
+                             value="$model/fb:instance[@id = concat($submission-name, '-instance')]/*"/>
 
             <!--<xforms:setvalue ref="$instance/request/body"-->
-                             <!--value="saxon:serialize(xxforms:extract-document($model/xforms:instance[@id = concat($submission-name, '-instance')]/*, '#all'), xxforms:instance('fr-xsl-output-instance'))"/>-->
+                             <!--value="saxon:serialize(xxforms:extract-document($model/fb:instance[@id = concat($submission-name, '-instance')]/*, '#all'), xxforms:instance('fr-xsl-output-instance'))"/>-->
 
             <!-- Extract SOAP action if there is one -->
             <xforms:var name="is-soap" value="contains($submission/@mediatype, 'application/soap+xml')" as="xs:boolean"/>
@@ -381,8 +381,8 @@
         <xforms:bind ref="instance('fb-submission-editor-instance')">
             <xforms:bind ref="id" type="xs:NCName" required="true()"
                          constraint="(normalize-space() != '' and normalize-space() = ../initial-id)
-                                        or not(../submission-id = $model/xforms:submission/@id
-                                            or ../instance-id = $model/xforms:instance/@id)"/>
+                                        or not(../submission-id = $model/fb:submission/@id
+                                            or ../instance-id = $model/fb:instance/@id)"/>
             <xforms:bind ref="submission-id" calculate="concat(../id, '-submission')"/>
             <xforms:bind ref="instance-id" calculate="concat(../id, '-instance')"/>
             <xforms:bind ref="request/resource" type="xs:anyURI" required="true()"/>
@@ -400,16 +400,16 @@
 
         <!-- Template for inserting a submission -->
         <xforms:instance id="fb-submission-template" xxforms:readonly="true" xxforms:exclude-result-prefixes="pipeline xhtml xs xsi xi xxi fr fb saxon xbl exforms">
-            <xforms:submission id="" class="fr-service" ref="instance('fr-service-request-instance')"
+            <fb:submission id="" class="fr-service" ref="instance('fr-service-request-instance')"
                                resource="" method="get" serialization="application/xml" mediatype="application/xml"
                                replace="instance" instance="fr-service-response-instance"/>
         </xforms:instance>
 
         <!-- Template for inserting an instance -->
         <xforms:instance id="fb-instance-template" xxforms:readonly="true" xxforms:exclude-result-prefixes="pipeline xhtml xs xsi xi xxi fr fb saxon xbl exforms">
-            <xforms:instance id="" class="fr-service" xxforms:exclude-result-prefixes="#all">
+            <fb:instance id="" class="fr-service" xxforms:exclude-result-prefixes="#all">
                 <body/>
-            </xforms:instance>
+            </fb:instance>
         </xforms:instance>
 
         <!-- Submission to test a service -->

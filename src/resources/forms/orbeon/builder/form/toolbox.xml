@@ -236,7 +236,7 @@
                 <xhtml:legend><xforms:output ref="$form-resources/http-services/label"/></xhtml:legend>
                 <!-- Repeat over existing services -->
                 <xhtml:ul>
-                    <xforms:repeat ref="$model/xforms:submission[ends-with(@id, '-submission') and tokenize(@class, '\s+') = 'fr-service']">
+                    <xforms:repeat ref="$model/fb:submission[ends-with(@id, '-submission') and tokenize(@class, '\s+') = 'fr-service']">
                         <xforms:var name="current-submission" value="."/>
                         <xhtml:li>
                             <xforms:var name="submission-name" value="substring-before(@id, '-submission')"/>
@@ -289,7 +289,7 @@
                 <xhtml:legend><xforms:output ref="$form-resources/database-services/label"/></xhtml:legend>
                 <!-- Repeat over existing services -->
                 <xhtml:ul>
-                    <xforms:repeat ref="$model/xforms:submission[ends-with(@id, '-submission') and tokenize(@class, '\s+') = 'fr-database-service']">
+                    <xforms:repeat ref="$model/fb:submission[ends-with(@id, '-submission') and tokenize(@class, '\s+') = 'fr-database-service']">
                         <xforms:var name="current-submission" value="."/>
                         <xhtml:li>
                             <xforms:var name="submission-name" value="substring-before(@id, '-submission')"/>
@@ -342,7 +342,7 @@
                 <xhtml:legend><xforms:output ref="$form-resources/actions/label"/></xhtml:legend>
                 <!-- Repeat over existing bindings -->
                 <xhtml:ul>
-                    <xforms:repeat ref="$model/xforms:action[ends-with(@id, '-binding')]">
+                    <xforms:repeat ref="$model/fb:action[ends-with(@id, '-binding')]">
                         <xforms:var name="current-action" value="."/>
                         <xhtml:li>
                             <xforms:var name="binding-name" value="substring-before(@id, '-binding')"/>

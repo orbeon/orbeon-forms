@@ -26,60 +26,67 @@
         xmlns:xbl="http://www.w3.org/ns/xbl"
         xmlns:formRunner="java:org.orbeon.oxf.fr.FormRunner">
 
-    <xsl:variable name="view"           select="/xhtml:html/xhtml:body/fr:view"     as="element(fr:view)?"/>
-    <xsl:variable name="body"           select="($view/fr:body, $view)[1]"          as="element()?"/>
-    <xsl:variable name="bottom"         select="$body/following-sibling::fr:bottom" as="element()?"/>
-    <xsl:variable name="custom-buttons" select="$bottom/fr:buttons"                 as="element()?"/>
+    <xsl:variable name="view"           select="(/xhtml:html/xhtml:body/fr:view)[1]" as="element(fr:view)?"/>
+    <xsl:variable name="body"           select="($view/fr:body, $view)[1]"           as="element()?"/>
+    <xsl:variable name="custom-buttons" select="$view/fr:buttons"                    as="element()*"/>
+    <xsl:variable name="custom-layout"  select="empty($body)"/>
 
-    <!-- This is a template for the default layout of a form -->
-    <xsl:variable name="default-page-template" as="element(fr:template)">
-        <fr:template>
-            <fr:navbar/>
-            <xhtml:div class="container">
-                <xhtml:p class="lead"><fr:description/></xhtml:p>
+    <!-- Template for the default layout of a form -->
+    <xsl:variable name="default-page-template" as="element(*)*">
+        <fr:navbar/>
+        <xhtml:div class="container">
+
+            <xhtml:p class="lead"><fr:description/></xhtml:p>
+
+            <!-- Error summary (if at top) -->
+            <xsl:if test="$error-summary-top">
+                <fr:error-summary position="top"/>
+            </xsl:if>
+
+            <xhtml:div class="row">
+                <fr:toc/>
             </xhtml:div>
-            <xhtml:div class="container">
+            <xhtml:div class="row">
+                <fr:body/>
+            </xhtml:div>
 
-                <!-- Error summary (if at top) -->
-                <xsl:if test="$error-summary-top">
-                    <fr:error-summary position="top"/>
+            <!-- Error summary (if at bottom) -->
+            <!-- If we configuration tells us the bottom error summary should not be shown, still include it but hide it with 'display: none'.
+                 This is necessary because the persistence model relies on the error summary to know if the data is valid. -->
+            <xhtml:div>
+                <xsl:if test="not($error-summary-bottom)">
+                    <xsl:attribute name="style">display: none</xsl:attribute>
                 </xsl:if>
-
-                <xhtml:div class="row">
-                    <fr:toc/>
-                </xhtml:div>
-                <xhtml:div class="row">
-                    <!-- Form content. Set context on form instance and define this group as #fr-form-group as observers will refer to it. -->
-                    <xforms:group id="fr-form-group" class="fr-body fr-border" model="fr-form-model" ref="instance('fr-form-instance')">
-                        <xhtml:a name="fr-form"/>
-                        <fr:default-body/>
-                        <fr:captcha/>
-                    </xforms:group>
-                </xhtml:div>
-
-                <!-- Error summary (if at bottom) -->
-                <!-- If we configuration tells us the bottom error summary should not be shown, still include it but hide it with 'display: none'.
-                     This is necessary because the persistence model relies on the error summary to know if the data is valid. -->
-                <xhtml:div>
-                    <xsl:if test="not($error-summary-bottom)">
-                        <xsl:attribute name="style">display: none</xsl:attribute>
-                    </xsl:if>
-                    <fr:error-summary position="bottom"/>
-                </xhtml:div>
-
-                <xhtml:div class="row">
-                    <fr:noscript-help/>
-                </xhtml:div>
-                <xhtml:div class="row">
-                    <fr:messages/>
-                </xhtml:div>
-                <fr:bottom-bar/>
-                <xhtml:div class="row">
-                    <fr:version/>
-                </xhtml:div>
+                <fr:error-summary position="bottom"/>
             </xhtml:div>
-        </fr:template>
+
+            <xhtml:div class="row">
+                <fr:noscript-help/>
+            </xhtml:div>
+            <xhtml:div class="row">
+                <fr:messages/>
+            </xhtml:div>
+            <fr:bottom-bar/>
+            <xhtml:div class="row">
+                <fr:version/>
+            </xhtml:div>
+        </xhtml:div>
     </xsl:variable>
+
+    <!-- Template for the default layout of the bottom bar -->
+    <xsl:variable name="default-bottom-template" as="element(*)*">
+        <fr:status-icons/>
+        <fr:buttons-bar/>
+    </xsl:variable>
+
+    <xsl:template match="fr:body">
+        <!-- Form content. Set context on form instance and define this group as #fr-form-group as observers will refer to it. -->
+        <xforms:group id="fr-form-group" class="fr-body{if ($is-detail) then ' fr-border' else ''}" model="fr-form-model" ref="instance('fr-form-instance')">
+            <xhtml:a name="fr-form"/>
+            <xsl:apply-templates select="if ($body) then $body/(node() except fr:buttons) else node()"/>
+            <fr:captcha/>
+        </xforms:group>
+    </xsl:template>
 
     <!-- Main entry point -->
     <xsl:template match="xhtml:body">
@@ -87,31 +94,8 @@
             <xsl:attribute name="class" select="string-join((if ($is-inline-hints) then 'xforms-disable-hint-as-tooltip' else (), 'xforms-disable-alert-as-tooltip', @class), ' ')"/>
             <xsl:apply-templates select="@* except @class"/>
             <xforms:group model="fr-form-model" id="fr-view" class="fr-view{concat(' fr-mode-', $mode)}">
-
-                <xsl:choose>
-                    <xsl:when test="exists($body)">
-                        <!-- Signals default layout -->
-                        <xsl:apply-templates select="$default-page-template/*"/>
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <!-- Custom layout (e.g. Form Builder) -->
-                        <xsl:apply-templates select="node()"/>
-                    </xsl:otherwise>
-                </xsl:choose>
-
+                <xsl:apply-templates select="if ($custom-layout) then node() else $default-page-template"/>
                 <xsl:call-template name="fr-hidden-controls"/>
-
-                <!--<xsl:choose>-->
-                    <!--<xsl:when test=".//fr:view">-->
-                        <!--&lt;!&ndash; Explicit fr:view is processed by template down the line &ndash;&gt;-->
-                        <!--<xsl:apply-templates select="node()"/>-->
-                    <!--</xsl:when>-->
-                    <!--<xsl:otherwise>-->
-                        <!--&lt;!&ndash; No explicit fr:view so consider the whole of xhtml:body as fr:view/fr:body &ndash;&gt;-->
-                        <!--<xsl:call-template name="fr-view"/>-->
-                    <!--</xsl:otherwise>-->
-                <!--</xsl:choose>-->
-                <!-- Dialogs -->
                 <xsl:call-template name="fr-dialogs"/>
             </xforms:group>
         </xsl:copy>
@@ -122,6 +106,9 @@
         <xhtml:div class="{string-join($header-classes, ' ')}">
             <xhtml:div class="navbar-inner">
                 <xhtml:div class="container">
+                    <!-- Copy width attribute on view if specified -->
+                    <xsl:copy-of select="$view/@width"/>
+
                     <xsl:if test="not($mode = ('email')) and not($hide-header)">
                         <xsl:choose>
                             <xsl:when test="$mode = 'view'">
@@ -150,13 +137,6 @@
                 </xhtml:div>
             </xhtml:div>
         </xhtml:div>
-    </xsl:template>
-
-    <xsl:template match="fr:default-body" name="fr-body">
-        <xsl:apply-templates select="$body/node()">
-            <!-- Dialogs are handled later -->
-            <xsl:with-param name="include-dialogs" select="false()" tunnel="yes" as="xs:boolean"/>
-        </xsl:apply-templates>
     </xsl:template>
 
     <xsl:template match="fr:hidden-controls" name="fr-hidden-controls">
@@ -402,26 +382,23 @@
     <xsl:template match="fr:dialogs"/>
 
     <xsl:template name="fr-dialogs">
-        <xforms:group id="fr-dialogs-group" appearance="xxforms:internal">
+        <!-- Copy custom dialogs under fr:dialogs only (other dialogs will be left in place) -->
+        <xsl:apply-templates select=".//fr:dialogs//xxforms:dialog"/>
 
-            <!-- Copy custom dialogs under fr:dialogs only (other dialogs will be left in place) -->
-            <xsl:apply-templates select=".//fr:dialogs//xxforms:dialog"/>
+        <!-- This model handles import/export -->
+        <xsl:if test="$buttons = ('save-locally')">
+            <xi:include href="oxf:/apps/fr/save-locally/save-locally-dialog.xml" xxi:omit-xml-base="true"/>
+        </xsl:if>
 
-            <!-- This model handles import/export -->
-            <xsl:if test="$buttons = ('save-locally')">
-                <xi:include href="oxf:/apps/fr/save-locally/save-locally-dialog.xml" xxi:omit-xml-base="true"/>
-            </xsl:if>
+        <!-- Misc standard dialogs -->
+        <xi:include href="oxf:/apps/fr/includes/clear-dialog.xhtml" xxi:omit-xml-base="true"/>
+        <xi:include href="oxf:/apps/fr/includes/submission-dialog.xhtml" xxi:omit-xml-base="true"/>
 
-            <!-- Misc standard dialogs -->
-            <xi:include href="oxf:/apps/fr/includes/clear-dialog.xhtml" xxi:omit-xml-base="true"/>
-            <xi:include href="oxf:/apps/fr/includes/submission-dialog.xhtml" xxi:omit-xml-base="true"/>
-
-            <!-- Error dialog -->
-            <fr:alert-dialog id="fr-error-dialog">
-                <fr:label ref="$fr-resources/detail/messages/error-dialog-title"/>
-                <fr:neutral-choice/>
-            </fr:alert-dialog>
-        </xforms:group>
+        <!-- Error dialog -->
+        <fr:alert-dialog id="fr-error-dialog">
+            <fr:label ref="$fr-resources/detail/messages/error-dialog-title"/>
+            <fr:neutral-choice/>
+        </fr:alert-dialog>
     </xsl:template>
 
     <!-- Noscript section help entry -->
@@ -559,18 +536,7 @@
 
     <xsl:template match="fr:bottom-bar">
         <xhtml:div class="row">
-            <xsl:choose>
-                <xsl:when test="$bottom">
-                    <xsl:apply-templates select="$bottom/node()"/>
-                </xsl:when>
-                <xsl:otherwise>
-                    <xsl:variable name="template" as="element()*">
-                        <fr:status-icons/>
-                        <fr:buttons-bar/>
-                    </xsl:variable>
-                    <xsl:apply-templates select="$template"/>
-                </xsl:otherwise>
-            </xsl:choose>
+            <xsl:apply-templates select="$default-bottom-template"/>
         </xhtml:div>
     </xsl:template>
 
@@ -601,20 +567,18 @@
                             <xforms:output mediatype="text/html" ref="$fr-resources/detail/messages/buttons-message"/>
                         </xhtml:div>
                         <!-- List of buttons we include based on property -->
-                        <xsl:variable name="default-buttons" as="element(fr:buttons)">
-                            <fr:buttons>
-                                <xsl:for-each select="$buttons">
-                                    <xsl:variable name="is-primary" select="position() = last()"/>
-                                    <xsl:element name="fr:{.}-button">
-                                        <xsl:if test="$is-primary">
-                                            <xsl:attribute name="appearance">xxforms:primary</xsl:attribute>
-                                        </xsl:if>
-                                    </xsl:element>
-                                    <xsl:text> </xsl:text>
-                                </xsl:for-each>
-                            </fr:buttons>
+                        <xsl:variable name="default-buttons" as="node()*">
+                            <xsl:for-each select="$buttons">
+                                <xsl:variable name="is-primary" select="position() = last()"/>
+                                <xsl:element name="fr:{.}-button">
+                                    <xsl:if test="$is-primary">
+                                        <xsl:attribute name="appearance">xxforms:primary</xsl:attribute>
+                                    </xsl:if>
+                                </xsl:element>
+                                <xsl:text> </xsl:text>
+                            </xsl:for-each>
                         </xsl:variable>
-                        <xsl:apply-templates select="$default-buttons/node()"/>
+                        <xsl:apply-templates select="$default-buttons"/>
                     </xsl:otherwise>
                 </xsl:choose>
             </xhtml:div>

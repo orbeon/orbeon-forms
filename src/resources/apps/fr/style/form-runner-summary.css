@@ -41,14 +41,9 @@
   overflow: auto;
   background: white;
 }
-.fr-summary-table-div .table {
+.fr-summary-table-div table {
   margin-bottom: 0;
-}
-.fr-summary-table-div tbody {
-  /* Links in table must appear as normal text */
-
-  /* When there is no link (delete-only), override YUI CSS that shows current row text in white */
-
+  max-width: none;
 }
 .fr-summary-table-div tbody a {
   text-decoration: none;
@@ -60,17 +55,17 @@
 }
 .fr-summary-table-div td {
   white-space: nowrap;
-  /* Mainly to prevent dates from wrapping */
 }
 .fr-summary-table-div td a {
-  /* Link to take as much space as possible in the cell */
-
   width: 100%;
   display: -moz-inline-box;
   display: inline-block;
   *zoom: 1;
   *display: inline;
   vertical-align: middle;
+}
+.fr-summary-table-div th {
+  white-space: nowrap;
 }
 .fr-summary-table-div .fr-summary-repeat-selection-checkbox {
   width: 1em;

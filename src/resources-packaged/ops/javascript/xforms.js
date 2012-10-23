@@ -2846,12 +2846,14 @@ ORBEON.xforms.Events = {
                             }
                         }
                     }
-                } else if (YAHOO.util.Dom.hasClass(target, "xforms-type-time")
-                        || (YAHOO.util.Dom.hasClass(target, "xforms-type-date") && !YAHOO.util.Dom.hasClass(target, "xforms-input-appearance-minimal"))
-                        || YAHOO.util.Dom.hasClass(target, "xforms-type-dateTime")) {
-
+                } else if (! $('body').is('.xforms-ios') &&
+                            (
+                                    YAHOO.util.Dom.hasClass(target, "xforms-type-time")
+                                || (YAHOO.util.Dom.hasClass(target, "xforms-type-date") && !YAHOO.util.Dom.hasClass(target, "xforms-input-appearance-minimal"))
+                                || YAHOO.util.Dom.hasClass(target, "xforms-type-dateTime")
+                            )
+                ) {
                     // For time, date, and dateTime fields, magic-parse field, and if recognized replace by display value
-
                     function toDisplayValue(input, magicToJSDate, jsDateToDisplay) {
                         var jsDate = magicToJSDate(input.value);
                         if (jsDate != null)

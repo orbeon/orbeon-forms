@@ -562,6 +562,10 @@ body {
 #fr-view .fr-grid .fr-grid-content .fr-width-3em select {
   width: 3em;
 }
+#fr-view .fr-grid .fr-grid-content .fr-width-4em input.xforms-input-input,
+#fr-view .fr-grid .fr-grid-content .fr-width-4em select {
+  width: 4em;
+}
 #fr-view .fr-grid .fr-grid-content .fr-width-5em input.xforms-input-input,
 #fr-view .fr-grid .fr-grid-content .fr-width-5em select {
   width: 5em;
@@ -585,6 +589,14 @@ body {
 #fr-view .fr-grid .fr-grid-content .fr-width-100pc input.xforms-input-input,
 #fr-view .fr-grid .fr-grid-content .fr-width-100pc select {
   width: 100%;
+}
+#fr-view .fr-grid .fr-grid-content .fr-width-2digits input.xforms-input-input,
+#fr-view .fr-grid .fr-grid-content .fr-width-2digits select {
+  width: 2.2em;
+}
+#fr-view .fr-grid .fr-grid-content .fr-width-4digits input.xforms-input-input,
+#fr-view .fr-grid .fr-grid-content .fr-width-4digits select {
+  width: 3.3em;
 }
 /* ***** View, PDF, email ******************************************************************************************* */
 pre.xforms-textarea,

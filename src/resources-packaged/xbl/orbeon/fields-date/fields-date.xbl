@@ -54,17 +54,9 @@
                 .xbl-fr-fields-date .xforms-control { display: inline; clear: none }
                 .xbl-fr-fields-date .fr-component-group img { vertical-align: bottom }
 
-                .xbl-fr-fields-date .fr-component-group .fr-width-2 input { width: 2em }
-                .xbl-fr-fields-date .fr-component-group .fr-width-4 input { width: 4em }
-                <!-- This is not very elegant but we need a strong rule to override the FR defaults -->
-                #doc .fr-grid .fr-grid-td .fr-grid-content .xbl-fr-fields-date .fr-component-group .fr-width-2 input { width: 2em }
-                #doc .fr-grid .fr-grid-td .fr-grid-content .xbl-fr-fields-date .fr-component-group .fr-width-4 input { width: 4em }
-                #doc2 .fr-grid .fr-grid-td .fr-grid-content .xbl-fr-fields-date .fr-component-group .fr-width-2 input { width: 2em }
-                #doc2 .fr-grid .fr-grid-td .fr-grid-content .xbl-fr-fields-date .fr-component-group .fr-width-4 input { width: 4em }
-                #doc3 .fr-grid .fr-grid-td .fr-grid-content .xbl-fr-fields-date .fr-component-group .fr-width-2 input { width: 2em }
-                #doc3 .fr-grid .fr-grid-td .fr-grid-content .xbl-fr-fields-date .fr-component-group .fr-width-4 input { width: 4em }
-                #doc4 .fr-grid .fr-grid-td .fr-grid-content .xbl-fr-fields-date .fr-component-group .fr-width-2 input { width: 2em }
-                #doc4 .fr-grid .fr-grid-td .fr-grid-content .xbl-fr-fields-date .fr-component-group .fr-width-4 input { width: 4em }
+                <!-- For use outside of Form Runner -->
+                .fr-width-2digits input.xforms-input-input { width: 2.2em }
+                .fr-width-4digits input.xforms-input-input { width: 3.3em }
             </xbl:style>
         </xbl:resources>
         <xbl:implementation>
@@ -125,9 +117,9 @@
                 <xf:group ref=".[not(is-readonly = 'true' and property('xxf:readonly-appearance') = 'static')]">
                     <!-- Don't show fields at all in static readonly mode -->
                     <!-- NOTE: navindex is copied to first field, but need one for second field too! -->
-                    <xf:input ref="month" class="fr-width-2" xbl:attr="navindex navindex=tabindex"/>
-                    <xf:input ref="day"   class="fr-width-2"/>
-                    <xf:input ref="year"  class="fr-width-4"/>
+                    <xf:input ref="month" class="fr-width-2digits" xbl:attr="navindex navindex=tabindex"/>
+                    <xf:input ref="day"   class="fr-width-2digits"/>
+                    <xf:input ref="year"  class="fr-width-4digits"/>
                 </xf:group>
 
                 <!-- React to update to local values -->

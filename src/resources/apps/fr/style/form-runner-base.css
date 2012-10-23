@@ -445,19 +445,20 @@ body {
 .fr-grid .xforms-input input.xforms-type-time {
   width: 7.5em;
 }
-.fr-grid .fr-grid-content {
-  padding: 4px;
-  *padding-right: 6px;
-}
-.fr-grid .fr-grid-content .xforms-help-image {
+.fr-grid .xforms-help-image {
   float: left;
-  margin-right: 3px;
+  padding-top: 2px;
+  padding-right: 3px;
 }
-.fr-grid .fr-grid-content .xforms-label {
+.fr-grid .xforms-label {
   margin-bottom: .5em;
   display: block;
   overflow: hidden;
   zoom: 1;
+}
+.fr-grid .fr-grid-content {
+  padding: 4px;
+  *padding-right: 6px;
 }
 .fr-repeat-table .fr-grid-content {
   padding-top: 0;

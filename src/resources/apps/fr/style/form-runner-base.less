@@ -357,23 +357,24 @@ body { padding-top: 40px } // if using navbar-fixed-top
         }
     }
 
+    .xforms-help-image {
+        float: left;
+        padding-top: (@baseLineHeight - 16)/2;      // Vertically center help image on first line
+        padding-right: 3px;
+    }
+
+    .xforms-label {
+        margin-bottom: .5em;                        // Insert some space between the label / help and the control (we add spacing below the label rather
+                                                    // than above the control to make the CSS more generally applicable to XBL components)
+        display: block;                             // Content after the label to show on a "new line"
+        overflow: hidden;                           // So the block area doesn't extend below the floated help, when there is one. Also see http://bit.ly/ruAKSU
+        zoom: 1;                                    // For the overflow: hidden to have an effect on IE6
+    }
+
     // Cell content
     .fr-grid-content {
-        padding: 4px;                   // Add some space around control
-        *padding-right: 6px;            // To help IE move back controls within .fr-grid-content
-
-        .xforms-help-image {
-            float: left;
-            margin-right: 3px;
-        }
-
-        .xforms-label {
-            margin-bottom: .5em;        // Insert some space between the label / help and the control (we add spacing below the label rather
-                                        // than above the control to make the CSS more generally applicable to XBL components)
-            display: block;             // Content after the label to show on a "new line"
-            overflow: hidden;           // So the block area doesn't extend below the floated help, when there is one. Also see http://bit.ly/ruAKSU
-            zoom: 1;                    // For the overflow: hidden to have an effect on IE6
-        }
+        padding: 4px;                               // Add some space around control
+        *padding-right: 6px;                        // To help IE move back controls within .fr-grid-content
     }
 }
 

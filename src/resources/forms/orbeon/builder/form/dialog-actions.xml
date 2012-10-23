@@ -379,7 +379,7 @@
 
         <!-- Template for a given binding -->
         <xforms:instance id="fb-binding-template" xxforms:readonly="true" xxforms:exclude-result-prefixes="pipeline xhtml xsi xi xxi fr fb saxon xbl exforms">
-            <xforms:action id="">
+            <fb:action id="">
                 <!-- React to event... on control... -->
                 <xforms:action ev:event="" ev:observer="" if="true()">
                     <!-- Service to call -->
@@ -401,7 +401,7 @@
                 <xforms:action ev:event="xforms-submit-done" ev:observer="SET ME" context="instance('fr-service-response-instance')">
                     <!-- Response actions will be here -->
                 </xforms:action>
-            </xforms:action>
+            </fb:action>
         </xforms:instance>
 
         <!-- Template for actions -->

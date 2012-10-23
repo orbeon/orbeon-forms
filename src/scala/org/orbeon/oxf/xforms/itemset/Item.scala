@@ -48,9 +48,15 @@ case class Item(label: Label, value: String, attributes: Map[QName, String])(val
     def javaScriptLabel(locationData: LocationData) =
         Option(label) map (_.javaScriptValue(locationData)) getOrElse ""
 
-    // Implement deep equals because children is not part of the case class
+    // Implement equals by hand because children are not part of the case class
+    // NOTE: The compiler does not generate equals for case classes that come with an equals! So can't use super to
+    // reach compiler-generated case class equals.
     override def equals(other: Any) = other match {
-        case otherItem: Item ⇒ super.equals(otherItem) && children == otherItem.children
+        case other: Item ⇒
+            label      == other.label      &&
+            value      == other.value      &&
+            attributes == other.attributes &&
+            super.equals(other)
         case _ ⇒ false
     }
 }

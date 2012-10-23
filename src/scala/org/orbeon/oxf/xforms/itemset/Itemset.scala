@@ -165,12 +165,6 @@ class Itemset(multiple: Boolean) extends ItemContainer {
 
         treeBuilder.getCurrentRoot.asInstanceOf[DocumentInfo]
     }
-
-    // Implement deep equals
-    override def equals(other: Any) = other match {
-        case otherItemset: Itemset ⇒ children == otherItemset.children
-        case _ ⇒ false
-    }
 }
 
 object Itemset {

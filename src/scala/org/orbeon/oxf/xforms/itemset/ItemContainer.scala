@@ -76,5 +76,11 @@ trait ItemContainer {
 
     def jAllItemsIterator = allItemsIterator.asJava
 
+    // Implement deep equals
+    override def equals(other: Any) = other match {
+        case other: ItemContainer ⇒ _children == other._children
+        case _ ⇒ false
+    }
+
     private def selfItem = if (this.isInstanceOf[Item]) this.asInstanceOf[Item] else null
 }

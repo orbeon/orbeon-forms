@@ -329,7 +329,23 @@ body { padding-top: 40px } // if using navbar-fixed-top
 
 .fr-grid {
 
-    select, textarea, input {
+    select,
+    textarea,
+    input[type="text"],             // Like Boostrap, use all the specific types to exclude checkbox/radio
+    input[type="password"],
+    input[type="datetime"],
+    input[type="datetime-local"],
+    input[type="date"],
+    input[type="month"],
+    input[type="time"],
+    input[type="week"],
+    input[type="number"],
+    input[type="email"],
+    input[type="url"],
+    input[type="search"],
+    input[type="tel"],
+    input[type="color"],
+    .uneditable-input {
         width: 100%;
     }
 
@@ -337,7 +353,7 @@ body { padding-top: 40px } // if using navbar-fixed-top
     width: 100%;
 
     .xforms-textarea textarea {
-        width: 100%;    // it's a reasonable default for textareas to be very wide
+        width: 100%;                // It's a reasonable default for textareas to be very wide
         height: 70px;
     }
 
@@ -387,32 +403,6 @@ body { padding-top: 40px } // if using navbar-fixed-top
     }
 }
 
-// Checkboxes and radio buttons
-.xforms-select1-appearance-full span {
-    &.xforms-deselected, &.xforms-selected { display: block; clear: both }
-    label { margin-right: 1em }
-}
-
-.xforms-select-appearance-full span.xforms-deselected, .xforms-select-appearance-full span.xforms-selected { display: block; clear: both }
-.xforms-select-appearance-full span label { margin-right: 1em }
-
-.xforms-select-appearance-full span label, .xforms-select1-appearance-full span label {
-    display: block;
-    padding-left: 17px;
-    text-indent: -17px;
-}
-
-.xforms-select-appearance-full span label input, .xforms-select1-appearance-full span label input  {
-    width: 13px;
-    height: 13px;
-    padding: 0;
-    margin: 0 4px 0 0;
-    vertical-align: bottom;
-    position: relative;
-    top: -1px;
-    *overflow: hidden;
-}
-
 .fr-grid {
 
     // But for boolean inputs, don't size (for IE)
@@ -429,8 +419,10 @@ body { padding-top: 40px } // if using navbar-fixed-top
     .xforms-mediatype-image img { display: block }
 
     //  Buttons
-    .fr-grid-content .xforms-trigger button, .fr-grid-content .xforms-trigger input { margin-top: 1.72em } // hand-tuned so it appears at about the same pos as input fields
-    .fr-grid-content .xforms-trigger button, .fr-grid-content .yui-button .xforms-trigger input { margin-top: 0 } // except YUI buttons don't appear right with top margin!
+    .fr-grid-content {
+        .xforms-trigger button, .xforms-trigger input { margin-top: 1.72em } // hand-tuned so it appears at about the same pos as input fields
+        .xforms-trigger button, .yui-button .xforms-trigger input { margin-top: 0 } // except YUI buttons don't appear right with top margin!
+    }
 
     // Cell widths
     .fr-grid-td {

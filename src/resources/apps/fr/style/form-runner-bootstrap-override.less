@@ -28,12 +28,41 @@ form.xforms-form {
     float: none;
     margin: 0;
 
-    select, textarea, input {
+    select,
+    textarea,
+    input[type="text"],             // Like Boostrap, use all the specific types to exclude checkbox/radio
+    input[type="password"],
+    input[type="datetime"],
+    input[type="datetime-local"],
+    input[type="date"],
+    input[type="month"],
+    input[type="time"],
+    input[type="week"],
+    input[type="number"],
+    input[type="email"],
+    input[type="url"],
+    input[type="search"],
+    input[type="tel"],
+    input[type="color"],
+    .uneditable-input {
         margin-bottom: 0;           // Override default 9px bottom margin added by Bootstrap
         color: black;               // Make text inside the fields stand out, as this is the most important information
         .box-sizing(border-box);    // Because we change this, the height must be changed as well below
         height: @baseLineHeight + 8px;
     }
+
+    // Copy rules for .radio and .checkbox, but use xforms-select1-appearance-full and xforms-select-appearance-full
+    .xforms-items {
+        label {
+          min-height: 18px;
+          padding-left: 18px;
+        }
+        input[type="radio"],
+        input[type="checkbox"] {
+          float: left;
+          margin-left: -18px;
+        }
+}
 
     .input-append .add-on, .input-prepend .add-on {
         height: 18px;

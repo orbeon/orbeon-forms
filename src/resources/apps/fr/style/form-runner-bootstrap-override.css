@@ -43,13 +43,36 @@ form.xforms-form {
 }
 form.xforms-form select,
 form.xforms-form textarea,
-form.xforms-form input {
+form.xforms-form input[type="text"],
+form.xforms-form input[type="password"],
+form.xforms-form input[type="datetime"],
+form.xforms-form input[type="datetime-local"],
+form.xforms-form input[type="date"],
+form.xforms-form input[type="month"],
+form.xforms-form input[type="time"],
+form.xforms-form input[type="week"],
+form.xforms-form input[type="number"],
+form.xforms-form input[type="email"],
+form.xforms-form input[type="url"],
+form.xforms-form input[type="search"],
+form.xforms-form input[type="tel"],
+form.xforms-form input[type="color"],
+form.xforms-form .uneditable-input {
   margin-bottom: 0;
   color: black;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
   height: 28px;
+}
+form.xforms-form .xforms-items label {
+  min-height: 18px;
+  padding-left: 18px;
+}
+form.xforms-form .xforms-items input[type="radio"],
+form.xforms-form .xforms-items input[type="checkbox"] {
+  float: left;
+  margin-left: -18px;
 }
 form.xforms-form .input-append .add-on,
 form.xforms-form .input-prepend .add-on {

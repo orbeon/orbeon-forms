@@ -423,7 +423,21 @@ body {
 }
 .fr-grid select,
 .fr-grid textarea,
-.fr-grid input {
+.fr-grid input[type="text"],
+.fr-grid input[type="password"],
+.fr-grid input[type="datetime"],
+.fr-grid input[type="datetime-local"],
+.fr-grid input[type="date"],
+.fr-grid input[type="month"],
+.fr-grid input[type="time"],
+.fr-grid input[type="week"],
+.fr-grid input[type="number"],
+.fr-grid input[type="email"],
+.fr-grid input[type="url"],
+.fr-grid input[type="search"],
+.fr-grid input[type="tel"],
+.fr-grid input[type="color"],
+.fr-grid .uneditable-input {
   width: 100%;
 }
 .fr-grid .xforms-textarea textarea {
@@ -464,39 +478,6 @@ body {
 .fr-repeat-table .fr-grid-content {
   padding-top: 0;
   padding-bottom: 0;
-}
-.xforms-select1-appearance-full span.xforms-deselected,
-.xforms-select1-appearance-full span.xforms-selected {
-  display: block;
-  clear: both;
-}
-.xforms-select1-appearance-full span label {
-  margin-right: 1em;
-}
-.xforms-select-appearance-full span.xforms-deselected,
-.xforms-select-appearance-full span.xforms-selected {
-  display: block;
-  clear: both;
-}
-.xforms-select-appearance-full span label {
-  margin-right: 1em;
-}
-.xforms-select-appearance-full span label,
-.xforms-select1-appearance-full span label {
-  display: block;
-  padding-left: 17px;
-  text-indent: -17px;
-}
-.xforms-select-appearance-full span label input,
-.xforms-select1-appearance-full span label input {
-  width: 13px;
-  height: 13px;
-  padding: 0;
-  margin: 0 4px 0 0;
-  vertical-align: bottom;
-  position: relative;
-  top: -1px;
-  *overflow: hidden;
 }
 .fr-grid .xforms-type-boolean input {
   width: auto;

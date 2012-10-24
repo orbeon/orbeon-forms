@@ -616,7 +616,7 @@
         <xsd:complexType>
             <xsd:attributeGroup ref="xforms:Common.Attributes"/>
             <xsd:attribute name="name" type="xsd:NMTOKEN" use="required"/>
-            <xsd:attribute name="target" type="xsd:IDREF" use="required"/>
+            <xsd:attribute name="targetid" type="xsd:IDREF" use="required"/>
             <xsd:attribute name="bubbles" type="xsd:boolean" use="optional" default="true"/>
             <xsd:attribute name="cancelable" type="xsd:boolean" use="optional" default="true"/>
             <xsd:attributeGroup ref="xforms:XML.Events"/>

@@ -137,7 +137,7 @@
                     <xsl:param name="default" as="xs:string"/>
                     <xsl:param name="handler" as="xs:string"/>
                     <xsl:variable name="fr-label" as="element(fr:label)?" select="$content/self::fr:label"/>
-                    <xforms:trigger ref="." xxbl:scope="outer">
+                    <xforms:trigger xxbl:scope="outer">
                         <xforms:label>
                             <xsl:if test="$handler = 'positive'"><xhtml:img src="/apps/fr/style/images/silk/tick.png" alt=""/></xsl:if>
                             <xsl:if test="$handler = 'negative'"><xhtml:img src="/apps/fr/style/images/silk/cross.png" alt=""/></xsl:if>

@@ -109,7 +109,7 @@ html body .xforms-form tr.xforms-disabled,
 .xforms-help-image {
     display: -moz-inline-box;
     display: inline-block;
-    margin-left: .2em;
+    margin-left: 0;
     vertical-align: middle;
     width: 16px;
     height: 16px;

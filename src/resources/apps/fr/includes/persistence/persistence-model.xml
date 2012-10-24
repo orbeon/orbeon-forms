@@ -172,8 +172,9 @@
         <!-- Perform refresh (above sets RRR flags already) so that after that we can clear error summary -->
         <xf:refresh/>
 
-        <!-- Clear error summary -->
+        <!-- Clear error summary and focus -->
         <xf:dispatch name="fr-unvisit-all" targetid="fr-error-summary-model"/>
+        <xf:setfocus control="fr-form-group" input-only="true"/>
     </xf:action>
 
     <!-- New document operation -->

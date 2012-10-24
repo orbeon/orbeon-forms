@@ -15,7 +15,7 @@
 
 .fr-summary-search, .fr-summary-table-div, .fr-summary-search-count {
     display: block;
-    margin: @spacing;   // use margin so we have margin collapsing
+    margin: @spacing 0;   // use margin so we have margin collapsing
 }
 
 .fr-summary-search {
@@ -102,6 +102,15 @@
 
 .pagination {
     margin-top: 0;
+    margin-bottom: 0;
+    float: left;
+}
+
+.fr-buttons {
+    display: block;
+    float: right;
+    margin-top: 7px;
+    margin-bottom: 0;
 }
 
 .xforms-readonly input { background-color: white; background-image: none; border: 0 solid white }

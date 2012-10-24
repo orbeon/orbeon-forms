@@ -62,11 +62,10 @@
 .fr-status-icons img {
   margin-left: 3px;
 }
-#fr-view .fr-body {
+.fr-body {
   display: block;
-  padding: 0;
 }
-#fr-view .fr-body h2 {
+.fr-body h2 {
   margin-top: 0;
 }
 body {
@@ -277,7 +276,6 @@ body {
 }
 .fr-buttons {
   float: right;
-  text-align: right;
   margin-bottom: 1em;
   /* Space between the image and the text in a button, only for the buttons bar
        (not other buttons in the form which might contain just an image) */
@@ -486,7 +484,7 @@ body {
   width: auto;
 }
 .fr-grid .xforms-select1-appearance-compact select,
-.fr-grid .fr-grid .xforms-select-appearance-compact select {
+.fr-grid .xforms-select-appearance-compact select {
   height: 6em;
 }
 .fr-grid .xforms-mediatype-image {

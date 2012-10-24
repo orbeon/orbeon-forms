@@ -30,10 +30,8 @@
   img { margin-left: 3px; }
 }
 
-#fr-view .fr-body {
+.fr-body {
     display: block;
-    padding: 0;
-
     h2 { margin-top: 0; }
 }
 
@@ -208,7 +206,6 @@ body { padding-top: 40px } // if using navbar-fixed-top
 
 .fr-buttons {
     float: right;
-    text-align: right;
     margin-bottom: 1em;
 
     /* Space between the image and the text in a button, only for the buttons bar
@@ -411,7 +408,7 @@ body { padding-top: 40px } // if using navbar-fixed-top
     }
 
     .xforms-upload input { width: auto } // The upload field responds to 100% width on IE, which gives strange result
-        .xforms-select1-appearance-compact select, .fr-grid .xforms-select-appearance-compact select { height: 6em }
+        .xforms-select1-appearance-compact select, .xforms-select-appearance-compact select { height: 6em }
 
     // Image output
     .xforms-mediatype-image { width: 100%; overflow: auto; display: block }

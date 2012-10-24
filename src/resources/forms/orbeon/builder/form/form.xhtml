@@ -259,9 +259,8 @@
                 <xh:div class="container">
 
                     <xh:div class="row">
-                        <fr:toc/>
-                    </xh:div>
-                    <xh:div class="row">
+                        <xh:div class="span12">
+
                         <!-- Form content. Set context on form instance and define this group as #fr-form-group as observers will refer to it. -->
                         <xf:group id="fr-form-group" class="fr-body fr-border" model="fr-form-model" ref="instance('fr-form-instance')">
                             <xh:a name="fr-form"/>
@@ -696,12 +695,15 @@
                             <xf:input ref="instance('fb-variables')/section-new-label" class="fb-section-new-label" style="display: none"/>
 
                         </xf:group>
+                        </xh:div>
                     </xh:div>
                     <xh:div class="row">
                         <xh:div class="fr-buttons">
-                            <xh:div class="fr-buttons-placeholder">
-                                <xh:div>
-                                    <xf:output value="$fr-resources/detail/messages/buttons-placeholder"/>
+                            <xh:div class="span12">
+                                <xh:div class="fr-buttons-placeholder">
+                                    <xh:div>
+                                        <xf:output value="$fr-resources/detail/messages/buttons-placeholder"/>
+                                    </xh:div>
                                 </xh:div>
                             </xh:div>
                         </xh:div>

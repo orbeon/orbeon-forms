@@ -593,12 +593,8 @@ a.xforms-help-image .fb-control-help {
   left: 2.5em;
   bottom: .5em;
 }
-#fr-form-group .fb-static-upload .xforms-upload-info {
-  padding: 0;
-}
-#fr-form-group .fb-static-upload .xforms-upload-size {
-  padding: 0;
-}
+#fr-form-group .fb-static-upload .xforms-upload-info,
+#fr-form-group .fb-static-upload .xforms-upload-size,
 #fr-form-group .fb-static-upload .xforms-upload-remove {
   padding: 0;
 }

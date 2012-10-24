@@ -43,12 +43,12 @@
                 <fr:error-summary position="top"/>
             </xsl:if>
 
-            <xhtml:div class="row">
+            <fr:row>
                 <fr:toc/>
-            </xhtml:div>
-            <xhtml:div class="row">
+            </fr:row>
+            <fr:row>
                 <fr:body/>
-            </xhtml:div>
+            </fr:row>
 
             <!-- Error summary (if at bottom) -->
             <!-- If we configuration tells us the bottom error summary should not be shown, still include it but hide it with 'display: none'.
@@ -60,16 +60,16 @@
                 <fr:error-summary position="bottom"/>
             </xhtml:div>
 
-            <xhtml:div class="row">
+            <fr:row>
                 <fr:noscript-help/>
-            </xhtml:div>
-            <xhtml:div class="row">
+            </fr:row>
+            <fr:row>
                 <fr:messages/>
-            </xhtml:div>
+            </fr:row>
             <fr:bottom-bar/>
-            <xhtml:div class="row">
+            <fr:row>
                 <fr:version/>
-            </xhtml:div>
+            </fr:row>
         </xhtml:div>
     </xsl:variable>
 
@@ -78,6 +78,14 @@
         <fr:status-icons/>
         <fr:buttons-bar/>
     </xsl:variable>
+
+    <xsl:template match="fr:row">
+        <xhtml:div class="row">
+            <xhtml:div class="span12">
+                <xsl:apply-templates/>
+            </xhtml:div>
+        </xhtml:div>
+    </xsl:template>
 
     <xsl:template match="fr:body">
         <!-- Form content. Set context on form instance and define this group as #fr-form-group as observers will refer to it. -->
@@ -366,7 +374,7 @@
 
     <xsl:template match="fr:version">
         <xsl:if test="not($has-version = false())">
-            <xhtml:div class="row">
+            <fr:row>
                 <xsl:variable xmlns:version="java:org.orbeon.oxf.common.Version"
                     name="orbeon-forms-version"
                     select="version:getVersionString()"
@@ -374,7 +382,7 @@
                 <xhtml:div class="fr-orbeon-version">
                     <xsl:value-of select="$orbeon-forms-version"/>
                 </xhtml:div>
-            </xhtml:div>
+            </fr:row>
         </xsl:if>
     </xsl:template>
 
@@ -461,7 +469,7 @@
         <!-- NOTE: We used to only handle events coming from controls bound to "fr-form-instance" instance, but this
              doesn't work with "section templates". We now use the observer mechanism of fr:error-summary -->
         <xsl:if test="not($is-form-builder)">
-            <xhtml:div class="row">
+            <fr:row>
                 <!-- For form builder we disable the error summary and say that the form is always valid -->
                 <fr:error-summary id="error-summary-control-{$position}" observer="fr-form-group" model="fr-error-summary-model"
                     errors-count-ref="errors-count" visible-errors-count-ref="visible-errors-count" valid-ref="valid">
@@ -475,7 +483,7 @@
                         <fr:footer/>
                     </xsl:if>
                 </fr:error-summary>
-            </xhtml:div>
+            </fr:row>
         </xsl:if>
 
     </xsl:template>
@@ -535,9 +543,9 @@
     </xsl:template>
 
     <xsl:template match="fr:bottom-bar">
-        <xhtml:div class="row">
+        <fr:row>
             <xsl:apply-templates select="$default-bottom-template"/>
-        </xhtml:div>
+        </fr:row>
     </xsl:template>
 
     <xsl:template match="fr:buttons-bar" name="fr-buttons-bar">

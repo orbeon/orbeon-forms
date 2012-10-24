@@ -65,6 +65,12 @@ form.xforms-form .uneditable-input {
   box-sizing: border-box;
   height: 28px;
 }
+form.xforms-form .pagination ul > li > .xforms-trigger {
+  cursor: pointer;
+}
+form.xforms-form .pagination ul > li > .xforms-trigger.xforms-readonly {
+  cursor: auto;
+}
 form.xforms-form .xforms-items label {
   min-height: 18px;
   padding-left: 18px;

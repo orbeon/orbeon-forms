@@ -51,6 +51,12 @@ form.xforms-form {
         height: @baseLineHeight + 8px;
     }
 
+    // Adapt pagination to use of xforms:trigger
+    .pagination ul > li {
+        &> .xforms-trigger { cursor: pointer; }
+        &> .xforms-trigger.xforms-readonly { cursor: auto; }
+    }
+
     // Copy rules for .radio and .checkbox, but use xforms-select1-appearance-full and xforms-select-appearance-full
     .xforms-items {
         label {

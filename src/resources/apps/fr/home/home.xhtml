@@ -48,47 +48,52 @@
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
-        <fr:view>
-            <fr:body>
-                <xhtml:table class="table table-borderedxxx table-condensed table-striped table-hover">
-                    <xhtml:tr>
-                        <!-- TODO: i18n -->
-                        <xhtml:th>Application</xhtml:th>
-                        <xhtml:th>Form</xhtml:th>
-                        <xhtml:th>Title</xhtml:th>
-                        <xhtml:th>View</xhtml:th>
-                        <xhtml:th>New</xhtml:th>
-                    </xhtml:tr>
-                    <xforms:repeat nodeset="instance('fr-forms')/form[exists(*) and @operations != '']"><!--  -->
+        <fr:navbar/>
+        <xhtml:div class="container">
+            <fr:row>
+                <fr:body>
+                    <xhtml:table class="table table-bordered table-condensed table-striped table-hover">
                         <xhtml:tr>
-                            <xhtml:td>
-                                <xforms:output value="application-name"/>
-                            </xhtml:td>
-                            <xhtml:td>
-                                <xforms:output value="form-name"/>
-                            </xhtml:td>
-                            <xhtml:td>
-                                <xforms:output value="title"/>
-                            </xhtml:td>
-                            <xhtml:td>
-                                <xforms:group ref=".[tokenize(@operations, '\s') = ('*', 'update', 'read', 'delete')]">
-                                    <xhtml:a href="/fr/{application-name}/{form-name}/summary">
-                                        <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/magnifier.png"/>
-                                    </xhtml:a>
-                                </xforms:group>
-                            </xhtml:td>
-                            <xhtml:td>
-                                <xforms:group ref=".[tokenize(@operations, '\s') = ('*', 'create')]">
-                                    <xhtml:a href="/fr/{application-name}/{form-name}/new">
-                                        <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/add.png"/>
-                                    </xhtml:a>
-                                </xforms:group>
-                            </xhtml:td>
+                            <!-- TODO: i18n -->
+                            <xhtml:th>Application</xhtml:th>
+                            <xhtml:th>Form</xhtml:th>
+                            <xhtml:th>Title</xhtml:th>
+                            <xhtml:th>View</xhtml:th>
+                            <xhtml:th>New</xhtml:th>
                         </xhtml:tr>
-                    </xforms:repeat>
-                </xhtml:table>
-            </fr:body>
-            <fr:bottom/>
-        </fr:view>
+                        <xforms:repeat nodeset="instance('fr-forms')/form[exists(*) and @operations != '']"><!--  -->
+                            <xhtml:tr>
+                                <xhtml:td>
+                                    <xforms:output value="application-name"/>
+                                </xhtml:td>
+                                <xhtml:td>
+                                    <xforms:output value="form-name"/>
+                                </xhtml:td>
+                                <xhtml:td>
+                                    <xforms:output value="title"/>
+                                </xhtml:td>
+                                <xhtml:td>
+                                    <xforms:group ref=".[tokenize(@operations, '\s') = ('*', 'update', 'read', 'delete')]">
+                                        <xhtml:a href="/fr/{application-name}/{form-name}/summary">
+                                            <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/magnifier.png"/>
+                                        </xhtml:a>
+                                    </xforms:group>
+                                </xhtml:td>
+                                <xhtml:td>
+                                    <xforms:group ref=".[tokenize(@operations, '\s') = ('*', 'create')]">
+                                        <xhtml:a href="/fr/{application-name}/{form-name}/new">
+                                            <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/add.png"/>
+                                        </xhtml:a>
+                                    </xforms:group>
+                                </xhtml:td>
+                            </xhtml:tr>
+                        </xforms:repeat>
+                    </xhtml:table>
+                </fr:body>
+            </fr:row>
+            <fr:row>
+                <fr:version/>
+            </fr:row>
+        </xhtml:div>
     </xhtml:body>
 </xhtml:html>

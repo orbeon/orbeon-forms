@@ -63,13 +63,10 @@
                     </xsl:element>
                 </xsl:template>
 
-                <!-- xf:group → fr:view -->
-                <xsl:template match="xforms:group[tokenize(@class, '\s+') = 'fb-view']">
-                    <fr:view>
-                        <fr:body>
-                            <xsl:apply-templates select="xforms:group[tokenize(@class, '\s+') = 'fb-body']/node()"/>
-                        </fr:body>
-                    </fr:view>
+                <xsl:template match="xforms:group[tokenize(@class, '\s+') = 'fb-body']">
+                    <fr:body>
+                        <xsl:apply-templates select="node() except *[@class = 'fb-annotation']"/>
+                    </fr:body>
                 </xsl:template>
 
                 <!-- Remove @edit-ref and @xxf:update, fb:view → fr:view -->

@@ -1,0 +1,72 @@
+<xhtml:html
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:xforms="http://www.w3.org/2002/xforms"
+        xmlns:ev="http://www.w3.org/2001/xml-events"
+        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+        xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+    <xhtml:head>
+        <xhtml:title/>
+        <xforms:model id="fr-form-model">
+            <xforms:instance id="fr-form-instance">
+                <form>
+                    <section-1>
+                        <control-1/>
+                    </section-1>
+                </form>
+            </xforms:instance>
+            <xforms:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xforms:bind id="section-1-bind" name="section-1" ref="section-1">
+                    <xforms:bind id="control-1-bind" name="control-1" ref="control-1"/>
+                </xforms:bind>
+            </xforms:bind>
+            <xforms:action ev:event="xforms-model-construct" ev:target="#observer" class="fb-annotation">
+                <xforms:dispatch name="fb-xforms-model-construct" targetid="/fr-form-model"/>
+            </xforms:action>
+            <xforms:action ev:event="xforms-recalculate" ev:target="#observer" class="fb-annotation">
+                <xforms:dispatch name="fb-xforms-recalculate" targetid="/fr-form-model"/>
+            </xforms:action>
+            <xforms:action ev:event="xforms-revalidate" ev:target="#observer" class="fb-annotation">
+                <xforms:dispatch name="fb-xforms-revalidate" targetid="/fr-form-model"/>
+            </xforms:action>
+            <xforms:action ev:event="xxforms-xpath-error" ev:target="#observer" class="fb-annotation" ev:defaultAction="cancel">
+                <xforms:dispatch name="fb-xxforms-xpath-error" targetid="/fr-form-model"/>
+            </xforms:action>
+        </xforms:model>
+    </xhtml:head>
+    <xhtml:body>
+        <fr:view width="800px" appearance="custom">
+            <xforms:group class="fb-body">
+                <xforms:var name="lang" value="xxforms:get-variable('fr-form-model', 'fb-lang')" as="element()" class="fb-annotation"/>
+                <xforms:var name="form-resources" value="instance('fr-form-resources')/(resource[@xml:lang = $lang], resource[1])[1]" as="element(resource)?" class="fb-annotation"/>
+                <xforms:var name="fr-resources" value="xxforms:get-variable('fr-resources-model', 'fr-fr-resources')" as="element(resource)?" class="fb-annotation"/>
+                <xforms:var name="fb-resources" value="xxforms:get-variable('fr-resources-model', 'fr-form-resources')" as="element(resource)?" class="fb-annotation"/>
+                <fr:section edit-ref="" xxforms:update="full" id="section-1-control" bind="section-1-bind">
+                    <xforms:label ref="$form-resources/section-1/label"/>
+                    <xforms:help ref="$form-resources/section-1/help"/>
+                    <fr:grid edit-ref="">
+                        <xhtml:tr>
+                            <xhtml:td>
+                                <xforms:input id="control-1-control" bind="control-1-bind">
+                                    <xforms:label ref="$form-resources/control-1/label"/>
+                                    <xforms:hint ref="$form-resources/control-1/hint"/>
+                                    <xforms:help ref="$form-resources/control-1/help"/>
+                                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
+                                </xforms:input>
+                            </xhtml:td>
+                            <xhtml:td/>
+                        </xhtml:tr>
+                    </fr:grid>
+                </fr:section>
+                <xforms:action ev:event="DOMActivate" xxforms:phantom="true" class="fb-annotation">
+                    <xforms:var name="control-element" value="xxforms:control-element(event('xxforms:absolute-targetid'))"/>
+                    <xforms:action if="tokenize($control-element/@class, '\s+') = 'xforms-activable'">
+                        <xforms:var name="th-column" value="count($control-element/preceding-sibling::*[@xxforms:element = 'xh:th']) + 1"/>
+                        <xforms:var name="new-selected-cell" value="if ($control-element/@xxforms:element = 'xh:th') then                                     ($control-element/following-sibling::xforms:repeat//*[@xxforms:element = 'xh:td'])[$th-column]/@id                                     else $control-element/@id"/>
+                        <xforms:setvalue ref="xxforms:get-variable('fr-form-model', 'selected-cell')" value="$new-selected-cell"/>
+                    </xforms:action>
+                </xforms:action>
+            </xforms:group>
+            <fr:buttons>Custom buttons here</fr:buttons>
+        </fr:view>
+    </xhtml:body>
+</xhtml:html>

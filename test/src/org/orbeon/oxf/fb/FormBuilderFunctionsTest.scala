@@ -470,18 +470,18 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
 
             // Initially can insert all
             assert(canInsertSection(doc) === true)
-            assert(canInsertGrid(doc) === true)
+            assert(canInsertGrid(doc)    === true)
             assert(canInsertControl(doc) === true)
 
             // Remove everything (assume top-level section with a single grid inside)
-            childrenContainers(findFRBodyElement(doc)) foreach  { section ⇒
+            childrenContainers(findFRBodyElement(doc)).toList foreach  { section ⇒ // evaluate with toList otherwise the lazy iterator can fail
                 assert(isLastGridInSection(childrenGrids(section).head) === true)
                 deleteContainer(section)
             }
 
             // After everything is removed we can only insert a section (later: can also insert grid)
             assert(canInsertSection(doc) === true)
-            assert(canInsertGrid(doc) === false)
+            assert(canInsertGrid(doc)    === false)
             assert(canInsertControl(doc) === false)
         }
 

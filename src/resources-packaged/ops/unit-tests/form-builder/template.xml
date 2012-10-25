@@ -1,0 +1,46 @@
+<xhtml:html
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:xforms="http://www.w3.org/2002/xforms"
+        xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+    <xhtml:head>
+        <xhtml:title/>
+        <xforms:model id="fr-form-model">
+            <xforms:instance id="fr-form-instance">
+                <form>
+                    <section-1>
+                        <control-1/>
+                    </section-1>
+                </form>
+            </xforms:instance>
+            <xforms:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xforms:bind id="section-1-bind" name="section-1" ref="section-1">
+                    <xforms:bind id="control-1-bind" name="control-1" ref="control-1"/>
+                </xforms:bind>
+            </xforms:bind>
+        </xforms:model>
+    </xhtml:head>
+    <xhtml:body>
+        <fr:view width="800px" appearance="custom">
+            <fr:body>
+                <fr:section id="section-1-control" bind="section-1-bind">
+                    <xforms:label ref="$form-resources/section-1/label"/>
+                    <xforms:help ref="$form-resources/section-1/help"/>
+                    <fr:grid>
+                        <xhtml:tr>
+                            <xhtml:td>
+                                <xforms:input id="control-1-control" bind="control-1-bind">
+                                    <xforms:label ref="$form-resources/control-1/label"/>
+                                    <xforms:hint ref="$form-resources/control-1/hint"/>
+                                    <xforms:help ref="$form-resources/control-1/help"/>
+                                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
+                                </xforms:input>
+                            </xhtml:td>
+                            <xhtml:td/>
+                        </xhtml:tr>
+                    </fr:grid>
+                </fr:section>
+            </fr:body>
+            <fr:buttons>Custom buttons here</fr:buttons>
+        </fr:view>
+    </xhtml:body>
+</xhtml:html>

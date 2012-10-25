@@ -67,29 +67,32 @@
                     </xsl:element>
                 </xsl:template>
 
-                <!-- fr:view → xf:group -->
-                <xsl:template match="xhtml:body//fr:view">
-                    <xforms:group class="fb-view">
-                        <!-- NOTE: We don't copy the view label anymore as it's unneeded -->
+                <!--
+                    fr:view:
+                    - copied over along with nested fr:buttons
+                    - the XForms engine must ignore foreign elements such as fr:view in the XForms view
+                    - we annotate fr:body below
+                -->
 
+                <!-- fr:body → xf:group -->
+                <xsl:template match="xhtml:body//fr:body">
+                    <xforms:group class="fb-body">
                         <!-- Scope $lang which is the language of the form being edited -->
-                        <xforms:var name="lang" value="xxforms:get-variable('fr-form-model', 'fb-lang')" as="element()"/>
+                        <xforms:var name="lang" value="xxforms:get-variable('fr-form-model', 'fb-lang')" as="element()" class="fb-annotation"/>
                         <!-- Scope $form-resources: resources of the form being edited.
                              Use the same logic as in resources-model. In the builder, we don't have a resources-model running
                              for the form being edited, so we duplicate this here. -->
-                        <xforms:var name="form-resources" value="instance('fr-form-resources')/(resource[@xml:lang = $lang], resource[1])[1]" as="element(resource)?"/>
+                        <xforms:var name="form-resources" value="instance('fr-form-resources')/(resource[@xml:lang = $lang], resource[1])[1]" as="element(resource)?" class="fb-annotation"/>
                         <!-- Scope $fr-resources for Form Runner resources -->
-                        <xforms:var name="fr-resources" value="xxforms:get-variable('fr-resources-model', 'fr-fr-resources')" as="element(resource)?"/>
+                        <xforms:var name="fr-resources" value="xxforms:get-variable('fr-resources-model', 'fr-fr-resources')" as="element(resource)?" class="fb-annotation"/>
                         <!-- Scope $fb-resources for Form Builder resources -->
-                        <xforms:var name="fb-resources" value="xxforms:get-variable('fr-resources-model', 'fr-form-resources')" as="element(resource)?"/>
+                        <xforms:var name="fb-resources" value="xxforms:get-variable('fr-resources-model', 'fr-form-resources')" as="element(resource)?" class="fb-annotation"/>
 
                         <!-- Apply all the content -->
-                        <xforms:group class="fb-body">
-                            <xsl:apply-templates select="fr:body/node()"/>
-                        </xforms:group>
+                        <xsl:apply-templates select="node()"/>
 
                         <!-- Listen to activations on grid cells -->
-                        <xforms:action ev:event="DOMActivate" xxforms:phantom="true">
+                        <xforms:action ev:event="DOMActivate" xxforms:phantom="true" class="fb-annotation">
                             <xforms:var name="control-element" value="xxforms:control-element(event('xxforms:absolute-targetid'))"/>
                             <xforms:action if="tokenize($control-element/@class, '\s+') = 'xforms-activable'">
                                 <xforms:var name="th-column" value="count($control-element/preceding-sibling::*[@xxforms:element = 'xh:th']) + 1"/>
@@ -99,10 +102,6 @@
                                 <xforms:setvalue ref="xxforms:get-variable('fr-form-model', 'selected-cell')" value="$new-selected-cell"/>
                             </xforms:action>
                         </xforms:action>
-
-                        <!--<xforms:output value="xxforms:get-variable('fr-form-model', 'selected-cell')" xxbl:scope="inner">-->
-                            <!--<xforms:label>Selected:</xforms:label>-->
-                        <!--</xforms:output>-->
 
                     </xforms:group>
                 </xsl:template>

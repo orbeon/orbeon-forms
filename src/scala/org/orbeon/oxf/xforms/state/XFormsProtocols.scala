@@ -113,6 +113,7 @@ object XFormsProtocols extends StandardTypes with StandardPrimitives with JavaLo
             }
             write(output, instance.readonly)
             write(output, instance.modified)
+            write(output, instance.valid)
         }
         
         def reads(in: Input) = {
@@ -126,6 +127,7 @@ object XFormsProtocols extends StandardTypes with StandardPrimitives with JavaLo
                 read[String](in),
                 read[String](in),
                 readCachingOrContent,
+                read[Boolean](in),
                 read[Boolean](in),
                 read[Boolean](in)
             )

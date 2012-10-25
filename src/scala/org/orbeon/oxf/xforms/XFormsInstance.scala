@@ -31,7 +31,6 @@ import scala.collection.JavaConverters._
 import org.orbeon.oxf.common.OXFException
 import state.InstanceState
 import org.orbeon.oxf.xforms.XFormsServerSharedInstancesCache.Loader
-import java.util.{List ⇒ JList}
 import org.orbeon.saxon.om.{VirtualNode, DocumentInfo, Item}
 import org.orbeon.oxf.util._
 
@@ -89,7 +88,8 @@ class XFormsInstance(
         private var _instanceCaching: Option[InstanceCaching],  // information to restore cached instance content
         private var _documentInfo: DocumentInfo,                // fully wrapped document
         private var _readonly: Boolean,                         // whether the instance is readonly (can change upon submission)
-        private var _modified: Boolean)                         // whether the instance was modified
+        private var _modified: Boolean,                         // whether the instance was modified
+        var valid: Boolean)                                     // whether the instance was valid as of the last revalidation
     extends ListenersTrait
     with XFormsEventObserver
     with Logging {
@@ -292,7 +292,8 @@ object XFormsInstance extends Logging {
             None,
             documentInfo,
             instance.readonly,
-            false)
+            false,
+            true)
 
     def createDocumentInfo(documentOrDocumentInfo: AnyRef, exposeXPathTypes: Boolean) = documentOrDocumentInfo match {
         case dom4jDocument: Document    ⇒ wrapDocument(dom4jDocument, exposeXPathTypes)
@@ -354,7 +355,8 @@ object XFormsInstance extends Logging {
                 caching,
                 documentInfo,
                 instanceState.readonly,
-                instanceState.modified))
+                instanceState.modified,
+                instanceState.valid))
     }
 
     // Extract the document starting at the given root element

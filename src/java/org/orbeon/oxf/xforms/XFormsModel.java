@@ -626,7 +626,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
                         Option.<InstanceCaching>apply(caching),
                         documentInfo,
                         instance.readonly(),
-                        false));
+                        false,
+                        true));
             } else {
                 // Instance cannot be cached
 
@@ -792,6 +793,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
     public void doRevalidate() {
 
+        Set<String> invalidInstances = null;
+
         // Validate only if needed, including checking the flags, because if validation state is clean, validation
         // being idempotent, revalidating is not needed.
         if (deferredActionContext.revalidate) {
@@ -816,7 +819,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
                 }
 
                 // Run validation
-                final Set<String> invalidInstances = new LinkedHashSet<String>();
+                invalidInstances = new LinkedHashSet<String>();
 
                 // Validate using schemas if needed
                 if (hasSchema) {
@@ -836,19 +839,6 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
                 if (mustBindValidate)
                     binds.applyValidationBinds(invalidInstances);
 
-                // NOTE: It is possible, with binds and the use of xxforms:instance(), that some instances in
-                // invalidInstances do not belong to this model. Those instances won't get events with the dispatching
-                // algorithm below.
-                // TODO: Must dispatch validity changes, not validity status
-                // TODO: Must dispatch after marking revalidate = false, right?
-                for (final XFormsInstance instance: instances) {
-                    if (invalidInstances.contains(instance.getEffectiveId())) {
-                        Dispatch.dispatchEvent(new XXFormsInvalidEvent(instance));
-                    } else {
-                        Dispatch.dispatchEvent(new XXFormsValidEvent(instance));
-                    }
-                }
-
                 if (indentedLogger.isDebugEnabled())
                     indentedLogger.endHandleOperation();
             }
@@ -860,6 +850,28 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
         // Notify dependencies
         containingDocument.getXPathDependencies().revalidateDone(staticModel);
+
+        if (invalidInstances != null) {
+            // Gather events to dispatch, at most one per instance, and only if validity has changed
+            // NOTE: It is possible, with binds and the use of xxforms:instance(), that some instances in
+            // invalidInstances do not belong to this model. Those instances won't get events with the dispatching
+            // algorithm below.
+            List<XFormsEvent> eventsToDispatch = new ArrayList<XFormsEvent>();
+            for (final XFormsInstance instance : instances) {
+
+                final boolean previouslyValid = instance.valid();
+                final boolean currentlyValid  = ! invalidInstances.contains(instance.getEffectiveId());
+
+                if (previouslyValid != currentlyValid) {
+                    instance.valid_$eq(currentlyValid);
+                    eventsToDispatch.add(currentlyValid ? new XXFormsValidEvent(instance) : new XXFormsInvalidEvent(instance));
+                }
+            }
+
+            // Dispatch all events
+            for (final XFormsEvent event : eventsToDispatch)
+                Dispatch.dispatchEvent(event);
+        }
     }
 
     private void doRefresh() {

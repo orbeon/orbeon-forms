@@ -201,7 +201,8 @@ case class InstanceState(
         modelEffectiveId: String,
         cachingOrContent: InstanceCaching Either String,
         readonly: Boolean,
-        modified: Boolean) {
+        modified: Boolean,
+        valid: Boolean) {
 
     def this(instance: XFormsInstance) =
         this(
@@ -209,7 +210,8 @@ case class InstanceState(
             instance.parent.getEffectiveId,
             instance.instanceCaching.toLeft(instance.contentAsString),
             instance.readonly,
-            instance.modified)
+            instance.modified,
+            instance.valid)
 }
 
 object DynamicState {

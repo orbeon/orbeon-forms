@@ -2294,6 +2294,115 @@
         </output>
     </test>
 
+    <test description="#513: Infinite loop with toggle on xxforms-invalid" name="oxf:pipeline">
+        <!-- See: https://github.com/orbeon/orbeon-forms/issues/513 -->
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model>
+                        <xf:instance id="instance"><instance/></xf:instance>
+                        <xf:bind ref="/instance" constraint="false()"/>
+                        <!-- Toggle causes invoking deferred update behavior. Before the fix, this would cause
+                             infinite recursion. -->
+                        <xf:toggle ev:event="xxforms-invalid" ev:observer="instance" case="case"/>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:switch id="my-switch">
+                        <xf:case id="case"/>
+                    </xf:switch>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response>
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <controls>
+                            <control effective-id="my-switch" case-id="case"/>
+                        </controls>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:div id="case" visibility="visible"/>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="No duplicate xxforms-validate/xxforms-revalidate events" name="oxf:pipeline">
+        <!-- See: https://github.com/orbeon/orbeon-forms/issues/513 -->
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="instance-1"><instance>valid</instance></xf:instance>
+                        <xf:bind ref="instance('instance-1')" constraint=". = 'valid'"/>
+
+                        <xf:instance id="instance-2"><instance>invalid</instance></xf:instance>
+                        <xf:bind ref="instance('instance-2')" constraint=". = 'valid'"/>
+
+                        <xf:instance id="events"><events/></xf:instance>
+
+                        <xf:insert
+                            ev:event="xxforms-valid xxforms-invalid xforms-revalidate"
+                            context="instance('events')"
+                            ref="*"
+                            origin="xxf:element(event('xxf:type'), xxf:attribute('targetid', event('xxf:targetid')))"/>
+
+                        <xf:action ev:event="xforms-model-construct-done">
+                            <!-- Up until now there must have been one xxforms-invalid event for instance-2 -->
+
+                            <!-- Toggling validity must produce 2 events -->
+                            <xf:setvalue ref="instance('instance-1')">invalid</xf:setvalue>
+                            <xf:setvalue ref="instance('instance-2')">valid</xf:setvalue>
+                            <xf:revalidate/>
+
+                            <!-- This must not produce any new event as validity hasn't changed -->
+                            <xf:setvalue ref="instance('instance-1')">foo</xf:setvalue>
+                            <xf:revalidate/>
+                        </xf:action>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response>
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance-1" model-id="model">
+                                <instance>foo</instance>
+                            </instance>
+                            <instance id="instance-2" model-id="model">
+                                <instance>valid</instance>
+                            </instance>
+                            <instance id="events" model-id="model">
+                                <events>
+                                    <xxforms-invalid targetid="instance-2"/>
+                                    <xforms-revalidate targetid="model"/>
+                                    <xxforms-invalid targetid="instance-1"/>
+                                    <xxforms-valid targetid="instance-2"/>
+                                    <xforms-revalidate targetid="model"/>
+                                </events>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 <!--
 
 TODO:

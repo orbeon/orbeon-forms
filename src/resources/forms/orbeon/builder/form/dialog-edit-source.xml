@@ -23,7 +23,7 @@
       xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
       xmlns:saxon="http://saxon.sf.net/"
 
-      id="fb-source-editor-dialog" level="modal" close="true" draggable="true" model="fb-source-editor-model">
+      id="fb-source-editor-dialog" level="modal" close="true" draggable="true" model="fb-source-editor-model" class="xxforms-set-height">
 
     <xforms:label ref="$form-resources/dialog-edit-source/label"/>
 

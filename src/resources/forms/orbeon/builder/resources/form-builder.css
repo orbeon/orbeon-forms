@@ -406,13 +406,30 @@ div.xbl-fr-grid {
 #fb-source-editor-dialog .xforms-alert-active {
   display: block;
 }
-#fb-source-editor-dialog .fb-xml-dialog-view {
-  width: 100%;
+#fb-source-editor-dialog .xxforms-dialog-body {
+  position: relative;
+  overflow: inherit;
 }
-#fb-source-editor-dialog .fb-xml-dialog-view textarea.xforms-textarea {
-  width: 100%;
-  height: 29em;
-  font-family: monospace;
+#fb-source-editor-dialog .xxforms-dialog-body .fb-xml-dialog-view {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 60px;
+  overflow: scroll;
+}
+#fb-source-editor-dialog .xxforms-dialog-body .fr-dialog-buttons {
+  height: 60px;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  line-height: 60px;
+  padding: 0 20px 0 0;
+  margin: 0;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
 }
 #fb-publish-dialog {
   width: 35em;

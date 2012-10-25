@@ -83,50 +83,45 @@
                             <sql:connection>
                                 <sql:datasource><xsl:value-of select="doc('input:request')/request/headers/header[name = 'orbeon-datasource']/value/string() treat as xs:string"/></sql:datasource>
 
-                                <!-- Query that returns all the search results, which we will reuse in multiple palces -->
+                                <!-- Query that returns all the search results, which we will reuse in multiple places -->
                                 <xsl:variable name="query">
                                     select
-                                        data.created, data.last_modified, data.document_id
+                                        created, last_modified, document_id
                                         <!-- Go over detail columns and extract data from XML -->
                                         <xsl:for-each select="/search/query[@path]">
-                                            , extractValue(data.xml, '/*/<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>',
+                                            , extractValue(xml, '/*/<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>',
                                                 '<xsl:value-of select="f:namespaces(.)"/>') detail_<xsl:value-of select="position()"/>
                                         </xsl:for-each>
-                                    from orbeon_form_data data,
-                                        (
-                                            select max(last_modified) last_modified, app, form, document_id
-                                            from orbeon_form_data
-                                            where
-                                                app = <sql:param type="xs:string" select="/search/app"/>
-                                                and form = <sql:param type="xs:string" select="/search/form"/>
-                                            group by app, form, document_id
-                                        ) latest
+                                    from
+                                    (
+                                        select created, last_modified, document_id, deleted, xml,
+                                            dense_rank() over (partition by document_id order by last_modified desc) as latest
+                                        from orbeon_form_data
+                                        where
+                                            app = <sql:param type="xs:string" select="/search/app"/>
+                                            and form = <sql:param type="xs:string" select="/search/form"/>
+                                    )
                                     where
-                                        <!-- Merge with 'latest', to make sure we only consider the document with the most recent last_date -->
-                                        data.last_modified = latest.last_modified
-                                        and data.app = latest.app
-                                        and data.form = latest.form
-                                        and data.document_id = latest.document_id
-                                        <!-- Don't take document that have been deleted -->
-                                        and data.deleted = 'N'
-                                        <!-- Conditions on searcheable columns -->
+                                        latest = 1
+                                        and deleted = 'N'
+                                        <!-- Conditions on searchable columns -->
                                         <xsl:for-each select="/search/query[@path and normalize-space() != '']">
                                             <xsl:choose>
                                                 <xsl:when test="@match = 'exact'">
                                                     <!-- Exact match -->
-                                                    and extractValue(data.xml, '/*/<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>', '<xsl:value-of select="f:namespaces(.)"/>')
+                                                    and extractValue(xml, '/*/<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>', '<xsl:value-of select="f:namespaces(.)"/>')
                                                     = '<xsl:value-of select="f:escape-sql(.)"/>'
                                                 </xsl:when>
                                                 <xsl:otherwise>
                                                     <!-- Substring, case-insensitive match -->
-                                                    and lower(extractValue(data.xml, '/*/<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>', '<xsl:value-of select="f:namespaces(.)"/>'))
+                                                    and lower(extractValue(xml, '/*/<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>', '<xsl:value-of select="f:namespaces(.)"/>'))
                                                     like '%<xsl:value-of select="lower-case(f:escape-sql(.))"/>%'
                                                 </xsl:otherwise>
                                             </xsl:choose>
                                         </xsl:for-each>
                                         <!-- Condition for free text search -->
                                         <xsl:if test="/search/query[empty(@path) and normalize-space() != '']">
-                                             and contains(data.xml, '<xsl:value-of select="f:escape-sql(concat('%', replace(/search/query[not(@path)], '_', '\\_'), '%'))"/>') > 0
+                                             and contains(xml, '<xsl:value-of select="f:escape-sql(concat('%', replace(/search/query[not(@path)], '_', '\\_'), '%'))"/>') > 0
                                         </xsl:if>
                                     order by created desc
                                 </xsl:variable>

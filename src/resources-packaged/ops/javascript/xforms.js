@@ -3333,8 +3333,8 @@ ORBEON.xforms.Events = {
             // Don't use the whole height of the viewport, leaving some space at the top of the page,
             // which could be used by a navigation bar, as in Liferay
             - 80;
-
-        yuiDialog.body.style.maxHeight = maxHeight + "px";
+        var property = $(yuiDialog.innerElement).is('.xxforms-set-height') ? 'height' : 'max-height';
+        $(yuiDialog.body).css(property, maxHeight + 'px');
     },
 
     /**
@@ -3888,7 +3888,7 @@ ORBEON.xforms.Init = {
             treeYui: {},                         // Maps tree id to the YUI object for that tree
             sliderYui: {},                       // Maps slider id to the YUI object for that slider
             isReloading: false,                  // Whether the form is being reloaded from the server
-            lastDialogZIndex: 100,               // zIndex of the last dialog displayed. Gets incremented so the last dialog is always on top of everything else
+            lastDialogZIndex: 1050,              // zIndex of the last dialog displayed; gets incremented so the last dialog is always on top of everything else; initial value set to Bootstrap's @zindexModal
             // Data relative to a form is stored in an array indexed by form id.
             formErrorPanel: {},                  // YUI panel used to report errors
             formHelpPanel: {},                   // Help dialog: YUI panel

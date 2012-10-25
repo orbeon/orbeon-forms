@@ -71,15 +71,6 @@ form.xforms-form .pagination ul > li > .xforms-trigger {
 form.xforms-form .pagination ul > li > .xforms-trigger.xforms-readonly {
   cursor: auto;
 }
-form.xforms-form .xforms-items label {
-  min-height: 18px;
-  padding-left: 18px;
-}
-form.xforms-form .xforms-items input[type="radio"],
-form.xforms-form .xforms-items input[type="checkbox"] {
-  float: left;
-  margin-left: -18px;
-}
 form.xforms-form .input-append .add-on,
 form.xforms-form .input-prepend .add-on {
   height: 18px;

@@ -1236,12 +1236,12 @@
                     <xhtml:label class="xforms-label">My label</xhtml:label>
                     <xhtml:span class="xforms-items">
                         <xhtml:span class="xforms-selected">
-                            <xhtml:label for="my-new-select1$$e0·1">
+                            <xhtml:label class="radio" for="my-new-select1$$e0·1">
                                 <xhtml:input id="my-new-select1$$e0·1" type="radio" name="my-new-select1·1" value="apple" checked="checked"/>Apple
                             </xhtml:label>
                         </xhtml:span>
                         <xhtml:span class="xforms-deselected">
-                            <xhtml:label for="my-new-select1$$e1·1">
+                            <xhtml:label class="radio" for="my-new-select1$$e1·1">
                                 <xhtml:input id="my-new-select1$$e1·1" type="radio" name="my-new-select1·1" value="orange"/>Orange
                             </xhtml:label>
                         </xhtml:span>
@@ -1255,12 +1255,12 @@
                     <xhtml:label class="xforms-label"/>
                     <xhtml:span class="xforms-items">
                         <xhtml:span class="xforms-deselected">
-                            <xhtml:label for="my-new-select1$$e0">
+                            <xhtml:label class="radio" for="my-new-select1$$e0">
                                 <xhtml:input id="my-new-select1$$e0" type="radio" name="my-new-select1" value="apple"/>Apple
                             </xhtml:label>
                         </xhtml:span>
                         <xhtml:span class="xforms-deselected">
-                            <xhtml:label for="my-new-select1$$e1">
+                            <xhtml:label class="radio" for="my-new-select1$$e1">
                                 <xhtml:input id="my-new-select1$$e1" type="radio" name="my-new-select1" value="orange"/>Orange
                             </xhtml:label>
                         </xhtml:span>

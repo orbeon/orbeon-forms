@@ -415,6 +415,8 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
             final String itemNamespacedId = XFormsUtils.namespaceId(handlerContext.getContainingDocument(), itemEffectiveId);
             if (! isBooleanInput) {
                 reusableAttributes.clear();
+                // Add Bootstrap classes
+                reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, isMultiple ? "checkbox" : "radio");
                 outputLabelForStart(handlerContext, reusableAttributes, null, itemNamespacedId, LHHAC.LABEL, "label", false);
             }
 

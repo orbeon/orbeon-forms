@@ -726,14 +726,14 @@
                          </div>
                          <xhtml:span id="xforms-select-full-template" class="xforms-template">
                              <xhtml:span class="xforms-deselected">
-                                 <xhtml:label for="$xforms-item-id-select$">
+                                <xhtml:label class="checkbox" for="$xforms-item-id-select$">
                                      <xhtml:input id="$xforms-item-id-select$" type="checkbox" name="$xforms-item-name$" value="$xforms-template-value$"/>$xforms-template-label$
                                  </xhtml:label>
                              </xhtml:span>
                          </xhtml:span>
                          <xhtml:span id="xforms-select1-full-template" class="xforms-template">
                              <xhtml:span class="xforms-deselected">
-                                 <xhtml:label for="$xforms-item-id-select1$">
+                                <xhtml:label class="radio" for="$xforms-item-id-select1$">
                                      <xhtml:input id="$xforms-item-id-select1$" type="radio" name="$xforms-item-name$" value="$xforms-template-value$"/>$xforms-template-label$
                                  </xhtml:label>
                              </xhtml:span>

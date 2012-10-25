@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <!-- -*- rnc -*- -->
 <grammar ns="http://www.w3.org/2001/xml-events" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:x="http://www.w3.org/1999/xhtml" xmlns="http://relaxng.org/ns/structure/1.0" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
   <x:h1>XML Events Module in RELAX NG</x:h1>

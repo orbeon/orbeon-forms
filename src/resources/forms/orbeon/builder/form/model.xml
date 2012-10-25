@@ -44,7 +44,7 @@
     <xforms:var name="metadata-instance" value="$model/xforms:instance[@id = 'fr-form-metadata']/*"/>
     <xforms:var name="resources" value="$model/xforms:instance[@id = 'fr-form-resources']/*"/>
     <xforms:var name="current-resources" value="($resources/resource[@xml:lang = $fb-lang])[1]"/>
-    <xforms:var name="body" value="xhtml:body//xforms:group[tokenize(@class, '\s+') = 'fb-body']"/>
+    <xforms:var name="body" value="xhtml:body//xforms:group[xxforms:has-class('fb-body')]"/>
 
     <xforms:var name="component-bindings" value="instance('fb-components-instance')//xbl:binding" as="element(xbl:binding)*"/>
     <xforms:var name="is-custom-instance" value="$metadata-instance/form-instance-mode = 'custom'" as="xs:boolean"/>

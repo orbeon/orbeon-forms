@@ -145,5 +145,11 @@ trait XXFormsIndependentFunctions extends OrbeonFunctionLibrary {
             Arg(STRING, EXACTLY_ONE),
             Arg(BOOLEAN, EXACTLY_ONE)
         )
+
+        // xxforms:has-class
+        Fun("has-class", classOf[XXFormsHasClass], 0, 1, BOOLEAN, EXACTLY_ONE,
+            Arg(STRING, EXACTLY_ONE),
+            Arg(NODE_TYPE, ALLOWS_ZERO_OR_MORE)
+        )
     }
 }

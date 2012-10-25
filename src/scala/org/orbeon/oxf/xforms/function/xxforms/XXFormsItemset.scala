@@ -14,13 +14,12 @@
 package org.orbeon.oxf.xforms.function.xxforms
 
 import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control
-import org.orbeon.oxf.xforms.function.XFormsFunction
+import org.orbeon.oxf.xforms.function.{FunctionSupport, XFormsFunction}
 import org.orbeon.saxon.expr.ExpressionTool
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om.Item
-import org.orbeon.saxon.value.StringValue
 
-class XXFormsItemset extends XFormsFunction {
+class XXFormsItemset extends XFormsFunction with FunctionSupport {
     override def evaluateItem(xpathContext: XPathContext): Item = {
 
         implicit val ctx = xpathContext
@@ -37,7 +36,7 @@ class XXFormsItemset extends XFormsFunction {
 
                 if (format == "json")
                     // Return a string
-                    StringValue.makeStringValue(itemset.getJSONTreeInfo(controlValueForSelection, select1Control.getLocationData))
+                    itemset.getJSONTreeInfo(controlValueForSelection, select1Control.getLocationData)
                 else
                     // Return an XML document
                     itemset.getXMLTreeInfo(xpathContext.getConfiguration, controlValueForSelection, select1Control.getLocationData)

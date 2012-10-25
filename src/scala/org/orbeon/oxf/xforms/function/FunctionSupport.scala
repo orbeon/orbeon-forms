@@ -17,7 +17,7 @@ import org.orbeon.oxf.xforms.XFormsObject
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.saxon.expr.{Expression, XPathContext}
 import org.orbeon.saxon.om.{ListIterator, ArrayIterator}
-import org.orbeon.saxon.value.StringValue
+import org.orbeon.saxon.value.{BooleanValue, StringValue}
 import collection.JavaConverters._
 
 trait FunctionSupport extends XFormsFunction {
@@ -50,4 +50,7 @@ trait FunctionSupport extends XFormsFunction {
 
     def asIterator(v: Array[String]) = new ArrayIterator(v map StringValue.makeStringValue)
     def asIterator(v: Seq[String])   = new ListIterator (v map StringValue.makeStringValue asJava)
+
+    implicit def stringToStringValue(v: String)    = StringValue.makeStringValue(v)
+    implicit def booleanToBooleanValue(v: Boolean) = BooleanValue.get(v)
 }

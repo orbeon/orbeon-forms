@@ -53,4 +53,8 @@ class XXFormsInvalidBinds extends XFormsFunction {// don't extend XFormsMIPFunct
     // TODO: something smart
     override def addToPathMap(pathMap: PathMap, pathMapNodeSet: PathMap.PathMapNodeSet): PathMap.PathMapNodeSet =
         super.addToPathMap(pathMap, pathMapNodeSet)
+
+    // Needed otherwise xpathContext.getContextItem doesn't return the correct value
+    override def getIntrinsicDependencies =
+        if (argument.size == 0) StaticProperty.DEPENDS_ON_CONTEXT_ITEM else 0
 }

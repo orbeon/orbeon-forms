@@ -34,7 +34,7 @@
                 <!-- Embed only XBL for section templates that are in use -->
                 <!-- NOTE: We used to embed all XBL components here. This is not desirable in most cases so we don't do it anymore. -->
                 <xsl:variable name="available-section-bindings" as="element(xbl:binding)*"
-                              select="doc('input:bindings')/*/xbl:xbl/xbl:binding[tokenize(@class, '\s+') = 'fr-section-component']"/>
+                              select="doc('input:bindings')/*/xbl:xbl/xbl:binding[p:has-class('fr-section-component')]"/>
 
                 <xsl:variable name="possible-section-element-qnames" as="xs:QName*"
                               select="for $e in /*/xhtml:body//*:section/* return QName(namespace-uri($e), name($e))"/>

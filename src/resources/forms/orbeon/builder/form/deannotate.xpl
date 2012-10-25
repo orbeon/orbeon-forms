@@ -63,7 +63,7 @@
                     </xsl:element>
                 </xsl:template>
 
-                <xsl:template match="xforms:group[tokenize(@class, '\s+') = 'fb-body']">
+                <xsl:template match="xforms:group[p:has-class('fb-body')]">
                     <fr:body>
                         <xsl:apply-templates select="node() except *[@class = 'fb-annotation']"/>
                     </fr:body>
@@ -90,14 +90,14 @@
                 </xsl:template>
 
                 <!-- Remove model actions -->
-                <xsl:template match="xhtml:head/xforms:model[@id = 'fr-form-model']/*[tokenize(@class, '\s+') = 'fb-annotation']"/>
+                <xsl:template match="xhtml:head/xforms:model[@id = 'fr-form-model']/*[p:has-class('fb-annotation')]"/>
 
                 <!-- Remove automatic grid and td ids -->
                 <xsl:template match="xhtml:body//fr:grid/@id[starts-with(., 'tmp-') and ends-with(., '-tmp')]"/>
                 <xsl:template match="xhtml:body//fr:grid//*:td/@id[starts-with(., 'tmp-') and ends-with(., '-tmp')]"/>
 
                 <!-- Remove xbl:xbl containing section templates bindings -->
-                <xsl:template match="xbl:xbl[xbl:binding[tokenize(@class, '\s+') = 'fr-section-component']]"/>
+                <xsl:template match="xbl:xbl[xbl:binding[p:has-class('fr-section-component')]]"/>
 
             </xsl:stylesheet>
         </p:input>

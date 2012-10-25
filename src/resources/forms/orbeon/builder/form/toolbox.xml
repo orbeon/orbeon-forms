@@ -124,7 +124,7 @@
                     <xforms:var name="binding" value="." as="element(xbl:binding)"/>
 
                     <!-- Whether the component is a section component or not -->
-                    <xforms:var name="is-section-component" value="tokenize($binding/@class, '\s+') = 'fr-section-component'" as="xs:boolean"/>
+                    <xforms:var name="is-section-component" value="xxforms:has-class('fr-section-component', $binding)" as="xs:boolean"/>
 
                     <xhtml:div class="fb-tool">
                         <xforms:trigger id="fb-add-component-trigger" ref="instance('fb-variables')/(if ($is-section-component) then section-trigger else control-trigger)">
@@ -140,7 +140,7 @@
                                     <xforms:load resource="javascript:ORBEON.Builder.controlAdded.fire('{$effective-id}')"/>
                                 </xforms:action>
                             </xforms:action>
--                                        </xforms:trigger>
+                        </xforms:trigger>
                     </xhtml:div>
                 </xforms:repeat>
             </xhtml:div>

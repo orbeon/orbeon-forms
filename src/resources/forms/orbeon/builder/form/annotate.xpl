@@ -61,7 +61,7 @@
                 </xsl:template>
 
                 <!-- Update namespace on actions and services so that they don't run at design time -->
-                <xsl:template match="xforms:model/xforms:*[tokenize(@class, '\s+') = ('fr-service', 'fr-database-service')] | xforms:model/xforms:action[ends-with(@id, '-binding')]">
+                <xsl:template match="xforms:model/xforms:*[p:classes() = ('fr-service', 'fr-database-service')] | xforms:model/xforms:action[ends-with(@id, '-binding')]">
                     <xsl:element name="fb:{local-name()}">
                         <xsl:apply-templates select="@* | node()"/>
                     </xsl:element>

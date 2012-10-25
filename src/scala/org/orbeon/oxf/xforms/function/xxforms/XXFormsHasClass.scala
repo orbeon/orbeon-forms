@@ -15,25 +15,10 @@ package org.orbeon.oxf.xforms.function.xxforms
 
 import org.orbeon.oxf.xforms.function.{FunctionSupport, XFormsFunction}
 import org.orbeon.saxon.expr.{StaticProperty, XPathContext}
-import org.orbeon.saxon.om.NodeInfo
-import org.w3c.dom.Node._
-import org.orbeon.oxf.util.ScalaUtils._
 
-class XXFormsHasClass extends XFormsFunction with FunctionSupport {
-    override def evaluateItem(xpathContext: XPathContext) = {
-        val className = argument(0).evaluateAsString(xpathContext).toString
-        val element   = argument.lift(1) map (_.iterate(xpathContext).next()) orElse Option(xpathContext.getContextItem)
-
-        element match {
-            case Some(node: NodeInfo) if node.getNodeKind == ELEMENT_NODE ⇒
-                val classCode = xpathContext.getNamePool.allocate("", "", "class")
-                val value     = node.getAttributeValue(classCode)
-
-                stringToSet(value)(className)
-            case _ ⇒
-                false
-        }
-    }
+class XXFormsHasClass extends XFormsFunction with FunctionSupport with ClassSupport {
+    override def evaluateItem(xpathContext: XPathContext) =
+        classes(1)(xpathContext)(stringArgument(0)(xpathContext))
 
     // Needed otherwise xpathContext.getContextItem doesn't return the correct value
     override def getIntrinsicDependencies =

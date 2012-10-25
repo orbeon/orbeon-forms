@@ -22,6 +22,9 @@ import collection.JavaConverters._
 
 trait FunctionSupport extends XFormsFunction {
 
+    def stringArgument(i: Int)(implicit xpathContext: XPathContext) =
+        arguments(i).evaluateAsString(xpathContext).toString
+
     // Resolve the relevant control by argument expression
     def relevantControl(i: Int)(implicit xpathContext: XPathContext): Option[XFormsControl] =
         relevantControl(arguments(i).evaluateAsString(xpathContext).toString)

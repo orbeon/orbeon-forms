@@ -52,7 +52,7 @@
     </p:processor>
 
     <!-- Format -->
-    <p:processor name="oxf:xslt">
+    <p:processor name="oxf:unsafe-xslt">
         <p:input name="data" href="#xhtml"/>
         <p:input name="config">
             <xsl:stylesheet version="2.0">
@@ -66,7 +66,7 @@
 
                 <!-- Keep repeat templates, controls, LHHA, and elements with MIP classes like repeat/group elements in tables
                      Also keep content of elements with class xxforms-test-preserve-content -->
-                <xsl:template match="xhtml:*[tokenize(@class, '\s+') = ('xforms-repeat-template', 'xforms-control', 'xforms-label',
+                <xsl:template match="xhtml:*[p:classes() = ('xforms-repeat-template', 'xforms-control', 'xforms-label',
                                         'xforms-hint', 'xforms-help', 'xforms-alert', 'xforms-help-image', 'xforms-group', 'xforms-group-begin-end',
                                         'xforms-invalid', 'xforms-required', 'xforms-readonly', 'xxforms-test-preserve-content',
                                         'xforms-repeat-begin-end', 'xforms-repeat-delimiter', 'xforms-repeat-selected-item-1', 'xforms-repeat-selected-item-2',

@@ -17,6 +17,7 @@
         xmlns:xs="http://www.w3.org/2001/XMLSchema"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xmlns:oxf="http://www.orbeon.com/oxf/processors"
+        xmlns:p="http://www.orbeon.com/oxf/pipeline"
         xmlns:xi="http://www.w3.org/2001/XInclude"
         xmlns:xforms="http://www.w3.org/2002/xforms"
         xmlns:xbl="http://www.w3.org/ns/xbl"
@@ -33,22 +34,17 @@
     <xsl:variable name="data" select="/*" as="element()"/>
     <xsl:variable name="parameters" select="doc('input:parameters')/*" as="element()"/>
 
-    <xsl:function name="fr:classes" as="xs:string*">
-        <xsl:param name="e" as="element()"/>
-        <xsl:copy-of select="tokenize($e/@class, '\s+')"/>
-    </xsl:function>
-
     <xsl:function name="fr:is-container-xbl" as="xs:boolean">
         <xsl:param name="e" as="element()"/>
-        <xsl:variable name="classes" select="fr:classes($e)"/>
-        <xsl:copy-of select="$classes = 'xbl-fr-section' or ($classes = 'xbl-fr-grid' and $e//table[fr:classes(.) = 'fr-repeat'])"/>
+        <xsl:variable name="classes" select="p:classes($e)"/>
+        <xsl:copy-of select="$classes = 'xbl-fr-section' or ($classes = 'xbl-fr-grid' and $e//table[p:classes(.) = 'fr-repeat'])"/>
     </xsl:function>
 
     <xsl:function name="fr:is-container-legacy" as="xs:boolean">
         <xsl:param name="e" as="element()"/>
-        <xsl:variable name="classes" select="fr:classes($e)"/>
-        <xsl:copy-of select="($classes = 'fr-section-container' and not($e/ancestor::*[fr:classes(.) = 'xbl-fr-section']))
-                                or ($e/self::table and $classes = 'fr-repeat' and not($e/ancestor::*[fr:classes(.) = 'xbl-fr-grid']))"/>
+        <xsl:variable name="classes" select="p:classes($e)"/>
+        <xsl:copy-of select="($classes = 'fr-section-container' and not($e/ancestor::*[p:classes(.) = 'xbl-fr-section']))
+                                or ($e/self::table and $classes = 'fr-repeat' and not($e/ancestor::*[p:classes(.) = 'xbl-fr-grid']))"/>
     </xsl:function>
 
     <xsl:function name="fr:is-container" as="xs:boolean">
@@ -61,7 +57,7 @@
     <xsl:function name="fr:container-static-id" as="xs:string">
         <xsl:param name="e" as="element()"/>
 
-        <xsl:variable name="classes" select="fr:classes($e)"/>
+        <xsl:variable name="classes" select="p:classes($e)"/>
         <xsl:variable name="static-id" select="xformsUtils:getStaticIdFromId($e/@id)"/>
 
         <xsl:choose>
@@ -75,7 +71,7 @@
             </xsl:when>
             <xsl:otherwise>
                 <!-- Case of a legacy repeat -->
-                <xsl:value-of select="replace(($e//tr[fr:classes(.) = 'xforms-repeat-begin-end'])[1]/@id, 'repeat-begin-(.*)', '$1')"/>
+                <xsl:value-of select="replace(($e//tr[p:classes(.) = 'xforms-repeat-begin-end'])[1]/@id, 'repeat-begin-(.*)', '$1')"/>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:function>
@@ -106,7 +102,7 @@
                 <substitution-font font-family="{.}" embed="true"/>
             </xsl:for-each>
 
-            <xsl:for-each select="//*[@id = 'fr-form-group']//*[fr:classes(.) = $is-a-control-classes and not(fr:classes(.) = $is-not-a-control-classes)]">
+            <xsl:for-each select="//*[@id = 'fr-form-group']//*[p:classes(.) = $is-a-control-classes and not(p:classes(.) = $is-not-a-control-classes)]">
 
                 <xsl:variable name="control" select="."/>
                 <xsl:variable name="static-id" select="xformsUtils:getStaticIdFromId(@id)"/>
@@ -115,7 +111,7 @@
                 <xsl:variable name="ancestor-static-ids" select="ancestor::*[fr:is-container(.)]/fr:container-static-id(.)"/>
                 <xsl:variable name="effective-id" select="replace(string-join((for $id in ($ancestor-static-ids, $static-id) return controlOps:controlName($id), $iterations), '$'), '·', '\$')"/>
 
-                <xsl:variable name="classes" select="fr:classes(.)"/>
+                <xsl:variable name="classes" select="p:classes(.)"/>
 
                 <!-- Get the expression to evaluate on the control from the configuration properties -->
                 <xsl:variable name="expression" as="xs:string?">

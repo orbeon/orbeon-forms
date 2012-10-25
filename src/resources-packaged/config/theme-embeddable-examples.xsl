@@ -18,13 +18,14 @@
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:p="http://www.orbeon.com/oxf/pipeline"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
     xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary">
 
     <xsl:template match="/">
         <xhtml:div class="orbeon-portlet-div">
             <!-- Copy xforms-disable-hint-as-tooltip and xforms-disable-alert-as-tooltip from the body to the div -->
-            <xsl:variable name="classes-to-copy" select="tokenize(/xhtml:html/xhtml:body/@class, '\s+')[matches(., '^xforms-disable-[^-]+-as-tooltip$')]"/>
+            <xsl:variable name="classes-to-copy" select="p:classes(/xhtml:html/xhtml:body)[matches(., '^xforms-disable-[^-]+-as-tooltip$')]"/>
             <xsl:if test="exists($classes-to-copy)">
                 <xsl:attribute name="class" select="$classes-to-copy"/>
             </xsl:if>

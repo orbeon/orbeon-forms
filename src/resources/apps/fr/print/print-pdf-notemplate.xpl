@@ -54,7 +54,7 @@
     </p:processor>
 
     <!-- Prepare XHTML before conversion to PDF -->
-    <p:processor name="oxf:xslt">
+    <p:processor name="oxf:unsafe-xslt">
         <p:input name="config">
             <xsl:transform version="2.0">
                 <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
@@ -71,7 +71,7 @@
                 <!-- Remove xforms-initially-hidden class on the form, normally removed by the script -->
                 <xsl:template match="*:form">
                     <xsl:copy>
-                        <xsl:attribute name="class" select="string-join(tokenize(@class, '\s+')[. != 'xforms-initially-hidden'], ' ')"/>
+                        <xsl:attribute name="class" select="string-join(p:classes()[. != 'xforms-initially-hidden'], ' ')"/>
                         <xsl:apply-templates select="@* except @class | node()"/>
                     </xsl:copy>
                 </xsl:template>

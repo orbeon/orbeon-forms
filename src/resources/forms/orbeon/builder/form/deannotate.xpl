@@ -57,7 +57,7 @@
                 </xsl:template>
 
                 <!-- Restore namespace on actions and services -->
-                <xsl:template match="xforms:model/fb:*[tokenize(@class, '\s+') = ('fr-service', 'fr-database-service')] | xforms:model/fb:action[ends-with(@id, '-binding')]">
+                <xsl:template match="xforms:model/fb:*[p:classes() = ('fr-service', 'fr-database-service')] | xforms:model/fb:action[ends-with(@id, '-binding')]">
                     <xsl:element name="xforms:{local-name()}">
                         <xsl:apply-templates select="@* | node()"/>
                     </xsl:element>

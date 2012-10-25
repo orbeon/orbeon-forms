@@ -24,6 +24,7 @@
         xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:xbl="http://www.w3.org/ns/xbl"
         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+        xmlns:p="http://www.orbeon.com/oxf/pipeline"
         xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
         xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderFunctions"
         xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps"
@@ -48,8 +49,8 @@
          http://wiki.orbeon.com/forms/projects/form-runner-builder/improved-actions-and-services-format
      -->
     <xsl:variable name="actions" select="$fr-form-model/xforms:action[ends-with(@id, '-binding')]"/>
-    <xsl:variable name="service-instances" select="$fr-form-model/xforms:instance[tokenize(@class, '\s+') = ('fr-service', 'fr-database-service')]"/>
-    <xsl:variable name="service-submissions" select="$fr-form-model/xforms:submission[tokenize(@class, '\s+') = ('fr-service', 'fr-database-service')]"/>
+    <xsl:variable name="service-instances" select="$fr-form-model/xforms:instance[p:classes() = ('fr-service', 'fr-database-service')]"/>
+    <xsl:variable name="service-submissions" select="$fr-form-model/xforms:submission[p:classes() = ('fr-service', 'fr-database-service')]"/>
 
     <!-- Distinct source ids for the given action -->
     <!-- NOTE: Source can also be a model -->

@@ -223,7 +223,7 @@
                 <xforms:rebuild model="fr-resources-model"/>
 
                 <xforms:var name="summary-elements" as="element()*"
-                            value="instance('fr-source-form-instance')/xhtml:body//*[(@ref or @bind) and @class and tokenize(@class, '\s+') = ('fr-summary', 'fr-search')]"/>
+                            value="instance('fr-source-form-instance')/xhtml:body//*[(@ref or @bind) and @class and xxforms:classes() = ('fr-summary', 'fr-search')]"/>
 
                 <xforms:var name="form-resources" model="fr-resources-model" value="$fr-form-resources" as="element(resource)?"/>
 

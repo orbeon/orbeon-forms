@@ -10,6 +10,7 @@ $ ->
     sectionEditor = $ '.fb-section-editor'
     currentSection = null
     sectionsCache = []
+    frBodyLeft = 0;
     pageX = 0; pageY = 0
 
     FSM.create
@@ -24,7 +25,8 @@ $ ->
                 pageY = event.pageY
 
     Builder.onOffsetMayHaveChanged ->
-        sectionsCache.length = 0
+        frBodyLeft = (f$.offset $ '.fr-body').left
+        sectionsCache.length = 0                                        # Don't recreate array, as other parts of the code keep a reference to it
         _.each ($ '.xbl-fr-section:visible'), (section) ->
             section = $ section
             sectionsCache.unshift
@@ -44,7 +46,7 @@ $ ->
                 sectionEditor.show()
                 sectionEditor.offset
                     top: section.offset.top - Builder.scrollTop()
-                    left: section.offset.left - f$.outerWidth sectionEditor
+                    left: frBodyLeft - f$.outerWidth sectionEditor      # Use `.fr-body` left rather than the section left to account for sub-sections indentation
             # Update trigger relevance
             do ->
                 container = section.el.children '.fr-section-container'

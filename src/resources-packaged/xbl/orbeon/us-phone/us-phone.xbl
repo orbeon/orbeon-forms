@@ -50,23 +50,32 @@
             <xbl:style src="/xbl/orbeon/us-phone/us-phone.css"/>
         </xbl:resources>
         <xbl:template>
-            <xh:span class="input-append">
-                <xf:input
-                    xbl:attr="navindex navindex=tabindex"
-                    ref="xxf:binding('fr-phone-binding')"
-                    class="fr-width-10em"
-                    xxf:maxlength="14"
-                    xxf:format="
-                        if (matches(., '^\d+$'))
-                        then concat('(', substring(., 1, 3), ') ', substring(., 4, 3), if (string-length() gt 6) then '-' else '', substring(., 7))
-                        else ."
-                    xxf:unformat="
-                        for $t in translate(normalize-space(), '()*-[].#/'': ', '')
-                        return if (matches($t, '^\d+$')) then $t else .">
-                    <xf:hint appearance="minimal">(555) 555-5555</xf:hint>
-                </xf:input>
-                <xh:span class="add-on"/>
-            </xh:span>
+            <xf:var name="view" value="exf:readonly(xxf:binding('fr-button')) and property('xxf:readonly-appearance') = 'static'"/>
+            <!-- Edit mode -->
+            <xf:group ref="xxf:binding('fr-phone-binding')[not($view)]">
+                <xh:span class="input-append">
+                    <xf:input
+                        xbl:attr="navindex navindex=tabindex"
+                        ref="."
+                        class="fr-width-10em"
+                        xxf:maxlength="14"
+                        xxf:format="
+                            if (matches(., '^\d+$'))
+                            then concat('(', substring(., 1, 3), ') ', substring(., 4, 3), if (string-length() gt 6) then '-' else '', substring(., 7))
+                            else ."
+                        xxf:unformat="
+                            for $t in translate(normalize-space(), '()*-[].#/'': ', '')
+                            return if (matches($t, '^\d+$')) then $t else .">
+                        <xf:hint appearance="minimal">(555) 555-5555</xf:hint>
+                    </xf:input>
+                    <xh:span class="add-on"/>
+                </xh:span>
+            </xf:group>
+            <!-- View mode -->
+            <xf:output ref="xxf:binding('fr-phone-binding')[$view]"
+                value="if (matches(., '^\d+$'))
+                       then concat('(', substring(., 1, 3), ') ', substring(., 4, 3), if (string-length() gt 6) then '-' else '', substring(., 7))
+                       else ."/>
         </xbl:template>
     </xbl:binding>
 

@@ -1513,7 +1513,8 @@ ORBEON.xforms.Controls = {
             // Select/Select tree
             return ORBEON.xforms.Page.getControl(control).getValue();
         } else if (YAHOO.util.Dom.hasClass(control, "xforms-range")) {
-            return ORBEON.xforms.Globals.sliderYui[control.id].previousVal / 200;
+            var value = ORBEON.xforms.Globals.sliderYui[control.id].previousVal / 200;
+            return value.toString();
         }
     },
 

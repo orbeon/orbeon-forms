@@ -24,8 +24,8 @@ class XXFormsItemset extends XFormsFunction with FunctionSupport {
 
         implicit val ctx = xpathContext
 
-        val controlStaticId = argument(0).evaluateAsString(xpathContext).toString
-        val format          = argument(1).evaluateAsString(xpathContext).toString
+        val controlStaticId = stringArgument(0)(xpathContext)
+        val format          = stringArgument(1)(xpathContext)
         val selected        = argument.lift(2) map (e ⇒ ExpressionTool.effectiveBooleanValue(e.iterate(xpathContext))) getOrElse false
 
         context.container.resolveObjectByIdInScope(getSourceEffectiveId, controlStaticId, null) match {

@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms
 
-import org.orbeon.oxf.xforms.function.XFormsFunction
+import org.orbeon.oxf.xforms.function.{FunctionSupport, XFormsFunction}
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.oxf.xforms.XFormsModelBinds
 import org.orbeon.saxon.om.{EmptyIterator, ListIterator, SequenceIterator}
@@ -21,14 +21,14 @@ import org.orbeon.saxon.om.{EmptyIterator, ListIterator, SequenceIterator}
 /**
  * The xxforms:bind() function.
  */
-class XXFormsBind extends XFormsFunction {
+class XXFormsBind extends XFormsFunction with FunctionSupport {
 
     override def iterate(xpathContext: XPathContext): SequenceIterator = {
 
         implicit val ctx = xpathContext
 
         // Get bind id
-        val bindId = argument(0).evaluateAsString(xpathContext).toString
+        val bindId = stringArgument(0)(xpathContext)
 
         // Get bind nodeset
         context.container.resolveObjectByIdInScope(getSourceEffectiveId, bindId, context.contextStack.getCurrentSingleItem) match {

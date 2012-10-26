@@ -47,7 +47,7 @@ trait RequestFunction extends XFormsFunction with FunctionSupport {
 
     override def iterate(xpathContext: XPathContext): SequenceIterator = {
 
-        val name = arguments(0).evaluateAsString(xpathContext).toString
+        val name = stringArgument(0)(xpathContext)
 
         // Ask XForms document if present, request otherwise
         val values =

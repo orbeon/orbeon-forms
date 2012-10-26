@@ -13,20 +13,20 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms
 
-import org.orbeon.oxf.xforms.function.XFormsFunction
+import org.orbeon.oxf.xforms.function.{FunctionSupport, XFormsFunction}
 import org.orbeon.saxon.om.{EmptyIterator, ListIterator}
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.oxf.xforms.XFormsModel
 import collection.JavaConverters._
 import org.orbeon.saxon.value.StringValue
 
-class XXFormsListVariables extends XFormsFunction {
+class XXFormsListVariables extends XFormsFunction with FunctionSupport {
 
     override def iterate(xpathContext: XPathContext) = {
 
         implicit val ctx = xpathContext
 
-        val modelEffectiveId = argument(0).evaluateAsString(xpathContext).toString
+        val modelEffectiveId = stringArgument(0)(xpathContext)
 
         context.containingDocument.getObjectByEffectiveId(modelEffectiveId) match {
             case model: XFormsModel ⇒

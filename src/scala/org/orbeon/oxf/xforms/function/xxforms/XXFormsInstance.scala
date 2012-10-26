@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.function.xxforms
 
 import org.orbeon.oxf.xforms._
-import org.orbeon.oxf.xforms.function.XFormsFunction
+import org.orbeon.oxf.xforms.function.{FunctionSupport, XFormsFunction}
 import org.orbeon.saxon.expr._
 import org.orbeon.saxon.om._
 
@@ -22,7 +22,7 @@ import org.orbeon.saxon.om._
  * xxforms:instance() function. This function operates like the standard instance() function, except that it looks for
  * instances globally instead of using the current model.
  */
-class XXFormsInstance extends XFormsFunction {
+class XXFormsInstance extends XFormsFunction with FunctionSupport {
 
     override def iterate(xpathContext: XPathContext): SequenceIterator = {
 
@@ -30,7 +30,7 @@ class XXFormsInstance extends XFormsFunction {
 
         val containingDocument = context.containingDocument
 
-        val instanceId     = argument(0).evaluateAsString(xpathContext).toString
+        val instanceId     = stringArgument(0)(xpathContext)
         // TODO: Argument is undocumented. Is it ever used at all? We now have a syntax for absolute ids so don't really need it.
         val useEffectiveId = argument.lift(1) map (_.effectiveBooleanValue(xpathContext)) getOrElse false
 

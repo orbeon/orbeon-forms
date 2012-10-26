@@ -40,11 +40,11 @@ class XXFormsDynamicHandler extends XFormsBaseHandler(false, false) {
         contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, elementName, elementQName, getAttributes(attributes, classes, effectiveId))
         handlerContext.pushComponentContext(prefixedId)
 
-        if (!handlerContext.isTemplate) {
+        if (! handlerContext.isTemplate) {
             containingDocument.getObjectByEffectiveId(effectiveId) match {
                 case control: XXFormsDynamicControl ⇒
                     // Output new scripts upon update if any
-                    if (!containingDocument.isInitializing && control.newScripts.nonEmpty) {
+                    if (! containingDocument.isInitializing && control.newScripts.nonEmpty) {
                         val helper = new ContentHandlerHelper(contentHandler)
                         helper.startElement(xhtmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "script", Array("type", "text/javascript"))
                         XHTMLHeadHandler.outputScripts(helper, control.newScripts map (script ⇒ script.clientName → script.body))
@@ -55,6 +55,12 @@ class XXFormsDynamicHandler extends XFormsBaseHandler(false, false) {
                     control.nested foreach { nested ⇒
                         handlerContext.pushPartAnalysis(nested.partAnalysis)
                         processShadowTree(controller, nested.template)
+
+                        // Add part globals
+                        nested.partAnalysis.getGlobals.values foreach { global ⇒
+                            XXFormsComponentHandler.processShadowTree(handlerContext.getController, global.fullShadowTree)
+                        }
+
                         handlerContext.popPartAnalysis()
                     }
 

@@ -614,33 +614,74 @@ span.xforms-textarea pre {
   html body form.xforms-initially-hidden {
     display: block;
   }
-  .fr-status-icons {
-    display: none;
-  }
-  .fr-section-container .fr-section-open-close {
-    display: none;
-  }
-  .xforms-form .xforms-loading-loading {
-    display: none;
-  }
-  .xforms-upload-remove {
-    display: none;
-  }
-  .xforms-upload-info {
-    background: transparent none repeat scroll 0 0;
-    padding-left: 2px;
-  }
-  .xbl-fr-attachment .xforms-output-appearance-xxforms-download {
-    display: none;
-  }
   style {
     display: none;
   }
   noscript {
     display: none;
   }
-  .fr-grid .xforms-select1-appearance-compact,
-  .fr-grid .xforms-select-appearance-compact {
+  form.xforms-form .fr-status-icons {
+    display: none;
+  }
+  form.xforms-form .xforms-loading-loading {
+    display: none;
+  }
+  form.xforms-form .xforms-upload-remove {
+    display: none;
+  }
+  form.xforms-form .xforms-upload-info {
+    background: transparent none repeat scroll 0 0;
+    padding-left: 2px;
+  }
+  form.xforms-form .xbl-fr-attachment .xforms-output-appearance-xxforms-download {
+    display: none;
+  }
+  form.xforms-form .fr-grid .xforms-select1-appearance-compact,
+  form.xforms-form .fr-grid .xforms-select-appearance-compact {
     height: auto;
+  }
+  form.xforms-form .clearfix:before,
+  form.xforms-form .clearfix:after,
+  form.xforms-form .row:before,
+  form.xforms-form .row:after,
+  form.xforms-form .row-fluid:before,
+  form.xforms-form .row-fluid:after,
+  form.xforms-form .container:before,
+  form.xforms-form .container:after,
+  form.xforms-form .container-fluid:before,
+  form.xforms-form .container-fluid:after,
+  form.xforms-form .dl-horizontal:before,
+  form.xforms-form .dl-horizontal:after,
+  form.xforms-form .controls-row:before,
+  form.xforms-form .controls-row:after,
+  form.xforms-form .form-actions:before,
+  form.xforms-form .form-actions:after,
+  form.xforms-form .form-horizontal .control-group:before,
+  form.xforms-form .form-horizontal .control-group:after,
+  form.xforms-form .nav-tabs:before,
+  form.xforms-form .nav-pills:before,
+  form.xforms-form .nav-tabs:after,
+  form.xforms-form .nav-pills:after,
+  form.xforms-form .tabbable:before,
+  form.xforms-form .tabbable:after,
+  form.xforms-form .navbar-inner:before,
+  form.xforms-form .navbar-inner:after,
+  form.xforms-form .navbar-form:before,
+  form.xforms-form .navbar-form:after,
+  form.xforms-form .pager:before,
+  form.xforms-form .pager:after,
+  form.xforms-form .modal-footer:before,
+  form.xforms-form .modal-footer:after,
+  form.xforms-form .thumbnails:before,
+  form.xforms-form .thumbnails:after,
+  form.xforms-form .navbar-inner:before,
+  form.xforms-form .navbar-inner:after {
+    display: block;
+  }
+  form.xforms-form .input-append,
+  form.xforms-form .input-prepend,
+  form.xforms-form .btn-group,
+  form.xforms-form .btn-toolbar {
+    font-size: .5px;
   }
 }

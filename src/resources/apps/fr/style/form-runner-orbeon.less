@@ -31,7 +31,7 @@ html, body { background-color: @frBackground }
         font-weight: normal;
         clear: left;
         padding: 0;
-        color: #555;                                    /* Lighter grey to compensate for larger title font */
+        color: @frHeaderColor;
     }
 
     h2 {
@@ -39,7 +39,7 @@ html, body { background-color: @frBackground }
     }
 
     h2 .fr-section-label {
-        display: block;                                 /* So the line expands all the way to the right */
+        display: block;                                 // So the line expands all the way to the right
     }
 
     h3, h4 {
@@ -229,14 +229,57 @@ h1 .xforms-trigger-appearance-xxforms-minimal input, h2 .xforms-trigger-appearan
 
 /* This is also used for PDF generation */
 @media print {
-    html, html body { background-color: white; background-image: none }
-    html { font-family: "Arial Unicode MS" }
-    .fr-separator { background-color: black; height: 2px }
-    h1, h2, h3 { color: black }
-    a, .xforms-trigger-appearance-xxforms-minimal { color: black; text-decoration: none }
-    .fr-top .fr-form-title, .fr-toc { color: black }
-    .fr-section-container div.fr-collapsible { color: black }
-    .fr-container { border: none }
-    .fr-top, .fr-bottom { background: none }
-    .xforms-required label { background-image: none; padding-left: 0 }
+    html {
+        &, body { background-color: white; background-image: none }
+        font-family: "Arial Unicode MS";
+        body { padding-top: 0 } // no need for padding because navbar is position: static
+    }
+
+    form.xforms-form {
+
+        a, .xforms-trigger-appearance-xxforms-minimal { color: black; text-decoration: none }
+        .xforms-required label { background-image: none; padding-left: 0 }
+
+        .container {
+            width: 100%;
+        }
+
+        .fr-body {
+            border: none;
+        }
+
+        h2 {
+            border-bottom: 1px solid darken(@wellBackground, 7%);
+        }
+
+        .navbar {
+            position: static; // override Bootstrap otherwise navbar appears on all pages
+        }
+
+        .navbar-inner {
+            background-color: white;
+            border-bottom: 1px solid darken(@wellBackground, 7%);
+
+            .fr-language-choice {
+                display: none;
+            }
+
+            .brand {
+                color: @frHeaderColor;
+                font-size: 25px;
+            }
+        }
+
+        .fr-form-description {
+            display: none;
+        }
+
+        .xbl-fr-section .fr-section-title {
+            // Remove open/close arrows
+            .fr-section-label { padding-left: 0; }
+            .fr-section-opened, .fr-section-closed {
+                background-image: none;
+            }
+        }
+    }
 }

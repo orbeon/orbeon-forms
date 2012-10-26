@@ -105,19 +105,16 @@
     <xsl:template match="fr:pdf-button">
         <!-- TODO: bind to strict-submit, but maybe fr-pdf-submission should check validity instead -->
         <!-- NOTE: Only the XForms document id is strictly needed. Keep app/form/document for filtering purposes. -->
-        <!-- TMP: For M12, disable button if no PDF template, see https://github.com/orbeon/orbeon-forms/issues/483 -->
-        <xsl:if test="$has-pdf-template">
-            <fr:href-button
-                    model="fr-persistence-model"
-                    ref="instance('fr-triggers-instance')/strict-submit"
-                    href="/fr/service/{$app}/{$form}/pdf/{{xxforms:instance('fr-parameters-instance')/document}}/{{xxforms:document-id()}}.pdf">
-                <xsl:copy-of select="@appearance"/>
-                <xforms:label>
-                    <xhtml:img width="16" height="16" src="/apps/fr/style/pdf.png" alt=""/>
-                    <xhtml:span><xforms:output value="$fr-resources/detail/labels/print-pdf"/></xhtml:span>
-                </xforms:label>
-            </fr:href-button>
-        </xsl:if>
+        <fr:href-button
+                model="fr-persistence-model"
+                ref="instance('fr-triggers-instance')/strict-submit"
+                href="/fr/service/{$app}/{$form}/pdf/{{xxforms:instance('fr-parameters-instance')/document}}/{{xxforms:document-id()}}.pdf">
+            <xsl:copy-of select="@appearance"/>
+            <xforms:label>
+                <xhtml:img width="16" height="16" src="/apps/fr/style/pdf.png" alt=""/>
+                <xhtml:span><xforms:output value="$fr-resources/detail/labels/print-pdf"/></xhtml:span>
+            </xforms:label>
+        </fr:href-button>
     </xsl:template>
 
     <xsl:template match="fr:save-button">

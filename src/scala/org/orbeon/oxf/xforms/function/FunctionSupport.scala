@@ -20,7 +20,7 @@ import org.orbeon.saxon.om.{ListIterator, ArrayIterator}
 import org.orbeon.saxon.value.{BooleanValue, StringValue}
 import collection.JavaConverters._
 
-trait FunctionSupport extends XFormsFunction {
+protected trait FunctionSupport extends XFormsFunction {
 
     def stringArgument(i: Int)(implicit xpathContext: XPathContext) =
         arguments(i).evaluateAsString(xpathContext).toString

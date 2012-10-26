@@ -28,7 +28,7 @@ class XXFormsClasses extends XFormsFunction with FunctionSupport with ClassSuppo
         if (argument.size == 0) StaticProperty.DEPENDS_ON_CONTEXT_ITEM else 0
 }
 
-trait ClassSupport extends XFormsFunction {
+protected trait ClassSupport extends XFormsFunction {
     def classes(i: Int)(implicit xpathContext: XPathContext): Set[String] = {
         val element = arguments.lift(i) map (_.iterate(xpathContext).next()) orElse Option(xpathContext.getContextItem)
 

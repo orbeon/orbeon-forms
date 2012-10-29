@@ -54,91 +54,89 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
 
     public void handleMIPClasses(StringBuilder sb, String controlPrefixedId, XFormsControl control) {
 
-        // Output MIP classes only having a binding
-        final boolean hasBinding = containingDocument.getStaticOps().hasBinding(controlPrefixedId);
-        if (hasBinding) {
-            if (control != null) {
-                // The case of a concrete control
+        // Output MIP classes
 
-                // TODO: Move this to to control itself, like writeMIPsAsAttributes
+        // TODO: Move this to to control itself, like writeMIPsAsAttributes
 
-                // Output standard MIP classes
-                if (!control.isRelevant()) {
-                    if (sb.length() > 0)
-                        sb.append(' ');
-                    sb.append("xforms-disabled");
-                }
-                if (control.visited()) {
-                    if (sb.length() > 0)
-                        sb.append(' ');
-                    sb.append("xforms-visited");
-                }
-                if (control instanceof XFormsSingleNodeControl) {
-                    // TODO: inherit from this method instead rather than using instanceof
-                    final XFormsSingleNodeControl singleNodeControl = (XFormsSingleNodeControl) control;
-                    if (!singleNodeControl.isValid()) {
-                        if (sb.length() > 0)
-                            sb.append(' ');
-                        sb.append("xforms-invalid");
-                        // Combined class for IE6
-                        if (control.visited()) {
-                            sb.append(" xforms-invalid-visited");
-                        }
-                    }
-                    if (singleNodeControl.isReadonly()) {
-                        if (sb.length() > 0)
-                            sb.append(' ');
-                        sb.append("xforms-readonly");
-                    }
-                    if (singleNodeControl.isRequired()) {
-                        if (sb.length() > 0)
-                            sb.append(' ');
-                        sb.append("xforms-required");
-                        if (control instanceof XFormsValueControl) {
-                            // NOTE: Test above excludes xf:group
-                            // Combined class for IE6
-                            if (((XFormsValueControl) control).isEmpty())
-                                sb.append(" xforms-required-empty");
-                            else
-                                sb.append(" xforms-required-filled");
-                        }
-                    }
+        // xforms-disabled class
+        // NOTE: We used to not output this class if the control existed and didn't have a binding. That looked either
+        // like an inconsistent optimization (not done for controls with bindings), or like an oversight (likely).
+        final boolean isRelevant = control != null && control.isRelevant();
+        if (! isRelevant && ! handlerContext.isTemplate()) { // don't output class within a template
+            if (sb.length() > 0)
+                sb.append(' ');
+            sb.append("xforms-disabled");
+        }
 
-                    // Output custom MIPs classes
-                    final String customMIPs = singleNodeControl.jCustomMIPsClassesAsString();
-                    if (! customMIPs.equals("")) {
-                        if (sb.length() > 0)
-                            sb.append(' ');
-                        sb.append(customMIPs);
-                    }
+        // MIP classes for a concrete control
+        if (isRelevant && containingDocument.getStaticOps().hasBinding(controlPrefixedId)) {
 
-                    // Output type class
-                    final String typeName = singleNodeControl.getBuiltinTypeName();
-                    if (typeName != null) {
-                        // Control is bound to built-in schema type
-                        if (sb.length() > 0)
-                            sb.append(' ');
-
-                        sb.append("xforms-type-");
-                        sb.append(typeName);
-                    } else {
-                        // Output custom type class
-                       final String customTypeName = singleNodeControl.getTypeLocalName();
-                       if (customTypeName != null) {
-                           // Control is bound to a custom schema type
-                           if (sb.length() > 0)
-                               sb.append(' ');
-
-                           sb.append("xforms-type-custom-");
-                           sb.append(customTypeName);
-                       }
-                    }
-                }
-            } else if (!handlerContext.isTemplate()) {
-                // Case of a non-concrete control - simply mark the control as disabled
+            // Output standard MIP classes
+            if (control.visited()) {
                 if (sb.length() > 0)
                     sb.append(' ');
-                sb.append("xforms-disabled");
+                sb.append("xforms-visited");
+            }
+            if (control instanceof XFormsSingleNodeControl) {
+                // TODO: inherit from this method instead rather than using instanceof
+                final XFormsSingleNodeControl singleNodeControl = (XFormsSingleNodeControl) control;
+                if (!singleNodeControl.isValid()) {
+                    if (sb.length() > 0)
+                        sb.append(' ');
+                    sb.append("xforms-invalid");
+                    // Combined class for IE6
+                    if (control.visited()) {
+                        sb.append(" xforms-invalid-visited");
+                    }
+                }
+                if (singleNodeControl.isReadonly()) {
+                    if (sb.length() > 0)
+                        sb.append(' ');
+                    sb.append("xforms-readonly");
+                }
+                if (singleNodeControl.isRequired()) {
+                    if (sb.length() > 0)
+                        sb.append(' ');
+                    sb.append("xforms-required");
+                    if (control instanceof XFormsValueControl) {
+                        // NOTE: Test above excludes xf:group
+                        // Combined class for IE6
+                        if (((XFormsValueControl) control).isEmpty())
+                            sb.append(" xforms-required-empty");
+                        else
+                            sb.append(" xforms-required-filled");
+                    }
+                }
+
+                // Output custom MIPs classes
+                final String customMIPs = singleNodeControl.jCustomMIPsClassesAsString();
+                if (! customMIPs.equals("")) {
+                    if (sb.length() > 0)
+                        sb.append(' ');
+                    sb.append(customMIPs);
+                }
+
+                // Output type class
+                final String typeName = singleNodeControl.getBuiltinTypeName();
+                if (typeName != null) {
+                    // Control is bound to built-in schema type
+                    if (sb.length() > 0)
+                        sb.append(' ');
+
+                    sb.append("xforms-type-");
+                    sb.append(typeName);
+                } else {
+                    // Output custom type class
+                   final String customTypeName = singleNodeControl.getTypeLocalName();
+                   if (customTypeName != null) {
+                       // Control is bound to a custom schema type
+                       if (sb.length() > 0)
+                           sb.append(' ');
+
+                       sb.append("xforms-type-custom-");
+                       sb.append(customTypeName);
+                   }
+                }
             }
         }
     }

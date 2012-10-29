@@ -994,10 +994,11 @@
                         <xxf:control id="my-input-1" visited="true"/>
                         <xxf:control id="my-dialog-1" visited="true"/>
                         <xxf:div id="my-dialog-1" visibility="hidden"/>
-                        <xxf:control id="my-input-2" visited="true"/>
+                        <xxf:control id="my-input-2" visited="true" relevant="false"/>
                         <xxf:control id="my-dialog-2" visited="true"/>
                         <xxf:div id="my-dialog-2" visibility="hidden"/>
-                        <xxf:control id="my-input-4" visited="true"/>
+                        <xxf:control id="my-input-3" relevant="false"/>
+                        <xxf:control id="my-input-4" visited="true" relevant="false"/>
                     </xxf:control-values>
                     <xxf:focus control-id="my-input-1"/>
                 </xxf:action>

@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms.control.controls
 
-import org.apache.commons.lang3.StringUtils
 import org.dom4j.Element
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.xforms.analysis.XPathDependencies

@@ -144,27 +144,16 @@ public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
             localForUpdate.neighborControlId = dialogOpenEvent.jNeighbor();
             localForUpdate.constrainToViewport = dialogOpenEvent.constrainToViewport();
 
-            containingDocument().getControls().markDirtySinceLastRequest(false);
-
-            // TODO: Issue here: if the dialog is non-relevant, it can't receive xxforms-dialog-open!
-            // SOLUTION: Make dialog itself relevant (if it can be), but content non-relevant
-            if (isXForms11Switch()) {
-                // Partial refresh
-                containingDocument().getControls().doPartialRefresh(this);
-            }
+            containingDocument().getControls().markDirtySinceLastRequest(true);
+            containingDocument().getControls().doPartialRefresh(this);
         } else if (XFormsEvents.XXFORMS_DIALOG_CLOSE.equals(event.name())) {
             // Close the dialog
 
             final XXFormsDialogControlLocal localForUpdate = (XXFormsDialogControlLocal) getLocalForUpdate();
             localForUpdate.visible = false;
             containingDocument().getControls().markDirtySinceLastRequest(false);
-
-            if (isXForms11Switch()) {
-                // Partial refresh
-                containingDocument().getControls().doPartialRefresh(this);
-            }
+            containingDocument().getControls().doPartialRefresh(this);
         }
-
     }
 
     @Override
@@ -260,5 +249,9 @@ public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
             return Boolean.parseBoolean(localXForms11Switch);
         else
             return XFormsProperties.isXForms11Switch(containingDocument());
+    }
+
+    public boolean contentVisible() {
+        return isVisible();
     }
 }

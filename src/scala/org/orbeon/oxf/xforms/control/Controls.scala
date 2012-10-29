@@ -155,7 +155,7 @@ object Controls {
     def findEffectiveControlId(ops: StaticStateGlobalOps, controls: XFormsControls, sourceEffectiveId: String, targetPrefixedId: String): String = {
         
         val tree = controls.getCurrentControlTree 
-        
+
         // Don't do anything if there are no controls
         if (tree.getChildren.isEmpty)
             return null
@@ -221,11 +221,15 @@ object Controls {
     }
 
     // Update the container's and all its descendants' bindings
-    def updateBindings(containerControl: XFormsContainerControl) = {
-        val xpathDependencies = containerControl.containingDocument.getXPathDependencies
+    def updateBindings(control: XFormsContainerControl) = {
+        val xpathDependencies = control.containingDocument.getXPathDependencies
         xpathDependencies.bindingUpdateStart()
-        val updater = new BindingUpdater(containerControl.containingDocument, containerControl.parent.bindingContextForChild)
-        visitControls(containerControl, updater, includeCurrent = true, recurse = true)
+
+        val startBindingContext =
+            control.preceding map (_.bindingContextForFollowing) getOrElse control.parent.bindingContextForChild
+
+        val updater = new BindingUpdater(control.containingDocument, startBindingContext)
+        visitControls(control, updater, includeCurrent = true, recurse = true)
         xpathDependencies.bindingUpdateDone()
         updater
     }

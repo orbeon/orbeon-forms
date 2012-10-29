@@ -33,11 +33,11 @@ import org.xml.sax.Attributes
 import scala.collection.Seq
 import scala.collection.JavaConverters._
 import org.orbeon.oxf.xforms.BindingContext
-import java.util.{Collections, LinkedList, List ⇒ JList}
 import org.dom4j.{QName, Element}
 import org.orbeon.saxon.om.Item
 import org.orbeon.oxf.xforms.analysis.controls.{RepeatControl, SingleNodeTrait, AppearanceTrait}
 import org.orbeon.oxf.xforms.model.DataModel
+import org.orbeon.oxf.util.ScalaUtils._
 
 /**
  * Represents an XForms control.
@@ -129,6 +129,15 @@ class XFormsControl(
 
     // NOP, can be overridden
     def iterationRemoved(): Unit = ()
+
+    // Preceding control if any
+    def preceding: Option[XFormsControl] = {
+        // Unlike ElementAnalysis we don't store a `preceding` pointer so we have to search for it
+        val siblingsOrSelf = parent.asInstanceOf[XFormsContainerControl].children
+        val index          = siblingsOrSelf indexWhere (this eq)
+        
+        index > 0 option siblingsOrSelf(index - 1)
+    }
 
     // NOTE: As of 2011-11-22, this is here so that effective ids of nested actions can be updated when iterations
     // are moved around. Ideally anyway, iterations should not require effective id changes. An iteration tree should

@@ -46,6 +46,9 @@ trait ControlBindingSupport {
     private var _wasRelevant = false
     final def wasRelevant = _wasRelevant
 
+    // Whether this control's content is visible (by default it is)
+    def contentVisible = true
+
     // Evaluate the control's binding, either during create or update
     final def evaluateBinding(parentContext: BindingContext, update: Boolean) = {
         pushBinding(parentContext, update)
@@ -141,8 +144,8 @@ trait ControlBindingSupport {
 
     def computeRelevant =
         // By default: if there is a parent, we have the same relevance as the parent, otherwise we are top-level so
-        // we are relevant by default
-        (parent eq null) || parent.isRelevant
+        // we are relevant by default. Also, we are not relevant if the parent says its content is not visible.
+        (parent eq null) || parent.isRelevant && parent.contentVisible
 
     def wasRelevantCommit() = {
         val result = _wasRelevant

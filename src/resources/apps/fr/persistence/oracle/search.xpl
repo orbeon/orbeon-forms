@@ -86,12 +86,8 @@
                                 <!-- Query that returns all the search results, which we will reuse in multiple places -->
                                 <xsl:variable name="query">
                                     select
-                                        created, last_modified, document_id
-                                        <!-- Go over detail columns and extract data from XML -->
-                                        <xsl:for-each select="/search/query[@path]">
-                                            , extractValue(xml, '/*/<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>',
-                                                '<xsl:value-of select="f:namespaces(.)"/>') detail_<xsl:value-of select="position()"/>
-                                        </xsl:for-each>
+                                        created, last_modified, document_id, xml,
+                                        row_number() over (order by created desc) row_number
                                     from
                                     (
                                         select created, last_modified, document_id, deleted, xml,
@@ -123,7 +119,6 @@
                                         <xsl:if test="/search/query[empty(@path) and normalize-space() != '']">
                                              and contains(xml, '<xsl:value-of select="f:escape-sql(concat('%', replace(/search/query[not(@path)], '_', '\\_'), '%'))"/>') > 0
                                         </xsl:if>
-                                    order by created desc
                                 </xsl:variable>
 
                                 <!-- Get total number of document in collection for this app/form -->
@@ -157,12 +152,23 @@
                                 <!-- Get details -->
                                 <sql:execute>
                                     <sql:query>
-                                        select *
-                                          from ( select
-                                          a.*, ROWNUM rnum
-                                              from ( <xsl:copy-of select="$query"/> ) a
-                                              where ROWNUM &lt;= <xsl:value-of select="/search/page-number * /search/page-size"/> )
-                                        where rnum  > <xsl:value-of select="(/search/page-number - 1) * /search/page-size"/>
+                                        select created, last_modified, document_id
+                                            <!-- Go over detail columns and extract data from XML -->
+                                            <xsl:for-each select="/search/query[@path]">
+                                                , extractValue(xml, '/*/<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>',
+                                                    '<xsl:value-of select="f:namespaces(.)"/>') detail_<xsl:value-of select="position()"/>
+                                            </xsl:for-each>
+                                        from
+                                        (
+                                            select *
+                                            from
+                                            (
+                                                <xsl:copy-of select="$query"/>
+                                            )
+                                            where
+                                                row_number > <xsl:value-of select="(/search/page-number - 1) * /search/page-size"/>
+                                                and row_number &lt;= <xsl:value-of select="/search/page-number * /search/page-size"/>
+                                        )
                                     </sql:query>
                                     <sql:result-set>
                                         <sql:row-iterator>

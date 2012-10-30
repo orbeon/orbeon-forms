@@ -23,7 +23,6 @@
         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
         xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:xbl="http://www.w3.org/ns/xbl"
-        xmlns:p="http://www.orbeon.com/oxf/pipeline"
 
         xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
         xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/orbeon/library">
@@ -222,7 +221,7 @@
     <xsl:template match="xhtml:body">
         <xsl:copy>
             <xsl:copy-of select="@*"/>
-            <xsl:attribute name="class" select="string-join((p:classes(), 'xforms-disable-hint-as-tooltip'), ' ')"/>
+            <xsl:attribute name="class" select="string-join((tokenize(@class, '\s+'), 'xforms-disable-hint-as-tooltip'), ' ')"/>
 
             <xhtml:div id="fr-view">
                 <xhtml:div id="doc2" class="fr-doc">

@@ -338,7 +338,7 @@
                                         or not(../xforms:action[1]/@id = $model/fb:action/@id)"/>
             <xforms:bind ref="instance-id" calculate="concat(../name, '-instance')"/>
 
-            <xforms:bind ref="xforms:action">
+            <xforms:bind ref="fb:action">
                 <!-- Action id -->
                 <xforms:bind ref="@id" calculate="concat(../../name, '-binding')"/>
                 <!-- Action that triggers the submission -->

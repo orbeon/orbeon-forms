@@ -64,13 +64,18 @@
             ORBEON.xforms.Document.setValue(this.clientValueTextareaId, this.myEditor.getContent());
         },
 
+        hasFocus: function() {
+            var activeElement = $(document.activeElement);
+            return activeElement.parents().is(this.container) ||    // Focus on an element inside the component (most likely the edition iframe)
+                activeElement.parent('.mceListBoxMenu').is('*');    // Focus is on absolutely positioned menu
+        },
+
         // Update MCE with server value
         serverToClient: function() {
-            if (! this.tinymceInitialized) return;                                                                  // Don't update value until TinyMCE is fully initialized
-            var mceContainer = YAHOO.util.Dom.getAncestorBy(document.activeElement, _.bind(function(e) {            // Look for ancestor of active element which is part of the MCE
-                return e == this.container || YD.hasClass(e, 'mceListBoxMenu');                                     // TinyMCE creates a div.mceListBoxMenu under the body for menus
-            }, this));
-            if (mceContainer == null) {                                                                             // Heuristic: if TinyMCE has focus, users might still be editing so don't update
+            var doUpdate =
+                this.tinymceInitialized &&                          // Don't update value until TinyMCE is fully initialized
+                ! this.hasFocus();                                  // Heuristic: if TinyMCE has focus, users might still be editing so don't update
+            if (doUpdate) {
                 var newServerValue = ORBEON.xforms.Document.getValue(this.serverValueOutputId);
                 this.myEditor.setContent(newServerValue);
             }

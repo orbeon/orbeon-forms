@@ -134,11 +134,6 @@ public class SchemaRepository {
         SCHEMAS.put(TestScriptProcessor.TEST_NAMESPACE_URI, PROCESSORS_SCHEMA_PATH + "test/test-processor-config.rng");
 
         SCHEMAS.put(PDFTemplateProcessor.PDFTemplateModelNamespaceURI(), PROCESSORS_SCHEMA_PATH + "pdf/pdf-template-model.rng");
-
-        SCHEMAS.put(XFormsConstants.XFORMS_NAMESPACE_URI + "/controls", "schemas/xforms-controls.rng");
-        SCHEMAS.put(XFormsConstants.XFORMS_NAMESPACE_URI + "/model", "schemas/xforms-1_0.xsd");
-        
-        SCHEMAS.put(XMLConstants.XHTML_NAMESPACE_URI, "schemas/xhtml1-transitional_and_xforms1.xsd");
         
         SCHEMAS.put("http://relaxng.org/ns/structure/1.0", "schemas/relaxng.rng");
         SCHEMAS.put("http://www.w3.org/2001/xml-events", "schemas/XML-Events-Schema.xsd");

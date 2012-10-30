@@ -406,11 +406,20 @@ div.xbl-fr-grid {
 #fb-source-editor-dialog .xforms-alert-active {
   display: block;
 }
-#fb-source-editor-dialog .xxforms-dialog-body {
+#fb-publish-dialog {
+  width: 35em;
+}
+.fb-publish-message {
+  background-color: white;
+  border: 1px solid #DDDDDD;
+  display: block;
+  padding: .5em;
+}
+.xxforms-set-height .xxforms-dialog-body {
   position: relative;
   overflow: inherit;
 }
-#fb-source-editor-dialog .xxforms-dialog-body .fb-xml-dialog-view {
+.xxforms-set-height .xxforms-dialog-body .fb-dialog-remaining-height {
   position: absolute;
   top: 0;
   left: 0;
@@ -418,7 +427,7 @@ div.xbl-fr-grid {
   bottom: 60px;
   overflow: scroll;
 }
-#fb-source-editor-dialog .xxforms-dialog-body .fr-dialog-buttons {
+.xxforms-set-height .xxforms-dialog-body .fr-dialog-buttons {
   height: 60px;
   position: absolute;
   bottom: 0;
@@ -431,22 +440,19 @@ div.xbl-fr-grid {
   -moz-box-sizing: border-box;
   box-sizing: border-box;
 }
-#fb-publish-dialog {
-  width: 35em;
+.fb-test-dialog {
+  width: 1000px;
 }
-.fb-publish-message {
-  background-color: white;
-  border: 1px solid #DDDDDD;
-  display: block;
-  padding: .5em;
+.fb-test-dialog .xxforms-dialog-body .fb-dialog-remaining-height {
+  overflow: hidden !important;
 }
-.fb-test-dialog .fb-test-iframe {
+.fb-test-dialog .xxforms-dialog-body .fb-test-iframe {
+  height: 100%;
   width: 100%;
-  border: 1px solid #666;
-}
-.fb-test-dialog .xforms-trigger button {
-  float: right;
-  width: 9.5em;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  border: none;
 }
 .xbl-fr-alert-dialog-message .xforms-label {
   font-weight: normal;

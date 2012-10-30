@@ -21,18 +21,21 @@
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
       xmlns:saxon="http://saxon.sf.net/"
 
-      id="fb-test-dialog" level="modal" close="true" draggable="false" class="fb-test-dialog"
-      style="width: 400px; height: 600px">
+      id="fb-test-dialog" level="modal" close="true" draggable="false" class="fb-test-dialog xxforms-set-height">
 
     <xforms:label ref="$form-resources/dialog-test/label"/>
-
-    <xhtml:iframe id="fb-test-iframe" name="fb-test-iframe" class="fb-test-iframe" src="about:blank"></xhtml:iframe>
-    <xforms:trigger>
-        <xforms:label>
-            <xhtml:img width="11" height="16" src="/apps/fr/style/close.gif" alt=""/>
-            <xhtml:span><xforms:output value="$fr-resources/detail/labels/close"/></xhtml:span>
-        </xforms:label>
-        <xxforms:hide ev:event="DOMActivate" dialog="fb-test-dialog"/>
-    </xforms:trigger>
-
+    <xhtml:div class="fb-dialog-remaining-height">
+        <xhtml:iframe id="fb-test-iframe" name="fb-test-iframe" class="fb-test-iframe" src="about:blank"/>
+    </xhtml:div>
+    <xhtml:div class="fr-dialog-buttons">
+        <xhtml:span>
+            <xforms:trigger appearance="xxforms:primary">
+                <xforms:label>
+                    <xhtml:img width="11" height="16" src="/apps/fr/style/close.gif" alt=""/>
+                    <xhtml:span><xforms:output value="$fr-resources/detail/labels/close"/></xhtml:span>
+                </xforms:label>
+                <xxforms:hide ev:event="DOMActivate" dialog="fb-test-dialog"/>
+            </xforms:trigger>
+        </xhtml:span>
+    </xhtml:div>
 </xxforms:dialog>

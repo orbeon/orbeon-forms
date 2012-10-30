@@ -27,7 +27,7 @@
 
     <xforms:label ref="$form-resources/dialog-edit-source/label"/>
 
-    <xhtml:div class="fb-xml-dialog-view">
+    <xhtml:div class="fb-dialog-remaining-height">
         <fr:code-mirror ref="source">
             <xforms:alert ref="$form-resources/dialog-edit-source/source/alert"/>
         </fr:code-mirror>

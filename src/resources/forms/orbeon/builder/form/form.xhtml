@@ -109,21 +109,8 @@
                         </xf:label>
                         <xf:action ev:event="DOMActivate">
                             <xxf:script>
-                                <!-- Dialog set to 90% of the viewport width/height -->
-                                var dialogWidth = YAHOO.util.Dom.getViewportWidth() * .9;
-                                var dialogHeight = YAHOO.util.Dom.getViewportHeight() * .9;
-                                <!-- Get references to elements in the dialog -->
-                                var testDialog = YAHOO.util.Dom.get("fb-test-dialog");
-                                var testDialogBody = YAHOO.util.Dom.getElementsByClassName("bd", null, testDialog)[0];
-                                var closeButton = YAHOO.util.Dom.getElementsByClassName("xbl-fr-button", null, testDialogBody)[0];
-                                var iframe = YAHOO.util.Dom.get("fb-test-iframe");
-                                <!-- Set width/height of dialog -->
-                                testDialog.style.width = dialogWidth + "px";
-                                testDialogBody.style.height = dialogHeight + "px";
-                                <!-- Height of iframe set to leave enough space to the close button -->
-                                iframe.style.height = (dialogHeight - 35) + "px";
                                 <!-- Reset the displayed page as the iframe might show the result from a previous test -->
-                                iframe.contentWindow.location.href = "about:blank";
+                                $('#fb-test-iframe')[0].contentWindow.location.href = "about:blank";
                                 ORBEON.xforms.Document.dispatchEvent("fb-test-button-group", "show-fb-test-dialog");
                             </xxf:script>
                         </xf:action>

@@ -306,12 +306,23 @@ div.xbl-fr-grid {
     .CodeMirror { font-size: 12px; }            // Pick slightly smaller font size, default being 13px
     .CodeMirror-scroll { height: auto }
     .xforms-alert-active { display: block }
+}
 
+// Publish dialog
+#fb-publish-dialog { width: 35em }
+.fb-publish-message {
+    background-color: white;
+    border: 1px solid #DDDDDD;
+    display: block;
+    padding: .5em;
+}
+
+.xxforms-set-height {                           // Dialogs for which we want the main area to take remaining height
     .xxforms-dialog-body {
         position: relative;                     // So the source editor and buttons can be absolutely positioned relative to the dialog body
         overflow: inherit;                      // Override the overflow: auto in xforms.css to avoid a second scrollbar on the body on Firefox
         @buttonsAreaHeight: 60px;
-        .fb-xml-dialog-view {                   // Contains the CodeMirror editor
+        .fb-dialog-remaining-height {           // Contains the CodeMirror editor
             position: absolute;                 // Take all the vertical space, leaving just 60px at the bottom for the buttons
             top: 0; left: 0; right: 0;
             bottom: @buttonsAreaHeight;
@@ -328,19 +339,19 @@ div.xbl-fr-grid {
     }
 }
 
-// Publish dialog
-#fb-publish-dialog { width: 35em }
-.fb-publish-message {
-    background-color: white;
-    border: 1px solid #DDDDDD;
-    display: block;
-    padding: .5em;
-}
-
 // Test dialog
 .fb-test-dialog {
-    .fb-test-iframe { width: 100%; border: 1px solid #666; }
-    .xforms-trigger button { float: right; width: 9.5em }
+    width: 1000px;                              // Space to fit the 940px layout (couldn't find a reasonable variable to use here)
+    .xxforms-dialog-body {
+        .fb-dialog-remaining-height {
+            overflow: hidden !important;        // Override scroll above, to avoid 1px scroll (not why this is necessary, or how else to avoid this)
+        }
+        .fb-test-iframe {
+            height: 100%; width: 100%;          // Use all the space available in container (.fb-dialog-remaining-height)
+            .box-sizing(border-box);            // So the size of this box doesn't get larger than its container, which would add scrollbars to the container
+            border: none;                       // By default, iframes have a particularly ugly border
+        }
+    }
 }
 
 // PE dialog

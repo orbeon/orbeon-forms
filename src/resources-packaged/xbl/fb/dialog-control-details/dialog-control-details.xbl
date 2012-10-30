@@ -41,21 +41,22 @@
         <xbl:implementation>
             <xf:model id="model">
                 <xf:instance id="local">
-                    <local relevant=""><!-- TODO: Relevance must be handled automatically by the XForms engine! -->
+                    <!-- TODO: Relevance must be handled automatically by the XForms engine! -->
+                    <local relevant="" valid="true">
                         <original-control-name/>    <!-- So we can find back the control when saving if users change the name -->
                         <control-name/>             <!-- Possibly new name set by users -->
                         <control-xpath/>            <!-- XPath expression to node might be editable if using custom XML -->
                         <classes/>                  <!-- fr-summary, fr-search... -->
                         <is-custom-instance/>
-                        <save-trigger/>             <!-- Contains 'enabled' if all the fields are valid -->
                         <control-names/>            <!-- All used control names in the form, to check that new name doesn't conflict with existing id -->
                         <control-details/>          <!-- Sub-elements contain additional properties for this control -->
+                        <save-trigger/>
                     </local>
                 </xf:instance>
 
                 <!-- Enable/disable trigger -->
-                <xf:setvalue ev:observer="local" ref="save-trigger" ev:event="xxforms-invalid">disabled</xf:setvalue>
-                <xf:setvalue ev:observer="local" ref="save-trigger" ev:event="xxforms-valid">enabled</xf:setvalue>
+                <xf:setvalue ev:event="xxforms-invalid" ev:observer="local" ref="@valid">false</xf:setvalue>
+                <xf:setvalue ev:event="xxforms-valid"   ev:observer="local" ref="@valid">true</xf:setvalue>
 
                 <!-- NOTE: We use normalize-space() to make sure there is no leading/trailing space -->
                 <xf:bind ref="control-name"
@@ -68,7 +69,7 @@
                              required="../is-custom-instance = 'true'"
                              type="xxf:xpath2"
                              fb:warning="not(normalize-space() and dataModel:isAllowedValueBindingExpression(../original-control-name, .))"/>
-                <xf:bind ref="save-trigger" readonly=". = 'disabled'"/>
+                <xf:bind ref="save-trigger" readonly="instance()/@valid = 'false'"/>
 
             </xf:model>
         </xbl:implementation>
@@ -126,7 +127,7 @@
                 </xf:action>
 
                 <!-- Save data upon close -->
-                <xf:action ev:event="DOMActivate" ev:observer="dialog" if="event('xxf:targetid') != 'cancel-trigger' and $local/save-trigger = 'enabled'">
+                <xf:action ev:event="DOMActivate" ev:observer="dialog" if="event('xxf:targetid') != 'cancel-trigger' and $local/@valid = 'true'">
 
                     <xf:var name="old-name" value="$local/original-control-name/string()"/>
                     <xf:var name="new-name" value="$local/control-name/string()"/>

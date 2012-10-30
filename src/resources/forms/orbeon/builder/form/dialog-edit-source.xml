@@ -69,7 +69,7 @@
         <xforms:var name="model" value="xxforms:instance('fb-form-instance')/xhtml:head/xforms:model[@id = 'fr-form-model']"/>
 
         <xforms:instance id="fb-source-editor-instance">
-            <source-editor>
+            <source-editor valid="true">
                 <source/>
                 <save-trigger/>
             </source-editor>
@@ -77,12 +77,12 @@
 
         <xforms:bind ref="instance('fb-source-editor-instance')">
             <xforms:bind ref="source" type="xxforms:xml"/>
-            <xforms:bind ref="save-trigger" readonly=". = 'disabled'"/>
+            <xforms:bind ref="save-trigger" readonly="../@valid = 'false'"/>
         </xforms:bind>
 
         <!-- Enable/disable trigger -->
-        <xforms:setvalue ev:event="xxforms-invalid" ev:observer="fb-source-editor-instance" ref="instance('fb-source-editor-instance')/save-trigger">disabled</xforms:setvalue>
-        <xforms:setvalue ev:event="xxforms-valid" ev:observer="fb-source-editor-instance" ref="instance('fb-source-editor-instance')/save-trigger">enabled</xforms:setvalue>
+        <xforms:setvalue ev:event="xxforms-invalid" ev:observer="fb-source-editor-instance" ref="@valid">false</xforms:setvalue>
+        <xforms:setvalue ev:event="xxforms-valid"   ev:observer="fb-source-editor-instance" ref="@valid">true</xforms:setvalue>
 
     </xforms:model>
 

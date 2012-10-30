@@ -48,7 +48,8 @@
         <xbl:implementation>
             <xf:model id="model">
                 <xf:instance id="local">
-                    <local relevant=""><!-- TODO: Relevance must be handled automatically by the XForms engine! -->
+                    <!-- TODO: Relevance must be handled automatically by the XForms engine! -->
+                    <local relevant="" valid="true">
                         <original-grid-name/>    <!-- So we can find back the control when saving if users change the name -->
                         <grid-name/>             <!-- Possibly new name set by users -->
 
@@ -60,15 +61,15 @@
                         <min-repeat/>            <!-- Minimum number of repetitions -->
                         <max-repeat/>            <!-- Maximum number of repetitions -->
 
-                        <save-trigger/>          <!-- Contains 'enabled' if all the fields are valid -->
-
                         <control-names/>         <!-- All used control names in the form, to check that new name doesn't conflict with existing id -->
+
+                        <save-trigger/>
                     </local>
                 </xf:instance>
 
                 <!-- Enable/disable trigger -->
-                <xf:setvalue ev:observer="local" ref="save-trigger" ev:event="xxforms-invalid">disabled</xf:setvalue>
-                <xf:setvalue ev:observer="local" ref="save-trigger" ev:event="xxforms-valid">enabled</xf:setvalue>
+                <xf:setvalue ev:event="xxforms-invalid" ev:observer="local" ref="@valid">false</xf:setvalue>
+                <xf:setvalue ev:event="xxforms-valid"   ev:observer="local" ref="@valid">true</xf:setvalue>
 
                 <!-- NOTE: We use normalize-space() to make sure there is no leading/trailing space -->
                 <xf:bind ref="grid-name"
@@ -86,7 +87,7 @@
                          calculate="normalize-space()" readonly="false()"/>
 
                 <xf:bind ref="control-xpath" relevant="../is-custom-mode = 'true'" type="xxf:xpath2" required="../is-custom-mode = 'true'"/>
-                <xf:bind ref="save-trigger" readonly=". = 'disabled'"/>
+                <xf:bind ref="save-trigger" readonly="instance()/@valid = 'false'"/>
 
             </xf:model>
         </xbl:implementation>
@@ -122,7 +123,7 @@
                 <xxf:hide ev:event="DOMActivate" ev:observer="cancel-trigger" dialog="dialog"/>
 
                 <!-- Save data upon close -->
-                <xf:action ev:event="DOMActivate" ev:observer="dialog" if="event('xxf:targetid') != 'cancel-trigger' and $local/save-trigger = 'enabled'">
+                <xf:action ev:event="DOMActivate" ev:observer="dialog" if="event('xxf:targetid') != 'cancel-trigger' and $local/@valid = 'true'">
 
                     <xf:var name="old-name" value="$local/original-grid-name/string()"/>
                     <xf:var name="new-name" value="$local/grid-name/string()"/>

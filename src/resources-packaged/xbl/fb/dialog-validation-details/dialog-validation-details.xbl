@@ -44,7 +44,8 @@
             <xforms:model id="model">
 
                 <xforms:instance id="local">
-                    <local relevant=""><!-- TODO: Relevance must be handled automatically by the XForms engine! -->
+                    <!-- TODO: Relevance must be handled automatically by the XForms engine! -->
+                    <local relevant="" valid="true">
 
                         <control-name/>
 
@@ -66,12 +67,12 @@
                 </xforms:instance>
 
                 <!-- Enable/disable trigger -->
-                <xforms:setvalue ev:event="xxforms-invalid" ev:observer="local" ref="save-trigger">disabled</xforms:setvalue>
-                <xforms:setvalue ev:event="xxforms-valid" ev:observer="local" ref="save-trigger">enabled</xforms:setvalue>
+                <xforms:setvalue ev:event="xxforms-invalid" ev:observer="local" ref="@valid">false</xforms:setvalue>
+                <xforms:setvalue ev:event="xxforms-valid"   ev:observer="local" ref="@valid">true</xforms:setvalue>
 
                 <xforms:bind ref="required" readonly="../schema-type != ''"/>
                 <xforms:bind ref="relevant | readonly | constraint | default | calculate" type="xxforms:xpath2" required="false()"/>
-                <xforms:bind ref="save-trigger" readonly=". = 'disabled'"/>
+                <xforms:bind ref="save-trigger" readonly="instance()/@valid = 'false'"/>
 
             </xforms:model>
         </xbl:implementation>
@@ -127,7 +128,7 @@
                 <!-- Save data upon close unless the sub-form is not valid -->
                 <!-- NOTE: We used to have not(event('fb:save') = false()), but we prefer explicit now because we may get
                      an extra xxforms-dialog-close event sent by the client, in which case we don't want to do the processing -->
-                <xforms:action ev:event="xxforms-dialog-close" if="event('fb:save') and $local/save-trigger = 'enabled'" ev:observer="dialog">
+                <xforms:action ev:event="xxforms-dialog-close" if="event('fb:save') and $local/@valid = 'true'" ev:observer="dialog">
                     <xforms:var name="current-control" value="if ($local/control-name != '') then controlOps:findControlByNameOrEmpty($form, $local/control-name) else ()"/>
 
                     <!-- Copy back the help/alert -->

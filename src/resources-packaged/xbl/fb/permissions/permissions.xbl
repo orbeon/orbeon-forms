@@ -38,8 +38,7 @@
         <xbl:implementation>
             <xforms:model id="permissions-model">
                 <xforms:instance id="ui">
-                    <ui>
-                        <valid/>
+                    <ui valid="true">
                         <apply-trigger/>
                         <has-permissions/>
                         <readonly-checked>create read-update delete</readonly-checked>
@@ -51,10 +50,10 @@
                     </ui>
                 </xforms:instance>
                 <!-- Maintain validity flag -->
-                <xforms:setvalue ev:event="xxforms-invalid" ev:observer="ui" ref="instance('ui')/valid">false</xforms:setvalue>
-                <xforms:setvalue ev:event="xxforms-valid" ev:observer="ui" ref="instance('ui')/valid">true</xforms:setvalue>
+                <xforms:setvalue ev:event="xxforms-invalid" ev:observer="ui" ref="@valid">false</xforms:setvalue>
+                <xforms:setvalue ev:event="xxforms-valid"   ev:observer="ui" ref="@valid">true</xforms:setvalue>
                 <xforms:bind ref="instance('ui')">
-                    <xforms:bind ref="apply-trigger" readonly="../valid = 'false'"/>
+                    <xforms:bind ref="apply-trigger" readonly="instance()/@valid = 'false'"/>
                     <xforms:bind ref="readonly-checked" readonly="true()"/>
                     <xforms:bind ref="permissions/permission/role" constraint="normalize-space()" required="true()"/>
                 </xforms:bind>

@@ -319,7 +319,7 @@
         <xforms:var name="current-resources" value="$resources/resource[@xml:lang = $fb-lang]"/>
 
         <xforms:instance id="fb-bindings-editor-instance">
-            <bindings-editor>
+            <bindings-editor valid="true">
                 <name/>
                 <initial-name/>
                 <instance-id/>
@@ -329,8 +329,8 @@
         </xforms:instance>
 
         <!-- Enable/disable trigger -->
-        <xforms:setvalue ev:event="xxforms-invalid" ev:observer="fb-bindings-editor-instance" ref="save-test-trigger">disabled</xforms:setvalue>
-        <xforms:setvalue ev:event="xxforms-valid" ev:observer="fb-bindings-editor-instance" ref="save-test-trigger">enabled</xforms:setvalue>
+        <xforms:setvalue ev:event="xxforms-invalid" ev:observer="fb-bindings-editor-instance" ref="@valid">false</xforms:setvalue>
+        <xforms:setvalue ev:event="xxforms-valid"   ev:observer="fb-bindings-editor-instance" ref="@valid">true</xforms:setvalue>
 
         <xforms:bind ref="instance('fb-bindings-editor-instance')">
             <xforms:bind ref="name" type="xs:NCName" required="true()"
@@ -374,7 +374,7 @@
                     </xforms:bind>
                 </xforms:bind>
             </xforms:bind>
-            <xforms:bind ref="save-test-trigger" readonly=". = 'disabled'"/>
+            <xforms:bind ref="save-test-trigger" readonly="../@valid = 'false'"/>
         </xforms:bind>
 
         <!-- Template for a given binding -->

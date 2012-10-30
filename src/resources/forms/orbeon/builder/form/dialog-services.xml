@@ -343,7 +343,7 @@
         <xforms:var name="model" value="xxforms:instance('fb-form-instance')/xhtml:head/xforms:model[@id = 'fr-form-model']"/>
 
         <xforms:instance id="fb-submission-editor-instance">
-            <submission>
+            <submission valid="true">
                 <id/>
                 <initial-id/>
                 <submission-id/>
@@ -375,8 +375,8 @@
         </xforms:instance>
 
         <!-- Enable/disable trigger -->
-        <xforms:setvalue ev:event="xxforms-invalid" ev:observer="fb-submission-editor-instance" ref="save-test-trigger">disabled</xforms:setvalue>
-        <xforms:setvalue ev:event="xxforms-valid" ev:observer="fb-submission-editor-instance" ref="save-test-trigger">enabled</xforms:setvalue>
+        <xforms:setvalue ev:event="xxforms-invalid" ev:observer="fb-submission-editor-instance" ref="@valid">false</xforms:setvalue>
+        <xforms:setvalue ev:event="xxforms-valid"   ev:observer="fb-submission-editor-instance" ref="@valid">true</xforms:setvalue>
 
         <xforms:bind ref="instance('fb-submission-editor-instance')">
             <xforms:bind ref="id" type="xs:NCName" required="true()"
@@ -395,7 +395,7 @@
                                     else ../serialization"/>
             <xforms:bind ref="request/body" type="xxforms:xml" required="true()"/>
             <xforms:bind ref="response/error-type" readonly="true()"/>
-            <xforms:bind ref="save-test-trigger" readonly=". = 'disabled'"/>
+            <xforms:bind ref="save-test-trigger" readonly="../@valid = 'false'"/>
         </xforms:bind>
 
         <!-- Template for inserting a submission -->

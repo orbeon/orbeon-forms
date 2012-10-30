@@ -45,19 +45,20 @@
         <xbl:implementation>
             <xf:model id="model">
                 <xf:instance id="local">
-                    <local relevant=""><!-- TODO: Relevance must be handled automatically by the XForms engine! -->
+                    <!-- TODO: Relevance must be handled automatically by the XForms engine! -->
+                    <local relevant="" valid="true">
                         <control-name/>
                         <help/>
 
-                        <save-trigger/>          <!-- Contains 'enabled' if all the fields are valid -->
+                        <save-trigger/>
                     </local>
                 </xf:instance>
 
                 <!-- Enable/disable trigger -->
-                <xf:setvalue ev:observer="local" ref="save-trigger" ev:event="xxforms-invalid">disabled</xf:setvalue>
-                <xf:setvalue ev:observer="local" ref="save-trigger" ev:event="xxforms-valid">enabled</xf:setvalue>
+                <xf:setvalue ev:event="xxforms-invalid" ev:observer="local" ref="@valid">false</xf:setvalue>
+                <xf:setvalue ev:event="xxforms-valid"   ev:observer="local" ref="@valid">true</xf:setvalue>
 
-                <xf:bind ref="save-trigger" readonly=". = 'disabled'"/>
+                <xf:bind ref="save-trigger" readonly="instance()/@valid = 'false'"/>
 
             </xf:model>
         </xbl:implementation>
@@ -75,7 +76,7 @@
                 <xxf:hide ev:event="DOMActivate" ev:observer="cancel-trigger" dialog="dialog"/>
 
                 <!-- Save data upon close -->
-                <xf:action ev:event="DOMActivate" ev:observer="dialog" if="event('xxf:targetid') != 'cancel-trigger' and $local/save-trigger = 'enabled'">
+                <xf:action ev:event="DOMActivate" ev:observer="dialog" if="event('xxf:targetid') != 'cancel-trigger' and $local/@valid = 'true'">
 
                     <xf:action type="xpath">    
                         controlOps:setControlHelp($local/control-name, $local/help)

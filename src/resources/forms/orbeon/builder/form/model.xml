@@ -437,7 +437,7 @@
 
     <!-- Instance for metadata editor -->
     <xforms:instance id="fb-metadata-instance">
-        <metadata>
+        <metadata valid="true">
             <next-trigger/>
             <mode/> <!-- edit | save-as -->
             <toolbox>
@@ -453,12 +453,12 @@
     </xforms:instance>
 
     <!-- Enable/disable trigger -->
-    <xforms:setvalue ev:event="xxforms-invalid" ev:observer="fb-metadata-instance" ref="instance('fb-metadata-instance')/next-trigger">disabled</xforms:setvalue>
-    <xforms:setvalue ev:event="xxforms-valid" ev:observer="fb-metadata-instance" ref="instance('fb-metadata-instance')/next-trigger">enabled</xforms:setvalue>
+    <xforms:setvalue ev:event="xxforms-invalid" ev:observer="fb-metadata-instance" ref="instance('fb-metadata-instance')/@valid">false</xforms:setvalue>
+    <xforms:setvalue ev:event="xxforms-valid"   ev:observer="fb-metadata-instance" ref="instance('fb-metadata-instance')/@valid">true</xforms:setvalue>
 
     <xforms:bind ref="instance('fb-metadata-instance')">
         <!-- Triggers -->
-        <xforms:bind ref="next-trigger" readonly=". = 'disabled'"/>
+        <xforms:bind ref="next-trigger" readonly="../@valid = 'false'"/>
         <xforms:bind ref="toolbox/schema" relevant="xxforms:property('oxf.fb.menu.schema')"/>
         <xforms:bind ref="toolbox/css" relevant="xxforms:property('oxf.fb.menu.css')"/>
         <xforms:bind ref="toolbox/pdf" relevant="xxforms:property('oxf.fb.menu.pdf')"/>

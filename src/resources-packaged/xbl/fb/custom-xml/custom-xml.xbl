@@ -41,7 +41,7 @@
         <xbl:implementation>
             <xforms:model id="custom-xml-model">
                 <xforms:instance id="ui">
-                    <ui>
+                    <ui valid="true">
                         <original-mode/>
                         <mode/>
                         <xml/>
@@ -51,12 +51,13 @@
                 </xforms:instance>
 
                 <!-- Keep track of whether the XML entered by users is valid -->
-                <xforms:setvalue ev:observer="ui" ev:event="xxforms-invalid" ref="save-trigger">disabled</xforms:setvalue>
-                <xforms:setvalue ev:observer="ui" ev:event="xxforms-valid"   ref="save-trigger">enabled</xforms:setvalue>
+                <xforms:setvalue ev:event="xxforms-invalid" ev:observer="ui" ref="@valid">false</xforms:setvalue>
+                <xforms:setvalue ev:event="xxforms-valid"   ev:observer="ui" ref="@valid">true</xforms:setvalue>
 
                 <xforms:bind ref="xml" type="xxforms:xml"/>
-                <xforms:bind ref="save-trigger" readonly=". = 'disabled'"/>
                 <xforms:bind ref="xml" readonly="../mode = 'automatic'"/>
+
+                <xforms:bind ref="save-trigger" readonly="instance()/@valid = 'false'"/>
             </xforms:model>
         </xbl:implementation>
         <xbl:template>
@@ -89,7 +90,7 @@
 
                 <!-- On close dialog -->
                 <xxforms:hide ev:event="DOMActivate" ev:observer="triggers" dialog="dialog"/>
-                <xforms:action ev:event="DOMActivate" ev:observer="dialog" if="event('xxforms:targetid') != 'cancel-trigger' and $ui/save-trigger = 'enabled'">
+                <xforms:action ev:event="DOMActivate" ev:observer="dialog" if="event('xxforms:targetid') != 'cancel-trigger' and $ui/@valid = 'true'">
 
                     <!-- If mode has changed or mode is custom, parse the XML and replace in form -->
                     <xforms:action if="$ui/mode != $ui/original-mode or $ui/mode = 'custom'">

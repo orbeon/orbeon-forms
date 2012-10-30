@@ -176,7 +176,7 @@
         <xforms:var name="model" value="xxforms:instance('fb-form-instance')/xhtml:head/xforms:model[@id = 'fr-form-model']"/>
 
         <xforms:instance id="fb-database-service-instance">
-            <submission>
+            <submission valid="true">
                 <name/>
                 <initial-name/>
                 <submission-id/>
@@ -190,8 +190,8 @@
         </xforms:instance>
 
         <!-- Enable/disable trigger -->
-        <xforms:setvalue ev:event="xxforms-invalid" ev:observer="fb-database-service-instance" ref="save-test-trigger">disabled</xforms:setvalue>
-        <xforms:setvalue ev:event="xxforms-valid" ev:observer="fb-database-service-instance" ref="save-test-trigger">enabled</xforms:setvalue>
+        <xforms:setvalue ev:event="xxforms-invalid" ev:observer="fb-database-service-instance" ref="@valid">false</xforms:setvalue>
+        <xforms:setvalue ev:event="xxforms-valid"   ev:observer="fb-database-service-instance" ref="@valid">true</xforms:setvalue>
 
         <xforms:bind ref="instance('fb-database-service-instance')">
             <!-- Make sure that the name is not already in use  -->
@@ -208,7 +208,7 @@
                          calculate="concat('&lt;sql:query xmlns:sql=''http://orbeon.org/oxf/xml/sql''>', ../query, '&lt;/sql:query>')"/>
             <xforms:bind ref="query" constraint="xxforms:valid(../query-xml)"/>
 
-            <xforms:bind ref="save-test-trigger" readonly=". = 'disabled'"/>
+            <xforms:bind ref="save-test-trigger" readonly="../@valid = 'false'"/>
         </xforms:bind>
 
         <!-- Template for the submission -->

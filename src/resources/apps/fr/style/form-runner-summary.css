@@ -67,8 +67,8 @@
 .fr-summary-table-div th {
   white-space: nowrap;
 }
-.fr-summary-table-div .fr-summary-repeat-selection-checkbox {
-  width: 1em;
+.fr-summary-table-div .fr-summary-repeat-selection-checkbox .xforms-select input {
+  float: none;
 }
 .fr-summary-table-div .fr-summary-repeat-selection-checkbox label {
   margin: 0;

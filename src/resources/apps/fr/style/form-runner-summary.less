@@ -55,12 +55,12 @@
         margin-bottom: 0;
         max-width: none;                                        // Because table can scrolls beyond size of container
     }
-    
+
     tbody {
         a { text-decoration: none; color: black; outline: 0 }   // Links in table must appear as normal text
         span { color: black;  }                                 // When there is no link (delete-only), override YUI CSS that shows current row text in white
     }
-    
+
     td {
         white-space: nowrap;                                    // Mainly to prevent dates from wrapping
         a {                                                     // Link to take as much space as possible in the cell
@@ -78,16 +78,13 @@
     }
 
     .fr-summary-repeat-selection-checkbox {
-        width: 1em;             // force minimum column width
-
+        .xforms-select input { float: none }                    // If the checkboxes is floated, IE7 incorrectly calculates the width of the column
         label {
             margin: 0;
             padding: 0;
             text-indent: 0;
-
             input { margin: 0}
         }
-
     }
 
     .fr-summary-repeat-column-number { text-align: right; width: 3em }

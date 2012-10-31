@@ -119,7 +119,7 @@
                             <!-- Use an input if app name is a wildcard -->
                             <xf:var name="is-input" value="xxf:instance('fr-permissions')/app[@name = '*']" as="xs:boolean"/>
                             <xf:group ref=".[$is-input]">
-                                <xf:input ref="app" id="fb-application-name-input" tabindex="1" xxf:autocomplete="off">
+                                <xf:input ref="app" id="fb-application-name-input" xxf:autocomplete="off">
                                     <xf:label ref="$resources/application-name/label"/>
                                     <xf:hint ref="$resources/application-name/hint"/>
                                     <xf:alert ref="$resources/application-name/alert"/>
@@ -155,21 +155,21 @@
                         <xh:div>
 
                             <!-- Form name -->
-                            <xf:input ref="form" id="fb-form-name-input" tabindex="2" xxf:autocomplete="off">
+                            <xf:input ref="form" id="fb-form-name-input" xxf:autocomplete="off">
                                 <xf:label ref="$resources/form-name/label"/>
                                 <xf:hint ref="$resources/form-name/hint"/>
                                 <xf:alert ref="$resources/form-name/alert"/>
                             </xf:input>
 
                             <!-- Title -->
-                            <xf:input ref="title" id="fb-title-input" tabindex="3" xxf:autocomplete="off">
+                            <xf:input ref="title" id="fb-title-input" xxf:autocomplete="off">
                                 <xf:label ref="$resources/title/label"/>
                                 <xf:hint ref="$resources/title/hint"/>
                                 <xf:alert ref="$resources/title/alert"/>
                             </xf:input>
 
                             <!-- Description -->
-                            <xf:textarea ref="description" tabindex="4">
+                            <xf:textarea ref="description" >
                                 <xf:label ref="$resources/description/label"/>
                                 <xf:hint ref="$resources/description/hint"/>
                                 <xf:alert ref="$resources/description/alert"/>
@@ -207,11 +207,11 @@
                     </xh:div>
 
                     <xh:div class="fr-dialog-buttons">
-                        <xf:trigger id="fb-metadata-continue-trigger" appearance="xxf:primary" tabindex="3">
+                        <xf:trigger id="fb-metadata-continue-trigger" appearance="xxf:primary">
                             <xf:label value="$resources/(if ($is-new-form) then continue else apply)/label"/>
                         </xf:trigger>
                         <xf:output value="$resources/or/label"/>
-                        <xf:trigger appearance="minimal" class="fr-inplace-cancel" tabindex="4">
+                        <xf:trigger appearance="minimal" class="fr-inplace-cancel">
                             <xf:label value="$resources/cancel/label"/>
                             <!-- Hide this dialog or go to the summary page -->
                             <xf:action ev:event="DOMActivate">

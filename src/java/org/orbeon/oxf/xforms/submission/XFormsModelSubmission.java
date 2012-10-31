@@ -1125,7 +1125,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
     public XFormsInstance findReplaceInstanceNoTargetref(XFormsInstance refInstance) {
         final XFormsInstance replaceInstance;
         if (xxfReplaceInstanceId != null)
-            replaceInstance = containingDocument.findInstance(xxfReplaceInstanceId);
+            replaceInstance = containingDocument.findInstanceOrNull(xxfReplaceInstanceId);
         else if (replaceInstanceId != null)
             replaceInstance = model.getInstance(replaceInstanceId);
         else if (refInstance == null)

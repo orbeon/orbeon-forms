@@ -54,7 +54,7 @@ class XXFormsInstance extends XFormsFunction with FunctionSupport {
 
                 def findDynamic = {
                     val containers = Iterator.iterate(startContainer)(_.getParentXBLContainer) takeWhile (_ ne null)
-                    val instances  = containers flatMap (c ⇒ Option(c.findInstance(instanceId)))
+                    val instances  = containers flatMap (_.findInstance(instanceId))
                     if (instances.hasNext) Some(SingletonIterator.makeIterator(instances.next().instanceRoot)) else None
                 }
 

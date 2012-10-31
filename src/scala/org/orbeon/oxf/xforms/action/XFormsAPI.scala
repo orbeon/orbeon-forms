@@ -190,10 +190,10 @@ object XFormsAPI {
         val containersToSearch =
             if (searchAncestors) ancestorXBLContainers else List(actionInterpreterDyn.value.get.container)
 
-        containersToSearch map
-                (_.findInstance(staticId)) find
-                    (_ ne null) map
-                        (_.instanceRoot)
+        containersToSearch flatMap
+            (_.findInstance(staticId)) find
+                (_ ne null) map
+                    (_.instanceRoot)
     }
 
     // Return a model

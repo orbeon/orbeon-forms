@@ -466,8 +466,14 @@ trait ContainerResolver {
         findInSelfAndDescendants[XFormsInstance](m ⇒ Option(m.getInstanceForNode(nodeInfo)), Some(c ⇒ Option(c.getInstanceForNode(nodeInfo)))) orNull
 
     // Locally find the instance with the specified id, searching in any relevant model
-    def findInstance(instanceId: String): XFormsInstance =
-        findInSelfAndDescendants(m ⇒ Option(m.getInstance(instanceId))) orNull
+    def findInstance(instanceId: String): Option[XFormsInstance] =
+        if (isRelevant && models.nonEmpty)
+            models.iterator map (_.getInstance(instanceId)) find (_ ne null)
+        else
+            None
+
+    // For Java callers
+    def findInstanceOrNull(instanceId: String) = findInstance(instanceId).orNull
 
     protected def initializeNestedControls() = ()
 

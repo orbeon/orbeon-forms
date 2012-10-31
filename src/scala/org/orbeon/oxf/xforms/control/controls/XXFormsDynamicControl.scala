@@ -218,7 +218,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
 
         partAnalysis.getModelsForScope(partAnalysis.startScope) foreach {
             _.instances.values filter (_.useInlineContent) foreach { instance ⇒
-                val innerInstance = childContainer.findInstance(instance.staticId)
+                val innerInstance = childContainer.findInstance(instance.staticId).get
                 InstanceMirror.addListener(innerInstance, innerListener)
             }
         }

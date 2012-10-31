@@ -53,9 +53,9 @@ case class Item(label: Label, value: String, attributes: Map[QName, String])(val
     // reach compiler-generated case class equals.
     override def equals(other: Any) = other match {
         case other: Item ⇒
-            label      == other.label      &&
-            value      == other.value      &&
-            attributes == other.attributes &&
+            label         == other.label         &&
+            externalValue == other.externalValue &&
+            attributes    == other.attributes    &&
             super.equals(other)
         case _ ⇒ false
     }

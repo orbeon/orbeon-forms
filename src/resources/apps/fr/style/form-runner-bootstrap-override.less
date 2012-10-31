@@ -45,10 +45,10 @@ form.xforms-form {
     input[type="tel"],
     input[type="color"],
     .uneditable-input {
-        margin-bottom: 0;           // Override default 9px bottom margin added by Bootstrap
-        color: black;               // Make text inside the fields stand out, as this is the most important information
-        .box-sizing(border-box);    // Because we change this, the height must be changed as well below
-        height: @baseLineHeight + 8px;
+        margin-bottom: 0;               // Override default 9px bottom margin added by Bootstrap
+        color: black;                   // Make text inside the fields stand out, as this is the most important information
+        .box-sizing(border-box);        // So width: 100% works with the padding added by Bootstrap
+        height: @baseLineHeight + 8px;  // Because of the border-box
     }
 
     // Adapt pagination to use of xforms:trigger

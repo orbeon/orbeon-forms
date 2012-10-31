@@ -93,9 +93,26 @@
 
     <!-- Go back to the Form Runner summary page -->
     <xforms:action ev:event="fr-goto-summary">
-        <xxforms:script>window.close();</xxforms:script>
-        <xforms:load resource="/fr/{$parameters/app}/{$parameters/form}/summary{if (property('xxforms:noscript')) then '?fr-noscript=true' else ''}"
-                     xxforms:show-progress="false"/>
+
+        <!-- Get close URI -->
+        <xxforms:variable name="parameters" value="xxforms:instance('fr-parameters-instance')" as="element()"/>
+        <xxforms:variable name="app" value="$parameters/app" as="xs:string"/>
+        <xxforms:variable name="form" value="$parameters/form" as="xs:string"/>
+        <xxforms:variable name="close-uri" value="xxforms:property(string-join(('oxf.fr.detail.close.uri', $app, $form), '.'))" as="xs:anyURI"/>
+        <xxforms:variable name="have-close-uri" value="$close-uri != ''" as="xs:anyURI"/>
+
+        <!-- If we have a close URI, go there -->
+        <xforms:action if="$have-close-uri">
+            <xforms:load resource="{$close-uri}" xxforms:show-progress="false"/>
+        </xforms:action>
+
+        <!-- If we don't have a close URI, close window if we can, otherwise go to the summary -->
+        <xforms:action if="not($have-close-uri)">
+            <xxforms:script>window.close();</xxforms:script>
+            <xforms:load resource="/fr/{$parameters/app}/{$parameters/form}/summary{if (property('xxforms:noscript')) then '?fr-noscript=true' else ''}"
+                         xxforms:show-progress="false"/>
+        </xforms:action>
+
     </xforms:action>
 
     <xforms:action ev:event="xforms-model-construct-done">

@@ -75,7 +75,7 @@
                 -->
 
                 <!-- fr:body → xf:group -->
-                <xsl:template match="xhtml:body//fr:body">
+                <xsl:template match="xhtml:body//fr:body[not(parent::fr:repeat) and not (parent::fr:grid)]">
                     <xforms:group class="fb-body">
                         <!-- Scope $lang which is the language of the form being edited -->
                         <xforms:var name="lang" value="xxforms:get-variable('fr-form-model', 'fb-lang')" as="element()" class="fb-annotation"/>

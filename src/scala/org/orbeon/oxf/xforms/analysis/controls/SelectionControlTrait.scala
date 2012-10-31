@@ -44,7 +44,7 @@ trait SelectionControlTrait extends InputValueControl with SelectAppearanceTrait
 
     val isEncryptValues = Option(element.attributeValue(ENCRYPT_ITEM_VALUES)) map
         (_.toBoolean) getOrElse
-            staticStateContext.partAnalysis.staticState.getProperty[Boolean](XFormsProperties.ENCRYPT_ITEM_VALUES_PROPERTY)
+            part.staticState.getProperty[Boolean](XFormsProperties.ENCRYPT_ITEM_VALUES_PROPERTY)
 
     private var itemsetAnalysis: Option[XPathAnalysis] = None
     private var _itemsetAnalyzed = false

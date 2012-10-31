@@ -23,9 +23,6 @@ import org.orbeon.oxf.xforms.event.XFormsEvents._
  */
 trait ViewTrait extends SimpleElementAnalysis with AppearanceTrait {
 
-    // Index of the element in the view
-    val index: Int = staticStateContext.index
-
     // By default, external events are keypress plus those specifically allowed by the form author
     protected def externalEventsDef = attSet(element, XXFORMS_EXTERNAL_EVENTS_QNAME) ++ Set(KEYPRESS)
     def externalEvents              = externalEventsDef

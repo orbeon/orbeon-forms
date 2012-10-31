@@ -10,13 +10,12 @@ class ComponentControl(staticStateContext: StaticStateContext, element: Element,
         with OptionalSingleNode {
 
     // Binding at the time the component is created
-    private var _binding = staticStateContext.partAnalysis.xblBindings.getBinding(prefixedId) orElse (throw new IllegalStateException)
+    private var _binding = part.xblBindings.getBinding(prefixedId) orElse (throw new IllegalStateException)
     def binding = _binding.get
 
     // Remove the component's binding
     def removeBinding(): Unit = {
 
-        val part = staticStateContext.partAnalysis
         assert(! part.isTopLevel)
 
         // Remove all descendants only, keeping the current control
@@ -30,7 +29,6 @@ class ComponentControl(staticStateContext: StaticStateContext, element: Element,
 
     // Set the component's binding
     def setBinding(element: Element): Unit = {
-        val part = staticStateContext.partAnalysis
         assert(! part.isTopLevel)
 
         _binding = part.xblBindings.processElementIfNeeded(element, prefixedId, locationData, scope)

@@ -99,7 +99,7 @@ trait PartXBLAnalysis extends TransientState {
 
     // Search scope in ancestor or self parts
     def searchResolutionScopeByPrefixedId(prefixedId: String) =
-        ancestorOrSelf map (_.scopeForPrefixedId(prefixedId)) filter (_ ne null) head
+        ancestorOrSelfIterator map (_.scopeForPrefixedId(prefixedId)) find (_ ne null) get
 
     def getGlobals = xblBindings.allGlobals
 

@@ -17,20 +17,14 @@ package org.orbeon.oxf.xforms.event
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData
 import org.orbeon.oxf.util.Logging
-import util.control.Breaks
 import org.orbeon.oxf.xforms.event.XFormsEvent._
 
 object Dispatch extends Logging {
 
-    private val propagateBreaks = new Breaks
-    import propagateBreaks.{break, breakable}
-
-    // Event dispatching algorithm
     def dispatchEvent(event: XFormsEvent) {
 
         val containingDocument = event.containingDocument
         implicit val indentedLogger = containingDocument.getIndentedLogger(XFormsEvents.LOGGING_CATEGORY)
-        val targetObject = event.targetObject
 
         // Utility to help make sure we push and pop the event
         def withEvent[T](body: ⇒ T): T =
@@ -40,152 +34,105 @@ object Dispatch extends Logging {
             } finally
                 containingDocument.endHandleEvent()
 
-        var statHandleEvent = 0
-        var statNativeHandlers = 0
-
-        // Call all the handlers relevant for the given event on the given observer
-        def callHandlers() = {
-
-            val phase = event.currentPhase
-            val observer = event.currentObserver
-            val isPhantom = observer.scope != targetObject.scope
-
-            def matchesPhaseAndCustom(eventHandler: EventHandler) =
-                (eventHandler.isCapturePhaseOnly && phase == Capture ||
-                 eventHandler.isTargetPhase      && phase == Target  ||
-                 eventHandler.isBubblingPhase    && phase == Bubbling && event.bubbles) && eventHandler.isMatch(event)
-
-            def matches(eventHandler: EventHandler) =
-                if (isPhantom)
-                    eventHandler.isPhantom && matchesPhaseAndCustom(eventHandler)
-                else
-                    matchesPhaseAndCustom(eventHandler)
-
-            var propagate = true
-            var performDefaultAction = true
-
-            // For target phase, also perform "action at target" before running event handler
-            // NOTE: As of 2011-03-07, this is used XFormsInstance for xforms-insert/xforms-delete processing,
-            // and in XFormsUploadControl for upload processing.
-            // withDebug("performing action at target")
-            if (phase == Target)
-                observer.performTargetAction(event)
-
-            for (handler ← handlersForObserver(observer) filter matches) {
-
-                withDebug("handler", Seq("name" → event.name, "phase" → phase.name, "observer" → observer.getEffectiveId)) {
-                    handler.handleEvent(containingDocument, observer, event)
-                    statHandleEvent += 1
-                }
-
-                // DOM 3: "Prevents other event listeners from being triggered but its effect must be deferred until
-                // all event listeners attached on the Event.currentTarget have been triggered."
-                // NOTE: DOM 3 introduces also stopImmediatePropagation
-                propagate &= handler.isPropagate
-                // DOM 3: "the event must be canceled, meaning any default actions normally taken by the
-                // implementation as a result of the event must not occur"
-                performDefaultAction &= handler.isPerformDefaultAction
-            }
-
-            // For target or bubbling phase, also call native listeners
-            // NOTE: It would be nice to have all listeners exposed this way
-            if (Set(Target, Bubbling)(phase))
-                for (listener ← observer.getListeners(event.name)) {
-                    listener.handleEvent(event)
-                    statNativeHandlers += 1
-                }
-
-            (propagate, performDefaultAction)
-        }
+        // This cast is not nice and we should fix the class hierarchy, since any XFormsEventTarget is also an
+        // XFormsEventObserver.
+        val target = event.targetObject.asInstanceOf[XFormsEventObserver]
 
         try {
-            withDebug("dispatching", Seq("name" → event.name, "target" → targetObject.getEffectiveId, "location" → (Option(event.locationData) map (_.toString) orNull))) {
+            var statHandleEvent = 0
+            var statNativeHandlers = 0
 
-                var propagate = true
-                var performDefaultAction = true
+            // Ask the target for the handlers associated with the event name
+            val (performDefaultAction, handlers) = {
+                val staticTarget = target.container.getPartAnalysis.getControlAnalysis(target.getPrefixedId)
+                staticTarget.handlersForEvent(event.name)
+            }
 
-                // Run all observers for the given phase
-                def doPhase(observers: Seq[XFormsEventObserver], phase: Phase) =
-                    breakable {
-                        for (observer ← observers) {
+            withEvent {
+                if (handlers.nonEmpty) {
+                    withDebug("dispatching", Seq("name" → event.name, "target" → target.getEffectiveId, "location" → (Option(event.locationData) map (_.toString) orNull))) {
+                        // There is at least one handler to run
 
-                            event.currentObserver = observer
-                            event.currentPhase = phase
+                        // Run all observers for the given phase
+                        def doPhase(observers: List[XFormsEventObserver], staticHandlers: Map[String, List[EventHandler]], phase: Phase) =
+                            for {
+                                observer ← observers
+                                handlers ← staticHandlers.get(observer.getPrefixedId).toList
+                                handler  ← handlers
+                                if event.matches(handler)   // custom filtering by event
+                            } yield {
+                                event.currentObserver = observer
+                                event.currentPhase = phase
 
-                            // Call event handlers
-                            val (localPropagate, localPerformDefaultAction) = callHandlers()
+                                withDebug("handler", Seq("name" → event.name, "phase" → phase.name, "observer" → observer.getEffectiveId)) {
+                                    handler.handleEvent(observer, event)
+                                    statHandleEvent += 1
+                                }
+                            }
 
-                            propagate &= localPropagate
-                            performDefaultAction &= localPerformDefaultAction
+                        // All ancestor observers (not filtered by scope) gathered lazily so that if there is nothing
+                        // to do for capture and bubbling, we don't compute them.
+                        lazy val ancestorObservers =
+                            Iterator.iterate(target.parentEventObserver)(_.parentEventObserver) takeWhile (_ ne null) toList
 
-                            // Cancel propagation if requested
-                            if (! propagate)
-                                break()
+                        // Capture phase
+                        handlers.get(Capture) foreach (doPhase(ancestorObservers.reverse, _, Capture))
+
+                        // Target phase
+                        locally {
+                            // Perform "action at target" before running event handlers
+
+                            // NOTE: As of 2011-03-07, this is used XFormsInstance for xforms-insert/xforms-delete
+                            // processing, and in XFormsUploadControl for upload processing.
+                            target.performTargetAction(event)
+
+                            handlers.get(Target) foreach (doPhase(List(target), _, Target))
+
+                            // Call native listeners on target if any
+                            for (listener ← target.getListeners(event.name)) {
+                                listener.handleEvent(event)
+                                statNativeHandlers += 1
+                            }
                         }
+
+                        // Bubbling phase, which the event may not support
+                        if (event.bubbles)
+                            handlers.get(Bubbling) foreach (doPhase(ancestorObservers, _, Bubbling))
+
+                        // Perform default action
+                        if (! event.cancelable || performDefaultAction)
+                            target.performDefaultAction(event)
+
+                        debugResults(Seq(
+                            "regular handlers called" → statHandleEvent.toString,
+                            "native handlers called"  → statNativeHandlers.toString
+                        ))
+                    }
+                } else {
+                    // No handlers, try to do as little as possible
+
+                    target.performTargetAction(event)
+
+                    for (listener ← target.getListeners(event.name)) {
+                        listener.handleEvent(event)
+                        statNativeHandlers += 1
                     }
 
-                // Find all observers
-                val eventObservers = findObservers(targetObject, event)
+                    if (! event.cancelable || performDefaultAction)
+                        target.performDefaultAction(event)
 
-                withEvent {
-                    // Capture phase
-                    doPhase(eventObservers.reverse.init, Capture)
-
-                    // Target phase
-                    if (propagate)
-                        doPhase(Seq(eventObservers.head), Target)
-
-                    // Bubbling phase
-                    if (propagate)
-                        doPhase(eventObservers.tail, Bubbling)
-
-                    // Perform default action if allowed to
-                    if (performDefaultAction || ! event.cancelable)
-                        withDebug("performing default action") {
-                            targetObject.performDefaultAction(event)
-                        }
-
-                    debugResults(Seq(
-                        "regular handlers called" → statHandleEvent.toString,
-                        "native handlers called"  → statNativeHandlers.toString
-                    ))
+                    debug("optimized dispatching", Seq(
+                        "name" → event.name,
+                        "target" → target.getEffectiveId,
+                        "location" → (Option(event.locationData) map (_.toString) orNull),
+                        "native handlers called"  → statNativeHandlers.toString))
                 }
             }
         } catch {
             case e: Exception ⇒
                 // Add location information if possible
-                val locationData = Option(targetObject.getLocationData).orNull
-                throw ValidationException.wrapException(e, new ExtendedLocationData(locationData, "dispatching XForms event", "event", event.name, "target id", targetObject.getEffectiveId))
+                val locationData = Option(target.getLocationData).orNull
+                throw ValidationException.wrapException(e, new ExtendedLocationData(locationData, "dispatching XForms event", "event", event.name, "target id", target.getEffectiveId))
         }
-    }
-
-    // Find observers for event dispatch, from leaf to root
-    // The first observer will be the target object
-    private def findObservers(targetObject: XFormsEventTarget, event: XFormsEvent): Seq[XFormsEventObserver] = {
-
-        val targetObserver = targetObject match {
-            case targetObject: XFormsEventObserver ⇒ targetObject
-            case _ ⇒ throw new IllegalArgumentException // this must not happen with the current class hierarchy
-        }
-
-        // TODO: Since we are looking at handlers here, we could collect them so we don't have to collect them again later?
-        def hasPhantomHandler(observer: XFormsEventObserver) =
-            handlersForObserver(observer) exists (_.isPhantom)
-
-        // Iterator over a target's ancestor observers
-        val allObserversIterator =
-            Iterator.iterate(targetObserver)(_.parentEventObserver) takeWhile (_ ne null)
-
-        // Iterator over all the observers we need to handle
-        val targetScope = targetObject.scope
-        val observerIterator =
-            allObserversIterator filter (observer ⇒ observer.scope == targetScope || hasPhantomHandler(observer))
-
-        observerIterator.toList.ensuring(_.head eq targetObject)
-    }
-
-    private def handlersForObserver(observer: XFormsEventObserver) = {
-        val part = observer.container.getPartAnalysis
-        part.getEventHandlers(observer.getPrefixedId)
     }
 }

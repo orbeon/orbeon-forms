@@ -40,6 +40,9 @@ import org.orbeon.scaxon.XML.evalOne
 import org.orbeon.oxf.processor.ProcessorUtils
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms._
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis
+import org.orbeon.oxf.xforms.event.XFormsEvent.Phase
+import org.orbeon.oxf.xforms.event.EventHandler
 
 class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit with MockitoSugar {
 
@@ -638,8 +641,12 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
         }
 
         // Everything else
+        val elementAnalysis = mock[ElementAnalysis]
+        Mockito when elementAnalysis.handlersForEvent(Matchers.any[String]) thenReturn ((true, Map.empty[Phase, Map[String, List[EventHandler]]]))
+
         val part = mock[PartAnalysis]
         Mockito when part.getEventHandlers(Matchers.any[String]) thenReturn Seq()
+        Mockito when part.getControlAnalysis(Matchers.any[String]) thenReturn elementAnalysis // this so that Dispatch works
 
         val xblContainer = mock[XBLContainer]
         Mockito when xblContainer.getPartAnalysis thenReturn part

@@ -39,7 +39,7 @@ class Instance(staticStateContext: StaticStateContext, element: Element, parent:
     val handleXInclude = false
 
     val validation = element.attributeValue(XXFORMS_VALIDATION_QNAME)
-    def exposeXPathTypes = staticStateContext.partAnalysis.staticState.isExposeXPathTypes
+    def exposeXPathTypes = part.staticState.isExposeXPathTypes
 
     val credentialsOrNull = {
         // NOTE: AVTs not supported because XPath expressions in those could access instances that haven't been loaded

@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms.event
 
-import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xml.dom4j.LocationData
 import java.util.{Set ⇒ JSet}
 
@@ -36,11 +35,11 @@ trait EventHandler {
     def jObserversPrefixedIds: JSet[String]
     def eventNames: Set[String]
 
-    def isMatchEventName(eventName: String): Boolean
-    def isMatch(event: XFormsEvent): Boolean
+    def isMatchByName(eventName: String): Boolean
+    def isMatchByNameAndTarget(eventName: String, targetPrefixedId: String): Boolean
 
     def getKeyModifiers: String
     def getKeyText: String
 
-    def handleEvent(containingDocument: XFormsContainingDocument, eventObserver: XFormsEventObserver, event: XFormsEvent)
+    def handleEvent(eventObserver: XFormsEventObserver, event: XFormsEvent)
 }

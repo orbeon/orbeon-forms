@@ -22,11 +22,22 @@ import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, LocationData, ExtendedLocationData}
 import org.orbeon.oxf.xml.ContentHandlerHelper
 import org.orbeon.oxf.xforms.xbl.Scope
 import org.orbeon.oxf.util.ScalaUtils.stringOptionToSet
+import org.orbeon.oxf.xforms.event.XFormsEvent.{Bubbling, Target, Capture, Phase}
+import org.orbeon.oxf.xforms.event.EventHandler
+import scala.collection.mutable
+import scala.util.control.Breaks
+import collection.JavaConverters._
+import java.util.concurrent.ConcurrentHashMap
 
 /**
  * Abstract representation of a common XForms element supporting optional context, binding and value.
  */
-abstract class ElementAnalysis(val element: Element, val parent: Option[ElementAnalysis], val preceding: Option[ElementAnalysis]) {
+abstract class ElementAnalysis(
+        val part: PartAnalysisImpl,
+        val element: Element,
+        val parent: Option[ElementAnalysis],
+        val preceding: Option[ElementAnalysis])
+    extends ElementEventHandlers {
 
     self ⇒
 
@@ -207,7 +218,131 @@ abstract class ElementAnalysis(val element: Element, val parent: Option[ElementA
     }
 }
 
+trait ElementEventHandlers {
+
+    element: ElementAnalysis ⇒
+
+    import ElementAnalysis._
+    import propagateBreaks.{break, breakable}
+
+    // Cache for event handlers, using a ConcurrentMap
+    // Q: Should we only cache per part/static state? That would depend on the overhead of ConcurrentHashMap.
+    private lazy val handlersCache =
+        new ConcurrentHashMap[String, (Boolean, Map[Phase, Map[String, List[EventHandler]]])].asScala
+
+    // Return event handler information for the given event name as a tuple:
+    // - whether the default action will need to run
+    // - all event handlers grouped by phase and observer prefixed id
+    // The information is cached locally.
+    def handlersForEvent(eventName: String): (Boolean, Map[Phase, Map[String, List[EventHandler]]]) =
+        handlersCache.getOrElseUpdate(eventName, handlersForEventImpl(eventName))
+
+    private def handlersForObserver(observer: ElementAnalysis) =
+        observer.part.getEventHandlers(observer.prefixedId)
+
+    private def hasPhantomHandler(observer: ElementAnalysis) =
+        handlersForObserver(observer) exists (_.isPhantom)
+
+    // Find all observers (including in ancestor parts) which either match the current scope or have a phantom handler
+    private def relevantObservers: List[ElementAnalysis] = {
+
+        def observersInAncestorParts =
+            part.elementInParent.toList flatMap (_.relevantObservers)
+
+        def relevant(observer: ElementAnalysis) =
+            observer.scope == element.scope || hasPhantomHandler(observer)
+
+        (ancestorOrSelfIterator(element) filter relevant) ++: observersInAncestorParts
+    }
+
+    // Find all the handlers for the given event name
+    // For all relevant observers, find the handlers which match by phase
+    private def handlersForEventImpl(eventName: String): (Boolean, Map[Phase, Map[String, List[EventHandler]]]) = {
+
+        def relevantHandlersForObserverByPhaseAndName(observer: ElementAnalysis, phase: Phase) = {
+
+            val isPhantom = observer.scope != element.scope
+
+            def matchesPhaseNameTarget(eventHandler: EventHandler) =
+                (eventHandler.isCapturePhaseOnly && phase == Capture ||
+                 eventHandler.isTargetPhase      && phase == Target  ||
+                 eventHandler.isBubblingPhase    && phase == Bubbling) && eventHandler.isMatchByNameAndTarget(eventName, element.prefixedId)
+
+            def matches(eventHandler: EventHandler) =
+                if (isPhantom)
+                    eventHandler.isPhantom && matchesPhaseNameTarget(eventHandler)
+                else
+                    matchesPhaseNameTarget(eventHandler)
+
+            val relevantHandlers = handlersForObserver(observer) filter matches
+
+            // DOM 3:
+            //
+            // - stopPropagation: "Prevents other event listeners from being triggered but its effect must be deferred
+            //   until all event listeners attached on the Event.currentTarget have been triggered."
+            // - preventDefault: "the event must be canceled, meaning any default actions normally taken by the
+            //   implementation as a result of the event must not occur"
+            // - NOTE: DOM 3 introduces also stopImmediatePropagation
+
+            // Compute the logical "and" for both flags, defaulting to true
+            val (propagate, performDefaultAction) =
+                relevantHandlers.foldLeft((true, true))((flags, handler) ⇒ (flags._1 && handler.isPropagate, flags._2 && handler.isPerformDefaultAction))
+
+            (propagate, performDefaultAction, relevantHandlers)
+        }
+
+        var propagate = true
+        var performDefaultAction = true
+
+        def handlersForPhase(observers: List[ElementAnalysis], phase: Phase) = {
+            val result = mutable.Map[String, List[EventHandler]]()
+            breakable {
+                for (observer ← observers) {
+
+                    val (localPropagate, localPerformDefaultAction, handlersToRun) =
+                        relevantHandlersForObserverByPhaseAndName(observer, phase)
+
+                    propagate &= localPropagate
+                    performDefaultAction &= localPerformDefaultAction
+                    if (handlersToRun.nonEmpty)
+                        result += observer.prefixedId → handlersToRun
+
+                    // Cancel propagation if requested
+                    if (! propagate)
+                        break()
+                }
+            }
+
+            if (result.nonEmpty)
+                Some(phase → result.toMap)
+            else
+                None
+        }
+
+        val observers = relevantObservers
+
+        val captureHandlers =
+            handlersForPhase(observers.reverse.init, Capture)
+
+        val targetHandlers =
+            if (propagate)
+                handlersForPhase(List(observers.head), Target)
+            else
+                None
+
+        val bubblingHandlers =
+            if (propagate)
+                handlersForPhase(observers.tail, Bubbling)
+            else
+                None
+
+        (performDefaultAction, Map() ++ captureHandlers ++ targetHandlers ++ bubblingHandlers)
+    }
+}
+
 object ElementAnalysis {
+
+    val propagateBreaks = new Breaks
 
     /**
      * Return the closest preceding element in the same scope.
@@ -226,9 +361,24 @@ object ElementAnalysis {
     /**
      * Return an iterator over all the element's ancestors.
      */
-    def ancestorsIterator(start: ElementAnalysis) = new Iterator[ElementAnalysis] {
+    def ancestorIterator(start: ElementAnalysis) = new Iterator[ElementAnalysis] {
 
-        private var theNext = start.parent
+        private[this] var theNext = start.parent
+
+        def hasNext = theNext.isDefined
+        def next() = {
+            val newResult = theNext.get
+            theNext = newResult.parent
+            newResult
+        }
+    }
+
+    /**
+     * Iterator over the element and all its ancestors.
+     */
+    def ancestorOrSelfIterator(start: ElementAnalysis) = new Iterator[ElementAnalysis] {
+
+        private[this] var theNext = Option(start)
 
         def hasNext = theNext.isDefined
         def next() = {
@@ -242,7 +392,7 @@ object ElementAnalysis {
      * Return a list of ancestors in the same scope from leaf to root.
      */
     def getAllAncestorsInScope(start: ElementAnalysis, scope: Scope): List[ElementAnalysis] =
-        ancestorsIterator(start) filter (_.scope == scope) toList
+        ancestorIterator(start) filter (_.scope == scope) toList
 
     /**
      * Return a list of ancestor-or-self in the same scope from leaf to root.
@@ -254,13 +404,13 @@ object ElementAnalysis {
      * Get the closest ancestor in the same scope.
      */
     def getClosestAncestorInScope(start: ElementAnalysis, scope: Scope) =
-        ancestorsIterator(start) find (_.scope == scope)
+        ancestorIterator(start) find (_.scope == scope)
 
     /**
      * Return the first ancestor with a binding analysis that is in the same scope/model.
      */
     def getClosestAncestorInScopeModel(start: ElementAnalysis, scopeModel: ScopeModel) =
-        ancestorsIterator(start) find (e ⇒ ScopeModel(e.scope, e.model) == scopeModel)
+        ancestorIterator(start) find (e ⇒ ScopeModel(e.scope, e.model) == scopeModel)
 
     /**
      * Get the binding XPath expression from the @ref or (deprecated) @nodeset attribute.

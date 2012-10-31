@@ -37,13 +37,13 @@ trait ShadowChildrenBuilder extends ChildrenBuilderTrait {
             else {
                 // Search in ancestor parts too
                 val controlId = containerScope.fullPrefix.init
-                val controlAnalysis = component.staticStateContext.partAnalysis.ancestorOrSelf map (_.getControlAnalysis(controlId)) filter (_ ne null) head
+                val controlAnalysis = component.part.ancestorOrSelfIterator map (_.getControlAnalysis(controlId)) find (_ ne null) get
 
                 controlAnalysis.scope
             }
 
         // Children elements have not been annotated earlier (because they are nested within the bound element)
-        component.staticStateContext.partAnalysis.xblBindings.annotateSubtreeByElement(
+        component.part.xblBindings.annotateSubtreeByElement(
             component.element,  // bound element
             child,              // child tree to annotate
             innerScope,         // handler's inner scope is the same as the component's

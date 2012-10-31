@@ -30,8 +30,8 @@ trait PartAnalysis extends PartGlobalOps with PartStaticAnalysisOps with XMLUtil
     def isTopLevel: Boolean
     val parent: Option[PartAnalysis]
 
-    def ancestors: Stream[PartAnalysis]
-    def ancestorOrSelf: Stream[PartAnalysis]
+    def ancestorIterator: Iterator[PartAnalysis]
+    def ancestorOrSelfIterator: Iterator[PartAnalysis]
 
     def startScope: Scope
 
@@ -50,5 +50,6 @@ trait PartAnalysis extends PartGlobalOps with PartStaticAnalysisOps with XMLUtil
     def dumpAnalysis()
     def toXML(helper: ContentHandlerHelper)
 
+    // The element in our parent that created the current part
     def elementInParent = parent map (_.getControlAnalysis(startScope.fullPrefix.init).asInstanceOf[SimpleElementAnalysis]) // .init removes the trailing '$'
 }

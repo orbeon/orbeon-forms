@@ -160,10 +160,12 @@ class EventHandlerImpl(
     /**
      * Process the event on the given observer.
      */
-    def handleEvent(containingDocument: XFormsContainingDocument, eventObserver: XFormsEventObserver, event: XFormsEvent) {
+    def handleEvent(eventObserver: XFormsEventObserver, event: XFormsEvent) {
         
         assert(_observersPrefixedIds ne null)
         assert(_targetPrefixedIds ne null)
+
+        val containingDocument = event.containingDocument
 
         // Find dynamic context within which the event handler runs
         val (container, handlerEffectiveId, xpathContext) =
@@ -217,17 +219,16 @@ class EventHandlerImpl(
 
     def jObserversPrefixedIds = observersPrefixedIds.asJava
 
-    def isMatchEventName(eventName: String) =
+    final def isMatchByName(eventName: String) =
         isAllEvents || eventNames(eventName)
 
     // Match if no target id is specified, or if any specified target matches
     private def isMatchTarget(targetPrefixedId: String) =
         targetPrefixedIds.isEmpty || targetPrefixedIds(targetPrefixedId)
 
-    def isMatch(event: XFormsEvent) =
-            isMatchEventName(event.name) &&
-            isMatchTarget(XFormsUtils.getPrefixedId(event.targetObject.getEffectiveId)) &&
-            event.matches(self)
+    // Match both name and target
+    final def isMatchByNameAndTarget(eventName: String, targetPrefixedId: String) =
+        isMatchByName(eventName) && isMatchTarget(targetPrefixedId)
 }
 
 object EventHandlerImpl extends Logging {

@@ -27,9 +27,9 @@ class RootControl(staticStateContext: StaticStateContext, element: Element, scop
     extends ContainerControl(staticStateContext, element, None, None, scope)
     with ChildrenBuilderTrait {
 
-    override val staticId = "#document"
-    override val prefixedId = staticStateContext.partAnalysis.startScope.fullPrefix + staticId
-    override def containerScope = staticStateContext.partAnalysis.startScope
+    override val staticId       = "#document"
+    override val prefixedId     = part.startScope.fullPrefix + staticId
+    override def containerScope = part.startScope
 
     // Ignore xbl:xbl elements that can be at the top-level, as the static state document produced by the extractor
     // might place them there.

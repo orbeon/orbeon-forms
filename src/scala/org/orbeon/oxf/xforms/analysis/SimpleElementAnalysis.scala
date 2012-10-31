@@ -29,27 +29,30 @@ class SimpleElementAnalysis(
        parent: Option[ElementAnalysis],
        preceding: Option[ElementAnalysis],
        val scope: Scope)
-    extends ElementAnalysis(element, parent, preceding) {
+    extends ElementAnalysis(staticStateContext.partAnalysis, element, parent, preceding) {
     
     self ⇒
 
     require(scope ne null)
 
+    // Index of the element in the view
+    def index = staticStateContext.index
+
     lazy val ancestorRepeatsAcrossParts: List[RepeatControl] =
-        ancestorRepeats ::: ((staticStateContext.partAnalysis.parent flatMap (_.elementInParent) toList) flatMap (c ⇒ c.ancestorRepeatsAcrossParts))
+        ancestorRepeats ::: ((part.parent flatMap (_.elementInParent) toList) flatMap (c ⇒ c.ancestorRepeatsAcrossParts))
 
     override def isWithinRepeat = ancestorRepeatsAcrossParts.nonEmpty
 
     // Make this lazy because we don't want the model to be resolved upon construction. Instead, resolve when scopeModel
     // is used the first time. How can we check/enforce that scopeModel is only used at the right time?
     lazy val model = findContainingModel
-    lazy val namespaceMapping = staticStateContext.partAnalysis.metadata.getNamespaceMapping(prefixedId)
+    lazy val namespaceMapping = part.metadata.getNamespaceMapping(prefixedId)
 
     lazy val inScopeVariables: Map[String, VariableTrait] = getRootVariables ++ treeInScopeVariables
 
     protected def getRootVariables: Map[String, VariableTrait] = Map.empty
 
-    def containerScope = staticStateContext.partAnalysis.containingScope(prefixedId)
+    def containerScope = part.containingScope(prefixedId)
 
     /**
      * Find the model associated with the given element, whether explicitly set with @model, or inherited.
@@ -60,7 +63,7 @@ class SimpleElementAnalysis(
             case localModelStaticId: String ⇒
                 // Get model prefixed id and verify it belongs to this scope
                 val localModelPrefixedId = scope.prefixedIdForStaticId(localModelStaticId)
-                val localModel = staticStateContext.partAnalysis.getModel(localModelPrefixedId)
+                val localModel = part.getModel(localModelPrefixedId)
                 if (localModel eq null)
                     throw new ValidationException("Reference to non-existing model id: " + localModelStaticId, ElementAnalysis.createLocationData(element))
 
@@ -69,7 +72,7 @@ class SimpleElementAnalysis(
                 // Use inherited model
                 closestAncestorInScope match {
                     case Some(ancestor) ⇒ ancestor.model // there is an ancestor control in the same scope, use its model id
-                    case None ⇒ Option(staticStateContext.partAnalysis.getDefaultModelForScope(scope)) // top-level control in a new scope, use default model id for scope
+                    case None ⇒ Option(part.getDefaultModelForScope(scope)) // top-level control in a new scope, use default model id for scope
                 }
         }
 
@@ -88,7 +91,7 @@ class SimpleElementAnalysis(
         bind match {
             case Some(bindStaticId) ⇒
                 // Use @bind analysis directly from model
-                val model = staticStateContext.partAnalysis.getModelByScopeAndBind(scope, bindStaticId)
+                val model = part.getModelByScopeAndBind(scope, bindStaticId)
                 if (model eq null)
                     throw new ValidationException("Reference to non-existing bind id: " + bindStaticId, ElementAnalysis.createLocationData(element))
                 model.bindsById.get(bindStaticId) map (_.getBindingAnalysis) orNull
@@ -124,7 +127,7 @@ class SimpleElementAnalysis(
 
     def getChildElementScope(childElement: Element) = {
         val childPrefixedId =  XFormsUtils.getRelatedEffectiveId(prefixedId, XFormsUtils.getElementId(childElement))
-        staticStateContext.partAnalysis.scopeForPrefixedId(childPrefixedId)
+        part.scopeForPrefixedId(childPrefixedId)
     }
 
     protected def analyzeXPath(contextAnalysis: Option[XPathAnalysis], xpathString: String): XPathAnalysis =
@@ -134,7 +137,7 @@ class SimpleElementAnalysis(
 
         val defaultInstancePrefixedId = model flatMap (_.defaultInstancePrefixedId)
 
-        PathMapXPathAnalysis(staticStateContext.partAnalysis, xpathString, staticStateContext.partAnalysis.metadata.getNamespaceMapping(prefixedId),
+        PathMapXPathAnalysis(part, xpathString, part.metadata.getNamespaceMapping(prefixedId),
             contextAnalysis, inScopeVariables, new SimplePathMapContext, scope, defaultInstancePrefixedId, locationData, element)
     }
 

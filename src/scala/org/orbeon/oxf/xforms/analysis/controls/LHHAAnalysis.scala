@@ -36,7 +36,7 @@ class LHHAAnalysis(staticStateContext: StaticStateContext, element: Element, par
     // Find the target control if any
     def targetControl =
         forStaticIdOption map
-            (forStaticId ⇒ staticStateContext.partAnalysis.getControlAnalysis(scope.prefixedIdForStaticId(forStaticId))) orElse
+            (forStaticId ⇒ part.getControlAnalysis(scope.prefixedIdForStaticId(forStaticId))) orElse
                 parent collect
                     { case lhhaControl: LHHATrait ⇒ lhhaControl }
 
@@ -45,7 +45,7 @@ class LHHAAnalysis(staticStateContext: StaticStateContext, element: Element, par
         case Some(lhhaControl) ⇒
             lhhaControl.setExternalLHHA(self)
         case None if ! isLocal ⇒
-            staticStateContext.partAnalysis.getIndentedLogger.logWarning("", "cannot attach exernal LHHA to control",
+            part.getIndentedLogger.logWarning("", "cannot attach exernal LHHA to control",
                 Array("type", localName, "element", Dom4jUtils.elementToDebugString(element)): _*)
         case None ⇒
     }

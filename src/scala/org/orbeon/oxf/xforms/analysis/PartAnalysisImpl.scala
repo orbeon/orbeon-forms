@@ -20,7 +20,6 @@ import org.orbeon.oxf.xforms.XFormsStaticStateImpl.StaticStateDocument
 import org.orbeon.oxf.util.XPathCache
 import org.orbeon.saxon.dom4j.DocumentWrapper
 import org.dom4j.Element
-import collection.immutable.Stream._
 import org.orbeon.oxf.xforms._
 import event.EventHandlerImpl
 import org.orbeon.oxf.xml.dom4j.{ExtendedLocationData, LocationData, Dom4jUtils}
@@ -61,13 +60,20 @@ class PartAnalysisImpl(
     def locationData = staticState.locationData
     def getIndentedLogger = staticState.getIndentedLogger
 
-    // Ancestor parts
-    def ancestors: Stream[PartAnalysis] = parent match {
-        case None ⇒ Stream.empty
-        case Some(parent) ⇒ parent #:: parent.ancestors
+    private def iterator(start: Option[PartAnalysis]): Iterator[PartAnalysis] = new Iterator[PartAnalysis] {
+
+        private[this] var theNext = start
+
+        def hasNext = theNext.isDefined
+        def next() = {
+            val newResult = theNext.get
+            theNext = newResult.parent
+            newResult
+        }
     }
 
-    def ancestorOrSelf = this #:: ancestors
+    def ancestorIterator       = iterator(partAnalysis.parent)
+    def ancestorOrSelfIterator = iterator(Some(partAnalysis))
 
     def getMark(prefixedId: String) = metadata.getMark(prefixedId)
 

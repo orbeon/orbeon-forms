@@ -104,11 +104,11 @@ trait PartEventHandlerAnalysis {
     }
 
     def getEventHandlers(observerPrefixedId: String) =
-        _handlersForObserver.get(observerPrefixedId) getOrElse Seq()
+        _handlersForObserver.get(observerPrefixedId) getOrElse Nil
 
     def observerHasHandlerForEvent(observerPrefixedId: String, eventName: String) =
         _handlersForObserver.get(observerPrefixedId) map
-            (handlers ⇒ handlers exists (_.isMatchEventName(eventName))) getOrElse false
+            (handlers ⇒ handlers exists (_.isMatchByName(eventName))) getOrElse false
 
     def getKeyHandlers = _keypressHandlers.asJava
 

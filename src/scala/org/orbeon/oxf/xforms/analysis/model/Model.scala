@@ -33,7 +33,7 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils
  * Static analysis of an XForms model <xf:model> element.
  */
 class Model(val staticStateContext: StaticStateContext, elem: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], val scope: Scope)
-        extends ElementAnalysis(elem, parent, preceding)
+        extends ElementAnalysis(staticStateContext.partAnalysis, elem, parent, preceding)
         with ChildrenBuilderTrait
         with ModelInstances
         with ModelVariables
@@ -46,7 +46,7 @@ class Model(val staticStateContext: StaticStateContext, elem: Element, parent: O
 
     type Bind = BindTree#Bind
 
-    val namespaceMapping = staticStateContext.partAnalysis.metadata.getNamespaceMapping(prefixedId)
+    val namespaceMapping = part.metadata.getNamespaceMapping(prefixedId)
 
     // NOTE: It is possible to imagine a model having a context and binding, but this is not supported now
     protected def computeContextAnalysis = None
@@ -55,10 +55,10 @@ class Model(val staticStateContext: StaticStateContext, elem: Element, parent: O
     val model = Some(this)
 
     // NOTE: Same code is in SimpleElementAnalysis, which is not optimal → maybe think about passing the container scope to constructors
-    def containerScope = staticStateContext.partAnalysis.containingScope(prefixedId)
+    def containerScope = part.containingScope(prefixedId)
 
     override def getChildrenContext = defaultInstancePrefixedId map { defaultInstancePrefixedId ⇒ // instance('defaultInstanceId')
-        PathMapXPathAnalysis(staticStateContext.partAnalysis, PathMapXPathAnalysis.buildInstanceString(defaultInstancePrefixedId),
+        PathMapXPathAnalysis(part, PathMapXPathAnalysis.buildInstanceString(defaultInstancePrefixedId),
             null, None, Map.empty[String, VariableTrait], null, scope, Some(defaultInstancePrefixedId), locationData, element)
     }
     
@@ -238,16 +238,16 @@ class BindTree(model: Model, bindElements: Seq[Element]) {
 
     // Destroy the tree of binds
     def destroy(): Unit =
-        bindsById.values foreach model.staticStateContext.partAnalysis.unmapScopeIds
+        bindsById.values foreach model.part.unmapScopeIds
 
     // Add a new bind
     def addBind(rawBindElement: Element, parentId: String, precedingId: Option[String]): Unit = {
 
-        assert(! model.staticStateContext.partAnalysis.isTopLevel)
+        assert(! model.part.isTopLevel)
 
         // First annotate tree
         val (annotatedTree, _) =
-            model.staticStateContext.partAnalysis.xblBindings.annotateSubtree(
+            model.part.xblBindings.annotateSubtree(
                 None,
                 Dom4jUtils.createDocumentCopyParentNamespaces(rawBindElement),
                 model.scope,
@@ -267,7 +267,7 @@ class BindTree(model: Model, bindElements: Seq[Element]) {
     // Remove an existing bind
     def removeBind(bind: Bind): Unit = {
 
-        assert(! model.staticStateContext.partAnalysis.isTopLevel)
+        assert(! model.part.isTopLevel)
 
         bind.parent match {
             case Some(parentBind: Bind) ⇒ parentBind.removeBind(bind)
@@ -387,7 +387,7 @@ class BindTree(model: Model, bindElements: Seq[Element]) {
 
             _children = _children filterNot (_ eq bind)
 
-            staticStateContext.partAnalysis.unmapScopeIds(bind)
+            part.unmapScopeIds(bind)
         }
 
         def getMIP(mipName: String) = if (mipName == TYPE) typeMIP else allMIPNameToXPathMIP.get(mipName)
@@ -552,7 +552,7 @@ trait ModelBinds {
 
     def annotateSubTree(rawElement: Element) = {
         val (annotatedTree, _) =
-            staticStateContext.partAnalysis.xblBindings.annotateSubtree(
+            part.xblBindings.annotateSubtree(
                 None,
                 Dom4jUtils.createDocumentCopyParentNamespaces(rawElement),
                 scope,
@@ -568,7 +568,7 @@ trait ModelBinds {
 
     def rebuildBinds(rawModelElement: Element): Unit = {
 
-        assert(! selfModel.staticStateContext.partAnalysis.isTopLevel)
+        assert(! selfModel.part.isTopLevel)
 
         bindTree.destroy()
         bindTree = new BindTree(selfModel, Dom4j.elements(rawModelElement, XFORMS_BIND_QNAME) map (annotateSubTree(_).getRootElement))

@@ -560,7 +560,7 @@ object ControlOps {
     // Find a given static control by name
     def findStaticControlByName(controlName: String) = {
         val model = getFormModel
-        val part = model.getStaticModel.staticStateContext.partAnalysis
+        val part = model.getStaticModel.part
         for {
             controlId ← findControlIdByName(getFormDoc, controlName)
             prefixedId = part.startScope.prefixedIdForStaticId(controlId)

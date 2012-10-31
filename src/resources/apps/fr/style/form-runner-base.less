@@ -344,6 +344,7 @@ body { padding-top: 40px } // if using navbar-fixed-top
     input[type="color"],
     .uneditable-input {
         width: 100%;
+        *padding: 0;                // IE7 doesn't support box-sizing, so undo Bootstrap padding, so width: 100% doesn't get the input doesn't overflow its container
     }
 
     table-layout: fixed;

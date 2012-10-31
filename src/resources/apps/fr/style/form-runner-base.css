@@ -437,6 +437,7 @@ body {
 .fr-grid input[type="color"],
 .fr-grid .uneditable-input {
   width: 100%;
+  *padding: 0;
 }
 .fr-grid .xforms-textarea textarea {
   width: 100%;

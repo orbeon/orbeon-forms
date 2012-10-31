@@ -272,7 +272,7 @@ textarea.xforms-invalid-visited {
 }
 .xbl-fr-section .fr-section-title a {
   text-decoration: none;
-  color: inherit;
+  color: #555555;
   display: block;
   height: 100%;
   overflow: hidden;

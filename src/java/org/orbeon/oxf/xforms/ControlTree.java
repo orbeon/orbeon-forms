@@ -148,8 +148,6 @@ public class ControlTree implements ExternalCopyable {
     private void dispatchCreationEvents(XFormsControl control) {
         if (XFormsControl.controlSupportsRefreshEvents(control)) {
             if (control.isRelevant()) {
-                final XFormsContainingDocument containingDocument = control.containingDocument();
-
                 // Commit current control state
                 control.commitCurrentUIState();
 
@@ -212,12 +210,11 @@ public class ControlTree implements ExternalCopyable {
             dispatchDestructionEvents(control);
         }
 
-        indentedLogger.endHandleOperation();
+        indentedLogger.endHandleOperation("controls", Integer.toString(controlsEffectiveIds.size()));
     }
 
     private void dispatchDestructionEvents(XFormsControl control) {
         if (XFormsControl.controlSupportsRefreshEvents(control)) {
-            final XFormsContainingDocument containingDocument = control.containingDocument();
 
             // Don't test for relevance here
             // o In iteration removal case, control is still relevant
@@ -245,7 +242,6 @@ public class ControlTree implements ExternalCopyable {
                 if (control instanceof XFormsSingleNodeControl) {
 
                     final XFormsSingleNodeControl singleNodeControl = (XFormsSingleNodeControl) control;
-                    final XFormsContainingDocument containingDocument = control.containingDocument();
 
                     // xforms-value-changed
                     if (isAllowSendingValueChangedEvents && singleNodeControl.isValueChanged()) {

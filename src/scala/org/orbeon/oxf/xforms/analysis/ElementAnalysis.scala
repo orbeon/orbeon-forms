@@ -143,9 +143,17 @@ abstract class ElementAnalysis(val element: Element, val parent: Option[ElementA
 
     val closestAncestorInScope = ElementAnalysis.getClosestAncestorInScope(self, scope)
 
+    // This control's ancestor repeats, computed on demand
+    // NOTE: Unclear what should be in ElementAnalysis vs. SimpleElementAnalysis
+    lazy val ancestorRepeats: List[RepeatControl] = parent match {
+        case Some(repeat: RepeatControl) ⇒ repeat :: repeat.ancestorRepeats
+        case Some(element)               ⇒ element.ancestorRepeats
+        case None                        ⇒ Nil
+    }
+
     // Whether this is within a repeat
-    // NOTE: it's not ideal that this is known by ElementAnalysis
-    val isWithinRepeat = RepeatControl.getAncestorRepeat(self).isDefined
+    // NOTE: Unclear what should be in ElementAnalysis vs. SimpleElementAnalysis
+    def isWithinRepeat: Boolean = throw new UnsupportedOperationException
 
     def toXML(helper: ContentHandlerHelper, attributes: List[String])(content: ⇒ Unit) {
 

@@ -36,32 +36,17 @@ class RepeatControl(staticStateContext: StaticStateContext, element: Element, pa
 
 object RepeatControl {
 
-    // Find the closest ancestor repeat if any.
-    def getAncestorRepeat(elementAnalysis: ElementAnalysis): Option[RepeatControl] =
-        ElementAnalysis.ancestorsIterator(elementAnalysis) collectFirst
-            { case repeatControl: RepeatControl ⇒ repeatControl }
-
-    // Find the closest ancestor repeat in the same scope, if any.
+    // Find the closest ancestor repeat in the same scope, if any
     def getAncestorRepeatInScope(elementAnalysis: ElementAnalysis): Option[RepeatControl] =
-        ElementAnalysis.ancestorsIterator(elementAnalysis) collectFirst
-            { case repeatControl: RepeatControl if repeatControl.scope == elementAnalysis.scope ⇒ repeatControl }
+        elementAnalysis.ancestorRepeats find (_.scope == elementAnalysis.scope)
 
     // Get the first ancestor repeats across parts
-    def getAncestorRepeatAcrossParts(elementAnalysis: ElementAnalysis): Option[RepeatControl] = elementAnalysis match {
-        case simpleElementAnalysis: SimpleElementAnalysis ⇒
-            val currentPart = simpleElementAnalysis.staticStateContext.partAnalysis
-            // First search ancestor local to this part, or else try the ancestor repeat associated with the parent part if any
-            getAncestorRepeat(simpleElementAnalysis) orElse
-                (currentPart.parent map
-                    (_.getControlAnalysis(currentPart.startScope.fullPrefix.init)) // .init removes the trailing '$'
-                        flatMap getAncestorRepeatAcrossParts) // recursively search ancestor parts
-        case _ ⇒ throw new IllegalArgumentException
-    }
+    def getAncestorRepeatAcrossParts(elementAnalysis: ElementAnalysis): Option[RepeatControl] =
+        getAllAncestorRepeatsAcrossParts(elementAnalysis).headOption
 
     // Get all ancestor repeats across parts, from leaf to root
-    def getAllAncestorRepeatsAcrossParts(elementAnalysis: ElementAnalysis): List[RepeatControl] =
-        getAncestorRepeatAcrossParts(elementAnalysis) match {
-            case Some(ancestor) ⇒ ancestor :: getAllAncestorRepeatsAcrossParts(ancestor)
-            case None ⇒ Nil
-        }
+    def getAllAncestorRepeatsAcrossParts(elementAnalysis: ElementAnalysis): List[RepeatControl] = elementAnalysis match {
+        case element: SimpleElementAnalysis ⇒ element.ancestorRepeatsAcrossParts
+        case _                              ⇒ throw new IllegalArgumentException
+    }
 }

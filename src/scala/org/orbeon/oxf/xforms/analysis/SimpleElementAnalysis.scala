@@ -35,6 +35,11 @@ class SimpleElementAnalysis(
 
     require(scope ne null)
 
+    lazy val ancestorRepeatsAcrossParts: List[RepeatControl] =
+        ancestorRepeats ::: ((staticStateContext.partAnalysis.parent flatMap (_.elementInParent) toList) flatMap (c ⇒ c.ancestorRepeatsAcrossParts))
+
+    override def isWithinRepeat = ancestorRepeatsAcrossParts.nonEmpty
+
     // Make this lazy because we don't want the model to be resolved upon construction. Instead, resolve when scopeModel
     // is used the first time. How can we check/enforce that scopeModel is only used at the right time?
     lazy val model = findContainingModel

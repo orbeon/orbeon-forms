@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms
 
-import analysis.{ElementAnalysis, Metadata}
+import org.orbeon.oxf.xforms.analysis.{SimpleElementAnalysis, ElementAnalysis, Metadata}
 import org.orbeon.oxf.xforms.event.EventHandler
 import org.orbeon.oxf.xml.dom4j.LocationData
 import java.util.{List ⇒ JList}
@@ -49,4 +49,6 @@ trait PartAnalysis extends PartGlobalOps with PartStaticAnalysisOps with XMLUtil
 
     def dumpAnalysis()
     def toXML(helper: ContentHandlerHelper)
+
+    def elementInParent = parent map (_.getControlAnalysis(startScope.fullPrefix.init).asInstanceOf[SimpleElementAnalysis]) // .init removes the trailing '$'
 }

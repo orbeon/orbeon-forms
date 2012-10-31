@@ -40,6 +40,9 @@ object Dispatch extends Logging {
             } finally
                 containingDocument.endHandleEvent()
 
+        var statHandleEvent = 0
+        var statNativeHandlers = 0
+
         // Call all the handlers relevant for the given event on the given observer
         def callHandlers() = {
 
@@ -72,6 +75,7 @@ object Dispatch extends Logging {
 
                 withDebug("handler", Seq("name" → event.name, "phase" → phase.name, "observer" → observer.getEffectiveId)) {
                     handler.handleEvent(containingDocument, observer, event)
+                    statHandleEvent += 1
                 }
 
                 // DOM 3: "Prevents other event listeners from being triggered but its effect must be deferred until
@@ -86,8 +90,10 @@ object Dispatch extends Logging {
             // For target or bubbling phase, also call native listeners
             // NOTE: It would be nice to have all listeners exposed this way
             if (Set(Target, Bubbling)(phase))
-                for (listener ← observer.getListeners(event.name))
+                for (listener ← observer.getListeners(event.name)) {
                     listener.handleEvent(event)
+                    statNativeHandlers += 1
+                }
 
             (propagate, performDefaultAction)
         }
@@ -138,6 +144,11 @@ object Dispatch extends Logging {
                         withDebug("performing default action") {
                             targetObject.performDefaultAction(event)
                         }
+
+                    debugResults(Seq(
+                        "regular handlers called" → statHandleEvent.toString,
+                        "native handlers called"  → statNativeHandlers.toString
+                    ))
                 }
             }
         } catch {

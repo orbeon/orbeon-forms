@@ -242,8 +242,13 @@ trait ModelContainer {
 
     def getAllModelsJava = getAllModels.asJava
 
-    def searchContainedModels(sourceEffectiveId: String, staticId: String, contextItem: Item): XFormsObject =
-        findInSelfAndDescendants(m ⇒ Option(m.resolveObjectById(sourceEffectiveId, staticId, contextItem))) orNull
+    // Performance: for some reason, with Scala 2.9.2 at least, using for (model ← models) { ... return ... } is much
+    // slower than using an Iterator (profiler).
+    def searchContainedModels(sourceEffectiveId: String, staticId: String, contextItem: Item): Option[XFormsObject] =
+        if (isRelevant && models.nonEmpty)
+            models.iterator map (_.resolveObjectById(sourceEffectiveId, staticId, contextItem)) find (_ ne null)
+        else
+            None
 
     def restoreModelsState(): Unit = {
         // Handle this container only
@@ -419,8 +424,8 @@ trait ContainerResolver {
         // 2. Search in directly contained models
         // NOTE: As of 2011-11, models don't use sourceEffectiveId
         val resultModelObject = searchContainedModels(sourceEffectiveId, staticOrAbsoluteId, contextItem)
-        if (resultModelObject ne null)
-            return resultModelObject
+        if (resultModelObject.isDefined)
+            return resultModelObject.get
 
         // Check that source is resolvable within this container
         if (! isEffectiveIdResolvableByThisContainer(sourceEffectiveId))
@@ -433,7 +438,7 @@ trait ContainerResolver {
         // Find closest control
         val sourceControlEffectiveId = {
             val tempModelObject = searchContainedModels(null, XFormsUtils.getStaticIdFromId(sourceEffectiveId), contextItem)
-            if (tempModelObject != null) {
+            if (tempModelObject.isDefined) {
                 // Source is a model object, so get first control instead
                 val firstControlEffectiveId = getFirstControlEffectiveId
                 if (firstControlEffectiveId eq null)

@@ -16,6 +16,8 @@ package org.orbeon.oxf.xforms.state;
 import org.dom4j.Document;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
 
+import java.util.concurrent.locks.Lock;
+
 /**
  * Represent the lifecycle of an XForms document from the point of view of state handling.
  */
@@ -35,10 +37,12 @@ public interface XFormsStateLifecycle {
 
     XFormsContainingDocument findOrRestoreDocument(RequestParameters parameters, boolean isInitialState, boolean updates);
 
+    Lock getDocumentLock(RequestParameters parameters);
     XFormsContainingDocument beforeUpdate(RequestParameters parameters);
     void beforeUpdateResponse(XFormsContainingDocument containingDocument, boolean ignoreSequence);
     void afterUpdateResponse(XFormsContainingDocument containingDocument);
     void afterUpdate(XFormsContainingDocument containingDocument, boolean keepDocument);
+    void releaseDocumentLock(Lock lock);
 
     void onAddedToCache(String uuid);
     void onRemovedFromCache(String uuid);

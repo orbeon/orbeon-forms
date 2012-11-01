@@ -31,6 +31,7 @@ import org.orbeon.oxf.xforms.event.events.XXFormsValueEvent;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.locks.Lock;
 
 import static junit.framework.Assert.*;
 
@@ -246,32 +247,37 @@ public class XFormsStateManagerTest extends ResourceManagerTestBase {
         // New state
         final State state2 = new State();
 
-        state2.document = stateManager.beforeUpdate(parameters);
+        final Lock lock = stateManager.getDocumentLock(parameters);
+        try {
+            state2.document = stateManager.beforeUpdate(parameters);
 
-        if (isCache)
-            assertSame(state1.document, state2.document);// must be the same because cache is enabled and cache has room
-        else
-            assertNotSame(state1.document, state2.document);// can't be the same because cache is disabled
+            if (isCache)
+                assertSame(state1.document, state2.document);// must be the same because cache is enabled and cache has room
+            else
+                assertNotSame(state1.document, state2.document);// can't be the same because cache is disabled
 
-        // Run events if any
-        state2.document.beforeExternalEvents(null);
-        if (callback != null) {
-            for (final XFormsEvent event: callback.createEvents(state2.document)) {
-                ClientEvents.processEvent(state2.document, event);
+            // Run events if any
+            state2.document.beforeExternalEvents(null);
+            if (callback != null) {
+                for (final XFormsEvent event: callback.createEvents(state2.document)) {
+                    ClientEvents.processEvent(state2.document, event);
+                }
             }
+            state2.document.afterExternalEvents();
+
+            stateManager.beforeUpdateResponse(state2.document, false);
+
+            // New state
+            state2.uuid = state2.document.getUUID();
+            state2.staticStateString = stateManager.getClientEncodedStaticState(state2.document);
+            state2.dynamicStateString = stateManager.getClientEncodedDynamicState(state2.document);
+
+            stateManager.afterUpdateResponse(state2.document);
+
+            stateManager.afterUpdate(state2.document, true);
+        } finally {
+            stateManager.releaseDocumentLock(lock);
         }
-        state2.document.afterExternalEvents();
-
-        stateManager.beforeUpdateResponse(state2.document, false);
-
-        // New state
-        state2.uuid = state2.document.getUUID();
-        state2.staticStateString = stateManager.getClientEncodedStaticState(state2.document);
-        state2.dynamicStateString = stateManager.getClientEncodedDynamicState(state2.document);
-
-        stateManager.afterUpdateResponse(state2.document);
-
-        stateManager.afterUpdate(state2.document, true);
 
         return state2;
     }

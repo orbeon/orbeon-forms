@@ -280,15 +280,12 @@ public class XFormsStateManager implements XFormsStateLifecycle {
     }
 
     /**
-     * Called before an incoming update.
-     *
-     * If found in cache, document is removed from cache.
+     * Return the locked document lock. Must be called before beforeUpdate().
      *
      * @param parameters    incoming Ajax request
-     * @return              document, either from cache or from state information
+     * @return              the document lock, already locked
      */
-    public XFormsContainingDocument beforeUpdate(RequestParameters parameters) {
-
+    public Lock getDocumentLock(RequestParameters parameters) {
         assert parameters.getUUID() != null;
 
         // Check that the session is associated with the requested UUID. This enforces the rule that an incoming request
@@ -303,8 +300,27 @@ public class XFormsStateManager implements XFormsStateLifecycle {
         // Lock document
         lock.lock();
 
-        // We got the lock, return the document
+        return lock;
+    }
 
+    /**
+     * Release the given document lock. Must be called after afterUpdate() in a finally block.
+     *
+     * @param lock  lock to release
+     */
+    public void releaseDocumentLock(Lock lock) {
+        lock.unlock();
+    }
+
+    /**
+     * Called before an incoming update.
+     *
+     * If found in cache, document is removed from cache.
+     *
+     * @param parameters    incoming Ajax request
+     * @return              document, either from cache or from state information
+     */
+    public XFormsContainingDocument beforeUpdate(RequestParameters parameters) {
         return findOrRestoreDocument(parameters, false, false);
     }
 
@@ -320,15 +336,6 @@ public class XFormsStateManager implements XFormsStateLifecycle {
      * @param keepDocument          whether to keep the document around
      */
     public void afterUpdate(XFormsContainingDocument containingDocument, boolean keepDocument) {
-        final String uuid = containingDocument.getUUID();
-        final Lock lock = getDocumentLock(uuid);
-        if (lock == null) {
-            // Possible situation is that session expired in the middle of a request? Seems unlikely. In this case we
-            // don't expect to update the session information as somebody clearly wanted to get rid of the session, so
-            // just return.
-            return;
-        }
-
         if (keepDocument) {
             // Re-add document to the cache
             indentedLogger.logDebug(LOG_TYPE, "Keeping document in cache.");
@@ -338,12 +345,10 @@ public class XFormsStateManager implements XFormsStateLifecycle {
             indentedLogger.logDebug(LOG_TYPE, "Not keeping document in cache following error.");
 
             // Remove all information about this document from the session
+            final String uuid = containingDocument.getUUID();
             removeCacheSessionListener(uuid);
             removeSessionDocument(uuid);
         }
-
-        // Unlock document
-        lock.unlock();
     }
 
     private static class RequestParametersImpl implements RequestParameters, java.io.Serializable {

@@ -263,7 +263,11 @@
                                      readonly would not have this unwanted behavior. -->
                                 <xf:group ref=".[not($local/readonly = 'true' and property('xxf:readonly-appearance') = 'static')]">
                                     <!-- Bound to text field value so button becomes readonly when the textfield is readonly -->
-                                    <xf:trigger ref="$local/textfield-value" class="fr-autocomplete-show-suggestions-button" id="show-suggestions-button"/>
+                                    <xf:trigger ref="$local/textfield-value" class="fr-autocomplete-show-suggestions-button" id="show-suggestions-button">
+                                        <xf:label>
+                                            <xh:img src="/xbl/orbeon/autocomplete/down-arrow.png" alt=""/>
+                                        </xf:label>
+                                    </xf:trigger>
                                 </xf:group>
                             </xsl:if>
                             <xh:div class="fr-autocomplete-yui-div"/>

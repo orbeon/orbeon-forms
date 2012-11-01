@@ -1,0 +1,52 @@
+/**
+ * The structure of the HTML as seen by the browser can be summaries as follows:
+ *
+ *      div class="xbl-fr-autocomplete"
+ *          div class="yui-ac"                                                              position: static (overrides YUI: relative, see comment below)
+ *              span class="xforms-input"
+ *                  input class="xforms-input-input"    Input in which users type           width: 140px, position: static (overrides YUI relative, see comment below)
+ *              div class="xbl-fr-select1-button"       Component showing full itemset
+ *              div class="yui-ac-container"                                                position: absolute
+ *                  div class="yui-ac-content"          Suggestions                         position: absolute, overflow: hidden, width: 140px
+ *
+ *
+ * For testing, to keep the suggestion list open while interacting with Firefox, disabled the display: none on the <div class="yui-ac-content">.
+ */
+
+.xbl-fr-autocomplete {
+
+    // Override position: absolute in YUI, otherwise the the input is taken out of the flow and content after the
+    // autocomplete will show under the input field. Only the yui-ac-content is position:absolute, not the .yui-ac.
+    // The downside of this technique is that we can't automatically size the suggestion box based on the width of the input
+    // field, and need to set the width of the input field and the suggestion box.
+    .xforms-input-input { position: static; width: 140px }
+    .yui-ac { position: static }
+    .yui-ac-content { width: 140px; -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box }
+
+    // Make the div that contains the text field inline-block so the component can be used in inline mode
+    // http://wiki.orbeon.com/forms/doc/contributor-guide/ie-bugs#TOC-Inline-block
+    .yui-ac {
+        display: -moz-inline-box;
+        display: inline-block;
+        *zoom: 1;
+        *display: inline;
+        vertical-align: middle;
+    }
+
+    // Always show the text field and the button on the same line
+    .yui-ac { white-space: nowrap }
+
+    // Button inline, next to the text field
+    .xbl-fr-select1-button { vertical-align: middle; display: inline-block; *display: inline }
+
+    // Get the input field vertically aligned on the button
+    .xbl-fr-select1-button .yui-menu-button { vertical-align: middle }
+    input { vertical-align: middle }
+
+    .fr-autocomplete-show-suggestions-button button {
+        height: 28px;                           // TODO: @baseLineHeight + 8px or better, as done in form-runner-bootstrap-override.less
+        margin-left: 3px;                       // Get the button to show as if it was merged with the text field (well, almost)
+        padding-top: 0; padding-bottom: 0;      // Remove top padding so the bottom shows vertically centered
+        img { *max-width: none }                // Overwide the max-width: 100% in Bootstrap to get IE7 to display the image
+    }
+}

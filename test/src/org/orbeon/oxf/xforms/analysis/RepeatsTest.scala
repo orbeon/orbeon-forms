@@ -76,7 +76,7 @@ class RepeatsTest extends DocumentTestBase with AssertionsForJUnit {
             </xh:html>
 
         // Test hierarchy string
-        assert(document.getStaticOps.getRepeatHierarchyString === "repeat-department,repeat-employee repeat-department,repeat-office repeat-department,repeat-building")
+        assert(document.getStaticOps.getRepeatHierarchyString("") === "repeat-department,repeat-employee repeat-department,repeat-office repeat-department,repeat-building")
 
         val repeatAncestors = Map(
             "department" → Seq(),

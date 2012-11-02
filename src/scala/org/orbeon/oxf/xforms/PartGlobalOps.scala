@@ -59,7 +59,7 @@ trait PartGlobalOps {
 
     // Repeats
     def repeats: Traversable[RepeatControl]
-    def getRepeatHierarchyString: String
+    def getRepeatHierarchyString(ns: String): String
 
     // AVTs
     def hasAttributeControl(prefixedForAttribute: String): Boolean

@@ -80,7 +80,7 @@ class StaticStateGlobalOps(topLevelPart: PartAnalysis) extends PartGlobalOps {
     def getBindingQNames = collectInParts(_.getBindingQNames)
 
     def repeats = collectInPartsReverse(_.repeats)
-    def getRepeatHierarchyString = parts map (_.getRepeatHierarchyString) mkString "," // just concat the repeat strings from all parts
+    def getRepeatHierarchyString(ns: String) = parts map (_.getRepeatHierarchyString(ns)) mkString "," // just concat the repeat strings from all parts
 
     def hasAttributeControl(prefixedForAttribute: String) = existsInParts(_.hasAttributeControl(prefixedForAttribute))
     def getAttributeControl(prefixedForAttribute: String, attributeName: String) = findInParts(_.getAttributeControl(prefixedForAttribute, attributeName)).orNull

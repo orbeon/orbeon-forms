@@ -316,7 +316,7 @@ public class ControlTree implements ExternalCopyable {
         if (root != null) {
             // Gather repeat indexes if any
             // Do this before cloning controls so that initial/current locals are still different
-            cloned.indexes = XFormsRepeatControl.findInitialIndexes(((XFormsControl) root).containingDocument(), this);
+            cloned.indexes = XFormsRepeatControl.initialIndexesJava(((XFormsControl) root).containingDocument());
 
             // Clone children if any
             cloned.root = (XFormsContainerControl) root.getBackCopy();

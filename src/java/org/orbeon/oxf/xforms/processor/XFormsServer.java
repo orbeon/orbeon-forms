@@ -541,18 +541,16 @@ public class XFormsServer extends ProcessorImpl {
                 // Output repeat indexes information
                 {
                     // Output index updates
+                    final String ns = containingDocument.getContainerNamespace();
                     if (allEvents) {
                         // All events
                         // Reload / back case: diff between current state and initial state as obtained from initial dynamic state
-                        final ControlTree currentControlTree = xformsControls.getCurrentControlTree();
-                        final ControlTree initialControlTree = initialContainingDocument.getControls().getCurrentControlTree();
-
-                        diffIndexState(ch, containingDocument, XFormsRepeatControl.findInitialIndexes(containingDocument, initialControlTree),
-                                XFormsRepeatControl.findCurrentIndexes(containingDocument, currentControlTree));
+                        diffIndexState(ch, ns, XFormsRepeatControl.initialIndexesJava(initialContainingDocument),
+                                XFormsRepeatControl.currentIndexesJava(containingDocument));
                     } else if (!testOutputAllActions && containingDocument.isDirtySinceLastRequest()) {
                         // Only output changes if needed
-                        diffIndexState(ch, containingDocument, xformsControls.getInitialControlTree().getIndexes(),
-                                XFormsRepeatControl.findCurrentIndexes(containingDocument, xformsControls.getCurrentControlTree()));
+                        diffIndexState(ch, ns, xformsControls.getInitialControlTree().getIndexes(),
+                                XFormsRepeatControl.currentIndexesJava(containingDocument));
                     }
                 }
 
@@ -647,7 +645,7 @@ public class XFormsServer extends ProcessorImpl {
         }
     }
 
-    private static void diffIndexState(ContentHandlerHelper ch, XFormsContainingDocument containingDocument, Map<String, Integer> initialRepeatIdToIndex,
+    private static void diffIndexState(ContentHandlerHelper ch, String ns, Map<String, Integer> initialRepeatIdToIndex,
                                        Map<String, Integer> currentRepeatIdToIndex) {
         if (currentRepeatIdToIndex.size() != 0) {
             boolean found = false;
@@ -664,8 +662,9 @@ public class XFormsServer extends ProcessorImpl {
                         found = true;
                     }
 
+                    // Make sure to namespace the id
                     ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "repeat-index",
-                            new String[] {"id", XFormsUtils.namespaceId(containingDocument, repeatId), "new-index", newIndex.toString()});
+                            new String[] {"id", ns + repeatId, "new-index", newIndex.toString()});
                 }
             }
             if (found)

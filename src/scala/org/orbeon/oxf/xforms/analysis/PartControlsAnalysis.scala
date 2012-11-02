@@ -134,22 +134,21 @@ trait PartControlsAnalysis extends TransientState {
     // Repeats
     def repeats = controlTypes.get("repeat") map (_.values map (_.asInstanceOf[RepeatControl])) getOrElse Seq.empty
 
-    def getRepeatHierarchyString =
+    def getRepeatHierarchyString(ns: String) =
         controlTypes.get("repeat") map { repeats ⇒
             val repeatsWithAncestors =
                 for {
                     repeat ← repeats.values
-                    prefixedId = repeat.prefixedId
+                    namespacedPrefixedId = ns + repeat.prefixedId
                     ancestorRepeat = RepeatControl.getAncestorRepeatAcrossParts(repeat)
                 } yield
                     ancestorRepeat match {
-                        case Some(ancestorRepeat) ⇒ prefixedId + " " + ancestorRepeat.prefixedId
-                        case None ⇒ prefixedId
+                        case Some(ancestorRepeat) ⇒ namespacedPrefixedId + " " + ns + ancestorRepeat.prefixedId
+                        case None                 ⇒ namespacedPrefixedId
                     }
 
             repeatsWithAncestors mkString ","
         } getOrElse ""
-
 
     def getTopLevelControls = Seq(controlTypes("root").values.head)
 

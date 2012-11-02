@@ -37,8 +37,6 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import scala.collection.Seq;
 
-import java.util.Map;
-
 /**
  * Handle xhtml:body.
  */
@@ -66,7 +64,6 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
         xmlReceiver.startElement(uri, localname, qName, attributes);
         helper = new ContentHandlerHelper(xmlReceiver);
 
-        final XFormsControls xformsControls = containingDocument.getControls();
         final String htmlPrefix = XMLUtils.prefixFromQName(qName);
 
         // Get formatting prefix and declare it if needed
@@ -150,34 +147,18 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
             });
 
             // Store information about nested repeats hierarchy
-            {
-                helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[]{
-                        "type", "hidden", "name", "$repeat-tree", "value", containingDocument.getStaticOps().getRepeatHierarchyString()
-                });
-            }
+            helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[]{
+                    "type", "hidden",
+                    "name", "$repeat-tree",
+                    "value", containingDocument.getStaticOps().getRepeatHierarchyString(containingDocument.getContainerNamespace())
+            });
 
             // Store information about the initial index of each repeat
-            {
-                final StringBuilder repeatIndexesBuilder = new StringBuilder();
-                final Map<String, Integer> repeatIdToIndex = XFormsRepeatControl.findCurrentIndexes(containingDocument, xformsControls.getCurrentControlTree());
-                if (repeatIdToIndex.size() != 0) {
-                    for (final Map.Entry<String, Integer> currentEntry: repeatIdToIndex.entrySet()) {
-                        final String repeatId = currentEntry.getKey();
-                        final Integer index = currentEntry.getValue();
-
-                        if (repeatIndexesBuilder.length() > 0)
-                            repeatIndexesBuilder.append(',');
-
-                        repeatIndexesBuilder.append(repeatId);
-                        repeatIndexesBuilder.append(' ');
-                        repeatIndexesBuilder.append(index);
-                    }
-                }
-
-                helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[]{
-                        "type", "hidden", "name", "$repeat-indexes", "value", repeatIndexesBuilder.toString()
-                });
-            }
+            helper.element(htmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "input", new String[]{
+                    "type", "hidden",
+                    "name", "$repeat-indexes",
+                    "value", XFormsRepeatControl.currentNamespacedIndexesString(containingDocument)
+            });
 
             // Ajax loading indicator
             if (XFormsProperties.isAjaxShowLoadingIcon(containingDocument)) {

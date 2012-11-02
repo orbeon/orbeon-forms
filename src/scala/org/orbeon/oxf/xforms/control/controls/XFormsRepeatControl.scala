@@ -35,7 +35,8 @@ import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.util.Logging
 
 import control.controls.XFormsRepeatControl._
-import java.util.{ArrayList, List ⇒ JList, Map ⇒ JMap, Collections}
+import java.lang.{Integer ⇒ JInteger}
+import java.util.{ArrayList, Map ⇒ JMap, Collections}
 import collection.JavaConverters._
 import org.orbeon.oxf.xforms.BindingContext
 import scala.collection.mutable.{ListBuffer, ArrayBuffer, LinkedHashMap}
@@ -621,13 +622,30 @@ object XFormsRepeatControl {
         oldRepeatIndex: Int
     )
 
-    // Find the initial repeat indexes for the given tree
-    def findInitialIndexes(doc: XFormsContainingDocument, tree: ControlTree) =
-        findIndexes(doc, tree, doc.getStaticOps.repeats, _.getInitialLocal.asInstanceOf[XFormsRepeatControlLocal].index).asJava
+    // Find the initial repeat indexes for the given doc
+    // NOTE: cast is ugly, but we know Scala boxes Int as java.lang.Integer, however asJava doesn't reflect this
+    def initialIndexesJava(doc: XFormsContainingDocument): JMap[String, JInteger] =
+        findIndexes(doc.getControls.getCurrentControlTree, doc.getStaticOps.repeats, _.getInitialLocal.asInstanceOf[XFormsRepeatControlLocal].index).asJava.asInstanceOf[JMap[String, JInteger] ]
 
-    // Find the current repeat indexes for the given tree
-    def findCurrentIndexes(doc: XFormsContainingDocument, tree: ControlTree) =
-        findIndexes(doc, tree, doc.getStaticOps.repeats, _.getIndex).asJava
+    // Find the current repeat indexes for the given doc
+    // NOTE: cast is ugly, but we know Scala boxes Int as java.lang.Integer, however asJava doesn't reflect this
+    def currentIndexesJava(doc: XFormsContainingDocument): JMap[String, JInteger]  =
+        currentIndexes(doc).asJava.asInstanceOf[JMap[String, JInteger]]
+
+    private def currentIndexes(doc: XFormsContainingDocument) =
+        findIndexes(doc.getControls.getCurrentControlTree, doc.getStaticOps.repeats, _.getIndex)
+
+    // Find the current repeat indexes for the given doc, as a string
+    def currentNamespacedIndexesString(doc: XFormsContainingDocument) = {
+
+        val ns = doc.getContainerNamespace
+
+        val repeats =
+            for ((repeatId, index) ← currentIndexes(doc))
+                yield ns + repeatId + ' ' + index
+
+        repeats mkString ","
+    }
 
     // For the given control, return the matching control that follows repeat indexes
     // This might be the same as the given control if it is within the repeat indexes chain, or another control if not
@@ -639,7 +657,7 @@ object XFormsRepeatControl {
         val ancestorRepeats = RepeatControl.getAllAncestorRepeatsAcrossParts(control.staticControl).reverse
         
         // Find just the indexes we need
-        val indexes = findIndexes(doc, tree, ancestorRepeats, _.getIndex)
+        val indexes = findIndexes(tree, ancestorRepeats, _.getIndex)
 
         // Build a suffix based on the ancestor repeats' current indexes
         val suffix = suffixForRepeats(indexes, ancestorRepeats)
@@ -648,8 +666,8 @@ object XFormsRepeatControl {
     }
 
     // Find indexes for the given repeats in the current document
-    private def findIndexes(doc: XFormsContainingDocument, tree: ControlTree, repeats: Seq[RepeatControl], index: XFormsRepeatControl ⇒ Int) =
-        repeats.foldLeft(LinkedHashMap[String, java.lang.Integer]()) {
+    private def findIndexes(tree: ControlTree, repeats: Seq[RepeatControl], index: XFormsRepeatControl ⇒ Int) =
+        repeats.foldLeft(LinkedHashMap[String, Int]()) {
             (indexes, repeat) ⇒
 
                 // Build the suffix based on all the ancestor repeats' indexes
@@ -667,7 +685,7 @@ object XFormsRepeatControl {
                 })
         }
     
-    private def suffixForRepeats(indexes: collection.Map[String, java.lang.Integer], repeats: Seq[RepeatControl]) =
+    private def suffixForRepeats(indexes: collection.Map[String, Int], repeats: Seq[RepeatControl]) =
         repeats map (repeat ⇒ indexes(repeat.prefixedId)) mkString REPEAT_HIERARCHY_SEPARATOR_2_STRING
     
     private def addSuffix(prefixedId: String, suffix: String) =

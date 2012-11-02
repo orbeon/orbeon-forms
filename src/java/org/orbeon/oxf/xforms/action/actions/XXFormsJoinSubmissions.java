@@ -18,8 +18,6 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.Version;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
-import org.orbeon.oxf.xforms.event.XFormsEvent;
-import org.orbeon.oxf.xforms.event.XFormsEventObserver;
 import org.orbeon.oxf.xforms.submission.AsynchronousSubmissionManager;
 import org.orbeon.oxf.xforms.xbl.Scope;
 import org.orbeon.saxon.om.Item;

@@ -11,29 +11,40 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<config xmlns="http://www.orbeon.com/oxf/controller">
+<controller xmlns="http://www.orbeon.com/oxf/controller" matcher="regexp">
+
+    <!-- ==== XForms Server ======================================================================================== -->
+
+    <page path-info="/xforms-server.*" model="/ops/xforms/xforms-server.xpl" public-methods="HEAD GET POST"/>
+
+    <!-- ==== Files ================================================================================================ -->
 
     <!-- Files to serve directly (and exclude files under /[app]/service/) -->
-    <files path-info="(?!/(xforms-server|([^/]+)/service/)).+\.(gif|css|pdf|json|js|png|jpg|xsd|htc|ico|swf|html|htm|txt)" matcher="regexp"/>
+    <files path="(?!/([^/]+)/service/).+\.(gif|css|pdf|json|js|png|jpg|xsd|htc|ico|swf|html|htm|txt)"/>
     <!-- Also exclude .xml files handled by Form Runner -->
-    <files path-info="(?!/(xforms-server|fr|([^/]+)/service)/).+\.xml" matcher="regexp" mime-type="application/xml"/>
+    <files path="(?!/(fr|([^/]+)/service)/).+\.xml"  mediatype="application/xml"/>
     <!-- For the following we override the standard mediatype to help browsers -->
-    <files path-info="(?!/([^/]+)/service/).+\.(java|xq)" matcher="regexp" mime-type="text/plain"/>
-    <files path-info="(?!/([^/]+)/service/).+\.jar" matcher="regexp" mime-type="application/zip"/>
+    <files path="(?!/([^/]+)/service/).+\.(java|xq)" mediatype="text/plain"/>
+    <files path="(?!/([^/]+)/service/).+\.jar"       mediatype="application/zip"/>
 
-    <!-- XForms server entry point -->
-    <page id="xforms-server" path-info="/xforms-server.*" matcher="regexp" model="/ops/xforms/xforms-server.xpl" public-methods="HEAD GET POST"/>
+    <!-- ==== Pages ================================================================================================ -->
 
     <!-- Home / welcome application -->
-    <page id="home" path-info="/" model="apps/home/page-flow.xml"/>
+    <page path-info="/" model="apps/home/page-flow.xml"/>
 
     <!-- Dispatch request to a specific application -->
-    <page id="apps" path-info="/([^/]+)/.*" matcher="regexp" model="apps/${1}/page-flow.xml" public-methods="#all"/>
+    <page path-info="/([^/]+)/.*" model="apps/${1}/page-flow.xml" public-methods="#all"/>
 
-    <!-- "Not Found" page displayed when no page matches the request path -->
-    <page id="not-found" path-info="/not-found" view="/config/not-found.xhtml"/>
+    <!-- ==== Epilogue and handlers ================================================================================ -->
+
+    <page id="not-found"    path="/not-found"    view="/config/not-found.xhtml"/>
+    <page id="unauthorized" path="/unauthorized" view="/config/unauthorized.xhtml"/>
+    <page id="error"        path="/error"        model="/config/error.xpl"/>
+
+    <not-found-handler    page="not-found"/>
+    <unauthorized-handler page="unauthorized"/>
+    <error-handler        page="error"/>
 
     <epilogue url="/config/epilogue.xpl"/>
-    <not-found-handler page="not-found"/>
 
-</config>
+</controller>

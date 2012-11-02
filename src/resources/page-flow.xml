@@ -26,7 +26,7 @@
     <!-- ==== Pages ================================================================================================ -->
 
     <!-- Redirect to the Home application -->
-    <page id="root" path="/(welcome/?)?">
+    <page path="/(welcome/?)?">
         <action><result page="home"/></action>
     </page>
 
@@ -34,7 +34,7 @@
     <page id="home" path="/home/" model="apps/home/page-flow.xml"/>
 
     <!-- Dispatch request to a specific application -->
-    <page id="apps" path="/([^/]+)/.*" model="apps/${1}/page-flow.xml" public-methods="#all"/>
+    <page path="/([^/]+)/.*" model="apps/${1}/page-flow.xml" public-methods="#all"/>
 
     <!-- ==== Epilogue and handlers ================================================================================ -->
 
@@ -42,8 +42,10 @@
     <page id="unauthorized" path="/unauthorized" view="/config/unauthorized.xhtml"/>
     <page id="error"        path="/error"        model="/config/error.xpl"/>
 
+    <not-found-handler    page="not-found"/>
+    <unauthorized-handler page="unauthorized"/>
+    <error-handler        page="error"/>
+
     <epilogue url="/config/epilogue.xpl"/>
-    <not-found-handler page="not-found"/>
-    <error-handler page="error"/>
 
 </controller>

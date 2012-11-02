@@ -26,8 +26,6 @@ import org.orbeon.oxf.xforms.event.XFormsEvent.{Bubbling, Target, Capture, Phase
 import org.orbeon.oxf.xforms.event.EventHandler
 import scala.collection.mutable
 import scala.util.control.Breaks
-import collection.JavaConverters._
-import java.util.concurrent.ConcurrentHashMap
 
 /**
  * Abstract representation of a common XForms element supporting optional context, binding and value.
@@ -225,17 +223,25 @@ trait ElementEventHandlers {
     import ElementAnalysis._
     import propagateBreaks.{break, breakable}
 
-    // Cache for event handlers, using a ConcurrentMap
-    // Q: Should we only cache per part/static state? That would depend on the overhead of ConcurrentHashMap.
-    private lazy val handlersCache =
-        new ConcurrentHashMap[String, (Boolean, Map[Phase, Map[String, List[EventHandler]]])].asScala
-
-    // Return event handler information for the given event name as a tuple:
-    // - whether the default action will need to run
+    // Event handler information as a tuple:
+    // - whether the default action needs to run
     // - all event handlers grouped by phase and observer prefixed id
-    // The information is cached locally.
-    def handlersForEvent(eventName: String): (Boolean, Map[Phase, Map[String, List[EventHandler]]]) =
-        handlersCache.getOrElseUpdate(eventName, handlersForEventImpl(eventName))
+    private type HandlerAnalysis = (Boolean, Map[Phase, Map[String, List[EventHandler]]])
+
+    // Cache for event handlers
+    // Use an immutable map and @volatile so that update are published to other threads accessing this static state.
+    @volatile private var handlersCache: Map[String, HandlerAnalysis] = Map()
+
+    // Return event handler information for the given event name
+    // We check the cache first, and if not found we compute the result and cache it. There is a chance that concurrent
+    // writers could overwrite each other's latest cache addition, but handlersForEventImpl is idempotent so this should
+    // not be an issue.
+    def handlersForEvent(eventName: String): HandlerAnalysis =
+        handlersCache.get(eventName) getOrElse {
+            val result = handlersForEventImpl(eventName)
+            handlersCache += eventName → result
+            result
+        }
 
     private def handlersForObserver(observer: ElementAnalysis) =
         observer.part.getEventHandlers(observer.prefixedId)
@@ -257,7 +263,7 @@ trait ElementEventHandlers {
 
     // Find all the handlers for the given event name
     // For all relevant observers, find the handlers which match by phase
-    private def handlersForEventImpl(eventName: String): (Boolean, Map[Phase, Map[String, List[EventHandler]]]) = {
+    private def handlersForEventImpl(eventName: String): HandlerAnalysis = {
 
         def relevantHandlersForObserverByPhaseAndName(observer: ElementAnalysis, phase: Phase) = {
 

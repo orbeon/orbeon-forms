@@ -44,13 +44,16 @@ object Authorizer extends Logging {
         authorizedWithToken(ec) || (if (RememberAuthorization) authorizeIfNeededAndRemember(ec.getRequest) else authorizedWithDelegate(ec.getRequest))
 
     // Whether the incoming request is authorized with a token
-    def authorizedWithToken(ec: ExternalContext) = {
+    def authorizedWithToken(ec: ExternalContext): Boolean =
+        authorizedWithToken(k ⇒ Option(ec.getRequest.getHeaderValuesMap.get(k)), k ⇒ ec.getWebAppContext.attributes.get(k))
+
+    def authorizedWithToken(header: String ⇒ Option[Array[String]], attribute: String ⇒ Option[AnyRef]): Boolean = {
 
         val requestToken =
-            (Option(ec.getRequest.getHeaderValuesMap.get(TokenKey)) flatten) headOption
+            header(TokenKey).flatten.headOption
 
         def applicationToken =
-            ec.getWebAppContext.attributes.get(TokenKey) collect { case token: String ⇒ token }
+            attribute(TokenKey) collect { case token: String ⇒ token }
 
         requestToken.isDefined && requestToken == applicationToken
     }

@@ -162,6 +162,18 @@
                 <dispatcher>FORWARD</dispatcher>
             </filter-mapping>
 
+            <filter>
+                <filter-name>orbeon-exist-filter</filter-name>
+                <filter-class>org.orbeon.oxf.servlet.TokenSecurityFilter</filter-class>
+            </filter>
+            <filter-mapping>
+                <filter-name>orbeon-exist-filter</filter-name>
+                <url-pattern>/exist/*</url-pattern>
+                <xsl:comment>Security filter for eXist</xsl:comment>
+                <dispatcher>REQUEST</dispatcher>
+                <dispatcher>FORWARD</dispatcher>
+            </filter-mapping>
+
             <xsl:comment>Orbeon context listener</xsl:comment>
             <listener>
                 <listener-class>org.orbeon.oxf.webapp.OrbeonServletContextListener</listener-class>

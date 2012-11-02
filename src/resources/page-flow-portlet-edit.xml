@@ -22,13 +22,13 @@
     <files path-info="(?!/([^/]+)/service/).+\.jar" matcher="regexp" mime-type="application/zip"/>
 
     <!-- XForms server entry point -->
-    <page id="xforms-server" path-info="/xforms-server.*" matcher="regexp" model="/ops/xforms/xforms-server.xpl"/>
+    <page id="xforms-server" path-info="/xforms-server.*" matcher="regexp" model="/ops/xforms/xforms-server.xpl" public-methods="HEAD GET POST"/>
 
     <!-- Home / welcome application -->
     <page id="home" path-info="/" model="apps/portlet-welcome/page-flow-edit.xml"/>
 
     <!-- Dispatch request to a specific application -->
-    <page id="apps" path-info="/([^/]+)/.*" matcher="regexp" model="apps/${1}/page-flow-edit.xml"/>
+    <page id="apps" path-info="/([^/]+)/.*" matcher="regexp" model="apps/${1}/page-flow-edit.xml" public-methods="#all"/>
 
     <!-- "Not Found" page displayed when no page matches the request path -->
     <page id="not-found" path-info="/not-found" view="/config/not-found.xhtml"/>

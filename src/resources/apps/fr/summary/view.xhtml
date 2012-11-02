@@ -607,7 +607,7 @@
                                                     <!-- 1-based position in the current document-->
                                                     <xforms:var name="position" value="position()"/>
                                                     <!-- Set context to current detail -->
-                                                    <xforms:group context="$document/details/detail[position() = $positions]" appearance="xxforms:internal">
+                                                    <xforms:group context="$document/details/detail[$position]" appearance="xxforms:internal">
                                                         <xhtml:td>
                                                             <!-- NOTE: Doing everything in a single big output XPath expression has the benefit of producing much less markup -->
                                                             <xforms:var name="detail" value="

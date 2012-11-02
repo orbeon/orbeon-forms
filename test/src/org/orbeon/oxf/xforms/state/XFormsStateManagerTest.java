@@ -247,7 +247,7 @@ public class XFormsStateManagerTest extends ResourceManagerTestBase {
         // New state
         final State state2 = new State();
 
-        final Lock lock = stateManager.getDocumentLock(parameters);
+        final Lock lock = stateManager.acquireDocumentLock(parameters);
         try {
             state2.document = stateManager.beforeUpdate(parameters);
 

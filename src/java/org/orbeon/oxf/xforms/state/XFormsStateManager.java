@@ -285,7 +285,7 @@ public class XFormsStateManager implements XFormsStateLifecycle {
      * @param parameters    incoming Ajax request
      * @return              the document lock, already locked
      */
-    public Lock getDocumentLock(RequestParameters parameters) {
+    public Lock acquireDocumentLock(RequestParameters parameters) {
         assert parameters.getUUID() != null;
 
         // Check that the session is associated with the requested UUID. This enforces the rule that an incoming request

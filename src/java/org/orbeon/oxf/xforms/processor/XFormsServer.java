@@ -153,7 +153,7 @@ public class XFormsServer extends ProcessorImpl {
         Callable<SubmissionResult> replaceAllCallable = null;
 
         // IMPORTANT: We now have a lock associated with the document
-        final Lock lock = XFormsStateManager.instance().getDocumentLock(parameters);
+        final Lock lock = XFormsStateManager.instance().acquireDocumentLock(parameters);
         try {
             // Get containing document from the incoming request
             final XFormsContainingDocument containingDocument = XFormsStateManager.instance().beforeUpdate(parameters);
@@ -354,7 +354,7 @@ public class XFormsServer extends ProcessorImpl {
                 XFormsStateManager.instance().afterUpdate(containingDocument, keepDocument);
             }
         } finally {
-            // Make sure to the lock
+            // Make sure to release the lock
             XFormsStateManager.instance().releaseDocumentLock(lock);
         }
 

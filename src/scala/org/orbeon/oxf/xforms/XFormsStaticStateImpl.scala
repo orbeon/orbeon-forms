@@ -30,7 +30,7 @@ import org.orbeon.oxf.xforms.XFormsStaticStateImpl.StaticStateDocument
 import state.AnnotatedTemplate
 import xbl.Scope
 import org.dom4j.{Element, Document}
-import org.orbeon.oxf.util.{SecureUtils, NumberUtils, XPathCache}
+import org.orbeon.oxf.util.{NumberUtils, XPathCache}
 import org.orbeon.oxf.util.ScalaUtils.stringOptionToSet
 
 class XFormsStaticStateImpl(

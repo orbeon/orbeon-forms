@@ -289,10 +289,8 @@ trait ElementEventHandlers {
             // - preventDefault: "the event must be canceled, meaning any default actions normally taken by the
             //   implementation as a result of the event must not occur"
             // - NOTE: DOM 3 introduces also stopImmediatePropagation
-
-            // Compute the logical "and" for both flags, defaulting to true
-            val (propagate, performDefaultAction) =
-                relevantHandlers.foldLeft((true, true))((flags, handler) ⇒ (flags._1 && handler.isPropagate, flags._2 && handler.isPerformDefaultAction))
+            val propagate            = relevantHandlers forall (_.isPropagate)
+            val performDefaultAction = relevantHandlers forall (_.isPerformDefaultAction)
 
             (propagate, performDefaultAction, relevantHandlers)
         }

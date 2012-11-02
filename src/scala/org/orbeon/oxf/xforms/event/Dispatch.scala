@@ -48,12 +48,23 @@ object Dispatch extends Logging {
                 staticTarget.handlersForEvent(event.name)
             }
 
+            // Call native listeners on target if any
+            def callNativeListeners(target: XFormsEventObserver) =
+                for (listener ← target.getListeners(event.name)) {
+                    listener.handleEvent(event)
+                    statNativeHandlers += 1
+                }
+
             withEvent {
                 if (handlers.nonEmpty) {
                     withDebug("dispatching", Seq("name" → event.name, "target" → target.getEffectiveId, "location" → (Option(event.locationData) map (_.toString) orNull))) {
                         // There is at least one handler to run
 
                         // Run all observers for the given phase
+                        // One one hand, we have prefixed ids, and on the other hand we need to find concrete controls.
+                        // The strategy we use here is to traverse all the observers. But we could instead determine the
+                        // effective id from prefixed id and then lookup the object by effective id. It is not clear at
+                        // this point which is faster.
                         def doPhase(observers: List[XFormsEventObserver], staticHandlers: Map[String, List[EventHandler]], phase: Phase) =
                             for {
                                 observer ← observers
@@ -88,11 +99,7 @@ object Dispatch extends Logging {
 
                             handlers.get(Target) foreach (doPhase(List(target), _, Target))
 
-                            // Call native listeners on target if any
-                            for (listener ← target.getListeners(event.name)) {
-                                listener.handleEvent(event)
-                                statNativeHandlers += 1
-                            }
+                            callNativeListeners(target)
                         }
 
                         // Bubbling phase, which the event may not support
@@ -110,14 +117,8 @@ object Dispatch extends Logging {
                     }
                 } else {
                     // No handlers, try to do as little as possible
-
                     target.performTargetAction(event)
-
-                    for (listener ← target.getListeners(event.name)) {
-                        listener.handleEvent(event)
-                        statNativeHandlers += 1
-                    }
-
+                    callNativeListeners(target)
                     if (! event.cancelable || performDefaultAction)
                         target.performDefaultAction(event)
 

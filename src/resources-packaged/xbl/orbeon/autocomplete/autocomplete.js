@@ -106,6 +106,7 @@
             if (doUpdateSuggestionList) {
                 // Tell YUI this control has the focus; we set the focus on the input, but the YUI focus handler is sometimes called too late
                 this.yuiAutoComplete._bFocused = true;
+                this.yuiAutoComplete._nKeyCode = null;  // See https://github.com/orbeon/orbeon-forms/issues/436
                 this.yuiAutoComplete._populateList(query, { results: newList }, { query: query });
             }
             this.justMadeSelection = false;

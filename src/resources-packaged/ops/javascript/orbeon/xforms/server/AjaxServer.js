@@ -1682,7 +1682,7 @@
                             // Change highlighted section in repeat
                             case "repeat-indexes": {
                                 var repeatIndexesElement = actionElement.childNodes[actionIndex];
-                                var newRepeatIndexes = new Array();
+                                var newRepeatIndexes = {};
                                 // Extract data from server response
                                 for (var j = 0; j < repeatIndexesElement.childNodes.length; j++) {
                                     if (ORBEON.util.Utils.getLocalName(repeatIndexesElement.childNodes[j]) == "repeat-index") {

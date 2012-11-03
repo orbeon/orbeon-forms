@@ -192,7 +192,7 @@ class XFormsRepeatHandler extends XFormsControlLifecyleHandler(true, true) { // 
 
     // Don't output any LHHA
     override def handleLabel() = ()
-    override def handleHint() = ()
+    override def handleHint()  = ()
     override def handleAlert() = ()
-    override def handleHelp() = ()
+    override def handleHelp()  = ()
 }

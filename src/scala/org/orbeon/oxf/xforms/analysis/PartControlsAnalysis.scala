@@ -140,7 +140,7 @@ trait PartControlsAnalysis extends TransientState {
                 for {
                     repeat ← repeats.values
                     namespacedPrefixedId = ns + repeat.prefixedId
-                    ancestorRepeat = RepeatControl.getAncestorRepeatAcrossParts(repeat)
+                    ancestorRepeat = repeat.ancestorRepeatsAcrossParts.headOption
                 } yield
                     ancestorRepeat match {
                         case Some(ancestorRepeat) ⇒ namespacedPrefixedId + " " + ns + ancestorRepeat.prefixedId

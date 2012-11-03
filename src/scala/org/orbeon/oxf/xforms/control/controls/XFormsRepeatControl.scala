@@ -654,7 +654,7 @@ object XFormsRepeatControl {
         val tree = doc.getControls.getCurrentControlTree
         
         // All ancestor repeats from root to leaf
-        val ancestorRepeats = RepeatControl.getAllAncestorRepeatsAcrossParts(control.staticControl).reverse
+        val ancestorRepeats = control.staticControl.ancestorRepeatsAcrossParts.reverse
         
         // Find just the indexes we need
         val indexes = findIndexes(tree, ancestorRepeats, _.getIndex)
@@ -671,7 +671,7 @@ object XFormsRepeatControl {
             (indexes, repeat) ⇒
 
                 // Build the suffix based on all the ancestor repeats' indexes
-                val suffix = suffixForRepeats(indexes, RepeatControl.getAllAncestorRepeatsAcrossParts(repeat).reverse)
+                val suffix = suffixForRepeats(indexes, repeat.ancestorRepeatsAcrossParts.reverse)
 
                 // Build the effective id
                 val effectiveId = addSuffix(repeat.prefixedId, suffix)

@@ -38,11 +38,6 @@ class SimpleElementAnalysis(
     // Index of the element in the view
     def index = staticStateContext.index
 
-    lazy val ancestorRepeatsAcrossParts: List[RepeatControl] =
-        ancestorRepeats ::: ((part.parent flatMap (_.elementInParent) toList) flatMap (c ⇒ c.ancestorRepeatsAcrossParts))
-
-    override def isWithinRepeat = ancestorRepeatsAcrossParts.nonEmpty
-
     // Make this lazy because we don't want the model to be resolved upon construction. Instead, resolve when scopeModel
     // is used the first time. How can we check/enforce that scopeModel is only used at the right time?
     lazy val model = findContainingModel
@@ -150,6 +145,6 @@ class SimpleElementAnalysis(
             LinkedHashMap(ElementAnalysis.getAllAncestorsOrSelfInScope(self) map (elementAnalysis ⇒ elementAnalysis.staticId → elementAnalysis): _*)
 
         // Return analysis for closest ancestor repeat in scope.
-        def getInScopeRepeat = RepeatControl.getAncestorRepeatInScope(self)
+        def getInScopeRepeat = self.ancestorRepeatInScope
     }
 }

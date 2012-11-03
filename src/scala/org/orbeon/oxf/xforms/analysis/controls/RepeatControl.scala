@@ -15,7 +15,6 @@ package org.orbeon.oxf.xforms.analysis.controls
 
 import org.dom4j.Element
 import org.orbeon.oxf.xforms.analysis._
-import java.lang.IllegalArgumentException
 import org.orbeon.oxf.xforms.xbl.Scope
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.event.XFormsEvents._
@@ -24,29 +23,11 @@ class RepeatControl(staticStateContext: StaticStateContext, element: Element, pa
     extends ContainerControl(staticStateContext, element, parent, preceding, scope)
     with ChildrenBuilderTrait {
 
-    // TODO: add repeat hierarchy information
-    
     val iterationElement = element.element(XFORMS_REPEAT_ITERATION_QNAME)
-    lazy val iteration = children collectFirst { case i: RepeatIterationControl ⇒ i }
     require(iterationElement ne null)
+
+    lazy val iteration = children collectFirst { case i: RepeatIterationControl ⇒ i }
 
     override protected def externalEventsDef = super.externalEventsDef + XXFORMS_DND
     override val externalEvents              = externalEventsDef
-}
-
-object RepeatControl {
-
-    // Find the closest ancestor repeat in the same scope, if any
-    def getAncestorRepeatInScope(elementAnalysis: ElementAnalysis): Option[RepeatControl] =
-        elementAnalysis.ancestorRepeats find (_.scope == elementAnalysis.scope)
-
-    // Get the first ancestor repeats across parts
-    def getAncestorRepeatAcrossParts(elementAnalysis: ElementAnalysis): Option[RepeatControl] =
-        getAllAncestorRepeatsAcrossParts(elementAnalysis).headOption
-
-    // Get all ancestor repeats across parts, from leaf to root
-    def getAllAncestorRepeatsAcrossParts(elementAnalysis: ElementAnalysis): List[RepeatControl] = elementAnalysis match {
-        case element: SimpleElementAnalysis ⇒ element.ancestorRepeatsAcrossParts
-        case _                              ⇒ throw new IllegalArgumentException
-    }
 }

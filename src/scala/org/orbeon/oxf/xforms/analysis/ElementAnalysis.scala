@@ -160,9 +160,16 @@ abstract class ElementAnalysis(
         case None                        ⇒ Nil
     }
 
+    lazy val ancestorRepeatsAcrossParts: List[RepeatControl] =
+        part.parent flatMap (_.elementInParent) match {
+            case Some(parentPart) ⇒ ancestorRepeats ::: parentPart.ancestorRepeatsAcrossParts
+            case None             ⇒ ancestorRepeats
+        }
+
+    lazy val ancestorRepeatInScope = ancestorRepeats find (_.scope == scope)
+
     // Whether this is within a repeat
-    // NOTE: Unclear what should be in ElementAnalysis vs. SimpleElementAnalysis
-    def isWithinRepeat: Boolean = throw new UnsupportedOperationException
+    def isWithinRepeat = ancestorRepeatsAcrossParts.nonEmpty
 
     def toXML(helper: ContentHandlerHelper, attributes: List[String])(content: ⇒ Unit) {
 

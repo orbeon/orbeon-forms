@@ -51,5 +51,5 @@ trait PartAnalysis extends PartGlobalOps with PartStaticAnalysisOps with XMLUtil
     def toXML(helper: ContentHandlerHelper)
 
     // The element in our parent that created the current part
-    def elementInParent = parent map (_.getControlAnalysis(startScope.fullPrefix.init).asInstanceOf[SimpleElementAnalysis]) // .init removes the trailing '$'
+    def elementInParent = parent map (_.getControlAnalysis(startScope.fullPrefix.init)) // .init removes the trailing '$'
 }

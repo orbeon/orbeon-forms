@@ -207,7 +207,7 @@ object ClientEvents extends Logging {
     // NOTE: Leave public for unit tests
     def adjustIdForRepeatIteration(doc: XFormsContainingDocument, effectiveId: String) =
         doc.getStaticOps.getControlAnalysis(getPrefixedId(effectiveId)) match {
-            case repeat: RepeatControl if RepeatControl.getAllAncestorRepeatsAcrossParts(repeat).size == getEffectiveIdSuffixParts(effectiveId).size - 1 ⇒
+            case repeat: RepeatControl if repeat.ancestorRepeatsAcrossParts.size == getEffectiveIdSuffixParts(effectiveId).size - 1 ⇒
                 getRelatedEffectiveId(effectiveId, repeat.iteration.get.staticId)
             case _ ⇒
                 effectiveId

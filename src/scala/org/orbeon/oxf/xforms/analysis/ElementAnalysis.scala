@@ -237,12 +237,23 @@ trait ElementEventHandlers {
 
     // Cache for event handlers
     // Use an immutable map and @volatile so that update are published to other threads accessing this static state.
+    // NOTE: We could use `AtomicReference` but we just get/set so there is no benefit to it.
     @volatile private var handlersCache: Map[String, HandlerAnalysis] = Map()
 
     // Return event handler information for the given event name
-    // We check the cache first, and if not found we compute the result and cache it. There is a chance that concurrent
-    // writers could overwrite each other's latest cache addition, but handlersForEventImpl is idempotent so this should
-    // not be an issue.
+    // We check the cache first, and if not found we compute the result and cache it.
+    //
+    // There is a chance that concurrent writers could overwrite each other's latest cache addition, but
+    // `handlersForEventImpl` is idempotent so this should not be an issue, especially since a document usually has many
+    // `ElementAnalysis` which means the likelihood of writing to the same `ElementAnalysis` concurrently is low. Also,
+    // after a while, most handlers will be memoized, which means no more concurrent writes, only concurrent reads.
+    // Finally, `handlersForEventImpl` is not quick but also not very costly.
+    //
+    // Other options include something like `Memoizer` from "Java Concurrency in Practice" (5.6), possibly modified to
+    // use Scala 2.10 `TrieMap` and `Future`. However a plain immutable `Map` might be more memory-efficient.
+    //
+    // Reasoning is great but the only way to know for sure what's best would be to run a solid performance test of the
+    // options.
     def handlersForEvent(eventName: String): HandlerAnalysis =
         handlersCache.get(eventName) getOrElse {
             val result = handlersForEventImpl(eventName)

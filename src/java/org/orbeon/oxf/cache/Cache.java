@@ -16,7 +16,6 @@ package org.orbeon.oxf.cache;
 import java.util.Iterator;
 
 public interface Cache {
-    String getCacheName();
     void add(CacheKey key, Object validity, Object object);
     void remove(CacheKey key);
     int removeAll();
@@ -26,7 +25,6 @@ public interface Cache {
     Iterator<CacheKey> iterateCacheKeys();
     Iterator<Object> iterateCacheObjects();
     int getCurrentSize();
-    int getMaxSize();
     void setMaxSize(int maxSize);
     CacheStatistics getStatistics();
 }

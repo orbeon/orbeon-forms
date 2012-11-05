@@ -48,7 +48,7 @@ public class XFormsDocumentCache {
      * @return              true if cache enabled
      */
     public boolean isEnabled(XFormsStaticState staticState) {
-        return staticState.isCacheDocument() && cache.getMaxSize() > 0;
+        return staticState.isCacheDocument();
     }
 
     /**
@@ -92,9 +92,5 @@ public class XFormsDocumentCache {
 
     public int getCurrentSize() {
         return cache.getCurrentSize();
-    }
-
-    public int getMaxSize() {
-        return cache.getMaxSize();
     }
 }

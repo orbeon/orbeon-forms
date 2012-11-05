@@ -28,7 +28,6 @@ import java.util.concurrent.locks.Lock;
  */
 public class MemoryCacheImpl implements Cache {
 
-    private final String cacheName;
     private int maxSize;
 
     private final String statisticsContextKey;
@@ -38,14 +37,8 @@ public class MemoryCacheImpl implements Cache {
     private int currentSize;
 
     public MemoryCacheImpl(String cacheName, int maxSize) {
-        this.cacheName = cacheName;
         this.maxSize = maxSize;
-
         this.statisticsContextKey =  "memory-cache-statistics." + cacheName;
-    }
-
-    public String getCacheName() {
-        return cacheName;
     }
 
     private class MemoryCacheStatistics implements CacheStatistics {

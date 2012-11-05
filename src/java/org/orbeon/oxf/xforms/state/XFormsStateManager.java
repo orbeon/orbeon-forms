@@ -457,7 +457,6 @@ public class XFormsStateManager implements XFormsStateLifecycle {
             if (indentedLogger.isDebugEnabled())
                 indentedLogger.logDebug(LOG_TYPE, "Getting document state from store.",
                         "current cache size", Integer.toString(XFormsDocumentCache.instance().getCurrentSize()),
-                        "max cache size", Integer.toString(XFormsDocumentCache.instance().getMaxSize()),
                         "current store size", Integer.toString(stateStore.getCurrentSize()),
                         "max store size", Integer.toString(stateStore.getMaxSize())
                 );

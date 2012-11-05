@@ -63,14 +63,4 @@ public class ObjectCache {
         }
         return cache;
     }
-
-    /**
-     * Get the instance of the object cache specified if it exists.
-     *
-     * @param cacheName     name of the cache
-     * @return              instance of cache, null if did not exist
-     */
-    public synchronized static Cache instanceIfExists(String cacheName) {
-        return (namedObjectCaches == null) ? null : namedObjectCaches.get(cacheName);
-    }
 }

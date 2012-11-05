@@ -149,8 +149,8 @@ object ContainerOps {
 
                 // Move data holder only
                 for {
-                    holder ← findDataHolder(doc, name)
-                    otherHolder ← findDataHolder(doc, otherName)
+                    holder ← findDataHolders(doc, name)
+                    otherHolder ← findDataHolders(doc, otherName)
                 } yield
                     move(holder, otherHolder)
 

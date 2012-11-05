@@ -343,7 +343,7 @@ object ToolboxOps {
             // Clear and insert each clipboard element
             Map[String, Seq[NodeInfo]](
                 "control"   → controlElement,
-                "holder"    → findDataHolder(td, name).toSeq,
+                "holder"    → findDataHolders(td, name).toSeq,
                 "resources" → resourcesWithLang,
                 "bind"      → findBindByName(td, name).toSeq) foreach {
 

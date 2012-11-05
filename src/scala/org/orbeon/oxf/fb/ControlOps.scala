@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.fb
 
+import java.util.{List ⇒ JList}
 import scala.collection.JavaConverters._
 import annotation.tailrec
 import org.orbeon.oxf.xml.XMLConstants.XS_STRING_QNAME
@@ -74,7 +75,7 @@ object ControlOps {
         findControlByName(inDoc, controlName).orNull
 
     // Find a bind by name
-    def findBindByName(inDoc: NodeInfo, name: String) = findBind(inDoc, isBindForName(_, name))
+    def findBindByName(inDoc: NodeInfo, name: String): Option[NodeInfo] = findBind(inDoc, isBindForName(_, name))
 
     // XForms callers: find a bind by name or null (the empty sequence)
     def findBindByNameOrEmpty(inDoc: NodeInfo, name: String) = findBindByName(inDoc, name).orNull
@@ -105,7 +106,7 @@ object ControlOps {
 
     // Find control holder
     // Don't return anything if isCustomInstance is true
-    def findDataHolder(inDoc: NodeInfo, controlName: String) =
+    def findDataHolders(inDoc: NodeInfo, controlName: String): Seq[NodeInfo] =
         if (! isCustomInstance)
             findBindByName(inDoc, controlName) map { bind ⇒
                 // From bind, infer path by looking at ancestor-or-self binds
@@ -118,10 +119,11 @@ object ControlOps {
                 val namespaces = new NamespaceMapping(Dom4jUtils.getNamespaceContextNoDefault(unwrapElement(bind)))
 
                 // Evaluate path from instance root element
-                evalOne(formInstanceRoot(inDoc), path, namespaces).asInstanceOf[NodeInfo]
-            }
+                val instanceElements = eval(formInstanceRoot(inDoc), path, namespaces)
+                instanceElements.asInstanceOf[JList[NodeInfo]].asScala
+            } getOrElse Seq()
         else
-            None
+            Seq()
 
     // Find control resource holders
     def findResourceHolders(controlName: String): Seq[NodeInfo] =
@@ -202,7 +204,7 @@ object ControlOps {
             val result = mutable.Buffer[NodeInfo]()
 
             result ++=
-                findDataHolder(doc, controlName)              ++=
+                findDataHolders(doc, controlName)             ++=
                 findBindByName(doc, controlName)              ++=
                 findTemplateHolder(control, controlName)      ++=
                 instanceElement(doc, templateId(controlName)) ++=
@@ -270,10 +272,14 @@ object ControlOps {
             (rename(_, oldName, newName))
 
     // Find all data, resources, and template holders for the given name
-    def findHolders(inDoc: NodeInfo, holderName: String): Seq[NodeInfo] =
-        Seq(findDataHolder(inDoc, holderName)) ++
-            (findResourceHolders(holderName) map (Option(_))) :+
-            (findControlByName(inDoc, holderName) flatMap (findTemplateHolder(_, holderName))) flatten
+    def findHolders(inDoc: NodeInfo, holderName: String): Seq[NodeInfo] = {
+        val result = mutable.Buffer[NodeInfo]()
+        result ++=
+                findDataHolders(inDoc, holderName) ++=
+                findResourceHolders(holderName) ++=
+                (findControlByName(inDoc, holderName) flatMap (findTemplateHolder(_, holderName)))
+        result.toList
+    }
 
     def findResourceAndTemplateHolders(inDoc: NodeInfo, holderName: String): Seq[NodeInfo] =
         (findResourceHolders(holderName) map (Option(_))) :+

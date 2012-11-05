@@ -13,6 +13,7 @@
  */
 package org.orbeon.scaxon
 
+import java.util.{List ⇒ JList}
 import org.orbeon.saxon.`type`.Type
 import org.orbeon.saxon.value.StringValue
 import xml.Elem
@@ -40,7 +41,11 @@ object XML {
     def evalOne(item: Item, expr: String, namespaces: NamespaceMapping = XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING, variables: Map[String, ValueRepresentation] = null)(implicit library: FunctionLibrary = null) =
         XPathCache.evaluateSingleKeepItems(Seq(item).asJava, 1, expr, namespaces, if (variables eq null) null else variables.asJava, library, null, null, null)
 
-    def eval(item: Item, expr: String, namespaces: NamespaceMapping = XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING, variables: Map[String, ValueRepresentation] = null)(implicit library: FunctionLibrary = null) =
+    def eval(item: Item,
+             expr: String,
+             namespaces: NamespaceMapping = XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING,
+             variables: Map[String, ValueRepresentation] = null)
+            (implicit library: FunctionLibrary = null): JList[AnyRef] =
         XPathCache.evaluate(item, expr, namespaces, if (variables eq null) null else variables.asJava, library, null, null, null)
 
     // Runtime conversion to NodeInfo (can fail!)

@@ -103,8 +103,8 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
             assert(hasIdValue(findBindByName(doc, control1).get, bindId(control1)))
 
             // Check content of value holder
-            assert(findDataHolder(doc, control1).isDefined)
-            assert(findDataHolder(doc, control1).get.getStringValue === "")
+            assert(findDataHolders(doc, control1).length == 1)
+            assert(findDataHolders(doc, control1).head.getStringValue === "")
 
             // TODO
             // controlResourceHolders
@@ -188,7 +188,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
             // NOTE: We should maybe just compare the XML for holders, binds, and resources
             val dataHolder = assertDataHolder(doc, newControlName, isCustomInstance)
             if (! isCustomInstance)
-                assert(name(dataHolder.get precedingSibling * head) === "control-1")
+                assert(name(dataHolder.head precedingSibling * head) === "control-1")
 
             val controlBind = findBindByName(doc, newControlName).get
             assert(hasIdValue(controlBind, bindId(newControlName)))
@@ -222,7 +222,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
                 // NOTE: We should maybe just compare the XML for holders, binds, and resources
                 val dataHolder = assertDataHolder(doc, containerNames.last, isCustomInstance)
                 if (! isCustomInstance)
-                    assert(name(dataHolder.get precedingSibling * head) === "control-1")
+                    assert(name(dataHolder.head precedingSibling * head) === "control-1")
 
                 val controlBind = findBindByName(doc, newRepeatName).get
                 assert(hasIdValue(controlBind, bindId(newRepeatName)))
@@ -253,8 +253,8 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
                 // NOTE: We should maybe just compare the XML for holders, binds, and resources
                 val dataHolder = assertDataHolder(doc, newControlName, isCustomInstance)
                 if (! isCustomInstance) {
-                    assert(dataHolder.get precedingSibling * isEmpty)
-                    assert(name(dataHolder.get parent * head) === newRepeatName)
+                    assert(dataHolder.head precedingSibling * isEmpty)
+                    assert(name(dataHolder.head parent * head) === newRepeatName)
                 }
 
                 val controlBind = findBindByName(doc, newControlName).get
@@ -590,11 +590,11 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
 //    }
 
     private def assertDataHolder(doc: DocumentWrapper, holderName: String, isCustomInstance: Boolean) = {
-        val dataHolder = findDataHolder(doc, holderName)
+        val dataHolder = findDataHolders(doc, holderName)
         if (isCustomInstance)
             assert(dataHolder.isEmpty)
         else
-            assert(dataHolder.isDefined)
+            assert(dataHolder.length == 1)
         dataHolder
     }
 

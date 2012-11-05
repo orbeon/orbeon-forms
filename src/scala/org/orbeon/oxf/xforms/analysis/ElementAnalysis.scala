@@ -35,7 +35,8 @@ abstract class ElementAnalysis(
         val element: Element,
         val parent: Option[ElementAnalysis],
         val preceding: Option[ElementAnalysis])
-    extends ElementEventHandlers {
+    extends ElementEventHandlers
+    with ElementRepeats {
 
     self ⇒
 
@@ -151,25 +152,6 @@ abstract class ElementAnalysis(
     def getChildrenContext: Option[XPathAnalysis] = if (hasBinding) getBindingAnalysis else getContextAnalysis
 
     val closestAncestorInScope = ElementAnalysis.getClosestAncestorInScope(self, scope)
-
-    // This control's ancestor repeats, computed on demand
-    // NOTE: Unclear what should be in ElementAnalysis vs. SimpleElementAnalysis
-    lazy val ancestorRepeats: List[RepeatControl] = parent match {
-        case Some(repeat: RepeatControl) ⇒ repeat :: repeat.ancestorRepeats
-        case Some(element)               ⇒ element.ancestorRepeats
-        case None                        ⇒ Nil
-    }
-
-    lazy val ancestorRepeatsAcrossParts: List[RepeatControl] =
-        part.parent flatMap (_.elementInParent) match {
-            case Some(parentPart) ⇒ ancestorRepeats ::: parentPart.ancestorRepeatsAcrossParts
-            case None             ⇒ ancestorRepeats
-        }
-
-    lazy val ancestorRepeatInScope = ancestorRepeats find (_.scope == scope)
-
-    // Whether this is within a repeat
-    def isWithinRepeat = ancestorRepeatsAcrossParts.nonEmpty
 
     def toXML(helper: ContentHandlerHelper, attributes: List[String])(content: ⇒ Unit) {
 
@@ -360,6 +342,33 @@ trait ElementEventHandlers {
 
         (performDefaultAction, Map() ++ captureHandlers ++ targetHandlers ++ bubblingHandlers)
     }
+}
+
+trait ElementRepeats {
+
+    element: ElementAnalysis ⇒
+
+    // This control's ancestor repeats, computed on demand
+    lazy val ancestorRepeats: List[RepeatControl] =
+        parent match {
+            case Some(parentRepeat: RepeatControl) ⇒ parentRepeat :: parentRepeat.ancestorRepeats
+            case Some(parentElement)               ⇒ parentElement.ancestorRepeats
+            case None                              ⇒ Nil
+        }
+
+    // Same as ancestorRepeats but across parts
+    lazy val ancestorRepeatsAcrossParts: List[RepeatControl] =
+        part.elementInParent match {
+            case Some(elementInParentPart) ⇒ ancestorRepeats ::: elementInParentPart.ancestorRepeatsAcrossParts
+            case None                      ⇒ ancestorRepeats
+        }
+
+    // This control's closest ancestor in the same scope
+    // NOTE: This doesn't need to go across parts, because parts don't share scopes at this time.
+    lazy val ancestorRepeatInScope = ancestorRepeats find (_.scope == scope)
+
+    // Whether this is within a repeat
+    def isWithinRepeat = ancestorRepeatsAcrossParts.nonEmpty
 }
 
 object ElementAnalysis {

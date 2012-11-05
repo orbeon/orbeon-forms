@@ -31,6 +31,7 @@ import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
 import org.orbeon.scaxon.XML._
 import org.orbeon.oxf.xforms.XFormsConstants
 import org.orbeon.oxf.xforms.action.XFormsAPI._
+import scala.collection.mutable
 
 /*
  * Form Builder: operations on controls.
@@ -188,24 +189,30 @@ object ControlOps {
 
     // Delete the controls in the given grid cell, if any
     def deleteCellContent(td: NodeInfo) =
-        td \ * flatMap (controlElementsToDelete(_)) foreach (delete(_))
+        td \ * flatMap controlElementsToDelete foreach (delete(_))
 
     // Find all associated elements to delete for a given control element
-    def controlElementsToDelete(control: NodeInfo): Seq[NodeInfo] = {
+    def controlElementsToDelete(control: NodeInfo): List[NodeInfo] = {
 
         val doc = control.getDocumentRoot
 
         // Holders, bind, templates, resources if the control has a name
-        val holders = getControlNameOption(control).toSeq flatMap { controlName ⇒
-            Seq(findDataHolder(doc, controlName),
-                findBindByName(doc, controlName),
-                findTemplateHolder(control, controlName),
-                instanceElement(doc, templateId(controlName))) ++
-                (findResourceHolders(controlName) map (Option(_))) flatten
+        val holders = getControlNameOption(control).toList flatMap { controlName ⇒
+
+            val result = mutable.Buffer[NodeInfo]()
+
+            result ++=
+                findDataHolder(doc, controlName)              ++=
+                findBindByName(doc, controlName)              ++=
+                findTemplateHolder(control, controlName)      ++=
+                instanceElement(doc, templateId(controlName)) ++=
+                findResourceHolders(controlName)
+
+            result.toList
         }
 
-        // Append control element
-        holders :+ control
+        // Prepend control element
+        control :: holders
     }
 
     // Rename a control with its holders, binds, etc.

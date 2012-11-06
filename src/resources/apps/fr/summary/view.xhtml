@@ -265,9 +265,16 @@
                         <!-- Set control name if not already done with @ref -->
                         <xforms:setvalue if="empty($path-ancestors)" ref="$query/@name" value="substring-before($bind-ancestor, '-bind')"/>
                         <!-- Prepend path from binds -->
-                        <xforms:var name="xpath-parts" value="($bind/ancestor-or-self::xforms:bind/(@ref | @nodeset))[position() gt 1], if (normalize-space()) then . else ()"/>
-                        <xforms:var name="xpath-parts-first" value="for $p in $xpath-parts return concat($p, '[1]')"/>
-                        <xforms:setvalue ref="$query/@path" value="string-join($xpath-parts-first, '/')"/>
+                        <xforms:var
+                            name="xpath-parts"
+                            value="($bind/ancestor-or-self::xforms:bind/(@ref | @nodeset))[position() gt 1],
+                                   if (normalize-space($query/@path)) then $query/@path else ()"/>
+                        <xforms:var
+                            name="xpath-parts-first"
+                            value="for $p in $xpath-parts return concat($p, '[1]')"/>
+                        <xforms:setvalue
+                            ref="$query/@path"
+                            value="string-join($xpath-parts-first, '/')"/>
 
                         <!--<xforms:message level="xxforms:log-info">XXX Bind: <xforms:output value="saxon:serialize($bind, 'xml')"/></xforms:message>-->
                         <!--<xforms:message level="xxforms:log-info">XXX Path: <xforms:output value="$query/@path"/></xforms:message>-->

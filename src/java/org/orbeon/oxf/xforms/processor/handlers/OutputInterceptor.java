@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
-import org.apache.commons.lang3.StringUtils;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.xml.*;
 import org.xml.sax.*;
@@ -24,9 +23,11 @@ import org.xml.sax.helpers.AttributesImpl;
  */
 public class OutputInterceptor extends ForwardingXMLReceiver {
 
-    private Listener beginDelimiterListener;
+    private final String spanQName;
+    private final Listener beginDelimiterListener;
+    private final boolean isAroundTableOrListElement;
 
-    private String spanQName;
+    private boolean gotElements = false;
 
     private String delimiterNamespaceURI;
     private String delimiterPrefix;
@@ -34,31 +35,51 @@ public class OutputInterceptor extends ForwardingXMLReceiver {
 
     private String addedClasses;
 
-    private boolean mustGenerateFirstDelimiters = true ;
+    private boolean mustGenerateFirstDelimiters = true;
 
-    private int level;
-    private boolean isCharacters;
+    private int level = 0;
     private StringBuilder currentCharacters = new StringBuilder();
 
     protected AttributesImpl reusableAttributes = new AttributesImpl();
-    public OutputInterceptor(XMLReceiver output, String spanQName, Listener beginDelimiterListener) {
+
+    public OutputInterceptor(XMLReceiver output, String spanQName, Listener beginDelimiterListener, boolean isAroundTableOrListElement) {
         super(output);
         this.spanQName = spanQName;
         this.beginDelimiterListener = beginDelimiterListener;
+        this.isAroundTableOrListElement = isAroundTableOrListElement;
+
+        // Default to <xhtml:span>
+        delimiterNamespaceURI = XMLConstants.XHTML_NAMESPACE_URI;
+        delimiterPrefix       = XMLUtils.prefixFromQName(spanQName);
+        delimiterLocalName    = XMLUtils.localNameFromQName(spanQName);
+    }
+
+    public boolean isGotElements() {
+        return gotElements;
     }
 
     public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
 
         level++;
-        final boolean topLevel = level == 1;
+        final boolean topLevelElement = level == 1;
 
-        flushCharacters(false, topLevel);
+        if (! gotElements) {
+            // Override default as we just go an element
 
-        // The first element received determines the type of separator
-        checkDelimiters(uri, qName, topLevel);
+            assert topLevelElement;
+
+            delimiterNamespaceURI = uri;
+            delimiterPrefix       = XMLUtils.prefixFromQName(qName);
+            delimiterLocalName    = XMLUtils.localNameFromQName(qName);
+
+            gotElements = true;
+        }
+
+        flushCharacters(false, topLevelElement);
+        generateFirstDelimitersIfNeeded();
 
         // Add or update classes on element if needed
-        super.startElement(uri, localname, qName, topLevel ? getAttributesWithClass(attributes) : attributes);
+        super.startElement(uri, localname, qName, topLevelElement ? getAttributesWithClass(attributes) : attributes);
     }
 
     public void endElement(String uri, String localname, String qName) throws SAXException {
@@ -71,45 +92,39 @@ public class OutputInterceptor extends ForwardingXMLReceiver {
 
     public void characters(char[] chars, int start, int length) {
         currentCharacters.append(chars, start, length);
-        isCharacters = true;
     }
 
-    public void flushCharacters(boolean finalFlush, boolean topLevel) throws SAXException {
+    public void flushCharacters(boolean finalFlush, boolean topLevelCharacters) throws SAXException {
 
-        if (currentCharacters.length() > 0) {
+        final String currentString = currentCharacters.toString();
 
-            final String currentString = currentCharacters.toString();
+        if (topLevelCharacters && ! isAroundTableOrListElement) {
+            // We handle top-level characters specially and wrap them in a span so we can hide them
+            generateTopLevelSpanWithCharacters(currentCharacters.toString());
+        } else {
+            // Just output characters as is in deeper levels, or when around at table or list element
             final char[] chars = currentString.toCharArray();
-            if (StringUtils.isBlank(currentString) || !topLevel) {
-                // Just output whitespace as is
-                super.characters(chars, 0, chars.length);
-            } else {
-
-                // The first element received determines the type of separator
-                checkDelimiters(XMLConstants.XHTML_NAMESPACE_URI, spanQName, topLevel);
-
-                // Wrap any other text within an xhtml:span
-                super.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, getAttributesWithClass(XMLUtils.EMPTY_ATTRIBUTES));
-                super.characters(chars, 0, chars.length);
-                super.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
-            }
-
-            isCharacters = false;
-            currentCharacters.setLength(0);
+            super.characters(chars, 0, chars.length);
         }
+
+        currentCharacters.setLength(0);
 
         if (finalFlush)
-            checkDelimiters(XMLConstants.XHTML_NAMESPACE_URI, spanQName, topLevel);
+            generateFirstDelimitersIfNeeded();
     }
 
-    private void checkDelimiters(String uri, String qName, boolean topLevel) throws SAXException {
+    private void generateTopLevelSpanWithCharacters(String characters) throws SAXException {
+        // The first element received determines the type of separator
+        generateFirstDelimitersIfNeeded();
 
-        if (topLevel && delimiterNamespaceURI == null) {
-            delimiterNamespaceURI = uri;
-            delimiterPrefix = XMLUtils.prefixFromQName(qName);
-            delimiterLocalName = XMLUtils.localNameFromQName(qName);
-        }
+        // Wrap any other text within an xhtml:span
+        super.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, getAttributesWithClass(XMLUtils.EMPTY_ATTRIBUTES));
+        final char[] chars = characters.toCharArray();
+        super.characters(chars, 0, chars.length);
+        super.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
+    }
 
+    private void generateFirstDelimitersIfNeeded() throws SAXException {
         if (mustGenerateFirstDelimiters) {
             // Generate first delimiter
             beginDelimiterListener.generateFirstDelimiter(this);
@@ -134,18 +149,6 @@ public class OutputInterceptor extends ForwardingXMLReceiver {
             return originalAttributes;
     }
 
-    public String getDelimiterNamespaceURI() {
-        return delimiterNamespaceURI;
-    }
-
-    public String getDelimiterPrefix() {
-        return delimiterPrefix;
-    }
-
-    public String getDelimiterLocalName() {
-        return delimiterLocalName;
-    }
-
     public boolean isMustGenerateFirstDelimiters() {
         return mustGenerateFirstDelimiters;
     }
@@ -154,7 +157,7 @@ public class OutputInterceptor extends ForwardingXMLReceiver {
         this.addedClasses = addedClasses;
     }
 
-    public void outputDelimiter(ContentHandler contentHandler, String delimiterNamespaceURI, String delimiterPrefix, String delimiterLocalName, String classes, String id) throws SAXException {
+    public void outputDelimiter(ContentHandler contentHandler, String classes, String id) throws SAXException {
 
         reusableAttributes.clear();
         if (id != null)

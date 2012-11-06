@@ -13,7 +13,9 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers.xhtml;
 
+import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.analysis.controls.AppearanceTrait;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsCaseControl;
 import org.orbeon.oxf.xforms.processor.handlers.OutputInterceptor;
@@ -90,12 +92,11 @@ public class XFormsCaseHandler extends XFormsControlLifecyleHandler {
                 public void generateFirstDelimiter(OutputInterceptor outputInterceptor) throws SAXException {
                     if (isMustGenerateBeginEndDelimiters) {
                         // Delimiter: begin case
-                        outputInterceptor.outputDelimiter(currentSavedOutput, outputInterceptor.getDelimiterNamespaceURI(),
-                                outputInterceptor.getDelimiterPrefix(), outputInterceptor.getDelimiterLocalName(), firstDelimiterClasses,
+                        outputInterceptor.outputDelimiter(currentSavedOutput, firstDelimiterClasses,
                                 "xforms-case-begin-" + XFormsUtils.namespaceId(containingDocument, effectiveId));
                     }
                 }
-            });
+            }, ((AppearanceTrait) staticControl().parent().get()).jAppearances().contains(XFormsConstants.XXFORMS_SEPARATOR_APPEARANCE_QNAME));
 
             final String controlClasses; {
                 final StringBuilder classes = new StringBuilder(isVisible ? "xforms-case-selected" : "xforms-case-deselected");
@@ -131,19 +132,13 @@ public class XFormsCaseHandler extends XFormsControlLifecyleHandler {
 
             final boolean isMustGenerateBeginEndDelimiters = !handlerContext.isFullUpdateTopLevelControl(effectiveId);
             if (isMustGenerateBeginEndDelimiters) {
-                if (currentOutputInterceptor.getDelimiterNamespaceURI() != null) {
-                    // Output end delimiter
-                    currentOutputInterceptor.outputDelimiter(currentSavedOutput, currentOutputInterceptor.getDelimiterNamespaceURI(),
-                        currentOutputInterceptor.getDelimiterPrefix(), currentOutputInterceptor.getDelimiterLocalName(), "xforms-case-begin-end",
-                            "xforms-case-end-" + XFormsUtils.namespaceId(containingDocument, effectiveId));
-                } else {
-                    // Output start and end delimiter using xhtml:span
-                    final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
-                    currentOutputInterceptor.outputDelimiter(currentSavedOutput, XMLConstants.XHTML_NAMESPACE_URI,
-                        xhtmlPrefix, "span", "xforms-case-begin-end", "xforms-case-begin-" + XFormsUtils.namespaceId(containingDocument, effectiveId));
-                    currentOutputInterceptor.outputDelimiter(currentSavedOutput, XMLConstants.XHTML_NAMESPACE_URI,
-                        xhtmlPrefix, "span", "xforms-case-begin-end", "xforms-case-end-" + XFormsUtils.namespaceId(containingDocument, effectiveId));
+                final String namespacedId = XFormsUtils.namespaceId(containingDocument, effectiveId);
+                if (! currentOutputInterceptor.isGotElements()) {
+                    // Output start delimiter using xhtml:span
+                    currentOutputInterceptor.outputDelimiter(currentSavedOutput, "xforms-case-begin-end", "xforms-case-begin-" + namespacedId);
                 }
+                // Output end delimiter
+                currentOutputInterceptor.outputDelimiter(currentSavedOutput, "xforms-case-begin-end", "xforms-case-end-" + namespacedId);
             }
         } else if (!isVisible) {
             // Case not visible, restore output

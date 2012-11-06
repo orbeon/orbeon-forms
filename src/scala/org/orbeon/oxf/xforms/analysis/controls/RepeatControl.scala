@@ -21,12 +21,15 @@ import org.orbeon.oxf.xforms.event.XFormsEvents._
 
 class RepeatControl(staticStateContext: StaticStateContext, element: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], scope: Scope)
     extends ContainerControl(staticStateContext, element, parent, preceding, scope)
-    with ChildrenBuilderTrait {
+    with ChildrenBuilderTrait
+    with AppearanceTrait {      // for separator appearance
 
     val iterationElement = element.element(XFORMS_REPEAT_ITERATION_QNAME)
     require(iterationElement ne null)
 
     lazy val iteration = children collectFirst { case i: RepeatIterationControl ⇒ i }
+
+    val isAroundTableOrListElement = appearances(XXFORMS_SEPARATOR_APPEARANCE_QNAME)
 
     override protected def externalEventsDef = super.externalEventsDef + XXFORMS_DND
     override val externalEvents              = externalEventsDef

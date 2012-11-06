@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml;
 import org.apache.commons.lang3.StringUtils;
 import org.orbeon.oxf.xforms.StaticStateGlobalOps;
 import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis;
 import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis;
 import org.orbeon.oxf.xforms.control.LHHASupport;
 import org.orbeon.oxf.xforms.control.XFormsControl;
@@ -203,6 +204,11 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandlerXHTM
         final StaticStateGlobalOps globalOps = containingDocument.getStaticOps();
         final LHHAAnalysis analysis = globalOps.getLabel(getPrefixedId());
         return analysis != null && analysis.isLocal();
+    }
+
+    protected ElementAnalysis staticControl() {
+        final StaticStateGlobalOps globalOps = containingDocument.getStaticOps();
+        return globalOps.getControlAnalysis(getPrefixedId());
     }
 
     private boolean hasLocalHint() {

@@ -78,12 +78,11 @@ public class XFormsGroupSeparatorHandler extends XFormsGroupHandler {
                 public void generateFirstDelimiter(OutputInterceptor outputInterceptor) throws SAXException {
                     // Delimiter: begin group
                     if (isMustGenerateBeginEndDelimiters) {
-                        outputInterceptor.outputDelimiter(currentSavedOutput, outputInterceptor.getDelimiterNamespaceURI(),
-                                outputInterceptor.getDelimiterPrefix(), outputInterceptor.getDelimiterLocalName(), firstDelimiterClasses,
+                        outputInterceptor.outputDelimiter(currentSavedOutput, firstDelimiterClasses,
                                 "group-begin-" + XFormsUtils.namespaceId(containingDocument, effectiveId));
                     }
                 }
-            });
+            }, true);
             
             controller.setOutput(new DeferredXMLReceiverImpl(outputInterceptor));
 
@@ -110,8 +109,7 @@ public class XFormsGroupSeparatorHandler extends XFormsGroupHandler {
 
             final boolean isMustGenerateBeginEndDelimiters = !handlerContext.isFullUpdateTopLevelControl(effectiveId);
             if (isMustGenerateBeginEndDelimiters) {
-                outputInterceptor.outputDelimiter(currentSavedOutput, outputInterceptor.getDelimiterNamespaceURI(),
-                        outputInterceptor.getDelimiterPrefix(), outputInterceptor.getDelimiterLocalName(), "xforms-group-begin-end",
+                outputInterceptor.outputDelimiter(currentSavedOutput, "xforms-group-begin-end",
                         "group-end-" + XFormsUtils.namespaceId(containingDocument, effectiveId));
             }
         } else if (isNonRelevant(control)) {

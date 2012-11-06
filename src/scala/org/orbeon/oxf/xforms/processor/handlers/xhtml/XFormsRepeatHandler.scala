@@ -23,6 +23,7 @@ import org.orbeon.oxf.xml.dom4j.ExtendedLocationData
 import org.xml.sax.Attributes
 import java.lang.{StringBuilder ⇒ JStringBuilder}
 import org.orbeon.oxf.xforms.processor.handlers.OutputInterceptor
+import org.orbeon.oxf.xforms.analysis.controls.RepeatControl
 
 /**
  * Handle xforms:repeat.
@@ -38,6 +39,7 @@ class XFormsRepeatHandler extends XFormsControlLifecyleHandler(true, true) { // 
         val isMustGenerateTemplate = (handlerContext.isTemplate || isTopLevelRepeat) && !handlerContext.isNoScript // don't generate templates in noscript mode as they won't be used
         val isMustGenerateDelimiters = !handlerContext.isNoScript
         val isMustGenerateBeginEndDelimiters = isMustGenerateDelimiters && !handlerContext.isFullUpdateTopLevelControl(effectiveId)
+        val namespacedId = XFormsUtils.namespaceId(containingDocument, effectiveId)
 
         val repeatControl = if (handlerContext.isTemplate) null else containingDocument.getObjectByEffectiveId(effectiveId).asInstanceOf[XFormsRepeatControl]
         val isConcreteControl = repeatControl != null
@@ -55,26 +57,23 @@ class XFormsRepeatHandler extends XFormsControlLifecyleHandler(true, true) { // 
         var outputDelimiter: (String, String) ⇒ Unit = null // initialized further below
 
         val outputInterceptor = if (!isMustGenerateDelimiters) null else new OutputInterceptor(savedOutput, spanQName, new OutputInterceptor.Listener {
-                def generateFirstDelimiter(outputInterceptor: OutputInterceptor) {
-
+                def generateFirstDelimiter(outputInterceptor: OutputInterceptor): Unit = {
                     if (isMustGenerateBeginEndDelimiters) {
 
                         def firstDelimiterClasses = "xforms-repeat-begin-end" + (if (userClasses.nonEmpty) (" " + userClasses) else "")
 
                         // Delimiter: begin repeat
-                        outputDelimiter(firstDelimiterClasses, "repeat-begin-" + XFormsUtils.namespaceId(containingDocument, effectiveId))
+                        outputDelimiter(firstDelimiterClasses, "repeat-begin-" + namespacedId)
 
                         // Delimiter: before repeat entries, unless disabled (disabled in case the repeat is completely empty)
                         if (mustOutputFirstDelimiter)
                             outputDelimiter("xforms-repeat-delimiter", null)
                     }
                 }
-            })
+            }, staticControl.asInstanceOf[RepeatControl].isAroundTableOrListElement)
 
         // Shortcut function to output the delimiter
-        outputDelimiter =
-            outputInterceptor.outputDelimiter(savedOutput, outputInterceptor.getDelimiterNamespaceURI,
-                outputInterceptor.getDelimiterPrefix, outputInterceptor.getDelimiterLocalName, _, _)
+        outputDelimiter = outputInterceptor.outputDelimiter(savedOutput, _, _)
 
         def appendClasses(sb: StringBuilder, classes: String) {
             if (classes.nonEmpty) {
@@ -94,6 +93,8 @@ class XFormsRepeatHandler extends XFormsControlLifecyleHandler(true, true) { // 
                     appendClasses(sb, "xforms-dnd-over")
             }
         }
+
+        var bodyRepeated = false
         
         def repeatBody(generateTemplate: Boolean, iteration: Int, repeatSelected: Boolean, classes: StringBuilder) {
 
@@ -115,6 +116,8 @@ class XFormsRepeatHandler extends XFormsControlLifecyleHandler(true, true) { // 
                     throw ValidationException.wrapException(e, new ExtendedLocationData(repeatControl.getLocationData, "unrolling xforms:repeat control", repeatControl.element))
             }
             handlerContext.popRepeatContext()
+
+            bodyRepeated = true
         }
 
         if (isMustGenerateDelimiters)
@@ -166,15 +169,7 @@ class XFormsRepeatHandler extends XFormsControlLifecyleHandler(true, true) { // 
         }
 
         // 3. Handle case where no delimiter was output by repeat iterations or template
-        if (isMustGenerateDelimiters && outputInterceptor.getDelimiterNamespaceURI == null) {
-
-            // This happens if:
-            // o there was no repeat iteration
-            // o AND no template was generated
-
-            assert(!isConcreteControl || repeatControl.getSize == 0)
-            assert(!isMustGenerateTemplate)
-
+        if (! bodyRepeated) {
             // What we do here is replay the body to /dev/null in order to find and output the begin delimiter (but not
             // the other delimiters)
             outputInterceptor.setForward(false)
@@ -187,7 +182,7 @@ class XFormsRepeatHandler extends XFormsControlLifecyleHandler(true, true) { // 
 
         // 4. Delimiter: end repeat
         if (isMustGenerateBeginEndDelimiters)
-            outputDelimiter("xforms-repeat-begin-end", "repeat-end-" + XFormsUtils.namespaceId(containingDocument, effectiveId))
+            outputDelimiter("xforms-repeat-begin-end", "repeat-end-" + namespacedId)
     }
 
     // Don't output any LHHA

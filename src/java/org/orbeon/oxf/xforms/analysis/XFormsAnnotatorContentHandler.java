@@ -212,9 +212,18 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
                         (existingAppearance != null ? existingAppearance + " " : "") + XFormsConstants.XXFORMS_SEPARATOR_APPEARANCE_QNAME.getQualifiedName());
                 startElement(true, uri, localname, qName, attributes);
             } else if (isXForms && "repeat".equals(localname)) {
-                // Leave element untouched (except for the id attribute)
+                // Add separator appearance
+                if (isClosestXHTMLAncestorTableContainer()) {
+                    final String existingAppearance = attributes.getValue("appearance");
+                    attributes = XMLUtils.addOrReplaceAttribute(attributes, "", "", XFormsConstants.APPEARANCE_QNAME.getName(),
+                            (existingAppearance != null ? existingAppearance + " " : "") + XFormsConstants.XXFORMS_SEPARATOR_APPEARANCE_QNAME.getQualifiedName());
+                }
+
+                // Start xforms:repeat
                 startElement(true, uri, localname, qName, attributes);
-                // Use xforms:repeat-iteration instead of xxforms:iteration so we don't have to deal with a new namespace
+
+                // Start xforms:repeat-iteration
+                // NOTE: Use xforms:repeat-iteration instead of xxforms:iteration so we don't have to deal with a new namespace
                 reusableAttributes.clear();
                 reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, xformsElementId + "~iteration");
                 final Attributes repeatIterationAttributes = getAttributesGatherNamespaces(qName, reusableAttributes, reusableStringArray, 0);

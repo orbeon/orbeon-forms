@@ -740,8 +740,11 @@
                          </xhtml:span>
                          <xhtml:span id="repeat-begin-xf-1" class="xforms-repeat-begin-end"/>
                          <xhtml:span class="xforms-repeat-delimiter"/>
+                         <xhtml:span class="xforms-repeat-selected-item-1"/>
                          <xhtml:span class="xforms-repeat-delimiter"/>
+                         <xhtml:span/>
                          <xhtml:span class="xforms-repeat-delimiter"/>
+                         <xhtml:span class="xforms-repeat-template"/>
                          <xhtml:span id="repeat-end-xf-1" class="xforms-repeat-begin-end"/>
                      </xhtml:form>
                  </xhtml:body>

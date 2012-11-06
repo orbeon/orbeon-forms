@@ -70,7 +70,7 @@ object ControlAnalysisFactory {
     private val VariableControlFactory: ControlFactory = (new VariableControl(_, _, _, _, _) with ChildrenActionsTrait)
     private val LHHAControlFactory    : ControlFactory = (new LHHAAnalysis(_, _, _, _, _))
     private val ValueControlFactory   : ControlFactory = (new InputValueControl(_, _, _, _, _))
-    private val SwitchControlFactory  : ControlFactory = (new ContainerControl(_, _, _, _, _) with OptionalSingleNode with LHHATrait with ChildrenBuilderTrait)
+    private val SwitchControlFactory  : ControlFactory = (new ContainerControl(_, _, _, _, _) with OptionalSingleNode with LHHATrait with ChildrenBuilderTrait with AppearanceTrait)
     private val CaseControlFactory    : ControlFactory = (new ContainerControl(_, _, _, _, _) with OptionalSingleNode with LHHATrait with ChildrenBuilderTrait)
 
     private val GroupControlFactory: ControlFactory =

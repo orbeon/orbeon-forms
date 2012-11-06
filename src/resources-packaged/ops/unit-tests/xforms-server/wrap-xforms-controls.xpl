@@ -57,6 +57,18 @@
         <p:input name="config">
             <xsl:stylesheet version="2.0">
 
+                <!-- All elements which mark the start of a repeat/switch/group -->
+                <xsl:variable
+                        name="start-repeat-group"
+                        select="//xhtml:*[p:classes() = 'xforms-repeat-begin-end' and starts-with(@id, 'repeat-begin-')
+                                       or p:classes() = 'xforms-group-begin-end'  and starts-with(@id, 'group-begin-')]"/>
+
+                <!-- All elements which are contained within repeat/switch/group delimiters (excluding begin/end markers)-->
+                <xsl:variable
+                    name="repeat-group-content"
+                    select="for $s in $start-repeat-group
+                            return ($s/following-sibling::* intersect $s/following-sibling::*[@id = replace($s/@id, '^(repeat|group)-begin-', '$1-end-')]/preceding-sibling::*)/generate-id()"/>
+
                 <!-- Handle body content only -->
                 <xsl:template match="/">
                     <controls>
@@ -65,10 +77,12 @@
                 </xsl:template>
 
                 <!-- Keep repeat templates, controls, LHHA, and elements with MIP classes like repeat/group elements in tables
-                     Also keep content of elements with class xxforms-test-preserve-content -->
+                     Also keep content of elements with class xxforms-test-preserve-content and content of repeats. -->
                 <xsl:template match="xhtml:*[p:classes() = ('xforms-repeat-template', 'xforms-control', 'xforms-label',
                                         'xforms-hint', 'xforms-help', 'xforms-alert', 'xforms-help-image', 'xforms-group', 'xforms-group-begin-end',
-                                        'xforms-invalid', 'xforms-required', 'xforms-readonly', 'xxforms-test-preserve-content')]">
+                                        'xforms-invalid', 'xforms-required', 'xforms-readonly', 'xxforms-test-preserve-content',
+                                        'xforms-repeat-begin-end', 'xforms-repeat-delimiter', 'xforms-repeat-selected-item-1', 'xforms-repeat-selected-item-2',
+                                        'xforms-repeat-selected-item-3', 'xforms-repeat-selected-item-4') or generate-id(.) = $repeat-group-content]">
                     <xsl:copy-of select="."/>
                 </xsl:template>
 
@@ -78,7 +92,7 @@
                 </xsl:template>
             </xsl:stylesheet>
         </p:input>
-        <p:output name="data" ref="response"/>
+        <p:output name="data" ref="response" debug="xxxx out"/>
     </p:processor>
 
 </p:config>

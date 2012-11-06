@@ -50,7 +50,9 @@
                 </fr:link-select1>
             </template>
         </metadata>
-
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/link-select1/link-select1.css"/>
+        </xbl:resources>
         <xbl:template>
             <!-- Hidden select to hold itemset -->
             <xf:var name="binding" value="xxf:binding('fr-link-select1-binding')"/>

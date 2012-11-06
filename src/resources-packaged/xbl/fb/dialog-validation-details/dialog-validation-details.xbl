@@ -117,6 +117,7 @@
                     </xforms:action>
 
                     <!-- Read all other built-in MIPs -->
+                    <xforms:setvalue ref="$local/required"   value="controlOps:getMipOrEmpty($form, $local/control-name, 'required') = 'true()' or . = 'true'"/>
                     <xforms:setvalue ref="$local/constraint" value="controlOps:getMipOrEmpty($form, $local/control-name, 'constraint')"/>
                     <xforms:setvalue ref="$local/relevant"   value="controlOps:getMipOrEmpty($form, $local/control-name, 'relevant')"/>
                     <xforms:setvalue ref="$local/readonly"   value="controlOps:getMipOrEmpty($form, $local/control-name, 'readonly')"/>
@@ -147,7 +148,12 @@
                             (: Set built-in type if needed :)
                             if ($local/builtin-type != '') then
                                 controlOps:updateMip($form, $control-name, 'type',
-                                    concat(if ($local/required = 'true' and not($local/builtin-type = ('listItem', 'listItems', 'dayTimeDuration', 'yearMonthDuration', 'email', 'card-number'))) then 'xs:' else 'xforms:', $local/builtin-type)) else (),
+                                    concat(
+                                        if ($local/required = 'true' and not($local/builtin-type = ('listItem', 'listItems', 'dayTimeDuration', 'yearMonthDuration', 'email', 'card-number')))
+                                        then 'xs:' else 'xforms:', $local/builtin-type
+                                    )
+                                )
+                            else (),
                             (: Set schema type if needed :)
                             (: TODO: Handle namespace and prefix for namespace :)
                             if ($local/schema-type != '') then

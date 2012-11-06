@@ -23,27 +23,16 @@
         color: #333;                                                                                // Orbeon color
     }
 
-    .fr-xforms-inspector-title { font-size: 167%;                                                   // Use larger font for title with padding
-                                padding: .5em 0 1em 0 }
-    .fr-xforms-inspector-disabled-function { color: #ccc }                                          // Grey out part of the UI that are disabled
+    .fr-xforms-inspector-title { font-size: 167%; padding: .5em 0 1em 0; }                           // Use larger font for title with padding
+    .fr-xforms-inspector-disabled-function {
+        color: #ccc;                                                                                // Grey out part of the UI that are disabled
+        .xforms-label { color: #ccc }                                                               // Label is light gray when disabled
+    }
     .xforms-label { display: inline-block; width: 5em;                                              // Align labels
                                 font-weight: bold; color: #333 }                                    // Styling to distinguish labels
-    .fr-xforms-inspector-disabled-function .xforms-label { color: #ccc }                            // Label is light gray when disabled
-    .xforms-select1-appearance-full label { margin: 0 }                                             // Reset xforms.js margin to the right of the label
-    .xforms-select1-appearance-full .xforms-selected,                                               // Add space between radio buttons
-    .xforms-select1-appearance-full .xforms-deselected { margin-right: 1em }
-    .xforms-select1-appearance-full span label { display: inline }
-    .xforms-select1-appearance-full input { margin: 0 0.5em 0 0 }                                   // Space between radio button and label
     .fr-xforms-inspector-instance { padding-left: 2em }                                             // Space between model and instance
     .fr-xforms-inspector-block { padding: .5em 0 }                                                  // Space before/after different sections of the form
     .xforms-input input { width: 20em }                                                             // Wider input fields
     .fr-xforms-inspector-source { padding: 1em 0 0 0 }                                              // Space before the view area
     .fr-xforms-inspector-mode { background-color: #F8F8F8; padding: .5em 0 }                        // Better integrate formatting with editor
-    select { vertical-align: text-top;                                                              // Top of the select box aligned to top of the label
-                                      height: 7em }                                                 // Normalize height between browsers
-
-    // Override definition which might be added by Form Runner
-    .xforms-select1-appearance-full span { display: inline }
-    .xforms-label { font-style: normal }
-    .xforms-select1-appearance-full span label { padding-left: 0 }                                  // Remove additional space the left of the radio buttons
 }

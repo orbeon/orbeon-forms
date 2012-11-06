@@ -119,7 +119,7 @@
 
                 <!-- Function selection-->
                 <xh:div class="fr-xforms-inspector-block">
-                    <xf:select1 ref="instance('inspector-instance')/function" appearance="full">
+                    <fr:link-select1 ref="instance('inspector-instance')/function" appearance="full">
                         <xf:action ev:event="xforms-value-changed">
                             <xf:setvalue  if=". = 'view-console'" ref="instance('inspector-instance')/shown-output"/>
                         </xf:action>
@@ -136,7 +136,7 @@
                             <xf:label>View Console</xf:label>
                             <xf:value>view-console</xf:value>
                         </xf:item>
-                    </xf:select1>
+                    </fr:link-select1>
                 </xh:div>
 
                 <!-- Model / instance -->
@@ -146,7 +146,7 @@
                         <!-- Model -->
                         <xxf:variable name="models" select="instance('inspector-itemset')/model"/>
                         <xf:group ref=".[count($models) gt 1]" class="fr-xforms-inspector-model">
-                            <xf:select1 ref="instance('inspector-instance')/current-model" appearance="compact">
+                            <xf:select1 ref="instance('inspector-instance')/current-model" appearance="minimal">
                                 <xf:label>Model: </xf:label>
                                 <xf:itemset ref="$models">
                                     <xf:label ref="@id"/>
@@ -164,7 +164,7 @@
                         </xf:group>
                         <!-- Instance -->
                         <xf:group ref=".[count(instance('inspector-itemset')/model[@id = instance('inspector-instance')/current-model]/instance) gt 1]" class="fr-xforms-inspector-instance">
-                            <xf:select1 ref="instance('inspector-instance')/current-instance" appearance="compact">
+                            <xf:select1 ref="instance('inspector-instance')/current-instance" appearance="minimal">
                                 <xf:label>Instance: </xf:label>
                                 <xf:itemset ref="instance('inspector-itemset')/model[@id = instance('inspector-instance')/current-model]/instance">
                                     <xf:label ref="@id"/>
@@ -194,9 +194,9 @@
                         <xf:input ref="." id="inspector-xpath">
                             <xf:label>XPath: </xf:label>
                         </xf:input>
-                        <fr:button ref=".">
+                        <xf:trigger ref=".">
                             <xf:label>Evaluate</xf:label>
-                        </fr:button>
+                        </xf:trigger>
                     </xf:group>
                 </xh:div>
 
@@ -239,7 +239,7 @@
 
                 <!-- Mode for formatting -->
                 <xh:div class="fr-xforms-inspector-mode">
-                    <xf:select1 appearance="full" ref="instance('inspector-instance')/mode">
+                    <fr:link-select1 appearance="full" ref="instance('inspector-instance')/mode">
                         <xf:label>Output: </xf:label>
                         <xf:item>
                             <xf:label>Pretty</xf:label>
@@ -249,7 +249,7 @@
                             <xf:label>Plain</xf:label>
                             <xf:value>plain</xf:value>
                         </xf:item>
-                    </xf:select1>
+                    </fr:link-select1>
                 </xh:div>
             </xf:group>
         </xbl:template>

@@ -11,9 +11,12 @@
 }
 .xbl-fr-xforms-inspector .fr-xforms-inspector-title {
   font-size: 167%;
-  padding: 0.5em 0 1em 0;
+  padding: .5em 0 1em 0;
 }
 .xbl-fr-xforms-inspector .fr-xforms-inspector-disabled-function {
+  color: #ccc;
+}
+.xbl-fr-xforms-inspector .fr-xforms-inspector-disabled-function .xforms-label {
   color: #cccccc;
 }
 .xbl-fr-xforms-inspector .xforms-label {
@@ -21,22 +24,6 @@
   width: 5em;
   font-weight: bold;
   color: #333333;
-}
-.xbl-fr-xforms-inspector .fr-xforms-inspector-disabled-function .xforms-label {
-  color: #cccccc;
-}
-.xbl-fr-xforms-inspector .xforms-select1-appearance-full label {
-  margin: 0;
-}
-.xbl-fr-xforms-inspector .xforms-select1-appearance-full .xforms-selected,
-.xbl-fr-xforms-inspector .xforms-select1-appearance-full .xforms-deselected {
-  margin-right: 1em;
-}
-.xbl-fr-xforms-inspector .xforms-select1-appearance-full span label {
-  display: inline;
-}
-.xbl-fr-xforms-inspector .xforms-select1-appearance-full input {
-  margin: 0 0.5em 0 0;
 }
 .xbl-fr-xforms-inspector .fr-xforms-inspector-instance {
   padding-left: 2em;
@@ -53,17 +40,4 @@
 .xbl-fr-xforms-inspector .fr-xforms-inspector-mode {
   background-color: #F8F8F8;
   padding: 0.5em 0;
-}
-.xbl-fr-xforms-inspector select {
-  vertical-align: text-top;
-  height: 7em;
-}
-.xbl-fr-xforms-inspector .xforms-select1-appearance-full span {
-  display: inline;
-}
-.xbl-fr-xforms-inspector .xforms-label {
-  font-style: normal;
-}
-.xbl-fr-xforms-inspector .xforms-select1-appearance-full span label {
-  padding-left: 0;
 }

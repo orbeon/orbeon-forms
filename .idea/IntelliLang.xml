@@ -2,6 +2,10 @@
 <project version="4">
   <component name="LanguageInjectionConfiguration">
     <injection language="XPath2" injector-id="xml">
+      <display-name>action</display-name>
+      <place><![CDATA[xmlTag().withLocalName(string().equalTo("action")).withNamespace(string().equalTo("http://www.w3.org/2002/xforms"))]]></place>
+    </injection>
+    <injection language="XPath2" injector-id="xml">
       <display-name>setvalue/@value</display-name>
       <place><![CDATA[xmlAttribute().withLocalName(string().equalTo("value")).withParent(xmlTag().withLocalName(string().equalTo("setvalue")).withNamespace(string().equalTo("http://www.w3.org/2002/xforms")))]]></place>
     </injection>

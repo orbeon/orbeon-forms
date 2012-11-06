@@ -21,6 +21,7 @@ import org.orbeon.oxf.fb.ControlOps._
 import org.orbeon.oxf.fb.ContainerOps._
 import collection.mutable.Buffer
 import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.oxf.properties.Properties
 
 /*
  * Form Builder: operations on grids.
@@ -96,6 +97,7 @@ object GridOps {
         result
     }
 
+    // Width of the grid in columns
     def getGridSize(grid: NodeInfo) = (grid \ "*:tr")(0) \ "*:td" size
 
     def newTdElement(grid: NodeInfo, id: String, rowspan: Option[Int] = None): NodeInfo = rowspan match {
@@ -212,49 +214,54 @@ object GridOps {
         (firstRow \ "*:td")(colPos)
     }
 
+    def maxGridColumns = Properties.instance.getPropertySet.getInteger("oxf.fb.grid.max-columns", 4)
+
     // Insert a column to the right
     def insertColRight(gridId: String, colPos: Int): Unit = insertColRight(tdAtColPos(gridId, colPos))
     def insertColRight(firstRowTd: NodeInfo) {
-
         val grid = getContainingGrid(firstRowTd)
-        val allRowCells = getAllRowCells(grid)
-        val pos = firstRowTd precedingSibling "*:td" size
+        if (getGridSize(grid) < maxGridColumns) {
 
-        val ids = nextIds(grid, "tmp", allRowCells.size).toIterator
+            val allRowCells = getAllRowCells(grid)
+            val pos = firstRowTd precedingSibling "*:td" size
 
-        allRowCells foreach { cells ⇒
-            val cell = cells(pos)
+            val ids = nextIds(grid, "tmp", allRowCells.size).toIterator
 
-            // For now insert same rowspans as previous column, but could also insert full column as an option
-            if (! cell.missing) {
-                insert(into = cell.td parent *, after = cell.td, origin = newTdElement(grid, ids.next(), if (cell.rowspan > 1) Some(cell.rowspan) else None))
+            allRowCells foreach { cells ⇒
+                val cell = cells(pos)
+
+                // For now insert same rowspans as previous column, but could also insert full column as an option
+                if (! cell.missing) {
+                    insert(into = cell.td parent *, after = cell.td, origin = newTdElement(grid, ids.next(), if (cell.rowspan > 1) Some(cell.rowspan) else None))
+                }
             }
-        }
 
-        debugDumpDocument("insert col right", grid)
+            debugDumpDocument("insert col right", grid)
+        }
     }
 
     // Insert a column to the left
     def insertColLeft(gridId: String, colPos: Int): Unit = insertColLeft(tdAtColPos(gridId, colPos))
     def insertColLeft(firstRowTd: NodeInfo) {
-
         val grid = getContainingGrid(firstRowTd)
-        val pos = firstRowTd precedingSibling "*:td" size
+        if (getGridSize(grid) < maxGridColumns) {
+            val pos = firstRowTd precedingSibling "*:td" size
 
-        if (pos > 0) {
-            // Do as if this was an insert to the right of the previous column
-            // This makes things simpler as we can reuse insertColRight, but maybe another logic could make sense too
-            insertColRight(firstRowTd precedingSibling "*:td" head)
-        } else {
-            // First column: just insert plain tds as the first row
-            val trs = grid \ "*:tr"
-            val ids = nextIds(grid, "tmp", trs.size).toIterator
+            if (pos > 0) {
+                // Do as if this was an insert to the right of the previous column
+                // This makes things simpler as we can reuse insertColRight, but maybe another logic could make sense too
+                insertColRight(firstRowTd precedingSibling "*:td" head)
+            } else {
+                // First column: just insert plain tds as the first row
+                val trs = grid \ "*:tr"
+                val ids = nextIds(grid, "tmp", trs.size).toIterator
 
-            trs foreach { tr ⇒
-                insert(into = tr, origin = newTdElement(grid, ids.next()))
+                trs foreach { tr ⇒
+                    insert(into = tr, origin = newTdElement(grid, ids.next()))
+                }
+
+                debugDumpDocument("insert col left", grid)
             }
-
-            debugDumpDocument("insert col left", grid)
         }
     }
 

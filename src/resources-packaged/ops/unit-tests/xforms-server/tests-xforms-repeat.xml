@@ -2933,8 +2933,8 @@
                         <instances>
                             <instance id="events" model-id="model">
                                 <events>
-                                    <event observer="/my-bar-1/my-department-repeat" type="my-event" target="/my-bar-1/my-department-repeat"/>
-                                    <event observer="/my-bar-1/my-department-repeat" type="xforms-enabled" target="/my-bar-1/my-department-repeat"/>
+                                    <event observer="|my-bar-1$my-department-repeat|" type="my-event" target="|my-bar-1$my-department-repeat|"/>
+                                    <event observer="|my-bar-1$my-department-repeat|" type="xforms-enabled" target="|my-bar-1$my-department-repeat|"/>
                                 </events>
                             </instance>
                         </instances>

@@ -408,11 +408,11 @@
                             <!-- NOTE: This needs to be after the xxf:dynamic as the shared upload control use xxf:binding() to get the binding of the current node,
                                        which only works if the control exists -->
                             <xh:div class="fb-cell-editor">
-                                <xf:var name="td" value="instance('fb-form-instance')/xhtml:body//*:td[@id = $selected-cell]"/>
-                                <xf:var name="grid" value="$td/ancestor::*:grid[1]"/>
-                                <xf:var name="control" value="$td/*[1]"/>
-                                <xf:var name="control-id" value="$control/@id"/>
-                                <xf:var name="has-control" value="exists($control-id)"/>
+                                <xf:var name="td"            value="instance('fb-form-instance')/xhtml:body//*:td[@id = $selected-cell]"/>
+                                <xf:var name="grid"          value="$td/ancestor::*:grid[1]"/>
+                                <xf:var name="control"       value="$td/*[1]"/><!-- may be empty! -->
+                                <xf:var name="control-id"    value="$control/@id"/>
+                                <xf:var name="has-control"   value="exists($control-id)"/>
                                 <xxf:var name="fb-resources" value="xxf:get-variable('fr-resources-model', 'fr-form-resources')"/>
 
                                 <xh:span class="fb-grid-cell-icons">
@@ -516,8 +516,8 @@
                                             current node when user interact with it, but we also need to be able to show empty/non-empty
                                             versions of the upload when user mouse over other cells.
                                 -->
-                                <xf:var name="control-effective-id" value="controlOps:buildControlEffectiveIdOrEmpty(instance('fb-form-instance'), $control-id)"/>
-                                <xf:var name="bound-item" value="xxf:binding(concat('/', $control-effective-id))"/>
+                                <xf:var name="control-absolute-id" value="controlOps:buildControlAbsoluteIdOrEmpty(instance('fb-form-instance'), $control-id)"/>
+                                <xf:var name="bound-item" value="if ($control-absolute-id) then xxf:binding($control-absolute-id) else ()"/>
                                 <xf:upload class="fb-static-upload" id="fb-static-upload-empty" ref="$bound-item[string(.) = ''], instance('fb-static-upload')/empty"/>
                                 <xf:upload class="fb-static-upload" id="fb-static-upload-non-empty" ref="$bound-item[string(.) != ''], instance('fb-static-upload')/non-empty"/>
 

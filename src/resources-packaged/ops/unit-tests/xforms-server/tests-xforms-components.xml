@@ -719,10 +719,10 @@
                             </instance>
                             <instance id="events" model-id="model">
                                 <events>
-                                    <event observer="/my-datatable" type="fr-selection-changed" target="/my-datatable" index="1"/>
-                                    <event observer="/my-datatable" type="fr-selection-changed" target="/my-datatable" index="3"/>
-                                    <event observer="/my-datatable" type="fr-selection-changed" target="/my-datatable" index="3"/>
-                                    <event observer="/my-datatable" type="fr-selection-changed" target="/my-datatable" index="2"/>
+                                    <event observer="|my-datatable|" type="fr-selection-changed" target="|my-datatable|" index="1"/>
+                                    <event observer="|my-datatable|" type="fr-selection-changed" target="|my-datatable|" index="3"/>
+                                    <event observer="|my-datatable|" type="fr-selection-changed" target="|my-datatable|" index="3"/>
+                                    <event observer="|my-datatable|" type="fr-selection-changed" target="|my-datatable|" index="2"/>
                                 </events>
                             </instance>
                             <instance id="datatable-instance" model-id="my-datatable$datatable-model">

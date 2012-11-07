@@ -3619,9 +3619,9 @@
                     <xforms:model id="model">
                         <!-- Upon ready, simulate click on button + close dialog for both XBL controls -->
                         <xforms:action ev:event="xforms-ready">
-                            <xforms:dispatch name="DOMActivate" targetid="/my-foo1/foo-trigger"/>
+                            <xforms:dispatch name="DOMActivate" targetid="|my-foo1$foo-trigger|"/>
                             <xxforms:hide dialog="my-dialog"/>
-                            <xforms:dispatch name="DOMActivate" targetid="/my-foo2/foo-trigger"/>
+                            <xforms:dispatch name="DOMActivate" targetid="|my-foo2$foo-trigger|"/>
                             <xxforms:hide dialog="my-dialog"/>
                         </xforms:action>
                     </xforms:model>

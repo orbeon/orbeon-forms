@@ -377,6 +377,10 @@ public class XFormsConstants {
     public static final char REPEAT_HIERARCHY_SEPARATOR_2 = '-';
     public static final String REPEAT_HIERARCHY_SEPARATOR_2_STRING = "" + REPEAT_HIERARCHY_SEPARATOR_2;
 
+    // We want to avoid accidental use of absolute ids by users. Using '/' makes it too likely that they will hit that
+    // character, see https://github.com/orbeon/orbeon-forms/issues/551.
+    public static final char ABSOLUTE_ID_SEPARATOR = 0x7C;
+
     public static final char COMPONENT_SEPARATOR = '$';
     // Use "$$" to minimize chances of conflict with user-defined ids
     public static final String LHHAC_SEPARATOR = "$$";

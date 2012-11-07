@@ -136,8 +136,8 @@
                                 <xforms:action if="$is-section-component" type="xpath">toolboxOps:insertNewSectionTemplate($model, $binding)</xforms:action>
                                 <xforms:action if="not($is-section-component)">
                                     <xforms:action type="xpath">toolboxOps:insertNewControl($model, $binding)</xforms:action>
-                                    <xforms:var name="effective-id" value="controlOps:buildControlEffectiveIdOrEmpty(instance('fb-form-instance'), $selected-cell)"/>
-                                    <xforms:load resource="javascript:ORBEON.Builder.controlAdded.fire('{$effective-id}')"/>
+                                    <xforms:var name="absolute-id" value="controlOps:buildControlAbsoluteIdOrEmpty(instance('fb-form-instance'), $selected-cell)"/>
+                                    <xforms:load resource="javascript:ORBEON.Builder.controlAdded.fire('{$absolute-id}')"/>
                                 </xforms:action>
                             </xforms:action>
                         </xforms:trigger>

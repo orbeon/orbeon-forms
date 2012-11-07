@@ -540,19 +540,19 @@
                             </instance>
                             <instance id="events-instance" model-id="events-model">
                                 <events>
-                                    <event type="DOMFocusIn" target="/my-repeat"/>
-                                    <event type="DOMFocusIn" target="/my-repeat~iteration·1"/>
-                                    <event type="DOMFocusIn" target="/my-input·1"/>
+                                    <event type="DOMFocusIn" target="|my-repeat|"/>
+                                    <event type="DOMFocusIn" target="|my-repeat~iteration·1|"/>
+                                    <event type="DOMFocusIn" target="|my-input·1|"/>
                                     <separator/>
-                                    <event type="DOMFocusOut" target="/my-input·2"/>
-                                    <event type="DOMFocusOut" target="/my-repeat~iteration·2"/>
-                                    <event type="DOMFocusIn" target="/my-repeat~iteration·1"/>
-                                    <event type="DOMFocusIn" target="/my-input·1"/>
+                                    <event type="DOMFocusOut" target="|my-input·2|"/>
+                                    <event type="DOMFocusOut" target="|my-repeat~iteration·2|"/>
+                                    <event type="DOMFocusIn" target="|my-repeat~iteration·1|"/>
+                                    <event type="DOMFocusIn" target="|my-input·1|"/>
                                     <separator/>
-                                    <event type="DOMFocusOut" target="/my-input·1"/>
-                                    <event type="DOMFocusOut" target="/my-repeat~iteration·1"/>
-                                    <event type="DOMFocusIn" target="/my-repeat~iteration·1"/>
-                                    <event type="DOMFocusIn" target="/my-input·1"/>
+                                    <event type="DOMFocusOut" target="|my-input·1|"/>
+                                    <event type="DOMFocusOut" target="|my-repeat~iteration·1|"/>
+                                    <event type="DOMFocusIn" target="|my-repeat~iteration·1|"/>
+                                    <event type="DOMFocusIn" target="|my-input·1|"/>
                                     <separator/>
                                 </events>
                             </instance>
@@ -635,9 +635,9 @@
                             </instance>
                             <instance id="events-instance" model-id="events-model">
                                 <events>
-                                    <event type="DOMFocusIn" target="/my-repeat"/>
-                                    <event type="DOMFocusIn" target="/my-repeat~iteration·1"/>
-                                    <event type="DOMFocusIn" target="/my-input·1"/>
+                                    <event type="DOMFocusIn" target="|my-repeat|"/>
+                                    <event type="DOMFocusIn" target="|my-repeat~iteration·1|"/>
+                                    <event type="DOMFocusIn" target="|my-input·1|"/>
                                     <separator/>
                                     <separator/>
                                 </events>
@@ -720,26 +720,26 @@
                         <instances>
                             <instance id="events-instance" model-id="events-model">
                                 <events>
-                                    <event type="DOMFocusIn" target="/my-outer-repeat"/>
-                                    <event type="DOMFocusIn" target="/my-outer-repeat~iteration·1"/>
-                                    <event type="DOMFocusIn" target="/my-inner-repeat·1"/>
-                                    <event type="DOMFocusIn" target="/my-inner-repeat~iteration·1-1"/>
-                                    <event type="DOMFocusIn" target="/my-input·1-1"/>
+                                    <event type="DOMFocusIn" target="|my-outer-repeat|"/>
+                                    <event type="DOMFocusIn" target="|my-outer-repeat~iteration·1|"/>
+                                    <event type="DOMFocusIn" target="|my-inner-repeat·1|"/>
+                                    <event type="DOMFocusIn" target="|my-inner-repeat~iteration·1-1|"/>
+                                    <event type="DOMFocusIn" target="|my-input·1-1|"/>
                                     <separator/>
-                                    <event type="DOMFocusOut" target="/my-input·1-1"/>
-                                    <event type="DOMFocusOut" target="/my-inner-repeat~iteration·1-1"/>
-                                    <event type="DOMFocusOut" target="/my-inner-repeat·1"/>
-                                    <event type="DOMFocusOut" target="/my-outer-repeat~iteration·1"/>
-                                    <event type="DOMFocusIn" target="/my-outer-repeat~iteration·2"/>
-                                    <event type="DOMFocusIn" target="/my-inner-repeat·2"/>
-                                    <event type="DOMFocusIn" target="/my-inner-repeat~iteration·2-1"/>
-                                    <event type="DOMFocusIn" target="/my-input·2-1"/>
+                                    <event type="DOMFocusOut" target="|my-input·1-1|"/>
+                                    <event type="DOMFocusOut" target="|my-inner-repeat~iteration·1-1|"/>
+                                    <event type="DOMFocusOut" target="|my-inner-repeat·1|"/>
+                                    <event type="DOMFocusOut" target="|my-outer-repeat~iteration·1|"/>
+                                    <event type="DOMFocusIn" target="|my-outer-repeat~iteration·2|"/>
+                                    <event type="DOMFocusIn" target="|my-inner-repeat·2|"/>
+                                    <event type="DOMFocusIn" target="|my-inner-repeat~iteration·2-1|"/>
+                                    <event type="DOMFocusIn" target="|my-input·2-1|"/>
                                     <separator/>
-                                    <event type="DOMFocusOut" target="/my-input·2-1"/>
-                                    <event type="DOMFocusOut" target="/my-inner-repeat~iteration·2-1"/>
-                                    <event type="DOMFocusOut" target="/my-inner-repeat·2"/>
-                                    <event type="DOMFocusOut" target="/my-outer-repeat~iteration·2"/>
-                                    <event type="DOMFocusOut" target="/my-outer-repeat"/>
+                                    <event type="DOMFocusOut" target="|my-input·2-1|"/>
+                                    <event type="DOMFocusOut" target="|my-inner-repeat~iteration·2-1|"/>
+                                    <event type="DOMFocusOut" target="|my-inner-repeat·2|"/>
+                                    <event type="DOMFocusOut" target="|my-outer-repeat~iteration·2|"/>
+                                    <event type="DOMFocusOut" target="|my-outer-repeat|"/>
                                 </events>
                             </instance>
                         </instances>
@@ -830,35 +830,35 @@
                         <instances>
                             <instance id="events-instance" model-id="events-model">
                                 <events>
-                                    <event type="DOMFocusIn" target="/my-switch"/>
-                                    <event type="DOMFocusIn" target="/case-1"/>
-                                    <event type="DOMFocusIn" target="/my-input-1"/>
+                                    <event type="DOMFocusIn" target="|my-switch|"/>
+                                    <event type="DOMFocusIn" target="|case-1|"/>
+                                    <event type="DOMFocusIn" target="|my-input-1|"/>
                                     <separator/>
-                                    <event type="xforms-deselect" target="/case-1"/>
-                                    <event type="xforms-select" target="/case-2"/>
-                                    <event type="DOMFocusOut" target="/my-input-1"/>
-                                    <event type="DOMFocusOut" target="/case-1"/>
-                                    <event type="DOMFocusIn" target="/case-2"/>
-                                    <event type="DOMFocusIn" target="/my-input-2"/>
+                                    <event type="xforms-deselect" target="|case-1|"/>
+                                    <event type="xforms-select" target="|case-2|"/>
+                                    <event type="DOMFocusOut" target="|my-input-1|"/>
+                                    <event type="DOMFocusOut" target="|case-1|"/>
+                                    <event type="DOMFocusIn" target="|case-2|"/>
+                                    <event type="DOMFocusIn" target="|my-input-2|"/>
                                     <separator/>
-                                    <event type="xforms-deselect" target="/case-2"/>
-                                    <event type="xforms-select" target="/case-1"/>
-                                    <event type="DOMFocusOut" target="/my-input-2"/>
-                                    <event type="DOMFocusOut" target="/case-2"/>
-                                    <event type="DOMFocusOut" target="/my-switch"/>
+                                    <event type="xforms-deselect" target="|case-2|"/>
+                                    <event type="xforms-select" target="|case-1|"/>
+                                    <event type="DOMFocusOut" target="|my-input-2|"/>
+                                    <event type="DOMFocusOut" target="|case-2|"/>
+                                    <event type="DOMFocusOut" target="|my-switch|"/>
                                     <separator/>
-                                    <event type="DOMFocusIn" target="/my-switch"/>
-                                    <event type="DOMFocusIn" target="/case-1"/>
-                                    <event type="DOMFocusIn" target="/my-input-1"/>
+                                    <event type="DOMFocusIn" target="|my-switch|"/>
+                                    <event type="DOMFocusIn" target="|case-1|"/>
+                                    <event type="DOMFocusIn" target="|my-input-1|"/>
                                     <separator/>
-                                    <event type="xforms-deselect" target="/case-1"/>
-                                    <event type="DOMFocusOut" target="/my-input-1"/>
-                                    <event type="DOMFocusOut" target="/case-1"/>
-                                    <event type="DOMFocusOut" target="/my-switch"/>
-                                    <event type="DOMFocusIn" target="/my-switch"/>
-                                    <event type="DOMFocusIn" target="/case-3"/>
-                                    <event type="DOMFocusIn" target="/my-input-3"/>
-                                    <event type="xforms-select" target="/case-3"/>
+                                    <event type="xforms-deselect" target="|case-1|"/>
+                                    <event type="DOMFocusOut" target="|my-input-1|"/>
+                                    <event type="DOMFocusOut" target="|case-1|"/>
+                                    <event type="DOMFocusOut" target="|my-switch|"/>
+                                    <event type="DOMFocusIn" target="|my-switch|"/>
+                                    <event type="DOMFocusIn" target="|case-3|"/>
+                                    <event type="DOMFocusIn" target="|my-input-3|"/>
+                                    <event type="xforms-select" target="|case-3|"/>
                                 </events>
                             </instance>
                         </instances>
@@ -961,25 +961,25 @@
                         <instances>
                             <instance id="events-instance" model-id="events-model">
                                 <events>
-                                    <event type="DOMFocusIn" target="/my-input-1"/>
+                                    <event type="DOMFocusIn" target="|my-input-1|"/>
                                     <separator/>
                                     <separator/>
-                                    <event type="DOMFocusOut" target="/my-input-1"/>
-                                    <event type="DOMFocusIn" target="/my-dialog-1"/>
-                                    <event type="DOMFocusIn" target="/my-input-2"/>
+                                    <event type="DOMFocusOut" target="|my-input-1|"/>
+                                    <event type="DOMFocusIn" target="|my-dialog-1|"/>
+                                    <event type="DOMFocusIn" target="|my-input-2|"/>
                                     <separator/>
-                                    <event type="DOMFocusOut" target="/my-input-2"/>
-                                    <event type="DOMFocusOut" target="/my-dialog-1"/>
+                                    <event type="DOMFocusOut" target="|my-input-2|"/>
+                                    <event type="DOMFocusOut" target="|my-dialog-1|"/>
                                     <separator/>
-                                    <event type="DOMFocusIn" target="/my-input-1"/>
+                                    <event type="DOMFocusIn" target="|my-input-1|"/>
                                     <separator/>
-                                    <event type="DOMFocusOut" target="/my-input-1"/>
-                                    <event type="DOMFocusIn" target="/my-dialog-2"/>
-                                    <event type="DOMFocusIn" target="/my-input-4"/>
+                                    <event type="DOMFocusOut" target="|my-input-1|"/>
+                                    <event type="DOMFocusIn" target="|my-dialog-2|"/>
+                                    <event type="DOMFocusIn" target="|my-input-4|"/>
                                     <separator/>
-                                    <event type="DOMFocusOut" target="/my-input-4"/>
-                                    <event type="DOMFocusOut" target="/my-dialog-2"/>
-                                    <event type="DOMFocusIn" target="/my-input-1"/>
+                                    <event type="DOMFocusOut" target="|my-input-4|"/>
+                                    <event type="DOMFocusOut" target="|my-dialog-2|"/>
+                                    <event type="DOMFocusIn" target="|my-input-1|"/>
                                 </events>
                             </instance>
                         </instances>
@@ -1023,7 +1023,7 @@
                             <xf:setfocus control="my-gaga"/>
                             <xf:insert model="events-model" context="." ref="*" origin="xxf:element('separator')"/>
                             <!-- Move focus within gaga -->
-                            <xf:setfocus control="/my-gaga/gaga-2"/>
+                            <xf:setfocus control="|my-gaga$gaga-2|"/>
                             <xf:insert model="events-model" context="." ref="*" origin="xxf:element('separator')"/>
                             <!-- Focus on toto -->
                             <xf:setfocus control="my-toto"/>
@@ -1087,18 +1087,18 @@
                         <instances>
                             <instance id="events-instance" model-id="events-model">
                                 <events>
-                                    <event type="DOMFocusIn" target="/my-input-1"/>
+                                    <event type="DOMFocusIn" target="|my-input-1|"/>
                                     <separator/>
-                                    <event type="DOMFocusOut" target="/my-input-1"/>
-                                    <event type="DOMFocusIn" target="/my-gaga"/>
+                                    <event type="DOMFocusOut" target="|my-input-1|"/>
+                                    <event type="DOMFocusIn" target="|my-gaga|"/>
                                     <separator/>
                                     <separator/>
-                                    <event type="DOMFocusOut" target="/my-gaga"/>
-                                    <event type="DOMFocusIn" target="/my-toto"/>
-                                    <event type="DOMFocusIn" target="/my-toto/toto-1"/>
+                                    <event type="DOMFocusOut" target="|my-gaga|"/>
+                                    <event type="DOMFocusIn" target="|my-toto|"/>
+                                    <event type="DOMFocusIn" target="|my-toto$toto-1|"/>
                                     <separator/>
-                                    <event type="DOMFocusOut" target="/my-toto/toto-1"/>
-                                    <event type="DOMFocusIn" target="/my-toto/toto-2"/>
+                                    <event type="DOMFocusOut" target="|my-toto$toto-1|"/>
+                                    <event type="DOMFocusIn" target="|my-toto$toto-2|"/>
                                 </events>
                             </instance>
                         </instances>

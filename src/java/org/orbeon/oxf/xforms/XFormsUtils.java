@@ -1239,7 +1239,8 @@ public class XFormsUtils {
      * Whether the id is an absolute id.
      */
     public static boolean isAbsoluteId(String id) {
-        return id.startsWith("/");
+        final int l = id.length();
+        return l >= 3 && id.charAt(0) == XFormsConstants.ABSOLUTE_ID_SEPARATOR && id.charAt(l - 1) == XFormsConstants.ABSOLUTE_ID_SEPARATOR;
     }
 
     /**
@@ -1247,14 +1248,14 @@ public class XFormsUtils {
      */
     public static String absoluteIdToEffectiveId(String absoluteId) {
         assert isAbsoluteId(absoluteId);
-        return absoluteId.substring(1).replace('/', '$');
+        return absoluteId.substring(1, absoluteId.length() - 1);
     }
 
     /**
      * Convert an effective id to an absolute id.
      */
     public static String effectiveIdToAbsoluteId(String effectiveId) {
-        return "/" + effectiveId.replace('$', '/');
+        return XFormsConstants.ABSOLUTE_ID_SEPARATOR + effectiveId + XFormsConstants.ABSOLUTE_ID_SEPARATOR;
     }
 
     public static boolean isTopLevelId(String id) {

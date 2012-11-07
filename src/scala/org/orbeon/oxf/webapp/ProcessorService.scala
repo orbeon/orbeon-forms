@@ -115,10 +115,6 @@ class ProcessorService(mainProcessorDefinition: ProcessorDefinition, errorProces
                 // Ignore error: this can happen if using JDK 1.3 (scheduling classed not available)
                 // and also happens from time to time on Tomcat 4.1.18 with JDK 1.4.2 (not sure why).
         }
-
-    // Whether to show exceptions to the client
-    private def showExceptions =
-        Properties.instance.getPropertySet.getBoolean(HTTPExceptionsProperty, DefaultHTTPExceptions)
 }
 
 object ProcessorService {
@@ -130,4 +126,8 @@ object ProcessorService {
     val Throwable   = "orbeon.throwable"
 
     val Logger = LoggerFactory.createLogger(classOf[ProcessorService])
+
+    // Whether to show exceptions to the client
+    def showExceptions =
+        Properties.instance.getPropertySet.getBoolean(HTTPExceptionsProperty, DefaultHTTPExceptions)
 }

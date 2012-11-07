@@ -27,8 +27,7 @@ import org.orbeon.oxf.processor.pipeline.{PipelineConfig, PipelineProcessor}
 import org.orbeon.oxf.resources.ResourceNotFoundException
 import org.orbeon.oxf.util.URLRewriterUtils._
 import org.orbeon.oxf.util._
-import org.orbeon.oxf.webapp.HttpRedirectException
-import org.orbeon.oxf.webapp.HttpStatusCodeException
+import org.orbeon.oxf.webapp.{ProcessorService, HttpRedirectException, HttpStatusCodeException}
 import org.orbeon.oxf.xml.Dom4j
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils._
@@ -113,6 +112,8 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
                 case Some(errorRoute) ⇒
                     // Run the error route
                     ec.getResponse.setStatus(500)
+                    if (ProcessorService.showExceptions)
+                        pc.setAttribute(ProcessorService.Throwable, t)
                     errorRoute.process(pc, ec, MatchResult(matches = false))
                 case None ⇒
                     // We don't have an error route so throw instead

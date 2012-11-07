@@ -17,7 +17,6 @@ import org.orbeon.oxf.pipeline.InitUtils._
 import org.orbeon.oxf.webapp.ProcessorService._
 import org.orbeon.oxf.pipeline.api.{PipelineContext, ProcessorDefinition}
 import org.orbeon.oxf.common.OXFException
-import collection.JavaConverters._
 
 // Servlet/portlet helper for processor definitions and services
 trait ServletPortlet {

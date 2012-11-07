@@ -135,20 +135,24 @@
                 </xf:group>
 
                 <!-- Save as -->
-                <xf:trigger id="fr-save-as-button" ref="instance('fb-triggers-instance')/save-as">
-                    <xf:label>
-                        <xh:img width="16" height="16" src="/apps/fr/style/images/silk/database_add.png" alt=""/>
-                        <xh:span><xf:output value="$fr-resources/detail/labels/save-as-document"/></xh:span>
-                    </xf:label>
-                    <xf:action ev:event="DOMActivate">
-                        <!-- Open the dialog in "save-as" mode -->
-                        <xf:dispatch name="fb-show-dialog" targetid="dialog-form-settings">
-                            <xxf:context name="title" value="xxf:bind('title-bind')"/>
-                            <xxf:context name="description" value="xxf:bind('description-bind')"/>
-                            <xxf:context name="mode" value="'save-as'"/>
-                        </xf:dispatch>
-                    </xf:action>
-                </xf:trigger>
+                <!--
+                    #556: Disable Save As button in Form Builder (https://github.com/orbeon/orbeon-forms/issues/556)
+                    #269: Save As must also copy attachments (https://github.com/orbeon/orbeon-forms/issues/269)
+                -->
+                <!--<xf:trigger id="fr-save-as-button" ref="instance('fb-triggers-instance')/save-as">-->
+                    <!--<xf:label>-->
+                        <!--<xh:img width="16" height="16" src="/apps/fr/style/images/silk/database_add.png" alt=""/>-->
+                        <!--<xh:span><xf:output value="$fr-resources/detail/labels/save-as-document"/></xh:span>-->
+                    <!--</xf:label>-->
+                    <!--<xf:action ev:event="DOMActivate">-->
+                        <!--&lt;!&ndash; Open the dialog in "save-as" mode &ndash;&gt;-->
+                        <!--<xf:dispatch name="fb-show-dialog" targetid="dialog-form-settings">-->
+                            <!--<xxf:context name="title" value="xxf:bind('title-bind')"/>-->
+                            <!--<xxf:context name="description" value="xxf:bind('description-bind')"/>-->
+                            <!--<xxf:context name="mode" value="'save-as'"/>-->
+                        <!--</xf:dispatch>-->
+                    <!--</xf:action>-->
+                <!--</xf:trigger>-->
 
                 <!-- "Save" from Form Runner -->
                 <fr:save-button appearance="xxforms:primary"/>

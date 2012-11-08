@@ -681,28 +681,7 @@
             <include name="yui/examples/treeview/assets/js/TaskNode.js"/>
             <include name="yui/examples/treeview/assets/js/CheckOnClickNode.js"/>
 
-            <!-- JSCalendar -->
-            <include name="javascript/jscalendar/calendar.js"/>
-            <include name="javascript/jscalendar/lang/calendar-en.js"/>
-            <include name="javascript/jscalendar/calendar-setup.js"/>
-
-            <!-- Autocomplete -->
-            <include name="javascript/suggest-common.js"/>
-            <include name="javascript/suggest-actb.js"/>
-
-            <!-- AJAXXSLT -->
-            <include name="javascript/ajaxxslt/util.js"/>
-            <include name="javascript/ajaxxslt/xmltoken.js"/>
-            <include name="javascript/ajaxxslt/dom.js"/>
-            <include name="javascript/ajaxxslt/xpath.js"/>
-
-            <!-- Encryption -->
-            <include name="javascript/encryption/encryption.js"/>
-            <include name="javascript/encryption/md5.js"/>
-            <include name="javascript/encryption/utf-8.js"/>
-
         </yui-compressor>
-
 
     </target>
 

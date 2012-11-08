@@ -584,28 +584,34 @@ span.xforms-textarea pre {
   *white-space: normal;
 }
 .fr-mode-view .xforms-hint,
-.fr-mode-pdf .xforms-hint,
-.fr-mode-email .xforms-hint {
+.fr-mode-view .fr-mode-pdf .xforms-hint,
+.fr-mode-view .fr-mode-email .xforms-hint {
   display: none;
 }
 .fr-mode-view .xforms-alert,
-.fr-mode-pdf .xforms-alert,
-.fr-mode-email .xforms-alert {
+.fr-mode-view .fr-mode-pdf .xforms-alert,
+.fr-mode-view .fr-mode-email .xforms-alert {
   display: none;
 }
 .fr-mode-view .fr-section-title img,
-.fr-mode-pdf .fr-section-title img,
-.fr-mode-email .fr-section-title img {
+.fr-mode-view .fr-mode-pdf .fr-section-title img,
+.fr-mode-view .fr-mode-email .fr-section-title img {
   display: none;
 }
 .fr-mode-view .xforms-help-image,
-.fr-mode-pdf .xforms-help-image,
-.fr-mode-email .xforms-help-image {
+.fr-mode-view .fr-mode-pdf .xforms-help-image,
+.fr-mode-view .fr-mode-email .xforms-help-image {
   display: none;
 }
 .fr-mode-view .fr-grid-content .xforms-control,
 .fr-mode-view .fr-grid-content .fr-component-group {
   margin-top: 0;
+}
+.fr-mode-view .fr-repeat-multiple-rows {
+  border-top: none;
+}
+.fr-mode-view .fr-repeat-multiple-rows .fr-dt-master-row {
+  display: none;
 }
 @media print {
   html body form.xforms-initially-hidden {

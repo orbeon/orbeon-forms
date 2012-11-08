@@ -471,18 +471,24 @@ button.btn-link {
 // Textarea in output mode can contain line breaks so try to keep them
 pre.xforms-textarea, span.xforms-textarea pre { white-space: -moz-pre-wrap; white-space: pre-wrap; *white-space: normal }
 
-.fr-mode-view .xforms-hint, .fr-mode-pdf .xforms-hint, .fr-mode-email .xforms-hint { display: none }
-.fr-mode-view .xforms-alert, .fr-mode-pdf .xforms-alert, .fr-mode-email .xforms-alert { display: none }
+.fr-mode-view {
+    .xforms-hint, .fr-mode-pdf .xforms-hint, .fr-mode-email .xforms-hint { display: none }
+    .xforms-alert, .fr-mode-pdf .xforms-alert, .fr-mode-email .xforms-alert { display: none }
 
-.fr-mode-view .fr-section-title img,
-  .fr-mode-pdf .fr-section-title img,
-  .fr-mode-email .fr-section-title img { display: none }
-.fr-mode-view .xforms-help-image,
-  .fr-mode-pdf .xforms-help-image,
-  .fr-mode-email .xforms-help-image { display: none }
+    .fr-section-title img,
+      .fr-mode-pdf .fr-section-title img,
+      .fr-mode-email .fr-section-title img { display: none }
+    .xforms-help-image,
+      .fr-mode-pdf .xforms-help-image,
+      .fr-mode-email .xforms-help-image { display: none }
 
-// For those controls that still have a display: block in view mode, make sure there is no top margin
-.fr-mode-view .fr-grid-content .xforms-control, .fr-mode-view .fr-grid-content .fr-component-group { margin-top: 0 }
+    // For those controls that still have a display: block in view mode, make sure there is no top margin
+    .fr-grid-content .xforms-control, .fr-grid-content .fr-component-group { margin-top: 0 }
+    .fr-repeat-multiple-rows {
+        .fr-dt-master-row { display: none }         // Hide the top header row, as we don't need the space for the *add* icon in view mode
+        border-top: none;                           // Avoid double border at the top
+    }
+}
 
 // This is also used for PDF generation
 @media print {

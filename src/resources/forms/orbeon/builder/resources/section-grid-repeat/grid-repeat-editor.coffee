@@ -91,12 +91,18 @@ $ ->
         hideIcons = (icons) -> -> _.each (_.values icons), (icon) -> f$.hide icon.el
         showIcons = (icons) -> (rowOrCol) ->
             _.each icons, (icon) ->
-                dontShow = _.any ['delete-row', 'delete-col'], (operation) ->
-                    isDelete = f$.is '.fb-' + operation, icon.el
-                    isDelete and do ->
-                        gridDiv = rowOrCol.grid.el
-                        gridTable = f$.children '.fr-grid', gridDiv
-                        not f$.is '.fb-can-' + operation, gridTable
+                canDo = (operation) ->
+                    gridDiv = rowOrCol.grid.el
+                    gridTable = f$.children '.fr-grid', gridDiv
+                    f$.is '.fb-can-' + operation, gridTable
+                operationRequires =
+                    'delete-row': 'delete-row'
+                    'delete-col': 'delete-col'
+                    'insert-col-left': 'add-col'
+                    'insert-col-right': 'add-col'
+                dontShow = _.any (_.keys operationRequires), (operation) ->
+                    (f$.is '.fb-' + operation, icon.el) and         # Is this an icon for the current operation
+                        (not canDo operationRequires[operation])    # We can't perform the operation
                 unless dontShow
                     f$.show icon.el
                     f$.offset (icon.offset rowOrCol), icon.el

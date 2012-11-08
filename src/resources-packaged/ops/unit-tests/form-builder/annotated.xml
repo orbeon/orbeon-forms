@@ -20,16 +20,16 @@
                 </xforms:bind>
             </xforms:bind>
             <xforms:action ev:event="xforms-model-construct" ev:target="#observer" class="fb-annotation">
-                <xforms:dispatch name="fb-xforms-model-construct" targetid="/fr-form-model"/>
+                <xforms:dispatch name="fb-xforms-model-construct" targetid="|fr-form-model|"/>
             </xforms:action>
             <xforms:action ev:event="xforms-recalculate" ev:target="#observer" class="fb-annotation">
-                <xforms:dispatch name="fb-xforms-recalculate" targetid="/fr-form-model"/>
+                <xforms:dispatch name="fb-xforms-recalculate" targetid="|fr-form-model|"/>
             </xforms:action>
             <xforms:action ev:event="xforms-revalidate" ev:target="#observer" class="fb-annotation">
-                <xforms:dispatch name="fb-xforms-revalidate" targetid="/fr-form-model"/>
+                <xforms:dispatch name="fb-xforms-revalidate" targetid="|fr-form-model|"/>
             </xforms:action>
             <xforms:action ev:event="xxforms-xpath-error" ev:target="#observer" class="fb-annotation" ev:defaultAction="cancel">
-                <xforms:dispatch name="fb-xxforms-xpath-error" targetid="/fr-form-model"/>
+                <xforms:dispatch name="fb-xxforms-xpath-error" targetid="|fr-form-model|"/>
             </xforms:action>
         </xforms:model>
     </xhtml:head>

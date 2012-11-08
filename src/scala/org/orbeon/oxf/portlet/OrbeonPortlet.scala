@@ -73,7 +73,7 @@ class OrbeonPortlet extends GenericPortlet with ServletPortlet with BufferedPort
     // Portlet init
     override def init(): Unit =
         withRootException("initialization", new PortletException(_)) {
-            Version.instance.checkPEFeature("Orbeon Forms portlet") // this is a PE feature
+            Version.instance.requirePEFeature("Orbeon Forms portlet") // this is a PE feature
             init(WebAppContext.instance(getPortletContext), Some("oxf.portlet-initialized-processor." → "oxf.portlet-initialized-processor.input."))
         }
 

@@ -105,7 +105,7 @@ class PEVersion extends Version {
         logger.info("This installation of " + VersionString + " is licensed to: " + licenseInfo.toString)
     }
 
-    def checkPEFeature(featureName: String) = ()
+    def requirePEFeature(featureName: String) = ()
 
     def isPEFeatureEnabled(featureRequested: Boolean, featureName: String) = featureRequested
 

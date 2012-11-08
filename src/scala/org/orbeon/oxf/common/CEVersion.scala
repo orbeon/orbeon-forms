@@ -23,7 +23,7 @@ class CEVersion extends Version {
     import Version._
 
     // Feature is disallowed
-    def checkPEFeature(featureName: String): Unit =
+    def requirePEFeature(featureName: String): Unit =
         throw new OXFException("Feature is not enabled in this version of the product: " + featureName)
 
     def isPEFeatureEnabled(featureRequested: Boolean, featureName: String): Boolean = {

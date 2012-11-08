@@ -22,7 +22,7 @@ abstract class Version {
 
     import Version._
 
-    def checkPEFeature(featureName: String)
+    def requirePEFeature(featureName: String)
     def isPEFeatureEnabled(featureRequested: Boolean, featureName: String): Boolean
     def createUIDependencies(containingDocument: XFormsContainingDocument): XPathDependencies
 

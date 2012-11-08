@@ -28,7 +28,7 @@ import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import xml._
 import xml.Attribute
 import org.dom4j.QName
-import org.orbeon.oxf.common.OXFException
+import org.orbeon.oxf.common.{Version, OXFException}
 import xml.Text
 import xml.NamespaceBinding
 import org.orbeon.oxf.xforms.XFormsConstants.XFORMS_NAMESPACE_URI
@@ -56,6 +56,9 @@ class SchemaGenerator extends ProcessorImpl {
     case class Libraries(orbeon: Option[DocumentInfo], app: Option[DocumentInfo])
 
     override def start(pipelineContext: PipelineContext) {
+
+        // This is a PE feature
+        Version.instance.requirePEFeature("XForms schema generator service")
 
         // Read form and library
         val ec = NetUtils.getExternalContext

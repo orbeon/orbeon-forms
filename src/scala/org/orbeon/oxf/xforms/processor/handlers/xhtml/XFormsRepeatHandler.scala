@@ -169,7 +169,7 @@ class XFormsRepeatHandler extends XFormsControlLifecyleHandler(true, true) { // 
         }
 
         // 3. Handle case where no delimiter was output by repeat iterations or template
-        if (! bodyRepeated) {
+        if (isMustGenerateTemplate && ! bodyRepeated) {
             // What we do here is replay the body to /dev/null in order to find and output the begin delimiter (but not
             // the other delimiters)
             outputInterceptor.setForward(false)

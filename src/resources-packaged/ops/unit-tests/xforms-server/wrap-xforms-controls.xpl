@@ -92,7 +92,7 @@
                 </xsl:template>
             </xsl:stylesheet>
         </p:input>
-        <p:output name="data" ref="response" debug="xxxx out"/>
+        <p:output name="data" ref="response"/>
     </p:processor>
 
 </p:config>

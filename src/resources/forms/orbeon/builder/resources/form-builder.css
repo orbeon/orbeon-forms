@@ -634,6 +634,7 @@ h2 .fr-section-label {
 }
 .fb-selected {
   box-shadow: 0 0 10px #004b92;
+  border-collapse: separate;
 }
 .fr-view .fr-grid .fr-grid-content .xforms-hint:hover,
 .fr-view .fr-grid .fr-grid-th .xforms-label:hover,

@@ -447,6 +447,7 @@ h2 .fr-section-label {
 
 .fb-selected {                                                                      // Selected cell in grids
     box-shadow: 0 0 10px @darkBlue;                                                 // Highlight current cell with "halo"
+    border-collapse: separate;                                                      // For the box-shadow to properly show on IE9 http://stackoverflow.com/a/5617540/5295
 }
 
 // Grid

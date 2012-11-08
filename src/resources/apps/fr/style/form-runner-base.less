@@ -72,8 +72,17 @@ body { padding-top: 40px } // if using navbar-fixed-top
         margin: 0 0 0 .5em;
     }
 
-    .fr-section-title .xforms-help-image {
-        display: inline;
+    .fr-section-title {
+
+        button.btn-link {
+            color: @frHeaderColor;
+            font-size: inherit;
+            *font-size: @baseLineHeight; // actual font size for IE7
+        }
+
+        .xforms-help-image {
+            display: inline;
+        }
     }
 
     // Noscript help section
@@ -128,15 +137,11 @@ body { padding-top: 40px } // if using navbar-fixed-top
 // Make sure text in trigger does not wrap (leads to non-native widget being used on Firefox)
 .xforms-trigger button, .xforms-trigger input { white-space: nowrap }
 
-// Make the button look like a link for noscript mode
-// TODO: add *zoom: 1 for IE?
-.xforms-trigger-appearance-xxforms-minimal button,
-    .xforms-trigger-appearance-xxforms-minimal input {
-    display: -moz-inline-box; display: inline-block;
+// Updates to Bootstrap btn-link
+button.btn-link {
     text-decoration: underline;
     font-size: inherit;
-    padding: 0;
-    /*vertical-align: middle;*/ // removing this for better alignment of top links/buttons
+    padding: 0 0 2px 0;
 }
 
 // But for boolean inputs, no background and border (for IE)
@@ -171,10 +176,10 @@ body { padding-top: 40px } // if using navbar-fixed-top
 // Language and mode selectors
 .fr-goto-content, .fr-language-choice, .fr-noscript-choice { margin-right: 1em }
 
-.fr-goto-content .xforms-trigger-appearance-xxforms-minimal,
-    .fr-language-choice .xforms-trigger-appearance-xxforms-minimal,
-    .fr-noscript-choice .xforms-trigger-appearance-xxforms-minimal { *font-size: 100% }// IE 6 HACK to fix the font size
-.fr-goto-content .xforms-label, .fr-language-choice .xforms-label, .fr-noscript-choice .xforms-label { display: inline; margin-right: .5em }
+.fr-goto-content .xforms-label, .fr-language-choice .xforms-label, .fr-noscript-choice .xforms-label {
+    display: inline;
+    margin-right: .5em;
+}
 
 // Status icons
 .fr-status-icons { margin-bottom: .5em; float: left }

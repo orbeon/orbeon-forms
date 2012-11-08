@@ -66,6 +66,16 @@ html, body { background-color: @frBackground }
     }
 }
 
+.xforms-noscript {
+    button.btn-link {
+        text-shadow: none;
+        margin-top: 0;
+        button { height: auto; }
+    }
+
+    .xforms-help-panel .xforms-help-group { list-style-type: square }
+}
+
 /* ***** Other ****************************************************************************************************** */
 
 .fr-orbeon-version {
@@ -99,10 +109,6 @@ html, body { background-color: @frBackground }
     color: #6E6E6E;
 }
 
-.xforms-noscript {
-    .xforms-help-panel .xforms-help-group { list-style-type: square }
-}
-
 /* Navbar */
 .fr-language-choice, .fr-noscript-choice, .fr-goto-content {
     color: @navbarLinkColorActive;
@@ -111,28 +117,21 @@ html, body { background-color: @frBackground }
     margin-top: 10px;
     text-align: right;
 
-    a { color: @navbarLinkColor }
+    a, button.btn-link { color: @navbarLinkColor }
 }
 
 .navbar-inverse {
     .fr-language-choice, .fr-noscript-choice, .fr-goto-content {
         color: @navbarInverseLinkColorActive;
-        a { color: @navbarInverseLinkColor }
+        a, button.btn-link { color: @navbarInverseLinkColor }
     }
 }
 
-.fr-goto-content { border: 2px solid #888888; padding: .5em; float: left; margin-left: 1em }
-
-/* Make button appear the same color as a link */
-.xforms-trigger-appearance-xxforms-minimal button, .xforms-trigger-appearance-xxforms-minimal input {
-    color: #6E6E6E;
-}
-
-/* But force minimal buttons color within heading */
-h1 .xforms-trigger-appearance-xxforms-minimal, h2 .xforms-trigger-appearance-xxforms-minimal, h3 .xforms-trigger-appearance-xxforms-minimal,
-h1 .xforms-trigger-appearance-xxforms-minimal button, h2 .xforms-trigger-appearance-xxforms-minimal button, h3 .xforms-trigger-appearance-xxforms-minimal button,
-h1 .xforms-trigger-appearance-xxforms-minimal input, h2 .xforms-trigger-appearance-xxforms-minimal input, h3 .xforms-trigger-appearance-xxforms-minimal input {
-    color: #004B92;
+.fr-goto-content {
+    border: 2px solid @navbarInverseLinkColor;
+    padding: 2px 6px;
+    margin-top: 7px;
+    float: left;
 }
 
 /* Add a star before the label of required fields, but only in new/edit modes */
@@ -192,8 +191,7 @@ h1 .xforms-trigger-appearance-xxforms-minimal input, h2 .xforms-trigger-appearan
         .fr-section-open-close { border-bottom: white }
         .xforms-label { font-weight: normal }
         .fr-section-arrow { float: left; display: block; height: 1.5em; background-color: white }
-        .xforms-trigger-appearance-xxforms-minimal button,
-            .xforms-trigger-appearance-xxforms-minimal input { text-decoration: none }
+        button.btn-link { text-decoration: none }
 
         .fr-section-opened, .fr-section-closed {
             padding-left: 20px;
@@ -237,7 +235,7 @@ h1 .xforms-trigger-appearance-xxforms-minimal input, h2 .xforms-trigger-appearan
 
     form.xforms-form {
 
-        a, .xforms-trigger-appearance-xxforms-minimal { color: black; text-decoration: none }
+        a, button.btn-link { color: black; text-decoration: none }
         .xforms-required label { background-image: none; padding-left: 0 }
 
         .container {

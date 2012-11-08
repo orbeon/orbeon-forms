@@ -83,8 +83,15 @@ class XFormsTriggerFullHandler extends XFormsTriggerHandler {
 
         // Determine bootstrap classes, which go on the <button> element
         // NOTE: It seems we don't need the .disabled class (if (disabled) List("disabled") else Nil).
-        val bootstrapClasses =
-            "btn" :: (getAppearances.asScala flatMap (appearance ⇒ BootstrapAppearances.get(appearance)) toList)
+        def isNoscriptMinimal =
+            handlerContext.isNoScript && XFormsControl.appearances(elementAnalysis)(XXFORMS_MINIMAL_APPEARANCE_QNAME)
+
+        val bootstrapClasses = "btn" :: (
+            if (isNoscriptMinimal)
+                "btn-link" :: Nil
+            else
+                (getAppearances.asScala flatMap (appearance ⇒ BootstrapAppearances.get(appearance)) toList))
+
 
         // xhtml:button or xhtml:input
         val spanQName = XMLUtils.buildQName(xhtmlPrefix, elementName)

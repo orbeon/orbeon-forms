@@ -110,6 +110,11 @@ body {
   display: block;
   margin: 0 0 0 .5em;
 }
+.xforms-noscript .fr-section-title button.btn-link {
+  color: #555555;
+  font-size: inherit;
+  *font-size: 20px;
+}
 .xforms-noscript .fr-section-title .xforms-help-image {
   display: inline;
 }
@@ -170,14 +175,10 @@ body {
 .xforms-trigger input {
   white-space: nowrap;
 }
-.xforms-trigger-appearance-xxforms-minimal button,
-.xforms-trigger-appearance-xxforms-minimal input {
-  display: -moz-inline-box;
-  display: inline-block;
+button.btn-link {
   text-decoration: underline;
   font-size: inherit;
-  padding: 0;
-  /*vertical-align: middle;*/
+  padding: 0 0 2px 0;
 }
 .xforms-type-boolean input {
   background: none;
@@ -222,16 +223,11 @@ body {
 .fr-noscript-choice {
   margin-right: 1em;
 }
-.fr-goto-content .xforms-trigger-appearance-xxforms-minimal,
-.fr-language-choice .xforms-trigger-appearance-xxforms-minimal,
-.fr-noscript-choice .xforms-trigger-appearance-xxforms-minimal {
-  *font-size: 100%;
-}
 .fr-goto-content .xforms-label,
 .fr-language-choice .xforms-label,
 .fr-noscript-choice .xforms-label {
   display: inline;
-  margin-right: 0.5em;
+  margin-right: .5em;
 }
 .fr-status-icons {
   margin-bottom: .5em;

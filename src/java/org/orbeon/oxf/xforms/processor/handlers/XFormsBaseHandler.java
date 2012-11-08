@@ -19,7 +19,6 @@ import org.orbeon.oxf.xforms.analysis.ElementAnalysis;
 import org.orbeon.oxf.xforms.analysis.controls.AttributeControl;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
-import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.control.controls.XXFormsAttributeControl;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.ElementHandler;
@@ -243,6 +242,6 @@ public abstract class XFormsBaseHandler extends ElementHandler {
 	}
 
     protected Set<QName> getAppearances() {
-        return XFormsControl.appearances(elementAnalysis);
+        return XFormsControl.jAppearances(elementAnalysis);
     }
 }

@@ -175,7 +175,7 @@ class XFormsControl(
         previousEffectiveIdCommit()
     }
 
-    final def getAppearances = XFormsControl.appearances(staticControl)
+    final def getAppearances = XFormsControl.jAppearances(staticControl)
     def isStaticReadonly = false
 
     // Optional mediatype
@@ -412,9 +412,11 @@ object XFormsControl {
 
     // Return the set of appearances for the given element, if any
     def appearances(elementAnalysis: ElementAnalysis) = elementAnalysis match {
-        case appearanceTrait: AppearanceTrait ⇒ appearanceTrait.jAppearances
-        case _ ⇒ Collections.emptySet[QName]
+        case appearanceTrait: AppearanceTrait ⇒ appearanceTrait.appearances
+        case _                                ⇒ Set.empty[QName]
     }
+
+    def jAppearances(elementAnalysis: ElementAnalysis) = appearances(elementAnalysis).asJava
 
     // Whether the given control has the text/html mediatype
     private val HTMLMediatype = Some("text/html")

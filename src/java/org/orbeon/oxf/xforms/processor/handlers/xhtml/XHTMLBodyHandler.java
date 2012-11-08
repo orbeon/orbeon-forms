@@ -21,7 +21,7 @@ import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis;
-import org.orbeon.oxf.xforms.analysis.controls.AppearanceTrait;
+import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.processor.handlers.HandlerContext;
 import org.orbeon.oxf.xforms.processor.handlers.NullContentHandler;
@@ -220,11 +220,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
         }
         
         public boolean hasAppearance(ElementAnalysis elementAnalysis, QName appearance) {
-            if (elementAnalysis instanceof AppearanceTrait) {
-                return ((AppearanceTrait) elementAnalysis).jAppearances().contains(appearance);
-            } else {
-                return false;
-            }
+            return XFormsControl.jAppearances(elementAnalysis).contains(appearance);
         }
     }
     
@@ -281,7 +277,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
             public ElementAnalysis match(Attributes attributes, Object handlerContext) {
                 final ElementAnalysis elementAnalysis = getElementAnalysis(attributes, handlerContext);
                 return elementAnalysis != null && !containingDocument.getStaticState().isNoscript()             // in noscript mode, use the full appearance
-                        && (hasAppearance(elementAnalysis, XFormsConstants.XFORMS_MINIMAL_APPEARANCE_QNAME))    // minimal appearance
+                        && hasAppearance(elementAnalysis, XFormsConstants.XFORMS_MINIMAL_APPEARANCE_QNAME)      // minimal appearance
                        ? elementAnalysis : null;
             }
         };

@@ -15,7 +15,6 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml;
 
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsUtils;
-import org.orbeon.oxf.xforms.analysis.controls.AppearanceTrait;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsCaseControl;
 import org.orbeon.oxf.xforms.processor.handlers.OutputInterceptor;
@@ -96,7 +95,7 @@ public class XFormsCaseHandler extends XFormsControlLifecyleHandler {
                                 "xforms-case-begin-" + XFormsUtils.namespaceId(containingDocument, effectiveId));
                     }
                 }
-            }, ((AppearanceTrait) staticControl().parent().get()).jAppearances().contains(XFormsConstants.XXFORMS_SEPARATOR_APPEARANCE_QNAME));
+            }, XFormsControl.jAppearances(elementAnalysis.parent().get()).contains(XFormsConstants.XXFORMS_SEPARATOR_APPEARANCE_QNAME));
 
             final String controlClasses; {
                 final StringBuilder classes = new StringBuilder(isVisible ? "xforms-case-selected" : "xforms-case-deselected");

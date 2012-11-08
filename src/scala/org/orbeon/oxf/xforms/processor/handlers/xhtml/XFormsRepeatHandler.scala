@@ -70,7 +70,7 @@ class XFormsRepeatHandler extends XFormsControlLifecyleHandler(true, true) { // 
                             outputDelimiter("xforms-repeat-delimiter", null)
                     }
                 }
-            }, staticControl.asInstanceOf[RepeatControl].isAroundTableOrListElement)
+            }, elementAnalysis.asInstanceOf[RepeatControl].isAroundTableOrListElement)
 
         // Shortcut function to output the delimiter
         outputDelimiter = outputInterceptor.outputDelimiter(savedOutput, _, _)

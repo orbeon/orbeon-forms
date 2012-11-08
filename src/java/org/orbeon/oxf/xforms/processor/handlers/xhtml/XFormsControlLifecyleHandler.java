@@ -206,11 +206,6 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandlerXHTM
         return analysis != null && analysis.isLocal();
     }
 
-    protected ElementAnalysis staticControl() {
-        final StaticStateGlobalOps globalOps = containingDocument.getStaticOps();
-        return globalOps.getControlAnalysis(getPrefixedId());
-    }
-
     private boolean hasLocalHint() {
         final StaticStateGlobalOps globalOps = containingDocument.getStaticOps();
         final LHHAAnalysis analysis = globalOps.getHint(getPrefixedId());

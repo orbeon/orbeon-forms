@@ -16,14 +16,9 @@ package org.orbeon.oxf.xforms.analysis.controls
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis._
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.analysis.SimpleElementAnalysis
-import scala.collection.JavaConverters._
 
-/**
- * Trait for all elements that have an appearance.
- */
+// Trait for all elements that have an appearance
 trait AppearanceTrait extends SimpleElementAnalysis {
     val appearances = attQNameSet(element, APPEARANCE_QNAME, namespaceMapping)
-    def jAppearances = appearances.asJava
-    
-    val mediatype = Option(element.attributeValue(MEDIATYPE_QNAME))
+    val mediatype   = Option(element.attributeValue(MEDIATYPE_QNAME))
 }

@@ -37,11 +37,11 @@ ORBEON.util.String = _.tap {}, (StringUtils) -> _.extend StringUtils,
     escapeForMarkup: (text) ->
         # List of characters to replace per http://stackoverflow.com/a/1091953/5295
         characters =
+            '&': '&amp;'        # This replacement needs to come first, so we don't replace the & in the subsequent character entity references
             '"': '&quot;'
             "'": '&apos;'
             '<': '&lt;'
             '>': '&gt;'
-            '&': '&amp;'
         for from, to of characters
             text = StringUtils.replace text, from, to
         text

@@ -84,10 +84,7 @@ object Transform {
         // Run the transformation
         withPipelineContext { newPipelineContext ⇒
             pipeline.reset(newPipelineContext)
-            domSerializerData.start(newPipelineContext)
-
-            // Get the result, move its root element into a xbl:template and return it
-            domSerializerData.getDocument(newPipelineContext)
+            domSerializerData.runGetDocument(newPipelineContext)
         }
     }
 
@@ -141,10 +138,7 @@ object Transform {
         // Run the transformation
         withPipelineContext { newPipelineContext ⇒
             pipeline.reset(newPipelineContext)
-            domSerializerData.start(newPipelineContext)
-
-            // Get the result, move its root element into a xbl:template and return it
-            domSerializerData.getDocument(newPipelineContext)
+            domSerializerData.runGetDocument(newPipelineContext)
         }
     }
 

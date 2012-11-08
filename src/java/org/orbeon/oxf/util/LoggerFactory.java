@@ -86,8 +86,7 @@ public class LoggerFactory {
                 try {
                     urlGenerator.reset(pipelineContext);
                     domSerializer.reset(pipelineContext);
-                    domSerializer.start(pipelineContext);
-                    element = domSerializer.getW3CDocument(pipelineContext).getDocumentElement();
+                    element = domSerializer.runGetW3CDocument(pipelineContext).getDocumentElement();
                     success = true;
                 } finally {
                     pipelineContext.destroy(success);

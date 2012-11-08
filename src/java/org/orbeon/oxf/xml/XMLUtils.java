@@ -1032,9 +1032,9 @@ public class XMLUtils {
             final PipelineContext pipelineContext = new PipelineContext();
             boolean success = false;
             try {
-                transformationOutput.start(pipelineContext);
+                final org.dom4j.Document result = transformationOutput.runGetDocument(pipelineContext);
                 success = true;
-                return transformationOutput.getDocument(pipelineContext);
+                return result;
             } finally {
                 pipelineContext.destroy(success);
             }

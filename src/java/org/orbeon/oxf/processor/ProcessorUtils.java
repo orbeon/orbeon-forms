@@ -145,8 +145,7 @@ public class ProcessorUtils {
         PipelineUtils.connect(urlGenerator, "data", domSerializer, "data");
 
         final PipelineContext pipelineContext = PipelineContext.get();
-        domSerializer.start(pipelineContext);
-        return domSerializer.getDocument(pipelineContext);
+        return domSerializer.runGetDocument(pipelineContext);
     }
 
     /**

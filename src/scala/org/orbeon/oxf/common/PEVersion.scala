@@ -73,8 +73,7 @@ class PEVersion extends Version {
                 val licenceDocument =
                     withPipelineContext { pipelineContext ⇒
                         serializer.reset(pipelineContext)
-                        serializer.start(pipelineContext)
-                        serializer.getDocument(pipelineContext)
+                        serializer.runGetDocument(pipelineContext)
                     }
 
                 LicenseInfo(licenceDocument)

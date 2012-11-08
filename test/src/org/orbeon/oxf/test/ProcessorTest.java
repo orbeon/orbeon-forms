@@ -78,8 +78,7 @@ public class ProcessorTest extends ResourceManagerTestBase {
                 final DOMSerializer domSerializer = new DOMSerializer();
                 PipelineUtils.connect(urlGenerator, "data", domSerializer, "data");
                 final PipelineContext pipelineContext = new PipelineContext();
-                domSerializer.start(pipelineContext);
-                tests = domSerializer.getDocument(pipelineContext);
+                tests = domSerializer.runGetDocument(pipelineContext);
             }
 
             // If there are tests with a true "only" attribute but not a true "exclude" attribute, execute only those
@@ -208,10 +207,7 @@ public class ProcessorTest extends ResourceManagerTestBase {
                         final Document expectedData = expectedNodesIterator.next();
 
                         // Run serializer
-                        domSerializer.start(pipelineContext);
-
-                        // Get actual data
-                        final Document actualData = domSerializer.getDocument(pipelineContext);
+                        final Document actualData = domSerializer.runGetDocument(pipelineContext);
 
                         // NOTE: We could make the comparison more configurable, for example to not collapse white space
                         final boolean outputPassed = Dom4j.compareDocumentsIgnoreNamespacesInScopeCollapse(expectedData, actualData);

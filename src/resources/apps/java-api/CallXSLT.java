@@ -65,11 +65,8 @@ public class CallXSLT extends SimpleProcessor {
         boolean success = false;
         final PipelineContext newPipelineContext = new PipelineContext(); // here we decide to use our own PipelineContext
         try {
-            // Execute processor by running serializer
             domSerializerData.start(newPipelineContext);
-
-            // Get result as a dom4j Document
-            final Document result = domSerializerData.getDocument(newPipelineContext); // must use same PipelineContext as start()
+            final Document result = domSerializerData.runGetDocument(newPipelineContext);
             success = true;
         } finally {
             newPipelineContext.destroy(success);

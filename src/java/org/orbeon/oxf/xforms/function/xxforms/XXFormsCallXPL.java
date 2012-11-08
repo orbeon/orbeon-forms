@@ -173,8 +173,7 @@ public class XXFormsCallXPL extends XFormsFunction {
                 // Read all outputs in sequence
                 List<DocumentWrapper> results = new ArrayList<DocumentWrapper>(outputNames.size());
                 for (DOMSerializer domSerializer: domSerializers) {
-                    domSerializer.start(pipelineContext);
-                    results.add(new DocumentWrapper((Document) Dom4jUtils.normalizeTextNodes(domSerializer.getDocument(pipelineContext)), null,
+                    results.add(new DocumentWrapper((Document) Dom4jUtils.normalizeTextNodes(domSerializer.runGetDocument(pipelineContext)), null,
                             xpathContext.getConfiguration()));
                 }
                 return new ListIterator(results);

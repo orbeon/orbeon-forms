@@ -76,7 +76,8 @@ object XPathCache {
     
     def getGlobalConfiguration = Configuration
 
-    // Evaluate an XPath expression on the document
+    // Evaluate an XPath expression on the document and return a List of native Java objects (i.e. String, Boolean,
+    // etc.), but NodeInfo wrappers are preserved.
     def evaluate(
             contextItem: Item,
             xpathString: String,

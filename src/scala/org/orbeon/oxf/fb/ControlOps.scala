@@ -33,6 +33,7 @@ import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsUtils.effectiveIdToAbsoluteId
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import scala.collection.mutable
+import org.orbeon.oxf.xforms.XFormsUtils
 
 /*
  * Form Builder: operations on controls.
@@ -449,12 +450,14 @@ object ControlOps {
             (e ⇒ isIdForControl(e attValue "id"))
 
     // Get the control's resource holder
-    def getControlResourceOrEmpty(controlName: String, resourceName: String) =
+    def getControlResourceOrEmpty(controlId: String, resourceName: String) = {
+        val controlName = XFormsUtils.getStaticIdFromId(controlId)  // Support effective id, to make it easier to use from XForms
         findCurrentResourceHolder(controlName) flatMap
             (n ⇒ n \ resourceName map (_.stringValue) headOption) getOrElse("")
+    }
 
-    def getControlHelpOrEmpty(controlName: String)  = getControlResourceOrEmpty(controlName, "help")
-    def getControlAlertOrEmpty(controlName: String) = getControlResourceOrEmpty(controlName, "alert")
+    def getControlHelpOrEmpty(controlId: String)  = getControlResourceOrEmpty(controlId, "help")
+    def getControlAlertOrEmpty(controlId: String) = getControlResourceOrEmpty(controlId, "alert")
 
     // Get the control's <item> for the current language
     def getControlItems(controlId: String) =
@@ -482,13 +485,15 @@ object ControlOps {
     }
 
     // Set a control's current resource
-    def setControlResource(controlName: String, resourceName: String, value: String) =
+    def setControlResource(controlId: String, resourceName: String, value: String) = {
+        val controlName = XFormsUtils.getStaticIdFromId(controlId)  // Support effective id, to make it easier to use from XForms
         findCurrentResourceHolder(controlName) flatMap
             (n ⇒ n \ resourceName headOption) foreach
                 (setvalue(_, value))
+    }
 
-    def setControlHelp(controlName: String,  value: String) = setControlResource(controlName, "help",  value)
-    def setControlAlert(controlName: String, value: String) = setControlResource(controlName, "alert", value)
+    def setControlHelp(controlId: String,  value: String) = setControlResource(controlId, "help",  value)
+    def setControlAlert(controlId: String, value: String) = setControlResource(controlId, "alert", value)
 
     // From an <xbl:binding>, return the view template (say <fr:autocomplete>)
     def viewTemplate(binding: NodeInfo) = {

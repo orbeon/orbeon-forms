@@ -24,10 +24,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.net.URLDecoder;
-import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * This class reproduces some methods from the super class so that it can still be used at runtime with a Portlet 1.0
@@ -87,55 +84,10 @@ public class WSRP2Utils {
         }
     }
 
-    private static final Pattern PATTERN_AMP;
-
-    static {
-        final String token = "[^=&]+";
-        PATTERN_AMP = Pattern.compile( "(" + token + ")=(" + token + ")?(?:&amp;|&|(?<!&amp;|&)\\z)" );
-    }
-
     public static String escapeXMLMinimal(String str) {
         str = str.replace("&", "&amp;");
         str = str.replace("<", "&lt;");
         return str;
-    }
-
-    public static final String STANDARD_PARAMETER_ENCODING = "utf-8";
-
-    // This is a modified copy of NetUtils.decodeQueryString(). Try to avoid duplication!
-    public static Map<String, String[]> decodeQueryString(final CharSequence queryString) {
-
-        final Map<String, String[]> result = new LinkedHashMap<String, String[]>();
-        if (queryString != null) {
-            final Matcher matcher = PATTERN_AMP.matcher(queryString);
-            int matcherEnd = 0;
-            while (matcher.find()) {
-                matcherEnd = matcher.end();
-                try {
-                    String name = URLDecoder.decode(matcher.group(1), STANDARD_PARAMETER_ENCODING);
-                    String group2 = matcher.group(2);
-
-                    final String value = group2 != null ? URLDecoder.decode(group2, STANDARD_PARAMETER_ENCODING) : "";
-
-                    // Handle the case where the source contains &amp;amp; because of double escaping which does occur in
-                    // full Ajax updates!
-                    if (name.startsWith("amp;"))
-                        name = name.substring("amp;".length());
-
-                    // NOTE: Replace spaces with '+'. This is an artifact of the fact that URLEncoder/URLDecoder
-                    // are not fully reversible.	
-                    StringConversions.addValueToStringArrayMap(result, name, value.replace(' ', '+'));
-                } catch (UnsupportedEncodingException e) {
-                    // Should not happen as we are using a required encoding
-                    throw new OXFException(e);
-                }
-            }
-            if (queryString.length() != matcherEnd) {
-                // There was garbage at the end of the query.
-                throw new OXFException("Malformed URL: " + queryString);
-            }
-        }
-        return result;
     }
 
     /**
@@ -143,7 +95,7 @@ public class WSRP2Utils {
      */
     private static String wsrpToPortletURL(String encodedURL, MimeResponse response) {
         // Parse URL
-        final Map<String, String[]> wsrpParameters = decodeQueryString(encodedURL);
+        final Map<String, String[]> wsrpParameters = NetUtils.decodeQueryStringPortlet(encodedURL);
 
         // Check URL type and create URL
         try {
@@ -175,7 +127,7 @@ public class WSRP2Utils {
                         // Should not happen
                         throw new OXFException(e);
                     }
-                    navigationParameters = decodeQueryString(decodedNavigationalState);
+                    navigationParameters = NetUtils.decodeQueryStringPortlet(decodedNavigationalState);
                 } else {
                     navigationParameters = null;
                 }

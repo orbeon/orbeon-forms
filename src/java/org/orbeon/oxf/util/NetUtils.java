@@ -345,6 +345,49 @@ public class NetUtils {
         return result;
     }
 
+    private static final Pattern PATTERN_AMP;
+
+    static {
+        final String token = "[^=&]+";
+        PATTERN_AMP = Pattern.compile( "(" + token + ")=(" + token + ")?(?:&amp;|&|(?<!&amp;|&)\\z)" );
+    }
+
+    // This is a modified copy of decodeQueryString() above. Not sure why we need 2 versions! Try to avoid duplication!
+    public static Map<String, String[]> decodeQueryStringPortlet(final CharSequence queryString) {
+
+        final Map<String, String[]> result = new LinkedHashMap<String, String[]>();
+        if (queryString != null) {
+            final Matcher matcher = PATTERN_AMP.matcher(queryString);
+            int matcherEnd = 0;
+            while (matcher.find()) {
+                matcherEnd = matcher.end();
+                try {
+                    String name = URLDecoder.decode(matcher.group(1), STANDARD_PARAMETER_ENCODING);
+                    String group2 = matcher.group(2);
+
+                    final String value = group2 != null ? URLDecoder.decode(group2, STANDARD_PARAMETER_ENCODING) : "";
+
+                    // Handle the case where the source contains &amp;amp; because of double escaping which does occur in
+                    // full Ajax updates!
+                    if (name.startsWith("amp;"))
+                        name = name.substring("amp;".length());
+
+                    // NOTE: Replace spaces with '+'. This is an artifact of the fact that URLEncoder/URLDecoder
+                    // are not fully reversible.
+                    StringConversions.addValueToStringArrayMap(result, name, value.replace(' ', '+'));
+                } catch (UnsupportedEncodingException e) {
+                    // Should not happen as we are using a required encoding
+                    throw new OXFException(e);
+                }
+            }
+            if (queryString.length() != matcherEnd) {
+                // There was garbage at the end of the query.
+                throw new OXFException("Malformed URL: " + queryString);
+            }
+        }
+        return result;
+    }
+
     /**
      * Encode a query string. The input Map contains names indexing Object[].
      */

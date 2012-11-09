@@ -1,0 +1,248 @@
+<xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml"
+            xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+            xmlns:ev="http://www.w3.org/2001/xml-events"
+            xmlns:xi="http://www.w3.org/2001/XInclude"
+            xmlns:xforms="http://www.w3.org/2002/xforms"
+            xmlns:saxon="http://saxon.sf.net/"
+            xmlns:xs="http://www.w3.org/2001/XMLSchema"
+            xmlns:exforms="http://www.exforms.org/exf/1-0"
+            xmlns:sql="http://orbeon.org/oxf/xml/sql"
+            xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+            xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+            xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xhtml:head>
+        <xhtml:title>Global Library</xhtml:title>
+        <xforms:model id="fr-form-model">
+            <xforms:instance id="fr-form-instance">
+                <form>
+                    <adress>
+                        <street-number/>
+                        <street-name/>
+                        <apt-suite/>
+                        <city>a</city>
+                        <state/>
+                        <zip/>
+                    </adress>
+                </form>
+            </xforms:instance>
+            <xforms:bind xmlns:dataModel="java:org.orbeon.oxf.fb.DataModel" id="fr-form-binds"
+                         nodeset="instance('fr-form-instance')">
+                <xforms:bind id="adress-bind" nodeset="adress" name="adress">
+                    <xforms:bind xmlns:fb="http://orbeon.org/oxf/xml/form-builder" id="street-number-bind"
+                                 name="street-number"
+                                 type="xs:string"
+                                 required="true()"
+                                 ref="street-number"/>
+                    <xforms:bind xmlns:fb="http://orbeon.org/oxf/xml/form-builder" id="street-name-bind"
+                                 name="street-name"
+                                 type="xforms:string"
+                                 readonly="true()"
+                                 ref="street-name"/>
+                    <xforms:bind id="apt-suite-bind" name="apt-suite" ref="apt-suite"/>
+                    <xforms:bind id="city-bind" name="city" ref="city"/>
+                    <xforms:bind id="state-bind" name="state" type="xforms:string" ref="state"/>
+                    <xforms:bind xmlns:fb="http://orbeon.org/oxf/xml/form-builder" id="zip-bind" name="zip"
+                                 type="xs:string"
+                                 required="true()"
+                                 ref="zip"/>
+                </xforms:bind>
+            </xforms:bind>
+            <xforms:instance xmlns:fb="http://orbeon.org/oxf/xml/form-builder" xxforms:readonly="true"
+                             id="fr-form-metadata">
+                <metadata>
+                    <application-name>orbeon</application-name>
+                    <form-name>library</form-name>
+                    <title xml:lang="en">Global Library</title>
+                    <description xml:lang="en">This special form contains the global Form Builder library of section templates accessible from all forms.</description>
+                    <title xml:lang="fr">Bibliothèque globale</title>
+                    <description xml:lang="fr">Ce formulaire spécial contient la bibliothèque global de Form Builder, avec les modèles de sections disponibles depuis tous les formulaires.</description>
+                    <logo mediatype="" filename="" size=""/>
+                </metadata>
+            </xforms:instance>
+            <xforms:instance id="fr-form-attachments">
+                <attachments>
+                    <css mediatype="text/css" filename="" size=""/>
+                    <pdf mediatype="application/pdf" filename="" size=""/>
+                </attachments>
+            </xforms:instance>
+            <xforms:instance id="fr-form-resources" xxforms:readonly="false">
+                <resources>
+                    <resource xml:lang="en">
+                        <adress>
+                            <label>US Address</label>
+                            <help/>
+                        </adress>
+                        <street-number>
+                            <label>Street Number</label>
+                            <hint/>
+                            <help/>
+                            <alert/>
+                        </street-number>
+                        <street-name>
+                            <label>Street Name</label>
+                            <hint/>
+                            <help/>
+                            <alert/>
+                        </street-name>
+                        <apt-suite>
+                            <label>Apt/Suite</label>
+                            <hint/>
+                            <help/>
+                            <alert/>
+                        </apt-suite>
+                        <city>
+                            <label>City</label>
+                            <hint/>
+                            <help/>
+                            <alert/>
+                        </city>
+                        <state>
+                            <label>State</label>
+                            <hint/>
+                            <help/>
+                            <alert/>
+                        </state>
+                        <zip>
+                            <label>Zip</label>
+                            <hint/>
+                            <help/>
+                            <alert/>
+                        </zip>
+                    </resource>
+                    <resource xml:lang="fr">
+                        <adress>
+                            <label>Adresse US</label>
+                            <help/>
+                        </adress>
+                        <street-number>
+                            <label>Numéro de rue</label>
+                            <hint/>
+                            <help/>
+                            <alert/>
+                        </street-number>
+                        <street-name>
+                            <label>Nom de rue</label>
+                            <hint/>
+                            <help/>
+                            <alert/>
+                        </street-name>
+                        <apt-suite>
+                            <label>Appartement/suite</label>
+                            <hint/>
+                            <help/>
+                            <alert/>
+                        </apt-suite>
+                        <city>
+                            <label>Ville</label>
+                            <hint/>
+                            <help/>
+                            <alert/>
+                        </city>
+                        <state>
+                            <label>Etat</label>
+                            <hint/>
+                            <help/>
+                            <alert/>
+                        </state>
+                        <zip>
+                            <label>Code postal</label>
+                            <hint/>
+                            <help/>
+                            <alert/>
+                        </zip>
+                    </resource>
+                </resources>
+            </xforms:instance>
+            <xforms:instance id="fr-service-request-instance" xxforms:exclude-result-prefixes="#all">
+                <request/>
+            </xforms:instance>
+            <xforms:instance id="fr-service-response-instance" xxforms:exclude-result-prefixes="#all">
+                <response/>
+            </xforms:instance>
+        </xforms:model>
+    </xhtml:head>
+    <xhtml:body>
+        <fr:view xmlns:oxf="http://www.orbeon.com/oxf/processors"
+                 xmlns:dataModel="java:org.orbeon.oxf.fb.DataModel"
+                 xmlns:xbl="http://www.w3.org/ns/xbl"
+                 xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+                 xmlns:p="http://www.orbeon.com/oxf/pipeline">
+            <fr:body>
+                <fr:section id="adress-section" bind="adress-bind">
+                    <xforms:label ref="$form-resources/adress/label"/>
+                    <xforms:help ref="$form-resources/adress/help"/>
+                    <fr:grid columns="3">
+                        <xhtml:tr>
+                            <xhtml:td>
+                                <xforms:input id="street-number-control" bind="street-number-bind">
+                                    <xforms:label ref="$form-resources/street-number/label"/>
+                                    <xforms:hint ref="$form-resources/street-number/hint"/>
+                                    <xforms:help ref="$form-resources/street-number/help"/>
+                                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
+                                </xforms:input>
+                            </xhtml:td>
+                            <xhtml:td>
+                                <xforms:input xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
+                                              id="street-name-control"
+                                              bind="street-name-bind">
+                                    <xforms:label ref="$form-resources/street-name/label"/>
+                                    <xforms:hint ref="$form-resources/street-name/hint"/>
+                                    <xforms:help ref="$form-resources/street-name/help"/>
+                                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
+                                </xforms:input>
+                            </xhtml:td>
+                            <xhtml:td>
+                                <xforms:input xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
+                                              id="apt-suite-control"
+                                              bind="apt-suite-bind">
+                                    <xforms:label ref="$form-resources/apt-suite/label"/>
+                                    <xforms:hint ref="$form-resources/apt-suite/hint"/>
+                                    <xforms:help ref="$form-resources/apt-suite/help"/>
+                                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
+                                </xforms:input>
+                            </xhtml:td>
+                        </xhtml:tr>
+                        <xhtml:tr>
+                            <xhtml:td>
+                                <xforms:input xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
+                                              id="city-control"
+                                              bind="city-bind">
+                                    <xforms:label ref="$form-resources/city/label"/>
+                                    <xforms:hint ref="$form-resources/city/hint"/>
+                                    <xforms:help ref="$form-resources/city/help"/>
+                                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
+                                </xforms:input>
+                            </xhtml:td>
+                            <xhtml:td>
+                                <fr:us-state xmlns="http://orbeon.org/oxf/xml/form-builder"
+                                             xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+                                             xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                                             xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
+                                             xmlns:xf="http://www.w3.org/2002/xforms"
+                                             id="state-control"
+                                             bind="state-bind">
+                                    <xf:label ref="$form-resources/state/label"/>
+                                    <xf:hint ref="$form-resources/state/hint"/>
+                                    <xf:help ref="$form-resources/state/help"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                </fr:us-state>
+                            </xhtml:td>
+                            <xhtml:td>
+                                <xforms:input xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
+                                              id="zip-control"
+                                              bind="zip-bind">
+                                    <xforms:label ref="$form-resources/zip/label"/>
+                                    <xforms:hint ref="$form-resources/zip/hint"/>
+                                    <xforms:help ref="$form-resources/zip/help"/>
+                                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
+                                </xforms:input>
+                            </xhtml:td>
+                        </xhtml:tr>
+                    </fr:grid>
+                    
+                </fr:section>
+            </fr:body>
+        </fr:view>
+    </xhtml:body>
+</xhtml:html>

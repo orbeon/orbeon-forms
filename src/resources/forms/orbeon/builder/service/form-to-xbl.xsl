@@ -38,9 +38,10 @@
                   select="string-join(('http://orbeon.org/oxf/xml/form-builder/component', doc('input:parameters')/*/app, doc('input:parameters')/*/form), '/')"/>
 
     <!-- Global stuff -->
-    <xsl:variable name="fr-form-model" select="/xhtml:html/xhtml:head//xforms:model[@id = 'fr-form-model']" as="element(xforms:model)"/>
-    <xsl:variable name="fr-form-instance" select="$fr-form-model/xforms:instance[@id = 'fr-form-instance']" as="element(xforms:instance)"/>
-    <xsl:variable name="fr-resources-instance" select="$fr-form-model/xforms:instance[@id = 'fr-form-resources']" as="element(xforms:instance)"/>
+    <xsl:variable name="fr-form-model"         select="/xhtml:html/xhtml:head//xforms:model[@id = 'fr-form-model']" as="element(xforms:model)"/>
+    <xsl:variable name="fr-form-instance"      select="$fr-form-model/xforms:instance[@id = 'fr-form-instance']"    as="element(xforms:instance)"/>
+    <xsl:variable name="fr-resources-instance" select="$fr-form-model/xforms:instance[@id = 'fr-form-resources']"   as="element(xforms:instance)"/>
+    <xsl:variable name="fr-metadata-instance"  select="$fr-form-model/xforms:instance[@id = 'fr-form-metadata']"    as="element(xforms:instance)*"/>
 
     <!-- Actions and services -->
     <!-- NOTE: Actions and services are implemented, for historical reasons, as XForms instances, submissions, and action
@@ -71,6 +72,12 @@
         <xsl:sequence select="$actions[$id = distinct-values((fr:action-sources(.), fr:action-destinations(.)))]"/>
     </xsl:function>
 
+    <xsl:function name="fr:title" as="xs:string">
+        <xsl:param name="lang" as="xs:string"/>
+        <xsl:param name="default" as="xs:string"/>
+        <xsl:value-of select="(normalize-space($fr-metadata-instance/*/title[@xml:lang = $lang])[. != ''], $default)[1]"/>
+    </xsl:function>
+
     <xsl:variable name="all-action-sources" select="distinct-values($actions/fr:action-sources(.))"/>
     <xsl:variable name="all-action-destinations" select="distinct-values($actions/fr:action-destinations(.))"/>
 
@@ -83,9 +90,9 @@
 
             <!-- Add Form Builder metadata -->
             <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
-                <display-name lang="en">Section Templates</display-name>
-                <display-name lang="fr">Modèles de sections</display-name>
-                <display-name lang="ru">Шаблоны разделов</display-name>
+                <display-name lang="en"><xsl:value-of select="fr:title('en', 'Section Templates')"/></display-name>
+                <display-name lang="fr"><xsl:value-of select="fr:title('fr', 'Modèles de sections')"/></display-name>
+                <display-name lang="ru"><xsl:value-of select="fr:title('ru', 'Шаблоны разделов')"/></display-name>
                 <icon lang="en">
                     <small-icon>/forms/orbeon/builder/images/input.png</small-icon>
                     <large-icon>/forms/orbeon/builder/images/input.png</large-icon>

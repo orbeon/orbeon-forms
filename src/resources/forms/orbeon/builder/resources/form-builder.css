@@ -177,11 +177,11 @@ div.xbl-fr-grid {
   margin-bottom: 10px;
 }
 .fb-toolbox .fb-toolbox-inside .fb-tools legend {
-  margin-bottom: 10px;
-  font-size: 12pt;
-  text-indent: 4px;
+  font-size: 11px;
+  margin-top: -8px;
+  margin-bottom: 4px;
+  text-indent: 9px;
   line-height: 24px;
-  margin-top: -4px;
 }
 .fb-toolbox .fb-toolbox-inside .fb-tools .xforms-label {
   display: block;

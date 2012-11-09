@@ -34,8 +34,8 @@
             <display-name lang="fr">Texte formatté</display-name>
             <display-name lang="ru">Текст в формате HTML</display-name>
             <icon lang="en">
-                <small-icon>/forms/orbeon/builder/images/html.png</small-icon>
-                <large-icon>/forms/orbeon/builder/images/html.png</large-icon>
+                <small-icon>/forms/orbeon/builder/images/html5.png</small-icon>
+                <large-icon>/forms/orbeon/builder/images/html5.png</large-icon>
             </icon>
             <templates>
                 <view>

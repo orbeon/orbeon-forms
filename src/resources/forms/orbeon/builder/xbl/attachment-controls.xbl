@@ -26,29 +26,31 @@
          xmlns:xbl="http://www.w3.org/ns/xbl">
 
     <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
-        <display-name lang="en">Typed Controls</display-name>
-        <display-name lang="fr">Contrôles typés</display-name>
-        <display-name lang="ru">Типизированные элементы</display-name>
+        <display-name lang="en">Attachments</display-name>
+        <display-name lang="fr">Fichiers joints</display-name>
+        <display-name lang="ru">[Attachments]</display-name>
     </metadata>
 
-    <xbl:binding id="fb-input-email" element="xforms|input">
+    <xbl:binding id="fb-output-image" element="xforms|output">
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
-            <display-name lang="en">Email Address</display-name>
-            <display-name lang="fr">Adresse email</display-name>
-            <display-name lang="ru">Адрес e-mail</display-name>
+            <display-name lang="en">Image</display-name>
+            <display-name lang="fr">Image</display-name>
+            <display-name lang="ru">Изображение</display-name>
             <icon lang="en">
-                <small-icon>/apps/fr/style/images/silk/email.png</small-icon>
-                <large-icon>/apps/fr/style/images/silk/email.png</large-icon>
+                <small-icon>/apps/fr/style/images/silk/photo.png</small-icon>
+                <large-icon>/apps/fr/style/images/silk/photo.png</large-icon>
             </icon>
             <templates>
-                <bind type="xforms:email"/>
+                <bind type="xforms:anyURI"/>
+                <!-- NOTE: Don't place filename, mediatype and size as those are not needed -->
+                <instance/>
                 <view>
-                    <xforms:input id="" ref="" xmlns="">
+                    <xforms:output id="" bind="" mediatype="image/*" class="fb-attachment" xmlns="">
                         <xforms:label ref=""/>
-                        <xforms:hint ref=""/>
                         <xforms:help ref=""/>
+                        <!-- No hint? -->
                         <xforms:alert ref=""/>
-                    </xforms:input>
+                    </xforms:output>
                 </view>
             </templates>
         </metadata>

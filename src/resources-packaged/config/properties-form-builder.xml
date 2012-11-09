@@ -21,20 +21,22 @@
     <property as="xs:string"  name="oxf.fb.toolbox.group.text.uri.*.*"               value="oxf:/forms/orbeon/builder/xbl/text-controls.xbl
                                                                                             oxf:/xbl/orbeon/tinymce/tinymce.xbl"/>
     <property as="xs:string"  name="oxf.fb.toolbox.group.typed.uri.*.*"              value="oxf:/forms/orbeon/builder/xbl/typed-controls.xbl
-                                                                                            oxf:/xbl/orbeon/image-attachment/image-attachment.xbl
-                                                                                            oxf:/xbl/orbeon/attachment/attachment.xbl
+                                                                                            oxf:/xbl/orbeon/us-phone/us-phone.xbl
+                                                                                            oxf:/xbl/orbeon/number/number.xbl
+                                                                                            oxf:/xbl/orbeon/currency/currency.xbl
+                                                                                            oxf:/xbl/orbeon/us-state/us-state.xbl"/>
+    <property as="xs:string"  name="oxf.fb.toolbox.group.dateTime.uri.*.*"           value="oxf:/forms/orbeon/builder/xbl/date-time-controls.xbl
                                                                                             oxf:/xbl/orbeon/dropdown-date/dropdown-date.xbl
                                                                                             oxf:/xbl/orbeon/fields-date/fields-date.xbl
-                                                                                            oxf:/xbl/orbeon/date-picker/date-picker.xbl
-                                                                                            oxf:/xbl/orbeon/us-phone/us-phone.xbl
-                                                                                            oxf:/xbl/orbeon/us-state/us-state.xbl
-                                                                                            oxf:/xbl/orbeon/number/number.xbl
-                                                                                            oxf:/xbl/orbeon/currency/currency.xbl"/>
+                                                                                            oxf:/xbl/orbeon/date-picker/date-picker.xbl"/>
     <property as="xs:string"  name="oxf.fb.toolbox.group.selection.uri.*.*"          value="oxf:/forms/orbeon/builder/xbl/selection-controls.xbl
                                                                                             oxf:/xbl/orbeon/box-select/box-select.xbl
                                                                                             oxf:/xbl/orbeon/databound-select1/databound-select1.xbl
                                                                                             oxf:/xbl/orbeon/autocomplete/autocomplete.xbl"/>
-    <property as="xs:string"  name="oxf.fb.toolbox.group.other.uri.*.*"              value="oxf:/forms/orbeon/builder/xbl/other-controls.xbl"/>
+    <property as="xs:string"  name="oxf.fb.toolbox.group.attachment.uri.*.*"         value="oxf:/forms/orbeon/builder/xbl/attachment-controls.xbl
+                                                                                            oxf:/xbl/orbeon/image-attachment/image-attachment.xbl
+                                                                                            oxf:/xbl/orbeon/attachment/attachment.xbl"/>
+    <property as="xs:string"  name="oxf.fb.toolbox.group.button.uri.*.*"             value="oxf:/forms/orbeon/builder/xbl/button-controls.xbl"/>
 
     <property as="xs:boolean" name="oxf.fb.menu.schema"                              value="true"/>
     <property as="xs:boolean" name="oxf.fb.menu.pdf"                                 value="true"/>

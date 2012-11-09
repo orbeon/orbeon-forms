@@ -26,13 +26,9 @@
          xmlns:xbl="http://www.w3.org/ns/xbl">
 
     <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
-        <display-name lang="en">Other Controls</display-name>
-        <display-name lang="fr">Autres contrôles</display-name>
-        <display-name lang="ru">Другие элементы</display-name>
-        <!--<icon lang="en">-->
-            <!--<small-icon>/forms/orbeon/builder/images/input.png</small-icon>-->
-            <!--<large-icon>/forms/orbeon/builder/images/input.png</large-icon>-->
-        <!--</icon>-->
+        <display-name lang="en">Buttons</display-name>
+        <display-name lang="fr">Boutons</display-name>
+        <display-name lang="ru">[Buttons]</display-name>
     </metadata>
 
     <xbl:binding id="fb-trigger" element="xforms|trigger">
@@ -97,7 +93,7 @@
     </xbl:binding>
     -->
 
-    <!-- Not fully working in Form Builder as of 2012-04-12
+    <!-- Not fully working in Form Builder as of 2012-11-09
     <xbl:binding id="fb-slider" element="xforms|range">
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Slider</display-name>

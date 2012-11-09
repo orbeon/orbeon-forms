@@ -105,8 +105,7 @@
                 <xforms:trigger appearance="full" id="insert-new-repeat-trigger" ref="instance('fb-variables')/grid-trigger" >
                     <xforms:label>
                         <xhtml:img src="/apps/fr/style/images/silk/table_add.png" alt=""/>
-                        <!-- TODO: i18n <xhtml:span><xforms:output value="$form-resources/new-grid/label"/></xhtml:span>-->
-                        <xhtml:span>New Repeat</xhtml:span>
+                        <xhtml:span><xforms:output value="$form-resources/new-repeat/label"/></xhtml:span>
                     </xforms:label>
                     <xforms:action ev:event="DOMActivate" type="xpath">
                         toolboxOps:insertNewRepeat($model)

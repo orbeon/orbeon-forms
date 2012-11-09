@@ -80,6 +80,9 @@
         <new-grid>
             <label>New Grid</label>
         </new-grid>
+        <new-repeat>
+            <label>New Repeat</label>
+        </new-repeat>
         <change-schema>
             <label>Change Schema</label>
         </change-schema>
@@ -908,6 +911,9 @@
         <new-grid>
             <label>Nouvelle grille</label>
         </new-grid>
+        <new-repeat>
+            <label>Nouveaux champs répétés</label>
+        </new-repeat>
         <change-schema>
             <label>Changer schéma</label>
         </change-schema>
@@ -1727,6 +1733,9 @@
         <new-grid>
             <label>Nytt rutenett</label>
         </new-grid>
+        <new-repeat>
+            <label>[New Repeat]</label>
+        </new-repeat>
         <change-schema>
             <label>Endre skjema</label>
         </change-schema>
@@ -2545,6 +2554,9 @@
         <new-grid>
             <label>Новая сетка</label>
         </new-grid>
+        <new-repeat>
+            <label>[New Repeat]</label>
+        </new-repeat>
         <change-schema>
             <label>Изменить схему</label>
         </change-schema>

@@ -16,34 +16,28 @@
         <xforms:model id="fr-form-model">
             <xforms:instance id="fr-form-instance">
                 <form>
-                    <adress>
+                    <address>
                         <street-number/>
                         <street-name/>
                         <apt-suite/>
-                        <city>a</city>
+                        <city/>
                         <state/>
                         <zip/>
-                    </adress>
+                    </address>
                 </form>
             </xforms:instance>
             <xforms:bind xmlns:dataModel="java:org.orbeon.oxf.fb.DataModel" id="fr-form-binds"
                          nodeset="instance('fr-form-instance')">
-                <xforms:bind id="adress-bind" nodeset="adress" name="adress">
+                <xforms:bind id="address-bind" nodeset="address" name="address">
                     <xforms:bind xmlns:fb="http://orbeon.org/oxf/xml/form-builder" id="street-number-bind"
                                  name="street-number"
-                                 type="xs:string"
                                  required="true()"
                                  ref="street-number"/>
-                    <xforms:bind xmlns:fb="http://orbeon.org/oxf/xml/form-builder" id="street-name-bind"
-                                 name="street-name"
-                                 type="xforms:string"
-                                 readonly="true()"
-                                 ref="street-name"/>
+                    <xforms:bind id="street-name-bind" name="street-name" ref="street-name" required="true()"/>
                     <xforms:bind id="apt-suite-bind" name="apt-suite" ref="apt-suite"/>
-                    <xforms:bind id="city-bind" name="city" ref="city"/>
-                    <xforms:bind id="state-bind" name="state" type="xforms:string" ref="state"/>
+                    <xforms:bind id="city-bind" name="city" ref="city" required="true()"/>
+                    <xforms:bind id="state-bind" name="state" ref="state" required="true()"/>
                     <xforms:bind xmlns:fb="http://orbeon.org/oxf/xml/form-builder" id="zip-bind" name="zip"
-                                 type="xs:string"
                                  required="true()"
                                  ref="zip"/>
                 </xforms:bind>
@@ -69,10 +63,10 @@
             <xforms:instance id="fr-form-resources" xxforms:readonly="false">
                 <resources>
                     <resource xml:lang="en">
-                        <adress>
+                        <address>
                             <label>US Address</label>
                             <help/>
-                        </adress>
+                        </address>
                         <street-number>
                             <label>Street Number</label>
                             <hint/>
@@ -111,10 +105,10 @@
                         </zip>
                     </resource>
                     <resource xml:lang="fr">
-                        <adress>
+                        <address>
                             <label>Adresse US</label>
                             <help/>
-                        </adress>
+                        </address>
                         <street-number>
                             <label>Numéro de rue</label>
                             <hint/>
@@ -169,9 +163,9 @@
                  xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
                  xmlns:p="http://www.orbeon.com/oxf/pipeline">
             <fr:body>
-                <fr:section id="adress-section" bind="adress-bind">
-                    <xforms:label ref="$form-resources/adress/label"/>
-                    <xforms:help ref="$form-resources/adress/help"/>
+                <fr:section id="address-section" bind="address-bind">
+                    <xforms:label ref="$form-resources/address/label"/>
+                    <xforms:help ref="$form-resources/address/help"/>
                     <fr:grid columns="3">
                         <xhtml:tr>
                             <xhtml:td>

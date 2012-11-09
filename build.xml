@@ -802,7 +802,7 @@
         </zip>
     </target>
 
-    <target name="orbeon-dist-packages" depends="orbeon-dist-war, proxy-portlet-war, orbeon-src">
+    <target name="orbeon-dist-packages" depends="orbeon-dist-war, proxy-portlet-war, orbeon-auth-war, orbeon-src">
         <!-- Create temporary zip file -->
         <property name="tmp-zip" value="${build.distrib.dir}/${versioned-name}-tmp.zip"/>
         <zip zipfile="${tmp-zip}">

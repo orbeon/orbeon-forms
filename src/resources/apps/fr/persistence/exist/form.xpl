@@ -23,8 +23,7 @@
         xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:f="http//www.orbeon.com/function"
         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-        xmlns:exist="http://exist.sourceforge.net/NS/exist"
-        xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary">
+        xmlns:exist="http://exist.sourceforge.net/NS/exist">
 
     <p:param name="data" type="output"/>
 

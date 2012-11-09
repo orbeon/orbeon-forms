@@ -51,10 +51,10 @@
 
     <!-- Global section templates (if not "orbeon/library") -->
     <xsl:if test="not($app = 'orbeon' and $form = 'library')">
-        <xsl:copy-of select="/xbl:xbl"/>
+        <xsl:copy-of select="doc('input:global-template-xbl')/xbl:xbl"/>
     </xsl:if>
     <!-- Custom section templates (if not "orbeon/*" as we don't want to copy components twice) -->
-    <xsl:if test="not($app = 'orbeon')">
+    <xsl:if test="not($app = 'orbeon') and not($form = 'library')">
         <xsl:copy-of select="doc('input:custom-template-xbl')/xbl:xbl"/>
     </xsl:if>
 </components>

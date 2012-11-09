@@ -86,7 +86,8 @@
     <!-- Aggregate results -->
     <p:processor name="oxf:unsafe-xslt">
         <p:input name="config" href="toolbox.xsl"/>
-        <p:input name="data" href="#global-template-xbl"/>
+        <p:input name="data"><dummy/></p:input>
+        <p:input name="global-template-xbl" href="#global-template-xbl"/>
         <p:input name="custom-template-xbl" href="#custom-template-xbl"/>
         <p:input name="request" href="#request"/>
         <p:output name="data" id="components"/>

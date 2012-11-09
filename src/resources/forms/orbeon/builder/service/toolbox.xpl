@@ -28,11 +28,6 @@
         </p:input>
         <p:output name="data" id="request"/>
     </p:processor>
-    <!--<p:processor name="oxf:regexp">-->
-        <!--<p:input name="config"><config>/fr/service/components/([^/]+)/([^/]+)</config></p:input>-->
-        <!--<p:input name="data" href="#request#xpointer(/request/request-path)"/>-->
-        <!--<p:output name="data" id="matcher-groups"/>-->
-    <!--</p:processor>-->
 
     <!-- Put app, form, and mode in format understood by read-form.xpl -->
     <p:processor name="oxf:xslt">
@@ -90,12 +85,10 @@
 
     <!-- Aggregate results -->
     <p:processor name="oxf:unsafe-xslt">
+        <p:input name="config" href="toolbox.xsl"/>
         <p:input name="data" href="#global-template-xbl"/>
         <p:input name="custom-template-xbl" href="#custom-template-xbl"/>
-        <p:input name="parameters" href="#parameters"/>
-        <!-- Externalize to limit impact of namespaces declared in this pipeline -->
-        <p:input name="config" href="toolbox.xsl"/>
-        <!--<p:output name="data" ref="data"/>-->
+        <p:input name="request" href="#request"/>
         <p:output name="data" id="components"/>
     </p:processor>
 

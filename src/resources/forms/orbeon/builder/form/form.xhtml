@@ -357,7 +357,8 @@
                                         <!-- De-annotate the form, as it will be re-annotated once the toolbox is loaded -->
                                         <xf:dispatch targetid="fr-form-model" name="fr-data-save-prepare"/>
                                         <xf:send submission="fb-load-toolbox">
-                                            <xxf:context name="app" value="event('app')"/>
+                                            <xxf:context name="app"  value="event('app')"/>
+                                            <xxf:context name="form" value="event('form')"/>
                                         </xf:send>
                                     </xf:action>
                                     <!-- "Save as" -->

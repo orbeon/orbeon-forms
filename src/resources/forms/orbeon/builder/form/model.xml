@@ -79,15 +79,16 @@
     <xforms:action ev:event="fr-data-ready" if="not(xxforms:instance('fr-parameters-instance')/mode = 'new')">
 
         <!-- Load toolbox if mode is not new. This also annotates the form when loading is done via fr-annotate-data. -->
+        <xforms:var
+            name="metadata"
+            value="instance('fr-form-instance')/
+                       xhtml:head/
+                           xforms:model[@id = 'fr-form-model']/
+                               xforms:instance[@id = 'fr-form-metadata']/
+                                   *"/>
         <xforms:send submission="fb-load-toolbox">
-            <xxforms:context
-                name="app"
-                value="instance('fr-form-instance')/
-                           xhtml:head/
-                               xforms:model[@id = 'fr-form-model']/
-                                   xforms:instance[@id = 'fr-form-metadata']/
-                                       */
-                                           application-name"/>
+            <xxforms:context name="app"  value="$metadata/application-name"/>
+            <xxforms:context name="form" value="$metadata/form-name"/>
         </xforms:send>
 
         <!-- RRR so that all binds are up to date for the rest of the initialization -->
@@ -418,7 +419,7 @@
     <!-- Submission to load the components library -->
     <!-- NOTE: We only pass the app name, not the form name -->
     <xforms:submission id="fb-load-toolbox" serialization="none"
-                       method="get" resource="/fr/service/custom/orbeon/builder/toolbox?application={event('app')}"
+                       method="get" resource="/fr/service/custom/orbeon/builder/toolbox?application={event('app')}&amp;form={event('form')}"
                        replace="instance" instance="fb-components-instance"
                        xxforms:readonly="true" xxforms:cache="true">>
 

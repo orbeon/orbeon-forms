@@ -19,8 +19,8 @@
             xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
             xmlns:p="http://www.orbeon.com/oxf/pipeline">
 
-    <xsl:variable name="app" as="xs:string" select="doc('input:parameters')/*/app"/>
-    <xsl:variable name="form" as="xs:string" select="doc('input:parameters')/*/form"/>
+    <xsl:variable name="app"  as="xs:string" select="doc('input:request')/*/parameters/parameter[name = 'application']/value"/>
+    <xsl:variable name="form" as="xs:string" select="doc('input:request')/*/parameters/parameter[name = 'form']/value"/>
 
     <!-- Find group names, e.g. "text", "selection", etc. -->
     <xsl:variable name="property-names" select="p:properties-start-with('oxf.fb.toolbox.group')" as="xs:string*" />
@@ -49,10 +49,12 @@
 
     </xsl:for-each>
 
-    <!-- Global section templates -->
-    <xsl:copy-of select="/xbl:xbl"/>
-    <!-- Custom section templates (if different from "orbeon" as we don't want to copy components twice) -->
-    <xsl:if test="$app != 'orbeon'">
+    <!-- Global section templates (if not "orbeon/library") -->
+    <xsl:if test="not($app = 'orbeon' and $form = 'library')">
+        <xsl:copy-of select="/xbl:xbl"/>
+    </xsl:if>
+    <!-- Custom section templates (if not "orbeon/*" as we don't want to copy components twice) -->
+    <xsl:if test="not($app = 'orbeon')">
         <xsl:copy-of select="doc('input:custom-template-xbl')/xbl:xbl"/>
     </xsl:if>
 </components>

@@ -67,7 +67,8 @@
                     <!-- Invalidate and reload the toolbox -->
                     <xforms:dispatch name="xxforms-instance-invalidate" target="fb-components-instance"/>
                     <xforms:send submission="fb-load-toolbox">
-                        <xxforms:context name="app" value="xxforms:bind('application-name-bind')"/>
+                        <xxforms:context name="app"  value="xxforms:bind('application-name-bind')"/>
+                        <xxforms:context name="form" value="xxforms:bind('form-name-bind')"/>
                     </xforms:send>
                 </xforms:action>
             </xforms:trigger>

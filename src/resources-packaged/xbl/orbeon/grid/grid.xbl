@@ -96,8 +96,6 @@
 
                         <!-- Grid table -->
                         <xf:var name="id" xbl:attr="xbl:text=id"/>
-                        <xf:var name="columns"     value="{$static-col-count}"/>
-                        <xf:var name="max-columns" value="xxforms:property('oxf.fb.grid.max-columns')"/>
                         <xh:table class="{'fr-grid',
                                           @class,
                                           if ($is-repeat)
@@ -105,8 +103,8 @@
                                                       if ($static-row-count le 1) then 'fr-repeat-single-row' else 'fr-repeat-multiple-rows')
                                                 else 'fr-norepeat',
                                           if ($is-editable)
-                                                then ('fr-editable', gridOps:canDoClasses(@id))
-                                                else ()}{{if ($columns lt $max-columns) then ' fb-can-add-col' else ''}}">
+                                                then gridOps:canDoClasses(@id)
+                                                else ()}">
                             <!-- If repeat, add buttons and headers-->
                             <xsl:if test="$is-repeat">
                                 <xh:thead class="yui-dt-hd">

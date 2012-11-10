@@ -241,8 +241,7 @@
             <!-- Test button -->
             <xforms:trigger ref="$instance/save-test-trigger[false()]">
                 <xforms:label>
-                    <xhtml:img src="/forms/orbeon/builder/images/play.png" alt=""/>
-                    <xhtml:span><xforms:output value="$form-resources/dialog-actions/test/label"/></xhtml:span>
+                    <xforms:output value="$form-resources/dialog-actions/test/label"/>
                 </xforms:label>
 
                 <!-- Test submission -->
@@ -250,12 +249,32 @@
                     <!-- TODO-->
                 </xforms:action>
             </xforms:trigger>
+            <!-- Delete button -->
+            <xforms:trigger ref="$instance/delete-trigger" appearance="xxforms:danger" id="fb-action-delete">
+                <xforms:label>
+                    <xforms:output value="$form-resources/remove/label"/>
+                </xforms:label>
+
+                <xforms:action ev:event="DOMActivate">
+                    <!-- Ask confirmation -->
+                    <xxforms:show dialog="fb-confirmation-dialog">
+                        <xxforms:context name="fr:message"
+                                         value="concat($form-resources/messages/delete-service, ' ''',
+                                                     $instance/name,
+                                                     '''?')"/>
+                        <xxforms:context name="fr:confirmation-target" value="'fb-action-delete'"/>
+                    </xxforms:show>
+                </xforms:action>
+                <xforms:action ev:event="fb-confirmation-yes">
+                    <!-- Delete stuff and close dialog -->
+                    <xforms:delete ref="$model/fb:action[@id = $instance/fb:action[1]/@id]"/>
+                    <xxforms:hide dialog="fb-action-dialog"/>
+                </xforms:action>
+            </xforms:trigger>
             <!-- Save button -->
             <xforms:trigger ref="$instance/save-test-trigger">
-
                 <xforms:label>
-                    <xhtml:img src="/apps/fr/style/images/silk/disk.png" alt=""/>
-                    <xhtml:span><xforms:output value="$form-resources/dialog-actions/save/label"/></xhtml:span>
+                    <xforms:output value="$form-resources/dialog-actions/save/label"/>
                 </xforms:label>
                 <!-- Save changes to form -->
                 <xforms:action ev:event="DOMActivate">
@@ -271,10 +290,10 @@
                     <xxforms:hide dialog="fb-action-dialog"/>
                 </xforms:action>
             </xforms:trigger>
-            <xforms:trigger>
+            <xforms:output value="$form-resources/or/label"/>
+            <xforms:trigger appearance="minimal">
                 <xforms:label>
-                    <xhtml:img src="/apps/fr/style/close.gif" alt=""/>
-                    <xhtml:span><xforms:output value="$form-resources/cancel/label"/></xhtml:span>
+                    <xforms:output value="$form-resources/cancel/label"/>
                 </xforms:label>
                 <!-- Hide dialog -->
                 <xxforms:hide ev:event="DOMActivate" dialog="fb-action-dialog"/>
@@ -323,6 +342,7 @@
                 <name/>
                 <initial-name/>
                 <instance-id/>
+                <delete-trigger/>
                 <save-test-trigger/>
                 <fb:action/>
             </bindings-editor>
@@ -374,6 +394,7 @@
                     </xforms:bind>
                 </xforms:bind>
             </xforms:bind>
+            <xforms:bind ref="delete-trigger" relevant="normalize-space(../initial-name)"/>
             <xforms:bind ref="save-test-trigger" readonly="../@valid = 'false'"/>
         </xforms:bind>
 

@@ -30,7 +30,7 @@
     <xhtml:div class="fr-grid">
         <xhtml:div class="fr-grid-content">
             <xforms:group ref="$instance">
-                <xforms:input ref="id" id="fb-service-name-input" incremental="true">
+                <xforms:input ref="name" id="fb-service-name-input" incremental="true">
                     <xforms:label ref="$form-resources/dialog-http-services/service-name/label"/>
                     <xforms:hint ref="$form-resources/dialog-http-services/service-name/hint"/>
                 </xforms:input>
@@ -184,8 +184,7 @@
             <!-- Test button -->
             <xforms:trigger ref="$instance/save-test-trigger">
                 <xforms:label>
-                    <xhtml:img src="/forms/orbeon/builder/images/play.png" alt=""/>
-                    <xhtml:span><xforms:output value="$form-resources/dialog-http-services/test/label"/></xhtml:span>
+                    <xforms:output value="$form-resources/dialog-http-services/test/label"/>
                 </xforms:label>
 
                 <!-- Test submission -->
@@ -222,11 +221,32 @@
                     </xforms:action>
                 </xforms:action>
             </xforms:trigger>
-            <!-- Save button -->
-            <xforms:trigger ref="$instance/save-test-trigger">
+            <!-- Delete button -->
+            <xforms:trigger ref="$instance/delete-trigger" appearance="xxforms:danger" id="fb-service-delete">
                 <xforms:label>
-                    <xhtml:img src="/apps/fr/style/images/silk/disk.png" alt=""/>
-                    <xhtml:span><xforms:output value="$form-resources/dialog-http-services/save/label"/></xhtml:span>
+                    <xforms:output value="$form-resources/remove/label"/>
+                </xforms:label>
+
+                <xforms:action ev:event="DOMActivate">
+                    <!-- Ask confirmation -->
+                    <xxforms:show dialog="fb-confirmation-dialog">
+                        <xxforms:context name="fr:message"
+                                         value="concat($form-resources/messages/delete-service, ' ''',
+                                                     $instance/name,
+                                                     '''?')"/>
+                        <xxforms:context name="fr:confirmation-target" value="'fb-service-delete'"/>
+                    </xxforms:show>
+                </xforms:action>
+                <xforms:action ev:event="fb-confirmation-yes">
+                    <!-- Delete stuff and close dialog -->
+                    <xforms:delete ref="$model/(fb:submission[@id = $instance/submission-id], fb:instance[@id = $instance/instance-id])"/>
+                    <xxforms:hide dialog="fb-service-dialog"/>
+                </xforms:action>
+            </xforms:trigger>
+            <!-- Save button -->
+            <xforms:trigger ref="$instance/save-test-trigger" appearance="xxforms:primary">
+                <xforms:label>
+                    <xforms:output value="$form-resources/dialog-http-services/save/label"/>
                 </xforms:label>
                 <!-- Save changes to form -->
                 <xforms:action ev:event="DOMActivate">
@@ -236,7 +256,7 @@
 
                     <!-- Insert new submission if needed -->
                     <xforms:action if="not(exists($model/fb:submission[@id = $submission-id]))">
-                        <xforms:insert context="$model" ref="fb:instance | fb:submission" origin="instance('fb-submission-template')"/>
+                        <xforms:insert context="$model" ref="xforms:* | fb:instance | fb:submission" origin="instance('fb-submission-template')"/>
                         <xforms:setvalue ref="$model/fb:submission[last()]/@id" value="$submission-id"/>
                     </xforms:action>
 
@@ -279,10 +299,10 @@
                     <xxforms:hide dialog="fb-service-dialog"/>
                 </xforms:action>
             </xforms:trigger>
-            <xforms:trigger>
+            <xforms:output value="$form-resources/or/label"/>
+            <xforms:trigger appearance="minimal">
                 <xforms:label>
-                    <xhtml:img src="/apps/fr/style/close.gif" alt=""/>
-                    <xhtml:span><xforms:output value="$form-resources/cancel/label"/></xhtml:span>
+                    <xforms:output value="$form-resources/cancel/label"/>
                 </xforms:label>
                 <!-- Hide dialog -->
                 <xxforms:hide ev:event="DOMActivate" dialog="fb-service-dialog"/>
@@ -310,8 +330,8 @@
 
         <!-- Copy parameters if any -->
         <xforms:action if="$submission-name">
-            <xforms:setvalue ref="$instance/id" value="$submission-name"/>
-            <xforms:setvalue ref="$instance/initial-id" value="$submission-name"/>
+            <xforms:setvalue ref="$instance/name" value="$submission-name"/>
+            <xforms:setvalue ref="$instance/initial-name" value="$submission-name"/>
             
             <xforms:var name="submission" value="$model/fb:submission[@id = concat($submission-name, '-submission')]"/>
             <xforms:setvalue ref="$instance/request/method" value="$submission/@method"/>
@@ -344,8 +364,8 @@
 
         <xforms:instance id="fb-submission-editor-instance">
             <submission valid="true">
-                <id/>
-                <initial-id/>
+                <name/>
+                <initial-name/>
                 <submission-id/>
                 <instance-id/>
                 <request>
@@ -370,6 +390,7 @@
                     <headers/>
                     <body/>
                 </response>
+                <delete-trigger/>
                 <save-test-trigger/>
             </submission>
         </xforms:instance>
@@ -379,12 +400,13 @@
         <xforms:setvalue ev:event="xxforms-valid"   ev:observer="fb-submission-editor-instance" ref="@valid">true</xforms:setvalue>
 
         <xforms:bind ref="instance('fb-submission-editor-instance')">
-            <xforms:bind ref="id" type="xs:NCName" required="true()"
-                         constraint="(normalize-space() != '' and normalize-space() = ../initial-id)
+            <xforms:bind ref="name" type="xs:NCName" required="true()"
+                         constraint="(normalize-space() != '' and normalize-space() = ../initial-name)
                                         or not(../submission-id = $model/fb:submission/@id
-                                            or ../instance-id = $model/fb:instance/@id)"/>
-            <xforms:bind ref="submission-id" calculate="concat(../id, '-submission')"/>
-            <xforms:bind ref="instance-id" calculate="concat(../id, '-instance')"/>
+                                            or ../instance-id = $model/fb:instance/@id)"
+                         readonly="normalize-space(../initial-name)"/>
+            <xforms:bind ref="submission-id" calculate="concat(../name, '-submission')"/>
+            <xforms:bind ref="instance-id" calculate="concat(../name, '-instance')"/>
             <xforms:bind ref="request/resource" type="xs:anyURI" required="true()"/>
             <xforms:bind ref="request/(is-soap, is-auth)" type="xs:boolean"/>
             <!--<xforms:bind ref="request/soap-action"/>-->
@@ -395,6 +417,7 @@
                                     else ../serialization"/>
             <xforms:bind ref="request/body" type="xxforms:xml" required="true()"/>
             <xforms:bind ref="response/error-type" readonly="true()"/>
+            <xforms:bind ref="delete-trigger" relevant="normalize-space(../initial-name)"/>
             <xforms:bind ref="save-test-trigger" readonly="../@valid = 'false'"/>
         </xforms:bind>
 

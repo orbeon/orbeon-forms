@@ -26,6 +26,7 @@
 
     <xforms:label ref="$form-resources/dialog-database-services/label"/>
 
+    <xforms:var name="instance" value="instance('fb-database-service-instance')"/>
     <xhtml:div class="fr-grid">
         <xhtml:div class="fr-grid-content">
             <xforms:input ref="name" id="fb-database-service-name-input" incremental="true">
@@ -88,22 +89,42 @@
                     </xforms:action>
                 </xforms:action>
             </xforms:trigger>
-            <!-- Save button -->
-            <xforms:trigger ref="save-test-trigger">
+            <!-- Delete button -->
+            <xforms:trigger ref="$instance/delete-trigger" appearance="xxforms:danger" id="fb-database-service-delete">
                 <xforms:label>
-                    <xhtml:img src="/apps/fr/style/images/silk/disk.png" alt=""/>
-                    <xhtml:span><xforms:output value="$form-resources/dialog-database-services/save/label"/></xhtml:span>
+                    <xforms:output value="$form-resources/remove/label"/>
+                </xforms:label>
+
+                <xforms:action ev:event="DOMActivate">
+                    <!-- Ask confirmation -->
+                    <xxforms:show dialog="fb-confirmation-dialog">
+                        <xxforms:context name="fr:message"
+                                         value="concat($form-resources/messages/delete-service, ' ''',
+                                                     $instance/name,
+                                                     '''?')"/>
+                        <xxforms:context name="fr:confirmation-target" value="'fb-database-service-delete'"/>
+                    </xxforms:show>
+                </xforms:action>
+                <xforms:action ev:event="fb-confirmation-yes">
+                    <!-- Delete stuff and close dialog -->
+                    <xforms:delete ref="$model/(fb:submission[@id = $instance/submission-id], fb:instance[@id = $instance/instance-id])"/>
+                    <xxforms:hide dialog="fb-database-service-dialog"/>
+                </xforms:action>
+            </xforms:trigger>
+            <!-- Save button -->
+            <xforms:trigger ref="save-test-trigger" appearance="xxforms:primary">
+                <xforms:label>
+                    <xforms:output value="$form-resources/dialog-database-services/save/label"/>
                 </xforms:label>
                 <!-- Save changes to form -->
                 <xforms:action ev:event="DOMActivate" xmlns:sql="http://orbeon.org/oxf/xml/sql">
-                    <xforms:var name="instance" value="instance('fb-database-service-instance')"/>
                     <!-- Actual id of the submission and instance -->
                     <xforms:var name="submission-id" value="$instance/submission-id"/>
                     <xforms:var name="instance-id" value="$instance/instance-id"/>
 
                     <!-- Insert new submission if needed -->
                     <xforms:action if="not(exists($model/fb:submission[@id = $submission-id]))">
-                        <xforms:insert context="$model" ref="fb:instance | fb:submission" origin="instance('fb-database-submission-template')"/>
+                        <xforms:insert context="$model" ref="xforms:* | fb:instance | fb:submission" origin="instance('fb-database-submission-template')"/>
                         <xforms:setvalue ref="$model/fb:submission[last()]/@id" value="$submission-id"/>
                     </xforms:action>
                     <xforms:var name="submission" value="$model/fb:submission[@id = $submission-id]"/>
@@ -131,10 +152,10 @@
                     <xxforms:hide dialog="fb-database-service-dialog"/>
                 </xforms:action>
             </xforms:trigger>
-            <xforms:trigger>
+            <xforms:output value="$form-resources/or/label"/>
+            <xforms:trigger appearance="minimal">
                 <xforms:label>
-                    <xhtml:img src="/apps/fr/style/close.gif" alt=""/>
-                    <xhtml:span><xforms:output value="$form-resources/cancel/label"/></xhtml:span>
+                    <xforms:output value="$form-resources/cancel/label"/>
                 </xforms:label>
                 <!-- Hide dialog -->
                 <xxforms:hide ev:event="DOMActivate" dialog="fb-database-service-dialog"/>
@@ -144,7 +165,6 @@
 
     <!-- Initialize dialog -->
     <xforms:action ev:event="xxforms-dialog-open" xmlns:sql="http://orbeon.org/oxf/xml/sql">
-        <xforms:var name="instance" value="instance('fb-database-service-instance')"/>
         <xforms:var name="submission-name" value="event('submission-name')"/>
 
         <!-- Clear instance entirely -->
@@ -185,6 +205,7 @@
                 <query/>
                 <query-xml/>
                 <response/>
+                <delete-trigger/>
                 <save-test-trigger/>
             </submission>
         </xforms:instance>
@@ -198,7 +219,8 @@
             <xforms:bind ref="name" type="xs:NCName"
                          constraint="(normalize-space() != '' and normalize-space() = ../initial-name)
                                         or not(../submission-id = $model/fb:submission/@id
-                                            or ../instance-id = $model/fb:instance/@id)"/>
+                                            or ../instance-id = $model/fb:instance/@id)"
+                         readonly="normalize-space(../initial-name)"/>
             <xforms:bind ref="submission-id" calculate="concat(../name, '-submission')"/>
             <xforms:bind ref="instance-id" calculate="concat(../name, '-instance')"/>
             <!-- TODO: type of datasource. What's the format? jdbc/foobar? a/b/c? use regexp -->
@@ -208,6 +230,7 @@
                          calculate="concat('&lt;sql:query xmlns:sql=''http://orbeon.org/oxf/xml/sql''>', ../query, '&lt;/sql:query>')"/>
             <xforms:bind ref="query" constraint="xxforms:valid(../query-xml)"/>
 
+            <xforms:bind ref="delete-trigger" relevant="normalize-space(../initial-name)"/>
             <xforms:bind ref="save-test-trigger" readonly="../@valid = 'false'"/>
         </xforms:bind>
 

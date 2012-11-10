@@ -89,7 +89,7 @@ body {
 }
 
 .fr-section-title.hover {                                                                                               // .hover added by CS on mouse over click interceptor
-    background-image: -webkit-linear-gradient(top, white, #DDD);                                                        // Yellow background to indicate clickable area
+    #gradient > .vertical(white, #DDD);
 }
 
 .fb-delete-grid-trigger {
@@ -145,13 +145,27 @@ div.xbl-fr-grid {
             }
 
             .fb-tool {
-                margin: 0 0 0 .7em;
+                margin: 0 0 0 4px;
 
-                .xforms-trigger { display: block }                                                                      // tools to always show vertically
-                .xforms-trigger button     {
-                    padding: 2px 0 2px 0;
+                .xforms-trigger button {
+                    padding: 2px 4px;
                     border: none; background: none; box-shadow: none;                                                   // remove button default styling
                     font-size: 85%;                                                                                     // smaller text next icon
+                    width: 100%;                 // to increase clicking area
+                    text-align: left;
+
+                    i {
+                        margin-top: -1px;        // so that Bootstrap icons are better aligned
+                    }
+                    img {
+                        margin-top: -3px;        // so that Bootstrap icons are better aligned
+                    }
+
+                    i, img { margin-right: 3px } // space between icon and text
+
+                    &:hover {
+                        #gradient > .vertical(white, #DDD);                                                             // effect on hover
+                    }
                 }
             }
 
@@ -384,44 +398,6 @@ h2 .fr-section-label {
     height: 36px;                                                                                                       // So the title takes space even when empty; 36px is line-height in bootstrap.css
                                                                                                                         // Goes on the label, not the h2, so the collaps background image shows even when empty
 }
-
-/* ***** Misc ******************************************************************************************************* */
-
-// Highlighting of top-level blocks (sections, ...)
-.fb-top-level-content { padding-left: .5em; margin-bottom: .5em; border-left: 0 solid transparent }
-.fb-top-level-content:hover { border-left: 0 solid #ccc }
-.fr-section-container .xforms-repeat-selected-item-1 { border-left: 0 solid @darkBlue}
-
-// Highlighting of section content (grids, ...)
-.fb-section-content { display: block; padding-left: .5em; margin-bottom: .5em; border-left: 0 solid transparent }
-.fb-section-content:hover { border-left: 0 solid #ccc}
-.fr-section-container .xforms-repeat-selected-item-2 { border-left: 0 solid @darkBlue}
-
-// Control editor
-.fb-edit-label .xforms-label { display: none }
-.fb-edit-label .fr-inplace-content {
-    display: inline;
-    margin-bottom: .2em;
-}
-
-.fb-edit-label .fr-inplace-edit .xforms-alert { display: none }
-
-a.xforms-help-image .fb-control-help { vertical-align: baseline; }
-
-// Would be nice to make text gray when only a hint
-/*.fb-control-label .fr-inplace-content { color: gray }*/
-
-.fb-edit-hint .fr-inplace-content {
-    font-size: smaller;
-    font-style: italic;
-    display: block;
-    margin-top: .2em;
-    color: gray
-}
-
-.fr-logo .xforms-upload-mediatype, .fr-logo .xforms-upload-size, .fr-logo .xforms-upload-filename { display: none }
-.fr-logo .xforms-upload-info { background-image: none; padding-left: 0 }
-.fr-logo .xforms-upload-remove { padding-left: 0 }
 
 /* ***** Grid ******************************************************************************************************* */
 .fb-cell-editor { display: none } // Contains the editing markup that will be moved inside each grid td

@@ -36,14 +36,14 @@
             <xforms:trigger>
                 <xforms:label>
                     <xhtml:img src="/apps/fr/style/clear.gif" alt=""/>
-                    <xhtml:span><xforms:output value="$form-resources/delete/label"/></xhtml:span>
+                    <xforms:output value="$form-resources/delete/label"/>
                 </xforms:label>
                 <xforms:dispatch ev:event="DOMActivate" name="fb-confirmation-yes" target="{confirmation-target}"/>
             </xforms:trigger>
-            <xforms:trigger id="fb-confirmation-dialog-cancel-trigger">
+            <xforms:output value="$form-resources/or/label"/>
+            <xforms:trigger id="fb-confirmation-dialog-cancel-trigger" appearance="minimal">
                 <xforms:label>
-                    <xhtml:img src="/apps/fr/style/close.gif" alt=""/>
-                    <xhtml:span><xforms:output value="$form-resources/cancel/label"/></xhtml:span>
+                    <xforms:output value="$form-resources/cancel/label"/>
                 </xforms:label>
                 <xforms:dispatch ev:event="DOMActivate" name="fb-confirmation-no" target="{confirmation-target}"/>
             </xforms:trigger>
@@ -57,7 +57,7 @@
         <!-- Remember parameters -->
         <xforms:setvalue ref="message" value="event('fr:message')"/>
         <xforms:setvalue ref="confirmation-target" value="event('fr:confirmation-target')"/>
-        <!-- Set focus when the dialog open  -->
+        <!-- Set focus on cancel button when the dialog open  -->
         <xforms:setfocus control="fb-confirmation-dialog-cancel-trigger"/>
     </xforms:action>
 

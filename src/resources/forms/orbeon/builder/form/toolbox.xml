@@ -42,7 +42,7 @@
             </xforms:trigger>
             <xforms:trigger appearance="minimal" ref="$xcv/copy-trigger" id="copy-trigger">
                 <xforms:label>
-                    <xhtml:img src="/forms/orbeon/builder/images/copy.gif" alt="{$form-resources/copy/label}" title="{$form-resources/copy/label}"/>
+                    <xhtml:img src="/forms/orbeon/builder/images/copy.png" alt="{$form-resources/copy/label}" title="{$form-resources/copy/label}"/>
                 </xforms:label>
                 <xforms:action ev:event="DOMActivate" type="xpath">
                     toolboxOps:copyToClipboard($current-td)

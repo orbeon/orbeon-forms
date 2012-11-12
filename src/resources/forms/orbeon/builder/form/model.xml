@@ -162,7 +162,7 @@
         </xforms:action>
 
         <!-- Handle user agent -->
-        <xforms:setvalue ref="instance('fb-user-agent-instance')/minimal-ie-version" value="fbf:minimalIEVersion()"/>
+        <xforms:setvalue ref="instance('fb-user-agent-instance')/minimal-ie-version" value="fbf:MinimalIEVersion()"/>
         <xforms:setvalue ref="instance('fb-user-agent-instance')/is-supported-browser" value="fbf:isBrowserSupported()"/>
 
         <xforms:rebuild/>

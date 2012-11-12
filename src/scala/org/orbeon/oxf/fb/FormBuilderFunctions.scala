@@ -31,6 +31,9 @@ object FormBuilderFunctions extends Logging {
 
     implicit def logger = containingDocument.getIndentedLogger("form-builder")
 
+    // Minimal version of IE supported
+    val MinimalIEVersion = 9
+
     val XH = XHTML_NAMESPACE_URI
     val XF = XFORMS_NAMESPACE_URI
     val XS = XSD_URI
@@ -120,14 +123,11 @@ object FormBuilderFunctions extends Logging {
 
     def makeInstanceExpression(name: String) = "instance('" + name + "')"
 
-    // Minimal version of IE supported
-    val minimalIEVersion = 8
-
     // Whether the browser is supported
     // Concretely, we only return false if the browser is an "old" version of IE
     def isBrowserSupported = {
         val request = NetUtils.getExternalContext.getRequest
-        ! UserAgent.isUserAgentIE(request) || UserAgent.getMSIEVersion(request) >= minimalIEVersion
+        ! UserAgent.isUserAgentIE(request) || UserAgent.getMSIEVersion(request) >= MinimalIEVersion
     }
 
     def debugDumpDocument(message: String, inDoc: NodeInfo) =

@@ -456,19 +456,6 @@ h2 .fr-section-label {
 .fr-grid-td .fb-hover { position: relative }                                        // So elements shown on hover can be absolutely positioned relative to the cell
                                                                                     // Necessary as Firefox doesn't support position: relative on table cells (http://goo.gl/Atzi2)
 
-// Column icons
-.fr-grid thead .fb-grid-column-toolbar-td {                                         // .fr-grid and thead added to take precedence over YUI's text-align: left
-    text-align: center;
-    padding-bottom: 2px;                                                            // Padding so that the icon doesn't touch the table border
-    height: 22px;                                                                   // Tall enough so that FF doesn't do funny things when the icons are shown upon hover
-}
-.fb-grid-column-toolbar-td .fb-insert-left { float: left }
-.fb-grid-column-toolbar-td .fb-insert-right { float: right }
-.fb-grid-column-toolbar-td a { display: none }                                      // By default, don't show the icons at the top of the grid
-.fb-grid-column-toolbar-td:hover a,                                                 // Show them when the mouse is specifically over that toolbar td
-.fb-grid-column-toolbar-td.fb-hover a                                               // Show them when the mouse is in a cell of the same column; style.coffee adds the .fb-hover
-    { display: block }
-
 .fb-selected {                                                                      // Selected cell in grids
     box-shadow: 0 0 10px @darkBlue;                                                 // Highlight current cell with "halo"
 }

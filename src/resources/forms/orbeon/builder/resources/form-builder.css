@@ -618,24 +618,6 @@ h2 .fr-section-label {
 .fr-grid-td .fb-hover {
   position: relative;
 }
-.fr-grid thead .fb-grid-column-toolbar-td {
-  text-align: center;
-  padding-bottom: 2px;
-  height: 22px;
-}
-.fb-grid-column-toolbar-td .fb-insert-left {
-  float: left;
-}
-.fb-grid-column-toolbar-td .fb-insert-right {
-  float: right;
-}
-.fb-grid-column-toolbar-td a {
-  display: none;
-}
-.fb-grid-column-toolbar-td:hover a,
-.fb-grid-column-toolbar-td.fb-hover a {
-  display: block;
-}
 .fb-selected {
   box-shadow: 0 0 10px #004b92;
 }

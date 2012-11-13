@@ -7,13 +7,14 @@
     <xsl:param name="target"/>
     <xsl:param name="build-root"/>
     <xsl:param name="version"/>
+    <xsl:param name="edition"/>
 
     <xsl:output method="xml" indent="yes" xslt:indent-amount="4"/>
 
     <xsl:template match="/">
         <web-app xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                  version="2.4" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
-            <display-name>Orbeon Forms <xsl:value-of select="$version"/></display-name>
+            <display-name>Orbeon Forms</display-name>
             <description>
         Orbeon Forms is an open source, standard-based web forms solution, which
         includes Form Builder, a WYSIWYG browser-based authoring tool, and Form

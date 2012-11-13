@@ -31,8 +31,7 @@
         <xhtml:span>
             <xforms:trigger appearance="xxforms:primary">
                 <xforms:label>
-                    <xhtml:img width="11" height="16" src="/apps/fr/style/close.gif" alt=""/>
-                    <xhtml:span><xforms:output value="$fr-resources/detail/labels/close"/></xhtml:span>
+                    <xforms:output value="$fr-resources/detail/labels/close"/>
                 </xforms:label>
                 <xxforms:hide ev:event="DOMActivate" dialog="fb-test-dialog"/>
             </xforms:trigger>

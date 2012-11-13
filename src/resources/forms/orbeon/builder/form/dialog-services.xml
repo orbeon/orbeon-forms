@@ -144,26 +144,17 @@
 
                                 <xforms:group ref=".[response/headers/header]">
                                     <xforms:label ref="$form-resources/dialog-http-services/headers/label"/>
-                                    <fr:grid columns="1">
+                                    <fr:grid ref="response/headers/header" id="fb-response-headers-repeat" readonly="true" repeat="true">
                                         <xhtml:tr>
+                                            <xhtml:td class="fb-nowrap">
+                                                <xforms:output value="name">
+                                                    <xforms:label ref="$form-resources/dialog-http-services/header-name/label"/>
+                                                </xforms:output>
+                                            </xhtml:td>
                                             <xhtml:td>
-                                                <fr:repeat ref="response/headers/header" id="fb-response-headers-repeat"
-                                                           columns="2" appearance="xxforms:table" readonly="true">
-                                                    <fr:body>
-                                                        <xhtml:tr>
-                                                            <xhtml:td class="fb-nowrap">
-                                                                <xforms:output value="name">
-                                                                    <xforms:label ref="$form-resources/dialog-http-services/header-name/label"/>
-                                                                </xforms:output>
-                                                            </xhtml:td>
-                                                            <xhtml:td>
-                                                                <xforms:output value="string-join(value, ', ')">
-                                                                    <xforms:label ref="$form-resources/dialog-http-services/header-value/label"/>
-                                                                </xforms:output>
-                                                            </xhtml:td>
-                                                        </xhtml:tr>
-                                                    </fr:body>
-                                                </fr:repeat>
+                                                <xforms:output value="string-join(value, ', ')">
+                                                    <xforms:label ref="$form-resources/dialog-http-services/header-value/label"/>
+                                                </xforms:output>
                                             </xhtml:td>
                                         </xhtml:tr>
                                     </fr:grid>

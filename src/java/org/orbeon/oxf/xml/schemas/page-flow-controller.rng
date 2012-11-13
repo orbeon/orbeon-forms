@@ -55,10 +55,14 @@
                             <attribute name="default-submission"/>
                         </optional>
                         <optional>
-                            <attribute name="model"/>
+                            <attribute name="model">
+                                <data type="anyURI"/>
+                            </attribute>
                         </optional>
                         <optional>
-                            <attribute name="view"/>
+                            <attribute name="view">
+                                <data type="anyURI"/>
+                            </attribute>
                         </optional>
 
                         <zeroOrMore>

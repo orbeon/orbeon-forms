@@ -115,6 +115,9 @@ html body .xforms-form tr.xforms-disabled,
     height: 16px;
     cursor: pointer;
     border: none;
+    background-image: url(../../ops/images/xforms/help.png);
+    background-repeat: no-repeat;
+    background-position: left bottom;
 }
 
 .xforms-alert-inactive, .xforms-alert-active {

@@ -404,19 +404,19 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
                 }
 
                 classes.append("-image"); // xforms-help-image class
-                final String helpImageClasses = classes.toString();
+                final String helpClasses = classes.toString();
 
-                final AttributesImpl imgAttributes = new AttributesImpl();
+                final AttributesImpl helpAttributes = new AttributesImpl();
                 if (addIds)
-                    imgAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, getLHHACId(containingDocument, targetControlEffectiveId, "i"));
-                imgAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, helpImageClasses);
-                imgAttributes.addAttribute("", "src", "src", ContentHandlerHelper.CDATA, XFormsConstants.HELP_IMAGE_URI);
-                imgAttributes.addAttribute("", "title", "title", ContentHandlerHelper.CDATA, "");// do we need a title for screen readers?
-                imgAttributes.addAttribute("", "alt", "alt", ContentHandlerHelper.CDATA, "");// however it seems that we don't need an alt since the help content is there
+                    helpAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, getLHHACId(containingDocument, targetControlEffectiveId, "i"));
+                helpAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, helpClasses);
+                // Q: Do we need a title and/or alt for screen readers?
+                helpAttributes.addAttribute("", "title", "title", ContentHandlerHelper.CDATA, "");
+                helpAttributes.addAttribute("", "alt", "alt", ContentHandlerHelper.CDATA, "");
 
-                final String imgQName = XMLUtils.buildQName(xhtmlPrefix, "img");
-                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "img", imgQName, imgAttributes);
-                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "img", imgQName);
+                final String helpQName = XMLUtils.buildQName(xhtmlPrefix, "span");
+                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", helpQName, helpAttributes);
+                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", helpQName);
 
                 if (isNoscript && control != null) {
                     // End </a>

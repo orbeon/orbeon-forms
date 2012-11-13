@@ -71,7 +71,6 @@
 
                  See also tinymce-config.js. -->
             <xbl:style src="/xbl/orbeon/tinymce/jscripts/tiny_mce/themes/advanced/skins/thebigreason/ui.css"/>
-            <xbl:style src="/xbl/orbeon/tinymce/jscripts/tiny_mce/themes/advanced/skins/thebigreason/content.css"/>
         </xbl:resources>
         <xbl:implementation>
             <xf:model id="tinymce-model">

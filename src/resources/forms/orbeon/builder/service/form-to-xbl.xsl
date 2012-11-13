@@ -38,7 +38,7 @@
                   select="string-join(('http://orbeon.org/oxf/xml/form-builder/component', doc('input:parameters')/*/app, doc('input:parameters')/*/form), '/')"/>
 
     <!-- Global stuff -->
-    <xsl:variable name="fr-form-model"         select="/xhtml:html/xhtml:head//xforms:model[@id = 'fr-form-model']" as="element(xforms:model)"/>
+    <xsl:variable name="fr-form-model"         select="/xhtml:html/xhtml:head//xforms:model[@id = 'fr-form-model']" as="element(xforms:model)*"/>
     <xsl:variable name="fr-form-instance"      select="$fr-form-model/xforms:instance[@id = 'fr-form-instance']"    as="element(xforms:instance)"/>
     <xsl:variable name="fr-resources-instance" select="$fr-form-model/xforms:instance[@id = 'fr-form-resources']"   as="element(xforms:instance)"/>
     <xsl:variable name="fr-metadata-instance"  select="$fr-form-model/xforms:instance[@id = 'fr-form-metadata']"    as="element(xforms:instance)*"/>

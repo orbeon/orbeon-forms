@@ -18,6 +18,7 @@
 @lightBlue: #DEF;
 @yellow: #ffffd3;
 @fbGutter: 10px;
+@fbGridIconsGutter: 22px;
 
 // Overwrite definition in form-runner-orbeon.css if any
 html {
@@ -53,9 +54,6 @@ body {
 }
 
 #fr-view fieldset, .xforms-dialog fieldset { border: 1px solid #CCCCCC; }
-
-// TODO: Do we need this one?
-.xbl-fr-section > label { display: none }
 
 .fb-section-editor {
     position: absolute;                                                                                                 // Its left/right set in CoffeeScript relative to the current section
@@ -101,12 +99,7 @@ body {
 .fb-ie-warning { margin: 1em; padding: .5em; border: 4px solid #D00000; background-color: #FFF0F0 }
 
 .fb-nowrap { white-space: nowrap }
-.fb-xforms-disabled { display: none }
 .fb-hide-alert .xforms-alert { display: none }
-
-div.xbl-fr-grid {
-    padding: 22px 0 0 22px;                                                                                             // Reserve space for icons
-}
 
 /* ***** Toolbox **************************************************************************************************** */
 
@@ -372,18 +365,6 @@ div.xbl-fr-grid {
 // NOTE: This should not be needed because alert dialog should not use label for message content
 .xbl-fr-alert-dialog-message .xforms-label { font-weight: normal }
 
-/* ***** Header ***************************************************************************************************** */
-
-.fr-header {
-    .fb-form-settings-trigger { display: inline-block; float: right; margin-left: .5em }
-    .fb-language-triggers  { display: inline-block; float: right; margin-left: 1em }
-}
-
-/* ***** Footer ***************************************************************************************************** */
-
-// Give height to footer so it shows up even if empty
-.fr-footer div { height: 1em }
-
 /* ***** In-Place Editing ******************************************************************************************* */
 
 // Label and hint editors
@@ -400,6 +381,18 @@ h2 .fr-section-label {
 }
 
 /* ***** Grid ******************************************************************************************************* */
+
+.fb {
+
+    .fr-section-container .fr-section-content {
+        padding: 10px;          // don't need as much padding as usual because grids have extra padding for their icons
+    }
+
+    .xbl-fr-grid {
+        padding: @fbGridIconsGutter 0 0 @fbGridIconsGutter; // reserve space for icons
+    }
+}
+
 .fb-cell-editor { display: none } // Contains the editing markup that will be moved inside each grid td
 
 .fr-view {
@@ -418,10 +411,6 @@ h2 .fr-section-label {
     display: block; width: 16px;
     height: 60px;
     text-align: center }
-
-// Grid icons and hovering
-.fb-grid-top-left-td { text-align: center; width: 24px }
-.fr-grid .fb-grid-top-left-td img { display: none }
 
 // Delete, expand, shrink shown to the left of the cell
 .fb-grid-cell-icons { position: absolute; left: .5em; top: .5em}

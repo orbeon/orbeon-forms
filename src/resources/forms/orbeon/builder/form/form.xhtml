@@ -398,8 +398,8 @@
 
                             </xf:group>
 
-                            <xf:group id="fb-details-group">
-                                <!-- Don't leak events -->
+                            <xf:group class="fb">
+                                <!-- Q: Not sure if evens still leak now. They shouldn't after all the changes to event handling. -->
                                 <xf:action ev:event="#all" ev:propagate="stop"/>
                                 <!-- Display the form being edited -->
                                 <xxf:dynamic id="fb" ref="instance('fb-form-instance')"/>

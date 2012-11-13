@@ -157,7 +157,10 @@ body {
 .fb-hide-alert .xforms-alert {
   display: none;
 }
-div.xbl-fr-grid {
+.fr-section-container span.fr-section-content {
+  padding: 10px;
+}
+.fb div.xbl-fr-grid {
   padding: 22px 0 0 22px;
 }
 /* ***** Toolbox **************************************************************************************************** */

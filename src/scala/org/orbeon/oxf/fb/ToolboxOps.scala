@@ -329,11 +329,14 @@ object ToolboxOps {
         }
 
     // Copy control to the clipboard
-    def copyToClipboard(td: NodeInfo) {
+    def copyToClipboard(td: NodeInfo): Unit = {
+
+        val doc = td.getDocumentRoot
+
         val name = getControlName(td \ * head)
         val xvc = asNodeInfo(model("fr-form-model").get.getVariable("xcv"))
 
-        findControlByName(td, name) foreach { controlElement ⇒
+        findControlByName(doc, name) foreach { controlElement ⇒
 
             // Create <resource xml:lang="..."> containers
             val resourcesWithLang = findResourceHoldersWithLang(name) map {
@@ -342,10 +345,10 @@ object ToolboxOps {
 
             // Clear and insert each clipboard element
             Map[String, Seq[NodeInfo]](
-                "control"   → controlElement,
-                "holder"    → findDataHolders(td, name).toSeq,
+                "control"   → List(controlElement),
+                "holder"    → findDataHolders(doc, name),
                 "resources" → resourcesWithLang,
-                "bind"      → findBindByName(td, name).toSeq) foreach {
+                "bind"      → findBindByName(doc, name).toList) foreach {
 
                 case (elementName, content) ⇒
                     delete(xvc \ elementName \ *)
@@ -355,13 +358,13 @@ object ToolboxOps {
     }
 
     // Cut control to the clipboard
-    def cutToClipboard(td: NodeInfo) {
+    def cutToClipboard(td: NodeInfo): Unit = {
         copyToClipboard(td)
         deleteCellContent(td)
     }
 
     // Paste control from the clipboard
-    def pasteFromClipboard(td: NodeInfo) {
+    def pasteFromClipboard(td: NodeInfo): Unit = {
         ensureEmptyTd(td) foreach { gridTd ⇒
 
             val xvc = asNodeInfo(model("fr-form-model").get.getVariable("xcv"))

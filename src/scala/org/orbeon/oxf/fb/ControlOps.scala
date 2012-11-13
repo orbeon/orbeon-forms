@@ -83,10 +83,10 @@ object ControlOps {
 
     // Find a bind by predicate
     def findBind(inDoc: NodeInfo, p: NodeInfo ⇒ Boolean) =
-        ((findModelElement(inDoc) \ "*:bind" filter (hasIdValue(_, "fr-form-binds"))) \\ "*:bind") filter (p(_)) headOption
+        findTopLevelBind(inDoc).toList \\ "*:bind" filter p headOption
 
     def isBindForName(bind: NodeInfo, name: String) =
-        hasIdValue(bind, bindId(name)) || bindRefOrNodeset(bind).toSeq.stringValue == name // also check ref/nodeset in case id is not present
+        hasIdValue(bind, bindId(name)) || bindRefOrNodeset(bind) == Some(name) // also check ref/nodeset in case id is not present
 
     // Get the control's name based on the control element
     def getControlName(control: NodeInfo) = getControlNameOption(control).get
@@ -102,8 +102,9 @@ object ControlOps {
     def findControlById(inDoc: NodeInfo, id: String) =
         findFRBodyElement(inDoc) \\ * filter (hasIdValue(_, id)) headOption
 
-    // Return a bind ref or nodeset attribute if present
-    def bindRefOrNodeset(bind: NodeInfo) = bind \@ ("ref" || "nodeset") headOption
+    // Return a bind ref or nodeset attribute value if present
+    def bindRefOrNodeset(bind: NodeInfo): Option[String] =
+        bind \@ ("ref" || "nodeset") map (_.stringValue) headOption
 
     // Find control holder
     // Don't return anything if isCustomInstance is true
@@ -111,10 +112,9 @@ object ControlOps {
         if (! isCustomInstance)
             findBindByName(inDoc, controlName) map { bind ⇒
                 // From bind, infer path by looking at ancestor-or-self binds
-                val bindRefs = (bind ancestorOrSelf "*:bind" flatMap
-                    (bindRefOrNodeset(_))).reverse.tail
+                val bindRefs = (bind ancestorOrSelf "*:bind" flatMap bindRefOrNodeset).reverse.tail
 
-                val path = bindRefs map ("(" + _.stringValue + ")") mkString "/"
+                val path = bindRefs map ("(" + _ + ")") mkString "/"
 
                 // Assume that namespaces in scope on leaf bind apply to ancestor binds (in theory mappings could be overridden along the way!)
                 val namespaces = new NamespaceMapping(Dom4jUtils.getNamespaceContextNoDefault(unwrapElement(bind)))
@@ -153,7 +153,10 @@ object ControlOps {
 
     // Find the top-level bind (marked with "fr-form-binds") if any
     def findTopLevelBind(inDoc: NodeInfo) =
-        findModelElement(inDoc) \ "*:bind" collectFirst { case bind if hasIdValue(bind, "fr-form-binds") ⇒ bind }
+        findModelElement(inDoc) \ "*:bind" collectFirst {
+            // There should be an id, but for backward compatibility also support ref/nodeset pointing to fr-form-instance
+            case bind if hasIdValue(bind, "fr-form-binds") || bindRefOrNodeset(bind) == Some("instance('fr-form-instance')") ⇒ bind
+        }
 
     // Ensure that a tree of bind exists
     def ensureBinds(inDoc: NodeInfo, names: Seq[String]): NodeInfo = {

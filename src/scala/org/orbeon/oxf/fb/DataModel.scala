@@ -100,8 +100,8 @@ object DataModel {
     // Find a bind ref by name (deannotate the expression if needed)
     def getBindRef(inDoc: NodeInfo, name: String) =
         findBindByName(inDoc, name) flatMap
-            (bindRefOrNodeset(_)) map
-                (ref ⇒ deAnnotatedBindRef(ref.stringValue))
+            bindRefOrNodeset map
+                deAnnotatedBindRef
 
     // Set a bind ref by name (annotate the expression if needed)
     def setBindRef(inDoc: NodeInfo, name: String, ref: String) =

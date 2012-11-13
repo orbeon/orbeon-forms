@@ -493,8 +493,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
 
             def rawBindRef(inDoc: NodeInfo, name: String) =
                 findBindByName(inDoc, name) flatMap
-                    (bindRefOrNodeset(_) map
-                        (_.stringValue))
+                    bindRefOrNodeset
 
             // Automatic de-annotation
             assert(DataModel.getBindRef(doc, "control-1") === Some("control-1"))

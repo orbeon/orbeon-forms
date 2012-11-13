@@ -338,6 +338,10 @@ button.btn-link {
   display: block;
   margin: auto;
 }
+.fr-repeat-table i.disabled {
+  opacity: 0.4;
+  filter: alpha(opacity=40);
+}
 /* ***** Dialogs **************************************************************************************************** */
 .xforms-dialog {
   width: 400px;

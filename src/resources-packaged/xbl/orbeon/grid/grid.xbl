@@ -117,8 +117,7 @@
                                                              value="{if ($max-occurs = 'unbounded') then 'true()'
                                                                        else concat('count($repeat-sequence) lt ', $max-occurs)}"/>
                                                     <xf:trigger appearance="minimal" ref="$repeat-context[$can-add]">
-                                                        <!-- TODO: i18n of alt/title -->
-                                                        <xf:label><xh:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/plus_16.png" alt="Add" title="Add"/></xf:label>
+                                                        <xf:label><xhtml:i class="icon-plus-sign"/></xf:label>
                                                         <xf:insert ev:event="DOMActivate"
                                                                    context="$repeat-context"
                                                                    ref="$repeat-sequence"
@@ -126,7 +125,7 @@
                                                                    at="$repeat-index"/>
                                                     </xf:trigger>
                                                     <xf:group ref="$repeat-context[not($can-add)]">
-                                                        <xh:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/plus_16g.png" alt=""/>
+                                                        <xhtml:i class="icon-plus-sign disabled"/>
                                                     </xf:group>
                                                 </xh:th>
                                             </xf:group>
@@ -141,7 +140,7 @@
                                                     <xf:group xxbl:scope="outer">
                                                         <xsl:for-each select="$control/(xf:label | xf:help | xf:hint)">
                                                             <xsl:copy>
-                                                                <!-- TODO: Once labels outside repeats are supported (http://goo.gl/tSz4i), uncomment the repeat and change the group to be internal -->
+                                                                <!-- LATER: Once labels outside repeats are supported (http://goo.gl/tSz4i), uncomment the repeat and change the group to be internal -->
                                                                 <!--<xsl:attribute name="for" select="$control/@id"/>-->
                                                                 <xsl:copy-of select="@* | node()"/>
                                                             </xsl:copy>
@@ -191,12 +190,11 @@
                                                                     <xxf:var name="can-remove"
                                                                              value="{if ($remove-constraint) then concat($remove-constraint, ' and ') else ''} {concat('count($repeat-sequence) gt ', $min-occurs)}"/>
                                                                     <xf:trigger appearance="minimal" ref="$repeat-context[$can-remove]">
-                                                                        <!-- TODO: i18n of alt/title -->
-                                                                        <xf:label><xh:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/delete_16.png" alt="Remove" title="Remove"/></xf:label>
+                                                                        <xf:label><xhtml:i class="icon-minus-sign"/></xf:label>
                                                                         <xf:delete ev:event="DOMActivate" ref="$repeat-sequence" at="$repeat-index"/>
                                                                     </xf:trigger>
                                                                     <xf:group ref="$repeat-context[not($can-remove)]">
-                                                                        <xh:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/delete_16g.png" alt=""/>
+                                                                        <xhtml:i class="icon-minus-sign disabled"/>
                                                                     </xf:group>
                                                                 </xh:td>
                                                             </xf:group>
@@ -255,7 +253,7 @@
                                         </xsl:when>
                                         <xsl:otherwise>
                                             <!-- Apply everything and annotate tr/td. This also enables nested groups/variables. -->
-                                            <!-- TODO: Should support groups/vars or similar mechanism generally, also with repeats and editable modes. Maybe a "visible" predicate on tr/td? -->
+                                            <!-- LATER: Should support groups/vars or similar mechanism generally, also with repeats and editable modes. Maybe a "visible" predicate on tr/td? -->
                                             <xf:group xxbl:scope="outer" appearance="xxf:internal">
                                                 <xsl:apply-templates select="*"/>
                                             </xf:group>
@@ -294,7 +292,7 @@
 
                 <xsl:template match="*:tr[empty(ancestor::*/local-name()[not(. = ('group', 'grid'))])]">
                     <xh:tr>
-                        <!-- Place Bootstrap classes  when no in a repeated grid -->
+                        <!-- Place Bootstrap classes  when not in a repeated grid -->
                         <!--<xsl:if test="not($is-repeat)"><xsl:attribute name="class">row</xsl:attribute></xsl:if>-->
                         <xsl:copy-of select="@* except @class"/>
                         <xsl:apply-templates select="*"/><!-- don't bother with other nodes -->
@@ -303,7 +301,7 @@
 
                 <xsl:template match="*:td[empty(ancestor::*/local-name()[not(. = ('group', 'tr', 'grid'))])]">
                     <xh:td>
-                        <!-- Place Bootstrap classes  when no in a repeated grid -->
+                        <!-- Place Bootstrap classes  when not in a repeated grid -->
                         <!--<xsl:if test="not($is-repeat)"><xsl:attribute name="class" select="concat('span', 12 idiv $static-col-count)"/></xsl:if>-->
                         <xsl:copy-of select="@* except @class"/>
                         <xh:div class="fr-grid-content"><!-- TODO: see if we want to keep this -->

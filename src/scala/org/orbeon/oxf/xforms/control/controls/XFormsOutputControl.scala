@@ -36,6 +36,7 @@ import org.orbeon.oxf.xforms.processor.XFormsResourceServer.proxyURI
 import org.orbeon.oxf.xforms.submission.{SubmissionUtils, Headers}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.xml.sax.helpers.AttributesImpl
+import org.orbeon.exception.OrbeonFormatter
 
 /**
  * Represents an xforms:output control.
@@ -129,47 +130,56 @@ class XFormsOutputControl(container: XBLContainer, parent: XFormsControl, elemen
         }
     }
 
-    private def proxyValueIfNeeded(internalValue: String, defaultValue: String, filename: String, mediatype: String): String = {
+    private def proxyValueIfNeeded(internalValue: String, defaultValue: String, filename: String, mediatype: String): String =
+        try {
+            // If the value is a file:, we make sure it is signed before returning it
+            def hmacValueOrDefault(initial: String, value: ⇒ String, default: ⇒ String) =
+                if (initial.startsWith("file:/") && ! XFormsUploadControl.verifyMAC(initial))
+                    default
+                else
+                    value
 
-        // If the value is a file:, we make sure it is signed before returning it
-        def hmacValueOrDefault(initial: String, value: ⇒ String, default: ⇒ String) =
-            if (initial.startsWith("file:/") && ! XFormsUploadControl.verifyMAC(initial))
-                default
-            else
-                value
+            def doProxyURI(uri: String, lastModified: Long) =
+                proxyURI(getIndentedLogger, uri, filename, mediatype, lastModified, evaluatedHeaders, XFormsProperties.getForwardSubmissionHeaders(containingDocument))
 
-        def doProxyURI(uri: String, lastModified: Long) =
-            proxyURI(getIndentedLogger, uri, filename, mediatype, lastModified, evaluatedHeaders, XFormsProperties.getForwardSubmissionHeaders(containingDocument))
+            val typeName = getBuiltinTypeName
 
-        val typeName = getBuiltinTypeName
-
-        if ((internalValue ne null) && internalValue.length > 0 && internalValue.trim.length > 0) {
-            if ((typeName eq null) || typeName == "anyURI") {
-                // xs:anyURI type (the default)
-                if (! urlNorewrite) {
-                    // Resolve xml:base and try to obtain a path which is an absolute path without the context
-                    val rebasedURI = XFormsUtils.resolveXMLBase(containingDocument, element, internalValue)
-                    val servletRewriter = new ServletURLRewriter(NetUtils.getExternalContext.getRequest)
-                    val resolvedURI = servletRewriter.rewriteResourceURL(rebasedURI.toString, URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT)
-                    val lastModified = NetUtils.getLastModifiedIfFast(resolvedURI)
-                    hmacValueOrDefault(
-                        resolvedURI,
-                        doProxyURI(resolvedURI, lastModified),
-                        defaultValue)
+            if (StringUtils.isNotBlank(internalValue)) {
+                if ((typeName eq null) || typeName == "anyURI") {
+                    // xs:anyURI type (the default)
+                    if (! urlNorewrite) {
+                        // Resolve xml:base and try to obtain a path which is an absolute path without the context
+                        val rebasedURI = XFormsUtils.resolveXMLBase(containingDocument, element, internalValue)
+                        val servletRewriter = new ServletURLRewriter(NetUtils.getExternalContext.getRequest)
+                        val resolvedURI = servletRewriter.rewriteResourceURL(rebasedURI.toString, URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT)
+                        val lastModified = NetUtils.getLastModifiedIfFast(resolvedURI)
+                        hmacValueOrDefault(
+                            resolvedURI,
+                            doProxyURI(resolvedURI, lastModified),
+                            defaultValue)
+                    } else
+                        // Otherwise we leave the value as is
+                        hmacValueOrDefault(internalValue, internalValue, defaultValue)
+                } else if (typeName == "base64Binary") {
+                    // xs:base64Binary type
+                    // NOTE: -1 for lastModified will cause XFormsResourceServer to set Last-Modified and Expires properly to "now"
+                    doProxyURI(NetUtils.base64BinaryToAnyURI(internalValue, NetUtils.SESSION_SCOPE), -1)
                 } else
-                    // Otherwise we leave the value as is
-                    hmacValueOrDefault(internalValue, internalValue, defaultValue)
-            } else if (typeName == "base64Binary") {
-                // xs:base64Binary type
-                // NOTE: -1 for lastModified will cause XFormsResourceServer to set Last-Modified and Expires properly to "now"
-                doProxyURI(NetUtils.base64BinaryToAnyURI(internalValue, NetUtils.SESSION_SCOPE), -1)
+                    // Dummy image
+                    defaultValue
             } else
                 // Dummy image
                 defaultValue
-        } else
-            // Dummy image
-            defaultValue
-    }
+        } catch {
+            case e: Exception ⇒
+                // We don't want to fail if there is an issue proxying, for example if the resource is not found.
+                // Ideally, this would indicate some condition on the control (not found? out of range?).
+                getIndentedLogger.logWarning("xforms:output", "exception while proxing value",
+                    "value",     internalValue,
+                    "throwable", OrbeonFormatter.format(e))
+
+                defaultValue
+        }
 
     override def getEscapedExternalValue =
         if (getAppearances.contains(XXFORMS_DOWNLOAD_APPEARANCE_QNAME) || (mediatypeAttribute exists (_.startsWith("image/")))) {

@@ -66,7 +66,7 @@
 
             <!-- Submission getting list of updated countries -->
             <xforms:submission ref="instance('search-dynamic')" id="update-countries" validate="false"
-                method="post" resource="/xforms-controls/services/countries" replace="instance" instance="searched-countries"/>
+                method="post" resource="/fr/service/custom/orbeon/controls/countries" replace="instance" instance="searched-countries"/>
 
             <!-- Add other countries for testing to list of all countries -->
             <xforms:insert ev:event="xforms-model-construct-done"

@@ -1,44 +1,12 @@
-<!--
-  Copyright (C) 2010 Orbeon, Inc.
-
-  This program is free software; you can redistribute it and/or modify it under the terms of the
-  GNU Lesser General Public License as published by the Free Software Foundation; either version
-  2.1 of the License, or (at your option) any later version.
-
-  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-  See the GNU Lesser General Public License for more details.
-
-  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
-  -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
-            xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
-            xmlns:sql="http://orbeon.org/oxf/xml/sql"
-            xmlns:exforms="http://www.exforms.org/exf/1-0"
-            xmlns:saxon="http://saxon.sf.net/"
-            xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
-            xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-            xmlns:xs="http://www.w3.org/2001/XMLSchema"
-            xmlns:xhtml="http://www.w3.org/1999/xhtml"
-            xmlns:xi="http://www.w3.org/2001/XInclude"
-            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-            xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
-            xmlns:ev="http://www.w3.org/2001/xml-events">
+<?xml version="1.0" encoding="UTF-8"?><xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xxi="http://orbeon.org/oxf/xml/xinclude" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:saxon="http://saxon.sf.net/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:exforms="http://www.exforms.org/exf/1-0" xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <xhtml:head>
-        <xforms:model id="fr-form-model" xxforms:noscript-support="false" xxforms:xpath-analysis="true">
+        <xforms:model id="fr-form-model" xxforms:noscript-support="false">
             <xforms:instance id="fr-form-instance">
                 <form>
                     <text-controls>
                         <textarea>Music is an art form whose medium is sound. Common elements of music are pitch (which governs melody and harmony), rhythm (and its associated concepts tempo, meter, and articulation), dynamics, and the sonic qualities of timbre and texture. The word derives from Greek μουσική (mousike), "(art) of the Muses".
 
 The creation, performance, significance, and even the definition of music vary according to culture and social context. Music ranges from strictly organized compositions (and their recreation in performance), through improvisational music to aleatoric forms. Music can be divided into genres and subgenres, although the dividing lines and relationships between music genres are often subtle, sometimes open to individual interpretation, and occasionally controversial. Within "the arts", music may be classified as a performing art, a fine art, and auditory art.</textarea>
-                        <input>Michelle</input>
-                        <number>888</number>
-                        <secret>42</secret>
-                        <inplace-input>Be kind whenever possible. It is always possible.</inplace-input>
-                        <output>Great love and great achievements involve great risk.</output>
-                    </text-controls>
-                    <rich-text-controls>
                         <htmlarea>&lt;div style="text-align: left;"&gt;&lt;b&gt;Pyotr Ilyich
 Tchaikovsky&lt;/b&gt;&lt;a shape="rect"
 href="http://en.wikipedia.org/wiki/Pyotr_Ilyich_Tchaikovsky#cite_note-0"&gt;&lt;span&gt; &lt;/span&gt;&lt;/a&gt;(&lt;a
@@ -70,13 +38,18 @@ is available under the &lt;a shape="rect" rel="license"
 href="http://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License"&gt;Creative
 Commons Attribution-ShareAlike License&lt;/a&gt;;
 additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
-                    </rich-text-controls>
-                    <typed-controls>
+                        <input>Michelle</input>
+                        <output>Great love and great achievements involve great risk.</output>
+                        <secret>42</secret>
+                    </text-controls>
+                    <section-45>
                         <email>info@orbeon.com</email>
-                        <boolean>false</boolean>
                         <us-phone>5555555555</us-phone>
+                        <number>888</number>
+                        <currency>10.99</currency>
                         <us-state>CA</us-state>
-                        <dollars>10.99</dollars>
+                    </section-45>
+                    <typed-controls>
                         <date>2009-10-16</date>
                         <time>17:47:57</time>
                         <datetime>2009-10-16T17:48:03</datetime>
@@ -85,114 +58,88 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                         <date-picker>2009-10-16</date-picker>
                     </typed-controls>
                     <selection-controls>
-                        <dropdown/>
-                        <radio-buttons/>
-                        <checkboxes/>
-                        <single-list>bird</single-list>
-                        <multiple-list/>
-                        <link-select1/>
-                        <box-select/>
-                        <single-tree-selector/>
-                        <multiple-tree-selector/>
-                        <autocomplete/>
+                        <dropdown>cat</dropdown>
+                        <radio-buttons>cat</radio-buttons>
+                        <checkboxes>cat bird</checkboxes>
+                        <single-list>cat</single-list>
+                        <multiple-list>cat bird</multiple-list>
+                        <boolean>false</boolean>
+                        <dynamic-data-dropdown/>
+                        <autocomplete label="United States">us</autocomplete>
+                        <autocomplete-result/>
                     </selection-controls>
                     <attachment-controls>
-                        <image-attachment filename="crater.jpg" mediatype="image/jpeg" size="16952">oxf:/apps/xforms-controls/images/crater.jpg</image-attachment>
-                        <static-image filename="step.jpg" mediatype="image/jpeg" size="37401">oxf:/apps/xforms-controls/images/step.jpg</static-image>
+                        <static-image filename="step.jpg" mediatype="image/jpeg" size="37401">oxf:/forms/orbeon/controls/form/step.jpg</static-image>
+                        <image-attachment filename="crater.jpg" mediatype="image/jpeg" size="16952">oxf:/forms/orbeon/controls/form/crater.jpg</image-attachment>
                         <file-attachment filename="" mediatype="" size=""/>
                     </attachment-controls>
-                    <other-controls>
-                        <browser-button-description>A browser button's look and feel is controlled by each browser individually</browser-button-description>
+                    <buttons>
                         <browser-button/>
-                        <link-button-description>A link button is a link which behaves like a button</link-button-description>
                         <link-button/>
-                        <standardized-button-description>A "standardized" button's appearance is meant to be the same on every browser</standardized-button-description>
-                        <standardized-button/>
+                    </buttons>
+                    <other-controls>
+                        <inplace-input>Be kind whenever possible. It is always possible.</inplace-input>
                     </other-controls>
+                    <us-address>
+                        <street-number>1600</street-number>
+                        <street-name>Pennsylvania Avenue NW</street-name>
+                        <apt-suite/>
+                        <city>Washington</city>
+                        <state>DC</state>
+                        <zip>20500</zip>
+                    </us-address>
                     <us-address/>
-                    <personal-information/>
                 </form>
             </xforms:instance>
-
-            <xforms:bind id="fr-form-binds" nodeset="instance('fr-form-instance')">
-                <xforms:bind id="text-controls-bind" nodeset="text-controls" name="text-controls">
-                    <xforms:bind id="input-bind" nodeset="input" name="input"/>
-                    <xforms:bind id="textarea-bind" nodeset="textarea" name="textarea"/>
-                    <xforms:bind id="number-bind" nodeset="number" name="number" type="xforms:positiveInteger"/>
-                    <xforms:bind id="output-bind" nodeset="output" name="output"/>
-                    <xforms:bind id="secret-bind" nodeset="secret" name="secret" type="xs:string"
-                                 required="true()"
-                                 constraint=". = '42'"/>
-                    <xforms:bind id="inplace-input-bind" nodeset="inplace-input" name="inplace-input"/>
+            <xforms:bind xmlns:dataModel="java:org.orbeon.oxf.fb.DataModel" id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xforms:bind id="text-controls-bind" ref="text-controls" name="text-controls">
+                    <xforms:bind id="input-bind" ref="input" name="input"/>
+                    <xforms:bind id="textarea-bind" ref="textarea" name="textarea"/>
+                    <xforms:bind xmlns:fb="http://orbeon.org/oxf/xml/form-builder" id="secret-bind" ref="secret" name="secret" type="xs:string" required="true()" constraint=". = '42'"/>
+                    <xforms:bind ref="output" id="output-bind" name="output"/>
+                    <xforms:bind ref="htmlarea" id="htmlarea-bind" name="htmlarea"/>
                 </xforms:bind>
-                <xforms:bind id="rich-text-controls-bind" nodeset="rich-text-controls">
-                    <xforms:bind id="htmlarea-bind" nodeset="htmlarea" name="htmlarea"/>
+                <xforms:bind id="typed-controls-bind" ref="typed-controls" name="typed-controls">
+                    <xforms:bind id="date-bind" ref="date" type="xforms:date" name="date"/>
+                    <xforms:bind id="time-bind" ref="time" type="xforms:time" name="time"/>
+                    <xforms:bind id="datetime-bind" ref="datetime" type="xforms:dateTime" name="datetime"/>
+                    <xforms:bind id="dropdown-date-bind" ref="dropdown-date" type="xforms:date" name="dropdown-date"/>
+                    <xforms:bind id="fields-date-bind" ref="fields-date" type="xforms:date" name="fields-date"/>
+                    <xforms:bind id="date-picker-bind" ref="date-picker" type="xforms:date" name="date-picker"/>
                 </xforms:bind>
-                <xforms:bind id="typed-controls-bind" nodeset="typed-controls" name="typed-controls">
-                    <xforms:bind id="date-bind" nodeset="date" type="xforms:date" name="date"/>
-                    <xforms:bind id="time-bind" nodeset="time" type="xforms:time" name="time"/>
-                    <xforms:bind id="datetime-bind" nodeset="datetime" type="xforms:dateTime" name="datetime"/>
-                    <xforms:bind id="dropdown-date-bind" nodeset="dropdown-date" type="xforms:date"
-                                 name="dropdown-date"/>
-                    <xforms:bind id="fields-date-bind" nodeset="fields-date" type="xforms:date"
-                                 name="fields-date"/>
-                    <xforms:bind id="date-picker-bind" nodeset="date-picker" type="xforms:date"
-                                 name="date-picker"/>
-                    <xforms:bind id="email-bind" nodeset="email" type="xforms:email" name="email"/>
-                    <xforms:bind id="boolean-bind" nodeset="boolean" type="xforms:boolean" name="boolean"/>
-                    <xforms:bind id="dollars-bind" nodeset="dollars" type="xforms:decimal" name="dollars"/>
-                    <xforms:bind id="us-phone-bind" nodeset="us-phone" constraint=". = '' or matches(., '^\d{10}$')"
-                                 name="us-phone"/>
-                    <xforms:bind id="us-state-bind" nodeset="us-state" type="xforms:string"
-                                 name="us-state"/>
+                <xforms:bind id="buttons-bind" ref="buttons" name="buttons">
+                    <xforms:bind id="browser-button-bind" ref="browser-button" name="browser-button"/>
+                    <xforms:bind id="link-button-bind" ref="link-button" name="link-button"/>
                 </xforms:bind>
-                <xforms:bind id="selection-controls-bind" nodeset="selection-controls"
-                             name="selection-controls">
-                    <xforms:bind id="dropdown-bind" nodeset="dropdown" type="xforms:string" name="dropdown"/>
-                    <xforms:bind id="radio-buttons-bind" nodeset="radio-buttons" type="xforms:string"
-                                 name="radio-buttons"/>
-                    <xforms:bind id="checkboxes-bind" nodeset="checkboxes" type="xforms:string"
-                                 name="checkboxes"/>
-                    <xforms:bind id="single-list-bind" nodeset="single-list" type="xforms:string"
-                                 name="single-list"/>
-                    <xforms:bind id="multiple-list-bind" nodeset="multiple-list" type="xforms:string"
-                                 name="multiple-list"/>
-                    <xforms:bind id="link-select1-bind" nodeset="link-select1" name="link-select1"/>
-                    <xforms:bind id="box-select-bind" nodeset="box-select" name="box-select"/>
-                    <xforms:bind id="single-tree-selector-bind" nodeset="single-tree-selector"
-                                 name="single-tree-selector"/>
-                    <xforms:bind id="multiple-tree-selector-bind" nodeset="multiple-tree-selector"
-                                 name="multiple-tree-selector"/>
-                    <xforms:bind id="autocomplete-bind" nodeset="autocomplete"
-                                 name="autocomplete"/>
+                <xforms:bind id="selection-controls-bind" ref="selection-controls" name="selection-controls">
+                    <xforms:bind id="dropdown-bind" ref="dropdown" type="xforms:string" name="dropdown"/>
+                    <xforms:bind id="radio-buttons-bind" ref="radio-buttons" type="xforms:string" name="radio-buttons"/>
+                    <xforms:bind id="checkboxes-bind" ref="checkboxes" type="xforms:string" name="checkboxes"/>
+                    <xforms:bind id="single-list-bind" ref="single-list" type="xforms:string" name="single-list"/>
+                    <xforms:bind id="multiple-list-bind" ref="multiple-list" name="multiple-list"/>
+                    <xforms:bind id="autocomplete-bind" ref="autocomplete" name="autocomplete"/>
+                    <xforms:bind id="boolean-bind" ref="boolean" type="xforms:boolean" name="boolean"/>
+                    <xforms:bind name="dynamic-data-dropdown" id="dynamic-data-dropdown-bind" ref="dynamic-data-dropdown" type="xforms:string"/>
+                    <xforms:bind xmlns:fb="http://orbeon.org/oxf/xml/form-builder" name="autocomplete-result" id="autocomplete-result-bind" ref="autocomplete-result" relevant="normalize-space($autocomplete)" calculate="$autocomplete"/>
                 </xforms:bind>
-                <xforms:bind id="other-controls-bind" nodeset="other-controls" name="other-controls">
-
-                    <xforms:bind id="browser-button-description-bind" nodeset="browser-button-description"
-                                 name="browser-button-description"/>
-                    <xforms:bind id="standardized-button-description-bind"
-                                 nodeset="standardized-button-description"
-                                 name="standardized-button-description"/>
-                    <xforms:bind id="browser-button-bind" nodeset="browser-button" name="browser-button"/>
-                    <xforms:bind id="standardized-button-bind" nodeset="standardized-button"
-                                 name="standardized-button"/>
-                    <xforms:bind id="link-button-bind" nodeset="link-button" name="link-button"/>
-                    <xforms:bind id="link-button-description-bind" nodeset="link-button-description"
-                                 name="link-button-description"/>
+                <xforms:bind id="attachment-controls-bind" ref="attachment-controls" name="attachment-controls">
+                    <xforms:bind id="image-attachment-bind" ref="image-attachment" type="xs:anyURI" name="image-attachment"/>
+                    <xforms:bind id="file-attachment-bind" ref="file-attachment" type="xs:anyURI" name="file-attachment"/>
+                    <xforms:bind ref="static-image" id="static-image-bind" type="xforms:anyURI" name="static-image"/>
                 </xforms:bind>
-                <xforms:bind id="attachment-controls-bind" nodeset="attachment-controls"
-                             name="attachment-controls">
-                    <xforms:bind id="image-attachment-bind" nodeset="image-attachment" type="xs:anyURI"
-                                 name="image-attachment"/>
-                    <xforms:bind id="static-image-bind" nodeset="static-image" type="xforms:anyURI"
-                                 name="static-image"/>
-                    <xforms:bind id="file-attachment-bind" nodeset="file-attachment" type="xs:anyURI"
-                                 name="file-attachment"/>
+                <xforms:bind name="other-controls" id="other-controls-bind" ref="other-controls">
+                    <xforms:bind ref="inplace-input" id="inplace-input-bind" name="inplace-input"/>
                 </xforms:bind>
+                <xforms:bind name="section-45" id="section-45-bind" ref="section-45">
+                    <xforms:bind ref="email" id="email-bind" type="xforms:email" name="email"/>
+                    <xforms:bind ref="currency" id="currency-bind" type="xforms:decimal" name="currency"/>
+                    <xforms:bind xmlns:fb="http://orbeon.org/oxf/xml/form-builder" ref="us-phone" id="us-phone-bind" constraint=". = '' or matches(., '^\d{10}$')" name="us-phone"/>
+                    <xforms:bind ref="number" id="number-bind" name="number" type="xforms:decimal"/>
+                    <xforms:bind ref="us-state" id="us-state-bind" type="xforms:string" name="us-state"/>
+                </xforms:bind>
+                <xforms:bind name="us-address" id="us-address-bind" ref="us-address"/>
             </xforms:bind>
-
-
-            <xforms:instance id="fr-form-metadata" xxforms:readonly="true">
+            <xforms:instance xmlns:fb="http://orbeon.org/oxf/xml/form-builder" xxforms:readonly="true" id="fr-form-metadata">
                 <metadata>
                     <application-name>orbeon</application-name>
                     <form-name>form-controls</form-name>
@@ -204,46 +151,66 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                     <logo mediatype="" filename="" size=""/>
                 </metadata>
             </xforms:instance>
-
-
             <xforms:instance id="fr-form-attachments">
                 <attachments>
                     <css mediatype="text/css" filename="" size=""/>
                     <pdf mediatype="application/pdf" filename="" size=""/>
                 </attachments>
             </xforms:instance>
-
-
-            <xforms:instance id="fr-form-resources" xxforms:readonly="true">
+            <xforms:instance xmlns:fb="http://orbeon.org/oxf/xml/form-builder" xxforms:readonly="true" id="fr-form-resources">
                 <resources>
                     <resource xml:lang="en">
-                        <htmlarea>
-                            <label>HTML Text</label>
-                            <hint>Standard HTML area</hint>
-                            <help/>
-                            <alert/>
-                        </htmlarea>
-                        <browser-button-description>
-                            <label/>
+                        <static-image>
+                            <label>Image</label>
                             <hint/>
                             <help/>
                             <alert/>
-                        </browser-button-description>
+                        </static-image>
+                        <email>
+                            <label>Email Address</label>
+                            <hint>Email field with validation</hint>
+                            <help/>
+                            <alert/>
+                        </email>
+                        <us-phone>
+                            <label>US Phone Number</label>
+                            <hint>US phone number field</hint>
+                            <help/>
+                            <alert/>
+                        </us-phone>
+                        <number>
+                            <label>Number</label>
+                            <hint>Number field with validation</hint>
+                            <help/>
+                            <alert/>
+                        </number>
+                        <currency>
+                            <label>Currency</label>
+                            <hint>Custom currency field</hint>
+                            <help/>
+                            <alert/>
+                        </currency>
+                        <us-state>
+                            <label>US State</label>
+                            <hint>US state selector</hint>
+                            <help/>
+                            <alert/>
+                        </us-state>
+                        <inplace-input>
+                            <label>In-place Input</label>
+                            <hint>Click to enter some text</hint>
+                            <help/>
+                            <alert/>
+                        </inplace-input>
                         <browser-button>
                             <label>Browser Button</label>
                             <hint>Standard browser button</hint>
                             <help/>
                             <alert/>
                         </browser-button>
-                        <link-button-description>
-                            <label/>
-                            <hint/>
-                            <help/>
-                            <alert/>
-                        </link-button-description>
                         <link-button>
                             <label>Link Button</label>
-                            <hint>Button with link appearance</hint>
+                            <hint>Button as a link</hint>
                             <help/>
                             <alert/>
                         </link-button>
@@ -253,63 +220,18 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                             <help/>
                             <alert/>
                         </image-attachment>
-                        <static-image>
-                            <label>Static Image</label>
-                            <hint/>
-                            <help/>
-                            <alert/>
-                        </static-image>
                         <file-attachment>
                             <label>File Attachment</label>
                             <hint>Attach a file</hint>
                             <help/>
                             <alert/>
                         </file-attachment>
-                        <email>
-                            <label>Email Address</label>
-                            <hint>Email field with validation</hint>
+                        <selection-controls>
+                            <label>Selection Controls</label>
                             <help/>
-                            <alert/>
-                        </email>
-                        <boolean>
-                            <label>Boolean Input</label>
-                            <hint>An input which captures "true" or "false"</hint>
-                            <help/>
-                            <alert/>
-                        </boolean>
-                        <us-phone>
-                            <label>US Phone Number</label>
-                            <hint>US phone number field</hint>
-                            <help/>
-                            <alert/>
-                        </us-phone>
-                        <us-state>
-                            <label>US State</label>
-                            <hint>US state selector</hint>
-                            <help/>
-                            <alert/>
-                        </us-state>
-                        <dollars>
-                            <label>Dollars</label>
-                            <hint>Custom currency field</hint>
-                            <help/>
-                            <alert/>
-                        </dollars>
-                        <standardized-button-description>
-                            <label/>
-                            <hint/>
-                            <help/>
-                            <alert/>
-                        </standardized-button-description>
-                        <standardized-button>
-                            <label>Standardized Button</label>
-                            <hint>Standardized button with cross-browser appearance</hint>
-                            <help/>
-                            <alert/>
-                        </standardized-button>
-
+                        </selection-controls>
                         <dropdown>
-                            <label>Dropdown</label>
+                            <label>Dropdown Menu</label>
                             <hint>Standard dropdown</hint>
                             <help/>
                             <alert/>
@@ -342,26 +264,14 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                             <item>
                                 <label>Dog</label>
                                 <value>dog</value>
-
-
-
-
                             </item>
                             <item>
                                 <label>Bird</label>
                                 <value>bird</value>
-
-
-
-
                             </item>
                             <item>
                                 <label>Fish</label>
                                 <value>fish</value>
-
-
-
-
                             </item>
                         </radio-buttons>
                         <checkboxes>
@@ -376,30 +286,18 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                             <item>
                                 <label>Dog</label>
                                 <value>dog</value>
-
-
-
-
                             </item>
                             <item>
                                 <label>Bird</label>
                                 <value>bird</value>
-
-
-
-
                             </item>
                             <item>
                                 <label>Fish</label>
                                 <value>fish</value>
-
-
-
-
                             </item>
                         </checkboxes>
                         <single-list>
-                            <label>Single List Box</label>
+                            <label>Scrollable List</label>
                             <hint>Standard single-selection list</hint>
                             <help/>
                             <alert/>
@@ -410,98 +308,18 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                             <item>
                                 <label>Dog</label>
                                 <value>dog</value>
-
-
-
-
                             </item>
                             <item>
                                 <label>Bird</label>
                                 <value>bird</value>
-
-
-
-
                             </item>
                             <item>
                                 <label>Fish</label>
                                 <value>fish</value>
-
-
-
-
                             </item>
                         </single-list>
                         <multiple-list>
-                            <label>Multiple List Box</label>
-                            <hint>Standard multiple-selection list</hint>
-                            <help/>
-                            <alert/>
-                            <item>
-                                <label>Cat</label>
-                                <value>cat</value>
-                            </item>
-                            <item>
-                                <label>Dog</label>
-                                <value>dog</value>
-
-
-
-
-                            </item>
-                            <item>
-                                <label>Bird</label>
-                                <value>bird</value>
-
-
-
-
-                            </item>
-                            <item>
-                                <label>Fish</label>
-                                <value>fish</value>
-
-
-
-
-                            </item>
-                        </multiple-list>
-                        <link-select1>
-                            <label>Link Selector</label>
-                            <hint>Custom selector with links</hint>
-                            <help/>
-                            <alert/>
-                            <item>
-                                <label>Cat</label>
-                                <value>cat</value>
-                            </item>
-                            <item>
-                                <label>Dog</label>
-                                <value>dog</value>
-
-
-
-
-                            </item>
-                            <item>
-                                <label>Bird</label>
-                                <value>bird</value>
-
-
-
-
-                            </item>
-                            <item>
-                                <label>Fish</label>
-                                <value>fish</value>
-
-
-
-
-                            </item>
-                        </link-select1>
-                        <box-select>
-                            <label>Box Selector</label>
+                            <label>Scrollable Checkboxes</label>
                             <hint>Custom scrollable selector with checkboxes</hint>
                             <help/>
                             <alert/>
@@ -512,96 +330,28 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                             <item>
                                 <label>Dog</label>
                                 <value>dog</value>
-
-
-
-
                             </item>
                             <item>
                                 <label>Bird</label>
                                 <value>bird</value>
-
-
-
-
                             </item>
                             <item>
                                 <label>Fish</label>
                                 <value>fish</value>
-
-
-
-
                             </item>
-                        </box-select>
-                        <single-tree-selector>
-                            <label>Single Tree Selector</label>
-                            <hint>Single-selection tree</hint>
+                        </multiple-list>
+                        <boolean>
+                            <label>Boolean Input</label>
+                            <hint>An input which captures "true" or "false"</hint>
                             <help/>
                             <alert/>
-                            <item>
-                                <label>Cat</label>
-                                <value>cat</value>
-                            </item>
-                            <item>
-                                <label>Dog</label>
-                                <value>dog</value>
-
-
-
-
-                            </item>
-                            <item>
-                                <label>Bird</label>
-                                <value>bird</value>
-
-
-
-
-                            </item>
-                            <item>
-                                <label>Fish</label>
-                                <value>fish</value>
-
-
-
-
-                            </item>
-                        </single-tree-selector>
-                        <multiple-tree-selector>
-                            <label>Multiple tree Selector</label>
-                            <hint>Multiple-selection tree</hint>
+                        </boolean>
+                        <dynamic-data-dropdown>
+                            <label>Dynamic Data Dropdown</label>
+                            <hint/>
                             <help/>
                             <alert/>
-                            <item>
-                                <label>Cat</label>
-                                <value>cat</value>
-                            </item>
-                            <item>
-                                <label>Dog</label>
-                                <value>dog</value>
-
-
-
-
-                            </item>
-                            <item>
-                                <label>Bird</label>
-                                <value>bird</value>
-
-
-
-
-                            </item>
-                            <item>
-                                <label>Fish</label>
-                                <value>fish</value>
-
-
-
-
-                            </item>
-                        </multiple-tree-selector>
+                        </dynamic-data-dropdown>
                         <date>
                             <label>Date</label>
                             <hint>Standard date field</hint>
@@ -620,9 +370,6 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                             <help/>
                             <alert/>
                         </datetime>
-
-
-
                         <dropdown-date>
                             <label>Dropdown Date</label>
                             <hint>Date selector with dropdown menus</hint>
@@ -641,107 +388,128 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                             <help/>
                             <alert/>
                         </date-picker>
-
-
-
                         <textarea>
-                            <label>Multi-Line Text</label>
+                            <label>Text Area</label>
                             <hint>Standard text area</hint>
                             <help/>
                             <alert/>
                         </textarea>
-
+                        <htmlarea>
+                            <label>Formatted Text</label>
+                            <hint>Standard HTML area</hint>
+                            <help/>
+                            <alert/>
+                        </htmlarea>
                         <text-controls>
                             <label>Text Controls</label>
                             <help/>
                         </text-controls>
+                        <section-45>
+                            <label>Typed Controls</label>
+                            <help/>
+                        </section-45>
                         <input>
-                            <label>Single-Line Text</label>
+                            <label>Input Field</label>
                             <hint>Standard input field</hint>
                             <help/>
                             <alert/>
                         </input>
-                        <number>
-                            <label>Number Field</label>
-                            <hint>Number field with validation</hint>
-                            <help/>
-                            <alert/>
-                        </number>
-                        <secret>
-                            <label>Password Field</label>
-                            <hint>The password is 42 ;)</hint>
-                            <help/>
-                            <alert>Missing or incorrect password</alert>
-                        </secret>
-                        <inplace-input>
-                            <label>In-place Input</label>
-                            <hint>Click to enter some text</hint>
-                            <help/>
-                            <alert/>
-                        </inplace-input>
-
                         <output>
                             <label>Text Output</label>
                             <hint/>
                             <help/>
                             <alert/>
                         </output>
-
-
+                        <secret>
+                            <label>Password Field</label>
+                            <hint>The password is 42 ;)</hint>
+                            <help/>
+                            <alert>Missing or incorrect password</alert>
+                        </secret>
                         <typed-controls>
-                            <label>Typed Controls</label>
+                            <label>Date and Time</label>
                             <help/>
                         </typed-controls>
-                        <selection-controls>
-                            <label>Selection Controls</label>
-                            <help/>
-                        </selection-controls>
-                        <other-controls>
+                        <buttons>
                             <label>Buttons</label>
                             <help/>
+                        </buttons>
+                        <other-controls>
+                            <label>Other Controls</label>
+                            <help/>
                         </other-controls>
+                        <us-address>
+                            <label>US Address Template</label>
+                            <help/>
+                        </us-address>
                         <attachment-controls>
-                            <label>Attachment Controls</label>
+                            <label>Attachments</label>
                             <help/>
                         </attachment-controls>
-                        <rich-text-controls>
-                            <label>Rich Text Control</label>
-                            <help/>
-                        </rich-text-controls>
                         <autocomplete>
                             <label>Autocomplete</label>
                             <hint>Enter the name of a country</hint>
                             <code>Country code</code>
                         </autocomplete>
-                    </resource>
-                    <resource xml:lang="fr">
-                        <htmlarea>
-                            <label>Zone texte HTML</label>
-                            <hint>Zone HTML standard</hint>
-                            <help/>
-                            <alert/>
-                        </htmlarea>
-                        <browser-button-description>
-                            <label/>
+                        <autocomplete-result>
+                            <label>Autocomplete Selection</label>
                             <hint/>
                             <help/>
                             <alert/>
-                        </browser-button-description>
+                        </autocomplete-result>
+                    </resource>
+                    <resource xml:lang="fr">
+                        <static-image>
+                            <label>Image</label>
+                            <hint/>
+                            <help/>
+                            <alert/>
+                        </static-image>
+                        <email>
+                            <label>Adresse email</label>
+                            <hint>Email field with validation</hint>
+                            <help/>
+                            <alert/>
+                        </email>
+                        <us-phone>
+                            <label>Téléphone US</label>
+                            <hint>US phone number field</hint>
+                            <help/>
+                            <alert/>
+                        </us-phone>
+                        <number>
+                            <label>Nombre</label>
+                            <hint>Number field with validation</hint>
+                            <help/>
+                            <alert/>
+                        </number>
+                        <currency>
+                            <label>Devise</label>
+                            <hint>Custom currency field</hint>
+                            <help/>
+                            <alert/>
+                        </currency>
+                        <us-state>
+                            <label>Etat US</label>
+                            <hint>US state selector</hint>
+                            <help/>
+                            <alert/>
+                        </us-state>
+                        <inplace-input>
+                            <label>In-place Input</label>
+                            <hint>Click to enter some text</hint>
+                            <help/>
+                            <alert/>
+                        </inplace-input>
                         <browser-button>
-                            <label>Bouton navigateur</label>
+                            <label>Bouton</label>
                             <hint>Bouton navigateur standard</hint>
                             <help/>
                             <alert/>
                         </browser-button>
-                        <link-button-description>
-                            <label/>
-                            <hint/>
-                            <help/>
-                            <alert/>
-                        </link-button-description>
                         <link-button>
                             <label>Bouton lien</label>
-                            <hint>Bouton sous forme de lien</hint>
+                            <hint>Lien agissant comme un bouton</hint>
                             <help/>
                             <alert/>
                         </link-button>
@@ -751,60 +519,16 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                             <help/>
                             <alert/>
                         </image-attachment>
-                        <static-image>
-                            <label>Image statique</label>
-                            <hint/>
-                            <help/>
-                            <alert/>
-                        </static-image>
                         <file-attachment>
                             <label>Fichier joint</label>
                             <hint>Joindre un fichier</hint>
                             <help/>
                             <alert/>
                         </file-attachment>
-                        <email>
-                            <label>Adresse email</label>
-                            <hint>Champ email avec validation</hint>
+                        <selection-controls>
+                            <label>Contrôles de sélection</label>
                             <help/>
-                            <alert/>
-                        </email>
-                        <boolean>
-                            <label>Champ Booléen</label>
-                            <hint>Un champ qui capture "vrai" ou "faux"</hint>
-                            <help/>
-                            <alert/>
-                        </boolean>
-                        <us-phone>
-                            <label>Téléphone US</label>
-                            <hint>Téléphone US sur mesure</hint>
-                            <help/>
-                            <alert/>
-                        </us-phone>
-                        <us-state>
-                            <label>Etat US</label>
-                            <hint>Sélecteur d'état US</hint>
-                            <help/>
-                            <alert/>
-                        </us-state>
-                        <dollars>
-                            <label>Dollars</label>
-                            <hint>Champ monnaie sur mesure</hint>
-                            <help/>
-                            <alert/>
-                        </dollars>
-                        <standardized-button-description>
-                            <label/>
-                            <hint/>
-                            <help/>
-                            <alert/>
-                        </standardized-button-description>
-                        <standardized-button>
-                            <label>Bouton standardisé</label>
-                            <hint>Bouton indépendant du navigateur</hint>
-                            <help/>
-                            <alert/>
-                        </standardized-button>
+                        </selection-controls>
                         <dropdown>
                             <label>Menu déroulant</label>
                             <hint>Menu standard</hint>
@@ -872,7 +596,7 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                             </item>
                         </checkboxes>
                         <single-list>
-                            <label>Liste simple</label>
+                            <label>Liste défilante</label>
                             <hint>Liste de sélection simple standard</hint>
                             <help/>
                             <alert/>
@@ -894,8 +618,8 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                             </item>
                         </single-list>
                         <multiple-list>
-                            <label>Liste multiple</label>
-                            <hint>Liste de sélection multiple standard</hint>
+                            <label>Cases à cocher défilantes</label>
+                            <hint>Composant cases à cocher avec ascenseur</hint>
                             <help/>
                             <alert/>
                             <item>
@@ -915,94 +639,18 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                                 <value>fish</value>
                             </item>
                         </multiple-list>
-                        <link-select1>
-                            <label>Sélection avec liens</label>
-                            <hint>Sélection sur mesure avec liens</hint>
+                        <boolean>
+                            <label>Boolean Input</label>
+                            <hint>An input which captures "true" or "false"</hint>
                             <help/>
                             <alert/>
-                            <item>
-                                <label>Chat</label>
-                                <value>cat</value>
-                            </item>
-                            <item>
-                                <label>Chien</label>
-                                <value>dog</value>
-                            </item>
-                            <item>
-                                <label>Oiseau</label>
-                                <value>bird</value>
-                            </item>
-                            <item>
-                                <label>Poisson</label>
-                                <value>fish</value>
-                            </item>
-                        </link-select1>
-                        <box-select>
-                            <label>Sélection dans une boîte</label>
-                            <hint>Sélection sur mesure avec cases à cocher</hint>
+                        </boolean>
+                        <dynamic-data-dropdown>
+                            <label>Dynamic Data Dropdown</label>
+                            <hint/>
                             <help/>
                             <alert/>
-                            <item>
-                                <label>Chat</label>
-                                <value>cat</value>
-                            </item>
-                            <item>
-                                <label>Chien</label>
-                                <value>dog</value>
-                            </item>
-                            <item>
-                                <label>Oiseau</label>
-                                <value>bird</value>
-                            </item>
-                            <item>
-                                <label>Poisson</label>
-                                <value>fish</value>
-                            </item>
-                        </box-select>
-                        <single-tree-selector>
-                            <label>Arbre de sélection simple</label>
-                            <hint>Arbre de sélection simple</hint>
-                            <help/>
-                            <alert/>
-                            <item>
-                                <label>Chat</label>
-                                <value>cat</value>
-                            </item>
-                            <item>
-                                <label>Chien</label>
-                                <value>dog</value>
-                            </item>
-                            <item>
-                                <label>Oiseau</label>
-                                <value>bird</value>
-                            </item>
-                            <item>
-                                <label>Poisson</label>
-                                <value>fish</value>
-                            </item>
-                        </single-tree-selector>
-                        <multiple-tree-selector>
-                            <label>Arbre de sélection multiple</label>
-                            <hint>Arbre de sélection multiple</hint>
-                            <help/>
-                            <alert/>
-                            <item>
-                                <label>Chat</label>
-                                <value>cat</value>
-                            </item>
-                            <item>
-                                <label>Chien</label>
-                                <value>dog</value>
-                            </item>
-                            <item>
-                                <label>Oiseau</label>
-                                <value>bird</value>
-                            </item>
-                            <item>
-                                <label>Poisson</label>
-                                <value>fish</value>
-                            </item>
-                        </multiple-tree-selector>
+                        </dynamic-data-dropdown>
                         <date>
                             <label>Date</label>
                             <hint>Champ date standard</hint>
@@ -1021,9 +669,6 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                             <help/>
                             <alert/>
                         </datetime>
-
-
-
                         <dropdown-date>
                             <label>Date avec menus</label>
                             <hint>Sélecteur de date avec menus</hint>
@@ -1042,106 +687,231 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                             <help/>
                             <alert/>
                         </date-picker>
-
-
-
                         <textarea>
                             <label>Zone de texte</label>
                             <hint>Zone de texte standard</hint>
                             <help/>
                             <alert/>
                         </textarea>
-
+                        <htmlarea>
+                            <label>Texte formatté</label>
+                            <hint>Standard HTML area</hint>
+                            <help/>
+                            <alert/>
+                        </htmlarea>
                         <text-controls>
                             <label>Contrôles texte</label>
                             <help/>
                         </text-controls>
+                        <section-45>
+                            <label>Contrôles typés</label>
+                            <help/>
+                        </section-45>
                         <input>
-                            <label>Ligne de texte</label>
+                            <label>Champ de texte</label>
                             <hint>Champ de texte standard</hint>
                             <help/>
                             <alert/>
                         </input>
-                        <number>
-                            <label>Nombre</label>
-                            <hint>Champ numérique avec validation</hint>
-                            <help/>
-                            <alert/>
-                        </number>
-                        <secret>
-                            <label>Mot de passe</label>
-                            <hint>Le mot de passe est 42 ;)</hint>
-                            <help/>
-                            <alert>Mot de passe manquant ou incorrect</alert>
-                        </secret>
-                        <inplace-input>
-                            <label>Entrée en place</label>
-                            <hint>Please enter some text</hint>
-                            <help/>
-                            <alert/>
-                        </inplace-input>
-
                         <output>
                             <label>Sortie texte</label>
                             <hint/>
                             <help/>
                             <alert/>
                         </output>
-
-
+                        <secret>
+                            <label>Mot de passe</label>
+                            <hint>Le mot de passe est 42 ;)</hint>
+                            <help/>
+                            <alert>Mot de passe manquant ou incorrect</alert>
+                        </secret>
                         <typed-controls>
-                            <label>Contrôles typés</label>
+                            <label>Contrôles date et heure</label>
                             <help/>
                         </typed-controls>
-                        <selection-controls>
-                            <label>Contrôles de sélection</label>
-                            <help/>
-                        </selection-controls>
-                        <other-controls>
+                        <buttons>
                             <label>Boutons</label>
                             <help/>
+                        </buttons>
+                        <other-controls>
+                            <label>Autres contrôles</label>
+                            <help/>
                         </other-controls>
+                        <us-address>
+                            <label>Modèle Adresse US</label>
+                            <help/>
+                        </us-address>
                         <attachment-controls>
                             <label>Fichiers joints</label>
                             <help/>
                         </attachment-controls>
-                        <rich-text-controls>
-                            <label>Contrôle texte riche</label>
-                            <help/>
-                        </rich-text-controls>
                         <autocomplete>
                             <label>Complétion automatique</label>
                             <hint>Entrez le nom d'un pays</hint>
                             <code>Code du pays</code>
                         </autocomplete>
+                        <autocomplete-result>
+                            <label>Résultat de la complétion</label>
+                            <hint/>
+                            <help/>
+                            <alert/>
+                        </autocomplete-result>
                     </resource>
                 </resources>
             </xforms:instance>
-
-
             <xforms:instance id="fr-service-request-instance" xxforms:exclude-result-prefixes="#all">
                 <request/>
             </xforms:instance>
-
             <xforms:instance id="fr-service-response-instance" xxforms:exclude-result-prefixes="#all">
                 <response/>
             </xforms:instance>
-
             <xforms:instance id="autocomplete-search-instance">
-                <instance><country-name/></instance>
+                <instance>
+                    <country-name>United States</country-name>
+                </instance>
             </xforms:instance>
             <xforms:instance id="autocomplete-itemset-instance">
                 <country/>
             </xforms:instance>
-            <xforms:submission id="autocomplete-submission" ref="instance('autocomplete-search-instance')"
-                validate="false" method="post" resource="/xforms-controls/services/countries"
-                replace="instance" instance="autocomplete-itemset-instance"/>
-
-        </xforms:model>
+            <xforms:submission id="autocomplete-submission" ref="instance('autocomplete-search-instance')" validate="false" method="post" resource="/fr/service/custom/orbeon/controls/countries" replace="instance" instance="autocomplete-itemset-instance"/>
+        </xforms:model><xbl:xbl xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderFunctions" xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps" xmlns:gridOps="java:org.orbeon.oxf.fb.GridOps" xmlns:exf="http://www.exforms.org/exf/1-0" xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/orbeon/library" xmlns:fb="http://orbeon.org/oxf/xml/form-builder" xmlns:p="http://www.orbeon.com/oxf/pipeline"><metadata xmlns="http://orbeon.org/oxf/xml/form-builder"><display-name lang="en">Global Library</display-name><display-name lang="fr">Bibliothèque globale</display-name><display-name lang="ru">Шаблоны разделов</display-name><icon lang="en"><small-icon>/forms/orbeon/builder/images/input.png</small-icon><large-icon>/forms/orbeon/builder/images/input.png</large-icon></icon></metadata><xbl:binding id="address-component" element="component|address" class="fr-section-component"><metadata xmlns="http://orbeon.org/oxf/xml/form-builder"><display-name lang="en">US Address</display-name><description lang="en"/><icon lang="en"><small-icon>/apps/fr/style/images/silk/plugin.png</small-icon><large-icon>/apps/fr/style/images/silk/plugin.png</large-icon></icon><display-name lang="fr">Adresse US</display-name><description lang="fr"/><icon lang="fr"><small-icon>/apps/fr/style/images/silk/plugin.png</small-icon><large-icon>/apps/fr/style/images/silk/plugin.png</large-icon></icon><templates><view><component:address/></view></templates></metadata><xbl:implementation><xforms:model id="address-model"><xforms:instance id="fr-form-instance"><address>
+                        <street-number/>
+                        <street-name/>
+                        <apt-suite/>
+                        <city>a</city>
+                        <state/>
+                        <zip/>
+                    </address></xforms:instance><xforms:instance id="fr-form-template"><address>
+                        <street-number/>
+                        <street-name/>
+                        <apt-suite/>
+                        <city>a</city>
+                        <state/>
+                        <zip/>
+                    </address></xforms:instance><xforms:bind><xforms:bind xmlns:dataModel="java:org.orbeon.oxf.fb.DataModel" id="street-number-bind" name="street-number" required="true()" ref="street-number"/><xforms:bind xmlns:dataModel="java:org.orbeon.oxf.fb.DataModel" id="street-name-bind" name="street-name" ref="street-name" required="true()"/><xforms:bind xmlns:dataModel="java:org.orbeon.oxf.fb.DataModel" id="apt-suite-bind" name="apt-suite" ref="apt-suite"/><xforms:bind xmlns:dataModel="java:org.orbeon.oxf.fb.DataModel" id="city-bind" name="city" ref="city" required="true()"/><xforms:bind xmlns:dataModel="java:org.orbeon.oxf.fb.DataModel" id="state-bind" name="state" ref="state" required="true()"/><xforms:bind xmlns:dataModel="java:org.orbeon.oxf.fb.DataModel" id="zip-bind" name="zip" required="true()" ref="zip"/></xforms:bind><xforms:instance id="fr-form-resources"><resources><resource xml:lang="en"><address>
+                            <label>US Address</label>
+                            <help/>
+                        </address><street-number>
+                            <label>Street Number</label>
+                            <hint/>
+                            <help/>
+                            <alert/>
+                        </street-number><street-name>
+                            <label>Street Name</label>
+                            <hint/>
+                            <help/>
+                            <alert/>
+                        </street-name><apt-suite>
+                            <label>Apt/Suite</label>
+                            <hint/>
+                            <help/>
+                            <alert/>
+                        </apt-suite><city>
+                            <label>City</label>
+                            <hint/>
+                            <help/>
+                            <alert/>
+                        </city><state>
+                            <label>State</label>
+                            <hint/>
+                            <help/>
+                            <alert/>
+                        </state><zip>
+                            <label>Zip</label>
+                            <hint/>
+                            <help/>
+                            <alert/>
+                        </zip></resource><resource xml:lang="fr"><address>
+                            <label>Adresse US</label>
+                            <help/>
+                        </address><street-number>
+                            <label>Numéro de rue</label>
+                            <hint/>
+                            <help/>
+                            <alert/>
+                        </street-number><street-name>
+                            <label>Nom de rue</label>
+                            <hint/>
+                            <help/>
+                            <alert/>
+                        </street-name><apt-suite>
+                            <label>Appartement/suite</label>
+                            <hint/>
+                            <help/>
+                            <alert/>
+                        </apt-suite><city>
+                            <label>Ville</label>
+                            <hint/>
+                            <help/>
+                            <alert/>
+                        </city><state>
+                            <label>Etat</label>
+                            <hint/>
+                            <help/>
+                            <alert/>
+                        </state><zip>
+                            <label>Code postal</label>
+                            <hint/>
+                            <help/>
+                            <alert/>
+                        </zip></resource></resources></xforms:instance><xforms:var name="form-resources" value="instance('fr-form-resources')/(resource[@xml:lang = xxforms:instance('fr-language-instance')], resource[1])[1]" as="element(resource)"/><xforms:instance id="readonly"><readonly/></xforms:instance><xforms:var name="fr-mode" value="xxforms:instance('fr-parameters-instance')/mode"/><xforms:bind ref="instance('fr-form-instance')" readonly="$fr-mode = ('view', 'pdf', 'email') or instance('readonly') = 'true'"/></xforms:model></xbl:implementation><xbl:template><xforms:group appearance="xxforms:internal" xxbl:scope="outer"><xforms:group appearance="xxforms:internal" xxbl:scope="inner"><xforms:var id="binding" name="binding" as="node()?"><xxforms:sequence select="." xxbl:scope="outer"/></xforms:var><xforms:action ev:event="xforms-enabled xforms-value-changed" ev:observer="binding"><xforms:action><xforms:action if="$binding/*"><xforms:delete ref="instance()/*"/><xforms:insert context="instance()" origin="$binding/*"/></xforms:action><xforms:action if="not($binding/*)"><xforms:insert context="$binding" origin="instance('fr-form-template')/*"/><xforms:insert context="instance()" origin="instance('fr-form-template')/*"/></xforms:action></xforms:action></xforms:action><xforms:var name="readonly" as="xs:boolean" value="exf:readonly($binding)"><xforms:setvalue ev:event="xforms-enabled xforms-value-changed" ref="instance('readonly')" value="exf:readonly($binding)"/></xforms:var><xforms:var name="fr-resources" as="element()?"><xxforms:sequence select="$fr-resources" xxbl:scope="outer"/></xforms:var><xforms:group appearance="xxforms:internal"><xforms:action ev:event="xforms-value-changed" if="exists($binding/*) and exists(event('xxforms:binding'))"><xforms:var name="source-binding" value="event('xxforms:binding')" as="element()"/><xforms:setvalue ref="$binding/*[resolve-QName(name(), .) = resolve-QName(name($source-binding), $source-binding)]" value="$source-binding"/></xforms:action><fr:grid xmlns:dataModel="java:org.orbeon.oxf.fb.DataModel" xmlns:oxf="http://www.orbeon.com/oxf/processors" columns="3">
+                        <xhtml:tr>
+                            <xhtml:td>
+                                <xforms:input id="street-number-control" bind="street-number-bind">
+                                    <xforms:label ref="$form-resources/street-number/label"/>
+                                    <xforms:hint ref="$form-resources/street-number/hint"/>
+                                    <xforms:help ref="$form-resources/street-number/help"/>
+                                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
+                                </xforms:input>
+                            </xhtml:td>
+                            <xhtml:td>
+                                <xforms:input xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary" id="street-name-control" bind="street-name-bind">
+                                    <xforms:label ref="$form-resources/street-name/label"/>
+                                    <xforms:hint ref="$form-resources/street-name/hint"/>
+                                    <xforms:help ref="$form-resources/street-name/help"/>
+                                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
+                                </xforms:input>
+                            </xhtml:td>
+                            <xhtml:td>
+                                <xforms:input xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary" id="apt-suite-control" bind="apt-suite-bind">
+                                    <xforms:label ref="$form-resources/apt-suite/label"/>
+                                    <xforms:hint ref="$form-resources/apt-suite/hint"/>
+                                    <xforms:help ref="$form-resources/apt-suite/help"/>
+                                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
+                                </xforms:input>
+                            </xhtml:td>
+                        </xhtml:tr>
+                        <xhtml:tr>
+                            <xhtml:td>
+                                <xforms:input xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary" id="city-control" bind="city-bind">
+                                    <xforms:label ref="$form-resources/city/label"/>
+                                    <xforms:hint ref="$form-resources/city/hint"/>
+                                    <xforms:help ref="$form-resources/city/help"/>
+                                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
+                                </xforms:input>
+                            </xhtml:td>
+                            <xhtml:td>
+                                <fr:us-state xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary" xmlns:xf="http://www.w3.org/2002/xforms" id="state-control" bind="state-bind">
+                                    <xf:label ref="$form-resources/state/label"/>
+                                    <xf:hint ref="$form-resources/state/hint"/>
+                                    <xf:help ref="$form-resources/state/help"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                </fr:us-state>
+                            </xhtml:td>
+                            <xhtml:td>
+                                <xforms:input xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary" id="zip-control" bind="zip-bind">
+                                    <xforms:label ref="$form-resources/zip/label"/>
+                                    <xforms:hint ref="$form-resources/zip/hint"/>
+                                    <xforms:help ref="$form-resources/zip/help"/>
+                                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
+                                </xforms:input>
+                            </xhtml:td>
+                        </xhtml:tr>
+                    </fr:grid></xforms:group></xforms:group></xforms:group></xbl:template></xbl:binding></xbl:xbl>
     </xhtml:head>
     <xhtml:body>
         <fr:view>
-            <fr:body>
+            <fr:body xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:dataModel="java:org.orbeon.oxf.fb.DataModel" xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
                 <fr:section id="text-controls-section" bind="text-controls-bind">
                     <xforms:label ref="$form-resources/text-controls/label"/>
                     <xforms:help ref="$form-resources/text-controls/help"/>
@@ -1156,70 +926,26 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                                 </xforms:input>
                             </xhtml:td>
                             <xhtml:td>
-                                <xforms:input xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
-                                              xmlns="http://orbeon.org/oxf/xml/form-builder"
-                                              xmlns:xbl="http://www.w3.org/ns/xbl"
-                                              xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-                                              id="number-control"
-                                              bind="number-bind" class="fr-width-10em">
-                                    <xforms:label ref="$form-resources/number/label"/>
-                                    <xforms:hint ref="$form-resources/number/hint"/>
-                                    <xforms:help ref="$form-resources/number/help"/>
+                                <xforms:output bind="output-bind" id="output-control">
+                                    <xforms:label ref="$form-resources/output/label"/>
+                                    <xforms:help ref="$form-resources/output/help"/>
                                     <xforms:alert ref="$fr-resources/detail/labels/alert"/>
-                                </xforms:input>
+                                </xforms:output>
                             </xhtml:td>
                             <xhtml:td>
-                                <xforms:secret xmlns="http://orbeon.org/oxf/xml/form-builder" id="secret-control"
-                                               bind="secret-bind"
-                                               xxforms:autocomplete="off" class="fr-width-10em">
+                                <xforms:secret id="secret-control" bind="secret-bind" xxforms:autocomplete="off" class="fr-width-10em">
                                     <xforms:label ref="$form-resources/secret/label"/>
                                     <xforms:hint ref="$form-resources/secret/hint"/>
                                     <xforms:help ref="$form-resources/secret/help"/>
                                     <xforms:alert ref="$fr-resources/detail/labels/alert"/>
                                 </xforms:secret>
-
-                            </xhtml:td>
-
-                        </xhtml:tr>
-                        <xhtml:tr>
-                            <xhtml:td>
-                                <fr:inplace-input xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-                                                  xmlns="http://orbeon.org/oxf/xml/form-builder"
-                                                  xmlns:oxf="http://www.orbeon.com/oxf/processors"
-                                                  xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
-                                                  xmlns:exf="http://www.exforms.org/exf/1-0"
-                                                  bind="inplace-input-bind"
-                                                  id="inplace-input-control">
-                                    <xforms:label ref="$form-resources/inplace-input/label"/>
-                                    <xforms:hint ref="$form-resources/inplace-input/hint"/>
-                                    <xforms:help ref="$form-resources/inplace-input/help"/>
-                                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
-                                </fr:inplace-input>
-
-                            </xhtml:td>
-                            <xhtml:td>
-                                <xforms:output xmlns="http://orbeon.org/oxf/xml/form-builder" bind="output-bind"
-                                               id="output-control">
-                                    <xforms:label ref="$form-resources/output/label"/>
-                                    <xforms:help ref="$form-resources/output/help"/>
-
-                                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
-                                </xforms:output>
-                            </xhtml:td>
-                            <xhtml:td>
-
                             </xhtml:td>
                         </xhtml:tr>
                     </fr:grid>
                     <fr:grid columns="1">
                         <xhtml:tr>
                             <xhtml:td>
-                                <xforms:textarea xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
-                                                 xmlns="http://orbeon.org/oxf/xml/form-builder"
-                                                 xmlns:xbl="http://www.w3.org/ns/xbl"
-                                                 xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-                                                 bind="textarea-bind"
-                                                 id="textarea-control">
+                                <xforms:textarea bind="textarea-bind" id="textarea-control">
                                     <xforms:label ref="$form-resources/textarea/label"/>
                                     <xforms:hint ref="$form-resources/textarea/hint"/>
                                     <xforms:help ref="$form-resources/textarea/help"/>
@@ -1227,18 +953,9 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                                 </xforms:textarea>
                             </xhtml:td>
                         </xhtml:tr>
-
-                    </fr:grid>
-                </fr:section>
-                <fr:section id="rich-text-controls-section" bind="rich-text-controls-bind">
-                    <xforms:label ref="$form-resources/rich-text-controls/label"/>
-                    <xforms:help ref="$form-resources/rich-text-controls/help"/>
-                    <fr:grid columns="1">
                         <xhtml:tr>
                             <xhtml:td>
-                                <fr:tinymce xmlns="http://orbeon.org/oxf/xml/form-builder"
-                                                 bind="htmlarea-bind"
-                                                 id="htmlarea-control">
+                                <fr:tinymce bind="htmlarea-bind" id="htmlarea-control">
                                     <xforms:label ref="$form-resources/htmlarea/label"/>
                                     <xforms:hint ref="$form-resources/htmlarea/hint"/>
                                     <xforms:help ref="$form-resources/htmlarea/help"/>
@@ -1248,102 +965,13 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                         </xhtml:tr>
                     </fr:grid>
                 </fr:section>
-                <fr:section id="typed-controls-section" bind="typed-controls-bind">
-                    <xforms:label ref="$form-resources/typed-controls/label"/>
-                    <xforms:help ref="$form-resources/typed-controls/help"/>
-                    <fr:grid columns="3">
+                <fr:section id="section-45-control" bind="section-45-bind">
+                    <xforms:label ref="$form-resources/section-45/label"/>
+                    <xforms:help ref="$form-resources/section-45/help"/>
+                    <fr:grid>
                         <xhtml:tr>
                             <xhtml:td>
-                                <xforms:input xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
-                                              xmlns="http://orbeon.org/oxf/xml/form-builder"
-                                              xmlns:xbl="http://www.w3.org/ns/xbl"
-                                              xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-                                              bind="date-bind"
-                                              id="date-control">
-                                    <xforms:label ref="$form-resources/date/label"/>
-                                    <xforms:hint ref="$form-resources/date/hint"/>
-                                    <xforms:help ref="$form-resources/date/help"/>
-                                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
-                                </xforms:input>
-                            </xhtml:td>
-                            <xhtml:td>
-                                <xforms:input xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
-                                              xmlns="http://orbeon.org/oxf/xml/form-builder"
-                                              xmlns:xbl="http://www.w3.org/ns/xbl"
-                                              xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-                                              bind="time-bind"
-                                              id="time-control">
-                                    <xforms:label ref="$form-resources/time/label"/>
-                                    <xforms:hint ref="$form-resources/time/hint"/>
-                                    <xforms:help ref="$form-resources/time/help"/>
-                                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
-                                </xforms:input>
-                            </xhtml:td>
-                            <xhtml:td>
-                                <xforms:input xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
-                                              xmlns="http://orbeon.org/oxf/xml/form-builder"
-                                              xmlns:xbl="http://www.w3.org/ns/xbl"
-                                              xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-                                              bind="datetime-bind"
-                                              id="datetime-control">
-                                    <xforms:label ref="$form-resources/datetime/label"/>
-                                    <xforms:hint ref="$form-resources/datetime/hint"/>
-                                    <xforms:help ref="$form-resources/datetime/help"/>
-                                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
-                                </xforms:input>
-                            </xhtml:td>
-
-                        </xhtml:tr>
-
-                        <xhtml:tr>
-                            <xhtml:td>
-                                <fr:dropdown-date xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
-                                                  xmlns="http://orbeon.org/oxf/xml/form-builder"
-                                                  xmlns:xbl="http://www.w3.org/ns/xbl"
-                                                  xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-                                                  bind="dropdown-date-bind"
-                                                  id="dropdown-date-control">
-                                    <xforms:label ref="$form-resources/dropdown-date/label"/>
-                                    <xforms:hint ref="$form-resources/dropdown-date/hint"/>
-                                    <xforms:help ref="$form-resources/dropdown-date/help"/>
-                                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
-                                </fr:dropdown-date>
-                            </xhtml:td>
-                            <xhtml:td>
-                                <fr:fields-date xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
-                                                xmlns="http://orbeon.org/oxf/xml/form-builder"
-                                                xmlns:xbl="http://www.w3.org/ns/xbl"
-                                                xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-                                                bind="fields-date-bind"
-                                                id="fields-date-control">
-                                    <xforms:label ref="$form-resources/fields-date/label"/>
-                                    <xforms:hint ref="$form-resources/fields-date/hint"/>
-                                    <xforms:help ref="$form-resources/fields-date/help"/>
-                                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
-                                </fr:fields-date>
-                            </xhtml:td>
-                            <xhtml:td>
-                                <fr:date-picker xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
-                                                xmlns="http://orbeon.org/oxf/xml/form-builder"
-                                                xmlns:xbl="http://www.w3.org/ns/xbl"
-                                                xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-                                                bind="date-picker-bind"
-                                                id="date-picker-control">
-                                    <xforms:label ref="$form-resources/date-picker/label"/>
-                                    <xforms:hint ref="$form-resources/date-picker/hint"/>
-                                    <xforms:help ref="$form-resources/date-picker/help"/>
-                                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
-                                </fr:date-picker>
-                            </xhtml:td>
-
-                        </xhtml:tr>
-
-                    </fr:grid>
-                    <fr:grid columns="3">
-                        <xhtml:tr>
-                            <xhtml:td>
-                                <xforms:input xmlns="http://orbeon.org/oxf/xml/form-builder" bind="email-bind"
-                                              id="email-control">
+                                <xforms:input bind="email-bind" id="email-control">
                                     <xforms:label ref="$form-resources/email/label"/>
                                     <xforms:hint ref="$form-resources/email/hint"/>
                                     <xforms:help ref="$form-resources/email/help"/>
@@ -1351,32 +979,7 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                                 </xforms:input>
                             </xhtml:td>
                             <xhtml:td>
-                                <xforms:input xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
-                                              xmlns="http://orbeon.org/oxf/xml/form-builder"
-                                              xmlns:xbl="http://www.w3.org/ns/xbl"
-                                              xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-                                              bind="boolean-bind"
-                                              id="boolean-control">
-                                    <xforms:label ref="$form-resources/boolean/label"/>
-                                    <xforms:hint ref="$form-resources/boolean/hint"/>
-                                    <xforms:help ref="$form-resources/boolean/help"/>
-                                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
-                                </xforms:input>
-                            </xhtml:td>
-                            <xhtml:td>
-                                <fr:currency xmlns="http://orbeon.org/oxf/xml/form-builder" bind="dollars-bind"
-                                                          id="dollars-control">
-                                    <xforms:label ref="$form-resources/dollars/label"/>
-                                    <xforms:hint ref="$form-resources/dollars/hint"/>
-                                    <xforms:help ref="$form-resources/dollars/help"/>
-                                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
-                                </fr:currency>
-                            </xhtml:td>
-                        </xhtml:tr>
-                        <xhtml:tr>
-                            <xhtml:td>
-                                <fr:us-phone xmlns="http://orbeon.org/oxf/xml/form-builder" bind="us-phone-bind"
-                                             id="us-phone-control">
+                                <fr:us-phone bind="us-phone-bind" id="us-phone-control">
                                     <xforms:label ref="$form-resources/us-phone/label"/>
                                     <xforms:hint ref="$form-resources/us-phone/hint"/>
                                     <xforms:help ref="$form-resources/us-phone/help"/>
@@ -1384,8 +987,25 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                                 </fr:us-phone>
                             </xhtml:td>
                             <xhtml:td>
-                                <fr:us-state xmlns="http://orbeon.org/oxf/xml/form-builder" bind="us-state-bind"
-                                             id="us-state-control" class="fr-width-10em">
+                                <fr:number id="number-control" grouping-separator="'" digits-after-decimal="2" decimal-separator="," bind="number-bind" class="fr-width-10em">
+                                    <xforms:label ref="$form-resources/number/label"/>
+                                    <xforms:hint ref="$form-resources/number/hint"/>
+                                    <xforms:help ref="$form-resources/number/help"/>
+                                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
+                                </fr:number>
+                            </xhtml:td>
+                        </xhtml:tr>
+                        <xhtml:tr>
+                            <xhtml:td>
+                                <fr:currency bind="currency-bind" id="currency-control" class="fr-width-10em">
+                                    <xforms:label ref="$form-resources/currency/label"/>
+                                    <xforms:hint ref="$form-resources/currency/hint"/>
+                                    <xforms:help ref="$form-resources/currency/help"/>
+                                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
+                                </fr:currency>
+                            </xhtml:td>
+                            <xhtml:td>
+                                <fr:us-state bind="us-state-bind" id="us-state-control" class="fr-width-10em">
                                     <xforms:label ref="$form-resources/us-state/label"/>
                                     <xforms:hint ref="$form-resources/us-state/hint"/>
                                     <xforms:help ref="$form-resources/us-state/help"/>
@@ -1395,7 +1015,183 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                             <xhtml:td/>
                         </xhtml:tr>
                     </fr:grid>
-
+                </fr:section>
+                <fr:section id="typed-controls-section" bind="typed-controls-bind">
+                    <xforms:label ref="$form-resources/typed-controls/label"/>
+                    <xforms:help ref="$form-resources/typed-controls/help"/>
+                    <fr:grid columns="3">
+                        <xhtml:tr>
+                            <xhtml:td>
+                                <xforms:input bind="date-bind" id="date-control">
+                                    <xforms:label ref="$form-resources/date/label"/>
+                                    <xforms:hint ref="$form-resources/date/hint"/>
+                                    <xforms:help ref="$form-resources/date/help"/>
+                                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
+                                </xforms:input>
+                            </xhtml:td>
+                            <xhtml:td>
+                                <xforms:input bind="time-bind" id="time-control">
+                                    <xforms:label ref="$form-resources/time/label"/>
+                                    <xforms:hint ref="$form-resources/time/hint"/>
+                                    <xforms:help ref="$form-resources/time/help"/>
+                                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
+                                </xforms:input>
+                            </xhtml:td>
+                            <xhtml:td>
+                                <xforms:input bind="datetime-bind" id="datetime-control">
+                                    <xforms:label ref="$form-resources/datetime/label"/>
+                                    <xforms:hint ref="$form-resources/datetime/hint"/>
+                                    <xforms:help ref="$form-resources/datetime/help"/>
+                                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
+                                </xforms:input>
+                            </xhtml:td>
+                        </xhtml:tr>
+                        <xhtml:tr>
+                            <xhtml:td>
+                                <fr:dropdown-date bind="dropdown-date-bind" id="dropdown-date-control">
+                                    <xforms:label ref="$form-resources/dropdown-date/label"/>
+                                    <xforms:hint ref="$form-resources/dropdown-date/hint"/>
+                                    <xforms:help ref="$form-resources/dropdown-date/help"/>
+                                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
+                                </fr:dropdown-date>
+                            </xhtml:td>
+                            <xhtml:td>
+                                <fr:fields-date bind="fields-date-bind" id="fields-date-control">
+                                    <xforms:label ref="$form-resources/fields-date/label"/>
+                                    <xforms:hint ref="$form-resources/fields-date/hint"/>
+                                    <xforms:help ref="$form-resources/fields-date/help"/>
+                                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
+                                </fr:fields-date>
+                            </xhtml:td>
+                            <xhtml:td>
+                                <fr:date-picker bind="date-picker-bind" id="date-picker-control">
+                                    <xforms:label ref="$form-resources/date-picker/label"/>
+                                    <xforms:hint ref="$form-resources/date-picker/hint"/>
+                                    <xforms:help ref="$form-resources/date-picker/help"/>
+                                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
+                                </fr:date-picker>
+                            </xhtml:td>
+                        </xhtml:tr>
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="selection-controls-section" bind="selection-controls-bind">
+                    <xforms:label ref="$form-resources/selection-controls/label"/>
+                    <xforms:help ref="$form-resources/selection-controls/help"/>
+                    <fr:grid columns="3">
+                        <xhtml:tr>
+                            <xhtml:td>
+                                <xforms:select1 appearance="minimal" bind="dropdown-bind" id="dropdown-control" class="fr-width-7em">
+                                    <xforms:label ref="$form-resources/dropdown/label"/>
+                                    <xforms:hint ref="$form-resources/dropdown/hint"/>
+                                    <xforms:help ref="$form-resources/dropdown/help"/>
+                                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
+                                    <xforms:item>
+                                        <xforms:label>[Select...]</xforms:label>
+                                        <xforms:value/>
+                                    </xforms:item>
+                                    <xforms:itemset ref="$form-resources/dropdown/item">
+                                        <xforms:label ref="label"/>
+                                        <xforms:value ref="value"/>
+                                    </xforms:itemset>
+                                </xforms:select1>
+                            </xhtml:td>
+                            <xhtml:td>
+                                <xforms:select1 appearance="full" bind="radio-buttons-bind" id="radio-buttons-control">
+                                    <xforms:label ref="$form-resources/radio-buttons/label"/>
+                                    <xforms:hint ref="$form-resources/radio-buttons/hint"/>
+                                    <xforms:help ref="$form-resources/radio-buttons/help"/>
+                                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
+                                    <xforms:itemset ref="$form-resources/radio-buttons/item">
+                                        <xforms:label ref="label"/>
+                                        <xforms:value ref="value"/>
+                                    </xforms:itemset>
+                                </xforms:select1>
+                            </xhtml:td>
+                            <xhtml:td>
+                                <xforms:select appearance="full" bind="checkboxes-bind" id="checkboxes-control">
+                                    <xforms:label ref="$form-resources/checkboxes/label"/>
+                                    <xforms:hint ref="$form-resources/checkboxes/hint"/>
+                                    <xforms:help ref="$form-resources/checkboxes/help"/>
+                                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
+                                    <xforms:itemset ref="$form-resources/checkboxes/item">
+                                        <xforms:label ref="label"/>
+                                        <xforms:value ref="value"/>
+                                    </xforms:itemset>
+                                </xforms:select>
+                            </xhtml:td>
+                        </xhtml:tr>
+                        <xhtml:tr>
+                            <xhtml:td>
+                                <xforms:select1 appearance="compact" bind="single-list-bind" id="single-list-control">
+                                    <xforms:label ref="$form-resources/single-list/label"/>
+                                    <xforms:hint ref="$form-resources/single-list/hint"/>
+                                    <xforms:help ref="$form-resources/single-list/help"/>
+                                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
+                                    <xforms:itemset ref="$form-resources/single-list/item">
+                                        <xforms:label ref="label"/>
+                                        <xforms:value ref="value"/>
+                                    </xforms:itemset>
+                                </xforms:select1>
+                            </xhtml:td>
+                            <xhtml:td>
+                                <fr:box-select xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:exf="http://www.exforms.org/exf/1-0" bind="multiple-list-bind" id="multiple-list-control">
+                                    <xforms:label ref="$form-resources/multiple-list/label"/>
+                                    <xforms:hint ref="$form-resources/multiple-list/hint"/>
+                                    <xforms:help ref="$form-resources/multiple-list/help"/>
+                                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
+                                    <xforms:itemset ref="$form-resources/multiple-list/item">
+                                        <xforms:label ref="label"/>
+                                        <xforms:value ref="value"/>
+                                    </xforms:itemset>
+                                </fr:box-select>
+                            </xhtml:td>
+                            <xhtml:td>
+                                <xforms:input xmlns="http://orbeon.org/oxf/xml/form-builder" bind="boolean-bind" id="boolean-control">
+                                    <xforms:label ref="$form-resources/boolean/label"/>
+                                    <xforms:hint ref="$form-resources/boolean/hint"/>
+                                    <xforms:help ref="$form-resources/boolean/help"/>
+                                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
+                                </xforms:input>
+                            </xhtml:td>
+                        </xhtml:tr>
+                        <xhtml:tr>
+                            <xhtml:td>
+                                <fr:autocomplete bind="autocomplete-bind" labelref="@label" id="autocomplete-control" dynamic-itemset="true" max-results-displayed="5">
+                                    <xforms:label ref="$form-resources/autocomplete/label"/>
+                                    <xforms:hint ref="$form-resources/autocomplete/hint"/>
+                                    <xforms:itemset ref="instance('autocomplete-itemset-instance')/country">
+                                        <xforms:label ref="name"/>
+                                        <xforms:value ref="us-code"/>
+                                    </xforms:itemset>
+                                    <xforms:action ev:event="fr-search-changed">
+                                        <xxforms:variable name="search-value" select="event('fr-search-value')"/>
+                                        <xforms:setvalue ref="instance('autocomplete-search-instance')/country-name" value="$search-value"/>
+                                        <xforms:send submission="autocomplete-submission"/>
+                                    </xforms:action>
+                                </fr:autocomplete>
+                            </xhtml:td>
+                            <xhtml:td>
+                                <xforms:output id="autocomplete-result-control" bind="autocomplete-result-bind">
+                                    <xforms:label ref="$form-resources/autocomplete-result/label"/>
+                                    <xforms:hint ref="$form-resources/autocomplete-result/hint"/>
+                                    <xforms:help ref="$form-resources/autocomplete-result/help"/>
+                                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
+                                </xforms:output>
+                            </xhtml:td>
+                            <xhtml:td>
+                                <fr:databound-select1 xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="dynamic-data-dropdown-control" appearance="minimal" resource="" bind="dynamic-data-dropdown-bind">
+                                    <xforms:label ref="$form-resources/dynamic-data-dropdown/label"/>
+                                    <xforms:hint ref="$form-resources/dynamic-data-dropdown/hint"/>
+                                    <xforms:help ref="$form-resources/dynamic-data-dropdown/help"/>
+                                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
+                                    <xforms:itemset ref="item">
+                                        <xforms:label ref="label"/>
+                                        <xforms:value ref="value"/>
+                                    </xforms:itemset>
+                                </fr:databound-select1>
+                            </xhtml:td>
+                        </xhtml:tr>
+                    </fr:grid>
                 </fr:section>
                 <fr:section id="attachment-controls-section" bind="attachment-controls-bind">
                     <xforms:label ref="$form-resources/attachment-controls/label"/>
@@ -1403,9 +1199,14 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                     <fr:grid columns="3">
                         <xhtml:tr>
                             <xhtml:td>
-                                <fr:image-attachment xmlns="http://orbeon.org/oxf/xml/form-builder" bind="image-attachment-bind"
-                                                     id="image-attachment-control"
-                                                     class="fr-attachment">
+                                <xforms:output mediatype="image/*" value="." bind="static-image-bind" id="static-image-control" class="fr-attachment">
+                                    <xforms:label ref="$form-resources/static-image/label"/>
+                                    <xforms:help ref="$form-resources/static-image/help"/>
+                                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
+                                </xforms:output>
+                            </xhtml:td>
+                            <xhtml:td>
+                                <fr:image-attachment bind="image-attachment-bind" id="image-attachment-control" class="fr-attachment">
                                     <xforms:label ref="$form-resources/image-attachment/label"/>
                                     <xforms:hint ref="$form-resources/image-attachment/hint"/>
                                     <xforms:help ref="$form-resources/image-attachment/help"/>
@@ -1416,20 +1217,7 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                                 </fr:image-attachment>
                             </xhtml:td>
                             <xhtml:td>
-                                <xforms:output xmlns="http://orbeon.org/oxf/xml/form-builder" mediatype="image/*" value="."
-                                               bind="static-image-bind"
-                                               id="static-image-control"
-                                               class="fr-attachment">
-                                    <xforms:label ref="$form-resources/static-image/label"/>
-                                    <xforms:help ref="$form-resources/static-image/help"/>
-
-                                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
-                                </xforms:output>
-                            </xhtml:td>
-                            <xhtml:td>
-                                <fr:attachment xmlns="http://orbeon.org/oxf/xml/form-builder" bind="file-attachment-bind"
-                                               id="file-attachment-control"
-                                               class="fr-attachment">
+                                <fr:attachment bind="file-attachment-bind" id="file-attachment-control" class="fr-attachment">
                                     <xforms:label ref="$form-resources/file-attachment/label"/>
                                     <xforms:hint ref="$form-resources/file-attachment/hint"/>
                                     <xforms:help ref="$form-resources/file-attachment/help"/>
@@ -1442,275 +1230,53 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                         </xhtml:tr>
                     </fr:grid>
                 </fr:section>
-                <fr:section id="selection-controls-section" bind="selection-controls-bind">
-                    <xforms:label ref="$form-resources/selection-controls/label"/>
-                    <xforms:help ref="$form-resources/selection-controls/help"/>
-                    <fr:grid columns="3">
-                        <xhtml:tr>
-                            <xhtml:td>
-                                <xforms:select1 xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
-                                                xmlns="http://orbeon.org/oxf/xml/form-builder"
-                                                xmlns:xbl="http://www.w3.org/ns/xbl"
-                                                xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-                                                appearance="minimal"
-                                                bind="dropdown-bind"
-                                                id="dropdown-control" class="fr-width-7em">
-                                    <xforms:label ref="$form-resources/dropdown/label"/>
-                                    <xforms:hint ref="$form-resources/dropdown/hint"/>
-                                    <xforms:help ref="$form-resources/dropdown/help"/>
-                                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
-                                    <xforms:item>
-                                        <xforms:label>[Select...]</xforms:label>
-                                        <xforms:value/>
-                                    </xforms:item>
-                                    <xforms:itemset nodeset="$form-resources/dropdown/item">
-                                        <xforms:label ref="label"/>
-                                        <xforms:value ref="value"/>
-                                    </xforms:itemset>
-                                </xforms:select1>
-                            </xhtml:td>
-                            <xhtml:td>
-                                <xforms:select1 xmlns="http://orbeon.org/oxf/xml/form-builder" appearance="full"
-                                                bind="radio-buttons-bind"
-                                                id="radio-buttons-control">
-                                    <xforms:label ref="$form-resources/radio-buttons/label"/>
-                                    <xforms:hint ref="$form-resources/radio-buttons/hint"/>
-                                    <xforms:help ref="$form-resources/radio-buttons/help"/>
-                                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
-
-                                    <xforms:itemset nodeset="$form-resources/radio-buttons/item">
-                                        <xforms:label ref="label"/>
-                                        <xforms:value ref="value"/>
-                                    </xforms:itemset>
-                                </xforms:select1>
-                            </xhtml:td>
-                            <xhtml:td>
-                                <xforms:select appearance="full" bind="checkboxes-bind" id="checkboxes-control">
-                                    <xforms:label ref="$form-resources/checkboxes/label"/>
-                                    <xforms:hint ref="$form-resources/checkboxes/hint"/>
-                                    <xforms:help ref="$form-resources/checkboxes/help"/>
-                                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
-                                    <xforms:itemset nodeset="$form-resources/checkboxes/item">
-                                        <xforms:label ref="label"/>
-                                        <xforms:value ref="value"/>
-                                    </xforms:itemset>
-                                </xforms:select>
-                            </xhtml:td>
-                        </xhtml:tr>
-                        <xhtml:tr>
-                            <xhtml:td>
-                                <xforms:select1 xmlns="http://orbeon.org/oxf/xml/form-builder" appearance="compact"
-                                                bind="single-list-bind"
-                                                id="single-list-control">
-                                    <xforms:label ref="$form-resources/single-list/label"/>
-                                    <xforms:hint ref="$form-resources/single-list/hint"/>
-                                    <xforms:help ref="$form-resources/single-list/help"/>
-                                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
-
-                                    <xforms:itemset nodeset="$form-resources/single-list/item">
-                                        <xforms:label ref="label"/>
-                                        <xforms:value ref="value"/>
-                                    </xforms:itemset>
-                                </xforms:select1>
-                            </xhtml:td>
-                            <xhtml:td>
-                                <xforms:select appearance="compact" bind="multiple-list-bind" id="multiple-list-control">
-                                    <xforms:label ref="$form-resources/multiple-list/label"/>
-                                    <xforms:hint ref="$form-resources/multiple-list/hint"/>
-                                    <xforms:help ref="$form-resources/multiple-list/help"/>
-                                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
-                                    <xforms:itemset nodeset="$form-resources/multiple-list/item">
-                                        <xforms:label ref="label"/>
-                                        <xforms:value ref="value"/>
-                                    </xforms:itemset>
-                                </xforms:select>
-                            </xhtml:td>
-                            <xhtml:td>
-                                <fr:link-select1 xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
-                                                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-                                                 xmlns="http://orbeon.org/oxf/xml/form-builder"
-                                                 xmlns:oxf="http://www.orbeon.com/oxf/processors"
-                                                 xmlns:xbl="http://www.w3.org/ns/xbl"
-                                                 xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
-                                                 xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-                                                 xmlns:exf="http://www.exforms.org/exf/1-0"
-                                                 bind="link-select1-bind"
-                                                 id="link-select1-control">
-                                    <xforms:label ref="$form-resources/link-select1/label"/>
-                                    <xforms:hint ref="$form-resources/link-select1/hint"/>
-                                    <xforms:help ref="$form-resources/link-select1/help"/>
-                                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
-                                    <xforms:itemset nodeset="$form-resources/link-select1/item">
-                                        <xforms:label ref="label"/>
-                                        <xforms:value ref="value"/>
-                                    </xforms:itemset>
-                                </fr:link-select1>
-                            </xhtml:td>
-                        </xhtml:tr>
-                        <xhtml:tr>
-                            <xhtml:td>
-                                <fr:box-select xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
-                                               xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-                                               xmlns="http://orbeon.org/oxf/xml/form-builder"
-                                               xmlns:oxf="http://www.orbeon.com/oxf/processors"
-                                               xmlns:xbl="http://www.w3.org/ns/xbl"
-                                               xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
-                                               xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-                                               xmlns:exf="http://www.exforms.org/exf/1-0"
-                                               bind="box-select-bind"
-                                               id="box-select-control">
-                                    <xforms:label ref="$form-resources/box-select/label"/>
-                                    <xforms:hint ref="$form-resources/box-select/hint"/>
-                                    <xforms:help ref="$form-resources/box-select/help"/>
-                                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
-                                    <xforms:itemset nodeset="$form-resources/box-select/item">
-                                        <xforms:label ref="label"/>
-                                        <xforms:value ref="value"/>
-                                    </xforms:itemset>
-                                </fr:box-select>
-                            </xhtml:td>
-                            <xhtml:td>
-                                <xforms:select1 xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
-                                                xmlns="http://orbeon.org/oxf/xml/form-builder"
-                                                xmlns:xbl="http://www.w3.org/ns/xbl"
-                                                xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-                                                appearance="xxforms:tree"
-                                                bind="single-tree-selector-bind"
-                                                id="single-tree-selector-control">
-                                    <xforms:label ref="$form-resources/single-tree-selector/label"/>
-                                    <xforms:hint ref="$form-resources/single-tree-selector/hint"/>
-                                    <xforms:help ref="$form-resources/single-tree-selector/help"/>
-                                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
-                                    <xforms:itemset nodeset="$form-resources/single-tree-selector/item">
-                                        <xforms:label ref="label"/>
-                                        <xforms:value ref="value"/>
-                                    </xforms:itemset>
-                                </xforms:select1>
-                            </xhtml:td>
-                            <xhtml:td>
-                                <xforms:select xmlns="http://orbeon.org/oxf/xml/form-builder" appearance="xxforms:tree"
-                                               bind="multiple-tree-selector-bind"
-                                               id="multiple-tree-selector-control">
-                                    <xforms:label ref="$form-resources/multiple-tree-selector/label"/>
-                                    <xforms:hint ref="$form-resources/multiple-tree-selector/hint"/>
-                                    <xforms:help ref="$form-resources/multiple-tree-selector/help"/>
-                                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
-                                    <xforms:itemset nodeset="$form-resources/multiple-tree-selector/item">
-                                        <xforms:label ref="label"/>
-                                        <xforms:value ref="value"/>
-                                    </xforms:itemset>
-                                </xforms:select>
-                            </xhtml:td>
-                        </xhtml:tr>
-                        <xhtml:tr>
-                            <xhtml:td>
-                                <xhtml:div class="autocomplete-container">
-                                    <fr:autocomplete bind="autocomplete-bind"
-                                                     id="autocomplete-control"
-                                                     dynamic-itemset="true" max-results-displayed="5">
-                                        <xforms:label ref="$form-resources/autocomplete/label"/>
-                                        <xforms:hint ref="$form-resources/autocomplete/hint"/>
-                                        <xforms:itemset nodeset="instance('autocomplete-itemset-instance')/country">
-                                            <xforms:label ref="name"/>
-                                            <xforms:value ref="us-code"/>
-                                        </xforms:itemset>
-                                        <xforms:action ev:event="fr-search-changed">
-                                            <xxforms:variable name="search-value" select="event('fr-search-value')"/>
-                                            <xforms:setvalue ref="instance('autocomplete-search-instance')/country-name" value="$search-value"/>
-                                            <xforms:send submission="autocomplete-submission"/>
-                                        </xforms:action>
-                                    </fr:autocomplete>
-                                    <xforms:group bind="autocomplete-bind" appearance="xxforms:internal">
-                                        <xforms:output ref=".[. != '']">
-                                            <xforms:label ref="$form-resources/autocomplete/code"/>
-                                        </xforms:output>
-                                    </xforms:group>
-                                </xhtml:div>
-                            </xhtml:td>
-                        </xhtml:tr>
-                    </fr:grid>
-                </fr:section>
-                <fr:section id="other-controls-section" bind="other-controls-bind">
-                    <xforms:label ref="$form-resources/other-controls/label"/>
-                    <xforms:help ref="$form-resources/other-controls/help"/>
+                <fr:section id="buttons-control" bind="buttons-bind">
+                    <xforms:label ref="$form-resources/buttons/label"/>
+                    <xforms:help ref="$form-resources/buttons/help"/>
                     <fr:grid columns="2">
                         <xhtml:tr>
                             <xhtml:td>
-                                <xforms:output xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
-                                               xmlns="http://orbeon.org/oxf/xml/form-builder"
-                                               xmlns:xbl="http://www.w3.org/ns/xbl"
-                                               xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-                                               bind="browser-button-description-bind"
-                                               id="browser-button-description-control">
-                                    <xforms:label ref="$form-resources/browser-button-description/label"/>
-                                    <xforms:help ref="$form-resources/browser-button-description/help"/>
-
-                                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
-                                </xforms:output>
-                            </xhtml:td>
-                            <xhtml:td>
-                                <xforms:trigger xmlns="http://orbeon.org/oxf/xml/form-builder" bind="browser-button-bind"
-                                                id="browser-button-control">
+                                <xforms:trigger bind="browser-button-bind" id="browser-button-control">
                                     <xforms:label ref="$form-resources/browser-button/label"/>
                                     <xforms:help ref="$form-resources/browser-button/help"/>
                                     <xforms:hint ref="$form-resources/browser-button/hint"/>
                                     <xforms:alert ref="$fr-resources/detail/labels/alert"/>
                                 </xforms:trigger>
                             </xhtml:td>
-                        </xhtml:tr>
-                        <xhtml:tr>
                             <xhtml:td>
-                                <xforms:output xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
-                                               xmlns="http://orbeon.org/oxf/xml/form-builder"
-                                               xmlns:xbl="http://www.w3.org/ns/xbl"
-                                               xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-                                               bind="link-button-description-bind"
-                                               id="link-button-description-control">
-                                    <xforms:label ref="$form-resources/link-button-description/label"/>
-                                    <xforms:help ref="$form-resources/link-button-description/help"/>
-
-                                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
-                                </xforms:output>
-                            </xhtml:td>
-                            <xhtml:td>
-                                <xforms:trigger xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
-                                                xmlns="http://orbeon.org/oxf/xml/form-builder"
-                                                xmlns:xbl="http://www.w3.org/ns/xbl"
-                                                xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-                                                appearance="minimal"
-                                                bind="link-button-bind"
-                                                id="link-button-control">
+                                <xforms:trigger appearance="minimal" bind="link-button-bind" id="link-button-control">
                                     <xforms:label ref="$form-resources/link-button/label"/>
                                     <xforms:help ref="$form-resources/link-button/help"/>
                                     <xforms:hint ref="$form-resources/link-button/hint"/>
                                     <xforms:alert ref="$fr-resources/detail/labels/alert"/>
                                 </xforms:trigger>
                             </xhtml:td>
-                        </xhtml:tr>
-                        <xhtml:tr>
-                            <xhtml:td>
-                                <xforms:output xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary"
-                                               xmlns="http://orbeon.org/oxf/xml/form-builder"
-                                               xmlns:xbl="http://www.w3.org/ns/xbl"
-                                               xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-                                               bind="standardized-button-description-bind"
-                                               id="standardized-button-description-control">
-                                    <xforms:label ref="$form-resources/standardized-button-description/label"/>
-                                    <xforms:help ref="$form-resources/standardized-button-description/help"/>
-
-                                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
-                                </xforms:output>
-                            </xhtml:td>
-                            <xhtml:td>
-                                <fr:button bind="standardized-button-bind" id="standardized-button-control">
-                                    <xforms:label ref="$form-resources/standardized-button/label"/>
-                                    <xforms:hint ref="$form-resources/standardized-button/hint"/>
-                                    <xforms:help ref="$form-resources/standardized-button/help"/>
-                                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
-                                </fr:button>
-                            </xhtml:td>
+                            <xhtml:td/>
                         </xhtml:tr>
                     </fr:grid>
+                </fr:section>
+                <fr:section id="other-controls-control" bind="other-controls-bind">
+                    <xforms:label ref="$form-resources/other-controls/label"/>
+                    <xforms:help ref="$form-resources/other-controls/help"/>
+                    <fr:grid>
+                        <xhtml:tr>
+                            <xhtml:td>
+                                <fr:inplace-input bind="inplace-input-bind" id="inplace-input-control">
+                                    <xforms:label ref="$form-resources/inplace-input/label"/>
+                                    <xforms:hint ref="$form-resources/inplace-input/hint"/>
+                                    <xforms:help ref="$form-resources/inplace-input/help"/>
+                                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
+                                </fr:inplace-input>
+                            </xhtml:td>
+                            <xhtml:td/>
+                            <xhtml:td/>
+                        </xhtml:tr>
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="us-address-control" bind="us-address-bind">
+                    <xforms:label ref="$form-resources/us-address/label"/>
+                    <xforms:help ref="$form-resources/us-address/help"/>
+                    <component:address xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/orbeon/library"/>
                 </fr:section>
             </fr:body>
         </fr:view>

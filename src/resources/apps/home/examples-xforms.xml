@@ -12,10 +12,6 @@
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
 <examples title="Orbeon Forms - XForms Examples and Apps">
-    <example title="XForms Controls" href="/xforms-controls/" img="/apps/home/images/xforms-controls-small.png">
-        View the Orbeon Forms <b>XForms and custom controls</b> in action, including using a tabviews, file and image
-        attachments, and a dynamic item editor.
-    </example>
     <example title="Espresso Order" href="/xforms-espresso/" img="/apps/home/images/xforms-espresso-small.png">
         The <b>Espresso Order</b> demo shows powerful aspect of XForms in a compact example:
         declarative binds, repeats, dynamic sets of items and dynamic rules.

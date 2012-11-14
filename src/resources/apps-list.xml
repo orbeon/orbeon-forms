@@ -20,10 +20,6 @@
         <application id="fr/orbeon/controls/new" label="Controls Form"/>
         <application id="fr/orbeon/contact/summary" label="Contact Form"/>
     </section>
-    <section label="Essential XForms">
-        <application id="xforms-controls" label="XForms Controls"/>
-        <application id="xforms-sandbox" label="XForms Sandbox"/>
-    </section>
     <section label="XForms Tutorial Apps">
         <application id="xforms-hello" label="XForms Hello"/>
         <application id="xforms-bookcast" label="XForms Bookcast"/>
@@ -37,6 +33,7 @@
         <application id="xforms-wizard-switch" label="Wizard w/ Switch"/>
     </section>
     <section label="XML Sandboxes">
+        <application id="xforms-sandbox" label="XForms Sandbox"/>
         <application id="sandbox-exist" label="eXist Sandbox"/>
         <application id="sandbox-transformations/schema" label="XML Schema Sandbox"/>
         <application id="sandbox-transformations/xpath" label="XPath Sandbox"/>

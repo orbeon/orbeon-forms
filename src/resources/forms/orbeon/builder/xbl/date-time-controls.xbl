@@ -26,7 +26,7 @@
          xmlns:xbl="http://www.w3.org/ns/xbl">
 
     <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
-        <display-name lang="en">Date and time</display-name>
+        <display-name lang="en">Date and Time</display-name>
         <display-name lang="fr">Contrôles date et heure</display-name>
         <display-name lang="ru">[Date and time]</display-name>
     </metadata>

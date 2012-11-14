@@ -65,7 +65,7 @@
         <xhtml:fieldset>
             <xhtml:legend>Switch to a tab by dispatching an event</xhtml:legend>
             <xforms:repeat ref="tab" id="toggle-repeat">
-                <xxforms:variable name="position" select="position()"/>
+                <xforms:var name="position" value="position()"/>
                 <fr:button id="toggle">
                     <xforms:label>Toggle tab <xforms:output value="$position"/></xforms:label>
                     <xforms:dispatch ev:event="DOMActivate" target="tab-{$position}" name="fr-toggle"/>

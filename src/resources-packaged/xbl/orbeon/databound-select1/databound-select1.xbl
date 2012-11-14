@@ -89,16 +89,16 @@
         </xbl:implementation>
         <xbl:template>
             <!-- When the component is initialized or when resources URL changes, update our internal itemset -->
-            <xxf:variable name="resource-avt" xbl:attr="xbl:text=resource" xxbl:scope="outer"/>
-            <xxf:variable name="resource">
-                <xxf:sequence select="xxf:evaluate-avt($resource-avt)" xxbl:scope="outer"/>
+            <xf:var name="resource-avt" xbl:attr="xbl:text=resource" xxbl:scope="outer"/>
+            <xf:var name="resource">
+                <xxf:sequence value="xxf:evaluate-avt($resource-avt)" xxbl:scope="outer"/>
                 <xf:action ev:event="xforms-enabled xforms-value-changed">
                     <!-- Update itemset based on resource if not blank (can be blank e.g. in builder) -->
                     <xf:send if="normalize-space($resource)" submission="get-itemset">
                         <xxf:context name="resource" value="$resource"/>
                     </xf:send>
                     <!-- Get sequence of values in the new itemset -->
-                    <xxf:variable
+                    <xf:var
                         name="new-values"
                         select="xxf:itemset('select', 'xml', false())//value/string()"/>
                     <!-- If the current value is not in the new itemset, set it to blank -->
@@ -106,7 +106,7 @@
                         if="not(xxf:binding('fr-databound-select1') = ($new-values, ''))"
                         ref="xxf:binding('fr-databound-select1')"/>
                 </xf:action>
-            </xxf:variable>
+            </xf:var>
 
             <!-- The concrete select1 -->
             <xf:select1 ref="xxf:binding('fr-databound-select1')" id="select">

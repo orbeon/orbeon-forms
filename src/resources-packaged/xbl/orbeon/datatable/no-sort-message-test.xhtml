@@ -22,7 +22,7 @@
 
         <xi:include href="datatable-unittest-model.xml"/>
 
-        <xxforms:variable name="basic-nodeset"
+        <xforms:var name="basic-nodeset"
             select="
             for $line in line[string-length(.) &lt; 20] return 
                 xxforms:element( 'line', (
@@ -41,11 +41,11 @@
         <xhtml:div>
             <xhtml:p/>
             <xforms:group ref="instance('detailed-lorem')">
-                <xxforms:variable name="sortOrder" select="instance('controls')/sortOrder"/>
-                <xxforms:variable name="nodeset" select="line[length &lt; 20]"/>
-                <xxforms:variable name="class"
+                <xforms:var name="sortOrder" value="instance('controls')/sortOrder"/>
+                <xforms:var name="nodeset" value="line[length &lt; 20]"/>
+                <xforms:var name="class"
                     select="if ($sortOrder='ascending') then 'yui-dt-asc' else if ($sortOrder='descending') then 'yui-dt-desc' else ''"/>
-                <xxforms:variable name="sortedNodeset"
+                <xforms:var name="sortedNodeset"
                     select="
                     if ($sortOrder='none') 
                     then $nodeset

@@ -60,7 +60,7 @@
                             </xhtml:table>
                         </xsl:template>
                         <xsl:template match="xforms:repeat/xhtml:tr" >
-                            <xxforms:variable name="position" select="position()"/>
+                            <xforms:var name="position" value="position()"/>
                             <xforms:group ref=".[$position mod 2 = 1]">
                                 <xhtml:tr xbl:attr="style=style1">
                                     <xsl:apply-templates select="@*|node()"/>

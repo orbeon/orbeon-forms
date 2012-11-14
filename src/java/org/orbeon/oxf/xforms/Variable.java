@@ -62,7 +62,7 @@ public class Variable {
 
         this.variableName = variableElement.attributeValue(XFormsConstants.NAME_QNAME);
         if (variableName == null)
-            throw new ValidationException("xxforms:variable or exforms:variable element must have a \"name\" attribute", getLocationData());
+            throw new ValidationException("xforms:var, xxforms:variable or exforms:variable element must have a \"name\" attribute", getLocationData());
 
         // Handle xxforms:sequence
         final Element sequenceElement = variableElement.element(XFormsConstants.XXFORMS_SEQUENCE_QNAME);

@@ -38,8 +38,8 @@
         <xxforms:dialog id="test-dialog">
             <xforms:label>Test Dialog</xforms:label>
 
-            <xxforms:variable name="test-variable-1" select="'42'"/>
-            <xxforms:variable name="test-variable-2" select="'101'"/>
+            <xforms:var name="test-variable-1" value="'42'"/>
+            <xforms:var name="test-variable-2" value="'101'"/>
             <xforms:message ev:event="xxforms-dialog-open">
                 Values: <xforms:output value="$test-variable-1"/>, <xforms:output value="$test-variable-2"/>
             </xforms:message>

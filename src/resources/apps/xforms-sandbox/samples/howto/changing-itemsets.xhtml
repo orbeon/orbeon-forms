@@ -51,11 +51,11 @@
                 <xbl:template>
                     <xforms:group appearance="xxforms:internal" id="container">
                         <!-- Pointers to nodes in the outside world -->
-                        <xxforms:variable name="value"><xxforms:sequence xbl:attr="select=value-ref" xxbl:scope="outer"/></xxforms:variable>
-                        <xxforms:variable name="label"><xxforms:sequence xbl:attr="select=label-ref" xxbl:scope="outer"/></xxforms:variable>
-                        <xxforms:variable name="valid"><xxforms:sequence xbl:attr="select=valid-ref" xxbl:scope="outer"/></xxforms:variable>
-                        <xxforms:variable name="alert" select="."/>
-                        <xxforms:variable name="is-readonly" select="exf:readonly($value)"/>
+                        <xforms:var name="value"><xxforms:sequence xbl:attr="value=value-ref" xxbl:scope="outer"/></xforms:var>
+                        <xforms:var name="label"><xxforms:sequence xbl:attr="value=label-ref" xxbl:scope="outer"/></xforms:var>
+                        <xforms:var name="valid"><xxforms:sequence xbl:attr="value=valid-ref" xxbl:scope="outer"/></xforms:var>
+                        <xforms:var name="alert" value="."/>
+                        <xforms:var name="is-readonly" value="exf:readonly($value)"/>
                         <!-- Expose a "value" for the itemset, so we can have an event when it changes -->
                         <xforms:group ref="xxforms:itemset('select1', 'json')" id="itemset" appearance="xxforms:internal"/>
                         <xforms:group ref="$value[$alert/@user-alert = '']" appearance="xxforms:internal">
@@ -63,12 +63,12 @@
                             <xforms:setvalue ev:event="xforms-enabled" ref="$alert/@user-alert" value="event('xxforms:alert')"/>
                         </xforms:group>
                         <!-- Update valid and alert when the value or the itemset changes  -->
-                        <xxforms:variable name="is-out-of-bound" select="not($value = xxforms:itemset('select1', 'xml')//item/value)"/>
-                        <xxforms:variable name="new-alert" select="if ($is-out-of-bound) then
+                        <xforms:var name="is-out-of-bound" value="not($value = xxforms:itemset('select1', 'xml')//item/value)"/>
+                        <xforms:var name="new-alert" value="if ($is-out-of-bound) then
                             concat('A value was selected (', $label, ') and this value is not available anymore.')
                             else $alert/@user-alert"/>
                         <xforms:action ev:event="xforms-enabled xforms-value-changed" ev:observer="select1 itemset">
-                            <xxforms:variable name="new-label" select="xxforms:itemset('select1', 'xml')//item[value = $value]/label"/>
+                            <xforms:var name="new-label" value="xxforms:itemset('select1', 'xml')//item[value = $value]/label"/>
                             <xforms:setvalue if="exists($new-label)" ref="$label" value="$new-label"/>
                             <xforms:setvalue ref="$alert" value="$new-alert"/>
                             <xforms:setvalue ref="$valid" value="not($is-out-of-bound)"/>

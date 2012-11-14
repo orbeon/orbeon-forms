@@ -31,10 +31,10 @@
     </xh:head>
     <xh:body>
 
-        <xxf:variable id="values" name="values" select="value"/>
+        <xf:var id="values" name="values" value="value"/>
 
         <xf:repeat id="repeat" ref="$values">
-            <xxf:variable id="value" name="value" select="."/>
+            <xf:var id="value" name="value" value="."/>
             <xf:input id="input" ref="$value"/>
         </xf:repeat>
 

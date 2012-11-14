@@ -32,7 +32,7 @@
                     <sortOrder>descending</sortOrder>
                 </params>
             </xforms:instance>
-            <xxforms:variable name="params" select="instance('params')"/>
+            <xforms:var name="params" value="instance('params')"/>
             <xforms:submission id="load" ref="instance('params')" instance="twitter"
                 replace="instance" method="get" resource="/xforms-sandbox/service/twitter"/>
         </xforms:model>
@@ -45,7 +45,7 @@
         <p>This sample demonstratres the pagination feature of the datatable widget with sort and
             pagination handled server side.</p>
 
-        <xxforms:variable name="params" select="instance('params')"/>
+        <xforms:var name="params" value="instance('params')"/>
         <fr:datatable paginated="true" sortAndPaginationMode="external" modal="true"
             nbPages="ceiling(/atom:feed/twit:nbResults div /atom:feed/twit:rpp)" page="$params/page">
             <xforms:action ev:event="fr-goto-page">
@@ -53,8 +53,8 @@
                 <xforms:send submission="load"/>
             </xforms:action>
             <xforms:action ev:event="fr-update-sort">
-                <xxforms:variable name="column" select="event('fr-column')"/>
-                <xxforms:variable name="nextSort"
+                <xforms:var name="column" value="event('fr-column')"/>
+                <xforms:var name="nextSort"
                     select="('published', 'author/name', 'title')[$column]"/>
                 <xforms:setvalue ref="$params/sortOrder"
                     value="if ($params/sortBy = $nextSort)

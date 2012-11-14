@@ -29,8 +29,8 @@
         </navigation-instance>
     </xforms:instance>
 
-    <xxforms:variable name="parameters" select="xxforms:instance('fr-parameters-instance')"/>
-    <xxforms:variable name="common-get-parameters" select="string-join((
+    <xforms:var name="parameters" value="xxforms:instance('fr-parameters-instance')"/>
+    <xforms:var name="common-get-parameters" value="string-join((
         'fr-language=', xxforms:instance('fr-language-instance'),
         if (instance('fr-navigation-instance')/orbeon-embeddable = '') then () else ('&amp;orbeon-embeddable=', instance('fr-navigation-instance')/orbeon-embeddable)), '')"/>
 
@@ -95,11 +95,11 @@
     <xforms:action ev:event="fr-goto-summary">
 
         <!-- Get close URI -->
-        <xxforms:variable name="parameters" value="xxforms:instance('fr-parameters-instance')" as="element()"/>
-        <xxforms:variable name="app" value="$parameters/app" as="xs:string"/>
-        <xxforms:variable name="form" value="$parameters/form" as="xs:string"/>
-        <xxforms:variable name="close-uri" value="xxforms:property(string-join(('oxf.fr.detail.close.uri', $app, $form), '.'))" as="xs:anyURI"/>
-        <xxforms:variable name="have-close-uri" value="$close-uri != ''" as="xs:anyURI"/>
+        <xforms:var name="parameters" value="xxforms:instance('fr-parameters-instance')" as="element()"/>
+        <xforms:var name="app" value="$parameters/app" as="xs:string"/>
+        <xforms:var name="form" value="$parameters/form" as="xs:string"/>
+        <xforms:var name="close-uri" value="xxforms:property(string-join(('oxf.fr.detail.close.uri', $app, $form), '.'))" as="xs:anyURI"/>
+        <xforms:var name="have-close-uri" value="$close-uri != ''" as="xs:anyURI"/>
 
         <!-- If we have a close URI, go there -->
         <xforms:action if="$have-close-uri">

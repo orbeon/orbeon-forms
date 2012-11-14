@@ -60,7 +60,7 @@
             <xforms:model id="model">
                 <xforms:instance id="model-resources" src="oxf:/xbl/orbeon/dialog-select/dialog-select-resources.xml"
                                  xxforms:readonly="true" xxforms:cache="true"/>
-                <xxforms:variable name="resources" select="instance('model-resources')/resource[@xml:lang = 'en']" as="element()?"/>
+                <xforms:var name="resources" value="instance('model-resources')/resource[@xml:lang = 'en']" as="element()?"/>
             </xforms:model>
         </xbl:implementation>
 
@@ -92,8 +92,8 @@
                 <xforms:action ev:event="fr-edit">
                     <!-- When dialog open, get list of available and selected items -->
                     <xforms:setvalue ref="label" value="event('fr-label')"/>
-                    <xxforms:variable name="binding" select="tokenize(event('fr-binding'), '\s+')"/>
-                    <xxforms:variable name="items" select="event('fr-items')"/>
+                    <xforms:var name="binding" value="tokenize(event('fr-binding'), '\s+')"/>
+                    <xforms:var name="items" value="event('fr-items')"/>
                     <xforms:delete ref="items/*"/>
                     <xforms:insert context="items" origin="$items"/>
                     <xforms:setvalue ref="available-itemset" value="string-join($items/value/string()[not(. = $binding)], ' ')"/>
@@ -105,10 +105,10 @@
                     <xforms:setfocus control="fr-dialog-select1-double-list-dialog"/>
                 </xforms:action>
 
-                <xxforms:variable name="resources" select="instance('fr-dialog-select1-double-list-resources')/resource[@xml:lang = 'en']" as="element()?"/>
-                <xxforms:variable name="available-values" select="tokenize(available-itemset, '\s+')" as="xs:string*"/>
-                <xxforms:variable name="selected-values" select="tokenize(selected-itemset, '\s+')" as="xs:string*"/>
-                <xxforms:variable name="items" select="items/item"/>
+                <xforms:var name="resources" value="instance('fr-dialog-select1-double-list-resources')/resource[@xml:lang = 'en']" as="element()?"/>
+                <xforms:var name="available-values" value="tokenize(available-itemset, '\s+')" as="xs:string*"/>
+                <xforms:var name="selected-values" value="tokenize(selected-itemset, '\s+')" as="xs:string*"/>
+                <xforms:var name="items" value="items/item"/>
 
                 <xhtml:table>
                     <xhtml:tr>
@@ -130,7 +130,7 @@
                                     </xhtml:span>
                                 </xforms:label>
                                 <xforms:action ev:event="DOMActivate">
-                                    <xxforms:variable name="selection" select="tokenize(../available, '\s+')" as="xs:string*"/>
+                                    <xforms:var name="selection" value="tokenize(../available, '\s+')" as="xs:string*"/>
                                     <xforms:setvalue ref="../selected-itemset"
                                                      value="string-join((tokenize(., '\s+'), $selection), ' ')"/>
                                     <xforms:setvalue ref="../available-itemset"
@@ -147,7 +147,7 @@
                                     </xhtml:span>
                                 </xforms:label>
                                 <xforms:action ev:event="DOMActivate">
-                                    <xxforms:variable name="selection" select="tokenize(../selected, '\s+')" as="xs:string*"/>
+                                    <xforms:var name="selection" value="tokenize(../selected, '\s+')" as="xs:string*"/>
                                     <xforms:setvalue ref="../available-itemset"
                                                      value="string-join((tokenize(., '\s+'), $selection), ' ')"/>
                                     <xforms:setvalue ref="../selected-itemset"
@@ -246,18 +246,18 @@
                     <xforms:action ev:event="#all" ev:propagate="stop" ev:target="#observer binding-var"/>
 
                     <!-- Variable pointing to external single-node binding -->
-                    <xxforms:variable name="binding" id="binding-var" as="node()?">
-                        <xxforms:sequence select="." xxbl:scope="outer"/>
-                    </xxforms:variable>
+                    <xforms:var name="binding" id="binding-var" as="node()?">
+                        <xxforms:sequence value="." xxbl:scope="outer"/>
+                    </xforms:var>
 
                     <!-- Variable containing the label, so we can pass it to the dialog -->
-                    <xxforms:variable name="label">
+                    <xforms:var name="label">
                         <xxforms:sequence xxbl:scope="outer">
                             <xsl:variable name="label" select="/fr:dialog-select1/xforms:label"/>
                             <xsl:if test="$label/@ref"><xsl:attribute name="select" select="$label/@ref"/></xsl:if>
                             <xsl:value-of select="$label"/>
                         </xxforms:sequence> 
-                    </xxforms:variable>
+                    </xforms:var>
 
                     <!-- Internal selection control providing access to the itemset -->
                     <!-- NOTE: Events on this control will propagate out -->
@@ -278,10 +278,10 @@
                         <xforms:action ev:event="#all" ev:propagate="stop"/>
 
                         <!-- All the items in the itemset specified by the user -->
-                        <xxforms:variable name="items" select="xxforms:itemset('hidden-select', 'xml')//item" as="element(item)*"/>
+                        <xforms:var name="items" value="xxforms:itemset('hidden-select', 'xml')//item" as="element(item)*"/>
 
                         <!-- Represent selected value -->
-                        <xxforms:variable name="selected" select="tokenize($binding, '\s+')" as="xs:string*"/>
+                        <xforms:var name="selected" value="tokenize($binding, '\s+')" as="xs:string*"/>
 
                         <!-- If a separator is specified, output a string, otherwise output ul/li -->
                         <xsl:variable name="separator" select="/fr:dialog-select1/@separator"/>
@@ -289,8 +289,8 @@
                             <xsl:when test="exists($separator)">
                                 <!-- Add tabindex so the element doesn't steal the focus on Firefox when styled with overflow-y: scroll.
                                      This isn't done by default, but can be done by the application, as is the case in the test-dialog-select.xthml -->
-                                <xxforms:variable name="separator" xbl:attr="xbl:text=separator" as="xs:string"/>
-                                <xxforms:variable name="joined" select="string-join($items[value = $selected]/label, $separator)"/>
+                                <xforms:var name="separator" xbl:attr="xbl:text=separator" as="xs:string"/>
+                                <xforms:var name="joined" value="string-join($items[value = $selected]/label, $separator)"/>
                                 <xforms:output value="$joined" tabindex="-1" id="joined" class="{{if ($joined = '') then '' else 'fr-non-empty'}}"/>
                             </xsl:when>
                             <xsl:otherwise>

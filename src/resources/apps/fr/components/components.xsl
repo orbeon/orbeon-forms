@@ -86,9 +86,9 @@
             <xsl:apply-templates select="@*"/>
 
             <!-- Scope variable with Form Runner resources -->
-            <xxforms:variable name="fr-resources" model="fr-resources-model" select="$fr-fr-resources" as="element(resource)?"/>
+            <xforms:var name="fr-resources" model="fr-resources-model" value="$fr-fr-resources" as="element(resource)?"/>
             <!-- Scope form resources -->
-            <xxforms:variable name="form-resources" model="fr-resources-model" select="$fr-form-resources" as="element(resource)?"/>
+            <xforms:var name="form-resources" model="fr-resources-model" value="$fr-form-resources" as="element(resource)?"/>
 
             <!-- Title from the current form's metadata -->
             <xforms:var
@@ -232,7 +232,7 @@
 
         </xforms:model>
 
-        <xxforms:variable name="url-base-for-requests" select="'{$url-base-for-requests}'"/>
+        <xforms:var name="url-base-for-requests" value="'{$url-base-for-requests}'"/>
 
         <!-- This model handles Form Builder roles and permissions -->
         <!-- NOTE: We could remove this if not($is-form-builder), except for the use of the $fr-roles variable -->
@@ -277,9 +277,9 @@
 
                 <!-- Do captcha verification, if needed -->
                 <!-- NOTE: The code would be shorter here if we were to use the XSLT app/form variables, but we want to move away from XSLT for FR -->
-                <xxforms:variable name="parameters" value="xxforms:instance('fr-parameters-instance')" as="element()"/>
-                <xxforms:variable name="app" value="$parameters/app" as="xs:string"/>
-                <xxforms:variable name="form" value="$parameters/form" as="xs:string"/>
+                <xforms:var name="parameters" value="xxforms:instance('fr-parameters-instance')" as="element()"/>
+                <xforms:var name="app" value="$parameters/app" as="xs:string"/>
+                <xforms:var name="form" value="$parameters/form" as="xs:string"/>
                 <xsl:if test="$has-captcha">
                     <xforms:action if="xxforms:instance('fr-persistence-instance')/captcha = 'false'">
                         <xforms:dispatch target="captcha" name="fr-verify"/>
@@ -337,9 +337,9 @@
             <xsl:apply-templates select="node()"/>
 
             <!-- Variable exposing all the user roles -->
-            <xxforms:variable name="fr-roles" select="tokenize(xxforms:instance('fr-permissions')/@all-roles, '\s+')" as="xs:string*"/>
+            <xforms:var name="fr-roles" value="tokenize(xxforms:instance('fr-permissions')/@all-roles, '\s+')" as="xs:string*"/>
             <!-- Variable exposing the form mode -->
-            <xxforms:variable name="fr-mode" select="xxforms:instance('fr-parameters-instance')/mode"/>
+            <xforms:var name="fr-mode" value="xxforms:instance('fr-parameters-instance')/mode"/>
 
             <!-- Bind to set the form instance read-only when necessary -->
             <xforms:bind nodeset="instance('fr-form-instance')" readonly="$fr-mode = ('view', 'pdf', 'email')"/>

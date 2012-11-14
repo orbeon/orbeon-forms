@@ -161,7 +161,7 @@
                     <fr:datatable id="table-variables">
                         <xhtml:thead>
                             <xhtml:tr>
-                                <xxforms:variable name="pos">position</xxforms:variable>
+                                <xforms:var name="pos">position</xforms:var>
                                 <xhtml:th>
                                     <xforms:output value="$pos"/>
                                 </xhtml:th>
@@ -174,7 +174,7 @@
                                     <xhtml:td>
                                         <xforms:output value="position()"/>
                                     </xhtml:td>
-                                    <xxforms:variable name="val" select="."/>
+                                    <xforms:var name="val" value="."/>
                                     <xhtml:td>
                                         <xforms:output value="$val"/>
                                     </xhtml:td>

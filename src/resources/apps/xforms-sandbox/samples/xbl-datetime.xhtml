@@ -34,8 +34,8 @@
                 <xbl:template>
                     <!-- NOTE: Once new scoping rules are in place, the following group should work -->
                     <!--<xforms:group xbl:attr="ref bind">-->
-                        <!--<xxforms:variable name="result" ref="."/>-->
-                        <xxforms:variable name="result" context="xxforms:component-context()" xbl:attr="select=ref" as="node()*"/>
+                        <!--<xforms:var name="result" ref="."/>-->
+                        <xforms:var name="result" context="xxforms:component-context()" xbl:attr="value=ref" as="node()*"/>
                         <xforms:group ref="$result">
                             <xforms:action ev:event="xforms-value-changed">
                                 <xforms:setvalue ref="instance('dateTime-instance')/date" value="context()/substring-before(., 'T')"/>

@@ -90,7 +90,7 @@
                         <xforms:trigger appearance="minimal">
                             <xforms:label ref="full"/>
                             <xforms:action ev:event="DOMActivate">
-                                <xxforms:variable name="address" select="."/>
+                                <xforms:var name="address" value="."/>
                                 <xforms:setvalue ref="/instance/street" value="$address/street"/>
                                 <xforms:setvalue ref="/instance/city" value="$address/city"/>
                                 <xforms:setvalue ref="/instance/state" value="upper-case($address/state)"/>

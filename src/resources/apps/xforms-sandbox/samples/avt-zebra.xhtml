@@ -58,7 +58,7 @@
                             <xforms:output value="position()"/>
                         </xhtml:td>
                         <xhtml:td>
-                            <xxforms:variable name="position" select="position()"/>
+                            <xforms:var name="position" value="position()"/>
                             <xforms:output value="."><!-- Should ../*[context()/position()] work too? -->
                                 <xforms:label><xhtml:span class="zebra-row-{if ($position mod 2 = 1) then 'even' else 'odd'}">Inverted label</xhtml:span></xforms:label>
                             </xforms:output>

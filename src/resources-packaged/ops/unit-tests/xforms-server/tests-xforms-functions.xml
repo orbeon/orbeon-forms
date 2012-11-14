@@ -357,7 +357,7 @@
                             <xhtml:body>
 
                                 <xforms:repeat id="my-repeat" nodeset="*">
-                                    <xxforms:variable name="position" select="position()" as="xs:integer"/>
+                                    <xforms:var name="position" value="position()" as="xs:integer"/>
                                     <xforms:group id="my-group" ref="..">
                                         <xforms:action ev:event="xforms-enabled">
                                             <!-- Test use in actions -->
@@ -552,7 +552,7 @@
                                 </xforms:model>
                             </xhtml:head>
                             <xhtml:body>
-                                <xxforms:variable name="lookup-records" select="instance('lookup-instance')/record" as="element(record)+"/>
+                                <xforms:var name="lookup-records" value="instance('lookup-instance')/record" as="element(record)+"/>
                                 <!-- Sort expression with variable and use of instance() -->
                                 <xforms:repeat id="exforms-sort-repeat" nodeset="exf:sort(record, 'for  $code in @code return instance(''lookup-instance'')/record[@code = $code]', 'text', 'descending')">
                                     <xforms:output id="exforms-sort-output" value="for $code in @code return instance('lookup-instance')/record[@code=$code]"/>
@@ -625,7 +625,7 @@
                 </xhtml:head>
                 <xhtml:body>
                     <xforms:output id="output1" value="xxforms:evaluate-avt('state={state}')"/>
-                    <xxforms:variable name="city" select="city"/>
+                    <xforms:var name="city" value="city"/>
                     <xforms:output id="output2" value="xxforms:evaluate-avt('state={state}&amp;city={$city}')"/>
                     <xforms:repeat id="repeat" nodeset="*">
                         <xforms:output id="output3" value="xxforms:evaluate-avt('position={position()}&amp;index={index(''repeat'')}')"/>
@@ -1528,7 +1528,7 @@
                             <xbl:template>
                                 <xforms:group>
                                     <!-- TODO: The variable value is evaluated when bindings are evaluated, so this won't work as expected -->
-                                    <!--<xxforms:variable id="lang" name="lang" select="xxforms:lang()"/>-->
+                                    <!--<xforms:var id="lang" name="lang" value="xxforms:lang()"/>-->
                                     <!--<xforms:output id="output1" value="$lang"/>-->
 
                                     <xforms:output id="output1" value="xxforms:lang()"/>

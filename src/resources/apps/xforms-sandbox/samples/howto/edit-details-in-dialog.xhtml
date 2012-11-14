@@ -141,7 +141,7 @@
                             <xforms:trigger appearance="minimal">
                                 <xforms:label>Edit</xforms:label>
                                 <xforms:action ev:event="DOMActivate">
-                                    <xxforms:variable name="current-planet" select="."/>
+                                    <xforms:var name="current-planet" value="."/>
                                     <xforms:insert context="instance('ui')/edited-planet"
                                         origin="instance('planets')/planet[name = $current-planet/name]"/>
                                     <xxforms:show dialog="edit-planet-dialog"/>

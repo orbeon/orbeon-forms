@@ -1178,7 +1178,7 @@
                                         <!-- Set initial index -->
                                         <xforms:setindex repeat="my-repeat" index="3"/>
                                         <!-- Save current index -->
-                                        <xxforms:variable name="initial-index" select="index('my-repeat')"/>
+                                        <xforms:var name="initial-index" value="index('my-repeat')"/>
                                         <!-- Iterate through all values -->
                                         <xforms:action iterate="value">
                                             <!-- Set index and dispatch event -->
@@ -1736,22 +1736,22 @@
                 </xhtml:head>
                 <xhtml:body>
                     <xforms:repeat id="department-repeat" nodeset="department">
-                        <xxforms:variable name="department-nodeset-1" select="xxforms:repeat-nodeset()" as="element*"/>
-                        <xxforms:variable name="department-nodeset-2" select="xxforms:repeat-nodeset('department-repeat')" as="element*"/>
+                        <xforms:var name="department-nodeset-1" value="xxforms:repeat-nodeset()" as="element*"/>
+                        <xforms:var name="department-nodeset-2" value="xxforms:repeat-nodeset('department-repeat')" as="element*"/>
                         <xforms:output id="department-output-1" value="count($department-nodeset-1)"/>
                         <xforms:output id="department-output-2" value="count($department-nodeset-2)"/>
                         <xforms:repeat id="employee-repeat" nodeset="employee">
-                            <xxforms:variable name="employee-nodeset-1" select="xxforms:repeat-nodeset()" as="element*"/>
-                            <xxforms:variable name="employee-nodeset-2" select="xxforms:repeat-nodeset('employee-repeat')" as="element*"/>
+                            <xforms:var name="employee-nodeset-1" value="xxforms:repeat-nodeset()" as="element*"/>
+                            <xforms:var name="employee-nodeset-2" value="xxforms:repeat-nodeset('employee-repeat')" as="element*"/>
                             <xforms:output id="employee-output-1" value="count($employee-nodeset-1)"/>
                             <xforms:output id="employee-output-2" value="count($employee-nodeset-2)"/>
 
-                            <xxforms:variable name="department-nodeset-3" select="xxforms:repeat-nodeset('department-repeat')" as="element*"/>
+                            <xforms:var name="department-nodeset-3" value="xxforms:repeat-nodeset('department-repeat')" as="element*"/>
                             <xforms:output id="department-output-3" value="count($department-nodeset-3)"/>
 
                             <!-- Make sure the function work from within an action as well -->
                             <xforms:action ev:event="xforms-enabled">
-                                <xxforms:variable name="test-nodeset" select="xxforms:repeat-nodeset()"/>
+                                <xforms:var name="test-nodeset" value="xxforms:repeat-nodeset()"/>
                                 <xforms:setvalue ref="." value="count($test-nodeset)"/>
                             </xforms:action>
                         </xforms:repeat>
@@ -1857,26 +1857,26 @@
                 </xhtml:head>
                 <xhtml:body>
                     <!-- Top-level variable with model change tests that source id for resolution doesn't break -->
-                    <xxforms:variable name="top-level-1" model="model2" select="." as="element()"/>
+                    <xforms:var name="top-level-1" model="model2" value="." as="element()"/>
 
                     <xforms:repeat id="department-repeat" nodeset="department" startindex="4">
-                        <xxforms:variable name="department-index-1" select="xxforms:index()" as="element*"/>
-                        <xxforms:variable name="department-index-2" select="xxforms:index('department-repeat')" as="element*"/>
+                        <xforms:var name="department-index-1" value="xxforms:index()" as="element*"/>
+                        <xforms:var name="department-index-2" value="xxforms:index('department-repeat')" as="element*"/>
                         <xforms:output id="department-output-1" value="$department-index-1"/>
                         <xforms:output id="department-output-2" value="$department-index-2"/>
 
                         <xforms:repeat id="employee-repeat" nodeset="employee" startindex="3">
-                            <xxforms:variable name="employee-index-1" select="xxforms:index()" as="element*"/>
-                            <xxforms:variable name="employee-index-2" select="xxforms:index('employee-repeat')" as="element*"/>
+                            <xforms:var name="employee-index-1" value="xxforms:index()" as="element*"/>
+                            <xforms:var name="employee-index-2" value="xxforms:index('employee-repeat')" as="element*"/>
                             <xforms:output id="employee-output-1" value="$employee-index-1"/>
                             <xforms:output id="employee-output-2" value="$employee-index-2"/>
 
-                            <xxforms:variable name="department-index-3" select="xxforms:index('department-repeat')" as="element*"/>
+                            <xforms:var name="department-index-3" value="xxforms:index('department-repeat')" as="element*"/>
                             <xforms:output id="department-output-3" value="$department-index-3"/>
 
                             <!-- Make sure the function work from within an action as well -->
                             <xforms:action ev:event="xforms-enabled" ev:target="department-output-3">
-                                <xxforms:variable name="test-nodeset" select="xxforms:index()"/>
+                                <xforms:var name="test-nodeset" value="xxforms:index()"/>
                                 <xforms:setvalue ref="." value="$test-nodeset"/>
                             </xforms:action>
                         </xforms:repeat>
@@ -2520,9 +2520,9 @@
                 </head>
                 <body>
                     <xforms:repeat nodeset="department" id="repeat-department">
-                        <xxforms:variable name="department-position" select="position()"/>
+                        <xforms:var name="department-position" value="position()"/>
                         <xforms:repeat nodeset="employee" id="repeat-employee">
-                            <xxforms:variable name="employee-position" select="position()"/>
+                            <xforms:var name="employee-position" value="position()"/>
                             <xforms:output id="my-output"
                                            value="string-join(for $v in ($department-position, $employee-position,
                                                     index('repeat-department'), index('repeat-employee')) return xs:string($v), ' ')"/>
@@ -2787,7 +2787,7 @@
                     </xforms:model>
                 </xhtml:head>
                 <xhtml:body>
-                    <xxforms:variable name="values" select="value"/>
+                    <xforms:var name="values" value="value"/>
                     <xforms:repeat id="my-repeat" ref="$values"/>
                 </xhtml:body>
             </xhtml:html>

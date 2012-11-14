@@ -61,7 +61,7 @@
                     </xforms:group>
 
                     <!-- Variables for attributes on the control -->
-                    <xxforms:variable name="class" xbl:attr="xbl:text=class"/>
+                    <xforms:var name="class" xbl:attr="xbl:text=class"/>
 
                     <!-- Div in which Google Maps does its rendering -->
                     <xhtml:div class="fb-map-gmap-div{if ($class = '') then '' else concat(' ', $class)}" id="gmap-div" xbl:attr="style"/>

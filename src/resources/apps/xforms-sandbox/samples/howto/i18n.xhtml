@@ -24,10 +24,10 @@
             <!-- Current language -->
             <xforms:instance id="language"><language/></xforms:instance>
             <!-- Shortcut pointing to the resource current resources -->
-            <xxforms:variable name="resources" select="instance('all-resources')/resources[@xml:lang = instance('language')]"/>
+            <xforms:var name="resources" value="instance('all-resources')/resources[@xml:lang = instance('language')]"/>
             <!-- Load resources for the current language -->
             <xforms:action ev:event="xforms-model-construct-done load-resources">
-                <xxforms:variable name="session-language" select="xxforms:get-session-attribute('language')"/>
+                <xforms:var name="session-language" value="xxforms:get-session-attribute('language')"/>
                 <xforms:setvalue ref="instance('language')" value="if (exists($session-language)) 
                     then $session-language/string() else instance('all-resources')/resources[1]/@xml:lang/string()"/>
             </xforms:action>
@@ -45,7 +45,7 @@
         <xforms:select1 appearance="minimal" ref="instance('language')">
             <xforms:action ev:event="xforms-value-changed">
                 <xforms:insert context="." origin="xxforms:set-session-attribute('language', .)"/>
-                <xxforms:variable name="session-language" select="xxforms:get-session-attribute('language')"/>
+                <xforms:var name="session-language" value="xxforms:get-session-attribute('language')"/>
                 <xforms:dispatch target="main-model" name="load-resources"/>
             </xforms:action>
             <xforms:label ref="$resources/language/change"/>

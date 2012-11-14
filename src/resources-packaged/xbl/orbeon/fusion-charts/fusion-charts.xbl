@@ -39,9 +39,9 @@
                         <!-- Inner group -->
                         <xforms:group xxbl:scope="inner" appearance="xxforms:internal">
                             <!-- Variable pointing to external single-node binding -->
-                            <xxforms:variable name="result" as="node()?">
-                                <xxforms:sequence select="." xxbl:scope="outer"/>
-                            </xxforms:variable>
+                            <xforms:var name="result" as="node()?">
+                                <xxforms:sequence value="." xxbl:scope="outer"/>
+                            </xforms:var>
 
                             <!-- Div in which the chart is rendered -->
                             <xhtml:div id="chart-div" class="xbl-fr-fusion-charts-chart-div">The chart will appear within this DIV. This text will be replaced by the chart.</xhtml:div>

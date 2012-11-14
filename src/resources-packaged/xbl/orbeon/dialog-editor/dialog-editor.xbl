@@ -83,12 +83,12 @@
         </xxbl:global>
         <xbl:template>
             <xforms:group appearance="xxforms:internal" id="container">
-                <xxforms:variable name="binding" as="node()?"><xxforms:sequence select="." xxbl:scope="outer" xbl:attr="model context ref bind"/></xxforms:variable>
+                <xforms:var name="binding" as="node()?"><xxforms:sequence value="." xxbl:scope="outer" xbl:attr="model context ref bind"/></xforms:var>
                 <!-- For access to label with xxforms:label() -->
                 <xforms:group appearance="xxforms:internal" ref="$binding" id="group-with-label">
                     <xbl:content includes=":root > xforms|label"/>
                 </xforms:group>
-                <xxforms:variable name="readonly" select="exforms:readonly($binding)"/>
+                <xforms:var name="readonly" value="exforms:readonly($binding)"/>
                 <xforms:group ref="$binding" id="group-external">
                     <!-- Button to open dialog -->
                     <xforms:group appearance="xxforms:internal">

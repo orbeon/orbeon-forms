@@ -54,8 +54,8 @@
                 </resources>
             </xforms:instance>
 
-            <xxforms:variable name="sorting" select="instance('sorting')"/>
-            <xxforms:variable name="resources" select="instance('resources')"/>
+            <xforms:var name="sorting" value="instance('sorting')"/>
+            <xforms:var name="resources" value="instance('resources')"/>
 
         </xforms:model>
 
@@ -93,8 +93,8 @@
 
         <fr:datatable sortAndPaginationMode="external">
             <xforms:action ev:event="fr-update-sort">
-                <xxforms:variable name="column" select="('name', 'email', 'phone')[event('fr-column')]"/>
-                <xxforms:variable name="contacts" select="contact"/>
+                <xforms:var name="column" value="('name', 'email', 'phone')[event('fr-column')]"/>
+                <xforms:var name="contacts" value="contact"/>
                 <xforms:setvalue ref="$sorting/order" value="if ($sorting/column = $column and . = 'ascending') then 'descending' else 'ascending'"/>
                 <xforms:setvalue ref="$sorting/column" value="$column"/>
                 <xforms:delete nodeset="$contacts"/>

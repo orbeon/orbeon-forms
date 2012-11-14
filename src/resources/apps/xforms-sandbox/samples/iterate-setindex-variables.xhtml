@@ -36,12 +36,12 @@
     </xhtml:head>
     <xhtml:body>
 
-        <xxforms:variable name="instance" select="."/>
+        <xforms:var name="instance" value="."/>
         <exforms:variable name="items" select="$instance/item"/>
 
         <xforms:repeat nodeset="$items" id="items-repeat">
             <exforms:variable name="current-item" select="."/>
-            <xxforms:variable name="current-position" select="position()"/>
+            <xforms:var name="current-position" value="position()"/>
             <xforms:output id="my-count" ref="$current-item/value">
                 <xforms:label value="concat($current-item/label, ':')"/>
                 <xforms:setvalue ev:event="my-event" ref="$current-item/value" value="count($items) + $current-position"/>

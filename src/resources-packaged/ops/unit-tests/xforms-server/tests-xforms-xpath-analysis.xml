@@ -1133,7 +1133,7 @@
                         <xf:instance id="instance">
                             <instance/>
                         </xf:instance>
-                        <xxf:variable name="mv" select="instance()"/>
+                        <xf:var name="mv" value="instance()"/>
                     </xf:model>
                 </xh:head>
                 <xh:body>
@@ -1144,7 +1144,7 @@
         <output name="analysis">
             <request request-uri="/orbeon/doc/home-welcome" query-string="id=12&amp;print=false" method="GET">
                 <model scope="" prefixed-id="model" default-instance-prefixed-id="instance" analyzed-binds="true">
-                    <variable scope="" prefixed-id="xf-1" model-prefixed-id="model" binding="false" value="true" name="mv">
+                    <var scope="" prefixed-id="xf-1" model-prefixed-id="model" binding="false" value="true" name="mv">
                         <value>
                             <analysis expression="instance()" analyzed="true">
                                 <returnable>
@@ -1161,7 +1161,7 @@
                                 </returnable-instances>
                             </analysis>
                         </value>
-                    </variable>
+                    </var>
                 </model>
                 <output scope="" prefixed-id="output1" model-prefixed-id="model" binding="false" value="true">
                     <value>
@@ -1193,13 +1193,13 @@
                         <xf:instance id="instance1">
                             <instance/>
                         </xf:instance>
-                        <xxf:variable name="mv" select="instance()"/>
+                        <xf:var name="mv" value="instance()"/>
                     </xf:model>
                     <xf:model id="model2">
                         <xf:instance id="instance2">
                             <instance/>
                         </xf:instance>
-                        <xxf:variable name="mv" select="instance()"/>
+                        <xf:var name="mv" value="instance()"/>
                     </xf:model>
                 </xh:head>
                 <xh:body>
@@ -1210,7 +1210,7 @@
         <output name="analysis">
             <request request-uri="/orbeon/doc/home-welcome" query-string="id=12&amp;print=false" method="GET">
                 <model scope="" prefixed-id="model1" default-instance-prefixed-id="instance1" analyzed-binds="true">
-                    <variable scope="" prefixed-id="xf-1" model-prefixed-id="model1" binding="false" value="true" name="mv">
+                    <var scope="" prefixed-id="xf-1" model-prefixed-id="model1" binding="false" value="true" name="mv">
                         <value>
                             <analysis expression="instance()" analyzed="true">
                                 <returnable>
@@ -1227,10 +1227,10 @@
                                 </returnable-instances>
                             </analysis>
                         </value>
-                    </variable>
+                    </var>
                 </model>
                 <model scope="" prefixed-id="model2" default-instance-prefixed-id="instance2" analyzed-binds="true">
-                    <variable scope="" prefixed-id="xf-2" model-prefixed-id="model2" binding="false" value="true" name="mv">
+                    <var scope="" prefixed-id="xf-2" model-prefixed-id="model2" binding="false" value="true" name="mv">
                         <value>
                             <analysis expression="instance()" analyzed="true">
                                 <returnable>
@@ -1247,7 +1247,7 @@
                                 </returnable-instances>
                             </analysis>
                         </value>
-                    </variable>
+                    </var>
                 </model>
                 <output scope="" prefixed-id="output1" model-prefixed-id="model2" binding="false" value="true">
                     <value>
@@ -1276,7 +1276,7 @@
         <output name="analysis">
             <request request-uri="/orbeon/doc/home-welcome" query-string="id=12&amp;print=false" method="GET">
                 <model scope="" prefixed-id="model1" default-instance-prefixed-id="instance1" analyzed-binds="true">
-                    <variable scope="" prefixed-id="xf-1" model-prefixed-id="model1" binding="false" value="true" name="mv">
+                    <var scope="" prefixed-id="xf-1" model-prefixed-id="model1" binding="false" value="true" name="mv">
                         <value>
                             <analysis expression="instance()" analyzed="true">
                                 <returnable>
@@ -1293,10 +1293,10 @@
                                 </returnable-instances>
                             </analysis>
                         </value>
-                    </variable>
+                    </var>
                 </model>
                 <model scope="" prefixed-id="model2" default-instance-prefixed-id="instance2" analyzed-binds="true">
-                    <variable scope="" prefixed-id="xf-2" model-prefixed-id="model2" binding="false" value="true" name="mv">
+                    <var scope="" prefixed-id="xf-2" model-prefixed-id="model2" binding="false" value="true" name="mv">
                         <value>
                             <analysis expression="instance()" analyzed="true">
                                 <returnable>
@@ -1313,7 +1313,7 @@
                                 </returnable-instances>
                             </analysis>
                         </value>
-                    </variable>
+                    </var>
                 </model>
                 <output scope="" prefixed-id="output1" model-prefixed-id="model1" binding="false" value="true">
                     <value>
@@ -1470,7 +1470,7 @@
                         </analysis>
                     </value>
                 </output>
-                <variable scope="" prefixed-id="xf-3" model-prefixed-id="model1" binding="false" value="true" name="mv1">
+                <var scope="" prefixed-id="xf-3" model-prefixed-id="model1" binding="false" value="true" name="mv1">
                     <value>
                         <analysis expression="$mv" analyzed="true">
                             <returnable>
@@ -1487,8 +1487,8 @@
                             </returnable-instances>
                         </analysis>
                     </value>
-                </variable>
-                <variable scope="" prefixed-id="xf-4" model-prefixed-id="model2" binding="false" value="true" name="mv2">
+                </var>
+                <var scope="" prefixed-id="xf-4" model-prefixed-id="model2" binding="false" value="true" name="mv2">
                     <value>
                         <analysis expression="$mv" analyzed="true">
                             <returnable>
@@ -1505,7 +1505,7 @@
                             </returnable-instances>
                         </analysis>
                     </value>
-                </variable>
+                </var>
                 <output scope="" prefixed-id="output5a" model-prefixed-id="model1" binding="false" value="true">
                     <value>
                         <analysis expression="string(($mv1)[1])" analyzed="true">
@@ -1551,13 +1551,13 @@
                         <xf:instance id="instance1">
                             <instance>42</instance>
                         </xf:instance>
-                        <xxf:variable name="mv" select="xxf:instance('instance2')"/>
+                        <xf:var name="mv" value="xxf:instance('instance2')"/>
                     </xf:model>
                     <xf:model id="model2">
                         <xf:instance id="instance2">
                             <instance>43</instance>
                         </xf:instance>
-                        <xxf:variable name="mv" select="xxf:instance('instance1')"/>
+                        <xf:var name="mv" value="xxf:instance('instance1')"/>
                     </xf:model>
                 </xh:head>
                 <xh:body/>
@@ -1566,7 +1566,7 @@
         <output name="analysis">
             <request request-uri="/orbeon/doc/home-welcome" query-string="id=12&amp;print=false" method="GET">
                 <model scope="" prefixed-id="model1" default-instance-prefixed-id="instance1" analyzed-binds="true">
-                    <variable scope="" prefixed-id="xf-1" model-prefixed-id="model1" binding="false" value="true" name="mv">
+                    <var scope="" prefixed-id="xf-1" model-prefixed-id="model1" binding="false" value="true" name="mv">
                         <value>
                             <analysis expression="xxf:instance('instance2')" analyzed="true">
                                 <returnable>
@@ -1583,10 +1583,10 @@
                                 </returnable-instances>
                             </analysis>
                         </value>
-                    </variable>
+                    </var>
                 </model>
                 <model scope="" prefixed-id="model2" default-instance-prefixed-id="instance2" analyzed-binds="true">
-                    <variable scope="" prefixed-id="xf-2" model-prefixed-id="model2" binding="false" value="true" name="mv">
+                    <var scope="" prefixed-id="xf-2" model-prefixed-id="model2" binding="false" value="true" name="mv">
                         <value>
                             <analysis expression="xxf:instance('instance1')" analyzed="true">
                                 <returnable>
@@ -1603,7 +1603,7 @@
                                 </returnable-instances>
                             </analysis>
                         </value>
-                    </variable>
+                    </var>
                 </model>
             </request>
         </output>
@@ -1624,16 +1624,16 @@
                             <instance/>
                         </xf:instance>
 
-                        <xxf:variable name="v11a" select="instance()"/>
-                        <xxf:variable name="v11b" select="instance('instance11')"/>
-                        <xxf:variable name="v12" select="instance('instance12')"/>
+                        <xf:var name="v11a" value="instance()"/>
+                        <xf:var name="v11b" value="instance('instance11')"/>
+                        <xf:var name="v12" value="instance('instance12')"/>
 
-                        <xxf:variable name="v13" select="xxf:instance('instance21')"/>
-                        <xxf:variable name="v14" select="xxf:instance('instance22')"/>
+                        <xf:var name="v13" value="xxf:instance('instance21')"/>
+                        <xf:var name="v14" value="xxf:instance('instance22')"/>
 
-                        <xxf:variable name="v15a" model="model2" select="instance()"/>
-                        <xxf:variable name="v15b" model="model2" select="instance('instance21')"/>
-                        <xxf:variable name="v16" model="model2" select="instance('instance22')"/>
+                        <xf:var name="v15a" model="model2" value="instance()"/>
+                        <xf:var name="v15b" model="model2" value="instance('instance21')"/>
+                        <xf:var name="v16" model="model2" value="instance('instance22')"/>
 
                     </xf:model>
                     <xf:model id="model2">
@@ -1644,15 +1644,15 @@
                             <instance/>
                         </xf:instance>
 
-                        <xxf:variable name="v21" select="instance()"/>
-                        <xxf:variable name="v22" select="instance('instance22')"/>
+                        <xf:var name="v21" value="instance()"/>
+                        <xf:var name="v22" value="instance('instance22')"/>
 
-                        <xxf:variable name="v23" select="xxf:instance('instance11')"/>
-                        <xxf:variable name="v24" select="xxf:instance('instance12')"/>
+                        <xf:var name="v23" value="xxf:instance('instance11')"/>
+                        <xf:var name="v24" value="xxf:instance('instance12')"/>
 
-                        <xxf:variable name="v25a" model="model1" select="instance()"/>
-                        <xxf:variable name="v25b" model="model1" select="instance('instance11')"/>
-                        <xxf:variable name="v26" model="model1" select="instance('instance12')"/>
+                        <xf:var name="v25a" model="model1" value="instance()"/>
+                        <xf:var name="v25b" model="model1" value="instance('instance11')"/>
+                        <xf:var name="v26" model="model1" value="instance('instance12')"/>
 
                     </xf:model>
                 </xh:head>
@@ -1662,7 +1662,7 @@
         <output name="analysis">
             <request request-uri="/orbeon/doc/home-welcome" query-string="id=12&amp;print=false" method="GET">
                 <model scope="" prefixed-id="model1" default-instance-prefixed-id="instance11" analyzed-binds="true">
-                    <variable scope="" prefixed-id="xf-1" model-prefixed-id="model1" binding="false" value="true" name="v11a">
+                    <var scope="" prefixed-id="xf-1" model-prefixed-id="model1" binding="false" value="true" name="v11a">
                         <value>
                             <analysis expression="instance()" analyzed="true">
                                 <returnable>
@@ -1679,8 +1679,8 @@
                                 </returnable-instances>
                             </analysis>
                         </value>
-                    </variable>
-                    <variable scope="" prefixed-id="xf-2" model-prefixed-id="model1" binding="false" value="true" name="v11b">
+                    </var>
+                    <var scope="" prefixed-id="xf-2" model-prefixed-id="model1" binding="false" value="true" name="v11b">
                         <value>
                             <analysis expression="instance('instance11')" analyzed="true">
                                 <returnable>
@@ -1697,8 +1697,8 @@
                                 </returnable-instances>
                             </analysis>
                         </value>
-                    </variable>
-                    <variable scope="" prefixed-id="xf-3" model-prefixed-id="model1" binding="false" value="true" name="v12">
+                    </var>
+                    <var scope="" prefixed-id="xf-3" model-prefixed-id="model1" binding="false" value="true" name="v12">
                         <value>
                             <analysis expression="instance('instance12')" analyzed="true">
                                 <returnable>
@@ -1715,8 +1715,8 @@
                                 </returnable-instances>
                             </analysis>
                         </value>
-                    </variable>
-                    <variable scope="" prefixed-id="xf-4" model-prefixed-id="model1" binding="false" value="true" name="v13">
+                    </var>
+                    <var scope="" prefixed-id="xf-4" model-prefixed-id="model1" binding="false" value="true" name="v13">
                         <value>
                             <analysis expression="xxf:instance('instance21')" analyzed="true">
                                 <returnable>
@@ -1733,8 +1733,8 @@
                                 </returnable-instances>
                             </analysis>
                         </value>
-                    </variable>
-                    <variable scope="" prefixed-id="xf-5" model-prefixed-id="model1" binding="false" value="true" name="v14">
+                    </var>
+                    <var scope="" prefixed-id="xf-5" model-prefixed-id="model1" binding="false" value="true" name="v14">
                         <value>
                             <analysis expression="xxf:instance('instance22')" analyzed="true">
                                 <returnable>
@@ -1751,8 +1751,8 @@
                                 </returnable-instances>
                             </analysis>
                         </value>
-                    </variable>
-                    <variable scope="" prefixed-id="xf-6" model-prefixed-id="model2" binding="false" value="true" name="v15a">
+                    </var>
+                    <var scope="" prefixed-id="xf-6" model-prefixed-id="model2" binding="false" value="true" name="v15a">
                         <value>
                             <analysis expression="instance()" analyzed="true">
                                 <returnable>
@@ -1769,8 +1769,8 @@
                                 </returnable-instances>
                             </analysis>
                         </value>
-                    </variable>
-                    <variable scope="" prefixed-id="xf-7" model-prefixed-id="model2" binding="false" value="true" name="v15b">
+                    </var>
+                    <var scope="" prefixed-id="xf-7" model-prefixed-id="model2" binding="false" value="true" name="v15b">
                         <value>
                             <analysis expression="instance('instance21')" analyzed="true">
                                 <returnable>
@@ -1787,8 +1787,8 @@
                                 </returnable-instances>
                             </analysis>
                         </value>
-                    </variable>
-                    <variable scope="" prefixed-id="xf-8" model-prefixed-id="model2" binding="false" value="true" name="v16">
+                    </var>
+                    <var scope="" prefixed-id="xf-8" model-prefixed-id="model2" binding="false" value="true" name="v16">
                         <value>
                             <analysis expression="instance('instance22')" analyzed="true">
                                 <returnable>
@@ -1805,10 +1805,10 @@
                                 </returnable-instances>
                             </analysis>
                         </value>
-                    </variable>
+                    </var>
                 </model>
                 <model scope="" prefixed-id="model2" default-instance-prefixed-id="instance21" analyzed-binds="true">
-                    <variable scope="" prefixed-id="xf-9" model-prefixed-id="model2" binding="false" value="true" name="v21">
+                    <var scope="" prefixed-id="xf-9" model-prefixed-id="model2" binding="false" value="true" name="v21">
                         <value>
                             <analysis expression="instance()" analyzed="true">
                                 <returnable>
@@ -1825,8 +1825,8 @@
                                 </returnable-instances>
                             </analysis>
                         </value>
-                    </variable>
-                    <variable scope="" prefixed-id="xf-10" model-prefixed-id="model2" binding="false" value="true" name="v22">
+                    </var>
+                    <var scope="" prefixed-id="xf-10" model-prefixed-id="model2" binding="false" value="true" name="v22">
                         <value>
                             <analysis expression="instance('instance22')" analyzed="true">
                                 <returnable>
@@ -1843,8 +1843,8 @@
                                 </returnable-instances>
                             </analysis>
                         </value>
-                    </variable>
-                    <variable scope="" prefixed-id="xf-11" model-prefixed-id="model2" binding="false" value="true" name="v23">
+                    </var>
+                    <var scope="" prefixed-id="xf-11" model-prefixed-id="model2" binding="false" value="true" name="v23">
                         <value>
                             <analysis expression="xxf:instance('instance11')" analyzed="true">
                                 <returnable>
@@ -1861,8 +1861,8 @@
                                 </returnable-instances>
                             </analysis>
                         </value>
-                    </variable>
-                    <variable scope="" prefixed-id="xf-12" model-prefixed-id="model2" binding="false" value="true" name="v24">
+                    </var>
+                    <var scope="" prefixed-id="xf-12" model-prefixed-id="model2" binding="false" value="true" name="v24">
                         <value>
                             <analysis expression="xxf:instance('instance12')" analyzed="true">
                                 <returnable>
@@ -1879,8 +1879,8 @@
                                 </returnable-instances>
                             </analysis>
                         </value>
-                    </variable>
-                    <variable scope="" prefixed-id="xf-13" model-prefixed-id="model1" binding="false" value="true" name="v25a">
+                    </var>
+                    <var scope="" prefixed-id="xf-13" model-prefixed-id="model1" binding="false" value="true" name="v25a">
                         <value>
                             <analysis expression="instance()" analyzed="true">
                                 <returnable>
@@ -1897,8 +1897,8 @@
                                 </returnable-instances>
                             </analysis>
                         </value>
-                    </variable>
-                    <variable scope="" prefixed-id="xf-14" model-prefixed-id="model1" binding="false" value="true" name="v25b">
+                    </var>
+                    <var scope="" prefixed-id="xf-14" model-prefixed-id="model1" binding="false" value="true" name="v25b">
                         <value>
                             <analysis expression="instance('instance11')" analyzed="true">
                                 <returnable>
@@ -1915,8 +1915,8 @@
                                 </returnable-instances>
                             </analysis>
                         </value>
-                    </variable>
-                    <variable scope="" prefixed-id="xf-15" model-prefixed-id="model1" binding="false" value="true" name="v26">
+                    </var>
+                    <var scope="" prefixed-id="xf-15" model-prefixed-id="model1" binding="false" value="true" name="v26">
                         <value>
                             <analysis expression="instance('instance12')" analyzed="true">
                                 <returnable>
@@ -1933,13 +1933,13 @@
                                 </returnable-instances>
                             </analysis>
                         </value>
-                    </variable>
+                    </var>
                 </model>
             </request>
         </output>
     </test>
 
-    <test description="Basic xxf:variable/xxf:sequence" name="oxf:java">
+    <test description="Basic xf:var/xxf:sequence" name="oxf:java">
         <input name="config">
             <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
         </input>
@@ -1956,22 +1956,22 @@
                             </instance>
                         </xf:instance>
 
-                        <xxf:variable id="vfoo" name="foo" select="foo"/>
-                        <xxf:variable id="vbar" name="bar" select="bar"/>
+                        <xf:var id="vfoo" name="foo" value="foo"/>
+                        <xf:var id="vbar" name="bar" value="bar"/>
 
                     </xf:model>
                 </xh:head>
                 <xh:body>
                     
-                    <xxf:variable id="vsum" name="sum">
-                        <xxf:sequence select="$foo + $bar"/>
-                    </xxf:variable>
-                    <xxf:variable id="vproduct" name="product">
-                        <xxf:sequence ref="foo" select=". * $bar"/>
-                    </xxf:variable>
-                    <xxf:variable id="vdifference" name="difference" ref="foo">
-                        <xxf:sequence select=". - $bar"/>
-                    </xxf:variable>
+                    <xf:var id="vsum" name="sum">
+                        <xxf:sequence value="$foo + $bar"/>
+                    </xf:var>
+                    <xf:var id="vproduct" name="product">
+                        <xxf:sequence ref="foo" value=". * $bar"/>
+                    </xf:var>
+                    <xf:var id="vdifference" name="difference" ref="foo">
+                        <xxf:sequence value=". - $bar"/>
+                    </xf:var>
 
                     <xf:output id="osum" value="$sum"/>
                     <xf:output id="oproduct" value="$product"/>
@@ -1982,7 +1982,7 @@
         <output name="analysis">
             <request request-uri="/orbeon/doc/home-welcome" query-string="id=12&amp;print=false" method="GET">
                 <model scope="" prefixed-id="model" default-instance-prefixed-id="instance" analyzed-binds="true">
-                <variable scope="" prefixed-id="vfoo" model-prefixed-id="model" binding="false" value="true" name="foo">
+                <var scope="" prefixed-id="vfoo" model-prefixed-id="model" binding="false" value="true" name="foo">
                     <value>
                         <analysis expression="foo" analyzed="true">
                             <returnable>
@@ -1999,8 +1999,8 @@
                             </returnable-instances>
                         </analysis>
                     </value>
-                </variable>
-                <variable scope="" prefixed-id="vbar" model-prefixed-id="model" binding="false" value="true" name="bar">
+                </var>
+                <var scope="" prefixed-id="vbar" model-prefixed-id="model" binding="false" value="true" name="bar">
                     <value>
                         <analysis expression="bar" analyzed="true">
                             <returnable>
@@ -2017,9 +2017,9 @@
                             </returnable-instances>
                         </analysis>
                     </value>
-                </variable>
+                </var>
             </model>
-                <variable scope="" prefixed-id="vsum" model-prefixed-id="model" binding="false" value="true" name="sum">
+                <var scope="" prefixed-id="vsum" model-prefixed-id="model" binding="false" value="true" name="sum">
                     <value>
                         <analysis expression="$foo + $bar" analyzed="true">
                             <value-dependent>
@@ -2034,8 +2034,8 @@
                             </dependent-instances>
                         </analysis>
                     </value>
-                </variable>
-                <variable scope="" prefixed-id="vproduct" model-prefixed-id="model" binding="false" value="true" name="product">
+                </var>
+                <var scope="" prefixed-id="vproduct" model-prefixed-id="model" binding="false" value="true" name="product">
                     <value>
                         <analysis expression=". * $bar" analyzed="true">
                             <value-dependent>
@@ -2050,8 +2050,8 @@
                             </dependent-instances>
                         </analysis>
                     </value>
-                </variable>
-                <variable scope="" prefixed-id="vdifference" model-prefixed-id="model" binding="true" value="true" name="difference">
+                </var>
+                <var scope="" prefixed-id="vdifference" model-prefixed-id="model" binding="true" value="true" name="difference">
                     <binding>
                         <analysis expression="foo" analyzed="true">
                             <returnable>
@@ -2082,7 +2082,7 @@
                             </dependent-instances>
                         </analysis>
                     </value>
-                </variable>
+                </var>
                 <output scope="" prefixed-id="osum" model-prefixed-id="model" binding="false" value="true">
                     <value>
                         <analysis expression="string(($sum)[1])" analyzed="true">
@@ -2135,7 +2135,7 @@
         </output>
     </test>
 
-    <test description="XBL xxf:variable/xxf:sequence" name="oxf:java">
+    <test description="XBL xf:var/xxf:sequence" name="oxf:java">
         <input name="config">
             <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
         </input>
@@ -2154,12 +2154,12 @@
                             </instance>
                         </xf:instance>
 
-                        <xxf:variable id="vfoo" name="foo">
-                            <xxf:sequence  select="foo"/>
-                        </xxf:variable>
-                        <xxf:variable id="vbar" name="bar">
-                            <xxf:sequence  select="bar"/>
-                        </xxf:variable>
+                        <xf:var id="vfoo" name="foo">
+                            <xxf:sequence  value="foo"/>
+                        </xf:var>
+                        <xf:var id="vbar" name="bar">
+                            <xxf:sequence  value="bar"/>
+                        </xf:var>
                     </xf:model>
                     <xbl:xbl>
                         <xbl:binding id="fr-foo" element="fr|foo">
@@ -2172,11 +2172,11 @@
                             </xbl:implementation>
                             <xbl:template>
 
-                                <xxf:variable id="iv" name="internal" select="."/>
-                                <xxf:variable id="ov" name="external">
-                                    <xxf:sequence xbl:attr="select=ref" xxbl:scope="outer"/>
-                                </xxf:variable>
-                                <xxf:variable id="ro" name="readonly" select="exf:readonly($external)"/>
+                                <xf:var id="iv" name="internal" value="."/>
+                                <xf:var id="ov" name="external">
+                                    <xxf:sequence xbl:attr="value=ref" xxbl:scope="outer"/>
+                                </xf:var>
+                                <xf:var id="ro" name="readonly" value="exf:readonly($external)"/>
 
                                 <xf:group ref="$external" id="group-external"/>
                                 <xf:output id="oexternal" value="$external"/>
@@ -2193,7 +2193,7 @@
         <output name="analysis">
             <request request-uri="/orbeon/doc/home-welcome" query-string="id=12&amp;print=false" method="GET">
                 <model scope="" prefixed-id="model" default-instance-prefixed-id="instance" analyzed-binds="true">
-                    <variable scope="" prefixed-id="vfoo" model-prefixed-id="model" binding="false" value="true" name="foo">
+                    <var scope="" prefixed-id="vfoo" model-prefixed-id="model" binding="false" value="true" name="foo">
                         <value>
                             <analysis expression="foo" analyzed="true">
                                 <returnable>
@@ -2210,8 +2210,8 @@
                                 </returnable-instances>
                             </analysis>
                         </value>
-                    </variable>
-                    <variable scope="" prefixed-id="vbar" model-prefixed-id="model" binding="false" value="true" name="bar">
+                    </var>
+                    <var scope="" prefixed-id="vbar" model-prefixed-id="model" binding="false" value="true" name="bar">
                         <value>
                             <analysis expression="bar" analyzed="true">
                                 <returnable>
@@ -2228,12 +2228,12 @@
                                 </returnable-instances>
                             </analysis>
                         </value>
-                    </variable>
+                    </var>
                 </model>
                 <foo scope="" prefixed-id="my-foo" model-prefixed-id="model" binding="false" value="false"/>
                 <model scope="my-foo" prefixed-id="my-foo$model" default-instance-prefixed-id="my-foo$instance" analyzed-binds="true"/>
                 <template scope="my-foo" prefixed-id="my-foo$xf-4" model-prefixed-id="my-foo$model" binding="false" value="false"/>
-                <variable scope="my-foo" prefixed-id="my-foo$iv" model-prefixed-id="my-foo$model" binding="false" value="true" name="internal">
+                <var scope="my-foo" prefixed-id="my-foo$iv" model-prefixed-id="my-foo$model" binding="false" value="true" name="internal">
                     <value>
                         <analysis expression="." analyzed="true">
                             <returnable>
@@ -2250,8 +2250,8 @@
                             </returnable-instances>
                         </analysis>
                     </value>
-                </variable>
-                <variable scope="my-foo" prefixed-id="my-foo$ov" model-prefixed-id="my-foo$model" binding="false" value="true" name="external">
+                </var>
+                <var scope="my-foo" prefixed-id="my-foo$ov" model-prefixed-id="my-foo$model" binding="false" value="true" name="external">
                     <value>
                         <analysis expression="foo" analyzed="true">
                             <returnable>
@@ -2268,12 +2268,12 @@
                             </returnable-instances>
                         </analysis>
                     </value>
-                </variable>
-                <variable scope="my-foo" prefixed-id="my-foo$ro" model-prefixed-id="my-foo$model" binding="false" value="true" name="readonly">
+                </var>
+                <var scope="my-foo" prefixed-id="my-foo$ro" model-prefixed-id="my-foo$model" binding="false" value="true" name="readonly">
                     <value>
                         <analysis expression="exf:readonly($external)" analyzed="false"/>
                     </value>
-                </variable>
+                </var>
                 <group scope="my-foo" prefixed-id="my-foo$group-external" model-prefixed-id="my-foo$model" binding="true" value="false">
                     <binding>
                         <analysis expression="$external" analyzed="true">
@@ -2389,7 +2389,7 @@
                     </xf:model>
                 </xh:head>
                 <xh:body>
-                    <xxf:variable id="show-variable" name="show" select="value = 'true'"/>
+                    <xf:var id="show-variable" name="show" value="value = 'true'"/>
                     <xf:group id="enclosing-group">
                         <xf:group id="nested-group" ref=".[$show]"/>
                     </xf:group>
@@ -2400,7 +2400,7 @@
         <output name="analysis">
             <request request-uri="/orbeon/doc/home-welcome" query-string="id=12&amp;print=false" method="GET">
                 <model scope="" prefixed-id="model" default-instance-prefixed-id="instance" analyzed-binds="true"/>
-                <variable scope="" prefixed-id="show-variable" model-prefixed-id="model" binding="false" value="true" name="show">
+                <var scope="" prefixed-id="show-variable" model-prefixed-id="model" binding="false" value="true" name="show">
                     <value>
                         <analysis expression="value = 'true'" analyzed="true">
                             <value-dependent>
@@ -2414,7 +2414,7 @@
                             </dependent-instances>
                         </analysis>
                     </value>
-                </variable>
+                </var>
                 <group scope="" prefixed-id="enclosing-group" model-prefixed-id="model" binding="false" value="false"/>
                 <group scope="" prefixed-id="nested-group" model-prefixed-id="model" binding="true" value="false">
                     <binding>
@@ -4353,7 +4353,7 @@
                         <xf:instance id="instance">
                             <instance/>
                         </xf:instance>
-                        <xxf:variable id="v1" name="foo" select="instance()/a"/>
+                        <xf:var id="v1" name="foo" value="instance()/a"/>
                         <xf:bind id="b1" ref="$foo"/>
                         <xf:bind id="b2" ref="." relevant="$foo = 42"/>
                     </xf:model>
@@ -4364,7 +4364,7 @@
         <output name="analysis">
             <request request-uri="/orbeon/doc/home-welcome" query-string="id=12&amp;print=false" method="GET">
                 <model scope="" prefixed-id="model" default-instance-prefixed-id="instance" analyzed-binds="true">
-                    <variable scope="" prefixed-id="v1" model-prefixed-id="model" binding="false" value="true" name="foo">
+                    <var scope="" prefixed-id="v1" model-prefixed-id="model" binding="false" value="true" name="foo">
                         <value>
                             <analysis expression="instance()/a" analyzed="true">
                                 <returnable>
@@ -4381,7 +4381,7 @@
                                 </returnable-instances>
                             </analysis>
                         </value>
-                    </variable>
+                    </var>
                     <binds>
                         <bind id="b1" ref="$foo">
                             <binding>
@@ -4923,11 +4923,11 @@
                         <xf:instance id="instance">
                             <instance/>
                         </xf:instance>
-                        <xxf:variable name="foo">Foo</xxf:variable>
+                        <xf:var name="foo">Foo</xf:var>
                     </xf:model>
                 </xh:head>
                 <xh:body>
-                    <xxf:variable name="bar">Bar</xxf:variable>
+                    <xf:var name="bar">Bar</xf:var>
                     <xf:input id="i1" ref="$foo"/>
                     <xf:output id="o1" value="concat(gaga, $bar)"/>
                 </xh:body>
@@ -4936,17 +4936,17 @@
         <output name="analysis">
             <request request-uri="/orbeon/doc/home-welcome" query-string="id=12&amp;print=false" method="GET">
                 <model scope="" prefixed-id="model" default-instance-prefixed-id="instance" analyzed-binds="true">
-                    <variable scope="" prefixed-id="xf-1" model-prefixed-id="model" binding="false" value="true" name="foo">
+                    <var scope="" prefixed-id="xf-1" model-prefixed-id="model" binding="false" value="true" name="foo">
                         <value>
                             <analysis expression="'CONSTANT'" analyzed="true"/>
                         </value>
-                    </variable>
+                    </var>
                 </model>
-                <variable scope="" prefixed-id="xf-2" model-prefixed-id="model" binding="false" value="true" name="bar">
+                <var scope="" prefixed-id="xf-2" model-prefixed-id="model" binding="false" value="true" name="bar">
                     <value>
                         <analysis expression="'CONSTANT'" analyzed="true"/>
                     </value>
-                </variable>
+                </var>
                 <input scope="" prefixed-id="i1" model-prefixed-id="model" binding="true" value="true">
                     <binding>
                         <analysis expression="$foo" analyzed="true"/>
@@ -4986,7 +4986,7 @@
                         <xf:instance id="i11">
                             <instance label=""/>
                         </xf:instance>
-                        <xxf:variable name="label" select="instance()/@label"/>
+                        <xf:var name="label" value="instance()/@label"/>
                     </xf:model>
                 </xh:head>
                 <xh:body>
@@ -4999,7 +4999,7 @@
         <output name="analysis">
             <request request-uri="/orbeon/doc/home-welcome" query-string="id=12&amp;print=false" method="GET">
                 <model scope="" prefixed-id="m1" default-instance-prefixed-id="i11" analyzed-binds="true">
-                    <variable scope="" prefixed-id="xf-1" model-prefixed-id="m1" binding="false" value="true" name="label">
+                    <var scope="" prefixed-id="xf-1" model-prefixed-id="m1" binding="false" value="true" name="label">
                         <value>
                             <analysis expression="instance()/@label" analyzed="true">
                                 <returnable>
@@ -5016,7 +5016,7 @@
                                 </returnable-instances>
                             </analysis>
                         </value>
-                    </variable>
+                    </var>
                 </model>
                 <group scope="" prefixed-id="g1" model-prefixed-id="m1" binding="false" value="false">
                     <label>
@@ -5052,7 +5052,7 @@
                     </xf:model>
                 </xh:head>
                 <xh:body>
-                    <xxf:variable id="bar-variable" name="bar" select="@bar"/>
+                    <xf:var id="bar-variable" name="bar" value="@bar"/>
                     <xf:label id="my-label" for="my-input" value="$bar"/>
                     <xf:input id="my-input" ref="instance()"/>
                 </xh:body>
@@ -5061,7 +5061,7 @@
         <output name="analysis">
             <request request-uri="/orbeon/doc/home-welcome" query-string="id=12&amp;print=false" method="GET">
                 <model scope="" prefixed-id="model" default-instance-prefixed-id="instance" analyzed-binds="true"/>
-                <variable scope="" prefixed-id="bar-variable" model-prefixed-id="model" binding="false" value="true" name="bar">
+                <var scope="" prefixed-id="bar-variable" model-prefixed-id="model" binding="false" value="true" name="bar">
                     <value>
                         <analysis expression="@bar" analyzed="true">
                             <returnable>
@@ -5078,7 +5078,7 @@
                             </returnable-instances>
                         </analysis>
                     </value>
-                </variable>
+                </var>
                 <input scope="" prefixed-id="my-input" model-prefixed-id="model" binding="true" value="true">
                     <binding>
                         <analysis expression="instance()" analyzed="true">
@@ -5616,19 +5616,19 @@
                             <xbl:template>
                                 <xf:group id="foo-group" xxbl:scope="outer">
                                     <!-- Pointing to the outer scope -->
-                                    <xxf:variable id="v1" name="v1" select="."/>
+                                    <xf:var id="v1" name="v1" value="."/>
 
-                                    <xxf:variable id="v2" name="v2" xxbl:scope="inner">
-                                        <xxf:sequence select="$v1" xxbl:scope="outer"/>
-                                    </xxf:variable>
+                                    <xf:var id="v2" name="v2" xxbl:scope="inner">
+                                        <xxf:sequence value="$v1" xxbl:scope="outer"/>
+                                    </xf:var>
                                     <xf:output id="output1" value="$v2" xxbl:scope="inner"/>
 
                                     <!-- Pointing to the inner scope -->
-                                    <xxf:variable id="v3" name="v3" select="." xxbl:scope="inner"/>
+                                    <xf:var id="v3" name="v3" value="." xxbl:scope="inner"/>
 
-                                    <xxf:variable id="v4" name="v4">
-                                        <xxf:sequence select="$v3" xxbl:scope="inner"/>
-                                    </xxf:variable>
+                                    <xf:var id="v4" name="v4">
+                                        <xxf:sequence value="$v3" xxbl:scope="inner"/>
+                                    </xf:var>
                                     <xf:output id="output2" value="$v4"/>
                                 </xf:group>
                             </xbl:template>
@@ -5647,7 +5647,7 @@
                 <model scope="my-foo" prefixed-id="my-foo$foo-model" default-instance-prefixed-id="my-foo$foo-instance" analyzed-binds="true"/>
                 <template scope="my-foo" prefixed-id="my-foo$xf-2" model-prefixed-id="my-foo$foo-model" binding="false" value="false"/>
                 <group scope="" prefixed-id="my-foo$foo-group" model-prefixed-id="model" binding="false" value="false"/>
-                <variable scope="" prefixed-id="my-foo$v1" model-prefixed-id="model" binding="false" value="true" name="v1">
+                <var scope="" prefixed-id="my-foo$v1" model-prefixed-id="model" binding="false" value="true" name="v1">
                     <value>
                         <analysis expression="." analyzed="true">
                             <returnable>
@@ -5664,8 +5664,8 @@
                             </returnable-instances>
                         </analysis>
                     </value>
-                </variable>
-                <variable scope="my-foo" prefixed-id="my-foo$v2" model-prefixed-id="my-foo$foo-model" binding="false" value="true" name="v2">
+                </var>
+                <var scope="my-foo" prefixed-id="my-foo$v2" model-prefixed-id="my-foo$foo-model" binding="false" value="true" name="v2">
                     <value>
                         <analysis expression="$v1" analyzed="true">
                             <returnable>
@@ -5682,7 +5682,7 @@
                             </returnable-instances>
                         </analysis>
                     </value>
-                </variable>
+                </var>
                 <output scope="my-foo" prefixed-id="my-foo$output1" model-prefixed-id="my-foo$foo-model" binding="false" value="true">
                     <value>
                         <analysis expression="string(($v2)[1])" analyzed="true">
@@ -5698,7 +5698,7 @@
                         </analysis>
                     </value>
                 </output>
-                <variable scope="my-foo" prefixed-id="my-foo$v3" model-prefixed-id="my-foo$foo-model" binding="false" value="true" name="v3">
+                <var scope="my-foo" prefixed-id="my-foo$v3" model-prefixed-id="my-foo$foo-model" binding="false" value="true" name="v3">
                     <value>
                         <analysis expression="." analyzed="true">
                             <returnable>
@@ -5715,8 +5715,8 @@
                             </returnable-instances>
                         </analysis>
                     </value>
-                </variable>
-                <variable scope="" prefixed-id="my-foo$v4" model-prefixed-id="model" binding="false" value="true" name="v4">
+                </var>
+                <var scope="" prefixed-id="my-foo$v4" model-prefixed-id="model" binding="false" value="true" name="v4">
                     <value>
                         <analysis expression="$v3" analyzed="true">
                             <returnable>
@@ -5733,7 +5733,7 @@
                             </returnable-instances>
                         </analysis>
                     </value>
-                </variable>
+                </var>
                 <output scope="" prefixed-id="my-foo$output2" model-prefixed-id="model" binding="false" value="true">
                     <value>
                         <analysis expression="string(($v4)[1])" analyzed="true">
@@ -5780,7 +5780,7 @@
                     </xbl:xbl>
                 </xh:head>
                 <xh:body>
-                    <xxf:variable name="bar" select="instance()/bar"/>
+                    <xf:var name="bar" value="instance()/bar"/>
                     <fr:foo id="my-foo" label-ref="$bar"/>
                 </xh:body>
             </xh:html>
@@ -5788,7 +5788,7 @@
         <output name="analysis">
             <request request-uri="/orbeon/doc/home-welcome" query-string="id=12&amp;print=false" method="GET">
                 <model scope="" prefixed-id="model" default-instance-prefixed-id="instance" analyzed-binds="true"/>
-                <variable scope="" prefixed-id="xf-2" model-prefixed-id="model" binding="false" value="true" name="bar">
+                <var scope="" prefixed-id="xf-2" model-prefixed-id="model" binding="false" value="true" name="bar">
                     <value>
                         <analysis expression="instance()/bar" analyzed="true">
                             <returnable>
@@ -5805,7 +5805,7 @@
                             </returnable-instances>
                         </analysis>
                     </value>
-                </variable>
+                </var>
                 <foo scope="" prefixed-id="my-foo" model-prefixed-id="model" binding="false" value="false"/>
                 <template scope="my-foo" prefixed-id="my-foo$xf-3" binding="false" value="false"/>
                 <group scope="my-foo" prefixed-id="my-foo$foo-group" binding="false" value="false">
@@ -6594,7 +6594,7 @@
                                 </deleted>
                             </instance>
                         </xf:instance>
-                        <xxf:variable name="deleted" select="deleted"/>
+                        <xf:var name="deleted" value="deleted"/>
                         <xf:action ev:event="xforms-ready">
                             <!-- NOTE: setindex is needed to cause the NPE upon delete -->
                             <xf:setindex repeat="my-index" index="2"/>

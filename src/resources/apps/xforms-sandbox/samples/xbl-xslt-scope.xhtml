@@ -97,14 +97,14 @@
                             </xhtml:div>
                         </xsl:template>
                         <xsl:template match="xforms:repeat">
-                            <xxforms:variable name="sortOrder" xxbl:scope="outer">
-                                <xxforms:sequence select="order" xxbl:scope="inner"/>
-                            </xxforms:variable>
-                            <xxforms:variable name="sortKey" xxbl:scope="outer">
-                                <xxforms:sequence select="key" xxbl:scope="inner"/>
-                            </xxforms:variable>
-                            <xxforms:variable name="nodeset" select="{@nodeset}" xxbl:scope="outer"/>
-                            <xxforms:variable name="rewrittenNodeset" xxbl:scope="outer">
+                            <xforms:var name="sortOrder" xxbl:scope="outer">
+                                <xxforms:sequence value="order" xxbl:scope="inner"/>
+                            </xforms:var>
+                            <xforms:var name="sortKey" xxbl:scope="outer">
+                                <xxforms:sequence value="key" xxbl:scope="inner"/>
+                            </xforms:var>
+                            <xforms:var name="nodeset" value="{@nodeset}" xxbl:scope="outer"/>
+                            <xforms:var name="rewrittenNodeset" xxbl:scope="outer">
                                 <xxforms:sequence xxbl:scope="outer"
                                     select="
                                 
@@ -114,7 +114,7 @@
                                 
                                 "
                                 />
-                            </xxforms:variable>
+                            </xforms:var>
                             <xforms:repeat id="repeat" nodeset="$rewrittenNodeset" xxbl:scope="outer">
                                 <xsl:apply-templates select="node()"/>
                             </xforms:repeat>

@@ -124,7 +124,7 @@
             </xhtml:tr>
             <xhtml:tr>
                 <xhtml:td>
-                    <xxforms:variable name="current-item"
+                    <xforms:var name="current-item"
                         select="instance(instance('main-instance')/data-set)//item[@value = instance('main-instance')/select1]"/>
                     <xhtml:p>
                         <xforms:output ref="select1">
@@ -163,7 +163,7 @@
             </xhtml:tr>
             <xhtml:tr>
                 <xhtml:td>
-                    <xxforms:variable name="current-items"
+                    <xforms:var name="current-items"
                         select="instance(instance('main-instance')/data-set)//item[@value = tokenize(instance('main-instance')/select, '\s')]"/>
                     <xhtml:p>
                         <xforms:output ref="select">

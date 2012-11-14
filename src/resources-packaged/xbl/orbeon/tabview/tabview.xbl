@@ -69,20 +69,20 @@
                         <!-- Builds relevance-related variables for each tab -->
                         <xsl:for-each select="fr:tab">
                             <!-- Point to whatever the fr:tab is bound to, if anything -->
-                            <xxforms:variable name="fr-tab-binding-{position()}">
-                                <xxforms:sequence xxbl:scope="outer" select=".">
+                            <xforms:var name="fr-tab-binding-{position()}">
+                                <xxforms:sequence xxbl:scope="outer" value=".">
                                     <xsl:copy-of select="@model | @context | @ref | @bind"/>
                                 </xxforms:sequence>
-                            </xxforms:variable>
+                            </xforms:var>
                             <!--  Is this tab relevant -->
-                            <xxforms:variable name="fr-tab-relevance-{position()}"
+                            <xforms:var name="fr-tab-relevance-{position()}"
                                 select="exists($fr-tab-binding-{position()}) and exf:relevant($fr-tab-binding-{position()})"/>
-                            <xxforms:variable name="fr-tab-relevance-{position()}"
+                            <xforms:var name="fr-tab-relevance-{position()}"
                                 select="exists($fr-tab-binding-{position()}) and exf:relevant($fr-tab-binding-{position()})"/>
                         </xsl:for-each>
 
                         <!-- Contains the relevance for all the tabs as a sequence of boolean values -->
-                        <xxforms:variable name="fr-tab-relevances" select="({string-join(
+                        <xforms:var name="fr-tab-relevances" value="({string-join(
                                 for $tab-index in 1 to count(fr:tab) return concat('$fr-tab-relevance-', $tab-index), ',')})"/>
                         <!-- Store index of the first tab which is relevant -->
                         <xforms:setvalue ev:event="xforms-enabled" ev:target="#observer" ref="active-tab-position" value="index-of($fr-tab-relevances, true())[1]"/>

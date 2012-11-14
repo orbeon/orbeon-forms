@@ -160,7 +160,7 @@
             <xforms:output id="fr-parameters-instance-document" ref="xxforms:instance('fr-parameters-instance')/document" style="display: none"/>
 
             <!-- When the mode changes to "edit" after a save from /new, attempt to change the URL -->
-            <xxforms:variable name="mode-for-save" select="xxforms:instance('fr-parameters-instance')/mode/string()">
+            <xforms:var name="mode-for-save" value="xxforms:instance('fr-parameters-instance')/mode/string()">
                 <!-- If URI is /new (it should be), change it to /edit/id -->
                 <!-- If browser supporting the HTML5 history API (http://goo.gl/Ootqu) -->
                 <xxforms:script ev:event="xforms-value-changed" if="$mode-for-save = 'edit'">
@@ -169,7 +169,7 @@
                             history.replaceState(null, "", "edit/" + ORBEON.xforms.Document.getValue("fr-parameters-instance-document"));
                     }
                 </xxforms:script>
-            </xxforms:variable>
+            </xforms:var>
 
             <!-- This is aHACK for Form Builder only: place non-relevant instances of all toolbox controls so that
                  xxf:dynamic will have all the JavaScript and CSS resources available on the client.
@@ -197,8 +197,8 @@
     <xsl:template match="fr:captcha" name="fr-captcha">
         <!-- Captcha -->
         <xforms:group appearance="xxforms:internal"  model="fr-persistence-model">
-            <xxforms:variable name="captcha" model="fr-persistence-model" select="instance('fr-persistence-instance')/captcha"/>
-            <xxforms:variable name="mode" select="xxforms:instance('fr-parameters-instance')/mode"/>
+            <xforms:var name="captcha" model="fr-persistence-model" value="instance('fr-persistence-instance')/captcha"/>
+            <xforms:var name="mode" value="xxforms:instance('fr-parameters-instance')/mode"/>
             <xsl:if test="$has-captcha">
                 <xforms:group ref=".[$mode = ('new', 'edit') and not(property('xxforms:noscript')) and $captcha = 'false']" class="fr-captcha">
                     <!-- Captcha component: either reCAPTCHA or SimpleCaptcha -->
@@ -279,12 +279,12 @@
     <xsl:template match="fr:logo">
         <xsl:if test="not($hide-logo)">
 
-            <xxforms:variable name="logo-uri"
+            <xforms:var name="logo-uri"
                 select="({if (@paths) then concat(@paths, ', ') else ''}xxforms:instance('fr-form-metadata')/logo,
                          '{$default-logo-uri}')[normalize-space()][1]"/>
 
             <!-- If image comes from resources, use an img tag so we can serve GIF for IE6 -->
-            <xxforms:variable name="is-logo-in-resources" select="starts-with($logo-uri, 'oxf:')"/>
+            <xforms:var name="is-logo-in-resources" value="starts-with($logo-uri, 'oxf:')"/>
             <xhtml:span class="fr-logo">
                 <xforms:group ref=".[$is-logo-in-resources]">
                     <xhtml:img src="{{substring-after($logo-uri, 'oxf:')}}" alt=""/>
@@ -300,7 +300,7 @@
         <!-- Switch language -->
         <xhtml:div class="fr-language-choice">
             <!-- Put default language first, then other languages -->
-            <xxforms:variable
+            <xforms:var
                 name="available-languages"
                 model="fr-resources-model"
                 value="formRunner:getFormLangSelection($app, $form, xxforms:instance('fr-form-resources')/resource/@xml:lang/string())"/>
@@ -417,7 +417,7 @@
         <xforms:group
             ref=".[normalize-space(string-join(({string-join(((descendant-or-self::fr:section | .//xforms:*)[@id]/xforms:help/@ref), ',')}), ''))]">
             <xhtml:li class="xforms-help-group">
-                <xxforms:variable name="section-has-help" select="normalize-space({xforms:help/@ref}) != ''" as="xs:boolean"/>
+                <xforms:var name="section-has-help" value="normalize-space({xforms:help/@ref}) != ''" as="xs:boolean"/>
                 <!-- Case where current section has help -->
                 <xforms:group ref=".[$section-has-help]">
                     <!-- Linked reachable from help icon -->
@@ -505,7 +505,7 @@
                     <!-- Form is invalid -->
 
                     <!-- Display localized errors count -->
-                    <xxforms:variable name="message" as="xs:string" model="fr-error-summary-model"
+                    <xforms:var name="message" as="xs:string" model="fr-error-summary-model"
                         select="for $c in errors-count return
                                       if ($c castable as xs:integer and xs:integer($c) > 0)
                                       then concat($c, ' ', $fr-resources/summary/titles/(if (xs:integer($c) = 1) then error-count else errors-count))

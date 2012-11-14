@@ -46,7 +46,7 @@
                     <xi:include href="oxf:/xbl/orbeon/inplace-input/inplace-input.xbl" xxi:omit-xml-base="true"/>
                 </xhtml:head>
                 <xhtml:body>
-                    <xxforms:variable name="my-hint" select="hint"/>
+                    <xforms:var name="my-hint" value="hint"/>
                     <fr:inplace-input id="my-inplace-input" ref="value">
                         <xforms:label ref="../label"/>
                         <xforms:hint ref="$my-hint"/>

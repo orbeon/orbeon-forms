@@ -55,9 +55,9 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <xxforms:variable name="department-position" select="position()"/>
+                    <xforms:var name="department-position" value="position()"/>
                     <xforms:repeat nodeset="employee" id="repeat-employee">
-                        <xxforms:variable name="employee-position" select="position()"/>
+                        <xforms:var name="employee-position" value="position()"/>
                         <tr>
                             <td>
                                 <xforms:output id="my-output-1" value="concat($department-position, ' ', $employee-position)"/>

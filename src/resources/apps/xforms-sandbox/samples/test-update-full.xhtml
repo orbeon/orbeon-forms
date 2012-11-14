@@ -66,7 +66,7 @@
             <xhtml:div>
                 <xhtml:table>
                     <xforms:repeat nodeset="instance('numbers')/number">
-                        <xxforms:variable name="position" select="position()"/>
+                        <xforms:var name="position" value="position()"/>
                         <xforms:group ref=".[@value != 2 or instance('ui')/show-two = 'true']" xxforms:update="full" id="group-update-full">
                             <xhtml:tr>
                                 <xhtml:td>

@@ -28,7 +28,7 @@
     xmlns:xbl="http://www.w3.org/ns/xbl"
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
-    <test description="xxforms:variable" name="oxf:pipeline">
+    <test description="xforms:var in view" name="oxf:pipeline">
         <input name="config">
             <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                 <p:param name="response" type="output"/>
@@ -66,12 +66,18 @@
                             </xhtml:head>
                             <xhtml:body>
 
-                                <xxforms:variable name="instance" select="."/>
+                                <!-- Test backward compatibility formats -->
+                                <xxforms:variable name="instance1" select="."/>
+                                <xxforms:variable name="instance2" value="$instance1"/>
+                                <exforms:variable name="instance3" select="$instance2"/>
+
+                                <xforms:var       name="instance" value="$instance3"/>
+
                                 <exforms:variable name="items" select="$instance/item"/>
 
                                 <xforms:repeat nodeset="$items" id="items-repeat">
                                     <exforms:variable name="current-item" select="."/>
-                                    <xxforms:variable name="current-position" select="position()"/>
+                                    <xforms:var name="current-position" value="position()"/>
                                     <xforms:output id="my-count" ref="$current-item/value">
                                         <xforms:label value="concat($current-item/label, ':')"/>
                                         <xforms:setvalue ev:event="my-event" ref="$current-item/value" value="count($items) + $current-position"/>
@@ -151,7 +157,7 @@
                             </xhtml:head>
                             <xhtml:body>
                                 <!-- This test ensures we do not regress with a bug in local variable allocation in XPathCache -->
-                                <xxforms:variable name="my-variable" select="orange"/>
+                                <xforms:var name="my-variable" value="orange"/>
                                 <xforms:output value="string-join(for $foo in pear return concat($foo, '-', $my-variable[1]), ', ') "/>
                             </xhtml:body>
                         </xhtml:html>
@@ -199,8 +205,8 @@
 
                                 <xforms:group id="test-group">
 
-                                    <xxforms:variable name="test-variable-1" select="'42'"/>
-                                    <xxforms:variable name="test-variable-2" select="'101'"/>
+                                    <xforms:var name="test-variable-1" value="'42'"/>
+                                    <xforms:var name="test-variable-2" value="'101'"/>
 
                                     <xforms:action ev:event="foobar">
                                         <xforms:setvalue ref="value1" value="$test-variable-1"/>
@@ -258,8 +264,8 @@
                                 <bar>43</bar>
                             </instance>
                         </xforms:instance>
-                        <xxforms:variable name="foo" select="foo"/>
-                        <xxforms:variable name="bar" select="bar"/>
+                        <xforms:var name="foo" value="foo"/>
+                        <xforms:var name="bar" value="bar"/>
 
                         <xforms:instance id="result1">
                             <instance>
@@ -291,8 +297,8 @@
                                 <gaga>7</gaga>
                             </instance>
                         </xforms:instance>
-                        <xxforms:variable name="gaga" select="gaga"/>
-                        <xxforms:variable name="foo" select="foo"/>
+                        <xforms:var name="gaga" value="gaga"/>
+                        <xforms:var name="foo" value="foo"/>
 
                         <xforms:instance id="result2">
                             <instance>
@@ -309,7 +315,7 @@
                                 <lucky>888</lucky>
                             </instance>
                         </xforms:instance>
-                        <xxforms:variable name="lucky" select="lucky"/>
+                        <xforms:var name="lucky" value="lucky"/>
 
                         <xforms:instance id="result3">
                             <instance>
@@ -323,15 +329,15 @@
                 <xhtml:body>
 
                     <xforms:group id="group1">
-                        <xxforms:variable name="sum" select="$foo + $bar"/>
-                        <xxforms:variable name="product" select="$foo * $bar"/>
+                        <xforms:var name="sum" value="$foo + $bar"/>
+                        <xforms:var name="product" value="$foo * $bar"/>
                         <xforms:group id="group2">
                             <xforms:action ev:event="event1">
                                 <!-- The variables must be in scope -->
                                 <xforms:setvalue ref="instance('result1')/sum" value="$sum"/>
                                 <xforms:setvalue ref="instance('result1')/product" value="$product"/>
 
-                                <xxforms:variable name="difference" select="$foo - $bar"/>
+                                <xforms:var name="difference" value="$foo - $bar"/>
 
                                 <!-- New variable must be in scope -->
                                 <xforms:setvalue ref="instance('result1')/difference" value="$difference"/>
@@ -352,7 +358,7 @@
                                     <xforms:setvalue ref="instance('result2')/sum" value="$sum"/>
                                     <xforms:setvalue ref="instance('result2')/product" value="$product"/>
 
-                                    <xxforms:variable name="difference" select="$foo - $gaga"/>
+                                    <xforms:var name="difference" value="$foo - $gaga"/>
 
                                     <!-- Model change on action -->
                                     <xforms:action model="model3">
@@ -413,7 +419,7 @@
         </output>
     </test>
 
-    <test description="Simple xxforms:sequence within xxforms:variable" name="oxf:pipeline">
+    <test description="Simple xxforms:sequence within xforms:var" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
@@ -427,8 +433,8 @@
                             </instance>
                         </xforms:instance>
 
-                        <xxforms:variable name="foo" select="foo"/>
-                        <xxforms:variable name="bar" select="bar"/>
+                        <xforms:var name="foo" value="foo"/>
+                        <xforms:var name="bar" value="bar"/>
 
                         <xforms:instance id="result">
                             <instance>
@@ -444,12 +450,12 @@
                 <xhtml:body>
 
                     <xforms:group id="group1">
-                        <xxforms:variable name="sum">
-                            <xxforms:sequence select="$foo + $bar"/>
-                        </xxforms:variable>
-                        <xxforms:variable name="product">
-                            <xxforms:sequence ref="foo" select=". * $bar"/>
-                        </xxforms:variable>
+                        <xforms:var name="sum">
+                            <xxforms:sequence value="$foo + $bar"/>
+                        </xforms:var>
+                        <xforms:var name="product">
+                            <xxforms:sequence ref="foo" value=". * $bar"/>
+                        </xforms:var>
                         <xforms:group id="group2">
                             <xforms:action ev:event="my-event">
                                 <xforms:setvalue ref="instance('result')/sum" value="$sum"/>
@@ -499,9 +505,9 @@
                     </xforms:model>
                 </xhtml:head>
                 <xhtml:body>
-                    <xxforms:variable name="foo" select="xs:integer(foo)" as="xs:integer">
+                    <xforms:var name="foo" value="xs:integer(foo)" as="xs:integer">
                         <xforms:setvalue ev:event="xforms-value-changed" ref="bar" value="$foo"/>
-                    </xxforms:variable>
+                    </xforms:var>
                 </xhtml:body>
             </xhtml:html>
         </input>
@@ -542,7 +548,7 @@
                     </xforms:model>
                 </xhtml:head>
                 <xhtml:body>
-                    <xxforms:variable name="foo" select="xs:integer(foo)" as="xs:integer" id="foo"/>
+                    <xforms:var name="foo" value="xs:integer(foo)" as="xs:integer" id="foo"/>
                     <xforms:setvalue ev:observer="foo" ev:event="xforms-value-changed" ref="bar" value="$foo"/>
                 </xhtml:body>
             </xhtml:html>

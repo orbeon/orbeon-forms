@@ -42,8 +42,8 @@ trait VariableAnalysisTrait extends SimpleElementAnalysis with VariableTrait {
                             case _ ⇒ StringAnalysis() // TODO: store constant value?
                         })
 
-                    // If in same scope as xxf:variable, in-scope variables are the same as xxf:variable because we don't
-                    // want the variable defined by xxf:variable to be in-scope for xxf:sequence. Otherwise, use
+                    // If in same scope as xf:var, in-scope variables are the same as xxf:var because we don't
+                    // want the variable defined by xf:var to be in-scope for xxf:sequence. Otherwise, use
                     // default algorithm.
 
                     // TODO: This is bad architecture as we duplicate the logic in ViewTrait.
@@ -61,7 +61,7 @@ trait VariableAnalysisTrait extends SimpleElementAnalysis with VariableTrait {
             case _ ⇒ None
         }
 
-    // Scope of xxf:variable OR nested xxf:sequence if present
+    // Scope of xf:var OR nested xxf:sequence if present
     lazy val (hasSequence, valueScope, valueNamespaceMapping, valueStaticId) = sequenceAnalysis match {
         case Some(sequenceAnalysis) ⇒
             (true, sequenceAnalysis.scope, sequenceAnalysis.namespaceMapping, sequenceAnalysis.staticId)

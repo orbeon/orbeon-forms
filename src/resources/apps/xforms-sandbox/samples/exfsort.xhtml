@@ -38,7 +38,7 @@
     </head>
     <body>
 
-        <xxforms:variable name="lookup-records" select="instance('lookup-instance')/record" as="element(record)+"/>
+        <xforms:var name="lookup-records" value="instance('lookup-instance')/record" as="element(record)+"/>
 
         <h2>Sorted instance using exforms:sort() and a variable</h2>
         <ul>

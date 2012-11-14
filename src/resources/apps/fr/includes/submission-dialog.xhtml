@@ -25,7 +25,7 @@
     <xforms:label ref="$fr-resources/detail/messages/submit-dialog-title"/>
 
     <xhtml:div>
-        <xxforms:variable name="content-from-persistence" select="xxforms:property(string-join(('oxf.fr.detail.submit.content-from-persistence', $app, $form), '.'))"/>
+        <xforms:var name="content-from-persistence" value="xxforms:property(string-join(('oxf.fr.detail.submit.content-from-persistence', $app, $form), '.'))"/>
         <xforms:output ref="if ($content-from-persistence) then . else $fr-resources/detail/messages/submit-dialog-message" mediatype="text/html"/>
     </xhtml:div>
     <xhtml:div class="fr-dialog-buttons">
@@ -64,7 +64,7 @@
                         <xhtml:span><xforms:output value="$fr-resources/detail/labels/submit-dialog-go"/></xhtml:span>
                     </xforms:label>
                     <xforms:action ev:event="DOMActivate">
-                        <xxforms:variable name="uri-xpath" select="xxforms:property(string-join(('oxf.fr.detail.submit.go.uri-xpath', $app, $form), '.'))"/>
+                        <xforms:var name="uri-xpath" value="xxforms:property(string-join(('oxf.fr.detail.submit.go.uri-xpath', $app, $form), '.'))"/>
                         <xforms:load context="xxforms:instance('fr-form-instance')" resource="{saxon:evaluate($uri-xpath)}"/>
                     </xforms:action>
                 </xforms:trigger>
@@ -89,9 +89,9 @@
             <content xmlns=""/>
         </xforms:instance>
 
-        <xxforms:variable name="parameters" select="xxforms:instance('fr-parameters-instance')"/>
-        <xxforms:variable name="app" select="$parameters/app"/>
-        <xxforms:variable name="form" select="$parameters/form"/>
+        <xforms:var name="parameters" value="xxforms:instance('fr-parameters-instance')"/>
+        <xforms:var name="app" value="$parameters/app"/>
+        <xforms:var name="form" value="$parameters/form"/>
 
     </xforms:model>
 </xxforms:dialog>

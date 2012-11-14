@@ -194,7 +194,7 @@
                         <td><xf:output value="concat('$ ', price)"/></td>
                         <td>
                             <!-- Predefined quantities dropdown -->
-                            <xxf:variable name="predefined-quantities" select="for $i in (0 to 29) return normalize-space(xs:string($i * 10))" as="xs:string+"/>
+                            <xf:var name="predefined-quantities" value="for $i in (0 to 29) return normalize-space(xs:string($i * 10))" as="xs:string+"/>
                             <xf:select1 class="quantity-select" ref="quantity">
                                 <!-- Show all predefined quantities -->
                                 <xf:itemset ref="$predefined-quantities">

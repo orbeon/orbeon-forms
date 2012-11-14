@@ -28,7 +28,7 @@
     <xforms:action ev:event="xforms-model-construct-done">
         <!-- Special treatment for Form Builder if roles are configured -->
 
-        <xxforms:variable name="fb-roles"
+        <xforms:var name="fb-roles"
                           value="if (doc-available('oxf:/config/form-builder-permissions.xml')) then doc('oxf:/config/form-builder-permissions.xml')
                                  else if (doc-available('oxf:/config/form-runner-roles.xml')) then doc('oxf:/config/form-runner-roles.xml')
                                  else ()"/>

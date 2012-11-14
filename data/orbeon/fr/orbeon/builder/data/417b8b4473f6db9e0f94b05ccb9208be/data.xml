@@ -1003,7 +1003,7 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                                         <xforms:value ref="us-code"/>
                                     </xforms:itemset>
                                     <xforms:action ev:event="fr-search-changed">
-                                        <xxforms:variable name="search-value" select="event('fr-search-value')"/>
+                                        <xforms:var name="search-value" value="event('fr-search-value')"/>
                                         <xforms:setvalue ref="instance('autocomplete-search-instance')/country-name" value="$search-value"/>
                                         <xforms:send submission="autocomplete-submission"/>
                                     </xforms:action>

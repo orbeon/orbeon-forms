@@ -1156,7 +1156,7 @@
                     </xforms:model>
                 </xhtml:head>
                 <xhtml:body>
-                    <xxforms:variable name="answer" select="42"/>
+                    <xforms:var name="answer" value="42"/>
                     <xforms:setvalue ev:observer="#document" ev:event="my-event" ref="value" value="$answer"/>
 
                     <xforms:input id="my-input" ref="value"/>
@@ -1260,7 +1260,7 @@
                     </xforms:model>
                 </xhtml:head>
                 <xhtml:body>
-                    <xxforms:variable name="answer" select="42"/>
+                    <xforms:var name="answer" value="42"/>
                     <xforms:setvalue ev:event="my-event" ref="value" value="$answer"/>
 
                     <xforms:input id="my-input" ref="value"/>
@@ -1701,28 +1701,28 @@
                                                  ))"/>
 
                         <!-- Must never get event as value is constant-->
-                        <xxforms:variable id="v1" name="v1">foobar</xxforms:variable>
+                        <xforms:var id="v1" name="v1">foobar</xforms:var>
                         <!-- Must get event -->
-                        <xxforms:variable id="v2a" name="v2a" select="value/string()"/>
+                        <xforms:var id="v2a" name="v2a" value="value/string()"/>
                         <!-- Must not get event -->
-                        <xxforms:variable id="v2b" name="v2b" select="value"/>
+                        <xforms:var id="v2b" name="v2b" value="value"/>
                         <!-- Must not get event -->
-                        <xxforms:variable id="v3a" name="v3a" select="constant/string()"/>
-                        <xxforms:variable id="v3b" name="v3b" select="constant"/>
+                        <xforms:var id="v3a" name="v3a" value="constant/string()"/>
+                        <xforms:var id="v3b" name="v3b" value="constant"/>
                         <!-- Must get event -->
-                        <xxforms:variable id="v4a" name="v4a" select="if (value = 'old') then e1 else e2"/>
+                        <xforms:var id="v4a" name="v4a" value="if (value = 'old') then e1 else e2"/>
                         <!-- Must not get event -->
-                        <xxforms:variable id="v4b" name="v4b" select="(if (value = 'old') then e1 else e2)/string()"/>
+                        <xforms:var id="v4b" name="v4b" value="(if (value = 'old') then e1 else e2)/string()"/>
                         <!-- Must get event -->
-                        <xxforms:variable id="v5a" name="v5a" select="if (value = 'old') then e1 else e3"/>
-                        <xxforms:variable id="v5b" name="v5b" select="(if (value = 'old') then e1 else e3)/string()"/>
+                        <xforms:var id="v5a" name="v5a" value="if (value = 'old') then e1 else e3"/>
+                        <xforms:var id="v5b" name="v5b" value="(if (value = 'old') then e1 else e3)/string()"/>
                         <!-- Must get event -->
-                        <xxforms:variable id="v6" name="v6" select="if (value = 'old') then (e1, e2) else (e1, e2, e3)"/>
-                        <xxforms:variable id="v7" name="v7" select="if (value = 'old') then 'tomato' else 42"/>
+                        <xforms:var id="v6" name="v6" value="if (value = 'old') then (e1, e2) else (e1, e2, e3)"/>
+                        <xforms:var id="v7" name="v7" value="if (value = 'old') then 'tomato' else 42"/>
 
                     </xforms:group>
                     <!-- Must get event -->
-                    <xxforms:variable id="v8" name="v8" select="value/string()">
+                    <xforms:var id="v8" name="v8" value="value/string()">
                         <xforms:insert ev:event="xforms-value-changed"
                                        context="instance('events')" nodeset="*"
                                        origin="xxforms:element('event',
@@ -1730,7 +1730,7 @@
                                                  xxforms:attribute('target', event('xxforms:targetid'))
                                                  ))"/>
                         <xf:action ev:event="#all" ev:propagate="stop"/>
-                    </xxforms:variable>
+                    </xforms:var>
                 </xhtml:body>
             </xhtml:html>
         </input>

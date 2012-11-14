@@ -114,7 +114,7 @@
                          xforms:setvalue/@value[starts-with(., 'instance(''fr-form-instance'')/*')]" mode="filter-actions">
         <xsl:attribute name="{name()}" select="concat('instance(''fr-form-instance'')', substring-after(., 'instance(''fr-form-instance'')/*'))"/>
     </xsl:template>
-    <xsl:template match="xxforms:variable[@name = 'control-resources']" mode="filter-actions">
+    <xsl:template match="xxforms:variable[@name = 'control-resources'] | xforms:var[@name = 'control-resources']" mode="filter-actions">
         <xforms:var name="control-resources" value="$form-resources/*[name() = $control-name]"/>
     </xsl:template>
 
@@ -288,7 +288,7 @@
                     <xforms:group appearance="xxforms:internal" xxbl:scope="inner">
                         <!-- Variable pointing to external node -->
                         <xforms:var id="binding" name="binding" as="node()?">
-                            <xxforms:sequence select="." xxbl:scope="outer"/>
+                            <xxforms:sequence value="." xxbl:scope="outer"/>
                         </xforms:var>
 
                         <xforms:action ev:event="xforms-enabled xforms-value-changed" ev:observer="binding">
@@ -316,7 +316,7 @@
 
                         <!-- Expose internally a variable pointing to Form Runner resources -->
                         <xforms:var name="fr-resources" as="element()?">
-                            <xxforms:sequence select="$fr-resources" xxbl:scope="outer"/>
+                            <xxforms:sequence value="$fr-resources" xxbl:scope="outer"/>
                         </xforms:var>
 
                         <xforms:group appearance="xxforms:internal">

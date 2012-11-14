@@ -63,7 +63,7 @@
                             </xforms:instance>
                         </xforms:model>
 
-                        <xxforms:variable name="local" value="instance()"/>
+                        <xforms:var name="local" value="instance()"/>
 
                         <!-- Set the focus on the first button in the dialog. This is done:
                              a) For usability: so users can press enter to activate the button, or press tab to go to

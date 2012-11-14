@@ -123,15 +123,15 @@
                                         <!-- Message -->
                                         <xhtml:span class="message">
                                             <!-- Bunch of regexps to escape, parse links, users, and hash tags with the message -->
-                                            <xxforms:variable name="markup-replaced" as="xs:string"
+                                            <xforms:var name="markup-replaced" as="xs:string"
                                                               select="replace(replace(text, '&lt;', '&amp;lt;'), '&quot;', '&amp;quot;')"/>
-                                            <xxforms:variable name="url-replaced" as="xs:string"
+                                            <xforms:var name="url-replaced" as="xs:string"
                                                               select="replace($markup-replaced, '([A-Za-z]+://[A-Za-z0-9\-_]+\.[A-Za-z0-9\-_:%&amp;\?/.=]+)',
                                                                         '&lt;a href=''$1''>$1&lt;/a>')"/>
-                                            <xxforms:variable name="user-replaced" as="xs:string"
+                                            <xforms:var name="user-replaced" as="xs:string"
                                                               select="replace($url-replaced, '[@]+([A-Za-z0-9\-_]+)',
                                                                         '&lt;a href=''http://twitter.com/$1'' rel=''nofollow''>@$1&lt;/a>')"/>
-                                            <xxforms:variable name="hash-replaced" as="xs:string"
+                                            <xforms:var name="hash-replaced" as="xs:string"
                                                               select="replace($user-replaced, '[##]+([A-Za-z0-9\-_]+)',
                                                                         '&lt;a href=''http://search.twitter.com/search?q=%23$1'' rel=''nofollow''>#$1&lt;/a>')"/>
 

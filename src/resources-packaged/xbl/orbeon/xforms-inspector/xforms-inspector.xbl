@@ -27,15 +27,15 @@
         <xbl:handlers>
             <xbl:handler event="fr-log" phase="target" defaultAction="cancel">
                 <xf:action if="instance('inspector-instance')/function = 'view-console'">
-                    <xxf:variable name="shown-output" select="instance('inspector-instance')/shown-output"/>
-                    <xxf:variable name="xml-indent" select="instance('inspector-instance')/xsl:output"/>
+                    <xf:var name="shown-output" value="instance('inspector-instance')/shown-output"/>
+                    <xf:var name="xml-indent" value="instance('inspector-instance')/xsl:output"/>
                     <!-- Add newline if we already have content shown -->
                     <xf:setvalue ref="$shown-output" value="concat(., if (. = '') then '' else '&#x0a;')"/>
 
                     <xf:action iterate="event('fr-messages')">
-                        <xxf:variable name="position" select="position()"/>
-                        <xxf:variable name="current" select="."/>
-                        <xxf:variable name="is-xml" select="$current instance of element()"/>
+                        <xf:var name="position" value="position()"/>
+                        <xf:var name="current" value="."/>
+                        <xf:var name="is-xml" value="$current instance of element()"/>
                         <!-- Add a space between values -->
                         <xf:setvalue if="$position != 1" ref="$shown-output" value="concat(., ' ')"/>
                         <xf:setvalue ref="$shown-output" value="concat(., if ($is-xml) then
@@ -56,12 +56,12 @@
                 <xf:action ev:event="xforms-enabled" ev:observer="inspector-group" ev:target="inspector-group">
                     <!-- Initialize itemset -->
                     <xf:action iterate="xxf:list-models()">
-                        <xxf:variable name="current-model-id" select="." as="xs:string"/>
+                        <xf:var name="current-model-id" value="." as="xs:string"/>
                         <xf:action context="instance('inspector-itemset')">
                             <xf:insert context="." ref="model" origin="xxf:element('model', xxf:attribute('id', $current-model-id))"/>
                         </xf:action>
                         <xf:action iterate="xxf:list-instances($current-model-id)">
-                            <xxf:variable name="current-instance-id" select="." as="xs:string"/>
+                            <xf:var name="current-instance-id" value="." as="xs:string"/>
                             <xf:action context="instance('inspector-itemset')/model[last()]">
                                 <xf:insert context="." ref="instance" origin="xxf:element('instance', xxf:attribute('id', $current-instance-id))"/>
                             </xf:action>
@@ -91,7 +91,7 @@
                     </instance>
                 </xf:instance>
 
-                <xxf:variable name="xml-indent" select="instance('inspector-instance')/xsl:output"/>
+                <xf:var name="xml-indent" value="instance('inspector-instance')/xsl:output"/>
                 <xf:bind ref="instance('inspector-instance')">
                     <xf:bind ref="current-instance" readonly="false()" calculate="if (. = '') then instance('inspector-itemset') /model[@id = instance('inspector-instance')/current-model]/instance[1]/@id else ."/>
                     <xf:bind ref="xpath" readonly="../function != 'evaluate-xpath'"/>
@@ -144,7 +144,7 @@
                     <xf:group appearance="xxf:internal">
                         <xf:dispatch ev:event="xforms-value-changed" name="DOMActivate" target="inspector-xpath"/>
                         <!-- Model -->
-                        <xxf:variable name="models" select="instance('inspector-itemset')/model"/>
+                        <xf:var name="models" value="instance('inspector-itemset')/model"/>
                         <xf:group ref=".[count($models) gt 1]" class="fr-xforms-inspector-model">
                             <xf:select1 ref="instance('inspector-instance')/current-model" appearance="minimal">
                                 <xf:label>Model: </xf:label>
@@ -201,8 +201,8 @@
                 </xh:div>
 
                 <!-- Input, only shown if user has an instance 'fr-xforms-inspector-input' -->
-                <xxf:variable name="external-input"><xxf:sequence select="xxf:instance('fr-xforms-inspector-input')" xxbl:scope="outer"/></xxf:variable>
-                <xxf:variable name="internal-input" select="instance('inspector-instance')/input"/>
+                <xf:var name="external-input"><xxf:sequence value="xxf:instance('fr-xforms-inspector-input')" xxbl:scope="outer"/></xf:var>
+                <xf:var name="internal-input" value="instance('inspector-instance')/input"/>
                 <xf:group ref=".[exists($external-input)]">
                     <xh:div class="fr-xforms-inspector-block fr-xforms-inspector-{if (instance('inspector-instance')/function = 'view-console') then 'enabled' else 'disabled'}-function">
                         <xf:input ref="$internal-input" incremental="true">
@@ -216,8 +216,8 @@
                 <xh:div class="fr-xforms-inspector-source" id="fr-xforms-inspector">
                     <xf:group ref="instance('inspector-instance')" appearance="xxf:internal">
                         <!-- NOTE: We can't use a calculate for this, as it would only be execute if something in the current model changes -->
-                        <xxf:variable name="current-instance" select="xxf:instance(current-instance, true())"/>
-                        <xxf:variable name="shown-output" select="
+                        <xf:var name="current-instance" value="xxf:instance(current-instance, true())"/>
+                        <xf:var name="shown-output" value="
                                 if (function = 'view-instance') then
                                     if (mode = 'formatted')
                                         then saxon:serialize($current-instance, $xml-indent)
@@ -232,7 +232,7 @@
                                         else xpath-output
                                 else shown-output">
                             <xf:setvalue ev:event="xforms-enabled xforms-value-changed" ref="shown-output" value="$shown-output"/>
-                        </xxf:variable>
+                        </xf:var>
                         <fr:code-mirror ref="shown-output"/>
                     </xf:group>
                 </xh:div>

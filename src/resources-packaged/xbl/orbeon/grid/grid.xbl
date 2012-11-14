@@ -213,9 +213,9 @@
 
                                                         <xsl:if test="$is-editable">
                                                             <!-- Point to this td -->
-                                                            <xxf:variable name="td" value="$grid/*:tr[{$static-row-pos}]/*:td[{$static-col-pos}]" as="element()"/>
+                                                            <xf:var name="td" value="$grid/*:tr[{$static-row-pos}]/*:td[{$static-col-pos}]" as="element()"/>
                                                             <!-- Point to the contained control -->
-                                                            <xxf:variable name="control" value="$td/*[1]" as="element()?"/>
+                                                            <xf:var name="control" value="$td/*[1]" as="element()?"/>
                                                         </xsl:if>
 
                                                         <xh:td>

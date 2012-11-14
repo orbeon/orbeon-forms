@@ -67,13 +67,13 @@
         <xhtml:h2>Table</xhtml:h2>
         <xhtml:table class="zebra-table">
             <xforms:repeat nodeset="company" id="company-repeat">
-                <xxforms:variable name="company-name" select="@name"/>
+                <xforms:var name="company-name" value="@name"/>
                 <xforms:repeat nodeset="department" id="department-repeat">
-                    <xxforms:variable name="department-name" select="@name"/>
-                    <xxforms:variable name="department-position" select="position()"/>
+                    <xforms:var name="department-name" value="@name"/>
+                    <xforms:var name="department-position" value="position()"/>
                     <xforms:repeat nodeset="employee" id="employee-repeat">
-                        <xxforms:variable name="employee-name" select="@name"/>
-                        <xxforms:variable name="employee-position" select="position()"/>
+                        <xforms:var name="employee-name" value="@name"/>
+                        <xforms:var name="employee-position" value="position()"/>
                         <xhtml:tr class="{if ((count(preceding::employee)  + 1) mod 2 = 1) then 'table-row-odd' else 'table-row-even'}">
                             <xhtml:td>
                                 <xforms:output value="if ($department-position = 1 and $employee-position = 1) then $company-name else ''"/>

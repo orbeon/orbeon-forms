@@ -73,14 +73,14 @@
                             <xxforms:script>YAHOO.xbl.fr.Recaptcha.instance(this).init();</xxforms:script>
                             <!-- Copy value of private key to local model -->
                             <!-- NOTE: We don't use xxbl:parameter() as we don't want the private key to get to the client -->
-                            <xxforms:variable name="private-key">
-                                <xxforms:sequence select="{if (fr:private-key/@ref) then fr:private-key/@ref else 'xxforms:property(''oxf.xforms.xbl.fr.recaptcha.private-key'')'}" xxbl:scope="outer"/>
-                            </xxforms:variable>
+                            <xforms:var name="private-key">
+                                <xxforms:sequence value="{if (fr:private-key/@ref) then fr:private-key/@ref else 'xxforms:property(''oxf.xforms.xbl.fr.recaptcha.private-key'')'}" xxbl:scope="outer"/>
+                            </xforms:var>
                             <xforms:setvalue ref="privatekey" value="$private-key" xxbl:scope="inner"/>
                         </xforms:action>
 
                         <xforms:action ev:event="fr-verify">
-                            <xxforms:variable name="did-entered-value" select="response != ''"/>
+                            <xforms:var name="did-entered-value" value="response != ''"/>
                             <!-- Do verification if user entered a value -->
                             <xforms:action if="$did-entered-value">
                                 <xforms:message level="xxforms:log-debug" value="saxon:serialize(instance('verify-request'), 'xml')"/>
@@ -90,8 +90,8 @@
                                 <xforms:setvalue ref="challenge"/>
                                 <xforms:setvalue ref="response"/>
                                 <!-- Parse the response -->
-                                <xxforms:variable name="lines" select="tokenize(instance('verify-response-text'), '\n')"/>
-                                <xxforms:variable name="is-success" select="$lines[1] = 'true'"/>
+                                <xforms:var name="lines" value="tokenize(instance('verify-response-text'), '\n')"/>
+                                <xforms:var name="is-success" value="$lines[1] = 'true'"/>
                                 <!-- Dispatch success event -->
                                 <xforms:dispatch if="$is-success" targetid="fr-recaptcha" name="fr-verify-done"/>
                                 <!-- Dispatch failure event -->

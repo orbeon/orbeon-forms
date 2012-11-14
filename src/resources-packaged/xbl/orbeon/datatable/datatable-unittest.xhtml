@@ -632,9 +632,9 @@
                         <xforms:action ev:event="fr-update-sort">
                             <xforms:setvalue ref="instance('controls')/sortOrder" value="if (instance('controls')/sortedColumn = event('fr-column') and . = 'ascending') then 'descending' else 'ascending'"/>
                             <xforms:setvalue ref="instance('controls')/sortedColumn" value="event('fr-column')"/>
-                            <xxforms:variable name="column" select="('position', 'text', 'length', 'nb-words')[event('fr-column')]"/>
-                            <xxforms:variable name="type" select="('number', 'text', 'number', 'number')[event('fr-column')]"/>
-                            <xxforms:variable name="sorted" select="exf:sort(instance('detailed-lorem')/line, $column, $type, instance('controls')/sortOrder)"/>
+                            <xforms:var name="column" value="('position', 'text', 'length', 'nb-words')[event('fr-column')]"/>
+                            <xforms:var name="type" value="('number', 'text', 'number', 'number')[event('fr-column')]"/>
+                            <xforms:var name="sorted" value="exf:sort(instance('detailed-lorem')/line, $column, $type, instance('controls')/sortOrder)"/>
                             <xforms:delete ref="instance('detailed-lorem')/line"/>
                             <xforms:insert context="instance('detailed-lorem')" origin="$sorted"/>
                         </xforms:action>

@@ -42,7 +42,7 @@
                         </xforms:instance>
 
                         <!-- NOTE: This doesn't work properly because the binds are not re-evaluated when just the outer readonly MIP changes -->
-                        <xxforms:variable name="ctx" context="xxforms:component-context()" xbl:attr="select=ref" as="node()*"/>
+                        <xforms:var name="ctx" context="xxforms:component-context()" xbl:attr="value=ref" as="node()*"/>
                         <xforms:bind nodeset="." readonly="exforms:readonly($ctx)"/>
 
                         <xforms:action ev:event="xforms-model-construct-done">
@@ -57,7 +57,7 @@
                     <xforms:group xbl:attr="ref bind" id="component-group">
                         <xbl:content includes="xforms|label,xforms|help,xforms|hint"/>
 
-                        <xxforms:variable name="result" select="." as="node()?"/>
+                        <xforms:var name="result" value="." as="node()?"/>
 
                         <!-- React to update to bound node -->
                         <xforms:group ref="$result" appearance="xxforms:internal" id="component-result-group">

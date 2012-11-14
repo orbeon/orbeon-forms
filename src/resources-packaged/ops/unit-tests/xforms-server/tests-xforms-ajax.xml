@@ -558,7 +558,7 @@
                                         <xf:bind ref="date" calculate="xs:date('error3')"/>                         <!-- XPath error on calculate value -->
                                         <xf:bind ref="date" required="xs:date('error4') = current-date()"/>         <!-- XPath error on boolean MIP -->
                                     </xf:bind>
-                                    <xxf:variable ref=".[@show = 'true']" name="var1" select="xs:date('error5')"/>  <!-- XPath error on variable value -->
+                                    <xf:var ref=".[@show = 'true']" name="var1" value="xs:date('error5')"/>  <!-- XPath error on variable value -->
                                 </xf:model>
                             </xh:head>
                             <xh:body>
@@ -579,7 +579,7 @@
                                 </xf:trigger>
 
                                 <xf:group ref=".[@show = 'true']">
-                                    <xxf:variable name="var2" select="xs:date('error6')"/>                          <!-- XPath error on variable value -->
+                                    <xf:var name="var2" value="xs:date('error6')"/>                          <!-- XPath error on variable value -->
                                     <xf:input ref=".[xs:date('error7') = current-date()]"/>                         <!-- XPath error on control binding -->
                                     <xf:output value="xs:date('error8')"/>                                          <!-- XPath error on control value -->
                                     <xf:select ref="select">
@@ -677,7 +677,7 @@
                                             <xf:bind ref="date" calculate="xs:date('error3')"/>                         <!-- XPath error on calculate value -->
                                             <xf:bind ref="date" required="xs:date('error4') = current-date()"/>         <!-- XPath error on boolean MIP -->
                                         </xf:bind>
-                                        <xxf:variable ref=".[@show = 'true']" name="var1" select="xs:date('error5')"/>  <!-- XPath error on variable value -->
+                                        <xf:var ref=".[@show = 'true']" name="var1" value="xs:date('error5')"/>  <!-- XPath error on variable value -->
                                     </xf:model>
                                 </xh:head>
                                 <xh:body>
@@ -698,7 +698,7 @@
                                     </xf:trigger>
 
                                     <xf:group ref=".[@show = 'true']">
-                                        <xxf:variable name="var2" select="xs:date('error6')"/>                          <!-- XPath error on variable value -->
+                                        <xf:var name="var2" value="xs:date('error6')"/>                          <!-- XPath error on variable value -->
                                         <xf:input ref=".[xs:date('error7') = current-date()]"/>                         <!-- XPath error on control binding -->
                                         <xf:output value="xs:date('error8')"/>                                          <!-- XPath error on control value -->
                                         <xf:select ref="select">

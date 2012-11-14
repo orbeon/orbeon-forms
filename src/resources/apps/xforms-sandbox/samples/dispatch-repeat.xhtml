@@ -44,7 +44,7 @@
             <xforms:label>Dispatch</xforms:label>
             <xforms:action ev:event="DOMActivate">
                 <!-- Save current index -->
-                <xxforms:variable name="initial-index" select="index('my-repeat')"/>
+                <xforms:var name="initial-index" value="index('my-repeat')"/>
                 <!-- Iterate through all values -->
                 <xforms:action iterate="value">
                     <!-- Set index and dispatch event -->

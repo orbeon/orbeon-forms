@@ -180,7 +180,7 @@
             <xforms:action ev:event="xforms-model-construct-done">
 
                 <!-- Load source form -->
-                <xxforms:variable name="source-form" select="xxforms:get-request-attribute('fr-form-definition')"/>
+                <xforms:var name="source-form" value="xxforms:get-request-attribute('fr-form-definition')"/>
                 <xforms:action if="exists($source-form)">
                     <!-- Got it from the request -->
                     <xforms:message level="xxforms:log-debug">Got source form from request.</xforms:message>

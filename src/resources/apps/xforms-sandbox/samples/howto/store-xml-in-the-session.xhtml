@@ -29,7 +29,7 @@
     </xhtml:head>
     <xhtml:body>
         <xhtml:div>
-            <xxforms:variable name="value-exists" select="instance('from-session')/value != ''"/>
+            <xforms:var name="value-exists" value="instance('from-session')/value != ''"/>
             <xforms:group ref=".[not($value-exists)]">No value was found in the session.</xforms:group>
             <xforms:group ref=".[$value-exists]">The value found in the session is: <xforms:output value="instance('from-session')/value"/></xforms:group>
         </xhtml:div>

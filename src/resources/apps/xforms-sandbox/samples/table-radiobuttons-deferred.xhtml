@@ -51,7 +51,7 @@
                 <xhtml:th>Code</xhtml:th>
             </xhtml:tr>
             <xforms:repeat nodeset="instance('countries')/country[position() lt 20]">
-                <xxforms:variable name="country" select="."/>
+                <xforms:var name="country" value="."/>
                 <xhtml:tr>
                     <xhtml:td>
                         <!-- Note the xxforms:group attribute which allows toggling the buttons in deferred events mode -->

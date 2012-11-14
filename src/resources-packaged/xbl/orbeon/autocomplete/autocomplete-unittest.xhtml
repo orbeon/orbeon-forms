@@ -189,11 +189,11 @@
                                      dynamic-itemset="true">
                         <!-- React to user searching -->
                         <xforms:action ev:event="fr-search-changed">
-                            <xxforms:variable name="search-value" select="event('fr-search-value')"/>
-                            <xxforms:variable name="make-suggestion" select="for $l in string-length($search-value) return $l >= 2 or $l = 0"/>
+                            <xforms:var name="search-value" value="event('fr-search-value')"/>
+                            <xforms:var name="make-suggestion" value="for $l in string-length($search-value) return $l >= 2 or $l = 0"/>
                             <xforms:action if="$make-suggestion">
                                 <!-- Update itemset -->
-                                <xxforms:variable name="make-suggestion" select="string-length() >= 2"/>
+                                <xforms:var name="make-suggestion" value="string-length() >= 2"/>
                                 <xforms:setvalue ref="instance('search-dynamic')/country-name" value="$search-value"/>
                                 <xforms:send submission="update-countries"/>
                                 <xforms:insert context="instance('searched-countries')" ref="country"

@@ -23,13 +23,13 @@
             <xf:instance id="instance1">
                 <instance>42</instance>
             </xf:instance>
-            <xxf:variable name="mv" select="instance()"/>
+            <xf:var name="mv" value="instance()"/>
         </xf:model>
         <xf:model id="model2">
             <xf:instance id="instance2">
                 <instance>43</instance>
             </xf:instance>
-            <xxf:variable name="mv" select="instance()"/>
+            <xf:var name="mv" value="instance()"/>
         </xf:model>
     </xh:head>
     <xh:body>
@@ -54,8 +54,8 @@
             <xf:output id="output4c" model="model2" value="$mv"/>
         </xf:group>
 
-        <xxf:variable name="mv1" select="$mv"/>
-        <xxf:variable name="mv2" model="model2" select="$mv"/>
+        <xf:var name="mv1" value="$mv"/>
+        <xf:var name="mv2" model="model2" value="$mv"/>
 
         <xf:output id="output5a" value="$mv1"/>
         <xf:output id="output5b" value="$mv2"/>

@@ -95,7 +95,7 @@
                                         <xsl:if test="$collapse">
                                             <!-- Handle DOMActivate event to open/close the switches -->
                                             <xforms:action ev:event="DOMActivate">
-                                                <xxforms:variable name="expand" select="xxforms:case('switch') = 'case-closed'" as="xs:boolean"/>
+                                                <xforms:var name="expand" value="xxforms:case('switch') = 'case-closed'" as="xs:boolean"/>
                                                 <xforms:action if="$expand">
                                                     <!-- Expand -->
                                                     <xf:setvalue ref="instance('open')">true</xf:setvalue>

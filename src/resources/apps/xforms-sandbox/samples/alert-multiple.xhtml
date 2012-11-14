@@ -62,7 +62,7 @@
 
         <xhtml:ul>
             <xforms:repeat nodeset="instance('instance')/*">
-                <xxforms:variable name="invalid-binds" select="xxforms:invalid-binds(.)"/>
+                <xforms:var name="invalid-binds" value="xxforms:invalid-binds(.)"/>
                 <xforms:repeat nodeset="for $bind-id in $invalid-binds return xxforms:element('bind-id', $bind-id)">
                     <xhtml:li>
                         <xforms:output value="if ($invalid-binds = 'must-be-present') then 'Age missing'

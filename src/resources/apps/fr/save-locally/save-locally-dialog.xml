@@ -38,7 +38,7 @@
 
     <xforms:model id="fr-save-locally-model">
 
-        <xxforms:variable name="parameters" select="xxforms:instance('fr-parameters-instance')"/>
+        <xforms:var name="parameters" value="xxforms:instance('fr-parameters-instance')"/>
 
         <!-- Contains the UUID returned after the document has been produced from us to be able to retrieve that document -->
         <xforms:instance id="fr-uuid">
@@ -52,7 +52,7 @@
         <xforms:action ev:observer="fr-save-locally-button" ev:event="DOMActivate">
             <xforms:setvalue ref="xxforms:instance('fr-persistence-instance')/save-attempted">true</xforms:setvalue>
 
-            <xxforms:variable name="fr-resources" model="fr-resources-model" select="$fr-fr-resources" as="element(resource)?"/>
+            <xforms:var name="fr-resources" model="fr-resources-model" value="$fr-fr-resources" as="element(resource)?"/>
             <xforms:insert nodeset="instance('fr-uuid')" origin="xxforms:call-xpl('oxf:/apps/fr/save-locally/save-generate.xpl',
                     ('form-instance', 'parameters', 'fr-current-resources'), (xxforms:instance('fr-form-instance'), $parameters, $fr-resources),
                     'uuid')"/>

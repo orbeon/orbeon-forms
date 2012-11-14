@@ -20,7 +20,7 @@
 
         <xi:include href="datatable-unittest-model.xml"/>
 
-        <xxforms:variable name="basic-nodeset"
+        <xforms:var name="basic-nodeset"
             select="
             for $line in line[string-length(.) &lt; 20] return
                 xxforms:element( 'line', (
@@ -191,7 +191,7 @@
                             <xhtml:thead>
                                 <xhtml:tr>
                                     <xhtml:th>Position</xhtml:th>
-                                    <xxforms:variable name="cpw">Characters per word</xxforms:variable>
+                                    <xforms:var name="cpw">Characters per word</xforms:var>
                                     <xforms:repeat ref="line[1]/*">
                                         <xhtml:th>
                                             <xforms:output value="name()"/>
@@ -205,8 +205,8 @@
                             <xhtml:tbody>
                                 <xforms:repeat ref="line[length &lt; 20]">
                                     <xhtml:tr>
-                                        <xxforms:variable name="position" select="position()"/>
-                                        <xxforms:variable name="cpw" select="round(length div nb-words)"/>
+                                        <xforms:var name="position" value="position()"/>
+                                        <xforms:var name="cpw" value="round(length div nb-words)"/>
                                         <xhtml:td>
                                             <xforms:output value="$position"/>
                                         </xhtml:td>
@@ -419,11 +419,11 @@
                 <xhtml:div>
                     <xhtml:p/>
                     <xforms:group ref="instance('detailed-lorem')">
-                        <xxforms:variable name="sortOrder" select="instance('controls')/sortOrder"/>
-                        <xxforms:variable name="nodeset" select="line[length &lt; 20]"/>
-                        <xxforms:variable name="class"
+                        <xforms:var name="sortOrder" value="instance('controls')/sortOrder"/>
+                        <xforms:var name="nodeset" value="line[length &lt; 20]"/>
+                        <xforms:var name="class"
                             select="if ($sortOrder='ascending') then 'yui-dt-asc' else if ($sortOrder='descending') then 'yui-dt-desc' else ''"/>
-                        <xxforms:variable name="sortedNodeset"
+                        <xforms:var name="sortedNodeset"
                             select="
                                     if ($sortOrder='none')
                                         then $nodeset
@@ -634,10 +634,10 @@
                 <xhtml:div>
                     <xhtml:p/>
                     <xforms:group ref="instance('detailed-lorem')">
-                        <xxforms:variable name="nbRows" select="count(line)"/>
-                        <xxforms:variable name="rowsPerPage" select="instance('controls')/rowsPerPage"/>
-                        <xxforms:variable name="nbPages" select="ceiling($nbRows div $rowsPerPage)"/>
-                        <xxforms:variable name="page" select="instance('controls')/page"/>
+                        <xforms:var name="nbRows" value="count(line)"/>
+                        <xforms:var name="rowsPerPage" value="instance('controls')/rowsPerPage"/>
+                        <xforms:var name="nbPages" value="ceiling($nbRows div $rowsPerPage)"/>
+                        <xforms:var name="page" value="instance('controls')/page"/>
 
                         <fr:datatable id="paginateExternal-table" debug="false" paginated="true" maxNbPagesToDisplay="7"
                             sortAndPaginationMode="external" page="$page" nbPages="$nbPages">

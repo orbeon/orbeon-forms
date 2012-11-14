@@ -109,14 +109,14 @@
                     <xhtml:th>Result</xhtml:th>
                 </xhtml:tr>
                 <xforms:repeat nodeset="reports/report">
-                    <xxforms:variable name="report" select="."/>
+                    <xforms:var name="report" value="."/>
                     <xforms:repeat nodeset="testcase">
-                        <xxforms:variable name="testcase" select="."/>
-                        <xxforms:variable name="testcase-position" select="position()"/>
+                        <xforms:var name="testcase" value="."/>
+                        <xforms:var name="testcase-position" value="position()"/>
                         <xforms:repeat nodeset="test[@result = 'fail']">
                             <xhtml:tr>
-                                <xxforms:variable name="test" select="."/>
-                                <xxforms:variable name="test-position" select="position()"/>
+                                <xforms:var name="test" value="."/>
+                                <xforms:var name="test-position" value="position()"/>
                                 <!-- Page -->
                                 <xhtml:td>
                                     <xforms:output value="substring-before($report/@page, '?orbeon-theme=plain')"/>

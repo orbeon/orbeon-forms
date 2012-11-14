@@ -211,7 +211,7 @@
             <xhtml:legend>Actions</xhtml:legend>
             <xforms:group>
                 <xforms:action ev:event="DOMActivate">
-                    <xxforms:variable name="enabled" select="enabled[@section = (if(event('xxforms:targetid') = 'toggle-outer') then 'outer' else 'inner')]"/>
+                    <xforms:var name="enabled" value="enabled[@section = (if(event('xxforms:targetid') = 'toggle-outer') then 'outer' else 'inner')]"/>
                     <xforms:setvalue ref="$enabled" value="if (. = 'true') then 'false' else 'true'"/>
                     <xforms:toggle case="{$enabled/@section}-{if ($enabled = 'true') then 'enabled' else 'disabled'}"/>
                 </xforms:action>

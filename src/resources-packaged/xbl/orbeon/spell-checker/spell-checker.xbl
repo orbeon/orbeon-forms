@@ -77,10 +77,10 @@
                         <xforms:send submission="spell-check-submission"/>
                         <!-- Iterate over the correction and insert <t> elements between <c> elements to represent the normal text (non-corrections) -->
                         <xforms:action iterate="instance('fr-spell-checker-result')/c">
-                            <xxforms:variable name="current-c" select="."/>
-                            <xxforms:variable name="position" select="position()"/>
-                            <xxforms:variable name="following-c" select="$current-c/following-sibling::c[1]"/>
-                            <xxforms:variable name="offset-after-current-c" select="$current-c/@o + $current-c/@l"/>
+                            <xforms:var name="current-c" value="."/>
+                            <xforms:var name="position" value="position()"/>
+                            <xforms:var name="following-c" value="$current-c/following-sibling::c[1]"/>
+                            <xforms:var name="offset-after-current-c" value="$current-c/@o + $current-c/@l"/>
                             <!-- If this is the first <c>, consider inserting a <t> before -->
                             <xforms:action if="$position = 1">
                                 <xforms:insert if="$current-c/@o > 0" ref="." position="before" origin="xxforms:element('t', (xxforms:attribute('o', '0'), xxforms:attribute('l', $current-c/@o)))"/>
@@ -91,7 +91,7 @@
                             </xforms:action>
                             <!-- If this is the last <c>, consider insert a <t> after -->
                             <xforms:action if="empty($following-c)">
-                                <xxforms:variable name="text-length" select="string-length(instance('fr-spell-checker-request')/text)"/>
+                                <xforms:var name="text-length" value="string-length(instance('fr-spell-checker-request')/text)"/>
                                 <xforms:insert if="$text-length > $offset-after-current-c" ref="." position="after" origin="xxforms:element('t', (xxforms:attribute('o', $offset-after-current-c), xxforms:attribute('l', $text-length - $offset-after-current-c)))"/>
                             </xforms:action>
                         </xforms:action>
@@ -106,7 +106,7 @@
 
                     <!-- Prepare UI for the next correction -->
                     <xforms:action ev:event="prepare-next-correction">
-                        <xxforms:variable name="current-c" select="(instance('fr-spell-checker-result')/c[empty(@handled)])[1]"/>
+                        <xforms:var name="current-c" value="(instance('fr-spell-checker-result')/c[empty(@handled)])[1]"/>
                         <xforms:action if="exists($current-c)">
                             <xforms:setvalue ref="instance('fr-spell-checker-internal')/unknown-word" value="$current-c/@current"/>
                             <xforms:setvalue ref="instance('fr-spell-checker-internal')/correction" value="tokenize($current-c, '\s')[1]"/>
@@ -140,7 +140,7 @@
                 </xforms:model>
 
                 <!-- The currently considered correction -->
-                <xxforms:variable name="current-c" select="(instance('fr-spell-checker-result')/c[empty(@handled)])[1]"/>
+                <xforms:var name="current-c" value="(instance('fr-spell-checker-result')/c[empty(@handled)])[1]"/>
 
                 <!-- On open, set focus -->
                 <xforms:action ev:event="xxforms-dialog-open">
@@ -272,9 +272,9 @@
         </xbl:resources>
         <xbl:template xxbl:transform="oxf:unsafe-xslt">
             <xforms:group appearance="xxforms:internal" xsl:version="2.0">
-                <xxforms:variable name="binding" as="node()?">
-                    <xxforms:sequence select="." xxbl:scope="outer" xbl:attr="model context ref bind"/>
-                </xxforms:variable>
+                <xforms:var name="binding" as="node()?">
+                    <xxforms:sequence value="." xxbl:scope="outer" xbl:attr="model context ref bind"/>
+                </xforms:var>
                 <xforms:group ref="$binding" id="container">
                     <!-- Trigger that starts spell checking -->
                     <fr:button class="fr-spell-checker-start" id="spell-check">

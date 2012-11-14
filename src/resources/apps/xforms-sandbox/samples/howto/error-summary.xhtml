@@ -116,7 +116,7 @@
                             <xhtml:span>Save</xhtml:span>
                         </xforms:label>
                         <xforms:action ev:event="DOMActivate">
-                            <xxforms:variable name="save-succeeded" select="instance('ui')/errors-count = 0"/>
+                            <xforms:var name="save-succeeded" value="instance('ui')/errors-count = 0"/>
                             <xforms:action if="$save-succeeded">
                                 <xforms:toggle case="save-success"/>
                             </xforms:action>

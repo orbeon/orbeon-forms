@@ -42,7 +42,7 @@
                     <xforms:group xbl:attr="ref bind">
                         <xbl:content includes="xforms|label,xforms|help,xforms|hint"/>
 
-                        <xxforms:variable name="result" select="." as="node()*"/>
+                        <xforms:var name="result" value="." as="node()*"/>
                         <xforms:group ref="$result" appearance="xxforms:internal">
                             <xforms:action ev:event="xforms-value-changed">
                                 <xforms:setvalue model="dateTime-model" ref="instance('dateTime-instance')/date" value="context()/substring-before(., 'T')"/>

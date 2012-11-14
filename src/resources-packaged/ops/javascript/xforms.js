@@ -2091,9 +2091,18 @@ ORBEON.xforms.Controls = {
     },
 
     setHintMessage: function(control, message) {
+        // Destroy existing tooltip if it was for a control which isn't anymore in the DOM
+        var tooltips = ORBEON.xforms.Globals.hintTooltipForControl;
+        if (tooltips[control.id] != null) {
+            if (tooltips[control.id].cfg.getProperty('context')[0] != control)
+                tooltips[control.id] = null
+        }
+
         if (YAHOO.util.Dom.hasClass(control, "xforms-trigger") || YAHOO.util.Dom.hasClass(control, "xforms-submit")) {
             // For triggers, the value is stored in the title for the control
-            if (ORBEON.xforms.Globals.hintTooltipForControl[control.id] == null) {
+
+
+            if (tooltips[control.id] == null) {
                 // We only update the title if we don't have already a YUI hint widget.
                 // If we do, updating the value in the YUI widget is enough. The YUI widget empties the content of the
                 // title attribute to avoid the text in the title from showing. If we set the title, we might have
@@ -2105,7 +2114,7 @@ ORBEON.xforms.Controls = {
             ORBEON.xforms.Controls._setMessage(control, "hint", message);
         }
         // If there is already a YUI hint created for that control, update the message for the YUI widget
-        ORBEON.xforms.Controls._setTooltipMessage(control, message, ORBEON.xforms.Globals.hintTooltipForControl);
+        ORBEON.xforms.Controls._setTooltipMessage(control, message, tooltips);
     },
 
     _setTooltipMessage: function(control, message, tooltipForControl) {

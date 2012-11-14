@@ -342,6 +342,8 @@ a.xforms-readonly, .xforms-trigger-readonly a { color: gray; cursor: default }
     padding-top: 2px; padding-bottom: 2px;      /* Compensate for the lost border by adding some padding */
 }
 
+.yui-tt-shadow { display: none }                /* Remove shadow, which now looks tacky, and also for issue #581 */
+
 /* ***** Repeats **************************************************************************************************** */
 
 .xforms-repeat-selected-item-1 {

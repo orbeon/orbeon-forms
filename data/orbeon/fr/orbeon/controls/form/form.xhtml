@@ -42,21 +42,21 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                         <output>Great love and great achievements involve great risk.</output>
                         <secret>42</secret>
                     </text-controls>
-                    <section-45>
+                    <typed-controls>
                         <email>info@orbeon.com</email>
                         <us-phone>5555555555</us-phone>
                         <number>888</number>
                         <currency>10.99</currency>
                         <us-state>CA</us-state>
-                    </section-45>
-                    <typed-controls>
+                    </typed-controls>
+                    <date-time-controls>
                         <date>2009-10-16</date>
                         <time>17:47:57</time>
                         <datetime>2009-10-16T17:48:03</datetime>
                         <dropdown-date>2009-10-16</dropdown-date>
                         <fields-date>2009-10-16</fields-date>
                         <date-picker>2009-10-16</date-picker>
-                    </typed-controls>
+                    </date-time-controls>
                     <selection-controls>
                         <dropdown>cat</dropdown>
                         <radio-buttons>cat</radio-buttons>
@@ -77,9 +77,6 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                         <browser-button/>
                         <link-button/>
                     </buttons>
-                    <other-controls>
-                        <inplace-input>Be kind whenever possible. It is always possible.</inplace-input>
-                    </other-controls>
                     <us-address>
                         <street-number>1600</street-number>
                         <street-name>Pennsylvania Avenue NW</street-name>
@@ -99,7 +96,7 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                     <xforms:bind ref="output" id="output-bind" name="output"/>
                     <xforms:bind ref="htmlarea" id="htmlarea-bind" name="htmlarea"/>
                 </xforms:bind>
-                <xforms:bind id="typed-controls-bind" ref="typed-controls" name="typed-controls">
+                <xforms:bind id="date-time-controls-bind" ref="date-time-controls" name="date-time-controls">
                     <xforms:bind id="date-bind" ref="date" type="xforms:date" name="date"/>
                     <xforms:bind id="time-bind" ref="time" type="xforms:time" name="time"/>
                     <xforms:bind id="datetime-bind" ref="datetime" type="xforms:dateTime" name="datetime"/>
@@ -127,10 +124,7 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                     <xforms:bind id="file-attachment-bind" ref="file-attachment" type="xs:anyURI" name="file-attachment"/>
                     <xforms:bind ref="static-image" id="static-image-bind" type="xforms:anyURI" name="static-image"/>
                 </xforms:bind>
-                <xforms:bind name="other-controls" id="other-controls-bind" ref="other-controls">
-                    <xforms:bind ref="inplace-input" id="inplace-input-bind" name="inplace-input"/>
-                </xforms:bind>
-                <xforms:bind name="section-45" id="section-45-bind" ref="section-45">
+                <xforms:bind name="typed-controls" id="typed-controls-bind" ref="typed-controls">
                     <xforms:bind ref="email" id="email-bind" type="xforms:email" name="email"/>
                     <xforms:bind ref="currency" id="currency-bind" type="xforms:decimal" name="currency"/>
                     <xforms:bind xmlns:fb="http://orbeon.org/oxf/xml/form-builder" ref="us-phone" id="us-phone-bind" constraint=". = '' or matches(., '^\d{10}$')" name="us-phone"/>
@@ -142,13 +136,11 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
             <xforms:instance xmlns:fb="http://orbeon.org/oxf/xml/form-builder" xxforms:readonly="true" id="fr-form-metadata">
                 <metadata>
                     <application-name>orbeon</application-name>
-                    <form-name>form-controls</form-name>
+                    <form-name>controls</form-name>
                     <title xml:lang="en">Form Builder Controls</title>
                     <description xml:lang="en">This form shows all the built-in controls supported by Form Builder</description>
-                    <title xml:lang="fr">Form Builder Controls</title>
-                    <description xml:lang="fr"/>
-                    <author/>
-                    <logo mediatype="" filename="" size=""/>
+                    <title xml:lang="fr">Contrôles de Form Builder</title>
+                    <description xml:lang="fr">Ce formulaire montre tous les contrôles supportés par Form Builder</description>
                 </metadata>
             </xforms:instance>
             <xforms:instance id="fr-form-attachments">
@@ -196,12 +188,6 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                             <help/>
                             <alert/>
                         </us-state>
-                        <inplace-input>
-                            <label>In-place Input</label>
-                            <hint>Click to enter some text</hint>
-                            <help/>
-                            <alert/>
-                        </inplace-input>
                         <browser-button>
                             <label>Browser Button</label>
                             <hint>Standard browser button</hint>
@@ -396,7 +382,7 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                         </textarea>
                         <htmlarea>
                             <label>Formatted Text</label>
-                            <hint>Standard HTML area</hint>
+                            <hint>Rich text editor</hint>
                             <help/>
                             <alert/>
                         </htmlarea>
@@ -404,10 +390,10 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                             <label>Text Controls</label>
                             <help/>
                         </text-controls>
-                        <section-45>
+                        <typed-controls>
                             <label>Typed Controls</label>
                             <help/>
-                        </section-45>
+                        </typed-controls>
                         <input>
                             <label>Input Field</label>
                             <hint>Standard input field</hint>
@@ -426,18 +412,14 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                             <help/>
                             <alert>Missing or incorrect password</alert>
                         </secret>
-                        <typed-controls>
+                        <date-time-controls>
                             <label>Date and Time</label>
                             <help/>
-                        </typed-controls>
+                        </date-time-controls>
                         <buttons>
                             <label>Buttons</label>
                             <help/>
                         </buttons>
-                        <other-controls>
-                            <label>Other Controls</label>
-                            <help/>
-                        </other-controls>
                         <us-address>
                             <label>US Address Template</label>
                             <help/>
@@ -495,12 +477,6 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                             <help/>
                             <alert/>
                         </us-state>
-                        <inplace-input>
-                            <label>In-place Input</label>
-                            <hint>Click to enter some text</hint>
-                            <help/>
-                            <alert/>
-                        </inplace-input>
                         <browser-button>
                             <label>Bouton</label>
                             <hint>Bouton navigateur standard</hint>
@@ -695,7 +671,7 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                         </textarea>
                         <htmlarea>
                             <label>Texte formatté</label>
-                            <hint>Standard HTML area</hint>
+                            <hint>Editeur de texte enrichi</hint>
                             <help/>
                             <alert/>
                         </htmlarea>
@@ -703,10 +679,10 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                             <label>Contrôles texte</label>
                             <help/>
                         </text-controls>
-                        <section-45>
+                        <typed-controls>
                             <label>Contrôles typés</label>
                             <help/>
-                        </section-45>
+                        </typed-controls>
                         <input>
                             <label>Champ de texte</label>
                             <hint>Champ de texte standard</hint>
@@ -725,18 +701,14 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                             <help/>
                             <alert>Mot de passe manquant ou incorrect</alert>
                         </secret>
-                        <typed-controls>
+                        <date-time-controls>
                             <label>Contrôles date et heure</label>
                             <help/>
-                        </typed-controls>
+                        </date-time-controls>
                         <buttons>
                             <label>Boutons</label>
                             <help/>
                         </buttons>
-                        <other-controls>
-                            <label>Autres contrôles</label>
-                            <help/>
-                        </other-controls>
                         <us-address>
                             <label>Modèle Adresse US</label>
                             <help/>
@@ -965,9 +937,9 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                         </xhtml:tr>
                     </fr:grid>
                 </fr:section>
-                <fr:section id="section-45-control" bind="section-45-bind">
-                    <xforms:label ref="$form-resources/section-45/label"/>
-                    <xforms:help ref="$form-resources/section-45/help"/>
+                <fr:section id="typed-controls-control" bind="typed-controls-bind">
+                    <xforms:label ref="$form-resources/typed-controls/label"/>
+                    <xforms:help ref="$form-resources/typed-controls/help"/>
                     <fr:grid>
                         <xhtml:tr>
                             <xhtml:td>
@@ -1016,9 +988,9 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                         </xhtml:tr>
                     </fr:grid>
                 </fr:section>
-                <fr:section id="typed-controls-section" bind="typed-controls-bind">
-                    <xforms:label ref="$form-resources/typed-controls/label"/>
-                    <xforms:help ref="$form-resources/typed-controls/help"/>
+                <fr:section id="date-time-controls-section" bind="date-time-controls-bind">
+                    <xforms:label ref="$form-resources/date-time-controls/label"/>
+                    <xforms:help ref="$form-resources/date-time-controls/help"/>
                     <fr:grid columns="3">
                         <xhtml:tr>
                             <xhtml:td>
@@ -1251,24 +1223,6 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                                     <xforms:alert ref="$fr-resources/detail/labels/alert"/>
                                 </xforms:trigger>
                             </xhtml:td>
-                            <xhtml:td/>
-                        </xhtml:tr>
-                    </fr:grid>
-                </fr:section>
-                <fr:section id="other-controls-control" bind="other-controls-bind">
-                    <xforms:label ref="$form-resources/other-controls/label"/>
-                    <xforms:help ref="$form-resources/other-controls/help"/>
-                    <fr:grid>
-                        <xhtml:tr>
-                            <xhtml:td>
-                                <fr:inplace-input bind="inplace-input-bind" id="inplace-input-control">
-                                    <xforms:label ref="$form-resources/inplace-input/label"/>
-                                    <xforms:hint ref="$form-resources/inplace-input/hint"/>
-                                    <xforms:help ref="$form-resources/inplace-input/help"/>
-                                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
-                                </fr:inplace-input>
-                            </xhtml:td>
-                            <xhtml:td/>
                             <xhtml:td/>
                         </xhtml:tr>
                     </fr:grid>

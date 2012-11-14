@@ -113,6 +113,7 @@ $ ->
                         ((f$.height clickInterceptor) - (f$.height labelInput)) / 2
                     left: interceptorOffset.left
                 f$.offset inputOffset, labelInput
+                f$.offset inputOffset, labelInput   # Workaround for issue on Chrome, see https://github.com/orbeon/orbeon-forms/issues/572
                 f$.width (f$.width labelAnchor) - 10, labelInput
                 f$.focus labelInput
 

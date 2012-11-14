@@ -89,7 +89,7 @@ $ ->
                     labelInput = $ '<input class="fb-edit-section-label"/>'
                     f$.append labelInput, $ '.fb-main'
                     labelInput.on 'blur', -> if f$.is ':visible', labelInput then sendNewLabelValue()
-                    labelInput.on 'keypress', (e) -> if e.charCode == 13 then sendNewLabelValue()
+                    labelInput.on 'keypress', (e) -> if e.which == 13 then sendNewLabelValue()
                     Events.ajaxResponseProcessedEvent.subscribe -> f$.hide labelInput
                 interceptorOffset = Builder.adjustedOffset clickInterceptor
                 # From the section title, get the anchor element, which contains the title

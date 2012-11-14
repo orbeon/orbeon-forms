@@ -67,6 +67,11 @@
                     </xsl:element>
                 </xsl:template>
 
+                <!-- Disable all event handlers at design time -->
+                <xsl:template match="@ev:event | @event">
+                    <xsl:attribute name="fb:{local-name()}" select="."/>
+                </xsl:template>
+
                 <!--
                     fr:view:
                     - copied over along with nested fr:buttons

@@ -63,6 +63,11 @@
                     </xsl:element>
                 </xsl:template>
 
+                <!-- Restore event handlers -->
+                <xsl:template match="@fb:event">
+                    <xsl:attribute name="ev:{local-name()}" select="."/>
+                </xsl:template>
+
                 <xsl:template match="xforms:group[p:has-class('fb-body')]">
                     <fr:body>
                         <xsl:apply-templates select="node() except *[@class = 'fb-annotation']"/>

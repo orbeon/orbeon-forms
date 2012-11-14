@@ -91,16 +91,16 @@
     </xhtml:head>
     <xhtml:body>
         <xforms:group id="flickr-main-body">
-            <p style="background: white; padding: 0.5em">
+            <xhtml:p style="background: white; padding: 0.5em">
                 Enter one or more Flickr tags below (for example "mountains") and press "enter" or
                 the "Find" button. You can then use the slider to resize the images returned.
-            </p>
-            <table class="flicker-slider-table">
-                <tr>
-                    <th>
+            </xhtml:p>
+            <xhtml:table class="flicker-slider-table">
+                <xhtml:tr>
+                    <xhtml:th>
                         Flickr tags:
-                    </th>
-                    <td colspan="2">
+                    </xhtml:th>
+                    <xhtml:td colspan="2">
                         <xforms:input ref="tags">
                             <xforms:label>Tags:</xforms:label>
                             <xforms:send ev:event="DOMActivate" submission="flickr-submission"/>
@@ -108,26 +108,26 @@
                         <xforms:submit submission="flickr-submission">
                             <xforms:label>Find</xforms:label>
                         </xforms:submit>
-                    </td>
-                </tr>
-                <tr>
-                    <th>
+                    </xhtml:td>
+                </xhtml:tr>
+                <xhtml:tr>
+                    <xhtml:th>
                         Image size:
-                    </th>
-                    <td>
+                    </xhtml:th>
+                    <xhtml:td>
                         <xforms:range ref="instance('control-instance')/size" incremental="true" start="10" end="200" id="image-size">
                             <xforms:label>Size:</xforms:label>
                         </xforms:range>
-                    </td>
-                    <td>
+                    </xhtml:td>
+                    <xhtml:td>
                         <xforms:output ref="instance('control-instance')/size"/>
-                    </td>
-                </tr>
-            </table>
+                    </xhtml:td>
+                </xhtml:tr>
+            </xhtml:table>
             <xforms:switch>
                 <xforms:case id="case-start"/>
                 <xforms:case id="case-busy">
-                    <img src="/images/loading.gif" alt="Busy"/>
+                    <xhtml:img src="/images/loading.gif" alt="Busy"/>
                 </xforms:case>
                 <xforms:case id="case-done" selected="true">
                     <xforms:group ref="instance('response-instance')">
@@ -150,7 +150,6 @@
                                        )"
                                     mediatype="text/html"
                                     class="flickr-image"/>
-                            <span style="display: none">x</span><!-- This is a hack for IE so that images flow. Better solutions welcome. -->
                         </xforms:repeat>
                     </xforms:group>
                 </xforms:case>
@@ -158,13 +157,9 @@
             <xforms:output ref="instance('response-instance')/err/@msg">
                 <xforms:label>Error:</xforms:label>
             </xforms:output>
-            <p style="font-size: smaller">
-                This XForms example is based on a <a
-                href="http://skimstone.x-port.net/index.php?q=node/89">tutorial</a> by Mark Birbeck.
-            </p>
+            <xhtml:p style="font-size: smaller">
+                This XForms example is based on a tutorial by Mark Birbeck.
+            </xhtml:p>
         </xforms:group>
-
-        <!--<fr:xforms-inspector xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>-->
-
     </xhtml:body>
 </xhtml:html>

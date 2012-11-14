@@ -82,7 +82,6 @@ case class AbstractBinding(
     def modeAllXForms  = xblMode("xforms")
     def modeBinding    = modeAllXForms || xblMode("binding")
     def modeValue      = modeAllXForms || xblMode("value")
-    def modeUIEvents   = modeAllXForms || xblMode("ui-events")
     def modeLHHA       = modeAllXForms || xblMode("lhha")
     def modeItemset    = modeAllXForms || xblMode("itemset")
 

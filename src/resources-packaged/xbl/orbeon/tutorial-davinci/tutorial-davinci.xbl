@@ -11,41 +11,41 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xbl:xbl xmlns:xhtml="http://www.w3.org/1999/xhtml"
-         xmlns:xforms="http://www.w3.org/2002/xforms"
+<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
          xmlns:ev="http://www.w3.org/2001/xml-events"
-         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
 
-    <xbl:binding element="fr|tutorial-davinci" id="fr-tutorial-davinci" xxbl:mode="binding lhha">
-        <xbl:implementation>
-            <!-- Local model -->
-            <xforms:model>
-                <xforms:instance>
-                    <value/>
-                </xforms:instance>
-            </xforms:model>
-        </xbl:implementation>
+    <xbl:binding element="fr|tutorial-davinci" id="fr-tutorial-davinci" xxbl:mode="xforms">
+        <xbl:handlers>
+            <!-- When the control comes to life or its value changes, copy the new value to the local model after
+                 reversing it -->
+            <xbl:handler event="xforms-enabled xforms-value-changed"
+                         ref="instance()"
+                         value="codepoints-to-string(
+                                  reverse(
+                                    string-to-codepoints(
+                                      xxf:binding('fr-tutorial-davinci'))))"/>
+        </xbl:handlers>
         <xbl:template>
-            <!-- When the external single-node binding comes to life or its value changes, copy it to the
-                 local value after reversing it -->
-            <xforms:var name="value" value="xxforms:binding('fr-tutorial-davinci')/string()">
-                <xforms:setvalue
-                    ev:event="xforms-enabled xforms-value-changed"
-                    ref="instance()"
-                    value="codepoints-to-string(reverse(string-to-codepoints($value)))"/>
-            </xforms:var>
+            <!-- Local model and instance -->
+            <xf:model>
+                <xf:instance><value/></xf:instance>
+            </xf:model>
             <!-- Input points to the internal value -->
-            <xforms:input ref="instance()">
+            <xf:input ref="instance()">
                 <!-- When the local value changes, copy it to the external single-node binding after reversing it -->
-                <xforms:setvalue
-                    ev:event="xforms-value-changed"
-                    ref="xxforms:binding('fr-tutorial-davinci')"
-                    value="codepoints-to-string(reverse(string-to-codepoints(context())))"/>
-            </xforms:input>
+                <xf:setvalue event="xforms-value-changed"
+                             ref="xxf:binding('fr-tutorial-davinci')"
+                             value="codepoints-to-string(
+                                      reverse(
+                                        string-to-codepoints(
+                                          instance())))"/>
+            </xf:input>
         </xbl:template>
     </xbl:binding>
 </xbl:xbl>

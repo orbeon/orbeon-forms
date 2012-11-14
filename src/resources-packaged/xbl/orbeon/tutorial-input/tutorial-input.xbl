@@ -11,31 +11,19 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xbl:xbl xmlns:xhtml="http://www.w3.org/1999/xhtml"
-         xmlns:xforms="http://www.w3.org/2002/xforms"
+<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
          xmlns:ev="http://www.w3.org/2001/xml-events"
-         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
 
-    <xbl:binding element="fr|tutorial-input" id="fr-tutorial-input">
+    <xbl:binding element="fr|tutorial-input" id="fr-tutorial-input" xxbl:mode="binding lhha">
         <xbl:template>
-            <!-- Outer group implementing the single-node binding -->
-            <xforms:group xbl:attr="model context ref bind" xxbl:scope="outer">
-                <!-- Copy LHHA elements if any -->
-                <xbl:content includes=":root > xforms|label, :root > xforms|help, :root > xforms|hint, :root > xforms|alert"/>
-                <!-- Inner group -->
-                <xforms:group xxbl:scope="inner">
-                    <!-- Variable pointing to external single-node binding -->
-                    <xxforms:variable name="binding" as="node()?">
-                        <xxforms:sequence select="." xxbl:scope="outer"/>
-                    </xxforms:variable>
-                    <!-- Input points to the external single-node binding -->
-                    <xforms:input ref="$binding"/>
-                </xforms:group>
-            </xforms:group>
+            <!-- Input points to the external single-node binding -->
+            <xf:input ref="xxf:binding('fr-tutorial-input')"/>
         </xbl:template>
     </xbl:binding>
 </xbl:xbl>

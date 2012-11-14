@@ -3430,13 +3430,9 @@
         </input>
         <output name="response">
             <controls>
-                <xhtml:span id="my-input$xf-3" class="xforms-group">
-                    <xhtml:span id="my-input$xf-4" class="xforms-group">
-                        <xhtml:span id="my-input$xf-7" class="xforms-control xforms-input">
-                            <xhtml:input id="my-input$xf-7$xforms-input-1" type="text" name="my-input$xf-7$xforms-input-1" value="" class="xforms-input-input"/>
-                        </xhtml:span>
-                    </xhtml:span>
-                </xhtml:span>
+                <xh:span id="my-input$xf-3" class="xforms-control xforms-input">
+                    <xh:input id="my-input$xf-3$xforms-input-1" type="text" name="my-input$xf-3$xforms-input-1" value="" class="xforms-input-input"/>
+                </xh:span>
             </controls>
         </output>
     </test>
@@ -3802,7 +3798,7 @@
         </output>
     </test>
 
-    <test description="Event handlers with and without xxbl:mode='handlers'" name="oxf:pipeline">
+    <test description="Event handlers with and without xxbl:mode='nohandlers'" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xh:html>

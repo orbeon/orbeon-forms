@@ -1,3 +1,5 @@
+# XForms span layout
+
 Plain input:
 
     <xf:input id="my-new-input" ref="default">

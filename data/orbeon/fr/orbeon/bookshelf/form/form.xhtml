@@ -1,6 +1,6 @@
 <!--
   Copyright (C) 2010 Orbeon, Inc.
-  
+
   This program is free software; you can redistribute it and/or modify it under the terms of the
   GNU Lesser General Public License as published by the Free Software Foundation; either version
   2.1 of the License, or (at your option) any later version.
@@ -11,19 +11,18 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:xh="http://www.w3.org/1999/xhtml"
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
       xmlns:xf="http://www.w3.org/2002/xforms"
       xmlns:xs="http://www.w3.org/2001/XMLSchema"
       xmlns:ev="http://www.w3.org/2001/xml-events"
       xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
-    <head>
-        <style type="text/css">
+    <xh:head>
+        <xh:style type="text/css">
             <!-- To prevent the first grid to become too tall -->
             #image-output-control.xforms-mediatype-image { max-height: 200px }
             .fr-mode-view .fr-grid-content { padding: 0 }
-        </style>
+        </xh:style>
         <xf:model id="fr-form-model" xxf:help-tooltip="false" xxf:noscript-support="false" xxf:xpath-analysis="true">
             <!-- Inline schema -->
             <xs:schema elementFormDefault="qualified" attributeFormDefault="unqualified">
@@ -94,7 +93,7 @@
                                 <xs:length value="0"/>
                             </xs:restriction>
                         </xs:simpleType>
-                    </xs:union>                    
+                    </xs:union>
                 </xs:simpleType>
 
                 <!-- Type for language -->
@@ -160,13 +159,11 @@
             <xf:instance id="fr-form-metadata" xxf:readonly="true">
                 <metadata xmlns="">
                     <application-name>orbeon</application-name>
-                    <form-name>bookcast</form-name>
+                    <form-name>bookshelf</form-name>
                     <title xml:lang="en">Orbeon Forms Bookshelf</title>
                     <description xml:lang="en">Orbeon Forms Bookshelf is a simple form allowing you to gather information about books.</description>
                     <title xml:lang="fr">Orbeon Forms Bookshelf</title>
                     <description xml:lang="fr">Orbeon Forms Bookshelf présente un formulaire simple qui vous permet de saisir des informations sur des livres.</description>
-                    <author>Orbeon, Inc.</author>
-                    <logo mediatype="" filename="" size=""/>
                 </metadata>
             </xf:instance>
 
@@ -419,8 +416,8 @@
             </xf:instance>
 
         </xf:model>
-    </head>
-    <body>
+    </xh:head>
+    <xh:body>
         <fr:view>
             <fr:body>
                 <fr:section id="details-section" bind="details-bind">
@@ -445,7 +442,7 @@
                                 </xf:input>
                             </fr:td>
                             <fr:td rowspan="3">
-                                <xf:upload id="image-upload-control" bind="image-bind" class="fr-attachment">
+                                <fr:image-attachment id="image-upload-control" bind="image-bind" class="fr-attachment">
                                     <xf:label ref="$form-resources/image/label"/>
                                     <xf:hint ref="$form-resources/image/hint"/>
                                     <xf:help ref="$form-resources/image/help"/>
@@ -453,8 +450,7 @@
                                     <xf:filename ref="@filename"/>
                                     <xf:mediatype ref="@mediatype"/>
                                     <xxf:size ref="@size"/>
-                                </xf:upload>
-                                <xf:output id="image-output-control" ref="image" mediatype="image/*" value="."/>
+                                </fr:image-attachment>
                             </fr:td>
                         </fr:tr>
                         <fr:tr>
@@ -537,5 +533,5 @@
                 </fr:section>
             </fr:body>
         </fr:view>
-    </body>
-</html>
+    </xh:body>
+</xh:html>

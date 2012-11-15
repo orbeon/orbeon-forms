@@ -1,0 +1,537 @@
+<!--
+  Copyright (C) 2010 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
+      xmlns:xf="http://www.w3.org/2002/xforms"
+      xmlns:xs="http://www.w3.org/2001/XMLSchema"
+      xmlns:ev="http://www.w3.org/2001/xml-events"
+      xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+      xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+    <xh:head>
+        <xh:style type="text/css">
+            <!-- To prevent the first grid to become too tall -->
+            #image-output-control.xforms-mediatype-image { max-height: 200px }
+            .fr-mode-view .fr-grid-content { padding: 0 }
+        </xh:style>
+        <xf:model id="fr-form-model" xxf:help-tooltip="false" xxf:noscript-support="false" xxf:xpath-analysis="true">
+            <!-- Inline schema -->
+            <xs:schema elementFormDefault="qualified" attributeFormDefault="unqualified">
+
+                <!-- Individual book element -->
+                <xs:element name="book">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="details" type="details"/>
+                            <xs:element name="notes" type="notes"/>
+                        </xs:sequence>
+                        </xs:complexType>
+                </xs:element>
+
+                <xs:complexType name="details">
+                    <xs:sequence>
+                        <xs:element name="title" type="xs:string"/>
+                        <xs:element name="author" type="xs:string"/>
+                        <xs:element name="language" type="language"/>
+                        <xs:element name="link" type="link"/>
+                        <xs:element name="rating" type="rating"/>
+                        <xs:element name="publication-year" type="publication-year"/>
+                        <xs:element name="review" type="xs:string"/>
+                        <xs:element name="image" type="image"/>
+                    </xs:sequence>
+                </xs:complexType>
+
+                <xs:complexType name="notes">
+                    <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                        <xs:element name="note" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+
+                <!-- Type for image -->
+                <xs:complexType name="image">
+                    <xs:simpleContent>
+                        <xs:extension base="xs:anyURI">
+                            <xs:attribute name="filename"/>
+                            <xs:attribute name="mediatype"/>
+                            <xs:attribute name="size"/>
+                        </xs:extension>
+                    </xs:simpleContent>
+                </xs:complexType>
+
+                <!-- Type for rating -->
+                <xs:simpleType name="rating">
+                    <xs:restriction base="xs:string">
+                        <xs:enumeration value=""/>
+                        <xs:enumeration value="1"/>
+                        <xs:enumeration value="2"/>
+                        <xs:enumeration value="3"/>
+                        <xs:enumeration value="4"/>
+                        <xs:enumeration value="5"/>
+                    </xs:restriction>
+                </xs:simpleType>
+
+                <!-- Type for publication year -->
+                <xs:simpleType name="publication-year">
+                    <xs:union>
+                        <xs:simpleType>
+                            <xs:restriction base="xs:integer">
+                                <xs:minInclusive value="0"/>
+                                <xs:maxExclusive value="10000"/>
+                            </xs:restriction>
+                        </xs:simpleType>
+                        <xs:simpleType>
+                            <xs:restriction base="xs:string">
+                                <xs:length value="0"/>
+                            </xs:restriction>
+                        </xs:simpleType>
+                    </xs:union>
+                </xs:simpleType>
+
+                <!-- Type for language -->
+                <xs:simpleType name="language">
+                    <xs:restriction base="xs:string">
+                        <xs:enumeration value=""/>
+                        <xs:enumeration value="de"/>
+                        <xs:enumeration value="en"/>
+                        <xs:enumeration value="fr"/>
+                        <xs:enumeration value="es"/>
+                        <xs:enumeration value="it"/>
+                        <xs:enumeration value="ru"/>
+                        <xs:enumeration value="zh"/>
+                    </xs:restriction>
+                </xs:simpleType>
+
+                <!-- Type for link -->
+                <xs:simpleType name="link">
+                    <xs:restriction base="xs:string">
+                        <!-- Approximative regexp for HTTP URLs -->
+                        <xs:pattern value="(https?\://([^/?#]+)(/([^?#]*)(\?([^?#]+))?(#(.*))?)?)?"/>
+                    </xs:restriction>
+                </xs:simpleType>
+
+            </xs:schema>
+
+            <!-- Instance that contains all the books -->
+            <xf:instance id="fr-form-instance" xxf:validation="strict">
+                <book xmlns="">
+                    <details>
+                        <title/>
+                        <author/>
+                        <language/>
+                        <link/>
+                        <rating/>
+                        <publication-year/>
+                        <review/>
+                        <image filename="" mediatype="" size=""/>
+                    </details>
+                    <notes>
+                        <note/>
+                    </notes>
+                </book>
+            </xf:instance>
+
+            <xf:bind id="fr-form-binds" ref=".">
+                <xf:bind id="details-bind" ref="details">
+                    <xf:bind id="title-bind" ref="title" required="true()"/>
+                    <xf:bind id="author-bind" ref="author" required="true()"/>
+                    <xf:bind id="language-bind" ref="language"/>
+                    <xf:bind id="link-bind" ref="link"/>
+                    <xf:bind id="rating-bind" ref="rating"/>
+                    <xf:bind id="publication-year-bind" ref="publication-year"/>
+                    <xf:bind id="review-bind" ref="review"/>
+                    <xf:bind id="image-bind" ref="image" type="xs:anyURI"/>
+                </xf:bind>
+                <xf:bind id="notes-bind" ref="notes">
+                    <xf:bind id="note-bind" ref="note"/>
+                </xf:bind>
+            </xf:bind>
+
+            <!-- Metadata -->
+            <xf:instance id="fr-form-metadata" xxf:readonly="true">
+                <metadata xmlns="">
+                    <application-name>orbeon</application-name>
+                    <form-name>bookshelf</form-name>
+                    <title xml:lang="en">Orbeon Forms Bookshelf</title>
+                    <description xml:lang="en">Orbeon Forms Bookshelf is a simple form allowing you to gather information about books.</description>
+                    <title xml:lang="fr">Orbeon Forms Bookshelf</title>
+                    <description xml:lang="fr">Orbeon Forms Bookshelf présente un formulaire simple qui vous permet de saisir des informations sur des livres.</description>
+                </metadata>
+            </xf:instance>
+
+            <!-- Attachments -->
+            <xf:instance id="fr-form-attachments">
+                <attachments xmlns="">
+                    <css mediatype="text/css" filename="" size=""/>
+                    <!-- Fix this once we have proper template -->
+                    <!--<pdf mediatype="application/pdf" filename="template.pdf" size="8638">/fr/service/resource/crud/orbeon/bookcast/form/template.pdf</pdf>-->
+                    <pdf mediatype="application/pdf" filename="" size=""/>
+                </attachments>
+            </xf:instance>
+
+            <!-- XForms instance containing all the resources -->
+            <xf:instance id="fr-form-resources">
+                <resources xmlns="">
+                    <resource xml:lang="en">
+                        <details>
+                            <label>Book Details</label>
+                            <help>This section contains details about the book.</help>
+                        </details>
+                        <notes>
+                            <label>Notes</label>
+                            <help>This section contains one or more notes about the book.</help>
+                        </notes>
+                        <title>
+                            <label>Title</label>
+                            <hint>Book title</hint>
+                            <help>This input contains the book title. For example...</help>
+                            <alert>The book title is missing</alert>
+                        </title>
+                        <author>
+                            <label>Author</label>
+                            <help>This input contains the book's author name.</help>
+                            <hint>Book author</hint>
+                            <alert>The author name is missing</alert>
+                        </author>
+                        <language>
+                            <label>Language</label>
+                            <hint>Book language</hint>
+                            <help>This contains the book language. For example...</help>
+                            <alert>The language selected is invalid</alert>
+                            <item>
+                                <label>Chinese</label>
+                                <value>zh</value>
+                            </item>
+                            <item>
+                                <label>English</label>
+                                <value>en</value>
+                            </item>
+                            <item>
+                                <label>French</label>
+                                <value>fr</value>
+                            </item>
+                            <item>
+                                <label>German</label>
+                                <value>de</value>
+                            </item>
+                            <item>
+                                <label>Italian</label>
+                                <value>it</value>
+                            </item>
+                            <item>
+                                <label>Russian</label>
+                                <value>ru</value>
+                            </item>
+                            <item>
+                                <label>Spanish</label>
+                                <value>es</value>
+                            </item>
+                        </language>
+                        <link>
+                            <label>Link</label>
+                            <hint>Optional link to external resource</hint>
+                            <help>This input contains a link to an external resource. For example...</help>
+                            <alert>The link must be a valid HTTP or HTTPS URL</alert>
+                        </link>
+                        <rating>
+                            <label>Rating</label>
+                            <hint>Your rating</hint>
+                            <help>This contains your rating about the book. For example...</help>
+                            <alert>The rating selected is invalid</alert>
+                            <item>
+                                <label>None</label>
+                                <value/>
+                            </item>
+                            <item>
+                                <label>1</label>
+                                <value>1</value>
+                            </item>
+                            <item>
+                                <label>2</label>
+                                <value>2</value>
+                            </item>
+                            <item>
+                                <label>3</label>
+                                <value>3</value>
+                            </item>
+                            <item>
+                                <label>4</label>
+                                <value>4</value>
+                            </item>
+                            <item>
+                                <label>5</label>
+                                <value>5</value>
+                            </item>
+                        </rating>
+                        <publication-year>
+                            <label>Publication Year</label>
+                            <hint>Year the book was published</hint>
+                            <help>This is the year the book was published. For example: "2009".</help>
+                            <alert>The year selected is invalid</alert>
+                        </publication-year>
+                        <review>
+                            <label>Review</label>
+                            <help>Your review for this book</help>
+                        </review>
+                        <image>
+                            <label>Book Cover</label>
+                            <hint>Upload a book cover image</hint>
+                            <help>This is an optional book cover image.</help>
+                            <alert>The book cover image is invalid</alert>
+                        </image>
+                        <note>
+                            <label>Note</label>
+                            <hint>Notes about this book</hint>
+                            <help>These notes contain your own comments about the book. For example...</help>
+                            <alert>The notes are invalid</alert>
+                        </note>
+                    </resource>
+                    <resource xml:lang="fr">
+                        <details>
+                            <label>Détails du livre</label>
+                            <help>Cette section contient les détails du livre.</help>
+                        </details>
+                        <notes>
+                            <label>Notes</label>
+                            <help>Cette section contient une ou plusieurs notes à propos du livre.</help>
+                        </notes>
+                        <title>
+                            <label>Titre</label>
+                            <hint>Titre du livre</hint>
+                            <help>Ce champ contient le titre du livre, par exemple...</help>
+                            <alert>Le titre du livre manque</alert>
+                        </title>
+                        <author>
+                            <label>Auteur</label>
+                            <help>Ce champ contient le nom de l'auteur du livre.</help>
+                            <hint>Auteur du livre</hint>
+                            <alert>L'auteur du livre manque</alert>
+                        </author>
+                        <language>
+                            <label>Langue</label>
+                            <hint>Langue du livre</hint>
+                            <help>Ce champ contient la langue du livre, par exemple...</help>
+                            <alert>La langue sélectionnée est invalide</alert>
+                            <item>
+                                <label>Allemand</label>
+                                <value>de</value>
+                            </item>
+                            <item>
+                                <label>Anglais</label>
+                                <value>en</value>
+                            </item>
+                            <item>
+                                <label>Chinois</label>
+                                <value>zh</value>
+                            </item>
+                            <item>
+                                <label>Français</label>
+                                <value>fr</value>
+                            </item>
+                            <item>
+                                <label>Espagnol</label>
+                                <value>es</value>
+                            </item>
+                            <item>
+                                <label>Italien</label>
+                                <value>it</value>
+                            </item>
+                            <item>
+                                <label>Russe</label>
+                                <value>ru</value>
+                            </item>
+                        </language>
+                        <link>
+                            <label>Lien</label>
+                            <hint>Lien optionnel vers une ressource externe</hint>
+                            <help>Ce champ contient un lien vers une ressource externe, par exemple...</help>
+                            <alert>Le lien doit être un URL HTTP ou HTTPS valide</alert>
+                        </link>
+                        <rating>
+                            <label>Evaluation</label>
+                            <hint>Votre évaluation</hint>
+                            <help>Ce champ contient votre évaluation du livre, par exemple...</help>
+                            <alert>L'évaluation sélectionnée est invalide</alert>
+                            <item>
+                                <label>Aucune</label>
+                                <value/>
+                            </item>
+                            <item>
+                                <label>1</label>
+                                <value>1</value>
+                            </item>
+                            <item>
+                                <label>2</label>
+                                <value>2</value>
+                            </item>
+                            <item>
+                                <label>3</label>
+                                <value>3</value>
+                            </item>
+                            <item>
+                                <label>4</label>
+                                <value>4</value>
+                            </item>
+                            <item>
+                                <label>5</label>
+                                <value>5</value>
+                            </item>
+                        </rating>
+                        <publication-year>
+                            <label>Année de publication</label>
+                            <hint>Année durant laquelle le livre a été publié</hint>
+                            <help>Ceci est l'année durant laquelle le livre a été publié. Par exemple: "2009".</help>
+                            <alert>L'année sélectionnée est invalide</alert>
+                        </publication-year>
+                        <review>
+                            <label>Critique</label>
+                            <help>Votre critique pour ce livre</help>
+                        </review>
+                        <image>
+                            <label>Couverture</label>
+                            <hint>Insérer une image de couverture</hint>
+                            <help>Ce champ contient une image de couverture optionnelle.</help>
+                            <alert>L'image de couverture est invalide</alert>
+                        </image>
+                        <note>
+                            <label>Note</label>
+                            <hint>Notes au sujet de ce livre</hint>
+                            <help>Ce champ de texte contient vos propres commentaires au sujet du livre, par exemple...</help>
+                            <alert>Cette note n'est pas valide</alert>
+                        </note>
+                    </resource>
+                </resources>
+            </xf:instance>
+
+            <xf:instance id="note-template">
+                <note xmlns=""/>
+            </xf:instance>
+
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <fr:view>
+            <fr:body>
+                <fr:section id="details-section" bind="details-bind">
+                    <xf:label ref="$form-resources/details/label"/>
+                    <xf:help ref="$form-resources/details/help"/>
+                    <fr:grid columns="3">
+                        <fr:tr>
+                            <fr:td>
+                                <xf:input id="title-control" bind="title-bind" class="fr-summary fr-search fr-email-subject">
+                                    <xf:label ref="$form-resources/title/label"/>
+                                    <xf:hint ref="$form-resources/title/hint"/>
+                                    <xf:help ref="$form-resources/title/help"/>
+                                    <xf:alert ref="$form-resources/title/alert"/>
+                                </xf:input>
+                            </fr:td>
+                            <fr:td>
+                                <xf:input id="author-control" bind="author-bind" class="fr-summary fr-search fr-email-subject">
+                                    <xf:label ref="$form-resources/author/label"/>
+                                    <xf:hint ref="$form-resources/author/hint"/>
+                                    <xf:help ref="$form-resources/author/help"/>
+                                    <xf:alert ref="$form-resources/author/alert"/>
+                                </xf:input>
+                            </fr:td>
+                            <fr:td rowspan="3">
+                                <fr:image-attachment id="image-upload-control" bind="image-bind" class="fr-attachment">
+                                    <xf:label ref="$form-resources/image/label"/>
+                                    <xf:hint ref="$form-resources/image/hint"/>
+                                    <xf:help ref="$form-resources/image/help"/>
+                                    <xf:alert ref="$form-resources/image/alert"/>
+                                    <xf:filename ref="@filename"/>
+                                    <xf:mediatype ref="@mediatype"/>
+                                    <xxf:size ref="@size"/>
+                                </fr:image-attachment>
+                            </fr:td>
+                        </fr:tr>
+                        <fr:tr>
+                            <fr:td>
+                                <xf:select1 id="language-control" bind="language-bind" class="fr-summary fr-search fr-width-10em">
+                                    <xf:label ref="$form-resources/language/label"/>
+                                    <xf:hint ref="$form-resources/language/hint"/>
+                                    <xf:help ref="$form-resources/language/help"/>
+                                    <xf:alert ref="$form-resources/language/alert"/>
+                                    <xf:item>
+                                        <xf:label>Choose One...</xf:label>
+                                        <xf:value/>
+                                    </xf:item>
+                                    <xf:itemset ref="$form-resources/language/item">
+                                        <xf:label ref="label"/>
+                                        <xf:value ref="value"/>
+                                    </xf:itemset>
+                                </xf:select1>
+                            </fr:td>
+                            <fr:td>
+                                <xf:input id="link-control" bind="link-bind">
+                                    <xf:label ref="$form-resources/link/label"/>
+                                    <xf:hint ref="$form-resources/link/hint"/>
+                                    <xf:help ref="$form-resources/link/help"/>
+                                    <xf:alert ref="$form-resources/link/alert"/>
+                                </xf:input>
+                            </fr:td>
+                        </fr:tr>
+                        <fr:tr>
+                            <fr:td>
+                                <xf:select1 id="rating-control" bind="rating-bind" appearance="minimal" class="fr-width-5em">
+                                    <xf:label ref="$form-resources/rating/label"/>
+                                    <xf:hint ref="$form-resources/rating/hint"/>
+                                    <xf:help ref="$form-resources/rating/help"/>
+                                    <xf:alert ref="$form-resources/rating/alert"/>
+                                    <xf:itemset ref="$form-resources/rating/item">
+                                        <xf:label ref="label"/>
+                                        <xf:value ref="value"/>
+                                    </xf:itemset>
+                                </xf:select1>
+                            </fr:td>
+                            <fr:td>
+                                <xf:input id="publication-year-control" bind="publication-year-bind" class="fr-width-5em">
+                                    <xf:label ref="$form-resources/publication-year/label"/>
+                                    <xf:hint ref="$form-resources/publication-year/hint"/>
+                                    <xf:help ref="$form-resources/publication-year/help"/>
+                                    <xf:alert ref="$form-resources/publication-year/alert"/>
+                                </xf:input>
+                            </fr:td>
+                        </fr:tr>
+                    </fr:grid>
+                    <fr:grid columns="1">
+                        <fr:tr>
+                            <fr:td>
+                                <fr:tinymce id="review-control" bind="review-bind">
+                                    <xf:label ref="$form-resources/review/label"/>
+                                    <xf:hint ref="$form-resources/review/hint"/>
+                                    <xf:help ref="$form-resources/review/help"/>
+                                    <xf:alert ref="$form-resources/review/alert"/>
+                                </fr:tinymce>
+                            </fr:td>
+                        </fr:tr>
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="notes-section" bind="notes-bind">
+                    <xf:label ref="$form-resources/notes/label"/>
+                    <xf:help ref="$form-resources/notes/help"/>
+                    <fr:grid repeat="true" ref="note" id="book-repeat" origin="instance('note-template')">
+                        <fr:tr>
+                            <fr:td>
+                                <xf:textarea id="note-control" ref="." appearance="xxf:autosize">
+                                    <xf:label ref="$form-resources/note/label"/>
+                                    <xf:hint ref="$form-resources/note/hint"/>
+                                    <xf:help ref="$form-resources/note/help"/>
+                                    <xf:alert ref="$form-resources/note/alert"/>
+                                </xf:textarea>
+                            </fr:td>
+                        </fr:tr>
+                    </fr:grid>
+                </fr:section>
+            </fr:body>
+        </fr:view>
+    </xh:body>
+</xh:html>

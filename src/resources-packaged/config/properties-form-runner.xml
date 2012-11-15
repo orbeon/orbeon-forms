@@ -146,7 +146,7 @@
     <!-- Configuration of built-in forms -->
     <property as="xs:string"  name="oxf.fr.detail.captcha.orbeon.builder"                       value=""/>
     <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.builder.form"            value="resource"/>
-    <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.bookshelf.form"          value="resource"/>
+    <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.bookshelf.form"          value="exist"/>         <!-- Be specific, as user might change the default persistence layer -->
     <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.controls.form"           value="exist"/>         <!-- Be specific, as user might change the default persistence layer -->
     <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.contact.form"            value="exist"/>         <!-- Be specific, as user might change the default persistence layer -->
     <property as="xs:string"  name="oxf.fr.detail.buttons.orbeon.controls"                      value="refresh collapse-all expand-all pdf workflow-review"/>
